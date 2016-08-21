@@ -1,0 +1,14 @@
+assignment:
+  frank-wolfe:
+    rgap: 1.0e-05
+distribution:
+  gravity:
+    convergence_level: 1.0e-10
+    max_iteractions: 50
+    max_tld: 1000
+  ipf:
+    convergence_level: 0.0001
+    max_iteractions: 50
+system:
+  cpus: 8
+  default_directory: ''

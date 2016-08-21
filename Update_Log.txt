@@ -1,0 +1,24 @@
+
+Version 0.3 - Release date: 21\August\2016
+
+%%%%%%%%%%     MAJOR BUG FIXES:     %%%%%%%%%%
+    
+    
+    
+%%%%%%%%%%     MINOR BUG FIXES:     %%%%%%%%%%
+
+
+%%%%%%%%%%     MAJOR NEW FEATURES:     %%%%%%%%%%
+
+* AequilibraE now can be used as a Python library
+
+* The whole software was re-factored with the graph defined as object and all results of procedures also defined as objects
+
+* A new tool for connecting centroids to the network has been added to the software
+
+* Computing path and showing on the map
+    
+%%%%%%%%%%     MINOR NEW FEATURES:     %%%%%%%%%%
+    
+ Network preparation:
+    * When creating a new node layer, the user can define the node ID with which the numbering starts
