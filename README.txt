@@ -1,10 +1,10 @@
 This Add-on for QGIS is developed with the intention to provide transportation planning tools in a GIS environment
 This add-on is FREE and open source.
 
-Last Version:  0.20
-Release data: March-29-2015
+Last Version:  0.30
+Release data: August-21-2016
 
-
+For more details: www.aequilibrae.com and www.xl-optim.com
 
 
 
