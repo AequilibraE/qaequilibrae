@@ -13,6 +13,7 @@
 """
 
 from qgis.core import *
+from PyQt4.QtCore import *
 import qgis
 import sys, os
 
