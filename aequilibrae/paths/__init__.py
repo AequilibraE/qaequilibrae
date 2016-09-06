@@ -27,5 +27,10 @@ if plat == 'Windows':
     if (8 * struct.calcsize("P")) == 32:
         from win32 import *
 
+if plat == 'Linux':
+    import struct
+    if (8 * struct.calcsize("P")) == 64:
+        from linux64 import *
+
 if plat == 'Darwin':
     from mac import *

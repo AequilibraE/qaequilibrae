@@ -23,8 +23,8 @@ from global_parameters import *
 from auxiliary_functions import *
 
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\forms\\")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\algorithms\\")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//forms//")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//algorithms//")
 
 
 from Network_preparation_procedure import FindsNodes
@@ -37,8 +37,8 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
 
         self.filename = False
         self.new_layer = False
-        QObject.connect(self.radioUseNodes, QtCore.SIGNAL("clicked(bool)"), self.uses_nodes)
-        QObject.connect(self.radioNewNodes, QtCore.SIGNAL("clicked(bool)"), self.uses_nodes)
+        self.radioUseNodes.clicked.connect(self.uses_nodes)
+        self.radioNewNodes.clicked.connect(self.uses_nodes)
 
         QObject.connect(self.nodelayers, SIGNAL("currentIndexChanged(QString)"), self.set_columns_nodes)
         self.pushOK.clicked.connect(self.run)

@@ -431,8 +431,7 @@ class Graph:
         must_types = [np.int64, np.int64, np.int64, np.int64]
         for field, ytype in zip(must_fields, must_types):
             if self.network[field].dtype != ytype:
-                self.status = 'Field "%s" in the network array has the wrong type. ' \
-                              'Please refer to the documentation' % field
+                self.status = 'Field "%s" in the network array has the wrong type. Please refer to the documentation' % field
 
                 # Uniqueness of the id
         link_ids = self.network['link_id']
@@ -458,8 +457,7 @@ class Graph:
         must_types = [np.int64, np.int64, np.int64, np.int64]
         for field, ytype in zip(must_fields, must_types):
             if self.graph[field].dtype != ytype:
-                self.status = 'Field "%s" in the network array has the wrong type. ' \
-                              'Please refer to the documentation' % field
+                self.status = 'Field "%s" in the network array has the wrong type. Please refer to the documentation' % field
 
                 # Uniqueness of the graph id
         a = np.bincount(self.graph['id'])

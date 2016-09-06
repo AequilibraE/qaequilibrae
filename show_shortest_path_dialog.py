@@ -31,14 +31,14 @@ from aequilibrae.paths import Graph
 from aequilibrae.paths.results import PathResults
 from aequilibrae.paths import path_computation
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\forms\\")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\aequilibrae\\")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
 # Inside def setupUi
 # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
 
-# from show_shortest_path_procedure import *
 from ui_compute_path import *
+from load_graph_layer_setting_dialog import LoadGraphLayerSettingDialog
 
 class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
     def __init__(self, iface):
@@ -50,69 +50,62 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
         self.centroids = None
         self.node_layer = None
         self.line_layer = None
+        self.node_keys = None
+        self.node_fields = None
         self.index = None
+        self.matrix = None
         self.clickTool = PointTool(self.iface.mapCanvas())
+        self.path = standard_path()
+        self.node_id = None
+
         self.res = PathResults()
         self.link_features = None
-        # For adding skims
-        self.load_graph_from_file.clicked.connect(self.loaded_new_graph_from_file)
 
-        self.cb_node_layer.currentIndexChanged.connect(partial(self.load_fields_to_ComboBoxes, self.cb_node_layer,
-                                                               self.cb_data_field, True))
-
-        self.cb_link_layer.currentIndexChanged.connect(partial(self.load_fields_to_ComboBoxes, self.cb_link_layer,
-                                                               self.cb_link_id_field, False))
-
-        self.cb_link_id_field.currentIndexChanged.connect(self.clear_memory_layer)
-
+        self.do_dist_matrix.setEnabled(False)
+        self.load_graph_from_file.clicked.connect(self.prepare_graph_and_network)
         self.from_but.clicked.connect(self.search_for_point_from)
         self.to_but.clicked.connect(self.search_for_point_to)
-
         self.do_dist_matrix.clicked.connect(self.produces_path)
 
-
-        # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
-            if layer.wkbType() in point_types:
-                self.cb_node_layer.addItem(layer.name())
-
-            if layer.wkbType() in line_types:
-                self.cb_link_layer.addItem(layer.name())
-
-        # loads default path from parameters
-        self.path = standard_path()
+    def prepare_graph_and_network(self):
+        dlg2 = LoadGraphLayerSettingDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+        if dlg2.error is None:
+            self.link_features = dlg2.link_features
+            self.line_layer = dlg2.line_layer
+            self.node_layer = dlg2.node_layer
+            self.node_keys = dlg2.node_keys
+            self.node_id = dlg2.node_id
+            self.node_fields = dlg2.node_fields
+            self.index = dlg2.index
+            self.graph = dlg2.graph
+            self.res.prepare(self.graph)
+            self.do_dist_matrix.setEnabled(True)
 
     def clear_memory_layer(self):
         self.link_features = None
-    def check_parameters(self):
-        if self.cb_node_layer.currentIndex() >= 0 and self.cb_data_field.currentIndex() >= 0:
-            return True
-        else:
-            qgis.utils.iface.messageBar().pushMessage("Wrong settings", "Please select node layer and ID field", level=3,
-                                                      duration=3)
-            return False
 
     def search_for_point_from(self):
-        if self.check_parameters():
-            self.iface.mapCanvas().setMapTool(self.clickTool)
-            QObject.connect(self.clickTool, SIGNAL("clicked"), self.fill_path_from)
-            self.from_but.setEnabled(False)
+        self.iface.mapCanvas().setMapTool(self.clickTool)
+        QObject.connect(self.clickTool, SIGNAL("clicked"), self.fill_path_from)
+        self.from_but.setEnabled(False)
 
     def search_for_point_to(self):
-        if self.check_parameters():
-            self.iface.mapCanvas().setMapTool(self.clickTool)
-            QObject.connect(self.clickTool, SIGNAL("clicked"), self.fill_path_to)
-            self.to_but.setEnabled(False)
+        self.iface.mapCanvas().setMapTool(self.clickTool)
+        QObject.connect(self.clickTool, SIGNAL("clicked"), self.fill_path_to)
+        self.to_but.setEnabled(False)
 
     def fill_path_to(self):
-        self.to_but.setEnabled(True)
         self.toNode = self.find_point()
         self.path_to.setText(str(self.toNode))
+        self.to_but.setEnabled(True)
 
     def fill_path_from(self):
-        self.from_but.setEnabled(True)
         self.fromNode = self.find_point()
         self.path_from.setText(str(self.fromNode))
+        self.from_but.setEnabled(True)
+        self.search_for_point_to()
 
     def find_point(self):
         try:
@@ -122,58 +115,14 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
             self.clickTool = PointTool(self.iface.mapCanvas())
             node_id = self.node_keys[nearest[0]]
 
-            index_field = self.node_fields.index(self.cb_data_field.currentText())
+            index_field = self.node_fields.index(self.node_id)
             node_actual_id = node_id[index_field]
             return node_actual_id
         except:
             pass
 
-    def load_fields_to_ComboBoxes(self, combobox, combofield, node_layer):
-        combofield.clear()
-        if combobox.currentIndex() >= 0:
-            layer = getVectorLayerByName(combobox.currentText())
-            for field in layer.dataProvider().fields().toList():
-                if field.type() in integer_types:
-                    combofield.addItem(field.name())
-            if node_layer:
-                # We create the spatial index used to associate the click to the network nodes
-                self.node_fields = [field.name() for field in layer.pendingFields()]
-                self.node_keys = {}
-                self.index = QgsSpatialIndex()
-                for feature in layer.getFeatures():
-                    self.index.insertFeature(feature)
-                    self.node_keys[feature.id()] = feature.attributes()
-                self.node_layer = layer
-            else:
-                self.line_layer = layer
-
-    def loaded_new_graph_from_file(self):
-        file_types = "AequilibraE graph(*.aeg)"
-
-        if len(self.graph_file_name.text()) == 0:
-            newname = QFileDialog.getOpenFileName(None, 'Result file', self.path, file_types)
-        else:
-            newname = QFileDialog.getOpenFileName(None, 'Result file', self.graph_file_name.text(), file_types)
-        self.cb_minimizing.clear()
-        self.all_centroids.setText('')
-        self.block_paths.setChecked(False)
-        if newname != None:
-            self.graph_file_name.setText(newname)
-            self.graph = Graph()
-            self.graph.load_from_disk(newname)
-            self.res.prepare(self.graph)
-
-            self.all_centroids.setText(str(self.graph.centroids))
-            if self.graph.block_centroid_flows:
-                self.block_paths.setChecked(True)
-            graph_fields = list(self.graph.graph.dtype.names)
-            self.skimmeable_fields = [x for x in graph_fields if
-                                      x not in ['link_id', 'a_node', 'b_node', 'direction', 'id', ]]
-
-            for q in self.skimmeable_fields:
-                self.cb_minimizing.addItem(q)
-
     def produces_path(self):
+        self.to_but.setEnabled(True)
         if len(self.path_from.text()) > 0 and len(self.path_to.text())> 0:
             self.res.reset()
             path_computation(int(self.path_from.text()), int(self.path_to.text()), self.graph, self.res)
@@ -194,12 +143,6 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
 
                 # If you want to create new layers
                 # This way is MUCH faster
-                if self.link_features is None:
-                    idx = self.line_layer.fieldNameIndex(self.cb_link_id_field.currentText())
-                    self.link_features = {}
-                    for feat in self.line_layer.getFeatures():
-                        link_id = feat.attributes()[idx]
-                        self.link_features[link_id] = feat
 
                 crs = self.line_layer.dataProvider().crs().authid()
                 vl = QgsVectorLayer("LineString?crs={}".format(crs), self.path_from.text() + " to " + self.path_to.text(), "memory")

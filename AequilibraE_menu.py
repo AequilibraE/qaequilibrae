@@ -24,11 +24,12 @@ from parameters_dialog import ParameterDialog
 from Network_preparation_dialog import TQ_NetPrepDialog
 from adds_connectors_dialog import AEQ_AddConnectors
 from create_graph_dialog import Graph_Creation_Dialog
-#from calibrate_gravity_dialog import CalibrateGravityDialog
 from show_shortest_path_dialog import ShortestPathDialog
-#from Transportation_modeling_dialogs import *
 from impedance_matrix_dialogs import ImpedanceMatrixDialog
+from desire_lines_dialog import DesireLinesDialog
 
+#from calibrate_gravity_dialog import CalibrateGravityDialog
+#from Transportation_modeling_dialogs import *
 #from Trip_distribution_dialogs import *
 #from GIS_tools_dialogs import *
 from simple_tag_dialog import SimpleTagDialog
@@ -151,6 +152,12 @@ class AequilibraE_menu:
         QObject.connect(self.simple_tag_action, SIGNAL("triggered()"), self.run_simple_tag)
         self.gis_tools_menu.addAction(self.simple_tag_action)
 
+        # Desire lines
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_desire_lines.png")
+        self.dlines_action = QAction(icon, u"Desire Lines", self.iface.mainWindow())
+        QObject.connect(self.dlines_action, SIGNAL("triggered()"), self.run_dlines)
+        self.gis_tools_menu.addAction(self.dlines_action)
+
         # ########################################################################
         # #################          LOOSE STUFF         #########################
 
@@ -232,5 +239,10 @@ class AequilibraE_menu:
 
     def run_simple_tag(self):
         dlg2 = SimpleTagDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_dlines(self):
+        dlg2 = DesireLinesDialog(self.iface)
         dlg2.show()
         dlg2.exec_()

@@ -23,8 +23,8 @@ from global_parameters import *
 import sys, os
 from global_parameters import *
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\forms\\")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\algorithms\\")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/algorithms/")
 
 from adds_connectors_procedure import AddsConnectorsProcedure
 from ui_ConnectingCentroids import *

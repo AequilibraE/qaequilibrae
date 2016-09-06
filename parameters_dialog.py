@@ -22,8 +22,8 @@ import sys
 import os
 import yaml
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\forms\\")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\algorithms\\")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/algorithms/")
 from ui_parameters import *
 
 
@@ -33,7 +33,7 @@ class ParameterDialog(QDialog, Ui_parameters):
         self.iface = iface
         self.setupUi(self)
 
-        self.path = os.path.dirname(os.path.abspath(__file__)) + "\\aequilibrae\\"
+        self.path = os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/"
         self.default_values = None
         self.parameter_values = None
         self.current_data = None

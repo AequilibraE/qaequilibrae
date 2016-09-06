@@ -23,8 +23,8 @@ from functools import partial
 from auxiliary_functions import *
 from global_parameters import *
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\forms\\")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\aequilibrae\\")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
 from create_graph_procedure import GraphCreation
 from ui_Create_Graph import *

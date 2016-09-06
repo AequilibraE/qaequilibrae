@@ -23,7 +23,7 @@ def main():
 
 
 def standard_path():
-    path = os.path.dirname(os.path.abspath(__file__)) + "\\aequilibrae\\"
+    path = os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/"
     with open(path + 'parameters.yml', 'r') as yml:
         path = yaml.safe_load(yml)
     return path['system']['default_directory']

@@ -9,128 +9,23 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>627</width>
-    <height>249</height>
+    <width>170</width>
+    <height>115</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Single shortest path toolbox                                    {Created by www.xl-optim.com}</string>
+   <string>Shortest path</string>
   </property>
   <property name="modal">
    <bool>false</bool>
   </property>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>10</y>
-     <width>591</width>
-     <height>91</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>GRAPH</string>
-   </property>
-   <widget class="QPushButton" name="load_graph_from_file">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>121</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load Graph file</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="graph_file_name">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>20</y>
-      <width>431</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="cb_minimizing">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>50</y>
-      <width>121</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="progress_label_2">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>52</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Minimize field:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="progress_label_3">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>50</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Centroids:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="all_centroids">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>50</y>
-      <width>51</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="block_paths">
-    <property name="geometry">
-     <rect>
-      <x>420</x>
-      <y>50</y>
-      <width>161</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Block paths through centroids</string>
-    </property>
-   </widget>
-  </widget>
   <widget class="QPushButton" name="do_dist_matrix">
    <property name="geometry">
     <rect>
-     <x>528</x>
-     <y>219</y>
-     <width>81</width>
-     <height>23</height>
+     <x>10</x>
+     <y>90</y>
+     <width>151</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="text">
@@ -140,8 +35,8 @@
   <widget class="QLineEdit" name="path_to">
    <property name="geometry">
     <rect>
-     <x>408</x>
-     <y>219</y>
+     <x>60</x>
+     <y>63</y>
      <width>100</width>
      <height>20</height>
     </rect>
@@ -150,9 +45,9 @@
   <widget class="QPushButton" name="to_but">
    <property name="geometry">
     <rect>
-     <x>368</x>
-     <y>217</y>
-     <width>35</width>
+     <x>10</x>
+     <y>62</y>
+     <width>45</width>
      <height>23</height>
     </rect>
    </property>
@@ -160,80 +55,11 @@
     <string>To</string>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>161</y>
-     <width>591</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Node Layer</string>
-   </property>
-   <widget class="QComboBox" name="cb_node_layer">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>20</y>
-      <width>221</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="cb_data_field">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>20</y>
-      <width>221</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="progress_label_4">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Layer</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="progress_label_5">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>20</y>
-      <width>51</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Node ID</string>
-    </property>
-   </widget>
-  </widget>
   <widget class="QLineEdit" name="path_from">
    <property name="geometry">
     <rect>
-     <x>248</x>
-     <y>219</y>
+     <x>60</x>
+     <y>33</y>
      <width>100</width>
      <height>20</height>
     </rect>
@@ -242,9 +68,9 @@
   <widget class="QPushButton" name="from_but">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>217</y>
-     <width>35</width>
+     <x>10</x>
+     <y>32</y>
+     <width>45</width>
      <height>23</height>
     </rect>
    </property>
@@ -252,74 +78,18 @@
     <string>From</string>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox_3">
+  <widget class="QPushButton" name="load_graph_from_file">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>105</y>
-     <width>591</width>
-     <height>51</height>
+     <x>10</x>
+     <y>3</y>
+     <width>151</width>
+     <height>21</height>
     </rect>
    </property>
-   <property name="title">
-    <string>Link Layer</string>
+   <property name="text">
+    <string>Configure</string>
    </property>
-   <widget class="QComboBox" name="cb_link_layer">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>20</y>
-      <width>221</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="cb_link_id_field">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>20</y>
-      <width>221</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="progress_label_6">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Layer</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="progress_label_7">
-    <property name="geometry">
-     <rect>
-      <x>317</x>
-      <y>20</y>
-      <width>51</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Link ID</string>
-    </property>
-   </widget>
   </widget>
  </widget>
  <resources/>

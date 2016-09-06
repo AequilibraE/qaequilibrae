@@ -16,7 +16,7 @@ from qgis.core import *
 import qgis
 import sys, os
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\forms")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms")
 
 # For the GIS tools portion
 from simple_tag_procedure import SimpleTAG
