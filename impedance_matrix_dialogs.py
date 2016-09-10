@@ -21,8 +21,8 @@ import sys, os
 import numpy as np
 from functools import partial
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\forms\\")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "\\aequilibrae\\")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 from impedance_matrix_procedures import ComputeDistMatrix
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import PathResults

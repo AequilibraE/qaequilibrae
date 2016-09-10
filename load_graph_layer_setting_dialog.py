@@ -57,6 +57,7 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
         self.node_fields = None
         self.node_keys = None
         self.error = None
+        self.graph_ok = False
 
         self.load_graph_from_file.clicked.connect(self.loaded_new_graph_from_file)
 
@@ -123,7 +124,7 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
         self.cb_minimizing.clear()
         self.all_centroids.setText('')
         self.block_paths.setChecked(False)
-        if newname != None:
+        try:
             self.graph_file_name.setText(newname)
             self.graph.load_from_disk(newname)
 
@@ -136,9 +137,12 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
 
             for q in self.skimmeable_fields:
                 self.cb_minimizing.addItem(q)
+            self.graph_ok = True
+        except:
+            pass
+
 
     def returns_configuration(self):
-
         if self.link_features is None:
             idx = self.line_layer.fieldNameIndex(self.cb_link_id_field.currentText())
             self.link_features = {}
@@ -146,11 +150,11 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
                 link_id = feat.attributes()[idx]
                 self.link_features[link_id] = feat
 
-
-        if None in [self.link_features, self.line_layer, self.node_layer, self.node_keys, self.node_fields]:
-            self.error = 'Not loaded correctly'
-        #all the logic
         self.ExitProcedure()
 
     def ExitProcedure(self):
+        if None in [self.line_layer, self.node_layer, self.node_keys, self.node_fields]:
+            self.error = 'Layers and fields not chosen correctly'
+        if not self.graph_ok:
+            self.error = 'Graph not loaded'
         self.close()

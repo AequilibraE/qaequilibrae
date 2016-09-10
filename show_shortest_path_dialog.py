@@ -71,7 +71,7 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
         dlg2 = LoadGraphLayerSettingDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
-        if dlg2.error is None:
+        if dlg2.error is None and dlg2.graph_ok:
             self.link_features = dlg2.link_features
             self.line_layer = dlg2.line_layer
             self.node_layer = dlg2.node_layer
@@ -96,6 +96,10 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
         QObject.connect(self.clickTool, SIGNAL("clicked"), self.fill_path_to)
         self.to_but.setEnabled(False)
 
+    def search_for_point_to_after_from(self):
+        self.iface.mapCanvas().setMapTool(self.clickTool)
+        QObject.connect(self.clickTool, SIGNAL("clicked"), self.fill_path_to)
+
     def fill_path_to(self):
         self.toNode = self.find_point()
         self.path_to.setText(str(self.toNode))
@@ -105,7 +109,7 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
         self.fromNode = self.find_point()
         self.path_from.setText(str(self.fromNode))
         self.from_but.setEnabled(True)
-        self.search_for_point_to()
+        self.search_for_point_to_after_from()
 
     def find_point(self):
         try:
@@ -123,7 +127,7 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
 
     def produces_path(self):
         self.to_but.setEnabled(True)
-        if len(self.path_from.text()) > 0 and len(self.path_to.text())> 0:
+        if self.path_from.text().isdigit() and self.path_to.text().isdigit():
             self.res.reset()
             path_computation(int(self.path_from.text()), int(self.path_to.text()), self.graph, self.res)
 

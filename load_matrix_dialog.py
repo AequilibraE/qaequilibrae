@@ -149,14 +149,16 @@ class LoadMatrixDialog(QtGui.QDialog, Ui_matrix_loader):
         if self.radio_npy_matrix.isChecked():
             file_types = "NumPY array(*.npy)"
             newname = QFileDialog.getOpenFileName(None, 'Result file', self.path, file_types)
-
-            if newname is not None:
+            try:
                 matrix = np.load(newname)
                 if len(matrix.shape[:]) == 2:
                     self.matrix = matrix
                     self.ExitProcedure()
                 else:
                     self.error = 'Numpy array needs to be 2 dimensional. Matrix provided has ' + str(len(matrix.shape[:]))
+            except:
+                pass
+
 
         if self.radio_omx_matrix.isChecked():
             pass

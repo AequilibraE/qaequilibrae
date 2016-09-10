@@ -14,8 +14,6 @@
 
 from qgis.core import *
 from PyQt4.QtCore import *
-import numpy as np
-from scipy.spatial import Delaunay
 import itertools
 
 from auxiliary_functions import *
@@ -26,6 +24,12 @@ from aequilibrae.paths import all_or_nothing
 
 from aequilibrae.paths import one_to_all, reblocks_matrix
 
+error = False
+try:
+    import numpy as np
+    from scipy.spatial import Delaunay
+except:
+    error = True
 
 from WorkerThread import WorkerThread
 
@@ -37,44 +41,47 @@ class DesireLinesProcedure(WorkerThread):
         self.matrix = matrix
         self.dl_type = dl_type
         self.error = None
+        if error:
+            self.error = 'Scipy and/or Numpy not installed'
         self.procedure = "ASSIGNMENT"
 
     def doWork(self):
-        layer = getVectorLayerByName(self.layer)
-        idx = layer.fieldNameIndex(self.id_field)
-        matrix = self.matrix
+        if self.error is None:
+            layer = getVectorLayerByName(self.layer)
+            idx = layer.fieldNameIndex(self.id_field)
+            matrix = self.matrix
 
-        featcount = layer.featureCount()
-        self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0,featcount))
+            featcount = layer.featureCount()
+            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0,featcount))
 
-        P = 0
-        points = []
-        point_ids = []
-        for feat in layer.getFeatures():
-            P += 1
-            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0,int(P)))
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Loading Layer Features: " + str(P) + "/" + str(featcount)))
+            P = 0
+            points = []
+            point_ids = []
+            for feat in layer.getFeatures():
+                P += 1
+                self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0,int(P)))
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Loading Layer Features: " + str(P) + "/" + str(featcount)))
 
-            point =list(feat.geometry().centroid().asPoint())
-            points.append(point)
-            point_ids.append(feat.attributes()[idx])
+                point =list(feat.geometry().centroid().asPoint())
+                points.append(point)
+                point_ids.append(feat.attributes()[idx])
 
-        points = np.array(points)
-        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, featcount))
+            points = np.array(points)
+            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, featcount))
 
-        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Preparing consistency check Matrix Vs. Zoning layer"))
+            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Preparing consistency check Matrix Vs. Zoning layer"))
 
-        vector1 = np.nonzero(np.sum(matrix, axis=0))[0]
-        vector2 = np.nonzero(np.sum(matrix, axis=1))[0]
-        nonzero = np.hstack((vector1,vector2))
+            vector1 = np.nonzero(np.sum(matrix, axis=0))[0]
+            vector2 = np.nonzero(np.sum(matrix, axis=1))[0]
+            nonzero = np.hstack((vector1,vector2))
 
-        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0,nonzero.shape[0]))
-        for i, zone in enumerate(nonzero):
-            if zone not in point_ids:
-                self.error = 'Zone ' + str(zone) + ' with positive flow not in zoning file'
-                break
-            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0,i+1))
-        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, nonzero.shape[0]))
+            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0,nonzero.shape[0]))
+            for i, zone in enumerate(nonzero):
+                if zone not in point_ids:
+                    self.error = 'Zone ' + str(zone) + ' with positive flow not in zoning file'
+                    break
+                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0,i+1))
+            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, nonzero.shape[0]))
 
         if self.error is None:
 
@@ -96,6 +103,7 @@ class DesireLinesProcedure(WorkerThread):
 
             if self.dl_type == "DesireLines":
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Creating Desire Lines"))
+                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, self.matrix.shape[0]*self.matrix.shape[1]/2))
 
                 #We create the dictionary with point information
                 all_points={}
@@ -105,8 +113,12 @@ class DesireLinesProcedure(WorkerThread):
 
                 # We are assuming that the matrix is square here. Maybe we could add more general code layer
                 desireline_link_id = 1
+                q = 0
+                all_features = []
                 for i in range(self.matrix.shape[0]):
                     for j in xrange(i+1,self.matrix.shape[1]):
+                        q += 1
+                        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
                         if self.matrix[i,j]+self.matrix[j,i] > 0:
                             a_node = i
                             a_point = QgsPoint(all_points[a_node][0], all_points[a_node][1])
@@ -118,11 +130,11 @@ class DesireLinesProcedure(WorkerThread):
                             feature.setAttributes([desireline_link_id, a_node, b_node, 0, dist,
                                                    float(self.matrix[i ,j]), float(self.matrix[j, i]),
                                                    float(self.matrix[i, j] + self.matrix[j, i])])
-                            a = dlpr.addFeatures([feature])
+                            all_features.append(feature)
+
                             desireline_link_id += 1
+                a = dlpr.addFeatures(all_features)
                 self.result_layer = desireline_layer
-
-
 
             elif self.dl_type == "DelaunayLines":
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Computing Delaunay Triangles"))
@@ -207,8 +219,6 @@ class DesireLinesProcedure(WorkerThread):
                 self.results.prepare(self.graph)
                 self.results.set_cores(1)
 
-                self.graph.save_to_disk("E:/graph.aeg")
-                print 'before assignment'
                 for O in range(self.matrix.shape[0]):
                     a = self.matrix[O, :]
                     if np.sum(a) > 0:
@@ -216,7 +226,6 @@ class DesireLinesProcedure(WorkerThread):
 
                 #all_or_nothing(self.matrix, self.graph, self.results)
 
-                print "After assignment"
                 f = self.results.link_loads[:,0]
                 link_loads = np.zeros((f.shape[0]+1, 2))
                 for i in range(f.shape[0]-1):
@@ -228,7 +237,6 @@ class DesireLinesProcedure(WorkerThread):
                     else:
                         link_loads[link_id, 1] = flow
 
-                print "Data consolidated. Writing file"
                 desireline_link_id = 1
                 for edge in edges:
                     a_node = edge[0]
