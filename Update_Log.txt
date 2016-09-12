@@ -17,6 +17,8 @@ Version 0.3 - Release date: 21\August\2016
 * A new tool for connecting centroids to the network has been added to the software
 
 * Computing path and showing on the map
+
+* Creating desire lines and delaunay lines
     
 %%%%%%%%%%     MINOR NEW FEATURES:     %%%%%%%%%%
     

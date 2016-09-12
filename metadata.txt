@@ -27,9 +27,9 @@ email=pedro@xl-optim.com
 # tags are comma separated with spaces allowed
 tags=
 
-homepage=www..xl-optim.com/AequilibraE
-tracker=
-repository= bitbucket.org/pedrocamargo/AequilibraE
+homepage=www.aequilibrae.com
+tracker=https://github.com/aequilibrae/aequilibrae/issues
+repository= https://github.com/aequilibrae/aequilibrae
 icon=icon.png
 # experimental flag
 experimental=True
