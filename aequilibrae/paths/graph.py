@@ -81,6 +81,110 @@ class Graph:
         self.__field_name__ = None
         self.__layer_name__ = None
 
+    # Create a graph from a shapefile. To be upgraded to ANY geographic file in the future
+    def create_from_geography(self, geo_file, id_field, dir_field, cost_field, skim_fields = [], anode="A_NODE", bnode="B_NODE"):
+        #try:
+        import shapefile
+        #try:
+        error = None
+        geo_file_records = shapefile.Reader(geo_file)
+        records = geo_file_records.records()
+
+        a = []
+        def find_field_index(fields, field_name):
+            for i, f in enumerate(fields):
+                if f[0] == field_name:
+                    return i - 1
+            return -1
+
+        # collect the fields in the network
+        check_titles = [id_field, dir_field, anode, bnode, cost_field]
+        id_field = find_field_index(geo_file_records.fields, id_field)
+        dir_field = find_field_index(geo_file_records.fields, dir_field)
+        cost_field = find_field_index(geo_file_records.fields, cost_field)
+        anode = find_field_index(geo_file_records.fields, anode)
+        bnode = find_field_index(geo_file_records.fields, bnode)
+
+        # Appends all fields to the list of fields to be used
+        all_types = [np.int64, np.int64, np.int64, np.float64, np.float64, np.int64]
+        all_titles = ['link_id', 'a_node', 'b_node', 'length_ab', 'length_ba', 'direction']
+        check_fields = [id_field, dir_field, anode, bnode, cost_field]
+        types_to_check = [int, int, int, int, float]
+
+        # Loads the skim index fields
+        dict_field = {}
+        for k in skim_fields:
+            skim_index = find_field_index(geo_file_records.fields, k)
+            check_fields.append(skim_index)
+            check_titles.append(k)
+            types_to_check.append(float)
+
+            all_types.append(np.float64)
+            all_types.append(np.float64)
+            all_titles.append((k + '_ab').encode('ascii', 'ignore'))
+            all_titles.append((k + '_ba').encode('ascii', 'ignore'))
+            dict_field[k + '_ab'] = skim_index
+            dict_field[k + '_ba'] = skim_index
+
+        dt = [(t, d) for t, d in zip(all_titles, all_types)]
+
+        # Check ID uniqueness and if there are any non-valid values
+        all_ids = []
+        for feat in records:
+            for i, j in enumerate(check_fields):
+                k = feat[j]
+                if not isinstance(k, types_to_check[i]):
+                    error = check_titles[i], "field has wrong type or empty values"
+                    break
+            all_ids.append(feat[check_fields[0]])
+            if error is not None:
+                break
+
+        if error is None:
+            # Checking uniqueness
+            all_ids = np.array(all_ids, np.int)
+            y = np.bincount(all_ids)
+            if np.max(y) > 1:
+                error = 'IDs are not unique.'
+
+        if error is None:
+            data = []
+
+            for feat in records:
+                line = []
+                line.append(feat[id_field])
+                line.append(feat[anode])
+                line.append(feat[bnode])
+                line.append(feat[cost_field])
+                line.append(feat[cost_field])
+                line.append(feat[dir_field])
+
+                # We append the skims now
+                for k in all_titles:
+                    if k in dict_field:
+                        line.append(feat[dict_field[k]])
+                data.append(line)
+
+            network = np.asarray(data)
+            del data
+
+            self.network = np.zeros(network.shape[0], dtype=dt)
+            for k, t in enumerate(dt):
+                self.network[t[0]] = network[:, k].astype(t[1])
+            del network
+
+            self.type_loaded = 'SHAPEFILE'
+            self.status = 'OK'
+            self.network_ok = True
+            self.prepare_graph()
+            self.__source__ = geo_file
+            self.__field_name__ = None
+            self.__layer_name__ = None
+            # except:
+            #     print "Unidentified error occurred"
+            #     print "Try creating a graph using AequilibraE's GUI in QGIS"
+        # except:
+        #     print "No Pyshp module available"
 
     # Procedure to load csv network from disk
     def load_network_from_csv(self, netw):
@@ -500,9 +604,3 @@ class Graph:
         else:
             raise ValueError('WRONG TYPE OR NULL VALUE')
         return def_type
-
-    def all_or_nothing(self, results, matrix):
-        pass
-
-    def one_to_all(self, origin, demand_vector, results, thread=0):
-        one_to_all(O, a, g, res, th, True)
