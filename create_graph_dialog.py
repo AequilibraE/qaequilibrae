@@ -14,6 +14,7 @@
 
 from qgis.core import *
 import qgis
+import numpy as np
 from PyQt4 import QtGui
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
