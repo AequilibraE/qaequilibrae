@@ -19,7 +19,6 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from auxiliary_functions import *
-from global_parameters import *
 import sys, os
 from global_parameters import *
 
