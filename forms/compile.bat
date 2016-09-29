@@ -1,4 +1,6 @@
 cd ECHO %CurrentDir%
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_report.ui -o ui_report.py
+
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_vector_loader.ui -o ui_vector_loader.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_ipf.ui -o ui_ipf.py

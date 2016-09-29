@@ -23,6 +23,7 @@ import numpy as np
 from auxiliary_functions import *
 from load_matrix_dialog import LoadMatrixDialog
 from load_vector_dialog import LoadVectorDialog
+from report_dialog import ReportDialog
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//forms//")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//algorithms//")
@@ -43,6 +44,7 @@ class IpfDialog(QDialog, Ui_ipf):
         self.setupUi(self)
         self.error = None
         self.outname = None
+        self.report = None
 
         self.path = standard_path()
 
@@ -118,6 +120,7 @@ class IpfDialog(QDialog, Ui_ipf):
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.workerThread.error, level=3)
         else:
             self.output = self.workerThread.ipf.output
+            self.report = self.workerThread.ipf.report
             np.save(self.outname, self.output)
         self.ExitProcedure()
 
@@ -130,3 +133,9 @@ class IpfDialog(QDialog, Ui_ipf):
 
     def ExitProcedure(self):
         self.close()
+        dlg2 = ReportDialog(self.iface, self.report)
+        dlg2.show()
+        dlg2.exec_()
+
+
+
