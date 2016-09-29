@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_DesireLines.ui'
 #
-# Created: Tue Sep 06 04:16:52 2016
-#      by: PyQt4 UI code generator 4.11.3
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -87,6 +86,9 @@ class Ui_DesireLines(object):
         self.lbl_matrix_loaded.setText(_fromUtf8(""))
         self.lbl_matrix_loaded.setWordWrap(False)
         self.lbl_matrix_loaded.setObjectName(_fromUtf8("lbl_matrix_loaded"))
+        self.lbl_matrix_loaded.raise_()
+        self.but_load_new_matrix.raise_()
+        self.matrix_viewer.raise_()
         self.groupBox_2 = QtGui.QGroupBox(DesireLines)
         self.groupBox_2.setGeometry(QtCore.QRect(9, 446, 621, 111))
         self.groupBox_2.setTitle(_fromUtf8(""))
@@ -127,12 +129,18 @@ class Ui_DesireLines(object):
         self.radio_delaunay.setCheckable(True)
         self.radio_delaunay.setChecked(True)
         self.radio_delaunay.setObjectName(_fromUtf8("radio_delaunay"))
+        self.progress_label.raise_()
+        self.lbl_funding2.raise_()
+        self.lbl_funding1.raise_()
+        self.progressbar.raise_()
+        self.groupBox.raise_()
+        self.groupBox_2.raise_()
 
         self.retranslateUi(DesireLines)
         QtCore.QMetaObject.connectSlotsByName(DesireLines)
 
     def retranslateUi(self, DesireLines):
-        DesireLines.setWindowTitle(_translate("DesireLines", "Graph creation toolbox - Provided by www.xl-optim.com", None))
+        DesireLines.setWindowTitle(_translate("DesireLines", "Aequilibrae - Desire Lines toolbox", None))
         self.lbl_funding2.setText(_translate("DesireLines", " www.ipea.gov.br", None))
         self.lbl_funding1.setText(_translate("DesireLines", "Partially funded by", None))
         self.progress_label.setText(_translate("DesireLines", "Status Message 0", None))

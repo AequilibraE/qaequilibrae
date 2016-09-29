@@ -23,6 +23,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms")
 from simple_tag_procedure import SimpleTAG
 from ui_simple_tag import *
 from global_parameters import *
+from auxiliary_functions import getVectorLayerByName
 
 #####################################################################################################
 ###################################        SIMPLE TAG          ######################################

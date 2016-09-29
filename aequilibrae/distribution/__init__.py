@@ -12,5 +12,6 @@ __version__ = "1.0"
 __revision__ = "$Revision: 1 $"
 __date__ = "$Date: 2016-07-02$"
 
+from ipf import Ipf
 #from . import AssignmentResults
 #from . import PathResults

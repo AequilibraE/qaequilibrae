@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Graph creation toolbox - Provided by www.xl-optim.com</string>
+   <string>Aequilibrae - Desire Lines toolbox</string>
   </property>
   <property name="modal">
    <bool>true</bool>

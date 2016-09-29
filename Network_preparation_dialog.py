@@ -73,12 +73,6 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
     def ProgressTextFromThread(self, value):
         self.progress_label.setText(value)
 
-    def browse_outfile(self):
-        if len(self.outdirname.displayText()) == 0:
-            newname = QFileDialog.getExistingDirectory(None, "Output Frames Directory", self.path)
-        else:
-            newname = QFileDialog.getExistingDirectory(None, "Output Frames Directory", self.outdirname.displayText())
-
     def set_columns_nodes(self):
         self.node_fields.clear()
         if self.nodelayers.currentIndex() >= 0:

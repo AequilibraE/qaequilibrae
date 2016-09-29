@@ -1,4 +1,8 @@
 cd ECHO %CurrentDir%
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_vector_loader.ui -o ui_vector_loader.py
+
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_ipf.ui -o ui_ipf.py
+
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_DesireLines.ui -o ui_DesireLines.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_matrix_loader.ui -o ui_matrix_loader.py

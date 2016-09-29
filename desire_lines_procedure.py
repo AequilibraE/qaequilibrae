@@ -18,7 +18,6 @@ import itertools
 
 from auxiliary_functions import *
 from aequilibrae.paths import Graph
-from aequilibrae.paths.results import PathResults
 from aequilibrae.paths.results import AssignmentResults
 from aequilibrae.paths import all_or_nothing
 

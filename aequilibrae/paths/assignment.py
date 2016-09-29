@@ -14,9 +14,10 @@
 try:
     import qgis
     from qgis.core import *
+    from PyQt4.QtCore import SIGNAL
 except:
     pass
-from PyQt4.QtCore import *
+
 import sys, os
 import time
 import numpy as np

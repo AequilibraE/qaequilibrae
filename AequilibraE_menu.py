@@ -27,6 +27,7 @@ from create_graph_dialog import Graph_Creation_Dialog
 from show_shortest_path_dialog import ShortestPathDialog
 from impedance_matrix_dialogs import ImpedanceMatrixDialog
 from desire_lines_dialog import DesireLinesDialog
+from ipf_dialog import IpfDialog
 
 #from calibrate_gravity_dialog import CalibrateGravityDialog
 #from Transportation_modeling_dialogs import *
@@ -80,15 +81,15 @@ class AequilibraE_menu:
 
         # # ########################################################################
         # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
-        #
-        # self.trip_distribution_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Trip Distribution"))
-        # self.AequilibraE_add_submenu(self.trip_distribution_menu)
-        #
-        # # gravity calibration
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_calibrate_gravity.png")
-        # self.calibrate_gravity_action = QAction(icon, u"Calibrate Gravity", self.iface.mainWindow())
-        # QObject.connect(self.calibrate_gravity_action, SIGNAL("triggered()"), self.run_calibrate_gravity)
-        # self.trip_distribution_menu.addAction(self.calibrate_gravity_action)
+
+        self.trip_distribution_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Trip Distribution"))
+        self.AequilibraE_add_submenu(self.trip_distribution_menu)
+
+        # # IPF
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_ipf.png")
+        self.ipf_action = QAction(icon, u"Iterative proportional fitting", self.iface.mainWindow())
+        QObject.connect(self.ipf_action, SIGNAL("triggered()"), self.run_ipf)
+        self.trip_distribution_menu.addAction(self.ipf_action)
         #
         # # Trip Distribution
         # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
@@ -256,5 +257,10 @@ class AequilibraE_menu:
 
     def run_dlines(self):
         dlg2 = DesireLinesDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_ipf(self):
+        dlg2 = IpfDialog(self.iface)
         dlg2.show()
         dlg2.exec_()

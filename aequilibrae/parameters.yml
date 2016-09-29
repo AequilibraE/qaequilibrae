@@ -3,12 +3,13 @@ assignment:
     rgap: 1.0e-05
 distribution:
   gravity:
-    convergence_level: 1.0e-10
-    max_iteractions: 50
-    max_tld: 1000
+    convergence level: 1.0e-10
+    max iteractions: 50
+    max tld: 1000
   ipf:
-    convergence_level: 0.0001
-    max_iteractions: 50
+    convergence level: 0.0001
+    max iteractions: 5000
+    balancing tolerance: 0.001
 system:
   cpus: 8
   default_directory: E:/

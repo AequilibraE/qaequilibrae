@@ -2,12 +2,12 @@
 /***************************************************************************
  AequilibraE - www.AequilibraE.com
  
-    Name:        Dialogs for matrix manipulation tools
+    Name:        Dialog for creating desire lines
                               -------------------
-        begin                : 2014-03-19
-        copyright            : TOOLS developers 2014
+        begin                : 2016-07-01
+        copyright            : Aequilibrae developers
         Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
+        Contributors: Pedro Camargo
         Licence: See LICENSE.TXT
  ***************************************************************************/
 """
