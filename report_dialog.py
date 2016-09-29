@@ -16,8 +16,6 @@
 from qgis.core import *
 from PyQt4 import QtGui
 from PyQt4.QtGui import *
-from PyQt4.Qsci import QsciLexerYAML
-from PyQt4 import QtCore
 
 import sys
 import os
@@ -34,13 +32,22 @@ class ReportDialog(QtGui.QDialog, Ui_report):
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
-
+        self.reporting = reporting
         for t in reporting:
             self.all_data.append(t)
 
-    def save(self):
-        pass
-        # not yet implemented
+        self.but_save_log.clicked.connect(self.save_log)
+
+    def save_log(self):
+        file_types = "Text files(*.txt)"
+        newname = QFileDialog.getSaveFileName(None, 'Save log', self.path, file_types)
+        if newname is not None:
+            outp = open(newname, 'w')
+            for t in self.reporting:
+                print >> outp, t
+            outp.flush()
+            outp.close()
+            self.ExitProcedure()
 
     def ExitProcedure(self):
         self.close()

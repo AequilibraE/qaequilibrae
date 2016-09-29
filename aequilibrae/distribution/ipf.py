@@ -15,10 +15,7 @@
 import numpy as np
 import os
 import yaml
-
-
-
-
+from time import clock
 
 class Ipf:
     def __init__(self, seed=None, rows=None, columns=None, parameters = None):
@@ -40,7 +37,7 @@ class Ipf:
         self.check_parameters()
 
         # check dimensions
-        if None in [self.rows, self.columns, self.seed, self.parameters]:
+        if self.rows is None or self.columns is None or self.seed is None or self.parameters is None:
             self.error = 'missing data'
 
         if self.error is None:
@@ -75,6 +72,7 @@ class Ipf:
                 self.error = 'Parameter list not complete'
 
     def fit(self):
+        t = clock()
         self.check_data()
         if self.error_free:
             max_iter =  self.parameters['max iteractions']
@@ -90,9 +88,11 @@ class Ipf:
             self.report.append('Total of seed matrix: ' + str("{:28,.4f}".format(np.sum(self.seed))))
             self.report.append('Total of target vectors: ' + str("{:25,.4f}".format(np.sum(self.rows))))
             self.report.append('')
-            iter = 1
+            self.report.append('Iteration,   Convergence')
             gap = conv_criteria + 1
-            while gap > conv_criteria and iter <= max_iter:
+
+            iter = 0
+            while gap > conv_criteria and iter < max_iter:
                 iter += 1
 
                 # computes factors for rows
@@ -111,8 +111,9 @@ class Ipf:
                 # increments iterarions and computes errors
                 gap = max(abs(1 - np.min(row_factor)), abs(np.max(row_factor) - 1), abs(1 - np.min(column_factor)),
                             abs(np.max(column_factor) - 1))
-                self.report.append('Iteration ' + str(iter) + '. Convergence error: ' + str("{:4,.10f}".format(np.sum(gap))))
-
+                self.report.append(str(iter) + '   ,   ' + str("{:4,.10f}".format(np.sum(gap))))
+            self.report.append('')
+            self.report.append('Running time: ' + str("{:4,.3f}".format(clock()-t)) + 's')
     def tot_rows(self, matrix):
         return np.sum(matrix, axis=1)
 
@@ -135,7 +136,7 @@ class Ipf:
         return path['distribution'][model]
 
 ###For testing
-# rows = np.random.rand(1000)*10000
+rows = np.random.rand(1000)*10000
 # columns = np.random.rand(1000)*10000
 # columns = columns * (np.sum(rows)/np.sum(columns))
 # mat = np.random.rand(1000,1000)

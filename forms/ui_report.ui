@@ -23,7 +23,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="but_save_log">
    <property name="geometry">
     <rect>
      <x>10</x>

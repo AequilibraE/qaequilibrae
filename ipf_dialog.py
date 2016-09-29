@@ -71,8 +71,8 @@ class IpfDialog(QDialog, Ui_ipf):
             file_types += ";;OpenMatrix(*.omx)"
         newname = QFileDialog.getSaveFileName(None, 'Result matrix', self.path, file_types)
         if newname is not None:
-            self.output_name.setText(newname)
             self.outname = newname
+            self.output_name.setText(newname)
 
     def runThread(self):
         QObject.connect(self.workerThread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.ProgressValueFromThread)
@@ -121,11 +121,28 @@ class IpfDialog(QDialog, Ui_ipf):
         else:
             self.output = self.workerThread.ipf.output
             self.report = self.workerThread.ipf.report
-            np.save(self.outname, self.output)
+
+            if self.outname[-3:].upper() == 'NPY':
+                np.save(self.outname, self.output)
+            else:
+                outp = open(self.outname, 'w')
+                print >> outp, 'O,D,Flow'
+                print_zeros = get_parameter_chain(['system', 'report zeros'])
+                if print_zeros:
+                    for i in range(self.output.shape[0]):
+                        for j in range(self.output.shape[1]):
+                            print >> outp, str(i) + ',' + str(j) + ',' + str(self.output[i,j])
+                else:
+                    for i in range(self.output.shape[0]):
+                        for j in range(self.output.shape[1]):
+                            if self.output[i,j]:
+                                print >> outp, str(i) + ',' + str(j) + ',' + str(self.output[i,j])
+                    outp.flush()
+                    outp.close()
         self.ExitProcedure()
 
     def run(self):
-        if None not in [self.matrix, self.rows, self.columns]:
+        if self.matrix is not None and self.rows is not None and self.columns is not None :
             self.workerThread = IpfProcedure(qgis.utils.iface.mainWindow(), self.matrix, self.rows, self.columns)
             self.runThread()
         else:

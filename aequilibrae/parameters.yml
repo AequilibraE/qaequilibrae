@@ -13,3 +13,4 @@ distribution:
 system:
   cpus: 8
   default_directory: E:/
+  report zeros: 1
