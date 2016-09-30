@@ -1,17 +1,23 @@
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
 
-    Name:        Main interface for changing the algorithm parameters
-                              -------------------
-        Creation           2016-08-15
-        Update             2016-08-15
-        copyright          AequilibraE developers 2014
-        Original Author    Pedro Camargo pedro@xl-optim.com
-        Contributors       Pedro Camargo
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ Name:       Main interface for changing the algorithm parameters
+ Purpose:    changing algorithm parameters
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-08-15
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 import qgis
 from qgis.core import *
