@@ -1,16 +1,24 @@
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
- 
-    Name:        Procedure for Computing Desire lines based on a Delaunay Triangulation network
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : AequilibraE developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Creating desire lines
+ Purpose:    Implements procedure for Computing Desire lines based on a Delaunay Triangulation network on
+             a separate thread
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-07-01
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
 from PyQt4.QtCore import *
@@ -30,7 +38,7 @@ try:
 except:
     error = True
 
-from WorkerThread import WorkerThread
+from worker_thread import WorkerThread
 
 class DesireLinesProcedure(WorkerThread):
     def __init__(self, parentThread, layer, id_field, matrix, dl_type):
@@ -46,7 +54,7 @@ class DesireLinesProcedure(WorkerThread):
 
     def doWork(self):
         if self.error is None:
-            layer = getVectorLayerByName(self.layer)
+            layer = get_vector_layer_by_name(self.layer)
             idx = layer.fieldNameIndex(self.id_field)
             matrix = self.matrix
 
@@ -252,5 +260,5 @@ class DesireLinesProcedure(WorkerThread):
                     desireline_link_id += 1
                 self.result_layer = desireline_layer
 
-        self.emit(SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"), True)
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), True)
 

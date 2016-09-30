@@ -24,6 +24,8 @@
 # Modelling Transport, 4th Edition
 # Ortuzar and Willumsen, Wiley 2011
 # The referred authors have no responsibility over this work, of course
+import sys
+sys.dont_write_bytecode = True
 
 import numpy as np
 import yaml

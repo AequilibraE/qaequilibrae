@@ -1,16 +1,23 @@
 """
-/***************************************************************************
- AequilibraE - www.AequilibraE.com
- 
-    Name:        Dialogs for applying proportinal fitting
-                              -------------------
-        begin                : 2016-09-29
-        copyright            : TOOLS developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Iterative proportinal fitting
+ Purpose:    Loads GUI for applying proportinal fitting
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-09-29
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
 import qgis
@@ -69,18 +76,18 @@ class IpfDialog(QDialog, Ui_ipf):
         file_types = "Comma-separated files(*.csv);;Numpy Binnary Array(*.npy)"
         if OMX:
             file_types += ";;OpenMatrix(*.omx)"
-        newname = QFileDialog.getSaveFileName(None, 'Result matrix', self.path, file_types)
-        if newname is not None:
-            self.outname = newname
-            self.output_name.setText(newname)
+        new_name = QFileDialog.getSaveFileName(None, 'Result matrix', self.path, file_types)
+        if new_name is not None:
+            self.outname = new_name
+            self.output_name.setText(new_name)
 
-    def runThread(self):
-        QObject.connect(self.workerThread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.ProgressValueFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressText( PyQt_PyObject )"), self.ProgressTextFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.ProgressRangeFromThread)
-        QObject.connect(self.workerThread, SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"),
-                        self.jobFinishedFromThread)
-        self.workerThread.start()
+    def run_thread(self):
+        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
+                        self.job_finished_from_thread)
+        self.worker_thread.start()
         self.exec_()
 
     def find_matrices(self):
@@ -106,21 +113,21 @@ class IpfDialog(QDialog, Ui_ipf):
                 self.columns_name.setText('LOADED')
                 self.columns_total.setText("{:20,.4f}".format(np.sum(self.columns)))
 
-    def ProgressRangeFromThread(self, val):
+    def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
 
-    def ProgressValueFromThread(self, value):
+    def progress_value_from_thread(self, value):
         self.progressbar.setValue(value[1])
 
-    def ProgressTextFromThread(self, value):
+    def progress_text_from_thread(self, value):
         self.progress_label.setText(value[1])
 
-    def jobFinishedFromThread(self, success):
-        if self.workerThread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.workerThread.error, level=3)
+    def job_finished_from_thread(self, success):
+        if self.worker_thread.error is not None:
+            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
         else:
-            self.output = self.workerThread.ipf.output
-            self.report = self.workerThread.ipf.report
+            self.output = self.worker_thread.ipf.output
+            self.report = self.worker_thread.ipf.report
 
             if self.outname[-3:].upper() == 'NPY':
                 np.save(self.outname, self.output)
@@ -131,24 +138,24 @@ class IpfDialog(QDialog, Ui_ipf):
                 if print_zeros:
                     for i in range(self.output.shape[0]):
                         for j in range(self.output.shape[1]):
-                            print >> outp, str(i) + ',' + str(j) + ',' + str(self.output[i,j])
+                            print >> outp, str(i) + ',' + str(j) + ',' + str(self.output[i, j])
                 else:
                     for i in range(self.output.shape[0]):
                         for j in range(self.output.shape[1]):
-                            if self.output[i,j]:
-                                print >> outp, str(i) + ',' + str(j) + ',' + str(self.output[i,j])
+                            if self.output[i, j]:
+                                print >> outp, str(i) + ',' + str(j) + ',' + str(self.output[i, j])
                     outp.flush()
                     outp.close()
-        self.ExitProcedure()
+        self.exit_procedure()
 
     def run(self):
-        if self.matrix is not None and self.rows is not None and self.columns is not None :
-            self.workerThread = IpfProcedure(qgis.utils.iface.mainWindow(), self.matrix, self.rows, self.columns)
-            self.runThread()
+        if self.matrix is not None and self.rows is not None and self.columns is not None:
+            self.worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), self.matrix, self.rows, self.columns)
+            self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Matrix not loaded", '', level=3)
 
-    def ExitProcedure(self):
+    def exit_procedure(self):
         self.close()
         dlg2 = ReportDialog(self.iface, self.report)
         dlg2.show()

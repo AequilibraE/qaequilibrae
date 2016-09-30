@@ -1,22 +1,30 @@
-# -------------------------------------------------------------------------------
-# Name:       TRAFFIC ASSIGNMENT
-# Purpose:    Implement procedures to translate a layer and parameters into entry for assignment
-#
-# Author:      Pedro Camargo
-# Website:    www.AequilibraE.com
-# Repository:  
-#
-# Created:     12/01/2014
-# Copyright:   (c) Pedro Camargo 2014
-# Licence:     GPL
-# -------------------------------------------------------------------------------
+"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Iterative proportinal fitting
+ Purpose:    Applies proportinal fitting in a separate thread
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-09-29
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
 from PyQt4.QtCore import *
 import sys
 sys.path.append("C:/Users/Pedro/.qgis2/python/plugins/AequilibraE/")
 
-from WorkerThread import WorkerThread
+from worker_thread import WorkerThread
 from aequilibrae.distribution import Ipf
 
 class IpfProcedure(WorkerThread):
@@ -27,8 +35,7 @@ class IpfProcedure(WorkerThread):
 
     def doWork(self):
         self.ipf.fit()
-        #self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), (evol_bar, 'Computation Finalized. Writing results'))
-        self.emit(SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"),0)
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),0)
 
 if __name__ == '__main__':
     main()

@@ -1,14 +1,16 @@
 # -------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------
 # Name:       TRIP DISTRIBUTION
-# Purpose:    Applying a growth factor method
+# Purpose:    Implementing a series of algorithms for trip distribution.
+#              1st stage: Iterative proportinal fitting, synthetic gravity with power and exponential functions
+#              2nd stage: Friction factors and synthetic gravity with gamma function
 #
 # Author:      Pedro Camargo
 # Website:    www.AequilibraE.com
 # Repository:  
 #
-# Created:     12/01/2014
-# Copyright:   (c) Pedro Camargo 2014
+# Created:     29/09/2016
+# Copyright:   (c) AequilibraE authors
 # Licence:     See LICENSE.TXT
 # -------------------------------------------------------------------------------
 
@@ -16,104 +18,14 @@
 # Modelling Transport, 4th Edition
 # Ortuzar and Willumsen, Wiley 2011
 
-# The referred authors have no responsability over this work, of course
-
-from qgis.core import *
-import qgis
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-import sys, os
-import time
+# The referred authors have no responsibility over this work, of course
+import sys
+sys.dont_write_bytecode = True
 
 import numpy as np
-import sys
-
 
 def main():
     pass
-
-class IterPropFit(WorkerThreadDistribution):
-    def __init__(self, parentThread, matrix, prod, atra, max_error, max_itera):
-        WorkerThreadDistribution.__init__(self, parentThread)
-        self.matrix = matrix
-        self.prod = prod
-        self.atra = atra
-        self.max_error = max_error
-        self.max_itera = max_itera
-        self.evol_bar = 2
-
-    def doWork(self):
-        matrix = self.matrix
-        prod = self.prod
-        atra = self.atra
-        max_error = self.max_error
-        max_itera = self.max_itera
-        evol_bar = self.evol_bar
-        self.error = None
-        target = 100000000
-        stepP = target / 100
-
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (evol_bar, self.max_itera))
-        count = 0
-
-        tt = time.clock()
-        # We guarantee that we enter the iterative process
-        error = max_error + 1
-        itera = 0
-
-        # We will ignore all errors as we are treating them explicitly
-        np.seterr(all='ignore')
-        # We check if dimensions are correct
-        if matrix.shape[1] == atra.shape[0] and matrix.shape[0] == prod.shape[0]:
-
-            # And if the vectors are balanced up to 6 decimals
-            if round(np.sum(prod), 6) == round(np.sum(atra), 6):
-
-                # Start iterating
-                while error > max_error and itera < max_itera:
-                    self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (evol_bar, int(itera)))
-                    self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                              (evol_bar, "Convergence error: " + str(round(error, 8))))
-
-                    # computes factors for rows
-                    marg_rows = tot_rows(matrix)
-                    row_factor = factor(marg_rows, prod)
-
-                    # applies factor
-                    matrix = np.transpose(np.transpose(matrix) * np.transpose(row_factor))
-
-                    # computes factors for columns
-                    marg_cols = tot_columns(matrix)
-                    column_factor = factor(marg_cols, atra)
-
-                    # applies factor
-                    matrix = matrix * column_factor
-
-                    # increments iterarions and computes errors
-                    itera = itera + 1
-                    error = max(1 - np.min(row_factor), np.max(row_factor) - 1, 1 - np.min(column_factor),
-                                np.max(column_factor) - 1)
-
-                text = "Error of " + str(round(error * 100, 10)) + '% reached after ' + str(
-                    itera) + ' iterations and in ' + str(round(time.clock() - tt, 0)) + ' seconds'
-
-                if itera < max_itera:
-                    self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                              (evol_bar, "Converged error: " + str(round(error, 6))))
-                    self.result_matrix = matrix
-                    self.logfile = text
-                else:
-                    self.result_matrix = None
-                    self.error = "Procedure did not converge after " + str(itera) + " iterations"
-            else:
-                self.error = "Production and Attraction vectors are not balanced"
-        else:
-            self.error = "Seed matrix, production and attraction vectors do not have compatible dimensions"
-
-        self.procedure = "FRATAR FINISHED"
-        self.emit(SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"), self.procedure)
-
 
 class GravityApplication(WorkerThreadDistribution):
     def __init__(self, parentThread, vectors, imp_matrix, parameters, max_cost, max_error, max_iter):
@@ -400,35 +312,6 @@ class GravityCalibration(WorkerThreadDistribution):
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), (evol_bar, "Converged error: " + str(round(error, 8))))
         text = "Error of ", round(error * 100, 8), '% reached after ', itera, ' iterations\n'
         self.text = text
-
-
-class WriteMatrix(WorkerThreadDistribution):
-    def __init__(self, parentThread, result_matrix, result_file):
-        WorkerThreadDistribution.__init__(self, parentThread)
-        self.result_matrix = result_matrix
-        self.result_file = result_file
-        self, evol_bar = 3
-
-    def doWork(self):
-        result_matrix = self.result_matrix
-        evol_bar = self.evol_bar
-        non_zeros = np.transpose(np.nonzero(result_matrix))
-        featcount = non_zeros.shape[0]
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (evol_bar, featcount))
-        P = 0
-        o = open(self.result_file, 'w')
-        print >> o, 'FROM,TO,FLOW'
-        for i, j in non_zeros:
-            P = P + 1
-            if P % 1000 == 0:
-                self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (evol_bar, int(P)))
-                self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                          (evol_bar, "Writing results: " + str(P) + "/" + str(featcount)))
-            print >> o, i, ',', j, ',', result_matrix[i, j]
-        o.flush()
-        o.close()
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (evol_bar, eatcount))
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), (evol_bar, "Procedure finalized"))
 
 
 def tot_rows(matrix):

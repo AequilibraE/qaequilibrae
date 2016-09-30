@@ -1,25 +1,35 @@
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
- 
-    Name:        Dialogs for modeling tools
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : AequilibraE developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Compute GIS tags
+ Purpose:    Implements computation of GIS tags on a separate thread
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2014-03-19
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
+
 from qgis.core import *
-import qgis
 from PyQt4.QtCore import *
 import numpy as np
 from auxiliary_functions import *
 from global_parameters import *
-from WorkerThread import WorkerThread
+from worker_thread import WorkerThread
+
+
 def main():
     pass
+
 
 class SimpleTAG(WorkerThread):
     def __init__(self, parentThread, flayer, tlayer, ffield, tfield, fmatch, tmatch, operation):
@@ -44,17 +54,18 @@ class SimpleTAG(WorkerThread):
         tfield = self.tfield
         tmatch = self.tmatch
 
-        self.from_layer = getVectorLayerByName(flayer)
-        self.to_layer = getVectorLayerByName(tlayer)
+        self.from_layer = get_vector_layer_by_name(flayer)
+        self.to_layer = get_vector_layer_by_name(tlayer)
 
         self.transform = None
         if self.from_layer.dataProvider().crs() != self.to_layer.dataProvider().crs():
-            self.transform = QgsCoordinateTransform(self.from_layer.dataProvider().crs(),self.to_layer.dataProvider().crs())
+            self.transform = QgsCoordinateTransform(self.from_layer.dataProvider().crs(),
+                                                    self.to_layer.dataProvider().crs())
 
-        #PROGRESS BAR
+        # PROGRESS BAR
         self.emit( SIGNAL( "ProgressMaxValue( PyQt_PyObject )" ), self.to_layer.dataProvider().featureCount())
 
-        #FIELDS INDICES
+        # FIELDS INDICES
         idx = self.from_layer.fieldNameIndex(ffield)
         fid = self.to_layer.fieldNameIndex(tfield)
         if self.fmatch is not None:
@@ -64,16 +75,15 @@ class SimpleTAG(WorkerThread):
             self.from_match = {feature.id(): feature.attributes()[idq] for (feature) in self.from_layer.getFeatures()}
             self.to_match = {feature.id(): feature.attributes()[idq2] for (feature) in self.to_layer.getFeatures()}
 
-
-        #We create an spatial self.index to hold all the features of the layer that will receive the data
-        #And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
+        # We create an spatial self.index to hold all the features of the layer that will receive the data
+        # And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
         allfeatures = {feature.id(): feature for (feature) in self.to_layer.getFeatures()}
         self.index = QgsSpatialIndex()
         for feature in allfeatures.values():
             self.index.insertFeature(feature)
         self.all_attr = {}
         
-        #Dictionary with the FROM values
+        # Dictionary with the FROM values
         self.from_val = {feature.id(): feature.attributes()[idx] for (feature) in self.from_layer.getFeatures()}
         self.from_count = len(self.from_val.keys()) #Number of features in the source layer
 
@@ -81,7 +91,7 @@ class SimpleTAG(WorkerThread):
         # matches are not found
         # self.sequence_of_searches.append(self.from_count)
 
-        #The spatial self.index for source layer
+        # The spatial self.index for source layer
         self.from_features = {feature.id(): feature for (feature) in self.from_layer.getFeatures()}
         self.index_from = QgsSpatialIndex()
 
@@ -103,14 +113,12 @@ class SimpleTAG(WorkerThread):
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), i)
             if self.all_attr[feat.id()] is not None:
                 a = self.to_layer.dataProvider().changeAttributeValues({feat.id(): {fid: self.all_attr[feat.id()]}})
-            # else:
-            #     a = self.to_layer.dataProvider().changeAttributeValues({feat.id(): {fid: ""}})
 
         self.to_layer.commitChanges()
         self.to_layer.updateFields()
         
         self.emit( SIGNAL( "ProgressValue( PyQt_PyObject )" ), self.to_layer.dataProvider().featureCount())
-        self.emit( SIGNAL( "FinishedThreadedProcedure( PyQt_PyObject )" ), "procedure")
+        self.emit( SIGNAL( "finished_threaded_procedure( PyQt_PyObject )" ), "procedure")
 
     def chooses_match(self, feat):
         geom = feat.geometry()
@@ -161,10 +169,11 @@ class SimpleTAG(WorkerThread):
             # The problem with the "nearest" search is that we cannot swear by it when we are using only spatial
             # indexes. For this reason we will compute a fixed number of nearest neighbors and then get the
             # distance for each one of them
-
+            pt = geom.centroid()
             s = self.sequence_of_searches[1]
             nearest = self.index_from.nearestNeighbor(pt, s)
             dists = np.zeros(len(nearest))
+
             for k, n in enumerate(nearest):
                 dists[k] = self.from_features[n].geometry().distance(geom)
             min_index = np.argsort(dists)

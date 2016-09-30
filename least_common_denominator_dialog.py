@@ -1,31 +1,38 @@
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
- 
-    Name:        Dialogs for GIS tools
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : AequilibraE developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Least commmon denominator
+ Purpose:    Loads GUI for computing least common denominator between two polygon layers
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-09-26
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import QgsMapLayerRegistry
 from PyQt4.QtCore import QObject, SIGNAL
 import qgis
-import sys, os
+import sys
+import os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms")
 
 # For the GIS tools portion
-from least_common_denominator_procedure import LeastCommonDenominator
+from least_common_denominator_procedure import LeastCommonDenominatorProcedure
 from ui_least_common_denominator import *
 from global_parameters import *
 from functools import partial
-from auxiliary_functions import getVectorLayerByName
-from least_common_denominator_procedure import LeastCommonDenominator
+from auxiliary_functions import get_vector_layer_by_name
 #####################################################################################################
 ###################################        SIMPLE TAG          ######################################
 
@@ -37,75 +44,76 @@ class LeastCommonDenominatorDialog(QtGui.QDialog, Ui_least_common_denominator):
 
         # The whole software is prepared to deal with all geometry types, but it has only been tested to work with
         # polygons, so I am turning the other layer types off
-        #self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
+        # self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
         self.valid_layer_types = poly_types + multi_poly
 
-
-        self.fromlayer.currentIndexChanged.connect(partial(self.reload_fields,'from'))
-        self.tolayer.currentIndexChanged.connect(partial(self.reload_fields,'to'))
+        self.from_layer.currentIndexChanged.connect(partial(self.reload_fields, 'from'))
+        self.to_layer.currentIndexChanged.connect(partial(self.reload_fields, 'to'))
         self.OK.clicked.connect(self.run)
 
         # We load the node and area layers existing in our canvas
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
             if layer.wkbType() in self.valid_layer_types:
-                self.fromlayer.addItem(layer.name())
-                self.tolayer.addItem(layer.name())
+                self.from_layer.addItem(layer.name())
+                self.to_layer.addItem(layer.name())
 
     def reload_fields(self, box):
         if box == 'from':
             self.fromfield.clear()
-            if self.fromlayer.currentIndex() >= 0:
-                layer = getVectorLayerByName(self.fromlayer.currentText())  # If we have the right layer in hands
+            if self.from_layer.currentIndex() >= 0:
+                layer = get_vector_layer_by_name(self.from_layer.currentText())  # If we have the right layer in hands
                 for field in layer.pendingFields().toList():
                     self.fromfield.addItem(field.name())
         else:
             self.tofield.clear()
-            if self.tolayer.currentIndex() >= 0:
-                layer = getVectorLayerByName(self.tolayer.currentText())  # If we have the right layer in hands
+            if self.to_layer.currentIndex() >= 0:
+                layer = get_vector_layer_by_name(self.to_layer.currentText())  # If we have the right layer in hands
                 for field in layer.pendingFields().toList():
                     self.tofield.addItem(field.name())
 
-    def runThread(self):
-        QObject.connect(self.workerThread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.ProgressValueFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.ProgressRangeFromThread)
+    def run_thread(self):
+        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
 
-        QObject.connect(self.workerThread, SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"),
-                        self.FinishedThreadedProcedure)
+        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
+                        self.finished_threaded_procedure)
         self.OK.setEnabled(False)
-        self.workerThread.start()
+        self.worker_thread.start()
         self.exec_()
 
-    def ProgressRangeFromThread(self, val):
+    def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val)
 
-    def ProgressValueFromThread(self, value):
+    def progress_value_from_thread(self, value):
         self.progressbar.setValue(value)
 
-    def FinishedThreadedProcedure(self, procedure):
-        if self.workerThread.error is None:
-            QgsMapLayerRegistry.instance().addMapLayer(self.workerThread.result)
+    def finished_threaded_procedure(self, procedure):
+        if self.worker_thread.error is None:
+            QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result)
         else:
-            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.workerThread.error,
+            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.worker_thread.error,
                                                       level=3)
         self.close()
 
     def run(self):
         error = None
-        if self.fromlayer.currentIndex() < 0 or self.fromfield.currentIndex() < 0 or self.tolayer.currentIndex() < 0 or self.tofield.currentIndex() < 0:
+        if self.from_layer.currentIndex() < 0 or self.fromfield.currentIndex() < 0 or \
+           self.to_layer.currentIndex() < 0 or self.tofield.currentIndex() < 0:
             error = "ComboBox with ilegal value"
 
-        flayer = self.fromlayer.currentText()
+        flayer = self.from_layer.currentText()
         ffield = self.fromfield.currentText()
-        tlayer = self.tolayer.currentText()
+        tlayer = self.to_layer.currentText()
         tfield = self.tofield.currentText()
 
-        layer1 = getVectorLayerByName(self.fromlayer.currentText()).wkbType()
-        layer2 = getVectorLayerByName(self.tolayer.currentText()).wkbType()
+        layer1 = get_vector_layer_by_name(self.from_layer.currentText()).wkbType()
+        layer2 = get_vector_layer_by_name(self.to_layer.currentText()).wkbType()
         if layer1 in point_types and layer2 in point_types:
             error = 'It is not sensible to have two point layers for this analysis'
 
         if error is None:
-            self.workerThread = LeastCommonDenominator(qgis.utils.iface.mainWindow(), flayer, tlayer, ffield, tfield)
-            self.runThread()
+            self.worker_thread = \
+                LeastCommonDenominatorProcedure(qgis.utils.iface.mainWindow(), flayer, tlayer, ffield, tfield)
+            self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly. ", error, level=3)

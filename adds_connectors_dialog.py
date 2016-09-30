@@ -1,17 +1,23 @@
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
 
-    Name:        Main interface for adding centroid connectors
-                              -------------------
-        Creation           2014-03-19
-        Update             2016-07-30
-        copyright          AequilibraE developers 2014
-        Original Author    Pedro Camargo pedro@xl-optim.com
-        Contributors:
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ Name:       Main interface for adding centroid connectors
+ Purpose:    Load GUI and user interface for the centroid addition procedure
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-07-30
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 import qgis
 from qgis.core import *
@@ -19,15 +25,18 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from auxiliary_functions import *
-import sys, os
+import sys
+import os
 from global_parameters import *
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/algorithms/")
 
 from adds_connectors_procedure import AddsConnectorsProcedure
-from ui_ConnectingCentroids import *
-class AEQ_AddConnectors(QDialog,Ui_ConnectingCentroids):
+from ui_ConnectingCentroids import Ui_ConnectingCentroids
+
+
+class AddConnectorsDialog(QDialog, Ui_ConnectingCentroids):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
@@ -38,10 +47,10 @@ class AEQ_AddConnectors(QDialog,Ui_ConnectingCentroids):
 
         self.IfMaxLength.toggled.connect(self.allows_distance)
         self.pushOK.clicked.connect(self.run)
-        self.pushClose.clicked.connect(self.ExitProcedure)
+        self.pushClose.clicked.connect(self.exit_procedure)
 
-        self.ChooseLineLayer.clicked.connect(self.BrowseLineLayer)
-        self.ChooseNodeLayer.clicked.connect(self.BrowseNodeLayer)
+        self.ChooseLineLayer.clicked.connect(self.browse_line_layer)
+        self.ChooseNodeLayer.clicked.connect(self.browse_node_layer)
 
         QObject.connect(self.CentroidLayer, SIGNAL("currentIndexChanged(QString)"), self.set_field_centroids)
         QObject.connect(self.NodeLayer, SIGNAL("currentIndexChanged(QString)"), self.set_field_nodes)
@@ -66,61 +75,62 @@ class AEQ_AddConnectors(QDialog,Ui_ConnectingCentroids):
         if self.IfMaxLength.isChecked():
             self.MaxLength.setEnabled(True)
 
-    def runThread(self):
-        QObject.connect(self.workerThread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.ProgressValueFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressText( PyQt_PyObject )"), self.ProgressTextFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.ProgressRangeFromThread)
-        QObject.connect(self.workerThread, SIGNAL("jobFinished( PyQt_PyObject )"), self.jobFinishedFromThread)
-        self.workerThread.start()
+    def run_thread(self):
+        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
+                        self.progress_range_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("jobFinished( PyQt_PyObject )"), self.job_finished_from_thread)
+        self.worker_thread.start()
         self.show()
 
-    def ProgressRangeFromThread(self, val):
+    def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val)
 
-    def ProgressValueFromThread(self, value):
+    def progress_value_from_thread(self, value):
         self.progressbar.setValue(value)
 
-    def ProgressTextFromThread(self, value):
+    def progress_text_from_thread(self, value):
         self.progress_label.setText(value)
 
     def set_field_centroids(self):
         self.CentroidField.clear()
         if self.CentroidLayer.currentIndex() >= 0:
-            layer = getVectorLayerByName(self.CentroidLayer.currentText())
+            layer = get_vector_layer_by_name(self.CentroidLayer.currentText())
             for field in layer.dataProvider().fields().toList():
                 self.CentroidField.addItem(field.name())
 
     def set_field_nodes(self):
         self.NodeField.clear()
         if self.NodeLayer.currentIndex() >= 0:
-            layer = getVectorLayerByName(self.NodeLayer.currentText())
+            layer = get_vector_layer_by_name(self.NodeLayer.currentText())
             for field in layer.dataProvider().fields().toList():
                 self.NodeField.addItem(field.name())
 
-    def BrowseNodeLayer(self):
+    def browse_node_layer(self):
         if len(self.OutNodes.text()) == 0:
-            newname = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
+            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
         else:
-            newname = QFileDialog.getSaveFileName(None, 'Result file', self.OutNodes.text(), "Shapefile(*.shp)")
-        self.OutNodes.setText(newname)
+            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.OutNodes.text(), "Shapefile(*.shp)")
+        self.OutNodes.setText(new_name)
         self.NewNodes = True
-        if len(newname) == 0:
+        if len(new_name) == 0:
             self.NewNodes = False
 
-    def BrowseLineLayer(self):
+    def browse_line_layer(self):
         if len(self.OutLinks.text()) == 0:
-            newname = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
+            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
         else:
-            newname = QFileDialog.getSaveFileName(None, 'Result file', self.OutLinks.text(), "Shapefile(*.shp)")
-        self.OutLinks.setText(newname)
+            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.OutLinks.text(), "Shapefile(*.shp)")
+        self.OutLinks.setText(new_name)
         self.NewLinks = True
-        if len(newname) == 0:
+        if len(new_name) == 0:
             self.NewLinks = False
 
-    def jobFinishedFromThread(self, success):
+    def job_finished_from_thread(self, success):
         self.pushOK.setEnabled(True)
-        if self.workerThread.error != None:
-            qgis.utils.iface.messageBar().pushMessage("Node layer error: ", self.workerThread.error, level=3)
+        if self.worker_thread.error is not None:
+            qgis.utils.iface.messageBar().pushMessage("Node layer error: ", self.worker_thread.error, level=3)
 
     def run(self):
 
@@ -145,8 +155,8 @@ class AEQ_AddConnectors(QDialog,Ui_ConnectingCentroids):
         #  WE NEED TO ADD SOME ERROR TREATMENT CODE HERE
 
         self.pushOK.setEnabled(False)
-        self.workerThread = AddsConnectorsProcedure(qgis.utils.iface.mainWindow(), *parameters)
-        self.runThread()
+        self.worker_thread = AddsConnectorsProcedure(qgis.utils.iface.mainWindow(), *parameters)
+        self.run_thread()
 
-    def ExitProcedure(self):
+    def exit_procedure(self):
         self.close()

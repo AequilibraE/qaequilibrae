@@ -1,28 +1,28 @@
-# -------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------
-# Name:       TRIP DISTRIBUTION
-# Purpose:    Applying a growth factor method
-#
-# Author:      Pedro Camargo
-# Website:    www.AequilibraE.com
-# Repository:
-#
-# Created:     12/01/2014
-# Copyright:   (c) Pedro Camargo 2014
-# Licence:     GPL
-# -------------------------------------------------------------------------------
+"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Loads vectors from file/layer
+ Purpose:    Implements vector loading
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-08-15
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
-import qgis
-from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-import sys, os
-import time
-
 import numpy as np
-
-from WorkerThread import WorkerThread
+from worker_thread import WorkerThread
 
 class LoadVector(WorkerThread):
     def __init__(self, parentThread, layer, idx):
@@ -31,13 +31,12 @@ class LoadVector(WorkerThread):
         self.idx = idx
         self.matrix = None
         self.error = None
-        self.procedure = procedure
 
     def doWork(self):
         layer = self.layer
         idx = self.idx
-        featcount = layer.featureCount()
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (featcount))
+        feat_count = layer.featureCount()
+        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (feat_count))
 
         idx1 = idx[0]
         idx2 = idx[1]
@@ -56,16 +55,8 @@ class LoadVector(WorkerThread):
 
         zones = np.max(vector[:, 0]) + 1
         vec = np.zeros(zones)
-        vec[zones[:,0]] = zones[:,1]
-
-        # self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (0))
-        # P = 0
-        # for i in vectors:
-        #     vec[i[0].astype(int)] = i[1]
-        #     P += 1
-        #     if P % 100 == 0:
-        #         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
+        vec[zones[:, 0]] = zones[:, 1]
 
         self.vector = vec
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(featcount)))
-        self.emit(SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"), 'Vector loaded')
+        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(feat_count)))
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'Vector loaded')

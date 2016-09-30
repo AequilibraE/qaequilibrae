@@ -1,21 +1,29 @@
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
- 
-    Name:        Dialogs for GIS tools
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : AequilibraE developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Compute GIS tags
+ Purpose:    Loads GUI for computing GIS tags
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2014-03-19
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
 from PyQt4.QtCore import *
 import qgis
-import sys, os
+import sys
+import os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms")
 
@@ -23,10 +31,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms")
 from simple_tag_procedure import SimpleTAG
 from ui_simple_tag import *
 from global_parameters import *
-from auxiliary_functions import getVectorLayerByName
+from auxiliary_functions import get_vector_layer_by_name
 
-#####################################################################################################
-###################################        SIMPLE TAG          ######################################
 
 class SimpleTagDialog(QtGui.QDialog, Ui_simple_tag):
     def __init__(self, iface):
@@ -62,16 +68,15 @@ class SimpleTagDialog(QtGui.QDialog, Ui_simple_tag):
         self.matches_types()
         if self.tolayer.currentIndex() >= 0:
             self.matchingto.clear()
-            layer = getVectorLayerByName(self.tolayer.currentText())  # If we have the right layer in hands
+            layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
             for field in layer.pendingFields().toList():
-                #if self.frommatchingtype == field.type():
                 self.matchingto.addItem(field.name())
 
     def set_from_fields(self):
         self.fromfield.clear()
 
         if self.fromlayer.currentIndex() >= 0:
-            layer = getVectorLayerByName(self.fromlayer.currentText())  # If we have the right layer in hands
+            layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
 
             for field in layer.pendingFields().toList():
                 self.fromfield.addItem(field.name())
@@ -90,12 +95,12 @@ class SimpleTagDialog(QtGui.QDialog, Ui_simple_tag):
         self.tofield.clear()
 
         if self.tolayer.currentIndex() >= 0:
-            layer = getVectorLayerByName(self.tolayer.currentText())  # If we have the right layer in hands
+            layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
 
             for field in layer.pendingFields().toList():
-                #if self.fromtype == field.type():
                 self.tofield.addItem(field.name())
-        if self.needsmatching.isChecked(): self.works_field_matching()
+        if self.needsmatching.isChecked():
+            self.works_field_matching()
 
     def works_field_matching(self):
 
@@ -109,12 +114,12 @@ class SimpleTagDialog(QtGui.QDialog, Ui_simple_tag):
             self.lblmatchto.setVisible(True)
 
             if self.fromlayer.currentIndex() >= 0:
-                layer = getVectorLayerByName(self.fromlayer.currentText())  # If we have the right layer in hands
+                layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
                 for field in layer.pendingFields().toList():
                     self.matchingfrom.addItem(field.name())
 
             if self.tolayer.currentIndex() >= 0:
-                layer = getVectorLayerByName(self.tolayer.currentText())  # If we have the right layer in hands
+                layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
                 for field in layer.pendingFields().toList():
                     self.matchingto.addItem(field.name())
         else:
@@ -128,45 +133,49 @@ class SimpleTagDialog(QtGui.QDialog, Ui_simple_tag):
         self.frommatchingtype = None
 
         if self.fromlayer.currentIndex() >= 0:
-            layer = getVectorLayerByName(self.fromlayer.currentText())  # If we have the right layer in hands
+            layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
             for field in layer.pendingFields().toList():
                 if self.fromfield.currentText() == field.name():
                     self.fromtype = field.type()
 
         if self.needsmatching.isChecked():
             if self.fromlayer.currentIndex() >= 0:
-                layer = getVectorLayerByName(self.fromlayer.currentText())  # If we have the right layer in hands
+                layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
                 for field in layer.pendingFields().toList():
                     if self.matchingfrom.currentText() == field.name():
                         self.frommatchingtype = field.type()
 
-    def runThread(self):
-        QObject.connect(self.workerThread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.ProgressValueFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.ProgressRangeFromThread)
+    def run_thread(self):
+        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
 
-        QObject.connect(self.workerThread, SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"),
-                        self.FinishedThreadedProcedure)
+        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
+                        self.finished_threaded_procedure)
         self.OK.setEnabled(False)
-        self.workerThread.start()
+        self.worker_thread.start()
         self.exec_()
 
-    def ProgressRangeFromThread(self, val):
+    def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val)
 
-    def ProgressValueFromThread(self, value):
+    def progress_value_from_thread(self, value):
         self.progressbar.setValue(value)
 
-    def FinishedThreadedProcedure(self, procedure):
-        if self.workerThread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.workerThread.error,
+    def finished_threaded_procedure(self, procedure):
+        if self.worker_thread.error is not None:
+            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.worker_thread.error,
                                                       level=3)
         self.close()
 
     def run(self):
         error = False
-        if self.fromlayer.currentIndex() < 0 or self.fromfield.currentIndex() < 0 or self.tolayer.currentIndex() < 0 or self.tofield.currentIndex() < 0: error = True
+        if min(self.fromlayer.currentIndex(), self.fromfield.currentIndex(),
+               self.tolayer.currentIndex(), self.tofield.currentIndex()) < 0:
+            error = True
+
         if self.needsmatching.isChecked():
-            if self.matchingfrom.currentIndex() < 0 or self.matchingto.currentIndex() < 0: error = True
+            if self.matchingfrom.currentIndex() < 0 or self.matchingto.currentIndex() < 0:
+                error = True
 
         flayer = self.fromlayer.currentText()
         ffield = self.fromfield.currentText()
@@ -187,10 +196,10 @@ class SimpleTagDialog(QtGui.QDialog, Ui_simple_tag):
         else:
             operation = "CLOSEST"
 
-        if error == False:
-            self.workerThread = SimpleTAG(qgis.utils.iface.mainWindow(), flayer, tlayer, ffield, tfield, fmatch,
+        if not error:
+            self.worker_thread = SimpleTAG(qgis.utils.iface.mainWindow(), flayer, tlayer, ffield, tfield, fmatch,
                                            tmatch, operation)
-            self.runThread()
+            self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", '  Try again', level=3)
 

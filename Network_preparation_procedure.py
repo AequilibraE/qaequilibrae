@@ -1,26 +1,35 @@
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
- 
-    Name:        Main interface for modeling tools
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : AequilibraE developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Network preparation
+ Purpose:    Prepares networks (extracting nodes A and B from links) on a separate thread
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2014-03-19
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
 from PyQt4.QtCore import *
 import numpy as np
 from auxiliary_functions import *
-from WorkerThread import WorkerThread
+from worker_thread import WorkerThread
 from global_parameters import *
 
 class FindsNodes(WorkerThread):
-    def __init__(self, parentThread, line_layer, new_line_layer, node_layer=False, node_ids=False, new_node_layer=False, node_start = 0):
+    def __init__(self, parentThread, line_layer, new_line_layer, node_layer=False, node_ids=False,
+                 new_node_layer=False, node_start=0):
+
         WorkerThread.__init__(self, parentThread)
         self.line_layer = line_layer
         self.node_layer = node_layer
@@ -34,18 +43,20 @@ class FindsNodes(WorkerThread):
         line_layer = self.line_layer
         node_layer = self.node_layer
         node_ids = self.node_ids
-        layer = getVectorLayerByName(line_layer)
-        featcount = layer.featureCount()
-        self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), featcount)
+        layer = get_vector_layer_by_name(line_layer)
+        feat_count = layer.featureCount()
+        self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), feat_count)
 
         P = 0
         for feature in layer.getFeatures():
             P += 1
             self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Detecting if layer is Singleparts: " + str(P) + "/" + str(featcount))
+            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Detecting if layer is Singleparts: " +
+                      str(P) + "/" + str(feat_count))
+
             geom = feature.geometry()
             if geom.isMultipart():
-               self.error = 'Layer is Multipart. Please go to "Vector-Geometry Tools-Multipart to Singleparts..."'
+               self.error = 'Layer is Multipart. Please go to "Vector-Geometry Tools-Multipart to Singleparts."'
                return None
 
         self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), 3)
@@ -54,9 +65,11 @@ class FindsNodes(WorkerThread):
 
         P = 0
         # We create the new line layer and load it in memory
-        EPSG_code = int(layer.crs().authid().split(":")[1])
+        epsg_code = int(layer.crs().authid().split(":")[1])
         new_line_layer = QgsVectorLayer(layer.source(), layer.name(), layer.providerType())
-        QgsVectorFileWriter.writeAsVectorFormat(new_line_layer, self.new_line_layer, str(EPSG_code), None, "ESRI Shapefile")
+        QgsVectorFileWriter.writeAsVectorFormat(new_line_layer, self.new_line_layer,
+                                                str(epsg_code), None, "ESRI Shapefile")
+
         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 1)
 
         new_line_layer = QgsVectorLayer(self.new_line_layer, 'noded_layer', 'ogr')
@@ -71,8 +84,9 @@ class FindsNodes(WorkerThread):
         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 2)
         # I f we have node IDs, we iterate over the ID field to make sure they are unique
         ids = []
-        if node_ids != False:
-            nodes = getVectorLayerByName(node_layer)
+
+        if not node_ids:
+            nodes = get_vector_layer_by_name(node_layer)
             index = QgsSpatialIndex()
             idx = nodes.fieldNameIndex(node_ids)
 
@@ -80,7 +94,9 @@ class FindsNodes(WorkerThread):
             self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 0)
 
             for P, feat in enumerate(nodes.getFeatures()):
-                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Checking node layer: " + str(P) + "/" + str(nodes.featureCount()))
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Checking node layer: " +
+                                                                   str(P) + "/" + str(nodes.featureCount()))
+
                 self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), P)
                 index.insertFeature(feat)
                 i_d = feat.attributes()[idx]
@@ -96,10 +112,10 @@ class FindsNodes(WorkerThread):
             for feat in new_line_layer.getFeatures():
                 P += 1
                 self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
-                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Links Analyzed: " + str(P) + "/" + str(featcount))
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Links Analyzed: " + str(P) + "/" + str(feat_count))
 
                 # We search for matches for all AB nodes
-                ab_nodes=[('A_NODE', 0), ('B_NODE', -1)]
+                ab_nodes = [('A_NODE', 0), ('B_NODE', -1)]
                 for field, position in ab_nodes:
                     node_ab = list(feat.geometry().asPolyline())[position]
 
@@ -113,7 +129,7 @@ class FindsNodes(WorkerThread):
 
                     fid = new_line_layer.fieldNameIndex(field)
                     # We see if they are really the same node
-                    if round(nf[0],10) == round(node_ab[0], 10) and round(nf[1], 10) == round(node_ab[1], 10):
+                    if round(nf[0], 10) == round(node_ab[0], 10) and round(nf[1], 10) == round(node_ab[1], 10):
                         ids = nfeat.attributes()[idx]
                         new_line_layer.dataProvider().changeAttributeValues({feat.id(): {fid: int(ids)}})
 
@@ -125,9 +141,11 @@ class FindsNodes(WorkerThread):
                 new_line_layer.commitChanges()
         else:
             #  Create node layer
-            new_node_layer = QgsVectorLayer('Point?crs=epsg:' + str(EPSG_code) + '&field=ID:integer', "temp", "memory")
-            DTYPE = [('LAT', np.float64), ('LONG', np.float64), ('LINK ID', np.int64), ('POSITION', np.int64), ('NODE ID', np.int64)]
-            all_nodes = np.zeros(featcount * 2, dtype=DTYPE)
+            new_node_layer = QgsVectorLayer('Point?crs=epsg:' + str(epsg_code) + '&field=ID:integer', "temp", "memory")
+            DTYPE = [('LAT', np.float64), ('LONG', np.float64), ('LINK ID', np.int64),
+                     ('POSITION', np.int64), ('NODE ID', np.int64)]
+
+            all_nodes = np.zeros(feat_count * 2, dtype=DTYPE)
 
             l = 0
             #  Let's read all links and the coordinates for their extremities
@@ -135,7 +153,7 @@ class FindsNodes(WorkerThread):
                 P += 1
                 if P % 500 == 0:
                     self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
-                    self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Links read: " + str(P) + "/" + str(featcount))
+                    self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Links read: " + str(P) + "/" + str(feat_count))
 
                 link = list(feat.geometry().asPolyline())
 
@@ -163,9 +181,9 @@ class FindsNodes(WorkerThread):
             incremental_ids = self.node_start - 1
             P = 0
 
-            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), featcount * 2)
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Computing node IDs: " + str(0)+"/" + str(featcount * 2))
-            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), featcount * 2)
+            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), feat_count * 2)
+            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Computing node IDs: " + str(0)+"/" + str(feat_count * 2))
+            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), feat_count * 2)
 
             for i in all_nodes:
                 P += 1
@@ -180,10 +198,12 @@ class FindsNodes(WorkerThread):
 
                 if P % 2000 == 0:
                     self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
-                    self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Computing node IDs: " + str(P) + "/" + str(featcount * 2))
+                    self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Computing node IDs: " +
+                                                                      str(P) + "/" + str(feat_count * 2))
 
-            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(featcount * 2))
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Computing node IDs: " + str(featcount * 2)+"/" + str(featcount * 2))
+            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(feat_count * 2))
+            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Computing node IDs: " +
+                                                              str(feat_count * 2)+"/" + str(feat_count * 2))
 
             # And we write the node layer as well
             node_id0 = -1
@@ -204,20 +224,25 @@ class FindsNodes(WorkerThread):
 
                 if P % 500 == 0:
                     self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
-                    self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing new node layer: " + str(P) + "/" + str(incremental_ids))
+                    self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing new node layer: " +
+                                                                      str(P) + "/" + str(incremental_ids))
 
             a = new_node_layer.dataProvider().addFeatures(cfeatures)
             del cfeatures
             new_node_layer.commitChanges()
             self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(incremental_ids))
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing new node layer: " + str(incremental_ids) + "/" + str(incremental_ids))
+            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing new node layer: " +
+                                                              str(incremental_ids) + "/" + str(incremental_ids))
 
             # Now we write all the node _IDs back to the line layer
             P = 0
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing node IDs to links: " + str(0) + "/" + str(featcount * 2))
-            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), featcount * 2)
+            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing node IDs to links: " +
+                                                              str(0) + "/" + str(feat_count * 2))
+
+            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), feat_count * 2)
             fid1 = new_line_layer.fieldNameIndex("A_NODE")
             fid2 = new_line_layer.fieldNameIndex("B_NODE")
+
             for i in all_nodes:
                 P += 1
                 lat, longit, link_id, position, node_id = i
@@ -229,14 +254,17 @@ class FindsNodes(WorkerThread):
 
                 if P % 50 == 0:
                     self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
-                    self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing node IDs to links: " + str(P) + "/" + str(featcount * 2))
+                    self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing node IDs to links: " +
+                                                                      str(P) + "/" + str(feat_count * 2))
 
             self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing node IDs to links: " + str(P)+"/" + str(featcount * 2))
+            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing node IDs to links: " +
+                                                              str(P)+"/" + str(feat_count * 2))
 
             self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "SAVING OUTPUTS")
 
-            QgsVectorFileWriter.writeAsVectorFormat(new_node_layer, self.new_node_layer, "utf-8", None, "ESRI Shapefile")
+            QgsVectorFileWriter.writeAsVectorFormat(new_node_layer, self.new_node_layer,
+                                                    "utf-8", None, "ESRI Shapefile")
 
             new_line_layer.commitChanges()
             QgsMapLayerRegistry.instance().addMapLayer(new_line_layer)

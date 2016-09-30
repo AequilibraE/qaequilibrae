@@ -1,16 +1,23 @@
 """
-/***************************************************************************
- AequilibraE - www.AequilibraE.com
- 
-    Name:        Dialog for creating desire lines
-                              -------------------
-        begin                : 2016-07-01
-        copyright            : Aequilibrae developers
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: Pedro Camargo
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Loads GUI for creating desire lines
+ Purpose:    Creatind desire and delaunay lines
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-07-01
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
 import qgis
@@ -21,14 +28,14 @@ import sys
 from global_parameters import *
 
 from auxiliary_functions import *
-from NumpyModel import NumpyModel
+from numpy_model import NumpyModel
 from load_matrix_dialog import LoadMatrixDialog
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//forms//")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//algorithms//")
 
 from desire_lines_procedure import DesireLinesProcedure
-from ui_DesireLines import *
+from ui_DesireLines import Ui_DesireLines
 
 class DesireLinesDialog(QDialog, Ui_DesireLines):
     def __init__(self, iface):
@@ -41,13 +48,14 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
         self.name_skims = 0
         self.matrix = None
         self.path = standard_path()
+        self.rows = None
+        self.columns = None
 
         # FIRST, we connect slot signals
         # For changing the input matrix
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
 
-        self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_ComboBoxes)
-
+        self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
@@ -57,19 +65,19 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
     # Create desire lines
         self.create_dl.clicked.connect(self.run)
 
-    def runThread(self):
-        QObject.connect(self.workerThread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.ProgressValueFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressText( PyQt_PyObject )"), self.ProgressTextFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.ProgressRangeFromThread)
-        QObject.connect(self.workerThread, SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"),
-                        self.jobFinishedFromThread)
-        self.workerThread.start()
+    def run_thread(self):
+        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
+                        self.job_finished_from_thread)
+        self.worker_thread.start()
         self.exec_()
 
-    def load_fields_to_ComboBoxes(self):
+    def load_fields_to_combo_boxes(self):
         self.zone_id_field.clear()
         if self.zoning_layer.currentIndex() >= 0:
-            layer = getVectorLayerByName(self.zoning_layer.currentText())
+            layer = get_vector_layer_by_name(self.zoning_layer.currentText())
             for field in layer.dataProvider().fields().toList():
                 if field.type() in integer_types:
                     self.zone_id_field.addItem(field.name())
@@ -94,9 +102,6 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
             self.matrix_viewer.setModel(m)
 
     def find_matrices(self):
-        #if self.matrix is not None:
-        #    self.lbl_matrix_loaded.setText('')
-
         dlg2 = LoadMatrixDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
@@ -105,34 +110,35 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
 
         self.add_matrix_to_viewer()
 
-    def ProgressRangeFromThread(self, val):
+    def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
 
-    def ProgressValueFromThread(self, value):
+    def progress_value_from_thread(self, value):
         self.progressbar.setValue(value[1])
 
-    def ProgressTextFromThread(self, value):
+    def progress_text_from_thread(self, value):
         self.progress_label.setText(value[1])
 
-    def jobFinishedFromThread(self, success):
-        if self.workerThread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.workerThread.error, level=3)
+    def job_finished_from_thread(self, success):
+        if self.worker_thread.error is not None:
+            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
         else:
             try:
-                QgsMapLayerRegistry.instance().addMapLayer(self.workerThread.result_layer)
+                QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
             except:
                 pass
-        self.ExitProcedure()
+        self.exit_procedure()
 
     def run(self):
         if self.matrix is not None:
             dl_type = 'DesireLines'
             if self.radio_delaunay.isChecked():
                 dl_type = 'DelaunayLines'
-            self.workerThread = DesireLinesProcedure(qgis.utils.iface.mainWindow(), self.zoning_layer.currentText(),
+            self.worker_thread = DesireLinesProcedure(qgis.utils.iface.mainWindow(), self.zoning_layer.currentText(),
                                                         self.zone_id_field.currentText(), self.matrix, dl_type)
-            self.runThread()
+            self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Matrix not loaded", '', level=3)
-    def ExitProcedure(self):
+
+    def exit_procedure(self):
         self.close()

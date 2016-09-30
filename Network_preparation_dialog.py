@@ -1,24 +1,30 @@
 """
-/***************************************************************************
- AequilibraE - www.AequilibraE.com
- 
-    Name:        Dialogs for modeling tools
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : TOOLS developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Network preparation
+ Purpose:    Loads GUI for preparing networks (extracting nodes A and B from links)
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2014-03-19
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
+
 from qgis.core import *
 import qgis
-from PyQt4 import QtGui
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
 import sys
-# from NumpyModel import NumpyModel
 from global_parameters import *
 from auxiliary_functions import *
 
@@ -42,7 +48,7 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
 
         QObject.connect(self.nodelayers, SIGNAL("currentIndexChanged(QString)"), self.set_columns_nodes)
         self.pushOK.clicked.connect(self.run)
-        self.pushClose.clicked.connect(self.ExitProcedure)
+        self.pushClose.clicked.connect(self.exit_procedure)
 
         self.select_new_line_layer.clicked.connect(self.set_new_line_layer)
 
@@ -55,39 +61,39 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
         # loads default path from parameters
         self.path = standard_path()
 
-
-    def runThread(self):
-        QObject.connect(self.workerThread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.ProgressValueFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressText( PyQt_PyObject )"), self.ProgressTextFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.ProgressRangeFromThread)
-        QObject.connect(self.workerThread, SIGNAL("jobFinished( PyQt_PyObject )"), self.jobFinishedFromThread)
-        self.workerThread.start()
+    def run_thread(self):
+        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("jobFinished( PyQt_PyObject )"), self.job_finished_from_thread)
+        self.worker_thread.start()
         self.show()
 
-    def ProgressRangeFromThread(self, val):
+    def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val)
 
-    def ProgressValueFromThread(self, value):
+    def progress_value_from_thread(self, value):
         self.progressbar.setValue(value)
 
-    def ProgressTextFromThread(self, value):
+    def progress_text_from_thread(self, value):
         self.progress_label.setText(value)
 
     def set_columns_nodes(self):
         self.node_fields.clear()
         if self.nodelayers.currentIndex() >= 0:
-            layer = getVectorLayerByName(self.nodelayers.currentText())
+            layer = get_vector_layer_by_name(self.nodelayers.currentText())
             for field in layer.dataProvider().fields().toList():
                 self.node_fields.addItem(field.name())
 
     def set_new_line_layer(self):
-        if len(self.out_lines.text()) == 0:
-            newname = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
+        if not len(self.out_lines.text()):
+            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
         else:
-            newname = QFileDialog.getSaveFileName(None, 'Result file', self.out_lines.text(), "Shapefile(*.shp)")
-        self.out_lines.setText(newname)
+            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.out_lines.text(), "Shapefile(*.shp)")
+        self.out_lines.setText(new_name)
         self.new_layer = True
-        if len(newname) == 0: self.new_layer = False
+        if not len(new_name):
+            self.new_layer = False
 
     def uses_nodes(self, state):
         if (self.radioUseNodes.isChecked()):
@@ -103,35 +109,36 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
             self.nodelayers.hideEvent
             self.np_node_start.setEnabled(True)
             if len(self.out_nodes.text()) == 0:
-                newname = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
+                new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
             else:
-                newname = QFileDialog.getSaveFileName(None, 'Result file', self.out_nodes.text(), "Shapefile(*.shp)")
-            if len(newname) > 0:
-                self.out_nodes.setText(newname)
+                new_name = QFileDialog.getSaveFileName(None, 'Result file', self.out_nodes.text(), "Shapefile(*.shp)")
+            if len(new_name) > 0:
+                self.out_nodes.setText(new_name)
                 self.filename = True
 
-    def jobFinishedFromThread(self, success):
+    def job_finished_from_thread(self, success):
         self.pushOK.setEnabled(True)
-        if self.workerThread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Node layer error: ", self.workerThread.error, level=3)
+        if self.worker_thread.error is not None:
+            qgis.utils.iface.messageBar().pushMessage("Node layer error: ", self.worker_thread.error, level=3)
         print 'Finished OK'
-    def run(self):
 
+    def run(self):
         if self.new_layer:
 
             if self.radioUseNodes.isChecked():
                 self.pushOK.setEnabled(False)
-                self.workerThread = FindsNodes(qgis.utils.iface.mainWindow(), self.linelayers.currentText(),
+                self.worker_thread = FindsNodes(qgis.utils.iface.mainWindow(), self.linelayers.currentText(),
                                                self.out_lines.text(), self.nodelayers.currentText(),
                                                self.node_fields.currentText())
-                self.runThread()
+                self.run_thread()
 
             else:
-                if self.filename == True:
+                if self.filename:
                     self.pushOK.setEnabled(False)
-                    self.workerThread = FindsNodes(qgis.utils.iface.mainWindow(), self.linelayers.currentText(),
-                                                   self.out_lines.text(), new_node_layer=self.out_nodes.text(), node_start = int(self.np_node_start.text()))
-                    self.runThread()
+                    self.worker_thread = FindsNodes(qgis.utils.iface.mainWindow(), self.linelayers.currentText(),
+                                                   self.out_lines.text(), new_node_layer=self.out_nodes.text(),
+                                                    node_start = int(self.np_node_start.text()))
+                    self.run_thread()
 
                 else:
                     qgis.utils.iface.messageBar().pushMessage("No file name provided",
@@ -141,6 +148,6 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
             qgis.utils.iface.messageBar().pushMessage("No file name provided",
                                                       "Please indicate a file name for the new LINE layer", level=3)
 
-    def ExitProcedure(self):
+    def exit_procedure(self):
         self.close()
 

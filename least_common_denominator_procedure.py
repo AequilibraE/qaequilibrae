@@ -1,28 +1,32 @@
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
- 
-    Name:        Dialogs for modeling tools
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : AequilibraE developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Least commmon denominator
+ Purpose:    Computes least common denominator between two polygon layers in a separate thread
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-09-26
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 from PyQt4.QtCore import QVariant, SIGNAL
 from qgis.core import QgsCoordinateTransform, QgsSpatialIndex, QgsFeature, QgsGeometry, QgsField, QgsVectorLayer
 
-
-import numpy as np
 from auxiliary_functions import *
 from global_parameters import *
-from WorkerThread import WorkerThread
-def main():
-    pass
+from worker_thread import WorkerThread
 
-class LeastCommonDenominator(WorkerThread):
+
+class LeastCommonDenominatorProcedure(WorkerThread):
     def __init__(self, parentThread, flayer, tlayer, ffield, tfield):
         WorkerThread.__init__(self, parentThread)
         self.flayer = flayer
@@ -41,37 +45,39 @@ class LeastCommonDenominator(WorkerThread):
         ffield = self.ffield
         tfield = self.tfield
 
-        self.from_layer = getVectorLayerByName(flayer)
-        self.to_layer = getVectorLayerByName(tlayer)
+        self.from_layer = get_vector_layer_by_name(flayer)
+        self.to_layer = get_vector_layer_by_name(tlayer)
 
         self.transform = None
         if self.from_layer.dataProvider().crs() != self.to_layer.dataProvider().crs():
-            self.transform = QgsCoordinateTransform(self.from_layer.dataProvider().crs(),self.to_layer.dataProvider().crs())
+            self.transform = QgsCoordinateTransform(self.from_layer.dataProvider().crs(),
+                                                    self.to_layer.dataProvider().crs())
 
-        #FIELDS INDICES
+        # FIELDS INDICES
         idx = self.from_layer.fieldNameIndex(ffield)
         fid = self.to_layer.fieldNameIndex(tfield)
 
-        #We create an spatial self.index to hold all the features of the layer that will receive the data
-        #And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
+        # We create an spatial self.index to hold all the features of the layer that will receive the data
+        # And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
         allfeatures = {feature.id(): feature for (feature) in self.to_layer.getFeatures()}
         self.index = QgsSpatialIndex()
         for feature in allfeatures.values():
             self.index.insertFeature(feature)
         self.all_attr = {}
 
-        # We create the memory layer that will have the analysis result, which is the lowest common denominator of both layers
-        EPSG_code = int(self.to_layer.crs().authid().split(":")[1])
+        # We create the memory layer that will have the analysis result, which is the lowest common
+        # denominator of both layers
+        epsg_code = int(self.to_layer.crs().authid().split(":")[1])
         if self.from_layer.wkbType() in self.poly_types and self.to_layer.wkbType() in self.poly_types:
-            lcd_layer = QgsVectorLayer("MultiPolygon?crs=epsg:" + str(EPSG_code), "output", "memory")
+            lcd_layer = QgsVectorLayer("MultiPolygon?crs=epsg:" + str(epsg_code), "output", "memory")
             self.output_type = 'Poly'
 
         elif self.from_layer.wkbType() in self.poly_types + self.line_types and \
              self.to_layer.wkbType() in self.poly_types + self.line_types:
-            lcd_layer = QgsVectorLayer("MultiLineString?crs=epsg:" + str(EPSG_code), "output", "memory")
+            lcd_layer = QgsVectorLayer("MultiLineString?crs=epsg:" + str(epsg_code), "output", "memory")
             self.output_type = 'Line'
         else:
-            lcd_layer = QgsVectorLayer("MultiPoint?crs=epsg:" + str(EPSG_code), "output", "memory")
+            lcd_layer = QgsVectorLayer("MultiPoint?crs=epsg:" + str(epsg_code), "output", "memory")
             self.output_type = 'Point'
 
         lcdpr = lcd_layer.dataProvider()
@@ -112,7 +118,7 @@ class LeastCommonDenominator(WorkerThread):
         self.result = lcd_layer
 
         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), self.from_layer.dataProvider().featureCount())
-        self.emit(SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"), "procedure")
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), "procedure")
 
     def find_geometry(self, g):
         if self.output_type == 'Poly':
@@ -134,7 +140,3 @@ class LeastCommonDenominator(WorkerThread):
             else:
                 geometry = QgsGeometry.fromPoint(g.asPoint())
         return geometry, stat
-
-
-if __name__ == '__main__':
-    main()

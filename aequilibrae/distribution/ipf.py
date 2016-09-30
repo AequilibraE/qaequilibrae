@@ -1,16 +1,25 @@
-# -------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------
-# Name:       Iterative proportional fitting
-# Purpose:    Implement Iterative proportinal fitting
-#
-# Author:      Pedro Camargo
-# Website:    www.AequilibraE.com
-# Repository:  
-#
-# Created:     29/09/2016
-# Copyright:   (c) AequilibraE authors
-# Licence:     See LICENSE.TXT
-# -------------------------------------------------------------------------------
+"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Iterative proportional fitting
+ Purpose:    Implement Iterative proportional fitting
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    29/09/2016
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+"""
+import sys
+sys.dont_write_bytecode = True
 
 import numpy as np
 import os

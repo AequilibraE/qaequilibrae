@@ -3,7 +3,7 @@
 Trip distribution code
 =============
 
-STILL NEED TO ADD SOME EXPLANATIONS HERE
+Imports procedures for trip distribution
 
 """
 
@@ -13,5 +13,6 @@ __revision__ = "$Revision: 1 $"
 __date__ = "$Date: 2016-07-02$"
 
 from ipf import Ipf
+from gravity_application import GravityApplication
 #from . import AssignmentResults
 #from . import PathResults

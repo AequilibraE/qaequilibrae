@@ -1,9 +1,30 @@
+"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Adding centroid connectors procedure
+ Purpose:    Executes centroid addition procedure in a separate thread
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-07-30
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
+
 from qgis.core import *
 from PyQt4.QtCore import *
-import numpy as np
 from auxiliary_functions import *
+
 from global_parameters import *
-from WorkerThread import WorkerThread
+from worker_thread import WorkerThread
 
 
 class AddsConnectorsProcedure(WorkerThread):
@@ -27,22 +48,22 @@ class AddsConnectorsProcedure(WorkerThread):
     def doWork(self):
         max_connectors = self.max_connectors
 
-        nodes = getVectorLayerByName(self.node_layer_name)
-        centroids = getVectorLayerByName(self.centroid_layer_name)
-        links = getVectorLayerByName(self.link_layer_name)
+        nodes = get_vector_layer_by_name(self.node_layer_name)
+        centroids = get_vector_layer_by_name(self.centroid_layer_name)
+        links = get_vector_layer_by_name(self.link_layer_name)
 
         # We create the new line layer
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Duplicating layers")
-        EPSG_code = int(links.crs().authid().split(":")[1])
+        epsg_code = int(links.crs().authid().split(":")[1])
         new_line_layer = QgsVectorLayer(links.source(), links.name(), links.providerType())
-        QgsVectorFileWriter.writeAsVectorFormat(new_line_layer, self.new_line_layer_name, str(EPSG_code), None,
+        QgsVectorFileWriter.writeAsVectorFormat(new_line_layer, self.new_line_layer_name, str(epsg_code), None,
                                                 "ESRI Shapefile")
         new_line_layer = QgsVectorLayer(self.new_line_layer_name, 'network_with_centroids', 'ogr')
 
         # Create new node layer
-        EPSG_code = int(nodes.crs().authid().split(":")[1])
+        epsg_code = int(nodes.crs().authid().split(":")[1])
         new_node_layer = QgsVectorLayer(nodes.source(), nodes.name(), nodes.providerType())
-        QgsVectorFileWriter.writeAsVectorFormat(new_node_layer, self.new_node_layer_name, str(EPSG_code), None,
+        QgsVectorFileWriter.writeAsVectorFormat(new_node_layer, self.new_node_layer_name, str(epsg_code), None,
                                                 "ESRI Shapefile")
         new_node_layer = QgsVectorLayer(self.new_node_layer_name, 'nodes_plus_centroids', 'ogr')
 

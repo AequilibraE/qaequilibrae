@@ -1,20 +1,26 @@
-# -*- coding: utf-8 -*-
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
-                                 A QGIS plugin
- AequilibraE and other tools for Transportation modelers
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : AequilibraE developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
 
+ Name:       QGIS menu
+ Purpose:    Creates the QGIS menu for AequilibraE and connects with the appropriate classes
 
-"""
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2014-03-19
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
+
 # Import the PyQt and QGIS libraries
+# noinspection PyUnresolvedReferences
 from qgis.core import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -22,17 +28,18 @@ from PyQt4.QtCore import *
 # Import the code for the dialog
 from parameters_dialog import ParameterDialog
 from Network_preparation_dialog import TQ_NetPrepDialog
-from adds_connectors_dialog import AEQ_AddConnectors
-from create_graph_dialog import Graph_Creation_Dialog
+from adds_connectors_dialog import AddConnectorsDialog
+from create_graph_dialog import GraphCreationDialog
 from show_shortest_path_dialog import ShortestPathDialog
 from impedance_matrix_dialogs import ImpedanceMatrixDialog
 from desire_lines_dialog import DesireLinesDialog
 from ipf_dialog import IpfDialog
 
-#from calibrate_gravity_dialog import CalibrateGravityDialog
-#from Transportation_modeling_dialogs import *
-#from Trip_distribution_dialogs import *
-#from GIS_tools_dialogs import *
+# from calibrate_gravity_dialog import CalibrateGravityDialog
+# from Transportation_modeling_dialogs import *
+# from Trip_distribution_dialogs import *
+# from GIS_tools_dialogs import *
+
 from simple_tag_dialog import SimpleTagDialog
 from least_common_denominator_dialog import LeastCommonDenominatorDialog
 import sys
@@ -41,12 +48,16 @@ sys.dont_write_bytecode = True
 import os.path
 
 
-class AequilibraE_menu:
+class AequilibraEMenu:
     def __init__(self, iface):
         self.iface = iface
         self.AequilibraE_menu = None
+        self.network_menu = None
+        self.trip_distribution_menu = None
+        self.assignment_menu = None
+        self.gis_tools_menu = None
 
-    def AequilibraE_add_submenu(self, submenu):
+    def aequilibrae_add_submenu(self, submenu):
         if self.AequilibraE_menu is not None:
             self.AequilibraE_menu.addMenu(submenu)
         else:
@@ -63,7 +74,7 @@ class AequilibraE_menu:
         # ################# NETWORK MANIPULATION SUB-MENU  #######################
 
         self.network_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Network Manipulation"))
-        self.AequilibraE_add_submenu(self.network_menu)
+        self.aequilibrae_add_submenu(self.network_menu)
 
         # Network preparation
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
@@ -71,19 +82,17 @@ class AequilibraE_menu:
         QObject.connect(self.network_prep_action, SIGNAL("triggered()"), self.run_net_prep)
         self.network_menu.addAction(self.network_prep_action)
 
-
         # Adding Connectors
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
         self.add_connectors_action = QAction(icon, u"Adding Connectors", self.iface.mainWindow())
         QObject.connect(self.add_connectors_action, SIGNAL("triggered()"), self.run_add_connectors)
         self.network_menu.addAction(self.add_connectors_action)
 
-
         # # ########################################################################
         # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
 
         self.trip_distribution_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Trip Distribution"))
-        self.AequilibraE_add_submenu(self.trip_distribution_menu)
+        self.aequilibrae_add_submenu(self.trip_distribution_menu)
 
         # # IPF
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_ipf.png")
@@ -97,12 +106,11 @@ class AequilibraE_menu:
         # QObject.connect(self.trip_distr_action, SIGNAL("triggered()"), self.run_trip_distr)
         # self.trip_distribution_menu.addAction(self.trip_distr_action)
 
-
         # ########################################################################
         # ###################  PATH COMPUTATION SUB-MENU   #######################
 
         self.assignment_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Paths and assignment"))
-        self.AequilibraE_add_submenu(self.assignment_menu)
+        self.aequilibrae_add_submenu(self.assignment_menu)
 
         # MATRIX HOLDER
         # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
@@ -122,7 +130,6 @@ class AequilibraE_menu:
         QObject.connect(self.shortest_path_action, SIGNAL("triggered()"), self.run_shortest_path)
         self.assignment_menu.addAction(self.shortest_path_action)
 
-
         # Distance matrix generation
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dist_matrix.png")
         self.dist_matrix_action = QAction(icon, u"Impedance matrix", self.iface.mainWindow())
@@ -136,11 +143,10 @@ class AequilibraE_menu:
         # self.assignment_menu.addAction(self.traffic_assignment_action)
         # #########################################################################
 
-
         # ########################################################################
         # #################        GIS TOOLS SUB-MENU    #########################
         self.gis_tools_menu = QMenu(QCoreApplication.translate("AequilibraE", "&GIS tools"))
-        self.AequilibraE_add_submenu(self.gis_tools_menu)
+        self.aequilibrae_add_submenu(self.gis_tools_menu)
 
         # # Node to area aggregation
         # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_node_to_area.png")
@@ -175,11 +181,10 @@ class AequilibraE_menu:
         QObject.connect(self.parameters_action, SIGNAL("triggered()"), self.run_change_parameters)
         self.AequilibraE_menu.addAction(self.parameters_action)
 
-
     #########################################################################
 
     def unload(self):
-        if self.AequilibraE_menu != None:
+        if self.AequilibraE_menu is not None:
             self.iface.mainWindow().menuBar().removeAction(self.AequilibraE_menu.menuAction())
         else:
             self.iface.removePluginMenu("&AequilibraE", self.network_menu.menuAction())
@@ -200,27 +205,22 @@ class AequilibraE_menu:
         # If we wanted modal, we would eliminate the dlg2.show()
 
     def run_add_connectors(self):
-        dlg2 = AEQ_AddConnectors(self.iface)
+        dlg2 = AddConnectorsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
-    def run_matrix_holder(self):
-        dlg2 = TQ_Matrix_Holder_Dialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+    # def run_matrix_holder(self):
+    #     dlg2 = TQ_Matrix_Holder_Dialog(self.iface)
+    #     dlg2.show()
+    #     dlg2.exec_()
 
-    def run_calibrate_gravity(self):
-        dlg2 = CalibrateGravityDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-
-    def run_trip_distr(self):
-        dlg2 = TQ_Trip_Dist_Dialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+    # def run_calibrate_gravity(self):
+    #     dlg2 = CalibrateGravityDialog(self.iface)
+    #     dlg2.show()
+    #     dlg2.exec_()
 
     def run_create_graph(self):
-        dlg2 = Graph_Creation_Dialog(self.iface)
+        dlg2 = GraphCreationDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
@@ -234,16 +234,16 @@ class AequilibraE_menu:
         dlg2.show()
         dlg2.exec_()
 
-    def run_traffic_assig(self):
-        # show the dialog
-        dlg = Traffic_AssignmentDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+    # def run_traffic_assig(self):
+    #     # show the dialog
+    #     dlg = Traffic_AssignmentDialog(self.iface)
+    #     dlg2.show()
+    #     dlg2.exec_()
 
-    def run_node_to_area(self):
-        dlg2 = node_to_area_class(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+    # def run_node_to_area(self):
+    #     dlg2 = node_to_area_class(self.iface)
+    #     dlg2.show()
+    #     dlg2.exec_()
 
     def run_simple_tag(self):
         dlg2 = SimpleTagDialog(self.iface)

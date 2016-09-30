@@ -1,17 +1,23 @@
 """
-/***************************************************************************
- AequilibraE - www.AequilibraE.com
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
 
-    Name:        Dialog for showing the report from algorithm runs
-                              -------------------
-        Creation           2016-29-16
-        Update             2016-29-16
-        copyright            : AequilibraE developers 2016
-        Original Author: Pedro Camargo (c@margo.co)
-        Contributors:
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ Name:       Report dialog
+ Purpose:    Dialog for showing the report from algorithm runs
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2014-03-19
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
 from PyQt4 import QtGui
@@ -40,14 +46,14 @@ class ReportDialog(QtGui.QDialog, Ui_report):
 
     def save_log(self):
         file_types = "Text files(*.txt)"
-        newname = QFileDialog.getSaveFileName(None, 'Save log', self.path, file_types)
-        if newname is not None:
-            outp = open(newname, 'w')
+        new_name = QFileDialog.getSaveFileName(None, 'Save log', self.path, file_types)
+        if new_name is not None:
+            outp = open(new_name, 'w')
             for t in self.reporting:
                 print >> outp, t
             outp.flush()
             outp.close()
-            self.ExitProcedure()
+            self.exit_procedure()
 
-    def ExitProcedure(self):
+    def exit_procedure(self):
         self.close()

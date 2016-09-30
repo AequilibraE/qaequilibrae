@@ -1,28 +1,30 @@
-# -------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------
-# Name:       TRIP DISTRIBUTION
-# Purpose:    Applying a growth factor method
-#
-# Author:      Pedro Camargo
-# Website:    www.AequilibraE.com
-# Repository:
-#
-# Created:     12/01/2014
-# Copyright:   (c) Pedro Camargo 2014
-# Licence:     GPL
-# -------------------------------------------------------------------------------
+"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Loads matrix from file/layer
+ Purpose:    Implements matrix loading
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-07-30
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
-import qgis
-from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-import sys, os
-import time
 
 import numpy as np
 
-from WorkerThread import WorkerThread
+from worker_thread import WorkerThread
 
 class LoadMatrix(WorkerThread):
     def __init__(self, parentThread, layer, idx, max_zone=None, filler=0):
@@ -38,8 +40,8 @@ class LoadMatrix(WorkerThread):
         layer = self.layer
         idx = self.idx
         max_zone = self.max_zone
-        featcount = layer.featureCount()
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (featcount))
+        feat_count = layer.featureCount()
+        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (feat_count))
 
         error = None
         idx1 = idx[0]
@@ -57,7 +59,7 @@ class LoadMatrix(WorkerThread):
             if P % 1000 == 0:
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
                 self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                          ("Loading matrix: " + str(P) + "/" + str(featcount)))
+                          ("Loading matrix: " + str(P) + "/" + str(feat_count)))
 
         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (0))
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), ("Converting Matrix to a NumPy array"))
@@ -78,10 +80,10 @@ class LoadMatrix(WorkerThread):
                 if P % 1000 == 0:
                     self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
                     self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                              ("Converting matrix: " + str(P) + "/" + str(featcount)))
+                              ("Converting matrix: " + str(P) + "/" + str(feat_count)))
 
         self.matrix = mat
         self.error = error
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(featcount)))
+        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(feat_count)))
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), ("Matrix loading finalized"))
-        self.emit(SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"), 'LOADED-MATRIX')
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'LOADED-MATRIX')

@@ -1,26 +1,34 @@
 """
-/***************************************************************************
- AequilibraE - www.AequilibraE.com
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
 
-    Name:        Dialog for creating the graph
-                              -------------------
-        begin                : 2016-07-30
-        copyright            : AequilibraE developers 2016
-        Original Author: Pedro Camargo (c@margo.co)
-        Contributors:
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ Name:       Creating the graph from geographic layer
+ Purpose:    GUI for creating the graph
 
-from qgis.core import *
-import qgis
-import numpy as np
-from PyQt4 import QtGui
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
 
-import sys, os
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-07-30
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
+
+import sys
 from functools import partial
+
+import numpy as np
+import qgis
+from PyQt4 import QtGui
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from qgis.core import *
+
 from auxiliary_functions import *
 from global_parameters import *
 
@@ -28,12 +36,13 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
 from create_graph_procedure import GraphCreation
-from ui_Create_Graph import *
+from ui_Create_Graph import Ui_Create_Graph
 
 
-class Graph_Creation_Dialog(QtGui.QDialog, Ui_Create_Graph):
+class GraphCreationDialog(QtGui.QDialog, Ui_Create_Graph):
     def __init__(self, iface):
         QDialog.__init__(self)
+        self.validtypes = integer_types + float_types
         self.iface = iface
         self.setupUi(self)
         self.field_types = {}
@@ -48,13 +57,13 @@ class Graph_Creation_Dialog(QtGui.QDialog, Ui_Create_Graph):
         self.links_are_bi_directional.stateChanged.connect(self.bi_directional)
 
         # For changing the network layer
-        self.network_layer.currentIndexChanged.connect(self.load_fields_to_ComboBoxes)
+        self.network_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
         # For setting centroids
         self.set_centroids_rule.stateChanged.connect(self.add_model_centroids)
 
         # For adding skims
         self.add_skim.clicked.connect(self.add_to_skim_list)
-        self.skim_list.doubleClicked.connect(self.slotDoubleClicked)
+        self.skim_list.doubleClicked.connect(self.slot_double_clicked)
 
         # SECOND, we set visibility for sections that should not be shown when the form opens (overlapping items)
         #        and re-dimension the items that need re-dimensioning
@@ -94,8 +103,7 @@ class Graph_Creation_Dialog(QtGui.QDialog, Ui_Create_Graph):
 
     def add_to_skim_list(self):
         try:
-            layer = getVectorLayerByName(self.network_layer.currentText())
-            self.validtypes = integer_types + float_types
+            layer = get_vector_layer_by_name(self.network_layer.currentText())
 
             ab_skim = layer.fieldNameIndex(self.ab_skim.currentText())
             ba_skim = layer.fieldNameIndex(self.ba_skim.currentText())
@@ -113,14 +121,14 @@ class Graph_Creation_Dialog(QtGui.QDialog, Ui_Create_Graph):
             qgis.utils.iface.messageBar().pushMessage("Wrong settings", "Please review the field information", level=3,
                                                       duration=3)
 
-    def slotDoubleClicked(self, mi):
+    def slot_double_clicked(self, mi):
         row = mi.row()
         if row > -1:
             self.skim_list.removeRow(row)
             self.tot_skims -= 1
 
     # GENERIC to be applied to MORE THAN ONE form
-    def load_fields_to_ComboBoxes(self):
+    def load_fields_to_combo_boxes(self):
 
         i_types = [self.direction_field, self.link_id, self.ab_skim, self.ba_skim]
         f_types = [self.ab_length, self.ba_length, self.ab_skim, self.ba_skim]
@@ -131,7 +139,7 @@ class Graph_Creation_Dialog(QtGui.QDialog, Ui_Create_Graph):
             combo.addItem('Choose Field')
 
         if self.network_layer.currentIndex() >= 0:
-            layer = getVectorLayerByName(self.network_layer.currentText())
+            layer = get_vector_layer_by_name(self.network_layer.currentText())
             for field in layer.dataProvider().fields().toList():
                 if field.type() in integer_types:
                     self.field_types[field.name()] = field.type()
@@ -147,32 +155,32 @@ class Graph_Creation_Dialog(QtGui.QDialog, Ui_Create_Graph):
         if self.set_centroids_rule.isChecked():
             self.model_centroids.setEnabled(True)
 
-    def runThread(self):
+    def run_thread(self):
 
-        QObject.connect(self.workerThread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.ProgressValueFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressText( PyQt_PyObject )"), self.ProgressTextFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.ProgressRangeFromThread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
+                        self.progress_range_from_thread)
 
-        QObject.connect(self.workerThread, SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"),
-                        self.FinishedThreadedProcedure)
+        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
+                        self.finished_threaded_procedure)
 
-        self.workerThread.start()
+        self.worker_thread.start()
         self.exec_()
 
     # VAL and VALUE have the following structure: (bar/text ID, value)
-    def ProgressRangeFromThread(self, val):
+    def progress_range_from_thread(self, val):
         self.progressbar0.setRange(0, val)
 
-    def ProgressValueFromThread(self, val):
+    def progress_value_from_thread(self, val):
         self.progressbar0.setValue(val)
 
-    def ProgressTextFromThread(self, val):
+    def progress_text_from_thread(self, val):
         self.progress_label0.setText(val)
 
-    def FinishedThreadedProcedure(self, param):
-
-        if self.workerThread.error != None:
-            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.workerThread.error,
+    def finished_threaded_procedure(self, param):
+        if self.worker_thread.error is not None:
+            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.worker_thread.error,
                                                       level=1)
         else:
             bcf = False
@@ -180,31 +188,29 @@ class Graph_Creation_Dialog(QtGui.QDialog, Ui_Create_Graph):
                 bcf = True
 
             if self.centroids is None:
-                self.workerThread.graph.set_graph(cost_field='length', skim_fields=list(self.skims.keys()),
-                                                  block_centroid_flows=bcf)
+                self.worker_thread.graph.set_graph(cost_field='length', skim_fields=list(self.skims.keys()),
+                                                   block_centroid_flows=bcf)
             else:
-                self.workerThread.graph.set_graph(centroids = int(self.centroids), cost_field='length',
-                                                  skim_fields=list(self.skims.keys()), block_centroid_flows=bcf)
+                self.worker_thread.graph.set_graph(centroids=int(self.centroids), cost_field='length',
+                                                   skim_fields=list(self.skims.keys()), block_centroid_flows=bcf)
 
-
-            self.workerThread.graph.save_to_disk(self.output)
+            self.worker_thread.graph.save_to_disk(self.output)
             qgis.utils.iface.messageBar().pushMessage("Finished. ", 'Graph saved successfully', level=3)
-            self.ExitProcedure()
+            self.exit_procedure()
 
     def browse_outfile(self, dialogbox_name, outbox, file_types):
         if len(outbox.text()) == 0:
-            newname = QFileDialog.getSaveFileName(None, dialogbox_name, self.path, file_types)
+            new_name = QFileDialog.getSaveFileName(None, dialogbox_name, self.path, file_types)
         else:
-            newname = QFileDialog.getSaveFileName(None, dialogbox_name, outbox.text(), file_types)
-        if newname != None:
-            outbox.setText(newname)
+            new_name = QFileDialog.getSaveFileName(None, dialogbox_name, outbox.text(), file_types)
+        if new_name is not None:
+            outbox.setText(new_name)
 
     def GraphCreationPhase1(self):  # CREATING GRAPH
         self.error = None
-        warning = ''
         text = ''
 
-        self.layer = getVectorLayerByName(self.network_layer.currentText())
+        self.layer = get_vector_layer_by_name(self.network_layer.currentText())
 
         if self.layer is None:
             self.error = 'Link layer not selected'
@@ -316,12 +322,12 @@ class Graph_Creation_Dialog(QtGui.QDialog, Ui_Create_Graph):
             self.lbl_funding1.setVisible(False)
             self.lbl_funding2.setVisible(False)
 
-            self.workerThread = GraphCreation(qgis.utils.iface.mainWindow(), self.layer, self.linkid, self.ab_length,
-                                              self.bidirectional, self.directionfield, self.ba_length, self.skims,
-                                              self.selected_only, self.featcount)
-            self.runThread()
+            self.worker_thread = GraphCreation(qgis.utils.iface.mainWindow(), self.layer, self.linkid, self.ab_length,
+                                               self.bidirectional, self.directionfield, self.ba_length, self.skims,
+                                               self.selected_only, self.featcount)
+            self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.error, level=3)
 
-    def ExitProcedure(self):
+    def exit_procedure(self):
         self.close()
