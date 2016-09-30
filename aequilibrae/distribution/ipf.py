@@ -28,7 +28,7 @@ class Ipf:
         self.parameters = parameters
         self.output = None
         self.error = None
-        self.__required_parameters=['convergence level', 'max iteractions', 'balancing tolerance']
+        self.__required_parameters=['convergence level', 'max iterations', 'balancing tolerance']
         self.error_free = True
         self.report = ['  #####    IPF computation    #####  ', '']
 
@@ -37,7 +37,7 @@ class Ipf:
         self.check_parameters()
 
         # check dimensions
-        if self.rows is None or self.columns is None or self.seed is None or self.parameters is None:
+        if self.rows is None or self.columns is None or self.seed is None:
             self.error = 'missing data'
 
         if self.error is None:
@@ -60,22 +60,24 @@ class Ipf:
                 self.error = 'Vectors are not balanced'
             else:
                 # guarantees that they are precisely balanced
-                self.columns = self.columns* (np.sum(self.rows)/np.sum(self.columns))
+                self.columns = self.columns * (np.sum(self.rows)/np.sum(self.columns))
 
         if self.error is not None:
-            print self.error
             self.error_free = False
 
     def check_parameters(self):
         for i in self.__required_parameters:
             if i not in  self.parameters:
-                self.error = 'Parameter list not complete'
+                self.error = 'Parameters error. It needs to be a dictionary with the following keys: '
+                for t in self.__required_parameters:
+                    self.error = self.error + t + ', '
+                break
 
     def fit(self):
         t = clock()
         self.check_data()
         if self.error_free:
-            max_iter =  self.parameters['max iteractions']
+            max_iter =  self.parameters['max iterations']
             conv_criteria = self.parameters['convergence level']
             self.output = np.copy(self.seed)
 
@@ -136,7 +138,7 @@ class Ipf:
         return path['distribution'][model]
 
 ###For testing
-rows = np.random.rand(1000)*10000
+# rows = np.random.rand(1000)*10000
 # columns = np.random.rand(1000)*10000
 # columns = columns * (np.sum(rows)/np.sum(columns))
 # mat = np.random.rand(1000,1000)

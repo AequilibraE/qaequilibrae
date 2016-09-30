@@ -3,12 +3,10 @@ assignment:
     rgap: 1.0e-05
 distribution:
   gravity:
-    convergence level: 1.0e-10
-    max iteractions: 50
-    max tld: 1000
+    max trip length: 1000
   ipf:
     convergence level: 0.0001
-    max iteractions: 5000
+    max iterations: 5000
     balancing tolerance: 0.001
 system:
   cpus: 8
