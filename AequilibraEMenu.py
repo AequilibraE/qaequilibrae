@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/09/2016
+ Updated:    2016-10-03
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -21,6 +21,9 @@
 
 # Import the PyQt and QGIS libraries
 # noinspection PyUnresolvedReferences
+import os
+import sys
+
 from qgis.core import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -33,7 +36,10 @@ from create_graph_dialog import GraphCreationDialog
 from show_shortest_path_dialog import ShortestPathDialog
 from impedance_matrix_dialogs import ImpedanceMatrixDialog
 from desire_lines_dialog import DesireLinesDialog
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//distribution//")
 from ipf_dialog import IpfDialog
+from apply_gravity_dialog import ApplyGravityDialog
 
 # from calibrate_gravity_dialog import CalibrateGravityDialog
 # from Transportation_modeling_dialogs import *
@@ -99,6 +105,13 @@ class AequilibraEMenu:
         self.ipf_action = QAction(icon, u"Iterative proportional fitting", self.iface.mainWindow())
         QObject.connect(self.ipf_action, SIGNAL("triggered()"), self.run_ipf)
         self.trip_distribution_menu.addAction(self.ipf_action)
+
+        # # Apply Gravity
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_apply_gravity.png")
+        self.apply_gravity_action = QAction(icon, u"Apply Gravity Model", self.iface.mainWindow())
+        QObject.connect(self.apply_gravity_action, SIGNAL("triggered()"), self.run_apply_gravity)
+        self.trip_distribution_menu.addAction(self.apply_gravity_action)
+
         #
         # # Trip Distribution
         # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
@@ -221,6 +234,11 @@ class AequilibraEMenu:
 
     def run_create_graph(self):
         dlg2 = GraphCreationDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_apply_gravity(self):
+        dlg2 = ApplyGravityDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

@@ -1,4 +1,8 @@
 cd ECHO %CurrentDir%
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_apply_gravity.ui -o ui_apply_gravity.py
+
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_gravity_parameters.ui -o ui_gravity_parameters.py
+
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_report.ui -o ui_report.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_vector_loader.ui -o ui_vector_loader.py

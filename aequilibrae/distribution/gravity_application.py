@@ -14,8 +14,8 @@
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    30/09/2016
- Updated:
+ Created:    2016-09-30
+ Updated:    2016-10-03
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -31,13 +31,22 @@ import numpy as np
 import yaml
 import os
 from ipf import Ipf
-
+from time import clock
 
 def main():
     pass
 
 
 class GravityApplication:
+    """"
+    Model specification is a dictionary of dictionaries:
+
+        model = {function, parameters
+                }
+        where function is: 'EXPO', 'POWER' or 'GAMMA'
+
+        and parameters are:  {alpha:..., beta:...}
+    """
     def __init__(self, rows=None, columns=None, impedance=None, model=None, parameters=None):
         self.error = None
         self.error_free = True
@@ -53,11 +62,17 @@ class GravityApplication:
         self.impedance = impedance
         self.parameters = parameters
         self.model = model
-
         self.output = None
+        self.report = ['  #####    GRAVITY APPLICATION    #####  ', '']
+        self.report.append('Model specification:')
+        self.report.append('    ' + self.model['function'])
+        for i in self.model['parameters'].keys():
+            self.report.append('    ' + i + ': ' + str(self.model['parameters'][i]))
+        self.report.append('')
 
     def apply(self):
         if self.error is None:
+            t= clock()
             max_cost = self.parameters['max trip length']
 
             # We create the output
@@ -86,6 +101,17 @@ class GravityApplication:
             # apply fratar
             ipf.fit()
             self.output = ipf.output
+
+            q = ipf.report.pop(0)
+            for q in ipf.report:
+                self.report.append(q)
+
+            self.report.append('')
+            self.report.append('')
+
+            self.report.append('Total of matrix: ' + "{:15,.4f}".format(np.sum(self.output)))
+            self.report.append('Intrazonal flow: ' + "{:15,.4f}".format(np.trace(self.output)))
+            self.report.append('Running time: ' +  str(round(clock()-t, 3)))
 
     def get_parameters(self, model):
         path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

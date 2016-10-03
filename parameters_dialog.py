@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-08-15
- Updated:    30/09/2016
+ Updated:    2016-10-03
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -29,7 +29,6 @@ import os
 import yaml
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/algorithms/")
 from ui_parameters import *
 
 

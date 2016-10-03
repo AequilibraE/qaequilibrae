@@ -13,17 +13,21 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-09-29
- Updated:    30/09/2016
+ Updated:    2016-10-03
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")) + "//forms//")
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
+
 from qgis.core import *
 import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-import sys
 from functools import partial
 import numpy as np
 
@@ -31,9 +35,6 @@ from auxiliary_functions import *
 from load_matrix_dialog import LoadMatrixDialog
 from load_vector_dialog import LoadVectorDialog
 from report_dialog import ReportDialog
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//forms//")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//algorithms//")
 
 from ipf_procedure import IpfProcedure
 from ui_ipf import Ui_ipf
