@@ -73,11 +73,12 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
-            if layer.wkbType() in point_types:
-                self.cb_node_layer.addItem(layer.name())
+            if 'wkbType' in dir(layer):
+                if layer.wkbType() in point_types:
+                    self.cb_node_layer.addItem(layer.name())
 
-            if layer.wkbType() in line_types:
-                self.cb_link_layer.addItem(layer.name())
+                if layer.wkbType() in line_types:
+                    self.cb_link_layer.addItem(layer.name())
 
         # loads default path from parameters
         self.path = standard_path()

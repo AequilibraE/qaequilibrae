@@ -54,9 +54,10 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
 
         # We load the line and node layers existing in our canvas
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if layer.wkbType() in line_types:
-                self.linelayers.addItem(layer.name())
-            # if layer.wkbType() == QGis.WKBPoint: self.nodelayers.addItem(layer.name())
+            if 'wkbType' in dir(layer):
+                if layer.wkbType() in line_types:
+                    self.linelayers.addItem(layer.name())
+                # if layer.wkbType() == QGis.WKBPoint: self.nodelayers.addItem(layer.name())
 
         # loads default path from parameters
         self.path = standard_path()

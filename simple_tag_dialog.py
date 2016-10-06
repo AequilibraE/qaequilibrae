@@ -54,9 +54,10 @@ class SimpleTagDialog(QtGui.QDialog, Ui_simple_tag):
 
         # We load the node and area layers existing in our canvas
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if layer.wkbType() in self.valid_layer_types:
-                self.fromlayer.addItem(layer.name())
-                self.tolayer.addItem(layer.name())
+            if 'wkbType' in dir(layer):
+                if layer.wkbType() in self.valid_layer_types:
+                    self.fromlayer.addItem(layer.name())
+                    self.tolayer.addItem(layer.name())
 
         self.works_field_matching()
 

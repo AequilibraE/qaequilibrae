@@ -53,9 +53,10 @@ class LeastCommonDenominatorDialog(QtGui.QDialog, Ui_least_common_denominator):
 
         # We load the node and area layers existing in our canvas
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if layer.wkbType() in self.valid_layer_types:
-                self.from_layer.addItem(layer.name())
-                self.to_layer.addItem(layer.name())
+            if 'wkbType' in dir(layer):
+                if layer.wkbType() in self.valid_layer_types:
+                    self.from_layer.addItem(layer.name())
+                    self.to_layer.addItem(layer.name())
 
     def reload_fields(self, box):
         if box == 'from':

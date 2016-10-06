@@ -60,11 +60,12 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
-            if layer.wkbType() in poly_types or layer.wkbType() in point_types:
-                self.zoning_layer.addItem(layer.name())
+            if 'wkbType' in dir(layer):
+                if layer.wkbType() in poly_types or layer.wkbType() in point_types:
+                    self.zoning_layer.addItem(layer.name())
 
-                self.progress_label.setVisible(True)
-                self.progressbar.setVisible(True)
+                    self.progress_label.setVisible(True)
+                    self.progressbar.setVisible(True)
 
 
     def run_thread(self):

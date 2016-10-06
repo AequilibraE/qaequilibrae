@@ -68,8 +68,9 @@ class LoadVectorDialog(QtGui.QDialog, Ui_vector_loader):
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
-            if layer.wkbType() in [100] + point_types + poly_types:
-                self.vector_layer.addItem(layer.name())
+            if 'wkbType' in dir(layer):
+                if layer.wkbType() in [100] + point_types + poly_types:
+                    self.vector_layer.addItem(layer.name())
 
         if not OMX:
             self.radio_omx_matrix.setVisible(False)

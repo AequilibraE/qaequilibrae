@@ -59,12 +59,13 @@ class AddConnectorsDialog(QDialog, Ui_ConnectingCentroids):
 
         # We load the line and node layers existing in our canvas
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if layer.wkbType() in line_types:
-                self.LineLayer.addItem(layer.name())
+            if 'wkbType' in dir(layer):
+                if layer.wkbType() in line_types:
+                    self.LineLayer.addItem(layer.name())
 
-            if layer.wkbType() in point_types:
-                self.NodeLayer.addItem(layer.name())
-                self.CentroidLayer.addItem(layer.name())
+                if layer.wkbType() in point_types:
+                    self.NodeLayer.addItem(layer.name())
+                    self.CentroidLayer.addItem(layer.name())
 
         # default directory
         self.path = standard_path()

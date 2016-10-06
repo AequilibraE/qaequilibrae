@@ -70,8 +70,9 @@ class LoadMatrixDialog(QtGui.QDialog, Ui_matrix_loader):
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
-            if layer.wkbType() == 100:
-                self.matrix_layer.addItem(layer.name())
+            if 'wkbType' in dir(layer):
+                if layer.wkbType() == 100:
+                    self.matrix_layer.addItem(layer.name())
 
         if no_omx:
             self.radio_omx_matrix.setEnabled(False)
