@@ -69,9 +69,11 @@ class DesireLinesProcedure(WorkerThread):
                 self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0,int(P)))
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Loading Layer Features: " + str(P) + "/" + str(featcount)))
 
-                point =list(feat.geometry().centroid().asPoint())
-                points.append(point)
-                point_ids.append(feat.attributes()[idx])
+                geom = feat.geometry()
+                if geom is not None:
+                    point =list(geom.centroid().asPoint())
+                    points.append(point)
+                    point_ids.append(feat.attributes()[idx])
 
             points = np.array(points)
             self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, featcount))

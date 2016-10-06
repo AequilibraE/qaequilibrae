@@ -19,6 +19,7 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
+from qgis.core import QgsMapLayerRegistry
 import math
 import os
 import yaml

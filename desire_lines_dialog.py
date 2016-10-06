@@ -55,13 +55,17 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
 
         self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
 
+        # Create desire lines
+        self.create_dl.clicked.connect(self.run)
+
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
             if layer.wkbType() in poly_types or layer.wkbType() in point_types:
                 self.zoning_layer.addItem(layer.name())
 
-    # Create desire lines
-        self.create_dl.clicked.connect(self.run)
+                self.progress_label.setVisible(True)
+                self.progressbar.setVisible(True)
+
 
     def run_thread(self):
         QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
@@ -129,6 +133,12 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
 
     def run(self):
         if self.matrix is not None:
+
+            self.lbl_funding1.setVisible(False)
+            self.lbl_funding2.setVisible(False)
+            self.progress_label.setVisible(True)
+            self.progressbar.setVisible(True)
+
             dl_type = 'DesireLines'
             if self.radio_delaunay.isChecked():
                 dl_type = 'DelaunayLines'
