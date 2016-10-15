@@ -47,8 +47,8 @@ class LeastCommonDenominatorDialog(QtGui.QDialog, Ui_least_common_denominator):
         # self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
         self.valid_layer_types = poly_types + multi_poly
 
-        self.from_layer.currentIndexChanged.connect(partial(self.reload_fields, 'from'))
-        self.to_layer.currentIndexChanged.connect(partial(self.reload_fields, 'to'))
+        self.fromlayer.currentIndexChanged.connect(partial(self.reload_fields, 'from'))
+        self.tolayer.currentIndexChanged.connect(partial(self.reload_fields, 'to'))
         self.OK.clicked.connect(self.run)
 
         # We load the node and area layers existing in our canvas
@@ -56,19 +56,19 @@ class LeastCommonDenominatorDialog(QtGui.QDialog, Ui_least_common_denominator):
             if 'wkbType' in dir(layer):
                 if layer.wkbType() in self.valid_layer_types:
                     self.from_layer.addItem(layer.name())
-                    self.to_layer.addItem(layer.name())
+                    self.tolayer.addItem(layer.name())
 
     def reload_fields(self, box):
         if box == 'from':
             self.fromfield.clear()
-            if self.from_layer.currentIndex() >= 0:
-                layer = get_vector_layer_by_name(self.from_layer.currentText())  # If we have the right layer in hands
+            if self.fromlayer.currentIndex() >= 0:
+                layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
                 for field in layer.pendingFields().toList():
                     self.fromfield.addItem(field.name())
         else:
             self.tofield.clear()
-            if self.to_layer.currentIndex() >= 0:
-                layer = get_vector_layer_by_name(self.to_layer.currentText())  # If we have the right layer in hands
+            if self.tolayer.currentIndex() >= 0:
+                layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
                 for field in layer.pendingFields().toList():
                     self.tofield.addItem(field.name())
 
@@ -98,17 +98,17 @@ class LeastCommonDenominatorDialog(QtGui.QDialog, Ui_least_common_denominator):
 
     def run(self):
         error = None
-        if self.from_layer.currentIndex() < 0 or self.fromfield.currentIndex() < 0 or \
-           self.to_layer.currentIndex() < 0 or self.tofield.currentIndex() < 0:
+        if self.fromlayer.currentIndex() < 0 or self.fromfield.currentIndex() < 0 or \
+           self.tolayer.currentIndex() < 0 or self.tofield.currentIndex() < 0:
             error = "ComboBox with ilegal value"
 
-        flayer = self.from_layer.currentText()
+        flayer = self.fromlayer.currentText()
         ffield = self.fromfield.currentText()
-        tlayer = self.to_layer.currentText()
+        tlayer = self.tolayer.currentText()
         tfield = self.tofield.currentText()
 
-        layer1 = get_vector_layer_by_name(self.from_layer.currentText()).wkbType()
-        layer2 = get_vector_layer_by_name(self.to_layer.currentText()).wkbType()
+        layer1 = get_vector_layer_by_name(self.fromlayer.currentText()).wkbType()
+        layer2 = get_vector_layer_by_name(self.tolayer.currentText()).wkbType()
         if layer1 in point_types and layer2 in point_types:
             error = 'It is not sensible to have two point layers for this analysis'
 
