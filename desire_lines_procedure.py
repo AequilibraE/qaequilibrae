@@ -19,10 +19,11 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-
+import qgis
 from qgis.core import *
 from PyQt4.QtCore import *
 import itertools
+import numpy as np
 
 from auxiliary_functions import *
 from aequilibrae.paths import Graph
@@ -33,7 +34,6 @@ from aequilibrae.paths import one_to_all, reblocks_matrix
 
 error = False
 try:
-    import numpy as np
     from scipy.spatial import Delaunay
 except:
     error = True
@@ -197,19 +197,40 @@ class DesireLinesProcedure(WorkerThread):
                 del network
 
                 # Here we transform the network to go from node 1 to N
-                max_node = max(np.max(self.graph.network['a_node']), np.max(self.graph.network['b_node']))+1
+                max_node = max(np.max(self.graph.network['a_node']), np.max(self.graph.network['b_node']))
+                max_node = max(max_node, self.matrix.shape[0], self.matrix.shape[1]) + 1
                 self.hash = np.zeros(max_node, np.int)
+
+                # Checks if any zone from the matrix is not present in the areas/node layer
+                t1 = np.sum(self.matrix, axis=0)
+                t2 = np.sum(self.matrix, axis=1)
+
+                if t1.shape[0] > t2.shape[0]:
+                    t2.resize(t1.shape)
+                elif t2.shape[0] > t1.shape[0]:
+                    t1.resize(t2.shape)
+                totals = t1 + t2
+
+                all_nodes = np.bincount(self.graph.network['a_node'])
+                for i in range(totals.shape[0]):
+                    if totals[i]:
+                        if not all_nodes[i]:
+                            qgis.utils.iface.messageBar().pushMessage("Matrix has demand for zones that do not exist "
+                                                                      "in the zones/nodes provided. Demand for those"
+                                                                      "ones were ignored. e.g.", str(i), level=3)
+                            break
+
                 h = 1
                 for i in range(self.graph.network.shape[0]):
                     a_node = self.graph.network['a_node'][i]
                     if self.hash[a_node] == 0:
                         self.hash[a_node] = h
-                        h=h+1
+                        h += 1
 
                     b_node = self.graph.network['b_node'][i]
                     if self.hash[b_node] == 0:
                         self.hash[b_node] = h
-                        h=h+1
+                        h += 1
 
                     self.graph.network['a_node'][i] = self.hash[a_node]
                     self.graph.network['b_node'][i] = self.hash[b_node]

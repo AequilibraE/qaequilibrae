@@ -55,7 +55,7 @@ class LeastCommonDenominatorDialog(QtGui.QDialog, Ui_least_common_denominator):
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
             if 'wkbType' in dir(layer):
                 if layer.wkbType() in self.valid_layer_types:
-                    self.from_layer.addItem(layer.name())
+                    self.fromlayer.addItem(layer.name())
                     self.tolayer.addItem(layer.name())
 
     def reload_fields(self, box):
