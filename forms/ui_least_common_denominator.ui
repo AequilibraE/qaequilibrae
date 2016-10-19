@@ -36,7 +36,7 @@
       <x>110</x>
       <y>60</y>
       <width>261</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
    </widget>
@@ -46,7 +46,7 @@
       <x>110</x>
       <y>30</y>
       <width>261</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
    </widget>
@@ -54,7 +54,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
+      <y>64</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -67,7 +67,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
+      <y>34</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -95,7 +95,7 @@
       <x>110</x>
       <y>60</y>
       <width>261</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
    </widget>
@@ -105,7 +105,7 @@
       <x>110</x>
       <y>30</y>
       <width>261</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
    </widget>
@@ -113,7 +113,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
+      <y>65</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -126,7 +126,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
+      <y>34</y>
       <width>121</width>
       <height>16</height>
      </rect>

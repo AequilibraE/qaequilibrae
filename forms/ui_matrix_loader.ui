@@ -143,7 +143,7 @@
      <x>99</x>
      <y>132</y>
      <width>331</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="maxVisibleItems">
@@ -156,7 +156,7 @@
      <x>99</x>
      <y>72</y>
      <width>331</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="maxVisibleItems">
@@ -167,7 +167,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>42</y>
+     <y>45</y>
      <width>121</width>
      <height>16</height>
     </rect>
@@ -180,7 +180,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>72</y>
+     <y>76</y>
      <width>121</width>
      <height>16</height>
     </rect>
@@ -193,7 +193,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>132</y>
+     <y>135</y>
      <width>121</width>
      <height>16</height>
     </rect>
@@ -206,9 +206,9 @@
    <property name="geometry">
     <rect>
      <x>99</x>
-     <y>42</y>
+     <y>41</y>
      <width>331</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="maxVisibleItems">
@@ -219,7 +219,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>102</y>
+     <y>105</y>
      <width>121</width>
      <height>16</height>
     </rect>
@@ -237,7 +237,7 @@
      <x>99</x>
      <y>102</y>
      <width>331</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="maxVisibleItems">
@@ -262,7 +262,7 @@
     <rect>
      <x>230</x>
      <y>14</y>
-     <width>61</width>
+     <width>71</width>
      <height>17</height>
     </rect>
    </property>
@@ -275,7 +275,7 @@
     <rect>
      <x>20</x>
      <y>14</y>
-     <width>151</width>
+     <width>161</width>
      <height>17</height>
     </rect>
    </property>

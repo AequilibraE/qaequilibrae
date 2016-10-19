@@ -57,10 +57,10 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>205</x>
+      <x>214</x>
       <y>108</y>
       <width>71</width>
-      <height>20</height>
+      <height>22</height>
      </rect>
     </property>
     <property name="text">
@@ -75,7 +75,7 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>80</width>
+      <width>131</width>
       <height>22</height>
      </rect>
     </property>
@@ -94,7 +94,7 @@
       <x>130</x>
       <y>30</y>
       <width>560</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -107,8 +107,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>66</y>
-      <width>80</width>
+      <y>68</y>
+      <width>121</width>
       <height>22</height>
      </rect>
     </property>
@@ -127,7 +127,7 @@
       <x>130</x>
       <y>66</y>
       <width>560</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -139,9 +139,9 @@
    <widget class="QCheckBox" name="IfMaxLength">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>16</x>
       <y>110</y>
-      <width>191</width>
+      <width>201</width>
       <height>17</height>
      </rect>
     </property>
@@ -152,7 +152,7 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>285</x>
       <y>110</y>
       <width>51</width>
       <height>16</height>
@@ -171,9 +171,9 @@
     <property name="geometry">
      <rect>
       <x>488</x>
-      <y>107</y>
+      <y>105</y>
       <width>201</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -205,7 +205,7 @@
      <rect>
       <x>20</x>
       <y>28</y>
-      <width>80</width>
+      <width>111</width>
       <height>22</height>
      </rect>
     </property>
@@ -224,7 +224,7 @@
       <x>130</x>
       <y>28</y>
       <width>560</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -239,7 +239,7 @@
       <x>130</x>
       <y>69</y>
       <width>561</width>
-      <height>20</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -254,9 +254,9 @@
    <widget class="QPushButton" name="ChooseLineLayer">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>67</y>
-      <width>101</width>
+      <x>10</x>
+      <y>70</y>
+      <width>111</width>
       <height>23</height>
      </rect>
     </property>
@@ -362,8 +362,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>28</y>
-      <width>80</width>
+      <y>29</y>
+      <width>131</width>
       <height>22</height>
      </rect>
     </property>
@@ -382,7 +382,7 @@
       <x>130</x>
       <y>28</y>
       <width>560</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -397,7 +397,7 @@
       <x>130</x>
       <y>102</y>
       <width>561</width>
-      <height>20</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -412,9 +412,9 @@
    <widget class="QPushButton" name="ChooseNodeLayer">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>100</y>
-      <width>101</width>
+      <x>10</x>
+      <y>104</y>
+      <width>111</width>
       <height>23</height>
      </rect>
     </property>
@@ -441,7 +441,7 @@
       <x>130</x>
       <y>65</y>
       <width>560</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -454,7 +454,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>65</y>
+      <y>67</y>
       <width>80</width>
       <height>22</height>
      </rect>
@@ -472,8 +472,8 @@
   <widget class="QLabel" name="label_16">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>510</y>
+     <x>280</x>
+     <y>509</y>
      <width>151</width>
      <height>21</height>
     </rect>
