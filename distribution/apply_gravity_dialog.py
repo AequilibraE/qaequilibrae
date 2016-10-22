@@ -66,6 +66,20 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
         self.impedance = None
         self.model = None
 
+        self.error_icon = os.path.abspath(os.path.join(os.path.dirname(__file__),"..")) + "//icons//error.png"
+        self.error_pic = pic = QtGui.QPixmap(self.error_icon)
+
+        self.loaded_icon = os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) + "//icons//check_mark.png"
+        self.loaded_pic = pic = QtGui.QPixmap(self.loaded_icon)
+
+
+        self.lbl_prod.setPixmap(self.error_pic)
+        self.lbl_atra.setPixmap(self.error_pic)
+        self.lbl_imped.setPixmap(self.error_pic)
+        self.lbl_par.setPixmap(self.error_pic)
+        self.lbl_output.setPixmap(self.error_pic)
+
+
         self.radio_friction.setEnabled(False)
 
         # Hide the progress bars
@@ -96,8 +110,7 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
             dlg2.exec_()
 
             self.model = dlg2.model
-            self.lbl_par.setText('P')
-            self.set_green(self.lbl_par)
+            self.lbl_par.setPixmap(self.loaded_pic)
 
             if self.model['function'].upper() == 'EXPO':
                 self.radio_expo.setChecked(True)
@@ -129,8 +142,7 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
         dlg2.exec_()
 
         self.model = dlg2.model
-        self.lbl_par.setText('P')
-        self.set_green(self.lbl_par)
+        self.lbl_par.setPixmap(self.loaded_pic)
 
     def browse_outfile(self):
         file_types = "Comma-separated files(*.csv);;Numpy Binnary Array(*.npy)"
@@ -140,8 +152,7 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
         if new_name is not None:
             self.outname = new_name
             self.report_output.setText(new_name)
-            self.lbl_output.setText('P')
-            self.set_green(self.lbl_output)
+            self.lbl_output.setPixmap(self.loaded_pic)
 
     def run_thread(self):
         # QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
@@ -162,8 +173,7 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
             a = "{:6,.0f}".format(self.impedance.shape[0])
             b = "{:6,.0f}".format(self.impedance.shape[1])
             self.report_matrix.append('Dimensions: '+ a + ' X ' + b)
-            self.lbl_imped.setText('P')
-            self.set_green(self.lbl_imped)
+            self.lbl_imped.setPixmap(self.loaded_pic)
 
     def find_vectors(self, destination):
         dlg2 = LoadVectorDialog(self.iface)
@@ -181,22 +191,13 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
                 self.report_prod.setText(text[0])
                 self.report_prod.append(text[1])
                 self.report_prod.append(text[2])
-                self.lbl_prod.setText('P')
-                self.set_green(self.lbl_prod)
+                self.lbl_prod.setPixmap(self.loaded_pic)
             else:
                 self.columns = dlg2.vector
                 self.report_atra.setText(text[0])
                 self.report_atra.append(text[1])
                 self.report_atra.append(text[2])
-                self.lbl_atra.setText('P')
-                self.set_green(self.lbl_atra)
-
-    def set_green(self, item):
-        palette = QtGui.QPalette()
-        brush = QtGui.QBrush(QtGui.QColor(0, 170, 0))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.ButtonText, brush)
-        item.setPalette(palette)
+                self.lbl_atra.setPixmap(self.loaded_pic)
 
     # def progress_range_from_thread(self, val):
     #     self.progressbar.setRange(0, val[1])
