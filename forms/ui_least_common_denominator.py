@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_least_common_denominator.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Sun Oct 23 20:28:14 2016
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -33,31 +34,31 @@ class Ui_least_common_denominator(object):
         self.groupBox.setGeometry(QtCore.QRect(10, 10, 381, 101))
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.fromfield = QtGui.QComboBox(self.groupBox)
-        self.fromfield.setGeometry(QtCore.QRect(110, 60, 261, 22))
+        self.fromfield.setGeometry(QtCore.QRect(110, 60, 261, 24))
         self.fromfield.setObjectName(_fromUtf8("fromfield"))
         self.fromlayer = QtGui.QComboBox(self.groupBox)
-        self.fromlayer.setGeometry(QtCore.QRect(110, 30, 261, 22))
+        self.fromlayer.setGeometry(QtCore.QRect(110, 30, 261, 24))
         self.fromlayer.setObjectName(_fromUtf8("fromlayer"))
         self.label_2 = QtGui.QLabel(self.groupBox)
-        self.label_2.setGeometry(QtCore.QRect(10, 60, 121, 16))
+        self.label_2.setGeometry(QtCore.QRect(10, 64, 121, 16))
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.label = QtGui.QLabel(self.groupBox)
-        self.label.setGeometry(QtCore.QRect(10, 30, 121, 16))
+        self.label.setGeometry(QtCore.QRect(10, 34, 121, 16))
         self.label.setObjectName(_fromUtf8("label"))
         self.groupBox_2 = QtGui.QGroupBox(least_common_denominator)
         self.groupBox_2.setGeometry(QtCore.QRect(10, 120, 381, 101))
         self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
         self.tofield = QtGui.QComboBox(self.groupBox_2)
-        self.tofield.setGeometry(QtCore.QRect(110, 60, 261, 22))
+        self.tofield.setGeometry(QtCore.QRect(110, 60, 261, 24))
         self.tofield.setObjectName(_fromUtf8("tofield"))
         self.tolayer = QtGui.QComboBox(self.groupBox_2)
-        self.tolayer.setGeometry(QtCore.QRect(110, 30, 261, 22))
+        self.tolayer.setGeometry(QtCore.QRect(110, 30, 261, 24))
         self.tolayer.setObjectName(_fromUtf8("tolayer"))
         self.label_5 = QtGui.QLabel(self.groupBox_2)
-        self.label_5.setGeometry(QtCore.QRect(10, 60, 121, 16))
+        self.label_5.setGeometry(QtCore.QRect(10, 65, 121, 16))
         self.label_5.setObjectName(_fromUtf8("label_5"))
         self.label_6 = QtGui.QLabel(self.groupBox_2)
-        self.label_6.setGeometry(QtCore.QRect(10, 30, 121, 16))
+        self.label_6.setGeometry(QtCore.QRect(10, 34, 121, 16))
         self.label_6.setObjectName(_fromUtf8("label_6"))
         self.progressbar = QtGui.QProgressBar(least_common_denominator)
         self.progressbar.setGeometry(QtCore.QRect(20, 230, 251, 23))

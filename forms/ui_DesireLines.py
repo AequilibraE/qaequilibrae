@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_DesireLines.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Sun Oct 23 20:26:56 2016
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -86,9 +87,6 @@ class Ui_DesireLines(object):
         self.lbl_matrix_loaded.setText(_fromUtf8(""))
         self.lbl_matrix_loaded.setWordWrap(False)
         self.lbl_matrix_loaded.setObjectName(_fromUtf8("lbl_matrix_loaded"))
-        self.lbl_matrix_loaded.raise_()
-        self.but_load_new_matrix.raise_()
-        self.matrix_viewer.raise_()
         self.groupBox_2 = QtGui.QGroupBox(DesireLines)
         self.groupBox_2.setGeometry(QtCore.QRect(9, 446, 621, 111))
         self.groupBox_2.setTitle(_fromUtf8(""))
@@ -100,41 +98,35 @@ class Ui_DesireLines(object):
         self.create_dl.setGeometry(QtCore.QRect(470, 10, 140, 25))
         self.create_dl.setObjectName(_fromUtf8("create_dl"))
         self.lblnodematch_13 = QtGui.QLabel(self.groupBox_2)
-        self.lblnodematch_13.setGeometry(QtCore.QRect(9, 45, 121, 16))
+        self.lblnodematch_13.setGeometry(QtCore.QRect(9, 50, 121, 16))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.lblnodematch_13.setFont(font)
         self.lblnodematch_13.setObjectName(_fromUtf8("lblnodematch_13"))
         self.zoning_layer = QtGui.QComboBox(self.groupBox_2)
-        self.zoning_layer.setGeometry(QtCore.QRect(130, 12, 321, 22))
+        self.zoning_layer.setGeometry(QtCore.QRect(130, 12, 321, 24))
         self.zoning_layer.setMaxVisibleItems(10)
         self.zoning_layer.setObjectName(_fromUtf8("zoning_layer"))
         self.radio_desire = QtGui.QRadioButton(self.groupBox_2)
-        self.radio_desire.setGeometry(QtCore.QRect(10, 88, 81, 17))
+        self.radio_desire.setGeometry(QtCore.QRect(10, 88, 111, 17))
         self.radio_desire.setCheckable(True)
         self.radio_desire.setChecked(False)
         self.radio_desire.setObjectName(_fromUtf8("radio_desire"))
         self.zone_id_field = QtGui.QComboBox(self.groupBox_2)
-        self.zone_id_field.setGeometry(QtCore.QRect(129, 45, 321, 22))
+        self.zone_id_field.setGeometry(QtCore.QRect(129, 45, 321, 24))
         self.zone_id_field.setMaxVisibleItems(10)
         self.zone_id_field.setObjectName(_fromUtf8("zone_id_field"))
         self.lblnodematch_12 = QtGui.QLabel(self.groupBox_2)
-        self.lblnodematch_12.setGeometry(QtCore.QRect(10, 12, 121, 16))
+        self.lblnodematch_12.setGeometry(QtCore.QRect(10, 16, 121, 16))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.lblnodematch_12.setFont(font)
         self.lblnodematch_12.setObjectName(_fromUtf8("lblnodematch_12"))
         self.radio_delaunay = QtGui.QRadioButton(self.groupBox_2)
-        self.radio_delaunay.setGeometry(QtCore.QRect(110, 88, 101, 17))
+        self.radio_delaunay.setGeometry(QtCore.QRect(140, 88, 111, 17))
         self.radio_delaunay.setCheckable(True)
         self.radio_delaunay.setChecked(True)
         self.radio_delaunay.setObjectName(_fromUtf8("radio_delaunay"))
-        self.progress_label.raise_()
-        self.lbl_funding2.raise_()
-        self.lbl_funding1.raise_()
-        self.progressbar.raise_()
-        self.groupBox.raise_()
-        self.groupBox_2.raise_()
 
         self.retranslateUi(DesireLines)
         QtCore.QMetaObject.connectSlotsByName(DesireLines)

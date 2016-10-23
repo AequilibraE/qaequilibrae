@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_vector_loader.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Sun Oct 23 20:25:39 2016
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -66,35 +67,35 @@ class Ui_vector_loader(object):
         self.progressbar.setTextVisible(True)
         self.progressbar.setObjectName(_fromUtf8("progressbar"))
         self.field_from = QtGui.QComboBox(vector_loader)
-        self.field_from.setGeometry(QtCore.QRect(99, 72, 331, 22))
+        self.field_from.setGeometry(QtCore.QRect(99, 72, 331, 24))
         self.field_from.setMaxVisibleItems(10)
         self.field_from.setObjectName(_fromUtf8("field_from"))
         self.lbl_matrix = QtGui.QLabel(vector_loader)
-        self.lbl_matrix.setGeometry(QtCore.QRect(20, 42, 121, 16))
+        self.lbl_matrix.setGeometry(QtCore.QRect(20, 46, 121, 16))
         self.lbl_matrix.setObjectName(_fromUtf8("lbl_matrix"))
         self.lbl_from = QtGui.QLabel(vector_loader)
-        self.lbl_from.setGeometry(QtCore.QRect(20, 72, 121, 16))
+        self.lbl_from.setGeometry(QtCore.QRect(20, 76, 121, 16))
         self.lbl_from.setObjectName(_fromUtf8("lbl_from"))
         self.vector_layer = QtGui.QComboBox(vector_loader)
-        self.vector_layer.setGeometry(QtCore.QRect(99, 42, 331, 22))
+        self.vector_layer.setGeometry(QtCore.QRect(99, 42, 331, 24))
         self.vector_layer.setMaxVisibleItems(10)
         self.vector_layer.setObjectName(_fromUtf8("vector_layer"))
         self.lbl_flow = QtGui.QLabel(vector_loader)
-        self.lbl_flow.setGeometry(QtCore.QRect(20, 102, 121, 16))
+        self.lbl_flow.setGeometry(QtCore.QRect(20, 106, 121, 16))
         self.lbl_flow.setObjectName(_fromUtf8("lbl_flow"))
         self.field_cells = QtGui.QComboBox(vector_loader)
         self.field_cells.setEnabled(True)
-        self.field_cells.setGeometry(QtCore.QRect(99, 102, 331, 22))
+        self.field_cells.setGeometry(QtCore.QRect(99, 102, 331, 24))
         self.field_cells.setMaxVisibleItems(10)
         self.field_cells.setObjectName(_fromUtf8("field_cells"))
         self.radio_omx_matrix = QtGui.QRadioButton(vector_loader)
         self.radio_omx_matrix.setGeometry(QtCore.QRect(368, 14, 61, 17))
         self.radio_omx_matrix.setObjectName(_fromUtf8("radio_omx_matrix"))
         self.radio_npy_matrix = QtGui.QRadioButton(vector_loader)
-        self.radio_npy_matrix.setGeometry(QtCore.QRect(230, 14, 61, 17))
+        self.radio_npy_matrix.setGeometry(QtCore.QRect(230, 14, 81, 17))
         self.radio_npy_matrix.setObjectName(_fromUtf8("radio_npy_matrix"))
         self.radio_layer_matrix = QtGui.QRadioButton(vector_loader)
-        self.radio_layer_matrix.setGeometry(QtCore.QRect(20, 14, 151, 17))
+        self.radio_layer_matrix.setGeometry(QtCore.QRect(20, 14, 161, 17))
         self.radio_layer_matrix.setChecked(True)
         self.radio_layer_matrix.setObjectName(_fromUtf8("radio_layer_matrix"))
 

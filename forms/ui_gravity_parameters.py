@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_gravity_parameters.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Sun Oct 23 20:25:18 2016
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -34,6 +35,7 @@ class Ui_gravity_parameters(object):
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.alpha_box = QtGui.QPlainTextEdit(gravity_parameters)
         self.alpha_box.setGeometry(QtCore.QRect(60, 15, 121, 25))
+        self.alpha_box.setPlainText(_fromUtf8(""))
         self.alpha_box.setObjectName(_fromUtf8("alpha_box"))
         self.beta_box = QtGui.QPlainTextEdit(gravity_parameters)
         self.beta_box.setGeometry(QtCore.QRect(60, 50, 121, 25))

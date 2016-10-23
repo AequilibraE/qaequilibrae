@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_apply_gravity.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Sun Oct 23 20:25:26 2016
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -293,11 +294,6 @@ class Ui_apply_gravity(object):
         font.setPointSize(10)
         self.but_apply_gravity.setFont(font)
         self.but_apply_gravity.setObjectName(_fromUtf8("but_apply_gravity"))
-        self.progressbar.raise_()
-        self.r_2.raise_()
-        self.lbl_funding2.raise_()
-        self.lbl_funding1.raise_()
-        self.but_apply_gravity.raise_()
 
         self.retranslateUi(apply_gravity)
         self.r_2.setCurrentIndex(0)
