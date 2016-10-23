@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>568</width>
-    <height>589</height>
+    <width>238</width>
+    <height>365</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AequilibraE - Apply gravity model</string>
+   <string>Calibrate gravity model</string>
   </property>
   <widget class="QToolBox" name="r_2">
    <property name="geometry">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>10</y>
      <width>220</width>
-     <height>300</height>
+     <height>281</height>
     </rect>
    </property>
    <property name="palette">
@@ -73,7 +73,7 @@
       <x>0</x>
       <y>0</y>
       <width>220</width>
-      <height>172</height>
+      <height>153</height>
      </rect>
     </property>
     <attribute name="label">
@@ -97,7 +97,7 @@
       <string>Load observed matrix</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="report_prod">
+    <widget class="QTextEdit" name="report_observed">
      <property name="geometry">
       <rect>
        <x>5</x>
@@ -116,12 +116,12 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2';&quot;&gt;Total demand: 0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLabel" name="lbl_prod">
+    <widget class="QLabel" name="lbl_observed">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>189</x>
        <y>0</y>
-       <width>50</width>
+       <width>31</width>
        <height>31</height>
       </rect>
      </property>
@@ -206,7 +206,7 @@ p, li { white-space: pre-wrap; }
       <x>0</x>
       <y>0</y>
       <width>220</width>
-      <height>172</height>
+      <height>153</height>
      </rect>
     </property>
     <attribute name="label">
@@ -230,7 +230,7 @@ p, li { white-space: pre-wrap; }
       <string>Impedance matrix</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="report_matrix">
+    <widget class="QTextEdit" name="report_impedance">
      <property name="geometry">
       <rect>
        <x>5</x>
@@ -338,7 +338,7 @@ p, li { white-space: pre-wrap; }
       <x>0</x>
       <y>0</y>
       <width>220</width>
-      <height>172</height>
+      <height>153</height>
      </rect>
     </property>
     <attribute name="label">
@@ -394,32 +394,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="text">
       <string>Friction Factors</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="but_select_model_file">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>115</y>
-       <width>95</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Model file</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="but_manual_input">
-     <property name="geometry">
-      <rect>
-       <x>115</x>
-       <y>115</y>
-       <width>95</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Manual input</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_par">
@@ -512,7 +486,7 @@ p, li { white-space: pre-wrap; }
       <x>0</x>
       <y>0</y>
       <width>220</width>
-      <height>172</height>
+      <height>153</height>
      </rect>
     </property>
     <attribute name="label">
@@ -566,13 +540,96 @@ p, li { white-space: pre-wrap; }
       <string>Select Output</string>
      </property>
     </widget>
+    <widget class="QLabel" name="lbl_output">
+     <property name="geometry">
+      <rect>
+       <x>189</x>
+       <y>0</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="ButtonText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>255</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="ToolTipText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="ButtonText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>255</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="ToolTipText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="ButtonText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>120</red>
+           <green>120</green>
+           <blue>120</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="ToolTipText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
+     <property name="font">
+      <font>
+       <family>Wingdings 2</family>
+       <pointsize>36</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>O</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QLabel" name="lbl_funding2">
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>358</y>
+     <y>337</y>
      <width>101</width>
      <height>21</height>
     </rect>
@@ -598,7 +655,7 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>357</y>
+     <y>336</y>
      <width>211</width>
      <height>23</height>
     </rect>
@@ -651,7 +708,7 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>12</x>
-     <y>359</y>
+     <y>338</y>
      <width>101</width>
      <height>20</height>
     </rect>
@@ -665,11 +722,11 @@ p, li { white-space: pre-wrap; }
     <string>Partially funded by</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="but_apply_gravity">
+  <widget class="QPushButton" name="but_calibrate_gravity">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>319</y>
+     <y>298</y>
      <width>220</width>
      <height>30</height>
     </rect>
@@ -680,25 +737,14 @@ p, li { white-space: pre-wrap; }
     </font>
    </property>
    <property name="text">
-    <string>Apply Gravity Model</string>
-   </property>
-  </widget>
-  <widget class="QGraphicsView" name="graphicsView">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>360</y>
-     <width>256</width>
-     <height>192</height>
-    </rect>
+    <string>Calibrate Gravity Model</string>
    </property>
   </widget>
   <zorder>progressbar</zorder>
   <zorder>r_2</zorder>
   <zorder>lbl_funding2</zorder>
   <zorder>lbl_funding1</zorder>
-  <zorder>but_apply_gravity</zorder>
-  <zorder>graphicsView</zorder>
+  <zorder>but_calibrate_gravity</zorder>
  </widget>
  <resources/>
  <connections/>

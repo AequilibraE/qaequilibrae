@@ -3,10 +3,12 @@ assignment:
     rgap: 1.0e-05
 distribution:
   gravity:
-    max trip length: 1000
+    max trip length: 10000
+    max iterations: 100
+    max error: 1.0e-04
   ipf:
     convergence level: 0.0001
-    max iterations: 50
+    max iterations: 500
     balancing tolerance: 0.001
 system:
   cpus: 8

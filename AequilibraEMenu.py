@@ -40,8 +40,8 @@ from desire_lines_dialog import DesireLinesDialog
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//distribution//")
 from ipf_dialog import IpfDialog
 from apply_gravity_dialog import ApplyGravityDialog
+from calibrate_gravity_dialog import CalibrateGravityDialog
 
-# from calibrate_gravity_dialog import CalibrateGravityDialog
 # from Transportation_modeling_dialogs import *
 # from Trip_distribution_dialogs import *
 # from GIS_tools_dialogs import *
@@ -111,6 +111,12 @@ class AequilibraEMenu:
         self.apply_gravity_action = QAction(icon, u"Apply Gravity Model", self.iface.mainWindow())
         QObject.connect(self.apply_gravity_action, SIGNAL("triggered()"), self.run_apply_gravity)
         self.trip_distribution_menu.addAction(self.apply_gravity_action)
+
+        # # Calibrate Gravity
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_calibrate_gravity.png")
+        self.calibrate_gravity_action = QAction(icon, u"Calibrate Gravity Model", self.iface.mainWindow())
+        QObject.connect(self.calibrate_gravity_action, SIGNAL("triggered()"), self.run_calibrate_gravity)
+        self.trip_distribution_menu.addAction(self.calibrate_gravity_action)
 
         #
         # # Trip Distribution
@@ -234,6 +240,11 @@ class AequilibraEMenu:
 
     def run_create_graph(self):
         dlg2 = GraphCreationDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_calibrate_gravity(self):
+        dlg2 = CalibrateGravityDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
