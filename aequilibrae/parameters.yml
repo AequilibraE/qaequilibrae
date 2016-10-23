@@ -12,5 +12,5 @@ distribution:
     max iterations: 5000
 system:
   cpus: 8
-  default_directory: /media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/CODE/AequilibraE-Tests
+  default_directory: Y:\DATA\Pedro\Professional\IPEA\Distribuicao\01_DATA
   report zeros: 1

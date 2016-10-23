@@ -192,9 +192,9 @@ class GravityApplication:
             if function.upper() == "EXPO":
                 self.output[i, :] = np.exp(-beta * cost) * p * a
             elif function.upper() == "POWER":
-                self.output[i, :] = np.power(cost, -alpha) * p * a
+                self.output[i, :] = np.nan_to_num(np.power(cost, -alpha) * p * a)
             elif function.upper() == "GAMMA":
-                self.output[i, :] = np.power(cost, alpha) * np.exp(-beta * cost) * p * a
+                self.output[i, :] = np.nan_to_num(np.power(cost, alpha) * np.exp(-beta * cost) * p * a)
 
         # Deals with infinite and NaNs
         infinite = np.isinf(self.output).astype(int)

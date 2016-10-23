@@ -77,9 +77,9 @@ class GravityCalibration:
                 def assemble_model(b1):
                     # NEED TO SET PARAMETERS #
                     if self.function == "EXPO":
-                        self.model['parameters'] = {'beta': b1}
-                    elif function == "POWER":
-                        self.model['parameters'] = {'alpha': b1}
+                        self.model['parameters'] = {'beta': float(b1)}
+                    elif self.function == "POWER":
+                        self.model['parameters'] = {'alpha': float(b1)}
 
                 # filtering for all costs over limit
                 a = (self.matrix < max_cost).astype(int)
