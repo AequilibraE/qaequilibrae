@@ -55,7 +55,7 @@ class LoadVector(WorkerThread):
 
         zones = np.max(vector[:, 0]) + 1
         vec = np.zeros(zones)
-        vec[zones[:, 0]] = zones[:, 1]
+        vec[vector[:, 0].astype(int)] = vector[:, 1]
 
         self.vector = vec
         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(feat_count)))

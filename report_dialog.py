@@ -47,7 +47,7 @@ class ReportDialog(QtGui.QDialog, Ui_report):
     def save_log(self):
         file_types = "Text files(*.txt)"
         new_name = QFileDialog.getSaveFileName(None, 'Save log', self.path, file_types)
-        if new_name is not None:
+        if len(new_name)>0:
             outp = open(new_name, 'w')
             for t in self.reporting:
                 print >> outp, t

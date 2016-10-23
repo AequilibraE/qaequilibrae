@@ -99,9 +99,9 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
         self.but_apply_gravity.clicked.connect(self.run)
 
     def get_model_file(self):
-        file_types = "Model File(*.yml)"
+        file_types = "Model File(*.yaml)"
         model_file = QFileDialog.getOpenFileName(None, 'Distribution model', self.path, file_types)
-        if model_file is not None:
+        if len(model_file) > 0:
             with open(model_file, 'r') as yml:
                 self.model = yaml.safe_load(yml)
 

@@ -142,7 +142,7 @@ class LoadVectorDialog(QtGui.QDialog, Ui_vector_loader):
             if self.error is None:
                 idx1 = self.layer.fieldNameIndex(self.field_from.currentText())
                 idx3 = self.layer.fieldNameIndex(self.field_cells.currentText())
-                idx = [idx1, idx2, idx3]
+                idx = [idx1, idx3]
 
                 self.worker_thread = LoadVector(qgis.utils.iface.mainWindow(), self.layer, idx)
                 self.run_thread()
