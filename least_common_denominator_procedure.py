@@ -84,7 +84,8 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         lcdpr.addAttributes([QgsField("Part_ID", QVariant.Int),
                              QgsField(ffield, self.from_layer.fields().field(idx).type()),
                              QgsField(tfield, self.to_layer.fields().field(fid).type()),
-                             QgsField('Percentage', QVariant.Double)])
+                             QgsField('P-' + str(ffield) , QVariant.Double), # percentage of the from field
+                             QgsField('P-' + str(tfield), QVariant.Double)]) # percentage of the to field
         lcd_layer.updateFields()
 
         # PROGRESS BAR
@@ -97,19 +98,23 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             if geom is not None:
                 if self.transform is not None:
                     a = geom.transform(self.transform)
-                geometry, a = self.find_geometry(geom)
+                geometry, statf = self.find_geometry(geom)
 
                 intersecting = self.index.intersects(geom.boundingBox())
                 for f in intersecting:
                     g = geom.intersection(allfeatures[f].geometry())
                     if g.area() > 0:
                         feature = QgsFeature()
-                        geometry, stat = self.find_geometry(g)
-                        feature.setGeometry(geometry)
+                        geo, stati = self.find_geometry(g)
+                        feature.setGeometry(geo)
+                        geo, statt = self.find_geometry(allfeatures[f].geometry())
+                        perct = stati / statt
+                        percf = stati / statf
                         feature.setAttributes([part_id,
                                                feat.attributes()[idx],
                                                allfeatures[f].attributes()[fid],
-                                               (stat / a)])
+                                               percf,
+                                               perct])
                         features.append(feature)
                         part_id += 1
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), fc)
