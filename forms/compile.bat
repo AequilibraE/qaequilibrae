@@ -1,4 +1,6 @@
 cd ECHO %CurrentDir%
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_bandwidths.ui -o ui_bandwidths.py
+
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_simple_tag.ui -o ui_simple_tag.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_least_common_denominator.ui -o ui_least_common_denominator.py

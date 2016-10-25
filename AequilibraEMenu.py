@@ -42,6 +42,10 @@ from ipf_dialog import IpfDialog
 from apply_gravity_dialog import ApplyGravityDialog
 from calibrate_gravity_dialog import CalibrateGravityDialog
 
+from .gis import CreateBandwidthsDialog
+# sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//gis//")
+# from create_bandwidth_dialog import CreateBandwidthsDialog
+
 # from Transportation_modeling_dialogs import *
 # from Trip_distribution_dialogs import *
 # from GIS_tools_dialogs import *
@@ -191,6 +195,12 @@ class AequilibraEMenu:
         QObject.connect(self.dlines_action, SIGNAL("triggered()"), self.run_dlines)
         self.gis_tools_menu.addAction(self.dlines_action)
 
+        # Desire lines
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_bandwidths.png")
+        self.bandwidth_action = QAction(icon, u"Stacked Bandwidth", self.iface.mainWindow())
+        QObject.connect(self.bandwidth_action, SIGNAL("triggered()"), self.run_bandwidth)
+        self.gis_tools_menu.addAction(self.bandwidth_action)
+
         # ########################################################################
         # #################          LOOSE STUFF         #########################
 
@@ -286,6 +296,11 @@ class AequilibraEMenu:
 
     def run_dlines(self):
         dlg2 = DesireLinesDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def  run_bandwidth(self):
+        dlg2 = CreateBandwidthsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
