@@ -33,7 +33,6 @@ from random import randint
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
 
-from create_bandwidths_procedure import CreateBandwidthsProcedure
 from ui_bandwidths import Ui_bandwidths
 from auxiliary_functions import get_parameter_chain
 
@@ -124,6 +123,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.mColorButton.setColor(a)
 
     def add_bands_to_map(self):
+        self.but_run.setEnabled(False)
         self.band_size = str(self.band_size)
         self.space_size = str(self.space_size)
 
@@ -172,6 +172,9 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
                 self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
 
                 acc_offset = acc_offset + ' + ' + str(side) + '*(' + width + '+' + self.space_size + ')'
+
+        self.layer.triggerRepaint()
+        self.exit_procedure()
 
     def exit_procedure(self):
         self.close()
