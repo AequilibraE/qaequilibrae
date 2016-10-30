@@ -2,7 +2,7 @@
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
 
- Name:       AequilibraE GIS folder initializer (Dialogs and procedures)
+ Name:       AequilibraE ASSIGNMENT folder initializer (Dialogs and procedures)
  Purpose:    Initialize plugin
 
  Original Author:  Pedro Camargo (c@margo.co)
@@ -19,4 +19,4 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from create_bandwidths_dialog import CreateBandwidthsDialog
+from traffic_assignment_dialog import TrafficAssignmentDialog

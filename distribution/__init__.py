@@ -2,8 +2,8 @@
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
 
- Name:       AequilibraE GIS folder initializer (Dialogs and procedures)
- Purpose:    Initialize plugin
+ Name:       QGIS distribution dialogs and procedures initializer
+ Purpose:
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -19,4 +19,6 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from create_bandwidths_dialog import CreateBandwidthsDialog
+from apply_gravity_dialog import ApplyGravityDialog
+from calibrate_gravity_dialog import CalibrateGravityDialog
+from ipf_dialog import IpfDialog
