@@ -18,5 +18,9 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
+from ui_simple_tag import Ui_simple_tag
+from ui_DesireLines import Ui_DesireLines
+from ui_bandwidths import Ui_bandwidths
+from ui_least_common_denominator import Ui_least_common_denominator
 
 from ui_traffic_assignment import Ui_traffic_assignment

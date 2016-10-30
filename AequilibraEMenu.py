@@ -23,34 +23,21 @@
 # noinspection PyUnresolvedReferences
 import os
 import sys
-
-from qgis.core import *
-from PyQt4.QtGui import *
+import sys
 from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from qgis.core import *
 
-# Import the code for the dialog
-from parameters_dialog import ParameterDialog
 from Network_preparation_dialog import TQ_NetPrepDialog
 from adds_connectors_dialog import AddConnectorsDialog
 from create_graph_dialog import GraphCreationDialog
-from show_shortest_path_dialog import ShortestPathDialog
 from impedance_matrix_dialogs import ImpedanceMatrixDialog
-from desire_lines_dialog import DesireLinesDialog
+from parameters_dialog import ParameterDialog
+from show_shortest_path_dialog import ShortestPathDialog
 
 from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
-from .gis import CreateBandwidthsDialog
+from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog
 from .paths import TrafficAssignmentDialog
-
-# sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//gis//")
-# from create_bandwidth_dialog import CreateBandwidthsDialog
-
-# from Transportation_modeling_dialogs import *
-# from Trip_distribution_dialogs import *
-# from GIS_tools_dialogs import *
-
-from simple_tag_dialog import SimpleTagDialog
-from least_common_denominator_dialog import LeastCommonDenominatorDialog
-import sys
 
 sys.dont_write_bytecode = True
 import os.path

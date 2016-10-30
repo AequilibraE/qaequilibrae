@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-01
- Updated:    2016-10-03
+ Updated:    2016-10-30
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -24,6 +24,8 @@ import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
 from global_parameters import *
 
@@ -31,9 +33,8 @@ from auxiliary_functions import *
 from numpy_model import NumpyModel
 from load_matrix_dialog import LoadMatrixDialog
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//forms//")
 from desire_lines_procedure import DesireLinesProcedure
-from ui_DesireLines import Ui_DesireLines
+from forms import Ui_DesireLines
 
 class DesireLinesDialog(QDialog, Ui_DesireLines):
     def __init__(self, iface):

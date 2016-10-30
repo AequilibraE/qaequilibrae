@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/09/2016
+ Updated:    30/10/2016
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -21,15 +21,16 @@
 
 from qgis.core import *
 from PyQt4.QtCore import *
+from PyQt4 import QtGui
 import qgis
 import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms")
 
 # For the GIS tools portion
 from simple_tag_procedure import SimpleTAG
-from ui_simple_tag import *
+from forms import Ui_simple_tag
 from global_parameters import *
 from auxiliary_functions import get_vector_layer_by_name
 

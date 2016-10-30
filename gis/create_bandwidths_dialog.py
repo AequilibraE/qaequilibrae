@@ -25,16 +25,15 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.gui import QgsMapLayerProxyModel
 
-from auxiliary_functions import *
 import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
+
 from global_parameters import *
 from random import randint
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-
-from ui_bandwidths import Ui_bandwidths
-from auxiliary_functions import get_parameter_chain
+from forms import Ui_bandwidths
+from auxiliary_functions import *
 
 
 class CreateBandwidthsDialog(QDialog, Ui_bandwidths):

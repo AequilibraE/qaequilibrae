@@ -21,15 +21,15 @@
 
 from qgis.core import QgsMapLayerRegistry
 from PyQt4.QtCore import QObject, SIGNAL
+from PyQt4 import QtGui
 import qgis
 import sys
 import os
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms")
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
 # For the GIS tools portion
 from least_common_denominator_procedure import LeastCommonDenominatorProcedure
-from ui_least_common_denominator import *
+from forms import Ui_least_common_denominator
 from global_parameters import *
 from functools import partial
 from auxiliary_functions import get_vector_layer_by_name
