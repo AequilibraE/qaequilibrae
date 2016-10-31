@@ -217,7 +217,7 @@ class DesireLinesProcedure(WorkerThread):
                         if not all_nodes[i]:
                             qgis.utils.iface.messageBar().pushMessage("Matrix has demand for zones that do not exist "
                                                                       "in the zones/nodes provided. Demand for those"
-                                                                      "ones were ignored. e.g.", str(i), level=3)
+                                                                      "ones were ignored. e.g. " +  str(i),'', level=3)
                             break
 
                 h = 1
