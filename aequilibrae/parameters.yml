@@ -11,7 +11,7 @@ distribution:
     convergence level: 0.0001
     max iterations: 5000
 system:
-  cpus: 8
-  default_directory: Y:\DATA\Pedro\Professional\IPEA\Distribuicao\01_DATA
+  cpus: 4
+  default_directory: /media/pedro/LargeDrive/Example_AequilibraE
   driving side: left
   report zeros: 1

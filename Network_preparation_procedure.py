@@ -85,7 +85,8 @@ class FindsNodes(WorkerThread):
         # I f we have node IDs, we iterate over the ID field to make sure they are unique
         ids = []
 
-        if not node_ids:
+        print node_ids
+        if node_ids is not False:
             nodes = get_vector_layer_by_name(node_layer)
             index = QgsSpatialIndex()
             idx = nodes.fieldNameIndex(node_ids)

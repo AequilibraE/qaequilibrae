@@ -84,8 +84,9 @@ def func_assig_thread(O, a, g, res, all_threads):
 
     one_to_all(O, a, g, res, th, True)
 
-def ota(O, a, g, res):
-    one_to_all(O, a, g, res, 0)
+
+def ota(O, a, g, res, th, b):
+    one_to_all(O, a, g, res, th, b)
 
 '''
 class WorkerThreadAssignment(QThread):

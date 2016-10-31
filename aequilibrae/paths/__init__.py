@@ -10,7 +10,7 @@ __revision__ = "$Revision: 1 $"
 __date__ = "$Date: 2016-07-02$"
 
 from .graph import Graph
-from .assignment import all_or_nothing
+from .assignment import all_or_nothing, ota
 from .results import *
 
 # We import the algorithms

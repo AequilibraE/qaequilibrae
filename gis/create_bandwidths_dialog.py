@@ -25,17 +25,15 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.gui import QgsMapLayerProxyModel
 
-from auxiliary_functions import *
 import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
+
 from global_parameters import *
 from random import randint
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-
-from create_bandwidths_procedure import CreateBandwidthsProcedure
-from ui_bandwidths import Ui_bandwidths
-from auxiliary_functions import get_parameter_chain
+from forms import Ui_bandwidths
+from auxiliary_functions import *
 
 
 class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
@@ -45,7 +43,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.setupUi(self)
         
         self.tot_bands = 0
-        self.band_size = 1.0
+        self.band_size = 10.0
         self.space_size = 0.01
         self.layer = None
         self.drive_side = get_parameter_chain(['system', 'driving side'])
@@ -56,7 +54,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
 
         # space slider
         self.slider_spacer.setMinimum(1)
-        self.slider_spacer.setMaximum(100)
+        self.slider_spacer.setMaximum(10)
         self.slider_spacer.setValue(1)
         self.slider_spacer.setTickPosition(QSlider.TicksBelow)
         self.slider_spacer.setTickInterval(5)
@@ -65,7 +63,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         # band slider
         self.slider_band_size.setMinimum(5)
         self.slider_band_size.setMaximum(150)
-        self.slider_band_size.setValue(1)
+        self.slider_band_size.setValue(50)
         self.slider_band_size.setTickPosition(QSlider.TicksBelow)
         self.slider_band_size.setTickInterval(5)
         self.slider_band_size.valueChanged.connect(self.sizevaluechange)
@@ -80,6 +78,9 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.but_run.clicked.connect(self.add_bands_to_map)
         self.add_fields_to_cboxes()
         self.random_rgb()
+        self.sizevaluechange()
+        self.spacevaluechange()
+
 
     def spacevaluechange(self):
         self.space_size = self.slider_spacer.value() / 100.0
@@ -124,6 +125,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.mColorButton.setColor(a)
 
     def add_bands_to_map(self):
+        self.but_run.setEnabled(False)
         self.band_size = str(self.band_size)
         self.space_size = str(self.space_size)
 
@@ -172,6 +174,9 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
                 self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
 
                 acc_offset = acc_offset + ' + ' + str(side) + '*(' + width + '+' + self.space_size + ')'
+
+        self.layer.triggerRepaint()
+        self.exit_procedure()
 
     def exit_procedure(self):
         self.close()

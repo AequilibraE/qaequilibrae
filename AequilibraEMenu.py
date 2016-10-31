@@ -23,36 +23,21 @@
 # noinspection PyUnresolvedReferences
 import os
 import sys
-
-from qgis.core import *
-from PyQt4.QtGui import *
+import sys
 from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from qgis.core import *
 
-# Import the code for the dialog
-from parameters_dialog import ParameterDialog
 from Network_preparation_dialog import TQ_NetPrepDialog
 from adds_connectors_dialog import AddConnectorsDialog
 from create_graph_dialog import GraphCreationDialog
-from show_shortest_path_dialog import ShortestPathDialog
 from impedance_matrix_dialogs import ImpedanceMatrixDialog
-from desire_lines_dialog import DesireLinesDialog
+from parameters_dialog import ParameterDialog
+from show_shortest_path_dialog import ShortestPathDialog
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//distribution//")
-from ipf_dialog import IpfDialog
-from apply_gravity_dialog import ApplyGravityDialog
-from calibrate_gravity_dialog import CalibrateGravityDialog
-
-from .gis import CreateBandwidthsDialog
-# sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//gis//")
-# from create_bandwidth_dialog import CreateBandwidthsDialog
-
-# from Transportation_modeling_dialogs import *
-# from Trip_distribution_dialogs import *
-# from GIS_tools_dialogs import *
-
-from simple_tag_dialog import SimpleTagDialog
-from least_common_denominator_dialog import LeastCommonDenominatorDialog
-import sys
+from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
+from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog
+from .paths import TrafficAssignmentDialog
 
 sys.dont_write_bytecode = True
 import os.path
@@ -159,12 +144,12 @@ class AequilibraEMenu:
         QObject.connect(self.dist_matrix_action, SIGNAL("triggered()"), self.run_dist_matrix)
         self.assignment_menu.addAction(self.dist_matrix_action)
 
-        # # Traffic Assignment
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_assignment.png")
-        # self.traffic_assignment_action = QAction(icon, u"Traffic Assignment", self.iface.mainWindow())
-        # QObject.connect(self.traffic_assignment_action, SIGNAL("triggered()"), self.run_traffic_assig)
-        # self.assignment_menu.addAction(self.traffic_assignment_action)
-        # #########################################################################
+        # Traffic Assignment
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_assignment.png")
+        self.traffic_assignment_action = QAction(icon, u"Traffic Assignment", self.iface.mainWindow())
+        QObject.connect(self.traffic_assignment_action, SIGNAL("triggered()"), self.run_traffic_assig)
+        self.assignment_menu.addAction(self.traffic_assignment_action)
+        #########################################################################
 
         # ########################################################################
         # #################        GIS TOOLS SUB-MENU    #########################
@@ -243,11 +228,6 @@ class AequilibraEMenu:
     #     dlg2.show()
     #     dlg2.exec_()
 
-    # def run_calibrate_gravity(self):
-    #     dlg2 = CalibrateGravityDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
-
     def run_create_graph(self):
         dlg2 = GraphCreationDialog(self.iface)
         dlg2.show()
@@ -273,11 +253,11 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    # def run_traffic_assig(self):
-    #     # show the dialog
-    #     dlg = Traffic_AssignmentDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+    def run_traffic_assig(self):
+        # show the dialog
+        dlg2 = TrafficAssignmentDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     # def run_node_to_area(self):
     #     dlg2 = node_to_area_class(self.iface)

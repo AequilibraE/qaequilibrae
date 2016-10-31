@@ -2,8 +2,8 @@
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
 
- Name:       AequilibraE GIS folder initializer (Dialogs and procedures)
- Purpose:    Initialize plugin
+ Name:       QGIS FORMS folder initializer
+ Purpose:
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -18,8 +18,9 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
+from ui_simple_tag import Ui_simple_tag
+from ui_DesireLines import Ui_DesireLines
+from ui_bandwidths import Ui_bandwidths
+from ui_least_common_denominator import Ui_least_common_denominator
 
-from create_bandwidths_dialog import CreateBandwidthsDialog
-from desire_lines_dialog import DesireLinesDialog
-from least_common_denominator_dialog import LeastCommonDenominatorDialog
-from simple_tag_dialog import SimpleTagDialog
+from ui_traffic_assignment import Ui_traffic_assignment
