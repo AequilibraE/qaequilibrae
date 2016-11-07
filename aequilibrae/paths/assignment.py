@@ -56,10 +56,10 @@ def main():
 def all_or_nothing(matrix, graph, results):
 
     # catch errors
-    if results.graph_id is None:
+    if results.__graph_id__ is None:
         raise ValueError('The results object was not prepared. Use results.prepare(graph)')
 
-    elif results.graph_id != graph.__id__:
+    elif results.__graph_id__ != graph.__id__:
         raise ValueError('The results object was prepared for a different graph')
 
     else:
@@ -210,7 +210,7 @@ class Assigns_All_Or_Nothing(WorkerThreadAssignment):
             if np.sum(self.matrix[O, :]) > 0:
                 # self.func_assig(O,self.matrix,graph_costs, b_nodes, graph_fs,idsgraph,graph_skim, self.Link_Loads, self.no_path, self.skims, self.thread_dict,predecessors,conn,temp_skims, evol_bar)
                 pool.apply_async(self.func_assig, args=(
-                O, self.matrix, self.graph, self.Link_Loads, self.no_path, self.skims, self.thread_dict, predecessors, conn, temp_skims, evol_bar))
+                O, self.matrix, self1, self.Link_Loads, self.no_path, self.skims, self.thread_dict, predecessors, conn, temp_skims, evol_bar))
         pool.close()
         pool.join()
 
