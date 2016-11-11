@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>602</width>
+    <width>689</width>
     <height>362</height>
    </rect>
   </property>
@@ -70,7 +70,7 @@
     <rect>
      <x>380</x>
      <y>30</y>
-     <width>211</width>
+     <width>301</width>
      <height>24</height>
     </rect>
    </property>
@@ -80,7 +80,7 @@
     <rect>
      <x>20</x>
      <y>100</y>
-     <width>160</width>
+     <width>191</width>
      <height>24</height>
     </rect>
    </property>
@@ -88,7 +88,7 @@
   <widget class="QgsColorButtonV2" name="mColorButton">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>465</x>
      <y>100</y>
      <width>120</width>
      <height>24</height>
@@ -111,9 +111,9 @@
   <widget class="QgsFieldComboBox" name="ba_FieldComboBox">
    <property name="geometry">
     <rect>
-     <x>202</x>
+     <x>238</x>
      <y>100</y>
-     <width>160</width>
+     <width>191</width>
      <height>24</height>
     </rect>
    </property>
@@ -121,7 +121,7 @@
   <widget class="QPushButton" name="but_add_band">
    <property name="geometry">
     <rect>
-     <x>520</x>
+     <x>600</x>
      <y>100</y>
      <width>71</width>
      <height>27</height>
@@ -136,7 +136,7 @@
     <rect>
      <x>10</x>
      <y>140</y>
-     <width>581</width>
+     <width>671</width>
      <height>181</height>
     </rect>
    </property>
@@ -153,7 +153,7 @@
     <number>0</number>
    </property>
    <property name="columnCount">
-    <number>3</number>
+    <number>4</number>
    </property>
    <attribute name="verticalHeaderDefaultSectionSize">
     <number>27</number>
@@ -173,11 +173,16 @@
      <string>Color</string>
     </property>
    </column>
+   <column>
+    <property name="text">
+     <string>Move/delete</string>
+    </property>
+   </column>
   </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>465</x>
      <y>70</y>
      <width>131</width>
      <height>21</height>
@@ -190,7 +195,7 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>202</x>
+     <x>238</x>
      <y>70</y>
      <width>131</width>
      <height>21</height>
@@ -218,7 +223,7 @@
     <rect>
      <x>10</x>
      <y>330</y>
-     <width>581</width>
+     <width>671</width>
      <height>27</height>
     </rect>
    </property>
