@@ -26,7 +26,6 @@ import time
 import numpy as np
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//aequilibrae//")
 
 from aequilibrae.paths import Graph
 from worker_thread import WorkerThread

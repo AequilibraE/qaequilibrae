@@ -20,3 +20,4 @@
  """
 
 from traffic_assignment_dialog import TrafficAssignmentDialog
+from create_graph_dialog import GraphCreationDialog

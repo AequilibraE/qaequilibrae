@@ -58,21 +58,27 @@ class GraphCreationDialog(QtGui.QDialog, Ui_Create_Graph):
 
         # For changing the network layer
         self.network_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+
+        # for changing the skim field
+        self.ab_skim.currentIndexChanged.connect(partial(self.choose_a_field, 'AB'))
+        self.ba_skim.currentIndexChanged.connect(partial(self.choose_a_field, 'BA'))
+
         # For setting centroids
         self.set_centroids_rule.stateChanged.connect(self.add_model_centroids)
 
         # For adding skims
         self.add_skim.clicked.connect(self.add_to_skim_list)
-        self.skim_list.doubleClicked.connect(self.slot_double_clicked)
+        # self.skim_list.doubleClicked.connect(self.slot_double_clicked)
 
         # SECOND, we set visibility for sections that should not be shown when the form opens (overlapping items)
         #        and re-dimension the items that need re-dimensioning
-        self.skim_list.setColumnWidth(0, 110)
-        self.skim_list.setColumnWidth(1, 171)
-        self.skim_list.setColumnWidth(2, 171)
+        self.skim_list.setColumnWidth(0, 161)
+        self.skim_list.setColumnWidth(1, 161)
+        self.skim_list.setColumnWidth(2, 161)
+        self.skim_list.setColumnWidth(3, 50)
 
         # Create_Network
-        self.create_network.clicked.connect(self.GraphCreationPhase1)
+        self.create_network.clicked.connect(self.run_graph_creation)
 
         self.select_result.clicked.connect(
             partial(self.browse_outfile, 'Result file', self.graph_file, "Aequilibrae Graph(*.aeg)"))
@@ -84,6 +90,9 @@ class GraphCreationDialog(QtGui.QDialog, Ui_Create_Graph):
 
         # loads default path from parameters
         self.path = standard_path()
+
+        #set initial values for skim list
+        self.set_initial_value_if_available()
 
     def bi_directional(self):
         if self.links_are_bi_directional.isChecked():
@@ -109,23 +118,64 @@ class GraphCreationDialog(QtGui.QDialog, Ui_Create_Graph):
             ba_skim = layer.fieldNameIndex(self.ba_skim.currentText())
 
             if ab_skim >= 0 and ba_skim >= 0:
+                skim_name = 'Skim ' + str(self.name_skims)
+                if 'AB' in self.ab_skim.currentText():
+                    if self.ab_skim.currentText().replace('AB', 'BA') == self.ba_skim.currentText():
+                        skim_name = self.ab_skim.currentText().replace('AB', '')
+                        if len(skim_name) > 0:
+                            if skim_name[0] in ['-', '_', ' ']:
+                                skim_name = skim_name[1:]
+                            elif skim_name[-1] in ['-', '_', ' ']:
+                                skim_name = skim_name[0:-1]
+                        if len(skim_name) == 0:
+                            skim_name = 'Skim ' + str(self.name_skims)
+
+                self.skim_list.setRowCount(self.tot_skims + 1)
+                self.skim_list.setItem(self.tot_skims, 0, QtGui.QTableWidgetItem(skim_name))
+                self.skim_list.setItem(self.tot_skims, 1,
+                                       QtGui.QTableWidgetItem(self.ab_skim.currentText()))  # .encode('ascii'))
+                self.skim_list.setItem(self.tot_skims, 2,
+                                       QtGui.QTableWidgetItem(self.ba_skim.currentText()))  # .encode('ascii'))
+
+                btn = QPushButton('X')
+                btn.clicked.connect(self.click_remove_button)
+                self.skim_list.setCellWidget(self.tot_skims, 3, btn)
+
                 self.tot_skims += 1
                 self.name_skims += 1
-                self.skim_list.setRowCount(self.tot_skims)
-                self.skim_list.setItem(self.tot_skims - 1, 0, QtGui.QTableWidgetItem('Skim ' + str(self.name_skims)))
-                self.skim_list.setItem(self.tot_skims - 1, 1,
-                                       QtGui.QTableWidgetItem(self.ab_skim.currentText()))  # .encode('ascii'))
-                self.skim_list.setItem(self.tot_skims - 1, 2,
-                                       QtGui.QTableWidgetItem(self.ba_skim.currentText()))  # .encode('ascii'))
+
         except:
             qgis.utils.iface.messageBar().pushMessage("Wrong settings", "Please review the field information", level=3,
                                                       duration=3)
 
-    def slot_double_clicked(self, mi):
-        row = mi.row()
-        if row > -1:
-            self.skim_list.removeRow(row)
-            self.tot_skims -= 1
+    def choose_a_field(self, modified):
+        i, j = 'AB', 'BA'
+
+        if modified == i:
+            text = self.ab_skim.currentText()
+            if i in text:
+                text = text.replace(i, j)
+                index = self.ba_skim.findText(text, Qt.MatchFixedString)
+                if index >= 0:
+                    self.ba_skim.setCurrentIndex(index)
+
+        if modified == j:
+            text = self.ba_skim.currentText()
+            if j in text:
+                text = text.replace(j, i)
+                index = self.ab_skim.findText(text, Qt.MatchFixedString)
+                if index >= 0:
+                    self.ab_skim.setCurrentIndex(index)
+
+    def set_initial_value_if_available(self):
+        all_items = [self.ab_skim.itemText(i) for i in range(self.ab_skim.count())]
+
+        for i in all_items:
+            if 'AB' in i:
+                index = self.ab_skim.findText(i, Qt.MatchFixedString)
+                if index >= 0:
+                    self.ab_skim.setCurrentIndex(index)
+                break
 
     # GENERIC to be applied to MORE THAN ONE form
     def load_fields_to_combo_boxes(self):
@@ -154,6 +204,12 @@ class GraphCreationDialog(QtGui.QDialog, Ui_Create_Graph):
         self.model_centroids.setEnabled(False)
         if self.set_centroids_rule.isChecked():
             self.model_centroids.setEnabled(True)
+
+    def click_remove_button(self):
+        btn = self.sender()
+        row = self.skim_list.indexAt(btn.pos()).row()
+        self.skim_list.removeRow(row)
+        self.tot_skims -= 1
 
     def run_thread(self):
 
@@ -206,7 +262,7 @@ class GraphCreationDialog(QtGui.QDialog, Ui_Create_Graph):
         if new_name is not None:
             outbox.setText(new_name)
 
-    def GraphCreationPhase1(self):  # CREATING GRAPH
+    def run_graph_creation(self):  # CREATING GRAPH
         self.error = None
         text = ''
 
