@@ -249,12 +249,8 @@ class DesireLinesProcedure(WorkerThread):
                 self.results.prepare(self.graph)
                 self.results.set_cores(1)
 
-                for O in range(self.matrix.shape[0]):
-                    a = self.matrix[O, :]
-                    if np.sum(a) > 0:
-                        one_to_all(O, a, self.graph, self.results, 0, no_gil=False)
-
-                #all_or_nothing(self.matrix, self.graph, self.results)
+                # Do the assignment
+                all_or_nothing(self.matrix, self.graph, self.results)
 
                 f = self.results.link_loads[:,0]
                 link_loads = np.zeros((f.shape[0]+1, 2))
