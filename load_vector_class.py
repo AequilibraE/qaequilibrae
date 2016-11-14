@@ -52,11 +52,13 @@ class LoadVector(WorkerThread):
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
 
         vector = np.array(vector)  # transform the list of lists in NumPy array
+        if np.max(np.bincount(vector[:,0]))  > 1:
+            self.error = 'Zone field is not unique'
+        else:
+            zones = np.max(vector[:, 0]) + 1
+            vec = np.zeros(zones)
+            vec[vector[:, 0].astype(int)] = vector[:, 1]
 
-        zones = np.max(vector[:, 0]) + 1
-        vec = np.zeros(zones)
-        vec[vector[:, 0].astype(int)] = vector[:, 1]
-
-        self.vector = vec
+            self.vector = vec
         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(feat_count)))
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'Vector loaded')
