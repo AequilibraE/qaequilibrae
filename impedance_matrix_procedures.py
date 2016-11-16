@@ -1,15 +1,23 @@
-# -------------------------------------------------------------------------------
-# Name:       TRAFFIC ASSIGNMENT
-# Purpose:    Implement procedures to translate a layer and parameters into entry for assignment
-#
-# Author:      Pedro Camargo
-# Website:    www.AequilibraE.com
-# Repository:  
-#
-# Created:     12/01/2014
-# Copyright:   (c) Pedro Camargo 2014
-# Licence:     GPL
-# -------------------------------------------------------------------------------
+"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Creating impedance matrices
+ Purpose:    Threaded procedure to compute impedance matrix
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2014-03-19
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 import qgis
 from qgis.core import *
@@ -21,9 +29,8 @@ sys.path.append("C:/Users/Pedro/.qgis2/python/plugins/AequilibraE/")
 
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
-import math
 import aequilibrae as ae
-from WorkerThread import WorkerThread
+from worker_thread import WorkerThread
 
 
 def main():
@@ -48,18 +55,17 @@ class ComputeDistMatrix(WorkerThread):
         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (evol_bar, 0))
 
         for origin in xrange(1, centroids):
-            trash = ae.paths.path_computation(origin,0,self.graph, self.result)
+            trash = ae.paths.path_computation(origin, 0, self.graph, self.result)
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (evol_bar, origin))
             for i, skm in enumerate(self.graph.skim_fields):
-                self.skim_matrices[origin,:,i] = self.result.temporary_skims[:,i][0:centroids].copy()
+                self.skim_matrices[origin, :, i] = self.result.temporary_skims[:, i][0:centroids].copy()
             self.result.reset()
 
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), (evol_bar, 'Computation Finalized. Writing results'))
-        self.emit(SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"),0)
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 0)
 
-    def func_assig(self, O, graph_costs, b_nodes, graph_fs, idsgraph, graph_skim, no_path, skims, thread_dict,
+    def func_assig(self, orig, graph_costs, b_nodes, graph_fs, idsgraph, graph_skim, no_path, skims, thread_dict,
                    predecessors, conn, temp_skims, evol_bar):
-        ct = 0
 
         ct = thread.get_ident()
         if ct in thread_dict.keys():
@@ -69,9 +75,9 @@ class ComputeDistMatrix(WorkerThread):
             thread_dict[ct] = a
             ct = a
 
-        a = AoN.SKIMS_One_to_all(O, graph_costs, b_nodes, graph_fs, idsgraph, graph_skim, no_path[O, :], skims[O, :, :],
+        a = AoN.SKIMS_One_to_all(orig, graph_costs, b_nodes, graph_fs, idsgraph, graph_skim, no_path[orig, :], skims[orig, :, :],
                                  predecessors[:, ct], conn[:, ct], temp_skims[:, :, ct])
-        self.assigned[0] = self.assigned[0] + 1
+        self.assigned[0] += 1
 
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), (evol_bar, str(self.assigned[0])))
 

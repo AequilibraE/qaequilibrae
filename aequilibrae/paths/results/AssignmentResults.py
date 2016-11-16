@@ -68,3 +68,4 @@ class AssignmentResults:
 
     def results(self):
         return np.sum(self.link_loads, axis=1)
+

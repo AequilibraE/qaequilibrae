@@ -1,16 +1,23 @@
 """
-/***************************************************************************
- AequilibraE - www.AequilibraE.com
- 
-    Name:        Dialogs for modeling tools
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : TOOLS developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Creating impedance matrices
+ Purpose:    Loads GUI to create impedance matrices
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2014-03-19
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
 import qgis
@@ -19,7 +26,6 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import QObject, SIGNAL
 import sys, os
 import numpy as np
-from functools import partial
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
@@ -46,29 +52,27 @@ class ImpedanceMatrixDialog(QtGui.QDialog, Ui_Impedance_Matrix):
         self.skim_fields = []
         # FIRST, we connect slot signals
 
-        #For loading a new graph
+        # For loading a new graph
         self.load_graph_from_file.clicked.connect(self.loaded_new_graph_from_file)
 
         # For adding skims
         self.bt_add_skim.clicked.connect(self.add_to_skim_list)
-        self.skim_list.doubleClicked.connect(self.slotDoubleClicked)
+        self.skim_list.doubleClicked.connect(self.slot_double_clicked)
 
         # RUN skims
         self.select_result.clicked.connect(self.browse_outfile)
 
         self.do_dist_matrix.clicked.connect(self.run_skimming)
 
-
         # SECOND, we set visibility for sections that should not be shown when the form opens (overlapping items)
         #        and re-dimension the items that need re-dimensioning
-        self.HideAllProgressBars()
+        self.hide_all_progress_bars()
         self.skim_list.setColumnWidth(0, 567)
 
         # loads default path from parameters
         self.path = standard_path()
 
-
-    def HideAllProgressBars(self):
+    def hide_all_progress_bars(self):
         self.progressbar.setVisible(False)
         self.progress_label.setVisible(False)
         self.progressbar.setValue(0)
@@ -77,41 +81,42 @@ class ImpedanceMatrixDialog(QtGui.QDialog, Ui_Impedance_Matrix):
     def loaded_new_graph_from_file(self):
         file_types = "AequilibraE graph(*.aeg)"
         if len(self.graph_file_name.text()) > 0:
-            newname = QFileDialog.getOpenFileName(None, 'Result file', self.graph_file_name.text(), file_types)
+            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.graph_file_name.text(), file_types)
         else:
-            newname = QFileDialog.getOpenFileName(None, 'Result file', self.path, file_types)
+            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.path, file_types)
 
         self.cb_minimizing.clear()
         self.cb_skims.clear()
         self.all_centroids.setText('')
         self.block_paths.setChecked(False)
-        if newname is not None:
-            self.graph_file_name.setText(newname)
+        if new_name is not None:
+            self.graph_file_name.setText(new_name)
             self.graph = Graph()
-            self.graph.load_from_disk(newname)
+            self.graph.load_from_disk(new_name)
 
             self.all_centroids.setText(str(self.graph.centroids))
             if self.graph.block_centroid_flows:
                 self.block_paths.setChecked(True)
             graph_fields = list(self.graph.graph.dtype.names)
-            self.skimmeable_fields = [x for x in graph_fields if x not in ['link_id', 'a_node', 'b_node', 'direction', 'id',]]
+            self.skimmeable_fields = [x for x in graph_fields if
+                                      x not in ['link_id', 'a_node', 'b_node', 'direction', 'id', ]]
 
             for q in self.skimmeable_fields:
                 self.cb_minimizing.addItem(q)
                 self.cb_skims.addItem(q)
 
     def add_to_skim_list(self):
-        if self.cb_skims.currentIndex()>=0:
+        if self.cb_skims.currentIndex() >= 0:
             self.tot_skims += 1
             self.skim_list.setRowCount(self.tot_skims)
             self.skim_list.setItem(self.tot_skims - 1, 0, QtGui.QTableWidgetItem((self.cb_skims.currentText())))
             self.skim_fields.append(self.cb_skims.currentText())
             self.cb_skims.removeItem(self.cb_skims.currentIndex())
 
-    def slotDoubleClicked(self, mi):
+    def slot_double_clicked(self, mi):
         row = mi.row()
         if row > -1:
-            self.cb_skims.addItem(self.skim_list.item(row,0).text())
+            self.cb_skims.addItem(self.skim_list.item(row, 0).text())
             self.skim_fields.pop(row)
             self.skim_list.removeRow(row)
             self.tot_skims -= 1
@@ -122,46 +127,48 @@ class ImpedanceMatrixDialog(QtGui.QDialog, Ui_Impedance_Matrix):
             file_types = "Numpy Binnary Array(*.npy)"
 
         if len(self.imped_results.text()) > 0:
-            newname = QFileDialog.getSaveFileName(None, 'Result file', self.imped_results.text(), file_types)
+            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.imped_results.text(), file_types)
         else:
-            newname = QFileDialog.getSaveFileName(None, 'Result file', self.path, file_types)
+            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, file_types)
 
         self.imped_results.setText('')
-        if newname != None:
-            self.imped_results.setText(newname)
+        if new_name is not None:
+            self.imped_results.setText(new_name)
 
-    def runThread(self):
+    def run_thread(self):
 
-        QObject.connect(self.workerThread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.ProgressValueFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressText( PyQt_PyObject )"), self.ProgressTextFromThread)
-        QObject.connect(self.workerThread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.ProgressRangeFromThread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
+                        self.progress_range_from_thread)
 
-        QObject.connect(self.workerThread, SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"),
-                        self.FinishedThreadedProcedure)
+        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
+                        self.finished_threaded_procedure)
 
-        self.workerThread.start()
+        self.worker_thread.start()
         self.exec_()
 
     # VAL and VALUE have the following structure: (bar/text ID, value)
-    def ProgressRangeFromThread(self, val):
+    def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
 
-    def ProgressValueFromThread(self, val):
+    def progress_value_from_thread(self, val):
         self.progressbar.setValue(val[1])
 
-    def ProgressTextFromThread(self, val):
+    def progress_text_from_thread(self, val):
         self.progress_label.setText(val[1])
 
-    def FinishedThreadedProcedure(self, val):
-        if self.workerThread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Assignment did NOT run correctly", self.workerThread.error, level=3)
+    def finished_threaded_procedure(self, val):
+        if self.worker_thread.error is not None:
+            qgis.utils.iface.messageBar().pushMessage("Assignment did NOT run correctly", self.worker_thread.error,
+                                                      level=3)
         else:
-            mat = self.workerThread.skim_matrices
-            mat[mat > 1e308] = np.inf # We treat the "infinity" that should have been treated within the Cython code
+            mat = self.worker_thread.skim_matrices
+            mat[mat > 1e308] = np.inf  # We treat the "infinity" that should have been treated within the Cython code
 
             if self.npy_res.isChecked():
                 np.save(self.imped_results.text(), mat)
-                q = open(self.imped_results.text()+'.csv', 'w')
+                q = open(self.imped_results.text() + '.csv', 'w')
                 for l in self.skim_fields:
                     print >> q, l
                 q.flush()
@@ -173,19 +180,19 @@ class ImpedanceMatrixDialog(QtGui.QDialog, Ui_Impedance_Matrix):
                     text = text + ',' + l
                 print >> q, text
                 for i in range(mat.shape[0]):
-                    if np.sum(mat[i,:,:])>0:
+                    if np.sum(mat[i, :, :]) > 0:
                         for j in range(mat.shape[1]):
-                            if np.sum(mat[i,j,:])>0:
+                            if np.sum(mat[i, j, :]) > 0:
                                 text = str(i) + ',' + str(j)
                                 s = 0
                                 for k in range(mat.shape[2]):
-                                    if mat[i,j,k] != np.inf:
-                                        s += mat[i,j,k]
-                                        text = text + ',' + str(mat[i,j,k])
+                                    if mat[i, j, k] != np.inf:
+                                        s += mat[i, j, k]
+                                        text = text + ',' + str(mat[i, j, k])
                                     else:
                                         text += ','
-                                if s>0:
-                                    print >>q, text
+                                if s > 0:
+                                    print >> q, text
                     q.flush()
                 q.close()
         self.close()
@@ -210,6 +217,5 @@ class ImpedanceMatrixDialog(QtGui.QDialog, Ui_Impedance_Matrix):
             self.funding2.setVisible(False)
             self.progressbar.setVisible(True)
             self.progress_label.setVisible(True)
-            self.workerThread = ComputeDistMatrix(qgis.utils.iface.mainWindow(),  self.graph, self.result)
-            self.runThread()
-
+            self.worker_thread = ComputeDistMatrix(qgis.utils.iface.mainWindow(), self.graph, self.result)
+            self.run_thread()

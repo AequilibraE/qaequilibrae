@@ -39,10 +39,10 @@
    <widget class="QComboBox" name="nodelayers">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>169</x>
       <y>84</y>
-      <width>560</width>
-      <height>22</height>
+      <width>541</width>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -55,8 +55,8 @@
     <property name="geometry">
      <rect>
       <x>31</x>
-      <y>114</y>
-      <width>111</width>
+      <y>119</y>
+      <width>151</width>
       <height>16</height>
      </rect>
     </property>
@@ -72,10 +72,10 @@
    <widget class="QComboBox" name="node_fields">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>169</x>
       <y>114</y>
-      <width>560</width>
-      <height>22</height>
+      <width>541</width>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -88,8 +88,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>84</y>
-      <width>111</width>
+      <y>88</y>
+      <width>151</width>
       <height>17</height>
      </rect>
     </property>
@@ -101,8 +101,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>20</y>
-      <width>131</width>
+      <y>24</y>
+      <width>171</width>
       <height>17</height>
      </rect>
     </property>
@@ -113,10 +113,10 @@
    <widget class="QLineEdit" name="out_nodes">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>170</x>
       <y>20</y>
-      <width>561</width>
-      <height>20</height>
+      <width>541</width>
+      <height>24</height>
      </rect>
     </property>
     <property name="text">
@@ -127,8 +127,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>50</y>
-      <width>131</width>
+      <y>55</y>
+      <width>171</width>
       <height>16</height>
      </rect>
     </property>
@@ -147,10 +147,10 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>49</y>
+      <x>170</x>
+      <y>50</y>
       <width>71</width>
-      <height>20</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="text">
@@ -182,8 +182,8 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>30</y>
-      <width>80</width>
+      <y>31</y>
+      <width>181</width>
       <height>22</height>
      </rect>
     </property>
@@ -199,10 +199,10 @@
    <widget class="QComboBox" name="linelayers">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>169</x>
       <y>30</y>
-      <width>560</width>
-      <height>22</height>
+      <width>541</width>
+      <height>24</height>
      </rect>
     </property>
     <property name="font">
@@ -309,10 +309,10 @@
   <widget class="QLineEdit" name="out_lines">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>190</x>
      <y>100</y>
-     <width>561</width>
-     <height>20</height>
+     <width>541</width>
+     <height>24</height>
     </rect>
    </property>
    <property name="font">
@@ -328,8 +328,8 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>100</y>
-     <width>131</width>
+     <y>104</y>
+     <width>161</width>
      <height>17</height>
     </rect>
    </property>

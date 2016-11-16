@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Graph creation toolbox - Provided by www.xl-optim.com</string>
+   <string>Aequilibrae - Desire Lines toolbox</string>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -241,7 +241,7 @@
     <property name="geometry">
      <rect>
       <x>9</x>
-      <y>45</y>
+      <y>50</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -261,7 +261,7 @@
       <x>130</x>
       <y>12</y>
       <width>321</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="maxVisibleItems">
@@ -273,7 +273,7 @@
      <rect>
       <x>10</x>
       <y>88</y>
-      <width>81</width>
+      <width>111</width>
       <height>17</height>
      </rect>
     </property>
@@ -293,7 +293,7 @@
       <x>129</x>
       <y>45</y>
       <width>321</width>
-      <height>22</height>
+      <height>24</height>
      </rect>
     </property>
     <property name="maxVisibleItems">
@@ -304,7 +304,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>12</y>
+      <y>16</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -321,9 +321,9 @@
    <widget class="QRadioButton" name="radio_delaunay">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>140</x>
       <y>88</y>
-      <width>101</width>
+      <width>111</width>
       <height>17</height>
      </rect>
     </property>

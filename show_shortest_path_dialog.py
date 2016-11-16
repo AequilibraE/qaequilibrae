@@ -1,16 +1,23 @@
 """
-/***************************************************************************
- AequilibraE - www.AequilibraE.com
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
 
-    Name:        Dialog for computing and displaying shortest paths based on clicks on the map
-                              -------------------
-        begin                : 2016-07-30
-        copyright            : AequilibraE developers 2016
-        Original Author: Pedro Camargo (c@margo.co)
-        Contributors:
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ Name:       Shortest path computation
+ Purpose:    Dialog for computing and displaying shortest paths based on clicks on the map
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-07-30
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
 import qgis
@@ -23,11 +30,8 @@ from random import randint
 
 import sys
 import os
-from functools import partial
 from auxiliary_functions import *
-from global_parameters import *
 from point_tool import PointTool
-from aequilibrae.paths import Graph
 from aequilibrae.paths.results import PathResults
 from aequilibrae.paths import path_computation
 
@@ -101,13 +105,13 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
         QObject.connect(self.clickTool, SIGNAL("clicked"), self.fill_path_to)
 
     def fill_path_to(self):
-        self.toNode = self.find_point()
-        self.path_to.setText(str(self.toNode))
+        self.to_node = self.find_point()
+        self.path_to.setText(str(self.to_node))
         self.to_but.setEnabled(True)
 
     def fill_path_from(self):
-        self.fromNode = self.find_point()
-        self.path_from.setText(str(self.fromNode))
+        self.from_node = self.find_point()
+        self.path_from.setText(str(self.from_node))
         self.from_but.setEnabled(True)
         self.search_for_point_to_after_from()
 
@@ -149,7 +153,8 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
                 # This way is MUCH faster
 
                 crs = self.line_layer.dataProvider().crs().authid()
-                vl = QgsVectorLayer("LineString?crs={}".format(crs), self.path_from.text() + " to " + self.path_to.text(), "memory")
+                vl = QgsVectorLayer("LineString?crs={}".format(crs), self.path_from.text() +
+                                    " to " + self.path_to.text(), "memory")
                 pr = vl.dataProvider()
 
                 # add fields
@@ -172,8 +177,9 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
                 registry = QgsSymbolLayerV2Registry.instance()
                 lineMeta = registry.symbolLayerMetadata("SimpleLine")
                 symbol = QgsLineSymbolV2()
-                lineLayer = lineMeta.createSymbolLayer({'width': '1', 'color': self.random_rgb(), 'offset': '0', 'penstyle': 'solid',
-                                                    'use_custom_dash': '0', 'joinstyle': 'bevel', 'capstyle': 'square'})
+                lineLayer = lineMeta.createSymbolLayer({'width': '1', 'color': self.random_rgb(), 'offset': '0',
+                                                        'penstyle': 'solid', 'use_custom_dash': '0',
+                                                        'joinstyle': 'bevel', 'capstyle': 'square'})
                 symbol.deleteSymbolLayer(0)
                 symbol.appendSymbolLayer(lineLayer)
                 renderer = QgsSingleSymbolRendererV2(symbol)
@@ -181,7 +187,8 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
                 qgis.utils.iface.mapCanvas().refresh()
 
             else:
-                qgis.utils.iface.messageBar().pushMessage("No path between " + self.path_from.text() + ' and ' + self.path_to.text(), '', level=3)
+                qgis.utils.iface.messageBar().pushMessage("No path between " + self.path_from.text() +
+                                                          ' and ' + self.path_to.text(), '', level=3)
 
     def random_rgb(self):
         rgb = ''
@@ -189,5 +196,5 @@ class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
             rgb = rgb + str(randint(0, 255)) + ','
         return rgb[:-1]
 
-    def ExitProcedure(self):
+    def exit_procedure(self):
         self.close()

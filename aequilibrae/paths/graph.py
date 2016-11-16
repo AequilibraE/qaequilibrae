@@ -1,15 +1,24 @@
-# -------------------------------------------------------------------------------
-# Name:       Traffic network class
-# Purpose:    Implement a network class to be the standard for AequilibraE
-#
-# Author:      Pedro Camargo
-# Website:    www.AequilibraE.com
-# Repository:
-#
-# Created:     June/05/2015
-# Copyright:   (c) AequilibraE developers 2015
-# Licence:     GPL
-# -------------------------------------------------------------------------------
+"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Transportation graph class
+ Purpose:    Implement a standard graph class to support all network computation
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camrgo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    June/05/2015
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
+
 import numpy as np
 import csv
 import cPickle

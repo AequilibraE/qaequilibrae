@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ipf</class>
+ <widget class="QDialog" name="ipf">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>546</width>
+    <height>196</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Aequilibrae - Iterative Proportional Fitting</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <widget class="QLabel" name="lbl_funding2">
+   <property name="geometry">
+    <rect>
+     <x>448</x>
+     <y>163</y>
+     <width>101</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>7</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string> www.ipea.gov.br</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::PlainText</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lbl_funding1">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>164</y>
+     <width>101</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>7</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Partially funded by</string>
+   </property>
+  </widget>
+  <widget class="QProgressBar" name="progressbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>161</y>
+     <width>251</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>170</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>240</red>
+         <green>240</green>
+         <blue>240</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>51</red>
+         <green>153</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="textVisible">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="progress_label">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>163</y>
+     <width>261</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Status Message 0</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="but_load_new_matrix">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>151</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Load seed matrix</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="apply_ipf">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>160</y>
+     <width>140</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Run IPF</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="matrix_name">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>40</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>No matrix loaded</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="matrix_total">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>62</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="but_load_rows">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>10</y>
+     <width>151</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Load rows vector</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="but_load_columns">
+   <property name="geometry">
+    <rect>
+     <x>385</x>
+     <y>10</y>
+     <width>151</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Load columns vector</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="columns_name">
+   <property name="geometry">
+    <rect>
+     <x>387</x>
+     <y>40</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>No vector loaded</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="columns_total">
+   <property name="geometry">
+    <rect>
+     <x>387</x>
+     <y>62</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="rows_total">
+   <property name="geometry">
+    <rect>
+     <x>202</x>
+     <y>62</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="rows_name">
+   <property name="geometry">
+    <rect>
+     <x>202</x>
+     <y>40</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>No vector loaded</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="but_choose_output_name">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>100</y>
+     <width>140</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save Output</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="output_name">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>102</y>
+     <width>371</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>progress_label</zorder>
+  <zorder>lbl_funding2</zorder>
+  <zorder>lbl_funding1</zorder>
+  <zorder>progressbar</zorder>
+  <zorder>but_load_new_matrix</zorder>
+  <zorder>apply_ipf</zorder>
+  <zorder>matrix_name</zorder>
+  <zorder>matrix_total</zorder>
+  <zorder>but_load_rows</zorder>
+  <zorder>but_load_columns</zorder>
+  <zorder>columns_name</zorder>
+  <zorder>columns_total</zorder>
+  <zorder>rows_total</zorder>
+  <zorder>rows_name</zorder>
+  <zorder>but_choose_output_name</zorder>
+  <zorder>output_name</zorder>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

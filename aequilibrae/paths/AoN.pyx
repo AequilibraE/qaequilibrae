@@ -1,8 +1,29 @@
 """
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Core path computation algorithms
+ Purpose:    Implement shortest path and network loading routines
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camrgo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    15/09/2013
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+
 Original Algorithm for Shortest path (Dijkstra with a Fibonacci heap) was written by Jake Vanderplas <vanderplas@astro.washington.edu> under license: BSD, (C) 2012
 
 Codes for route ennumeration, DAG construction and Link nesting were written by Pedro Camargo (2013) and have all their rights reserved to the author
-"""
+
+ """
+
 cimport numpy as np
 cimport cython
 from cython.parallel cimport parallel, prange, threadid

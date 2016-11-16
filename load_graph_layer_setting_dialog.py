@@ -1,35 +1,35 @@
 """
-/***************************************************************************
- AequilibraE - www.AequilibraE.com
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
 
-    Name:        Dialog for computing and displaying shortest paths based on clicks on the map
-                              -------------------
-        begin                : 2016-07-30
-        copyright            : AequilibraE developers 2016
-        Original Author: Pedro Camargo (c@margo.co)
-        Contributors:
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ Name:       Loads graph from file
+ Purpose:    Loads GUI for loading graphs from files and configuring them before computation
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-07-30
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 from qgis.core import *
 import qgis
-from qgis.gui import QgsMapToolEmitPoint
 from PyQt4 import QtGui
 from PyQt4.QtGui import *
-from PyQt4.QtCore import *
-import PyQt4
-from random import randint
 
 import sys
 import os
 from functools import partial
 from auxiliary_functions import *
 from global_parameters import *
-from point_tool import PointTool
 from aequilibrae.paths import Graph
-from aequilibrae.paths.results import PathResults
-from aequilibrae.paths import path_computation
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
@@ -61,10 +61,10 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
 
         self.load_graph_from_file.clicked.connect(self.loaded_new_graph_from_file)
 
-        self.cb_node_layer.currentIndexChanged.connect(partial(self.load_fields_to_ComboBoxes, self.cb_node_layer,
+        self.cb_node_layer.currentIndexChanged.connect(partial(self.load_fields_to_combo_boxes, self.cb_node_layer,
                                                                self.cb_data_field, True))
 
-        self.cb_link_layer.currentIndexChanged.connect(partial(self.load_fields_to_ComboBoxes, self.cb_link_layer,
+        self.cb_link_layer.currentIndexChanged.connect(partial(self.load_fields_to_combo_boxes, self.cb_link_layer,
                                                                self.cb_link_id_field, False))
 
         self.cb_link_id_field.currentIndexChanged.connect(self.clear_memory_layer)
@@ -73,31 +73,31 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
-            if layer.wkbType() in point_types:
-                self.cb_node_layer.addItem(layer.name())
+            if 'wkbType' in dir(layer):
+                if layer.wkbType() in point_types:
+                    self.cb_node_layer.addItem(layer.name())
 
-            if layer.wkbType() in line_types:
-                self.cb_link_layer.addItem(layer.name())
+                if layer.wkbType() in line_types:
+                    self.cb_link_layer.addItem(layer.name())
 
         # loads default path from parameters
         self.path = standard_path()
-
 
     def check_parameters(self):
         if self.cb_node_layer.currentIndex() >= 0 and self.cb_data_field.currentIndex() >= 0:
             return True
         else:
-            qgis.utils.iface.messageBar().pushMessage("Wrong settings", "Please select node layer and ID field", level=3,
-                                                      duration=3)
+            qgis.utils.iface.messageBar().pushMessage("Wrong settings", "Please select node layer and ID field",
+                                                      level=3, duration=3)
             return False
 
     def clear_memory_layer(self):
         self.link_features = None
 
-    def load_fields_to_ComboBoxes(self, combobox, combofield, node_layer):
+    def load_fields_to_combo_boxes(self, combobox, combofield, node_layer):
         combofield.clear()
         if combobox.currentIndex() >= 0:
-            layer = getVectorLayerByName(combobox.currentText())
+            layer = get_vector_layer_by_name(combobox.currentText())
             for field in layer.dataProvider().fields().toList():
                 if field.type() in integer_types:
                     combofield.addItem(field.name())
@@ -118,15 +118,15 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
         file_types = "AequilibraE graph(*.aeg)"
 
         if len(self.graph_file_name.text()) == 0:
-            newname = QFileDialog.getOpenFileName(None, 'Result file', self.path, file_types)
+            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.path, file_types)
         else:
-            newname = QFileDialog.getOpenFileName(None, 'Result file', self.graph_file_name.text(), file_types)
+            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.graph_file_name.text(), file_types)
         self.cb_minimizing.clear()
         self.all_centroids.setText('')
         self.block_paths.setChecked(False)
         try:
-            self.graph_file_name.setText(newname)
-            self.graph.load_from_disk(newname)
+            self.graph_file_name.setText(new_name)
+            self.graph.load_from_disk(new_name)
 
             self.all_centroids.setText(str(self.graph.centroids))
             if self.graph.block_centroid_flows:
@@ -141,7 +141,6 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
         except:
             pass
 
-
     def returns_configuration(self):
         if self.link_features is None:
             idx = self.line_layer.fieldNameIndex(self.cb_link_id_field.currentText())
@@ -150,9 +149,9 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
                 link_id = feat.attributes()[idx]
                 self.link_features[link_id] = feat
 
-        self.ExitProcedure()
+        self.exit_procedure()
 
-    def ExitProcedure(self):
+    def exit_procedure(self):
         if None in [self.line_layer, self.node_layer, self.node_keys, self.node_fields]:
             self.error = 'Layers and fields not chosen correctly'
         if not self.graph_ok:

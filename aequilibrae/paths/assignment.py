@@ -1,34 +1,40 @@
-# -------------------------------------------------------------------------------
-# Name:       TRAFFIC ASSIGNMENT
-# Purpose:    Implement procedures to translate a layer and parameters into entry for assignment
-#
-# Author:      Pedro Camargo
-# Website:    www.AequilibraE.com
-# Repository:  
-#
-# Created:     12/01/2014
-# Copyright:   (c) Pedro Camargo 2014
-# Licence:     GPL
-# -------------------------------------------------------------------------------
+"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
+
+ Name:       Traffic assignment
+ Purpose:    Implement ttaffic assignment algorithms based on Cython's network loading procedures
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camrgo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    15/09/2013
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
+
+
+import sys
+sys.dont_write_bytecode = True
 
 try:
     import qgis
     from qgis.core import *
+    from PyQt4.QtCore import SIGNAL
 except:
     pass
-from PyQt4.QtCore import *
-import sys, os
-import time
-import numpy as np
-import sys
 
+import numpy as np
+import platform
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
 
-import math
-
-
-import platform
 plat = platform.system()
 if plat == 'Windows':
     import struct
@@ -36,7 +42,10 @@ if plat == 'Windows':
         from win64 import *
     if (8 * struct.calcsize("P")) == 32:
         from win32 import *
-
+if plat == 'Linux':
+    import struct
+    if (8 * struct.calcsize("P")) == 64:
+        from linux64 import *
 if plat == 'Darwin':
     from mac import *
 
@@ -47,10 +56,10 @@ def main():
 def all_or_nothing(matrix, graph, results):
 
     # catch errors
-    if results.graph_id is None:
+    if results.__graph_id__ is None:
         raise ValueError('The results object was not prepared. Use results.prepare(graph)')
 
-    elif results.graph_id != graph.__id__:
+    elif results.__graph_id__ != graph.__id__:
         raise ValueError('The results object was prepared for a different graph')
 
     else:
@@ -75,8 +84,9 @@ def func_assig_thread(O, a, g, res, all_threads):
 
     one_to_all(O, a, g, res, th, True)
 
-def ota(O, a, g, res):
-    one_to_all(O, a, g, res, 0)
+
+def ota(O, a, g, res, th, b):
+    one_to_all(O, a, g, res, th, b)
 
 '''
 class WorkerThreadAssignment(QThread):
@@ -200,7 +210,7 @@ class Assigns_All_Or_Nothing(WorkerThreadAssignment):
             if np.sum(self.matrix[O, :]) > 0:
                 # self.func_assig(O,self.matrix,graph_costs, b_nodes, graph_fs,idsgraph,graph_skim, self.Link_Loads, self.no_path, self.skims, self.thread_dict,predecessors,conn,temp_skims, evol_bar)
                 pool.apply_async(self.func_assig, args=(
-                O, self.matrix, self.graph, self.Link_Loads, self.no_path, self.skims, self.thread_dict, predecessors, conn, temp_skims, evol_bar))
+                O, self.matrix, self1, self.Link_Loads, self.no_path, self.skims, self.thread_dict, predecessors, conn, temp_skims, evol_bar))
         pool.close()
         pool.join()
 

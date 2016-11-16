@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_compute_path.ui'
 #
-# Created: Mon Sep 05 04:22:13 2016
+# Created: Sun Oct 23 20:24:23 2016
 #      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,22 +27,22 @@ class Ui_compute_path(object):
     def setupUi(self, compute_path):
         compute_path.setObjectName(_fromUtf8("compute_path"))
         compute_path.setWindowModality(QtCore.Qt.NonModal)
-        compute_path.resize(170, 115)
+        compute_path.resize(170, 118)
         compute_path.setModal(False)
         self.do_dist_matrix = QtGui.QPushButton(compute_path)
-        self.do_dist_matrix.setGeometry(QtCore.QRect(10, 90, 151, 21))
+        self.do_dist_matrix.setGeometry(QtCore.QRect(10, 94, 151, 21))
         self.do_dist_matrix.setObjectName(_fromUtf8("do_dist_matrix"))
         self.path_to = QtGui.QLineEdit(compute_path)
-        self.path_to.setGeometry(QtCore.QRect(60, 63, 100, 20))
+        self.path_to.setGeometry(QtCore.QRect(60, 63, 100, 24))
         self.path_to.setObjectName(_fromUtf8("path_to"))
         self.to_but = QtGui.QPushButton(compute_path)
-        self.to_but.setGeometry(QtCore.QRect(10, 62, 45, 23))
+        self.to_but.setGeometry(QtCore.QRect(10, 64, 45, 23))
         self.to_but.setObjectName(_fromUtf8("to_but"))
         self.path_from = QtGui.QLineEdit(compute_path)
-        self.path_from.setGeometry(QtCore.QRect(60, 33, 100, 20))
+        self.path_from.setGeometry(QtCore.QRect(60, 33, 100, 24))
         self.path_from.setObjectName(_fromUtf8("path_from"))
         self.from_but = QtGui.QPushButton(compute_path)
-        self.from_but.setGeometry(QtCore.QRect(10, 32, 45, 23))
+        self.from_but.setGeometry(QtCore.QRect(10, 34, 45, 23))
         self.from_but.setObjectName(_fromUtf8("from_but"))
         self.load_graph_from_file = QtGui.QPushButton(compute_path)
         self.load_graph_from_file.setGeometry(QtCore.QRect(10, 3, 151, 21))

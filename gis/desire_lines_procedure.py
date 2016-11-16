@@ -1,24 +1,32 @@
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
- 
-    Name:        Procedure for Computing Desire lines based on a Delaunay Triangulation network
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : AequilibraE developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
 
+ Name:       Creating desire lines
+ Purpose:    Implements procedure for Computing Desire lines based on a Delaunay Triangulation network on
+             a separate thread
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-07-01
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
+import qgis
 from qgis.core import *
 from PyQt4.QtCore import *
 import itertools
+import numpy as np
 
 from auxiliary_functions import *
 from aequilibrae.paths import Graph
-from aequilibrae.paths.results import PathResults
 from aequilibrae.paths.results import AssignmentResults
 from aequilibrae.paths import all_or_nothing
 
@@ -26,12 +34,11 @@ from aequilibrae.paths import one_to_all, reblocks_matrix
 
 error = False
 try:
-    import numpy as np
     from scipy.spatial import Delaunay
 except:
     error = True
 
-from WorkerThread import WorkerThread
+from worker_thread import WorkerThread
 
 class DesireLinesProcedure(WorkerThread):
     def __init__(self, parentThread, layer, id_field, matrix, dl_type):
@@ -47,7 +54,7 @@ class DesireLinesProcedure(WorkerThread):
 
     def doWork(self):
         if self.error is None:
-            layer = getVectorLayerByName(self.layer)
+            layer = get_vector_layer_by_name(self.layer)
             idx = layer.fieldNameIndex(self.id_field)
             matrix = self.matrix
 
@@ -62,9 +69,11 @@ class DesireLinesProcedure(WorkerThread):
                 self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0,int(P)))
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Loading Layer Features: " + str(P) + "/" + str(featcount)))
 
-                point =list(feat.geometry().centroid().asPoint())
-                points.append(point)
-                point_ids.append(feat.attributes()[idx])
+                geom = feat.geometry()
+                if geom is not None:
+                    point =list(geom.centroid().asPoint())
+                    points.append(point)
+                    point_ids.append(feat.attributes()[idx])
 
             points = np.array(points)
             self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, featcount))
@@ -188,19 +197,40 @@ class DesireLinesProcedure(WorkerThread):
                 del network
 
                 # Here we transform the network to go from node 1 to N
-                max_node = max(np.max(self.graph.network['a_node']), np.max(self.graph.network['b_node']))+1
+                max_node = max(np.max(self.graph.network['a_node']), np.max(self.graph.network['b_node']))
+                max_node = max(max_node, self.matrix.shape[0], self.matrix.shape[1]) + 1
                 self.hash = np.zeros(max_node, np.int)
+
+                # Checks if any zone from the matrix is not present in the areas/node layer
+                t1 = np.sum(self.matrix, axis=0)
+                t2 = np.sum(self.matrix, axis=1)
+
+                if t1.shape[0] > t2.shape[0]:
+                    t2.resize(t1.shape)
+                elif t2.shape[0] > t1.shape[0]:
+                    t1.resize(t2.shape)
+                totals = t1 + t2
+
+                all_nodes = np.bincount(self.graph.network['a_node'])
+                for i in range(totals.shape[0]):
+                    if totals[i]:
+                        if not all_nodes[i]:
+                            qgis.utils.iface.messageBar().pushMessage("Matrix has demand for zones that do not exist "
+                                                                      "in the zones/nodes provided. Demand for those"
+                                                                      "ones were ignored. e.g. " +  str(i),'', level=3)
+                            break
+
                 h = 1
                 for i in range(self.graph.network.shape[0]):
                     a_node = self.graph.network['a_node'][i]
                     if self.hash[a_node] == 0:
                         self.hash[a_node] = h
-                        h=h+1
+                        h += 1
 
                     b_node = self.graph.network['b_node'][i]
                     if self.hash[b_node] == 0:
                         self.hash[b_node] = h
-                        h=h+1
+                        h += 1
 
                     self.graph.network['a_node'][i] = self.hash[a_node]
                     self.graph.network['b_node'][i] = self.hash[b_node]
@@ -219,12 +249,8 @@ class DesireLinesProcedure(WorkerThread):
                 self.results.prepare(self.graph)
                 self.results.set_cores(1)
 
-                for O in range(self.matrix.shape[0]):
-                    a = self.matrix[O, :]
-                    if np.sum(a) > 0:
-                        one_to_all(O, a, self.graph, self.results, 0, no_gil=False)
-
-                #all_or_nothing(self.matrix, self.graph, self.results)
+                # Do the assignment
+                all_or_nothing(self.matrix, self.graph, self.results)
 
                 f = self.results.link_loads[:,0]
                 link_loads = np.zeros((f.shape[0]+1, 2))
@@ -253,5 +279,5 @@ class DesireLinesProcedure(WorkerThread):
                     desireline_link_id += 1
                 self.result_layer = desireline_layer
 
-        self.emit(SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"), True)
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), True)
 

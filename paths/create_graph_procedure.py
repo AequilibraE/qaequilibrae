@@ -1,16 +1,23 @@
 """
-/***************************************************************************
- AequilibraE - www.AequilibraE.com
+ -----------------------------------------------------------------------------------------------------------
+ Package:    AequilibraE
 
-    Name:        Procedure for creating the graph
-                              -------------------
-        begin                : 2016-07-30
-        copyright            : AequilibraE developers 2016
-        Original Author: Pedro Camargo (c@margo.co)
-        Contributors:
-        Licence: See LICENSE.TXT
- ***************************************************************************/
-"""
+ Name:       Creating the graph from geographic layer
+ Purpose:    Threaded procedure for creating the graph
+
+ Original Author:  Pedro Camargo (c@margo.co)
+ Contributors:
+ Last edited by: Pedro Camargo
+
+ Website:    www.AequilibraE.com
+ Repository:  https://github.com/AequilibraE/AequilibraE
+
+ Created:    2016-07-30
+ Updated:    30/09/2016
+ Copyright:   (c) AequilibraE authors
+ Licence:     See LICENSE.TXT
+ -----------------------------------------------------------------------------------------------------------
+ """
 
 import qgis
 from qgis.core import *
@@ -19,10 +26,9 @@ import time
 import numpy as np
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//aequilibrae//")
 
 from aequilibrae.paths import Graph
-from WorkerThread import WorkerThread
+from worker_thread import WorkerThread
 
 class GraphCreation(WorkerThread):
     def __init__(self, parentThread, netlayer, linkid, ablength, bidirectional, directionfield, balength, skims, selected_only, featcount):
@@ -159,4 +165,4 @@ class GraphCreation(WorkerThread):
                 self.graph.__field_name__ = None
                 self.graph.__layer_name__ = None
 
-        self.emit(SIGNAL("FinishedThreadedProcedure( PyQt_PyObject )"), None)
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), None)
