@@ -109,6 +109,7 @@ class FindsNodes(WorkerThread):
                     return None
                 ids.append(i_d)
 
+            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), new_line_layer.featureCount())
             P = 0
             for feat in new_line_layer.getFeatures():
                 P += 1
