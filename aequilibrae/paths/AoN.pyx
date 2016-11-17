@@ -396,6 +396,10 @@ cpdef int assigone(int origin,
     w = _copy_skims(skim_matrix,
                   final_skim_matrix)
 
+    '''_select_link(links
+
+
+    '''
     return 1
 
 @cython.wraparound(False)
