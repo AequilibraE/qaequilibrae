@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>777</width>
-    <height>329</height>
+    <height>302</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@
      <x>20</x>
      <y>130</y>
      <width>741</width>
-     <height>151</height>
+     <height>121</height>
     </rect>
    </property>
    <property name="font">
@@ -39,8 +39,8 @@
    <widget class="QComboBox" name="nodelayers">
     <property name="geometry">
      <rect>
-      <x>169</x>
-      <y>84</y>
+      <x>164</x>
+      <y>46</y>
       <width>541</width>
       <height>24</height>
      </rect>
@@ -54,8 +54,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>31</x>
-      <y>119</y>
+      <x>25</x>
+      <y>86</y>
       <width>151</width>
       <height>16</height>
      </rect>
@@ -72,8 +72,8 @@
    <widget class="QComboBox" name="node_fields">
     <property name="geometry">
      <rect>
-      <x>169</x>
-      <y>114</y>
+      <x>164</x>
+      <y>81</y>
       <width>541</width>
       <height>24</height>
      </rect>
@@ -87,8 +87,8 @@
    <widget class="QRadioButton" name="radioUseNodes">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>88</y>
+      <x>350</x>
+      <y>14</y>
       <width>151</width>
       <height>17</height>
      </rect>
@@ -96,12 +96,15 @@
     <property name="text">
      <string>Use node layer</string>
     </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
    </widget>
    <widget class="QRadioButton" name="radioNewNodes">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>24</y>
+      <x>172</x>
+      <y>13</y>
       <width>171</width>
       <height>17</height>
      </rect>
@@ -109,25 +112,15 @@
     <property name="text">
      <string>Create node layer</string>
     </property>
-   </widget>
-   <widget class="QLineEdit" name="out_nodes">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>20</y>
-      <width>541</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>55</y>
+      <x>25</x>
+      <y>85</y>
       <width>171</width>
       <height>16</height>
      </rect>
@@ -140,6 +133,9 @@
     <property name="text">
      <string>Node numbering start</string>
     </property>
+    <property name="buddy">
+     <cstring>label_3</cstring>
+    </property>
    </widget>
    <widget class="QLineEdit" name="np_node_start">
     <property name="enabled">
@@ -147,8 +143,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>50</y>
+      <x>179</x>
+      <y>81</y>
       <width>71</width>
       <height>24</height>
      </rect>
@@ -158,6 +154,50 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>25</x>
+      <y>52</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Node Layer</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="out_nodes">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>45</y>
+      <width>551</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_new_node_layer">
+    <property name="geometry">
+     <rect>
+      <x>22</x>
+      <y>44</y>
+      <width>101</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>New line layer</string>
     </property>
    </widget>
   </widget>
@@ -199,9 +239,9 @@
    <widget class="QComboBox" name="linelayers">
     <property name="geometry">
      <rect>
-      <x>169</x>
+      <x>149</x>
       <y>30</y>
-      <width>541</width>
+      <width>561</width>
       <height>24</height>
      </rect>
     </property>
@@ -216,7 +256,7 @@
    <property name="geometry">
     <rect>
      <x>22</x>
-     <y>300</y>
+     <y>269</y>
      <width>261</width>
      <height>23</height>
     </rect>
@@ -266,7 +306,7 @@
    <property name="geometry">
     <rect>
      <x>300</x>
-     <y>302</y>
+     <y>270</y>
      <width>261</width>
      <height>20</height>
     </rect>
@@ -284,7 +324,7 @@
    <property name="geometry">
     <rect>
      <x>612</x>
-     <y>300</y>
+     <y>269</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -297,7 +337,7 @@
    <property name="geometry">
     <rect>
      <x>690</x>
-     <y>300</y>
+     <y>269</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -306,42 +346,30 @@
     <string>Close</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="out_lines">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>100</y>
-     <width>541</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="select_new_line_layer">
+  <widget class="QPushButton" name="btn_new_line_layer">
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>104</y>
-     <width>161</width>
-     <height>17</height>
+     <y>90</y>
+     <width>101</width>
+     <height>27</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
    </property>
    <property name="text">
     <string>New line layer</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="out_lines">
+   <property name="geometry">
+    <rect>
+     <x>173</x>
+     <y>95</y>
+     <width>551</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>...</string>
    </property>
   </widget>
  </widget>

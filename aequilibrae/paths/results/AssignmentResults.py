@@ -9,6 +9,7 @@ class AssignmentResults:
     def __init__(self):
         """
         @type graph: Set of numpy arrays to store Computation results
+        self.critical={required:{"links":[lnk_id1, lnk_id2, ..., lnk_idn], "path file": False}, results:{}}
         """
         self.link_loads = None   # The actual results for assignment
         self.predecessors = None  # The predecessors for each node in the graph
@@ -18,6 +19,7 @@ class AssignmentResults:
         self.temporary_skims = None
         self.num_skims = None  # number of skims that will be computed. Depends on the setting of the graph provided
         self.cores = mp.cpu_count()
+        self.critical = {"required": {"links": [], "path file": False}, "results": {}}
 
         self.nodes = -1
         self.zones = -1
