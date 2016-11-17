@@ -3,7 +3,7 @@ This add-on is FREE and open source.
 It can also be used on a Python shell. For initial instruction on how to do it, access http://www.xl-optim.com/new-version-of-aequilibrae/
 
 Last Version:  0.3.2
-Release data: August-21-2016
+Release date: November-23-2016
 
 For more details: www.aequilibrae.com and www.xl-optim.com
 
