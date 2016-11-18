@@ -74,6 +74,7 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         # Signals for the algorithm tab
         self.progressbar0.setVisible(False)
         self.progressbar0.setValue(0)
+        self.progress_label0.setVisible(False)
 
         self.do_assignment.clicked.connect(self.run)
         self.cancel_all.clicked.connect(self.exit_procedure)
