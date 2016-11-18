@@ -30,12 +30,11 @@ from qgis.core import *
 
 from Network_preparation_dialog import TQ_NetPrepDialog
 from adds_connectors_dialog import AddConnectorsDialog
-from impedance_matrix_dialogs import ImpedanceMatrixDialog
 from parameters_dialog import ParameterDialog
-from show_shortest_path_dialog import ShortestPathDialog
+
 from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog
-from .paths import GraphCreationDialog, TrafficAssignmentDialog
+from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 
 sys.dont_write_bytecode = True
 import os.path
