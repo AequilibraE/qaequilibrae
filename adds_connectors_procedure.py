@@ -52,8 +52,9 @@ class AddsConnectorsProcedure(WorkerThread):
         centroids = get_vector_layer_by_name(self.centroid_layer_name)
         links = get_vector_layer_by_name(self.link_layer_name)
 
-        # We create the new line layer
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Duplicating layers")
+        self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), 2)
+        # We create the new line layer
         epsg_code = int(links.crs().authid().split(":")[1])
         new_line_layer = QgsVectorLayer(links.source(), links.name(), links.providerType())
         QgsVectorFileWriter.writeAsVectorFormat(new_line_layer, self.new_line_layer_name, str(epsg_code), None,
@@ -61,6 +62,7 @@ class AddsConnectorsProcedure(WorkerThread):
         new_line_layer = QgsVectorLayer(self.new_line_layer_name, 'network_with_centroids', 'ogr')
 
         # Create new node layer
+        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 1)
         epsg_code = int(nodes.crs().authid().split(":")[1])
         new_node_layer = QgsVectorLayer(nodes.source(), nodes.name(), nodes.providerType())
         QgsVectorFileWriter.writeAsVectorFormat(new_node_layer, self.new_node_layer_name, str(epsg_code), None,
