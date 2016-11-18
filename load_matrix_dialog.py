@@ -119,6 +119,7 @@ class LoadMatrixDialog(QtGui.QDialog, Ui_matrix_loader):
         QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
                         self.finished_threaded_procedure)
 
+        self.load.setEnabled(False)
         self.worker_thread.start()
         self.exec_()
 
@@ -130,6 +131,7 @@ class LoadMatrixDialog(QtGui.QDialog, Ui_matrix_loader):
         self.progressbar.setValue(val)
 
     def finished_threaded_procedure(self, param):
+        self.load.setEnabled(True)
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Error while loading matrix:", self.worker_thread.error,
                                                       level=1)

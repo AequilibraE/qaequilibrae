@@ -30,6 +30,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from functools import partial
 import numpy as np
+import warnings
 
 from auxiliary_functions import *
 from load_matrix_dialog import LoadMatrixDialog
@@ -44,6 +45,8 @@ try:
     OMX = True
 except:
     OMX = False
+
+warnings.filterwarnings('ignore')
 
 class IpfDialog(QDialog, Ui_ipf):
     def __init__(self, iface):

@@ -108,7 +108,7 @@ class CalibrateGravityDialog(QDialog, Ui_gravity_calibration):
             self.lbl_output.setPixmap(self.error_pic)
             self.result_file = None
         else:
-            if new_name[-4].upper() != 'YAML':
+            if new_name[-4:].upper() != 'YAML':
                 new_name = new_name + '.yaml'
             self.result_file = new_name
             self.report_output.setText(new_name)
