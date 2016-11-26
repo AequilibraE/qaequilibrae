@@ -31,14 +31,13 @@ import multiprocessing as M
 import thread
 from multiprocessing.dummy import Pool as ThreadPool
 
+VERSION = '0.3.3'
 include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
-
-
 def path_computation(origin,destination,graph, results):
     cdef ITYPE_t nodes, O, D, p
     cdef int i, j, skims, a
@@ -48,12 +47,16 @@ def path_computation(origin,destination,graph, results):
 
     # Consistency checks
     if origin >= graph.fs.shape[0]:
-        return "Node " + str(O) + " is outside the range of nodes in the graph"
+        return "Node " + str(origin) + " is outside the range of nodes in the graph"
 
     if graph.fs[origin] == graph.fs[origin+1]:
         return "Node " + str(origin) + " does not exist in the graph"
 
+    if VERSION != graph.__version__:
+        return 'This graph was created for a different version of AequilibraE. Please re-create it'
+    #We transform the python variables in Cython variables
     O = origin
+    D = destination
     new_b_nodes = blocking_centroid_flows(O, graph)
     graph_fs = graph.fs
     graph_costs = graph.cost
@@ -61,9 +64,6 @@ def path_computation(origin,destination,graph, results):
     idsgraph = graph.graph['link_id']
     nodes = graph.num_nodes
 
-    #We transform the python variables in Cython variables
-    O = origin
-    D = destination
 
     predecessors = results.predecessors
     conn = results.connectors
@@ -74,14 +74,14 @@ def path_computation(origin,destination,graph, results):
     #memmory views we will need
     #print "creating views"
     cdef double [:] g_view = graph_costs
-    cdef long long [:] b_nodes_view = blocking_centroid_flows(O, graph)
-    cdef long long [:] graph_fs_view = graph_fs
+    cdef int [:] b_nodes_view = blocking_centroid_flows(O, graph)
+    cdef int [:] graph_fs_view = graph_fs
     cdef double [:, :] graph_skim_view = graph_skim
-    cdef long long  [:] idsgraph_view = idsgraph
+    cdef int [:] idsgraph_view = idsgraph
 
 
-    cdef long long [:] predecessors_view = predecessors
-    cdef long long [:] conn_view = conn
+    cdef int [:] predecessors_view = predecessors
+    cdef int [:] conn_view = conn
     cdef double [:, :] skim_matrix_view = temp_skims
 
     #Now we do all procedures with NO GIL
@@ -153,27 +153,32 @@ def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
     if graph_fs[O] == graph_fs[O+1]:
         return "Node " + str(O) + " does not exist in the graph"
 
+    if VERSION != graph.__version__:
+        return 'This graph was created for a different version of AequilibraE. Please re-create it'
+
     nodes = graph.num_nodes + 1
 
-    ##print "Blocking through centroids"
     new_b_nodes = blocking_centroid_flows(O, graph)
-    #In order to release the GIL for this procedure, we create all the
-    #memmory views we will need
+    # In order to release the GIL for this procedure, we create all the
+    # memmory views we will need
     cdef double [:] demand_view = demand
 
-    cdef long long [:] graph_fs_view = graph.fs
-    cdef long long [:] b_nodes_view = new_b_nodes
+    cdef int [:] graph_fs_view = graph.fs
+    cdef int [:] b_nodes_view = new_b_nodes
     cdef double [:] g_view = graph.cost
-    cdef long long  [:] idsgraph_view = graph.ids
+    cdef int [:] idsgraph_view = graph.ids
     cdef double [:, :] graph_skim_view = graph.skims
 
-    cdef long long [:] predecessors_view = result.predecessors[:, curr_thread]
-    cdef long long [:] conn_view = result.connectors[:, curr_thread]
+    cdef int [:] predecessors_view = result.predecessors[:, curr_thread]
+    cdef int [:] conn_view = result.connectors[:, curr_thread]
     cdef double [:] Link_Loads_view = result.link_loads[:, curr_thread]
-    cdef long long [:] no_path_view = result.no_path[O, :, curr_thread]
+    cdef int [:] no_path_view = result.no_path[O, :, curr_thread]
 
     cdef double [:, :] skim_matrix_view = result.temporary_skims[:, :, curr_thread]
     cdef double [:, :] final_skim_matrices_view = result.skims[O, :, :]
+
+    cdef int [:] pred_view = result.path_file['results'][O,:,0]
+    cdef int [:] c_view = result.path_file['results'][O,:,1]
 
         #Now we do all procedures with NO GIL
     ##print "assigone"
@@ -208,8 +213,28 @@ def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
                    predecessors_view,
                    conn_view,
                    final_skim_matrices_view)
+
+    if result.path_file['save']:
+        put_path_file_on_disk(pred_view,
+                              predecessors_view,
+                              c_view,
+                              conn_view)
+
     return origin
 
+@cython.wraparound(False)
+@cython.embedsignature(True)
+@cython.boundscheck(False)
+cpdef void put_path_file_on_disk(int [:] pred,
+                                 int [:] predecessors,
+                                 int [:] conn,
+                                 int [:] connectors) nogil:
+    cdef int i
+    cdef int k = pred.shape[0]
+
+    for i in range(k):
+        pred[i] = predecessors[i]
+        conn[i] = connectors[i]
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
@@ -228,11 +253,11 @@ def reblocks_matrix(matrix, hashtable, new_max):
 
 
 
-cdef blocking_centroid_flows(O, graph):
+cdef blocking_centroid_flows(int O, graph):
     cdef int i, centroids
 
     centroids = graph.centroids +1
-    cdef long long [:] fs = graph.fs
+    cdef int [:] fs = graph.fs
 
     if graph.block_centroid_flows:
         new_b_nodes = np.array(graph.b_node, copy=True)
@@ -257,14 +282,14 @@ cdef blocking_centroid_flows(O, graph):
 cpdef int skims_one(int origin,
                    int block_centroid_flow,
                    double[:] graph_costs,
-                   long long [:] csr_indices,
-                   long long [:] csr_indptr,
-                   long long [:] ids_graph,
+                   int [:] csr_indices,
+                   int [:] csr_indptr,
+                   int [:] ids_graph,
                    double[:,:] graph_skim,
-                   long long [:] no_path,
+                   int [:] no_path,
                    double[:,:] skim_matrix,
-                   long long [:] predecessors,
-                   long long [:] conn,
+                   int [:] predecessors,
+                   int [:] conn,
                    double[:,:] final_skim_matrix) nogil:
 
     cdef ITYPE_t links, i, j, w
@@ -310,7 +335,7 @@ cpdef int skims_one(int origin,
 @cython.boundscheck(False)
 cdef int _copy_skims_check_path(double[:,:] skim_matrix,  #Skim matrix computed from one origin to all nodes
                      double[:,:] final_skim_matrix,
-                     long long [:] no_path) nogil:  #Skim matrix computed for one origin to all other centroids only
+                     int [:] no_path) nogil:  #Skim matrix computed for one origin to all other centroids only
 
     cdef int i, j
     cdef int N = final_skim_matrix.shape[0]
@@ -332,15 +357,15 @@ cpdef int assigone(int origin,
                    int nodes,
                    double[:] demand,
                    double[:] graph_costs,
-                   long long [:] csr_indices,
-                   long long [:] csr_indptr,
-                   long long [:] ids_graph,
+                   int [:] csr_indices,
+                   int [:] csr_indptr,
+                   int [:] ids_graph,
                    double[:,:] graph_skim,
                    double[:] Link_Loads,
-                   long long [:] no_path,
+                   int [:] no_path,
                    double[:,:] skim_matrix,
-                   long long [:] predecessors,
-                   long long [:] conn,
+                   int [:] predecessors,
+                   int [:] conn,
                    double[:,:] final_skim_matrix) nogil:
 
     cdef int links, i, j, w
@@ -408,10 +433,10 @@ cpdef int assigone(int origin,
 cpdef int _assignsAON(int origin,
                       int nodes,
                       double[:] demand,
-                      long long [:] pred,
-                      long long [:] conn,
+                      int [:] pred,
+                      int [:] conn,
                       double[:] Link_Loads,
-                      long long [:] no_path) nogil:
+                      int [:] no_path) nogil:
 
     cdef unsigned int t_origin
     cdef ITYPE_t c, j, i, p,
@@ -463,11 +488,11 @@ cdef int _copy_skims(double[:,:] skim_matrix,  #Skim matrix computed from one or
 cpdef int _dijkstra_directed_single_pair(int origin,
                                          int dest,
                                          double[:] graph_costs,
-                                         long long [:] csr_indices,
-                                         long long [:] csr_indptr,  # graph forward star
-                                         long long [:] pred,
-                                         long long [:] ids,
-                                         long long [:] connectors,
+                                         int [:] csr_indices,
+                                         int [:] csr_indptr,  # graph forward star
+                                         int [:] pred,
+                                         int [:] ids,
+                                         int [:] connectors,
                                          double[:,:] skim_costs,
                                          double[:,:] skim_matrix):
 
@@ -534,11 +559,11 @@ cpdef int _dijkstra_directed_single_pair(int origin,
 @cython.boundscheck(False) # turn of bounds-checking for entire function
 cpdef int _dijkstra_directed(int origin,
                              double[:] graph_costs,
-                             long long [:] csr_indices,
-                             long long [:] csr_indptr,
-                             long long [:] pred,
-                             long long [:] ids,
-                             long long [:] connectors,
+                             int [:] csr_indices,
+                             int [:] csr_indptr,
+                             int [:] pred,
+                             int [:] ids,
+                             int [:] connectors,
                              double[:,:] skim_costs,
                              double[:,:] skim_matrix) nogil:
 
@@ -843,19 +868,19 @@ cdef FibonacciNode* remove_min(FibonacciHeap* heap) nogil:
 #
 #     #In order to release the GIL for this procedure, we create all the
 #     #memmory views we will need
-#     cdef long long [:] graph_fs_view = graph_fs
-#     cdef long long [:] b_nodes_view = b_nodes
+#     cdef int [:] graph_fs_view = graph_fs
+#     cdef int [:] b_nodes_view = b_nodes
 #     cdef double [:] g_view =graph_costs
-#     cdef long long  [:] idsgraph_view = idsgraph
+#     cdef int  [:] idsgraph_view = idsgraph
 #     cdef double [:,:] graph_skim_view = graph_skim
 #
-#     cdef long long [:,:] predecessors_view = predecessors
-#     cdef long long [:,:] conn_view = conn
+#     cdef int [:,:] predecessors_view = predecessors
+#     cdef int [:,:] conn_view = conn
 #
 #     cdef double [:,:] demand_view=demand
 #
 #     cdef double [:,:] Link_Loads_view=Link_Loads
-#     cdef long long [:,:] no_path_view=no_path
+#     cdef int [:,:] no_path_view=no_path
 #     cdef double [:,:,:] skim_matrix_view = temp_skims
 #     cdef double [:,:,:] final_skim_matrices_view=skim_matrix
 #
@@ -919,19 +944,19 @@ cdef FibonacciNode* remove_min(FibonacciHeap* heap) nogil:
 #
 #     #In order to release the GIL for this procedure, we create all the
 #     #memmory views we will need
-#     cdef long long [:] graph_fs_view = graph_fs
-#     cdef long long [:] b_nodes_view = b_nodes
+#     cdef int [:] graph_fs_view = graph_fs
+#     cdef int [:] b_nodes_view = b_nodes
 #     cdef double [:] g_view =graph_costs
-#     cdef long long  [:] idsgraph_view = idsgraph
+#     cdef int  [:] idsgraph_view = idsgraph
 #
 #
-#     cdef long long [:] predecessors_view = predecessors
-#     cdef long long [:] conn_view = conn
+#     cdef int [:] predecessors_view = predecessors
+#     cdef int [:] conn_view = conn
 #     cdef double [:,:] demand_view=demand
 #     cdef double [:,:] graph_skim_view = graph_skim
 #
 #     cdef double [:] Link_Loads_view=Link_Loads
-#     cdef long long [:,:] no_path_view=no_path
+#     cdef int [:,:] no_path_view=no_path
 #
 #     cdef double [:,:,:] skim_matrix_view = temp_skims
 #     cdef double [:,:] final_skim_matrices_view=skim_matrix
