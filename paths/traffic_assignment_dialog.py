@@ -41,7 +41,7 @@ from numpy_model import NumpyModel
 from ui_traffic_assignment import Ui_traffic_assignment
 from traffic_assignment_procedure import TrafficAssignmentProcedure
 from aequilibrae.paths import Graph, AssignmentResults
-
+from get_output_file_name import GetOutputFileName
 
 
 class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
@@ -88,16 +88,45 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
 
         self.changing_algorithm()
 
+        # critical analysis tab
+        self.path_file_output_name = None
+        self.do_path_file.stateChanged.connect(self.change_status_for_path_file)
+        self.select_path_file_name.clicked.connect(self.choose_output_for_path_file)
 
+        self.change_status_for_path_file()
+
+    def choose_output_for_path_file(self):
+        new_name, type = GetOutputFileName(self, 'Path File', ["AequilibraE Path File(*.aep)"], ".aep", self.path)
+
+        if new_name is not None:
+            self.path_file_output_name = new_name
+            self.path_file_display.setText(new_name)
+            self.results.setSavePathFile(True, self.path_file_output_name)
+        else:
+            self.path_file_output_name = None
+            self.path_file_display.setText('...')
+
+
+    def change_status_for_path_file(self):
+        if self.do_path_file.isChecked():
+            self.select_path_file_name.setEnabled(True)
+            self.path_file_display.setVisible(True)
+        else:
+            self.select_path_file_name.setEnabled(False)
+            self.path_file_display.setVisible(False)
 
     def select_skim(self):
         pass
 
     def load_graph(self):
         self.lbl_graphfile.setText('')
-        file_types = "AequilibraE graph(*.aeg)"
-        graph_file = QFileDialog.getOpenFileName(None, 'Traffic Assignment', self.path, file_types)
-        if len(graph_file) > 0:
+
+        file_types = ["AequilibraE graph(*.aeg)"]
+        default_type = '.aeg'
+        box_name = 'Traffic Assignment'
+        graph_file, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
+
+        if graph_file is not None:
             self.graph.load_from_disk(graph_file)
 
             not_considering_list = self.graph.required_default_fields
@@ -112,12 +141,18 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
             self.results.prepare(self.graph)
             cores = get_parameter_chain(['system', 'cpus'])
             self.results.set_cores(cores)
+
+            if self.do_path_file.isChecked() and self.path_file_output_name is not None:
+                self.results.setSavePathFile(True, self.path_file_output_name)
         else:
             self.graph = Graph()
 
     def browse_outfile(self):
-        file_types = "Comma-separated files(*.csv);;Numpy Binnary Array(*.npy)"
-        new_name = QFileDialog.getSaveFileName(None, 'Result matrix', self.path, file_types)
+        file_types = ["Comma-separated files(*.csv)", "Numpy Binnary Array(*.npy)"]
+        default_type = '.csv'
+        box_name = 'Result Matrix'
+        new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
+
         if len(new_name) > 0:
             self.outname = new_name
             self.lbl_output.setText(self.outname)

@@ -23,17 +23,17 @@
 # noinspection PyUnresolvedReferences
 import os
 import sys
-import sys
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 
-from Network_preparation_dialog import TQ_NetPrepDialog
 from adds_connectors_dialog import AddConnectorsDialog
 from parameters_dialog import ParameterDialog
 
 from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog
+from .network import NetworkPreparationDialog
 from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 
 sys.dont_write_bytecode = True
@@ -210,7 +210,7 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_net_prep(self):
-        dlg2 = TQ_NetPrepDialog(self.iface)
+        dlg2 = NetworkPreparationDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
         # If we wanted modal, we would eliminate the dlg2.show()
@@ -219,11 +219,6 @@ class AequilibraEMenu:
         dlg2 = AddConnectorsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
-
-    # def run_matrix_holder(self):
-    #     dlg2 = TQ_Matrix_Holder_Dialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
 
     def run_create_graph(self):
         dlg2 = GraphCreationDialog(self.iface)

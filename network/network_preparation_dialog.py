@@ -35,7 +35,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//algorithms//")
 
 from Network_preparation_procedure import FindsNodes
 from ui_TQ_NetPrep import *
-class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
+
+class NetworkPreparationDialog(QDialog, Ui_TQ_NetPrep):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
@@ -49,8 +50,9 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
         QObject.connect(self.nodelayers, SIGNAL("currentIndexChanged(QString)"), self.set_columns_nodes)
         self.pushOK.clicked.connect(self.run)
         self.pushClose.clicked.connect(self.exit_procedure)
+        self.btn_new_node_layer.clicked.connect(self.find_new_node_layer)
 
-        self.select_new_line_layer.clicked.connect(self.set_new_line_layer)
+        self.btn_new_line_layer.clicked.connect(self.set_new_line_layer)
 
         # We load the line and node layers existing in our canvas
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
@@ -61,6 +63,7 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
 
         # loads default path from parameters
         self.path = standard_path()
+        self.uses_nodes()
 
     def run_thread(self):
         QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
@@ -96,8 +99,16 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
         if not len(new_name):
             self.new_layer = False
 
-    def uses_nodes(self, state):
-        if (self.radioUseNodes.isChecked()):
+    def uses_nodes(self):
+        q = [self.btn_new_node_layer, self.out_nodes, self.label_3, self.np_node_start, self.out_nodes]
+        w = [self.nodelayers, self.node_fields, self.label_2, self.label_4]
+
+        if self.radioUseNodes.isChecked():
+            for i in q:
+                i.setVisible(False)
+            for i in w:
+                i.setVisible(True)
+
             self.nodelayers.clear()
             self.node_fields.clear()
             self.np_node_start.setEnabled(False)
@@ -105,15 +116,23 @@ class TQ_NetPrepDialog(QDialog, Ui_TQ_NetPrep):
                 if layer.wkbType() in point_types:
                     self.nodelayers.addItem(layer.name())
         else:
+            for i in q:
+                i.setVisible(True)
+            for i in w:
+                i.setVisible(False)
+
             self.nodelayers.clear()
             self.node_fields.clear()
             self.nodelayers.hideEvent
             self.np_node_start.setEnabled(True)
-            if len(self.out_nodes.text()) == 0:
-                new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
-            else:
-                new_name = QFileDialog.getSaveFileName(None, 'Result file', self.out_nodes.text(), "Shapefile(*.shp)")
-            if len(new_name) > 0:
+
+    def find_new_node_layer(self):
+        if len(self.out_nodes.text()) == 0:
+            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
+        else:
+            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.out_nodes.text(), "Shapefile(*.shp)")
+        if len(new_name) > 0:
+            if new_name[-3:].upper() in ['SHP']:
                 self.out_nodes.setText(new_name)
                 self.filename = True
 
