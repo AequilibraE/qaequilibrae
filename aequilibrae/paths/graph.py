@@ -7,7 +7,7 @@
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
- Last edited by: Pedro Camrgo
+ Last edited by: Pedro Camargo
 
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
@@ -31,7 +31,7 @@ import uuid
 
     nodes_fs: Numpy array with the indices of each node in the forward star.
                        DIMENSION: # Of nodes +1
-                       TYPE: numpy.int64
+                       TYPE: numpy.int32
 
     network:  Numpy record array with arbitrary number of fields (and titles of columns) corresponding to each link
                        DIMENSION: # Of links
@@ -79,7 +79,7 @@ class Graph:
         self.network_ok = False
         self.type_loaded = False
 
-        self.__version__ = '0.3'
+        self.__version__ = '0.3.3'
 
         # Randomly generate a unique Graph ID randomly
         self.__id__ = uuid.uuid4().hex
@@ -115,7 +115,7 @@ class Graph:
         bnode = find_field_index(geo_file_records.fields, bnode)
 
         # Appends all fields to the list of fields to be used
-        all_types = [np.int64, np.int64, np.int64, np.float64, np.float64, np.int64]
+        all_types = [np.int32, np.int32, np.int32, np.float64, np.float64, np.int8]
         all_titles = ['link_id', 'a_node', 'b_node', 'length_ab', 'length_ba', 'direction']
         check_fields = [id_field, dir_field, anode, bnode, cost_field]
         types_to_check = [int, int, int, int, float]
@@ -242,7 +242,7 @@ class Graph:
 
         for k in range(len(all_types)):
             if all_types[k] == long:
-                all_types[k] = np.int64
+                all_types[k] = np.int32
             elif all_types[k] == float:
                 all_types[k] = np.float64
             elif all_types[k] == str:
@@ -299,7 +299,7 @@ class Graph:
 
         for k in range(len(all_types)):
             if all_types[k] == long:
-                all_types[k] = np.int64
+                all_types[k] = np.int32
             elif all_types[k] == float:
                 all_types[k] = np.float64
             elif all_types[k] == str:
@@ -328,7 +328,7 @@ class Graph:
         ind = np.lexsort((self.graph['b_node'], self.graph['a_node']))
         self.graph = self.graph[ind]
 
-        self.fs = np.zeros(self.num_nodes +2, dtype=np.int64)
+        self.fs = np.zeros(self.num_nodes +2, dtype=np.int32)
 
         a = self.graph['a_node'][0]
         p = 0
@@ -362,11 +362,11 @@ class Graph:
                 self.num_links = negs.shape[0] + poss.shape[0]
                 self.num_links += zers.shape[0] * 2
 
-                dtype = [('link_id', np.int64),
-                         ('a_node', np.int64),
-                         ('b_node', np.int64),
-                         ('direction', np.int64),
-                         ('id', np.int64),
+                dtype = [('link_id', np.int32),
+                         ('a_node', np.int32),
+                         ('b_node', np.int32),
+                         ('direction', np.int8),
+                         ('id', np.int32),
                          ('length', np.float64)]
 
                 for i in all_titles:
@@ -419,7 +419,7 @@ class Graph:
 
                 self.graph['id'] = np.arange(self.num_links)
                 self.num_nodes = max(np.max(self.graph['a_node']), np.max(self.graph['b_node']))
-                self.fs = np.zeros(self.num_nodes + 2, dtype=np.int64)  # NOT SURE IF IT SHOULD BE +1 OR +2. SINCE IT IS WORKING AND DOES NOT AFFECT RESULTS, LEAVING AS +2 FOR NOW
+                self.fs = np.zeros(self.num_nodes + 2, dtype=np.int32)  # NOT SURE IF IT SHOULD BE +1 OR +2. SINCE IT IS WORKING AND DOES NOT AFFECT RESULTS, LEAVING AS +2 FOR NOW
 
                 a = self.graph['a_node'][0]
                 p = 0
@@ -541,7 +541,7 @@ class Graph:
                 self.status = 'could not find field "%s" in the network array' % field
 
                 # checking data types
-        must_types = [np.int64, np.int64, np.int64, np.int64]
+        must_types = [np.int32, np.int32, np.int32, np.int32]
         for field, ytype in zip(must_fields, must_types):
             if self.network[field].dtype != ytype:
                 self.status = 'Field "%s" in the network array has the wrong type. Please refer to the documentation' % field
@@ -567,7 +567,7 @@ class Graph:
                 self.status = 'could not find field "%s" in the network array' % field
 
                 # checking data types
-        must_types = [np.int64, np.int64, np.int64, np.int64]
+        must_types = [np.int32, np.int32, np.int32, np.int32]
         for field, ytype in zip(must_fields, must_types):
             if self.graph[field].dtype != ytype:
                 self.status = 'Field "%s" in the network array has the wrong type. Please refer to the documentation' % field

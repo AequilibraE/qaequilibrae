@@ -29,14 +29,12 @@ from PyQt4.QtGui import *
 from qgis.core import *
 
 from adds_connectors_dialog import AddConnectorsDialog
-from impedance_matrix_dialogs import ImpedanceMatrixDialog
-
 from parameters_dialog import ParameterDialog
-from show_shortest_path_dialog import ShortestPathDialog
+
 from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog
-from .paths import GraphCreationDialog, TrafficAssignmentDialog
 from .network import NetworkPreparationDialog
+from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 
 sys.dont_write_bytecode = True
 import os.path

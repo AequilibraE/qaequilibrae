@@ -243,7 +243,7 @@
       <rect>
        <x>20</x>
        <y>80</y>
-       <width>261</width>
+       <width>571</width>
        <height>261</height>
       </rect>
      </property>
@@ -276,7 +276,7 @@
       <rect>
        <x>20</x>
        <y>49</y>
-       <width>261</width>
+       <width>571</width>
        <height>24</height>
       </rect>
      </property>
@@ -289,7 +289,7 @@
       <rect>
        <x>60</x>
        <y>20</y>
-       <width>221</width>
+       <width>531</width>
        <height>24</height>
       </rect>
      </property>
@@ -312,47 +312,20 @@
       <string>Field</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="select_link_analysis_4">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>300</x>
-       <y>92</y>
-       <width>181</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Complete path file</string>
-     </property>
-    </widget>
-    <widget class="QRadioButton" name="select_link_analysis">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>300</x>
-       <y>60</y>
-       <width>331</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Select link analysis</string>
-     </property>
-    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>Critical analysis</string>
+    </attribute>
     <widget class="QTableWidget" name="path_list">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
-       <x>300</x>
-       <y>122</y>
-       <width>321</width>
+       <x>10</x>
+       <y>130</y>
+       <width>611</width>
        <height>211</height>
       </rect>
      </property>
@@ -389,6 +362,61 @@
        <string>Querying element</string>
       </property>
      </column>
+    </widget>
+    <widget class="QCheckBox" name="do_select_link">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>141</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Select link analysis</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="do_path_file">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>171</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save complete path file</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="select_path_file_name">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>111</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Select output file</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="path_file_display">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>55</y>
+       <width>481</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="tab">
