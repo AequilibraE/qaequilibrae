@@ -3,8 +3,8 @@ import numpy as np
 DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
 
-ITYPE = np.int64
-ctypedef np.int64_t ITYPE_t
+ITYPE = np.int32
+ctypedef np.int32_t ITYPE_t
 
 # EPS is the precision of DTYPE
 cdef DTYPE_t DTYPE_EPS = 1E-15

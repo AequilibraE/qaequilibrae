@@ -30,8 +30,8 @@ class PathResults:
         self.links = graph.num_links + 1
         self.num_skims = graph.skims.shape[1]
 
-        self.predecessors = np.zeros(self.nodes, dtype=np.int64)
-        self.connectors = np.zeros(self.nodes, dtype=np.int64)
+        self.predecessors = np.zeros(self.nodes, dtype=np.int32)
+        self.connectors = np.zeros(self.nodes, dtype=np.int32)
         self.temporary_skims = np.zeros((self.nodes, self.num_skims), np.float64)
         self.__graph_id__ = graph.__id__
 
