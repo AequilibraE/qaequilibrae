@@ -1,4 +1,6 @@
 cd ECHO %CurrentDir%
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 Ui_compare_scenarios.ui -o ui_compare_scenarios.py
+
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 Ui_TQ_NetPrep.ui -o ui_TQ_NetPrep.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_bandwidths.ui -o ui_bandwidths.py

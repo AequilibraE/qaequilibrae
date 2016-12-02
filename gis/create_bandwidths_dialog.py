@@ -58,7 +58,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
 
         # space slider
         self.slider_spacer.setMinimum(1)
-        self.slider_spacer.setMaximum(10)
+        self.slider_spacer.setMaximum(30)
         self.slider_spacer.setValue(1)
         self.slider_spacer.setTickPosition(QSlider.TicksBelow)
         self.slider_spacer.setTickInterval(5)
