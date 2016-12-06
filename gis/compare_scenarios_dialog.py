@@ -2,8 +2,8 @@
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
 
- Name:       Main interface for creating stacked bandwidths for link layers
- Purpose:    Load GUI and user interface for the bandwidth creation
+ Name:       Main interface for comparing assignment scenarios
+ Purpose:    Load GUI and user interface for the scenario comparison procedure
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -12,7 +12,7 @@
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    2016-10-24
+ Created:    2016-12-01
  Updated:
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
