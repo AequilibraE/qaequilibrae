@@ -321,13 +321,13 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
                                                 self.space_size + ')'
                 if isinstance(clr, dict):
                     if direc == 'ab':
-                        props['color_dd_expression'] = "ramp_color(\'" + self.ramps[
-                            'color ab'] + "\',scale_linear(" + '"' + self.ramps['ramp ab'] + '", ' + str(self.ramps[
-                                                                'min ab']) + ', ' + str(self.ramps['max ab']) + ', 0, 1))'
+                        props['color_dd_expression'] = "ramp_color(\'" + clr[
+                            'color ab'] + "\',scale_linear(" + '"' + clr['ramp ab'] + '", ' + str(clr[
+                                                                'min ab']) + ', ' + str(clr['max ab']) + ', 0, 1))'
                     else:
-                        props['color_dd_expression'] = "ramp_color(\'" + self.ramps[
-                            'color ba'] + "\',scale_linear(" + '"' + self.ramps['ramp ba'] + '", ' + str(self.ramps[
-                                                                'min ba']) + ', ' + str(self.ramps['max ba']) + ', 0, 1))'
+                        props['color_dd_expression'] = "ramp_color(\'" + clr[
+                            'color ba'] + "\',scale_linear(" + '"' + clr['ramp ba'] + '", ' + str(clr[
+                                                                'min ba']) + ', ' + str(clr['max ba']) + ', 0, 1))'
                 else:
                     props['line_color'] = str(clr.getRgb()[0]) + ',' + str(clr.getRgb()[1]) + ',' + str(clr.getRgb()[2]) + ',' \
                                           + str(clr.getRgb()[3])
