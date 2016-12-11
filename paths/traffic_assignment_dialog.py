@@ -284,8 +284,8 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
 
         if self.do_path_file.isChecked():
             if self.method['algorithm'] == 'AoN':
-                # del(self.results.path_file['results'])
-                # self.results.path_file = None
+                del(self.results.path_file['results'])
+                self.results.path_file = None
 
                 shutil.move(self.temp_path_file + '.aep', self.path_file_output_name)
                 shutil.move(self.temp_path_file + '.aed', self.path_file_output_name[:-3] + 'aed')

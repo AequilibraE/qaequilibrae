@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui_traffic_assignment.ui'
+# Form implementation generated from reading ui file 'ui_Traffic_Assignment.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Sun Dec 11 21:21:52 2016
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -62,7 +63,7 @@ class Ui_traffic_assignment(object):
         self.minimizing_field.setGeometry(QtCore.QRect(150, 72, 391, 30))
         self.minimizing_field.setObjectName(_fromUtf8("minimizing_field"))
         self.ba_time_lbl = QtGui.QLabel(self.tab_2)
-        self.ba_time_lbl.setGeometry(QtCore.QRect(50, 75, 151, 16))
+        self.ba_time_lbl.setGeometry(QtCore.QRect(50, 79, 151, 16))
         self.ba_time_lbl.setObjectName(_fromUtf8("ba_time_lbl"))
         self.no_connectors_in_graph = QtGui.QCheckBox(self.tab_2)
         self.no_connectors_in_graph.setGeometry(QtCore.QRect(151, 106, 341, 20))
@@ -239,7 +240,7 @@ class Ui_traffic_assignment(object):
         self.select_result.setGeometry(QtCore.QRect(10, 34, 121, 24))
         self.select_result.setObjectName(_fromUtf8("select_result"))
         self.do_group_outputs = QtGui.QCheckBox(self.groupBox)
-        self.do_group_outputs.setGeometry(QtCore.QRect(90, 0, 231, 22))
+        self.do_group_outputs.setGeometry(QtCore.QRect(387, 8, 231, 22))
         self.do_group_outputs.setObjectName(_fromUtf8("do_group_outputs"))
         self.critical_matrix_path_2 = QtGui.QLabel(self.groupBox)
         self.critical_matrix_path_2.setEnabled(False)

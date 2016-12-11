@@ -105,7 +105,7 @@ class AssignmentResults:
 
                 if self.nodes > 0 and self.zones > 0:
                     a = np.memmap(path_result, dtype=np.int32, mode='w+', shape=(self.zones,self.nodes, 2))
-                    saveDataFileDictionary(self.__graph_id__,'path file', list(a.shape[:]), dictio_name)
+                    saveDataFileDictionary(self.__graph_id__,'path file', [int(x) for x in a.shape[:]], dictio_name)
 
         self.path_file = {'save': save,
                           'results': a
