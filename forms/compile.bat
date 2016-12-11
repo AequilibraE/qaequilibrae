@@ -1,4 +1,8 @@
 cd ECHO %CurrentDir%
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 Ui_compare_scenarios.ui -o ui_compare_scenarios.py
+
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 Ui_TQ_NetPrep.ui -o ui_TQ_NetPrep.py
+
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_bandwidths.ui -o ui_bandwidths.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_simple_tag.ui -o ui_simple_tag.py
@@ -8,8 +12,6 @@ C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_least_common_denominator.ui -o ui_
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_impedance_matrix.ui -o ui_impedance_matrix.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_DesireLines.ui -o ui_DesireLines.py
-
-C:\Python27\Lib\site-packages\PyQt4\pyuic4 Ui_TQ_NetPrep.ui -o ui_TQ_NetPrep.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_matrix_loader.ui -o ui_matrix_loader.py
 

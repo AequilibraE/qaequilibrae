@@ -23,17 +23,17 @@
 # noinspection PyUnresolvedReferences
 import os
 import sys
-import sys
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 
-from Network_preparation_dialog import TQ_NetPrepDialog
 from adds_connectors_dialog import AddConnectorsDialog
 from parameters_dialog import ParameterDialog
 
 from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
-from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog
+from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
+from .network import NetworkPreparationDialog
 from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 
 sys.dont_write_bytecode = True
@@ -177,11 +177,17 @@ class AequilibraEMenu:
         QObject.connect(self.dlines_action, SIGNAL("triggered()"), self.run_dlines)
         self.gis_tools_menu.addAction(self.dlines_action)
 
-        # Desire lines
+        # Bandwidths
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_bandwidths.png")
         self.bandwidth_action = QAction(icon, u"Stacked Bandwidth", self.iface.mainWindow())
         QObject.connect(self.bandwidth_action, SIGNAL("triggered()"), self.run_bandwidth)
         self.gis_tools_menu.addAction(self.bandwidth_action)
+
+        # Scenario comparison
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_scenario_comparison.png")
+        self.scenario_comparison_action = QAction(icon, u"Scenario Comparison", self.iface.mainWindow())
+        QObject.connect(self.scenario_comparison_action, SIGNAL("triggered()"), self.run_scenario_comparison)
+        self.gis_tools_menu.addAction(self.scenario_comparison_action)
 
         # ########################################################################
         # #################          LOOSE STUFF         #########################
@@ -210,7 +216,7 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_net_prep(self):
-        dlg2 = TQ_NetPrepDialog(self.iface)
+        dlg2 = NetworkPreparationDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
         # If we wanted modal, we would eliminate the dlg2.show()
@@ -219,11 +225,6 @@ class AequilibraEMenu:
         dlg2 = AddConnectorsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
-
-    # def run_matrix_holder(self):
-    #     dlg2 = TQ_Matrix_Holder_Dialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
 
     def run_create_graph(self):
         dlg2 = GraphCreationDialog(self.iface)
@@ -256,11 +257,6 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    # def run_node_to_area(self):
-    #     dlg2 = node_to_area_class(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
-
     def run_simple_tag(self):
         dlg2 = SimpleTagDialog(self.iface)
         dlg2.show()
@@ -281,7 +277,12 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
+    def  run_scenario_comparison(self):
+            dlg2 = CompareScenariosDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
+
     def run_ipf(self):
-        dlg2 = IpfDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+            dlg2 = IpfDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()

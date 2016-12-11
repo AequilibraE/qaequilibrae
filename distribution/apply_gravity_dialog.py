@@ -150,9 +150,14 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
             file_types += ";;OpenMatrix(*.omx)"
         new_name = QFileDialog.getSaveFileName(None, 'Result matrix', self.path, file_types)
         if new_name is not None:
-            self.outname = new_name
-            self.report_output.setText(new_name)
-            self.lbl_output.setPixmap(self.loaded_pic)
+            print new_name.upper()[-3:]
+            print new_name
+            if new_name.upper()[-3:] not in ['NPY', 'CSV']:
+                qgis.utils.iface.messageBar().pushMessage("Output file requires extension", level=3)
+            else:
+                self.outname = new_name
+                self.report_output.setText(new_name)
+                self.lbl_output.setPixmap(self.loaded_pic)
 
     def run_thread(self):
         # QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
@@ -258,6 +263,12 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
 
         if self.outname is None:
             self.error = 'Parameters for output missing'
+
+        if self.rows.shape[0] != self.impedance.shape[0]:
+            self.error = 'Production vector does not have same dimensions as impedance matrix'
+
+        if self.columns.shape[0] != self.impedance.shape[1]:
+            self.error = 'Attraction vector does not have same dimensions as impedance matrix'
 
         if self.error is not None:
             return False

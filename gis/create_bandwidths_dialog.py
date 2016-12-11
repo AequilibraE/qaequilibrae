@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-24
- Updated:
+ Updated:    2016-12-07
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -35,7 +35,8 @@ from random import randint
 
 from forms import Ui_bandwidths
 from auxiliary_functions import *
-
+from set_color_ramps_dialog import LoadColorRampSelector
+from color_ramps import AequilibraERamps
 
 class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
     def __init__(self, iface):
@@ -47,6 +48,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.band_size = 10.0
         self.space_size = 0.01
         self.layer = None
+        self.ramps = None
         self.drive_side = get_parameter_chain(['system', 'driving side'])
 
         # layers and fields        # For adding skims
@@ -58,7 +60,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
 
         # space slider
         self.slider_spacer.setMinimum(1)
-        self.slider_spacer.setMaximum(10)
+        self.slider_spacer.setMaximum(30)
         self.slider_spacer.setValue(1)
         self.slider_spacer.setTickPosition(QSlider.TicksBelow)
         self.slider_spacer.setTickInterval(5)
@@ -78,18 +80,29 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.bands_list.setColumnWidth(2, 110)
         self.bands_list.setColumnWidth(3, 110)
 
+        # loading ramps
+        self.but_load_ramp.setVisible(False)
+        self.txt_ramp.setVisible(False)
 
         self.but_add_band.clicked.connect(self.add_to_bands_list)
         self.bands_list.setEditTriggers(QTableWidget.NoEditTriggers)
 
         # self.bands_list.doubleClicked.connect(self.slot_double_clicked)
 
+        self.rdo_color.toggled.connect(self.color_origins)
+        self.rdo_ramp.toggled.connect(self.color_origins)
         self.but_run.clicked.connect(self.add_bands_to_map)
+        self.but_load_ramp.clicked.connect(self.load_ramp_action)
         self.add_fields_to_cboxes()
         self.random_rgb()
         self.sizevaluechange()
         self.spacevaluechange()
         self.set_initial_value_if_available()
+
+    def color_origins(self):
+        self.mColorButton.setVisible(self.rdo_color.isChecked())
+        self.but_load_ramp.setVisible(self.rdo_ramp.isChecked())
+        self.txt_ramp.setVisible(self.rdo_ramp.isChecked())
 
     def choose_a_field(self, modified):
         i, j = 'AB', 'BA'
@@ -109,7 +122,6 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
                 index = self.ab_FieldComboBox.findText(text, Qt.MatchFixedString)
                 if index >= 0:
                     self.ab_FieldComboBox.setCurrentIndex(index)
-
 
     def set_initial_value_if_available(self):
         all_items = [self.ab_FieldComboBox.itemText(i) for i in range(self.ab_FieldComboBox.count())]
@@ -153,9 +165,13 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
             self.bands_list.setItem(self.tot_bands, 1, QTableWidgetItem(self.ba_FieldComboBox.currentText()))
 
             # color
-            self.bands_list.setItem(self.tot_bands, 2, QTableWidgetItem(''))
-            self.bands_list.item(self.tot_bands, 2).setBackground(self.mColorButton.color())
-
+            if self.ramps is None:
+                self.bands_list.setItem(self.tot_bands, 2, QTableWidgetItem(''))
+                self.bands_list.item(self.tot_bands, 2).setBackground(self.mColorButton.color())
+            else:
+                self.bands_list.setItem(self.tot_bands, 2, QTableWidgetItem(str(self.ramps)))
+                self.ramps = None
+                self.rdo_color.setChecked(True)
 
             # Up-Down buttons
 
@@ -248,6 +264,15 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         a.setRgb(rgb[0], rgb[1], rgb[2])
         self.mColorButton.setColor(a)
 
+    def load_ramp_action(self):
+        self.ramps = None
+        dlg2 = LoadColorRampSelector(self.iface, self.layer)
+        dlg2.show()
+        dlg2.exec_()
+        if dlg2.results is not None:
+            self.ramps = dlg2.results
+            self.txt_ramp.setText(str(self.ramps))
+
     def add_bands_to_map(self):
         self.but_run.setEnabled(False)
         self.band_size = str(self.band_size)
@@ -274,15 +299,18 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
                 # The function "(2 * j -1) * ba"  maps the index j {1,2} and the direction to the side of the
                 # link the band needs to be. Try it out. it works!!
                 #bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).backgroundColor()))
-            cl = self.bands_list.item(i, 2).backgroundColor()
-            bands_ab.append((self.bands_list.item(i, 0).text(), ab, cl))
-            bands_ba.append((self.bands_list.item(i, 1).text(), ba, cl))
+            if len(self.bands_list.item(i, 2).text()) == 0:
+                cl = self.bands_list.item(i, 2).backgroundColor()
+            else:
+                cl = eval(self.bands_list.item(i, 2).text())
+            bands_ab.append((self.bands_list.item(i, 0).text(), ab, cl, 'ab'))
+            bands_ba.append((self.bands_list.item(i, 1).text(), ba, cl, 'ba'))
         sides = [bands_ab, bands_ba]
         max_value = max(values)
 
         for s in sides:
             acc_offset = '0'
-            for field, side, clr in s:
+            for field, side, clr, direc in s:
                 symbol_layer = QgsSimpleLineSymbolLayerV2.create({})
                 props = symbol_layer.properties()
                 width = '(coalesce(scale_linear("' + field + '", 0, ' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
@@ -291,9 +319,19 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
                 props['offset_dd_expression'] = acc_offset + '+' + str(side) + ' * (coalesce(scale_linear("' + field + \
                                                 '", 0, ' + str(max_value) + ', 0, ' + self.band_size + '), 0)/2 + ' + \
                                                 self.space_size + ')'
+                if isinstance(clr, dict):
+                    if direc == 'ab':
+                        props['color_dd_expression'] = "ramp_color(\'" + clr[
+                            'color ab'] + "\',scale_linear(" + '"' + clr['ramp ab'] + '", ' + str(clr[
+                                                                'min ab']) + ', ' + str(clr['max ab']) + ', 0, 1))'
+                    else:
+                        props['color_dd_expression'] = "ramp_color(\'" + clr[
+                            'color ba'] + "\',scale_linear(" + '"' + clr['ramp ba'] + '", ' + str(clr[
+                                                                'min ba']) + ', ' + str(clr['max ba']) + ', 0, 1))'
+                else:
+                    props['line_color'] = str(clr.getRgb()[0]) + ',' + str(clr.getRgb()[1]) + ',' + str(clr.getRgb()[2]) + ',' \
+                                          + str(clr.getRgb()[3])
 
-                props['line_color'] = str(clr.getRgb()[0]) + ',' + str(clr.getRgb()[1]) + ',' + str(clr.getRgb()[2]) + ',' \
-                                      + str(clr.getRgb()[3])
                 symbol_layer = QgsSimpleLineSymbolLayerV2.create(props)
                 self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
 

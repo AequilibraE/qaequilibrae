@@ -117,6 +117,7 @@ class ParameterDialog(QDialog, Ui_parameters):
             stream = open(self.path + '/parameters.yml', 'w')
             yaml.dump(self.current_data, stream, default_flow_style=False)
             stream.close()
+            self.but_close.setText('Close')
 
     def load_default_data(self):
         pretty_data = yaml.dump(self.default_values, default_flow_style=False)
