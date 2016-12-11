@@ -41,7 +41,7 @@ from ui_traffic_assignment import Ui_traffic_assignment
 from traffic_assignment_procedure import TrafficAssignmentProcedure
 from aequilibrae.paths import Graph, AssignmentResults
 from get_output_file_name import GetOutputFileName
-
+from load_select_link_query_builder import LoadSelectLinkQueryBuilder
 
 class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
     def __init__(self, iface):
@@ -96,12 +96,55 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         # critical analysis and path file saving
         self.group_outputs = False
         self.do_group_outputs.setEnabled(False)
+
+        # path file
         self.do_path_file.stateChanged.connect(self.change_status_for_path_file)
         self.select_path_file_name.clicked.connect(self.choose_output_for_path_file)
         self.do_path_file.setEnabled(False)
         self.change_status_for_path_file()
         self.path_file_output_name = None
         self.temp_path_file = None
+
+        #critical link
+        self.but_build_query.clicked.connect(self.build_query)
+        self.do_select_link.stateChanged.connect(self.set_behavior_special_analysis)
+        self.select_link_list.setColumnWidth(0, 280)
+        self.select_link_list.setColumnWidth(1, 40)
+        self.select_link_list.setColumnWidth(2, 150)
+        self.select_link_list.setColumnWidth(3, 40)
+        self.tot_link_queries = 0
+
+    def build_query(self):
+        self.but_build_query.setEnabled(False)
+        dlg2 = LoadSelectLinkQueryBuilder(self.iface, self.graph.graph)
+        #dlg2.show()
+        dlg2.exec_()
+        if dlg2.links is not None:
+            self.select_link_list.setRowCount(self.tot_link_queries + 1)
+            text = ''
+            for i in dlg2.links:
+                text = text + ', (' + i[0].encode('utf-8') + ', ' + i[1].encode('utf-8') + ')'
+            text = text[1:]
+            self.select_link_list.setItem(self.tot_link_queries, 0, QTableWidgetItem(text))
+            self.select_link_list.setItem(self.tot_link_queries, 1, QTableWidgetItem(dlg2.query_type))
+            self.select_link_list.setItem(self.tot_link_queries, 2, QTableWidgetItem(dlg2.query_name))
+            del_button = QPushButton('X')
+            del_button.clicked.connect(self.click_button_inside_the_list)
+            self.select_link_list.setCellWidget(self.tot_link_queries, 3, del_button)
+
+            self.tot_link_queries += 1
+        else:
+            self.matrix = None
+
+        self.but_build_query.setEnabled(True)
+
+    def click_button_inside_the_list(self):
+        button = self.sender()
+        index = self.select_link_list.indexAt(button.pos())
+        row = index.row()
+        self.select_link_list.removeRow(row)
+        self.tot_link_queries -= 1
+
 
     def choose_output_for_path_file(self):
         new_name, type = GetOutputFileName(self, 'Path File', ["AequilibraE Path File(*.aep)"], ".aep", self.path)
@@ -150,13 +193,10 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
             self.results.prepare(self.graph)
             cores = get_parameter_chain(['system', 'cpus'])
             self.results.set_cores(cores)
-
-            self.do_path_file.setEnabled(True)
-
         else:
             self.graph = Graph()
-            self.do_path_file.setEnabled(False)
         self.change_status_for_path_file()
+        self.set_behavior_special_analysis()
 
     def browse_outfile(self):
         file_types = ["Comma-separated files(*.csv)", "Numpy Binnary Array(*.npy)"]
@@ -170,6 +210,22 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         else:
             self.outname = None
             self.lbl_output.setText('')
+
+    def set_behavior_special_analysis(self):
+        if self.graph.num_links < 1:
+            behavior = False
+        else:
+            behavior = True
+
+        self.do_path_file.setEnabled(behavior)
+        self.do_select_link.setEnabled(behavior)
+        self.do_extract_link_flows.setEnabled(behavior)
+
+        self.but_build_query.setEnabled(behavior * self.do_select_link.isChecked())
+        self.select_link_list.setEnabled(behavior * self.do_select_link.isChecked())
+
+        self.list_link_extraction.setEnabled(behavior * self.do_extract_link_flows.isChecked())
+        self.but_build_query_extract.setEnabled(behavior * self.do_extract_link_flows.isChecked())
 
     def add_fields_to_cboxes(self):
         l = get_vector_layer_by_name(self.network_layer.currentText())

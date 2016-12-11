@@ -1,5 +1,7 @@
 cd ECHO %CurrentDir%
-C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_Traffic_Assignment.ui -o ui_Traffic_Assignment.py
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_traffic_assignment.ui -o ui_traffic_assignment.py
+
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_link_query_builder.ui -o ui_link_query_builder.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_bandwidths.ui -o ui_bandwidths.py
 
