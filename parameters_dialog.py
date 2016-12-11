@@ -113,7 +113,6 @@ class ParameterDialog(QDialog, Ui_parameters):
 
     def save_new_parameters(self):
         self.validate_data()
-
         if not self.error:
             stream = open(self.path + '/parameters.yml', 'w')
             yaml.dump(self.current_data, stream, default_flow_style=False)

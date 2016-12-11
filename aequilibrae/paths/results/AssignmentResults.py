@@ -4,7 +4,11 @@
 import multiprocessing as mp
 import numpy as np
 import warnings
-import tempfile
+import sqlite3
+import sys
+import os
+from memory_mapped_files_handling import saveDataFileDictionary
+
 
 class AssignmentResults:
     def __init__(self):
@@ -20,23 +24,27 @@ class AssignmentResults:
         self.temporary_skims = None
         self.num_skims = None  # number of skims that will be computed. Depends on the setting of the graph provided
         self.cores = mp.cpu_count()
-        self.critical = {"parameters":{},
-                         "queries": {},     # Queries are a dictionary
-                         "results": {}}
-        self.set_critical_storage_parameters(memory=True, compression=False)
 
+        self.critical_queries = {}  # Queries are a dictionary
+        self.critical = None
 
-        self.path_file = {"save": False,
-                          "results": None,
+        self.link_extraction = {"save": False,
+                          "links": None,
                           "output": None}
 
-        self.temp_dir = tempfile.gettempdir()
+        self.path_file = {"save": False,
+                          "results": None}
 
         self.nodes = -1
         self.zones = -1
         self.links = -1
         self.__graph_id__ = None
 
+        self.lids = None
+        self.direcs = None
+
+        # We set the critical analysis, link extraction and path file saving to False
+        self.setSavePathFile(False)
 
     # In case we want to do by hand, we can prepare each method individually
     def prepare(self, graph):
@@ -45,6 +53,9 @@ class AssignmentResults:
         self.zones = graph.centroids + 1
         self.links = graph.num_links + 1
         self.num_skims = graph.skims.shape[1]
+
+        self.lids = graph.graph['link_id']
+        self.direcs = graph.graph['direction']
         self.__redim()
         self.__graph_id__ = graph.__id__
 
@@ -80,30 +91,96 @@ class AssignmentResults:
         else:
             raise ValueError("Number of cores needs to be an integer")
 
-    def set_critical_storage_parameters(self, memory=None, compression=None):
-        if memory is not None:
-            self.critical['parameters']['memory'] = memory
-
-        if compression is not None:
-            self.critical['parameters']['compression'] = compression
-
-    def SetCriticalOutput(self, ):
-        # Warning for the select link analysis in memory
-        if self.critical['parameters']['memory']:
-            warnings.warn("Warning...........Message")
-
     def setSavePathFile(self, save=False, path_result=None):
-        self.path_file["save"] = save
+        a = self.path_file = np.zeros((max(1,self.zones), 1, 2), dtype=np.int32)
         if save:
-            if self.nodes > 0 and self.zones > 0:
-                self.path_file["results"] = np.memmap(path_result, dtype=np.int32, mode='w+', shape=(self.zones,self.nodes, 2))
-                print self.zones, self.nodes, 2
-        else:
-            self.path_file["results"] = np.zeros(self.zones, 1, 2)
+            if path_result is None:
+                warnings.warn("Path file not set properly. Need to specify output file too")
+            else:
+                if path_result[-3:].lower() != 'aep':
+                    dictio_name = path_result + '.aed'
+                    path_result += '.aep'
+                else:
+                    dictio_name = path_result[:-3] + 'aed'
 
-    def setTempDir(self, temp_dir):
-        self.temp_dir = temp_dir
+                if self.nodes > 0 and self.zones > 0:
+                    a = np.memmap(path_result, dtype=np.int32, mode='w+', shape=(self.zones,self.nodes, 2))
+                    saveDataFileDictionary(self.__graph_id__,'path file', list(a.shape[:]), dictio_name)
+
+        self.path_file = {'save': save,
+                          'results': a
+                          }
 
     def results(self):
         return np.sum(self.link_loads, axis=1)
+
+    def save_loads_to_disk(self, output_file, file_type=None):
+
+        dt = [('Link ID', np.int), ('AB Flow', np.float), ('BA Flow', np.float), ('Tot Flow', np.float)]
+        res = np.zeros(np.max(self.lids) + 1, dtype=dt)
+
+        res['Link ID'][:] = np.arange(np.max(self.lids) + 1)[:]
+
+        # Indices of links BA and AB
+        ABs = self.direcs < 0
+        BAs = self.direcs > 0
+
+        link_flows = self.results()[:-1]
+
+        # AB Flows
+        link_ids = self.lids[ABs]
+        res['AB Flow'][link_ids] = link_flows[ABs]
+
+        # BA Flows
+        link_ids = self.lids[BAs]
+        res['BA Flow'][link_ids] = link_flows[BAs]
+
+        # Tot Flow
+        res['Tot Flow'] = res['AB Flow'] + res['BA Flow']
+
+        if file_type is None:
+            # Guess file type
+            if output_file[-3:].upper() == 'CSV':
+                file_type = 'csv'
+            if output_file[-6:].upper() == 'SQLITE':
+                file_type = 'sqlite'
+
+        # Save to disk
+        if file_type == 'csv':
+            np.savetxt(output_file, res, delimiter=',', header='Link_ID,AB Flow,BA Flow,Tot Flow')
+
+        if file_type == 'sqlite':
+            def insert_new_line(conn, link):
+                sql = ''' INSERT INTO projects(name,begin_date,end_date)
+                          VALUES(?,?,?) '''
+                cur = conn.cursor()
+                cur.execute(sql, link)
+                return cur.lastrowid
+
+            sqlite_file = output_file  # name of the sqlite database file
+            table_name = 'link_flows'  # name of the table to be created
+            id_field = 'link_id'  # name of the column
+            ab_field = 'ab_flow'  # name of the column
+            ba_field = 'ba_flow'  # name of the column
+            tot_field = 'tot_flow'  # name of the column
+            id_type = 'INTEGER'  # column data type
+            ab_type = 'REAL'  # column data type
+            ba_type = 'REAL'  # column data type
+            tot_type =  'REAL'  # column data type
+
+            # Connecting to the database file
+            conn = sqlite3.connect(sqlite_file)
+            c = conn.cursor()
+
+            # Creating the flows table
+            c.execute('CREATE TABLE link_flows (link_id INTEGER PRIMARY KEY, ab_flow, ba_flow, tot_flow REAL)' \
+                      .format(tn=table_name, nf=id_field, ft=id_type))
+
+            # writing flows to it
+            for link in range(res.shape[0]):
+                insert_new_line(conn, link)
+            # Committing changes and closing the connection to the database file
+            conn.commit()
+            conn.close()
+
 

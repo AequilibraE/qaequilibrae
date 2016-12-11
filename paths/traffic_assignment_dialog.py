@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-30
- Updated:
+ Updated:...
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -29,9 +29,8 @@ import sys
 import os
 from functools import partial
 import numpy as np
-import yaml
-
-
+import uuid
+import shutil
 
 from global_parameters import integer_types
 from auxiliary_functions import *
@@ -50,6 +49,7 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
+        self.temp_path = tempPath() + '/'
 
         self.error = None
         self.outname = None
@@ -67,6 +67,11 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
 
         # Signals from the Network tab
         self.load_graph_from_file.clicked.connect(self.load_graph)
+        self.network_layer.setVisible(False)
+        self.network_field.setVisible(False)
+        self.lblnodematch_11.setVisible(False)
+        self.lblnodematch_14.setVisible(False)
+        self.chb_check_consistency.setVisible(False)
         self.network_layer.setFilters(QgsMapLayerProxyModel.LineLayer)
         self.network_layer.layerChanged.connect(self.add_fields_to_cboxes)
         self.add_fields_to_cboxes()
@@ -88,12 +93,15 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
 
         self.changing_algorithm()
 
-        # critical analysis tab
-        self.path_file_output_name = None
+        # critical analysis and path file saving
+        self.group_outputs = False
+        self.do_group_outputs.setEnabled(False)
         self.do_path_file.stateChanged.connect(self.change_status_for_path_file)
         self.select_path_file_name.clicked.connect(self.choose_output_for_path_file)
-
+        self.do_path_file.setEnabled(False)
         self.change_status_for_path_file()
+        self.path_file_output_name = None
+        self.temp_path_file = None
 
     def choose_output_for_path_file(self):
         new_name, type = GetOutputFileName(self, 'Path File', ["AequilibraE Path File(*.aep)"], ".aep", self.path)
@@ -101,11 +109,11 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         if new_name is not None:
             self.path_file_output_name = new_name
             self.path_file_display.setText(new_name)
-            self.results.setSavePathFile(True, self.path_file_output_name)
+            self.temp_path_file = self.temp_path + uuid.uuid4().hex
+            self.results.setSavePathFile(True, self.temp_path_file + '.aep')
         else:
             self.path_file_output_name = None
             self.path_file_display.setText('...')
-
 
     def change_status_for_path_file(self):
         if self.do_path_file.isChecked():
@@ -114,6 +122,8 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         else:
             self.select_path_file_name.setEnabled(False)
             self.path_file_display.setVisible(False)
+            self.path_file_output_name = None
+            self.path_file_display.setText('...')
 
     def select_skim(self):
         pass
@@ -137,15 +147,16 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
                 if i not in not_considering_list:
                     self.minimizing_field.addItem(i)
             self.lbl_graphfile.setText(graph_file)
-
             self.results.prepare(self.graph)
             cores = get_parameter_chain(['system', 'cpus'])
             self.results.set_cores(cores)
 
-            if self.do_path_file.isChecked() and self.path_file_output_name is not None:
-                self.results.setSavePathFile(True, self.path_file_output_name)
+            self.do_path_file.setEnabled(True)
+
         else:
             self.graph = Graph()
+            self.do_path_file.setEnabled(False)
+        self.change_status_for_path_file()
 
     def browse_outfile(self):
         file_types = ["Comma-separated files(*.csv)", "Numpy Binnary Array(*.npy)"]
@@ -220,38 +231,7 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
                 np.save(self.outname, self.output)
 
             else:
-                lids = self.graph.graph['link_id']
-                direcs = self.graph.graph['direction']
-
-                dt = [('Link ID', np.int), ('AB Flow', np.float), ('BA Flow', np.float), ('Tot Flow', np.float)]
-                res = np.zeros(np.max(lids) +1, dtype = dt)
-
-                res['Link ID'][:] = np.arange(np.max(lids) + 1)[:]
-
-                # Indices of links BA and AB
-                ABs = direcs < 0
-                BAs = direcs > 0
-
-                link_flows = self.results.results()[:-1]
-
-                # AB Flows
-                link_ids = lids[ABs]
-                res['AB Flow'][link_ids] = link_flows[ABs]
-
-                # BA Flows
-                link_ids = lids[BAs]
-                res['BA Flow'][link_ids] = link_flows[BAs]
-
-                # Tot Flow
-                res['Tot Flow'] = res['AB Flow'] + res['BA Flow']
-                np.savetxt(self.outname, res, delimiter = ',', header='Link_ID,AB Flow,BA Flow,Tot Flow')
-                # outp = open(self.outname, 'w')
-                # print >> outp, 'Link_ID,AB Flow,BA Flow,Tot Flow'
-                # for k in res:
-                #     print >> outp, str(k[0]) + ',' + str(k[1]) + ',' + str(k[2]) + ',' + str(k[3])
-                # outp.flush()
-                # outp.close()
-        self.exit_procedure()
+                self.produce_all_outputs()
 
     def run(self):
         if self.check_data():
@@ -271,14 +251,17 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         if not self.graph.num_links:
             self.error = 'Graph was not loaded'
 
-        if not len(self.network_layer.currentText()):
-            self.error = 'No line layer selected'
+        # if not len(self.network_layer.currentText()):
+        #     self.error = 'No line layer selected'
 
-        if not len(self.network_field.currentText()):
-            self.error = 'No link ID field selected'
+        # if not len(self.network_field.currentText()):
+        #     self.error = 'No link ID field selected'
 
         if self.outname is None:
             self.error = 'Parameters for output missing'
+
+        if self.do_path_file.isChecked() and self.path_file_output_name is None:
+            self.error = 'No output file name for the path file selected'
 
         if self.error is not None:
             return False
@@ -294,6 +277,22 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
     def progress_text_from_thread(self, val):
         self.progress_label0.setText(val)
 
+    def produce_all_outputs(self):
+
+        # Save link flows to disk
+        self.results.save_loads_to_disk(self.outname)
+
+        if self.do_path_file.isChecked():
+            if self.method['algorithm'] == 'AoN':
+                # del(self.results.path_file['results'])
+                # self.results.path_file = None
+
+                shutil.move(self.temp_path_file + '.aep', self.path_file_output_name)
+                shutil.move(self.temp_path_file + '.aed', self.path_file_output_name[:-3] + 'aed')
+
+
+        self.exit_procedure()
+        #+ '.aep'
 
     def exit_procedure(self):
         self.close()

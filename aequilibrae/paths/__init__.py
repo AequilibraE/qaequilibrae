@@ -9,12 +9,13 @@ __version__ = "1.0"
 __revision__ = "$Revision: 1 $"
 __date__ = "$Date: 2016-07-02$"
 
-from .graph import Graph
+import platform
+
+from aequilibrae.paths.results.memory_mapped_files_handling import saveDataFileDictionary
 from .assignment import all_or_nothing, ota
+from .graph import Graph
 from .results import *
 
-# We import the algorithms
-import platform
 plat = platform.system()
 
 if plat == 'Windows':

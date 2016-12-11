@@ -12,6 +12,7 @@ distribution:
     max iterations: 5000
 system:
   cpus: 4
-  default_directory: /media/pedro/LargeDrive/Example_AequilibraE
+  default_directory: /media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/AequilibraE testing data/Assignment
+  temp directory: '/temp'
   driving side: left
   report zeros: 1
