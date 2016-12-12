@@ -101,7 +101,7 @@ class AssignmentResults:
                 warnings.warn("Critical Link analysis not set properly. Need to specify output file too")
             else:
                 if crit_res_result[-3:].lower() != 'aes':
-                    dictio_name = crit_res_result + '.aes'
+                    dictio_name = crit_res_result + '.aed'
                     crit_res_result += '.aes'
                 else:
                     dictio_name = crit_res_result[:-3] + 'aed'

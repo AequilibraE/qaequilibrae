@@ -2,8 +2,8 @@
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
 
- Name:       QGIS FORMS folder initializer
- Purpose:
+ Name:       Routines for handling data files dictionaries
+ Purpose:    Having all this handling in a single place
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -12,18 +12,19 @@
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    30/10/2016
+ Created:    2016-12-09
  Updated:
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-from ui_simple_tag import Ui_simple_tag
-from ui_DesireLines import Ui_DesireLines
-from ui_bandwidths import Ui_bandwidths
-from ui_compare_scenarios import Ui_compare_scenarios
-from ui_least_common_denominator import Ui_least_common_denominator
-from ui_bandwidth_color_ramps import Ui_BandwidthColorRamps
+import yaml
 
-from ui_traffic_assignment import Ui_traffic_assignment
-from ui_link_query_builder import Ui_link_query_builder
+def saveDataFileDictionary(uuid, data_type, dimensions, target_file):
+    dictio = {'uuid': uuid,
+              'Data Type': data_type,
+              'Dimensions': dimensions}
+
+    stream = open(target_file, 'w')
+    yaml.dump(dictio, stream, default_flow_style=False)
+    stream.close()

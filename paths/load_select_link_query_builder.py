@@ -39,11 +39,13 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 from ui_link_query_builder import Ui_link_query_builder
 
 class LoadSelectLinkQueryBuilder(QtGui.QDialog, Ui_link_query_builder):
-    def __init__(self, iface, graph):
+    def __init__(self, iface, graph, window_title):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.graph = graph
+
+        self.setWindowTitle(window_title)
 
         self.links = []
         self.label = None

@@ -37,7 +37,7 @@
    </column>
    <column>
     <property name="text">
-     <string>Delete</string>
+     <string>Del</string>
     </property>
    </column>
   </widget>
@@ -54,9 +54,9 @@
   <widget class="QLineEdit" name="txt_query_name">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>100</x>
      <y>290</y>
-     <width>141</width>
+     <width>151</width>
      <height>26</height>
     </rect>
    </property>
@@ -66,7 +66,7 @@
     <rect>
      <x>12</x>
      <y>294</y>
-     <width>71</width>
+     <width>81</width>
      <height>16</height>
     </rect>
    </property>
@@ -85,9 +85,9 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>290</x>
      <y>290</y>
-     <width>221</width>
+     <width>171</width>
      <height>26</height>
     </rect>
    </property>

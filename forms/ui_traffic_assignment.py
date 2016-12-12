@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_traffic_assignment.ui'
 #
-# Created: Mon Dec 12 09:22:03 2016
-#      by: PyQt4 UI code generator 4.11.3
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -155,16 +154,20 @@ class Ui_traffic_assignment(object):
         self.tab_5.setObjectName(_fromUtf8("tab_5"))
         self.list_link_extraction = QtGui.QTableWidget(self.tab_5)
         self.list_link_extraction.setEnabled(False)
-        self.list_link_extraction.setGeometry(QtCore.QRect(10, 40, 311, 311))
+        self.list_link_extraction.setGeometry(QtCore.QRect(10, 50, 611, 291))
         self.list_link_extraction.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
         self.list_link_extraction.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.list_link_extraction.setRowCount(0)
-        self.list_link_extraction.setColumnCount(2)
+        self.list_link_extraction.setColumnCount(4)
         self.list_link_extraction.setObjectName(_fromUtf8("list_link_extraction"))
         item = QtGui.QTableWidgetItem()
         self.list_link_extraction.setHorizontalHeaderItem(0, item)
         item = QtGui.QTableWidgetItem()
         self.list_link_extraction.setHorizontalHeaderItem(1, item)
+        item = QtGui.QTableWidgetItem()
+        self.list_link_extraction.setHorizontalHeaderItem(2, item)
+        item = QtGui.QTableWidgetItem()
+        self.list_link_extraction.setHorizontalHeaderItem(3, item)
         self.list_link_extraction.verticalHeader().setDefaultSectionSize(27)
         self.do_extract_link_flows = QtGui.QCheckBox(self.tab_5)
         self.do_extract_link_flows.setEnabled(False)
@@ -172,7 +175,7 @@ class Ui_traffic_assignment(object):
         self.do_extract_link_flows.setObjectName(_fromUtf8("do_extract_link_flows"))
         self.but_build_query_extract = QtGui.QPushButton(self.tab_5)
         self.but_build_query_extract.setEnabled(False)
-        self.but_build_query_extract.setGeometry(QtCore.QRect(240, 5, 81, 30))
+        self.but_build_query_extract.setGeometry(QtCore.QRect(540, 11, 81, 30))
         self.but_build_query_extract.setObjectName(_fromUtf8("but_build_query_extract"))
         self.tabWidget.addTab(self.tab_5, _fromUtf8(""))
         self.tab = QtGui.QWidget()
@@ -297,9 +300,13 @@ class Ui_traffic_assignment(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("traffic_assignment", "Critical analysis", None))
         self.list_link_extraction.setAccessibleName(_translate("traffic_assignment", "<html><head/><body><p>xcxc</p></body></html>", None))
         item = self.list_link_extraction.horizontalHeaderItem(0)
-        item.setText(_translate("traffic_assignment", "Link ID", None))
+        item.setText(_translate("traffic_assignment", "Links", None))
         item = self.list_link_extraction.horizontalHeaderItem(1)
-        item.setText(_translate("traffic_assignment", "Direction", None))
+        item.setText(_translate("traffic_assignment", "Type", None))
+        item = self.list_link_extraction.horizontalHeaderItem(2)
+        item.setText(_translate("traffic_assignment", "Query name", None))
+        item = self.list_link_extraction.horizontalHeaderItem(3)
+        item.setText(_translate("traffic_assignment", "Del", None))
         self.do_extract_link_flows.setText(_translate("traffic_assignment", "Perform link flow extraction", None))
         self.but_build_query_extract.setText(_translate("traffic_assignment", "Build Query", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("traffic_assignment", "Link flow extraction", None))
