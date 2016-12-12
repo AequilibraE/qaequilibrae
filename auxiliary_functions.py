@@ -29,6 +29,11 @@ import tempfile
 def main():
     pass
 
+directions_dictionary = {'AB': 1,
+                         'BA': -1,
+                         1: 'AB',
+                         -1: 'BA'
+                        }
 
 # Just a shorthand function to return the current standard path
 def standard_path():

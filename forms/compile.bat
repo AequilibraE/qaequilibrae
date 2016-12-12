@@ -1,7 +1,7 @@
 cd ECHO %CurrentDir%
-C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_traffic_assignment.ui -o ui_traffic_assignment.py
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 Ui_compare_scenarios.ui -o ui_compare_scenarios.py
 
-C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_link_query_builder.ui -o ui_link_query_builder.py
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 Ui_TQ_NetPrep.ui -o ui_TQ_NetPrep.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_bandwidths.ui -o ui_bandwidths.py
 
@@ -12,8 +12,6 @@ C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_least_common_denominator.ui -o ui_
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_impedance_matrix.ui -o ui_impedance_matrix.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_DesireLines.ui -o ui_DesireLines.py
-
-C:\Python27\Lib\site-packages\PyQt4\pyuic4 Ui_TQ_NetPrep.ui -o ui_TQ_NetPrep.py
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_matrix_loader.ui -o ui_matrix_loader.py
 
@@ -52,3 +50,4 @@ C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_Trip_Distribution.ui -o ui_Trip_Di
 
 C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_nodes_to_areas.ui -o ui_nodes_to_areas.py
 
+C:\Python27\Lib\site-packages\PyQt4\pyuic4 ui_Traffic_Assignment.ui -o ui_Traffic_Assignment.py

@@ -187,47 +187,6 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         elif purpose == 'Link flow extraction':
             self.tot_link_flow_extract -= 1
 
-        #critical link
-        self.but_build_query.clicked.connect(self.build_query)
-        self.do_select_link.stateChanged.connect(self.set_behavior_special_analysis)
-        self.select_link_list.setColumnWidth(0, 280)
-        self.select_link_list.setColumnWidth(1, 40)
-        self.select_link_list.setColumnWidth(2, 150)
-        self.select_link_list.setColumnWidth(3, 40)
-        self.tot_link_queries = 0
-
-    def build_query(self):
-        self.but_build_query.setEnabled(False)
-        dlg2 = LoadSelectLinkQueryBuilder(self.iface, self.graph.graph)
-        #dlg2.show()
-        dlg2.exec_()
-        if dlg2.links is not None:
-            self.select_link_list.setRowCount(self.tot_link_queries + 1)
-            text = ''
-            for i in dlg2.links:
-                text = text + ', (' + i[0].encode('utf-8') + ', ' + i[1].encode('utf-8') + ')'
-            text = text[1:]
-            self.select_link_list.setItem(self.tot_link_queries, 0, QTableWidgetItem(text))
-            self.select_link_list.setItem(self.tot_link_queries, 1, QTableWidgetItem(dlg2.query_type))
-            self.select_link_list.setItem(self.tot_link_queries, 2, QTableWidgetItem(dlg2.query_name))
-            del_button = QPushButton('X')
-            del_button.clicked.connect(self.click_button_inside_the_list)
-            self.select_link_list.setCellWidget(self.tot_link_queries, 3, del_button)
-
-            self.tot_link_queries += 1
-        else:
-            self.matrix = None
-
-        self.but_build_query.setEnabled(True)
-
-    def click_button_inside_the_list(self):
-        button = self.sender()
-        index = self.select_link_list.indexAt(button.pos())
-        row = index.row()
-        self.select_link_list.removeRow(row)
-        self.tot_link_queries -= 1
-
-
     def choose_output_for_path_file(self):
         new_name, file_type = GetOutputFileName(self, 'Path File', ["AequilibraE Path File(*.aep)"], ".aep", self.path)
 

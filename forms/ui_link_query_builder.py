@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'ui_link_query_builder.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Mon Dec 12 03:34:24 2016
+#      by: PyQt4 UI code generator 4.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -42,17 +43,17 @@ class Ui_link_query_builder(object):
         self.filter_field.setGeometry(QtCore.QRect(99, 16, 131, 26))
         self.filter_field.setObjectName(_fromUtf8("filter_field"))
         self.txt_query_name = QtGui.QLineEdit(link_query_builder)
-        self.txt_query_name.setGeometry(QtCore.QRect(100, 290, 151, 26))
+        self.txt_query_name.setGeometry(QtCore.QRect(90, 290, 141, 26))
         self.txt_query_name.setObjectName(_fromUtf8("txt_query_name"))
         self.label = QtGui.QLabel(link_query_builder)
-        self.label.setGeometry(QtCore.QRect(12, 294, 81, 16))
+        self.label.setGeometry(QtCore.QRect(12, 294, 71, 16))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.label.setFont(font)
         self.label.setObjectName(_fromUtf8("label"))
         self.but_build_query = QtGui.QPushButton(link_query_builder)
         self.but_build_query.setEnabled(False)
-        self.but_build_query.setGeometry(QtCore.QRect(290, 290, 171, 26))
+        self.but_build_query.setGeometry(QtCore.QRect(240, 290, 221, 26))
         self.but_build_query.setObjectName(_fromUtf8("but_build_query"))
         self.label_2 = QtGui.QLabel(link_query_builder)
         self.label_2.setGeometry(QtCore.QRect(14, 20, 71, 16))
@@ -90,7 +91,7 @@ class Ui_link_query_builder(object):
         item = self.selected_links.horizontalHeaderItem(1)
         item.setText(_translate("link_query_builder", "Dir", None))
         item = self.selected_links.horizontalHeaderItem(2)
-        item.setText(_translate("link_query_builder", "Del", None))
+        item.setText(_translate("link_query_builder", "Delete", None))
         self.label.setText(_translate("link_query_builder", "Query name", None))
         self.but_build_query.setText(_translate("link_query_builder", "Accept", None))
         self.label_2.setText(_translate("link_query_builder", "Filter link", None))
