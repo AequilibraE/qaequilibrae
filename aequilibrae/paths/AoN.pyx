@@ -138,8 +138,7 @@ def path_computation(origin,destination,graph, results):
 @cython.boundscheck(False)
 def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
     cdef int nodes, O, i
-    ##print "start one to all"
-    ##print "Checking bounds"
+    cdef int critical_queries, link_extract_queries, query_type
     #We transform the python variables in Cython variables
     O = origin
     graph_fs = graph.fs
@@ -156,11 +155,19 @@ def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
     if VERSION != graph.__version__:
         return 'This graph was created for a different version of AequilibraE. Please re-create it'
 
+    aux_link_flows = np.zeros(1, ITYPE)
+    if result.critical_links['save']:
+        critical_queries = len(result.critical_links['queries'])
+        aux_link_flows = np.zeros(result.links, ITYPE)
+
+    if result.link_extraction['save']:
+        link_extract_queries = len(result.link_extraction['queries'])
+
     nodes = graph.num_nodes + 1
 
     new_b_nodes = blocking_centroid_flows(O, graph)
     # In order to release the GIL for this procedure, we create all the
-    # memmory views we will need
+    # memory views we will need
     cdef double [:] demand_view = demand
 
     cdef int [:] graph_fs_view = graph.fs
@@ -177,11 +184,14 @@ def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
     cdef double [:, :] skim_matrix_view = result.temporary_skims[:, :, curr_thread]
     cdef double [:, :] final_skim_matrices_view = result.skims[O, :, :]
 
+    # path file variables
     cdef int [:] pred_view = result.path_file['results'][O,:,0]
     cdef int [:] c_view = result.path_file['results'][O,:,1]
 
+    # select link variables
+    cdef double [:, :] sel_link_view = result.critical_links['results'][O,:,:]
+    cdef int [:] aux_link_flows_view = aux_link_flows
         #Now we do all procedures with NO GIL
-    ##print "assigone"
     if no_gil:
         with nogil:
             a=assigone(O,
@@ -220,7 +230,60 @@ def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
                               c_view,
                               conn_view)
 
+    for i in range(critical_queries):
+        critical_links_view = return_an_int_view(result.path_file['queries']['elements'][i])
+        query_type = 0
+        if result.path_file['queries'][ type][i] == "or":
+            query_type = 1
+        perform_select_link_analysis(O,
+                                     nodes,
+                                     demand_view,
+                                     predecessors_view,
+                                     conn_view,
+                                     aux_link_flows_view,
+                                     sel_link_view,
+                                     query_type)
+        cdef int j
+
+
+
     return origin
+
+cdef return_an_int_view(input):
+    cdef int [:] critical_links_view = input
+    return critical_links_view
+
+
+@cython.wraparound(False)
+@cython.embedsignature(True)
+@cython.boundscheck(False)
+cpdef void perform_select_link_analysis(int origin,
+                                        int nodes,
+                                        double[:] demand,
+                                        int [:] pred,
+                                        int [:] conn,
+                                        int [:] aux_link_flows,
+                                        double [:, :] critical_array,
+                                        int query_type) nogil:
+    cdef unsigned int t_origin
+    cdef ITYPE_t c, j, i, p,
+    cdef unsigned int dests = demand.shape[0]
+    cdef unsigned int q = critical_array.shape[0]
+
+    for j in range(dests):
+        if demand[j] > 0:
+            p = pred[j]
+            j = i
+            while p >= 0:
+                c = conn[j]
+                aux_link_flows[c] = 1
+                j = p
+                p = pred[j]
+        if query_type == 1: # Either one of the links in the query
+        for i in range(q):
+            if aux_link_flows[q[i]] == 1:
+                critical_array
+
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
@@ -839,163 +902,3 @@ cdef FibonacciNode* remove_min(FibonacciHeap* heap) nogil:
         temp = temp_right
 
     return out
-
-# def all_to_all(demand,graph, Link_Loads, no_path,skim_matrix, predecessors, conn, temp_skims, cores):
-#     cdef int nodes, a, zones, O, links, ct, i, block_centroid_flow
-#
-#
-#     graph_costs = graph.cost
-#     b_nodes = graph.b_node
-#     graph_fs = graph.fs
-#     graph_skim = graph.skims
-#     idsgraph = graph.ids
-#     block_centroid_flow = graph.block_centroid_flow
-#
-#     #We transform the python variables in Cython variables
-#     zones=demand.shape[0]
-#     links=b_nodes.shape[0]
-#     nodes=graph_costs.shape[0]
-#
-#     #We need to create a new cost array in order to not allow
-#     #flows through the centroids
-#     #g=graph_costs.copy()
-#
-#     #And we also have some thread-specific arrays for the shortest path three to be constructed
-#     #predecessors = np.empty(nodes, dtype=ITYPE)
-#     #conn = np.empty(nodes, dtype=ITYPE)
-#     #temp_skims=np.empty((nodes, skims), dtype=DTYPE)
-#
-#
-#     #In order to release the GIL for this procedure, we create all the
-#     #memmory views we will need
-#     cdef int [:] graph_fs_view = graph_fs
-#     cdef int [:] b_nodes_view = b_nodes
-#     cdef double [:] g_view =graph_costs
-#     cdef int  [:] idsgraph_view = idsgraph
-#     cdef double [:,:] graph_skim_view = graph_skim
-#
-#     cdef int [:,:] predecessors_view = predecessors
-#     cdef int [:,:] conn_view = conn
-#
-#     cdef double [:,:] demand_view=demand
-#
-#     cdef double [:,:] Link_Loads_view=Link_Loads
-#     cdef int [:,:] no_path_view=no_path
-#     cdef double [:,:,:] skim_matrix_view = temp_skims
-#     cdef double [:,:,:] final_skim_matrices_view=skim_matrix
-#
-#
-#     for O in prange(zones, nogil=True, num_threads=cores):
-#         ct=cython.parallel.threadid()
-#         a=assigone(O,
-#                  nodes,
-#                  demand_view[O,:],
-#                  g_view,
-#                  b_nodes_view,
-#                  graph_fs_view,
-#                  idsgraph_view,
-#                  graph_skim_view,
-#                  Link_Loads_view[:,ct],
-#                  no_path_view[O,:],
-#                  skim_matrix_view[:,:,ct],
-#                  predecessors_view[:,ct],
-#                  conn_view[:,ct],
-#                  final_skim_matrices_view[O,:,:])
-#
-#     for i in prange(links, nogil=True, num_threads=cores):
-#         a=_total_assignment(Link_Loads_view[i,:])
-#
-#     return 1
-#
-# @cython.wraparound(False)
-# @cython.embedsignature(True)
-# @cython.boundscheck(False)
-# cpdef int _total_assignment(double[:] Link_Loads) nogil:
-#     cdef int i
-#     cdef int j = Link_Loads.shape[0]
-#     for i in xrange (1,j):
-#         Link_Loads[0]=Link_Loads[0]+Link_Loads[i]
-#     return 1
-#
-# def Some_to_all(Oi,Oj,demand,graph, Link_Loads, no_path,skim_matrix, predecessors, conn, temp_skims):
-#     cdef int nodes, a, zones, O, links, ct, i, j, block_centroid_flow
-#
-#     block_centroid_flow = graph.block_centroid_flow
-#     graph_costs = graph.cost
-#     b_nodes = graph.b_node
-#     graph_fs = graph.fs
-#     graph_skim = graph.skims
-#     idsgraph = graph.ids
-#
-#     #We transform the python variables in Cython variables
-#     i=Oi
-#     j=Oj
-#     nodes=graph_costs.shape[0]
-#     zones=demand.shape[0]
-#     links=b_nodes.shape[0]
-#     skims=skim_matrix.shape[1]
-#
-#
-#     #And we also have some thread-specific arrays for the shortest path three to be constructed
-#     #predecessors = np.empty(nodes, dtype=ITYPE)
-#     #conn = np.empty(nodes, dtype=ITYPE)
-#     #temp_skims=np.empty((nodes, skims), dtype=DTYPE)
-#     #cdef double [:] g_view = g
-#
-#     #In order to release the GIL for this procedure, we create all the
-#     #memmory views we will need
-#     cdef int [:] graph_fs_view = graph_fs
-#     cdef int [:] b_nodes_view = b_nodes
-#     cdef double [:] g_view =graph_costs
-#     cdef int  [:] idsgraph_view = idsgraph
-#
-#
-#     cdef int [:] predecessors_view = predecessors
-#     cdef int [:] conn_view = conn
-#     cdef double [:,:] demand_view=demand
-#     cdef double [:,:] graph_skim_view = graph_skim
-#
-#     cdef double [:] Link_Loads_view=Link_Loads
-#     cdef int [:,:] no_path_view=no_path
-#
-#     cdef double [:,:,:] skim_matrix_view = temp_skims
-#     cdef double [:,:] final_skim_matrices_view=skim_matrix
-#
-#
-#     #Now we do all procedures with NO GIL
-#     with nogil:
-#         #We remove the connectors
-#         # a=_removes_connectors(g_view,  #graph_costs
-#                               # graph_fs_view,
-#                               # O,
-#                               # zones)
-#             for O in xrange(i,j):
-#                 a=assigone(O,
-#                          nodes,
-#                          demand_view[O,:],
-#                          g_view,
-#                          b_nodes_view,
-#                          graph_fs_view,
-#                          idsgraph_view,
-#                          graph_skim_view,
-#                          Link_Loads_view,
-#                          no_path_view[O,:],
-#                          skim_matrix_view[O,:,:],
-#                          predecessors_view,
-#                          conn_view,
-#                          final_skim_matrices_view)
-#     return O
-#
-#
-# def empty_function(i):
-#     cdef int j
-#     j = i
-#     with nogil:
-#         j = _empty_function(j)
-#
-# cpdef int _empty_function(int i) nogil:
-#     cdef int j, k
-#
-#     for j in range(10):
-#         k = j ** j
-#     return k

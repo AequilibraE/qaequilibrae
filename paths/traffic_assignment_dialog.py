@@ -43,6 +43,7 @@ from aequilibrae.paths import Graph, AssignmentResults
 from get_output_file_name import GetOutputFileName
 from load_select_link_query_builder import LoadSelectLinkQueryBuilder
 
+
 class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
     def __init__(self, iface):
         class OutputType:
@@ -130,7 +131,6 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         self.tot_link_flow_extract = 0
         self.link_extract = OutputType
 
-
     def build_query(self, purpose):
         if purpose == 'select link':
             button = self.but_build_query
@@ -138,12 +138,11 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
             table = self.select_link_list
             counter = self.tot_crit_link_queries
 
-        elif purpose == 'Link flow extraction':
+        if purpose == 'Link flow extraction':
             button = self.but_build_query_extract
             message = 'Link flow extraction'
             table = self.list_link_extraction
             counter = self.tot_link_flow_extract
-
 
         button.setEnabled(False)
         dlg2 = LoadSelectLinkQueryBuilder(self.iface, self.graph.graph, message)
@@ -214,7 +213,6 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
             self.critical_link_output_file = None
             self.critical_matrix_path.setText('...')
 
-
     def change_status_for_path_file(self):
         if self.do_path_file.isChecked():
             self.select_path_file_name.setEnabled(True)
@@ -275,6 +273,11 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
             behavior = True
 
         self.do_path_file.setEnabled(behavior)
+
+        # This line of code turns off the features of select link analysis and link flow extraction while these
+        #features are still being developed
+        behavior = False
+
         self.do_select_link.setEnabled(behavior)
         self.do_extract_link_flows.setEnabled(behavior)
 
@@ -391,8 +394,6 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
                 query_type = self.select_link_list.item(i, 1).text()
                 query_name = self.select_link_list.item(i, 2).text()
 
-                # sample:   (2, "AB"), (3, "BA"), (4, "AB"), (5, "BA"), (6, "BA"), (7, "AB")
-
                 for l in links:
                     d = directions_dictionary[l[1]]
                     lk = self.graph.ids[(self.graph.graph['link_id'] == int(l[0])) & (self.graph.graph['direction'] == d)]
@@ -404,7 +405,6 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         self.critical_queries = {'labels': query_labels,
                                  'elements': query_elements,
                                  ' type': query_types}
-
 
     def progress_range_from_thread(self, val):
         self.progressbar0.setRange(0, val)
@@ -420,6 +420,7 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         # Save link flows to disk
         self.results.save_loads_to_disk(self.outname)
 
+        # Path file
         if self.do_path_file.isChecked():
             if self.method['algorithm'] == 'AoN':
                 del(self.results.path_file['results'])
@@ -428,9 +429,32 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
                 shutil.move(self.path_file.temp_file + '.aep', self.path_file.output_name)
                 shutil.move(self.path_file.temp_file + '.aed', self.path_file.output_name[:-3] + 'aed')
 
+        # select link analysis
+        if self.do_path_file.isChecked():
+            if self.method['algorithm'] == 'AoN':
+                del(self.results.critical_links['results'])
+                self.results.critical_links = None
+
+                shutil.move(self.critical_output.temp_file + '.aep', self.critical_output.output_name)
+                shutil.move(self.critical_output.temp_file + '.aed', self.critical_output.output_name[:-3] + 'aed')
+
+        if self.do_select_link.isChecked():
+            if self.method['algorithm'] == 'AoN':
+                del(self.results.critical_links['results'])
+                self.results.critical_links = None
+
+                shutil.move(self.critical_output.temp_file + '.aep', self.critical_output.output_name)
+                shutil.move(self.critical_output.temp_file + '.aed', self.critical_output.output_name[:-3] + 'aed')
+
+        if self.do_extract_link_flows.isChecked():
+            if self.method['algorithm'] == 'AoN':
+                del(self.results.link_extraction['results'])
+                self.results.link_extraction = None
+
+                shutil.move(self.link_extract.temp_file + '.aep', self.link_extract.output_name)
+                shutil.move(self.link_extract.temp_file + '.aed', self.link_extract.output_name[:-3] + 'aed')
 
         self.exit_procedure()
-        #+ '.aep'
 
     def exit_procedure(self):
         self.close()

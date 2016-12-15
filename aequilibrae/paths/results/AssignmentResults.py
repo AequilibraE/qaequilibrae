@@ -25,14 +25,13 @@ class AssignmentResults:
         self.num_skims = None  # number of skims that will be computed. Depends on the setting of the graph provided
         self.cores = mp.cpu_count()
 
-        self.critical_links = { 'save': False,
-                                'queries': {},  # Queries are a dictionary
-                                'results': False
-                               }
+        self.critical_links = {'save': False,
+                               'queries': {},  # Queries are a dictionary
+                               'results': False}
 
         self.link_extraction = {"save": False,
-                          "links": None,
-                          "output": None}
+                                'queries': {},  # Queries are a dictionary
+                                "output": None}
 
         self.path_file = {"save": False,
                           "results": None}
