@@ -133,73 +133,82 @@ class CompareScenariosDialog(QDialog, Ui_compare_scenarios):
 
 
     def execute_comparison(self):
-        self.but_run.setEnabled(False)
-        self.band_size = str(self.band_size)
-        self.space_size = str(self.space_size)
+        if self.check_inputs():
+            self.but_run.setEnabled(False)
+            self.band_size = str(self.band_size)
+            self.space_size = str(self.space_size)
 
-        # define the side of the plotting based on the side of the road the system has defined
-        ab = -1
-        if self.drive_side == 'right':
-            ab = 1
-        ba = - ab
+            # define the side of the plotting based on the side of the road the system has defined
+            ab = -1
+            if self.drive_side == 'right':
+                ab = 1
+            ba = - ab
 
-        # fields
-        ab_base = self.ab_FieldComboBoxBase.currentText()
-        ba_base = self.ba_FieldComboBoxBase.currentText()
-        ab_alt = self.ab_FieldComboBoxAlt.currentText()
-        ba_alt = self.ba_FieldComboBoxAlt.currentText()
-        idx_ab = self.layer.fieldNameIndex(ab_base)
-        idx_ba = self.layer.fieldNameIndex(ba_base)
-        idx2_ab = self.layer.fieldNameIndex(ab_alt)
-        idx2_ba = self.layer.fieldNameIndex(ba_alt)
+            # fields
+            ab_base = self.ab_FieldComboBoxBase.currentText()
+            ba_base = self.ba_FieldComboBoxBase.currentText()
+            ab_alt = self.ab_FieldComboBoxAlt.currentText()
+            ba_alt = self.ba_FieldComboBoxAlt.currentText()
+            idx_ab = self.layer.fieldNameIndex(ab_base)
+            idx_ba = self.layer.fieldNameIndex(ba_base)
+            idx2_ab = self.layer.fieldNameIndex(ab_alt)
+            idx2_ba = self.layer.fieldNameIndex(ba_alt)
 
-        # Create the bandwidths for the comon flow, if requested
-        if self.radio_compo.isChecked():
-            values = []
-            values.append(self.layer.maximumValue(idx_ab))
-            values.append(self.layer.maximumValue(idx_ba))
-            values.append(self.layer.maximumValue(idx2_ab))
-            values.append(self.layer.maximumValue(idx2_ba))
-            max_value = max(values)
+            # Create the bandwidths for the comon flow, if requested
+            if self.radio_compo.isChecked():
+                values = []
+                values.append(self.layer.maximumValue(idx_ab))
+                values.append(self.layer.maximumValue(idx_ba))
+                values.append(self.layer.maximumValue(idx2_ab))
+                values.append(self.layer.maximumValue(idx2_ba))
+                max_value = max(values)
 
-            # We create the styles for AB and BA directions and add to the fields
-            for abb, aba, di, t in ([ab_base, ab_alt, ab, 'ab'],[ba_base, ba_alt, ba, 'ba']):
-                width = '(coalesce(scale_linear(min("' + abb + '","' + aba + '") , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
-                offset = str(di) + '*(' + width + '/2 + ' + self.space_size + ')'
-                symbol_layer = self.create_style(width, offset, self.common_colour)
+                # We create the styles for AB and BA directions and add to the fields
+                for abb, aba, di, t in ([ab_base, ab_alt, ab, 'ab'],[ba_base, ba_alt, ba, 'ba']):
+                    width = '(coalesce(scale_linear(min("' + abb + '","' + aba + '") , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
+                    offset = str(di) + '*(' + width + '/2 + ' + self.space_size + ')'
+                    symbol_layer = self.create_style(width, offset, self.common_colour)
+                    self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
+                    if t == 'ab':
+                        ab_offset = str(di) + '*(' + width + ' + ' + self.space_size + ')'
+                    else:
+                        ba_offset = str(di) + '*(' + width + ' + ' + self.space_size + ')'
+
+
+            # If we want a plot of the differences only
+            if self.radio_diff.isChecked():
+                # we compute the size of the differences
+                diffs = []
+                for feat in self.layer.getFeatures():
+                    diffs.append(abs(feat.attributes()[idx_ab] - feat.attributes()[idx2_ab]))
+                    diffs.append(abs(feat.attributes()[idx_ba] - feat.attributes()[idx2_ba]))
+                max_value = max(diffs)
+                ab_offset = '0'
+                ba_offset = '0'
+
+            # We now create the positive and negative bandwidths for each side of the link
+            styles = []
+            styles.append((ab_base, ab_alt, self.positive_color, ab, ab_offset))
+            styles.append((ab_alt, ab_base, self.negative_color, ab, ab_offset))
+            styles.append((ba_base, ba_alt, self.positive_color, ba, ba_offset))
+            styles.append((ba_alt, ba_base, self.negative_color, ba, ba_offset))
+
+            for i in styles:
+                width = '(coalesce(scale_linear(max("' + i[0] + '"-"' + i[1] + '",0) , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
+                offset = i[4] + '+' + str(i[3]) + '*(' + width + '/2 + ' + self.space_size + ')'
+                symbol_layer = self.create_style(width, offset, i[2])
                 self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
-                if t == 'ab':
-                    ab_offset = str(di) + '*(' + width + ' + ' + self.space_size + ')'
-                else:
-                    ba_offset = str(di) + '*(' + width + ' + ' + self.space_size + ')'
 
+            self.layer.triggerRepaint()
+            self.exit_procedure()
 
-        # If we want a plot of the differences only
-        if self.radio_diff.isChecked():
-            # we compute the size of the differences
-            diffs = []
-            for feat in self.layer.getFeatures():
-                diffs.append(abs(feat.attributes()[idx_ab] - feat.attributes()[idx2_ab]))
-                diffs.append(abs(feat.attributes()[idx_ba] - feat.attributes()[idx2_ba]))
-            max_value = max(diffs)
-            ab_offset = '0'
-            ba_offset = '0'
-
-        # We now create the positive and negative bandwidths for each side of the link
-        styles = []
-        styles.append((ab_base, ab_alt, self.positive_color, ab, ab_offset))
-        styles.append((ab_alt, ab_base, self.negative_color, ab, ab_offset))
-        styles.append((ba_base, ba_alt, self.positive_color, ba, ba_offset))
-        styles.append((ba_alt, ba_base, self.negative_color, ba, ba_offset))
-
-        for i in styles:
-            width = '(coalesce(scale_linear(max("' + i[0] + '"-"' + i[1] + '",0) , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
-            offset = i[4] + '+' + str(i[3]) + '*(' + width + '/2 + ' + self.space_size + ')'
-            symbol_layer = self.create_style(width, offset, i[2])
-            self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
-
-        self.layer.triggerRepaint()
-        self.exit_procedure()
+    def check_inputs(self):
+        if self.layer is None:
+            return False
+        if min(self.ab_FieldComboBoxBase.currentIndex(), self.ba_FieldComboBoxBase.currentIndex(),
+               self.ab_FieldComboBoxAlt.currentIndex(), self.ba_FieldComboBoxAlt.currentIndex()) < 0:
+            return False
+        return True
 
     def create_style(self, width, offset, color):
         symbol_layer = QgsSimpleLineSymbolLayerV2.create({})
