@@ -23,15 +23,29 @@ from qgis.core import QgsMapLayerRegistry
 import math
 import os
 import yaml
+import tempfile
 
 
 def main():
     pass
 
+directions_dictionary = {'AB': 1,
+                         'BA': -1,
+                         1: 'AB',
+                         -1: 'BA'
+                        }
 
 # Just a shorthand function to return the current standard path
 def standard_path():
     return get_parameter_chain(['system', 'default_directory'])
+
+
+def tempPath():
+    tmp_path = get_parameter_chain(['system', 'temp directory'])
+    if os.path.isdir(tmp_path):
+        return tmp_path
+    else:
+        return tempfile.gettempdir()
 
 
 # Returns the parameter for a given hierarchy of groups in a dictionary of dictionaries (recovered from a yml)
