@@ -19,9 +19,6 @@
  -----------------------------------------------------------------------------------------------------------
 
 Original Algorithm for Shortest path (Dijkstra with a Fibonacci heap) was written by Jake Vanderplas <vanderplas@astro.washington.edu> under license: BSD, (C) 2012
-
-Codes for route ennumeration, DAG construction and Link nesting were written by Pedro Camargo (2013) and have all their rights reserved to the author
-
  """
 
 cimport numpy as np
