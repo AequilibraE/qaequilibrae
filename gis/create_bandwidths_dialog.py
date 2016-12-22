@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-24
- Updated:    2016-12-07
+ Updated:    2016-12-21
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -106,6 +106,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.mColorButton.setVisible(self.rdo_color.isChecked())
         self.but_load_ramp.setVisible(self.rdo_ramp.isChecked())
         self.txt_ramp.setVisible(self.rdo_ramp.isChecked())
+        self.but_load_ramp.setEnabled(self.rdo_ramp.isChecked())
 
     def choose_a_field(self, modified):
         i, j = 'AB', 'BA'
