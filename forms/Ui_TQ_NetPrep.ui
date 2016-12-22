@@ -174,30 +174,43 @@
      <string>Node Layer</string>
     </property>
    </widget>
-   <widget class="QLabel" name="out_nodes">
+   <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>55</y>
-      <width>551</width>
-      <height>20</height>
+      <x>25</x>
+      <y>58</y>
+      <width>101</width>
+      <height>22</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
     <property name="text">
-     <string>...</string>
+     <string>Node layer name</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_new_node_layer">
+   <widget class="QLineEdit" name="OutNodes">
     <property name="geometry">
      <rect>
-      <x>22</x>
-      <y>54</y>
-      <width>101</width>
-      <height>27</height>
+      <x>135</x>
+      <y>56</y>
+      <width>561</width>
+      <height>24</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
     <property name="text">
-     <string>New node layer</string>
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>Enter name for node layer with centroids</string>
     </property>
    </widget>
   </widget>
@@ -251,30 +264,43 @@
      </font>
     </property>
    </widget>
-   <widget class="QLabel" name="out_lines">
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>65</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Line layer name</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="OutLinks">
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>73</y>
-      <width>551</width>
-      <height>20</height>
+      <y>64</y>
+      <width>561</width>
+      <height>24</height>
      </rect>
     </property>
-    <property name="text">
-     <string>...</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btn_new_line_layer">
-    <property name="geometry">
-     <rect>
-      <x>17</x>
-      <y>68</y>
-      <width>101</width>
-      <height>27</height>
-     </rect>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
     <property name="text">
-     <string>New line layer</string>
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>Enter name for new network layer</string>
     </property>
    </widget>
   </widget>
