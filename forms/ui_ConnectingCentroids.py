@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'Ui_ConnectingCentroids.ui'
 #
-# Created: Sun Oct 23 20:24:37 2016
-#      by: PyQt4 UI code generator 4.11.3
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -109,9 +108,12 @@ class Ui_ConnectingCentroids(object):
         self.OutLinks.setFont(font)
         self.OutLinks.setText(_fromUtf8(""))
         self.OutLinks.setObjectName(_fromUtf8("OutLinks"))
-        self.ChooseLineLayer = QtGui.QPushButton(self.groupBox_2)
-        self.ChooseLineLayer.setGeometry(QtCore.QRect(10, 70, 111, 23))
-        self.ChooseLineLayer.setObjectName(_fromUtf8("ChooseLineLayer"))
+        self.label_8 = QtGui.QLabel(self.groupBox_2)
+        self.label_8.setGeometry(QtCore.QRect(20, 70, 111, 22))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label_8.setFont(font)
+        self.label_8.setObjectName(_fromUtf8("label_8"))
         self.progressbar = QtGui.QProgressBar(ConnectingCentroids)
         self.progressbar.setGeometry(QtCore.QRect(30, 470, 191, 23))
         palette = QtGui.QPalette()
@@ -158,9 +160,6 @@ class Ui_ConnectingCentroids(object):
         self.OutNodes.setFont(font)
         self.OutNodes.setText(_fromUtf8(""))
         self.OutNodes.setObjectName(_fromUtf8("OutNodes"))
-        self.ChooseNodeLayer = QtGui.QPushButton(self.groupBox_3)
-        self.ChooseNodeLayer.setGeometry(QtCore.QRect(10, 104, 111, 23))
-        self.ChooseNodeLayer.setObjectName(_fromUtf8("ChooseNodeLayer"))
         self.SelectedNodes = QtGui.QCheckBox(self.groupBox_3)
         self.SelectedNodes.setGeometry(QtCore.QRect(150, 133, 191, 17))
         self.SelectedNodes.setObjectName(_fromUtf8("SelectedNodes"))
@@ -176,6 +175,12 @@ class Ui_ConnectingCentroids(object):
         font.setPointSize(9)
         self.label_7.setFont(font)
         self.label_7.setObjectName(_fromUtf8("label_7"))
+        self.label_9 = QtGui.QLabel(self.groupBox_3)
+        self.label_9.setGeometry(QtCore.QRect(20, 104, 101, 22))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label_9.setFont(font)
+        self.label_9.setObjectName(_fromUtf8("label_9"))
         self.label_16 = QtGui.QLabel(ConnectingCentroids)
         self.label_16.setGeometry(QtCore.QRect(280, 509, 151, 21))
         font = QtGui.QFont()
@@ -212,14 +217,16 @@ class Ui_ConnectingCentroids(object):
         self.label_6.setText(_translate("ConnectingCentroids", "meters", None))
         self.groupBox_2.setTitle(_translate("ConnectingCentroids", "Links layer", None))
         self.label.setText(_translate("ConnectingCentroids", "Network Layer", None))
-        self.ChooseLineLayer.setText(_translate("ConnectingCentroids", "New line layer", None))
+        self.OutLinks.setPlaceholderText(_translate("ConnectingCentroids", "Enter name for new network layer", None))
+        self.label_8.setText(_translate("ConnectingCentroids", "Line layer name", None))
         self.pushOK.setText(_translate("ConnectingCentroids", "Run!", None))
         self.pushClose.setText(_translate("ConnectingCentroids", "Close", None))
         self.groupBox_3.setTitle(_translate("ConnectingCentroids", "Nodes Layer", None))
         self.label_4.setText(_translate("ConnectingCentroids", "Node Layer", None))
-        self.ChooseNodeLayer.setText(_translate("ConnectingCentroids", "New node layer", None))
+        self.OutNodes.setPlaceholderText(_translate("ConnectingCentroids", "Enter name for node layer with centroids", None))
         self.SelectedNodes.setText(_translate("ConnectingCentroids", "Use only selected nodes", None))
         self.label_7.setText(_translate("ConnectingCentroids", "ID field", None))
+        self.label_9.setText(_translate("ConnectingCentroids", "Node layer name", None))
         self.label_16.setText(_translate("ConnectingCentroids", " www.ipea.gov.br", None))
         self.label_15.setText(_translate("ConnectingCentroids", "The development of this tool was partially funded by:", None))
         self.progress_label.setText(_translate("ConnectingCentroids", "...", None))

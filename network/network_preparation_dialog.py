@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/09/2016
+ Updated:    21/12/2016
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -50,16 +50,12 @@ class NetworkPreparationDialog(QDialog, Ui_TQ_NetPrep):
         QObject.connect(self.nodelayers, SIGNAL("currentIndexChanged(QString)"), self.set_columns_nodes)
         self.pushOK.clicked.connect(self.run)
         self.pushClose.clicked.connect(self.exit_procedure)
-        self.btn_new_node_layer.clicked.connect(self.find_new_node_layer)
-
-        self.btn_new_line_layer.clicked.connect(self.set_new_line_layer)
 
         # We load the line and node layers existing in our canvas
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
             if 'wkbType' in dir(layer):
                 if layer.wkbType() in line_types:
                     self.linelayers.addItem(layer.name())
-                # if layer.wkbType() == QGis.WKBPoint: self.nodelayers.addItem(layer.name())
 
         # loads default path from parameters
         self.path = standard_path()
@@ -89,18 +85,8 @@ class NetworkPreparationDialog(QDialog, Ui_TQ_NetPrep):
             for field in layer.dataProvider().fields().toList():
                 self.node_fields.addItem(field.name())
 
-    def set_new_line_layer(self):
-        if not len(self.out_lines.text()):
-            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
-        else:
-            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.out_lines.text(), "Shapefile(*.shp)")
-        self.out_lines.setText(new_name)
-        self.new_layer = True
-        if not len(new_name):
-            self.new_layer = False
-
     def uses_nodes(self):
-        q = [self.btn_new_node_layer, self.out_nodes, self.label_3, self.np_node_start, self.out_nodes]
+        q = [self.OutNodes, self.label_9, self.np_node_start, self.label_3]
         w = [self.nodelayers, self.node_fields, self.label_2, self.label_4]
 
         if self.radioUseNodes.isChecked():
@@ -126,47 +112,31 @@ class NetworkPreparationDialog(QDialog, Ui_TQ_NetPrep):
             self.nodelayers.hideEvent
             self.np_node_start.setEnabled(True)
 
-    def find_new_node_layer(self):
-        if len(self.out_nodes.text()) == 0:
-            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
-        else:
-            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.out_nodes.text(), "Shapefile(*.shp)")
-        if len(new_name) > 0:
-            if new_name[-3:].upper() in ['SHP']:
-                self.out_nodes.setText(new_name)
-                self.filename = True
-
     def job_finished_from_thread(self, success):
         self.pushOK.setEnabled(True)
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Node layer error: ", self.worker_thread.error, level=3)
-        print 'Finished OK'
+        else:
+            QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_line_layer)
+            if self.worker_thread.new_node_layer:
+                QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_node_layer)
+
 
     def run(self):
-        if self.new_layer:
+        if self.radioUseNodes.isChecked():
+            self.pushOK.setEnabled(False)
+            self.worker_thread = FindsNodes(qgis.utils.iface.mainWindow(), self.linelayers.currentText(),
+                                           self.OutLinks.text(), self.nodelayers.currentText(),
+                                           self.node_fields.currentText())
+            self.run_thread()
 
-            if self.radioUseNodes.isChecked():
-                self.pushOK.setEnabled(False)
-                self.worker_thread = FindsNodes(qgis.utils.iface.mainWindow(), self.linelayers.currentText(),
-                                               self.out_lines.text(), self.nodelayers.currentText(),
-                                               self.node_fields.currentText())
-                self.run_thread()
-
-            else:
-                if self.filename:
-                    self.pushOK.setEnabled(False)
-                    self.worker_thread = FindsNodes(qgis.utils.iface.mainWindow(), self.linelayers.currentText(),
-                                                   self.out_lines.text(), new_node_layer=self.out_nodes.text(),
-                                                    node_start = int(self.np_node_start.text()))
-                    self.run_thread()
-
-                else:
-                    qgis.utils.iface.messageBar().pushMessage("No file name provided",
-                                                              "Please indicate a file name for the new NODE layer",
-                                                              level=3)
         else:
-            qgis.utils.iface.messageBar().pushMessage("No file name provided",
-                                                      "Please indicate a file name for the new LINE layer", level=3)
+            self.pushOK.setEnabled(False)
+            self.worker_thread = FindsNodes(qgis.utils.iface.mainWindow(), self.linelayers.currentText(),
+                                           self.OutLinks.text(), new_node_layer=self.OutNodes.text(),
+                                            node_start = int(self.np_node_start.text()))
+            self.run_thread()
+
 
     def exit_procedure(self):
         self.close()

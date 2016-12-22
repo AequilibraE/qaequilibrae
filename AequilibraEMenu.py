@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    2016-10-03
+ Updated:    2016-12-21
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -23,17 +23,15 @@
 # noinspection PyUnresolvedReferences
 import os
 import sys
+from qgis.core import *
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from qgis.core import *
 
-from adds_connectors_dialog import AddConnectorsDialog
 from parameters_dialog import ParameterDialog
-
 from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
-from .network import NetworkPreparationDialog
+from .network import NetworkPreparationDialog, AddConnectorsDialog
 from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 
 sys.dont_write_bytecode = True

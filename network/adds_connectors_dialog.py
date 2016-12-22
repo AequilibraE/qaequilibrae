@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30
- Updated:    30/09/2016
+ Updated:    21/12/2016
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -47,9 +47,6 @@ class AddConnectorsDialog(QDialog, Ui_ConnectingCentroids):
         self.IfMaxLength.toggled.connect(self.allows_distance)
         self.pushOK.clicked.connect(self.run)
         self.pushClose.clicked.connect(self.exit_procedure)
-
-        self.ChooseLineLayer.clicked.connect(self.browse_line_layer)
-        self.ChooseNodeLayer.clicked.connect(self.browse_node_layer)
 
         QObject.connect(self.CentroidLayer, SIGNAL("currentIndexChanged(QString)"), self.set_field_centroids)
         QObject.connect(self.NodeLayer, SIGNAL("currentIndexChanged(QString)"), self.set_field_nodes)
@@ -107,30 +104,13 @@ class AddConnectorsDialog(QDialog, Ui_ConnectingCentroids):
             for field in layer.dataProvider().fields().toList():
                 self.NodeField.addItem(field.name())
 
-    def browse_node_layer(self):
-        if len(self.OutNodes.text()) == 0:
-            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
-        else:
-            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.OutNodes.text(), "Shapefile(*.shp)")
-        self.OutNodes.setText(new_name)
-        self.NewNodes = True
-        if len(new_name) == 0:
-            self.NewNodes = False
-
-    def browse_line_layer(self):
-        if len(self.OutLinks.text()) == 0:
-            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, "Shapefile(*.shp)")
-        else:
-            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.OutLinks.text(), "Shapefile(*.shp)")
-        self.OutLinks.setText(new_name)
-        self.NewLinks = True
-        if len(new_name) == 0:
-            self.NewLinks = False
-
     def job_finished_from_thread(self, success):
         self.pushOK.setEnabled(True)
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Node layer error: ", self.worker_thread.error, level=3)
+        else:
+            QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_node_layer)
+            QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_line_layer)
 
     def run(self):
 
