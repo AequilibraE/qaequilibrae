@@ -28,9 +28,12 @@ import numpy as np
 from auxiliary_functions import *
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import AssignmentResults
-from aequilibrae.paths import all_or_nothing
 
-from aequilibrae.paths import one_to_all, reblocks_matrix
+no_binary = False
+try:
+    from aequilibrae.paths import all_or_nothing, one_to_all, reblocks_matrix
+except:
+    no_binary = True
 
 error = False
 try:

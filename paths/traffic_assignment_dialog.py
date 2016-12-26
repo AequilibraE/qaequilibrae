@@ -39,10 +39,14 @@ from report_dialog import ReportDialog
 from numpy_model import NumpyModel
 from ui_traffic_assignment import Ui_traffic_assignment
 from traffic_assignment_procedure import TrafficAssignmentProcedure
-from aequilibrae.paths import Graph, AssignmentResults
 from get_output_file_name import GetOutputFileName
 from load_select_link_query_builder import LoadSelectLinkQueryBuilder
 
+no_binary = False
+try:
+    from aequilibrae.paths import Graph, AssignmentResults
+except:
+    no_binary = True
 
 class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
     def __init__(self, iface):

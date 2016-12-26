@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    15/09/2013
- Updated:    30/09/2016
+ Updated:    12/25/2016
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -240,10 +240,6 @@ def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
                                      aux_link_flows_view,
                                      sel_link_view,
                                      query_type)
-        cdef int j
-
-
-
     return origin
 
 cdef return_an_int_view(input):
@@ -277,9 +273,9 @@ cpdef void perform_select_link_analysis(int origin,
                 j = p
                 p = pred[j]
         if query_type == 1: # Either one of the links in the query
-        for i in range(q):
-            if aux_link_flows[q[i]] == 1:
-                critical_array
+            for i in range(q):
+                if aux_link_flows[i] == 1:
+                    critical_array
 
 
 @cython.wraparound(False)
