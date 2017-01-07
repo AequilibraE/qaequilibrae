@@ -25,7 +25,6 @@ from PyQt4.QtCore import *
 import time
 import numpy as np
 import sys
-sys.path.append("C:/Users/Pedro/.qgis2/python/plugins/AequilibraE/")
 
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
