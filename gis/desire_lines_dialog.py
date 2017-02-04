@@ -64,6 +64,9 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
         # Create desire lines
         self.create_dl.clicked.connect(self.run)
 
+        # cancel button
+        self.cancel.clicked.connect(self.exit_procedure)
+
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
             if 'wkbType' in dir(layer):

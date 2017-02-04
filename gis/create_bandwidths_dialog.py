@@ -106,7 +106,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.mColorButton.setVisible(self.rdo_color.isChecked())
         self.but_load_ramp.setVisible(self.rdo_ramp.isChecked())
         self.txt_ramp.setVisible(self.rdo_ramp.isChecked())
-        self.but_load_ramp.setEnabled(self.rdo_ramp.isChecked())
+        # self.but_load_ramp.setEnabled(self.rdo_ramp.isChecked())
 
     def choose_a_field(self, modified):
         i, j = 'AB', 'BA'
@@ -154,7 +154,6 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
 
     def add_fields_to_cboxes(self):
         self.layer = get_vector_layer_by_name(self.mMapLayerComboBox.currentText())
-
         if self.layer is not None:
             self.but_load_ramp.setEnabled(True)
         else:

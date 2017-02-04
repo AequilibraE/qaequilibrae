@@ -193,7 +193,7 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
     def choose_output_for_path_file(self):
         new_name, file_type = GetOutputFileName(self, 'Path File', ["AequilibraE Path File(*.aep)"], ".aep", self.path)
 
-        if new_name is not None:
+        if new_name:
             self.path_file.extension = file_type
             self.path_file.output_name = new_name
             self.path_file_display.setText(new_name)
@@ -207,7 +207,7 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         new_name, type = GetOutputFileName(self, 'Select Link analysis', ["Select Link Analysis Matrix(*.aes)",
                                                  "NumPy Array(*.npy)", "SQLite(*.sqlite)"], ".aes", self.path)
 
-        if new_name is not None:
+        if new_name:
             self.critical_link_output_file = new_name
             self.critical_matrix_path.setText(new_name)
             self.critical_link_temp_file = self.temp_path + uuid.uuid4().hex
@@ -263,7 +263,7 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         box_name = 'Result Matrix'
         new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
 
-        if len(new_name) > 0:
+        if new_name:
             self.outname = new_name
             self.lbl_output.setText(self.outname)
         else:
