@@ -26,9 +26,14 @@ from auxiliary_functions import *
 from global_parameters import *
 from worker_thread import WorkerThread
 from multiprocessing.dummy import Pool as ThreadPool
-from aequilibrae.paths import ota
 import numpy as np
 import thread
+
+no_binary = False
+try:
+    from aequilibrae.paths import ota
+except:
+    no_binary = True
 
 class TrafficAssignmentProcedure(WorkerThread):
     def __init__(self, parentThread, matrix, graph, results, method, skims=None, critical=None):

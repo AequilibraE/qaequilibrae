@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    2016-10-03
+ Updated:    2016-12-21
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -23,18 +23,24 @@
 # noinspection PyUnresolvedReferences
 import os
 import sys
+import qgis
+from qgis.core import *
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from qgis.core import *
 
-from adds_connectors_dialog import AddConnectorsDialog
 from parameters_dialog import ParameterDialog
-
+from binary_downloader_class import BinaryDownloaderDialog
 from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
-from .network import NetworkPreparationDialog
+from .network import NetworkPreparationDialog, AddConnectorsDialog
 from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
+
+no_binary = False
+try:
+    from aequilibrae.paths import path_computation
+except:
+    no_binary = True
 
 sys.dont_write_bytecode = True
 import os.path
@@ -198,6 +204,12 @@ class AequilibraEMenu:
         QObject.connect(self.parameters_action, SIGNAL("triggered()"), self.run_change_parameters)
         self.AequilibraE_menu.addAction(self.parameters_action)
 
+        # Download binaries
+        if no_binary:
+            icon = QIcon(os.path.dirname(__file__) + "/icons/icon_binaries.png")
+            self.binary_action = QAction(icon, u"Download binaries", self.iface.mainWindow())
+            QObject.connect(self.binary_action, SIGNAL("triggered()"), self.run_binary_donwload)
+            self.AequilibraE_menu.addAction(self.binary_action)
     #########################################################################
 
     def unload(self):
@@ -209,12 +221,18 @@ class AequilibraEMenu:
             self.iface.removePluginMenu("&AequilibraE", self.trip_distribution_menu.menuAction())
             self.iface.removePluginMenu("&AequilibraE", self.gis_tools_menu.menuAction())
 
-    # run method that calls the network preparation section of the code
+
     def run_change_parameters(self):
         dlg2 = ParameterDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
+    def run_binary_donwload(self):
+        dlg2 = BinaryDownloaderDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    # run method that calls the network preparation section of the code
     def run_net_prep(self):
         dlg2 = NetworkPreparationDialog(self.iface)
         dlg2.show()
@@ -242,20 +260,29 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_shortest_path(self):
-        dlg2 = ShortestPathDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+        if no_binary:
+            self.message_binary()
+        else:
+            dlg2 = ShortestPathDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
 
     def run_dist_matrix(self):
-        dlg2 = ImpedanceMatrixDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+        if no_binary:
+            self.message_binary()
+        else:
+            dlg2 = ImpedanceMatrixDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
 
     def run_traffic_assig(self):
         # show the dialog
-        dlg2 = TrafficAssignmentDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+        if no_binary:
+            self.message_binary()
+        else:
+            dlg2 = TrafficAssignmentDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
 
     def run_simple_tag(self):
         dlg2 = SimpleTagDialog(self.iface)
@@ -268,21 +295,29 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_dlines(self):
-        dlg2 = DesireLinesDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+        if no_binary:
+            self.message_binary()
+        else:
+            dlg2 = DesireLinesDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
 
-    def  run_bandwidth(self):
+    def run_bandwidth(self):
         dlg2 = CreateBandwidthsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
-    def  run_scenario_comparison(self):
-            dlg2 = CompareScenariosDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
+    def run_scenario_comparison(self):
+        dlg2 = CompareScenariosDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_ipf(self):
-            dlg2 = IpfDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
+        dlg2 = IpfDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def message_binary(self):
+        qgis.utils.iface.messageBar().pushMessage("Binary Error: ",
+                                                  "Please download it from the repository using the downloader from the menu",
+                                                  level=3)

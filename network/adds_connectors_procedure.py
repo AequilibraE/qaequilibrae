@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30
- Updated:    30/09/2016
+ Updated:    21/12/2016
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -55,19 +55,11 @@ class AddsConnectorsProcedure(WorkerThread):
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Duplicating layers")
         self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), 2)
         # We create the new line layer
-        epsg_code = int(links.crs().authid().split(":")[1])
-        new_line_layer = QgsVectorLayer(links.source(), links.name(), links.providerType())
-        QgsVectorFileWriter.writeAsVectorFormat(new_line_layer, self.new_line_layer_name, str(epsg_code), None,
-                                                "ESRI Shapefile")
-        new_line_layer = QgsVectorLayer(self.new_line_layer_name, 'network_with_centroids', 'ogr')
+        new_line_layer = self.duplicate_layer(links, 'LineString', self.new_line_layer_name)
 
         # Create new node layer
         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 1)
-        epsg_code = int(nodes.crs().authid().split(":")[1])
-        new_node_layer = QgsVectorLayer(nodes.source(), nodes.name(), nodes.providerType())
-        QgsVectorFileWriter.writeAsVectorFormat(new_node_layer, self.new_node_layer_name, str(epsg_code), None,
-                                                "ESRI Shapefile")
-        new_node_layer = QgsVectorLayer(self.new_node_layer_name, 'nodes_plus_centroids', 'ogr')
+        new_node_layer = self.duplicate_layer(nodes, 'Point', self.new_node_layer_name)
 
         # Now we start to set the field for writing the new data
         idx = nodes.fieldNameIndex(self.node_ids)
@@ -144,10 +136,22 @@ class AddsConnectorsProcedure(WorkerThread):
 
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Saving new line layer")
         new_line_layer.commitChanges()
-        QgsMapLayerRegistry.instance().addMapLayer(new_line_layer)
+        self.new_node_layer = new_node_layer
 
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Saving new node layer")
         new_node_layer.commitChanges()
-        QgsMapLayerRegistry.instance().addMapLayer(new_node_layer)
+        self.new_line_layer = new_line_layer
 
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "DONE")
+
+    def duplicate_layer(self, original_layer, layer_type, layer_name):
+        epsg_code = int(original_layer.crs().authid().split(":")[1])
+        feats = [feat for feat in original_layer.getFeatures()]
+        duplicate_layer = QgsVectorLayer(layer_type + "?crs=epsg:" + str(epsg_code), layer_name, "memory")
+        new_layer_data = duplicate_layer.dataProvider()
+        attr = original_layer.dataProvider().fields().toList()
+        new_layer_data.addAttributes(attr)
+        duplicate_layer.updateFields()
+        new_layer_data.addFeatures(feats)
+        del feats
+        return duplicate_layer

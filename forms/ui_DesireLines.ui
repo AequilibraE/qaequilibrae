@@ -221,7 +221,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Cancel</string>
+     <string>Cancel and Exit</string>
     </property>
    </widget>
    <widget class="QPushButton" name="create_dl">

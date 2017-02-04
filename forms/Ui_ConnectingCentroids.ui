@@ -250,18 +250,26 @@
     <property name="text">
      <string/>
     </property>
+    <property name="placeholderText">
+     <string>Enter name for new network layer</string>
+    </property>
    </widget>
-   <widget class="QPushButton" name="ChooseLineLayer">
+   <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>70</y>
       <width>111</width>
-      <height>23</height>
+      <height>22</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
     <property name="text">
-     <string>New line layer</string>
+     <string>Line layer name</string>
     </property>
    </widget>
   </widget>
@@ -408,18 +416,8 @@
     <property name="text">
      <string/>
     </property>
-   </widget>
-   <widget class="QPushButton" name="ChooseNodeLayer">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>104</y>
-      <width>111</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>New node layer</string>
+    <property name="placeholderText">
+     <string>Enter name for node layer with centroids</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="SelectedNodes">
@@ -466,6 +464,24 @@
     </property>
     <property name="text">
      <string>ID field</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>104</y>
+      <width>101</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Node layer name</string>
     </property>
    </widget>
   </widget>

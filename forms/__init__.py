@@ -26,3 +26,4 @@ from ui_least_common_denominator import Ui_least_common_denominator
 from ui_bandwidth_color_ramps import Ui_BandwidthColorRamps
 
 from ui_traffic_assignment import Ui_traffic_assignment
+from ui_link_query_builder import Ui_link_query_builder

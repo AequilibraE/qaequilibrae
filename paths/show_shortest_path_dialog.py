@@ -33,7 +33,12 @@ import os
 from auxiliary_functions import *
 from point_tool import PointTool
 from aequilibrae.paths.results import PathResults
-from aequilibrae.paths import path_computation
+
+no_binary = False
+try:
+    from aequilibrae.paths import path_computation
+except:
+    no_binary = True
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")

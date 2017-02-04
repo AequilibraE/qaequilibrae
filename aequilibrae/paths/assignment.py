@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    15/09/2013
- Updated:    30/09/2016
+ Updated:    23/12/2016
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -31,23 +31,14 @@ except:
     pass
 
 import numpy as np
-import platform
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
 
-plat = platform.system()
-if plat == 'Windows':
-    import struct
-    if (8 * struct.calcsize("P")) == 64:
-        from win64 import *
-    if (8 * struct.calcsize("P")) == 32:
-        from win32 import *
-if plat == 'Linux':
-    import struct
-    if (8 * struct.calcsize("P")) == 64:
-        from linux64 import *
-if plat == 'Darwin':
-    from mac import *
+no_binaries = False
+try:
+    from AoN import one_to_all, reblocks_matrix, path_computation
+except:
+    no_binaries = True
 
 def main():
     pass

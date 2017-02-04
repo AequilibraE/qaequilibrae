@@ -36,6 +36,11 @@ from load_matrix_dialog import LoadMatrixDialog
 from desire_lines_procedure import DesireLinesProcedure
 from forms import Ui_DesireLines
 
+no_binary = False
+try:
+    from aequilibrae.paths import all_or_nothing
+except:
+    no_binary = True
 class DesireLinesDialog(QDialog, Ui_DesireLines):
     def __init__(self, iface):
         QDialog.__init__(self)
@@ -59,6 +64,9 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
         # Create desire lines
         self.create_dl.clicked.connect(self.run)
 
+        # cancel button
+        self.cancel.clicked.connect(self.exit_procedure)
+
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
             if 'wkbType' in dir(layer):
@@ -67,7 +75,6 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
 
                     self.progress_label.setVisible(True)
                     self.progressbar.setVisible(True)
-
 
     def run_thread(self):
         QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
@@ -144,6 +151,7 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
             dl_type = 'DesireLines'
             if self.radio_delaunay.isChecked():
                 dl_type = 'DelaunayLines'
+
             self.worker_thread = DesireLinesProcedure(qgis.utils.iface.mainWindow(), self.zoning_layer.currentText(),
                                                         self.zone_id_field.currentText(), self.matrix, dl_type)
             self.run_thread()

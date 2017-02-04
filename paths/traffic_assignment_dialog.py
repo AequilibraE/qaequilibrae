@@ -39,12 +39,23 @@ from report_dialog import ReportDialog
 from numpy_model import NumpyModel
 from ui_traffic_assignment import Ui_traffic_assignment
 from traffic_assignment_procedure import TrafficAssignmentProcedure
-from aequilibrae.paths import Graph, AssignmentResults
 from get_output_file_name import GetOutputFileName
+from load_select_link_query_builder import LoadSelectLinkQueryBuilder
 
+no_binary = False
+try:
+    from aequilibrae.paths import Graph, AssignmentResults
+except:
+    no_binary = True
 
 class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
     def __init__(self, iface):
+        class OutputType:
+            def __init__(self):
+                self.temp_file = None
+                self.extension = None
+                self.output_name = None
+
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
@@ -96,24 +107,115 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         # critical analysis and path file saving
         self.group_outputs = False
         self.do_group_outputs.setEnabled(False)
+
+        # path file
         self.do_path_file.stateChanged.connect(self.change_status_for_path_file)
         self.select_path_file_name.clicked.connect(self.choose_output_for_path_file)
         self.do_path_file.setEnabled(False)
+        self.path_file = OutputType
         self.change_status_for_path_file()
-        self.path_file_output_name = None
-        self.temp_path_file = None
+
+        # Queries
+        tables = [self.select_link_list, self.list_link_extraction]
+        for table in tables:
+            table.setColumnWidth(0, 280)
+            table.setColumnWidth(1, 40)
+            table.setColumnWidth(2, 150)
+            table.setColumnWidth(3, 40)
+
+        #critical link
+        self.but_build_query.clicked.connect(partial(self.build_query, 'select link'))
+        self.do_select_link.stateChanged.connect(self.set_behavior_special_analysis)
+        self.tot_crit_link_queries = 0
+        self.critical_output = OutputType
+
+        # link flow extraction
+        self.but_build_query_extract.clicked.connect(partial(self.build_query, 'Link flow extraction'))
+        self.do_extract_link_flows.stateChanged.connect(self.set_behavior_special_analysis)
+        self.tot_link_flow_extract = 0
+        self.link_extract = OutputType
+
+    def build_query(self, purpose):
+        if purpose == 'select link':
+            button = self.but_build_query
+            message = 'Select Link Analysis'
+            table = self.select_link_list
+            counter = self.tot_crit_link_queries
+
+        if purpose == 'Link flow extraction':
+            button = self.but_build_query_extract
+            message = 'Link flow extraction'
+            table = self.list_link_extraction
+            counter = self.tot_link_flow_extract
+
+        button.setEnabled(False)
+        dlg2 = LoadSelectLinkQueryBuilder(self.iface, self.graph.graph, message)
+        dlg2.exec_()
+
+        if dlg2.links is not None:
+            table.setRowCount(counter + 1)
+            text = ''
+            for i in dlg2.links:
+                text = text + ', (' + i[0].encode('utf-8') + ', "' + i[1].encode('utf-8') + '")'
+            text = text[2:]
+            table.setItem(counter, 0, QTableWidgetItem(text))
+            table.setItem(counter, 1, QTableWidgetItem(dlg2.query_type))
+            table.setItem(counter, 2, QTableWidgetItem(dlg2.query_name))
+            del_button = QPushButton('X')
+            del_button.clicked.connect(partial(self.click_button_inside_the_list, purpose))
+            table.setCellWidget(counter, 3, del_button)
+            counter += 1
+
+        if purpose == 'select link':
+            self.tot_crit_link_queries = counter
+
+        elif purpose == 'Link flow extraction':
+            self.tot_link_flow_extract = counter
+
+        button.setEnabled(True)
+
+    def click_button_inside_the_list(self, purpose):
+        if purpose == 'select link':
+            table = self.select_link_list
+        elif purpose == 'Link flow extraction':
+            table = self.list_link_extraction
+
+        button = self.sender()
+        index = self.select_link_list.indexAt(button.pos())
+        row = index.row()
+        table.removeRow(row)
+
+        if purpose == 'select link':
+            self.tot_crit_link_queries -= 1
+        elif purpose == 'Link flow extraction':
+            self.tot_link_flow_extract -= 1
 
     def choose_output_for_path_file(self):
-        new_name, type = GetOutputFileName(self, 'Path File', ["AequilibraE Path File(*.aep)"], ".aep", self.path)
+        new_name, file_type = GetOutputFileName(self, 'Path File', ["AequilibraE Path File(*.aep)"], ".aep", self.path)
 
-        if new_name is not None:
-            self.path_file_output_name = new_name
+        if new_name:
+            self.path_file.extension = file_type
+            self.path_file.output_name = new_name
             self.path_file_display.setText(new_name)
-            self.temp_path_file = self.temp_path + uuid.uuid4().hex
-            self.results.setSavePathFile(True, self.temp_path_file + '.aep')
+            self.path_file.temp_file = self.temp_path + uuid.uuid4().hex
+            self.results.setSavePathFile(True, self.path_file.temp_file + '.aep')
         else:
-            self.path_file_output_name = None
+            self.path_file.output_name = None
             self.path_file_display.setText('...')
+
+    def choose_output_for_critical_link(self):
+        new_name, type = GetOutputFileName(self, 'Select Link analysis', ["Select Link Analysis Matrix(*.aes)",
+                                                 "NumPy Array(*.npy)", "SQLite(*.sqlite)"], ".aes", self.path)
+
+        if new_name:
+            self.critical_link_output_file = new_name
+            self.critical_matrix_path.setText(new_name)
+            self.critical_link_temp_file = self.temp_path + uuid.uuid4().hex
+
+            self.results.setCriticalLinks(True, self.critical_queries, self.critical_link_temp_file + '.aes')
+        else:
+            self.critical_link_output_file = None
+            self.critical_matrix_path.setText('...')
 
     def change_status_for_path_file(self):
         if self.do_path_file.isChecked():
@@ -122,7 +224,7 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         else:
             self.select_path_file_name.setEnabled(False)
             self.path_file_display.setVisible(False)
-            self.path_file_output_name = None
+            self.path_file.output_name = None
             self.path_file_display.setText('...')
 
     def select_skim(self):
@@ -150,13 +252,10 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
             self.results.prepare(self.graph)
             cores = get_parameter_chain(['system', 'cpus'])
             self.results.set_cores(cores)
-
-            self.do_path_file.setEnabled(True)
-
         else:
             self.graph = Graph()
-            self.do_path_file.setEnabled(False)
         self.change_status_for_path_file()
+        self.set_behavior_special_analysis()
 
     def browse_outfile(self):
         file_types = ["Comma-separated files(*.csv)", "Numpy Binnary Array(*.npy)"]
@@ -164,12 +263,33 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         box_name = 'Result Matrix'
         new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
 
-        if len(new_name) > 0:
+        if new_name:
             self.outname = new_name
             self.lbl_output.setText(self.outname)
         else:
             self.outname = None
             self.lbl_output.setText('')
+
+    def set_behavior_special_analysis(self):
+        if self.graph.num_links < 1:
+            behavior = False
+        else:
+            behavior = True
+
+        self.do_path_file.setEnabled(behavior)
+
+        # This line of code turns off the features of select link analysis and link flow extraction while these
+        #features are still being developed
+        behavior = False
+
+        self.do_select_link.setEnabled(behavior)
+        self.do_extract_link_flows.setEnabled(behavior)
+
+        self.but_build_query.setEnabled(behavior * self.do_select_link.isChecked())
+        self.select_link_list.setEnabled(behavior * self.do_select_link.isChecked())
+
+        self.list_link_extraction.setEnabled(behavior * self.do_extract_link_flows.isChecked())
+        self.but_build_query_extract.setEnabled(behavior * self.do_extract_link_flows.isChecked())
 
     def add_fields_to_cboxes(self):
         l = get_vector_layer_by_name(self.network_layer.currentText())
@@ -219,7 +339,6 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         else:
             self.matrix_viewer.clearSpans()
 
-
     def job_finished_from_thread(self, success):
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
@@ -260,13 +379,36 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         if self.outname is None:
             self.error = 'Parameters for output missing'
 
-        if self.do_path_file.isChecked() and self.path_file_output_name is None:
+        if self.do_path_file.isChecked() and self.path_file.output_name is None:
             self.error = 'No output file name for the path file selected'
 
         if self.error is not None:
             return False
         else:
             return True
+
+    def load_assignment_queries(self):
+        # First we load the assignment queries
+        query_labels=[]
+        query_elements = []
+        query_types=[]
+        if self.tot_crit_link_queries:
+            for i in range(self.tot_crit_link_queries):
+                links = eval(self.select_link_list.item(i, 0).text())
+                query_type = self.select_link_list.item(i, 1).text()
+                query_name = self.select_link_list.item(i, 2).text()
+
+                for l in links:
+                    d = directions_dictionary[l[1]]
+                    lk = self.graph.ids[(self.graph.graph['link_id'] == int(l[0])) & (self.graph.graph['direction'] == d)]
+
+                query_labels.append(query_name)
+                query_elements.append(lk)
+                query_types(query_type)
+
+        self.critical_queries = {'labels': query_labels,
+                                 'elements': query_elements,
+                                 ' type': query_types}
 
     def progress_range_from_thread(self, val):
         self.progressbar0.setRange(0, val)
@@ -282,17 +424,41 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
         # Save link flows to disk
         self.results.save_loads_to_disk(self.outname)
 
+        # Path file
         if self.do_path_file.isChecked():
             if self.method['algorithm'] == 'AoN':
-                # del(self.results.path_file['results'])
-                # self.results.path_file = None
+                del(self.results.path_file['results'])
+                self.results.path_file = None
 
-                shutil.move(self.temp_path_file + '.aep', self.path_file_output_name)
-                shutil.move(self.temp_path_file + '.aed', self.path_file_output_name[:-3] + 'aed')
+                shutil.move(self.path_file.temp_file + '.aep', self.path_file.output_name)
+                shutil.move(self.path_file.temp_file + '.aed', self.path_file.output_name[:-3] + 'aed')
 
+        # select link analysis
+        if self.do_path_file.isChecked():
+            if self.method['algorithm'] == 'AoN':
+                del(self.results.critical_links['results'])
+                self.results.critical_links = None
+
+                shutil.move(self.critical_output.temp_file + '.aep', self.critical_output.output_name)
+                shutil.move(self.critical_output.temp_file + '.aed', self.critical_output.output_name[:-3] + 'aed')
+
+        if self.do_select_link.isChecked():
+            if self.method['algorithm'] == 'AoN':
+                del(self.results.critical_links['results'])
+                self.results.critical_links = None
+
+                shutil.move(self.critical_output.temp_file + '.aep', self.critical_output.output_name)
+                shutil.move(self.critical_output.temp_file + '.aed', self.critical_output.output_name[:-3] + 'aed')
+
+        if self.do_extract_link_flows.isChecked():
+            if self.method['algorithm'] == 'AoN':
+                del(self.results.link_extraction['results'])
+                self.results.link_extraction = None
+
+                shutil.move(self.link_extract.temp_file + '.aep', self.link_extract.output_name)
+                shutil.move(self.link_extract.temp_file + '.aed', self.link_extract.output_name[:-3] + 'aed')
 
         self.exit_procedure()
-        #+ '.aep'
 
     def exit_procedure(self):
         self.close()
@@ -300,6 +466,4 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
             dlg2.exec_()
-
-
 

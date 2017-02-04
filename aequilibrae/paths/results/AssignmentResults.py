@@ -16,21 +16,23 @@ class AssignmentResults:
         @type graph: Set of numpy arrays to store Computation results
         self.critical={required:{"links":[lnk_id1, lnk_id2, ..., lnk_idn], "path file": False}, results:{}}
         """
-        self.link_loads = None   # The actual results for assignment
-        self.predecessors = None  # The predecessors for each node in the graph
-        self.connectors = None  # The previous link for each node in the tree
-        self.skims = None  # The array of skims
-        self.no_path = None  # The list os paths
-        self.temporary_skims = None
-        self.num_skims = None  # number of skims that will be computed. Depends on the setting of the graph provided
+        self.link_loads = None       # The actual results for assignment
+        self.predecessors = None     # The predecessors for each node in the graph
+        self.connectors = None       # The previous link for each node in the tree
+        self.reached_first = None    # Keeps the order in which the nodes were reached for the cascading network loading
+        self.skims = None            # The array of skims
+        self.no_path = None          # The list os paths
+        self.temporary_skims = None  # holds the skims for all nodes in the network (during path finding)
+        self.num_skims = None        # number of skims that will be computed. Depends on the setting of the graph provided
         self.cores = mp.cpu_count()
 
-        self.critical_queries = {}  # Queries are a dictionary
-        self.critical = None
+        self.critical_links = {'save': False,
+                               'queries': {},  # Queries are a dictionary
+                               'results': False}
 
         self.link_extraction = {"save": False,
-                          "links": None,
-                          "output": None}
+                                'queries': {},  # Queries are a dictionary
+                                "output": None}
 
         self.path_file = {"save": False,
                           "results": None}
@@ -45,6 +47,7 @@ class AssignmentResults:
 
         # We set the critical analysis, link extraction and path file saving to False
         self.setSavePathFile(False)
+        self.setCriticalLinks(False)
 
     # In case we want to do by hand, we can prepare each method individually
     def prepare(self, graph):
@@ -69,9 +72,10 @@ class AssignmentResults:
             print 'Exception: Assignment results object was not yet prepared/initialized'
 
     def __redim(self):
-        self.link_loads = np.zeros((self.links, self.cores), np.float64)
+        self.link_loads = np.zeros((self.links, self.cores*2), np.float64)
         self.predecessors = np.zeros((self.nodes, self.cores), dtype=np.int32)
         self.connectors = np.zeros((self.nodes, self.cores), dtype=np.int32)
+        self.reached_first = np.zeros((self.nodes, self.cores), dtype=np.int32)
 
         self.skims = np.zeros((self.zones, self.zones, self.num_skims), np.float64)
         self.no_path = np.zeros((self.zones, self.zones, self.cores), dtype=np.int32)
@@ -91,8 +95,36 @@ class AssignmentResults:
         else:
             raise ValueError("Number of cores needs to be an integer")
 
+    def setCriticalLinks(self, save=False, queries=None, crit_res_result=None):
+        a = np.zeros((max(1,self.zones), 2, 2), dtype=np.float64)
+        if save:
+            if crit_res_result is None:
+                warnings.warn("Critical Link analysis not set properly. Need to specify output file too")
+            else:
+                if crit_res_result[-3:].lower() != 'aes':
+                    dictio_name = crit_res_result + '.aed'
+                    crit_res_result += '.aes'
+                else:
+                    dictio_name = crit_res_result[:-3] + 'aed'
+
+                if self.nodes > 0 and self.zones > 0:
+                    if ['elements', 'labels', 'type'] in queries.keys():
+                        if len(queries['labels']) == len(queries['elements']) == len(queries['type']):
+                            num_queries = len(queries['labels'])
+                            a = np.memmap(crit_res_result, dtype=np.float64, mode='w+', shape=(self.zones,self.zones, num_queries))
+                            saveDataFileDictionary(self.__graph_id__,'critical link analysis', [int(x) for x in a.shape[:]], dictio_name)
+                        else:
+                            raise ValueError("Queries are inconsistent. 'Labels', 'elements' and 'type' need to have same dimensions")
+                    else:
+                        raise ValueError("Queries are inconsistent. It needs to contain the following elements: 'Labels', 'elements' and 'type'")
+
+        self.critical_links = {'save': save,
+                               'queries': queries,
+                               'results': a
+                               }
+
     def setSavePathFile(self, save=False, path_result=None):
-        a = self.path_file = np.zeros((max(1,self.zones), 1, 2), dtype=np.int32)
+        a = np.zeros((max(1,self.zones), 1, 2), dtype=np.int32)
         if save:
             if path_result is None:
                 warnings.warn("Path file not set properly. Need to specify output file too")
@@ -105,7 +137,7 @@ class AssignmentResults:
 
                 if self.nodes > 0 and self.zones > 0:
                     a = np.memmap(path_result, dtype=np.int32, mode='w+', shape=(self.zones,self.nodes, 2))
-                    saveDataFileDictionary(self.__graph_id__,'path file', list(a.shape[:]), dictio_name)
+                    saveDataFileDictionary(self.__graph_id__,'path file', [int(x) for x in a.shape[:]], dictio_name)
 
         self.path_file = {'save': save,
                           'results': a

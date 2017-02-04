@@ -19,6 +19,7 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
+import qgis
 from qgis.core import QgsMapLayerRegistry
 import math
 import os
@@ -29,6 +30,20 @@ import tempfile
 def main():
     pass
 
+directions_dictionary = {'AB': 1,
+                         'BA': -1,
+                         1: 'AB',
+                         -1: 'BA'
+                        }
+
+
+def user_message(message, level):
+    if level == "WARNING":
+        level = 1
+    if level == "ERROR":
+        level = 3
+
+    qgis.utils.iface.messageBar().pushMessage(message, '', level=level)
 
 # Just a shorthand function to return the current standard path
 def standard_path():

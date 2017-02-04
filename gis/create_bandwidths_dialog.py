@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-24
- Updated:    2016-12-07
+ Updated:    2016-12-21
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -92,17 +92,21 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.rdo_color.toggled.connect(self.color_origins)
         self.rdo_ramp.toggled.connect(self.color_origins)
         self.but_run.clicked.connect(self.add_bands_to_map)
+        self.but_run.setEnabled(False)
+
         self.but_load_ramp.clicked.connect(self.load_ramp_action)
         self.add_fields_to_cboxes()
         self.random_rgb()
         self.sizevaluechange()
         self.spacevaluechange()
         self.set_initial_value_if_available()
+        self.but_load_ramp.setEnabled(False)
 
     def color_origins(self):
         self.mColorButton.setVisible(self.rdo_color.isChecked())
         self.but_load_ramp.setVisible(self.rdo_ramp.isChecked())
         self.txt_ramp.setVisible(self.rdo_ramp.isChecked())
+        # self.but_load_ramp.setEnabled(self.rdo_ramp.isChecked())
 
     def choose_a_field(self, modified):
         i, j = 'AB', 'BA'
@@ -150,6 +154,10 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
 
     def add_fields_to_cboxes(self):
         self.layer = get_vector_layer_by_name(self.mMapLayerComboBox.currentText())
+        if self.layer is not None:
+            self.but_load_ramp.setEnabled(True)
+        else:
+            self.but_load_ramp.setEnabled(False)
         self.ab_FieldComboBox.setLayer(self.layer)
         self.ba_FieldComboBox.setLayer(self.layer)
 
@@ -199,6 +207,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
 
             # incrementing and moving on
             self.tot_bands += 1
+            self.but_run.setEnabled(True)
             self.random_rgb()
 
     def click_button_inside_the_list(self):
@@ -255,6 +264,9 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         elif column == 2:
             self.bands_list.removeRow(row)
             self.tot_bands -= 1
+
+            if self.tot_bands == 0:
+                self.but_run.setEnabled(False)
 
     def random_rgb(self):
         rgb = []

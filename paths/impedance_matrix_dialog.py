@@ -27,11 +27,10 @@ from PyQt4.QtCore import QObject, SIGNAL
 import sys, os
 import numpy as np
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 from impedance_matrix_procedures import ComputeDistMatrix
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import PathResults
+from get_output_file_name import GetOutputFileName
 
 from auxiliary_functions import *
 from global_parameters import *
@@ -79,12 +78,9 @@ class ImpedanceMatrixDialog(QtGui.QDialog, Ui_Impedance_Matrix):
         self.progress_label.setText('')
 
     def loaded_new_graph_from_file(self):
-        file_types = "AequilibraE graph(*.aeg)"
-        if len(self.graph_file_name.text()) > 0:
-            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.graph_file_name.text(), file_types)
-        else:
-            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.path, file_types)
+        file_types = ["AequilibraE graph(*.aeg)"]
 
+        new_name, file_type = GetOutputFileName(self, 'Graph file', file_types, ".aeg", self.path)
         self.cb_minimizing.clear()
         self.cb_skims.clear()
         self.all_centroids.setText('')

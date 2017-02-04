@@ -317,7 +317,7 @@
     <attribute name="title">
      <string>Critical analysis</string>
     </attribute>
-    <widget class="QTableWidget" name="path_list">
+    <widget class="QTableWidget" name="select_link_list">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -349,22 +349,22 @@
      </attribute>
      <column>
       <property name="text">
-       <string>Query Type</string>
+       <string>Links</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Query ID</string>
+       <string>Type</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Link IDs</string>
+       <string>Query name</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Link Directions</string>
+       <string>Del</string>
       </property>
      </column>
     </widget>
@@ -384,21 +384,37 @@
       <string>Select link analysis</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="but_build_query">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>540</x>
+       <y>11</y>
+       <width>81</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Build Query</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_5">
     <attribute name="title">
      <string>Link flow extraction</string>
     </attribute>
-    <widget class="QTableWidget" name="path_list_2">
+    <widget class="QTableWidget" name="list_link_extraction">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
-       <width>281</width>
-       <height>251</height>
+       <y>50</y>
+       <width>611</width>
+       <height>291</height>
       </rect>
      </property>
      <property name="accessibleName">
@@ -414,36 +430,62 @@
       <number>0</number>
      </property>
      <property name="columnCount">
-      <number>2</number>
+      <number>4</number>
      </property>
      <attribute name="verticalHeaderDefaultSectionSize">
       <number>27</number>
      </attribute>
      <column>
       <property name="text">
-       <string>Link ID</string>
+       <string>Links</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Direction</string>
+       <string>Type</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Query name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Del</string>
       </property>
      </column>
     </widget>
-    <widget class="QCheckBox" name="do_select_link_2">
+    <widget class="QCheckBox" name="do_extract_link_flows">
      <property name="enabled">
       <bool>false</bool>
      </property>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>15</y>
        <width>191</width>
        <height>22</height>
       </rect>
      </property>
      <property name="text">
       <string>Perform link flow extraction</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="but_build_query_extract">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>540</x>
+       <y>11</y>
+       <width>81</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Build Query</string>
      </property>
     </widget>
    </widget>
@@ -705,8 +747,8 @@
      <widget class="QCheckBox" name="do_group_outputs">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>0</y>
+        <x>387</x>
+        <y>8</y>
         <width>231</width>
         <height>22</height>
        </rect>

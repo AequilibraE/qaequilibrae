@@ -144,12 +144,12 @@ class LoadColorRampSelector(QDialog, Ui_BandwidthColorRamps):
         if action:
             self.resize(589, 238)
             self.cbb_ab_field.clear()
-            for field in self.layer.dataProvider().fields().toList():
+            for field in self.layer.pendingFields().toList():
                 self.cbb_ab_field.addItem(field.name())
         else:
             self.resize(341, 238)
             self.cbb_ab_field.clear()
-            fields = self.layer.dataProvider().fields().toList()
+            fields = self.layer.pendingFields().toList()
             fields = [x.name() for x in fields]
             fields = [x.lower() for x in fields]
             for field in fields:

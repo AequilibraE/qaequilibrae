@@ -29,16 +29,12 @@ import os
 from functools import partial
 import numpy as np
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) + "//forms//")
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 from auxiliary_functions import *
 from load_matrix_dialog import LoadMatrixDialog
 from report_dialog import ReportDialog
 
 from calibrate_gravity_procedure import CalibrateGravityProcedure
 from ui_gravity_calibration import Ui_gravity_calibration
-from load_distribution_model import LoadDistributionModelDialog
 import yaml
 
 
@@ -104,15 +100,17 @@ class CalibrateGravityDialog(QDialog, Ui_gravity_calibration):
     def browse_outfile(self):
         file_types = "Model specification(*.yaml)"
         new_name = QFileDialog.getSaveFileName(None, 'Model file', self.path, file_types)
-        if new_name is None:
-            self.lbl_output.setPixmap(self.error_pic)
-            self.result_file = None
-        else:
+
+        if new_name:
             if new_name[-4:].upper() != 'YAML':
                 new_name = new_name + '.yaml'
             self.result_file = new_name
             self.report_output.setText(new_name)
             self.lbl_output.setPixmap(self.loaded_pic)
+        else:
+            self.lbl_output.setPixmap(self.error_pic)
+            self.result_file = None
+
 
     def run_thread(self):
         # QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)

@@ -125,6 +125,7 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
                 self.radio_friction.setChecked(True)
 
     def manual_model_input(self):
+        func = False
         if self.radio_expo.isChecked():
             func = 'EXPO'
 
@@ -137,12 +138,15 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
         if self.radio_friction.isChecked():
             func = 'FRICTION'
 
-        dlg2 = LoadDistributionModelDialog(self.iface, func, {})
-        dlg2.show()
-        dlg2.exec_()
+        if func:
+            dlg2 = LoadDistributionModelDialog(self.iface, func, {})
+            dlg2.show()
+            dlg2.exec_()
 
-        self.model = dlg2.model
-        self.lbl_par.setPixmap(self.loaded_pic)
+            self.model = dlg2.model
+            self.lbl_par.setPixmap(self.loaded_pic)
+        else:
+            user_message('Please choose the model type before loading parameters from file', 'WARNING')
 
     def browse_outfile(self):
         file_types = "Comma-separated files(*.csv);;Numpy Binnary Array(*.npy)"

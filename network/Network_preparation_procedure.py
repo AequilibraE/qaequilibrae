@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/09/2016
+ Updated:    21/12/2016
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -45,19 +45,6 @@ class FindsNodes(WorkerThread):
         node_ids = self.node_ids
         layer = get_vector_layer_by_name(line_layer)
         feat_count = layer.featureCount()
-        self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), feat_count)
-
-        P = 0
-        for feature in layer.getFeatures():
-            P += 1
-            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Detecting if layer is Singleparts: " +
-                      str(P) + "/" + str(feat_count))
-
-            geom = feature.geometry()
-            if geom.isMultipart():
-               self.error = 'Layer is Multipart. Please go to "Vector-Geometry Tools-Multipart to Singleparts."'
-               return None
 
         self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), 3)
         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 0)
@@ -66,13 +53,8 @@ class FindsNodes(WorkerThread):
         P = 0
         # We create the new line layer and load it in memory
         epsg_code = int(layer.crs().authid().split(":")[1])
-        new_line_layer = QgsVectorLayer(layer.source(), layer.name(), layer.providerType())
-        QgsVectorFileWriter.writeAsVectorFormat(new_line_layer, self.new_line_layer,
-                                                str(epsg_code), None, "ESRI Shapefile")
-
+        new_line_layer = self.duplicate_layer(layer, 'Linestring', self.new_line_layer)
         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 1)
-
-        new_line_layer = QgsVectorLayer(self.new_line_layer, 'noded_layer', 'ogr')
 
         # Add the A_Node and B_node fields to the layer
         field_names = [x.name().upper() for x in new_line_layer.dataProvider().fields().toList()]
@@ -86,7 +68,7 @@ class FindsNodes(WorkerThread):
         ids = []
 
         print node_ids
-        if node_ids is not False:
+        if node_ids:
             nodes = get_vector_layer_by_name(node_layer)
             index = QgsSpatialIndex()
             idx = nodes.fieldNameIndex(node_ids)
@@ -141,9 +123,11 @@ class FindsNodes(WorkerThread):
                         return None
 
                 new_line_layer.commitChanges()
+                self.new_line_layer = new_line_layer
         else:
+            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), feat_count)
             #  Create node layer
-            new_node_layer = QgsVectorLayer('Point?crs=epsg:' + str(epsg_code) + '&field=ID:integer', "temp", "memory")
+            new_node_layer = QgsVectorLayer('Point?crs=epsg:' + str(epsg_code) + '&field=ID:integer', self.new_node_layer, "memory")
             DTYPE = [('LAT', np.float64), ('LONG', np.float64), ('LINK ID', np.int64),
                      ('POSITION', np.int64), ('NODE ID', np.int64)]
 
@@ -209,7 +193,7 @@ class FindsNodes(WorkerThread):
 
             # And we write the node layer as well
             node_id0 = -1
-            P=0
+            P = 0
             self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), incremental_ids)
             cfeatures = []
             for i in all_nodes:
@@ -263,12 +247,21 @@ class FindsNodes(WorkerThread):
             self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Writing node IDs to links: " +
                                                               str(P)+"/" + str(feat_count * 2))
 
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "SAVING OUTPUTS")
-
-            QgsVectorFileWriter.writeAsVectorFormat(new_node_layer, self.new_node_layer,
-                                                    "utf-8", None, "ESRI Shapefile")
-
             new_line_layer.commitChanges()
-            QgsMapLayerRegistry.instance().addMapLayer(new_line_layer)
+            self.new_line_layer = new_line_layer
+
+            self.new_node_layer = new_node_layer
 
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "DONE")
+
+    def duplicate_layer(self, original_layer, layer_type, layer_name):
+        epsg_code = int(original_layer.crs().authid().split(":")[1])
+        feats = [feat for feat in original_layer.getFeatures()]
+        duplicate_layer = QgsVectorLayer(layer_type + "?crs=epsg:" + str(epsg_code), layer_name, "memory")
+        new_layer_data = duplicate_layer.dataProvider()
+        attr = original_layer.dataProvider().fields().toList()
+        new_layer_data.addAttributes(attr)
+        duplicate_layer.updateFields()
+        new_layer_data.addFeatures(feats)
+        del feats
+        return duplicate_layer

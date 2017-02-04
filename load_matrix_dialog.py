@@ -31,9 +31,6 @@ import os
 from auxiliary_functions import *
 from global_parameters import *
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
-
 from load_matrix_class import LoadMatrix
 from ui_matrix_loader import *
 
