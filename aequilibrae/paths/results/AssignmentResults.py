@@ -1,6 +1,3 @@
-# cimport numpy as np
-# cimport cython
-# include 'parameters.pxi'
 import multiprocessing as mp
 import numpy as np
 import warnings
@@ -17,12 +14,8 @@ class AssignmentResults:
         self.critical={required:{"links":[lnk_id1, lnk_id2, ..., lnk_idn], "path file": False}, results:{}}
         """
         self.link_loads = None       # The actual results for assignment
-        self.predecessors = None     # The predecessors for each node in the graph
-        self.connectors = None       # The previous link for each node in the tree
-        self.reached_first = None    # Keeps the order in which the nodes were reached for the cascading network loading
         self.skims = None            # The array of skims
         self.no_path = None          # The list os paths
-        self.temporary_skims = None  # holds the skims for all nodes in the network (during path finding)
         self.num_skims = None        # number of skims that will be computed. Depends on the setting of the graph provided
         self.cores = mp.cpu_count()
 
@@ -46,8 +39,6 @@ class AssignmentResults:
         self.direcs = None
 
         # We set the critical analysis, link extraction and path file saving to False
-        self.setSavePathFile(False)
-        self.setCriticalLinks(False)
 
     # In case we want to do by hand, we can prepare each method individually
     def prepare(self, graph):
@@ -62,24 +53,20 @@ class AssignmentResults:
         self.__redim()
         self.__graph_id__ = graph.__id__
 
+        self.setSavePathFile(False)
+        self.setCriticalLinks(False)
+
     def reset(self):
-        if self.predecessors is not None:
-            self.predecessors.fill(-1)
-            self.connectors.fill(-1)
+        if self.link_loads is not None:
             self.skims.fill(0)
             self.no_path.fill(-1)
         else:
             print 'Exception: Assignment results object was not yet prepared/initialized'
 
     def __redim(self):
-        self.link_loads = np.zeros((self.links, self.cores*2), np.float64)
-        self.predecessors = np.zeros((self.nodes, self.cores), dtype=np.int32)
-        self.connectors = np.zeros((self.nodes, self.cores), dtype=np.int32)
-        self.reached_first = np.zeros((self.nodes, self.cores), dtype=np.int32)
-
+        self.link_loads = np.zeros(self.links, np.float64)
         self.skims = np.zeros((self.zones, self.zones, self.num_skims), np.float64)
-        self.no_path = np.zeros((self.zones, self.zones, self.cores), dtype=np.int32)
-        self.temporary_skims = np.zeros((self.nodes, self.num_skims, self.cores), np.float64)
+        self.no_path = np.zeros((self.zones, self.zones), dtype=np.int32)
 
         self.reset()
 
@@ -88,14 +75,14 @@ class AssignmentResults:
             if cores > 0:
                 if self.cores != cores:
                     self.cores = cores
-                    if self.predecessors is not None:
+                    if self.link_loads is not None:
                         self.__redim()
             else:
                 raise ValueError("Number of cores needs to be equal or bigger than one")
         else:
             raise ValueError("Number of cores needs to be an integer")
 
-    def setCriticalLinks(self, save=False, queries=None, crit_res_result=None):
+    def setCriticalLinks(self, save=False, queries={}, crit_res_result=None):
         a = np.zeros((max(1,self.zones), 2, 2), dtype=np.float64)
         if save:
             if crit_res_result is None:
@@ -142,9 +129,6 @@ class AssignmentResults:
         self.path_file = {'save': save,
                           'results': a
                           }
-
-    def results(self):
-        return np.sum(self.link_loads, axis=1)
 
     def save_loads_to_disk(self, output_file, file_type=None):
 

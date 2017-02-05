@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    15/09/2013
- Updated:    12/25/2016
+ Updated:    05/Feb/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -23,21 +23,21 @@ Original Algorithm for Shortest path (Dijkstra with a Fibonacci heap) was writte
 
 cimport numpy as np
 cimport cython
-from cython.parallel cimport parallel, prange, threadid
 import multiprocessing as M
 import thread
 from multiprocessing.dummy import Pool as ThreadPool
 
-VERSION = '0.3.3'
+VERSION = '0.3.4'
 include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
-def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
+def one_to_all(origin, demand, graph, result, aux_result, curr_thread):
     cdef int nodes, O, i
-    cdef int critical_queries, link_extract_queries, query_type
+    cdef int critical_queries = 0
+    cdef int link_extract_queries, query_type
     #We transform the python variables in Cython variables
     O = origin
     graph_fs = graph.fs
@@ -45,8 +45,8 @@ def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
     if result.__graph_id__ != graph.__id__:
         return "Results object not prepared. Use --> results.prepare(graph)"
 
-    if O >= graph_fs.shape[0]:
-        return "Node " + str(O) + " is outside the range of nodes in the graph"
+    if O >= result.zones:
+        return "Node " + str(O) + " is outside the range of zones in the graph"
 
     if graph_fs[O] == graph_fs[O+1]:
         return "Node " + str(O) + " does not exist in the graph"
@@ -72,16 +72,17 @@ def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
     cdef int [:] graph_fs_view = graph.fs
     cdef int [:] b_nodes_view = new_b_nodes
     cdef double [:] g_view = graph.cost
-    cdef int [:] idsgraph_view = graph.ids
+    cdef int [:] ids_graph_view = graph.ids
     cdef double [:, :] graph_skim_view = graph.skims
-
-    cdef int [:] predecessors_view = result.predecessors[:, curr_thread]
-    cdef int [:] conn_view = result.connectors[:, curr_thread]
-    cdef double [:] Link_Loads_view = result.link_loads[:, curr_thread]
-    cdef int [:] no_path_view = result.no_path[O, :, curr_thread]
-
-    cdef double [:, :] skim_matrix_view = result.temporary_skims[:, :, curr_thread]
     cdef double [:, :] final_skim_matrices_view = result.skims[O, :, :]
+    cdef int [:] no_path_view = result.no_path[O, :]
+
+    cdef int [:] predecessors_view = aux_result.predecessors[:, curr_thread]
+    cdef double [:, :] skim_matrix_view = aux_result.temporary_skims[:, :, curr_thread]
+    cdef int [:] reached_first_view = aux_result.reached_first[:, curr_thread]
+    cdef int [:] conn_view = aux_result.connectors[:, curr_thread]
+    cdef double [:] link_loads_view = aux_result.temp_link_loads[:, curr_thread]
+    cdef double [:] node_load_view = aux_result.temp_node_loads[:, curr_thread]
 
     # path file variables
     cdef int [:] pred_view = result.path_file['results'][O,:,0]
@@ -90,38 +91,48 @@ def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
     # select link variables
     cdef double [:, :] sel_link_view = result.critical_links['results'][O,:,:]
     cdef int [:] aux_link_flows_view = aux_link_flows
-        #Now we do all procedures with NO GIL
-    if no_gil:
-        with nogil:
-            a=assigone(O,
-                       nodes,
-                       demand_view,
-                       g_view,
-                       b_nodes_view,
-                       graph_fs_view,
-                       idsgraph_view,
-                       graph_skim_view,
-                       Link_Loads_view,
-                       no_path_view,
-                       skim_matrix_view,
-                       predecessors_view,
-                       conn_view,
-                       final_skim_matrices_view)
-    else:
-        a=assigone(O,
-                   nodes,
-                   demand_view,
-                   g_view,
-                   b_nodes_view,
-                   graph_fs_view,
-                   idsgraph_view,
-                   graph_skim_view,
-                   Link_Loads_view,
-                   no_path_view,
-                   skim_matrix_view,
-                   predecessors_view,
-                   conn_view,
-                   final_skim_matrices_view)
+
+    #Now we do all procedures with NO GIL
+    with nogil:
+        clean_arrays(O,
+                     graph_skim_view,
+                     skim_matrix_view,
+                     predecessors_view,
+                     conn_view,
+                     reached_first_view,
+                     node_load_view)
+
+        w = path_finding(O,
+                         g_view,
+                         b_nodes_view,
+                         graph_fs_view,
+                         predecessors_view,
+                         ids_graph_view,
+                         conn_view,
+                         graph_skim_view,
+                         skim_matrix_view,
+                         reached_first_view)
+
+        network_loading(O,
+                        nodes,
+                        demand_view,
+                        predecessors_view,
+                        conn_view,
+                        link_loads_view,
+                        no_path_view,
+                        reached_first_view,
+                        node_load_view,
+                        w)
+
+        _copy_skims(skim_matrix_view,
+                    final_skim_matrices_view)
+
+        '''_select_link(links
+
+
+        '''
+
+
 
     if result.path_file['save']:
         put_path_file_on_disk(pred_view,
@@ -143,6 +154,82 @@ def one_to_all(origin, demand, graph, result, curr_thread, no_gil=True):
                                      sel_link_view,
                                      query_type)
     return origin
+
+@cython.wraparound(False)
+@cython.embedsignature(True)
+@cython.boundscheck(False)
+cpdef void clean_arrays(int origin,
+                       double[:,:] graph_skim,
+                       double[:,:] skim_matrix,
+                       int [:] predecessors,
+                       int [:] conn,
+                       int [:] reached_first,
+                       double [:] node_load) nogil:
+
+    cdef int links, i, j, w
+    cdef int skims = graph_skim.shape[1]
+    cdef int N = predecessors.shape[0] #Nodes in our graph (The sparse graph has an overhead of one on the shape)
+
+    for i in range(N):
+        predecessors[i] = -1
+        conn[i] = -1
+        reached_first[i] = -1
+        node_load[i] = 0
+        for j in range(skims):
+            skim_matrix[i,j] = INFINITE
+
+    for j in range(skims):
+        skim_matrix[origin,j] = 0
+
+@cython.wraparound(False)
+@cython.embedsignature(True)
+@cython.boundscheck(False) # turn of bounds-checking for entire function
+cpdef void network_loading(int origin,
+                      int nodes,
+                      double[:] demand,
+                      int [:] pred,
+                      int [:] conn,
+                      double[:] link_loads,
+                      int [:] no_path,
+                      int [:] reached_first,
+                      double [:] node_load,
+                      int found) nogil:
+
+    cdef unsigned int i, node, predecessor, connector
+    cdef unsigned int zones = demand.shape[0]
+
+    # Loads the demand to the centroids
+    for i in range(zones):
+        node_load[i] = demand[i]
+
+    #Recursevely cascades to the origin
+    for i in xrange(found, 0, -1):
+        node = reached_first[i]
+
+        # captures how we got to that node
+        predecessor = pred[node]
+        connector = conn[node]
+
+        # loads the flow to the link
+        link_loads[connector] += node_load[node]
+
+        # Cascades the load from the node to their predecessor
+        node_load[predecessor] =+ node_load[node]
+
+@cython.wraparound(False)
+@cython.embedsignature(True)
+@cython.boundscheck(False)
+cdef void _copy_skims(double[:,:] skim_matrix,  #Skim matrix computed from one origin to all nodes
+                      double[:,:] final_skim_matrix) nogil:  #Skim matrix computed for one origin to all other centroids only
+
+    cdef int i, j
+    cdef int N=final_skim_matrix.shape[0]
+    cdef int skims=final_skim_matrix.shape[1]
+
+    for i in range(N):
+        for j in range(skims):
+            final_skim_matrix[i,j]=skim_matrix[i,j]
+
 
 cdef return_an_int_view(input):
     cdef int [:] critical_links_view = input
@@ -194,23 +281,6 @@ cpdef void put_path_file_on_disk(int [:] pred,
         pred[i] = predecessors[i]
         conn[i] = connectors[i]
 
-@cython.wraparound(False)
-@cython.embedsignature(True)
-@cython.boundscheck(False)
-def reblocks_matrix(matrix, hashtable, new_max):
-    cdef int i, j
-    cdef int k = matrix.shape[0]
-    cdef int l = matrix.shape[1]
-
-    new_mat = np.zeros((int(new_max), int(new_max)), dtype = np.float64)
-
-    for i in range(k):
-        for j in range(l):
-            new_mat[hashtable[i], hashtable[j]] = matrix[i,j]
-    return new_mat
-
-
-
 cdef blocking_centroid_flows(int O, graph):
     cdef int i, centroids
 
@@ -234,57 +304,53 @@ cdef blocking_centroid_flows(int O, graph):
 
     return new_b_nodes
 
-@cython.wraparound(False)
-@cython.embedsignature(True)
-@cython.boundscheck(False)
-cpdef int skims_one(int origin,
-                   int block_centroid_flow,
-                   double[:] graph_costs,
-                   int [:] csr_indices,
-                   int [:] csr_indptr,
-                   int [:] ids_graph,
-                   double[:,:] graph_skim,
-                   int [:] no_path,
-                   double[:,:] skim_matrix,
-                   int [:] predecessors,
-                   int [:] conn,
-                   double[:,:] final_skim_matrix) nogil:
-
-    cdef ITYPE_t links, i, j, w
-
-    cdef int skims = graph_skim.shape[1]
-    cdef int zones = final_skim_matrix.shape[0]
-    cdef int N = graph_costs.shape[0] #Nodes in our graph (The sparse graph has an overhead of one on the shape)
-
-    #------------------------------
-    # initializes skim_matrix for output
-    # initializes predecessors  and link connectors for output
-    for i in range(N):
-        predecessors[i]=-1
-        conn[i]=-1
-        for j in range(skims):
-            skim_matrix[i,j]=INFINITE
-
-    for j in range(skims):
-        skim_matrix[origin,j]=0
-
-    #------------------------------
-    #Runs the shortest path algorithm to capture the SPath
-    w = path_finding(origin,
-                           graph_costs,
-                           csr_indices,
-                           csr_indptr,
-                           predecessors,
-                           ids_graph,
-                           conn,
-                           graph_skim,
-                           skim_matrix)
-    #------------------------------
-    #----------------------------------------------------------------------------------------------
-
-
-
-    return 1
+# @cython.wraparound(False)
+# @cython.embedsignature(True)
+# @cython.boundscheck(False)
+# cpdef void skims_one(int origin,
+#                    int block_centroid_flow,
+#                    double[:] graph_costs,
+#                    int [:] csr_indices,
+#                    int [:] graph_fs,
+#                    int [:] ids_graph,
+#                    double[:,:] graph_skim,
+#                    int [:] no_path,
+#                    double[:,:] skim_matrix,
+#                    int [:] predecessors,
+#                    int [:] conn,
+#                    double[:,:] final_skim_matrix) nogil:
+#
+#     cdef ITYPE_t links, i, j, w
+#
+#     cdef int skims = graph_skim.shape[1]
+#     cdef int zones = final_skim_matrix.shape[0]
+#     cdef int N = graph_costs.shape[0] #Nodes in our graph (The sparse graph has an overhead of one on the shape)
+#
+#     #------------------------------
+#     # initializes skim_matrix for output
+#     # initializes predecessors  and link connectors for output
+#     for i in range(N):
+#         predecessors[i]=-1
+#         conn[i]=-1
+#         for j in range(skims):
+#             skim_matrix[i,j]=INFINITE
+#
+#     for j in range(skims):
+#         skim_matrix[origin,j]=0
+#
+#     #------------------------------
+#     #Runs the shortest path algorithm to capture the SPath
+#     w = path_finding(origin,
+#                            graph_costs,
+#                            csr_indices,
+#                            graph_fs,
+#                            predecessors,
+#                            ids_graph,
+#                            conn,
+#                            graph_skim,
+#                            skim_matrix)
+#     #------------------------------
+#     #----------------------------------------------------------------------------------------------
 
 
 
@@ -308,134 +374,12 @@ cdef int _copy_skims_check_path(double[:,:] skim_matrix,  #Skim matrix computed 
     return 1
 
 
-@cython.wraparound(False)
-@cython.embedsignature(True)
-@cython.boundscheck(False)
-cpdef int assigone(int origin,
-                   int nodes,
-                   double[:] demand,
-                   double[:] graph_costs,
-                   int [:] csr_indices,
-                   int [:] csr_indptr,
-                   int [:] ids_graph,
-                   double[:,:] graph_skim,
-                   double[:] Link_Loads,
-                   int [:] no_path,
-                   double[:,:] skim_matrix,
-                   int [:] predecessors,
-                   int [:] conn,
-                   double[:,:] final_skim_matrix) nogil:
-
-    cdef int links, i, j, w
-
-    cdef int skims = graph_skim.shape[1]
-    cdef int zones = demand.shape[0]
-    cdef int N = predecessors.shape[0] #Nodes in our graph (The sparse graph has an overhead of one on the shape)
-
-    # If the origin is outside the range of nodes
-    if origin >= N:
-        return 0
-
-    #------------------------------
-    # initializes skim_matrix for output
-    # initializes predecessors  and link connectors for output
-
-    for i in range(N):
-        predecessors[i] = -1
-        conn[i] = -1
-        for j in range(skims):
-            skim_matrix[i,j] = INFINITE
-
-    for j in range(skims):
-        skim_matrix[origin,j] = 0
-
-    #with gil:
-    #    #print 'starting dijkstra'
-    #------------------------------
-    #Runs the shortest path algorithm to capture the SPath
-    w = path_finding(origin,
-                       graph_costs,
-                       csr_indices,
-                       csr_indptr,
-                       predecessors,
-                       ids_graph,
-                       conn,
-                       graph_skim,
-                       skim_matrix)
-    #------------------------------
-    #----------------------------------------------------------------------------------------------
-    #performs the assignment itself
-    #with gil:
-    #    #print 'starting assign'
-
-    w = network_loading(origin,
-                  nodes,
-                  demand,
-                  predecessors,
-                  conn,
-                  Link_Loads,
-                  no_path)
-
-    w = _copy_skims(skim_matrix,
-                  final_skim_matrix)
-
-    '''_select_link(links
-
-
-    '''
-    return 1
-
-@cython.wraparound(False)
-@cython.embedsignature(True)
-@cython.boundscheck(False) # turn of bounds-checking for entire function
-cpdef int network_loading(int origin,
-                      int nodes,
-                      double[:] demand,
-                      int [:] pred,
-                      int [:] conn,
-                      double[:] Link_Loads,
-                      int [:] no_path) nogil:
-
-    cdef unsigned int t_origin
-    cdef ITYPE_t c, j, i, p,
-    cdef unsigned int dests = demand.shape[0]
-
-    for i in range(dests):
-        if demand[i] > 0:
-            p = pred[i]
-            if pred[i] < 0:
-                if i != origin:
-                    no_path[i] = -1
-            else:
-                j = i
-                while p >= 0:
-                    c = conn[j]
-                    Link_Loads[c] = Link_Loads[c] + demand[i]
-                    j = p
-                    p = pred[j]
-    return 1
-
-
-@cython.wraparound(False)
-@cython.embedsignature(True)
-@cython.boundscheck(False)
-cdef int _copy_skims(double[:,:] skim_matrix,  #Skim matrix computed from one origin to all nodes
-                      double[:,:] final_skim_matrix) nogil:  #Skim matrix computed for one origin to all other centroids only
-
-    cdef int i, j
-    cdef int N=final_skim_matrix.shape[0]
-    cdef int skims=final_skim_matrix.shape[1]
-
-    for i in range(N):
-        for j in range(skims):
-            final_skim_matrix[i,j]=skim_matrix[i,j]
-    return 1
 
 # ###########################################################################################################################
 #############################################################################################################################
 #Original Dijkstra implementation by Jake Vanderplas', taken from SciPy V0.11
 #The old Pyrex syntax for loops was replaced with Python syntax
-#Old Numpy Buffers were replaces with latest memmory views interface to allow for the release of the GIL
+#Old Numpy Buffers were replaces with latest memory views interface to allow for the release of the GIL
 # Path tracking arrays and skim arrays were also added to it
 #############################################################################################################################
 # ###########################################################################################################################
@@ -446,18 +390,20 @@ cdef int _copy_skims(double[:,:] skim_matrix,  #Skim matrix computed from one or
 cpdef int path_finding(int origin,
                              double[:] graph_costs,
                              int [:] csr_indices,
-                             int [:] csr_indptr,
+                             int [:] graph_fs,
                              int [:] pred,
                              int [:] ids,
                              int [:] connectors,
                              double[:,:] skim_costs,
-                             double[:,:] skim_matrix) nogil:
+                             double[:,:] skim_matrix,
+                             int [:] reached_first ) nogil:
 
     cdef unsigned int N = graph_costs.shape[0]
 
     cdef unsigned int skims = skim_costs.shape[1]
 
     cdef int i, k, j_source, j_current
+    cdef int found = 0
     cdef int j
     cdef double weight
 
@@ -482,10 +428,11 @@ cpdef int path_finding(int origin,
 
     while heap.min_node:
         v = remove_min(&heap)
+        reached_first[found] = v.index
+        found += 1
         v.state = 1
-        #with gil:
-            #print v.index, csr_indptr[v.index], csr_indptr[v.index + 1]
-        for j in xrange(csr_indptr[v.index],csr_indptr[v.index + 1]):
+
+        for j in xrange(graph_fs[v.index],graph_fs[v.index + 1]):
             j_current = csr_indices[j]
             current_node = &nodes[j_current]
 
@@ -514,7 +461,7 @@ cpdef int path_finding(int origin,
                         skim_matrix[j_current,k]=skim_matrix[v.index,k]+skim_costs[j,k]
         #v has now been scanned: add the distance to the results
     free(nodes)
-    return 1
+    return found -1
 
 ######################################################################
 # FibonacciNode structure

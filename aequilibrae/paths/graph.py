@@ -79,7 +79,7 @@ class Graph:
         self.network_ok = False
         self.type_loaded = False
 
-        self.__version__ = '0.3.3'
+        self.__version__ = '0.3.4'
 
         # Randomly generate a unique Graph ID randomly
         self.__id__ = uuid.uuid4().hex
