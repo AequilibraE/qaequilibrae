@@ -214,7 +214,7 @@ cpdef void network_loading(int origin,
         link_loads[connector] += node_load[node]
 
         # Cascades the load from the node to their predecessor
-        node_load[predecessor] =+ node_load[node]
+        node_load[predecessor] += node_load[node]
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
