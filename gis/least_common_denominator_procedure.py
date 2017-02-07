@@ -33,8 +33,6 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         self.tlayer = tlayer
         self.ffield = ffield
         self.tfield = tfield
-        self.unionf = None
-        self.uniont = None
         self.error = None
         self.result = None
         self.output_type = None
@@ -63,18 +61,10 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         # We create an spatial self.index to hold all the features of the layer that will receive the data
         # And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
         allfeatures = {feature.id(): feature for (feature) in self.to_layer.getFeatures()}
+        merged = allfeatures.copy()
         self.index = QgsSpatialIndex()
         for feature in allfeatures.values():
             self.index.insertFeature(feature)
-
-            # We merge all the TO geometries
-            geometry = feature.geometry()
-            if geometry is not None:
-                if self.uniont is None:
-                    self.uniont = geometry
-                    #self.uniont = self.get_multi_type(geometry)
-                else:
-                    self.uniont = self.uniont.combine(self.uniont)
 
         self.all_attr = {}
 
@@ -105,7 +95,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         # PROGRESS BAR
         self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.from_layer.dataProvider().featureCount())
 
-
+        debug_code(1)
         part_id = 1
         features = []
         for fc, feat in enumerate(self.from_layer.getFeatures()):
@@ -114,6 +104,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                 if self.transform is not None:
                     a = geom.transform(self.transform)
                 geometry, statf = self.find_geometry(geom)
+                uncovered, statf = self.find_geometry(geom)
 
                 intersecting = self.index.intersects(geometry.boundingBox())
                 # Find all intersecting parts
@@ -132,14 +123,20 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                                                percf,
                                                perct])
                         features.append(feature)
+
+                        # prepare the data for the non overlapping
+                        debug_code(2.1)
+                        uncovered = uncovered.difference(g)
+                        debug_code(2.2)
+                        merged[f].setGeometry(merged[f].geometry().difference(g))
+                        debug_code(2.3)
                         part_id += 1
 
                 #Find the part that does not intersect anything
-                g = geometry.difference(self.uniont)
-
-                if g.area() > 0:
+                debug_code(3)
+                if uncovered.area() > 0:
                     feature = QgsFeature()
-                    geo, stati = self.find_geometry(g)
+                    geo, stati = self.find_geometry(uncovered)
                     feature.setGeometry(geo)
                     perct = 0
                     percf = stati / statf
@@ -151,35 +148,25 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                     features.append(feature)
                     part_id += 1
 
-                # We merge the geometries to compute the tos that have no correspondence in from later
-                if self.unionf is None:
-                    #self.unionf = self.get_multi_type(geom)
-                    self.unionf = geom
-                else:
-                    self.unionf = self.unionf.combine(geom)
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), fc)
-
+        debug_code(4)
         # Find the features on TO that have no correspondence in FROM
-        for f, feature in allfeatures.iteritems():
+        for f, feature in merged.iteritems():
             geom = feature.geometry()
-            if geom is not None:
-                geometry, statt = self.find_geometry(geom)
-
-                # Find the part that does not intersect anything
-                g = geometry.difference(self.unionf)
-                if g.area() > 0:
-                    feature = QgsFeature()
-                    geo, stati = self.find_geometry(g)
-                    feature.setGeometry(geo)
-                    perct = stati / statt
-                    percf = 0
-                    feature.setAttributes([part_id,
-                                           '',
-                                           allfeatures[f].attributes()[fid],
-                                           percf,
-                                           perct])
-                    features.append(feature)
-                    part_id += 1
+            aux, statt = self.find_geometry(allfeatures[f].geometry())
+            if geom.area() > 0:
+                feature = QgsFeature()
+                geo, stati = self.find_geometry(geom)
+                feature.setGeometry(geo)
+                perct = stati / statt
+                percf = 0
+                feature.setAttributes([part_id,
+                                       '',
+                                       allfeatures[f].attributes()[fid],
+                                       percf,
+                                       perct])
+                features.append(feature)
+                part_id += 1
 
         if features:
             a = lcdpr.addFeatures(features)
