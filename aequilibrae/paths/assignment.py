@@ -34,9 +34,11 @@ import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
 
+from multi_threaded_aon import MultiThreadedAoN
 no_binaries = False
 try:
-    from AoN import one_to_all, reblocks_matrix, path_computation
+    from AoN import one_to_all
+    #reblocks_matrix, path_computation
 except:
     no_binaries = True
 
@@ -45,11 +47,12 @@ def main():
 
 
 def all_or_nothing(matrix, graph, results):
+    aux_res = MultiThreadedAoN()
+    aux_res.prepare(results)
 
     # catch errors
     if results.__graph_id__ is None:
         raise ValueError('The results object was not prepared. Use results.prepare(graph)')
-
     elif results.__graph_id__ != graph.__id__:
         raise ValueError('The results object was prepared for a different graph')
     else:
@@ -58,24 +61,23 @@ def all_or_nothing(matrix, graph, results):
         for O in range(results.zones):
             a = matrix[O, :]
             if np.sum(a) > 0:
-                pool.apply_async(func_assig_thread, args=(O, a, graph, results, all_threads))
+                # func_assig_thread(1, a, graph, results, aux_res, all_threads)
+                # break
+                pool.apply_async(func_assig_thread, args=(O, a, graph, results, aux_res, all_threads))
         pool.close()
         pool.join()
+    results.link_loads = np.sum(aux_res.temp_link_loads, axis=1)
 
 
-def func_assig_thread(O, a, g, res, all_threads):
+def func_assig_thread(O, a, g, res, aux_res, all_threads):
     if thread.get_ident() in all_threads:
         th = all_threads[thread.get_ident()]
     else:
         all_threads[thread.get_ident()] = all_threads['count']
         th = all_threads['count']
         all_threads['count'] += 1
+    one_to_all(O, a, g, res, aux_res, th)
 
-    one_to_all(O, a, g, res, th, True)
-
-
-def ota(O, a, g, res, th, b):
-    one_to_all(O, a, g, res, th, b)
 
 if __name__ == '__main__':
     main()

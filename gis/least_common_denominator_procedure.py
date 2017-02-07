@@ -34,10 +34,11 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         self.ffield = ffield
         self.tfield = tfield
         self.error = None
+        self.result = None
+        self.output_type = None
         self.poly_types = poly_types + multi_poly
         self.line_types = line_types + multi_line
         self.point_types = point_types + multi_point
-        self.result = None
 
     def doWork(self):
         flayer = self.flayer
@@ -60,9 +61,11 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         # We create an spatial self.index to hold all the features of the layer that will receive the data
         # And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
         allfeatures = {feature.id(): feature for (feature) in self.to_layer.getFeatures()}
+        merged = allfeatures.copy()
         self.index = QgsSpatialIndex()
         for feature in allfeatures.values():
             self.index.insertFeature(feature)
+
         self.all_attr = {}
 
         # We create the memory layer that will have the analysis result, which is the lowest common
@@ -80,6 +83,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             lcd_layer = QgsVectorLayer("MultiPoint?crs=epsg:" + str(epsg_code), "output", "memory")
             self.output_type = 'Point'
 
+
         lcdpr = lcd_layer.dataProvider()
         lcdpr.addAttributes([QgsField("Part_ID", QVariant.Int),
                              QgsField(ffield, self.from_layer.fields().field(idx).type()),
@@ -91,6 +95,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         # PROGRESS BAR
         self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.from_layer.dataProvider().featureCount())
 
+        debug_code(1)
         part_id = 1
         features = []
         for fc, feat in enumerate(self.from_layer.getFeatures()):
@@ -99,10 +104,12 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                 if self.transform is not None:
                     a = geom.transform(self.transform)
                 geometry, statf = self.find_geometry(geom)
+                uncovered, statf = self.find_geometry(geom)
 
-                intersecting = self.index.intersects(geom.boundingBox())
+                intersecting = self.index.intersects(geometry.boundingBox())
+                # Find all intersecting parts
                 for f in intersecting:
-                    g = geom.intersection(allfeatures[f].geometry())
+                    g = geometry.intersection(allfeatures[f].geometry())
                     if g.area() > 0:
                         feature = QgsFeature()
                         geo, stati = self.find_geometry(g)
@@ -116,8 +123,51 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                                                percf,
                                                perct])
                         features.append(feature)
+
+                        # prepare the data for the non overlapping
+                        debug_code(2.1)
+                        uncovered = uncovered.difference(g)
+                        debug_code(2.2)
+                        merged[f].setGeometry(merged[f].geometry().difference(g))
+                        debug_code(2.3)
                         part_id += 1
+
+                #Find the part that does not intersect anything
+                debug_code(3)
+                if uncovered.area() > 0:
+                    feature = QgsFeature()
+                    geo, stati = self.find_geometry(uncovered)
+                    feature.setGeometry(geo)
+                    perct = 0
+                    percf = stati / statf
+                    feature.setAttributes([part_id,
+                                           feat.attributes()[idx],
+                                           '',
+                                           percf,
+                                           perct])
+                    features.append(feature)
+                    part_id += 1
+
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), fc)
+        debug_code(4)
+        # Find the features on TO that have no correspondence in FROM
+        for f, feature in merged.iteritems():
+            geom = feature.geometry()
+            aux, statt = self.find_geometry(allfeatures[f].geometry())
+            if geom.area() > 0:
+                feature = QgsFeature()
+                geo, stati = self.find_geometry(geom)
+                feature.setGeometry(geo)
+                perct = stati / statt
+                percf = 0
+                feature.setAttributes([part_id,
+                                       '',
+                                       allfeatures[f].attributes()[fid],
+                                       percf,
+                                       perct])
+                features.append(feature)
+                part_id += 1
+
         if features:
             a = lcdpr.addFeatures(features)
         self.result = lcd_layer
@@ -135,7 +185,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         elif self.output_type == 'Line':
             stat = g.length()
             if g.isMultipart():
-                geometry = QgsGeometry.fromMultiLineString(g.asMultiPoly())
+                geometry = QgsGeometry.fromMultiLineString(g.asMultiPolyLine())
             else:
                 geometry = QgsGeometry.fromLineString(g.asPoly())
         else:
@@ -145,3 +195,11 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             else:
                 geometry = QgsGeometry.fromPoint(g.asPoint())
         return geometry, stat
+
+    # def get_multi_type(self, g):
+    #     if self.output_type == 'Poly':
+    #         return QgsGeometry.fromMultiPolygon(g.asMultiPolygon())
+    #     elif self.output_type == 'Line':
+    #         return QgsGeometry.fromMultiLineString(g.asMultiPolyLine())
+    #     else:
+    #         return QgsGeometry.fromMultiPoint(g.asMultiPoint())
