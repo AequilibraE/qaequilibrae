@@ -31,7 +31,8 @@ from aequilibrae.paths.results import AssignmentResults
 
 no_binary = False
 try:
-    from aequilibrae.paths import all_or_nothing, one_to_all, reblocks_matrix
+    from aequilibrae.paths import all_or_nothing, one_to_all
+    from aequilibrae.paths import reblocks_matrix
 except:
     no_binary = True
 
