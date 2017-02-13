@@ -48,7 +48,7 @@ def main():
 
 def all_or_nothing(matrix, graph, results):
     aux_res = MultiThreadedAoN()
-    aux_res.prepare(results)
+    aux_res.prepare(graph, results)
 
     # catch errors
     if results.__graph_id__ is None:

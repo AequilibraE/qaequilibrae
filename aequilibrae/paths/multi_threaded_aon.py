@@ -10,11 +10,14 @@ class MultiThreadedAoN:
         self.temp_link_loads = None  # Temporary results for assignment. Necessary for parallelization
         self.temp_node_loads = None  # Temporary nodes for assignment. Necessary for cascading
 
+        self.temp_b_nodes = None  #  holds the b_nodes in case of flows through centroid connectors are blocked
+
     # In case we want to do by hand, we can prepare each method individually
-    def prepare(self, results):
+    def prepare(self, graph, results):
         self.predecessors = np.zeros((results.nodes, results.cores), dtype=np.int32)
-        self.temporary_skims = np.zeros((results.nodes, results.num_skims, results.cores), np.float64)
+        self.temporary_skims = np.zeros((results.nodes, results.num_skims, results.cores), dtype=np.float64)
         self.reached_first = np.zeros((results.nodes, results.cores), dtype=np.int32)
         self.connectors = np.zeros((results.nodes, results.cores), dtype=np.int32)
-        self.temp_link_loads = np.zeros((results.links, results.cores), np.float64)
-        self.temp_node_loads = np.zeros((results.nodes, results.cores), np.float64)
+        self.temp_link_loads = np.zeros((results.links, results.cores), dtype=np.float64)
+        self.temp_node_loads = np.zeros((results.nodes, results.cores), dtype=np.float64)
+        self.temp_b_nodes = graph.b_node.copy()
