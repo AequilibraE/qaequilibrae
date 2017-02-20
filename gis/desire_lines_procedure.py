@@ -218,9 +218,8 @@ class DesireLinesProcedure(WorkerThread):
                 for i in range(totals.shape[0]):
                     if totals[i]:
                         if not all_nodes[i]:
-                            qgis.utils.iface.messageBar().pushMessage("Matrix has demand for zones that do not exist "
-                                                                      "in the zones/nodes provided. Demand for those"
-                                                                      "ones were ignored. e.g. " +  str(i),'', level=3)
+                            self.error = ("Matrix has demand for zones that do not exist in the zones/nodes provided."
+                                         " Demand for those ones were ignored. e.g. " +  str(i))
                             break
 
                 h = 1

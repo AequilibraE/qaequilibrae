@@ -35,6 +35,7 @@ from load_matrix_dialog import LoadMatrixDialog
 
 from desire_lines_procedure import DesireLinesProcedure
 from forms import Ui_DesireLines
+from report_dialog import ReportDialog
 
 no_binary = False
 try:
@@ -132,7 +133,9 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
 
     def job_finished_from_thread(self, success):
         if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
+            self.exit_procedure()
+            self.throws_error(self.worker_thread.error)
+
         else:
             try:
                 QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
@@ -157,6 +160,12 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Matrix not loaded", '', level=3)
+
+    def throws_error(self, error_message):
+        error_message = ["*** ERROR ***", error_message]
+        dlg2 = ReportDialog(self.iface, error_message)
+        dlg2.show()
+        dlg2.exec_()
 
     def exit_procedure(self):
         self.close()
