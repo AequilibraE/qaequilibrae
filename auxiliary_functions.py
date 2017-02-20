@@ -110,6 +110,21 @@ def haversine(lon1, lat1, lon2, lat2):
     meters = 6378137 * c
     return meters
 
+def debug_code(message):
+    debug_file = tempfile.gettempdir() + '/aequilibrae.debug'
+    if not os.path.exists(debug_file):
+        o = open(tempfile.gettempdir() + '/aequilibrae.debug', 'w')
+    else:
+        o = open(tempfile.gettempdir() + '/aequilibrae.debug', 'a')
+    if type(message) not in [list, tuple]:
+        print >> o, message
+    else:
+        t = '['
+        for q in message:
+            t += str(q) + ','
+        print >>o, t[:-1] +']'
+    o.flush()
+    o.close()
 
 if __name__ == '__main__':
     main()
