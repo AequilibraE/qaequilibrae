@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    15/09/2013
- Updated:    05/Feb/2017
+ Updated:    25/Feb/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -23,11 +23,10 @@ Original Algorithm for Shortest path (Dijkstra with a Fibonacci heap) was writte
 
 cimport numpy as np
 cimport cython
-import multiprocessing as M
 import thread
 from multiprocessing.dummy import Pool as ThreadPool
 
-VERSION = '0.3.4'
+
 include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
 

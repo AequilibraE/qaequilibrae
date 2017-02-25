@@ -30,13 +30,6 @@ import tempfile
 def main():
     pass
 
-directions_dictionary = {'AB': 1,
-                         'BA': -1,
-                         1: 'AB',
-                         -1: 'BA'
-                        }
-
-
 def user_message(message, level):
     if level == "WARNING":
         level = 1

@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    June/05/2015
- Updated:    30/09/2016
+ Updated:    25/02/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -24,6 +24,8 @@ import csv
 import cPickle
 from datetime import datetime
 import uuid
+VERSION = "0.3.5"
+
 
 '''description: Description of the graph (OPTIONAL)
     num_links: Number of directed links in the graph
@@ -79,7 +81,7 @@ class Graph:
         self.network_ok = False
         self.type_loaded = False
 
-        self.__version__ = '0.3.4'
+        self.__version__ = VERSION
 
         # Randomly generate a unique Graph ID randomly
         self.__id__ = uuid.uuid4().hex

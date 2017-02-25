@@ -22,66 +22,56 @@
 import sys
 from functools import partial
 
+import os
 import numpy as np
 import qgis
-from PyQt4 import QtGui
+from PyQt4 import QtGui, uic
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 
 from auxiliary_functions import *
 from global_parameters import *
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
-
 from create_graph_procedure import GraphCreation
-from ui_Create_Graph import Ui_Create_Graph
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/forms/", 'Ui_Create_Graph.ui'))
 
 
-class GraphCreationDialog(QtGui.QDialog, Ui_Create_Graph):
+class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.validtypes = integer_types + float_types
         self.iface = iface
         self.setupUi(self)
-        self.field_types = {}
         self.centroids = None
         self.progressbar0.setVisible(False)
         self.progress_label0.setVisible(False)
-
-        self.tot_skims = 0
-        self.name_skims = 0
+        self.fields = 0
+        self.fields_lst.setColumnWidth(0, 180)
+        self.fields_lst.setColumnWidth(1, 180)
+        self.fields_lst.setColumnWidth(2, 40)
+        self.fields_lst.setColumnWidth(3, 60)
 
         # FIRST, we connect slot signals
         self.links_are_bi_directional.stateChanged.connect(self.bi_directional)
+        self.chk_dual_fields.stateChanged.connect(self.dual_fields)
+
 
         # For changing the network layer
         self.network_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
 
-        # for changing the skim field
-        self.ab_skim.currentIndexChanged.connect(partial(self.choose_a_field, 'AB'))
-        self.ba_skim.currentIndexChanged.connect(partial(self.choose_a_field, 'BA'))
-
-        # For setting centroids
-        self.set_centroids_rule.stateChanged.connect(self.add_model_centroids)
-
-        # For adding skims
-        self.add_skim.clicked.connect(self.add_to_skim_list)
-        # self.skim_list.doubleClicked.connect(self.slot_double_clicked)
-
-        # SECOND, we set visibility for sections that should not be shown when the form opens (overlapping items)
-        #        and re-dimension the items that need re-dimensioning
-        self.skim_list.setColumnWidth(0, 161)
-        self.skim_list.setColumnWidth(1, 161)
-        self.skim_list.setColumnWidth(2, 161)
-        self.skim_list.setColumnWidth(3, 50)
-
-        # Create_Network
-        self.create_network.clicked.connect(self.run_graph_creation)
-
-        self.select_result.clicked.connect(
-            partial(self.browse_outfile, 'Result file', self.graph_file, "Aequilibrae Graph(*.aeg)"))
+        # # for changing the skim field
+        # self.ab_skim.currentIndexChanged.connect(partial(self.choose_a_field, 'AB'))
+        # self.ba_skim.currentIndexChanged.connect(partial(self.choose_a_field, 'BA'))
+        #
+        # # For setting centroids
+        # self.set_centroids_rule.stateChanged.connect(self.add_model_centroids)
+        #
+        # # Create_Network
+        # self.create_network.clicked.connect(self.run_graph_creation)
+        #
+        # self.select_result.clicked.connect(
+        #     partial(self.browse_outfile, 'Result file', self.graph_file, "Aequilibrae Graph(*.aeg)"))
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
@@ -90,82 +80,41 @@ class GraphCreationDialog(QtGui.QDialog, Ui_Create_Graph):
 
         # loads default path from parameters
         self.path = standard_path()
+        #
+        # #set initial values for skim list
+        # self.set_initial_value_if_available()
+        self.dual_fields()
+        self.bi_directional()
 
-        #set initial values for skim list
-        self.set_initial_value_if_available()
+
 
     def bi_directional(self):
         if self.links_are_bi_directional.isChecked():
-            self.ba_length.setVisible(True)
-            self.ba_length_lbl.setVisible(True)
+            self.chk_dual_fields.setVisible(True)
             self.dir_label.setVisible(True)
             self.direction_field.setVisible(True)
-            self.ba_skim.setVisible(True)
-            self.lblnodematch_13.setVisible(True)
+            self.fields_lst.setColumnWidth(1, 180)
+            self.fields_lst.horizontalHeaderItem(0).setText("AB field")
+            self.fields_lst.setGeometry(QRect(10, 130, 511, 261))
         else:
-            self.ba_length.setVisible(False)
-            self.ba_length_lbl.setVisible(False)
+            self.chk_dual_fields.setVisible(True)
             self.dir_label.setVisible(False)
             self.direction_field.setVisible(False)
-            self.ba_skim.setVisible(False)
-            self.lblnodematch_13.setVisible(False)
+            self.fields_lst.setColumnWidth(1, 0)
+            self.fields_lst.horizontalHeaderItem(0).setText("Link field")
+            self.fields_lst.setGeometry(QRect(10, 130, 331, 261))
+        self.dual_fields()
 
-    def add_to_skim_list(self):
-        try:
-            layer = get_vector_layer_by_name(self.network_layer.currentText())
-
-            ab_skim = layer.fieldNameIndex(self.ab_skim.currentText())
-            ba_skim = layer.fieldNameIndex(self.ba_skim.currentText())
-
-            if ab_skim >= 0 and ba_skim >= 0:
-                skim_name = 'Skim ' + str(self.name_skims)
-                if 'AB' in self.ab_skim.currentText():
-                    if self.ab_skim.currentText().replace('AB', 'BA') == self.ba_skim.currentText():
-                        skim_name = self.ab_skim.currentText().replace('AB', '')
-                        if len(skim_name) > 0:
-                            if skim_name[0] in ['-', '_', ' ']:
-                                skim_name = skim_name[1:]
-                            elif skim_name[-1] in ['-', '_', ' ']:
-                                skim_name = skim_name[0:-1]
-                        if len(skim_name) == 0:
-                            skim_name = 'Skim ' + str(self.name_skims)
-
-                self.skim_list.setRowCount(self.tot_skims + 1)
-                self.skim_list.setItem(self.tot_skims, 0, QtGui.QTableWidgetItem(skim_name))
-                self.skim_list.setItem(self.tot_skims, 1,
-                                       QtGui.QTableWidgetItem(self.ab_skim.currentText()))  # .encode('ascii'))
-                self.skim_list.setItem(self.tot_skims, 2,
-                                       QtGui.QTableWidgetItem(self.ba_skim.currentText()))  # .encode('ascii'))
-
-                btn = QPushButton('X')
-                btn.clicked.connect(self.click_remove_button)
-                self.skim_list.setCellWidget(self.tot_skims, 3, btn)
-
-                self.tot_skims += 1
-                self.name_skims += 1
-
-        except:
-            qgis.utils.iface.messageBar().pushMessage("Wrong settings", "Please review the field information", level=3,
-                                                      duration=3)
-
-    def choose_a_field(self, modified):
-        i, j = 'AB', 'BA'
-
-        if modified == i:
-            text = self.ab_skim.currentText()
-            if i in text:
-                text = text.replace(i, j)
-                index = self.ba_skim.findText(text, Qt.MatchFixedString)
-                if index >= 0:
-                    self.ba_skim.setCurrentIndex(index)
-
-        if modified == j:
-            text = self.ba_skim.currentText()
-            if j in text:
-                text = text.replace(j, i)
-                index = self.ab_skim.findText(text, Qt.MatchFixedString)
-                if index >= 0:
-                    self.ab_skim.setCurrentIndex(index)
+    def dual_fields(self):
+        if self.chk_dual_fields.isChecked():
+            self.fields_lst.setColumnWidth(1, 0)
+            self.fields_lst.horizontalHeaderItem(0).setText("Fields *")
+            self.fields_lst.setGeometry(QRect(10, 130, 331, 261))
+        else:
+            self.fields_lst.setColumnWidth(1, 180)
+            self.fields_lst.horizontalHeaderItem(0).setText("AB field")
+            self.fields_lst.setGeometry(QRect(10, 130, 511, 261))
+        self.list_all_fields()
 
     def set_initial_value_if_available(self):
         all_items = [self.ab_skim.itemText(i) for i in range(self.ab_skim.count())]
@@ -179,37 +128,108 @@ class GraphCreationDialog(QtGui.QDialog, Ui_Create_Graph):
 
     # GENERIC to be applied to MORE THAN ONE form
     def load_fields_to_combo_boxes(self):
+        i_types = [self.direction_field, self.link_id]
 
-        i_types = [self.direction_field, self.link_id, self.ab_skim, self.ba_skim]
-        f_types = [self.ab_length, self.ba_length, self.ab_skim, self.ba_skim]
-
-        self.field_types = {}
-        for combo in i_types + f_types:
+        for combo in i_types:
             combo.clear()
-            combo.addItem('Choose Field')
 
         if self.network_layer.currentIndex() >= 0:
+            self.layer = get_vector_layer_by_name(self.network_layer.currentText())
+            for field in self.layer.pendingFields().toList():
+                if field not in reserved_fields:
+                    if field.type() in integer_types:
+                        for combo in i_types:
+                            combo.addItem(field.name())
+        self.list_all_fields()
+
+    def list_all_fields(self):
+        self.fields_lst.setRowCount(0)
+        self.fields = 0
+
+        def add_new_field_to_list(text, sec_field):
+            self.fields_lst.setRowCount(self.fields + 1)
+            self.fields_lst.setItem(self.fields, 0, QTableWidgetItem(text))
+
+            def centralized_widget(widget):
+                my_widget = QWidget()
+                #chk_bx.setCheckState(Qt.Checked) # If we wanted them all checked by default
+                lay_out = QHBoxLayout(my_widget)
+                lay_out.addWidget(widget)
+                lay_out.setAlignment(Qt.AlignCenter)
+                lay_out.setContentsMargins(0, 0, 0, 0)
+                my_widget.setLayout(lay_out)
+                return my_widget
+
+            chk = centralized_widget(QCheckBox())
+            q = QRadioButton()
+            q.toggled.connect(self.handleItemClicked)
+            chk2 = centralized_widget(q)
+
+
+            self.fields_lst.setCellWidget(self.fields, 2, chk)
+            self.fields_lst.setCellWidget(self.fields, 3, chk2)
+
+            if sec_field is not None:
+                cmb_bx = centralized_widget(sec_field)
+                self.fields_lst.setCellWidget(self.fields, 1, cmb_bx)
+
+            self.fields += 1
+
+        if self.network_layer.currentIndex() >= 0:
+
             layer = get_vector_layer_by_name(self.network_layer.currentText())
-            for field in layer.dataProvider().fields().toList():
-                if field.type() in integer_types:
-                    self.field_types[field.name()] = field.type()
-                    for combo in i_types:
-                        combo.addItem(field.name())
-                if field.type() in float_types:
-                    self.field_types[field.name()] = field.type()
-                    for combo in f_types:
-                        combo.addItem(field.name())
+            all_fields = layer.pendingFields().toList()
+            fields = []
+            for field in all_fields:
+                if field.type() in integer_types + float_types:
+                    fields.append(field.name())
+            fields = [x.lower() for x in fields]
+            for f in reserved_fields:
+                if f in fields:
+                    fields.pop(f)
+
+            if self.chk_dual_fields.isChecked():
+                for field in fields:
+                    if '_ab' in field:
+                        if field.replace('_ab', '_ba') in fields:
+                            fields.remove(field.replace('_ab', '_ba'))
+                            field = field.replace('_ab', '_*')
+                            add_new_field_to_list(field, None)
+                    elif '_ba' in field:
+                        if field.replace('_ba', '_ab') in fields:
+                            fields.remove(field.replace('_ba', '_ab'))
+                            field = field.replace('_ba', '_*')
+                            add_new_field_to_list(field, None)
+                    else:
+                        add_new_field_to_list(field, None)
+            else:
+                for field in fields:
+                    cmb_bx = QComboBox()
+                    for f in fields:
+                        cmb_bx.addItem(f)
+                    cmb_bx.setCurrentIndex(cmb_bx.findText(field, Qt.MatchFixedString))
+                    add_new_field_to_list(field, cmb_bx)
+
+    def handleItemClicked(self):
+        box = self.sender()
+        parent = box.parent()
+
+        for i in range(self.fields):
+            if self.fields_lst.cellWidget(i, 3) is parent:
+                row = i
+                break
+
+        for i in range(self.fields):
+            if i != row:
+                for chk in self.fields_lst.cellWidget(i, 3).findChildren(QRadioButton):
+                    chk.setChecked(False)
+
+
 
     def add_model_centroids(self):
         self.model_centroids.setEnabled(False)
         if self.set_centroids_rule.isChecked():
             self.model_centroids.setEnabled(True)
-
-    def click_remove_button(self):
-        btn = self.sender()
-        row = self.skim_list.indexAt(btn.pos()).row()
-        self.skim_list.removeRow(row)
-        self.tot_skims -= 1
 
     def run_thread(self):
 
@@ -340,24 +360,6 @@ class GraphCreationDialog(QtGui.QDialog, Ui_Create_Graph):
                         if i < 0:
                             self.error = "There is a skim with the wrong BA field: " + self.skim_list.item(row,
                                                                                                            2).text()
-                skims = {}
-                for row in range(self.tot_skims):
-                    skim_name = self.skim_list.item(row, 0).text()
-                    ab_field = self.layer.fieldNameIndex(self.skim_list.item(row, 1).text())
-
-                    ba_field = -1
-                    if self.links_are_bi_directional.isChecked():
-                        ba_field = self.layer.fieldNameIndex(self.skim_list.item(row, 2).text())
-
-                    abtype = self.field_types[self.skim_list.item(row, 1).text()]
-                    batype = self.field_types[self.skim_list.item(row, 2).text()]
-
-                    if abtype in ['Integer', 'integer'] and batype in ['Integer', 'integer']:
-                        skims[unicode(skim_name)] = (ab_field, ba_field, np.int64)
-                    else:
-                        skims[unicode(skim_name)] = (ab_field, ba_field, np.float64)
-
-                self.skims = skims
 
         self.output = self.graph_file.text()
         if self.error == None and self.output == "":
