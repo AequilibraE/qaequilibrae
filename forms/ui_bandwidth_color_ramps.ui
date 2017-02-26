@@ -284,6 +284,19 @@
    <header>qgsfieldcombobox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>chk_dual_fields</tabstop>
+  <tabstop>cbb_ab_field</tabstop>
+  <tabstop>cbb_ba_field</tabstop>
+  <tabstop>cbb_ab_color</tabstop>
+  <tabstop>cbb_ba_color</tabstop>
+  <tabstop>txt_ab_min</tabstop>
+  <tabstop>txt_ab_max</tabstop>
+  <tabstop>txt_ba_min</tabstop>
+  <tabstop>txt_ba_max</tabstop>
+  <tabstop>but_done</tabstop>
+  <tabstop>but_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

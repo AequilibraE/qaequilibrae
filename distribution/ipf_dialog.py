@@ -68,7 +68,7 @@ class IpfDialog(QDialog, Ui_ipf):
         # FIRST, we connect slot signals
         # For changing the input matrix
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
-        self.but_load_rows.clicked.connect(partial(self.find_vectors, 'rows'))
+        self.but_load_rows.clicked.connect(partial(self.find_vectors, 'zones'))
         self.but_load_columns.clicked.connect(partial(self.find_vectors, 'columns'))
 
         self.but_choose_output_name.clicked.connect(self.browse_outfile)
@@ -108,7 +108,7 @@ class IpfDialog(QDialog, Ui_ipf):
         dlg2.show()
         dlg2.exec_()
         if dlg2.vector is not None:
-            if destination == 'rows':
+            if destination == 'zones':
                 self.rows = dlg2.vector
                 self.rows_name.setText('LOADED')
                 self.rows_total.setText("{:20,.4f}".format(np.sum(self.rows)))

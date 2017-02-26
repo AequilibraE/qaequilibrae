@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-24
- Updated:    2016-12-21
+ Updated:    2017-02-26
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -25,18 +25,15 @@ from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.gui import QgsMapLayerProxyModel
-
+from forms import Ui_bandwidths
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
-from global_parameters import *
 from random import randint
-
-from forms import Ui_bandwidths
 from auxiliary_functions import *
 from set_color_ramps_dialog import LoadColorRampSelector
-from color_ramps import AequilibraERamps
+
 
 class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
     def __init__(self, iface):
@@ -106,7 +103,7 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.mColorButton.setVisible(self.rdo_color.isChecked())
         self.but_load_ramp.setVisible(self.rdo_ramp.isChecked())
         self.txt_ramp.setVisible(self.rdo_ramp.isChecked())
-        # self.but_load_ramp.setEnabled(self.rdo_ramp.isChecked())
+        self.but_load_ramp.setEnabled(self.rdo_ramp.isChecked())
 
     def choose_a_field(self, modified):
         i, j = 'AB', 'BA'
@@ -277,13 +274,14 @@ class CreateBandwidthsDialog(QDialog, Ui_bandwidths):
         self.mColorButton.setColor(a)
 
     def load_ramp_action(self):
-        self.ramps = None
-        dlg2 = LoadColorRampSelector(self.iface, self.layer)
-        dlg2.show()
-        dlg2.exec_()
-        if dlg2.results is not None:
-            self.ramps = dlg2.results
-            self.txt_ramp.setText(str(self.ramps))
+        if self.layer is not None:
+            self.ramps = None
+            dlg2 = LoadColorRampSelector(self.iface, self.layer)
+            dlg2.show()
+            dlg2.exec_()
+            if dlg2.results is not None:
+                self.ramps = dlg2.results
+                self.txt_ramp.setText(str(self.ramps))
 
     def add_bands_to_map(self):
         self.but_run.setEnabled(False)

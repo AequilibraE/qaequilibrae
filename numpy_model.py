@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/09/2016
+ Updated:    2017-02-26
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -31,11 +31,11 @@ Qt = QtCore.Qt
 #adaptations for headers come from: http://stackoverflow.com/questions/14135543/how-to-set-the-qtableview-header-name-in-pyqt4
 
 class NumpyModel(QtCore.QAbstractTableModel):
-    def __init__(self, narray, headerdata,row_headersdata, parent=None):
+    def __init__(self, narray, headerdata, row_headersdata, parent=None):
         QtCore.QAbstractTableModel.__init__(self, parent)
         self._array = narray
         self.headerdata = headerdata
-        self.row_headersdata=row_headersdata
+        self.row_headersdata = row_headersdata
 
     def rowCount(self, parent=None):
         return self._array.shape[0]

@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/09/2016
+ Updated:    26/02/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -42,14 +42,12 @@ def user_message(message, level):
 def standard_path():
     return get_parameter_chain(['system', 'default_directory'])
 
-
 def tempPath():
     tmp_path = get_parameter_chain(['system', 'temp directory'])
     if os.path.isdir(tmp_path):
         return tmp_path
     else:
         return tempfile.gettempdir()
-
 
 # Returns the parameter for a given hierarchy of groups in a dictionary of dictionaries (recovered from a yml)
 def get_parameter_chain(chain):
@@ -64,7 +62,6 @@ def get_parameter_chain(chain):
             g = {}
     return g
 
-
 # Recovers a group of parameters (or the entire yml) as a dictionary of dictionaries
 def get_parameters_group(group=None):
     path = os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/"
@@ -77,14 +74,12 @@ def get_parameters_group(group=None):
     else:
         return {}
 
-
 def get_vector_layer_by_name(layer_name):
     layer = QgsMapLayerRegistry.instance().mapLayersByName(layer_name)
     if not layer:
         return None
     else:
         return layer[0]
-
 
 # Haversine formula here:
 # http://gis.stackexchange.com/questions/44064/how-to-calculate-distances-in-a-point-sequence/56589#56589

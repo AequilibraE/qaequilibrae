@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>534</width>
+    <width>536</width>
     <height>523</height>
    </rect>
   </property>
@@ -385,7 +385,38 @@
     <string>Cancel</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="but_advanced">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>55</y>
+     <width>71</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Advanced</string>
+   </property>
+  </widget>
  </widget>
+ <tabstops>
+  <tabstop>network_layer</tabstop>
+  <tabstop>link_id</tabstop>
+  <tabstop>chk_dual_fields</tabstop>
+  <tabstop>links_are_bi_directional</tabstop>
+  <tabstop>direction_field</tabstop>
+  <tabstop>but_advanced</tabstop>
+  <tabstop>select_result</tabstop>
+  <tabstop>create_network</tabstop>
+  <tabstop>cancel</tabstop>
+  <tabstop>graph_file</tabstop>
+  <tabstop>fields_lst</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

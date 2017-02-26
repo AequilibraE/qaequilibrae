@@ -37,8 +37,7 @@ import thread
 from multi_threaded_aon import MultiThreadedAoN
 no_binaries = False
 try:
-    from AoN import one_to_all
-    #reblocks_matrix, path_computation
+    from AoN import one_to_all, path_computation
 except:
     no_binaries = True
 
@@ -58,7 +57,7 @@ def all_or_nothing(matrix, graph, results):
     else:
         pool = ThreadPool(results.cores)
         all_threads = {'count': 0}
-        for O in range(results.zones):
+        for O in range(matrix.shape[0]):
             a = matrix[O, :]
             if np.sum(a) > 0:
                 # func_assig_thread(1, a, graph, results, aux_res, all_threads)

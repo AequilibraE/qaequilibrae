@@ -33,6 +33,7 @@ from qgis.core import *
 from auxiliary_functions import *
 from global_parameters import *
 from create_graph_procedure import GraphCreation
+from graph_advanced_features import GraphAdvancedFeatures
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/forms/", 'Ui_Create_Graph.ui'))
 
@@ -44,6 +45,9 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
         self.centroids = None
+        self.block_through_centroids = False
+        self.selected_only = False
+
         self.progressbar0.setVisible(False)
         self.progress_label0.setVisible(False)
         self.fields = 0
@@ -56,9 +60,11 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         self.links_are_bi_directional.stateChanged.connect(self.bi_directional)
         self.chk_dual_fields.stateChanged.connect(self.dual_fields)
 
-
         # For changing the network layer
         self.network_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+
+        # Calls the advanced features
+        self.but_advanced.clicked.connect(self.call_advanced_features)
 
         # # for changing the skim field
         # self.ab_skim.currentIndexChanged.connect(partial(self.choose_a_field, 'AB'))
@@ -223,6 +229,14 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             if i != row:
                 for chk in self.fields_lst.cellWidget(i, 3).findChildren(QRadioButton):
                     chk.setChecked(False)
+
+    def call_advanced_features(self):
+        dlg2 = GraphAdvancedFeatures(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+        self.centroids = dlg2.centroids
+        self.block_through_centroids = dlg2.block_through_centroids
+        self.selected_only = dlg2.selected_only
 
 
 
