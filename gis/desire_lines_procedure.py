@@ -24,7 +24,7 @@ from qgis.core import *
 from PyQt4.QtCore import *
 import itertools
 import numpy as np
-
+import struct
 from auxiliary_functions import *
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import AssignmentResults
@@ -54,6 +54,7 @@ class DesireLinesProcedure(WorkerThread):
         self.reverse_hash = reverse_hash
         self.hash_table = hash_table
         self.not_loaded = []
+        self.python_version = (8 * struct.calcsize("P"))
 
         if error:
             self.error = 'Scipy and/or Numpy not installed'
@@ -149,7 +150,12 @@ class DesireLinesProcedure(WorkerThread):
                 #We process all the triangles to only get each edge once
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Building Delaunay Network: Collecting Edges"))
                 edges = []
-                for triangle in tri.simplices:
+                if self.python_version == 32:
+                    all_edges = tri.vertices
+                else:
+                    all_edges = tri.simplices
+
+                for triangle in all_edges:
                     links = list(itertools.combinations(triangle, 2))
 
                     for i in links:

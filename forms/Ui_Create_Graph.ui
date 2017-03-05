@@ -140,7 +140,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QComboBox" name="link_id">
+  <widget class="QComboBox" name="cmb_link_id">
    <property name="geometry">
     <rect>
      <x>90</x>
@@ -168,7 +168,7 @@
     <string>Link ID</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="direction_field">
+  <widget class="QComboBox" name="cmb_direction_field">
    <property name="geometry">
     <rect>
      <x>90</x>
@@ -316,7 +316,7 @@
     <string>Status Message 0</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="create_network">
+  <widget class="QPushButton" name="but_create_graph">
    <property name="geometry">
     <rect>
      <x>410</x>
@@ -406,13 +406,13 @@
  </widget>
  <tabstops>
   <tabstop>network_layer</tabstop>
-  <tabstop>link_id</tabstop>
+  <tabstop>cmb_link_id</tabstop>
   <tabstop>chk_dual_fields</tabstop>
   <tabstop>links_are_bi_directional</tabstop>
-  <tabstop>direction_field</tabstop>
+  <tabstop>cmb_direction_field</tabstop>
   <tabstop>but_advanced</tabstop>
   <tabstop>select_result</tabstop>
-  <tabstop>create_network</tabstop>
+  <tabstop>but_create_graph</tabstop>
   <tabstop>cancel</tabstop>
   <tabstop>graph_file</tabstop>
   <tabstop>fields_lst</tabstop>

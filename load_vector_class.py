@@ -23,6 +23,7 @@ from qgis.core import *
 from PyQt4.QtCore import *
 import numpy as np
 from worker_thread import WorkerThread
+import struct
 
 class LoadVector(WorkerThread):
     def __init__(self, parentThread, layer, idx):
@@ -31,6 +32,7 @@ class LoadVector(WorkerThread):
         self.idx = idx
         self.matrix = None
         self.error = None
+        self.python_version = (8 * struct.calcsize("P"))
 
     def doWork(self):
         layer = self.layer
@@ -52,7 +54,14 @@ class LoadVector(WorkerThread):
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
 
         vector = np.array(vector)  # transform the list of lists in NumPy array
-        if np.max(np.bincount(vector[:,0].astype(np.int64)))  > 1:
+
+        # bincount has odd behavior on 32 vs 64, so we need to control for that
+        if self.python_version == 32:
+            zones = np.bincount(vector[:,0].astype(np.int32))
+        else:
+            zones = np.bincount(vector[:, 0].astype(np.int64))
+
+        if np.max(zones)  > 1:
             self.error = 'Zone field is not unique'
         else:
             zones = np.max(vector[:, 0]) + 1
