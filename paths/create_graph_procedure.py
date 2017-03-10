@@ -26,41 +26,49 @@ import time
 import numpy as np
 import sys
 import os
+import struct
 
+import  aequilibrae.reserved_fields as reserved_fieds
 from aequilibrae.paths import Graph
 from worker_thread import WorkerThread
 
 class GraphCreation(WorkerThread):
-    def __init__(self, parentThread, netlayer, linkid, ablength, bidirectional, directionfield, balength, skims, selected_only, featcount):
+    def __init__(self, parentThread, net_layer, link_id, direction_field, fields_to_add, selected_only):
         WorkerThread.__init__(self, parentThread)
-        self.netlayer = netlayer
-        self.linkid = linkid
-        self.ablength = ablength
-        self.balength = balength
-        self.bidirectional = bidirectional
-        self.directionfield = directionfield
-        self.skims = skims
+        self.net_layer = net_layer
+        self.link_id = link_id
+        self.direction_field = direction_field
+        self.fields_to_add = fields_to_add
         self.selected_only = selected_only
         self.features = None
-        self.featcount =  featcount
         self.error = None
+        self.python_version = (8 * struct.calcsize("P"))
+
+        self.bi_directional = False
+        if direction_field is not None:
+            self.bi_directional = True
+
+        if self.selected_only:
+            self.feat_count = self.net_layer.selectedFeatureCount()
+        else:
+            self.feat_count = self.net_layer.featureCount()
 
     def doWork(self):
         # Checking ID uniqueness
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Checking ID uniqueness")
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.featcount)
+        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.feat_count)
 
         a = []
-        all_ids = np.zeros(self.featcount, dtype=np.int_)
+        all_ids = np.zeros(self.feat_count, dtype=np.int_)
 
         if self.selected_only:
-            self.features = self.netlayer.selectedFeatures()
+            self.features = self.net_layer.selectedFeatures()
         else:
-            self.features = self.netlayer.getFeatures()
+            self.features = self.net_layer.getFeatures()
 
         p = 0
         for feat in self.features:
-            k = feat.attributes()[self.linkid]
+            k = feat.attributes()[self.link_id]
             if k == NULL:
                 self.error = "ID field has NULL values"
                 break
@@ -69,11 +77,15 @@ class GraphCreation(WorkerThread):
                 p += 1
                 if p % 50 == 0:
                     self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), self.featcount)
+        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), self.feat_count)
 
         if self.error is None:
             # Checking uniqueness
-            y = np.bincount(all_ids)
+            if self.python_version == 32: # controlling for Numpy's weird behavior on bincount
+                y = np.bincount(all_ids.astype(np.int32))
+            else:
+                y = np.bincount(all_ids)
+
             if np.max(y) > 1:
                 self.error = 'IDs are not unique.'
 
@@ -83,55 +95,45 @@ class GraphCreation(WorkerThread):
 
             self.graph = Graph()
 
-            all_types = [np.int64, np.int64, np.int64, np.float64, np.float64, np.int64]
-            all_titles = ['link_id', 'a_node', 'b_node', 'length_ab', 'length_ba', 'direction']
+            all_types = [np.int32, np.int32, np.int32, np.int8]
+            all_titles = ['link_id', reserved_fieds.a_node, reserved_fieds.b_node, 'direction']
 
-            dict_field = {}
-            for k in self.skims:
-                a, b, t = self.skims[k]
+            for name_field, values in self.fields_to_add.iteritems():
                 all_types.append(np.float64)
+                all_titles.append((name_field + '_ab').encode('ascii','ignore'))
                 all_types.append(np.float64)
-                all_titles.append((k + '_ab').encode('ascii','ignore'))
-                all_titles.append((k + '_ba').encode('ascii','ignore'))
-
-                dict_field[k + '_ab'] = a
-                if self.bidirectional:
-                    dict_field[k + '_ba'] = b
-                else:
-                    dict_field[k + '_ba'] = -1
+                all_titles.append((name_field + '_ba').encode('ascii','ignore'))
 
             dt = [(t, d) for t, d in zip(all_titles, all_types)]
 
-            anode = self.netlayer.fieldNameIndex('A_Node')
-            bnode = self.netlayer.fieldNameIndex('B_Node')
+            a_node = self.net_layer.fieldNameIndex(reserved_fieds.a_node)
+            b_node = self.net_layer.fieldNameIndex(reserved_fieds.b_node)
             data = []
 
             if self.selected_only:
-                self.features = self.netlayer.selectedFeatures()
+                self.features = self.net_layer.selectedFeatures()
             else:
-                self.features = self.netlayer.getFeatures()
+                self.features = self.net_layer.getFeatures()
 
             p = 0
             for feat in self.features:
                 line = []
-                line.append(feat.attributes()[self.linkid])
-                line.append(feat.attributes()[anode])
-                line.append(feat.attributes()[bnode])
-                line.append(feat.attributes()[self.ablength])
-                if self.bidirectional:
-                    line.append(feat.attributes()[self.balength])
-                    line.append(feat.attributes()[self.directionfield])
+                line.append(feat.attributes()[self.link_id])
+                line.append(feat.attributes()[a_node])
+                line.append(feat.attributes()[b_node])
+                if self.bi_directional:
+                    line.append(feat.attributes()[self.direction_field])
                 else:
-                    line.append(-1)
                     line.append(1)
 
-                # We append the skims now
-                for k in all_titles:
-                    if k in dict_field:
-                        if dict_field[k] >= 0:
-                            line.append(feat.attributes()[dict_field[k]])
-                        else:
-                            line.append(-1)
+                # We append the data fields now
+                for k, v in self.fields_to_add.iteritems():
+                    a, b = v
+                    line.append(feat.attributes()[a])
+                    if self.bi_directional:
+                        line.append(feat.attributes()[b])
+                    else:
+                        line.append(-1)
 
                 for k in line:
                     if k == NULL:
@@ -150,9 +152,9 @@ class GraphCreation(WorkerThread):
 
             if self.error is None:
                 network = np.asarray(data)
-                del data
 
                 self.graph.network = np.zeros(network.shape[0], dtype=dt)
+
                 for k, t in enumerate(dt):
                     self.graph.network[t[0]] = network[:,k].astype(t[1])
                 del network

@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30
- Updated:    30/09/2016
+ Updated:    2017-02-26
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -21,13 +21,13 @@
 
 from qgis.core import *
 from PyQt4.QtCore import *
-
 import numpy as np
-
+from scipy.sparse import csr_matrix
 from worker_thread import WorkerThread
 
+
 class LoadMatrix(WorkerThread):
-    def __init__(self, parentThread, layer, idx, max_zone=None, filler=0):
+    def __init__(self, parentThread, layer, idx, max_zone=None, filler=0, sparse=False):
         WorkerThread.__init__(self, parentThread)
         self.layer = layer
         self.idx = idx
@@ -35,6 +35,7 @@ class LoadMatrix(WorkerThread):
         self.matrix = None
         self.error = None
         self.filler = filler
+        self.sparse = sparse
 
     def doWork(self):
         layer = self.layer
@@ -71,16 +72,19 @@ class LoadMatrix(WorkerThread):
         if max_zone is None:
             max_zone = np.max(matrix[:, 0:2]) + 1
         if error is None:
-            mat = np.zeros((int(max_zone), int(max_zone)))
-            mat.fill(self.filler)
-            P = 0
-            for i in matrix:
-                mat[i[0].astype(int), i[1].astype(int)] = i[2]
-                P += 1
-                if P % 1000 == 0:
-                    self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
-                    self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                              ("Converting matrix: " + str(P) + "/" + str(feat_count)))
+            if self.sparse:
+                mat = csr_matrix((matrix[:,2], (matrix[:,0], matrix[:,1])), shape=(max_zone, max_zone))
+            else:
+                mat = np.zeros((int(max_zone), int(max_zone)))
+                mat.fill(self.filler)
+                P = 0
+                for i in matrix:
+                    mat[i[0].astype(int), i[1].astype(int)] = i[2]
+                    P += 1
+                    if P % 1000 == 0:
+                        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
+                        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
+                                  ("Converting matrix: " + str(P) + "/" + str(feat_count)))
 
         self.matrix = mat
         self.error = error

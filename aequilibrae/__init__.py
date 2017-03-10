@@ -12,3 +12,4 @@ sys.dont_write_bytecode = True
 
 from . import paths  # We import the graph
 from . import distribution
+import reserved_fields

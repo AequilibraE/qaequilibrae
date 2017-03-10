@@ -317,6 +317,20 @@
    <header>qgsmaplayercombobox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>slider_spacer</tabstop>
+  <tabstop>slider_band_size</tabstop>
+  <tabstop>mMapLayerComboBox</tabstop>
+  <tabstop>ab_FieldComboBox</tabstop>
+  <tabstop>ba_FieldComboBox</tabstop>
+  <tabstop>rdo_color</tabstop>
+  <tabstop>rdo_ramp</tabstop>
+  <tabstop>mColorButton</tabstop>
+  <tabstop>but_load_ramp</tabstop>
+  <tabstop>but_add_band</tabstop>
+  <tabstop>but_run</tabstop>
+  <tabstop>bands_list</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

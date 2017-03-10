@@ -25,6 +25,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import sys
 import os
+import numpy as np
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
 from global_parameters import *
@@ -35,12 +36,8 @@ from load_matrix_dialog import LoadMatrixDialog
 
 from desire_lines_procedure import DesireLinesProcedure
 from forms import Ui_DesireLines
+from report_dialog import ReportDialog
 
-no_binary = False
-try:
-    from aequilibrae.paths import all_or_nothing
-except:
-    no_binary = True
 class DesireLinesDialog(QDialog, Ui_DesireLines):
     def __init__(self, iface):
         QDialog.__init__(self)
@@ -52,8 +49,10 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
         self.name_skims = 0
         self.matrix = None
         self.path = standard_path()
-        self.rows = None
+        self.zones = None
         self.columns = None
+        self.hash_table =None
+        self.reverse_hash = None
 
         # FIRST, we connect slot signals
         # For changing the input matrix
@@ -98,28 +97,19 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
             procedure to add the matrix to the viewer
         """
         if self.matrix is not None:
-            self.rows = self.matrix.shape[0]
-            self.columns = self.matrix.shape[1]
+            self.zones = self.matrix.shape[0]
 
-            # Load the matrix
-            row_headers = []
-            col_headers = []
-            for i in range(self.rows):
-                row_headers.append(str(i))
-            for j in range(self.columns):
-                col_headers.append(str(j))
-
-            m = NumpyModel(self.matrix, col_headers, row_headers)
+            m = NumpyModel(self.matrix, list(self.reverse_hash), list(self.reverse_hash))
             self.matrix_viewer.setModel(m)
 
     def find_matrices(self):
-        dlg2 = LoadMatrixDialog(self.iface)
+        dlg2 = LoadMatrixDialog(self.iface, sparse=True)
         dlg2.show()
         dlg2.exec_()
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
-
-        self.add_matrix_to_viewer()
+            self.matrix, self.hash_table, self.reverse_hash = self.reblocks_matrix(self.matrix)
+            self.add_matrix_to_viewer()
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
@@ -132,7 +122,9 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
 
     def job_finished_from_thread(self, success):
         if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
+            self.exit_procedure()
+            self.throws_error(self.worker_thread.error)
+
         else:
             try:
                 QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
@@ -153,10 +145,58 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
                 dl_type = 'DelaunayLines'
 
             self.worker_thread = DesireLinesProcedure(qgis.utils.iface.mainWindow(), self.zoning_layer.currentText(),
-                                                        self.zone_id_field.currentText(), self.matrix, dl_type)
+                                                        self.zone_id_field.currentText(), self.matrix, self.hash_table, self.reverse_hash, dl_type)
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Matrix not loaded", '', level=3)
+
+    def throws_error(self, error_message):
+        error_message = ["*** ERROR ***", error_message]
+        dlg2 = ReportDialog(self.iface, error_message)
+        dlg2.show()
+        dlg2.exec_()
+
+    def reblocks_matrix(self, sparse_matrix_csr):
+        matrix_shape = sparse_matrix_csr.shape[0]
+        compact_shape = 0
+
+        indptr = sparse_matrix_csr.indptr
+        indices = sparse_matrix_csr.indices
+        data = sparse_matrix_csr.data
+
+        # Create our master_hash
+        master_hash = np.zeros(matrix_shape, np.int64)
+
+        # Gets all non-zero coordinates and makes sure that they are considered
+        froms, tos = sparse_matrix_csr.nonzero()
+
+        for i in range(froms.shape[0]):
+            master_hash[froms[i]] = 1
+            master_hash[tos[i]] = 1
+
+        # Creates the hash
+        reverse_hash = []
+        for i in range(matrix_shape):
+            if master_hash[i] > 0:
+                master_hash[i] = compact_shape
+                compact_shape += 1
+                reverse_hash.append(i)
+
+        # Creates the matrix
+        matrix = np.zeros((compact_shape, compact_shape), np.float64)
+        reverse_hash = reverse_hash
+
+        # populates the new zero-based matrix with values
+        for k in range(froms.shape[0]):
+            i = froms[k]
+            j = tos[k]
+            new_i = master_hash[i]
+            new_j = master_hash[j]
+            matrix[new_i, new_j] = sparse_matrix_csr[i, j]
+
+        return matrix, master_hash, reverse_hash
+
+
 
     def exit_procedure(self):
         self.close()

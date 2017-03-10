@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30
- Updated:    30/09/2016
+ Updated:    26/02/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -21,7 +21,8 @@
 
 from qgis.core import *
 import qgis
-from PyQt4 import QtGui
+from PyQt4 import QtGui, uic
+
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 import numpy as np
@@ -32,7 +33,6 @@ from auxiliary_functions import *
 from global_parameters import *
 
 from load_matrix_class import LoadMatrix
-from ui_matrix_loader import *
 
 no_omx = False
 try:
@@ -40,14 +40,16 @@ try:
 except:
     no_omx = True
 
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.abspath(__file__)) + "/forms/", 'ui_matrix_loader.ui'))
 
-class LoadMatrixDialog(QtGui.QDialog, Ui_matrix_loader):
-    def __init__(self, iface):
+
+class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
+    def __init__(self, iface, sparse=False):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
-
+        self.sparse = sparse
         self.layer = None
         self.orig = None
         self.dest = None
@@ -149,7 +151,7 @@ class LoadMatrixDialog(QtGui.QDialog, Ui_matrix_loader):
                 idx3 = self.layer.fieldNameIndex(self.field_cells.currentText())
                 idx = [idx1, idx2, idx3]
 
-                self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), self.layer, idx)
+                self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), self.layer, idx, sparse=self.sparse)
                 self.run_thread()
 
         if self.radio_npy_matrix.isChecked():

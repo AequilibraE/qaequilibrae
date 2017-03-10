@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    June/05/2015
- Updated:    30/09/2016
+ Updated:    25/02/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -24,6 +24,9 @@ import csv
 import cPickle
 from datetime import datetime
 import uuid
+
+VERSION = "0.3.5"
+
 
 '''description: Description of the graph (OPTIONAL)
     num_links: Number of directed links in the graph
@@ -51,7 +54,7 @@ class Graph:
         @type graph: Numpy record array
         """
 
-        self.required_default_fields = ['link_id', 'a_node', 'b_node', 'direction', 'length']
+        self.required_default_fields = ['link_id', 'a_node', 'b_node', 'direction']
         self.other_fields = ''
         self.date = str(datetime.now())
 
@@ -65,9 +68,10 @@ class Graph:
         # These are the fields actually used in computing paths
         self.fs = False      # This method will hold the forward star for the graph
         self.b_node = False  # b node for each directed link
-        self.cost = False    # This array holds the values being used in the shortest path routine
+        self.cost = None    # This array holds the values being used in the shortest path routine
         self.skims = False   # 2-D Array with the fields to be computed as skims
         self.skim_fields = False # List of skim fields to be used in computation
+        self.cost_field = False # Name of the cost field
         self.ids = False     # 1-D Array with link IDs (sequence from 0 to N-1)
 
         self.block_centroid_flows = False
@@ -78,8 +82,7 @@ class Graph:
         self.status = 'NO network loaded'
         self.network_ok = False
         self.type_loaded = False
-
-        self.__version__ = '0.3.4'
+        self.__version__ = VERSION
 
         # Randomly generate a unique Graph ID randomly
         self.__id__ = uuid.uuid4().hex
@@ -366,8 +369,7 @@ class Graph:
                          ('a_node', np.int32),
                          ('b_node', np.int32),
                          ('direction', np.int8),
-                         ('id', np.int32),
-                         ('length', np.float64)]
+                         ('id', np.int32)]
 
                 for i in all_titles:
                     if i not in self.required_default_fields and i[0:-3] not in self.required_default_fields:
@@ -382,7 +384,7 @@ class Graph:
                 a4 = a3 + zers.shape[0]
 
                 for i in all_titles:
-                    if i in self.required_default_fields and i not in ['a_node', 'b_node', 'direction']:
+                    if i == 'link_id':
                         self.graph[i][0:a1] = negs[i]
                         self.graph[i][a1:a2] = poss[i]
                         self.graph[i][a2:a3] = zers[i]
@@ -405,7 +407,6 @@ class Graph:
                         self.graph[i][a1:a2] = 1
                         self.graph[i][a2:a3] = -1
                         self.graph[i][a3:a4] = 1
-
                     else:
                         if i[-3:] == '_ab':
                             self.graph[i[0:-3]][0:a1] = negs[i[0:-3] + '_ba']
@@ -437,7 +438,7 @@ class Graph:
                 self.b_node = self.graph['b_node']
 
     # We set which are the fields that are going to be minimized in this file
-    def set_graph(self, centroids=None, cost_field='length', skim_fields=False, block_centroid_flows=False):
+    def set_graph(self, centroids=None, cost_field=None, skim_fields=False, block_centroid_flows=False):
         """
         :type self: object
         :type skim_fields: list of fields for skims
@@ -446,22 +447,29 @@ class Graph:
             self.centroids = centroids
         self.block_centroid_flows = block_centroid_flows
 
+        if cost_field is not None:
+            self.cost_field = cost_field
+            if self.graph[cost_field].dtype == np.float64:
+                self.cost = self.graph[cost_field]
+            else:
+                print 'Cost field with wrong type. Converting to float64'
+                self.cost = self.graph[cost_field].astype(np.float64)
 
-        if self.graph[cost_field].dtype == np.float64:
-            self.cost = self.graph[cost_field]
+        skim_fields = []
+        if self.cost is not None:
+            if not skim_fields:
+                skim_fields = [self.cost_field, self.cost_field]
+            else:
+                s = [self.cost_field]
+                for i in skim_fields:
+                    s.append(i)
+                skim_fields = s
         else:
-            print 'Cost field with wrong type. Converting to float64'
-            self.cost = self.graph[cost_field].astype(np.float64)
-
-        if not skim_fields:
-            skim_fields = [cost_field, cost_field]
-        else:
-            s = [cost_field]
-            for i in skim_fields:
-                s.append(i)
-            skim_fields = s
+            if skim_fields:
+                print 'Before setting skims, you need to set the cost field'
 
         t = False
+        print skim_fields
         for i in skim_fields:
             if self.graph[i].dtype != np.float64:
                 t = True
@@ -547,7 +555,7 @@ class Graph:
                 self.status = 'Field "%s" in the network array has the wrong type. Please refer to the documentation' % field
 
                 # Uniqueness of the id
-        link_ids = self.network['link_id']
+        link_ids = self.network['link_id'].astype(np.int)
         a = np.bincount(link_ids)
         if np.max(a) > 1:
             self.status = '"link_id" field not unique'
@@ -573,11 +581,11 @@ class Graph:
                 self.status = 'Field "%s" in the network array has the wrong type. Please refer to the documentation' % field
 
                 # Uniqueness of the graph id
-        a = np.bincount(self.graph['id'])
+        a = np.bincount(self.graph['id'].astype(np.int))
         if np.max(a) > 1:
             self.status = '"id" field not unique'
 
-        a = np.bincount(self.graph['link_id'])
+        a = np.bincount(self.graph['link_id'].astype(np.int))
         if np.max(a) > 2:
             self.status = '"link_id" field has more than one link per direction'
 

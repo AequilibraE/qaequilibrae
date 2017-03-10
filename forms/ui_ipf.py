@@ -164,7 +164,7 @@ class Ui_ipf(object):
         self.but_load_new_matrix.setText(_translate("ipf", "Load seed matrix", None))
         self.apply_ipf.setText(_translate("ipf", "Run IPF", None))
         self.matrix_name.setText(_translate("ipf", "No matrix loaded", None))
-        self.but_load_rows.setText(_translate("ipf", "Load rows vector", None))
+        self.but_load_rows.setText(_translate("ipf", "Load zones vector", None))
         self.but_load_columns.setText(_translate("ipf", "Load columns vector", None))
         self.columns_name.setText(_translate("ipf", "No vector loaded", None))
         self.rows_name.setText(_translate("ipf", "No vector loaded", None))

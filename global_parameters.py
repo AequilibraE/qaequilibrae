@@ -16,3 +16,14 @@ integer_types = [2, 4]
 float_types = [6]
 string_types = [10]
 numeric_types = integer_types + float_types
+
+directions_dictionary = {'AB': 1,
+                         'BA': -1,
+                         1: 'AB',
+                         -1: 'BA'
+                        }
+
+
+reserved_fields = ['A_Node', 'B_node']
+
+
