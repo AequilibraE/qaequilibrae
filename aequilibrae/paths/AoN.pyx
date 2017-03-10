@@ -70,16 +70,18 @@ def one_to_all(origin, demand, graph, result, aux_result, curr_thread):
     # memory views we will need
     cdef double [:] demand_view = demand
 
+    # views from the graph
     cdef int [:] graph_fs_view = graph.fs
-
     cdef double [:] g_view = graph.cost
     cdef int [:] ids_graph_view = graph.ids
     cdef int [:] original_b_nodes_view = graph.b_node
     cdef double [:, :] graph_skim_view = graph.skims
+
+    # views from the result object
     cdef double [:, :] final_skim_matrices_view = result.skims[O, :, :]
     cdef int [:] no_path_view = result.no_path[O, :]
 
-
+    # views from the aux-result object
     cdef int [:] predecessors_view = aux_result.predecessors[:, curr_thread]
     cdef double [:, :] skim_matrix_view = aux_result.temporary_skims[:, :, curr_thread]
     cdef int [:] reached_first_view = aux_result.reached_first[:, curr_thread]
