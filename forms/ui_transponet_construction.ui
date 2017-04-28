@@ -45,6 +45,11 @@
      </column>
      <column>
       <property name="text">
+       <string>required</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Property</string>
       </property>
      </column>
@@ -106,12 +111,23 @@
      </column>
      <column>
       <property name="text">
+       <string>Required</string>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignVCenter</set>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Property</string>
       </property>
      </column>
      <column>
       <property name="text">
        <string>keep</string>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignVCenter</set>
       </property>
      </column>
     </widget>
