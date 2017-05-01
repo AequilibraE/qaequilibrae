@@ -22,9 +22,11 @@ CREATE TABLE 'links' (
   capacity_ab REAL,
   capacity_ba REAL,
   speed_ab REAL,
-  speed_ba REAL
+  speed_ba REAL,
   'length' REAL
 );
+#
+SELECT InitSpatialMetaData();
 #
 SELECT AddGeometryColumn( 'links', 'geometry', 4326, 'LINESTRING', 'XY' );
 #
@@ -40,6 +42,8 @@ CREATE TABLE 'nodes' (
   ogc_fid INTEGER PRIMARY KEY, -- Hidden widget
   node_id INTEGER UNIQUE NOT NULL -- Text edit widget with 'Not null' constraint
 );
+#
+SELECT InitSpatialMetaData();
 #
 SELECT AddGeometryColumn( 'nodes', 'geometry', 4326, 'POINT', 'XY' );
 #

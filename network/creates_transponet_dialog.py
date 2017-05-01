@@ -67,8 +67,10 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         self.node_field_indices = {}
         self.link_field_indices = {}
 
-        self.changed_layer('nodes')
-        self.changed_layer('links')
+        if self.node_layers_list.currentIndex() >= 0:
+            self.changed_layer('nodes')
+        if self.link_layers_list.currentIndex() >= 0:
+            self.changed_layer('links')
 
     def changed_layer(self, layer_type):
         if layer_type == 'nodes':
@@ -109,14 +111,36 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
 
             table.setCellWidget(counter, 1, centers_item(q))
 
-            q = QCheckBox()
-            q.setChecked(True)
-            q.stateChanged.connect(partial(self.set_field_to_keep, layer_type))
-            table.setCellWidget(counter, 3, centers_item(q))
+            chb = QCheckBox()
+            chb.setChecked(True)
+            chb.stateChanged.connect(partial(self.set_field_to_keep, layer_type))
+            table.setCellWidget(counter, 3, centers_item(chb))
             counter += 1
 
         self.counter[layer_type] = counter
 
+    def find_similar_texts_in_combobox(self, text, comb):
+        index = comb.findText(text, Qt.MatchFixedString)
+        if index >= 0:
+            comb.setCurrentIndex(index)
+        else:
+            index = comb.findText(text[0:min(5,len(text))], Qt.MatchFixedString)
+            if index >= 0:
+                comb.setCurrentIndex(index)
+            else:
+                # We treat special cases
+                if text.lower() == "dir":
+                    text = 'direction'
+                if text.lower() == 'id':
+                    index = comb.findText('link_id', Qt.MatchFixedString)
+                    if index >= 0:
+                        text = 'link_id'
+                    index = comb.findText('node_id', Qt.MatchFixedString)
+                    if index >= 0:
+                        text = 'link_id'
+                index = comb.findText(text, Qt.MatchFixedString)
+                if index >= 0:
+                    comb.setCurrentIndex(index)
 
     def set_field_to_default(self, layer_type):
         if layer_type == 'nodes':
@@ -152,11 +176,13 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
             for i, q in enumerate(table.cellWidget(row, 3).findChildren(QCheckBox)):
                 q.setChecked(True)
 
-            q = QComboBox()
+            cbb = QComboBox()
             for i in required_fields:
-                q.addItem(i)
+                cbb.addItem(i)
 
-            table.setCellWidget(row, 2, centers_item(q))
+            text = table.item(row, 0).text()
+            self.find_similar_texts_in_combobox(text, cbb)
+            table.setCellWidget(row, 2, centers_item(cbb))
 
 
     def set_field_to_keep(self, layer_type):
@@ -188,7 +214,7 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
             conn = db.connect(self.output_file)
             curr = conn.cursor()
 
-            # We add the node layer
+            # We add the Nodes layer
             for f in self.node_layer.getFeatures():
                 attrs = []
                 for q in self.node_fields:
@@ -197,9 +223,23 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
                 sql = 'INSERT INTO nodes (' + nfields + ', geometry) '
                 sql += "VALUES (" + attrs + ", "
                 sql += "GeomFromText('" + f.geometry().exportToWkt().upper() + "', " + str(self.node_layer.crs().authid().split(":")[1]) + "))"
-                print sql
                 a = curr.execute(sql)
             conn.commit()
+
+            # We add the Lines layer
+            for f in self.link_layer.getFeatures():
+                attrs = []
+                for q in self.link_fields:
+                    attrs.append(str(f.attributes()[self.link_field_indices[q]]))
+                attrs = ', '.join(attrs)
+                sql = 'INSERT INTO links (' + lfields + ', geometry) '
+                sql += "VALUES (" + attrs + ", "
+                sql += "GeomFromText('" + f.geometry().exportToWkt().upper() + "', " + str(
+                    self.link_layer.crs().authid().split(":")[1]) + "))"
+                a = curr.execute(sql)
+            conn.commit()
+
+
             # DONE
             self.run_series_of_queries(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)), 'triggers.sql'))
@@ -250,10 +290,10 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         sql_commands_list = query_list.split('#')
         # Run one query/command at a time
         for cmd in sql_commands_list:
-            print cmd
             try:
                 curr.execute(cmd)
             except:
+                print "\n\n\nQuery error:"
                 print cmd
         conn.commit()
         conn.close()
