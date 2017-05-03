@@ -207,38 +207,62 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         if self.consistency_checks():
             nfields = ", ".join(self.node_fields)
             lfields = ", ".join(self.link_fields)
-
             self.output_file, file_type = GetOutputFileName(self, 'TranspoNet', ["SQLite(*.sqlite)"], ".sqlite", self.path)
             self.run_series_of_queries(os.path.join(os.path.dirname(os.path.abspath(__file__)),'queries_for_empty_file.sql'))
 
             conn = db.connect(self.output_file)
             curr = conn.cursor()
 
-            # We add the Nodes layer
-            for f in self.node_layer.getFeatures():
-                attrs = []
-                for q in self.node_fields:
-                    attrs.append(str(f.attributes()[self.node_field_indices[q]]))
-                attrs = ', '.join(attrs)
-                sql = 'INSERT INTO nodes (' + nfields + ', geometry) '
-                sql += "VALUES (" + attrs + ", "
-                sql += "GeomFromText('" + f.geometry().exportToWkt().upper() + "', " + str(self.node_layer.crs().authid().split(":")[1]) + "))"
-                a = curr.execute(sql)
-            conn.commit()
+            # Adds the non-standard fields to a layer
+            def adds_non_standard_fields_to_layers(table, layer, layer_fields, required_fields, field_indices):
+                fields = layer.pendingFields()
+                string_fields = []
+                for f in layer_fields:
+                    if f not in required_fields:
+                        field = fields[field_indices[f]]
+                        field_length = field.length()
+                        if not field.isNumeric():
+                            field_type = 'char'
+                            string_fields.append(field_indices[f])
+                        else:
+                            print field.typeName()
+                            if 'Int' in field.typeName():
+                                field_type = 'INTEGER'
+                            else:
+                                field_type = 'REAL'
+                        sql = 'alter table ' + table + ' add column ' + f + ' ' + field_type + '(' + str(field_length) + ')'
+                        curr.execute(sql)
+                        conn.commit()
+                return string_fields
 
-            # We add the Lines layer
-            for f in self.link_layer.getFeatures():
-                attrs = []
-                for q in self.link_fields:
-                    attrs.append(str(f.attributes()[self.link_field_indices[q]]))
-                attrs = ', '.join(attrs)
-                sql = 'INSERT INTO links (' + lfields + ', geometry) '
-                sql += "VALUES (" + attrs + ", "
-                sql += "GeomFromText('" + f.geometry().exportToWkt().upper() + "', " + str(
-                    self.link_layer.crs().authid().split(":")[1]) + "))"
-                a = curr.execute(sql)
-            conn.commit()
+            node_string_fields = adds_non_standard_fields_to_layers('nodes', self.node_layer, self.node_fields,
+                                                                    self.required_fields_nodes, self.node_field_indices)
 
+            link_string_fields = adds_non_standard_fields_to_layers('links', self.link_layer, self.link_fields,
+                                                                    self.required_fields_links, self.link_field_indices)
+
+            def transfer_layer_features(table, layer, layer_fields, field_indices, string_fields, field_titles):
+                # We add the Nodes layer
+                for f in layer.getFeatures():
+                    attrs = []
+                    for q in layer_fields:
+                        if field_indices[q] in string_fields:
+                            attrs.append("'" + f.attributes()[field_indices[q]] + "'")
+                        else:
+                            attrs.append(str(f.attributes()[field_indices[q]]))
+                    attrs = ', '.join(attrs)
+                    sql = 'INSERT INTO ' + table + ' (' + field_titles + ', geometry) '
+                    sql += "VALUES (" + attrs + ", "
+                    sql += "GeomFromText('" + f.geometry().exportToWkt().upper() + "', " + str(
+                        layer.crs().authid().split(":")[1]) + "))"
+                    a = curr.execute(sql)
+                conn.commit()
+
+            transfer_layer_features('nodes', self.node_layer, self.node_fields, self.node_field_indices,
+                                    node_string_fields, nfields)
+
+            transfer_layer_features('links', self.link_layer, self.link_fields, self.link_field_indices,
+                                    link_string_fields, lfields)
 
             # DONE
             self.run_series_of_queries(
@@ -246,10 +270,11 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
 
     def consistency_checks(self):
         passed_checks = True
-        def compile_fields(layer, table, link_type):
+
+        def compile_fields(layer, table, layer_type):
             name_fields = []
             name_field_indices = {}
-            for row in range(self.counter[link_type]):
+            for row in range(self.counter[layer_type]):
                 for q in table.cellWidget(row, 3).findChildren(QCheckBox):
                     if q.isChecked():
                         for j in table.cellWidget(row, 1).findChildren(QCheckBox):
