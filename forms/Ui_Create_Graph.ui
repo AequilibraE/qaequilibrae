@@ -70,7 +70,7 @@
   <widget class="QCheckBox" name="chk_dual_fields">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>301</x>
      <y>63</y>
      <width>101</width>
      <height>17</height>
@@ -86,19 +86,6 @@
    </property>
    <property name="checked">
     <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="network_layer">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>20</y>
-     <width>431</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="maxVisibleItems">
-    <number>10</number>
    </property>
   </widget>
   <widget class="QLabel" name="lblnodematch_11">
@@ -122,7 +109,7 @@
   <widget class="QCheckBox" name="links_are_bi_directional">
    <property name="geometry">
     <rect>
-     <x>320</x>
+     <x>301</x>
      <y>100</y>
      <width>161</width>
      <height>20</height>
@@ -403,9 +390,25 @@
     <string>Advanced</string>
    </property>
   </widget>
+  <widget class="QgsMapLayerComboBox" name="network_layer">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>20</y>
+     <width>431</width>
+     <height>24</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
-  <tabstop>network_layer</tabstop>
   <tabstop>cmb_link_id</tabstop>
   <tabstop>chk_dual_fields</tabstop>
   <tabstop>links_are_bi_directional</tabstop>

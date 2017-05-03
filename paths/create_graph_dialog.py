@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30
- Updated:    30/09/2016
+ Updated:    2017-05-04
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -35,6 +35,9 @@ from global_parameters import *
 from create_graph_procedure import GraphCreation
 from graph_advanced_features import GraphAdvancedFeatures
 from get_output_file_name import GetOutputFileName
+from qgis.gui import QgsMapLayerProxyModel
+
+sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/forms/", 'Ui_Create_Graph.ui'))
 
 
@@ -78,9 +81,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             partial(self.browse_outfile, 'Result file', self.graph_file, "Aequilibrae Graph(*.aeg)"))
 
         # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
-            if layer.wkbType() in line_types:
-                self.network_layer.addItem(layer.name())
+        self.network_layer.setFilters(QgsMapLayerProxyModel.LineLayer)
 
         # loads default path from parameters
         self.path = standard_path()
