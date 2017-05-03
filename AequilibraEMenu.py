@@ -33,7 +33,7 @@ from parameters_dialog import ParameterDialog
 from binary_downloader_class import BinaryDownloaderDialog
 from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
-from .network import NetworkPreparationDialog, AddConnectorsDialog
+from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 
 no_binary = False
@@ -85,6 +85,12 @@ class AequilibraEMenu:
         self.add_connectors_action = QAction(icon, u"Adding Connectors", self.iface.mainWindow())
         QObject.connect(self.add_connectors_action, SIGNAL("triggered()"), self.run_add_connectors)
         self.network_menu.addAction(self.add_connectors_action)
+
+        # Creating TranspoNet
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
+        self.create_transponet_action = QAction(icon, u"Create TranspoNet", self.iface.mainWindow())
+        QObject.connect(self.create_transponet_action, SIGNAL("triggered()"), self.run_create_transponet)
+        self.network_menu.addAction(self.create_transponet_action)
 
         # # ########################################################################
         # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -235,6 +241,13 @@ class AequilibraEMenu:
     # run method that calls the network preparation section of the code
     def run_net_prep(self):
         dlg2 = NetworkPreparationDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+        # If we wanted modal, we would eliminate the dlg2.show()
+
+    # run method that calls the network preparation section of the code
+    def run_create_transponet(self):
+        dlg2 = CreatesTranspoNetDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
         # If we wanted modal, we would eliminate the dlg2.show()

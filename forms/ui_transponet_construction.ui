@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ui_transponet_construction</class>
+ <widget class="QDialog" name="ui_transponet_construction">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>535</width>
+    <height>448</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>TranpoNet preparation</string>
+  </property>
+  <widget class="QTabWidget" name="tabs_list_widget">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>15</y>
+     <width>510</width>
+     <height>391</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>LINK layer fields</string>
+    </attribute>
+    <widget class="QTableWidget" name="table_link_fields">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>65</y>
+       <width>475</width>
+       <height>275</height>
+      </rect>
+     </property>
+     <column>
+      <property name="text">
+       <string>Field</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>required</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Property</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>keep</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QgsMapLayerComboBox" name="link_layers_list">
+     <property name="geometry">
+      <rect>
+       <x>71</x>
+       <y>15</y>
+       <width>421</width>
+       <height>30</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>18</x>
+       <y>15</y>
+       <width>56</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <italic>true</italic>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Layer</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>NODE layer fields</string>
+    </attribute>
+    <widget class="QTableWidget" name="table_node_fields">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>65</y>
+       <width>475</width>
+       <height>275</height>
+      </rect>
+     </property>
+     <column>
+      <property name="text">
+       <string>Field</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Required</string>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignVCenter</set>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Property</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>keep</string>
+      </property>
+      <property name="textAlignment">
+       <set>AlignLeft|AlignVCenter</set>
+      </property>
+     </column>
+    </widget>
+    <widget class="QgsMapLayerComboBox" name="node_layers_list">
+     <property name="geometry">
+      <rect>
+       <x>71</x>
+       <y>15</y>
+       <width>421</width>
+       <height>30</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>18</x>
+       <y>15</y>
+       <width>56</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <italic>true</italic>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Layer</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="but_create_network_file">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>410</y>
+     <width>111</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Create Network</string>
+   </property>
+  </widget>
+  <widget class="QProgressBar" name="progressbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>410</y>
+     <width>231</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>170</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>240</red>
+         <green>240</green>
+         <blue>240</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>51</red>
+         <green>153</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="textVisible">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="progress_label">
+   <property name="geometry">
+    <rect>
+     <x>261</x>
+     <y>412</y>
+     <width>261</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Status Message 0</string>
+   </property>
+  </widget>
+  <zorder>progress_label</zorder>
+  <zorder>tabs_list_widget</zorder>
+  <zorder>but_create_network_file</zorder>
+  <zorder>progressbar</zorder>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
