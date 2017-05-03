@@ -14,7 +14,7 @@
  Transponet Repository: https://github.com/AequilibraE/TranspoNet
 
  Created:    2017-04-28
- Updated:    
+ Updated:    2017-05-03
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -28,11 +28,11 @@ from PyQt4 import uic
 from auxiliary_functions import *
 import sys
 from qgis.gui import QgsMapLayerProxyModel
-from pyspatialite import dbapi2 as db
 import os
 from global_parameters import *
 from functools import partial
 from get_output_file_name import GetOutputFileName
+from creates_transponet_procedure import CreatesTranspoNetProcedure
 
 sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -56,7 +56,7 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         self.but_create_network_file.clicked.connect(self.create_net)
         self.counter = {}
         self.output_file = False
-
+        self.error = None
         self.node_layers_list.layerChanged.connect(partial (self.changed_layer, 'nodes'))
         self.node_layers_list.setFilters(QgsMapLayerProxyModel.PointLayer)
 
@@ -71,6 +71,9 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
             self.changed_layer('nodes')
         if self.link_layers_list.currentIndex() >= 0:
             self.changed_layer('links')
+
+        self.progressbar.setVisible(False)
+        self.progress_label.setVisible(False)
 
     def changed_layer(self, layer_type):
         if layer_type == 'nodes':
@@ -205,72 +208,31 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
 
     def create_net(self):
         if self.consistency_checks():
-            nfields = ", ".join(self.node_fields)
-            lfields = ", ".join(self.link_fields)
-            self.output_file, file_type = GetOutputFileName(self, 'TranspoNet', ["SQLite(*.sqlite)"], ".sqlite", self.path)
-            self.run_series_of_queries(os.path.join(os.path.dirname(os.path.abspath(__file__)),'queries_for_empty_file.sql'))
+            self.output_file, file_type = GetOutputFileName(self, 'TranspoNet', ["SQLite(*.sqlite)"], ".sqlite",
+                                                            self.path)
 
-            conn = db.connect(self.output_file)
-            curr = conn.cursor()
+            parameters = [self.output_file,
+                          self.node_fields,
+                          self.link_fields,
+                          self.node_layer,
+                          self.required_fields_nodes,
+                          self.node_field_indices,
+                          self.link_layer,
+                          self.required_fields_links,
+                          self.link_field_indices]
 
-            # Adds the non-standard fields to a layer
-            def adds_non_standard_fields_to_layers(table, layer, layer_fields, required_fields, field_indices):
-                fields = layer.pendingFields()
-                string_fields = []
-                for f in layer_fields:
-                    if f not in required_fields:
-                        field = fields[field_indices[f]]
-                        field_length = field.length()
-                        if not field.isNumeric():
-                            field_type = 'char'
-                            string_fields.append(field_indices[f])
-                        else:
-                            print field.typeName()
-                            if 'Int' in field.typeName():
-                                field_type = 'INTEGER'
-                            else:
-                                field_type = 'REAL'
-                        sql = 'alter table ' + table + ' add column ' + f + ' ' + field_type + '(' + str(field_length) + ')'
-                        curr.execute(sql)
-                        conn.commit()
-                return string_fields
-
-            node_string_fields = adds_non_standard_fields_to_layers('nodes', self.node_layer, self.node_fields,
-                                                                    self.required_fields_nodes, self.node_field_indices)
-
-            link_string_fields = adds_non_standard_fields_to_layers('links', self.link_layer, self.link_fields,
-                                                                    self.required_fields_links, self.link_field_indices)
-
-            def transfer_layer_features(table, layer, layer_fields, field_indices, string_fields, field_titles):
-                # We add the Nodes layer
-                for f in layer.getFeatures():
-                    attrs = []
-                    for q in layer_fields:
-                        if field_indices[q] in string_fields:
-                            attrs.append("'" + f.attributes()[field_indices[q]] + "'")
-                        else:
-                            attrs.append(str(f.attributes()[field_indices[q]]))
-                    attrs = ', '.join(attrs)
-                    sql = 'INSERT INTO ' + table + ' (' + field_titles + ', geometry) '
-                    sql += "VALUES (" + attrs + ", "
-                    sql += "GeomFromText('" + f.geometry().exportToWkt().upper() + "', " + str(
-                        layer.crs().authid().split(":")[1]) + "))"
-                    a = curr.execute(sql)
-                conn.commit()
-
-            transfer_layer_features('nodes', self.node_layer, self.node_fields, self.node_field_indices,
-                                    node_string_fields, nfields)
-
-            transfer_layer_features('links', self.link_layer, self.link_fields, self.link_field_indices,
-                                    link_string_fields, lfields)
-
-            # DONE
-            self.run_series_of_queries(
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), 'triggers.sql'))
+            self.but_create_network_file.setVisible(False)
+            self.progressbar.setVisible(True)
+            self.progress_label.setVisible(True)
+            self.worker_thread = CreatesTranspoNetProcedure(qgis.utils.iface.mainWindow(), *parameters)
+            self.run_thread()
+        else:
+            qgis.utils.iface.messageBar().pushMessage("Missing mandatory fields settings", self.error, level=3,
+                                                      duration=3)
 
     def consistency_checks(self):
         passed_checks = True
-
+        self.error = []
         def compile_fields(layer, table, layer_type):
             name_fields = []
             name_field_indices = {}
@@ -295,32 +257,38 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         for i in self.required_fields_nodes:
             if i not in self.node_fields:
                 passed_checks = False
-                break
+                self.error.append(i)
 
         for i in self.required_fields_links:
             if i not in self.link_fields:
                 passed_checks = False
-                break
+                self.error.append(i)
+
+        if not passed_checks:
+            self.error = '(' + ', '.join(self.error) + ')'
+
         return passed_checks
 
-    def run_series_of_queries(self, queries):
-
-        conn = db.connect(self.output_file)
-        curr = conn.cursor()
-        # Reads all commands
-        sql_file = open(queries, 'r')
-        query_list = sql_file.read()
-        sql_file.close()
-        # Split individual commands
-        sql_commands_list = query_list.split('#')
-        # Run one query/command at a time
-        for cmd in sql_commands_list:
-            try:
-                curr.execute(cmd)
-            except:
-                print "\n\n\nQuery error:"
-                print cmd
-        conn.commit()
-        conn.close()
     def exit_procedure(self):
         self.close()
+
+    def run_thread(self):
+        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
+                        self.progress_range_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("jobFinished( PyQt_PyObject )"), self.job_finished_from_thread)
+        self.worker_thread.start()
+        self.show()
+
+    def progress_range_from_thread(self, val):
+        self.progressbar.setRange(0, val)
+
+    def progress_value_from_thread(self, value):
+        self.progressbar.setValue(value)
+
+    def progress_text_from_thread(self, value):
+        self.progress_label.setText(value)
+
+    def job_finished_from_thread(self, success):
+        self.exit_procedure()
