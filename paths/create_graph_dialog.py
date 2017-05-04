@@ -76,7 +76,6 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         # Calls the advanced features
         self.but_advanced.clicked.connect(self.call_advanced_features)
 
-        #
         # Create graph
         self.but_create_graph.clicked.connect(self.run_graph_creation)
         #
@@ -90,6 +89,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         self.path = standard_path()
         self.dual_fields()
         self.bi_directional()
+        self.load_fields_to_combo_boxes()
 
     def bi_directional(self):
         if self.links_are_bi_directional.isChecked():

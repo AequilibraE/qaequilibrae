@@ -15,6 +15,7 @@ def GetOutputFileName(clss, box_name, file_types, default_type, start_path):
     extension = None
     if dlg.exec_():
         new_name = dlg.selectedFiles()[0]
+        new_name = new_name.replace('..', '.')
         if new_name[-4] == '.':
             extension = new_name[-3:]
         else:
