@@ -25,12 +25,12 @@ from qgis.gui import QgsMapToolEmitPoint
 from PyQt4 import QtGui
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-import PyQt4
+from PyQt4 import uic, QtCore
 from random import randint
 
 import sys
 import os
-from auxiliary_functions import *
+from ..common_tools.auxiliary_functions import *
 from point_tool import PointTool
 from aequilibrae.paths.results import PathResults
 
@@ -40,16 +40,14 @@ try:
 except:
     no_binary = True
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
-# Inside def setupUi
-# self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+#sys.modules['qgsmaplayercombobox'] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_compute_path.ui'))
 
-from ui_compute_path import *
-from load_graph_layer_setting_dialog import LoadGraphLayerSettingDialog
+from ..common_tools import LoadGraphLayerSettingDialog
 
-class ShortestPathDialog(QtGui.QDialog, Ui_compute_path):
+class ShortestPathDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         QtGui.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)

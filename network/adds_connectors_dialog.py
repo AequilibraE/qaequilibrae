@@ -23,19 +23,18 @@ import qgis
 from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4 import uic
 
-from auxiliary_functions import *
+from ..common_tools.auxiliary_functions import *
 import sys
 import os
-from global_parameters import *
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
+from ..common_tools.global_parameters import *
 
 from adds_connectors_procedure import AddsConnectorsProcedure
-from ui_ConnectingCentroids import Ui_ConnectingCentroids
 
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_connecting_centroids.ui'))
 
-class AddConnectorsDialog(QDialog, Ui_ConnectingCentroids):
+class AddConnectorsDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface

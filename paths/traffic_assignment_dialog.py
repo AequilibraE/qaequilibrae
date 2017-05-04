@@ -23,7 +23,7 @@ from qgis.core import *
 import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui, QtCore, uic
 from qgis.gui import QgsMapLayerProxyModel, QgsFieldProxyModel
 import sys
 import os
@@ -32,15 +32,15 @@ import numpy as np
 import uuid
 import shutil
 
-from global_parameters import integer_types
-from auxiliary_functions import *
-from load_matrix_dialog import LoadMatrixDialog
-from report_dialog import ReportDialog
-from numpy_model import NumpyModel
-from ui_traffic_assignment import Ui_traffic_assignment
+from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import *
+from ..common_tools import LoadMatrixDialog
+from ..common_tools import ReportDialog
+from ..common_tools import NumpyModel
+from ..common_tools import GetOutputFileName
+
 from traffic_assignment_procedure import TrafficAssignmentProcedure
-from get_output_file_name import GetOutputFileName
-from load_select_link_query_builder import LoadSelectLinkQueryBuilder
+from load_select_link_query_builder_dialog import LoadSelectLinkQueryBuilderDialog
 
 no_binary = False
 try:
@@ -48,7 +48,11 @@ try:
 except:
     no_binary = True
 
-class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
+sys.modules['qgsmaplayercombobox'] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_traffic_assignment.ui'))
+
+
+class TrafficAssignmentDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         class OutputType:
             def __init__(self):
@@ -149,7 +153,7 @@ class TrafficAssignmentDialog(QDialog, Ui_traffic_assignment):
             counter = self.tot_link_flow_extract
 
         button.setEnabled(False)
-        dlg2 = LoadSelectLinkQueryBuilder(self.iface, self.graph.graph, message)
+        dlg2 = LoadSelectLinkQueryBuilderDialog(self.iface, self.graph.graph, message)
         dlg2.exec_()
 
         if dlg2.links is not None:

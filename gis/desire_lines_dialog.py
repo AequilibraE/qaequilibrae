@@ -23,22 +23,24 @@ from qgis.core import *
 import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4 import uic
 import sys
 import os
 import numpy as np
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
-from global_parameters import *
+from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import *
 
-from auxiliary_functions import *
-from numpy_model import NumpyModel
-from load_matrix_dialog import LoadMatrixDialog
+from ..common_tools import NumpyModel
+from ..common_tools import LoadMatrixDialog
+from ..common_tools import ReportDialog
 
 from desire_lines_procedure import DesireLinesProcedure
-from forms import Ui_DesireLines
-from report_dialog import ReportDialog
 
-class DesireLinesDialog(QDialog, Ui_DesireLines):
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_DesireLines.ui'))
+
+class DesireLinesDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface

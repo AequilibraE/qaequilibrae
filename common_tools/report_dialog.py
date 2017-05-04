@@ -20,19 +20,16 @@
  """
 
 from qgis.core import *
-from PyQt4 import QtGui
+from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
 
 import sys
 import os
 from auxiliary_functions import standard_path
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_report.ui'))
 
-from ui_report import Ui_report
-
-class ReportDialog(QtGui.QDialog, Ui_report):
+class ReportDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface, reporting):
         QDialog.__init__(self)
         self.iface = iface

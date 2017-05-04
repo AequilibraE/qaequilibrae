@@ -21,22 +21,20 @@
 
 from qgis.core import *
 import qgis
-from PyQt4 import QtGui
+from PyQt4 import QtGui, uic, QtCore
 from PyQt4.QtGui import *
 
 import sys
 import os
 from functools import partial
-from auxiliary_functions import *
-from global_parameters import *
-from aequilibrae.paths import Graph
+from ..common_tools.auxiliary_functions import *
+from ..common_tools.global_parameters import *
+from ..aequilibrae.paths import Graph
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
-from ui_load_network_info import *
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_load_network_info.ui'))
 
-class LoadGraphLayerSettingDialog(QtGui.QDialog, Ui_load_network_info):
+class LoadGraphLayerSettingDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         QtGui.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)

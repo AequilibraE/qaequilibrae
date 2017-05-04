@@ -21,7 +21,7 @@
 
 from qgis.core import *
 import qgis
-from PyQt4 import QtGui
+from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 import numpy as np
@@ -31,11 +31,8 @@ from functools import partial
 from auxiliary_functions import *
 from global_parameters import *
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
 from load_vector_class import LoadVector
-from ui_vector_loader import Ui_vector_loader
 
 try:
     import omx
@@ -43,7 +40,9 @@ try:
 except:
     OMX = False
 
-class LoadVectorDialog(QtGui.QDialog, Ui_vector_loader):
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_vector_loader.ui'))
+
+class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface

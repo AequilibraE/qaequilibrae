@@ -29,16 +29,19 @@ from PyQt4 import QtGui, uic
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
+from PyQt4 import uic
 
-from auxiliary_functions import *
-from global_parameters import *
+from ..common_tools.auxiliary_functions import *
+from ..common_tools.global_parameters import *
+from ..common_tools import GetOutputFileName
+
 from create_graph_procedure import GraphCreation
 from graph_advanced_features import GraphAdvancedFeatures
-from get_output_file_name import GetOutputFileName
+
 from qgis.gui import QgsMapLayerProxyModel
 
-sys.modules['qgsmaplayercombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/forms/", 'Ui_Create_Graph.ui'))
+#sys.modules['qgsmaplayercombobox'] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_Create_Graph.ui'))
 
 
 class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):

@@ -16,7 +16,7 @@
  Updated:    26/02/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
+ ------------------auxiliary_functions-----------------------------------------------------------------------------------------
  """
 
 import qgis
@@ -64,7 +64,7 @@ def get_parameter_chain(chain):
 
 # Recovers a group of parameters (or the entire yml) as a dictionary of dictionaries
 def get_parameters_group(group=None):
-    path = os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/"
+    path = os.path.dirname(os.path.dirname(__file__))  + "/aequilibrae/"
     with open(path + 'parameters.yml', 'r') as yml:
         path = yaml.safe_load(yml)
     if group is None:

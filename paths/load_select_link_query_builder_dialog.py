@@ -20,25 +20,21 @@
  """
 # Filtering largely adapted from http://stackoverflow.com/questions/34252413/how-to-create-a-filter-for-qtablewidget
 
-from qgis.core import *
-import qgis
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt4 import uic
 import numpy as np
 
 import sys
-import os
-from auxiliary_functions import *
-from global_parameters import *
-from link_query_model import LinkQueryModel
+from ..common_tools.auxiliary_functions import *
+from ..common_tools.global_parameters import *
+from ..common_tools import LinkQueryModel
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
+#sys.modules['qgsmaplayercombobox'] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_link_query_builder.ui'))
 
-from ui_link_query_builder import Ui_link_query_builder
 
-class LoadSelectLinkQueryBuilder(QtGui.QDialog, Ui_link_query_builder):
+class LoadSelectLinkQueryBuilderDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface, graph, window_title):
         QDialog.__init__(self)
         self.iface = iface

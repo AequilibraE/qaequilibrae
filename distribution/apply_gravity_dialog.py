@@ -19,26 +19,23 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
-import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4 import QtGui, QtCore, uic
-import sys
+from PyQt4 import QtGui, uic
 import os
 from functools import partial
 import numpy as np
 
-from auxiliary_functions import *
-from load_matrix_dialog import LoadMatrixDialog
-from load_vector_dialog import LoadVectorDialog
-from report_dialog import ReportDialog
+
+from ..common_tools.auxiliary_functions import *
+from ..common_tools import ReportDialog
+from ..common_tools import LoadMatrixDialog, LoadVectorDialog
 
 from apply_gravity_procedure import ApplyGravityProcedure
 from load_distribution_model import LoadDistributionModelDialog
 import yaml
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/forms/", 'ui_apply_gravity.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_apply_gravity.ui'))
 
 try:
     import omx

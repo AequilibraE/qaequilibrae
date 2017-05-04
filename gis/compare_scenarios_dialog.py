@@ -24,19 +24,21 @@ from functools import partial
 from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4 import uic
 from qgis.gui import QgsMapLayerProxyModel
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
-from global_parameters import *
+from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import *
+
 from random import randint
 
-from forms import Ui_compare_scenarios
-from auxiliary_functions import *
+sys.modules['qgsfieldcombobox'] = qgis.gui
+sys.modules['qgsmaplayercombobox'] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_compare_scenarios.ui'))
 
-
-class CompareScenariosDialog(QDialog, Ui_compare_scenarios):
+class CompareScenariosDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface

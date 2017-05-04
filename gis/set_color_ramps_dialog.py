@@ -28,16 +28,17 @@ from functools import partial
 from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
+from PyQt4 import uic
 import sys
 import os
-#from qgis.gui  import QgsColorButtonV2, QgsFieldComboBox, QgsMapLayerComboBox
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
 
-from forms import Ui_BandwidthColorRamps
+sys.modules['qgsfieldcombobox'] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_bandwidth_color_ramps.ui'))
 
-class LoadColorRampSelector(QDialog, Ui_BandwidthColorRamps):
+
+
+class LoadColorRampSelector(QDialog, FORM_CLASS):
     def __init__(self, iface, layer):
         QDialog.__init__(self)
         self.iface = iface

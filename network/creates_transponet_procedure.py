@@ -22,10 +22,10 @@
 
 from qgis.core import *
 from PyQt4.QtCore import *
-from auxiliary_functions import *
+from ..common_tools.auxiliary_functions import *
 from pyspatialite import dbapi2 as db
-from global_parameters import *
-from worker_thread import WorkerThread
+from ..common_tools.global_parameters import *
+from ..common_tools import WorkerThread
 
 
 class CreatesTranspoNetProcedure(WorkerThread):

@@ -23,22 +23,22 @@ import qgis
 from qgis.core import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciLexerYAML
+from PyQt4 import uic
 
 import sys
 import os
 import yaml
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-from ui_parameters import *
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_parameters.ui'))
 
 
-class ParameterDialog(QDialog, Ui_parameters):
+class ParameterDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
-        self.path = os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/"
+        self.path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/"
         self.default_values = None
         self.parameter_values = None
         self.current_data = None

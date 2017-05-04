@@ -29,7 +29,7 @@ from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from parameters_dialog import ParameterDialog
+from common_tools import ParameterDialog
 from binary_downloader_class import BinaryDownloaderDialog
 from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog

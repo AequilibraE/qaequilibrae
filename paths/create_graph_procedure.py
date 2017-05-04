@@ -30,7 +30,7 @@ import struct
 
 import  aequilibrae.reserved_fields as reserved_fieds
 from aequilibrae.paths import Graph
-from worker_thread import WorkerThread
+from ..common_tools import WorkerThread
 
 class GraphCreation(WorkerThread):
     def __init__(self, parentThread, net_layer, link_id, direction_field, fields_to_add, selected_only):

@@ -25,18 +25,17 @@ from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import uic
-from auxiliary_functions import *
 import sys
 from qgis.gui import QgsMapLayerProxyModel
 import os
-from global_parameters import *
+from ..common_tools.global_parameters import *
+from ..common_tools import GetOutputFileName
+from ..common_tools.auxiliary_functions import *
 from functools import partial
-from get_output_file_name import GetOutputFileName
 from creates_transponet_procedure import CreatesTranspoNetProcedure
 
 sys.modules['qgsmaplayercombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                            'forms/ui_transponet_construction.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_transponet_construction.ui'))
 
 class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):

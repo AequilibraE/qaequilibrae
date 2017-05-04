@@ -21,9 +21,9 @@
 from PyQt4.QtCore import QVariant, SIGNAL
 from qgis.core import QgsCoordinateTransform, QgsSpatialIndex, QgsFeature, QgsGeometry, QgsField, QgsVectorLayer
 
-from auxiliary_functions import *
-from global_parameters import *
-from worker_thread import WorkerThread
+from ..common_tools.auxiliary_functions import *
+from ..common_tools.global_parameters import *
+from ..common_tools import WorkerThread
 
 
 class LeastCommonDenominatorProcedure(WorkerThread):

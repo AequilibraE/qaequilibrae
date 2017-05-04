@@ -22,9 +22,9 @@
 from qgis.core import *
 from PyQt4.QtCore import *
 import numpy as np
-from auxiliary_functions import *
-from worker_thread import WorkerThread
-from global_parameters import *
+from ..common_tools.auxiliary_functions import *
+from ..common_tools import WorkerThread
+from ..common_tools.global_parameters import *
 
 class FindsNodes(WorkerThread):
     def __init__(self, parentThread, line_layer, new_line_layer, node_layer=False, node_ids=False,

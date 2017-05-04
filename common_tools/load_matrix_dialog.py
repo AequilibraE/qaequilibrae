@@ -29,8 +29,8 @@ import numpy as np
 
 import sys
 import os
-from auxiliary_functions import *
-from global_parameters import *
+from ..common_tools.auxiliary_functions import *
+from ..common_tools.global_parameters import *
 
 from load_matrix_class import LoadMatrix
 
@@ -40,7 +40,7 @@ try:
 except:
     no_omx = True
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.abspath(__file__)) + "/forms/", 'ui_matrix_loader.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_matrix_loader.ui'))
 
 
 class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):

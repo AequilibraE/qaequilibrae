@@ -25,7 +25,7 @@ from PyQt4.QtCore import *
 import itertools
 import numpy as np
 import struct
-from auxiliary_functions import *
+from ..common_tools.auxiliary_functions import *
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import AssignmentResults
 
@@ -41,7 +41,7 @@ try:
 except:
     no_binary = True
 
-from worker_thread import WorkerThread
+from ..common_tools import WorkerThread
 
 class DesireLinesProcedure(WorkerThread):
     def __init__(self, parentThread, layer, id_field, matrix, hash_table, reverse_hash, dl_type):

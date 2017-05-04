@@ -21,21 +21,20 @@
 
 from qgis.core import *
 from PyQt4.QtCore import *
-from PyQt4 import QtGui
+from PyQt4 import QtGui, uic
 import qgis
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
-
 
 # For the GIS tools portion
 from simple_tag_procedure import SimpleTAG
-from forms import Ui_simple_tag
-from global_parameters import *
-from auxiliary_functions import get_vector_layer_by_name
 
+from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import  get_vector_layer_by_name
 
-class SimpleTagDialog(QtGui.QDialog, Ui_simple_tag):
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_simple_tag.ui'))
+
+class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
         QtGui.QDialog.__init__(self)
         self.iface = iface

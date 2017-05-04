@@ -23,20 +23,17 @@ from qgis.core import *
 import qgis
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+from PyQt4 import uic
 
 import sys
-from global_parameters import *
-from auxiliary_functions import *
-
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//forms//")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "//algorithms//")
-
+from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import *
 
 from Network_preparation_procedure import FindsNodes
-from ui_TQ_NetPrep import *
 
-class NetworkPreparationDialog(QDialog, Ui_TQ_NetPrep):
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_network_preparation.ui'))
+
+class NetworkPreparationDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface

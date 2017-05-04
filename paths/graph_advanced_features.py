@@ -21,10 +21,10 @@
 
 from qgis.core import *
 from PyQt4 import QtGui, QtCore, uic
-from auxiliary_functions import *
+from ..common_tools.auxiliary_functions import *
 
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/forms/", 'advanced_graph_details.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/advanced_graph_details.ui'))
 
 class GraphAdvancedFeatures(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):

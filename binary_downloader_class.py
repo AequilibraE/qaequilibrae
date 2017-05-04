@@ -6,7 +6,7 @@ import urllib
 import platform
 import struct
 print os.path.join(os.path.dirname(os.path.abspath(__file__)) + "/forms/", 'ui_binary_downloader.ui')
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.abspath(__file__)) + "/forms/", 'ui_binary_downloader.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__) + "/forms/", 'ui_binary_downloader.ui'))
 
 
 class BinaryDownloaderDialog(QtGui.QDialog, FORM_CLASS):
