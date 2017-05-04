@@ -140,7 +140,6 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             if index >= 0:
                 self.cmb_direction_field.setCurrentIndex(index)
 
-
     # GENERIC to be applied to MORE THAN ONE form
     def load_fields_to_combo_boxes(self):
         i_types = [self.cmb_direction_field, self.cmb_link_id]
@@ -240,10 +239,14 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         for i in range(self.fields):
             if i != row:
                 for chk in self.fields_lst.cellWidget(i, 3).findChildren(QRadioButton):
+                    chk.blockSignals(True)
                     chk.setChecked(False)
+                    chk.blockSignals(False)
 
         for chk in self.fields_lst.cellWidget(row, 3).findChildren(QRadioButton):
+            chk.blockSignals(True)
             chk.setChecked(True)
+            chk.blockSignals(False)
 
     def call_advanced_features(self):
         dlg2 = GraphAdvancedFeatures(self.iface)
