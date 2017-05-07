@@ -22,7 +22,7 @@
 from qgis.core import *
 from PyQt4.QtCore import *
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import coo_matrix
 from worker_thread import WorkerThread
 
 
@@ -73,7 +73,7 @@ class LoadMatrix(WorkerThread):
             max_zone = np.max(matrix[:, 0:2]) + 1
         if error is None:
             if self.sparse:
-                mat = csr_matrix((matrix[:,2], (matrix[:,0], matrix[:,1])), shape=(max_zone, max_zone))
+                mat = coo_matrix((matrix[:,2], (matrix[:,0], matrix[:,1])), shape=(max_zone, max_zone))
             else:
                 mat = np.zeros((int(max_zone), int(max_zone)))
                 mat.fill(self.filler)
