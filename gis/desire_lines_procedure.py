@@ -14,7 +14,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-01
- Updated:    30/09/2016
+ Updated:    2017-05-07
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -38,21 +38,21 @@ except:
 no_binary = False
 try:
     from aequilibrae.paths import all_or_nothing
+    #from aequilibrae.paths import MultiThreadedAoN, one_to_all
 except:
     no_binary = True
 
 from ..common_tools import WorkerThread
 
 class DesireLinesProcedure(WorkerThread):
-    def __init__(self, parentThread, layer, id_field, matrix, hash_table, reverse_hash, dl_type):
+    def __init__(self, parentThread, layer, id_field, matrix, matrix_hash, dl_type):
         WorkerThread.__init__(self, parentThread)
         self.layer = layer
         self.id_field = id_field
         self.matrix = matrix
         self.dl_type = dl_type
         self.error = None
-        self.reverse_hash = reverse_hash
-        self.hash_table = hash_table
+        self.matrix_hash = matrix_hash
         self.not_loaded = []
         self.python_version = (8 * struct.calcsize("P"))
 
@@ -65,6 +65,8 @@ class DesireLinesProcedure(WorkerThread):
             layer = get_vector_layer_by_name(self.layer)
             idx = layer.fieldNameIndex(self.id_field)
             matrix = self.matrix
+
+            matrix_nodes = max(self.matrix_hash.values()) + 1
 
             featcount = layer.featureCount()
             self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0,featcount))
@@ -112,17 +114,18 @@ class DesireLinesProcedure(WorkerThread):
                     all_points[point_ids[i]]=points[i]
 
                 # We are assuming that the matrix is square here
+                reverse_hash = {v: k for k, v in self.matrix_hash.iteritems()}
                 desireline_link_id = 1
                 q = 0
                 all_features = []
                 for i in range(self.matrix.shape[0]):
-                    if np.sum(self.matrix[i,:]) > 0:
-                        a_node = self.reverse_hash[i]
-                        for j in xrange(i+1,self.matrix.shape[1]):
+                    if np.sum(self.matrix[i, :]) > 0:
+                        a_node = reverse_hash[i]
+                        for j in xrange(i + 1, self.matrix.shape[1]):
                             q += 1
                             self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
                             if self.matrix[i,j]+self.matrix[j,i] > 0:
-                                b_node = self.reverse_hash[j]
+                                b_node = reverse_hash[j]
                                 if a_node in all_points.keys() and b_node in all_points.keys():
                                     a_point = QgsPoint(all_points[a_node][0], all_points[a_node][1])
                                     b_point = QgsPoint(all_points[b_node][0], all_points[b_node][1])
@@ -166,13 +169,8 @@ class DesireLinesProcedure(WorkerThread):
                 #Writing Delaunay layer
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Building Delaunay Network: Assembling Layer"))
 
-                current_hash = {}
-                for i, val in enumerate(self.reverse_hash):
-                    current_hash[val] = i
-
                 desireline_link_id = 1
                 data = []
-                nodes_in_tesselation = len(self.reverse_hash) + 1
                 for edge in edges:
                         a_node = edge[0]
                         a_point = QgsPoint(points[a_node][0], points[a_node][1])
@@ -182,16 +180,16 @@ class DesireLinesProcedure(WorkerThread):
                         line = []
                         line.append(desireline_link_id)
 
-                        if point_ids[a_node] not in current_hash:
-                            current_hash[point_ids[a_node]] = nodes_in_tesselation
-                            nodes_in_tesselation + 1
+                        if point_ids[a_node] not in self.matrix_hash.keys():
+                            self.matrix_hash[point_ids[a_node]] = matrix_nodes
+                            matrix_nodes += 1
 
-                        if point_ids[b_node] not in current_hash:
-                            current_hash[point_ids[b_node]] = nodes_in_tesselation
-                            nodes_in_tesselation + 1
+                        if point_ids[b_node] not in self.matrix_hash.keys():
+                            self.matrix_hash[point_ids[b_node]] = matrix_nodes
+                            matrix_nodes += 1
 
-                        line.append(current_hash[point_ids[a_node]])
-                        line.append(current_hash[point_ids[b_node]])
+                        line.append(self.matrix_hash[point_ids[a_node]])
+                        line.append(self.matrix_hash[point_ids[b_node]])
                         line.append(dist)
                         line.append(dist)
                         line.append(0)
@@ -219,12 +217,14 @@ class DesireLinesProcedure(WorkerThread):
                 self.graph.network_ok = True
                 self.graph.prepare_graph()
 
-                self.graph.set_graph(nodes_in_tesselation, cost_field='length', block_centroid_flows=False)
+                self.graph.set_graph(matrix_nodes, cost_field='length', block_centroid_flows=False)
+                self.graph.save_to_disk('E:/test.aeg')
                 self.results = AssignmentResults()
                 self.results.prepare(self.graph)
                 self.results.set_cores(1)
 
                 # Do the assignment
+                #self.all_or_nothing(self.matrix, self.graph, self.results)
                 all_or_nothing(self.matrix, self.graph, self.results)
 
                 f = self.results.link_loads
@@ -258,3 +258,9 @@ class DesireLinesProcedure(WorkerThread):
 
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), True)
 
+    # def all_or_nothing(self, matrix, graph, results):
+    #     aux_res = MultiThreadedAoN()
+    #     aux_res.prepare(graph, results)
+    #     for O in range(matrix.shape[0]):
+    #         one_to_all(O, matrix[O, :], graph, results, aux_res, 0)
+    #     results.link_loads = np.sum(aux_res.temp_link_loads, axis=1)

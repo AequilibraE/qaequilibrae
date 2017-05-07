@@ -14,7 +14,7 @@ class PathResults:
         self.connectors = None
         self.temporary_skims = None
         self.path = None
-        self.pathnodes = None
+        self.path_nodes = None
         self.milepost = None
         self.reached_first = None
 
