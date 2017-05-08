@@ -196,6 +196,7 @@ class DesireLinesProcedure(WorkerThread):
                         data.append(line)
                         desireline_link_id += 1
 
+                print matrix_nodesprint
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Building graph"))
                 network = np.asarray(data)
                 del data
@@ -220,7 +221,7 @@ class DesireLinesProcedure(WorkerThread):
                 self.graph.set_graph(matrix_nodes, cost_field='length', block_centroid_flows=False)
                 self.results = AssignmentResults()
                 self.results.prepare(self.graph)
-                self.results.set_cores(1)
+                # self.results.set_cores(1)
 
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Assigning demand"))
                 # Do the assignment
