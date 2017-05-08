@@ -178,32 +178,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             tos[tos == indices[i]] = i
             titles.append(str(indices[i]))
 
-        matrix = coo_matrix((data, (froms, tos)), shape=(compact_shape, compact_shape)).toarray()
-        # matrix = sparse_matrix.toarray()
-
-        # froms, tos = sparse_matrix_csr.nonzero()
-        #
-        # all_non_zeros = np.hstack((froms,tos))
-        # non_zeros = np.unique(all_non_zeros)
-        #
-        # compact_shape = non_zeros.shape[0]
-        #
-        # # Builds the hash
-        # matrix_hash = {}
-        # titles = []
-        # for i in range(compact_shape):
-        #     matrix_hash[non_zeros[i]] = i
-        #     titles.append(str(non_zeros[i]))
-        #
-        # # populates the new zero-based matrix with values
-        # matrix = np.zeros((compact_shape, compact_shape), np.float64)
-        # for k in range(froms.shape[0]):
-        #     i = froms[k]
-        #     j = tos[k]
-        #     new_i = matrix_hash[i]
-        #     new_j = matrix_hash[j]
-        #     matrix[new_i, new_j] = sparse_matrix_csr[i, j]
-
+        matrix = coo_matrix((data, (froms, tos)), shape=(compact_shape, compact_shape)).toarray().astype(np.float64)
         return matrix, matrix_hash, titles
 
 
