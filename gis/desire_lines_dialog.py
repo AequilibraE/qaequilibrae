@@ -27,6 +27,7 @@ from PyQt4 import uic
 import sys
 import os
 import numpy as np
+from scipy.sparse import coo_matrix
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
@@ -157,30 +158,51 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         dlg2.show()
         dlg2.exec_()
 
-    def reblocks_matrix(self, sparse_matrix_csr):
+    def reblocks_matrix(self, sparse_matrix):
         # Gets all non-zero coordinates and makes sure that they are considered
-        froms, tos = sparse_matrix_csr.nonzero()
 
-        all_non_zeros = np.hstack((froms,tos))
-        non_zeros = np.unique(all_non_zeros)
+        froms = sparse_matrix.row
+        tos =  sparse_matrix.col
+        data = sparse_matrix.data
 
-        compact_shape = non_zeros.shape[0]
+        all_indices = np.hstack((froms, tos))
+        indices = np.unique(all_indices)
+        compact_shape = indices.shape[0]
 
         # Builds the hash
         matrix_hash = {}
         titles = []
         for i in range(compact_shape):
-            matrix_hash[non_zeros[i]] = i
-            titles.append(str(non_zeros[i]))
+            matrix_hash[indices[i]] = i
+            froms[froms == indices[i]] = i
+            tos[tos == indices[i]] = i
+            titles.append(str(indices[i]))
 
-        # populates the new zero-based matrix with values
-        matrix = np.zeros((compact_shape, compact_shape), np.float64)
-        for k in range(froms.shape[0]):
-            i = froms[k]
-            j = tos[k]
-            new_i = matrix_hash[i]
-            new_j = matrix_hash[j]
-            matrix[new_i, new_j] = sparse_matrix_csr[i, j]
+        matrix = coo_matrix((data, (froms, tos)), shape=(compact_shape, compact_shape)).toarray()
+        # matrix = sparse_matrix.toarray()
+
+        # froms, tos = sparse_matrix_csr.nonzero()
+        #
+        # all_non_zeros = np.hstack((froms,tos))
+        # non_zeros = np.unique(all_non_zeros)
+        #
+        # compact_shape = non_zeros.shape[0]
+        #
+        # # Builds the hash
+        # matrix_hash = {}
+        # titles = []
+        # for i in range(compact_shape):
+        #     matrix_hash[non_zeros[i]] = i
+        #     titles.append(str(non_zeros[i]))
+        #
+        # # populates the new zero-based matrix with values
+        # matrix = np.zeros((compact_shape, compact_shape), np.float64)
+        # for k in range(froms.shape[0]):
+        #     i = froms[k]
+        #     j = tos[k]
+        #     new_i = matrix_hash[i]
+        #     new_j = matrix_hash[j]
+        #     matrix[new_i, new_j] = sparse_matrix_csr[i, j]
 
         return matrix, matrix_hash, titles
 
