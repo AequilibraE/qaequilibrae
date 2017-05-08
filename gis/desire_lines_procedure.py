@@ -132,7 +132,7 @@ class DesireLinesProcedure(WorkerThread):
                                     dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
                                     feature = QgsFeature()
                                     feature.setGeometry(QgsGeometry.fromPolyline([a_point, b_point]))
-                                    feature.setAttributes([desireline_link_id, a_node, b_node, 0, dist,
+                                    feature.setAttributes([desireline_link_id, int(a_node), int(b_node), 0, dist,
                                                            float(self.matrix[i ,j]), float(self.matrix[j, i]),
                                                            float(self.matrix[i, j] + self.matrix[j, i])])
                                     all_features.append(feature)
