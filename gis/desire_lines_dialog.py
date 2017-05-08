@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-01
- Updated:    2016-10-30
+ Updated:    2017-05-07
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -53,8 +53,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.path = standard_path()
         self.zones = None
         self.columns = None
-        self.hash_table =None
-        self.reverse_hash = None
+        self.matrix_hash =None
 
         # FIRST, we connect slot signals
         # For changing the input matrix
@@ -94,14 +93,14 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 if field.type() in integer_types:
                     self.zone_id_field.addItem(field.name())
 
-    def add_matrix_to_viewer(self):
+    def add_matrix_to_viewer(self, titles):
         """
             procedure to add the matrix to the viewer
         """
         if self.matrix is not None:
             self.zones = self.matrix.shape[0]
 
-            m = NumpyModel(self.matrix, list(self.reverse_hash), list(self.reverse_hash))
+            m = NumpyModel(self.matrix, titles, titles)
             self.matrix_viewer.setModel(m)
 
     def find_matrices(self):
@@ -110,8 +109,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         dlg2.exec_()
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
-            self.matrix, self.hash_table, self.reverse_hash = self.reblocks_matrix(self.matrix)
-            self.add_matrix_to_viewer()
+            self.matrix, self.matrix_hash, titles = self.reblocks_matrix(self.matrix)
+            self.add_matrix_to_viewer(titles)
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
@@ -147,7 +146,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 dl_type = 'DelaunayLines'
 
             self.worker_thread = DesireLinesProcedure(qgis.utils.iface.mainWindow(), self.zoning_layer.currentText(),
-                                                        self.zone_id_field.currentText(), self.matrix, self.hash_table, self.reverse_hash, dl_type)
+                                                        self.zone_id_field.currentText(), self.matrix, self.matrix_hash, dl_type)
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Matrix not loaded", '', level=3)
@@ -159,45 +158,31 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         dlg2.exec_()
 
     def reblocks_matrix(self, sparse_matrix_csr):
-        matrix_shape = sparse_matrix_csr.shape[0]
-        compact_shape = 0
-
-        indptr = sparse_matrix_csr.indptr
-        indices = sparse_matrix_csr.indices
-        data = sparse_matrix_csr.data
-
-        # Create our master_hash
-        master_hash = np.zeros(matrix_shape, np.int64)
-
         # Gets all non-zero coordinates and makes sure that they are considered
         froms, tos = sparse_matrix_csr.nonzero()
 
-        for i in range(froms.shape[0]):
-            master_hash[froms[i]] = 1
-            master_hash[tos[i]] = 1
+        all_non_zeros = np.hstack((froms,tos))
+        non_zeros = np.unique(all_non_zeros)
 
-        # Creates the hash
-        reverse_hash = []
-        for i in range(matrix_shape):
-            if master_hash[i] > 0:
-                master_hash[i] = compact_shape
-                compact_shape += 1
-                reverse_hash.append(i)
+        compact_shape = non_zeros.shape[0]
 
-        # Creates the matrix
-        matrix = np.zeros((compact_shape, compact_shape), np.float64)
-        reverse_hash = reverse_hash
+        # Builds the hash
+        matrix_hash = {}
+        titles = []
+        for i in range(compact_shape):
+            matrix_hash[non_zeros[i]] = i
+            titles.append(str(non_zeros[i]))
 
         # populates the new zero-based matrix with values
+        matrix = np.zeros((compact_shape, compact_shape), np.float64)
         for k in range(froms.shape[0]):
             i = froms[k]
             j = tos[k]
-            new_i = master_hash[i]
-            new_j = master_hash[j]
+            new_i = matrix_hash[i]
+            new_j = matrix_hash[j]
             matrix[new_i, new_j] = sparse_matrix_csr[i, j]
 
-        return matrix, master_hash, reverse_hash
-
+        return matrix, matrix_hash, titles
 
 
     def exit_procedure(self):
