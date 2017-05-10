@@ -220,7 +220,7 @@ class DesireLinesProcedure(WorkerThread):
                 self.graph.set_graph(matrix_nodes, cost_field='length', block_centroid_flows=False)
                 self.results = AssignmentResults()
                 self.results.prepare(self.graph)
-                self.results.set_cores(1)
+                # self.results.set_cores(1)
 
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Assigning demand"))
                 # Do the assignment
@@ -266,10 +266,3 @@ class DesireLinesProcedure(WorkerThread):
                 self.result_layer = desireline_layer
 
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), True)
-
-    # def all_or_nothing(self, matrix, graph, results):
-    #     aux_res = MultiThreadedAoN()
-    #     aux_res.prepare(graph, results)
-    #     for O in range(matrix.shape[0]):
-    #         one_to_all(O, matrix[O, :], graph, results, aux_res, 0)
-    #     results.link_loads = np.sum(aux_res.temp_link_loads, axis=1)

@@ -176,7 +176,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             matrix_hash[indices[i]] = i
             froms[froms == indices[i]] = i
             tos[tos == indices[i]] = i
-            titles.append(str(indices[i]))
+            titles.append(indices[i])
 
         matrix = coo_matrix((data, (froms, tos)), shape=(compact_shape, compact_shape)).toarray().astype(np.float64)
         return matrix, matrix_hash, titles
