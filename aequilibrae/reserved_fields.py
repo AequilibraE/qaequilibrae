@@ -1,2 +1,2 @@
-a_node = 'A_Node'
-b_node = 'B_Node'
+a_node = 'a_node'
+b_node = 'b_node'

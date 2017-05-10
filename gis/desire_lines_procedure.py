@@ -132,7 +132,7 @@ class DesireLinesProcedure(WorkerThread):
                                     dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
                                     feature = QgsFeature()
                                     feature.setGeometry(QgsGeometry.fromPolyline([a_point, b_point]))
-                                    feature.setAttributes([desireline_link_id, a_node, b_node, 0, dist,
+                                    feature.setAttributes([desireline_link_id, int(a_node), int(b_node), 0, dist,
                                                            float(self.matrix[i ,j]), float(self.matrix[j, i]),
                                                            float(self.matrix[i, j] + self.matrix[j, i])])
                                     all_features.append(feature)
@@ -218,18 +218,22 @@ class DesireLinesProcedure(WorkerThread):
                 self.graph.prepare_graph()
 
                 self.graph.set_graph(matrix_nodes, cost_field='length', block_centroid_flows=False)
-                self.graph.save_to_disk('E:/test.aeg')
                 self.results = AssignmentResults()
                 self.results.prepare(self.graph)
                 self.results.set_cores(1)
 
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Assigning demand"))
                 # Do the assignment
                 #self.all_or_nothing(self.matrix, self.graph, self.results)
                 all_or_nothing(self.matrix, self.graph, self.results)
 
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Collecting results"))
                 f = self.results.link_loads
+
                 link_loads = np.zeros((f.shape[0]+1, 2))
+                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, f.shape[0]-1))
                 for i in range(f.shape[0]-1):
+                    self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, i))
                     direction = self.graph.graph['direction'][i]
                     link_id = self.graph.graph['link_id'][i]
                     flow = f[i]
@@ -238,9 +242,14 @@ class DesireLinesProcedure(WorkerThread):
                     else:
                         link_loads[link_id, 1] = flow
 
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Building resulting layer"))
                 desireline_link_id = 1
                 features = []
-                for edge in edges:
+                max_edges = len(edges)
+                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, max_edges))
+                for i, edge in enumerate(edges):
+                    self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, i))
+
                     a_node = edge[0]
                     a_point = QgsPoint(points[a_node][0], points[a_node][1])
                     b_node = edge[1]
