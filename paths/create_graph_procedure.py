@@ -54,40 +54,44 @@ class GraphCreation(WorkerThread):
             self.feat_count = self.net_layer.featureCount()
 
     def doWork(self):
-        # Checking ID uniqueness
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Checking ID uniqueness")
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.feat_count)
-
-        a = []
-        all_ids = np.zeros(self.feat_count, dtype=np.int_)
 
         if self.selected_only:
             self.features = self.net_layer.selectedFeatures()
         else:
             self.features = self.net_layer.getFeatures()
 
-        p = 0
-        for feat in self.features:
-            k = feat.attributes()[self.link_id]
-            if k == NULL:
-                self.error = "ID field has NULL values"
-                break
-            else:
-                all_ids[p] = k
-                p += 1
-                if p % 50 == 0:
-                    self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), self.feat_count)
+        # Checking ID uniqueness
+        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Checking ID uniqueness")
 
-        if self.error is None:
-            # Checking uniqueness
-            if self.python_version == 32: # controlling for Numpy's weird behavior on bincount
-                y = np.bincount(all_ids.astype(np.int32))
-            else:
-                y = np.bincount(all_ids)
+        all_ids = self.net_layer.uniqueValues(self.link_id)
+        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Collected")
 
-            if np.max(y) > 1:
+        if NULL in all_ids:
+            self.error = "ID field has NULL values"
+        else:
+            if len(all_ids) < self.feat_count:
                 self.error = 'IDs are not unique.'
+
+
+        # self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.feat_count)
+        # a = []
+        # all_ids = np.zeros(self.feat_count, dtype=np.int_)
+
+        #
+        # p = 0
+        # for feat in self.features:
+        #     k = feat.attributes()[self.link_id]
+        #     if k == NULL:
+        #         self.error = "ID field has NULL values"
+        #         break
+        #     else:
+        #         all_ids[p] = k
+        #         p += 1
+        #         if p % 50 == 0:
+        #             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
+        # self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), self.feat_count)
+
+
 
         if self.error is None:
             self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Loading data from layer")

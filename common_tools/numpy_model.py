@@ -34,8 +34,8 @@ class NumpyModel(QtCore.QAbstractTableModel):
     def __init__(self, narray, headerdata, row_headersdata, parent=None):
         QtCore.QAbstractTableModel.__init__(self, parent)
         self._array = narray
-        self.headerdata = headerdata
-        self.row_headersdata = row_headersdata
+        self.headerdata = [str(x) for x in headerdata]
+        self.row_headersdata = [str(x) for x in row_headersdata]
 
     def rowCount(self, parent=None):
         return self._array.shape[0]
