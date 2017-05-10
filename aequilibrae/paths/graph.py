@@ -433,6 +433,9 @@ class Graph:
                         a = self.graph['a_node'][i]
                         k = i
 
+                for j in xrange(p, self.num_nodes):
+                    self.fs[j + 1] = k
+
                 self.fs[self.num_nodes +1] = self.graph.shape[0]  # IF ENDS UP BEING +2 IN THE COMMENT ON LINE 299, THEN THIS LINE BECOMES IRRELEVANT
                 self.ids = self.graph['id']
                 self.b_node = self.graph['b_node']
@@ -469,7 +472,6 @@ class Graph:
                 print 'Before setting skims, you need to set the cost field'
 
         t = False
-        print skim_fields
         for i in skim_fields:
             if self.graph[i].dtype != np.float64:
                 t = True
