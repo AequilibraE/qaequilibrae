@@ -458,11 +458,11 @@ class Graph:
         if skim_fields:
             skim_fields.insert(0, self.cost_field)
 
-        t = False
-        for i in skim_fields:
-            if self.graph[i].dtype != np.float64:
-                t = True
-        self.skims = np.zeros((self.num_links, len(skim_fields)), np.float64)
+            t = False
+            for i in skim_fields:
+                if self.graph[i].dtype != np.float64:
+                    t = True
+            self.skims = np.zeros((self.num_links, len(skim_fields)), np.float64)
 
         if t:
             print 'Some skim field with wrong type. Converting to float64'
@@ -471,7 +471,7 @@ class Graph:
         else:
             for i, j in enumerate(skim_fields):
                 self.skims[:, i] = self.graph[j]
-        self.skim_fields = skim_fields
+            self.skim_fields = skim_fields
 
     # Procedure to pickle graph and save to disk
     def save_to_disk(self, filename):
