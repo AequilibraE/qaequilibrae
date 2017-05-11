@@ -9,7 +9,7 @@
  Contributors:
  Last edited by: Pedro Camargo
 
- Website:    www.AequilibraE.com
+ Website:    www.AequilibraE.com1
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19

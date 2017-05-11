@@ -433,6 +433,9 @@ class Graph:
                         a = self.graph['a_node'][i]
                         k = i
 
+                for j in xrange(p, self.num_nodes):
+                    self.fs[j + 1] = k
+
                 self.fs[self.num_nodes +1] = self.graph.shape[0]  # IF ENDS UP BEING +2 IN THE COMMENT ON LINE 299, THEN THIS LINE BECOMES IRRELEVANT
                 self.ids = self.graph['id']
                 self.b_node = self.graph['b_node']
@@ -455,11 +458,20 @@ class Graph:
                 print 'Cost field with wrong type. Converting to float64'
                 self.cost = self.graph[cost_field].astype(np.float64)
 
-        if skim_fields:
-            skim_fields.insert(0, self.cost_field)
+        skim_fields = []
+        if self.cost is not None:
+            if not skim_fields:
+                skim_fields = [self.cost_field, self.cost_field]
+            else:
+                s = [self.cost_field]
+                for i in skim_fields:
+                    s.append(i)
+                skim_fields = s
+        else:
+            if skim_fields:
+                print 'Before setting skims, you need to set the cost field'
 
         t = False
-
         for i in skim_fields:
             if self.graph[i].dtype != np.float64:
                 t = True
@@ -473,7 +485,7 @@ class Graph:
         else:
             for i, j in enumerate(skim_fields):
                 self.skims[:, i] = self.graph[j]
-            self.skim_fields = skim_fields
+        self.skim_fields = skim_fields
 
     # Procedure to pickle graph and save to disk
     def save_to_disk(self, filename):
