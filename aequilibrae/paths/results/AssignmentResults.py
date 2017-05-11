@@ -141,7 +141,7 @@ class AssignmentResults:
         ABs = self.direcs < 0
         BAs = self.direcs > 0
 
-        link_flows = self.results()[:-1]
+        link_flows = self.link_loads[:-1]
 
         # AB Flows
         link_ids = self.lids[ABs]

@@ -347,7 +347,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
         else:
-            self.output = self.results.results()
+            self.output = self.results.link_loads
             self.report = self.worker_thread.report
 
             if self.outname[-3:].upper() == 'NPY':

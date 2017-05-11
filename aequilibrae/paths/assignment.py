@@ -57,25 +57,29 @@ def all_or_nothing(matrix, graph, results):
     else:
         pool = ThreadPool(results.cores)
         all_threads = {'count': 0}
+        report = []
         for O in range(matrix.shape[0]):
             a = matrix[O, :]
             if np.sum(a) > 0:
                 # func_assig_thread(1, a, graph, results, aux_res, all_threads)
                 # break
-                pool.apply_async(func_assig_thread, args=(O, a, graph, results, aux_res, all_threads))
+                pool.apply_async(func_assig_thread, args=(O, a, graph, results, aux_res, all_threads, report))
         pool.close()
         pool.join()
     results.link_loads = np.sum(aux_res.temp_link_loads, axis=1)
+    return report
 
 
-def func_assig_thread(O, a, g, res, aux_res, all_threads):
+def func_assig_thread(O, a, g, res, aux_res, all_threads, report):
     if thread.get_ident() in all_threads:
         th = all_threads[thread.get_ident()]
     else:
         all_threads[thread.get_ident()] = all_threads['count']
         th = all_threads['count']
         all_threads['count'] += 1
-    one_to_all(O, a, g, res, aux_res, th)
+    a = one_to_all(O, a, g, res, aux_res, th)
+    if a != O:
+        report.append(a)
 
 
 if __name__ == '__main__':

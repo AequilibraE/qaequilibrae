@@ -44,7 +44,7 @@ def one_to_all(origin, demand, graph, result, aux_result, curr_thread):
     if O >= result.zones:
         return "Centroid " + str(O) + " is outside the range of zones in the graph"
 
-    if O >= graph.num_nodes:
+    if O > graph.num_nodes:
         return "Centroid " + str(O) + " does not exist in the graph"
 
     if graph_fs[O] == graph_fs[O+1]:

@@ -128,6 +128,10 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             self.throws_error(self.worker_thread.error)
 
         else:
+            if self.worker_thread.report:
+                dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+                dlg2.show()
+                dlg2.exec_()
             try:
                 QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
             except:
@@ -174,8 +178,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         titles = []
         for i in range(compact_shape):
             matrix_hash[indices[i]] = i
-            froms[froms == indices[i]] = i
-            tos[tos == indices[i]] = i
+            froms[froms == indices[i]] = matrix_hash[indices[i]]
+            tos[tos == indices[i]] = matrix_hash[indices[i]]
             titles.append(indices[i])
 
         matrix = coo_matrix((data, (froms, tos)), shape=(compact_shape, compact_shape)).toarray().astype(np.float64)

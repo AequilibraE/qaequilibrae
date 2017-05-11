@@ -98,13 +98,14 @@ def haversine(lon1, lat1, lon2, lat2):
     meters = 6378137 * c
     return meters
 
-def debug_code(message):
-    debug_file = tempfile.gettempdir() + '/aequilibrae.debug'
+
+def logger(message):
+    debug_file = tempfile.gettempdir() + '/aequilibrae.log'
     if not os.path.exists(debug_file):
-        o = open(tempfile.gettempdir() + '/aequilibrae.debug', 'w')
+        o = open(debug_file, 'w')
     else:
-        o = open(tempfile.gettempdir() + '/aequilibrae.debug', 'a')
-    if type(message) not in [list, tuple]:
+        o = open(debug_file, 'a')
+    if type(message) not in [list, tuple, dict]:
         print >> o, message
     else:
         t = '['
