@@ -54,6 +54,7 @@ class DesireLinesProcedure(WorkerThread):
         self.error = None
         self.matrix_hash = matrix_hash
         self.not_loaded = []
+        self.report = []
         self.python_version = (8 * struct.calcsize("P"))
 
         if error:
@@ -67,25 +68,26 @@ class DesireLinesProcedure(WorkerThread):
             matrix = self.matrix
 
             matrix_nodes = max(self.matrix_hash.values()) + 1
-
             featcount = layer.featureCount()
-            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0,featcount))
+            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, featcount))
 
+            all_centroids = {}
             P = 0
-            points = []
-            point_ids = []
             for feat in layer.getFeatures():
                 P += 1
-                self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0,int(P)))
+                self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, int(P)))
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Loading Layer Features: " + str(P) + "/" + str(featcount)))
 
                 geom = feat.geometry()
                 if geom is not None:
-                    point =list(geom.centroid().asPoint())
-                    points.append(point)
-                    point_ids.append(feat.attributes()[idx])
+                    point = list(geom.centroid().asPoint())
+                    centroid_id = feat.attributes()[idx]
+                    all_centroids[centroid_id] = point
 
-            points = np.array(points)
+                    if centroid_id not in self.matrix_hash.keys():
+                        self.matrix_hash[centroid_id] = matrix_nodes
+                        matrix_nodes += 1
+            reverse_hash = {v: k for k, v in self.matrix_hash.iteritems()}
 
             #Creating resulting layer
             EPSG_code = int(layer.crs().authid().split(":")[1])
@@ -107,14 +109,6 @@ class DesireLinesProcedure(WorkerThread):
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Creating Desire Lines"))
                 self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, self.matrix.shape[0]*self.matrix.shape[1]/2))
 
-                #We create the dictionary with point information
-                all_points={}
-                point_ids = np.array(point_ids).astype(np.int)
-                for i in range(point_ids.shape[0]):
-                    all_points[point_ids[i]]=points[i]
-
-                # We are assuming that the matrix is square here
-                reverse_hash = {v: k for k, v in self.matrix_hash.iteritems()}
                 desireline_link_id = 1
                 q = 0
                 all_features = []
@@ -123,12 +117,12 @@ class DesireLinesProcedure(WorkerThread):
                         a_node = reverse_hash[i]
                         for j in xrange(i + 1, self.matrix.shape[1]):
                             q += 1
+                            b_node = reverse_hash[j]
                             self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
-                            if self.matrix[i,j]+self.matrix[j,i] > 0:
-                                b_node = reverse_hash[j]
-                                if a_node in all_points.keys() and b_node in all_points.keys():
-                                    a_point = QgsPoint(all_points[a_node][0], all_points[a_node][1])
-                                    b_point = QgsPoint(all_points[b_node][0], all_points[b_node][1])
+                            if self.matrix[i, j] + self.matrix[j, i] > 0:
+                                if a_node in all_centroids.keys() and b_node in all_centroids.keys():
+                                    a_point = all_centroids[a_node]
+                                    b_point = all_centroids[b_node]
                                     dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
                                     feature = QgsFeature()
                                     feature.setGeometry(QgsGeometry.fromPolyline([a_point, b_point]))
@@ -139,7 +133,12 @@ class DesireLinesProcedure(WorkerThread):
                                     desireline_link_id += 1
                                 else:
                                     tu = (a_node, b_node, self.matrix[i, j], self.matrix[j, i])
-                                    self.not_loaded.append('Flows between node {0} and node {1} could not be loaded. AB flow was equal to {2} and BA flow was equal to {3}'.format(*tu))
+                                    self.not_loaded.append('No centroids available to depict flow between node {0} and node {1}. AB flow was equal to {2} and BA flow was equal to {3}'.format(*tu))
+                    else:
+                        q += self.matrix.shape[1]
+                        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
+
+
                 if desireline_link_id > 1:
                     a = dlpr.addFeatures(all_features)
                     self.result_layer = desireline_layer
@@ -147,11 +146,20 @@ class DesireLinesProcedure(WorkerThread):
                     self.error = 'Nothing to show'
 
             elif self.dl_type == "DelaunayLines":
-                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Computing Delaunay Triangles"))
-                tri = Delaunay(points)
+
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Computing Delaunay Triangles"))
+                points = []
+                seccond_relation ={}
+                i = 0
+                for k, v in all_centroids.iteritems():
+                    points.append(v)
+                    seccond_relation[i] = k
+                    i += 1
+
+                tri = Delaunay(np.array(points))
 
                 #We process all the triangles to only get each edge once
-                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Building Delaunay Network: Collecting Edges"))
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Building Delaunay Network: Collecting Edges"))
                 edges = []
                 if self.python_version == 32:
                     all_edges = tri.vertices
@@ -160,40 +168,36 @@ class DesireLinesProcedure(WorkerThread):
 
                 for triangle in all_edges:
                     links = list(itertools.combinations(triangle, 2))
-
                     for i in links:
                         l= [min(i[0],i[1]), max(i[0],i[1])]
                         if l not in edges:
                             edges.append(l)
 
                 #Writing Delaunay layer
-                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Building Delaunay Network: Assembling Layer"))
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Building Delaunay Network: Assembling Layer"))
 
                 desireline_link_id = 1
                 data = []
+                dl_link_ids = {}
                 for edge in edges:
-                        a_node = edge[0]
-                        a_point = QgsPoint(points[a_node][0], points[a_node][1])
-                        b_node = edge[1]
-                        b_point = QgsPoint(points[b_node][0], points[b_node][1])
+                        a_node = seccond_relation[edge[0]]
+                        a_point = all_centroids[a_node]
+                        a_point = QgsPoint(a_point[0], a_point[1])
+                        b_node = seccond_relation[edge[1]]
+                        b_point = all_centroids[b_node]
+                        b_point = QgsPoint(b_point[0], b_point[1])
                         dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
                         line = []
                         line.append(desireline_link_id)
-
-                        if point_ids[a_node] not in self.matrix_hash.keys():
-                            self.matrix_hash[point_ids[a_node]] = matrix_nodes
-                            matrix_nodes += 1
-
-                        if point_ids[b_node] not in self.matrix_hash.keys():
-                            self.matrix_hash[point_ids[b_node]] = matrix_nodes
-                            matrix_nodes += 1
-
-                        line.append(self.matrix_hash[point_ids[a_node]])
-                        line.append(self.matrix_hash[point_ids[b_node]])
+                        line.append(self.matrix_hash[a_node])
+                        line.append(self.matrix_hash[b_node])
                         line.append(dist)
                         line.append(dist)
                         line.append(0)
                         data.append(line)
+                        if a_node not in dl_link_ids.keys():
+                            dl_link_ids[a_node] = {}
+                        dl_link_ids[a_node][b_node] = desireline_link_id
                         desireline_link_id += 1
 
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Building graph"))
@@ -225,14 +229,14 @@ class DesireLinesProcedure(WorkerThread):
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Assigning demand"))
                 # Do the assignment
                 #self.all_or_nothing(self.matrix, self.graph, self.results)
-                all_or_nothing(self.matrix, self.graph, self.results)
+                self.report = all_or_nothing(self.matrix, self.graph, self.results)
 
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Collecting results"))
                 f = self.results.link_loads
 
-                link_loads = np.zeros((f.shape[0]+1, 2))
-                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, f.shape[0]-1))
-                for i in range(f.shape[0]-1):
+                link_loads = np.zeros((f.shape[0] + 1, 2))
+                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, f.shape[0] - 1))
+                for i in range(f.shape[0] - 1):
                     self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, i))
                     direction = self.graph.graph['direction'][i]
                     link_id = self.graph.graph['link_id'][i]
@@ -243,25 +247,27 @@ class DesireLinesProcedure(WorkerThread):
                         link_loads[link_id, 1] = flow
 
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Building resulting layer"))
-                desireline_link_id = 1
                 features = []
                 max_edges = len(edges)
                 self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, max_edges))
+
                 for i, edge in enumerate(edges):
                     self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, i))
-
-                    a_node = edge[0]
-                    a_point = QgsPoint(points[a_node][0], points[a_node][1])
-                    b_node = edge[1]
-                    b_point = QgsPoint(points[b_node][0], points[b_node][1])
+                    a_node = seccond_relation[edge[0]]
+                    a_point = all_centroids[a_node]
+                    a_point = QgsPoint(a_point[0], a_point[1])
+                    b_node = seccond_relation[edge[1]]
+                    b_point = all_centroids[b_node]
+                    b_point = QgsPoint(b_point[0], b_point[1])
                     dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
+
                     feature = QgsFeature()
                     feature.setGeometry(QgsGeometry.fromPolyline([a_point, b_point]))
-                    feature.setAttributes([desireline_link_id, point_ids[a_node], point_ids[b_node], 0, dist,
+                    desireline_link_id = dl_link_ids[a_node][b_node]
+                    feature.setAttributes([desireline_link_id, a_node, b_node, 0, dist,
                                            float(link_loads[desireline_link_id, 0]), float(link_loads[desireline_link_id, 1]),
                                            float(link_loads[desireline_link_id, 0] + link_loads[desireline_link_id, 1])])
                     features.append(feature)
-                    desireline_link_id += 1
                 a = dlpr.addFeatures(features)
                 self.result_layer = desireline_layer
 
