@@ -38,6 +38,7 @@ class FindsNodes(WorkerThread):
         self.new_line_layer = new_line_layer
         self.node_start = node_start
         self.error = None
+        self.report = []
 
     def doWork(self):
         line_layer = self.line_layer
@@ -142,22 +143,22 @@ class FindsNodes(WorkerThread):
                     self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Links read: " + str(P) + "/" + str(feat_count))
 
                 link = list(feat.geometry().asPolyline())
+                if link:
+                    link_id = feat.id()
 
-                node_a = (round(link[0][0], 10), round(link[0][1], 10))
-                node_b = (round(link[-1][0], 10), round(link[-1][1], 10))
+                    node_a = (round(link[0][0], 10), round(link[0][1], 10))
+                    node_b = (round(link[-1][0], 10), round(link[-1][1], 10))
 
-                link_id = feat.id()
-
-                all_nodes[l][0] = node_a[0]
-                all_nodes[l][1] = node_a[1]
-                all_nodes[l][2] = link_id
-                all_nodes[l][3] = 0
-                l += 1
-                all_nodes[l][0] = node_b[0]
-                all_nodes[l][1] = node_b[1]
-                all_nodes[l][2] = link_id
-                all_nodes[l][3] = 1
-                l += 1
+                    all_nodes[l][0] = node_a[0]
+                    all_nodes[l][1] = node_a[1]
+                    all_nodes[l][2] = link_id
+                    all_nodes[l][3] = 0
+                    l += 1
+                    all_nodes[l][0] = node_b[0]
+                    all_nodes[l][1] = node_b[1]
+                    all_nodes[l][2] = link_id
+                    all_nodes[l][3] = 1
+                    l += 1
 
             # Now we sort the nodes and assign IDs to them
             all_nodes = np.sort(all_nodes, order=['LAT', 'LONG'])

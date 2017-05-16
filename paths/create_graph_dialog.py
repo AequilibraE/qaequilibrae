@@ -238,15 +238,18 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
 
         for i in range(self.fields):
             if i != row:
-                for chk in self.fields_lst.cellWidget(i, 3).findChildren(QRadioButton):
-                    chk.blockSignals(True)
-                    chk.setChecked(False)
-                    chk.blockSignals(False)
+                for qradio in self.fields_lst.cellWidget(i, 3).findChildren(QRadioButton):
+                    qradio.blockSignals(True)
+                    qradio.setChecked(False)
+                    qradio.blockSignals(False)
+            else:
+                for chkb in self.fields_lst.cellWidget(i, 2).findChildren(QCheckBox):
+                    chkb.setChecked(True)
 
-        for chk in self.fields_lst.cellWidget(row, 3).findChildren(QRadioButton):
-            chk.blockSignals(True)
-            chk.setChecked(True)
-            chk.blockSignals(False)
+        for qradio in self.fields_lst.cellWidget(row, 3).findChildren(QRadioButton):
+            qradio.blockSignals(True)
+            qradio.setChecked(True)
+            qradio.blockSignals(False)
 
     def call_advanced_features(self):
         dlg2 = GraphAdvancedFeatures(self.iface)
