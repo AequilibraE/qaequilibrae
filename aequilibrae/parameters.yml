@@ -17,3 +17,4 @@ system:
   driving side: right
   report zeros: 1
   temp directory: /temp
+  logging: False

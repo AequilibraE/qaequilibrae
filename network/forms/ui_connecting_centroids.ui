@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>744</width>
+    <width>725</width>
     <height>535</height>
    </rect>
   </property>
@@ -88,21 +88,6 @@
      <string>Centroid layer</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="CentroidLayer">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>30</y>
-      <width>560</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
@@ -119,21 +104,6 @@
     </property>
     <property name="text">
      <string>ID field</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="CentroidField">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>66</y>
-      <width>560</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
     </property>
    </widget>
    <widget class="QCheckBox" name="IfMaxLength">
@@ -182,6 +152,26 @@
      </font>
     </property>
    </widget>
+   <widget class="QgsMapLayerComboBox" name="CentroidLayer">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>28</y>
+      <width>560</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QgsFieldComboBox" name="CentroidField">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>66</y>
+      <width>560</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
@@ -216,21 +206,6 @@
     </property>
     <property name="text">
      <string>Network Layer</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="LineLayer">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>28</y>
-      <width>560</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
     </property>
    </widget>
    <widget class="QLineEdit" name="OutLinks">
@@ -270,6 +245,16 @@
     </property>
     <property name="text">
      <string>Line layer name</string>
+    </property>
+   </widget>
+   <widget class="QgsMapLayerComboBox" name="LineLayer">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>28</y>
+      <width>560</width>
+      <height>24</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -384,21 +369,6 @@
      <string>Node Layer</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="NodeLayer">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>28</y>
-      <width>560</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="OutNodes">
     <property name="geometry">
      <rect>
@@ -431,21 +401,6 @@
     </property>
     <property name="text">
      <string>Use only selected nodes</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="NodeField">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>65</y>
-      <width>560</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
     </property>
    </widget>
    <widget class="QLabel" name="label_7">
@@ -482,6 +437,26 @@
     </property>
     <property name="text">
      <string>Node layer name</string>
+    </property>
+   </widget>
+   <widget class="QgsMapLayerComboBox" name="NodeLayer">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>28</y>
+      <width>560</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QgsFieldComboBox" name="NodeField">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>65</y>
+      <width>560</width>
+      <height>24</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -545,6 +520,33 @@
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsFieldComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsfieldcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>LineLayer</tabstop>
+  <tabstop>OutLinks</tabstop>
+  <tabstop>NodeLayer</tabstop>
+  <tabstop>NodeField</tabstop>
+  <tabstop>OutNodes</tabstop>
+  <tabstop>SelectedNodes</tabstop>
+  <tabstop>CentroidLayer</tabstop>
+  <tabstop>CentroidField</tabstop>
+  <tabstop>IfMaxLength</tabstop>
+  <tabstop>MaxLength</tabstop>
+  <tabstop>NumberConnectors</tabstop>
+  <tabstop>pushOK</tabstop>
+  <tabstop>pushClose</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

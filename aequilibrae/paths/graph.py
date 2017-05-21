@@ -20,12 +20,16 @@
  """
 
 import numpy as np
-import csv
+import os, csv
 import cPickle
 from datetime import datetime
 import uuid
 
-VERSION = "0.3.5"
+VERSION = ''
+a = open(os.path.join(os.path.dirname(__file__),'parameters.pxi'), 'r')
+for i in a.readlines():
+    if 'VERSION' in i:
+        VERSION = i[11:-1]
 
 
 '''description: Description of the graph (OPTIONAL)

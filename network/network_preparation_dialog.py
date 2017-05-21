@@ -24,6 +24,7 @@ import qgis
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from PyQt4 import uic
+from qgis.gui import QgsMapLayerProxyModel
 
 import sys
 from ..common_tools.global_parameters import *
@@ -31,6 +32,7 @@ from ..common_tools.auxiliary_functions import *
 
 from Network_preparation_procedure import FindsNodes
 
+sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_network_preparation.ui'))
 
 class NetworkPreparationDialog(QDialog, FORM_CLASS):
@@ -49,10 +51,8 @@ class NetworkPreparationDialog(QDialog, FORM_CLASS):
         self.pushClose.clicked.connect(self.exit_procedure)
 
         # We load the line and node layers existing in our canvas
-        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if 'wkbType' in dir(layer):
-                if layer.wkbType() in line_types:
-                    self.linelayers.addItem(layer.name())
+        self.linelayers.setFilters(QgsMapLayerProxyModel.LineLayer)
+        self.node_fields.setFilters(QgsMapLayerProxyModel.PointLayer)
 
         # loads default path from parameters
         self.path = standard_path()
@@ -93,11 +93,6 @@ class NetworkPreparationDialog(QDialog, FORM_CLASS):
                 i.setVisible(True)
 
             self.nodelayers.clear()
-            self.node_fields.clear()
-            self.np_node_start.setEnabled(False)
-            for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-                if layer.wkbType() in point_types:
-                    self.nodelayers.addItem(layer.name())
         else:
             for i in q:
                 i.setVisible(True)
@@ -105,7 +100,6 @@ class NetworkPreparationDialog(QDialog, FORM_CLASS):
                 i.setVisible(False)
 
             self.nodelayers.clear()
-            self.node_fields.clear()
             self.nodelayers.hideEvent
             self.np_node_start.setEnabled(True)
 

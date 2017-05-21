@@ -126,35 +126,30 @@ def one_to_all(origin, demand, graph, result, aux_result, curr_thread):
                         node_load_view,
                         w)
 
-        # _copy_skims(skim_matrix_view,
-        #             final_skim_matrices_view)
+        _copy_skims(skim_matrix_view,
+                    final_skim_matrices_view)
 
-        '''_select_link(links
+    if result.path_file['save']:
+        with nogil:
+            put_path_file_on_disk(pred_view,
+                                  predecessors_view,
+                                  c_view,
+                                  conn_view)
 
-
-        '''
-
-
-
-    # if result.path_file['save']:
-    #     put_path_file_on_disk(pred_view,
-    #                           predecessors_view,
-    #                           c_view,
-    #                           conn_view)
-    #
-    # for i in range(critical_queries):
-    #     critical_links_view = return_an_int_view(result.path_file['queries']['elements'][i])
-    #     query_type = 0
-    #     if result.path_file['queries'][ type][i] == "or":
-    #         query_type = 1
-    #     perform_select_link_analysis(O,
-    #                                  nodes,
-    #                                  demand_view,
-    #                                  predecessors_view,
-    #                                  conn_view,
-    #                                  aux_link_flows_view,
-    #                                  sel_link_view,
-    #                                  query_type)
+    for i in range(critical_queries):
+        critical_links_view = return_an_int_view(result.path_file['queries']['elements'][i])
+        query_type = 0
+        if result.path_file['queries'][ type][i] == "or":
+            query_type = 1
+        with nogil:
+            perform_select_link_analysis(O,
+                                         nodes,
+                                         demand_view,
+                                         predecessors_view,
+                                         conn_view,
+                                         aux_link_flows_view,
+                                         sel_link_view,
+                                         query_type)
     return origin
 
 @cython.wraparound(False)

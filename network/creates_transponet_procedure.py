@@ -42,11 +42,12 @@ class CreatesTranspoNetProcedure(WorkerThread):
         self.link_layer = link_layer
         self.required_fields_links = required_fields_links
         self.link_field_indices = link_field_indices
-        self.report = ['test']
+        self.report = []
+
     def doWork(self):
         nfields = ", ".join(self.node_fields)
         lfields = ", ".join(self.link_fields)
-        self.emit_messages(message='Initializing Spatialite layer set', value=0, max_val=1)
+        self.emit_messages(message='Sit tight. Initializing Spatialite layer set', value=0, max_val=1)
         self.run_series_of_queries(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), 'queries_for_empty_file.sql'))
 
@@ -92,12 +93,12 @@ class CreatesTranspoNetProcedure(WorkerThread):
                         field_type = 'INTEGER'
                     else:
                         field_type = 'REAL'
-            try:
-                sql = 'alter table ' + table + ' add column ' + f + ' ' + field_type + '(' + str(field_length) + ')'
-                curr.execute(sql)
-                conn.commit()
-            except:
-                self.report.append('field ' + str(f) + ' could not be added')
+                try:
+                    sql = 'alter table ' + table + ' add column ' + f + ' ' + field_type + '(' + str(field_length) + ')'
+                    curr.execute(sql)
+                    conn.commit()
+                except:
+                    self.report.append('field ' + str(f) + ' could not be added')
         curr.close()
         return string_fields
 

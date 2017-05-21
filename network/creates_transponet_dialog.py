@@ -297,7 +297,7 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         self.progress_label.setText(value)
 
     def job_finished_from_thread(self, success):
-        if not self.worker_thread.report:
+        if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
             dlg2.exec_()
