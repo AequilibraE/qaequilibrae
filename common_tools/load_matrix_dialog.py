@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30
- Updated:    26/02/2017
+ Updated:    2016-06-07
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ import sys
 import os
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
-
+from get_output_file_name import GetOutputFileName
 from load_matrix_class import LoadMatrix
 
 no_omx = False
@@ -155,8 +155,12 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
                 self.run_thread()
 
         if self.radio_npy_matrix.isChecked():
-            file_types = "NumPY array(*.npy)"
-            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.path, file_types)
+
+            file_types = ["NumPY array(*.npy)"]
+            default_type = '.npy'
+            box_name = 'Matrix Loader'
+            new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
+
             try:
                 matrix = np.load(new_name)
                 if len(matrix.shape[:]) == 2:
