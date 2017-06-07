@@ -2,8 +2,8 @@
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
 
- Name:       Shortest path computation
- Purpose:    Dialog for computing and displaying shortest paths based on clicks on the map
+ Name:       Setting graph options
+ Purpose:    Dialog for inputing number of centroids, blocking flows through path and to use only selected links
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -12,8 +12,8 @@
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    2016-07-30
- Updated:    30/09/2016
+ Created:    01/01/2017
+ Updated:    31/05/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -28,7 +28,6 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ad
 
 class GraphAdvancedFeatures(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        #QtGui.QDialog.__init__(self)
         QtGui.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
         self.iface = iface
         self.setupUi(self)
@@ -41,10 +40,8 @@ class GraphAdvancedFeatures(QtGui.QDialog, FORM_CLASS):
         self.set_centroids_rule.stateChanged.connect(self.check_centroids_option)
 
     def check_centroids_option(self):
-        if self.set_centroids_rule.isChecked():
-            self.model_centroids.setEnabled(True)
-        else:
-            self.model_centroids.setEnabled(False)
+        self.model_centroids.setEnabled(self.set_centroids_rule.isChecked())
+        if not self.set_centroids_rule.isChecked():
             self.centroids = None
 
     def exit_procedure(self):
@@ -56,7 +53,10 @@ class GraphAdvancedFeatures(QtGui.QDialog, FORM_CLASS):
 
         if self.set_centroids_rule.isChecked():
             self.centroids = self.model_centroids.text()
-            if not isinstance(self.centroids, int):
+
+            if self.centroids.isdigit():
+                self.centroids = int(self.centroids)
+            else:
                 self.centroids = None
 
         self.close()

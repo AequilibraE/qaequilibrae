@@ -30,7 +30,7 @@ import struct
 
 import  aequilibrae.reserved_fields as reserved_fieds
 from aequilibrae.paths import Graph
-from ..common_tools import WorkerThread
+from ..common_tools import WorkerThread, reporter
 
 class GraphCreation(WorkerThread):
     def __init__(self, parentThread, net_layer, link_id, direction_field, fields_to_add, selected_only):
@@ -42,71 +42,50 @@ class GraphCreation(WorkerThread):
         self.selected_only = selected_only
         self.features = None
         self.error = None
-        self.python_version = (8 * struct.calcsize("P"))
+        self.report = []
+        self.feat_count = 0
 
         self.bi_directional = False
         if direction_field is not None:
             self.bi_directional = True
 
-        if self.selected_only:
-            self.feat_count = self.net_layer.selectedFeatureCount()
-        else:
-            self.feat_count = self.net_layer.featureCount()
-
     def doWork(self):
-
         if self.selected_only:
             self.features = self.net_layer.selectedFeatures()
+            self.feat_count = self.net_layer.selectedFeatureCount()
         else:
             self.features = self.net_layer.getFeatures()
+            self.feat_count = self.net_layer.featureCount()
 
         # Checking ID uniqueness
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Checking ID uniqueness")
-
+        self.report.append(reporter("Checking ID uniqueness", 0))
+        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Checking ID uniqueness. Please wait")
         all_ids = self.net_layer.uniqueValues(self.link_id)
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Collected")
 
         if NULL in all_ids:
             self.error = "ID field has NULL values"
+            self.report.append(self.error)
         else:
             if len(all_ids) < self.feat_count:
                 self.error = 'IDs are not unique.'
-
-
-        # self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.feat_count)
-        # a = []
-        # all_ids = np.zeros(self.feat_count, dtype=np.int_)
-
-        #
-        # p = 0
-        # for feat in self.features:
-        #     k = feat.attributes()[self.link_id]
-        #     if k == NULL:
-        #         self.error = "ID field has NULL values"
-        #         break
-        #     else:
-        #         all_ids[p] = k
-        #         p += 1
-        #         if p % 50 == 0:
-        #             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
-        # self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), self.feat_count)
-
-
+                self.report.append(self.error)
 
         if self.error is None:
+            self.report.append(reporter('Loading data from layer', 0))
             self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Loading data from layer")
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
+            self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.feat_count)
 
             self.graph = Graph()
 
             all_types = [np.int32, np.int32, np.int32, np.int8]
-            all_titles = ['link_id', reserved_fieds.a_node, reserved_fieds.b_node, 'direction']
+            all_titles = [reserved_fieds.link_id, reserved_fieds.a_node, reserved_fieds.b_node, reserved_fieds.direction]
 
             for name_field, values in self.fields_to_add.iteritems():
-                all_types.append(np.float64)
                 all_titles.append((name_field + '_ab').encode('ascii','ignore'))
                 all_types.append(np.float64)
                 all_titles.append((name_field + '_ba').encode('ascii','ignore'))
+                all_types.append(np.float64)
 
             dt = [(t, d) for t, d in zip(all_titles, all_types)]
 
@@ -114,13 +93,7 @@ class GraphCreation(WorkerThread):
             b_node = self.net_layer.fieldNameIndex(reserved_fieds.b_node)
             data = []
 
-            if self.selected_only:
-                self.features = self.net_layer.selectedFeatures()
-            else:
-                self.features = self.net_layer.getFeatures()
-
-            p = 0
-            for feat in self.features:
+            for p, feat in enumerate(self.features):
                 line = []
                 line.append(feat.attributes()[self.link_id])
                 line.append(feat.attributes()[a_node])
@@ -141,20 +114,18 @@ class GraphCreation(WorkerThread):
 
                 for k in line:
                     if k == NULL:
-                        t = ''
-                        for j in line:
-                            t = t + ',' + str(j)
+                        t = ','.join([str(x) for x in line])
                         self.error = 'Field with NULL value - ID:' + str(line[0]) + "  /  " + t
                         break
                 if self.error is not None:
                     break
                 data.append(line)
 
-                p += 1
                 if p % 50 == 0:
                     self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
 
             if self.error is None:
+                self.report.append(reporter('Converting data to graph', 0))
                 network = np.asarray(data)
 
                 self.graph.network = np.zeros(network.shape[0], dtype=dt)
@@ -171,4 +142,5 @@ class GraphCreation(WorkerThread):
                 self.graph.__field_name__ = None
                 self.graph.__layer_name__ = None
 
+        self.report.append(reporter('Process finished', 0))
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), None)

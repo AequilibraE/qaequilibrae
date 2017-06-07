@@ -33,7 +33,7 @@ from PyQt4 import uic
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
-from ..common_tools import GetOutputFileName
+from ..common_tools import GetOutputFileName, ReportDialog
 
 from create_graph_procedure import GraphCreation
 from graph_advanced_features import GraphAdvancedFeatures
@@ -292,13 +292,18 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
                 self.worker_thread.graph.set_graph(cost_field=self.cost_field, skim_fields=list(self.cost_field),
                                                    block_centroid_flows=self.block_through_centroids)
             else:
-                self.worker_thread.graph.set_graph(centroids=int(self.centroids), cost_field=self.cost_field,
+                self.worker_thread.graph.set_graph(centroids=self.centroids, cost_field=self.cost_field,
                                                    skim_fields=list(self.cost_field),
                                                    block_centroid_flows=self.block_through_centroids)
 
             self.worker_thread.graph.save_to_disk(self.output)
             qgis.utils.iface.messageBar().pushMessage("Finished. ", 'Graph saved successfully', level=3)
-            self.exit_procedure()
+
+        self.exit_procedure()
+        if self.worker_thread.report:
+            dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+            dlg2.show()
+            dlg2.exec_()
 
     def browse_outfile(self, dialogbox_name, outbox, file_types):
         new_name, file_type = GetOutputFileName(self, 'Graph File', ["Aequilibrae Graph(*.aeg)"], ".aeg", self.path)
