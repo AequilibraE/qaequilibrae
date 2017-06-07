@@ -25,7 +25,7 @@ import math
 import os
 import yaml
 import tempfile
-
+from time import localtime, strftime
 
 def main():
     pass
@@ -105,15 +105,17 @@ def logger(message):
         o = open(debug_file, 'w')
     else:
         o = open(debug_file, 'a')
-    if type(message) not in [list, tuple, dict]:
-        print >> o, message
-    else:
-        t = '['
-        for q in message:
-            t += str(q) + ','
-        print >>o, t[:-1] +']'
+    if type(message) in [list, tuple, dict]:
+        message = str(message)
+    print >>o, message
     o.flush()
     o.close()
+
+
+def reporter(message, tabs=0):
+    t = strftime("%Y-%m-%d %H:%M:%S", localtime())
+    return ' ' * tabs + t + ' - ' +str(message)
+
 
 if __name__ == '__main__':
     main()
