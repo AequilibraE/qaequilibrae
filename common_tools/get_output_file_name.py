@@ -1,5 +1,5 @@
 from PyQt4.QtGui import QFileDialog
-
+import tempfile
 
 def GetOutputFileName(clss, box_name, file_types, default_type, start_path):
     dlg = QFileDialog(clss)
@@ -21,3 +21,9 @@ def GetOutputFileName(clss, box_name, file_types, default_type, start_path):
         else:
             extension = new_name[-4:]
     return new_name, extension
+
+def GetOutputFolderName(base_path=None, message='Select a folder:'):
+    if base_path is None:
+        base_path = tempfile.gettempdir()
+    dir = QFileDialog.getExistingDirectory(None, message, base_path, QFileDialog.ShowDirsOnly)
+    return dir
