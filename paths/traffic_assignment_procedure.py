@@ -6,14 +6,14 @@
  Purpose:    Executes traffic assignment procedure in a separate thread
 
  Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
+ Contributors:   Pedro Camargo
  Last edited by: Pedro Camargo
 
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    30/10/2016
- Updated:
+ Updated:    07/06/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ import thread
 
 no_binary = False
 try:
-    from aequilibrae.paths import ota
+    from aequilibrae.paths import one_to_all, MultiThreadedAoN
 except:
     no_binary = True
 
@@ -44,31 +44,34 @@ class TrafficAssignmentProcedure(WorkerThread):
         self.method = method
         self.skims = skims
         self.critical = critical
-        self.error = None
         self.all_threads = {}
         self.performed = 0
         self.report = []
+        self.aux_res = MultiThreadedAoN()
+        self.aux_res.prepare(graph, results)
+        logger(results.path_file)
 
     def doWork(self):
 
         self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), self.matrix.shape[0])
         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 0)
-
         # If we are going to perform All or Nothing
         if self.method['algorithm'] == 'AoN':
             pool = ThreadPool(self.results.cores)
             self.all_threads['count'] = 0
-
             for O in range(self.results.zones):
                 a = self.matrix[O, :]
                 if np.sum(a) > 0:
-                    #self.func_assig_thread(O, a)
                     pool.apply_async(self.func_assig_thread, args=(O, a))
             pool.close()
             pool.join()
 
-        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "DONE")
+        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), self.matrix.shape[0])
+        self.results.link_loads = np.sum(self.aux_res.temp_link_loads, axis=1)
+
+        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Saving Outputs")
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), None)
+
 
     def func_assig_thread(self, O, a):
         if thread.get_ident() in self.all_threads:
@@ -77,7 +80,10 @@ class TrafficAssignmentProcedure(WorkerThread):
             self.all_threads[thread.get_ident()] = self.all_threads['count']
             th = self.all_threads['count']
             self.all_threads['count'] += 1
-        ota(O, a, self.graph, self.results, th, True)
+        a = one_to_all(O, a, self.graph, self.results, self.aux_res, th)
+        if a != O:
+            self.report.append(a)
+
 
         self.performed += 1
         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), self.performed)

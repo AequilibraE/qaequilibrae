@@ -86,30 +86,12 @@
     <attribute name="title">
      <string>Network</string>
     </attribute>
-    <widget class="QLabel" name="lblnodematch_11">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>203</y>
-       <width>121</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Line layer</string>
-     </property>
-    </widget>
     <widget class="QComboBox" name="minimizing_field">
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>72</y>
-       <width>391</width>
+       <y>82</y>
+       <width>461</width>
        <height>30</height>
       </rect>
      </property>
@@ -118,34 +100,13 @@
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>79</y>
+       <y>89</y>
        <width>151</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
       <string>Minimizing field</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="no_connectors_in_graph">
-     <property name="geometry">
-      <rect>
-       <x>151</x>
-       <y>106</y>
-       <width>341</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Prevent flows through centroid connectors</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="load_graph_from_file">
@@ -166,8 +127,8 @@
       <rect>
        <x>153</x>
        <y>35</y>
-       <width>391</width>
-       <height>20</height>
+       <width>471</width>
+       <height>41</height>
       </rect>
      </property>
      <property name="font">
@@ -178,60 +139,32 @@
      <property name="text">
       <string>Load graph *.aeg</string>
      </property>
-    </widget>
-    <widget class="QCheckBox" name="chb_check_consistency">
-     <property name="enabled">
-      <bool>false</bool>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
-     <property name="geometry">
-      <rect>
-       <x>410</x>
-       <y>264</y>
-       <width>131</width>
-       <height>18</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Check consistency</string>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="lblnodematch_14">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>236</y>
-       <width>121</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Link ID field</string>
-     </property>
-    </widget>
-    <widget class="QgsMapLayerComboBox" name="network_layer">
-     <property name="geometry">
-      <rect>
-       <x>151</x>
-       <y>196</y>
-       <width>391</width>
-       <height>30</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="network_field">
+    <widget class="QTableWidget" name="graph_properties_table">
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>230</y>
-       <width>391</width>
-       <height>30</height>
+       <y>120</y>
+       <width>461</width>
+       <height>231</height>
       </rect>
      </property>
+     <column>
+      <property name="text">
+       <string>Property</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Value</string>
+      </property>
+     </column>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_4">
@@ -319,7 +252,7 @@
     </attribute>
     <widget class="QTableWidget" name="select_link_list">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -370,7 +303,7 @@
     </widget>
     <widget class="QCheckBox" name="do_select_link">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -386,7 +319,7 @@
     </widget>
     <widget class="QPushButton" name="but_build_query">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -407,7 +340,7 @@
     </attribute>
     <widget class="QTableWidget" name="list_link_extraction">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -458,7 +391,7 @@
     </widget>
     <widget class="QCheckBox" name="do_extract_link_flows">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -474,7 +407,7 @@
     </widget>
     <widget class="QPushButton" name="but_build_query_extract">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -655,29 +588,13 @@
      <property name="title">
       <string>Outputs</string>
      </property>
-     <widget class="QLabel" name="critical_matrix_path">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>108</y>
-        <width>451</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>...</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="lbl_output">
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>35</y>
+        <y>50</y>
         <width>451</width>
-        <height>21</height>
+        <height>51</height>
        </rect>
       </property>
       <property name="font">
@@ -688,118 +605,56 @@
       <property name="text">
        <string>Output</string>
       </property>
-     </widget>
-     <widget class="QPushButton" name="select_critical_analysis_output">
-      <property name="enabled">
-       <bool>false</bool>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="select_output_folder">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>103</y>
-        <width>121</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Critical output</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="path_file_display">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>72</y>
-        <width>451</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>...</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="select_path_file_name">
-      <property name="geometry">
-       <rect>
-        <x>11</x>
-        <y>67</y>
-        <width>121</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Select output file</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="select_result">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>34</y>
+        <y>49</y>
         <width>121</width>
         <height>24</height>
        </rect>
       </property>
       <property name="text">
-       <string>Assignment results</string>
+       <string>Results</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="do_group_outputs">
+     <widget class="QCheckBox" name="do_output_to_sqlite">
       <property name="geometry">
        <rect>
-        <x>387</x>
-        <y>8</y>
+        <x>380</x>
+        <y>10</y>
         <width>231</width>
         <height>22</height>
        </rect>
       </property>
       <property name="text">
-       <string>Group outputs in a single database</string>
+       <string>Final outputs to SQLite</string>
       </property>
      </widget>
-     <widget class="QLabel" name="critical_matrix_path_2">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
+     <widget class="QCheckBox" name="do_output_to_csv">
       <property name="geometry">
        <rect>
-        <x>150</x>
-        <y>146</y>
-        <width>451</width>
-        <height>17</height>
+        <x>140</x>
+        <y>10</y>
+        <width>231</width>
+        <height>22</height>
        </rect>
       </property>
       <property name="text">
-       <string>...</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="select_link_flow_extraction_output">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>141</y>
-        <width>121</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Critical output</string>
+       <string>Final outputs to CSVs</string>
       </property>
      </widget>
     </widget>
    </widget>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QgsMapLayerComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qgsmaplayercombobox.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

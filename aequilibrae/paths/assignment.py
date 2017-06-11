@@ -61,8 +61,6 @@ def all_or_nothing(matrix, graph, results):
         for O in range(matrix.shape[0]):
             a = matrix[O, :]
             if np.sum(a) > 0:
-                # func_assig_thread(1, a, graph, results, aux_res, all_threads)
-                # break
                 pool.apply_async(func_assig_thread, args=(O, a, graph, results, aux_res, all_threads, report))
         pool.close()
         pool.join()
