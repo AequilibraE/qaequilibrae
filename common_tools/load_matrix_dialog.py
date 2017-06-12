@@ -151,7 +151,8 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
                 idx3 = self.layer.fieldNameIndex(self.field_cells.currentText())
                 idx = [idx1, idx2, idx3]
 
-                self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), self.layer, idx, sparse=self.sparse)
+                self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), layer=self.layer, idx=idx,
+                                                sparse=self.sparse, mapped_array=self.return_memory_mapped.isChecked())
                 self.run_thread()
 
         if self.radio_npy_matrix.isChecked():

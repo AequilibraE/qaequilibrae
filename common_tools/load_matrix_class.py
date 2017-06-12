@@ -24,18 +24,24 @@ from PyQt4.QtCore import *
 import numpy as np
 from scipy.sparse import coo_matrix
 from worker_thread import WorkerThread
-
+import uuid
+import tempfile
+import os
+from auxiliary_functions import logger
 
 class LoadMatrix(WorkerThread):
-    def __init__(self, parentThread, layer, idx, max_zone=None, filler=0, sparse=False):
+    def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
-        self.layer = layer
-        self.idx = idx
-        self.max_zone = max_zone
+        self.layer = kwargs.get('layer')
+        self.idx = kwargs.get('idx')
+        self.max_zone = kwargs.get('max_zone', None)
+        self.filler = kwargs.get('filler', 0)
+        self.sparse = kwargs.get('sparse', False)
+        self.mapped_array = kwargs.get('mapped_array', False)
+
         self.matrix = None
         self.error = None
-        self.filler = filler
-        self.sparse = sparse
+
 
     def doWork(self):
         layer = self.layer
@@ -75,8 +81,16 @@ class LoadMatrix(WorkerThread):
             if self.sparse:
                 mat = coo_matrix((matrix[:,2], (matrix[:,0], matrix[:,1])), shape=(max_zone, max_zone))
             else:
-                mat = np.zeros((int(max_zone), int(max_zone)))
-                mat.fill(self.filler)
+                if self.mapped_array:
+                    mat = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_array_' + str(uuid.uuid4().hex) + '.mat'),
+                                    dtype=np.float_,
+                                    mode='w+',
+                                    shape=(int(max_zone), int(max_zone)))
+                else:
+                    mat = np.zeros((int(max_zone), int(max_zone)))
+                if self.filler != 0:
+                    mat.fill(self.filler)
+
                 P = 0
                 for i in matrix:
                     mat[i[0].astype(int), i[1].astype(int)] = i[2]
@@ -85,7 +99,6 @@ class LoadMatrix(WorkerThread):
                         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
                         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
                                   ("Converting matrix: " + str(P) + "/" + str(feat_count)))
-
         self.matrix = mat
         self.error = error
         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(feat_count)))

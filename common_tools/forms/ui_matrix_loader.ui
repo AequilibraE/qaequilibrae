@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>456</width>
-    <height>245</height>
+    <height>270</height>
    </rect>
   </property>
   <property name="font">
@@ -32,7 +32,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>172</y>
+     <y>207</y>
      <width>411</width>
      <height>23</height>
     </rect>
@@ -85,7 +85,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>202</y>
+     <y>237</y>
      <width>411</width>
      <height>23</height>
     </rect>
@@ -284,6 +284,19 @@
    </property>
    <property name="checked">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="return_memory_mapped">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>170</y>
+     <width>401</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save memory (Load as memory mapped array)</string>
    </property>
   </widget>
  </widget>

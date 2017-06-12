@@ -35,6 +35,7 @@ from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
+import tempfile, glob
 
 no_binary = False
 try:
@@ -219,6 +220,12 @@ class AequilibraEMenu:
     #########################################################################
 
     def unload(self):
+        # Removes all the temporary files from previous uses
+        p = tempfile.gettempdir() + '/aequilibrae_*'
+        for f in glob.glob(p):
+            os.unlink(f)
+
+        # unloads the add-on
         if self.AequilibraE_menu is not None:
             self.iface.mainWindow().menuBar().removeAction(self.AequilibraE_menu.menuAction())
         else:

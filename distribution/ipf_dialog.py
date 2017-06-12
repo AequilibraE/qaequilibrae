@@ -97,7 +97,7 @@ class IpfDialog(QDialog, FORM_CLASS):
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
             self.matrix_name.setText('LOADED')
-            self.matrix_total.setText("{:20,.4f}".format(np.sum(self.matrix)))
+            self.matrix_total.setText(str("{:,.2f}".format(float(np.sum(self.matrix)))))
 
     def find_vectors(self, destination):
         dlg2 = LoadVectorDialog(self.iface)
