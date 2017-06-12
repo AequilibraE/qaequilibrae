@@ -99,9 +99,8 @@ class Graph:
 
     # Create a graph from a shapefile. To be upgraded to ANY geographic file in the future
     def create_from_geography(self, geo_file, id_field, dir_field, cost_field, skim_fields = [], anode="A_NODE", bnode="B_NODE"):
-        #try:
         import shapefile
-        #try:
+        cost_field_name = cost_field
         error = None
         geo_file_records = shapefile.Reader(geo_file)
         records = geo_file_records.records()
@@ -123,7 +122,7 @@ class Graph:
 
         # Appends all fields to the list of fields to be used
         all_types = [np.int32, np.int32, np.int32, np.float64, np.float64, np.int8]
-        all_titles = ['link_id', 'a_node', 'b_node', 'length_ab', 'length_ba', 'direction']
+        all_titles = ['link_id', 'a_node', 'b_node', cost_field_name.lower() + '_ab', cost_field_name.lower() + '_ba', 'direction']
         check_fields = [id_field, dir_field, anode, bnode, cost_field]
         types_to_check = [int, int, int, int, float]
 
