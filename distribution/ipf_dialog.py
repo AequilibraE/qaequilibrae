@@ -9,11 +9,11 @@
  Contributors:
  Last edited by: Pedro Camargo
 
- Website:    www.AequilibraE.comfrom PyQt4 import QtGui, QtCore, uic
+ Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-09-29
- Updated:    2016-10-03
+ Updated:    2017-06-13
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
