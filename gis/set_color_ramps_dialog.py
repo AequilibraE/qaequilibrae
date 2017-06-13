@@ -28,21 +28,17 @@ from functools import partial
 from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from qgis.gui import QgsMapLayerProxyModel
+from PyQt4 import uic
 import sys
 import os
-#from qgis.gui  import QgsColorButtonV2, QgsFieldComboBox, QgsMapLayerComboBox
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
-
-from global_parameters import *
-from random import randint
-
-from forms import Ui_BandwidthColorRamps
-from auxiliary_functions import *
-from color_ramps import AequilibraERamps
 
 
-class LoadColorRampSelector(QDialog, Ui_BandwidthColorRamps):
+sys.modules['qgsfieldcombobox'] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_bandwidth_color_ramps.ui'))
+
+
+
+class LoadColorRampSelector(QDialog, FORM_CLASS):
     def __init__(self, iface, layer):
         QDialog.__init__(self)
         self.iface = iface
@@ -50,12 +46,11 @@ class LoadColorRampSelector(QDialog, Ui_BandwidthColorRamps):
         self.layer = layer
         myStyle = QgsStyleV2().defaultStyle()
 
-        self.defaultColorRampNames = myStyle.colorRampNames() #+ list(AequilibraERamps.keys())
+        self.defaultColorRampNames = myStyle.colorRampNames()
 
         for i in self.defaultColorRampNames:
             self.cbb_ab_color.addItem(i)
             self.cbb_ba_color.addItem(i)
-        #index = self.cbb_ba_color.findText(list(AequilibraERamps.keys())[0], Qt.MatchFixedString)
         index = 0
         self.cbb_ab_color.setCurrentIndex(index)
         self.cbb_ba_color.setCurrentIndex(index)

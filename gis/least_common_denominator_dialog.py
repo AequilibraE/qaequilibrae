@@ -21,22 +21,25 @@
 
 from qgis.core import QgsMapLayerRegistry
 from PyQt4.QtCore import QObject, SIGNAL
-from PyQt4 import QtGui
+from PyQt4 import QtGui, uic
 import qgis
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
 # For the GIS tools portion
 from least_common_denominator_procedure import LeastCommonDenominatorProcedure
-from forms import Ui_least_common_denominator
-from global_parameters import *
+
+from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import get_vector_layer_by_name
+from ..common_tools.global_parameters import *
 from functools import partial
-from auxiliary_functions import get_vector_layer_by_name
+
 #####################################################################################################
 ###################################        SIMPLE TAG          ######################################
 
-class LeastCommonDenominatorDialog(QtGui.QDialog, Ui_least_common_denominator):
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_least_common_denominator.ui'))
+
+class LeastCommonDenominatorDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
         QtGui.QDialog.__init__(self)
         self.iface = iface

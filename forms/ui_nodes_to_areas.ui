@@ -337,6 +337,21 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>nodelayer</tabstop>
+  <tabstop>nodefield</tabstop>
+  <tabstop>arealayer</tabstop>
+  <tabstop>areafield</tabstop>
+  <tabstop>needsmatching</tabstop>
+  <tabstop>nodematching</tabstop>
+  <tabstop>areamatching</tabstop>
+  <tabstop>sum</tabstop>
+  <tabstop>max</tabstop>
+  <tabstop>min</tabstop>
+  <tabstop>avg</tabstop>
+  <tabstop>divide_value</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

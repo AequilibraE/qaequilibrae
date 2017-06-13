@@ -1,6 +1,3 @@
-# cimport numpy as np
-# cimport cython
-# include 'parameters.pxi'
 import multiprocessing as mp
 import numpy as np
 import warnings
@@ -16,13 +13,10 @@ class AssignmentResults:
         @type graph: Set of numpy arrays to store Computation results
         self.critical={required:{"links":[lnk_id1, lnk_id2, ..., lnk_idn], "path file": False}, results:{}}
         """
-        self.link_loads = None   # The actual results for assignment
-        self.predecessors = None  # The predecessors for each node in the graph
-        self.connectors = None  # The previous link for each node in the tree
-        self.skims = None  # The array of skims
-        self.no_path = None  # The list os paths
-        self.temporary_skims = None
-        self.num_skims = None  # number of skims that will be computed. Depends on the setting of the graph provided
+        self.link_loads = None       # The actual results for assignment
+        self.skims = None            # The array of skims
+        self.no_path = None          # The list os paths
+        self.num_skims = None        # number of skims that will be computed. Depends on the setting of the graph provided
         self.cores = mp.cpu_count()
 
         self.critical_links = {'save': False,
@@ -45,8 +39,6 @@ class AssignmentResults:
         self.direcs = None
 
         # We set the critical analysis, link extraction and path file saving to False
-        self.setSavePathFile(False)
-        self.setCriticalLinks(False)
 
     # In case we want to do by hand, we can prepare each method individually
     def prepare(self, graph):
@@ -61,23 +53,20 @@ class AssignmentResults:
         self.__redim()
         self.__graph_id__ = graph.__id__
 
+        self.setSavePathFile(False)
+        self.setCriticalLinks(False)
+
     def reset(self):
-        if self.predecessors is not None:
-            self.predecessors.fill(-1)
-            self.connectors.fill(-1)
+        if self.link_loads is not None:
             self.skims.fill(0)
             self.no_path.fill(-1)
         else:
             print 'Exception: Assignment results object was not yet prepared/initialized'
 
     def __redim(self):
-        self.link_loads = np.zeros((self.links, self.cores), np.float64)
-        self.predecessors = np.zeros((self.nodes, self.cores), dtype=np.int32)
-        self.connectors = np.zeros((self.nodes, self.cores), dtype=np.int32)
-
+        self.link_loads = np.zeros(self.links, np.float64)
         self.skims = np.zeros((self.zones, self.zones, self.num_skims), np.float64)
-        self.no_path = np.zeros((self.zones, self.zones, self.cores), dtype=np.int32)
-        self.temporary_skims = np.zeros((self.nodes, self.num_skims, self.cores), np.float64)
+        self.no_path = np.zeros((self.zones, self.zones), dtype=np.int32)
 
         self.reset()
 
@@ -86,14 +75,14 @@ class AssignmentResults:
             if cores > 0:
                 if self.cores != cores:
                     self.cores = cores
-                    if self.predecessors is not None:
+                    if self.link_loads is not None:
                         self.__redim()
             else:
                 raise ValueError("Number of cores needs to be equal or bigger than one")
         else:
             raise ValueError("Number of cores needs to be an integer")
 
-    def setCriticalLinks(self, save=False, queries=None, crit_res_result=None):
+    def setCriticalLinks(self, save=False, queries={}, crit_res_result=None):
         a = np.zeros((max(1,self.zones), 2, 2), dtype=np.float64)
         if save:
             if crit_res_result is None:
@@ -141,75 +130,73 @@ class AssignmentResults:
                           'results': a
                           }
 
-    def results(self):
-        return np.sum(self.link_loads, axis=1)
+    def save_to_disk(self, output='loads', output_file_name ='link_flows', file_type='csv'):
+        ''' Function to write to disk all outputs computed during assignment
+    Args:
+        output: 'loads', for writing the link loads
+                'path_file', for writing the path file to a format different than the native binary
 
-    def save_loads_to_disk(self, output_file, file_type=None):
+        output_file_name: Name of the file, with extension
 
-        dt = [('Link ID', np.int), ('AB Flow', np.float), ('BA Flow', np.float), ('Tot Flow', np.float)]
-        res = np.zeros(np.max(self.lids) + 1, dtype=dt)
+        file_type: 'csv', for comma-separated files
+                   'sqlite' for sqlite databases
+    Returns:
+        Nothing'''
+        if output == 'loads':
+            dt = [('Link ID', np.int), ('AB Flow', np.float), ('BA Flow', np.float), ('Tot Flow', np.float)]
+            res = np.zeros(np.max(self.lids) + 1, dtype=dt)
 
-        res['Link ID'][:] = np.arange(np.max(self.lids) + 1)[:]
+            res['Link ID'][:] = np.arange(np.max(self.lids) + 1)[:]
 
-        # Indices of links BA and AB
-        ABs = self.direcs < 0
-        BAs = self.direcs > 0
+            # Indices of links BA and AB
+            ABs = self.direcs < 0
+            BAs = self.direcs > 0
 
-        link_flows = self.results()[:-1]
+            link_flows = self.link_loads[:-1]
 
-        # AB Flows
-        link_ids = self.lids[ABs]
-        res['AB Flow'][link_ids] = link_flows[ABs]
+            # AB Flows
+            link_ids = self.lids[ABs]
+            res['AB Flow'][link_ids] = link_flows[ABs]
 
-        # BA Flows
-        link_ids = self.lids[BAs]
-        res['BA Flow'][link_ids] = link_flows[BAs]
+            # BA Flows
+            link_ids = self.lids[BAs]
+            res['BA Flow'][link_ids] = link_flows[BAs]
 
-        # Tot Flow
-        res['Tot Flow'] = res['AB Flow'] + res['BA Flow']
+            # Tot Flow
+            res['Tot Flow'] = res['AB Flow'] + res['BA Flow']
 
-        if file_type is None:
-            # Guess file type
-            if output_file[-3:].upper() == 'CSV':
-                file_type = 'csv'
-            if output_file[-6:].upper() == 'SQLITE':
-                file_type = 'sqlite'
+            # Save to disk
+            if file_type == 'csv':
+                np.savetxt(output_file_name, res, fmt="%d "+",%1.10f"*3, header='Link_ID,AB Flow,BA Flow,Tot Flow')
 
-        # Save to disk
-        if file_type == 'csv':
-            np.savetxt(output_file, res, delimiter=',', header='Link_ID,AB Flow,BA Flow,Tot Flow')
-
-        if file_type == 'sqlite':
-            def insert_new_line(conn, link):
-                sql = ''' INSERT INTO projects(name,begin_date,end_date)
-                          VALUES(?,?,?) '''
-                cur = conn.cursor()
-                cur.execute(sql, link)
-                return cur.lastrowid
-
-            sqlite_file = output_file  # name of the sqlite database file
-            table_name = 'link_flows'  # name of the table to be created
-            id_field = 'link_id'  # name of the column
-            ab_field = 'ab_flow'  # name of the column
-            ba_field = 'ba_flow'  # name of the column
-            tot_field = 'tot_flow'  # name of the column
-            id_type = 'INTEGER'  # column data type
-            ab_type = 'REAL'  # column data type
-            ba_type = 'REAL'  # column data type
-            tot_type =  'REAL'  # column data type
-
+            if file_type == 'sqlite':
             # Connecting to the database file
-            conn = sqlite3.connect(sqlite_file)
+                conn = sqlite3.connect(output_file_name)
+                c = conn.cursor()
+            # Creating the flows table
+                c.execute('''DROP TABLE IF EXISTS link_flows''')
+                c.execute('''CREATE TABLE link_flows (link_id INTEGER PRIMARY KEY, ab_flow REAL, ba_flow REAL, tot_flow REAL)''')
+
+                c.executemany('INSERT INTO link_flows VALUES (?,?,?,?)', res)
+                conn.commit()
+                conn.close()
+
+        elif output == 'path_file':
+            conn = sqlite3.connect(output_file_name)
             c = conn.cursor()
 
             # Creating the flows table
-            c.execute('CREATE TABLE link_flows (link_id INTEGER PRIMARY KEY, ab_flow, ba_flow, tot_flow REAL)' \
-                      .format(tn=table_name, nf=id_field, ft=id_type))
+            c.execute('''DROP TABLE IF EXISTS path_file''')
+            c.execute('''CREATE TABLE path_file (origin_zone INTEGER, node INTEGER, predecessor INTEGER)''')
 
-            # writing flows to it
-            for link in range(res.shape[0]):
-                insert_new_line(conn, link)
-            # Committing changes and closing the connection to the database file
+            path_file = path_file = self.path_file['results']
+            for i in range(self.zones):
+                data = np.zeros((self.nodes, 3), np.int64)
+                data[:,0].fill(i)
+                data[:,1] = path_file[i,:,0]
+                data[:,2] = path_file[i,:,1]
+                c.executemany('''INSERT INTO path_file VALUES(?, ?, ?)''', data)
+
             conn.commit()
             conn.close()
 

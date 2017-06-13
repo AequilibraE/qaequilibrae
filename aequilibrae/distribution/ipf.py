@@ -106,7 +106,7 @@ class Ipf:
             while gap > conv_criteria and iter < max_iter:
                 iter += 1
 
-                # computes factors for rows
+                # computes factors for zones
                 marg_rows = self.tot_rows(self.output)
                 row_factor = self.factor(marg_rows, self.rows)
                 # applies factor
@@ -147,12 +147,12 @@ class Ipf:
         return path['distribution'][model]
 
 ###For testing
-# rows = np.random.rand(1000)*10000
+# zones = np.random.rand(1000)*10000
 # columns = np.random.rand(1000)*10000
-# columns = columns * (np.sum(rows)/np.sum(columns))
+# columns = columns * (np.sum(zones)/np.sum(columns))
 # mat = np.random.rand(1000,1000)
 #
-# ipf = Ipf(mat, rows, columns)
+# ipf = Ipf(mat, zones, columns)
 # ipf.fit()
 # for i in ipf.report:
 #     print i

@@ -19,26 +19,26 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
-import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4 import QtGui, QtCore
-import sys
-import os
+from PyQt4 import QtGui, uic
 from functools import partial
 import numpy as np
+import os
 
-from auxiliary_functions import *
-from load_matrix_dialog import LoadMatrixDialog
-from report_dialog import ReportDialog
+
+from ..common_tools import LoadMatrixDialog
+from ..common_tools.auxiliary_functions import *
+from ..common_tools import ReportDialog
+
 
 from calibrate_gravity_procedure import CalibrateGravityProcedure
-from ui_gravity_calibration import Ui_gravity_calibration
 import yaml
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_gravity_calibration.ui'))
 
 
-class CalibrateGravityDialog(QDialog, Ui_gravity_calibration):
+
+class CalibrateGravityDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface

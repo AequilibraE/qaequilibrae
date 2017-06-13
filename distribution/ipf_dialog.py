@@ -13,32 +13,28 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-09-29
- Updated:    2016-10-03
+ Updated:    2017-06-13
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")) + "//forms//")
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
-
-from qgis.core import *
-import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4 import uic
 from functools import partial
 import numpy as np
 import warnings
 
-from auxiliary_functions import *
-from load_matrix_dialog import LoadMatrixDialog
-from load_vector_dialog import LoadVectorDialog
-from report_dialog import ReportDialog
+
+from ..common_tools.auxiliary_functions import *
+from ..common_tools import ReportDialog
+from ..common_tools import LoadMatrixDialog, LoadVectorDialog
 
 from ipf_procedure import IpfProcedure
-from ui_ipf import Ui_ipf
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_ipf.ui'))
 
 try:
     import omx
@@ -48,7 +44,7 @@ except:
 
 warnings.filterwarnings('ignore')
 
-class IpfDialog(QDialog, Ui_ipf):
+class IpfDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
@@ -68,7 +64,7 @@ class IpfDialog(QDialog, Ui_ipf):
         # FIRST, we connect slot signals
         # For changing the input matrix
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
-        self.but_load_rows.clicked.connect(partial(self.find_vectors, 'rows'))
+        self.but_load_rows.clicked.connect(partial(self.find_vectors, 'zones'))
         self.but_load_columns.clicked.connect(partial(self.find_vectors, 'columns'))
 
         self.but_choose_output_name.clicked.connect(self.browse_outfile)
@@ -101,14 +97,14 @@ class IpfDialog(QDialog, Ui_ipf):
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
             self.matrix_name.setText('LOADED')
-            self.matrix_total.setText("{:20,.4f}".format(np.sum(self.matrix)))
+            self.matrix_total.setText(str("{:,.2f}".format(float(np.sum(self.matrix)))))
 
     def find_vectors(self, destination):
         dlg2 = LoadVectorDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
         if dlg2.vector is not None:
-            if destination == 'rows':
+            if destination == 'zones':
                 self.rows = dlg2.vector
                 self.rows_name.setText('LOADED')
                 self.rows_total.setText("{:20,.4f}".format(np.sum(self.rows)))

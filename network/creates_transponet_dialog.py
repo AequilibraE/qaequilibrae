@@ -25,18 +25,18 @@ from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import uic
-from auxiliary_functions import *
 import sys
 from qgis.gui import QgsMapLayerProxyModel
 import os
-from global_parameters import *
+from ..common_tools.global_parameters import *
+from ..common_tools import GetOutputFileName
+from ..common_tools.auxiliary_functions import *
+from ..common_tools import ReportDialog
 from functools import partial
-from get_output_file_name import GetOutputFileName
 from creates_transponet_procedure import CreatesTranspoNetProcedure
 
 sys.modules['qgsmaplayercombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                            'forms/ui_transponet_construction.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_transponet_construction.ui'))
 
 class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -66,6 +66,7 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         self.link_fields = []
         self.node_field_indices = {}
         self.link_field_indices = {}
+        self.report = None
 
         if self.node_layers_list.currentIndex() >= 0:
             self.changed_layer('nodes')
@@ -76,51 +77,56 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         self.progress_label.setVisible(False)
 
     def changed_layer(self, layer_type):
+
+        layer_fields = None
         if layer_type == 'nodes':
             table = self.table_node_fields
             self.node_layer = get_vector_layer_by_name(self.node_layers_list.currentText())
-            layer_fields = self.node_layer.pendingFields()
-        else:
+            if self.node_layer:
+                layer_fields = self.node_layer.pendingFields()
+        if layer_type == 'links':
             table = self.table_link_fields
             self.link_layer = get_vector_layer_by_name(self.link_layers_list.currentText())
-            layer_fields = self.link_layer.pendingFields()
+            if self.link_layer:
+                layer_fields = self.link_layer.pendingFields()
 
+        table.clearContents()
         # We create the comboboxes that will hold the definitions for all the fields that are mandatory for
         # creating the appropriate triggers on the SQLite file
-        fields = [field.name() for field in layer_fields]
+        if layer_fields:
+            fields = [field.name() for field in layer_fields]
 
-        def centers_item(item):
-            cell_widget = QWidget()
-            lay_out = QHBoxLayout(cell_widget)
-            lay_out.addWidget(item)
-            lay_out.setAlignment(Qt.AlignCenter)
-            lay_out.setContentsMargins(0, 0, 0, 0)
-            cell_widget.setLayout(lay_out)
-            return cell_widget
+            def centers_item(item):
+                cell_widget = QWidget()
+                lay_out = QHBoxLayout(cell_widget)
+                lay_out.addWidget(item)
+                lay_out.setAlignment(Qt.AlignCenter)
+                lay_out.setContentsMargins(0, 0, 0, 0)
+                cell_widget.setLayout(lay_out)
+                return cell_widget
 
-        counter = 0
-        for field in fields:
-            table.setRowCount(counter + 1)
-            item = QTableWidgetItem(field)
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            table.setItem(counter, 0, item)
+            counter = 0
+            for field in fields:
+                table.setRowCount(counter + 1)
+                item1 = QTableWidgetItem(field)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                table.setItem(counter, 0, item1)
 
-            item = QTableWidgetItem(field)
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            table.setItem(counter, 2, item)
+                item2 = QTableWidgetItem(field)
+                item2.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                table.setItem(counter, 2, item2)
 
-            q = QCheckBox()
-            q.stateChanged.connect(partial(self.set_field_to_default, layer_type))
+                chb1 = QCheckBox()
+                chb1.stateChanged.connect(partial(self.set_field_to_default, layer_type))
+                table.setCellWidget(counter, 1, centers_item(chb1))
 
-            table.setCellWidget(counter, 1, centers_item(q))
+                chb2 = QCheckBox()
+                chb2.setChecked(True)
+                chb2.stateChanged.connect(partial(self.set_field_to_keep, layer_type))
+                table.setCellWidget(counter, 3, centers_item(chb2))
+                counter += 1
 
-            chb = QCheckBox()
-            chb.setChecked(True)
-            chb.stateChanged.connect(partial(self.set_field_to_keep, layer_type))
-            table.setCellWidget(counter, 3, centers_item(chb))
-            counter += 1
-
-        self.counter[layer_type] = counter
+            self.counter[layer_type] = counter
 
     def find_similar_texts_in_combobox(self, text, comb):
         index = comb.findText(text, Qt.MatchFixedString)
@@ -291,4 +297,8 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         self.progress_label.setText(value)
 
     def job_finished_from_thread(self, success):
+        if self.worker_thread.report:
+            dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+            dlg2.show()
+            dlg2.exec_()
         self.exit_procedure()

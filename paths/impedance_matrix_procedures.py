@@ -29,7 +29,7 @@ import sys
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
 import aequilibrae as ae
-from worker_thread import WorkerThread
+from ..common_tools import WorkerThread
 
 
 def main():

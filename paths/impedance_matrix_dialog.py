@@ -21,7 +21,7 @@
 
 from qgis.core import *
 import qgis
-from PyQt4 import QtGui
+from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
 from PyQt4.QtCore import QObject, SIGNAL
 import sys, os
@@ -30,14 +30,16 @@ import numpy as np
 from impedance_matrix_procedures import ComputeDistMatrix
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import PathResults
-from get_output_file_name import GetOutputFileName
+from ..common_tools import GetOutputFileName
 
-from auxiliary_functions import *
-from global_parameters import *
-from ui_impedance_matrix import *
+from ..common_tools.auxiliary_functions import *
+from ..common_tools.global_parameters import *
+
+#sys.modules['qgsmaplayercombobox'] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_impedance_matrix.ui'))
 
 
-class ImpedanceMatrixDialog(QtGui.QDialog, Ui_Impedance_Matrix):
+class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface

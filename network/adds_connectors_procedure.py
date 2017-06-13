@@ -21,10 +21,10 @@
 
 from qgis.core import *
 from PyQt4.QtCore import *
-from auxiliary_functions import *
+from ..common_tools.auxiliary_functions import *
 
-from global_parameters import *
-from worker_thread import WorkerThread
+from ..common_tools.global_parameters import *
+from ..common_tools import WorkerThread
 
 
 class AddsConnectorsProcedure(WorkerThread):

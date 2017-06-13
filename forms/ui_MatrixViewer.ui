@@ -250,6 +250,20 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>matrix_cores_selector</tabstop>
+  <tabstop>matrix_index_selector</tabstop>
+  <tabstop>marg_no_marg</tabstop>
+  <tabstop>marg_sum_marg</tabstop>
+  <tabstop>marg_max_marg</tabstop>
+  <tabstop>marg_min_marg</tabstop>
+  <tabstop>matrix_viewer</tabstop>
+  <tabstop>radioButton</tabstop>
+  <tabstop>radioButton_2</tabstop>
+  <tabstop>radioButton_3</tabstop>
+  <tabstop>but_close</tabstop>
+  <tabstop>but_load_new_matrix</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

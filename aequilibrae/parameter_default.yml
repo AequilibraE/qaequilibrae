@@ -16,3 +16,4 @@ system:
   temp directory: '/temp'
   driving side: left
   report zeros: 1
+  logging: False

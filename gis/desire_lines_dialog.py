@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-01
- Updated:    2016-10-30
+ Updated:    2017-05-07
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -23,25 +23,25 @@ from qgis.core import *
 import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4 import uic
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
+import numpy as np
+from scipy.sparse import coo_matrix
 
-from global_parameters import *
+from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import *
 
-from auxiliary_functions import *
-from numpy_model import NumpyModel
-from load_matrix_dialog import LoadMatrixDialog
+from ..common_tools import NumpyModel
+from ..common_tools import LoadMatrixDialog
+from ..common_tools import ReportDialog
 
 from desire_lines_procedure import DesireLinesProcedure
-from forms import Ui_DesireLines
 
-no_binary = False
-try:
-    from aequilibrae.paths import all_or_nothing
-except:
-    no_binary = True
-class DesireLinesDialog(QDialog, Ui_DesireLines):
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_DesireLines.ui'))
+
+class DesireLinesDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
@@ -52,8 +52,9 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
         self.name_skims = 0
         self.matrix = None
         self.path = standard_path()
-        self.rows = None
+        self.zones = None
         self.columns = None
+        self.matrix_hash =None
 
         # FIRST, we connect slot signals
         # For changing the input matrix
@@ -93,33 +94,24 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
                 if field.type() in integer_types:
                     self.zone_id_field.addItem(field.name())
 
-    def add_matrix_to_viewer(self):
+    def add_matrix_to_viewer(self, titles):
         """
             procedure to add the matrix to the viewer
         """
         if self.matrix is not None:
-            self.rows = self.matrix.shape[0]
-            self.columns = self.matrix.shape[1]
+            self.zones = self.matrix.shape[0]
 
-            # Load the matrix
-            row_headers = []
-            col_headers = []
-            for i in range(self.rows):
-                row_headers.append(str(i))
-            for j in range(self.columns):
-                col_headers.append(str(j))
-
-            m = NumpyModel(self.matrix, col_headers, row_headers)
+            m = NumpyModel(self.matrix, titles, titles)
             self.matrix_viewer.setModel(m)
 
     def find_matrices(self):
-        dlg2 = LoadMatrixDialog(self.iface)
+        dlg2 = LoadMatrixDialog(self.iface, sparse=True)
         dlg2.show()
         dlg2.exec_()
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
-
-        self.add_matrix_to_viewer()
+            self.matrix, self.matrix_hash, titles = self.reblocks_matrix(self.matrix)
+            self.add_matrix_to_viewer(titles)
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
@@ -132,8 +124,14 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
 
     def job_finished_from_thread(self, success):
         if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
+            self.exit_procedure()
+            self.throws_error(self.worker_thread.error)
+
         else:
+            if self.worker_thread.report:
+                dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+                dlg2.show()
+                dlg2.exec_()
             try:
                 QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
             except:
@@ -153,10 +151,40 @@ class DesireLinesDialog(QDialog, Ui_DesireLines):
                 dl_type = 'DelaunayLines'
 
             self.worker_thread = DesireLinesProcedure(qgis.utils.iface.mainWindow(), self.zoning_layer.currentText(),
-                                                        self.zone_id_field.currentText(), self.matrix, dl_type)
+                                                        self.zone_id_field.currentText(), self.matrix, self.matrix_hash, dl_type)
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Matrix not loaded", '', level=3)
+
+    def throws_error(self, error_message):
+        error_message = ["*** ERROR ***", error_message]
+        dlg2 = ReportDialog(self.iface, error_message)
+        dlg2.show()
+        dlg2.exec_()
+
+    def reblocks_matrix(self, sparse_matrix):
+        # Gets all non-zero coordinates and makes sure that they are considered
+
+        froms = sparse_matrix.row
+        tos =  sparse_matrix.col
+        data = sparse_matrix.data
+
+        all_indices = np.hstack((froms, tos))
+        indices = np.unique(all_indices)
+        compact_shape = indices.shape[0]
+
+        # Builds the hash
+        matrix_hash = {}
+        titles = []
+        for i in range(compact_shape):
+            matrix_hash[indices[i]] = i
+            froms[froms == indices[i]] = matrix_hash[indices[i]]
+            tos[tos == indices[i]] = matrix_hash[indices[i]]
+            titles.append(indices[i])
+
+        matrix = coo_matrix((data, (froms, tos)), shape=(compact_shape, compact_shape)).toarray().astype(np.float64)
+        return matrix, matrix_hash, titles
+
 
     def exit_procedure(self):
         self.close()

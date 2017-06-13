@@ -1,26 +1,17 @@
-
 from qgis.core import *
-import qgis
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-import sys
-import os
-
-from auxiliary_functions import *
+from PyQt4 import uic, QtGui
 
 import os
 import urllib
 import platform
 import struct
+print os.path.join(os.path.dirname(os.path.abspath(__file__)) + "/forms/", 'ui_binary_downloader.ui')
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__) + "/forms/", 'ui_binary_downloader.ui'))
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
-from ui_binary_downloader import *
-
-class BinaryDownloaderDialog(QtGui.QDialog, Ui_binary_downloader):
+class BinaryDownloaderDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QtGui.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 

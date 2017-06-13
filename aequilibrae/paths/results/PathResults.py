@@ -14,8 +14,9 @@ class PathResults:
         self.connectors = None
         self.temporary_skims = None
         self.path = None
-        self.pathnodes = None
+        self.path_nodes = None
         self.milepost = None
+        self.reached_first = None
 
         self.links = -1
         self.nodes = -1
@@ -32,6 +33,7 @@ class PathResults:
 
         self.predecessors = np.zeros(self.nodes, dtype=np.int32)
         self.connectors = np.zeros(self.nodes, dtype=np.int32)
+        self.reached_first = np.zeros(self.nodes, dtype=np.int32)
         self.temporary_skims = np.zeros((self.nodes, self.num_skims), np.float64)
         self.__graph_id__ = graph.__id__
 

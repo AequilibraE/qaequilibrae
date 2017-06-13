@@ -22,10 +22,10 @@
 
 from qgis.core import *
 from PyQt4.QtCore import *
-from auxiliary_functions import *
+from ..common_tools.auxiliary_functions import *
 from pyspatialite import dbapi2 as db
-from global_parameters import *
-from worker_thread import WorkerThread
+from ..common_tools.global_parameters import *
+from ..common_tools import WorkerThread
 
 
 class CreatesTranspoNetProcedure(WorkerThread):
@@ -42,34 +42,37 @@ class CreatesTranspoNetProcedure(WorkerThread):
         self.link_layer = link_layer
         self.required_fields_links = required_fields_links
         self.link_field_indices = link_field_indices
+        self.report = []
 
     def doWork(self):
         nfields = ", ".join(self.node_fields)
         lfields = ", ".join(self.link_fields)
-        self.emit_messages(message='Initializing Spatialite layer set', value=0, max_val=1)
+        self.emit_messages(message='Sit tight. Initializing Spatialite layer set', value=0, max_val=1)
         self.run_series_of_queries(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), 'queries_for_empty_file.sql'))
 
         conn = db.connect(self.output_file)
 
+        self.emit_messages(message='Adding non-mandatory link fields', value=0, max_val=1)
+
+        link_string_fields = self.adds_non_standard_fields_to_layers(conn, 'links', self.link_layer, self.link_fields,
+                                                                     self.required_fields_links,
+                                                                     self.link_field_indices)
+
         self.emit_messages(message='Adding non-mandatory node fields', value=0, max_val=1)
         node_string_fields = self.adds_non_standard_fields_to_layers(conn, 'nodes', self.node_layer, self.node_fields,
-                                                                self.required_fields_nodes, self.node_field_indices)
+                                                                     self.required_fields_nodes, self.node_field_indices)
+
+        self.transfer_layer_features(conn, 'links', self.link_layer, self.link_fields, self.link_field_indices,
+                                     link_string_fields, lfields)
 
         self.transfer_layer_features(conn, 'nodes', self.node_layer, self.node_fields, self.node_field_indices,
                                 node_string_fields, nfields)
 
-        self.emit_messages(message='Adding non-mandatory link fields', value=0, max_val=1)
-        link_string_fields = self.adds_non_standard_fields_to_layers(conn, 'links', self.link_layer, self.link_fields,
-                                                                self.required_fields_links, self.link_field_indices)
-
-        self.transfer_layer_features(conn, 'links', self.link_layer, self.link_fields, self.link_field_indices,
-                                link_string_fields, lfields)
-
         self.emit_messages(message = 'Creating layer triggers', value = 0, max_val=1)
         # DONE
         self.run_series_of_queries(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'triggers.sql'))
+           os.path.join(os.path.dirname(os.path.abspath(__file__)), 'triggers.sql'))
 
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "DONE")
 
@@ -90,9 +93,12 @@ class CreatesTranspoNetProcedure(WorkerThread):
                         field_type = 'INTEGER'
                     else:
                         field_type = 'REAL'
-                sql = 'alter table ' + table + ' add column ' + f + ' ' + field_type + '(' + str(field_length) + ')'
-                curr.execute(sql)
-                conn.commit()
+                try:
+                    sql = 'alter table ' + table + ' add column ' + f + ' ' + field_type + '(' + str(field_length) + ')'
+                    curr.execute(sql)
+                    conn.commit()
+                except:
+                    self.report.append('field ' + str(f) + ' could not be added')
         curr.close()
         return string_fields
 
@@ -113,7 +119,14 @@ class CreatesTranspoNetProcedure(WorkerThread):
             sql += "VALUES (" + attrs + ", "
             sql += "GeomFromText('" + f.geometry().exportToWkt().upper() + "', " + str(
                 layer.crs().authid().split(":")[1]) + "))"
-            a = curr.execute(sql)
+            try:
+                a = curr.execute(sql)
+            except:
+                if f.id():
+                    msg = 'feature with id ' + str(f.id()) + ' could not be added to layer ' + table
+                else:
+                    msg = 'feature with no node id present. It could not be added to layer ' + table
+                self.report.append(msg)
         conn.commit()
         curr.close()
 
@@ -140,7 +153,6 @@ class CreatesTranspoNetProcedure(WorkerThread):
             try:
                 curr.execute(cmd)
             except:
-                print "\n\n\nQuery error:"
-                print cmd
+                self.report.append( 'query error: ' + cmd)
         conn.commit()
         conn.close()

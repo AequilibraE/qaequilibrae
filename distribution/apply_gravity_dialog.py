@@ -19,29 +19,23 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
-import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4 import QtGui, QtCore
-import sys
+from PyQt4 import QtGui, uic
 import os
 from functools import partial
 import numpy as np
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")) + "//forms//")
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
-from auxiliary_functions import *
-from load_matrix_dialog import LoadMatrixDialog
-from load_vector_dialog import LoadVectorDialog
-from report_dialog import ReportDialog
+from ..common_tools.auxiliary_functions import *
+from ..common_tools import ReportDialog
+from ..common_tools import LoadMatrixDialog, LoadVectorDialog
 
 from apply_gravity_procedure import ApplyGravityProcedure
-from ui_apply_gravity import Ui_apply_gravity
 from load_distribution_model import LoadDistributionModelDialog
 import yaml
 
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_apply_gravity.ui'))
 
 try:
     import omx
@@ -49,7 +43,7 @@ try:
 except:
     OMX = False
 
-class ApplyGravityDialog(QDialog, Ui_apply_gravity):
+class ApplyGravityDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
@@ -87,7 +81,7 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
         self.progressbar.setValue(0)
 
         # Connect slot signals
-        self.but_load_rows.clicked.connect(partial(self.find_vectors, 'rows'))
+        self.but_load_rows.clicked.connect(partial(self.find_vectors, 'zones'))
         self.but_load_columns.clicked.connect(partial(self.find_vectors, 'columns'))
         self.but_load_impedance.clicked.connect(self.find_matrices)
 
@@ -195,7 +189,7 @@ class ApplyGravityDialog(QDialog, Ui_apply_gravity):
             a = "Total Demand: " + "{:10,.4f}".format(np.sum(dlg2.vector))
             text.append(a)
 
-            if destination == 'rows':
+            if destination == 'zones':
                 self.rows = dlg2.vector
                 self.report_prod.setText(text[0])
                 self.report_prod.append(text[1])

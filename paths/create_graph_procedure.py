@@ -26,133 +26,110 @@ import time
 import numpy as np
 import sys
 import os
+import struct
 
+import  aequilibrae.reserved_fields as reserved_fieds
 from aequilibrae.paths import Graph
-from worker_thread import WorkerThread
+from ..common_tools import WorkerThread, reporter
 
 class GraphCreation(WorkerThread):
-    def __init__(self, parentThread, netlayer, linkid, ablength, bidirectional, directionfield, balength, skims, selected_only, featcount):
+    def __init__(self, parentThread, net_layer, link_id, direction_field, fields_to_add, selected_only):
         WorkerThread.__init__(self, parentThread)
-        self.netlayer = netlayer
-        self.linkid = linkid
-        self.ablength = ablength
-        self.balength = balength
-        self.bidirectional = bidirectional
-        self.directionfield = directionfield
-        self.skims = skims
+        self.net_layer = net_layer
+        self.link_id = link_id
+        self.direction_field = direction_field
+        self.fields_to_add = fields_to_add
         self.selected_only = selected_only
         self.features = None
-        self.featcount =  featcount
         self.error = None
+        self.report = []
+        self.feat_count = 0
+
+        self.bi_directional = False
+        if direction_field is not None:
+            self.bi_directional = True
 
     def doWork(self):
-        # Checking ID uniqueness
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Checking ID uniqueness")
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.featcount)
-
-        a = []
-        all_ids = np.zeros(self.featcount, dtype=np.int_)
-
         if self.selected_only:
-            self.features = self.netlayer.selectedFeatures()
+            self.features = self.net_layer.selectedFeatures()
+            self.feat_count = self.net_layer.selectedFeatureCount()
         else:
-            self.features = self.netlayer.getFeatures()
+            self.features = self.net_layer.getFeatures()
+            self.feat_count = self.net_layer.featureCount()
 
-        p = 0
-        for feat in self.features:
-            k = feat.attributes()[self.linkid]
-            if k == NULL:
-                self.error = "ID field has NULL values"
-                break
-            else:
-                all_ids[p] = k
-                p += 1
-                if p % 50 == 0:
-                    self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), self.featcount)
+        # Checking ID uniqueness
+        self.report.append(reporter("Checking ID uniqueness", 0))
+        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Checking ID uniqueness. Please wait")
+        all_ids = self.net_layer.uniqueValues(self.link_id)
 
-        if self.error is None:
-            # Checking uniqueness
-            y = np.bincount(all_ids)
-            if np.max(y) > 1:
+        if NULL in all_ids:
+            self.error = "ID field has NULL values"
+            self.report.append(self.error)
+        else:
+            if len(all_ids) < self.feat_count:
                 self.error = 'IDs are not unique.'
+                self.report.append(self.error)
 
         if self.error is None:
+            self.report.append(reporter('Loading data from layer', 0))
             self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Loading data from layer")
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
+            self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.feat_count)
 
             self.graph = Graph()
 
-            all_types = [np.int64, np.int64, np.int64, np.float64, np.float64, np.int64]
-            all_titles = ['link_id', 'a_node', 'b_node', 'length_ab', 'length_ba', 'direction']
+            all_types = [np.int32, np.int32, np.int32, np.int8]
+            all_titles = [reserved_fieds.link_id, reserved_fieds.a_node, reserved_fieds.b_node, reserved_fieds.direction]
 
-            dict_field = {}
-            for k in self.skims:
-                a, b, t = self.skims[k]
+            for name_field, values in self.fields_to_add.iteritems():
+                all_titles.append((name_field + '_ab').encode('ascii','ignore'))
                 all_types.append(np.float64)
+                all_titles.append((name_field + '_ba').encode('ascii','ignore'))
                 all_types.append(np.float64)
-                all_titles.append((k + '_ab').encode('ascii','ignore'))
-                all_titles.append((k + '_ba').encode('ascii','ignore'))
-
-                dict_field[k + '_ab'] = a
-                if self.bidirectional:
-                    dict_field[k + '_ba'] = b
-                else:
-                    dict_field[k + '_ba'] = -1
 
             dt = [(t, d) for t, d in zip(all_titles, all_types)]
 
-            anode = self.netlayer.fieldNameIndex('A_Node')
-            bnode = self.netlayer.fieldNameIndex('B_Node')
+            a_node = self.net_layer.fieldNameIndex(reserved_fieds.a_node)
+            b_node = self.net_layer.fieldNameIndex(reserved_fieds.b_node)
             data = []
 
-            if self.selected_only:
-                self.features = self.netlayer.selectedFeatures()
-            else:
-                self.features = self.netlayer.getFeatures()
-
-            p = 0
-            for feat in self.features:
+            for p, feat in enumerate(self.features):
                 line = []
-                line.append(feat.attributes()[self.linkid])
-                line.append(feat.attributes()[anode])
-                line.append(feat.attributes()[bnode])
-                line.append(feat.attributes()[self.ablength])
-                if self.bidirectional:
-                    line.append(feat.attributes()[self.balength])
-                    line.append(feat.attributes()[self.directionfield])
+                line.append(feat.attributes()[self.link_id])
+                line.append(feat.attributes()[a_node])
+                line.append(feat.attributes()[b_node])
+                if self.bi_directional:
+                    line.append(feat.attributes()[self.direction_field])
                 else:
-                    line.append(-1)
                     line.append(1)
 
-                # We append the skims now
-                for k in all_titles:
-                    if k in dict_field:
-                        if dict_field[k] >= 0:
-                            line.append(feat.attributes()[dict_field[k]])
-                        else:
-                            line.append(-1)
+                # We append the data fields now
+                for k, v in self.fields_to_add.iteritems():
+                    a, b = v
+                    line.append(feat.attributes()[a])
+                    if self.bi_directional:
+                        line.append(feat.attributes()[b])
+                    else:
+                        line.append(-1)
 
                 for k in line:
                     if k == NULL:
-                        t = ''
-                        for j in line:
-                            t = t + ',' + str(j)
+                        t = ','.join([str(x) for x in line])
                         self.error = 'Field with NULL value - ID:' + str(line[0]) + "  /  " + t
                         break
                 if self.error is not None:
                     break
                 data.append(line)
 
-                p += 1
                 if p % 50 == 0:
                     self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
 
             if self.error is None:
+                self.report.append(reporter('Converting data to graph', 0))
                 network = np.asarray(data)
-                del data
 
                 self.graph.network = np.zeros(network.shape[0], dtype=dt)
+
                 for k, t in enumerate(dt):
                     self.graph.network[t[0]] = network[:,k].astype(t[1])
                 del network
@@ -165,4 +142,5 @@ class GraphCreation(WorkerThread):
                 self.graph.__field_name__ = None
                 self.graph.__layer_name__ = None
 
+        self.report.append(reporter('Process finished', 0))
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), None)

@@ -25,7 +25,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
-from worker_thread import WorkerThread
+from ..common_tools import WorkerThread
 from aequilibrae.distribution import GravityCalibration
 
 

@@ -18,20 +18,17 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-
-from qgis.core import *
-from PyQt4 import QtGui
+import os
+from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
 
-import sys
-import os
-from auxiliary_functions import *
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
+from ..common_tools.auxiliary_functions import *
 
-from ui_gravity_parameters import *
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_gravity_parameters.ui'))
 
-class LoadDistributionModelDialog(QtGui.QDialog, Ui_gravity_parameters):
+
+class LoadDistributionModelDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface, function, parameters=None):
         QDialog.__init__(self)
         self.iface = iface

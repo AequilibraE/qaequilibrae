@@ -23,19 +23,22 @@ import qgis
 from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+from PyQt4 import uic
+from qgis.gui import QgsMapLayerProxyModel
+from functools import partial
 
-from auxiliary_functions import *
+from ..common_tools.auxiliary_functions import *
 import sys
 import os
-from global_parameters import *
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms/")
+from ..common_tools.global_parameters import *
 
 from adds_connectors_procedure import AddsConnectorsProcedure
-from ui_ConnectingCentroids import Ui_ConnectingCentroids
 
+sys.modules['qgsfieldcombobox'] = qgis.gui
+sys.modules['qgsmaplayercombobox'] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_connecting_centroids.ui'))
 
-class AddConnectorsDialog(QDialog, Ui_ConnectingCentroids):
+class AddConnectorsDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
@@ -48,24 +51,21 @@ class AddConnectorsDialog(QDialog, Ui_ConnectingCentroids):
         self.pushOK.clicked.connect(self.run)
         self.pushClose.clicked.connect(self.exit_procedure)
 
-        QObject.connect(self.CentroidLayer, SIGNAL("currentIndexChanged(QString)"), self.set_field_centroids)
-        QObject.connect(self.NodeLayer, SIGNAL("currentIndexChanged(QString)"), self.set_field_nodes)
+        self.NodeLayer.layerChanged.connect(partial(self.set_fields,'nodes'))
+        self.CentroidLayer.layerChanged.connect(partial(self.set_fields,'centroids'))
 
         for i in xrange(1, 21):
             self.NumberConnectors.addItem(str(i))
 
         # We load the line and node layers existing in our canvas
-        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if 'wkbType' in dir(layer):
-                if layer.wkbType() in line_types:
-                    self.LineLayer.addItem(layer.name())
-
-                if layer.wkbType() in point_types:
-                    self.NodeLayer.addItem(layer.name())
-                    self.CentroidLayer.addItem(layer.name())
+        self.LineLayer.setFilters(QgsMapLayerProxyModel.LineLayer)
+        self.NodeLayer.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self.CentroidLayer.setFilters(QgsMapLayerProxyModel.PointLayer)
 
         # default directory
         self.path = standard_path()
+        self.set_fields('nodes')
+        self.set_fields('centroids')
 
     def allows_distance(self):
         self.MaxLength.setEnabled(False)
@@ -90,19 +90,13 @@ class AddConnectorsDialog(QDialog, Ui_ConnectingCentroids):
     def progress_text_from_thread(self, value):
         self.progress_label.setText(value)
 
-    def set_field_centroids(self):
-        self.CentroidField.clear()
-        if self.CentroidLayer.currentIndex() >= 0:
-            layer = get_vector_layer_by_name(self.CentroidLayer.currentText())
-            for field in layer.dataProvider().fields().toList():
-                self.CentroidField.addItem(field.name())
+    def set_fields(self, lyr):
+        if lyr in ['nodes', 'centroids']:
+            if lyr == "nodes":
+                self.NodeField.setLayer(self.NodeLayer.currentLayer())
 
-    def set_field_nodes(self):
-        self.NodeField.clear()
-        if self.NodeLayer.currentIndex() >= 0:
-            layer = get_vector_layer_by_name(self.NodeLayer.currentText())
-            for field in layer.dataProvider().fields().toList():
-                self.NodeField.addItem(field.name())
+            if lyr == "centroids":
+                self.CentroidField.setLayer(self.CentroidLayer.currentLayer())
 
     def job_finished_from_thread(self, success):
         self.pushOK.setEnabled(True)
@@ -111,6 +105,7 @@ class AddConnectorsDialog(QDialog, Ui_ConnectingCentroids):
         else:
             QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_node_layer)
             QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_line_layer)
+        self.exit_procedure()
 
     def run(self):
 
