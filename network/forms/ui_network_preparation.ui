@@ -36,21 +36,6 @@
    <property name="title">
     <string>Nodes layer</string>
    </property>
-   <widget class="QComboBox" name="nodelayers">
-    <property name="geometry">
-     <rect>
-      <x>164</x>
-      <y>56</y>
-      <width>541</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
@@ -198,7 +183,17 @@
      <string>Enter name for node layer with centroids</string>
     </property>
    </widget>
-   <widget class="QgsMapLayerComboBox" name="node_fields">
+   <widget class="QgsMapLayerComboBox" name="cbb_node_layer">
+    <property name="geometry">
+     <rect>
+      <x>164</x>
+      <y>56</y>
+      <width>541</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QgsFieldComboBox" name="cbb_node_fields">
     <property name="geometry">
      <rect>
       <x>164</x>
@@ -208,8 +203,8 @@
      </rect>
     </property>
    </widget>
-   <zorder>node_fields</zorder>
-   <zorder>nodelayers</zorder>
+   <zorder>OutNodes</zorder>
+   <zorder>cbb_node_layer</zorder>
    <zorder>label_2</zorder>
    <zorder>radioUseNodes</zorder>
    <zorder>radioNewNodes</zorder>
@@ -217,7 +212,7 @@
    <zorder>np_node_start</zorder>
    <zorder>label_4</zorder>
    <zorder>label_9</zorder>
-   <zorder>OutNodes</zorder>
+   <zorder>cbb_node_fields</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
@@ -293,7 +288,7 @@
      <string>Enter name for new network layer</string>
     </property>
    </widget>
-   <widget class="QgsMapLayerComboBox" name="linelayers">
+   <widget class="QgsMapLayerComboBox" name="cbb_line_layer">
     <property name="geometry">
      <rect>
       <x>149</x>
@@ -401,19 +396,23 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QgsFieldComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsfieldcombobox.h</header>
+  </customwidget>
+  <customwidget>
    <class>QgsMapLayerComboBox</class>
    <extends>QComboBox</extends>
    <header>qgsmaplayercombobox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>linelayers</tabstop>
+  <tabstop>cbb_line_layer</tabstop>
   <tabstop>OutLinks</tabstop>
   <tabstop>radioNewNodes</tabstop>
   <tabstop>radioUseNodes</tabstop>
   <tabstop>OutNodes</tabstop>
-  <tabstop>nodelayers</tabstop>
-  <tabstop>node_fields</tabstop>
+  <tabstop>cbb_node_layer</tabstop>
   <tabstop>np_node_start</tabstop>
   <tabstop>pushOK</tabstop>
   <tabstop>pushClose</tabstop>

@@ -26,7 +26,7 @@ from ..common_tools.auxiliary_functions import *
 from ..common_tools import WorkerThread
 from ..common_tools.global_parameters import *
 
-class FindsNodes(WorkerThread):
+class NetworkPreparationProcedure(WorkerThread):
     def __init__(self, parentThread, line_layer, new_line_layer, node_layer=False, node_ids=False,
                  new_node_layer=False, node_start=0):
 
@@ -68,7 +68,6 @@ class FindsNodes(WorkerThread):
         # I f we have node IDs, we iterate over the ID field to make sure they are unique
         ids = []
 
-        print node_ids
         if node_ids:
             nodes = get_vector_layer_by_name(node_layer)
             index = QgsSpatialIndex()
@@ -86,45 +85,48 @@ class FindsNodes(WorkerThread):
                 i_d = feat.attributes()[idx]
                 if i_d in ids:
                     self.error = "ID " + str(i_d) + ' is non unique in your selected field'
-                    return None
+                    self.report.append(self.error)
                 if i_d < 0:
                     self.error = "Negative node ID in your selected field"
-                    return None
+                    self.report.append(self.error)
+                    break
                 ids.append(i_d)
 
-            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), new_line_layer.featureCount())
-            P = 0
-            for feat in new_line_layer.getFeatures():
-                P += 1
-                self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
-                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Links Analyzed: " + str(P) + "/" + str(feat_count))
+            if self.error is None:
+                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), new_line_layer.featureCount())
+                P = 0
+                for feat in new_line_layer.getFeatures():
+                    P += 1
+                    self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
+                    self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Processing links: " + str(P) + "/" + str(feat_count))
 
-                # We search for matches for all AB nodes
-                ab_nodes = [('A_NODE', 0), ('B_NODE', -1)]
-                for field, position in ab_nodes:
-                    node_ab = list(feat.geometry().asPolyline())[position]
+                    # We search for matches for all AB nodes
+                    ab_nodes = [('A_NODE', 0), ('B_NODE', -1)]
+                    for field, position in ab_nodes:
+                        node_ab = list(feat.geometry().asPolyline())[position]
+                        # We compute the closest node
+                        nearest = index.nearestNeighbor(QgsPoint(node_ab), 1)
 
-                    # We compute the closest node
-                    nearest = index.nearestNeighbor(QgsPoint(node_ab), 1)
+                        # We get coordinates on this node
+                        fid = nearest[0]
+                        nfeat = nodes.getFeatures(QgsFeatureRequest(fid)).next()
+                        nf = nfeat.geometry().asPoint()
 
-                    # We get coordinates on this node
-                    fid = nearest[0]
-                    nfeat = nodes.getFeatures(QgsFeatureRequest(fid)).next()
-                    nf = nfeat.geometry().asPoint()
+                        fid = new_line_layer.fieldNameIndex(field)
 
-                    fid = new_line_layer.fieldNameIndex(field)
-                    # We see if they are really the same node
-                    if round(nf[0], 10) == round(node_ab[0], 10) and round(nf[1], 10) == round(node_ab[1], 10):
-                        ids = nfeat.attributes()[idx]
-                        new_line_layer.dataProvider().changeAttributeValues({feat.id(): {fid: int(ids)}})
+                        if round(nf[0], 10) == round(node_ab[0], 10) and round(nf[1], 10) == round(node_ab[1], 10):
+                            ids = nfeat.attributes()[idx]
+                            new_line_layer.dataProvider().changeAttributeValues({feat.id(): {fid: int(ids)}})
 
-                    else: # If not, we throw an error
-                        new_line_layer.dataProvider().changeAttributeValues({feat.id(): {fid: -10000}})
-                        self.error = 'CORRESPONDING NODE NOTE FOUND'
-                        return None
+                        else: # If not, we throw an error
+                            self.error = 'CORRESPONDING NODE NOTE FOUND. Link: ' + str(feat.attributes())
+                            self.report.append(self.error)
+                            break
+                    if self.error is not None:
+                        break
 
-                new_line_layer.commitChanges()
-                self.new_line_layer = new_line_layer
+                    new_line_layer.commitChanges()
+                    self.new_line_layer = new_line_layer
         else:
             self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), feat_count)
             #  Create node layer
