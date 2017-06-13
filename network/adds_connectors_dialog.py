@@ -91,11 +91,12 @@ class AddConnectorsDialog(QDialog, FORM_CLASS):
         self.progress_label.setText(value)
 
     def set_fields(self, lyr):
-        if lyr == "nodes":
-            self.NodeField.setLayer(self.NodeLayer.currentLayer())
+        if lyr in ['nodes', 'centroids']:
+            if lyr == "nodes":
+                self.NodeField.setLayer(self.NodeLayer.currentLayer())
 
-        if lyr == "centroids":
-            self.CentroidField.setLayer(self.CentroidLayer.currentLayer())
+            if lyr == "centroids":
+                self.CentroidField.setLayer(self.CentroidLayer.currentLayer())
 
     def job_finished_from_thread(self, success):
         self.pushOK.setEnabled(True)
@@ -104,6 +105,7 @@ class AddConnectorsDialog(QDialog, FORM_CLASS):
         else:
             QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_node_layer)
             QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_line_layer)
+        self.exit_procedure()
 
     def run(self):
 

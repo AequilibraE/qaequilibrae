@@ -311,7 +311,7 @@
   <widget class="QPushButton" name="pushOK">
    <property name="geometry">
     <rect>
-     <x>572</x>
+     <x>553</x>
      <y>470</y>
      <width>75</width>
      <height>23</height>
@@ -324,7 +324,7 @@
   <widget class="QPushButton" name="pushClose">
    <property name="geometry">
     <rect>
-     <x>650</x>
+     <x>631</x>
      <y>470</y>
      <width>75</width>
      <height>23</height>
