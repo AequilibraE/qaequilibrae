@@ -13,7 +13,7 @@ distribution:
 system:
   cpus: 4
   default_directory: /media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/AequilibraE/Testing
-    data/Assignment testing data/Assignment
+    data/Assignment
   driving side: right
   logging: false
   report zeros: 1

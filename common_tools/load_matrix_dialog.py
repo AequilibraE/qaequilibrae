@@ -57,6 +57,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.matrix = None
         self.error = None
 
+        self.load.setEnabled(False)
         self.radio_layer_matrix.clicked.connect(self.change_matrix_type)
         self.radio_npy_matrix.clicked.connect(self.change_matrix_type)
         self.radio_omx_matrix.clicked.connect(self.change_matrix_type)
@@ -77,6 +78,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             self.radio_omx_matrix.setEnabled(False)
 
     def change_matrix_type(self):
+        self.load.setEnabled(True)
         members = [self.lbl_matrix, self.lbl_from, self.matrix_layer, self.field_from]
         all_members = members + [self.lbl_to, self.lbl_flow, self.field_to, self.field_cells]
 
@@ -89,6 +91,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             self.lbl_from.setText('From')
             for member in all_members:
                 member.setVisible(True)
+            self.load_fields_to_combo_boxes()
 
         if self.radio_omx_matrix.isChecked():
             self.lbl_matrix.setText('Matrix core')
@@ -97,11 +100,12 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
                 member.setVisible(True)
 
     def load_fields_to_combo_boxes(self):
-
+        self.load.setEnabled(False)
         for combo in [self.field_from, self.field_to, self.field_cells]:
             combo.clear()
 
         if self.matrix_layer.currentIndex() >= 0:
+            self.load.setEnabled(True)
             self.layer = get_vector_layer_by_name(self.matrix_layer.currentText())
             for field in self.layer.dataProvider().fields().toList():
                 if field.type() in integer_types:

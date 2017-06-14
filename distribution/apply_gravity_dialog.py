@@ -226,13 +226,14 @@ class ApplyGravityDialog(QDialog, FORM_CLASS):
                 print >> outp, 'O,D,Flow'
                 print_zeros = get_parameter_chain(['system', 'report zeros'])
                 if print_zeros:
+                    logger('printing')
                     for i in range(self.output.shape[0]):
                         for j in range(self.output.shape[1]):
                             print >> outp, str(i) + ',' + str(j) + ',' + str(self.output[i, j])
                 else:
                     for i in range(self.output.shape[0]):
                         for j in range(self.output.shape[1]):
-                            if self.output[i, j]:
+                            if self.output[i, j] > 0:
                                 print >> outp, str(i) + ',' + str(j) + ',' + str(self.output[i, j])
                     outp.flush()
                     outp.close()
@@ -247,6 +248,7 @@ class ApplyGravityDialog(QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Input error", self.error, level=3)
 
     def check_data(self):
+        self.error = None
         if self.impedance is None:
             self.error = 'Impedance missing'
 

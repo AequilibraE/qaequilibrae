@@ -114,7 +114,7 @@ class GravityApplication:
             self.report.append('Running time: ' +  str(round(clock()-t, 3)))
 
     def get_parameters(self, model):
-        path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".."))
+        path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "."))
         with open(path + '/parameters.yml', 'r') as yml:
             path = yaml.safe_load(yml)
         return path['distribution'][model]
