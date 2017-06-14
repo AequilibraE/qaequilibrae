@@ -78,6 +78,7 @@ class LeastCommonDenominatorDialog(QtGui.QDialog, FORM_CLASS):
     def run_thread(self):
         QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
         QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
 
         QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
                         self.finished_threaded_procedure)
@@ -85,8 +86,11 @@ class LeastCommonDenominatorDialog(QtGui.QDialog, FORM_CLASS):
         self.worker_thread.start()
         self.exec_()
 
-    def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val)
+    def progress_range_from_thread(self, value):
+        self.progressbar.setRange(0, value)
+
+    def progress_text_from_thread(self, value):
+        self.progress_label.setText(value)
 
     def progress_value_from_thread(self, value):
         self.progressbar.setValue(value)
