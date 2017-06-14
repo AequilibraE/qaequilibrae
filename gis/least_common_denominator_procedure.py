@@ -20,6 +20,7 @@
  """
 from PyQt4.QtCore import QVariant, SIGNAL
 from qgis.core import QgsCoordinateTransform, QgsSpatialIndex, QgsFeature, QgsGeometry, QgsField, QgsVectorLayer
+import copy
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
@@ -60,14 +61,19 @@ class LeastCommonDenominatorProcedure(WorkerThread):
 
         # We create an spatial self.index to hold all the features of the layer that will receive the data
         # And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
-        allfeatures = {feature.id(): feature for (feature) in self.to_layer.getFeatures()}
-        merged = allfeatures.copy()
+        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.to_layer.dataProvider().featureCount())
+        self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Building Spatial Index')
+        allfeatures = {}
+        merged = {}
         self.index = QgsSpatialIndex()
-        for feature in allfeatures.values():
+        for i, feature in enumerate(self.to_layer.getFeatures()):
+            allfeatures[feature.id()] = feature
+            merged[feature.id()] = feature
             self.index.insertFeature(feature)
+            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), i)
 
+        self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Duplicating Layers')
         self.all_attr = {}
-
         # We create the memory layer that will have the analysis result, which is the lowest common
         # denominator of both layers
         epsg_code = int(self.to_layer.crs().authid().split(":")[1])
@@ -94,7 +100,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
 
         # PROGRESS BAR
         self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.from_layer.dataProvider().featureCount())
-
+        self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Running Analysis')
         part_id = 1
         features = []
         for fc, feat in enumerate(self.from_layer.getFeatures()):
@@ -104,6 +110,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                     a = geom.transform(self.transform)
                 geometry, statf = self.find_geometry(geom)
                 uncovered, statf = self.find_geometry(geom)
+                # uncovered = copy.deepcopy(geometry)
 
                 intersecting = self.index.intersects(geometry.boundingBox())
                 # Find all intersecting parts
@@ -124,26 +131,31 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         features.append(feature)
 
                         # prepare the data for the non overlapping
-                        uncovered = uncovered.difference(g)
-                        merged[f].setGeometry(merged[f].geometry().difference(g))
-                        part_id += 1
+                        if uncovered is not None:
+                            uncovered = uncovered.difference(g)
+                            aux = merged[f].geometry().difference(g)
+                            if aux is not None:
+                                merged[f].setGeometry(aux)
+                            part_id += 1
 
                 #Find the part that does not intersect anything
-                if uncovered.area() > 0:
-                    feature = QgsFeature()
-                    geo, stati = self.find_geometry(uncovered)
-                    feature.setGeometry(geo)
-                    perct = 0
-                    percf = stati / statf
-                    feature.setAttributes([part_id,
-                                           feat.attributes()[idx],
-                                           '',
-                                           percf,
-                                           perct])
-                    features.append(feature)
-                    part_id += 1
+                if uncovered is not None:
+                    if uncovered.area() > 0:
+                        feature = QgsFeature()
+                        geo, stati = self.find_geometry(uncovered)
+                        feature.setGeometry(geo)
+                        perct = 0
+                        percf = stati / statf
+                        feature.setAttributes([part_id,
+                                               feat.attributes()[idx],
+                                               '',
+                                               percf,
+                                               perct])
+                        features.append(feature)
+                        part_id += 1
 
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), fc)
+            self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Running Analysis (' +"{:,}".format(fc) + '/' + "{:,}".format(self.from_layer.featureCount()) + ')')
 
         # Find the features on TO that have no correspondence in FROM
         for f, feature in merged.iteritems():
