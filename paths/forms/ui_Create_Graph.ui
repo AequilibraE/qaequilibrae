@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Graph creation toolbox</string>
+   <string>AequilibraE - Graph creation toolbox</string>
   </property>
   <property name="modal">
    <bool>false</bool>

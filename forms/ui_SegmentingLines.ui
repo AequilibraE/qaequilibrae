@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Creating line segments</string>
+   <string>AequilibraE - Creating line segments</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">

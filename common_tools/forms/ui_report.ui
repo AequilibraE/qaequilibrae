@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AequilibraE -Algorithm report</string>
+   <string>AequilibraE - Procedure report</string>
   </property>
   <widget class="QTextEdit" name="all_data">
    <property name="geometry">

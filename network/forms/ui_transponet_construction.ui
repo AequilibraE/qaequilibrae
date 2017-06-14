@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TranpoNet preparation</string>
+   <string>AequilibraE - TranpoNet preparation</string>
   </property>
   <widget class="QTabWidget" name="tabs_list_widget">
    <property name="geometry">

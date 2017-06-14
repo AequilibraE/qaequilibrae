@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Stacked Bandwidth and color ramps</string>
+   <string>AequilibraE - Stacked Bandwidth and color ramps</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">

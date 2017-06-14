@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Traffic Assignment toolbox - Provided by www.xl-optim.com</string>
+   <string>AequilibraE - Traffic Assignment toolbox</string>
   </property>
   <property name="modal">
    <bool>true</bool>

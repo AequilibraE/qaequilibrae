@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Binary downloader class</string>
+   <string>AequilibraE - Binary downloader</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">

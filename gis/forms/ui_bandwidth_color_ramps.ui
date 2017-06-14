@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>AequilibraE - Color Ramps</string>
   </property>
   <widget class="QCheckBox" name="chk_dual_fields">
    <property name="geometry">
