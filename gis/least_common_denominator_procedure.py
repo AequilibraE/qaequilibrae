@@ -155,7 +155,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         part_id += 1
 
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), fc)
-            self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Running Analysis (' + str(fc) + '/' + str(self.from_layer.featureCount()) + ')')
+            self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Running Analysis (' +"{:,}".format(fc) + '/' + "{:,}".format(self.from_layer.featureCount()) + ')')
 
         # Find the features on TO that have no correspondence in FROM
         for f, feature in merged.iteritems():
