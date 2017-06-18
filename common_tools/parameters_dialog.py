@@ -77,7 +77,6 @@ class ParameterDialog(QDialog, FORM_CLASS):
     def validate_data(self):
         self.error = False
         self.current_data = yaml.safe_load(self.text_box.text())
-        print type(self.current_data)
         if isinstance(self.current_data, dict):  # Checking if we did not erase everything
             self.compare_dictionaries(self.default_values, self.current_data)
         else:

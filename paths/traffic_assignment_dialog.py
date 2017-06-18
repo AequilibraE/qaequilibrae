@@ -318,7 +318,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.matrix_viewer.clearSpans()
 
     def job_finished_from_thread(self, success):
-        logger(self.worker_thread.report)
         if self.worker_thread.report:
             self.report = self.worker_thread.report
         else:
@@ -455,7 +454,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
 
     def exit_procedure(self):
         self.close()
-        logger(self.report)
         if self.report:
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()

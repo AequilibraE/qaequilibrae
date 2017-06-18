@@ -148,8 +148,6 @@ class ApplyGravityDialog(QDialog, FORM_CLASS):
             file_types += ";;OpenMatrix(*.omx)"
         new_name = QFileDialog.getSaveFileName(None, 'Result matrix', self.path, file_types)
         if new_name is not None:
-            print new_name.upper()[-3:]
-            print new_name
             if new_name.upper()[-3:] not in ['NPY', 'CSV']:
                 qgis.utils.iface.messageBar().pushMessage("Output file requires extension", level=3)
             else:
@@ -226,7 +224,6 @@ class ApplyGravityDialog(QDialog, FORM_CLASS):
                 print >> outp, 'O,D,Flow'
                 print_zeros = get_parameter_chain(['system', 'report zeros'])
                 if print_zeros:
-                    logger('printing')
                     for i in range(self.output.shape[0]):
                         for j in range(self.output.shape[1]):
                             print >> outp, str(i) + ',' + str(j) + ',' + str(self.output[i, j])

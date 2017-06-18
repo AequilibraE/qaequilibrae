@@ -126,8 +126,6 @@ class GravityCalibration:
                 self.report.append('')
 
                 # compute convergence criteria
-                print bm
-                print bm1
                 self.conv = abs((bm / bm1) - 1)
                 self.itera += 1
 

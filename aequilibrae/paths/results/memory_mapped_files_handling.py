@@ -27,5 +27,4 @@ def saveDataFileDictionary(uuid, data_type, dimensions, target_file):
 
     stream = open(target_file, 'w')
     yaml.dump(dictio, stream, default_flow_style=False)
-    print target_file
     stream.close()

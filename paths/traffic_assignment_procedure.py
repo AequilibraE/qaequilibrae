@@ -49,7 +49,6 @@ class TrafficAssignmentProcedure(WorkerThread):
         self.report = []
         self.aux_res = MultiThreadedAoN()
         self.aux_res.prepare(graph, results)
-        logger(results.path_file)
 
     def doWork(self):
 

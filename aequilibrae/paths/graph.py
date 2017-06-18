@@ -195,11 +195,6 @@ class Graph:
             self.__source__ = geo_file
             self.__field_name__ = None
             self.__layer_name__ = None
-            # except:
-            #     print "Unidentified error occurred"
-            #     print "Try creating a graph using AequilibraE's GUI in QGIS"
-        # except:
-        #     print "No Pyshp module available"
 
     # Procedure to load csv network from disk
     def load_network_from_csv(self, netw):
