@@ -20,7 +20,7 @@ repository= https://github.com/aequilibrae/aequilibrae
 tracker=https://github.com/aequilibrae/aequilibrae/issues
 icon=icon.png
 experimental=False
-homepage=http://www.aequilibrae.com
+homepage=https://github.com/AequilibraE/AequilibraE
 
 
 # tags are comma separated with spaces allowed
