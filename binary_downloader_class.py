@@ -1,6 +1,7 @@
 from qgis.core import *
 from PyQt4 import uic, QtGui
 
+from .common_tools import ReportDialog
 import os
 import urllib
 import platform
@@ -14,12 +15,12 @@ class BinaryDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         QtGui.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-
-        self.linux64 = 'http://www.aequilibrae.com/binaries/v.0.3.3/AoN_linux64.so'
-        self.linux32 = 'http://www.aequilibrae.com/binaries/v.0.3.3/AoN_linux64.so'
-        self.windows32 = 'http://www.aequilibrae.com/binaries/v.0.3.3/AoN_win32.pyd'
-        self.windows64 = 'http://www.aequilibrae.com/binaries/v.0.3.3/AoN_win64.pyd'
-        self.mac = 'http://www.aequilibrae.com/binaries/v.0.3.3/AoN_mac.so'
+        error = True
+        self.linux64 = 'https://goo.gl/Xx7iQH'
+        # self.linux32 = 'http://www.aequilibrae.com/binaries/v.0.3.3/AoN_linux64.so'
+        self.windows32 = 'https://goo.gl/tpqE4o'
+        self.windows64 = 'https://goo.gl/reQhi2'
+        self.mac = 'http://www.aequilibrae.com/binaries/v.0.3.5/AoN_mac.so'
 
         self.local_path = os.path.dirname(os.path.abspath(__file__)) + '/aequilibrae/paths/AoN.so'
         plat = platform.system()
@@ -27,14 +28,22 @@ class BinaryDownloaderDialog(QtGui.QDialog, FORM_CLASS):
             self.local_path = os.path.dirname(os.path.abspath(__file__)) + '/aequilibrae/paths/AoN.pyd'
             if (8 * struct.calcsize("P")) == 64:
                 self.binary_path = self.windows64
+                error = False
             if (8 * struct.calcsize("P")) == 32:
                 self.binary_path = self.windows32
+                error = False
         if plat == 'Linux':
             if (8 * struct.calcsize("P")) == 64:
                 self.binary_path = self.linux64
+                error = False
         if plat == 'Darwin':
             self.binary_path = self.mac
+            error = False
 
+        if error:
+            dlg2 = ReportDialog(self.iface, ['AequilibraE not supported on your platform'])
+            dlg2.show()
+            dlg2.exec_()
         self.lbl_remote_path.setText('File download path: ' + self.binary_path)
         self.lbl_local_path.setText('File local destination: ' + self.local_path)
         self.but_download.clicked.connect(self.download_binary)
