@@ -22,7 +22,7 @@
 from qgis.core import *
 import qgis
 from PyQt4 import QtGui, uic
-
+from scipy.sparse import coo_matrix
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 import numpy as np
@@ -169,7 +169,10 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             try:
                 matrix = np.load(new_name)
                 if len(matrix.shape[:]) == 2:
-                    self.matrix = matrix
+                    if self.sparse:
+                        self.matrix = coo_matrix(matrix)
+                    else:
+                        self.matrix = matrix
                     self.exit_procedure()
                 else:
                     self.error = 'Numpy array needs to be 2 dimensional. Matrix provided has ' + str(len(matrix.shape[:]))

@@ -91,7 +91,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         if self.zoning_layer.currentIndex() >= 0:
             layer = get_vector_layer_by_name(self.zoning_layer.currentText())
             for field in layer.dataProvider().fields().toList():
-                if field.type() in integer_types:
+                if field.type() in numeric_types:
                     self.zone_id_field.addItem(field.name())
 
     def add_matrix_to_viewer(self, titles):
@@ -111,7 +111,10 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
             self.matrix, self.matrix_hash, titles = self.reblocks_matrix(self.matrix)
-            self.add_matrix_to_viewer(titles)
+            if self.chb_display_matrix.isChecked():
+                self.add_matrix_to_viewer(titles)
+
+            self.chb_display_matrix.setEnabled(False)
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
@@ -164,7 +167,6 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
 
     def reblocks_matrix(self, sparse_matrix):
         # Gets all non-zero coordinates and makes sure that they are considered
-
         froms = sparse_matrix.row
         tos =  sparse_matrix.col
         data = sparse_matrix.data
@@ -181,7 +183,6 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             froms[froms == indices[i]] = matrix_hash[indices[i]]
             tos[tos == indices[i]] = matrix_hash[indices[i]]
             titles.append(indices[i])
-
         matrix = coo_matrix((data, (froms, tos)), shape=(compact_shape, compact_shape)).toarray().astype(np.float64)
         return matrix, matrix_hash, titles
 

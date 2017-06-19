@@ -195,9 +195,23 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QCheckBox" name="chb_display_matrix">
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>400</y>
+      <width>101</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Display Matrix</string>
+    </property>
+   </widget>
    <zorder>lbl_matrix_loaded</zorder>
    <zorder>but_load_new_matrix</zorder>
    <zorder>matrix_viewer</zorder>
+   <zorder>chb_display_matrix</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
