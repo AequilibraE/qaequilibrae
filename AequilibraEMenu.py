@@ -29,7 +29,7 @@ from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from .common_tools import ParameterDialog
+from .common_tools import ParameterDialog, logger, ReportDialog
 from binary_downloader_class import BinaryDownloaderDialog
 from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
@@ -38,11 +38,20 @@ from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDia
 import tempfile, glob
 
 no_binary = False
+old_binary = False
 try:
-    from aequilibrae.paths import path_computation
+    from aequilibrae.paths import VERSION
+    VERSION_GRAPH = ''
+    a = open(os.path.join(os.path.dirname(__file__), 'aequilibrae/paths/parameters.pxi'), 'r')
+    for i in a.readlines():
+        if 'VERSION' in i:
+            VERSION_GRAPH = i[11:-1]
+
+    if VERSION != VERSION_GRAPH:
+        old_binary = True
 except:
     no_binary = True
-
+    
 sys.dont_write_bytecode = True
 import os.path
 
@@ -217,6 +226,18 @@ class AequilibraEMenu:
             self.binary_action = QAction(icon, u"Download binaries", self.iface.mainWindow())
             QObject.connect(self.binary_action, SIGNAL("triggered()"), self.run_binary_donwload)
             self.AequilibraE_menu.addAction(self.binary_action)
+            
+            
+        if old_binary:
+            report = ['You have an old version of the AequilibraE binaries']
+            report.append('To fix this issue, please do the following:')
+            report.append('     1. Uninstall AequilibraE')
+            report.append('     2. Re-install AequilibraE from the official repository')
+            report.append('     3. Download the new binaries from the Menu Aequilibrae-Download Binaries')
+            report.append('     4. Re-start QGIS')
+            dlg2 = ReportDialog(self.iface, report)
+            dlg2.show()
+            dlg2.exec_()
     #########################################################################
 
     def unload(self):
