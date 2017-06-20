@@ -44,10 +44,13 @@ try:
     VERSION_GRAPH = ''
     a = open(os.path.join(os.path.dirname(__file__), 'aequilibrae/paths/parameters.pxi'), 'r')
     for i in a.readlines():
-        if 'VERSION' in i and 'SUB_VERSION' not in i:
-            VERSION_GRAPH = i[11:-1]
+        if 'VERSION' in i and 'SUB' not in i:
+            logger(i)
+            VERSION_GRAPH = i[11:-2]
 
     if VERSION != VERSION_GRAPH:
+        logger(VERSION)
+        logger(VERSION_GRAPH)
         old_binary = True
 except:
     no_binary = True
