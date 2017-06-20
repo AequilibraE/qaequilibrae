@@ -44,7 +44,7 @@ try:
     VERSION_GRAPH = ''
     a = open(os.path.join(os.path.dirname(__file__), 'aequilibrae/paths/parameters.pxi'), 'r')
     for i in a.readlines():
-        if 'VERSION' in i:
+        if 'VERSION' in i and 'SUB_VERSION' not in i:
             VERSION_GRAPH = i[11:-1]
 
     if VERSION != VERSION_GRAPH:
