@@ -20,7 +20,7 @@ class BinaryDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         # self.linux32 = 'http://www.aequilibrae.com/binaries/v.0.3.3/AoN_linux64.so'
         self.windows32 = 'https://goo.gl/tpqE4o'
         self.windows64 = 'https://goo.gl/WfaJ4p'
-        self.mac = 'http://www.aequilibrae.com/binaries/v.0.3.5/AoN_mac.so'
+        self.mac = 'https://goo.gl/hwd8iN'
 
         self.local_path = os.path.dirname(os.path.abspath(__file__)) + '/aequilibrae/paths/AoN.so'
         plat = platform.system()
