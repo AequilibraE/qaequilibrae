@@ -87,6 +87,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             self.matrix_list_view.setColumnWidth(1, 100)
             self.matrix_list_view.setColumnWidth(2, 125)
             self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
+            self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
         else:
 
             self.matrix_list_view.setVisible(False)
@@ -173,6 +174,15 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
                 self.matrix = self.worker_thread.matrix
                 self.exit_procedure()
 
+    # Method for removing a line from the table with a double click
+    def slot_double_clicked(self, mi):
+        row = mi.row()
+        if row > -1:
+            mat = self.matrix_list_view.item(row, 0).text()
+            self.matrices.pop(mat)
+            self.matrix_count -= 1
+            self.matrix_list_view.removeRow(row)
+            self.update_matrix_list()
 
     def load_the_matrix(self):
         self.error = None
@@ -217,9 +227,9 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.matrix_list_view.blockSignals(True)
         i = 0
         for key, value in self.matrices.iteritems():
-            r = np.max(value[:,0])
-            c = np.max(value[:,1])
-            dimensions = str(r) + " x "+str(c)
+            r = int(np.max(value[:,0]))
+            c = int(np.max(value[:,1]))
+            dimensions = "{:,}".format(r) + " x " + "{:,}".format(c)
             total = "{:,.2f}".format(float(np.sum(value)))
             item_1 = QTableWidgetItem(key)
             self.matrix_list_view.setItem(i, 0, item_1)
