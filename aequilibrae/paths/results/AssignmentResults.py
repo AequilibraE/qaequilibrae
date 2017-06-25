@@ -18,6 +18,8 @@ class AssignmentResults:
         self.no_path = None          # The list os paths
         self.num_skims = None        # number of skims that will be computed. Depends on the setting of the graph provided
         self.cores = mp.cpu_count()
+        self.classes = {'number':1,
+                        'names':['flow']}
 
         self.critical_links = {'save': False,
                                'queries': {},  # Queries are a dictionary
@@ -41,8 +43,10 @@ class AssignmentResults:
         # We set the critical analysis, link extraction and path file saving to False
 
     # In case we want to do by hand, we can prepare each method individually
-    def prepare(self, graph):
+    def prepare(self, graph, matrix):
 
+        self.classes['number'] = matrix.num_matrices
+        self.classes['names'] = list(matrix.names.keys())
         self.nodes = graph.num_nodes + 1
         self.zones = graph.centroids + 1
         self.links = graph.num_links + 1
@@ -56,6 +60,7 @@ class AssignmentResults:
         self.setSavePathFile(False)
         self.setCriticalLinks(False)
 
+
     def reset(self):
         if self.link_loads is not None:
             self.skims.fill(0)
@@ -64,7 +69,7 @@ class AssignmentResults:
             print 'Exception: Assignment results object was not yet prepared/initialized'
 
     def __redim(self):
-        self.link_loads = np.zeros(self.links, np.float64)
+        self.link_loads = np.zeros((self.links, self.classes), np.float64)
         self.skims = np.zeros((self.zones, self.zones, self.num_skims), np.float64)
         self.no_path = np.zeros((self.zones, self.zones), dtype=np.int32)
 

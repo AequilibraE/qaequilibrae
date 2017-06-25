@@ -18,6 +18,6 @@ class MultiThreadedAoN:
         self.temporary_skims = np.zeros((results.nodes, results.num_skims, results.cores), dtype=np.float64)
         self.reached_first = np.zeros((results.nodes, results.cores), dtype=np.int32)
         self.connectors = np.zeros((results.nodes, results.cores), dtype=np.int32)
-        self.temp_link_loads = np.zeros((results.links, results.cores), dtype=np.float64)
-        self.temp_node_loads = np.zeros((results.nodes, results.cores), dtype=np.float64)
+        self.temp_link_loads = np.zeros((results.links, results.classes['number'], results.cores), dtype=np.float64)
+        self.temp_node_loads = np.zeros((results.nodes, results.classes['number'], results.cores), dtype=np.float64)
         self.temp_b_nodes = graph.b_node.copy()

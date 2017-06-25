@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-01
- Updated:    2017-05-07
+ Updated:    2017-06-25
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -61,6 +61,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
 
         self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+        self.chb_display_matrix.stateChanged.connect(self.add_matrix_to_viewer)
+        self.cbb_matrix_cores.currentIndexChanged.connect(self.add_matrix_to_viewer)
 
         # Create desire lines
         self.create_dl.clicked.connect(self.run)
@@ -94,27 +96,29 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 if field.type() in numeric_types:
                     self.zone_id_field.addItem(field.name())
 
-    def add_matrix_to_viewer(self, titles):
+    def add_matrix_to_viewer(self):
         """
             procedure to add the matrix to the viewer
         """
         if self.matrix is not None:
-            self.zones = self.matrix.shape[0]
-
-            m = NumpyModel(self.matrix, titles, titles)
+            mat_name = self.cbb_matrix_cores.currentText()
+            mat_index = self.matrix.names[mat_name]
+            m = NumpyModel(self.matrix.matrix[:,:,mat_index], self.matrix.index, self.matrix.index)
+            self.matrix_viewer.clearSpans()
             self.matrix_viewer.setModel(m)
 
     def find_matrices(self):
-        dlg2 = LoadMatrixDialog(self.iface, sparse=True)
+        dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True)
         dlg2.show()
         dlg2.exec_()
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
-            self.matrix, self.matrix_hash, titles = self.reblocks_matrix(self.matrix)
-            if self.chb_display_matrix.isChecked():
-                self.add_matrix_to_viewer(titles)
-
-            self.chb_display_matrix.setEnabled(False)
+            self.cbb_matrix_cores.clear()
+            k = 0
+            for i in self.matrix.names.keys():
+                self.cbb_matrix_cores.addItem(i)
+                k += 1
+            self.chb_display_matrix.setChecked(False)
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
@@ -164,28 +168,6 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         dlg2 = ReportDialog(self.iface, error_message)
         dlg2.show()
         dlg2.exec_()
-
-    def reblocks_matrix(self, sparse_matrix):
-        # Gets all non-zero coordinates and makes sure that they are considered
-        froms = sparse_matrix.row
-        tos =  sparse_matrix.col
-        data = sparse_matrix.data
-
-        all_indices = np.hstack((froms, tos))
-        indices = np.unique(all_indices)
-        compact_shape = indices.shape[0]
-
-        # Builds the hash
-        matrix_hash = {}
-        titles = []
-        for i in range(compact_shape):
-            matrix_hash[indices[i]] = i
-            froms[froms == indices[i]] = matrix_hash[indices[i]]
-            tos[tos == indices[i]] = matrix_hash[indices[i]]
-            titles.append(indices[i])
-        matrix = coo_matrix((data, (froms, tos)), shape=(compact_shape, compact_shape)).toarray().astype(np.float64)
-        return matrix, matrix_hash, titles
-
 
     def exit_procedure(self):
         self.close()

@@ -14,7 +14,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-01
- Updated:    2017-05-07
+ Updated:    2017-06-25
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -149,11 +149,11 @@ class DesireLinesProcedure(WorkerThread):
 
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Computing Delaunay Triangles"))
                 points = []
-                seccond_relation ={}
+                second_relation ={}
                 i = 0
                 for k, v in all_centroids.iteritems():
                     points.append(v)
-                    seccond_relation[i] = k
+                    second_relation[i] = k
                     i += 1
 
                 tri = Delaunay(np.array(points))
@@ -180,10 +180,10 @@ class DesireLinesProcedure(WorkerThread):
                 data = []
                 dl_link_ids = {}
                 for edge in edges:
-                        a_node = seccond_relation[edge[0]]
+                        a_node = second_relation[edge[0]]
                         a_point = all_centroids[a_node]
                         a_point = QgsPoint(a_point[0], a_point[1])
-                        b_node = seccond_relation[edge[1]]
+                        b_node = second_relation[edge[1]]
                         b_point = all_centroids[b_node]
                         b_point = QgsPoint(b_point[0], b_point[1])
                         dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
@@ -223,13 +223,13 @@ class DesireLinesProcedure(WorkerThread):
 
                 self.graph.set_graph(matrix_nodes, cost_field='length', block_centroid_flows=False)
                 self.results = AssignmentResults()
-                self.results.prepare(self.graph)
+                self.results.prepare(self.graph, self.matrix)
                 # self.results.set_cores(1)
 
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Assigning demand"))
                 # Do the assignment
                 #self.all_or_nothing(self.matrix, self.graph, self.results)
-                self.report = all_or_nothing(self.matrix, self.graph, self.results)
+                self.report = all_or_nothing(self.matrix.matrix, self.graph, self.results)
 
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Collecting results"))
                 f = self.results.link_loads
@@ -253,10 +253,10 @@ class DesireLinesProcedure(WorkerThread):
 
                 for i, edge in enumerate(edges):
                     self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, i))
-                    a_node = seccond_relation[edge[0]]
+                    a_node = second_relation[edge[0]]
                     a_point = all_centroids[a_node]
                     a_point = QgsPoint(a_point[0], a_point[1])
-                    b_node = seccond_relation[edge[1]]
+                    b_node = second_relation[edge[1]]
                     b_point = all_centroids[b_node]
                     b_point = QgsPoint(b_point[0], b_point[1])
                     dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))

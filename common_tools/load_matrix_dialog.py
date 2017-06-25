@@ -3,7 +3,7 @@
  Package:    AequilibraE
 
  Name:       Loads matrix from file/layer
- Purpose:    Loads GUI for loading matrix from differencet sources
+ Purpose:    Loads GUI for loading matrix from different sources
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -32,7 +32,8 @@ import os
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from get_output_file_name import GetOutputFileName
-from load_matrix_class import LoadMatrix
+from load_matrix_class import LoadMatrix, MatrixReblocking
+from report_dialog import ReportDialog
 
 no_omx = False
 try:
@@ -44,18 +45,21 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/u
 
 
 class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
-    def __init__(self, iface, sparse=False):
+    def __init__(self, iface, **kwargs):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
-        self.sparse = sparse
+        self.sparse = kwargs.get('sparse', False)
+        self.multiple = kwargs.get('multiple', False)
         self.layer = None
         self.orig = None
         self.dest = None
         self.cells = None
-        self.matrix = None
+        self.matrix_count = 0
+        self.matrices = {}
         self.error = None
+        self.__current_name = None
 
         self.load.setEnabled(False)
         self.radio_layer_matrix.clicked.connect(self.change_matrix_type)
@@ -67,6 +71,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
         # For adding skims
         self.load.clicked.connect(self.load_the_matrix)
+        self.but_close.clicked.connect(self.update_matrix_hashes)
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
@@ -76,6 +81,16 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
         if no_omx:
             self.radio_omx_matrix.setEnabled(False)
+
+        if self.multiple:
+            self.matrix_list_view.setColumnWidth(0, 100)
+            self.matrix_list_view.setColumnWidth(1, 100)
+            self.matrix_list_view.setColumnWidth(2, 125)
+            self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
+        else:
+
+            self.matrix_list_view.setVisible(False)
+            self.resize(368, 233)
 
     def change_matrix_type(self):
         self.load.setEnabled(True)
@@ -119,10 +134,12 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
         QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
         QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
         QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
                         self.finished_threaded_procedure)
 
         self.load.setEnabled(False)
+        self.but_close.setEnabled(False)
         self.worker_thread.start()
         self.exec_()
 
@@ -133,58 +150,107 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
     def progress_value_from_thread(self, val):
         self.progressbar.setValue(val)
 
+    def progress_text_from_thread(self, val):
+        self.progress_label.setText(val)
+
     def finished_threaded_procedure(self, param):
+        self.but_close.setEnabled(True)
         self.load.setEnabled(True)
-        if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error while loading matrix:", self.worker_thread.error,
-                                                      level=1)
+        if self.worker_thread.report:
+            dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+            dlg2.show()
+            dlg2.exec_()
         else:
-            self.matrix = self.worker_thread.matrix
-            self.exit_procedure()
+            if param == 'LOADED-MATRIX':
+                self.matrices[self.__current_name] = self.worker_thread.matrix
+                self.matrix_count += 1
+                self.update_matrix_list()
 
-    def load_the_matrix(self):  # CREATING GRAPH
+                if self.multiple == False:
+                    self.update_matrix_hashes()
+
+            elif param == 'REBLOCKED MATRICES':
+                self.matrix = self.worker_thread.matrix
+                self.exit_procedure()
+
+
+    def load_the_matrix(self):
         self.error = None
-
+        self.worker_thread = None
         if self.radio_layer_matrix.isChecked():
             if self.field_from.currentIndex() < 0 or self.field_from.currentIndex() < 0 or self.field_cells.currentIndex() < 0:
                 self.error = 'Invalid field chosen'
 
             if self.error is None:
+                self.__current_name = self.matrix_layer.currentText()
                 idx1 = self.layer.fieldNameIndex(self.field_from.currentText())
                 idx2 = self.layer.fieldNameIndex(self.field_to.currentText())
                 idx3 = self.layer.fieldNameIndex(self.field_cells.currentText())
                 idx = [idx1, idx2, idx3]
 
-                self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), layer=self.layer, idx=idx,
-                                                sparse=self.sparse, mapped_array=self.return_memory_mapped.isChecked())
-                self.run_thread()
+                self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type='layer', layer=self.layer, idx=idx,
+                                                sparse=self.sparse)
 
         if self.radio_npy_matrix.isChecked():
-
             file_types = ["NumPY array(*.npy)"]
             default_type = '.npy'
             box_name = 'Matrix Loader'
             new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
+            self.__current_name = new_name
 
-            try:
-                matrix = np.load(new_name)
-                if len(matrix.shape[:]) == 2:
-                    if self.sparse:
-                        self.matrix = coo_matrix(matrix)
-                    else:
-                        self.matrix = matrix
-                    self.exit_procedure()
-                else:
-                    self.error = 'Numpy array needs to be 2 dimensional. Matrix provided has ' + str(len(matrix.shape[:]))
-            except:
-                pass
+            self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type='numpy', file_path=new_name)
 
         if self.radio_omx_matrix.isChecked():
             pass
             # Still not implemented
 
+        if self.worker_thread is not None:
+            self.run_thread()
+
         if self.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+
+    def update_matrix_list(self):
+        self.matrix_list_view.clearContents()
+        self.matrix_list_view.setRowCount(self.matrix_count)
+
+        self.matrix_list_view.blockSignals(True)
+        i = 0
+        for key, value in self.matrices.iteritems():
+            r = np.max(value[:,0])
+            c = np.max(value[:,1])
+            dimensions = str(r) + " x "+str(c)
+            total = "{:,.2f}".format(float(np.sum(value)))
+            item_1 = QTableWidgetItem(key)
+            self.matrix_list_view.setItem(i, 0, item_1)
+
+            item_2 = QTableWidgetItem(dimensions)
+            item_2.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.matrix_list_view.setItem(i, 1, item_2)
+
+            item_3 = QTableWidgetItem(total)
+            item_3.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.matrix_list_view.setItem(i, 2, item_3)
+
+            i += 1
+        self.matrix_list_view.blockSignals(False)
+
+    def change_matrix_name(self, item):
+        row = item.row()
+        new_name = self.matrix_list_view.item(row, 0).text()
+
+        current_names = []
+        for i in range(self.matrix_count):
+            current_names.append(self.matrix_list_view.item(i, 0).text())
+
+        for old_key in self.matrices.keys():
+            if old_key not in current_names:
+                self.matrices[new_name] = self.matrices.pop(old_key)
+
+    def update_matrix_hashes(self):
+        self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices)
+        self.run_thread()
+
 
     def exit_procedure(self):
         self.close()
