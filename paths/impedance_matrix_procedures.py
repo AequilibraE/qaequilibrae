@@ -28,7 +28,7 @@ import sys
 
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
-import aequilibrae as ae
+from aequilibrae.paths import path_computation, MultiThreadedPathComputation
 from ..common_tools import WorkerThread
 
 
@@ -42,43 +42,44 @@ class ComputeDistMatrix(WorkerThread):
         self.graph = graph
         self.result = result
         self.skim_matrices = np.zeros((result.zones, result.zones, result.num_skims), np.float64)
-        #self.cores = cores
         self.error = None
-        self.evol_bar = 0 #evol_bar
+        self.report = []
+        self.performed = 0
 
     def doWork(self):
-        evol_bar = self.evol_bar
-        centroids = self.graph.centroids+1
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), (evol_bar, 'Computing Impedance matrix'))
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (evol_bar, centroids-1))
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (evol_bar, 0))
+        centroids = self.graph.centroids + 1
 
-        for origin in xrange(1, centroids):
-            trash = ae.paths.path_computation(origin, 0, self.graph, self.result)
-            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (evol_bar, origin))
-            for i, skm in enumerate(self.graph.skim_fields):
-                self.skim_matrices[origin, :, i] = self.result.temporary_skims[:, i][0:centroids].copy()
-            self.result.reset()
+        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), 'Computing Impedance matrix')
+        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.graph.centroids)
+        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
 
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), (evol_bar, 'Computation Finalized. Writing results'))
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 0)
 
-    def func_assig(self, orig, graph_costs, b_nodes, graph_fs, idsgraph, graph_skim, no_path, skims, thread_dict,
-                   predecessors, conn, temp_skims, evol_bar):
+        aux_res = MultiThreadedPathComputation()
+        aux_res.prepare(self.graph, self.result)
 
-        ct = thread.get_ident()
-        if ct in thread_dict.keys():
-            ct = thread_dict[ct]
+        pool = ThreadPool(self.result.cores)
+        all_threads = {'count': 0}
+        for O in range(self.result.zones):
+            pool.apply_async(self.func_assig_thread, args=(O, self.graph, self.result, aux_res, all_threads, self.report))
+        pool.close()
+        pool.join()
+
+        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), self.graph.centroids)
+
+        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Saving Outputs")
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), None)
+
+    def func_assig_thread(self, O, g, res, aux_res, all_threads, report):
+        if thread.get_ident() in all_threads:
+            th = all_threads[thread.get_ident()]
         else:
-            a = len(thread_dict.keys())
-            thread_dict[ct] = a
-            ct = a
+            all_threads[thread.get_ident()] = all_threads['count']
+            th = all_threads['count']
+            all_threads['count'] += 1
+        a = path_computation(O, g, res, aux_res, th)
+        if a != O:
+            report.append(a)
 
-        a = AoN.SKIMS_One_to_all(orig, graph_costs, b_nodes, graph_fs, idsgraph, graph_skim, no_path[orig, :], skims[orig, :, :],
-                                 predecessors[:, ct], conn[:, ct], temp_skims[:, :, ct])
-        self.assigned[0] += 1
-
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), (evol_bar, str(self.assigned[0])))
-
-if __name__ == '__main__':
-    main()
+        self.performed += 1
+        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), self.performed)
+        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), str(self.performed) + ' / ' + str(self.matrix.shape[0] - 1))

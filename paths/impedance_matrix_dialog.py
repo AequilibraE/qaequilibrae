@@ -31,7 +31,7 @@ from impedance_matrix_procedures import ComputeDistMatrix
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import PathResults
 from ..common_tools import GetOutputFileName
-
+from ..common_tools import ReportDialog
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 
@@ -148,52 +148,43 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
     # VAL and VALUE have the following structure: (bar/text ID, value)
     def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val[1])
+        self.progressbar.setRange(0, val)
 
     def progress_value_from_thread(self, val):
-        self.progressbar.setValue(val[1])
+        self.progressbar.setValue(val)
 
     def progress_text_from_thread(self, val):
-        self.progress_label.setText(val[1])
+        self.progress_label.setText(val)
 
     def finished_threaded_procedure(self, val):
-        if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Assignment did NOT run correctly", self.worker_thread.error,
-                                                      level=3)
+        if self.worker_thread.report:
+            self.report = self.worker_thread.report
         else:
-            mat = self.worker_thread.skim_matrices
-            mat[mat > 1e308] = np.inf  # We treat the "infinity" that should have been treated within the Cython code
 
             if self.npy_res.isChecked():
-                np.save(self.imped_results.text(), mat)
+                np.save(self.imped_results.text(), self.result.skims)
                 q = open(self.imped_results.text() + '.csv', 'w')
                 for l in self.skim_fields:
                     print >> q, l
                 q.flush()
                 q.close()
             if self.csv_res.isChecked():
+
                 q = open(self.imped_results.text(), 'w')
                 text = 'Origin,Destination,' + self.cb_minimizing.currentText()
                 for l in self.skim_fields:
                     text = text + ',' + l
                 print >> q, text
-                for i in range(mat.shape[0]):
-                    if np.sum(mat[i, :, :]) > 0:
-                        for j in range(mat.shape[1]):
-                            if np.sum(mat[i, j, :]) > 0:
-                                text = str(i) + ',' + str(j)
-                                s = 0
-                                for k in range(mat.shape[2]):
-                                    if mat[i, j, k] != np.inf:
-                                        s += mat[i, j, k]
-                                        text = text + ',' + str(mat[i, j, k])
-                                    else:
-                                        text += ','
-                                if s > 0:
-                                    print >> q, text
+                for i in range(self.graph.centroids + 1):
+                    if np.sum(self.result.skims[i, :, :]) > 0:
+                        for j in range(self.graph.centroids + 1):
+                            if np.sum(self.result.skims[i, j, :]) > 0:
+                                text = str(i) + ',' + str(j) + ','
+                                text = text + ''.join([`num` for num in self.result.skims[i, j, :]])
+                                print >> q, text
                     q.flush()
                 q.close()
-        self.close()
+        self.exit_procedure()
 
     def run_skimming(self):  # Saving results
         centroids = int(self.all_centroids.text())
@@ -217,3 +208,10 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
             self.progress_label.setVisible(True)
             self.worker_thread = ComputeDistMatrix(qgis.utils.iface.mainWindow(), self.graph, self.result)
             self.run_thread()
+
+    def exit_procedure(self):
+        self.close()
+        if self.report:
+            dlg2 = ReportDialog(self.iface, self.report)
+            dlg2.show()
+            dlg2.exec_()

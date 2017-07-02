@@ -1,22 +1,19 @@
 # cimport numpy as np
 # cimport cython
-# import multiprocessing as M
 # include 'parameters.pxi'
 import numpy as np
-
+import multiprocessing as mp
 
 class PathResults:
     def __init__(self):
         """
         @type graph: Set of numpy arrays to store Computation results
         """
-        self.predecessors = None
-        self.connectors = None
-        self.temporary_skims = None
+        self.skims = None
         self.path = None
         self.path_nodes = None
         self.milepost = None
-        self.reached_first = None
+        self.cores = mp.cpu_count()
 
         self.links = -1
         self.nodes = -1
@@ -31,17 +28,22 @@ class PathResults:
         self.links = graph.num_links + 1
         self.num_skims = graph.skims.shape[1]
 
-        self.predecessors = np.zeros(self.nodes, dtype=np.int32)
-        self.connectors = np.zeros(self.nodes, dtype=np.int32)
-        self.reached_first = np.zeros(self.nodes, dtype=np.int32)
-        self.temporary_skims = np.zeros((self.nodes, self.num_skims), np.float64)
+        self.skims = np.zeros((self.zones, self.zones, self.num_skims), np.float64)
         self.__graph_id__ = graph.__id__
 
+    def set_cores(self, cores):
+        if isinstance(cores, int):
+            if cores > 0:
+                if self.cores != cores:
+                    self.cores = cores
+            else:
+                raise ValueError("Number of cores needs to be equal or bigger than one")
+        else:
+            raise ValueError("Number of cores needs to be an integer")
+
     def reset(self):
-        if self.predecessors is not None:
-            self.predecessors.fill(-1)
-            self.connectors.fill(-1)
-            self.temporary_skims.fill(0)
+        if self.skims is not None:
+            self.skims.fill(np.inf)
             self.path = None
             self.path_nodes = None
             self.milepost = None

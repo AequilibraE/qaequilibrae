@@ -13,7 +13,8 @@ from graph import Graph
 from .results import *
 from assignment import *
 from multi_threaded_aon import MultiThreadedAoN
+from multi_threaded_path_computation import MultiThreadedPathComputation
 try:
-    from AoN import one_to_all, path_computation
+    from AoN import one_to_all, path_computation, VERSION
 except:
     pass

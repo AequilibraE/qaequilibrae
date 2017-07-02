@@ -161,7 +161,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Load new matrix</string>
+     <string>Load matrices</string>
     </property>
    </widget>
    <widget class="QTableView" name="matrix_viewer">
@@ -174,30 +174,32 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="lbl_matrix_loaded">
+   <widget class="QCheckBox" name="chb_display_matrix">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>400</y>
-      <width>441</width>
-      <height>21</height>
+      <x>14</x>
+      <y>402</y>
+      <width>111</width>
+      <height>17</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <pointsize>10</pointsize>
-     </font>
-    </property>
     <property name="text">
-     <string/>
-    </property>
-    <property name="wordWrap">
-     <bool>false</bool>
+     <string>Display Matrix</string>
     </property>
    </widget>
-   <zorder>lbl_matrix_loaded</zorder>
-   <zorder>but_load_new_matrix</zorder>
-   <zorder>matrix_viewer</zorder>
+   <widget class="QComboBox" name="cbb_matrix_cores">
+    <property name="geometry">
+     <rect>
+      <x>143</x>
+      <y>399</y>
+      <width>291</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="maxVisibleItems">
+     <number>10</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">

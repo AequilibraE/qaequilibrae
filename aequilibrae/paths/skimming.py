@@ -2,8 +2,8 @@
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
 
- Name:       Traffic assignment
- Purpose:    Implement traffic assignment algorithms based on Cython's network loading procedures
+ Name:       Network skimming
+ Purpose:    Implement skimming algorithms based on Cython's path finding and skimming
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -12,7 +12,7 @@
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    15/09/2013
+ Created:    2017-07-03
  Updated:    2017-05-07
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
@@ -34,7 +34,7 @@ import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
 
-from multi_threaded_aon import MultiThreadedAoN
+from multi_threaded_path_computation import MultiThreadedPathComputation
 no_binaries = False
 try:
     from AoN import one_to_all, path_computation
@@ -45,10 +45,12 @@ def main():
     pass
 
 
-def all_or_nothing(matrix, graph, results):
-    aux_res = MultiThreadedAoN()
+def network_skimming(graph, results, origins=None):
+    aux_res = MultiThreadedPathComputation()
     aux_res.prepare(graph, results)
 
+    if origins is None:
+        origins = [i for i in range(results.zones)]
     # catch errors
     if results.__graph_id__ is None:
         raise ValueError('The results object was not prepared. Use results.prepare(graph)')
@@ -58,24 +60,22 @@ def all_or_nothing(matrix, graph, results):
         pool = ThreadPool(results.cores)
         all_threads = {'count': 0}
         report = []
-        for O in range(matrix.shape[0]):
-            a = matrix[O, :]
-            if np.sum(a) > 0:
-                pool.apply_async(func_assig_thread, args=(O, a, graph, results, aux_res, all_threads, report))
+        for O in origins:
+            pool.apply_async(func_assig_thread, args=(O, graph, results, aux_res, all_threads, report))
         pool.close()
         pool.join()
     results.link_loads = np.sum(aux_res.temp_link_loads, axis=1)
     return report
 
 
-def func_assig_thread(O, a, g, res, aux_res, all_threads, report):
+def func_assig_thread(O, g, res, aux_res, all_threads, report):
     if thread.get_ident() in all_threads:
         th = all_threads[thread.get_ident()]
     else:
         all_threads[thread.get_ident()] = all_threads['count']
         th = all_threads['count']
         all_threads['count'] += 1
-    a = one_to_all(O, a, g, res, aux_res, th)
+    a = path_computation(O, g, res, aux_res, th)
     if a != O:
         report.append(a)
 
