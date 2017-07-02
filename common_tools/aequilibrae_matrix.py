@@ -44,6 +44,8 @@ class AequilibraeMatrix():
 
         self.names = {}
 
+        # a = np.recarray((matrix_dimension,matrix_dimension,),	 dtype=[('array_1', float), ('array_2', float), ('array_3', float)])
+
     def load_from_disk(self, path_to_file):
         pass
         # self.matrix = np.memmap(os.path.join(self.file_location, self.file_name),
