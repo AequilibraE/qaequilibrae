@@ -51,8 +51,7 @@ try:
         old_binary = True
 except:
     no_binary = True
-logger(VERSION)
-logger(VERSION_GRAPH)
+
 sys.dont_write_bytecode = True
 import os.path
 
@@ -227,8 +226,8 @@ class AequilibraEMenu:
             self.binary_action = QAction(icon, u"Download binaries", self.iface.mainWindow())
             QObject.connect(self.binary_action, SIGNAL("triggered()"), self.run_binary_donwload)
             self.AequilibraE_menu.addAction(self.binary_action)
-            
-            
+
+
         if old_binary:
             report = ['You have an old version of the AequilibraE binaries']
             report.append('To fix this issue, please do the following:')
