@@ -122,7 +122,9 @@ class DesireLinesProcedure(WorkerThread):
                             if self.matrix[i, j] + self.matrix[j, i] > 0:
                                 if a_node in all_centroids.keys() and b_node in all_centroids.keys():
                                     a_point = all_centroids[a_node]
+                                    a_point = QgsPoint(a_point[0], a_point[1])
                                     b_point = all_centroids[b_node]
+                                    b_point = QgsPoint(b_point[0], b_point[1])
                                     dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
                                     feature = QgsFeature()
                                     feature.setGeometry(QgsGeometry.fromPolyline([a_point, b_point]))
