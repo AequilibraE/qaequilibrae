@@ -106,10 +106,11 @@ class MatrixReblocking(WorkerThread):
         WorkerThread.__init__(self, parentThread)
         self.matrices = kwargs.get('matrices')
         self.sparse = kwargs.get('sparse', False)
+        self.file_location = kwargs.get('path', tempfile.gettempdir())
+        self.file_name = kwargs.get('file_name', 'aequilibrae_array_' + str(uuid.uuid4().hex) + '.npy')
 
         self.num_matrices = len(self.matrices.keys())
         self.matrix_hash = {}
-        self.matrix_shape = 0
         self.titles = []
         self.report = []
 
@@ -135,45 +136,43 @@ class MatrixReblocking(WorkerThread):
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
 
             compact_shape = int(indices.shape[0])
-            # Builds the hash
-            for i in range(compact_shape):
-                self.matrix_hash[indices[i]] = i
-                self.titles.append(int(indices[i]))
+            index = np.zeros(np.max(indices)+1, np.int64)
+
+            for i, j in enumerate(indices):
+                index[j] = i
         else:
             compact_shape = 0
             for mat_name, mat in self.matrices.iteritems():
                 compact_shape = np.max(compact_shape, mat.shape[0])
 
-            # Builds the hash
-            self.matrix_hash = {i:i for i in range(compact_shape)}
-            self.matrix.index = [i for i in range(compact_shape)]
+            indices = np.arange(compact_shape)
+            index = np.zeros(np.max(indices) + 1, np.int64)
 
-        self.matrix = AequilibraeMatrix(zones=compact_shape, cores=self.num_matrices)
-        self.matrix.matrix_hash = self.matrix_hash
-        self.matrix.index = self.titles
+            for i, j in enumerate(indices):
+                index[j] = i
+
+        self.matrix = AequilibraeMatrix(file_location = self.file_location, file_name = self. file_name,
+                                        zones=compact_shape, cores=self.num_matrices, names=self.matrices.keys(),
+                                        dtype = np.float64)
+
+        self.index[:, 0] = index[:]
 
         k = 0
-        j = self.num_matrices * compact_shape
-        m = 0
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), j)
+        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.num_matrices)
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Reblocking matrices")
         for mat_name, mat in self.matrices.iteritems():
             if self.sparse:
-                for i in range(compact_shape):
-                    k += 1
-                    mat[:,0][mat[:,0] == indices[i]] = self.matrix_hash[indices[i]]
-                    mat[:,1][mat[:,1] == indices[i]] = self.matrix_hash[indices[i]]
-                    self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), k)
+                k += 1
+                mat[:,0] = index[mat[:,0]][:]
+                mat[:,1] = index[mat[:,1]][:]
+                self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), k)
             else:
-                k += self.num_matrices
+                k += 1
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 1)
-            self.matrix.matrix[:,:,m] = coo_matrix((mat[:,2], (mat[:,0], mat[:,1])),
+            self.matrix[mat_name][:,:] = coo_matrix((mat[:,2], (mat[:,0], mat[:,1])),
                                            shape=(compact_shape, compact_shape)).toarray().astype(np.float64)[:]
-            self.matrix.names[mat_name] =  m
-            m += 1
             del(mat)
 
-        self.matrix.zones = compact_shape
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Matrix Reblocking finalized")
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'REBLOCKED MATRICES')
 

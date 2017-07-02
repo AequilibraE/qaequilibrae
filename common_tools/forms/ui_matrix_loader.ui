@@ -33,7 +33,7 @@
     <rect>
      <x>20</x>
      <y>170</y>
-     <width>201</width>
+     <width>141</width>
      <height>23</height>
     </rect>
    </property>
@@ -260,7 +260,7 @@
   <widget class="QRadioButton" name="radio_npy_matrix">
    <property name="geometry">
     <rect>
-     <x>202</x>
+     <x>120</x>
      <y>14</y>
      <width>71</width>
      <height>17</height>
@@ -275,12 +275,12 @@
     <rect>
      <x>20</x>
      <y>14</y>
-     <width>161</width>
+     <width>91</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Use open file as matrix</string>
+    <string>Open layer</string>
    </property>
    <property name="checked">
     <bool>true</bool>
@@ -289,9 +289,9 @@
   <widget class="QPushButton" name="but_close">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>171</x>
      <y>170</y>
-     <width>121</width>
+     <width>91</width>
      <height>23</height>
     </rect>
    </property>
@@ -333,7 +333,7 @@
     </palette>
    </property>
    <property name="text">
-    <string>Close</string>
+    <string>Single use</string>
    </property>
   </widget>
   <widget class="QTableWidget" name="matrix_list_view">
@@ -372,6 +372,75 @@
    </property>
    <property name="text">
     <string/>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radio_aeq_matrix">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>195</x>
+     <y>14</y>
+     <width>81</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Aequilibrae</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="but_permanent_save">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>170</y>
+     <width>91</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>180</red>
+         <green>180</green>
+         <blue>180</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>180</red>
+         <green>180</green>
+         <blue>180</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>180</red>
+         <green>180</green>
+         <blue>180</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
+   </property>
+   <property name="text">
+    <string>Save</string>
    </property>
   </widget>
  </widget>

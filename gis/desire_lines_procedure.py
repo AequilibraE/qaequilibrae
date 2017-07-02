@@ -65,7 +65,6 @@ class DesireLinesProcedure(WorkerThread):
         if self.error is None:
             layer = get_vector_layer_by_name(self.layer)
             idx = layer.fieldNameIndex(self.id_field)
-            matrix = self.matrix
 
             matrix_nodes = max(self.matrix_hash.values()) + 1
             featcount = layer.featureCount()
