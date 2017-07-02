@@ -25,7 +25,7 @@ import uuid
 import tempfile
 import os
 from auxiliary_functions import logger
-
+from numpy.lib.format import open_memmap
 
 class AequilibraeMatrix():
     def __init__(self, **kwargs):
