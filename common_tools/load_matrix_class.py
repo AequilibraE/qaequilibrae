@@ -28,79 +28,152 @@ import uuid
 import tempfile
 import os
 from auxiliary_functions import logger
+from aequilibrae_matrix import AequilibraeMatrix
 
 class LoadMatrix(WorkerThread):
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
+        self.matrix_type = kwargs.get('type')
+        self.numpy_file = kwargs.get('file_path')
         self.layer = kwargs.get('layer')
         self.idx = kwargs.get('idx')
-        self.max_zone = kwargs.get('max_zone', None)
         self.filler = kwargs.get('filler', 0)
         self.sparse = kwargs.get('sparse', False)
-        self.mapped_array = kwargs.get('mapped_array', False)
 
         self.matrix = None
-        self.error = None
-
+        self.matrix_hash = None
+        self.titles = None
+        self.report = []
 
     def doWork(self):
-        layer = self.layer
-        idx = self.idx
-        max_zone = self.max_zone
-        feat_count = layer.featureCount()
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (feat_count))
+        if self.matrix_type == 'layer':
+            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Loading from table")
+            feat_count = self.layer.featureCount()
+            self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (feat_count))
 
-        error = None
-        idx1 = idx[0]
-        idx2 = idx[1]
-        idx3 = idx[2]
-        # We read all the vectors and put in a list of lists
-        matrix = []
-        P = 0
-        for feat in layer.getFeatures():
-            P += 1
-            a = feat.attributes()[idx1]
-            b = feat.attributes()[idx2]
-            c = feat.attributes()[idx3]
-            matrix.append([a, b, c])
-            if P % 1000 == 0:
-                self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
-                self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                          ("Loading matrix: " + str(P) + "/" + str(feat_count)))
+            # We read all the vectors and put in a list of lists
+            matrix = []
+            P = 0
+            for feat in self.layer.getFeatures():
+                P += 1
+                a = feat.attributes()[self.idx[0]]
+                b = feat.attributes()[self.idx[1]]
+                c = feat.attributes()[self.idx[2]]
+                matrix.append([a, b, c])
+                if P % 1000 == 0:
+                    self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
+                    self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
+                              ("Loading matrix: " + str(P) + "/" + str(feat_count)))
 
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (0))
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), ("Converting Matrix to a NumPy array"))
-        matrix = np.array(matrix)  # transform the list of lists in NumPy array
+            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (0))
+            self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), ("Converting to a NumPy array"))
+            matrix1 = np.array(matrix)  # transform the list of lists in NumPy array
 
-        if max_zone != np.max(matrix[:, 0:2]) + 1 and max_zone is not None:
-            error = 'Vectors and matrix do not have matching dimensions'  # Compute number of zones in the problem
-        mat = 0
-        if max_zone is None:
-            max_zone = np.max(matrix[:, 0:2]) + 1
-        if error is None:
-            if self.sparse:
-                mat = coo_matrix((matrix[:,2], (matrix[:,0], matrix[:,1])), shape=(max_zone, max_zone))
-            else:
-                if self.mapped_array:
-                    mat = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_array_' + str(uuid.uuid4().hex) + '.mat'),
-                                    dtype=np.float_,
-                                    mode='w+',
-                                    shape=(int(max_zone), int(max_zone)))
+            # Bring it all to memory mapped
+            self.matrix = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
+                               dtype=np.float64,
+                               mode='w+',
+                               shape=(int(matrix1.shape[0]), 3))
+            self.matrix[:] = matrix1[:]
+            del(matrix1)
+
+        elif self.matrix_type == 'numpy':
+            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Loading from NumPY")
+            try:
+                mat= np.load(self.numpy_file)
+                if len(mat.shape[:]) == 2:
+                    mat = coo_matrix(mat)
+                    cells = int(mat.row.shape[0])
+                    self.matrix = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
+                                            dtype=np.float64,
+                                            mode='w+',
+                                            shape=(cells, 3))
+                    self.matrix[:,0] = mat.row[:]
+                    self.matrix[:,1] = mat.col[:]
+                    self.matrix[:,2] = mat.data[:]
+                    del(mat)
                 else:
-                    mat = np.zeros((int(max_zone), int(max_zone)))
-                if self.filler != 0:
-                    mat.fill(self.filler)
+                    self.report.append('Numpy array needs to be 2 dimensional. Matrix provided has ' + str(len(mat.shape[:])))
+            except:
+                self.report.append('Could not load array')
 
-                P = 0
-                for i in matrix:
-                    mat[i[0].astype(int), i[1].astype(int)] = i[2]
-                    P += 1
-                    if P % 1000 == 0:
-                        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
-                        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                                  ("Converting matrix: " + str(P) + "/" + str(feat_count)))
-        self.matrix = mat
-        self.error = error
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(feat_count)))
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), ("Matrix loading finalized"))
+        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), '')
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'LOADED-MATRIX')
+
+
+class MatrixReblocking(WorkerThread):
+    def __init__(self, parentThread, **kwargs):
+        WorkerThread.__init__(self, parentThread)
+        self.matrices = kwargs.get('matrices')
+        self.sparse = kwargs.get('sparse', False)
+
+        self.num_matrices = len(self.matrices.keys())
+        self.matrix_hash = {}
+        self.matrix_shape = 0
+        self.titles = []
+        self.report = []
+
+    def doWork(self):
+        if self.sparse:
+            # Builds the hash
+            self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.num_matrices)
+            self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Building correspondence")
+            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
+            indices = None
+            p = 0
+            for mat_name, mat in self.matrices.iteritems():
+                # Gets all non-zero coordinates and makes sure that they are considered
+                froms = mat[:,0]
+                tos =  mat[:,1]
+
+                if indices is None:
+                    all_indices = np.hstack((froms, tos))
+                else:
+                    all_indices = np.hstack((indices, froms, tos))
+                indices = np.unique(all_indices)
+                p += 1
+                self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
+
+            compact_shape = int(indices.shape[0])
+            # Builds the hash
+            for i in range(compact_shape):
+                self.matrix_hash[indices[i]] = i
+                self.titles.append(int(indices[i]))
+        else:
+            compact_shape = 0
+            for mat_name, mat in self.matrices.iteritems():
+                compact_shape = np.max(compact_shape, mat.shape[0])
+
+            # Builds the hash
+            self.matrix_hash = {i:i for i in range(compact_shape)}
+            self.matrix.index = [i for i in range(compact_shape)]
+
+        self.matrix = AequilibraeMatrix(zones=compact_shape, cores=self.num_matrices)
+        self.matrix.matrix_hash = self.matrix_hash
+        self.matrix.index = self.titles
+
+        k = 0
+        j = self.num_matrices * compact_shape
+        m = 0
+        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), j)
+        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Reblocking matrices")
+        for mat_name, mat in self.matrices.iteritems():
+            if self.sparse:
+                for i in range(compact_shape):
+                    k += 1
+                    mat[:,0][mat[:,0] == indices[i]] = self.matrix_hash[indices[i]]
+                    mat[:,1][mat[:,1] == indices[i]] = self.matrix_hash[indices[i]]
+                    self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), k)
+            else:
+                k += self.num_matrices
+                self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 1)
+            self.matrix.matrix[:,:,m] = coo_matrix((mat[:,2], (mat[:,0], mat[:,1])),
+                                           shape=(compact_shape, compact_shape)).toarray().astype(np.float64)[:]
+            self.matrix.names[mat_name] =  m
+            m += 1
+            del(mat)
+
+        self.matrix.zones = compact_shape
+        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Matrix Reblocking finalized")
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'REBLOCKED MATRICES')
+

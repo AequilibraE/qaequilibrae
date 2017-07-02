@@ -14,6 +14,6 @@ from .results import *
 from assignment import *
 from multi_threaded_aon import MultiThreadedAoN
 try:
-    from AoN import one_to_all, path_computation
+    from AoN import one_to_all, path_computation, VERSION
 except:
     pass

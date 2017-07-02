@@ -28,8 +28,8 @@ import uuid
 VERSION = ''
 a = open(os.path.join(os.path.dirname(__file__),'parameters.pxi'), 'r')
 for i in a.readlines():
-    if 'VERSION' in i:
-        VERSION = i[11:-1]
+    if 'VERSION' in i and 'SUB' not in i:
+        VERSION = i[11:-2]
 
 
 '''description: Description of the graph (OPTIONAL)
