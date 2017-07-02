@@ -76,8 +76,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 if layer.wkbType() in poly_types or layer.wkbType() in point_types:
                     self.zoning_layer.addItem(layer.name())
 
-                    self.progress_label.setVisible(True)
-                    self.progressbar.setVisible(True)
+                    self.progress_label.setVisible(False)
+                    self.progressbar.setVisible(False)
 
     def run_thread(self):
         QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
