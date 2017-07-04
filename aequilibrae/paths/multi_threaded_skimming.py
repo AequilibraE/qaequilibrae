@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class MultiThreadedPathComputation:
+class MultiThreadedNetworkSkimming:
     def __init__(self):
         self.predecessors = None  # The predecessors for each node in the graph
         self.temporary_skims = None  # holds the skims for all nodes in the network (during path finding)

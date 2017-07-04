@@ -286,10 +286,107 @@ cdef void blocking_centroid_flows(int O,
             temp_b_nodes[i] = O
 
 
+
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
-def path_computation(origin, graph, result, aux_result, curr_thread):
+def path_computation(origin, destination, graph, results):
+    cdef ITYPE_t nodes, O, D, p, centroids
+    cdef int i, j, skims, a
+
+    if results.__graph_id__ != graph.__id__:
+        return "Results object not prepared. Use --> results.prepare(graph)"
+
+    # Consistency checks
+    if origin >= graph.fs.shape[0]:
+        return "Node " + str(origin) + " is outside the range of nodes in the graph"
+
+    if graph.fs[origin] == graph.fs[origin+1]:
+        return "Node " + str(origin) + " does not exist in the graph"
+
+    if VERSION != graph.__version__:
+        return 'This graph was created for a different version of AequilibraE. Please re-create it'
+    #We transform the python variables in Cython variables
+    O = origin
+    D = destination
+    nodes = graph.num_nodes
+
+     # initializes skim_matrix for output
+    # initializes predecessors  and link connectors for output
+    results.predecessors.fill(-1)
+    results.connectors.fill(-1)
+    results.temporary_skims.fill(-1)
+    skims = results.temporary_skims.shape[1]
+
+    for j in range(skims):
+        results.temporary_skims[O, j] = 0
+
+
+    #In order to release the GIL for this procedure, we create all the
+    #memmory views we will need
+    #print "creating views"
+    cdef double [:] g_view = graph.cost
+    cdef int [:] original_b_nodes_view = graph.b_node
+    cdef int [:] graph_fs_view = graph.fs
+    cdef double [:, :] graph_skim_view = graph.skims
+    cdef int [:] ids_graph_view = graph.graph['link_id']
+    centroids = graph.centroids
+
+    cdef int [:] predecessors_view = results.predecessors
+    cdef int [:] conn_view = results.connectors
+    cdef double [:, :] skim_matrix_view = results.temporary_skims
+    cdef int [:] reached_first_view = results.reached_first
+
+    new_b_nodes = graph.b_node.copy()
+    cdef int [:] b_nodes_view = new_b_nodes
+
+
+    #Now we do all procedures with NO GIL
+    #print "start computation"
+    with nogil:
+        blocking_centroid_flows(O,
+                                centroids,
+                                graph_fs_view,
+                                original_b_nodes_view,
+                                b_nodes_view)
+
+        w = path_finding(O,
+                         g_view,
+                         b_nodes_view,
+                         graph_fs_view,
+                         predecessors_view,
+                         ids_graph_view,
+                         conn_view,
+                         reached_first_view)
+
+    if 0<= D < results.nodes:
+        p = predecessors_view[D]
+        all_connectors = []
+        all_nodes = [D]
+        milepost = [skim_matrix_view[D]]
+        if p >= 0:
+            while p > 0:
+                all_connectors.append(conn_view[D])
+                all_nodes.append(p)
+                milepost.append(skim_matrix_view[p])
+                D = p
+                p = predecessors_view[p]
+            results.path = np.asarray(all_connectors, np.int64)[::-1]
+            results.path_nodes = np.asarray(all_nodes, np.int64)[::-1]
+            results.milepost =  np.asarray(milepost, np.float64)[::-1]
+
+            del all_nodes
+            del all_connectors
+            del milepost
+
+
+
+
+
+@cython.wraparound(False)
+@cython.embedsignature(True)
+@cython.boundscheck(False)
+def network_skimming(origin, graph, result, aux_result, curr_thread):
     """
 
     :param origin:

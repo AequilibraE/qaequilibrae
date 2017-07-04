@@ -28,7 +28,7 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QPushButton" name="load">
+  <widget class="QPushButton" name="but_load">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -286,7 +286,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="but_close">
+  <widget class="QPushButton" name="but_save_for_single_use">
    <property name="geometry">
     <rect>
      <x>171</x>
@@ -382,12 +382,12 @@
     <rect>
      <x>195</x>
      <y>14</y>
-     <width>81</width>
+     <width>101</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Aequilibrae</string>
+    <string>AequilibraE</string>
    </property>
   </widget>
   <widget class="QPushButton" name="but_permanent_save">

@@ -56,7 +56,6 @@ except:
 sys.dont_write_bytecode = True
 import os.path
 
-
 class AequilibraEMenu:
     def __init__(self, iface):
         self.iface = iface

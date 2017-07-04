@@ -102,8 +102,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         """
         if self.matrix is not None:
             mat_name = self.cbb_matrix_cores.currentText()
-            mat_index = self.matrix.names[mat_name]
-            m = NumpyModel(self.matrix.matrix[:,:,mat_index], self.matrix.index, self.matrix.index)
+            m = NumpyModel(self.matrix.matrix[mat_name], self.matrix['index'][:], self.matrix['index'][:])
             self.matrix_viewer.clearSpans()
             self.matrix_viewer.setModel(m)
 
@@ -115,7 +114,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             self.matrix = dlg2.matrix
             self.cbb_matrix_cores.clear()
             k = 0
-            for i in self.matrix.names.keys():
+            for i in self.matrix.names:
                 self.cbb_matrix_cores.addItem(i)
                 k += 1
             self.chb_display_matrix.setChecked(False)

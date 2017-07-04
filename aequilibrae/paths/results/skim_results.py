@@ -4,7 +4,7 @@
 import numpy as np
 import multiprocessing as mp
 
-class PathResults:
+class SkimResults:
     def __init__(self):
         """
         @type graph: Set of numpy arrays to store Computation results

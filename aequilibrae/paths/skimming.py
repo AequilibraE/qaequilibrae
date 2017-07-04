@@ -34,7 +34,7 @@ import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
 
-from multi_threaded_path_computation import MultiThreadedPathComputation
+from multi_threaded_skimming import MultiThreadedNetworkSkimming
 no_binaries = False
 try:
     from AoN import one_to_all, path_computation
@@ -46,7 +46,7 @@ def main():
 
 
 def network_skimming(graph, results, origins=None):
-    aux_res = MultiThreadedPathComputation()
+    aux_res = MultiThreadedNetworkSkimming()
     aux_res.prepare(graph, results)
 
     if origins is None:

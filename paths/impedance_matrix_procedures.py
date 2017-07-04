@@ -28,7 +28,7 @@ import sys
 
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
-from aequilibrae.paths import path_computation, MultiThreadedPathComputation
+from aequilibrae.paths import network_skimming, MultiThreadedNetworkSkimming
 from ..common_tools import WorkerThread
 
 
@@ -54,7 +54,7 @@ class ComputeDistMatrix(WorkerThread):
         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
 
 
-        aux_res = MultiThreadedPathComputation()
+        aux_res = MultiThreadedNetworkSkimming()
         aux_res.prepare(self.graph, self.result)
 
         pool = ThreadPool(self.result.cores)
@@ -76,7 +76,7 @@ class ComputeDistMatrix(WorkerThread):
             all_threads[thread.get_ident()] = all_threads['count']
             th = all_threads['count']
             all_threads['count'] += 1
-        a = path_computation(O, g, res, aux_res, th)
+        a = network_skimming(O, g, res, aux_res, th)
         if a != O:
             report.append(a)
 

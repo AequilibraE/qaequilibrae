@@ -12,8 +12,8 @@ distribution:
     max iterations: 5000
 system:
   cpus: 4
-  default_directory: /media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/AequilibraE/Testing
-    data/Assignment
+  default_directory: /media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/Research/CONFERENCES/TRB/2018
+    - Delaunay Lines/Examples/AUS
   driving side: right
   logging: false
   report zeros: 1

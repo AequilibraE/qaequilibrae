@@ -29,7 +29,7 @@ import numpy as np
 
 from impedance_matrix_procedures import ComputeDistMatrix
 from aequilibrae.paths import Graph
-from aequilibrae.paths.results import PathResults
+from aequilibrae.paths import SkimResults
 from ..common_tools import GetOutputFileName
 from ..common_tools import ReportDialog
 from ..common_tools.auxiliary_functions import *
@@ -45,7 +45,7 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
 
-        self.result = PathResults()
+        self.result = SkimResults()
         self.validtypes = integer_types + float_types
         self.tot_skims = 0
         self.name_skims = 0
@@ -157,33 +157,33 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.progress_label.setText(val)
 
     def finished_threaded_procedure(self, val):
-        if self.worker_thread.report:
+        if len(self.worker_thread.report) > 0:
             self.report = self.worker_thread.report
-        else:
 
-            if self.npy_res.isChecked():
-                np.save(self.imped_results.text(), self.result.skims)
-                q = open(self.imped_results.text() + '.csv', 'w')
-                for l in self.skim_fields:
-                    print >> q, l
+        if self.npy_res.isChecked():
+            np.save(self.imped_results.text(), self.result.skims)
+            q = open(self.imped_results.text() + '.csv', 'w')
+            for l in self.skim_fields:
+                print >> q, l
+            q.flush()
+            q.close()
+        if self.csv_res.isChecked():
+            infinite = np.zeros(1, np.float64)
+            infinite[0] = 1.797e+308
+            q = open(self.imped_results.text(), 'w')
+            text = 'Origin,Destination,' + self.cb_minimizing.currentText()
+            for l in self.skim_fields:
+                text = text + ',' + l
+            print >> q, text
+            for i in range(self.graph.centroids + 1):
+                if np.sum(self.result.skims[i, :, :]) > 0:
+                    for j in range(self.graph.centroids + 1):
+                        if np.sum(self.result.skims[i, j, :]) > 0:
+                            text = str(i) + ',' + str(j) + ','
+                            text = text + ','.join([`num` if infinite[0]>num else '' for num in self.result.skims[i, j, :]])
+                            print >> q, text
                 q.flush()
-                q.close()
-            if self.csv_res.isChecked():
-
-                q = open(self.imped_results.text(), 'w')
-                text = 'Origin,Destination,' + self.cb_minimizing.currentText()
-                for l in self.skim_fields:
-                    text = text + ',' + l
-                print >> q, text
-                for i in range(self.graph.centroids + 1):
-                    if np.sum(self.result.skims[i, :, :]) > 0:
-                        for j in range(self.graph.centroids + 1):
-                            if np.sum(self.result.skims[i, j, :]) > 0:
-                                text = str(i) + ',' + str(j) + ','
-                                text = text + ''.join([`num` for num in self.result.skims[i, j, :]])
-                                print >> q, text
-                    q.flush()
-                q.close()
+            q.close()
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results

@@ -71,10 +71,14 @@ class LoadMatrix(WorkerThread):
 
             # Bring it all to memory mapped
             self.matrix = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
-                               dtype=np.float64,
+                               dtype=[('from', np.int64), ('to', np.int64), ('flow', np.float64)],
                                mode='w+',
-                               shape=(int(matrix1.shape[0]), 3))
-            self.matrix[:] = matrix1[:]
+                               shape=(int(matrix1.shape[0]), ))
+
+
+            self.matrix['from'] = matrix1[:, 0]
+            self.matrix['to'] = matrix1[:, 1]
+            self.matrix['flow'] = matrix1[:, 2]
             del(matrix1)
 
         elif self.matrix_type == 'numpy':
@@ -85,12 +89,12 @@ class LoadMatrix(WorkerThread):
                     mat = coo_matrix(mat)
                     cells = int(mat.row.shape[0])
                     self.matrix = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
-                                            dtype=np.float64,
+                                            dtype=[('from', np.int64), ('to', np.int64), ('flow', np.float64)],
                                             mode='w+',
-                                            shape=(cells, 3))
-                    self.matrix[:,0] = mat.row[:]
-                    self.matrix[:,1] = mat.col[:]
-                    self.matrix[:,2] = mat.data[:]
+                                            shape=(cells, ))
+                    self.matrix['from'][:] = mat.row[:]
+                    self.matrix['to'] = mat.col[:]
+                    self.matrix['flow'][:] = mat.data[:]
                     del(mat)
                 else:
                     self.report.append('Numpy array needs to be 2 dimensional. Matrix provided has ' + str(len(mat.shape[:])))
@@ -107,7 +111,7 @@ class MatrixReblocking(WorkerThread):
         self.matrices = kwargs.get('matrices')
         self.sparse = kwargs.get('sparse', False)
         self.file_location = kwargs.get('path', tempfile.gettempdir())
-        self.file_name = kwargs.get('file_name', 'aequilibrae_array_' + str(uuid.uuid4().hex) + '.npy')
+        self.file_name = kwargs.get('file_name', 'aequilibrae_array_' + str(uuid.uuid4().hex) + '.aem')
 
         self.num_matrices = len(self.matrices.keys())
         self.matrix_hash = {}
@@ -124,8 +128,8 @@ class MatrixReblocking(WorkerThread):
             p = 0
             for mat_name, mat in self.matrices.iteritems():
                 # Gets all non-zero coordinates and makes sure that they are considered
-                froms = mat[:,0]
-                tos =  mat[:,1]
+                froms = mat['from']
+                tos = mat['to']
 
                 if indices is None:
                     all_indices = np.hstack((froms, tos))
@@ -136,7 +140,7 @@ class MatrixReblocking(WorkerThread):
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
 
             compact_shape = int(indices.shape[0])
-            index = np.zeros(np.max(indices)+1, np.int64)
+            index = np.zeros(np.max(indices) + 1, np.int64)
 
             for i, j in enumerate(indices):
                 index[j] = i
@@ -155,7 +159,7 @@ class MatrixReblocking(WorkerThread):
                                         zones=compact_shape, cores=self.num_matrices, names=self.matrices.keys(),
                                         dtype = np.float64)
 
-        self.index[:, 0] = index[:]
+        self.matrix['index'][:] = indices[:]
 
         k = 0
         self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.num_matrices)
@@ -163,13 +167,13 @@ class MatrixReblocking(WorkerThread):
         for mat_name, mat in self.matrices.iteritems():
             if self.sparse:
                 k += 1
-                mat[:,0] = index[mat[:,0]][:]
-                mat[:,1] = index[mat[:,1]][:]
+                mat['from'][:] = index[mat['from']][:]
+                mat['to'][:] = index[mat['to']][:]
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), k)
             else:
                 k += 1
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 1)
-            self.matrix[mat_name][:,:] = coo_matrix((mat[:,2], (mat[:,0], mat[:,1])),
+            self.matrix[mat_name][:,:] = coo_matrix((mat['flow'], (mat['from'], mat['to'])),
                                            shape=(compact_shape, compact_shape)).toarray().astype(np.float64)[:]
             del(mat)
 
