@@ -318,7 +318,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         if self.layer is None:
             self.error = 'Link layer not selected'
 
-        self.output = self.graph_file.text()
+        self.output = self.graph_file.text().encode('ascii', 'ignore')
         if self.error is None and self.output == "":
             self.error = 'No file name was provided for the graph'
 
