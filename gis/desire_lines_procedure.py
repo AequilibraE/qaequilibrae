@@ -53,7 +53,6 @@ class DesireLinesProcedure(WorkerThread):
         self.dl_type = dl_type
         self.error = None
         self.matrix_hash = matrix_hash
-        self.not_loaded = []
         self.report = []
         self.python_version = (8 * struct.calcsize("P"))
 
@@ -135,7 +134,7 @@ class DesireLinesProcedure(WorkerThread):
                                     desireline_link_id += 1
                                 else:
                                     tu = (a_node, b_node, self.matrix[i, j], self.matrix[j, i])
-                                    self.not_loaded.append('No centroids available to depict flow between node {0} and node {1}. AB flow was equal to {2} and BA flow was equal to {3}'.format(*tu))
+                                    self.report.append('No centroids available to depict flow between node {0} and node {1}. AB flow was equal to {2} and BA flow was equal to {3}'.format(*tu))
                     else:
                         q += self.matrix.shape[1]
                         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
