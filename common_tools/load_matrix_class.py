@@ -19,16 +19,17 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
-from PyQt4.QtCore import *
-import numpy as np
-from scipy.sparse import coo_matrix
-from worker_thread import WorkerThread
-import uuid
-import tempfile
 import os
-from auxiliary_functions import logger
-from aequilibrae_matrix import AequilibraeMatrix
+import tempfile
+import uuid
+from scipy.sparse import coo_matrix
+
+import numpy as np
+from PyQt4.QtCore import *
+
+from aequilibrae.matrix import AequilibraeMatrix
+from worker_thread import WorkerThread
+
 
 class LoadMatrix(WorkerThread):
     def __init__(self, parentThread, **kwargs):

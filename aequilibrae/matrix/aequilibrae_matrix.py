@@ -24,7 +24,7 @@ from scipy.sparse import coo_matrix
 import uuid
 import tempfile
 import os
-from auxiliary_functions import logger
+from common_tools.auxiliary_functions import logger
 from numpy.lib.format import open_memmap
 
 class AequilibraeMatrix():
