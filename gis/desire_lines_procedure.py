@@ -98,9 +98,9 @@ class DesireLinesProcedure(WorkerThread):
                               QgsField("B_Node", QVariant.Int),
                               QgsField("direct", QVariant.Int),
                               QgsField("length",  QVariant.Double),
-                              QgsField("AB_FLOW",  QVariant.Double),
-                              QgsField("BA_FLOW",  QVariant.Double),
-                              QgsField("TOT_FLOW",  QVariant.Double)])
+                              QgsField("ab_flow",  QVariant.Double),
+                              QgsField("ab_flow",  QVariant.Double),
+                              QgsField("tot_flow",  QVariant.Double)])
             desireline_layer.updateFields()
 
 
