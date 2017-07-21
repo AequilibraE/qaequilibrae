@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>535</width>
-    <height>448</height>
+    <width>617</width>
+    <height>441</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,12 +18,12 @@
     <rect>
      <x>15</x>
      <y>15</y>
-     <width>510</width>
+     <width>591</width>
      <height>391</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -32,9 +32,9 @@
     <widget class="QTableWidget" name="table_link_fields">
      <property name="geometry">
       <rect>
-       <x>15</x>
+       <x>220</x>
        <y>65</y>
-       <width>475</width>
+       <width>350</width>
        <height>275</height>
       </rect>
      </property>
@@ -45,17 +45,12 @@
      </column>
      <column>
       <property name="text">
-       <string>required</string>
+       <string>Initialize?</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Property</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>keep</string>
+       <string>Source/Value</string>
       </property>
      </column>
     </widget>
@@ -64,7 +59,7 @@
       <rect>
        <x>71</x>
        <y>15</y>
-       <width>421</width>
+       <width>501</width>
        <height>30</height>
       </rect>
      </property>
@@ -90,6 +85,59 @@
       <string>Layer</string>
      </property>
     </widget>
+    <widget class="QTableWidget" name="table_available_link_fields">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>65</y>
+       <width>181</width>
+       <height>275</height>
+      </rect>
+     </property>
+     <column>
+      <property name="text">
+       <string>Layer field</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QToolButton" name="but_adds_to_links">
+     <property name="geometry">
+      <rect>
+       <x>195</x>
+       <y>170</y>
+       <width>21</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonIconOnly</enum>
+     </property>
+     <property name="arrowType">
+      <enum>Qt::RightArrow</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="but_removes_from_links">
+     <property name="geometry">
+      <rect>
+       <x>195</x>
+       <y>190</y>
+       <width>21</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonIconOnly</enum>
+     </property>
+     <property name="arrowType">
+      <enum>Qt::LeftArrow</enum>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
@@ -98,9 +146,9 @@
     <widget class="QTableWidget" name="table_node_fields">
      <property name="geometry">
       <rect>
-       <x>15</x>
+       <x>220</x>
        <y>65</y>
-       <width>475</width>
+       <width>350</width>
        <height>275</height>
       </rect>
      </property>
@@ -111,23 +159,15 @@
      </column>
      <column>
       <property name="text">
-       <string>Required</string>
+       <string>Initialize?</string>
       </property>
       <property name="textAlignment">
-       <set>AlignLeft|AlignVCenter</set>
+       <set>AlignHCenter|AlignVCenter|AlignCenter</set>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Property</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>keep</string>
-      </property>
-      <property name="textAlignment">
-       <set>AlignLeft|AlignVCenter</set>
+       <string>Source/Value</string>
       </property>
      </column>
     </widget>
@@ -136,7 +176,7 @@
       <rect>
        <x>71</x>
        <y>15</y>
-       <width>421</width>
+       <width>501</width>
        <height>30</height>
       </rect>
      </property>
@@ -162,12 +202,65 @@
       <string>Layer</string>
      </property>
     </widget>
+    <widget class="QTableWidget" name="table_available_node_field">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>65</y>
+       <width>181</width>
+       <height>275</height>
+      </rect>
+     </property>
+     <column>
+      <property name="text">
+       <string>Layer field</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QToolButton" name="but_removes_from_nodes">
+     <property name="geometry">
+      <rect>
+       <x>195</x>
+       <y>190</y>
+       <width>21</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonIconOnly</enum>
+     </property>
+     <property name="arrowType">
+      <enum>Qt::LeftArrow</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="but_adds_to_nodes">
+     <property name="geometry">
+      <rect>
+       <x>195</x>
+       <y>170</y>
+       <width>21</width>
+       <height>19</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonIconOnly</enum>
+     </property>
+     <property name="arrowType">
+      <enum>Qt::RightArrow</enum>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QPushButton" name="but_create_network_file">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>490</x>
      <y>410</y>
      <width>111</width>
      <height>27</height>
@@ -185,7 +278,7 @@
     <rect>
      <x>20</x>
      <y>410</y>
-     <width>231</width>
+     <width>271</width>
      <height>23</height>
     </rect>
    </property>
@@ -236,7 +329,7 @@
   <widget class="QLabel" name="progress_label">
    <property name="geometry">
     <rect>
-     <x>261</x>
+     <x>290</x>
      <y>412</y>
      <width>261</width>
      <height>21</height>

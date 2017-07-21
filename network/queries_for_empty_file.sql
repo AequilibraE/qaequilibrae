@@ -26,9 +26,7 @@ CREATE TABLE 'links' (
   'length' REAL
 );
 #
-SELECT InitSpatialMetaData();
-#
-SELECT AddGeometryColumn( 'links', 'geometry', 4326, 'LINESTRING', 'XY' );
+SELECT AddGeometryColumn( 'links', 'geometry', DEFAULT_CRS, 'LINESTRING', 'XY' );
 #
 SELECT CreateSpatialIndex( 'links' , 'geometry' );
 #
@@ -43,9 +41,7 @@ CREATE TABLE 'nodes' (
   node_id INTEGER UNIQUE NOT NULL -- Text edit widget with 'Not null' constraint
 );
 #
-SELECT InitSpatialMetaData();
-#
-SELECT AddGeometryColumn( 'nodes', 'geometry', 4326, 'POINT', 'XY' );
+SELECT AddGeometryColumn( 'nodes', 'geometry', DEFAULT_CRS, 'POINT', 'XY' );
 #
 SELECT CreateSpatialIndex( 'nodes' , 'geometry' );
 #
