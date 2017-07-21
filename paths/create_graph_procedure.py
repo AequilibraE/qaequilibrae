@@ -28,7 +28,7 @@ import sys
 import os
 import struct
 
-import  aequilibrae.reserved_fields as reserved_fieds
+import aequilibrae.reserved_fields as reserved_fields
 from aequilibrae.paths import Graph
 from ..common_tools import WorkerThread, reporter
 
@@ -79,7 +79,7 @@ class GraphCreation(WorkerThread):
             self.graph = Graph()
 
             all_types = [np.int32, np.int32, np.int32, np.int8]
-            all_titles = [reserved_fieds.link_id, reserved_fieds.a_node, reserved_fieds.b_node, reserved_fieds.direction]
+            all_titles = [reserved_fields.link_id, reserved_fields.a_node, reserved_fields.b_node, reserved_fields.direction]
 
             for name_field, values in self.fields_to_add.iteritems():
                 all_titles.append((name_field + '_ab').encode('ascii','ignore'))
@@ -89,8 +89,8 @@ class GraphCreation(WorkerThread):
 
             dt = [(t, d) for t, d in zip(all_titles, all_types)]
 
-            a_node = self.net_layer.fieldNameIndex(reserved_fieds.a_node)
-            b_node = self.net_layer.fieldNameIndex(reserved_fieds.b_node)
+            a_node = self.net_layer.fieldNameIndex(reserved_fields.a_node)
+            b_node = self.net_layer.fieldNameIndex(reserved_fields.b_node)
             data = []
 
             for p, feat in enumerate(self.features):
