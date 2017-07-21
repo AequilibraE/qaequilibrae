@@ -24,8 +24,12 @@ from scipy.sparse import coo_matrix
 import uuid
 import tempfile
 import os
-from common_tools.auxiliary_functions import logger
 from numpy.lib.format import open_memmap
+
+try:
+    from common_tools.auxiliary_functions import logger
+except:
+    pass
 
 class AequilibraeMatrix():
     def __init__(self, **kwargs):
@@ -36,9 +40,9 @@ class AequilibraeMatrix():
 
         self.num_matrices = kwargs.get('cores', 1)
 
-        self.names = kwargs.get('names', None)
+        self.names = kwargs.get('names', ['mat'])
 
-        self.data_type = kwargs.get('dtype', float)
+        self.data_type = kwargs.get('dtype', np.float32)
 
         self.matrix_hash = {}
 
@@ -52,17 +56,20 @@ class AequilibraeMatrix():
         else:
             if type(self.names) is list:
                 if len(self.names) != self.num_matrices:
-                    raise('List of matrix names incompatible with number of matrices')
+                    raise Exception('List of matrix names incompatible with number of matrices')
             else:
-                raise ('Matrix names need to be provided as a list')
+                if self.num_matrices == 1 and type(self.names) is str:
+                    self.names = [self.names]
+                else:
+                    raise Exception('Matrix names need to be provided as a list')
 
             for reserved in self.reserved_names:
                 if reserved in self.names:
-                    raise (reserved + ' is a reserved name')
+                    raise Exception(reserved + ' is a reserved name')
 
         # sets the dtype
         dtype = [(x.encode('utf-8'), self.data_type) for x in self.names]
-        dtype.append(('index', int))
+        dtype.append(('index', np.int32))
 
         # the shape
         shape = (self.zones,self.zones,)
@@ -71,8 +78,11 @@ class AequilibraeMatrix():
         self.matrix = open_memmap(matrix_path, mode='w+', dtype=dtype, shape=shape)
 
 
-    def load_from_disk(self, path_to_file):
+    def load(self, path_to_file):
         self.matrix = open_memmap(path_to_file, mode='r+')
+        self.zones = self.matrix.shape[0]
+        self.names = [x for i, x in self.matrix.dtype]
+        self.names.pop('index')
 
     def __getitem__(self, mat_name):
 
