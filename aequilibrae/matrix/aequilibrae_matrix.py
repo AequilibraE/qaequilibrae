@@ -25,7 +25,10 @@ import uuid
 import tempfile
 import os
 from numpy.lib.format import open_memmap
+import zipfile
 
+
+# Necessary in case we are no the QGIS world
 try:
     from common_tools.auxiliary_functions import logger
 except:
@@ -35,6 +38,9 @@ class AequilibraeMatrix():
     def __init__(self, **kwargs):
         self.file_location = kwargs.get('path', tempfile.gettempdir())
         self.file_name = kwargs.get('file_name', 'aequilibrae_array_' + str(uuid.uuid4().hex) + '.npy')
+        
+        self.storage_path = None
+        self.computation_path = os.path.join(self.file_location, self.file_name)
 
         self.zones = kwargs.get('zones', 1)
 
@@ -93,3 +99,22 @@ class AequilibraeMatrix():
             return self.matrix[mat_name]
 
         raise AttributeError("No such method or matrix core! --> " + str(mat_name))
+    
+    def save_to_disk(self, file_path= None, compressed=True):
+            if compressed:
+                compression = zipfile.ZIP_DEFLATED
+            else:
+                compression = zipfile.ZIP_STORED
+        
+            if file_path is not None:
+                if file_path[-3:].lower() != 'aem':
+                    file_path += '.aem'
+            else:
+                if self.storage_path is None:
+                    raise AttributeError('No file name provided')
+                else:
+                    file_path = self.storage_path
+                
+            archive = zipfile.ZipFile(file_path, 'w', compression)
+            archive.write(self.computation_path, os.path.basename(self.computation_path))
+            archive.close()

@@ -30,8 +30,8 @@ import warnings
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
-from ..common_tools import LoadMatrixDialog, LoadVectorDialog
-
+from ..common_tools import LoadVectorDialog
+from ..matrix import LoadMatrixDialog
 from ipf_procedure import IpfProcedure
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_ipf.ui'))

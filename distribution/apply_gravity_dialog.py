@@ -29,7 +29,9 @@ import numpy as np
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
-from ..common_tools import LoadMatrixDialog, LoadVectorDialog
+from ..common_tools import LoadVectorDialog
+from ..matrix import LoadMatrixDialog
+
 
 from apply_gravity_procedure import ApplyGravityProcedure
 from load_distribution_model import LoadDistributionModelDialog

@@ -289,7 +289,7 @@
   <widget class="QPushButton" name="but_save_for_single_use">
    <property name="geometry">
     <rect>
-     <x>171</x>
+     <x>270</x>
      <y>170</y>
      <width>91</width>
      <height>23</height>
@@ -396,7 +396,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>170</x>
      <y>170</y>
      <width>91</width>
      <height>23</height>
@@ -441,6 +441,22 @@
    </property>
    <property name="text">
     <string>Save</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="compressed">
+   <property name="geometry">
+    <rect>
+     <x>174</x>
+     <y>204</y>
+     <width>181</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Compress outputs</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

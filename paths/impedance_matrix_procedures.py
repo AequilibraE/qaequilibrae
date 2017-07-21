@@ -28,14 +28,14 @@ import sys
 
 from multiprocessing.dummy import Pool as ThreadPool
 import thread
-from aequilibrae.paths import network_skimming, MultiThreadedNetworkSkimming
 from ..common_tools import WorkerThread
 
-
-def main():
-    pass
-
-
+no_binary = False
+try:
+    from aequilibrae.paths import network_skimming, MultiThreadedNetworkSkimming
+except:
+    no_binary = True
+    
 class ComputeDistMatrix(WorkerThread):
     def __init__(self, parentThread, graph, result):
         WorkerThread.__init__(self, parentThread)

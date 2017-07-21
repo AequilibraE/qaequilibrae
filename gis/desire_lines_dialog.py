@@ -33,7 +33,7 @@ from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
 
 from ..common_tools import NumpyModel
-from ..common_tools import LoadMatrixDialog
+from ..matrix import LoadMatrixDialog
 from ..common_tools import ReportDialog
 
 from desire_lines_procedure import DesireLinesProcedure

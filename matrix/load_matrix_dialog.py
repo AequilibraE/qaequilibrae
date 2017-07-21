@@ -31,9 +31,9 @@ import sys
 import os
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
-from get_output_file_name import GetOutputFileName
+from ..common_tools.get_output_file_name import GetOutputFileName
+from ..common_tools.report_dialog import ReportDialog
 from load_matrix_class import LoadMatrix, MatrixReblocking
-from report_dialog import ReportDialog
 
 no_omx = False
 try:
@@ -52,6 +52,8 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.path = standard_path()
         self.sparse = kwargs.get('sparse', False)
         self.multiple = kwargs.get('multiple', False)
+        self.allow_single_use = kwargs.get('single_use', False)
+        self.output_name = None
         self.layer = None
         self.orig = None
         self.dest = None
@@ -72,8 +74,13 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
         # Buttons
         self.but_load.clicked.connect(self.load_the_matrix)
-        self.but_save_for_single_use.clicked.connect(self.prepare_final_matrix)
-        self.but_permanent_save.clicked.connect(self.find_place_to_save_matrix)
+        
+        if self.allow_single_use:
+            self.but_save_for_single_use.clicked.connect(self.prepare_final_matrix)
+        else:
+            self.but_save_for_single_use.setVisible(False)
+            
+        self.but_permanent_save.clicked.connect(self.get_name_and_save_to_disk)
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
@@ -94,9 +101,20 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
             self.matrix_list_view.setVisible(False)
             self.resize(368, 233)
+        
+        self.but_save_for_single_use.setEnabled(False)
+        self.but_permanent_save.setEnabled(False)
+
+    def slot_double_clicked(self, mi):
+        row = mi.row()
+        if row > -1:
+            self.matrix_count -= 1
+            mat_to_remove = self.matrix_list_view.item(row, 0).text()
+            self.matrices.pop(mat_to_remove, None)
+            self.update_matrix_list()
 
     def change_matrix_type(self):
-        self.load.setEnabled(True)
+        self.but_load.setEnabled(True)
         members = [self.lbl_matrix, self.lbl_from, self.matrix_layer, self.field_from]
         all_members = members + [self.lbl_to, self.lbl_flow, self.field_to, self.field_cells]
 
@@ -118,12 +136,12 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
                 member.setVisible(True)
 
     def load_fields_to_combo_boxes(self):
-        self.load.setEnabled(False)
+        self.but_load.setEnabled(False)
         for combo in [self.field_from, self.field_to, self.field_cells]:
             combo.clear()
 
         if self.matrix_layer.currentIndex() >= 0:
-            self.load.setEnabled(True)
+            self.but_load.setEnabled(True)
             self.layer = get_vector_layer_by_name(self.matrix_layer.currentText())
             for field in self.layer.dataProvider().fields().toList():
                 if field.type() in integer_types:
@@ -141,8 +159,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
                         self.finished_threaded_procedure)
 
-        self.load.setEnabled(False)
-        self.but_close.setEnabled(False)
+        self.but_load.setEnabled(False)
         self.worker_thread.start()
         self.exec_()
 
@@ -157,14 +174,22 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.progress_label.setText(val)
 
     def finished_threaded_procedure(self, param):
-        self.but_close.setEnabled(True)
-        self.load.setEnabled(True)
+        self.but_load.setEnabled(True)
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
             dlg2.exec_()
         else:
             if param == 'LOADED-MATRIX':
+                self.compressed.setVisible(True)
+                self.progress_label.setVisible(False)
+                
+                if self.__current_name in self.matrices.keys():
+                    i = 1
+                    while self.__current_name + '_' + str(i) in self.matrices.keys():
+                        i += 1
+                    self.__current_name = self.__current_name + '_' + str(i)
+                    
                 self.matrices[self.__current_name] = self.worker_thread.matrix
                 self.matrix_count += 1
                 self.update_matrix_list()
@@ -174,8 +199,9 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
             elif param == 'REBLOCKED MATRICES':
                 self.matrix = self.worker_thread.matrix
+                if self.output_name is not None:
+                    self.matrix.save_to_disk(file_path=self.output_name, compressed=self.compressed.isChecked())
                 self.exit_procedure()
-
 
     def load_the_matrix(self):
         self.error = None
@@ -185,6 +211,8 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
                 self.error = 'Invalid field chosen'
 
             if self.error is None:
+                self.compressed.setVisible(False)
+                self.progress_label.setVisible(True)
                 self.__current_name = self.matrix_layer.currentText()
                 idx1 = self.layer.fieldNameIndex(self.field_from.currentText())
                 idx2 = self.layer.fieldNameIndex(self.field_to.currentText())
@@ -214,16 +242,24 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
 
     def update_matrix_list(self):
+        if self.matrix_count > 0:
+            self.but_save_for_single_use.setEnabled(True)
+            self.but_permanent_save.setEnabled(True)
+        else:
+            self.but_save_for_single_use.setEnabled(False)
+            self.but_permanent_save.setEnabled(False)
+            
         self.matrix_list_view.clearContents()
         self.matrix_list_view.setRowCount(self.matrix_count)
 
         self.matrix_list_view.blockSignals(True)
         i = 0
         for key, value in self.matrices.iteritems():
-            r = np.max(value[:,0])
-            c = np.max(value[:,1])
-            dimensions = str(r) + " x "+str(c)
-            total = "{:,.2f}".format(float(np.sum(value)))
+            logger(value)
+            r = np.unique(value['from']).shape[0]
+            c = np.unique(value['to']).shape[0]
+            dimensions = "{:,}".format(r) + " x " + "{:,}".format(c)
+            total = "{:,.2f}".format(float(value['flow'].sum()))
             item_1 = QTableWidgetItem(key)
             self.matrix_list_view.setItem(i, 0, item_1)
 
@@ -250,8 +286,20 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             if old_key not in current_names:
                 self.matrices[new_name] = self.matrices.pop(old_key)
 
-    def update_matrix_hashes(self):
-        self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices)
+    def get_name_and_save_to_disk(self):
+        self.output_name, _ = GetOutputFileName(self, 'AequilibraE matrix', ["Aequilibrae Matrix(*.aem)"], '.aem', self.path)
+        self.prepare_final_matrix()
+        
+    def prepare_final_matrix(self):
+        self.compressed.setVisible(False)
+        self.progress_label.setVisible(True)
+        
+        if self.output_name is None:
+            self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices)
+        else:
+            _, file_name = os.path.split(self.output_name[:-3] + 'npy')
+            self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse,
+                                                  matrices=self.matrices, file_name=file_name)
         self.run_thread()
 
 

@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    2016-12-21
+ Updated:    2017-07-21
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -35,6 +35,7 @@ from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
+from .matrix import LoadMatrixDialog
 import tempfile, glob
 
 no_binary = False
@@ -72,7 +73,9 @@ class AequilibraEMenu:
             self.iface.addPluginToMenu("&AequilibraE", submenu.menuAction())
 
     def initGui(self):
-
+        #Removes temporary files
+        self.removes_temporary_files()
+        
         # CREATING MASTER MENU HEAD
         self.AequilibraE_menu = QMenu(QCoreApplication.translate("AequilibraE", "AequilibraE"))
         self.iface.mainWindow().menuBar().insertMenu(self.iface.firstRightStandardMenu().menuAction(),
@@ -101,6 +104,19 @@ class AequilibraEMenu:
         self.create_transponet_action = QAction(icon, u"Create TranspoNet", self.iface.mainWindow())
         QObject.connect(self.create_transponet_action, SIGNAL("triggered()"), self.run_create_transponet)
         self.network_menu.addAction(self.create_transponet_action)
+
+        # ########################################################################
+        # #################  MATRIX MANIPULATION SUB-MENU  #######################
+
+        self.matrix_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Matrices"))
+        self.aequilibrae_add_submenu(self.matrix_menu)
+
+        # Loading matrices
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
+        self.load_matrix_action = QAction(icon, u"Import matrix", self.iface.mainWindow())
+        QObject.connect(self.load_matrix_action, SIGNAL("triggered()"), self.run_load_matrices)
+        self.matrix_menu.addAction(self.load_matrix_action)
+
 
         # # ########################################################################
         # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -241,10 +257,7 @@ class AequilibraEMenu:
     #########################################################################
 
     def unload(self):
-        # Removes all the temporary files from previous uses
-        p = tempfile.gettempdir() + '/aequilibrae_*'
-        for f in glob.glob(p):
-            os.unlink(f)
+        self.removes_temporary_files()
 
         # unloads the add-on
         if self.AequilibraE_menu is not None:
@@ -255,9 +268,22 @@ class AequilibraEMenu:
             self.iface.removePluginMenu("&AequilibraE", self.trip_distribution_menu.menuAction())
             self.iface.removePluginMenu("&AequilibraE", self.gis_tools_menu.menuAction())
 
+    def removes_temporary_files(self):
+        # Removes all the temporary files from previous uses
+        p = tempfile.gettempdir() + '/aequilibrae_*'
+        for f in glob.glob(p):
+            try:
+                os.unlink(f)
+            except:
+                pass
 
     def run_change_parameters(self):
         dlg2 = ParameterDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_load_matrices(self):
+        dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=False)
         dlg2.show()
         dlg2.exec_()
 
