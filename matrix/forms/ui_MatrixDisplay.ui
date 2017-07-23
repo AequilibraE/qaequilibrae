@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MatrixDisplay</class>
+ <widget class="QDialog" name="MatrixDisplay">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>637</width>
+    <height>593</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Aequilibrae - Desire Lines toolbox</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <widget class="QTableView" name="matrix_viewer">
+   <property name="geometry">
+    <rect>
+     <x>16</x>
+     <y>8</y>
+     <width>601</width>
+     <height>371</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="chb_display_matrix">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>390</y>
+     <width>111</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Display Matrix</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="but_load_new_matrix">
+   <property name="geometry">
+    <rect>
+     <x>466</x>
+     <y>388</y>
+     <width>151</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Load matrices</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbb_matrix_cores">
+   <property name="geometry">
+    <rect>
+     <x>149</x>
+     <y>387</y>
+     <width>291</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="maxVisibleItems">
+    <number>10</number>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

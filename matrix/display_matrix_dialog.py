@@ -1,3 +1,8 @@
+""" TODO:
+IMPLEMENT THIS CLASS
+"""
+
+
 """
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
@@ -61,6 +66,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
 
         self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+        self.chb_display_matrix.stateChanged.connect(self.add_matrix_to_viewer)
+        self.cbb_matrix_cores.currentIndexChanged.connect(self.add_matrix_to_viewer)
 
         # Create desire lines
         self.create_dl.clicked.connect(self.run)
@@ -94,14 +101,28 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 if field.type() in numeric_types:
                     self.zone_id_field.addItem(field.name())
 
+    def add_matrix_to_viewer(self):
+        """
+            procedure to add the matrix to the viewer
+        """
+        if self.matrix is not None:
+            mat_name = self.cbb_matrix_cores.currentText()
+            m = NumpyModel(self.matrix.matrix[mat_name], self.matrix['index'][:], self.matrix['index'][:])
+            self.matrix_viewer.clearSpans()
+            self.matrix_viewer.setModel(m)
 
     def find_matrices(self):
         dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True)
         dlg2.show()
         dlg2.exec_()
+        self.chb_display_matrix.setChecked(False)
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
-
+            self.cbb_matrix_cores.clear()
+            k = 0
+            for i in self.matrix.names:
+                self.cbb_matrix_cores.addItem(i)
+                k += 1
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
@@ -141,7 +162,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 dl_type = 'DelaunayLines'
 
             self.worker_thread = DesireLinesProcedure(qgis.utils.iface.mainWindow(), self.zoning_layer.currentText(),
-                                                        self.zone_id_field.currentText(), self.matrix, self.matrix_hash, dl_type)
+                                                      self.zone_id_field.currentText(), self.matrix, self.matrix_hash, dl_type)
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Matrix not loaded", '', level=3)
