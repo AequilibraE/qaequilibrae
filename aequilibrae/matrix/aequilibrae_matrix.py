@@ -53,7 +53,7 @@ class AequilibraeMatrix():
         self.matrix_hash = {}
 
         self.reserved_names = ['matrix', 'matrix_hash', 'data_type', 'names',
-                               'num_matrice', 'zones', 'file_location', 'file_name']
+                               'num_matrice', 'zones', 'file_location', 'file_name', 'storage_path']
 
         if self.names is None:
             self.names = []
@@ -84,12 +84,6 @@ class AequilibraeMatrix():
         self.matrix = open_memmap(matrix_path, mode='w+', dtype=dtype, shape=shape)
 
 
-    def load(self, path_to_file):
-        self.matrix = open_memmap(path_to_file, mode='r+')
-        self.zones = self.matrix.shape[0]
-        self.names = [x for i, x in self.matrix.dtype]
-        self.names.pop('index')
-
     def __getitem__(self, mat_name):
 
         if mat_name == 'index':
@@ -118,3 +112,27 @@ class AequilibraeMatrix():
             archive = zipfile.ZipFile(file_path, 'w', compression)
             archive.write(self.computation_path, os.path.basename(self.computation_path))
             archive.close()
+
+    def load(self, file_path):
+        f = open(file_path)
+        self.storage_path = os.path.realpath(f.name)
+        f.close()
+
+        self.file_location = tempfile.gettempdir()
+        # We use a random file name for computation to be able to handle multiple matrices with the same name
+        # at the same time
+        self.file_name = 'aequilibrae_array_' + str(uuid.uuid4().hex) + '.npy'
+        self.computation_path = os.path.join(self.file_location, self.file_name)
+
+        # Extract and rename it
+        zip_ref = zipfile.ZipFile(self.storage_path, 'r')
+        zip_ref.extractall(self.file_location)
+        zip_ref.close()
+        os.rename(os.path.join(self.file_location, os.path.basename(self.storage_path)[:-3]+'npy'), self.computation_path)
+
+        # Map in memory and load matrix names plus dimensions
+        self.matrix = open_memmap(self.computation_path, mode='r+')
+        self.zones = self.matrix.shape[0]
+        print self.matrix.dtype
+        self.names = [x for x in self.matrix.dtype.fields]
+        self.names.remove('index')

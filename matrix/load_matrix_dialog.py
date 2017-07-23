@@ -34,6 +34,7 @@ from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.report_dialog import ReportDialog
 from load_matrix_class import LoadMatrix, MatrixReblocking
+from ..aequilibrae.matrix import AequilibraeMatrix
 
 no_omx = False
 try:
@@ -67,6 +68,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.but_load.setEnabled(False)
         self.radio_layer_matrix.clicked.connect(self.change_matrix_type)
         self.radio_npy_matrix.clicked.connect(self.change_matrix_type)
+        self.radio_aeq_matrix.clicked.connect(self.change_matrix_type)
         self.radio_omx_matrix.clicked.connect(self.change_matrix_type)
 
         # For changing the network layer
@@ -230,6 +232,17 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             self.__current_name = new_name
 
             self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type='numpy', file_path=new_name)
+
+
+        if self.radio_aeq_matrix.isChecked():
+            file_types = ["AequilibraE Matrix(*.aem)"]
+            default_type = '.aem'
+            box_name = 'AequilibraE Matrix'
+            new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
+            if new_name is not None:
+                self.matrix = AequilibraeMatrix()
+                self.matrix.load(new_name)
+                self.exit_procedure()
 
         if self.radio_omx_matrix.isChecked():
             pass
