@@ -85,6 +85,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
         self.rdo_color.toggled.connect(self.color_origins)
 
+        self.rdo_scale_auto.toggled.connect(self.set_new_scale)
         self.rdo_scale_custom.toggled.connect(self.set_new_scale)
         
         self.rdo_ramp.toggled.connect(self.color_origins)
@@ -108,7 +109,9 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
     def set_new_scale(self):
         if self.rdo_scale_custom.isChecked():
             self.load_scale_setter()
-
+        else:
+            self.scale = copy.deepcopy(self.default_scale)
+            
     def choose_a_field(self, modified):
         i, j = 'AB', 'BA'
 
@@ -279,12 +282,16 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             dlg2.show()
             dlg2.exec_()
             self.scale = dlg2.scale
-        
+
+        self.rdo_scale_custom.blockSignals(True)
+        self.rdo_scale_auto.blockSignals(True)
         if self.scale == self.default_scale:
             self.rdo_scale_auto.setChecked(True)
         else:
             self.rdo_scale_custom.setChecked(True)
-                
+        self.rdo_scale_auto.blockSignals(False)
+        self.rdo_scale_custom.blockSignals(False)
+        
     def add_bands_to_map(self):
         for item in [self.gbox_scale, self.but_run, self.but_set_scale, self.mMapLayerComboBox, self.but_add_band,
                      self.rdo_color, self.rdo_ramp]:
