@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-24
- Updated:    2017-02-26
+ Updated:    2017-07-24
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -28,11 +28,13 @@ from PyQt4 import uic
 from qgis.gui import QgsMapLayerProxyModel
 import sys
 import os
+import copy
 
 from random import randint
 from ..common_tools.auxiliary_functions import *
 
 from set_color_ramps_dialog import LoadColorRampSelector
+from bandwidth_scale_dialog import BandwidthScaleDialog
 
 sys.modules['qgsfieldcombobox'] = qgis.gui
 sys.modules['qgscolorbuttonv2'] = qgis.gui
@@ -46,6 +48,12 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
         
         self.tot_bands = 0
+        self.default_scale = {'width': 10,
+                              'spacing': 0.1,
+                              'max_flow': -1}
+        
+        self.scale = copy.deepcopy(self.default_scale)
+        
         self.band_size = 10.0
         self.space_size = 0.01
         self.layer = None
@@ -58,22 +66,6 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
         self.ab_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, 'AB'))
         self.ba_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, 'BA'))
-
-        # space slider
-        self.slider_spacer.setMinimum(1)
-        self.slider_spacer.setMaximum(30)
-        self.slider_spacer.setValue(1)
-        self.slider_spacer.setTickPosition(QSlider.TicksBelow)
-        self.slider_spacer.setTickInterval(5)
-        self.slider_spacer.valueChanged.connect(self.spacevaluechange)
-
-        # band slider
-        self.slider_band_size.setMinimum(5)
-        self.slider_band_size.setMaximum(150)
-        self.slider_band_size.setValue(50)
-        self.slider_band_size.setTickPosition(QSlider.TicksBelow)
-        self.slider_band_size.setTickInterval(5)
-        self.slider_band_size.valueChanged.connect(self.sizevaluechange)
 
         #List of bands
         self.bands_list.setColumnWidth(0, 210)
@@ -96,10 +88,10 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.but_run.setEnabled(False)
 
         self.but_load_ramp.clicked.connect(self.load_ramp_action)
+        self.but_set_scale.clicked.connect(self.load_scale_setter)
+        
         self.add_fields_to_cboxes()
         self.random_rgb()
-        self.sizevaluechange()
-        self.spacevaluechange()
         self.set_initial_value_if_available()
         self.but_load_ramp.setEnabled(False)
 
@@ -138,29 +130,17 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                     self.ab_FieldComboBox.setCurrentIndex(index)
                 break
 
-    def spacevaluechange(self):
-        self.space_size = self.slider_spacer.value() / 100.0
-        self.lbl_space.setText("{:3,.2f}".format(self.space_size))
-
-    def sizevaluechange(self):
-        self.band_size = self.slider_band_size.value() / 5.0
-        self.lbl_width.setText("{:3,.2f}".format(self.band_size))
-
-    # # Method for removing a line from the table with a double click
-    # def slot_double_clicked(self, mi):
-    #     row = mi.row()
-    #     if row > -1:
-    #         self.bands_list.removeRow(row)
-    #         self.tot_bands -= 1
-
     def add_fields_to_cboxes(self):
-        self.layer = get_vector_layer_by_name(self.mMapLayerComboBox.currentText())
-        if self.layer is not None:
-            self.but_load_ramp.setEnabled(True)
-        else:
-            self.but_load_ramp.setEnabled(False)
-        self.ab_FieldComboBox.setLayer(self.layer)
-        self.ba_FieldComboBox.setLayer(self.layer)
+        if self.mMapLayerComboBox.currentIndex()> 0:
+            self.layer = get_vector_layer_by_name(self.mMapLayerComboBox.currentText())
+            if self.layer is not None:
+                self.but_load_ramp.setEnabled(True)
+            else:
+                self.but_load_ramp.setEnabled(False)
+            self.ab_FieldComboBox.setLayer(self.layer)
+            self.ba_FieldComboBox.setLayer(self.layer)
+        # except:
+        #     pass
 
     def add_to_bands_list(self):
         if self.ab_FieldComboBox.currentIndex() >= 0 and self.ba_FieldComboBox.currentIndex() >= 0:
@@ -286,12 +266,23 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             if dlg2.results is not None:
                 self.ramps = dlg2.results
                 self.txt_ramp.setText(str(self.ramps))
-
+                
+    def load_scale_setter(self):
+        if self.layer is not None:
+            self.ramps = None
+            dlg2 = BandwidthScaleDialog(self.iface, self.layer, self.scale, self.default_scale)
+            dlg2.show()
+            dlg2.exec_()
+            self.scale = dlg2.scale
+                
     def add_bands_to_map(self):
-        self.but_run.setEnabled(False)
-        self.band_size = str(self.band_size)
-        self.space_size = str(self.space_size)
-
+        for item in [self.gbox_scale, self.but_run, self.but_set_scale, self.mMapLayerComboBox, self.but_add_band,
+                     self.rdo_color, self.rdo_ramp]:
+            item.setEnabled(False)
+        
+        band_size = str(self.scale['width'])
+        space_size = str(self.scale['spacing'])
+        max_value = int(self.scale['max_flow'])
         # define the side of the plotting based on the side of the road the system has defined
         ab = -1
         if self.drive_side == 'right':
@@ -307,7 +298,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             for j in range(2):
                 field = self.bands_list.item(i, j).text()
                 idx = self.layer.fieldNameIndex(field)
-                values.append(self.layer.maximumValue(idx))
+                if max_value < 0:
+                    values.append(self.layer.maximumValue(idx))
 
                 # we also build a list of bands to construct
                 # The function "(2 * j -1) * ba"  maps the index j {1,2} and the direction to the side of the
@@ -319,20 +311,21 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 cl = eval(self.bands_list.item(i, 2).text())
             bands_ab.append((self.bands_list.item(i, 0).text(), ab, cl, 'ab'))
             bands_ba.append((self.bands_list.item(i, 1).text(), ba, cl, 'ba'))
-        sides = [bands_ab, bands_ba]
-        max_value = max(values)
+        
+        if max_value < 0:
+            max_value = max(values)
 
-        for s in sides:
+        for s in [bands_ab, bands_ba]:
             acc_offset = '0'
             for field, side, clr, direc in s:
                 symbol_layer = QgsSimpleLineSymbolLayerV2.create({})
                 props = symbol_layer.properties()
-                width = '(coalesce(scale_linear("' + field + '", 0, ' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
+                width = '(coalesce(scale_linear("' + field + '", 0, ' + str(max_value) + ', 0, ' + band_size + '), 0))'
                 props['width_dd_expression'] = width
 
                 props['offset_dd_expression'] = acc_offset + '+' + str(side) + ' * (coalesce(scale_linear("' + field + \
-                                                '", 0, ' + str(max_value) + ', 0, ' + self.band_size + '), 0)/2 + ' + \
-                                                self.space_size + ')'
+                                                '", 0, ' + str(max_value) + ', 0, ' + band_size + '), 0)/2 + ' + \
+                                                space_size + ')'
                 if isinstance(clr, dict):
                     if direc == 'ab':
                         props['color_dd_expression'] = "ramp_color(\'" + clr[
@@ -349,14 +342,10 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 symbol_layer = QgsSimpleLineSymbolLayerV2.create(props)
                 self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
 
-                acc_offset = acc_offset + ' + ' + str(side) + '*(' + width + '+' + self.space_size + ')'
+                acc_offset = acc_offset + ' + ' + str(side) + '*(' + width + '+' + space_size + ')'
 
         self.layer.triggerRepaint()
         self.exit_procedure()
 
     def exit_procedure(self):
         self.close()
-
-
-if __name__ == '__main__':
-    main()
