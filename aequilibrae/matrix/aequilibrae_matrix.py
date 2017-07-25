@@ -55,6 +55,11 @@ class AequilibraeMatrix():
         self.reserved_names = ['matrix', 'matrix_hash', 'data_type', 'names',
                                'num_matrice', 'zones', 'file_location', 'file_name', 'storage_path']
 
+        # methods that will be used for computation
+        self.matrix_view = None
+        self.view_names = None
+
+
         if self.names is None:
             self.names = []
             for i in range(self.num_matrices):
@@ -133,6 +138,19 @@ class AequilibraeMatrix():
         # Map in memory and load matrix names plus dimensions
         self.matrix = open_memmap(self.computation_path, mode='r+')
         self.zones = self.matrix.shape[0]
-        print self.matrix.dtype
         self.names = [x for x in self.matrix.dtype.fields]
         self.names.remove('index')
+        self.num_matrices = len(self.names)
+        self.data_type = self.matrix.dtype[0]
+
+    def computational_view(self, core_list = None):
+        if core_list is None:
+            core_list = self.names
+        if isinstance(core_list,list):
+            partial_mat = self.matrix[[core_list]]
+            self.matrix_view = partial_mat.view(np.float64).reshape(partial_mat.shape + (-1,))
+            self.view_names = core_list
+        else:
+            self.matrix_view = None
+            self.view_names = None
+            raise ('Please provide a list of matrices')
