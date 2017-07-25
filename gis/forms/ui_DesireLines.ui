@@ -10,11 +10,20 @@
     <x>0</x>
     <y>0</y>
     <width>710</width>
-    <height>445</height>
+    <height>444</height>
    </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>715</width>
+    <height>444</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Aequilibrae - Desire Lines toolbox</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -131,7 +140,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Status Message 0</string>
+    <string>...</string>
    </property>
   </widget>
   <widget class="QPushButton" name="but_load_new_matrix">
@@ -282,10 +291,10 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QTableWidget" name="tableWidget">
+  <widget class="QTableWidget" name="tbl_array_cores">
    <property name="geometry">
     <rect>
-     <x>390</x>
+     <x>384</x>
      <y>25</y>
      <width>311</width>
      <height>331</height>
@@ -430,7 +439,7 @@
   <zorder>cancel</zorder>
   <zorder>radio_delaunay</zorder>
   <zorder>radio_desire</zorder>
-  <zorder>tableWidget</zorder>
+  <zorder>tbl_array_cores</zorder>
   <zorder>line</zorder>
   <zorder>line_2</zorder>
   <zorder>chb_use_all_matrices</zorder>

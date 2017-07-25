@@ -3,7 +3,7 @@
  Package:    AequilibraE
 
  Name:       Loads GUI for creating desire lines
- Purpose:    Creatind desire and delaunay lines
+ Purpose:    Creating desire and delaunay lines
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -26,8 +26,6 @@ from PyQt4.QtGui import *
 from PyQt4 import uic
 import sys
 import os
-import numpy as np
-from scipy.sparse import coo_matrix
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
@@ -56,11 +54,17 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.columns = None
         self.matrix_hash =None
 
+        self.resize(383, 385)
+        self.setMaximumSize(QSize(383, 385))
+
         # FIRST, we connect slot signals
         # For changing the input matrix
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
 
         self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+
+        self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
+
 
         # Create desire lines
         self.create_dl.clicked.connect(self.run)
@@ -76,6 +80,40 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
 
                     self.progress_label.setVisible(False)
                     self.progressbar.setVisible(False)
+
+    def set_show_matrices(self):
+        self.tbl_array_cores.clear()
+        if self.chb_use_all_matrices.isChecked():
+            self.resize(383, 385)
+            self.setMaximumSize(QSize(383, 385))
+        else:
+            self.setMaximumSize(QSize(710, 385))
+            self.resize(710, 385)
+            self.tbl_array_cores.setColumnWidth(0, 200)
+            self.tbl_array_cores.setColumnWidth(1, 80)
+            self.tbl_array_cores.setHorizontalHeaderLabels(["Matrix","Use?"])
+
+            if self.matrix is not None:
+                table = self.tbl_array_cores
+                table.setRowCount(self.matrix.num_matrices)
+                for i, mat in enumerate(self.matrix.names):
+                    item1 = QTableWidgetItem(mat)
+                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    table.setItem(i, 0, item1)
+
+                    chb1 = QCheckBox()
+                    chb1.setChecked(True)
+                    chb1.setEnabled(True)
+                    table.setCellWidget(i, 1, self.centers_item(chb1))
+
+    def centers_item(self, item):
+        cell_widget = QWidget()
+        lay_out = QHBoxLayout(cell_widget)
+        lay_out.addWidget(item)
+        lay_out.setAlignment(Qt.AlignCenter)
+        lay_out.setContentsMargins(0, 0, 0, 0)
+        cell_widget.setLayout(lay_out)
+        return cell_widget
 
     def run_thread(self):
         QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
@@ -94,14 +132,12 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 if field.type() in numeric_types:
                     self.zone_id_field.addItem(field.name())
 
-
     def find_matrices(self):
-        dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True)
+        dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=True)
         dlg2.show()
         dlg2.exec_()
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
-
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
@@ -128,13 +164,40 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 dlg2.exec_()
         self.exit_procedure()
 
-    def run(self):
-        if self.matrix is not None:
+    def check_all_inputs(self):
+        if self.matrix is None:
+            return False
 
+        if self.zoning_layer.currentIndex() < 0:
+            return False
+
+        if self.zone_id_field.currentIndex() < 0:
+            return False
+
+        if self.chb_use_all_matrices.isChecked():
+            matrix_cores_to_use = self.matrix.names
+        else:
+            matrix_cores_to_use = []
+            for i, mat in enumerate(self.matrix.names):
+                if self.tbl_array_cores.cellWidget(i, 1).findChildren(QCheckBox)[0].isChecked():
+                    matrix_cores_to_use.append(mat)
+
+        if len(matrix_cores_to_use) > 0:
+            self.matrix.computational_view(matrix_cores_to_use)
+        else:
+            return False
+
+
+    def run(self):
+        if self.check_all_inputs():
+        # Sets the visual of the tool
             self.lbl_funding1.setVisible(False)
             self.lbl_funding2.setVisible(False)
             self.progress_label.setVisible(True)
             self.progressbar.setVisible(True)
+
+            self.resize(710, 444)
+            self.setMaximumSize(QSize(710, 444))
 
             dl_type = 'DesireLines'
             if self.radio_delaunay.isChecked():
@@ -144,7 +207,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                                                         self.zone_id_field.currentText(), self.matrix, self.matrix_hash, dl_type)
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage("Matrix not loaded", '', level=3)
+            qgis.utils.iface.messageBar().pushMessage("Inputs not loaded properly. You need the layer and at least one matrix core", '', level=3)
 
     def throws_error(self, error_message):
         error_message = ["*** ERROR ***", error_message]
