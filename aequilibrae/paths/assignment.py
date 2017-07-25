@@ -65,6 +65,7 @@ def all_or_nothing(matrix, graph, results):
         pool.close()
         pool.join()
     results.link_loads = np.sum(aux_res.temp_link_loads, axis=1)
+    del aux_res
     return report
 
 

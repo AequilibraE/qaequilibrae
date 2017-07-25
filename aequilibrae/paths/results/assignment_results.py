@@ -43,24 +43,29 @@ class AssignmentResults:
         # We set the critical analysis, link extraction and path file saving to False
 
     # In case we want to do by hand, we can prepare each method individually
-    def prepare(self, graph, matrix=None):
+    def prepare(self, graph, matrix):
 
-        self.nodes = graph.num_nodes + 1
-        self.zones = graph.centroids + 1
-        self.links = graph.num_links + 1
-        self.num_skims = graph.skims.shape[1]
+        if matrix.view_names is None:
+            raise ('Please set the matrix computational view')
+        else:
+            self.classes['number'] = matrix.matrix_view.shape[2]
+            self.classes['names'] = matrix.view_names
 
-        self.lids = graph.graph['link_id']
-        self.direcs = graph.graph['direction']
-        self.__redim()
-        self.__graph_id__ = graph.__id__
+        if graph is None:
+            raise ('Please provide a graph')
+        else:
+            self.nodes = graph.num_nodes + 1
+            self.zones = graph.centroids + 1
+            self.links = graph.num_links + 1
+            self.num_skims = graph.skims.shape[1]
 
-        self.setSavePathFile(False)
-        self.setCriticalLinks(False)
+            self.lids = graph.graph['link_id']
+            self.direcs = graph.graph['direction']
+            self.__redim()
+            self.__graph_id__ = graph.__id__
 
-        if matrix is not None:
-            self.classes['number'] = matrix.num_matrices
-            self.classes['names'] = list(matrix.names.keys())
+            self.setSavePathFile(False)
+            self.setCriticalLinks(False)
 
     def reset(self):
         if self.link_loads is not None:
