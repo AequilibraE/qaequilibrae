@@ -62,6 +62,8 @@ class DesireLinesProcedure(WorkerThread):
 
     def doWork(self):
         if self.error is None:
+            mat_view = self.matrix.matrix_view
+            classes = mat_view.shape[2]
             layer = get_vector_layer_by_name(self.layer)
             idx = layer.fieldNameIndex(self.id_field)
 
@@ -92,32 +94,35 @@ class DesireLinesProcedure(WorkerThread):
 
             desireline_layer = QgsVectorLayer("LineString?crs=epsg:" + str(EPSG_code), self.dl_type, "memory")
             dlpr = desireline_layer.dataProvider()
-            dlpr.addAttributes([QgsField("link_id", QVariant.Int),
+            fields = [QgsField("link_id", QVariant.Int),
                               QgsField("A_Node", QVariant.Int),
                               QgsField("B_Node", QVariant.Int),
                               QgsField("direct", QVariant.Int),
-                              QgsField("length",  QVariant.Double),
-                              QgsField("ab_flow",  QVariant.Double),
-                              QgsField("ab_flow",  QVariant.Double),
-                              QgsField("tot_flow",  QVariant.Double)])
+                              QgsField("length",  QVariant.Double)]
+            for f in self.matrix.view_names:
+                fields.extend([QgsField(f + '_ab',  QVariant.Double),
+                              QgsField(f + '_ba',  QVariant.Double),
+                              QgsField(f + '_tot',  QVariant.Double)])
+
+            dlpr.addAttributes(fields)
             desireline_layer.updateFields()
 
 
             if self.dl_type == "DesireLines":
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Creating Desire Lines"))
-                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, self.matrix.shape[0]*self.matrix.shape[1]/2))
+                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, self.matrix.zones**2/2))
 
                 desireline_link_id = 1
                 q = 0
                 all_features = []
-                for i in range(self.matrix.shape[0]):
-                    if np.sum(self.matrix[i, :]) > 0:
+                for i in range(mat_view.shape[0]):
+                    if np.sum(mat_view[i, :, :]) > 0:
                         a_node = reverse_hash[i]
-                        for j in xrange(i + 1, self.matrix.shape[1]):
+                        for j in xrange(i + 1, mat_view.shape[1]):
                             q += 1
                             b_node = reverse_hash[j]
                             self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
-                            if self.matrix[i, j] + self.matrix[j, i] > 0:
+                            if np.sum(mat_view[i, j, :]) + np.sum(mat_view[j, i, :]) > 0:
                                 if a_node in all_centroids.keys() and b_node in all_centroids.keys():
                                     a_point = all_centroids[a_node]
                                     a_point = QgsPoint(a_point[0], a_point[1])
@@ -126,16 +131,19 @@ class DesireLinesProcedure(WorkerThread):
                                     dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
                                     feature = QgsFeature()
                                     feature.setGeometry(QgsGeometry.fromPolyline([a_point, b_point]))
-                                    feature.setAttributes([desireline_link_id, int(a_node), int(b_node), 0, dist,
-                                                           float(self.matrix[i ,j]), float(self.matrix[j, i]),
-                                                           float(self.matrix[i, j] + self.matrix[j, i])])
+                                    attrs = [desireline_link_id, int(a_node), int(b_node), 0, dist]
+                                    for c in range(classes):
+                                        attrs.extend([float(mat_view[i, j, c]), float(mat_view[j, i, c]),
+                                                       float(mat_view[i, j, c]) + float(mat_view[j, i, c])])
+
+                                    feature.setAttributes(attrs)
                                     all_features.append(feature)
                                     desireline_link_id += 1
                                 else:
-                                    tu = (a_node, b_node, self.matrix[i, j], self.matrix[j, i])
-                                    self.report.append('No centroids available to depict flow between node {0} and node {1}. AB flow was equal to {2} and BA flow was equal to {3}'.format(*tu))
+                                    tu = (a_node, b_node, np.sum(mat_view[i, j, :]), np.sum(mat_view[j, i, :]))
+                                    self.report.append('No centroids available to depict flow between node {0} and node {1}. Total AB flow was equal to {2} and total BA flow was equal to {3}'.format(*tu))
                     else:
-                        q += self.matrix.shape[1]
+                        q += self.matrix.zones
                         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
 
 
@@ -224,27 +232,23 @@ class DesireLinesProcedure(WorkerThread):
                 self.graph.set_graph(matrix_nodes, cost_field='length', block_centroid_flows=False)
                 self.results = AssignmentResults()
                 self.results.prepare(self.graph, self.matrix)
-                # self.results.set_cores(1)
 
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Assigning demand"))
-                # Do the assignment
-                #self.all_or_nothing(self.matrix, self.graph, self.results)
-                self.report = all_or_nothing(self.matrix.matrix, self.graph, self.results)
-
+                self.report = all_or_nothing(self.matrix, self.graph, self.results)
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Collecting results"))
                 f = self.results.link_loads
 
-                link_loads = np.zeros((f.shape[0] + 1, 2))
+                link_loads = np.zeros((f.shape[0] + 1, 2, classes))
                 self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, f.shape[0] - 1))
                 for i in range(f.shape[0] - 1):
                     self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, i))
                     direction = self.graph.graph['direction'][i]
                     link_id = self.graph.graph['link_id'][i]
-                    flow = f[i]
+                    flow = f[i, :]
                     if direction == 1:
-                        link_loads[link_id, 0] = flow
+                        link_loads[link_id, 0, :] = flow[:]
                     else:
-                        link_loads[link_id, 1] = flow
+                        link_loads[link_id, 1, :] = flow[:]
 
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Building resulting layer"))
                 features = []
@@ -264,9 +268,12 @@ class DesireLinesProcedure(WorkerThread):
                     feature = QgsFeature()
                     feature.setGeometry(QgsGeometry.fromPolyline([a_point, b_point]))
                     desireline_link_id = dl_link_ids[a_node][b_node]
-                    feature.setAttributes([desireline_link_id, a_node, b_node, 0, dist,
-                                           float(link_loads[desireline_link_id, 0]), float(link_loads[desireline_link_id, 1]),
-                                           float(link_loads[desireline_link_id, 0] + link_loads[desireline_link_id, 1])])
+                    attr = [desireline_link_id, a_node, b_node, 0, dist]
+                    for c in range(classes):
+                        attr.extend([float(link_loads[desireline_link_id, 0, c]),
+                                     float(link_loads[desireline_link_id, 1, c]),
+                                     float(link_loads[desireline_link_id, 0, c]) + float(link_loads[desireline_link_id, 1, c])])
+                    feature.setAttributes(attr)
                     features.append(feature)
                 a = dlpr.addFeatures(features)
                 self.result_layer = desireline_layer

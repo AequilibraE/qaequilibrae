@@ -54,31 +54,34 @@ def all_or_nothing(matrix, graph, results):
         raise ValueError('The results object was not prepared. Use results.prepare(graph)')
     elif results.__graph_id__ != graph.__id__:
         raise ValueError('The results object was prepared for a different graph')
+    elif matrix.matrix_view is None:
+        raise ValueError('Matrix was not prepared for assignment. '
+                         'Please create a matrix view with all classes you want to assign')
     else:
+        mat = matrix.matrix_view
         pool = ThreadPool(results.cores)
         all_threads = {'count': 0}
         report = []
-        for O in range(matrix.shape[0]):
-            a = matrix[O, :]
-            if np.sum(a) > 0:
-                pool.apply_async(func_assig_thread, args=(O, a, graph, results, aux_res, all_threads, report))
+        for O in range(matrix.zones):
+            if np.sum(mat[O, :, :]) > 0:
+                pool.apply_async(func_assig_thread, args=(O, matrix, graph, results, aux_res, all_threads, report))
         pool.close()
         pool.join()
-    results.link_loads = np.sum(aux_res.temp_link_loads, axis=1)
+    results.link_loads = np.sum(aux_res.temp_link_loads, axis=2)
     del aux_res
     return report
 
 
-def func_assig_thread(O, a, g, res, aux_res, all_threads, report):
+def func_assig_thread(O, matrix, g, res, aux_res, all_threads, report):
     if thread.get_ident() in all_threads:
         th = all_threads[thread.get_ident()]
     else:
         all_threads[thread.get_ident()] = all_threads['count']
         th = all_threads['count']
         all_threads['count'] += 1
-    a = one_to_all(O, a, g, res, aux_res, th)
-    if a != O:
-        report.append(a)
+    x = one_to_all(O, matrix, g, res, aux_res, th)
+    if x != O:
+        report.append(x)
 
 
 if __name__ == '__main__':

@@ -30,8 +30,8 @@ from libc.stdlib cimport abort, malloc, free
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
-def one_to_all(origin, demand, graph, result, aux_result, curr_thread):
-    cdef int nodes, O, i, centroids, block_flows_through_centroids
+def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
+    cdef int nodes, O, i, centroids, block_flows_through_centroids, classes
     cdef int critical_queries = 0
     cdef int link_extract_queries, query_type
     #We transform the python variables in Cython variables
@@ -68,7 +68,8 @@ def one_to_all(origin, demand, graph, result, aux_result, curr_thread):
 
     # In order to release the GIL for this procedure, we create all the
     # memory views we will need
-    cdef double [:] demand_view = demand
+    cdef double [:, :] demand_view = matrix.matrix_view[origin, :, :]
+    classes = matrix.matrix_view.shape[2]
 
     # views from the graph
     cdef int [:] graph_fs_view = graph.fs
@@ -86,8 +87,8 @@ def one_to_all(origin, demand, graph, result, aux_result, curr_thread):
     cdef double [:, :] skim_matrix_view = aux_result.temporary_skims[:, :, curr_thread]
     cdef int [:] reached_first_view = aux_result.reached_first[:, curr_thread]
     cdef int [:] conn_view = aux_result.connectors[:, curr_thread]
-    cdef double [:] link_loads_view = aux_result.temp_link_loads[:, curr_thread]
-    cdef double [:] node_load_view = aux_result.temp_node_loads[:, curr_thread]
+    cdef double [:, :] link_loads_view = aux_result.temp_link_loads[:, curr_thread]
+    cdef double [:, :] node_load_view = aux_result.temp_node_loads[:, curr_thread]
     cdef int [:] b_nodes_view = aux_result.temp_b_nodes
 
     # path file variables
@@ -116,6 +117,7 @@ def one_to_all(origin, demand, graph, result, aux_result, curr_thread):
                          reached_first_view)
 
         network_loading(O,
+                        classes,
                         nodes,
                         demand_view,
                         predecessors_view,
@@ -143,6 +145,7 @@ def one_to_all(origin, demand, graph, result, aux_result, curr_thread):
             query_type = 1
         with nogil:
             perform_select_link_analysis(O,
+                                         classes,
                                          nodes,
                                          demand_view,
                                          predecessors_view,
@@ -156,17 +159,18 @@ def one_to_all(origin, demand, graph, result, aux_result, curr_thread):
 @cython.embedsignature(True)
 @cython.boundscheck(False) # turn of bounds-checking for entire function
 cpdef void network_loading(int origin,
-                      int nodes,
-                      double[:] demand,
-                      int [:] pred,
-                      int [:] conn,
-                      double[:] link_loads,
-                      int [:] no_path,
-                      int [:] reached_first,
-                      double [:] node_load,
-                      int found) nogil:
+                           int classes,
+                           int nodes,
+                           double[:, :] demand,
+                           int [:] pred,
+                           int [:] conn,
+                           double[:, :] link_loads,
+                           int [:] no_path,
+                           int [:] reached_first,
+                           double [:, :] node_load,
+                           int found) nogil:
 
-    cdef unsigned int i, node, predecessor, connector
+    cdef unsigned int i, j, node, predecessor, connector
     cdef unsigned int zones = demand.shape[0]
     cdef int N = node_load.shape[0]
 
@@ -175,8 +179,9 @@ cpdef void network_loading(int origin,
         node_load[i] = 0
 
     # Loads the demand to the centroids
-    for i in range(zones):
-        node_load[i] = demand[i]
+    for j in range(classes):
+        for i in range(zones):
+            node_load[i, j] = demand[i, j]
 
     #Recursevely cascades to the origin
     for i in xrange(found, 0, -1):
@@ -186,11 +191,12 @@ cpdef void network_loading(int origin,
         predecessor = pred[node]
         connector = conn[node]
 
-        # loads the flow to the link
-        link_loads[connector] += node_load[node]
+        # loads the flow to the links for each class
+        for j in range(classes):
+            link_loads[connector, j] += node_load[node, j]
 
-        # Cascades the load from the node to their predecessor
-        node_load[predecessor] += node_load[node]
+            # Cascades the load from the node to their predecessor
+            node_load[predecessor, j] += node_load[node, j]
 
 
 @cython.wraparound(False)
@@ -217,20 +223,24 @@ cdef return_an_int_view(input):
 @cython.embedsignature(True)
 @cython.boundscheck(False)
 cpdef void perform_select_link_analysis(int origin,
+                                        int classes,
                                         int nodes,
-                                        double[:] demand,
+                                        double[:, :] demand,
                                         int [:] pred,
                                         int [:] conn,
                                         int [:] aux_link_flows,
                                         double [:, :] critical_array,
                                         int query_type) nogil:
     cdef unsigned int t_origin
-    cdef ITYPE_t c, j, i, p,
+    cdef ITYPE_t c, j, i, p, l
     cdef unsigned int dests = demand.shape[0]
     cdef unsigned int q = critical_array.shape[0]
 
+    """ TODO:
+    FIX THE SELECT LINK ANALYSIS FOR MULTIPLE CLASSES"""
+    l = 0
     for j in range(dests):
-        if demand[j] > 0:
+        if demand[j, l] > 0:
             p = pred[j]
             j = i
             while p >= 0:

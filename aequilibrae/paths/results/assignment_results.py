@@ -153,32 +153,37 @@ class AssignmentResults:
                    'sqlite' for sqlite databases
     Returns:
         Nothing'''
+        headers = ['link']
         if output == 'loads':
-            dt = [('Link ID', np.int), ('AB Flow', np.float), ('BA Flow', np.float), ('Tot Flow', np.float)]
-            res = np.zeros(np.max(self.lids) + 1, dtype=dt)
+            dt = [('Link ID', np.int)]
+            for n in self.classes['names']:
+                dt.extend([(n + '_ab', np.float), (n + '_ba', np.float), (n + '_tot', np.float)])
+                headers.extend(n + '_ab', n + '_ba', n + '_tot')
+            res = np.zeros((np.max(self.lids) + 1, self.classes['number']), dtype=dt)
 
             res['Link ID'][:] = np.arange(np.max(self.lids) + 1)[:]
 
             # Indices of links BA and AB
             ABs = self.direcs < 0
             BAs = self.direcs > 0
+            ab_ids = self.lids[ABs]
+            ba_ids = self.lids[BAs]
 
-            link_flows = self.link_loads[:-1]
+            # Link flows
+            link_flows = self.link_loads[:-1, :]
+            for i in enumerate(self.classes['names']):
+                n = self.classes['names'][i]
+                # AB Flows
+                res[n + '_ab'][ab_ids] = link_flows[ABs, :]
+                # BA Flows
+                res[n + '_ba'][ba_ids] = link_flows[BAs, :]
 
-            # AB Flows
-            link_ids = self.lids[ABs]
-            res['AB Flow'][link_ids] = link_flows[ABs]
-
-            # BA Flows
-            link_ids = self.lids[BAs]
-            res['BA Flow'][link_ids] = link_flows[BAs]
-
-            # Tot Flow
-            res['Tot Flow'] = res['AB Flow'] + res['BA Flow']
+                # Tot Flow
+                res[n + '_tot'] = res[n + '_ab'] + res[n + '_ba']
 
             # Save to disk
             if file_type == 'csv':
-                np.savetxt(output_file_name, res, fmt="%d "+",%1.10f"*3, header='Link_ID,AB Flow,BA Flow,Tot Flow')
+                np.savetxt(output_file_name, res, fmt="%d "+",%1.10f"*3, header=headers)
 
             if file_type == 'sqlite':
             # Connecting to the database file
@@ -186,9 +191,16 @@ class AssignmentResults:
                 c = conn.cursor()
             # Creating the flows table
                 c.execute('''DROP TABLE IF EXISTS link_flows''')
-                c.execute('''CREATE TABLE link_flows (link_id INTEGER PRIMARY KEY, ab_flow REAL, ba_flow REAL, tot_flow REAL)''')
+                fi = ''
+                qm = '?'
+                for f in headers[1:]:
+                    fi += ', ' + f + ' REAL'
+                    qm += ', ?'
 
-                c.executemany('INSERT INTO link_flows VALUES (?,?,?,?)', res)
+                c.execute('''CREATE TABLE link_flows (link_id INTEGER PRIMARY KEY''' + fi + ')''')
+                c.execute('BEGIN TRANSACTION')
+                c.executemany('INSERT INTO link_flows VALUES (' + qm + ')', res)
+                c.execute('END TRANSACTION')
                 conn.commit()
                 conn.close()
 
@@ -199,6 +211,7 @@ class AssignmentResults:
             # Creating the flows table
             c.execute('''DROP TABLE IF EXISTS path_file''')
             c.execute('''CREATE TABLE path_file (origin_zone INTEGER, node INTEGER, predecessor INTEGER)''')
+            c.execute('BEGIN TRANSACTION')
 
             path_file = path_file = self.path_file['results']
             for i in range(self.zones):
@@ -207,7 +220,7 @@ class AssignmentResults:
                 data[:,1] = path_file[i,:,0]
                 data[:,2] = path_file[i,:,1]
                 c.executemany('''INSERT INTO path_file VALUES(?, ?, ?)''', data)
-
+            c.execute('END TRANSACTION')
             conn.commit()
             conn.close()
 

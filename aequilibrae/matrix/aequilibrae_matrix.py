@@ -29,10 +29,10 @@ import zipfile
 
 
 # Necessary in case we are no the QGIS world
-try:
-    from common_tools.auxiliary_functions import logger
-except:
-    pass
+# try:
+#     from common_tools.auxiliary_functions import logger
+# except:
+#     pass
 
 class AequilibraeMatrix():
     def __init__(self, **kwargs):
@@ -88,8 +88,7 @@ class AequilibraeMatrix():
         matrix_path = os.path.join(self.file_location, self.file_name)
         self.matrix = open_memmap(matrix_path, mode='w+', dtype=dtype, shape=shape)
 
-
-    def __getitem__(self, mat_name):
+    def __getattr__(self, mat_name):
 
         if mat_name == 'index':
             return self.matrix['index'][:,0]
@@ -98,7 +97,7 @@ class AequilibraeMatrix():
             return self.matrix[mat_name]
 
         raise AttributeError("No such method or matrix core! --> " + str(mat_name))
-    
+
     def save_to_disk(self, file_path= None, compressed=True):
             if compressed:
                 compression = zipfile.ZIP_DEFLATED
@@ -142,12 +141,13 @@ class AequilibraeMatrix():
         self.names.remove('index')
         self.num_matrices = len(self.names)
         self.data_type = self.matrix.dtype[0]
+        self.matrix_hash = {self.index[i]: i for i in range(self.zones)}
 
     def computational_view(self, core_list = None):
         if core_list is None:
             core_list = self.names
-        if isinstance(core_list,list):
-            partial_mat = self.matrix[[core_list]]
+        if isinstance(core_list, list):
+            partial_mat = self.matrix[core_list]
             self.matrix_view = partial_mat.view(np.float64).reshape(partial_mat.shape + (-1,))
             self.view_names = core_list
         else:

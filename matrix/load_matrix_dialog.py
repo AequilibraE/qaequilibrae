@@ -215,7 +215,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             if self.error is None:
                 self.compressed.setVisible(False)
                 self.progress_label.setVisible(True)
-                self.__current_name = self.matrix_layer.currentText()
+                self.__current_name = self.matrix_layer.currentText().lower().replace(' ', '_')
                 idx1 = self.layer.fieldNameIndex(self.field_from.currentText())
                 idx2 = self.layer.fieldNameIndex(self.field_to.currentText())
                 idx3 = self.layer.fieldNameIndex(self.field_cells.currentText())
@@ -289,7 +289,9 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
     def change_matrix_name(self, item):
         row = item.row()
-        new_name = self.matrix_list_view.item(row, 0).text()
+        new_name = self.matrix_list_view.item(row, 0).text().lower().replace(' ', '_')
+        item_1 = QTableWidgetItem(new_name)
+        self.matrix_list_view.setItem(row, 0, item_1)
 
         current_names = []
         for i in range(self.matrix_count):

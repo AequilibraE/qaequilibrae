@@ -26,6 +26,7 @@ from PyQt4.QtGui import *
 from PyQt4 import uic
 import sys
 import os
+import copy
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
@@ -52,7 +53,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.path = standard_path()
         self.zones = None
         self.columns = None
-        self.matrix_hash =None
+        self.matrix_hash = {}
 
         self.resize(383, 385)
         self.setMaximumSize(QSize(383, 385))
@@ -138,6 +139,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         dlg2.exec_()
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
+            self.set_show_matrices()
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
@@ -183,9 +185,15 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                     matrix_cores_to_use.append(mat)
 
         if len(matrix_cores_to_use) > 0:
+            logger(matrix_cores_to_use)
             self.matrix.computational_view(matrix_cores_to_use)
         else:
             return False
+
+        # We build the matrix hash from the matrix index
+        self.matrix_hash = copy.deepcopy(self.matrix.matrix_hash)
+
+        return True
 
 
     def run(self):
@@ -195,9 +203,9 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             self.lbl_funding2.setVisible(False)
             self.progress_label.setVisible(True)
             self.progressbar.setVisible(True)
+            self.setMaximumSize(QSize(383, 444))
+            self.resize(383, 444)
 
-            self.resize(710, 444)
-            self.setMaximumSize(QSize(710, 444))
 
             dl_type = 'DesireLines'
             if self.radio_delaunay.isChecked():
