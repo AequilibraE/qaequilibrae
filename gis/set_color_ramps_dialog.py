@@ -144,9 +144,7 @@ class LoadColorRampSelector(QDialog, FORM_CLASS):
         else:
             self.resize(341, 238)
             self.cbb_ab_field.clear()
-            fields = self.layer.pendingFields().toList()
-            fields = [x.name() for x in fields]
-            fields = [x.lower() for x in fields]
+            fields = [x.name().lower() for x in self.layer.pendingFields().toList()]
             for field in fields:
                 if '_ab' in field:
                     if field.replace('_ab', '_ba') in fields:
