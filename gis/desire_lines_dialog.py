@@ -55,8 +55,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.columns = None
         self.matrix_hash = {}
 
-        self.resize(383, 385)
         self.setMaximumSize(QSize(383, 385))
+        self.resize(383, 385)
 
         # FIRST, we connect slot signals
         # For changing the input matrix

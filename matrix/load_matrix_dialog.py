@@ -52,7 +52,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.path = standard_path()
         self.sparse = kwargs.get('sparse', False)
-        self.multiple = kwargs.get('multiple', False)
+        self.multiple = kwargs.get('multiple', True)
         self.allow_single_use = kwargs.get('single_use', False)
         self.output_name = None
         self.layer = None
@@ -93,16 +93,22 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         if no_omx:
             self.radio_omx_matrix.setEnabled(False)
 
-        if self.multiple:
-            self.matrix_list_view.setColumnWidth(0, 100)
+        self.resizing()
+
+    def resizing(self):
+        if self.radio_aeq_matrix.isChecked():
+            self.setMaximumSize(QSize(127, 176))
+            self.resize(127, 176)
+            self.but_permanent_save.setVisible(False)
+        else:
+            self.matrix_list_view.setColumnWidth(0, 180)
             self.matrix_list_view.setColumnWidth(1, 100)
             self.matrix_list_view.setColumnWidth(2, 125)
             self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
             self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
-        else:
-
-            self.matrix_list_view.setVisible(False)
-            self.resize(368, 233)
+            self.setMaximumSize(QSize(501, 349))
+            self.resize(501, 349)
+            self.but_permanent_save.setVisible(True)
         
         self.but_save_for_single_use.setEnabled(False)
         self.but_permanent_save.setEnabled(False)
@@ -136,6 +142,8 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             self.lbl_from.setText('Indices')
             for member in members:
                 member.setVisible(True)
+
+        self.resizing()
 
     def load_fields_to_combo_boxes(self):
         self.but_load.setEnabled(False)
