@@ -10,3 +10,5 @@ def clean_after_tests():
             os.unlink(f)
         except:
             pass
+
+clean_after_tests()
