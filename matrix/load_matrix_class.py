@@ -156,11 +156,11 @@ class MatrixReblocking(WorkerThread):
             for i, j in enumerate(indices):
                 index[j] = i
 
-        self.matrix = AequilibraeMatrix(file_location = self.file_location, file_name = self. file_name,
+        self.matrix = AequilibraeMatrix(file_location = self.file_location, file_name = self.file_name,
                                         zones=compact_shape, cores=self.num_matrices, names=self.matrices.keys(),
                                         dtype = np.float64)
 
-        self.matrix['index'][:] = indices[:]
+        self.matrix.index[:] = indices[:]
 
         k = 0
         self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.num_matrices)
@@ -174,8 +174,8 @@ class MatrixReblocking(WorkerThread):
             else:
                 k += 1
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 1)
-            self.matrix[mat_name][:,:] = coo_matrix((mat['flow'], (mat['from'], mat['to'])),
-                                           shape=(compact_shape, compact_shape)).toarray().astype(np.float64)[:]
+            self.matrix.matrix[mat_name][:,:] = coo_matrix((mat['flow'], (mat['from'], mat['to'])),
+                                           shape=(compact_shape, compact_shape)).toarray().astype(np.float64)
             del(mat)
 
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Matrix Reblocking finalized")

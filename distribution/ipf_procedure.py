@@ -33,7 +33,6 @@ class IpfProcedure(WorkerThread):
     def __init__(self, parentThread, seed, rows, columns):
         WorkerThread.__init__(self, parentThread)
         self.ipf = Ipf(seed, rows, columns)
-        self.error = None
 
     def doWork(self):
         self.ipf.fit()

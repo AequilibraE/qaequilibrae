@@ -9,9 +9,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>456</width>
-    <height>197</height>
+    <width>477</width>
+    <height>168</height>
    </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>477</width>
+    <height>168</height>
+   </size>
   </property>
   <property name="font">
    <font>
@@ -84,10 +90,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>167</y>
-     <width>411</width>
-     <height>23</height>
+     <x>440</x>
+     <y>20</y>
+     <width>31</width>
+     <height>141</height>
     </rect>
    </property>
    <property name="palette">
@@ -132,6 +138,9 @@
    </property>
    <property name="textVisible">
     <bool>true</bool>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
    </property>
   </widget>
   <widget class="QComboBox" name="field_from">

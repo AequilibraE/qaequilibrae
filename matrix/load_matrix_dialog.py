@@ -65,7 +65,6 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.error = None
         self.__current_name = None
 
-        self.but_load.setEnabled(False)
         self.radio_layer_matrix.clicked.connect(self.change_matrix_type)
         self.radio_npy_matrix.clicked.connect(self.change_matrix_type)
         self.radio_aeq_matrix.clicked.connect(self.change_matrix_type)

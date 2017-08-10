@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>546</width>
-    <height>196</height>
+    <width>578</width>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,9 +22,9 @@
   <widget class="QLabel" name="lbl_funding2">
    <property name="geometry">
     <rect>
-     <x>448</x>
-     <y>163</y>
-     <width>101</width>
+     <x>494</x>
+     <y>190</y>
+     <width>81</width>
      <height>21</height>
     </rect>
    </property>
@@ -45,8 +45,8 @@
   <widget class="QLabel" name="lbl_funding1">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>164</y>
+     <x>406</x>
+     <y>191</y>
      <width>101</width>
      <height>20</height>
     </rect>
@@ -66,10 +66,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>161</y>
-     <width>251</width>
-     <height>23</height>
+     <x>180</x>
+     <y>168</y>
+     <width>171</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="palette">
@@ -119,9 +119,9 @@
   <widget class="QLabel" name="progress_label">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>163</y>
-     <width>261</width>
+     <x>360</x>
+     <y>170</y>
+     <width>201</width>
      <height>21</height>
     </rect>
    </property>
@@ -137,10 +137,10 @@
   <widget class="QPushButton" name="but_load_new_matrix">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>151</width>
-     <height>23</height>
+     <x>15</x>
+     <y>15</y>
+     <width>140</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="font">
@@ -152,43 +152,12 @@
     <string>Load seed matrix</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="apply_ipf">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>160</y>
-     <width>140</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Run IPF</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="matrix_name">
-   <property name="geometry">
-    <rect>
-     <x>12</x>
-     <y>40</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>No matrix loaded</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="matrix_total">
    <property name="geometry">
     <rect>
-     <x>12</x>
-     <y>62</y>
-     <width>151</width>
+     <x>380</x>
+     <y>20</y>
+     <width>180</width>
      <height>21</height>
     </rect>
    </property>
@@ -198,16 +167,16 @@
     </font>
    </property>
    <property name="text">
-    <string/>
+    <string>...</string>
    </property>
   </widget>
   <widget class="QPushButton" name="but_load_rows">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>10</y>
-     <width>151</width>
-     <height>23</height>
+     <x>14</x>
+     <y>68</y>
+     <width>140</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="font">
@@ -222,10 +191,10 @@
   <widget class="QPushButton" name="but_load_columns">
    <property name="geometry">
     <rect>
-     <x>385</x>
-     <y>10</y>
-     <width>151</width>
-     <height>23</height>
+     <x>14</x>
+     <y>116</y>
+     <width>140</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="font">
@@ -240,8 +209,8 @@
   <widget class="QLabel" name="columns_name">
    <property name="geometry">
     <rect>
-     <x>387</x>
-     <y>40</y>
+     <x>186</x>
+     <y>120</y>
      <width>151</width>
      <height>21</height>
     </rect>
@@ -258,9 +227,9 @@
   <widget class="QLabel" name="columns_total">
    <property name="geometry">
     <rect>
-     <x>387</x>
-     <y>62</y>
-     <width>151</width>
+     <x>380</x>
+     <y>120</y>
+     <width>180</width>
      <height>21</height>
     </rect>
    </property>
@@ -270,15 +239,15 @@
     </font>
    </property>
    <property name="text">
-    <string/>
+    <string>...</string>
    </property>
   </widget>
   <widget class="QLabel" name="rows_total">
    <property name="geometry">
     <rect>
-     <x>202</x>
-     <y>62</y>
-     <width>141</width>
+     <x>380</x>
+     <y>73</y>
+     <width>180</width>
      <height>21</height>
     </rect>
    </property>
@@ -288,15 +257,15 @@
     </font>
    </property>
    <property name="text">
-    <string/>
+    <string>...</string>
    </property>
   </widget>
   <widget class="QLabel" name="rows_name">
    <property name="geometry">
     <rect>
-     <x>202</x>
-     <y>40</y>
-     <width>141</width>
+     <x>186</x>
+     <y>73</y>
+     <width>161</width>
      <height>21</height>
     </rect>
    </property>
@@ -309,35 +278,27 @@
     <string>No vector loaded</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="but_choose_output_name">
+  <widget class="QPushButton" name="but_choose_output_and_run">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>100</y>
+     <x>15</x>
+     <y>167</y>
      <width>140</width>
-     <height>25</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
     <string>Save Output</string>
    </property>
   </widget>
-  <widget class="QLabel" name="output_name">
+  <widget class="QComboBox" name="cob_matrix_core">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>102</y>
-     <width>371</width>
-     <height>21</height>
+     <x>180</x>
+     <y>15</y>
+     <width>171</width>
+     <height>30</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string/>
    </property>
   </widget>
   <zorder>progress_label</zorder>
@@ -345,8 +306,6 @@
   <zorder>lbl_funding1</zorder>
   <zorder>progressbar</zorder>
   <zorder>but_load_new_matrix</zorder>
-  <zorder>apply_ipf</zorder>
-  <zorder>matrix_name</zorder>
   <zorder>matrix_total</zorder>
   <zorder>but_load_rows</zorder>
   <zorder>but_load_columns</zorder>
@@ -354,8 +313,8 @@
   <zorder>columns_total</zorder>
   <zorder>rows_total</zorder>
   <zorder>rows_name</zorder>
-  <zorder>but_choose_output_name</zorder>
-  <zorder>output_name</zorder>
+  <zorder>but_choose_output_and_run</zorder>
+  <zorder>cob_matrix_core</zorder>
  </widget>
  <resources/>
  <connections/>

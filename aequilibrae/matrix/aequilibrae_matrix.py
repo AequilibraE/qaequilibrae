@@ -28,6 +28,7 @@ from numpy.lib.format import open_memmap
 import zipfile
 
 
+
 # Necessary in case we are no the QGIS world
 # try:
 #     from common_tools.auxiliary_functions import logger
@@ -48,7 +49,7 @@ class AequilibraeMatrix():
 
         self.names = kwargs.get('names', ['mat'])
 
-        self.data_type = kwargs.get('dtype', np.float32)
+        self.data_type = kwargs.get('dtype', np.float64)
 
         self.matrix_hash = {}
 
@@ -80,18 +81,20 @@ class AequilibraeMatrix():
 
         # sets the dtype
         dtype = [(x.encode('utf-8'), self.data_type) for x in self.names]
-        dtype.append(('index', np.int32))
+        dtype.append(('index', np.int64))
 
         # the shape
         shape = (self.zones,self.zones,)
-        # the path
-        matrix_path = os.path.join(self.file_location, self.file_name)
-        self.matrix = open_memmap(matrix_path, mode='w+', dtype=dtype, shape=shape)
+
+        self.matrix = open_memmap(self.computation_path, mode='w+', dtype=dtype, shape=shape)
 
     def __getattr__(self, mat_name):
 
         if mat_name == 'index':
             return self.matrix['index'][:,0]
+
+        if mat_name.lower() == 'matrix':
+            return self.matrix
 
         if mat_name in self.names:
             return self.matrix[mat_name]
@@ -137,11 +140,10 @@ class AequilibraeMatrix():
         # Map in memory and load matrix names plus dimensions
         self.matrix = open_memmap(self.computation_path, mode='r+')
         self.zones = self.matrix.shape[0]
-        self.names = [x for x in self.matrix.dtype.fields]
-        self.names.remove('index')
+        self.names = [x for x in self.matrix.dtype.fields if x != 'index']
         self.num_matrices = len(self.names)
         self.data_type = self.matrix.dtype[0]
-        self.matrix_hash = {self.index[i]: i for i in range(self.zones)}
+        self.matrix_hash = self.__builds_hash__()
 
     def computational_view(self, core_list = None):
         if core_list is None:
@@ -154,3 +156,24 @@ class AequilibraeMatrix():
             self.matrix_view = None
             self.view_names = None
             raise ('Please provide a list of matrices')
+
+    def copy(self):
+        output = AequilibraeMatrix(zones=self.zones,
+                                        num_matrices=self.num_matrices,
+                                        names=self.names,
+                                        data_type=self.data_type,
+                                        cores=self.num_matrices)
+
+        output.index[:] = self.index[:]
+        for name in self.names:
+            output.matrix[name][:, :] = self.matrix[name][:, :]
+
+        output.__builds_hash__()
+
+        if self.view_names is not None:
+            output.computational_view(self.view_names)
+
+        return output
+
+    def __builds_hash__(self):
+        return {self.index[i]: i for i in range(self.zones)}

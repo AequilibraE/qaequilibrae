@@ -1,1 +1,2 @@
 from aequilibrae_matrix import AequilibraeMatrix
+from aequilibrae_data import AequilibraEData
