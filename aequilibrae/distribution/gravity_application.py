@@ -15,7 +15,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-09-30
- Updated:    2016-10-03
+ Updated:    2017-08-11
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -30,7 +30,8 @@ sys.dont_write_bytecode = True
 import numpy as np
 import yaml
 import os
-from ipf import Ipf
+from aequilibrae.distribution import Ipf, SyntheticGravityModel
+from aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
 from time import clock
 
 def main():
@@ -39,58 +40,51 @@ def main():
 
 class GravityApplication:
     """"
-    Model specification is a dictionary of dictionaries:
-
-        model = {function, parameters
-                }
-        where function is: 'EXPO', 'POWER' or 'GAMMA'
-
-        and parameters are:  {alpha:..., beta:...}
+    Model is an instance of SyntheticGravityModel class
     """
-    def __init__(self, rows=None, columns=None, impedance=None, model=None, parameters=None):
-        self.error = None
-        self.error_free = True
+
+    def __init__(self, **kwargs):
 
         self.__required_parameters = ['max trip length']
-        if parameters is None:
-            parameters = self.get_parameters('gravity')
-
         self.__required_model = ['function', 'parameters']
 
-        self.rows = rows
-        self.columns = columns
-        self.impedance = impedance
-        self.parameters = parameters
-        self.model = model
+        self.parameters = kwargs.get('parameters', self.get_parameters('gravity'))
+
+        self.rows = kwargs.get('rows')
+        self.row_field = kwargs.get('row_field', None)
+
+        self.columns = kwargs.get('columns')
+        self.column_field = kwargs.get('column_field', None)
+
+        self.impedance = kwargs.get('impedance')
+        self.model = kwargs.get('model')
+
         self.output = None
-        self.report = ['  #####    GRAVITY APPLICATION    #####  ', '']
-        self.report.append('Model specification:')
-        self.report.append('    ' + self.model['function'])
-        for i in self.model['parameters'].keys():
-            self.report.append('    ' + i + ': ' + str(self.model['parameters'][i]))
-        self.report.append('')
 
     def apply(self):
+        self.check_data()
         if self.error is None:
             t= clock()
             max_cost = self.parameters['max trip length']
 
             # We create the output
-            self.output = np.zeros_like(self.impedance)
+            self.output = self.impedance.copy()
 
             # We apply the function
             self.apply_function()
 
             # We zero those cells that have a trip length above the limit
             if max_cost > 0:
-                a = (self.impedance < max_cost).astype(int)
-                self.output = a * self.output
+                a = (self.impedance.matrix_view[:,:,0] < max_cost).astype(int)
+                self.output.matrix_view[:,:,0] = a * self.output.matrix_view[:,:,0]
 
             # We adjust the total of the self.output
-            self.output = self.output * (np.sum(self.rows) / np.sum(self.output))
+            self.output.matrix_view[:,:,0] = self.output.matrix_view[:,:,0] * \
+                                             (np.sum(self.rows) / np.sum(self.output.matrix_view[:,:,0]))
 
             # And adjust with a fratar
-            ipf = Ipf(self.output, self.rows, self.columns)
+            ipf = Ipf(matrix=self.output, rows=self.rows, columns=self.columns,
+                      column_field=self.column_field, row_field=self.row_field)
 
             # We use the model application parameters in case they were provided
             # not the standard way of using this tool)
@@ -120,37 +114,57 @@ class GravityApplication:
         return path['distribution'][model]
 
     def check_data(self):
-        self.error = None
+        self.report = ['  #####    GRAVITY APPLICATION    #####  ', '']
         self.check_parameters()
 
-        # check dimensions
-        if self.rows is None or self.columns is None or self.impedance is None:
-            self.error = 'missing data'
-
-        if self.error is None:
-            # check vectors are indeed vectors and the matrix is two dimensional
-            if len(self.rows.shape[:]) > 1:
-                self.error = 'Rows is a 2+ dimensional array and not a vector'
-            if len(self.columns.shape[:]) > 1:
-                self.error = 'Columns is a 2+ dimensional array and not a vector'
-            if len(self.impedance.shape[:]) != 2:
-                self.error = 'Impedance matrix is not bi-dimensional'
-
-            # check that vectors have the appropriate dimensions
-            if self.rows.shape[0] != self.impedance.shape[0]:
-                self.error = 'Dimensions for row vector and impedance matrix do not match'
-            if self.columns.shape[0] != self.impedance.shape[1]:
-                self.error = 'Dimensions for column vector and impedance matrix do not match'
-
-            # check balancing:
-            if abs(np.sum(self.rows) - np.sum(self.columns)) > self.parameters['balancing tolerance']:
-                self.error = 'Vectors are not balanced'
-            else:
-                # guarantees that they are precisely balanced
-                self.columns = self.columns * (np.sum(self.rows)/np.sum(self.columns))
-
-        if self.error is not None:
+        if not isinstance(SyntheticGravityModel, self.model):
             self.error_free = False
+            raise TypeError('Model is not an instance of SyntheticGravityModel')
+
+        self.report.append('Model specification:')
+        self.report.append('    Function: ' + self.model.function)
+        if self.model.alpha is not None:
+            self.report.append('    alpha: ' + str(self.model.alpha))
+
+        if self.model.beta is not None:
+            self.report.append('    beta: ' + str(self.model.beta))
+
+        self.report.append('')
+
+    # check dimensions
+        # check data types
+        if not isinstance(self.rows, AequilibraEData):
+            raise TypeError('Row vector needs to be an instance of AequilibraEData')
+
+        if not isinstance(self.columns, AequilibraEData):
+            raise TypeError('Column vector needs to be an instance of AequilibraEData')
+
+        if not isinstance(self.impedance, AequilibraeMatrix):
+            raise TypeError('Seed matrix needs to be an instance of AequilibraEMatrix')
+
+        # Check data dimensions
+        if not np.array_equal(self.rows.index, self.columns.index):
+            raise ValueError('Indices from row vector do not match those from column vector')
+
+        if not np.array_equal(self.impedance.index, self.columns.index):
+            raise ValueError('Indices from vectors do not match those from seed matrix')
+
+        # Check if matrix was set for computation
+        if self.impedance.matrix_view is None:
+            raise ValueError('Matrix needs to be set for computation')
+        else:
+            if self.impedance.matrix_view.shape[2] > 1:
+                raise ValueError("Matrix' computational view needs to be set for a single matrix core")
+
+        # check balancing:
+        sum_rows = np.sum(self.rows.data[self.row_field])
+        sum_cols = np.sum(self.columns.data[self.column_field])
+        if abs(sum_rows - sum_cols) > self.parameters['balancing tolerance']:
+            raise ValueError( 'Vectors are not balanced')
+        else:
+            # guarantees that they are precisely balanced
+            self.columns.data[self.column_field][:] = self.columns.data[self.column_field][:] * (
+                sum_rows / sum_cols)
 
     def check_parameters(self):
         # Check if parameters are configured properly
@@ -171,36 +185,23 @@ class GravityApplication:
                 break
 
     def apply_function(self):
-        function = self.model['function']
-        param = self.model['parameters']
-
-        if function.upper() == "EXPO":
-            beta = param['beta']
-        elif function.upper() == "POWER":
-            alpha = param['alpha']
-        elif function.upper() == "GAMMA":
-            beta = param['beta']
-            alpha = param['alpha']
-        else:
-            self.error = 'Model specification error. Function not defined'
-
-        for i in range(self.rows.shape[0]):
-            cost = self.impedance[i, :]
+        for i in range(self.rows.entries):
+            cost = self.impedance.matrix_view[i, :, 0]
             p = self.rows[i]
             a = self.columns[:]
 
-            if function.upper() == "EXPO":
-                self.output[i, :] = np.exp(-beta * cost) * p * a
-            elif function.upper() == "POWER":
-                self.output[i, :] = np.nan_to_num(np.power(cost, -alpha) * p * a)
-            elif function.upper() == "GAMMA":
-                self.output[i, :] = np.nan_to_num(np.power(cost, alpha) * np.exp(-beta * cost) * p * a)
+            if self.model.function == "EXPO":
+                self.output.matrix_view[i, :, 0] = np.exp(- self.model.beta * cost) * p * a[:]
+            elif self.model.function == "POWER":
+                self.output.matrix_view[i, :, 0] = np.nan_to_num(np.power(cost, - self.model.alpha) * p * a)[:]
+            elif self.model.function == "GAMMA":
+                self.output.matrix_view[i, :, 0] = np.nan_to_num(np.power(cost, self.model.alpha) * np.exp(- self.model.beta * cost) * p * a)[:]
 
         # Deals with infinite and NaNs
-        infinite = np.isinf(self.output).astype(int)
-        non_inf = np.ones_like(self.output) - infinite
-        self.output = self.output * non_inf
-        np.nan_to_num(self.output)
+        infinite = np.isinf(self.output.matrix_view[i, :, 0]).astype(int)
+        non_inf = np.ones_like(self.output.matrix_view[i, :, 0]) - infinite
+        self.output.matrix_view[i, :, 0] = self.output.matrix_view[i, :, 0] * non_inf
+        np.nan_to_num(self.output.matrix_view[i, :, 0])
 
 if __name__ == '__main__':
     main()

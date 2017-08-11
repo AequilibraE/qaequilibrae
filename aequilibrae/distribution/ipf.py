@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    29/09/2016
- Updated:    30/09/2016
+ Updated:    11/08/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------

@@ -13,6 +13,12 @@
     <height>118</height>
    </rect>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>170</width>
+    <height>118</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Shortest path</string>
   </property>

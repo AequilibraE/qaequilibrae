@@ -3,7 +3,7 @@
  <class>DesireLines</class>
  <widget class="QDialog" name="DesireLines">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -23,10 +23,10 @@
    <string>Aequilibrae - Desire Lines toolbox</string>
   </property>
   <property name="sizeGripEnabled">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <property name="modal">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <widget class="QLabel" name="lbl_funding2">
    <property name="geometry">

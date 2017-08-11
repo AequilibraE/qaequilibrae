@@ -23,7 +23,7 @@ from qgis.core import *
 import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4 import uic
+from PyQt4 import uic, QtCore
 import sys
 import os
 import copy
@@ -42,7 +42,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/u
 
 class DesireLinesDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
         self.iface = iface
         self.setupUi(self)
         self.error = None
