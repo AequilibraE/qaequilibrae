@@ -31,11 +31,11 @@ from PyQt4.QtGui import *
 
 from .common_tools import ParameterDialog, logger, ReportDialog
 from binary_downloader_class import BinaryDownloaderDialog
-from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
+from .distribution_procedures import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
-from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
-from .matrix import LoadMatrixDialog
+from .paths_computation import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
+from .matrix_procedures import LoadMatrixDialog
 import tempfile, glob
 
 no_binary = False
@@ -43,7 +43,7 @@ old_binary = False
 try:
     from aequilibrae.paths import VERSION
     VERSION_GRAPH = ''
-    a = open(os.path.join(os.path.dirname(__file__), 'aequilibrae/paths/parameters.pxi'), 'r')
+    a = open(os.path.join(os.path.dirname(__file__), 'aequilibrae/paths_computation/parameters.pxi'), 'r')
 
     for i in a.readlines():
         if 'VERSION' in i and 'SUB' not in i:
@@ -113,7 +113,7 @@ class AequilibraEMenu:
 
         # Loading matrices
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
-        self.load_matrix_action = QAction(icon, u"Import matrix", self.iface.mainWindow())
+        self.load_matrix_action = QAction(icon, u"Import matrix_procedures", self.iface.mainWindow())
         QObject.connect(self.load_matrix_action, SIGNAL("triggered()"), self.run_load_matrices)
         self.matrix_menu.addAction(self.load_matrix_action)
 
@@ -173,9 +173,9 @@ class AequilibraEMenu:
         QObject.connect(self.shortest_path_action, SIGNAL("triggered()"), self.run_shortest_path)
         self.assignment_menu.addAction(self.shortest_path_action)
 
-        # Distance matrix generation
+        # Distance matrix_procedures generation
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dist_matrix.png")
-        self.dist_matrix_action = QAction(icon, u"Impedance matrix", self.iface.mainWindow())
+        self.dist_matrix_action = QAction(icon, u"Impedance matrix_procedures", self.iface.mainWindow())
         QObject.connect(self.dist_matrix_action, SIGNAL("triggered()"), self.run_dist_matrix)
         self.assignment_menu.addAction(self.dist_matrix_action)
 

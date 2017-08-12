@@ -22,7 +22,7 @@ column_vector.columns[:] = np.random.rand(zones)[:] * 1000
 # balance vectors
 column_vector.columns[:] = column_vector.columns[:] * (row_vector.rows.sum()/column_vector.columns.sum())
 
-# seed matrix
+# seed matrix_procedures
 args = {'zones': zones,
         'cores': 1,
         'names': ['seed']}

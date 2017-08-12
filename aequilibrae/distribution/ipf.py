@@ -151,7 +151,6 @@ class Ipf:
 
             self.report.append('')
             self.report.append('Running time: ' + str("{:4,.3f}".format(clock()-t)) + 's')
-            # self.output.matrix[comput_core][:,:] = seed[:, :]
     def tot_rows(self, matrix):
         return np.sum(matrix, axis=1)
 

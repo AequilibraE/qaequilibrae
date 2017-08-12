@@ -53,7 +53,7 @@ class AequilibraeMatrix():
 
         self.matrix_hash = {}
 
-        self.reserved_names = ['matrix', 'matrix_hash', 'data_type', 'names',
+        self.reserved_names = ['matrix_procedures', 'matrix_hash', 'data_type', 'names',
                                'num_matrice', 'zones', 'file_location', 'file_name', 'storage_path']
 
         # methods that will be used for computation
@@ -68,7 +68,7 @@ class AequilibraeMatrix():
         else:
             if type(self.names) is list:
                 if len(self.names) != self.num_matrices:
-                    raise Exception('List of matrix names incompatible with number of matrices')
+                    raise Exception('List of matrix_procedures names incompatible with number of matrices')
             else:
                 if self.num_matrices == 1 and type(self.names) is str:
                     self.names = [self.names]
@@ -93,13 +93,13 @@ class AequilibraeMatrix():
         if mat_name == 'index':
             return self.matrix['index'][:,0]
 
-        if mat_name.lower() == 'matrix':
+        if mat_name.lower() == 'matrix_procedures':
             return self.matrix
 
         if mat_name in self.names:
             return self.matrix[mat_name]
 
-        raise AttributeError("No such method or matrix core! --> " + str(mat_name))
+        raise AttributeError("No such method or matrix_procedures core! --> " + str(mat_name))
 
     def save_to_disk(self, file_path= None, compressed=True):
             if compressed:
@@ -137,7 +137,7 @@ class AequilibraeMatrix():
         zip_ref.close()
         os.rename(os.path.join(self.file_location, os.path.basename(self.storage_path)[:-3]+'npy'), self.computation_path)
 
-        # Map in memory and load matrix names plus dimensions
+        # Map in memory and load matrix_procedures names plus dimensions
         self.matrix = open_memmap(self.computation_path, mode='r+')
         self.zones = self.matrix.shape[0]
         self.names = [x for x in self.matrix.dtype.fields if x != 'index']

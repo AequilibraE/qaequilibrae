@@ -31,6 +31,8 @@ from gravity_application import GravityApplication
 import numpy as np
 import sys
 import yaml
+from ..parameters import Parameters
+
 
 class GravityCalibration:
     """"
@@ -145,22 +147,22 @@ class GravityCalibration:
 
     def check_inputs(self):
         if self.matrix.shape[:] != self.cost_matrix.shape[:]:
-            self.error = "Observed matrix and cost matrix do not have the same dimensions"
+            self.error = "Observed matrix_procedures and cost matrix_procedures do not have the same dimensions"
 
         elif not np.sum(self.matrix):
-            self.error = 'Observed matrix has no flows'
+            self.error = 'Observed matrix_procedures has no flows'
 
         elif not np.sum(self.cost_matrix):
-            self.error = 'Cost matrix is all zero'
+            self.error = 'Cost matrix_procedures is all zero'
 
         elif not np.sum(self.cost_matrix * self.matrix):
             self.error = 'All cells with positive flows have zero costs'
 
         elif np.min(self.cost_matrix) < 0:
-            self.error = 'Cost matrix has negative values'
+            self.error = 'Cost matrix_procedures has negative values'
 
         elif np.min(self.matrix) < 0:
-            self.error = 'Observed matrix has negative values'
+            self.error = 'Observed matrix_procedures has negative values'
 
     def apply_gravity(self):
         self.gravity = GravityApplication(rows=np.sum(self.matrix, axis=0), columns=np.sum(self.matrix, axis=1),
@@ -170,7 +172,8 @@ class GravityCalibration:
         return np.sum(self.result_matrix * self.cost_matrix) / np.sum(self.result_matrix)
 
     def get_parameters(self, model):
+        par = Parameters()
         path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         with open(path + '/parameters.yml', 'r') as yml:
             path = yaml.safe_load(yml)
-        return path['distribution'][model]
+        return path['distribution_procedures'][model]

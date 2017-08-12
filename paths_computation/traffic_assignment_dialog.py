@@ -34,7 +34,7 @@ import shutil
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
-from ..matrix import LoadMatrixDialog
+from ..matrix_procedures import LoadMatrixDialog
 from ..common_tools import ReportDialog
 from ..common_tools import NumpyModel
 from ..common_tools import GetOutputFolderName, GetOutputFileName
@@ -69,7 +69,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.graph = Graph()
         self.results = AssignmentResults()
 
-        # Signals for the matrix tab
+        # Signals for the matrix_procedures tab
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
         self.display_matrix.stateChanged.connect(self.display_matrix_or_not)
 
@@ -357,7 +357,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.error = None
 
         if self.matrix is None:
-            self.error = 'Demand matrix missing'
+            self.error = 'Demand matrix_procedures missing'
 
         if not self.graph.num_links:
             self.error = 'Graph was not loaded'
@@ -367,7 +367,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
 
         if self.results.zones != np.max(self.matrix.shape[:]):
             self.error = 'Number of zones in the graph ({0}) does not match the number of ' \
-                         'zones in your matrix ({1})'.format(self.results.zones, np.max(self.matrix.shape[:]))
+                         'zones in your matrix_procedures ({1})'.format(self.results.zones, np.max(self.matrix.shape[:]))
 
         if self.error is not None:
             return False

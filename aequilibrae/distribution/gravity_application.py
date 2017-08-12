@@ -30,25 +30,24 @@ sys.dont_write_bytecode = True
 import numpy as np
 import yaml
 import os
-from aequilibrae.distribution import Ipf, SyntheticGravityModel
-from aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
+from ipf import Ipf
+from synthetic_gravity_model import SyntheticGravityModel
+from ..matrix import AequilibraeMatrix, AequilibraEData
 from time import clock
-
-def main():
-    pass
-
+from ..parameters import Parameters
 
 class GravityApplication:
     """"
     Model is an instance of SyntheticGravityModel class
+    Impedance is an instance of AequilibraEMatrix
+    Row and Column vectors are instances of AequilibraEData
     """
-
     def __init__(self, **kwargs):
 
         self.__required_parameters = ['max trip length']
         self.__required_model = ['function', 'parameters']
 
-        self.parameters = kwargs.get('parameters', self.get_parameters('gravity'))
+        self.parameters = kwargs.get('parameters', self.get_parameters())
 
         self.rows = kwargs.get('rows')
         self.row_field = kwargs.get('row_field', None)
@@ -63,61 +62,58 @@ class GravityApplication:
 
     def apply(self):
         self.check_data()
-        if self.error is None:
-            t= clock()
-            max_cost = self.parameters['max trip length']
+        t= clock()
+        max_cost = self.parameters['max trip length']
+        # We create the output
+        self.output = self.impedance.copy()
+        comput_core = self.output.view_names[0]
+        # We apply the function
+        self.apply_function()
 
-            # We create the output
-            self.output = self.impedance.copy()
+        # We zero those cells that have a trip length above the limit
+        if max_cost > 0:
+            a = (self.output.matrix[comput_core][:, :] < max_cost).astype(int)
+            self.output.matrix[comput_core][:, :] = a * self.output.matrix[comput_core][:, :]
 
-            # We apply the function
-            self.apply_function()
+        # We adjust the total of the self.output
+        total_factor = np.sum(self.rows.data[self.row_field]) / np.sum(self.output.matrix[comput_core][:, :])
+        self.output.matrix[comput_core][:, :] = self.output.matrix[comput_core][:, :] * total_factor
 
-            # We zero those cells that have a trip length above the limit
-            if max_cost > 0:
-                a = (self.impedance.matrix_view[:,:,0] < max_cost).astype(int)
-                self.output.matrix_view[:,:,0] = a * self.output.matrix_view[:,:,0]
+        # And adjust with a fratar
+        ipf = Ipf(matrix=self.output, rows=self.rows, columns=self.columns,
+                  column_field=self.column_field, row_field=self.row_field)
 
-            # We adjust the total of the self.output
-            self.output.matrix_view[:,:,0] = self.output.matrix_view[:,:,0] * \
-                                             (np.sum(self.rows) / np.sum(self.output.matrix_view[:,:,0]))
+        # We use the model application parameters in case they were provided
+        # not the standard way of using this tool)
+        for p in ipf.parameters:
+            if p in self.parameters:
+                ipf.parameters[p] = self.parameters[p]
 
-            # And adjust with a fratar
-            ipf = Ipf(matrix=self.output, rows=self.rows, columns=self.columns,
-                      column_field=self.column_field, row_field=self.row_field)
+        # apply fratar
+        ipf.fit()
+        self.output = ipf.output
 
-            # We use the model application parameters in case they were provided
-            # not the standard way of using this tool)
-            for p in ipf.parameters:
-                if p in self.parameters:
-                    ipf.parameters[p] = self.parameters[p]
+        q = ipf.report.pop(0)
+        for q in ipf.report:
+            self.report.append(q)
 
-            # apply fratar
-            ipf.fit()
-            self.output = ipf.output
+        self.report.append('')
+        self.report.append('')
 
-            q = ipf.report.pop(0)
-            for q in ipf.report:
-                self.report.append(q)
+        self.report.append('Total of matrix: ' + "{:15,.4f}".format(float(np.sum(self.output.matrix[comput_core]))))
+        self.report.append('Intrazonal flow: ' + "{:15,.4f}".format(float(np.trace(self.output.matrix[comput_core]))))
+        self.report.append('Running time: ' + str(round(clock()-t, 3)))
 
-            self.report.append('')
-            self.report.append('')
-
-            self.report.append('Total of matrix: ' + "{:15,.4f}".format(np.sum(self.output)))
-            self.report.append('Intrazonal flow: ' + "{:15,.4f}".format(np.trace(self.output)))
-            self.report.append('Running time: ' +  str(round(clock()-t, 3)))
-
-    def get_parameters(self, model):
-        path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "."))
-        with open(path + '/parameters.yml', 'r') as yml:
-            path = yaml.safe_load(yml)
-        return path['distribution'][model]
+    def get_parameters(self):
+        par = Parameters().parameters
+        para = par['distribution']['ipf'].copy()
+        para.update(par['distribution']['gravity'])
+        return para
 
     def check_data(self):
         self.report = ['  #####    GRAVITY APPLICATION    #####  ', '']
-        self.check_parameters()
 
-        if not isinstance(SyntheticGravityModel, self.model):
+        if not isinstance(self.model, SyntheticGravityModel):
             self.error_free = False
             raise TypeError('Model is not an instance of SyntheticGravityModel')
 
@@ -166,7 +162,10 @@ class GravityApplication:
             self.columns.data[self.column_field][:] = self.columns.data[self.column_field][:] * (
                 sum_rows / sum_cols)
 
+        self.check_parameters()
+
     def check_parameters(self):
+        par = Parameters()
         # Check if parameters are configured properly
         for p in self.__required_parameters:
             if p not in self.parameters:
@@ -175,33 +174,22 @@ class GravityApplication:
                     self.error = self.error + t + ', '
                 break
 
-        # Check if model function and parameters are provided properly
-        for p in self.__required_model:
-            if p not in self.model:
-                self.error = 'Model specification not provided correctly. It needs ' \
-                             'to be a dictionary with the following keys: '
-                for t in self.__required_model:
-                    self.error = self.error + t + ', '
-                break
-
     def apply_function(self):
+        comput_core = self.output.view_names[0]
         for i in range(self.rows.entries):
-            cost = self.impedance.matrix_view[i, :, 0]
-            p = self.rows[i]
-            a = self.columns[:]
+            p = self.rows.data[self.row_field][i]
+            a = self.columns.data[self.column_field][:]
 
             if self.model.function == "EXPO":
-                self.output.matrix_view[i, :, 0] = np.exp(- self.model.beta * cost) * p * a[:]
+                self.output.matrix[comput_core][i, :] = np.exp(- self.model.beta * self.impedance.matrix_view[i, :, 0]) * p * a
+
             elif self.model.function == "POWER":
-                self.output.matrix_view[i, :, 0] = np.nan_to_num(np.power(cost, - self.model.alpha) * p * a)[:]
+                self.output.matrix[comput_core][i, :] = np.nan_to_num(np.power(self.impedance.matrix_view[i, :, 0], - self.model.alpha) * p * a)[:]
             elif self.model.function == "GAMMA":
-                self.output.matrix_view[i, :, 0] = np.nan_to_num(np.power(cost, self.model.alpha) * np.exp(- self.model.beta * cost) * p * a)[:]
+                self.output.matrix[comput_core][i, :] = np.nan_to_num(np.power(self.impedance.matrix_view[i, :, 0], self.model.alpha) * np.exp(- self.model.beta * self.impedance.matrix_view[i, :, 0]) * p * a)[:]
 
         # Deals with infinite and NaNs
-        infinite = np.isinf(self.output.matrix_view[i, :, 0]).astype(int)
-        non_inf = np.ones_like(self.output.matrix_view[i, :, 0]) - infinite
-        self.output.matrix_view[i, :, 0] = self.output.matrix_view[i, :, 0] * non_inf
-        np.nan_to_num(self.output.matrix_view[i, :, 0])
-
-if __name__ == '__main__':
-    main()
+        infinite = np.isinf(self.output.matrix[comput_core][:, :]).astype(int)
+        non_inf = np.ones_like(self.output.matrix[comput_core][:, :]) - infinite
+        self.output.matrix[comput_core][:, :] = self.output.matrix[comput_core][:, :] * non_inf
+        np.nan_to_num(self.output.matrix[comput_core][:, :])

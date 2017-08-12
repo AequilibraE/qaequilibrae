@@ -38,7 +38,7 @@ from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
 
 from ..common_tools import NumpyModel
-from ..matrix import LoadMatrixDialog
+from ..matrix_procedures import LoadMatrixDialog
 from ..common_tools import ReportDialog
 
 from desire_lines_procedure import DesireLinesProcedure
@@ -62,7 +62,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.matrix_hash =None
 
         # FIRST, we connect slot signals
-        # For changing the input matrix
+        # For changing the input matrix_procedures
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
 
         self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
@@ -103,7 +103,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
 
     def add_matrix_to_viewer(self):
         """
-            procedure to add the matrix to the viewer
+            procedure to add the matrix_procedures to the viewer
         """
         if self.matrix is not None:
             mat_name = self.cbb_matrix_cores.currentText()

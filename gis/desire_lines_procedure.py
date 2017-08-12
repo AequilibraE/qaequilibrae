@@ -38,7 +38,7 @@ except:
 no_binary = False
 try:
     from aequilibrae.paths import all_or_nothing
-    #from aequilibrae.paths import MultiThreadedAoN, one_to_all
+    #from aequilibrae.paths_computation import MultiThreadedAoN, one_to_all
 except:
     no_binary = True
 

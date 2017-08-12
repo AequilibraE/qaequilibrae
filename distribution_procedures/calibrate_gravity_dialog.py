@@ -27,7 +27,7 @@ import numpy as np
 import os
 
 
-from ..matrix import LoadMatrixDialog
+from ..matrix_procedures import LoadMatrixDialog
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
 

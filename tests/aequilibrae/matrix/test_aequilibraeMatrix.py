@@ -48,7 +48,7 @@ class TestAequilibraeMatrix(TestCase):
         if not np.array_equal(self.new_matrix.index, np.arange(zones) + 100):
             self.fail('Matrix indices was not maintained')
 
-        # test in-memory matrix copy
+        # test in-memory matrix_procedures copy
         matrix_copy = self.new_matrix.copy()
 
         matrix_copy.storage_path = self.new_matrix.storage_path

@@ -49,7 +49,7 @@ class ComputeDistMatrix(WorkerThread):
     def doWork(self):
         centroids = self.graph.centroids + 1
 
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), 'Computing Impedance matrix')
+        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), 'Computing Impedance matrix_procedures')
         self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.graph.centroids)
         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
 

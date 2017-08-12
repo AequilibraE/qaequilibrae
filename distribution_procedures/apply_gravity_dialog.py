@@ -30,7 +30,7 @@ import numpy as np
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
 from ..common_tools import LoadVectorDialog
-from ..matrix import LoadMatrixDialog
+from ..matrix_procedures import LoadMatrixDialog
 
 
 from apply_gravity_procedure import ApplyGravityProcedure
@@ -148,7 +148,7 @@ class ApplyGravityDialog(QDialog, FORM_CLASS):
         file_types = "Comma-separated files(*.csv);;Numpy Binnary Array(*.npy)"
         if OMX:
             file_types += ";;OpenMatrix(*.omx)"
-        new_name = QFileDialog.getSaveFileName(None, 'Result matrix', self.path, file_types)
+        new_name = QFileDialog.getSaveFileName(None, 'Result matrix_procedures', self.path, file_types)
         if new_name is not None:
             if new_name.upper()[-3:] not in ['NPY', 'CSV']:
                 qgis.utils.iface.messageBar().pushMessage("Output file requires extension", level=3)
@@ -264,10 +264,10 @@ class ApplyGravityDialog(QDialog, FORM_CLASS):
             self.error = 'Parameters for output missing'
 
         if self.rows.shape[0] != self.impedance.shape[0]:
-            self.error = 'Production vector does not have same dimensions as impedance matrix'
+            self.error = 'Production vector does not have same dimensions as impedance matrix_procedures'
 
         if self.columns.shape[0] != self.impedance.shape[1]:
-            self.error = 'Attraction vector does not have same dimensions as impedance matrix'
+            self.error = 'Attraction vector does not have same dimensions as impedance matrix_procedures'
 
         if self.error is not None:
             return False

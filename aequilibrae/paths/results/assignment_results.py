@@ -15,7 +15,7 @@ class AssignmentResults:
         """
         self.link_loads = None       # The actual results for assignment
         self.skims = None            # The array of skims
-        self.no_path = None          # The list os paths
+        self.no_path = None          # The list os paths_computation
         self.num_skims = None        # number of skims that will be computed. Depends on the setting of the graph provided
         self.cores = mp.cpu_count()
         self.classes = {'number':1,
@@ -46,7 +46,7 @@ class AssignmentResults:
     def prepare(self, graph, matrix):
 
         if matrix.view_names is None:
-            raise ('Please set the matrix computational view')
+            raise ('Please set the matrix_procedures computational view')
         else:
             self.classes['number'] = matrix.matrix_view.shape[2]
             self.classes['names'] = matrix.view_names

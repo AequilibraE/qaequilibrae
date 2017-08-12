@@ -309,7 +309,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
                 self.matrices[new_name] = self.matrices.pop(old_key)
 
     def get_name_and_save_to_disk(self):
-        self.output_name, _ = GetOutputFileName(self, 'AequilibraE matrix', ["Aequilibrae Matrix(*.aem)"], '.aem', self.path)
+        self.output_name, _ = GetOutputFileName(self, 'AequilibraE matrix_procedures', ["Aequilibrae Matrix(*.aem)"], '.aem', self.path)
         self.prepare_final_matrix()
         
     def prepare_final_matrix(self):

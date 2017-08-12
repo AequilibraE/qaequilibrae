@@ -56,7 +56,7 @@ def all_or_nothing(matrix, graph, results):
         raise ValueError('The results object was prepared for a different graph')
     elif matrix.matrix_view is None:
         raise ValueError('Matrix was not prepared for assignment. '
-                         'Please create a matrix view with all classes you want to assign')
+                         'Please create a matrix_procedures view with all classes you want to assign')
     else:
         mat = matrix.matrix_view
         pool = ThreadPool(results.cores)

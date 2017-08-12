@@ -69,7 +69,7 @@ class Graph:
         self.network = False  # This method will hold ALL information on the network
         self.graph = False  # This method will hold an array with ALL fields in the graph.
 
-        # These are the fields actually used in computing paths
+        # These are the fields actually used in computing paths_computation
         self.fs = False      # This method will hold the forward star for the graph
         self.b_node = False  # b node for each directed link
         self.cost = None    # This array holds the values being used in the shortest path routine

@@ -32,7 +32,7 @@ from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
 
 from ..common_tools import NumpyModel
-from ..matrix import LoadMatrixDialog
+from ..matrix_procedures import LoadMatrixDialog
 from ..common_tools import ReportDialog
 
 from desire_lines_procedure import DesireLinesProcedure
@@ -59,7 +59,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.resize(383, 385)
 
         # FIRST, we connect slot signals
-        # For changing the input matrix
+        # For changing the input matrix_procedures
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
 
         self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
@@ -190,7 +190,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         else:
             return False
 
-        # We build the matrix hash from the matrix index
+        # We build the matrix_procedures hash from the matrix_procedures index
         self.matrix_hash = copy.deepcopy(self.matrix.matrix_hash)
 
         return True
@@ -215,7 +215,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                                                         self.zone_id_field.currentText(), self.matrix, self.matrix_hash, dl_type)
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage("Inputs not loaded properly. You need the layer and at least one matrix core", '', level=3)
+            qgis.utils.iface.messageBar().pushMessage("Inputs not loaded properly. You need the layer and at least one matrix_procedures core", '', level=3)
 
     def throws_error(self, error_message):
         error_message = ["*** ERROR ***", error_message]

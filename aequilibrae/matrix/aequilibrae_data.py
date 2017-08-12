@@ -103,7 +103,7 @@ class AequilibraEData():
 
         self.file_path, self.file_name = os.path.split(self.complete_path)
 
-        # Map in memory and load matrix names plus dimensions
+        # Map in memory and load matrix_procedures names plus dimensions
         self.data = open_memmap(self.complete_path, mode='r+')
 
         self.entries = self.data.shape[0]

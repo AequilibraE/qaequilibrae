@@ -18,9 +18,13 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
+import yaml
 
 
 valid_functions = ['EXPO', 'GAMMA', 'POWER']
+members = ['function', 'alpha', 'beta']
+model_type = 'SyntheticGravityModel'
+
 class SyntheticGravityModel:
     def __init__(self):
         self.function = None
@@ -50,5 +54,26 @@ class SyntheticGravityModel:
 
             self.__dict__[key] = value
 
-    def load(self):
-        pass
+    def load(self, file_name):
+        try:
+            model = yaml.safe_load(open(file_name, 'r'))[model_type]
+            for key, value in model.iteritems():
+                if key in members:
+                    self.__dict__[key] = value
+                else:
+                    raise ValueError('Model has unknown parameters: ' + str(key))
+        except:
+            raise ValueError('File provided is not a valid Synthetic Gravity Model')
+
+    def save(self, file_name):
+        filename = str(file_name)
+        if file_name[-4:].upper() != '.MOD':
+            file += '.mod'
+
+        model = {model_type:
+                     {'function': self.function,
+                      'alpha':    self.alpha,
+                      'beta':     self.beta}}
+
+        yaml.dump(model, open(file_name, 'w'), default_flow_style=False)
+

@@ -202,8 +202,8 @@ cpdef void network_loading(int origin,
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
-cdef void _copy_skims(double[:,:] skim_matrix,  #Skim matrix computed from one origin to all nodes
-                      double[:,:] final_skim_matrix) nogil:  #Skim matrix computed for one origin to all other centroids only
+cdef void _copy_skims(double[:,:] skim_matrix,  #Skim matrix_procedures computed from one origin to all nodes
+                      double[:,:] final_skim_matrix) nogil:  #Skim matrix_procedures computed for one origin to all other centroids only
 
     cdef int i, j
     cdef int N=final_skim_matrix.shape[0]

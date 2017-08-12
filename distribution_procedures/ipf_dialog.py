@@ -29,7 +29,7 @@ import warnings
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog, GetOutputFileName, LoadVectorDialog
-from ..matrix import LoadMatrixDialog
+from ..matrix_procedures import LoadMatrixDialog
 from ipf_procedure import IpfProcedure
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_ipf.ui'))
@@ -61,7 +61,7 @@ class IpfDialog(QDialog, FORM_CLASS):
         self.output_type = None
 
         # FIRST, we connect slot signals
-        # For changing the input matrix
+        # For changing the input matrix_procedures
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
         self.but_load_rows.clicked.connect(partial(self.find_vectors, 'zones'))
         self.but_load_columns.clicked.connect(partial(self.find_vectors, 'columns'))

@@ -22,10 +22,10 @@ class BinaryDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         self.windows64 = 'https://goo.gl/WfaJ4p'
         self.mac = 'https://goo.gl/hwd8iN'
 
-        self.local_path = os.path.dirname(os.path.abspath(__file__)) + '/aequilibrae/paths/AoN.so'
+        self.local_path = os.path.dirname(os.path.abspath(__file__)) + '/aequilibrae/paths_computation/AoN.so'
         plat = platform.system()
         if plat == 'Windows':
-            self.local_path = os.path.dirname(os.path.abspath(__file__)) + '/aequilibrae/paths/AoN.pyd'
+            self.local_path = os.path.dirname(os.path.abspath(__file__)) + '/aequilibrae/paths_computation/AoN.pyd'
             if (8 * struct.calcsize("P")) == 64:
                 self.binary_path = self.windows64
                 error = False
