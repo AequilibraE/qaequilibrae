@@ -286,7 +286,7 @@
    <property name="title">
     <string>Scale</string>
    </property>
-   <widget class="QRadioButton" name="radioButton_2">
+   <widget class="QRadioButton" name="rdo_scale_custom">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -306,7 +306,7 @@
      <string>User-defined</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton">
+   <widget class="QRadioButton" name="rdo_scale_auto">
     <property name="geometry">
      <rect>
       <x>10</x>

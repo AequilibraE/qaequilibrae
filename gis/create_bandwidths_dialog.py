@@ -61,8 +61,9 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.drive_side = get_parameter_chain(['system', 'driving side'])
 
         # layers and fields        # For adding skims
-        self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.LineLayer)
         self.mMapLayerComboBox.layerChanged.connect(self.add_fields_to_cboxes)
+        self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.LineLayer)
+        
 
         self.ab_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, 'AB'))
         self.ba_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, 'BA'))
@@ -83,6 +84,10 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         # self.bands_list.doubleClicked.connect(self.slot_double_clicked)
 
         self.rdo_color.toggled.connect(self.color_origins)
+
+        self.rdo_scale_auto.toggled.connect(self.set_new_scale)
+        self.rdo_scale_custom.toggled.connect(self.set_new_scale)
+        
         self.rdo_ramp.toggled.connect(self.color_origins)
         self.but_run.clicked.connect(self.add_bands_to_map)
         self.but_run.setEnabled(False)
@@ -101,6 +106,12 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.txt_ramp.setVisible(self.rdo_ramp.isChecked())
         self.but_load_ramp.setEnabled(self.rdo_ramp.isChecked())
 
+    def set_new_scale(self):
+        if self.rdo_scale_custom.isChecked():
+            self.load_scale_setter()
+        else:
+            self.scale = copy.deepcopy(self.default_scale)
+            
     def choose_a_field(self, modified):
         i, j = 'AB', 'BA'
 
@@ -131,17 +142,14 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 break
 
     def add_fields_to_cboxes(self):
-        if self.mMapLayerComboBox.currentIndex()> 0:
-            self.layer = get_vector_layer_by_name(self.mMapLayerComboBox.currentText())
-            if self.layer is not None:
-                self.but_load_ramp.setEnabled(True)
-            else:
-                self.but_load_ramp.setEnabled(False)
+        self.layer = self.mMapLayerComboBox.currentLayer()
+        if self.layer is not None:
+            self.but_load_ramp.setEnabled(True)
             self.ab_FieldComboBox.setLayer(self.layer)
             self.ba_FieldComboBox.setLayer(self.layer)
-        # except:
-        #     pass
-
+        else:
+            self.but_load_ramp.setEnabled(False)
+        
     def add_to_bands_list(self):
         if self.ab_FieldComboBox.currentIndex() >= 0 and self.ba_FieldComboBox.currentIndex() >= 0:
             ab_band = self.layer.fieldNameIndex(self.ab_FieldComboBox.currentText())
@@ -274,7 +282,16 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             dlg2.show()
             dlg2.exec_()
             self.scale = dlg2.scale
-                
+
+        self.rdo_scale_custom.blockSignals(True)
+        self.rdo_scale_auto.blockSignals(True)
+        if self.scale == self.default_scale:
+            self.rdo_scale_auto.setChecked(True)
+        else:
+            self.rdo_scale_custom.setChecked(True)
+        self.rdo_scale_auto.blockSignals(False)
+        self.rdo_scale_custom.blockSignals(False)
+        
     def add_bands_to_map(self):
         for item in [self.gbox_scale, self.but_run, self.but_set_scale, self.mMapLayerComboBox, self.but_add_band,
                      self.rdo_color, self.rdo_ramp]:
@@ -282,7 +299,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         
         band_size = str(self.scale['width'])
         space_size = str(self.scale['spacing'])
-        max_value = int(self.scale['max_flow'])
+        max_value = self.scale['max_flow']
         # define the side of the plotting based on the side of the road the system has defined
         ab = -1
         if self.drive_side == 'right':

@@ -246,7 +246,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Reset</string>
+    <string>Get from field</string>
    </property>
   </widget>
   <widget class="Line" name="line">

@@ -108,20 +108,16 @@ class BandwidthScaleDialog(QDialog, FORM_CLASS):
         max_flow = -1
         if self.cbb_field_to_scale_from.currentIndex() > 0:
             if '_*' in self.cbb_field_to_scale_from.currentText():
-                field_ab = self.cbb_field_to_scale_from.currentText().replace('_*', '_ab')
-                idx = self.layer.fieldNameIndex(field_ab)
-                max_ab = int(round(self.layer.maximumValue(idx), 0))
-                
-                field_ba = self.cbb_field_to_scale_from.currentText().replace('_*', '_ba')
-                idx = self.layer.fieldNameIndex(field_ba)
-                max_ba = int(round(self.layer.maximumValue(idx), 0))
-                
-                max_flow = max(max_ab, max_ba)
+                fields = [self.cbb_field_to_scale_from.currentText().replace('_*', '_ab'),
+                          self.cbb_field_to_scale_from.currentText().replace('_*', '_ba')]
             else:
-                idx = self.layer.fieldNameIndex(self.cbb_field_to_scale_from.currentText())
-                max_flow = int(round(self.layer.maximumValue(idx), 0))
+                fields = [self.cbb_field_to_scale_from.currentText()]
+            
+            for f in fields:
+                idx = self.layer.fieldNameIndex(f)
+                max_flow = max(max_flow, self.layer.maximumValue(idx))
                 
-        self.box_ref_value.setText("{:3,}".format(max_flow))
+        self.box_ref_value.setText("{:3,.2f}".format(max_flow))
         self.scale['max_flow'] = max_flow
         self.reset_sliders()
     
@@ -138,5 +134,5 @@ class BandwidthScaleDialog(QDialog, FORM_CLASS):
         self.lbl_width.setText("{:3,.2f}".format(self.scale['width']))
         
     def exit_procedure(self):
-        self.scale['max_flow'] = int(float(self.box_ref_value.text().replace(',','')))
+        self.scale['max_flow'] = float(self.box_ref_value.text().replace(',',''))
         self.close()

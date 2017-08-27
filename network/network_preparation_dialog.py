@@ -110,7 +110,6 @@ class NetworkPreparationDialog(QDialog, FORM_CLASS):
     def job_finished_from_thread(self, success):
 
         if self.worker_thread.error is not None:
-            logger(self.worker_thread.error)
             qgis.utils.iface.messageBar().pushMessage("Node layer error: ", self.worker_thread.error, level=3)
         else:
             QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_line_layer)
