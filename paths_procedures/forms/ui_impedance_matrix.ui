@@ -22,7 +22,7 @@
   <widget class="QLabel" name="funding1">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>13</x>
      <y>371</y>
      <width>321</width>
      <height>16</height>
@@ -34,13 +34,13 @@
     </font>
    </property>
    <property name="text">
-    <string>The development of this tool was partially funded by:</string>
+    <string>Development partially funded by:</string>
    </property>
   </widget>
   <widget class="QLabel" name="funding2">
    <property name="geometry">
     <rect>
-     <x>497</x>
+     <x>210</x>
      <y>369</y>
      <width>121</width>
      <height>21</height>
@@ -177,19 +177,6 @@
    <property name="title">
     <string>RESULTS</string>
    </property>
-   <widget class="QPushButton" name="do_dist_matrix">
-    <property name="geometry">
-     <rect>
-      <x>503</x>
-      <y>20</y>
-      <width>81</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Compute</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="select_result">
     <property name="geometry">
      <rect>
@@ -213,7 +200,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QRadioButton" name="csv_res">
+   <widget class="QRadioButton" name="radio_csv">
     <property name="geometry">
      <rect>
       <x>374</x>
@@ -229,17 +216,33 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QRadioButton" name="npy_res">
+   <widget class="QRadioButton" name="radio_aequilibrae">
     <property name="geometry">
      <rect>
-      <x>424</x>
+      <x>422</x>
       <y>22</y>
-      <width>71</width>
+      <width>91</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>NumPY</string>
+     <string>AequilibraE</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radio_omx">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>20</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>OMX</string>
     </property>
    </widget>
   </widget>
@@ -386,6 +389,27 @@
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QPushButton" name="do_dist_matrix">
+   <property name="geometry">
+    <rect>
+     <x>398</x>
+     <y>363</y>
+     <width>201</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Compute</string>
+   </property>
+  </widget>
+  <zorder>progressbar</zorder>
+  <zorder>progress_label</zorder>
+  <zorder>funding1</zorder>
+  <zorder>funding2</zorder>
+  <zorder>groupBox</zorder>
+  <zorder>groupBox_3</zorder>
+  <zorder>groupBox_2</zorder>
+  <zorder>do_dist_matrix</zorder>
  </widget>
  <resources/>
  <connections/>

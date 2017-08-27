@@ -15,7 +15,7 @@ class AssignmentResults:
         """
         self.link_loads = None       # The actual results for assignment
         self.skims = None            # The array of skims
-        self.no_path = None          # The list os paths_computation
+        self.no_path = None          # The list os paths
         self.num_skims = None        # number of skims that will be computed. Depends on the setting of the graph provided
         self.cores = mp.cpu_count()
         self.classes = {'number':1,

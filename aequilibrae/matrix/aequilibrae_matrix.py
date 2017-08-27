@@ -26,8 +26,9 @@ import tempfile
 import os
 from numpy.lib.format import open_memmap
 import zipfile
+import copy
 
-
+import warnings
 
 # Necessary in case we are no the QGIS world
 # try:
@@ -45,16 +46,17 @@ class AequilibraeMatrix():
 
         self.zones = kwargs.get('zones', 1)
 
-        self.num_matrices = kwargs.get('cores', 1)
+        self.cores = kwargs.get('cores', 1)
 
-        self.names = kwargs.get('names', ['mat'])
+        self.names = kwargs.get('names')
 
         self.data_type = kwargs.get('dtype', np.float64)
 
         self.matrix_hash = {}
 
         self.reserved_names = ['matrix_procedures', 'matrix_hash', 'data_type', 'names',
-                               'num_matrice', 'zones', 'file_location', 'file_name', 'storage_path']
+                               'num_matrice', 'zones', 'file_location', 'file_name', 'storage_path',
+                               'rows', 'vector', 'columns', 'export']
 
         # methods that will be used for computation
         self.matrix_view = None
@@ -63,14 +65,14 @@ class AequilibraeMatrix():
 
         if self.names is None:
             self.names = []
-            for i in range(self.num_matrices):
+            for i in range(self.cores):
                 self.names.append('matrix_' + str(i))
         else:
             if type(self.names) is list:
-                if len(self.names) != self.num_matrices:
+                if len(self.names) != self.cores:
                     raise Exception('List of matrix_procedures names incompatible with number of matrices')
             else:
-                if self.num_matrices == 1 and type(self.names) is str:
+                if self.cores == 1 and type(self.names) is str:
                     self.names = [self.names]
                 else:
                     raise Exception('Matrix names need to be provided as a list')
@@ -120,6 +122,26 @@ class AequilibraeMatrix():
             archive.write(self.computation_path, os.path.basename(self.computation_path))
             archive.close()
 
+    def export(self, output_name, cores = None):
+        extension = output_name.upper()[-3:]
+        if cores is None:
+            cores = self.names
+
+        if extension == 'CSV':
+            names = self.view_names
+            self.computational_view(cores)
+            output = open(output_name, 'w')
+            for i in range(self.zones):
+                for j in range(self.zones):
+                    record = [self.index[i], self.index[j]]
+                    record.extend(self.matrix_view[i,j,:])
+                    print >> output, ','.join(record)
+            output.flush()
+            output.close()
+            self.computational_view(names)
+        else:
+            warnings.warn('File extension not implemented yet')
+
     def load(self, file_path):
         f = open(file_path)
         self.storage_path = os.path.realpath(f.name)
@@ -141,7 +163,7 @@ class AequilibraeMatrix():
         self.matrix = open_memmap(self.computation_path, mode='r+')
         self.zones = self.matrix.shape[0]
         self.names = [x for x in self.matrix.dtype.fields if x != 'index']
-        self.num_matrices = len(self.names)
+        self.cores = len(self.names)
         self.data_type = self.matrix.dtype[0]
         self.matrix_hash = self.__builds_hash__()
 
@@ -157,23 +179,52 @@ class AequilibraeMatrix():
             self.view_names = None
             raise ('Please provide a list of matrices')
 
-    def copy(self):
+    def copy(self, cores=None, names=None):
+
+        if cores is None: cores = self.names
+
+        if not isinstance(cores, list):
+            raise ValueError('Cores need to be presented as list')
+
+        if names is None:
+            names = copy.deepcopy(cores)
+            if not isinstance(names, list):
+                raise ValueError('names need to be presented as list')
+
+            if len(cores) != len(names):
+                raise ValueError('Cores to copy and list of names needs to have the same length')
+
         output = AequilibraeMatrix(zones=self.zones,
-                                        num_matrices=self.num_matrices,
-                                        names=self.names,
-                                        data_type=self.data_type,
-                                        cores=self.num_matrices)
+                                   cores=len(names),
+                                   names=names,
+                                   data_type=self.data_type)
 
         output.index[:] = self.index[:]
-        for name in self.names:
-            output.matrix[name][:, :] = self.matrix[name][:, :]
-
+        for name, new_name in zip(cores, names):
+            output.matrix[new_name][:, :] = self.matrix[name][:, :]
+            name_dict = {name: new_name}
         output.__builds_hash__()
 
         if self.view_names is not None:
-            output.computational_view(self.view_names)
+            new_view_names = [name_dict[name] for name in self.view_names if name in cores]
+            if new_view_names:
+                output.computational_view(new_view_names)
 
         return output
+
+    def rows(self):
+        return self.vector(axis=0)
+
+    def columns(self):
+        return self.vector(axis=1)
+
+    def vector(self, axis):
+        if self.view_names is None:
+            raise ReferenceError('Matrix is not set for computation')
+        if len(self.view_names) > 1:
+            raise ReferenceError('Vector for a multi-core matrix is ambiguous')
+
+        return np.sum(self.matrix_view[:,:,0], axis=axis)
 
     def __builds_hash__(self):
         return {self.index[i]: i for i in range(self.zones)}

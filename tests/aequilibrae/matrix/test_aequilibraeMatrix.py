@@ -5,7 +5,6 @@ import tempfile
 import numpy as np
 
 from aequilibrae.matrix import AequilibraeMatrix
-from common_tools import clean_after_tests
 
 zones = 100
 path_test =tempfile.gettempdir()
@@ -49,11 +48,14 @@ class TestAequilibraeMatrix(TestCase):
             self.fail('Matrix indices was not maintained')
 
         # test in-memory matrix_procedures copy
-        matrix_copy = self.new_matrix.copy()
+        matrix_copy = self.new_matrix.copy(cores=['mat'], names=['copy_mat'])
 
         matrix_copy.storage_path = self.new_matrix.storage_path
         matrix_copy.file_location = self.new_matrix.file_location
         matrix_copy.file_name = self.new_matrix.file_name
 
-        if not np.array_equal(matrix_copy.matrix, self.new_matrix.matrix):
+        if not np.array_equal(matrix_copy.copy_mat, self.new_matrix.mat):
             self.fail('Matrix copy was not perfect')
+
+        if matrix_copy.names != ['copy_mat']:
+            self.fail('Wrong number of cores were copied')

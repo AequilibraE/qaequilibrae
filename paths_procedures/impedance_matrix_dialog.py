@@ -167,7 +167,7 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
                 print >> q, l
             q.flush()
             q.close()
-        if self.csv_res.isChecked():
+        if self.radio_csv.isChecked():
             infinite = np.zeros(1, np.float64)
             infinite[0] = 1.797e+308
             q = open(self.imped_results.text(), 'w')

@@ -38,8 +38,8 @@ class SyntheticGravityModel:
             if key == 'function':
                 self.alpha = None
                 self.beta = None
-                if value not in valid_functions:
-                    raise ValueError('Function needs to be one of these: ' + ', '.join(valid_functions))
+                if value not in self.valid_functions:
+                    raise ValueError('Function needs to be one of these: ' + ', '.join(self.valid_functions))
             else:
                 if isinstance(value, float) or isinstance(value, int):
                     if key == 'alpha':
@@ -54,11 +54,21 @@ class SyntheticGravityModel:
 
             self.__dict__[key] = value
 
+    def __getattr__(self, key):
+        if key == 'valid_functions':
+            return valid_functions
+        elif key == 'members':
+            return members
+        elif key == 'model_type':
+            return model_type
+        else:
+            return self.__dict__[key]
+
     def load(self, file_name):
         try:
-            model = yaml.safe_load(open(file_name, 'r'))[model_type]
+            model = yaml.safe_load(open(file_name, 'r'))[self.model_type]
             for key, value in model.iteritems():
-                if key in members:
+                if key in self.members:
                     self.__dict__[key] = value
                 else:
                     raise ValueError('Model has unknown parameters: ' + str(key))

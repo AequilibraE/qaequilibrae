@@ -57,27 +57,30 @@ class GravityApplication:
 
         self.impedance = kwargs.get('impedance')
         self.model = kwargs.get('model')
-
+        self.core_name = kwargs.get('output_core','gravity')
         self.output = None
+        self.gap = np.inf
 
     def apply(self):
         self.check_data()
         t= clock()
         max_cost = self.parameters['max trip length']
         # We create the output
-        self.output = self.impedance.copy()
-        comput_core = self.output.view_names[0]
+        self.core_name = 'gravity'
+        self.output = self.impedance.copy(cores=self.impedance.view_names, names=[self.core_name])
+        self.output.computational_view([self.core_name])
+
         # We apply the function
         self.apply_function()
 
         # We zero those cells that have a trip length above the limit
         if max_cost > 0:
-            a = (self.output.matrix[comput_core][:, :] < max_cost).astype(int)
-            self.output.matrix[comput_core][:, :] = a * self.output.matrix[comput_core][:, :]
+            a = (self.output.matrix[self.core_name][:, :] < max_cost).astype(int)
+            self.output.matrix[self.core_name][:, :] = a * self.output.matrix[self.core_name][:, :]
 
         # We adjust the total of the self.output
-        total_factor = np.sum(self.rows.data[self.row_field]) / np.sum(self.output.matrix[comput_core][:, :])
-        self.output.matrix[comput_core][:, :] = self.output.matrix[comput_core][:, :] * total_factor
+        total_factor = np.sum(self.rows.data[self.row_field]) / np.sum(self.output.matrix[self.core_name][:, :])
+        self.output.matrix[self.core_name][:, :] = self.output.matrix[self.core_name][:, :] * total_factor
 
         # And adjust with a fratar
         ipf = Ipf(matrix=self.output, rows=self.rows, columns=self.columns,
@@ -92,6 +95,7 @@ class GravityApplication:
         # apply fratar
         ipf.fit()
         self.output = ipf.output
+        self.gap = ipf.gap
 
         q = ipf.report.pop(0)
         for q in ipf.report:
@@ -100,8 +104,8 @@ class GravityApplication:
         self.report.append('')
         self.report.append('')
 
-        self.report.append('Total of matrix: ' + "{:15,.4f}".format(float(np.sum(self.output.matrix[comput_core]))))
-        self.report.append('Intrazonal flow: ' + "{:15,.4f}".format(float(np.trace(self.output.matrix[comput_core]))))
+        self.report.append('Total of matrix: ' + "{:15,.4f}".format(float(np.sum(self.output.matrix[self.core_name]))))
+        self.report.append('Intrazonal flow: ' + "{:15,.4f}".format(float(np.trace(self.output.matrix[self.core_name]))))
         self.report.append('Running time: ' + str(round(clock()-t, 3)))
 
     def get_parameters(self):
@@ -136,7 +140,7 @@ class GravityApplication:
             raise TypeError('Column vector needs to be an instance of AequilibraEData')
 
         if not isinstance(self.impedance, AequilibraeMatrix):
-            raise TypeError('Seed matrix needs to be an instance of AequilibraEMatrix')
+            raise TypeError('Impedance matrix needs to be an instance of AequilibraEMatrix')
 
         # Check data dimensions
         if not np.array_equal(self.rows.index, self.columns.index):
@@ -175,21 +179,21 @@ class GravityApplication:
                 break
 
     def apply_function(self):
-        comput_core = self.output.view_names[0]
+        self.core_name = self.output.view_names[0]
         for i in range(self.rows.entries):
             p = self.rows.data[self.row_field][i]
             a = self.columns.data[self.column_field][:]
 
             if self.model.function == "EXPO":
-                self.output.matrix[comput_core][i, :] = np.exp(- self.model.beta * self.impedance.matrix_view[i, :, 0]) * p * a
+                self.output.matrix[self.core_name][i, :] = np.exp(- self.model.beta * self.impedance.matrix_view[i, :, 0]) * p * a
 
             elif self.model.function == "POWER":
-                self.output.matrix[comput_core][i, :] = np.nan_to_num(np.power(self.impedance.matrix_view[i, :, 0], - self.model.alpha) * p * a)[:]
+                self.output.matrix[self.core_name][i, :] = np.nan_to_num(np.power(self.impedance.matrix_view[i, :, 0], - self.model.alpha) * p * a)[:]
             elif self.model.function == "GAMMA":
-                self.output.matrix[comput_core][i, :] = np.nan_to_num(np.power(self.impedance.matrix_view[i, :, 0], self.model.alpha) * np.exp(- self.model.beta * self.impedance.matrix_view[i, :, 0]) * p * a)[:]
+                self.output.matrix[self.core_name][i, :] = np.nan_to_num(np.power(self.impedance.matrix_view[i, :, 0], self.model.alpha) * np.exp(- self.model.beta * self.impedance.matrix_view[i, :, 0]) * p * a)[:]
 
         # Deals with infinite and NaNs
-        infinite = np.isinf(self.output.matrix[comput_core][:, :]).astype(int)
-        non_inf = np.ones_like(self.output.matrix[comput_core][:, :]) - infinite
-        self.output.matrix[comput_core][:, :] = self.output.matrix[comput_core][:, :] * non_inf
-        np.nan_to_num(self.output.matrix[comput_core][:, :])
+        infinite = np.isinf(self.output.matrix[self.core_name][:, :]).astype(int)
+        non_inf = np.ones_like(self.output.matrix[self.core_name][:, :]) - infinite
+        self.output.matrix[self.core_name][:, :] = self.output.matrix[self.core_name][:, :] * non_inf
+        np.nan_to_num(self.output.matrix[self.core_name][:, :])

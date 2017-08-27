@@ -28,8 +28,8 @@ import numpy as np
 import warnings
 
 from ..common_tools.auxiliary_functions import *
-from ..common_tools import ReportDialog, GetOutputFileName, LoadVectorDialog
-from ..matrix_procedures import LoadMatrixDialog
+from ..common_tools import ReportDialog, GetOutputFileName
+from ..matrix_procedures import LoadMatrixDialog, LoadVectorDialog
 from ipf_procedure import IpfProcedure
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_ipf.ui'))

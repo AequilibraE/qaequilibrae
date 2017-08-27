@@ -1,10 +1,10 @@
 import os
 import yaml
-import aequilibrae as ae
+
 
 class Parameters:
     def __init__(self):
-        self.path = os.path.dirname(ae.__file__)
+        self.path = os.path.dirname(os.path.realpath(__file__))
 
         file = os.path.join(self.path, 'parameters.yml')
         with open(file, 'r') as yml:

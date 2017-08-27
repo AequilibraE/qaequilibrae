@@ -34,8 +34,8 @@ from binary_downloader_class import BinaryDownloaderDialog
 from .distribution_procedures import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
-from .paths_computation import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
-from .matrix_procedures import LoadMatrixDialog
+from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
+from .matrix_procedures import LoadMatrixDialog, LoadVectorDialog
 import tempfile, glob
 
 no_binary = False
@@ -43,11 +43,11 @@ old_binary = False
 try:
     from aequilibrae.paths import VERSION
     VERSION_GRAPH = ''
-    a = open(os.path.join(os.path.dirname(__file__), 'aequilibrae/paths_computation/parameters.pxi'), 'r')
+    a = open(os.path.join(os.path.dirname(__file__), 'aequilibrae/paths/parameters.pxi'), 'r')
 
     for i in a.readlines():
-        if 'VERSION' in i and 'SUB' not in i:
-            VERSION_GRAPH = i[11:-2]
+        if 'VERSION' in i:
+            VERSION_GRAPH = i[11:-1]
 
     if VERSION != VERSION_GRAPH:
         old_binary = True
@@ -108,14 +108,20 @@ class AequilibraEMenu:
         # ########################################################################
         # #################  MATRIX MANIPULATION SUB-MENU  #######################
 
-        self.matrix_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Matrices"))
+        self.matrix_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Data"))
         self.aequilibrae_add_submenu(self.matrix_menu)
 
         # Loading matrices
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
-        self.load_matrix_action = QAction(icon, u"Import matrix_procedures", self.iface.mainWindow())
+        self.load_matrix_action = QAction(icon, u"Import matrices", self.iface.mainWindow())
         QObject.connect(self.load_matrix_action, SIGNAL("triggered()"), self.run_load_matrices)
         self.matrix_menu.addAction(self.load_matrix_action)
+
+        # Loading Database
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dataset.png")
+        self.load_database_action = QAction(icon, u"Import dataset", self.iface.mainWindow())
+        QObject.connect(self.load_database_action, SIGNAL("triggered()"), self.run_load_database)
+        self.matrix_menu.addAction(self.load_database_action)
 
 
         # # ########################################################################
@@ -173,9 +179,9 @@ class AequilibraEMenu:
         QObject.connect(self.shortest_path_action, SIGNAL("triggered()"), self.run_shortest_path)
         self.assignment_menu.addAction(self.shortest_path_action)
 
-        # Distance matrix_procedures generation
+        # Distance matrix generation
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dist_matrix.png")
-        self.dist_matrix_action = QAction(icon, u"Impedance matrix_procedures", self.iface.mainWindow())
+        self.dist_matrix_action = QAction(icon, u"Impedance matrix", self.iface.mainWindow())
         QObject.connect(self.dist_matrix_action, SIGNAL("triggered()"), self.run_dist_matrix)
         self.assignment_menu.addAction(self.dist_matrix_action)
 
@@ -284,6 +290,11 @@ class AequilibraEMenu:
 
     def run_load_matrices(self):
         dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=False)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_load_database(self):
+        dlg2 = LoadVectorDialog(self.iface, single_use=False)
         dlg2.show()
         dlg2.exec_()
 

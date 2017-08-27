@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>matrix_loader</class>
- <widget class="QDialog" name="matrix_loader">
+ <class>vector_loader</class>
+ <widget class="QDialog" name="vector_loader">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -9,14 +9,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>501</width>
-    <height>349</height>
+    <width>498</width>
+    <height>410</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>501</width>
-    <height>349</height>
+    <width>498</width>
+    <height>430</height>
    </size>
   </property>
   <property name="font">
@@ -25,21 +25,21 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>AequilibraE  -  Matrix loader</string>
+   <string>AequilibraE  -  Vector loader</string>
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../../../../../../.designer/icon.png</normaloff>../../../../../../.designer/icon.png</iconset>
+    <normaloff>../icon.png</normaloff>../icon.png</iconset>
   </property>
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QPushButton" name="but_load">
+  <widget class="QPushButton" name="but_import_and_use">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>140</y>
-     <width>91</width>
+     <x>160</x>
+     <y>68</y>
+     <width>131</width>
      <height>23</height>
     </rect>
    </property>
@@ -81,7 +81,7 @@
     </palette>
    </property>
    <property name="text">
-    <string>LOAD</string>
+    <string>Use data</string>
    </property>
   </widget>
   <widget class="QProgressBar" name="progressbar">
@@ -91,9 +91,9 @@
    <property name="geometry">
     <rect>
      <x>460</x>
-     <y>177</y>
+     <y>10</y>
      <width>31</width>
-     <height>161</height>
+     <height>391</height>
     </rect>
    </property>
    <property name="palette">
@@ -142,281 +142,87 @@
    <property name="orientation">
     <enum>Qt::Vertical</enum>
    </property>
-   <property name="textDirection">
-    <enum>QProgressBar::BottomToTop</enum>
-   </property>
   </widget>
-  <widget class="QComboBox" name="field_cells">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
+  <widget class="QComboBox" name="cob_index_field">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>104</y>
-     <width>261</width>
+     <x>250</x>
+     <y>36</y>
+     <width>190</width>
      <height>24</height>
     </rect>
    </property>
    <property name="maxVisibleItems">
     <number>10</number>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="field_from">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>42</y>
-     <width>261</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="maxVisibleItems">
-    <number>10</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbl_matrix">
-   <property name="geometry">
-    <rect>
-     <x>151</x>
-     <y>15</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Matrix core</string>
    </property>
   </widget>
   <widget class="QLabel" name="lbl_from">
    <property name="geometry">
     <rect>
-     <x>151</x>
-     <y>46</y>
+     <x>171</x>
+     <y>40</y>
      <width>121</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>From</string>
+    <string>Index field</string>
    </property>
   </widget>
-  <widget class="QLabel" name="lbl_flow">
+  <widget class="QRadioButton" name="radio_aequilibrae">
    <property name="geometry">
     <rect>
-     <x>151</x>
-     <y>108</y>
-     <width>121</width>
-     <height>16</height>
+     <x>10</x>
+     <y>10</y>
+     <width>131</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Flow</string>
+    <string>AequilibraE data</string>
    </property>
-  </widget>
-  <widget class="QComboBox" name="matrix_layer">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>11</y>
-     <width>261</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="maxVisibleItems">
-    <number>10</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbl_to">
-   <property name="geometry">
-    <rect>
-     <x>151</x>
-     <y>77</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>To</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="field_to">
-   <property name="enabled">
+   <property name="checked">
     <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>73</y>
-     <width>261</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="maxVisibleItems">
-    <number>10</number>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radio_omx_matrix">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>108</y>
-     <width>61</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>OMX</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radio_npy_matrix">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>77</y>
-     <width>71</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Numpy</string>
    </property>
   </widget>
   <widget class="QRadioButton" name="radio_layer_matrix">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>46</y>
-     <width>91</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Open layer</string>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="but_save_for_single_use">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>140</y>
-     <width>91</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="palette">
-    <palette>
-     <active>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </active>
-     <inactive>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </inactive>
-     <disabled>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </disabled>
-    </palette>
-   </property>
-   <property name="text">
-    <string>Single use</string>
-   </property>
-  </widget>
-  <widget class="QTableWidget" name="matrix_list_view">
-   <property name="geometry">
-    <rect>
      <x>10</x>
-     <y>177</y>
-     <width>441</width>
-     <height>161</height>
-    </rect>
-   </property>
-   <column>
-    <property name="text">
-     <string>Name</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Dimensions</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Total</string>
-    </property>
-   </column>
-  </widget>
-  <widget class="QLabel" name="progress_label">
-   <property name="geometry">
-    <rect>
-     <x>299</x>
-     <y>142</y>
-     <width>191</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radio_aeq_matrix">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>15</y>
-     <width>101</width>
+     <y>40</y>
+     <width>161</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>AequilibraE</string>
+    <string>Import from layer</string>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="chb_all_fields">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>96</y>
+     <width>141</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>All fields</string>
    </property>
    <property name="checked">
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="but_permanent_save">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
+  <widget class="QPushButton" name="but_save_and_use">
    <property name="geometry">
     <rect>
-     <x>105</x>
-     <y>140</y>
-     <width>91</width>
+     <x>304</x>
+     <y>68</y>
+     <width>136</width>
      <height>23</height>
     </rect>
    </property>
@@ -458,44 +264,166 @@
     </palette>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>Save and Use</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="compressed">
+  <widget class="QTableWidget" name="table_fields_to_import">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>143</y>
-     <width>141</width>
-     <height>17</height>
+     <x>247</x>
+     <y>139</y>
+     <width>190</width>
+     <height>261</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>Field</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QTableWidget" name="table_all_fields">
+   <property name="geometry">
+    <rect>
+     <x>13</x>
+     <y>139</y>
+     <width>190</width>
+     <height>261</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>Field</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QToolButton" name="but_removes_from_links">
+   <property name="geometry">
+    <rect>
+     <x>214</x>
+     <y>250</y>
+     <width>21</width>
+     <height>19</height>
     </rect>
    </property>
    <property name="text">
-    <string>Compress outputs</string>
+    <string>...</string>
    </property>
-   <property name="checked">
-    <bool>true</bool>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonIconOnly</enum>
+   </property>
+   <property name="arrowType">
+    <enum>Qt::LeftArrow</enum>
    </property>
   </widget>
-  <zorder>matrix_list_view</zorder>
-  <zorder>but_load</zorder>
-  <zorder>progressbar</zorder>
-  <zorder>field_cells</zorder>
-  <zorder>field_from</zorder>
-  <zorder>lbl_matrix</zorder>
-  <zorder>lbl_from</zorder>
-  <zorder>lbl_flow</zorder>
-  <zorder>matrix_layer</zorder>
-  <zorder>lbl_to</zorder>
-  <zorder>field_to</zorder>
-  <zorder>radio_omx_matrix</zorder>
-  <zorder>radio_npy_matrix</zorder>
-  <zorder>radio_layer_matrix</zorder>
-  <zorder>but_save_for_single_use</zorder>
-  <zorder>progress_label</zorder>
-  <zorder>radio_aeq_matrix</zorder>
-  <zorder>but_permanent_save</zorder>
-  <zorder>compressed</zorder>
+  <widget class="QToolButton" name="but_adds_to_links">
+   <property name="geometry">
+    <rect>
+     <x>214</x>
+     <y>230</y>
+     <width>21</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>...</string>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonIconOnly</enum>
+   </property>
+   <property name="arrowType">
+    <enum>Qt::RightArrow</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="but_load">
+   <property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>68</y>
+     <width>131</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>180</red>
+         <green>180</green>
+         <blue>180</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>180</red>
+         <green>180</green>
+         <blue>180</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>180</red>
+         <green>180</green>
+         <blue>180</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
+   </property>
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cob_data_layer">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>10</y>
+     <width>190</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="maxVisibleItems">
+    <number>10</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lbl_from_2">
+   <property name="geometry">
+    <rect>
+     <x>171</x>
+     <y>13</y>
+     <width>121</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Data layer</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lbl_from_3">
+   <property name="geometry">
+    <rect>
+     <x>283</x>
+     <y>122</y>
+     <width>131</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Keep these fields only</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

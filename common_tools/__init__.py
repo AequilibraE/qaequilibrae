@@ -24,8 +24,6 @@ from get_output_file_name import GetOutputFileName
 from get_output_file_name import GetOutputFolderName
 from link_query_model import LinkQueryModel
 from load_graph_layer_setting_dialog import LoadGraphLayerSettingDialog
-from load_vector_class import LoadVector
-from load_vector_dialog import LoadVectorDialog
 from numpy_model import NumpyModel
 from parameters_dialog import ParameterDialog
 from report_dialog import ReportDialog

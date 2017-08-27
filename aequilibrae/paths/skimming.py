@@ -37,7 +37,7 @@ import thread
 from multi_threaded_skimming import MultiThreadedNetworkSkimming
 no_binaries = False
 try:
-    from AoN import one_to_all, path_computation
+    from AoN import one_to_all, network_skimming
 except:
     no_binaries = True
 
@@ -45,13 +45,15 @@ def main():
     pass
 
 
-def network_skimming(graph, results, origins=None):
+def skimming(graph, results, origins=None):
     aux_res = MultiThreadedNetworkSkimming()
     aux_res.prepare(graph, results)
 
     if origins is None:
         origins = [i for i in range(results.zones)]
     # catch errors
+    if graph.cost_field is None:
+        raise ValueError('The graph was not set for computation. Use graph.set_graph')
     if results.__graph_id__ is None:
         raise ValueError('The results object was not prepared. Use results.prepare(graph)')
     elif results.__graph_id__ != graph.__id__:
@@ -64,7 +66,6 @@ def network_skimming(graph, results, origins=None):
             pool.apply_async(func_assig_thread, args=(O, graph, results, aux_res, all_threads, report))
         pool.close()
         pool.join()
-    results.link_loads = np.sum(aux_res.temp_link_loads, axis=1)
     return report
 
 
@@ -75,7 +76,7 @@ def func_assig_thread(O, g, res, aux_res, all_threads, report):
         all_threads[thread.get_ident()] = all_threads['count']
         th = all_threads['count']
         all_threads['count'] += 1
-    a = path_computation(O, g, res, aux_res, th)
+    a = network_skimming(O, g, res, aux_res, th)
     if a != O:
         report.append(a)
 

@@ -22,7 +22,7 @@
 from qgis.core import *
 from PyQt4.QtCore import *
 import numpy as np
-from worker_thread import WorkerThread
+from ..common_tools.worker_thread import WorkerThread
 import struct
 
 class LoadVector(WorkerThread):

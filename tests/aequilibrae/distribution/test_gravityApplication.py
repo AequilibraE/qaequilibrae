@@ -9,13 +9,17 @@ zones = 100
 args = {'entries': zones,
         'fields': ['rows'],
         'types': [np.float64]}
+
 row_vector = AequilibraEData(**args)
-row_vector.rows[:] = np.random.rand(zones)[:] * 1000
+row_vector.index[:] = np.arange(row_vector.entries) + 100
+row_vector.rows[:] = row_vector.index[:] + np.random.rand(zones)[:]
 
 # column vector
 args['fields'] = ['columns']
 column_vector = AequilibraEData(**args)
-column_vector.columns[:] = np.random.rand(zones)[:] * 1000
+column_vector.index[:] = np.arange(column_vector.entries) + 100
+column_vector.columns[:] = column_vector.index[:] + np.random.rand(zones)[:]
+
 
 # balance vectors
 column_vector.columns[:] = column_vector.columns[:] * (row_vector.rows.sum()/column_vector.columns.sum())
@@ -27,6 +31,7 @@ args = {'zones': zones,
 
 matrix = AequilibraeMatrix(**args)
 matrix.impedance[:, :] = np.random.rand(zones, zones)[:,:]
+matrix.index[:] = np.arange(matrix.zones) + 100
 matrix.computational_view(['impedance'])
 
 model = SyntheticGravityModel()
@@ -45,4 +50,6 @@ class TestGravityApplication(TestCase):
 
         distributed_matrix = GravityApplication(**args)
         distributed_matrix.apply()
-        pass
+
+        if distributed_matrix.gap > distributed_matrix.parameters['convergence level']:
+            self.fail('Gravity application did not converge')

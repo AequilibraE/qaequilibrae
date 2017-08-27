@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-08-15
- Updated:    30/09/2016
+ Updated:    15/08/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -28,22 +28,16 @@ import numpy as np
 
 import sys, os
 from functools import partial
-from auxiliary_functions import *
-from global_parameters import *
+from ..common_tools.auxiliary_functions import *
+from ..common_tools.global_parameters import *
 
 
 from load_vector_class import LoadVector
 
-try:
-    import omx
-    OMX = True
-except:
-    OMX = False
-
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_vector_loader.ui'))
 
 class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, iface, **kwargs):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
@@ -54,58 +48,112 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
         self.cells = None
         self.vector = None
         self.error = None
+        self.selected_fields = None
+        self.ignore_fields = []
+        self.single_use = kwargs.get("single_use", True)
 
-        self.radio_layer_matrix.clicked.connect(self.change_vector_type)
-        self.radio_npy_matrix.clicked.connect(self.change_vector_type)
-        self.radio_omx_matrix.clicked.connect(self.change_vector_type)
+        self.radio_layer_matrix.clicked.connect(partial(self.size_it_accordingly, False))
+        self.radio_aequilibrae.clicked.connect(partial(self.size_it_accordingly, False))
+        self.chb_all_fields.clicked.connect(self.set_tables_with_fields)
+        self.but_adds_to_links.clicked.connect(self.append_to_list)
 
         # For changing the network layer
-        self.vector_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
-
+        self.cob_data_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+        self.but_removes_from_links.clicked.connect(self.removes_fields)
         # For adding skims
-        self.load.clicked.connect(self.load_the_vector)
+        self.but_load.clicked.connect(self.load_from_aequilibrae_format)
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
             if 'wkbType' in dir(layer):
                 if layer.wkbType() in [100] + point_types + poly_types:
-                    self.vector_layer.addItem(layer.name())
+                    self.cob_data_layer.addItem(layer.name())
 
-        if not OMX:
-            self.radio_omx_matrix.setVisible(False)
+        if not self.single_use:
+            self.radio_layer_matrix.setChecked(True)
+            self.radio_aequilibrae.setEnabled(False)
+            self.but_import_and_use.setEnabled(False)
+            self.but_load.setEnabled(False)
+            self.but_save_and_use.setText('Import')
 
-    def change_vector_type(self):
-        members = [self.lbl_matrix, self.lbl_from, self.vector_layer, self.field_from]
-        all_members = members + [self.lbl_flow, self.field_cells]
+        self.size_it_accordingly(partial(self.size_it_accordingly, False))
 
-        # Covers the Numpy option (minimizes the code length this way)
-        for member in all_members:
-            member.setVisible(False)
+    def set_tables_with_fields(self):
+        self.size_it_accordingly(False)
 
-        if self.radio_layer_matrix.isChecked():
-            self.lbl_matrix.setText('Vector layer')
-            self.lbl_from.setText('From')
-            for member in all_members:
-                member.setVisible(True)
+        if self.chb_all_fields.isChecked() and self.layer is not None:
+            self.ignore_fields = []
+            self.selected_fields = [x.name() for x in self.layer.dataProvider().fields().toList()]
 
-        if self.radio_omx_matrix.isChecked():
-            self.lbl_matrix.setText('Vector core')
-            self.lbl_from.setText('Indices')
-            for member in members:
-                member.setVisible(True)
+        for table in [self.table_all_fields, self.table_fields_to_import]:
+            table.setRowCount(0)
+            table.clearContents()
+        if self.layer is not None:
+            comb = [(self.table_fields_to_import, self.selected_fields),
+                    (self.table_all_fields, self.ignore_fields)]
+            for table, fields in comb:
+                for field in fields:
+                    table.setRowCount(table.rowCount() + 1)
+                    item1 = QTableWidgetItem(field)
+                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    table.setItem(table.rowCount() -1, 0, item1)
+
+    def size_it_accordingly(self, final=False):
+        def set_size(w, h):
+            self.setMaximumSize(QSize(w, h))
+            self.resize(w, h)
+
+        if self.radio_aequilibrae.isChecked():
+            set_size(154, 100)
+        else:
+            if final:
+                if self.radio_layer_matrix.isChecked():
+                    if self.chb_all_fields.isChecked():
+                        set_size(498, 120)
+                    self.progressbar.setMinimumHeight(100)
+                else:
+                    set_size(498, 410)
+                    self.progressbar.setMinimumHeight(390)
+            else:
+                if self.chb_all_fields.isChecked():
+                    set_size(449, 120)
+                else:
+                    set_size(449, 410)
+
+    def removes_fields(self):
+        for i in self.table_fields_to_import.selectedRanges():
+            old_fields = [self.table_fields_to_import.item(row, 0).text() for row in xrange(i.topRow(), i.bottomRow() + 1)]
+
+            self.ignore_fields.extend(old_fields)
+            self.selected_fields = [x for x in self.selected_fields if x not in old_fields]
+
+        self.set_tables_with_fields()
+
+    def append_to_list(self):
+        for i in self.table_all_fields.selectedRanges():
+            new_fields = [self.table_all_fields.item(row, 0).text() for row in xrange(i.topRow(), i.bottomRow() + 1)]
+
+            self.selected_fields.extend(new_fields)
+            self.ignore_fields = [x for x in self.ignore_fields if x not in new_fields]
+
+        self.set_tables_with_fields()
+
 
     def load_fields_to_combo_boxes(self):
-        for combo in [self.field_from, self.field_cells]:
-            combo.clear()
+        self.cob_index_field.clear()
 
-        if self.vector_layer.currentIndex() >= 0:
-            self.layer = get_vector_layer_by_name(self.vector_layer.currentText())
+        all_fields = []
+        if self.cob_data_layer.currentIndex() >= 0:
+            self.ignore_fields = []
+            self.layer = get_vector_layer_by_name(self.cob_data_layer.currentText())
+            self.selected_fields = [x.name() for x in self.layer.dataProvider().fields().toList()]
             for field in self.layer.dataProvider().fields().toList():
                 if field.type() in integer_types:
-                    self.field_from.addItem(field.name())
-                    self.field_cells.addItem(field.name())
+                    self.cob_index_field.addItem(field.name())
+                    all_fields.append(field.name())
                 if field.type() in float_types:
-                    self.field_cells.addItem(field.name())
+                    all_fields.append(field.name())
+        self.set_tables_with_fields()
 
     def run_thread(self):
         QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
@@ -132,6 +180,11 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
         else:
             self.vector = self.worker_thread.vector
             self.exit_procedure()
+
+
+    def load_from_aequilibrae_format(self):
+        pass
+
 
     def load_the_vector(self):
         self.error = None
@@ -160,11 +213,6 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
                     self.error = 'Numpy array needs to be 2 dimensional. Matrix provided has ' + str(len(matrix.shape[:]))
             except:
                 pass
-
-
-        if self.radio_omx_matrix.isChecked():
-            pass
-            # Still not implemented
 
         if self.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)

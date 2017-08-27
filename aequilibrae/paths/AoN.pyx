@@ -440,7 +440,7 @@ def network_skimming(origin, graph, result, aux_result, curr_thread):
     cdef double [:, :] graph_skim_view = graph.skims
 
     # views from the result object
-    cdef double [:, :] final_skim_matrices_view = result.skims[O, :, :]
+    cdef double [:, :] final_skim_matrices_view = result.skims.matrix_view[O, :, :]
 
     # views from the aux-result object
     cdef int [:] predecessors_view = aux_result.predecessors[:, curr_thread]

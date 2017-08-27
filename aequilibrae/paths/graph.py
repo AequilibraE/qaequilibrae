@@ -69,7 +69,7 @@ class Graph:
         self.network = False  # This method will hold ALL information on the network
         self.graph = False  # This method will hold an array with ALL fields in the graph.
 
-        # These are the fields actually used in computing paths_computation
+        # These are the fields actually used in computing paths
         self.fs = False      # This method will hold the forward star for the graph
         self.b_node = False  # b node for each directed link
         self.cost = None    # This array holds the values being used in the shortest path routine
@@ -459,7 +459,7 @@ class Graph:
         skim_fields = []
         if self.cost is not None:
             if not skim_fields:
-                skim_fields = [self.cost_field, self.cost_field]
+                skim_fields = [self.cost_field]
             else:
                 s = [self.cost_field]
                 for i in skim_fields:
@@ -474,7 +474,7 @@ class Graph:
             if self.graph[i].dtype != np.float64:
                 t = True
 
-        self.skims = np.zeros((self.num_links, len(skim_fields)), np.float64)
+        self.skims = np.zeros((self.num_links, len(skim_fields) + 1), np.float64)
 
         if t:
             print 'Some skim field with wrong type. Converting to float64'
