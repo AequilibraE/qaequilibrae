@@ -119,7 +119,9 @@ class AequilibraeMatrix():
                     file_path = self.storage_path
                 
             archive = zipfile.ZipFile(file_path, 'w', compression)
-            archive.write(self.computation_path, os.path.basename(self.computation_path))
+
+            # saves
+            archive.write(self.computation_path, os.path.basename(file_path)[:-3]+'npy')
             archive.close()
 
     def export(self, output_name, cores = None):
@@ -131,11 +133,17 @@ class AequilibraeMatrix():
             names = self.view_names
             self.computational_view(cores)
             output = open(output_name, 'w')
+
+            titles = ['row', 'column']
+            for core in self.view_names:
+                titles.append(core)
+            print >> output, ','.join(titles)
+
             for i in range(self.zones):
                 for j in range(self.zones):
                     record = [self.index[i], self.index[j]]
                     record.extend(self.matrix_view[i,j,:])
-                    print >> output, ','.join(record)
+                    print >> output, ','.join(str(x) for x in record)
             output.flush()
             output.close()
             self.computational_view(names)

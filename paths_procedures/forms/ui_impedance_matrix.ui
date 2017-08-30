@@ -3,27 +3,33 @@
  <class>Impedance_Matrix</class>
  <widget class="QDialog" name="Impedance_Matrix">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>627</width>
-    <height>401</height>
+    <height>393</height>
    </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>627</width>
+    <height>393</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>AequilibraE - Impedance matrix toolbox</string>
   </property>
   <property name="modal">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <widget class="QLabel" name="funding1">
    <property name="geometry">
     <rect>
      <x>13</x>
-     <y>371</y>
+     <y>362</y>
      <width>321</width>
      <height>16</height>
     </rect>
@@ -41,7 +47,7 @@
    <property name="geometry">
     <rect>
      <x>210</x>
-     <y>369</y>
+     <y>360</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -171,7 +177,7 @@
      <x>20</x>
      <y>300</y>
      <width>591</width>
-     <height>61</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="title">
@@ -213,7 +219,7 @@
      <string>CSV</string>
     </property>
     <property name="checked">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="radio_aequilibrae">
@@ -227,6 +233,9 @@
     </property>
     <property name="text">
      <string>AequilibraE</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="radio_omx">
@@ -319,7 +328,7 @@
    <property name="geometry">
     <rect>
      <x>370</x>
-     <y>370</y>
+     <y>361</y>
      <width>241</width>
      <height>20</height>
     </rect>
@@ -340,7 +349,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>370</y>
+     <y>361</y>
      <width>331</width>
      <height>23</height>
     </rect>
@@ -393,7 +402,7 @@
    <property name="geometry">
     <rect>
      <x>398</x>
-     <y>363</y>
+     <y>354</y>
      <width>201</width>
      <height>31</height>
     </rect>

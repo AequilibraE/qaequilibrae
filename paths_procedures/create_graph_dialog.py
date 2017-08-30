@@ -289,11 +289,10 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         else:
 
             if self.centroids is None:
-                self.worker_thread.graph.set_graph(cost_field=self.cost_field, skim_fields=list(self.cost_field),
+                self.worker_thread.graph.set_graph(cost_field=self.cost_field,
                                                    block_centroid_flows=self.block_through_centroids)
             else:
                 self.worker_thread.graph.set_graph(centroids=self.centroids, cost_field=self.cost_field,
-                                                   skim_fields=list(self.cost_field),
                                                    block_centroid_flows=self.block_through_centroids)
 
             self.worker_thread.graph.save_to_disk(self.output)

@@ -37,18 +37,12 @@ from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTrans
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 from .matrix_procedures import LoadMatrixDialog, LoadVectorDialog
 import tempfile, glob
+from .aequilibrae.__version__ import version as VERSION_GRAPH
 
 no_binary = False
 old_binary = False
 try:
     from aequilibrae.paths import VERSION
-    VERSION_GRAPH = ''
-    a = open(os.path.join(os.path.dirname(__file__), 'aequilibrae/paths/parameters.pxi'), 'r')
-
-    for i in a.readlines():
-        if 'VERSION' in i:
-            VERSION_GRAPH = i[11:-1]
-
     if VERSION != VERSION_GRAPH:
         old_binary = True
 except:

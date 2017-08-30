@@ -26,9 +26,9 @@
   <widget class="QPushButton" name="but_save_log">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>470</x>
      <y>610</y>
-     <width>821</width>
+     <width>361</width>
      <height>31</height>
     </rect>
    </property>
@@ -41,6 +41,26 @@
    </property>
    <property name="text">
     <string>Save log</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="but_close">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>610</y>
+     <width>361</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Close</string>
    </property>
   </widget>
  </widget>

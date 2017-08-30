@@ -3,7 +3,7 @@
 # include 'parameters.pxi'
 import numpy as np
 import multiprocessing as mp
-from aequilibrae.matrix import AequilibraeMatrix
+from ...matrix import AequilibraeMatrix
 
 class SkimResults:
     def __init__(self):
@@ -27,7 +27,7 @@ class SkimResults:
         self.nodes = graph.num_nodes + 1
         self.zones = graph.centroids + 1
         self.links = graph.num_links + 1
-        self.num_skims = graph.skims.shape[1]
+        self.num_skims = len(graph.skim_fields)
 
         self.skims = AequilibraeMatrix(zones=self.zones, cores=self.num_skims, names=graph.skim_fields)
         self.skims.index[:] = np.arange(self.zones)[:]

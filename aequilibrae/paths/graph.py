@@ -24,12 +24,7 @@ import os, csv
 import cPickle
 from datetime import datetime
 import uuid
-
-VERSION = ''
-a = open(os.path.join(os.path.dirname(__file__),'parameters.pxi'), 'r')
-for i in a.readlines():
-    if 'VERSION' in i and 'SUB' not in i:
-        VERSION = i[11:-2]
+from ..__version__ import version as VERSION
 
 
 '''description: Description of the graph (OPTIONAL)
@@ -110,6 +105,9 @@ class Graph:
             for i, f in enumerate(fields):
                 if f[0] == field_name:
                     return i - 1
+
+            f = [str(x[0]) for x in fields]
+            raise ValueError (field_name + ' does not exist. Fields available are: ' + ', '.join(f))
             return -1
 
         # collect the fields in the network
@@ -148,6 +146,7 @@ class Graph:
         for feat in records:
             for i, j in enumerate(check_fields):
                 k = feat[j]
+                u = type(k)
                 if not isinstance(k, types_to_check[i]):
                     error = check_titles[i], "field has wrong type or empty values"
                     break
@@ -195,6 +194,8 @@ class Graph:
             self.__source__ = geo_file
             self.__field_name__ = None
             self.__layer_name__ = None
+        if error is not None:
+            raise ValueError(error)
 
     # Procedure to load csv network from disk
     def load_network_from_csv(self, netw):
@@ -456,7 +457,6 @@ class Graph:
                 print 'Cost field with wrong type. Converting to float64'
                 self.cost = self.graph[cost_field].astype(np.float64)
 
-        skim_fields = []
         if self.cost is not None:
             if not skim_fields:
                 skim_fields = [self.cost_field]
@@ -503,6 +503,8 @@ class Graph:
         mygraph['status'] = self.status
         mygraph['network_ok'] = self.network_ok
         mygraph['type_loaded'] = self.type_loaded
+        mygraph['graph_id'] = self.__id__
+        mygraph['graph_version'] = self.__version__
 
         cPickle.dump(mygraph, open(filename, 'wb'))
 
@@ -523,6 +525,8 @@ class Graph:
         self.status = mygraph['status']
         self.network_ok = mygraph['network_ok']
         self.type_loaded = mygraph['type_loaded']
+        self.__id__ = mygraph['graph_id']
+        self.__version__ = mygraph['graph_version']
         del mygraph
 
     # We return the list of the fields that are the same for both directions to their initial states

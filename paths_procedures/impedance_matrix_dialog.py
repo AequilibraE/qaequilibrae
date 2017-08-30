@@ -121,13 +121,12 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
     def browse_outfile(self):
         file_types = "Comma-Separated files(*.csv)"
-        if self.npy_res.isChecked():
-            file_types = "Numpy Binnary Array(*.npy)"
+        def_type='.csv'
+        if self.radio_aequilibrae.isChecked():
+            file_types = "AequilibraE Array(*.aem)"
+            def_type = 'aem'
 
-        if len(self.imped_results.text()) > 0:
-            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.imped_results.text(), file_types)
-        else:
-            new_name = QFileDialog.getSaveFileName(None, 'Result file', self.path, file_types)
+        new_name, _ = GetOutputFileName(self, 'AequilibraE impedance computation', [file_types], def_type, self.path)
 
         self.imped_results.setText('')
         if new_name is not None:
@@ -135,6 +134,7 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
     def run_thread(self):
 
+        self.do_dist_matrix.setVisible(False)
         QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
         QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
         QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
@@ -160,30 +160,10 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
         if len(self.worker_thread.report) > 0:
             self.report = self.worker_thread.report
 
-        if self.npy_res.isChecked():
-            np.save(self.imped_results.text(), self.result.skims)
-            q = open(self.imped_results.text() + '.csv', 'w')
-            for l in self.skim_fields:
-                print >> q, l
-            q.flush()
-            q.close()
+        if self.radio_aequilibrae.isChecked():
+            self.result.skims.save_to_disk(file_path=self.imped_results.text(), compressed=True)
         if self.radio_csv.isChecked():
-            infinite = np.zeros(1, np.float64)
-            infinite[0] = 1.797e+308
-            q = open(self.imped_results.text(), 'w')
-            text = 'Origin,Destination,' + self.cb_minimizing.currentText()
-            for l in self.skim_fields:
-                text = text + ',' + l
-            print >> q, text
-            for i in range(self.graph.centroids + 1):
-                if np.sum(self.result.skims[i, :, :]) > 0:
-                    for j in range(self.graph.centroids + 1):
-                        if np.sum(self.result.skims[i, j, :]) > 0:
-                            text = str(i) + ',' + str(j) + ','
-                            text = text + ','.join([`num` if infinite[0]>num else '' for num in self.result.skims[i, j, :]])
-                            print >> q, text
-                q.flush()
-            q.close()
+            self.result.skims.export(self.imped_results.text())
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results
@@ -194,6 +174,10 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
             block_paths = True
 
         if centroids > 0:
+            # Guarantees that there is only one copy of the minimizing value in there
+            if cost_field in self.skim_fields:
+                self.skim_fields.remove(cost_field)
+
             self.graph.set_graph(centroids, cost_field, self.skim_fields, block_paths)
             self.result.prepare(self.graph)
         else:

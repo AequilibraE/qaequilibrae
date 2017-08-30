@@ -40,6 +40,7 @@ class ReportDialog(QtGui.QDialog, FORM_CLASS):
             self.all_data.append(t)
 
         self.but_save_log.clicked.connect(self.save_log)
+        self.but_close.clicked.connect(self.exit_procedure)
 
     def save_log(self):
         file_types = "Text files(*.txt)"

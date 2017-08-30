@@ -26,6 +26,9 @@ cimport cython
 
 include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
+from ..__version__ import version as VERSION
+
+
 
 @cython.wraparound(False)
 @cython.embedsignature(True)

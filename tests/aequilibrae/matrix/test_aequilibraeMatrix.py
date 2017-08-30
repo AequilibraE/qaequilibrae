@@ -30,6 +30,7 @@ class TestAequilibraeMatrix(TestCase):
         del(matrix)
 
     def test_load(self):
+        self.test___init__()
         self.new_matrix = AequilibraeMatrix()
         self.new_matrix.load(os.path.join(path_test, name_test[:-3] + 'aem'))
 
@@ -59,3 +60,7 @@ class TestAequilibraeMatrix(TestCase):
 
         if matrix_copy.names != ['copy_mat']:
             self.fail('Wrong number of cores were copied')
+
+    def test_export(self):
+        self.test_load()
+        self.new_matrix.export('/tmp/aequilibrae_test_export_matrix.csv')
