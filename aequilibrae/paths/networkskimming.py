@@ -37,7 +37,7 @@ import thread
 from multi_threaded_skimming import MultiThreadedNetworkSkimming
 no_binaries = False
 try:
-    from AoN import one_to_all, network_skimming
+    from AoN import skimming_single_origin
 except:
     no_binaries = True
 
@@ -45,7 +45,7 @@ def main():
     pass
 
 
-def skimming(graph, results, origins=None):
+def network_skimming(graph, results, origins=None):
     aux_res = MultiThreadedNetworkSkimming()
     aux_res.prepare(graph, results)
 

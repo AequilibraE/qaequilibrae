@@ -39,7 +39,7 @@ class TestGraph(TestCase):
         self.graph.set_graph(centroids=30, cost_field='distance',block_centroid_flows=True)
         if self.graph.centroids != 30:
             self.fail('Number of centroids not properly set')
-        if self.graph.num_links != 230:
+        if self.graph.num_links != 222:
             self.fail('Number of links not properly set')
         if self.graph.num_nodes != 169:
             self.fail('Number of nodes not properly set')

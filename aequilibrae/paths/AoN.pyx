@@ -82,7 +82,7 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
     cdef double [:, :] graph_skim_view = graph.skims
 
     # views from the result object
-    cdef double [:, :] final_skim_matrices_view = result.skims[O, :, :]
+    cdef double [:, :] final_skim_matrices_view = result.skims.matrix_view[O, :, :]
     cdef int [:] no_path_view = result.no_path[O, :]
 
     # views from the aux-result object
@@ -399,7 +399,7 @@ def path_computation(origin, destination, graph, results):
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
-def network_skimming(origin, graph, result, aux_result, curr_thread):
+def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
     """
 
     :param origin:
@@ -527,7 +527,7 @@ cpdef void skimming(int origin,
 
 # ###########################################################################################################################
 #############################################################################################################################
-#Original Dijkstra implementation by Jake Vanderplas', taken from SciPy V0.11
+#Original Dijkstra implementation by Jake Vanderplas, taken from SciPy V0.11
 #The old Pyrex syntax for loops was replaced with Python syntax
 #Old Numpy Buffers were replaces with latest memory views interface to allow for the release of the GIL
 # Path tracking arrays and skim arrays were also added to it

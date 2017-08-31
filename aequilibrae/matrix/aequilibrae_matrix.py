@@ -179,8 +179,12 @@ class AequilibraeMatrix():
         if core_list is None:
             core_list = self.names
         if isinstance(core_list, list):
-            partial_mat = self.matrix[core_list]
-            self.matrix_view = partial_mat.view(np.float64).reshape(partial_mat.shape + (-1,))
+
+            view_dtype = np.dtype({core:self.matrix.dtype.fields[core] for core in core_list})
+            self.matrix_view = np.ndarray(self.matrix.shape, view_dtype, self.matrix, 0, self.matrix.strides)
+
+            # partial_mat = self.matrix[core_list]
+            # self.matrix_view = partial_mat.view(np.float64).reshape(partial_mat.shape + (-1,))
             self.view_names = core_list
         else:
             self.matrix_view = None
