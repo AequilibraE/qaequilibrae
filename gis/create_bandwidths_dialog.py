@@ -343,6 +343,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 props['offset_dd_expression'] = acc_offset + '+' + str(side) + ' * (coalesce(scale_linear("' + field + \
                                                 '", 0, ' + str(max_value) + ', 0, ' + band_size + '), 0)/2 + ' + \
                                                 space_size + ')'
+                props['line_style_expression'] = 'if ("' + field + '" = 0,' + "'no', 'solid')"
+                
                 if isinstance(clr, dict):
                     if direc == 'ab':
                         props['color_dd_expression'] = "ramp_color(\'" + clr[

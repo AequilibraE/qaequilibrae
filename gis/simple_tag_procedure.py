@@ -122,73 +122,74 @@ class SimpleTAG(WorkerThread):
 
     def chooses_match(self, feat):
         geom = feat.geometry()
-        if self.transform is not None:
-            geom.transform(self.transform)
+        if geom is not None:
+            if self.transform is not None:
+                geom.transform(self.transform)
 
-        if self.operation in ["ENCLOSED", "TOUCHING"]:
-            nearest = self.index_from.intersects(geom.boundingBox())
+            if self.operation in ["ENCLOSED", "TOUCHING"]:
+                nearest = self.index_from.intersects(geom.boundingBox())
 
-            if self.fmatch:
-                near2 = []
-                for n in nearest:
-                    if self.from_match[feat.id()] == self.to_match[n]:
-                        near2.append(n)
-                nearest = near2
-
-            if self.operation == "ENCLOSED":
-                for n in nearest:
-                    if self.from_features[n].geometry().contains(geom):
-                        self.all_attr[feat.id()] = self.from_val[n]
-                        break
-            else:
-                # we will compute the overlaps to make sure we are keeping the best match. e.g. Largest area or largest
-                # length
-                current_max = [None, -1]
-                relevant_types = line_types + poly_types
-                ranking = False
-                if self.from_layer.wkbType() in relevant_types and self.to_layer.wkbType() in relevant_types:
-                    ranking = True
-                    intersec = 'length'
-                    if self.from_layer.wkbType() in poly_types and self.to_layer.wkbType() in poly_types:
-                        intersec = 'area'
-
-                for n in nearest:
-                    if ranking:
-                        intersection = self.from_features[n].geometry().intersection(geom)
-                        if intersection.geometry() is not None:
-                            if intersec == 'length':
-                                aux = intersection.geometry().length()
-                            else:
-                                aux = intersection.geometry().area()
-                            if aux > current_max[1]:
-                                current_max[0] = self.from_val[n]
-                                current_max[1] = aux
-                if current_max[0] is not None:
-                    self.all_attr[feat.id()] = current_max[0]
-        else:
-            # The problem with the "nearest" search is that we cannot swear by it when we are using only spatial
-            # indexes. For this reason we will compute a fixed number of nearest neighbors and then get the
-            # distance for each one of them
-            pt = geom.centroid()
-            s = self.sequence_of_searches[1]
-            nearest = self.index_from.nearestNeighbor(pt, s)
-            dists = np.zeros(len(nearest))
-
-            for k, n in enumerate(nearest):
-                dists[k] = self.from_features[n].geometry().distance(geom)
-            min_index = np.argsort(dists)
-
-            for k in range(len(nearest)):
-                n = nearest[min_index[k]]
                 if self.fmatch:
-                    if self.from_match[feat.id()] == self.to_match[n]:
+                    near2 = []
+                    for n in nearest:
+                        if self.from_match[feat.id()] == self.to_match[n]:
+                            near2.append(n)
+                    nearest = near2
+
+                if self.operation == "ENCLOSED":
+                    for n in nearest:
+                        if self.from_features[n].geometry().contains(geom):
+                            self.all_attr[feat.id()] = self.from_val[n]
+                            break
+                else:
+                    # we will compute the overlaps to make sure we are keeping the best match. e.g. Largest area or largest
+                    # length
+                    current_max = [None, -1]
+                    relevant_types = line_types + poly_types
+                    ranking = False
+                    if self.from_layer.wkbType() in relevant_types and self.to_layer.wkbType() in relevant_types:
+                        ranking = True
+                        intersec = 'length'
+                        if self.from_layer.wkbType() in poly_types and self.to_layer.wkbType() in poly_types:
+                            intersec = 'area'
+
+                    for n in nearest:
+                        if ranking:
+                            intersection = self.from_features[n].geometry().intersection(geom)
+                            if intersection.geometry() is not None:
+                                if intersec == 'length':
+                                    aux = intersection.geometry().length()
+                                else:
+                                    aux = intersection.geometry().area()
+                                if aux > current_max[1]:
+                                    current_max[0] = self.from_val[n]
+                                    current_max[1] = aux
+                    if current_max[0] is not None:
+                        self.all_attr[feat.id()] = current_max[0]
+            else:
+                # The problem with the "nearest" search is that we cannot swear by it when we are using only spatial
+                # indexes. For this reason we will compute a fixed number of nearest neighbors and then get the
+                # distance for each one of them
+                pt = geom.centroid()
+                s = self.sequence_of_searches[1]
+                nearest = self.index_from.nearestNeighbor(pt, s)
+                dists = np.zeros(len(nearest))
+
+                for k, n in enumerate(nearest):
+                    dists[k] = self.from_features[n].geometry().distance(geom)
+                min_index = np.argsort(dists)
+
+                for k in range(len(nearest)):
+                    n = nearest[min_index[k]]
+                    if self.fmatch:
+                        if self.from_match[feat.id()] == self.to_match[n]:
+                            self.all_attr[feat.id()] = self.from_val[n]
+                            break
+                    else:
                         self.all_attr[feat.id()] = self.from_val[n]
                         break
-                else:
-                    self.all_attr[feat.id()] = self.from_val[n]
-                    break
-                if feat.id() in self.all_attr:
-                    break
+                    if feat.id() in self.all_attr:
+                        break
 
 
 if __name__ == '__main__':
