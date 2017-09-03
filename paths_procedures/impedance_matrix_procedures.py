@@ -32,7 +32,7 @@ from ..common_tools import WorkerThread
 
 no_binary = False
 try:
-    from aequilibrae.paths import networkskimming, MultiThreadedNetworkSkimming
+    from aequilibrae.paths import skimming_single_origin, MultiThreadedNetworkSkimming
 except:
     no_binary = True
     
@@ -53,30 +53,39 @@ class ComputeDistMatrix(WorkerThread):
         self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.graph.centroids)
         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
 
-
         aux_res = MultiThreadedNetworkSkimming()
         aux_res.prepare(self.graph, self.result)
 
-        pool = ThreadPool(self.result.cores)
-        all_threads = {'count': 0}
-        for O in range(self.result.zones):
-            pool.apply_async(self.func_assig_thread, args=(O, self.graph, self.result, aux_res, all_threads, self.report))
-        pool.close()
-        pool.join()
+        origins = [i for i in range(self.result.zones)]
+
+        # catch errors
+        if self.graph.cost_field is None:
+            raise ValueError('The graph was not set for computation. Use graph.set_graph')
+        if self.result.__graph_id__ is None:
+            raise ValueError('The results object was not prepared. Use results.prepare(graph)')
+        elif self.result.__graph_id__ != self.graph.__id__:
+            raise ValueError('The results object was prepared for a different graph')
+        else:
+            pool = ThreadPool(self.result.cores)
+            all_threads = {'count': 0}
+            for O in origins:
+                pool.apply_async(self.func_assig_thread, args=(O, aux_res, all_threads, self.report))
+            pool.close()
+            pool.join()
 
         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), self.graph.centroids)
-
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Saving Outputs")
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), None)
 
-    def func_assig_thread(self, O, g, res, aux_res, all_threads, report):
+    def func_assig_thread(self, O, aux_res, all_threads, report):
         if thread.get_ident() in all_threads:
             th = all_threads[thread.get_ident()]
         else:
             all_threads[thread.get_ident()] = all_threads['count']
             th = all_threads['count']
             all_threads['count'] += 1
-        a = networkskimming(O, g, res, aux_res, th)
+        a = skimming_single_origin(O, self.graph, self.result, aux_res, th)
+
         if a != O:
             report.append(a)
 

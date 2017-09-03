@@ -142,7 +142,10 @@ class AequilibraeMatrix():
             for i in range(self.zones):
                 for j in range(self.zones):
                     record = [self.index[i], self.index[j]]
-                    record.extend(self.matrix_view[i,j,:])
+                    if len(self.view_names) > 1:
+                        record.extend(self.matrix_view[i,j,:][0])
+                    else:
+                        record.append(self.matrix_view[i,j][0])
                     print >> output, ','.join(str(x) for x in record)
             output.flush()
             output.close()

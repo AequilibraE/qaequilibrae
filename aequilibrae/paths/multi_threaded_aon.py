@@ -20,4 +20,6 @@ class MultiThreadedAoN:
         self.connectors = np.zeros((results.nodes, results.cores), dtype=np.int32)
         self.temp_link_loads = np.zeros((results.links, results.classes['number'], results.cores), dtype=np.float64)
         self.temp_node_loads = np.zeros((results.nodes, results.classes['number'], results.cores), dtype=np.float64)
-        self.temp_b_nodes = graph.b_node.copy()
+        self.temp_b_nodes =  np.zeros((graph.b_node.shape[0], results.cores), dtype=np.int32)
+        for i in range(results.cores):
+            self.temp_b_nodes[:,i] = graph.b_node[:]

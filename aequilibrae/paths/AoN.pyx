@@ -29,7 +29,6 @@ from libc.stdlib cimport abort, malloc, free
 from ..__version__ import version as VERSION
 
 
-
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
@@ -92,7 +91,7 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
     cdef int [:] conn_view = aux_result.connectors[:, curr_thread]
     cdef double [:, :] link_loads_view = aux_result.temp_link_loads[:, curr_thread]
     cdef double [:, :] node_load_view = aux_result.temp_node_loads[:, curr_thread]
-    cdef int [:] b_nodes_view = aux_result.temp_b_nodes
+    cdef int [:] b_nodes_view = aux_result.temp_b_nodes[:, curr_thread]
 
     # path file variables
     cdef int [:] pred_view = result.path_file['results'][O,:,0]
@@ -329,15 +328,10 @@ def path_computation(origin, destination, graph, results):
     results.predecessors.fill(-1)
     results.connectors.fill(-1)
     results.temporary_skims.fill(-1)
-    skims = results.temporary_skims.shape[1]
-
-    for j in range(skims):
-        results.temporary_skims[O, j] = 0
-
+    skims = results.num_skims
 
     #In order to release the GIL for this procedure, we create all the
     #memmory views we will need
-    #print "creating views"
     cdef double [:] g_view = graph.cost
     cdef int [:] original_b_nodes_view = graph.b_node
     cdef int [:] graph_fs_view = graph.fs
@@ -353,9 +347,7 @@ def path_computation(origin, destination, graph, results):
     new_b_nodes = graph.b_node.copy()
     cdef int [:] b_nodes_view = new_b_nodes
 
-
     #Now we do all procedures with NO GIL
-    #print "start computation"
     with nogil:
         blocking_centroid_flows(O,
                                 centroids,
@@ -392,16 +384,11 @@ def path_computation(origin, destination, graph, results):
             del all_connectors
             del milepost
 
-
-
-
-
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
 def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
     """
-
     :param origin:
     :param graph:
     :param results:
@@ -440,19 +427,19 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
     cdef double [:] g_view = graph.cost
     cdef int [:] ids_graph_view = graph.ids
     cdef int [:] original_b_nodes_view = graph.b_node
-    cdef double [:, :] graph_skim_view = graph.skims
 
-    # views from the result object
-    cdef double [:, :] final_skim_matrices_view = result.skims.matrix_view[O, :, :]
+
+    # views that depend on whether we have a single skim or multiple
+    if skims > 1:  # We ned to handle the existence of a single skim or multiple
+        final_skim_matrices_view, graph_skim_view, skim_matrix_view = views_multiple(O, curr_thread, graph, result, aux_result)
+    else:
+        final_skim_matrices_view, graph_skim_view, skim_matrix_view = views_single(O, curr_thread, graph, result, aux_result)
 
     # views from the aux-result object
     cdef int [:] predecessors_view = aux_result.predecessors[:, curr_thread]
-    cdef double [:, :] skim_matrix_view = aux_result.temporary_skims[:, :, curr_thread]
     cdef int [:] reached_first_view = aux_result.reached_first[:, curr_thread]
     cdef int [:] conn_view = aux_result.connectors[:, curr_thread]
-    cdef int [:] b_nodes_view = aux_result.temp_b_nodes
-
-
+    cdef int [:] b_nodes_view = aux_result.temp_b_nodes[:, curr_thread]
 
     #Now we do all procedures with NO GIL
     with nogil:
@@ -470,34 +457,98 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
                          ids_graph_view,
                          conn_view,
                          reached_first_view)
+        if skims > 1:
+            skim_multiple_fields(O,
+                                 nodes,
+                                 centroids,
+                                 skims,
+                                 skim_matrix_view,
+                                 predecessors_view,
+                                 conn_view,
+                                 graph_skim_view,
+                                 reached_first_view,
+                                 w,
+                                 final_skim_matrices_view)
+        else:
+            skim_single_field(O,
+                                 nodes,
+                                 centroids,
+                                 skims,
+                                 skim_matrix_view,
+                                 predecessors_view,
+                                 conn_view,
+                                 graph_skim_view,
+                                 reached_first_view,
+                                 w,
+                                 final_skim_matrices_view)
+    return origin
 
-        skimming(O,
-                 nodes,
-                 centroids,
-                 skims,
-                 skim_matrix_view,
-                 predecessors_view,
-                 conn_view,
-                 graph_skim_view,
-                 reached_first_view,
-                 w,
-                 final_skim_matrices_view)
+cdef views_single(O, curr_thread, graph, result, aux_result):
+    cdef double [:] final_skim_matrices_view = result.skims.matrix_view[O, :]
+    cdef double [:] graph_skim_view = graph.skims[:, 0]
+    cdef double [:] skim_matrix_view = aux_result.temporary_skims[:, 0, curr_thread]
+    return final_skim_matrices_view, graph_skim_view, skim_matrix_view
+
+cdef views_multiple(O, curr_thread, graph, result, aux_result):
+    cdef double [:, :] final_skim_matrices_view = result.skims.matrix_view[O, :, :]
+    cdef double [:, :] graph_skim_view = graph.skims[:, :]
+    cdef double [:, :] skim_matrix_view = aux_result.temporary_skims[:, :, curr_thread]
+    return final_skim_matrices_view, graph_skim_view, skim_matrix_view
 
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False) # turn of bounds-checking for entire function
-cpdef void skimming(int origin,
-                    int nodes,
-                    int centroids,
-                    int skims,
-                    double[:, :] node_skims,
-                    int [:] pred,
-                    int [:] conn,
-                    double[:, :] graph_costs,
-                    int [:] reached_first,
-                    int found,
-                    double [:,:] final_skims) nogil:
+cpdef void skim_single_field(int origin,
+                                int nodes,
+                                int centroids,
+                                int skims,
+                                double[:] node_skims,
+                                int [:] pred,
+                                int [:] conn,
+                                double[:] graph_costs,
+                                int [:] reached_first,
+                                int found,
+                                double [:] final_skims) nogil:
+    cdef unsigned int i, node, predecessor, connector, j
+
+    # sets all skims to infinity
+    for i in range(nodes):
+            node_skims[i] = INFINITE
+
+    # Zeroes the intrazonal cost
+    node_skims[origin] = 0
+
+    # Cascade skimming
+    for i in xrange(1, found + 1):
+        node = reached_first[i]
+
+        # captures how we got to that node
+        predecessor = pred[node]
+        connector = conn[node]
+
+        node_skims[node] = node_skims[predecessor] + graph_costs[connector]
+
+    for i in range(centroids + 1):
+        final_skims[i] = node_skims[i]
+
+
+
+
+@cython.wraparound(False)
+@cython.embedsignature(True)
+@cython.boundscheck(False) # turn of bounds-checking for entire function
+cpdef void skim_multiple_fields(int origin,
+                                int nodes,
+                                int centroids,
+                                int skims,
+                                double[:, :] node_skims,
+                                int [:] pred,
+                                int [:] conn,
+                                double[:, :] graph_costs,
+                                int [:] reached_first,
+                                int found,
+                                double [:,:] final_skims) nogil:
     cdef unsigned int i, node, predecessor, connector, j
 
     # sets all skims to infinity
@@ -510,7 +561,7 @@ cpdef void skimming(int origin,
             node_skims[origin, j] = 0
 
     # Cascade skimming
-    for i in xrange(1, found):
+    for i in xrange(1, found + 1):
         node = reached_first[i]
 
         # captures how we got to that node
@@ -520,7 +571,7 @@ cpdef void skimming(int origin,
         for j in range(skims):
             node_skims[node, j] = node_skims[predecessor, j] + graph_costs[connector, j]
 
-    for i in range(centroids):
+    for i in range(centroids + 1):
         for j in range(skims):
             final_skims[i, j] = node_skims[i, j]
 

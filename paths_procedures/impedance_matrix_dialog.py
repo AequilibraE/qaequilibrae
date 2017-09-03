@@ -157,8 +157,7 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.progress_label.setText(val)
 
     def finished_threaded_procedure(self, val):
-        if len(self.worker_thread.report) > 0:
-            self.report = self.worker_thread.report
+        self.report = self.worker_thread.report
 
         if self.radio_aequilibrae.isChecked():
             self.result.skims.save_to_disk(file_path=self.imped_results.text(), compressed=True)

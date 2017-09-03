@@ -76,7 +76,8 @@ def func_assig_thread(O, g, res, aux_res, all_threads, report):
         all_threads[thread.get_ident()] = all_threads['count']
         th = all_threads['count']
         all_threads['count'] += 1
-    a = network_skimming(O, g, res, aux_res, th)
+    a = skimming_single_origin(O, g, res, aux_res, th)
+
     if a != O:
         report.append(a)
 
