@@ -427,19 +427,16 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
     cdef double [:] g_view = graph.cost
     cdef int [:] ids_graph_view = graph.ids
     cdef int [:] original_b_nodes_view = graph.b_node
+    cdef double [:, :] graph_skim_view = graph.skims[:, :]
 
-
-    # views that depend on whether we have a single skim or multiple
-    if skims > 1:  # We ned to handle the existence of a single skim or multiple
-        final_skim_matrices_view, graph_skim_view, skim_matrix_view = views_multiple(O, curr_thread, graph, result, aux_result)
-    else:
-        final_skim_matrices_view, graph_skim_view, skim_matrix_view = views_single(O, curr_thread, graph, result, aux_result)
+    cdef double [:, :] final_skim_matrices_view = result.skims.matrix_view[O, :, :]
 
     # views from the aux-result object
     cdef int [:] predecessors_view = aux_result.predecessors[:, curr_thread]
     cdef int [:] reached_first_view = aux_result.reached_first[:, curr_thread]
     cdef int [:] conn_view = aux_result.connectors[:, curr_thread]
     cdef int [:] b_nodes_view = aux_result.temp_b_nodes[:, curr_thread]
+    cdef double [:, :] skim_matrix_view = aux_result.temporary_skims[:, :, curr_thread]
 
     #Now we do all procedures with NO GIL
     with nogil:
@@ -457,43 +454,18 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
                          ids_graph_view,
                          conn_view,
                          reached_first_view)
-        if skims > 1:
-            skim_multiple_fields(O,
-                                 nodes,
-                                 centroids,
-                                 skims,
-                                 skim_matrix_view,
-                                 predecessors_view,
-                                 conn_view,
-                                 graph_skim_view,
-                                 reached_first_view,
-                                 w,
-                                 final_skim_matrices_view)
-        else:
-            skim_single_field(O,
-                                 nodes,
-                                 centroids,
-                                 skims,
-                                 skim_matrix_view,
-                                 predecessors_view,
-                                 conn_view,
-                                 graph_skim_view,
-                                 reached_first_view,
-                                 w,
-                                 final_skim_matrices_view)
+        skim_multiple_fields(O,
+                             nodes,
+                             centroids,
+                             skims,
+                             skim_matrix_view,
+                             predecessors_view,
+                             conn_view,
+                             graph_skim_view,
+                             reached_first_view,
+                             w,
+                             final_skim_matrices_view)
     return origin
-
-cdef views_single(O, curr_thread, graph, result, aux_result):
-    cdef double [:] final_skim_matrices_view = result.skims.matrix_view[O, :]
-    cdef double [:] graph_skim_view = graph.skims[:, 0]
-    cdef double [:] skim_matrix_view = aux_result.temporary_skims[:, 0, curr_thread]
-    return final_skim_matrices_view, graph_skim_view, skim_matrix_view
-
-cdef views_multiple(O, curr_thread, graph, result, aux_result):
-    cdef double [:, :] final_skim_matrices_view = result.skims.matrix_view[O, :, :]
-    cdef double [:, :] graph_skim_view = graph.skims[:, :]
-    cdef double [:, :] skim_matrix_view = aux_result.temporary_skims[:, :, curr_thread]
-    return final_skim_matrices_view, graph_skim_view, skim_matrix_view
 
 
 @cython.wraparound(False)

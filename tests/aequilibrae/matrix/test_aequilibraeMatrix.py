@@ -9,15 +9,14 @@ from aequilibrae.matrix import AequilibraeMatrix
 zones = 100
 path_test =tempfile.gettempdir()
 name_test = 'aequilibrae_matrix_test.npy'
-new_matrix = None
 
 class TestAequilibraeMatrix(TestCase):
     def test___init__(self):
         args = {'path': path_test,
                 'file_name': name_test,
                 'zones': zones,
-                'cores': 2,
-                'names': ['mat', 'seed']}
+                'cores': 3,
+                'names': ['mat', 'seed', 'dist']}
 
         matrix = AequilibraeMatrix(**args)
 
@@ -39,6 +38,10 @@ class TestAequilibraeMatrix(TestCase):
         self.new_matrix.computational_view(['mat', 'seed'])
         if self.new_matrix.matrix_view.shape[2] != 2:
             self.fail('Computational view returns the wrong number of matrices')
+
+        self.new_matrix.matrix_view.fill(-1.1)
+        if self.new_matrix.mat[0,0] != -1.1:
+            self.fail('Assigning to matrix view did not work')
 
     def test_copy(self):
         self.test_load()

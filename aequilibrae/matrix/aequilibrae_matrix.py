@@ -50,7 +50,7 @@ class AequilibraeMatrix():
 
         self.names = kwargs.get('names')
 
-        self.data_type = kwargs.get('dtype', np.float64)
+        self.data_type = kwargs.get('`', np.float64)
 
         self.matrix_hash = {}
 
@@ -143,9 +143,9 @@ class AequilibraeMatrix():
                 for j in range(self.zones):
                     record = [self.index[i], self.index[j]]
                     if len(self.view_names) > 1:
-                        record.extend(self.matrix_view[i,j,:][0])
+                        record.extend(self.matrix_view[i,j,:])
                     else:
-                        record.append(self.matrix_view[i,j][0])
+                        record.append(self.matrix_view[i,j])
                     print >> output, ','.join(str(x) for x in record)
             output.flush()
             output.close()
@@ -182,17 +182,19 @@ class AequilibraeMatrix():
         if core_list is None:
             core_list = self.names
         if isinstance(core_list, list):
+            cores = len(core_list)
+            var_size = np.dtype(self.data_type).itemsize
+
+            strides = (self.zones * cores * var_size, cores * var_size, var_size)
+            view_shape = (self.zones, self.zones, cores)
 
             view_dtype = np.dtype({core:self.matrix.dtype.fields[core] for core in core_list})
-            self.matrix_view = np.ndarray(self.matrix.shape, view_dtype, self.matrix, 0, self.matrix.strides)
-
-            # partial_mat = self.matrix[core_list]
-            # self.matrix_view = partial_mat.view(np.float64).reshape(partial_mat.shape + (-1,))
+            self.matrix_view = np.ndarray.view(np.ndarray(view_shape, view_dtype, self.matrix, 0, strides))
             self.view_names = core_list
         else:
             self.matrix_view = None
             self.view_names = None
-            raise ('Please provide a list of matrices')
+            raise TypeError('Please provide a list of matrices')
 
     def copy(self, cores=None, names=None):
 
@@ -237,9 +239,9 @@ class AequilibraeMatrix():
         if self.view_names is None:
             raise ReferenceError('Matrix is not set for computation')
         if len(self.view_names) > 1:
-            raise ReferenceError('Vector for a multi-core matrix is ambiguous')
+            raise ValueError('Vector for a multi-core matrix is ambiguous')
 
-        return np.sum(self.matrix_view[:,:,0], axis=axis)
+        return self.matrix_view.astype(np.float).sum(axis=axis)[:,0]
 
     def __builds_hash__(self):
         return {self.index[i]: i for i in range(self.zones)}

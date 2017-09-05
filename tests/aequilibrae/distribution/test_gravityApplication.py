@@ -34,10 +34,18 @@ matrix.impedance[:, :] = np.random.rand(zones, zones)[:,:]
 matrix.index[:] = np.arange(matrix.zones) + 100
 matrix.computational_view(['impedance'])
 
-model = SyntheticGravityModel()
-model.function = 'EXPO'
-model.beta = 0.1
+model_expo = SyntheticGravityModel()
+model_expo.function = 'EXPO'
+model_expo.beta = 0.1
 
+model_gamma = SyntheticGravityModel()
+model_gamma.function = 'GAMMA'
+model_gamma.beta = 0.1
+model_gamma.alpha = 0.1
+
+model_power = SyntheticGravityModel()
+model_power.function = 'POWER'
+model_power.alpha = 0.1
 
 class TestGravityApplication(TestCase):
     def test_apply(self):
@@ -45,11 +53,16 @@ class TestGravityApplication(TestCase):
                 'rows': row_vector,
                 'row_field': 'rows',
                 'columns': column_vector,
-                'column_field': 'columns',
-                'model': model}
+                'column_field': 'columns'}
 
-        distributed_matrix = GravityApplication(**args)
-        distributed_matrix.apply()
+        models = [('EXPO', model_expo),('POWER', model_power), ('GAMMA', model_gamma)]
 
-        if distributed_matrix.gap > distributed_matrix.parameters['convergence level']:
-            self.fail('Gravity application did not converge')
+        for model_name, model_obj in models:
+            args['model'] = model_obj
+            distributed_matrix = GravityApplication(**args)
+            distributed_matrix.apply()
+
+            if distributed_matrix.gap > distributed_matrix.parameters['convergence level']:
+                self.fail('Gravity application did not converge for model ' + model_name)
+
+

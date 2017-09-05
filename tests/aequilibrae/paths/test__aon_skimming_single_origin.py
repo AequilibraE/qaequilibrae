@@ -30,8 +30,10 @@ class TestSkimming_single_origin(TestCase):
         aux_result = MultiThreadedNetworkSkimming()
         aux_result.prepare(g, res)
 
+        print res.skims.matrix_view.shape[:]
         a = skimming_single_origin(origin, g, res, aux_result, 0)
         tot = np.sum(res.skims.distance[origin, :])
+        print tot
         if tot > 10e10:
             self.fail('Skimming was not successful. At least one np.inf returned.')
 
