@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>479</width>
-    <height>347</height>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,8 +29,8 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>192</x>
-     <y>246</y>
+     <x>186</x>
+     <y>241</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -58,8 +58,8 @@
   <widget class="QSlider" name="slider_band_size">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>276</y>
+     <x>184</x>
+     <y>271</y>
      <width>111</width>
      <height>18</height>
     </rect>
@@ -94,9 +94,9 @@
   <widget class="QPushButton" name="but_run">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>310</y>
-     <width>441</width>
+     <x>30</x>
+     <y>380</y>
+     <width>421</width>
      <height>27</height>
     </rect>
    </property>
@@ -107,8 +107,8 @@
   <widget class="QLabel" name="lbl_width">
    <property name="geometry">
     <rect>
-     <x>306</x>
-     <y>275</y>
+     <x>300</x>
+     <y>270</y>
      <width>31</width>
      <height>21</height>
     </rect>
@@ -134,10 +134,13 @@
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>248</y>
+     <y>250</y>
      <width>121</width>
      <height>17</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>BASE minus ALTERNATIVE</string>
    </property>
    <property name="text">
     <string>Differences only</string>
@@ -150,10 +153,13 @@
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>277</y>
+     <y>280</y>
      <width>111</width>
      <height>17</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>BASE minus ALTERNATIVE</string>
    </property>
    <property name="text">
     <string>Composite</string>
@@ -167,6 +173,9 @@
      <width>221</width>
      <height>161</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string/>
    </property>
    <property name="title">
     <string>Base case</string>
@@ -277,6 +286,84 @@
     </property>
    </widget>
   </widget>
+  <widget class="QgsColorButtonV2" name="positive_color">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>340</y>
+     <width>111</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Positive</string>
+   </property>
+  </widget>
+  <widget class="QgsColorButtonV2" name="negative_color">
+   <property name="geometry">
+    <rect>
+     <x>185</x>
+     <y>340</y>
+     <width>111</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Negative</string>
+   </property>
+  </widget>
+  <widget class="QgsColorButtonV2" name="common_flow_color">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>340</y>
+     <width>111</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Common</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="positive_label">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>310</y>
+     <width>101</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Positive differences</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="negative_label">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>310</y>
+     <width>101</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Negative differences</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="common_label">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>310</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Common flow</string>
+   </property>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -288,6 +375,11 @@
    <class>QgsMapLayerComboBox</class>
    <extends>QComboBox</extends>
    <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsColorButtonV2</class>
+   <extends>QToolButton</extends>
+   <header>qgscolorbuttonv2.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
