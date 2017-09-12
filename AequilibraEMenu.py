@@ -47,6 +47,7 @@ try:
         if 'VERSION' in i and 'SUB' not in i:
             VERSION_GRAPH = i[11:-2]
 
+    # logger((VERSION, VERSION_GRAPH))
     if VERSION != VERSION_GRAPH:
         old_binary = True
 except:

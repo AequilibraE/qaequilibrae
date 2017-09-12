@@ -169,7 +169,8 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
                 for abb, aba, di, t in ([ab_base, ab_alt, ab, 'ab'],[ba_base, ba_alt, ba, 'ba']):
                     width = '(coalesce(scale_linear(min("' + abb + '","' + aba + '") , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
                     offset = str(di) + '*(' + width + '/2 + ' + self.space_size + ')'
-                    symbol_layer = self.create_style(width, offset, self.common_colour)
+                    line_pattern = 'if (("' + abb + '"+"' + aba +  '") = 0,' + "'no', 'solid')"
+                    symbol_layer = self.create_style(width, offset, self.common_colour, line_pattern)
                     self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
                     if t == 'ab':
                         ab_offset = str(di) + '*(' + width + ' + ' + self.space_size + ')'
@@ -198,7 +199,8 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
             for i in styles:
                 width = '(coalesce(scale_linear(max("' + i[0] + '"-"' + i[1] + '",0) , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
                 offset = i[4] + '+' + str(i[3]) + '*(' + width + '/2 + ' + self.space_size + ')'
-                symbol_layer = self.create_style(width, offset, i[2])
+                line_pattern = 'if (("' + i[0] + '"+"' +  i[1] + '") = 0,' + "'no', 'solid')"
+                symbol_layer = self.create_style(width, offset, i[2], line_pattern)
                 self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
 
             self.layer.triggerRepaint()
@@ -212,13 +214,12 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
             return False
         return True
 
-    def create_style(self, width, offset, color):
-    # def create_style(self, width, offset, color, field_zero):
+    def create_style(self, width, offset, color, line_pattern):
         symbol_layer = QgsSimpleLineSymbolLayerV2.create({})
         props = symbol_layer.properties()
         props['width_dd_expression'] = width
         props['offset_dd_expression'] = offset
-
+        props['line_style_expression'] = line_pattern
         props['line_color'] = color
         # props['line_style_expression'] = 'if ("' + field_zero + '" = 0,' + "'no', 'solid')"
         symbol_layer = QgsSimpleLineSymbolLayerV2.create(props)
