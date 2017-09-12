@@ -49,7 +49,7 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
         self.negative_color = "218, 0, 3, 255"
 
         self.band_size = 10.0
-        self.space_size = 0.01
+        self.space_size = 0.0
         self.layer = None
         self.drive_side = get_parameter_chain(['system', 'driving side'])
 
@@ -213,12 +213,14 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
         return True
 
     def create_style(self, width, offset, color):
+    # def create_style(self, width, offset, color, field_zero):
         symbol_layer = QgsSimpleLineSymbolLayerV2.create({})
         props = symbol_layer.properties()
         props['width_dd_expression'] = width
         props['offset_dd_expression'] = offset
 
         props['line_color'] = color
+        # props['line_style_expression'] = 'if ("' + field_zero + '" = 0,' + "'no', 'solid')"
         symbol_layer = QgsSimpleLineSymbolLayerV2.create(props)
         return symbol_layer
 
