@@ -64,9 +64,9 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
         self.ba_FieldComboBoxAlt.currentIndexChanged.connect(partial(self.choose_a_field, 'alt_BA'))
 
         # space slider
-        self.slider_spacer.setMinimum(1)
+        self.slider_spacer.setMinimum(0)
         self.slider_spacer.setMaximum(30)
-        self.slider_spacer.setValue(1)
+        self.slider_spacer.setValue(0)
         self.slider_spacer.setTickPosition(QSlider.TicksBelow)
         self.slider_spacer.setTickInterval(10)
         self.slider_spacer.valueChanged.connect(self.spacevaluechange)

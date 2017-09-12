@@ -14,5 +14,5 @@ cdef ITYPE_t NULL_IDX = -9999
 
 cdef double INFINITE = 1.79769313e+308
 
-VERSION = "0.3.5"
-SUB_VERSION = '1'
+VERSION = "0.3.8"
+SUB_VERSION = '0'

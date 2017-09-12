@@ -127,7 +127,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>0.01</string>
+    <string>0.00</string>
    </property>
   </widget>
   <widget class="QRadioButton" name="radio_diff">
