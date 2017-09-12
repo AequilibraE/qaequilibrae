@@ -44,10 +44,12 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
 
-        self.common_colour = "0, 0, 0, 255"
-        self.positive_color = "0, 174, 116, 255"
-        self.negative_color = "218, 0, 3, 255"
-
+        self.positive_color.setColor(QColor(0, 174, 116, 255))
+        self.negative_color.setColor(QColor(218, 0, 3, 255))
+        self.common_flow_color.setColor(QColor(0, 0, 0, 255))
+        self.radio_diff.toggled.connect(self.show_color_composite)
+        self.radio_compo.toggled.connect(self.show_color_composite)
+        
         self.band_size = 10.0
         self.space_size = 0.0
         self.layer = None
@@ -84,7 +86,12 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
         self.sizevaluechange()
         self.spacevaluechange()
         self.set_initial_value_if_available()
-
+        self.show_color_composite()
+        
+    def show_color_composite(self):
+        self.common_label.setVisible(self.radio_compo.isChecked())
+        self.common_flow_color.setVisible(self.radio_compo.isChecked())
+        
     def choose_a_field(self, modified):
         if modified[0:3] == 'bas':
             self.choose_field_indeed(modified, self.ab_FieldComboBoxBase, self.ba_FieldComboBoxBase)
@@ -170,7 +177,7 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
                     width = '(coalesce(scale_linear(min("' + abb + '","' + aba + '") , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
                     offset = str(di) + '*(' + width + '/2 + ' + self.space_size + ')'
                     line_pattern = 'if (("' + abb + '"+"' + aba +  '") = 0,' + "'no', 'solid')"
-                    symbol_layer = self.create_style(width, offset, self.common_colour, line_pattern)
+                    symbol_layer = self.create_style(width, offset, self.text_color(self.common_flow_color), line_pattern)
                     self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
                     if t == 'ab':
                         ab_offset = str(di) + '*(' + width + ' + ' + self.space_size + ')'
@@ -191,10 +198,10 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
 
             # We now create the positive and negative bandwidths for each side of the link
             styles = []
-            styles.append((ab_base, ab_alt, self.positive_color, ab, ab_offset))
-            styles.append((ab_alt, ab_base, self.negative_color, ab, ab_offset))
-            styles.append((ba_base, ba_alt, self.positive_color, ba, ba_offset))
-            styles.append((ba_alt, ba_base, self.negative_color, ba, ba_offset))
+            styles.append((ab_base, ab_alt, self.text_color(self.positive_color), ab, ab_offset))
+            styles.append((ab_alt, ab_base, self.text_color(self.negative_color), ab, ab_offset))
+            styles.append((ba_base, ba_alt, self.text_color(self.positive_color), ba, ba_offset))
+            styles.append((ba_alt, ba_base, self.text_color(self.negative_color), ba, ba_offset))
 
             for i in styles:
                 width = '(coalesce(scale_linear(max("' + i[0] + '"-"' + i[1] + '",0) , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
@@ -228,6 +235,10 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
     def exit_procedure(self):
         self.close()
 
-
+    def text_color(self, some_color_btn):
+        str_color = str(some_color_btn.color().getRgb())
+        str_color = str_color.replace("(", "")
+        return str_color.replace(")", "")
+       
 if __name__ == '__main__':
     main()
