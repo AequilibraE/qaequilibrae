@@ -176,7 +176,7 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
                 for abb, aba, di, t in ([ab_base, ab_alt, ab, 'ab'],[ba_base, ba_alt, ba, 'ba']):
                     width = '(coalesce(scale_linear(min("' + abb + '","' + aba + '") , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
                     offset = str(di) + '*(' + width + '/2 + ' + self.space_size + ')'
-                    line_pattern = 'if (("' + abb + '"+"' + aba +  '") = 0,' + "'no', 'solid')"
+                    line_pattern = 'if (max(("' + abb + '"+"' + aba +  '"),0) = 0,' + "'no', 'solid')"
                     symbol_layer = self.create_style(width, offset, self.text_color(self.common_flow_color), line_pattern)
                     self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
                     if t == 'ab':
@@ -198,16 +198,17 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
 
             # We now create the positive and negative bandwidths for each side of the link
             styles = []
-            styles.append((ab_base, ab_alt, self.text_color(self.positive_color), ab, ab_offset))
-            styles.append((ab_alt, ab_base, self.text_color(self.negative_color), ab, ab_offset))
-            styles.append((ba_base, ba_alt, self.text_color(self.positive_color), ba, ba_offset))
-            styles.append((ba_alt, ba_base, self.text_color(self.negative_color), ba, ba_offset))
-
+            styles.append((ab_base, ab_alt, ab, ab_offset))
+            styles.append((ba_base, ba_alt, ba, ba_offset))
+            
             for i in styles:
-                width = '(coalesce(scale_linear(max("' + i[0] + '"-"' + i[1] + '",0) , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
-                offset = i[4] + '+' + str(i[3]) + '*(' + width + '/2 + ' + self.space_size + ')'
-                line_pattern = 'if (("' + i[0] + '"+"' +  i[1] + '") = 0,' + "'no', 'solid')"
-                symbol_layer = self.create_style(width, offset, i[2], line_pattern)
+                width = '(coalesce(scale_linear(abs("' + i[0] + '"-"' + i[1] + '") , 0,' + \
+                        str(max_value) + ', 0, ' + self.band_size + '), 0))'
+                offset = i[3] + '+' + str(i[2]) + '*(' + width + '/2 + ' + self.space_size + ')'
+                line_pattern = 'if (("' + i[0] + '"-"' +  i[1] + '") = 0,' + "'no', 'solid')"
+                color = 'if (max(("' + i[0] + '"-"' + i[1] + '"),0) = 0,' + self.text_color(self.negative_color) + \
+                        ', ' + self.text_color(self.positive_color) + ')'
+                symbol_layer = self.create_style(width, offset, color, line_pattern)
                 self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
 
             self.layer.triggerRepaint()
@@ -227,8 +228,7 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
         props['width_dd_expression'] = width
         props['offset_dd_expression'] = offset
         props['line_style_expression'] = line_pattern
-        props['line_color'] = color
-        # props['line_style_expression'] = 'if ("' + field_zero + '" = 0,' + "'no', 'solid')"
+        props['color_dd_expression'] = color
         symbol_layer = QgsSimpleLineSymbolLayerV2.create(props)
         return symbol_layer
 
@@ -238,7 +238,7 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
     def text_color(self, some_color_btn):
         str_color = str(some_color_btn.color().getRgb())
         str_color = str_color.replace("(", "")
-        return str_color.replace(")", "")
+        return "'" + str_color.replace(")", "") + "'"
        
 if __name__ == '__main__':
     main()
