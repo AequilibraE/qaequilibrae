@@ -188,9 +188,9 @@ class GravityApplication:
                 self.output.matrix[self.core_name][i, :] = np.exp(- self.model.beta * self.impedance.matrix_view[i, :, 0].astype(np.float)) * p * a
 
             elif self.model.function == "POWER":
-                self.output.matrix[self.core_name][i, :] = np.nan_to_num(np.power(self.impedance.matrix_view[i, :, 0], - self.model.alpha) * p * a)[:]
+                self.output.matrix[self.core_name][i, :] = (np.power(self.impedance.matrix_view[i, :, 0].astype(np.float), - self.model.alpha) * p * a)[:]
             elif self.model.function == "GAMMA":
-                self.output.matrix[self.core_name][i, :] = np.nan_to_num(np.power(self.impedance.matrix_view[i, :, 0], self.model.alpha) * np.exp(- self.model.beta * self.impedance.matrix_view[i, :, 0]) * p * a)[:]
+                self.output.matrix[self.core_name][i, :] = (np.power(self.impedance.matrix_view[i, :, 0].astype(np.float), self.model.alpha) * np.exp(- self.model.beta * self.impedance.matrix_view[i, :, 0].astype(np.float)) * p * a)[:]
 
         # Deals with infinite and NaNs
         infinite = np.isinf(self.output.matrix[self.core_name][:, :]).astype(int)

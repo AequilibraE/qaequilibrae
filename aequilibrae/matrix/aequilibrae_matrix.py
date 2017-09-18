@@ -24,11 +24,18 @@ from scipy.sparse import coo_matrix
 import uuid
 import tempfile
 import os
-from numpy.lib.format import open_memmap
-import zipfile
 import copy
-
+from shutil import copyfile
 import warnings
+
+# CONSTANTS
+VERSION = 1 # VERSION OF THE MATRIX FORMAT
+INT = 0
+FLOAT = 1
+COMPLEX = 2
+CORE_NAME_MAX_LENGTH=50
+NOT_COMPRESSED = 0
+COMPRESSED = 1
 
 # Necessary in case we are no the QGIS world
 # try:
@@ -37,92 +44,123 @@ import warnings
 #     pass
 
 class AequilibraeMatrix():
-    def __init__(self, **kwargs):
-        self.file_location = kwargs.get('path', tempfile.gettempdir())
-        self.file_name = kwargs.get('file_name', 'aequilibrae_array_' + str(uuid.uuid4().hex) + '.npy')
-        
-        self.storage_path = None
-        self.computation_path = os.path.join(self.file_location, self.file_name)
-
-        self.zones = kwargs.get('zones', 1)
-
-        self.cores = kwargs.get('cores', 1)
-
-        self.names = kwargs.get('names')
-
-        self.data_type = kwargs.get('`', np.float64)
-
-        self.matrix_hash = {}
-
-        self.reserved_names = ['matrix_procedures', 'matrix_hash', 'data_type', 'names',
-                               'num_matrice', 'zones', 'file_location', 'file_name', 'storage_path',
+    def __init__(self, file_name=None, zones=None, matrix_names=None, data_type=np.float64, compressed=False):
+        self.reserved_names = ['reserved_names', 'file_path', 'zones', 'names', 'cores', 'data_type',
+                               'compressed', '__version__', 'index', 'matrix', 'matrix_hash',
                                'rows', 'vector', 'columns', 'export']
 
-        # methods that will be used for computation
+        self.file_path = file_name
+        self.zones = zones
+        if matrix_names is None:
+            self.names = ['mat']
+        else:
+            self.names = matrix_names
+        self.cores = len(self.names)
+
+        self.data_type = data_type
+        data_size = np.dtype(data_type).itemsize
+
+        # Matrix compression still not supported
+        if compressed:
+            compressed = False
+            raise 'Matrix compression not yet supported'
+
+        if compressed:
+            self.compressed = COMPRESSED
+        else:
+            self.compressed = NOT_COMPRESSED
+
+        if isinstance(self.names, list):
+            pass
+        else:
+            raise Exception('Matrix names need to be provided as a list')
+
+        for reserved in self.reserved_names:
+            if reserved in self.names:
+                raise Exception(reserved + ' is a reserved name')
+
+        self.matrix = None
+        self.index = None
         self.matrix_view = None
         self.view_names = None
+        self.matrix_hash = {}
 
+        if None not in [self.file_path, self.zones]:
+            matrix_cells = self.zones * self.zones
+            data_class = self.define_data_class()
 
-        if self.names is None:
-            self.names = []
+            # Writes file version
+            fp = np.memmap(self.file_path, dtype='int8', offset=0, mode='w+', shape=(1))
+            fp[0] = VERSION
+            self.__version__ = VERSION
+            self.flush_and_close(fp)
+
+            # If matrix is compressed or not
+            fp = np.memmap(self.file_path, dtype='int8', offset=1, mode='r+', shape=(1))
+            fp[0] = self.compressed
+            self.flush_and_close(fp)
+
+            # number matrix cells if compressed
+            fp = np.memmap(self.file_path, dtype='int64', offset=2, mode='r+', shape=(1))
+            fp[0] = matrix_cells
+            self.flush_and_close(fp)
+
+            # Zones
+            fp = np.memmap(self.file_path, dtype='int32', offset=10, mode='r+', shape=(1))
+            fp[0] = self.zones
+            self.flush_and_close(fp)
+
+            # Matrix cores
+            fp = np.memmap(self.file_path, dtype='int8', offset=14, mode='r+', shape=(1))
+            fp[0] = self.cores
+            self.flush_and_close(fp)
+
+            # Data type
+            fp = np.memmap(self.file_path, dtype='int8', offset=15, mode='r+', shape=(1))
+            fp[0] = data_class
+            self.flush_and_close(fp)
+
+            # Data size
+            fp = np.memmap(self.file_path, dtype='int8', offset=16, mode='r+', shape=(1))
+            fp[0] = data_size
+            self.flush_and_close(fp)
+
+            # core names
+            fp = np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=17, mode='r+', shape=(self.cores))
             for i in range(self.cores):
-                self.names.append('matrix_' + str(i))
-        else:
-            if type(self.names) is list:
-                if len(self.names) != self.cores:
-                    raise Exception('List of matrix_procedures names incompatible with number of matrices')
+                fp[i] = self.names[i]
+            self.flush_and_close(fp)
+
+            # Index
+            offset = 17 + CORE_NAME_MAX_LENGTH * self.cores
+            fp = np.memmap(self.file_path, dtype='int64', offset=offset, mode='r+', shape=(self.zones))
+            fp.fill(0)
+            self.flush_and_close(fp)
+
+            # DATA
+            offset += self.zones * 8
+            if self.compressed:
+                self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(matrix_cells, self.cores + 2))
             else:
-                if self.cores == 1 and type(self.names) is str:
-                    self.names = [self.names]
-                else:
-                    raise Exception('Matrix names need to be provided as a list')
+                self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(self.zones, self.zones, self.cores))
+            self.matrix.fill(0)
+            self.matrix.flush()
 
-            for reserved in self.reserved_names:
-                if reserved in self.names:
-                    raise Exception(reserved + ' is a reserved name')
-
-        # sets the dtype
-        dtype = [(x.encode('utf-8'), self.data_type) for x in self.names]
-        dtype.append(('index', np.int64))
-
-        # the shape
-        shape = (self.zones,self.zones,)
-
-        self.matrix = open_memmap(self.computation_path, mode='w+', dtype=dtype, shape=shape)
+            # Re-set index connection Index
+            offset = 17 + CORE_NAME_MAX_LENGTH * self.cores
+            self.index = np.memmap(self.file_path, dtype='int64', offset=offset, mode='r+', shape=(zones))
+            self.index.flush()
 
     def __getattr__(self, mat_name):
-
-        if mat_name == 'index':
-            return self.matrix['index'][:,0]
-
-        if mat_name.lower() == 'matrix_procedures':
-            return self.matrix
-
         if mat_name in self.names:
-            return self.matrix[mat_name]
+            return self.matrix[:, :, self.names.index(mat_name)]
 
-        raise AttributeError("No such method or matrix_procedures core! --> " + str(mat_name))
+        raise AttributeError("No such method or matrix core! --> " + str(mat_name))
 
-    def save_to_disk(self, file_path= None, compressed=True):
-            if compressed:
-                compression = zipfile.ZIP_DEFLATED
-            else:
-                compression = zipfile.ZIP_STORED
-        
-            if file_path is not None:
-                if file_path[-3:].lower() != 'aem':
-                    file_path += '.aem'
-            else:
-                if self.storage_path is None:
-                    raise AttributeError('No file name provided')
-                else:
-                    file_path = self.storage_path
-                
-            archive = zipfile.ZipFile(file_path, 'w', compression)
-
-            # saves
-            archive.write(self.computation_path, os.path.basename(file_path)[:-3]+'npy')
-            archive.close()
+    def compress(self):
+        pass
+    def decompress(self):
+        pass
 
     def export(self, output_name, cores = None):
         extension = output_name.upper()[-3:]
@@ -154,78 +192,154 @@ class AequilibraeMatrix():
             warnings.warn('File extension not implemented yet')
 
     def load(self, file_path):
-        f = open(file_path)
-        self.storage_path = os.path.realpath(f.name)
-        f.close()
+        self.file_path = file_path
 
-        self.file_location = tempfile.gettempdir()
-        # We use a random file name for computation to be able to handle multiple matrices with the same name
-        # at the same time
-        self.file_name = 'aequilibrae_array_' + str(uuid.uuid4().hex) + '.npy'
-        self.computation_path = os.path.join(self.file_location, self.file_name)
+        data_class = self.define_data_class()
 
-        # Extract and rename it
-        zip_ref = zipfile.ZipFile(self.storage_path, 'r')
-        zip_ref.extractall(self.file_location)
-        zip_ref.close()
-        os.rename(os.path.join(self.file_location, os.path.basename(self.storage_path)[:-3]+'npy'), self.computation_path)
+        # GET File version
+        fp = np.memmap(self.file_path, dtype='int8', offset=0, mode='r+', shape=(1))
+        self.__version__ = fp[0]
+        if self.__version__ != VERSION:
+            raise ValueError ('Matrix formats do not match')
+        del fp
 
-        # Map in memory and load matrix_procedures names plus dimensions
-        self.matrix = open_memmap(self.computation_path, mode='r+')
-        self.zones = self.matrix.shape[0]
-        self.names = [x for x in self.matrix.dtype.fields if x != 'index']
-        self.cores = len(self.names)
-        self.data_type = self.matrix.dtype[0]
-        self.matrix_hash = self.__builds_hash__()
+        # If matrix is compressed or not
+        fp = np.memmap(self.file_path, dtype='int8', offset=1, mode='r+', shape=(1))
+        self.compressed = fp[0]
+        del fp
+
+        # number matrix cells if compressed
+        fp = np.memmap(self.file_path, dtype='int64', offset=2, mode='r+', shape=(1))
+        matrix_cells = fp[0]
+        del fp
+
+        # Zones
+        fp = np.memmap(self.file_path, dtype='int32', offset=10, mode='r+', shape=(1))
+        self.zones = fp[0]
+        del fp
+
+        # Matrix cores
+        fp = np.memmap(self.file_path, dtype='int8', offset=14, mode='r+', shape=(1))
+        self.cores = fp[0]
+        del fp
+
+        # Data type
+        fp = np.memmap(self.file_path, dtype='int8', offset=15, mode='r+', shape=(1))
+        data_class = fp[0]
+        del fp
+
+        # Data size
+        fp = np.memmap(self.file_path, dtype='int8', offset=16, mode='r+', shape=(1))
+        data_size = fp[0]
+        del fp
+
+        if data_class == INT:
+            if data_size == 1:
+                self.data_type = np.int8
+            elif data_size == 2:
+                self.data_type = np.int16
+            elif data_size == 4:
+                self.data_type = np.int32
+            elif data_size == 8:
+                self.data_type = np.int64
+            elif data_size == 16:
+                self.data_type = np.int128
+
+        if data_class == FLOAT:
+            if data_size == 1:
+                self.data_type = np.float8
+            elif data_size == 2:
+                self.data_type = np.float16
+            elif data_size == 4:
+                self.data_type = np.float32
+            elif data_size == 8:
+                self.data_type = np.float64
+            elif data_size == 16:
+                self.data_type = np.float128
+
+        # core names
+        fp = np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=17, mode='r+', shape=(self.cores))
+        self.names = []
+        for i in range(self.cores):
+            self.names.append(fp[i])
+        del fp
+
+        # Index
+        offset = 17 + CORE_NAME_MAX_LENGTH * self.cores
+        self.index = np.memmap(self.file_path, dtype='int64', offset=offset, mode='r+', shape=(self.zones))
+
+        # DATA
+        offset += self.zones * 8
+        if self.compressed:
+            self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(matrix_cells, self.cores + 2))
+        else:
+            self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(self.zones, self.zones, self.cores))
+
 
     def computational_view(self, core_list = None):
+        self.matrix_view = None
+        self.view_names = None
         if core_list is None:
             core_list = self.names
-        if isinstance(core_list, list):
-            cores = len(core_list)
-            var_size = np.dtype(self.data_type).itemsize
-
-            strides = (self.zones * cores * var_size, cores * var_size, var_size)
-            view_shape = (self.zones, self.zones, cores)
-
-            view_dtype = np.dtype({core:self.matrix.dtype.fields[core] for core in core_list})
-            self.matrix_view = np.ndarray.view(np.ndarray(view_shape, view_dtype, self.matrix, 0, strides))
-            self.view_names = core_list
         else:
-            self.matrix_view = None
-            self.view_names = None
-            raise TypeError('Please provide a list of matrices')
+            if isinstance(core_list, list):
+                for i in core_list:
+                    if i not in self.names:
+                        raise ValueError('Matrix core {} no available on this matrix').format(i)
 
-    def copy(self, cores=None, names=None):
+                if len(core_list) > 1:
+                    for i, x in enumerate(core_list[1:]):
+                        k = self.names.index(x) # index of the first element
+                        k0 = self.names.index(core_list[i]) # index of the first element
+                        if k-k0 != 1:
+                            raise ValueError('Matrix cores {} and {} are not adjacent').format(core_list[i-1], x)
+            else:
+                raise TypeError('Please provide a list of matrices')
 
-        if cores is None: cores = self.names
+        self.view_names = core_list
+        if len(core_list) == 1:
+            self.matrix_view = self.matrix[:, :, self.names.index(core_list[0]):self.names.index(core_list[0])+1]
+        elif len(core_list) > 1:
+            self.matrix_view = self.matrix[:, :, self.names.index(core_list[0]):self.names.index(core_list[-1])+1]
 
-        if not isinstance(cores, list):
-            raise ValueError('Cores need to be presented as list')
+    def copy(self, output_name, cores=None, compress=None):
 
-        if names is None:
-            names = copy.deepcopy(cores)
-            if not isinstance(names, list):
-                raise ValueError('names need to be presented as list')
+        if cores is None:
 
-            if len(cores) != len(names):
-                raise ValueError('Cores to copy and list of names needs to have the same length')
+            copyfile(self.file_path, output_name)
+            output = AequilibraeMatrix()
+            output.load(output_name)
+            if self.view_names is not None:
+                output.computational_view(self.view_names)
 
-        output = AequilibraeMatrix(zones=self.zones,
-                                   cores=len(names),
-                                   names=names,
-                                   data_type=self.data_type)
+            if compress is not None:
+                if compress != self.compressed:
+                    if compress:
+                        output.compress()
+                    else:
+                        output.decompress()
+        else:
+            if compress is None:
+                compress = self.compressed
 
-        output.index[:] = self.index[:]
-        for name, new_name in zip(cores, names):
-            output.matrix[new_name][:, :] = self.matrix[name][:, :]
-            name_dict = {name: new_name}
-        output.__builds_hash__()
+            if not isinstance(cores, list):
+                raise ValueError('Cores need to be presented as list')
 
-        if self.view_names is not None:
-            new_view_names = [name_dict[name] for name in self.view_names if name in cores]
-            if new_view_names:
-                output.computational_view(new_view_names)
+            for i in cores:
+                if i not in self.names:
+                    raise ValueError('Matrix core {} not available on this matrix').format(i)
+
+            output = AequilibraeMatrix(file_name=output_name,
+                                       zones=self.zones,
+                                       matrix_names=cores,
+                                       data_type=self.data_type,
+                                       compressed=bool(self.compressed))
+
+            output.index[:] = self.index[:]
+            for i, c in enumerate(cores):
+                output.matrix[:, :, i] = self.matrix[:, :, self.names.index(c)]
+
+            output.matrix.flush()
 
         return output
 
@@ -245,3 +359,17 @@ class AequilibraeMatrix():
 
     def __builds_hash__(self):
         return {self.index[i]: i for i in range(self.zones)}
+
+    def define_data_class(self):
+        if self.data_type in [np.float16, np.float32, np.float64, np.float128]:
+            data_class = FLOAT
+
+        if self.data_type in [np.int8, np.int16, np.int32, np.int64]:
+            data_class = INT
+
+        return data_class
+
+    @staticmethod
+    def flush_and_close(fp):
+        fp.flush()
+        del fp

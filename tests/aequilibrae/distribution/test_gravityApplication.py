@@ -3,7 +3,7 @@ from aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
 from aequilibrae.distribution import SyntheticGravityModel, GravityApplication
 import numpy as np
 
-zones = 100
+zones = 10
 
 # row vector
 args = {'entries': zones,
@@ -30,9 +30,14 @@ args = {'zones': zones,
         'names': ['impedance']}
 
 matrix = AequilibraeMatrix(**args)
+
+# randoms = np.random.randint(5, size=(2, 4))
 matrix.impedance[:, :] = np.random.rand(zones, zones)[:,:]
 matrix.index[:] = np.arange(matrix.zones) + 100
 matrix.computational_view(['impedance'])
+
+print matrix.matrix_view
+print matrix.matrix['impedance']
 
 model_expo = SyntheticGravityModel()
 model_expo.function = 'EXPO'
@@ -41,11 +46,11 @@ model_expo.beta = 0.1
 model_gamma = SyntheticGravityModel()
 model_gamma.function = 'GAMMA'
 model_gamma.beta = 0.1
-model_gamma.alpha = 0.1
+model_gamma.alpha = -0.2
 
 model_power = SyntheticGravityModel()
 model_power.function = 'POWER'
-model_power.alpha = 0.1
+model_power.alpha = -0.2
 
 class TestGravityApplication(TestCase):
     def test_apply(self):
@@ -64,5 +69,6 @@ class TestGravityApplication(TestCase):
 
             if distributed_matrix.gap > distributed_matrix.parameters['convergence level']:
                 self.fail('Gravity application did not converge for model ' + model_name)
+
 
 
