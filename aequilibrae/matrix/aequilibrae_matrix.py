@@ -92,60 +92,54 @@ class AequilibraeMatrix():
             # Writes file version
             self.__version__ = VERSION
 
-            # file version
-            self.__set_matrix_elements__(offset = 0, dsize=(1), dtype='int8', values=[VERSION], overwrite=True)
+            """
+            Matrix structure
+            
+    What:   Version | Compression flag | # of cells in compressed matrix | # of zones | # of cores | Data type | Data size | Core names |      index      |            Matrix            |
+    Size:     int8  |       int8       |              int64              |   int32    |    int8    |   int8    |   int8    |     S50    |      int64      |   f(Data type, Data size)    |
+    Offset:     0   |         1        |                2                |     10     |     14     |    15     |    16     |     17     | 17 + 50 * cores |  17 + 50 * cores + zones * 8 |
+            """
+            np.memmap(self.file_path, dtype='int8', offset=0, mode='w+', shape=(1))[0] = VERSION
             
             # If matrix is compressed or not
-            self.__set_matrix_elements__(offset = 1, dsize=(1), dtype='int8', values=[self.compressed], overwrite=False)
+            np.memmap(self.file_path, dtype='int8', offset=1, mode='r+', shape=(1))[0] = self.compressed
             
             # number matrix cells if compressed
-            self.__set_matrix_elements__(offset = 2, dsize=(1), dtype='int64', values=[matrix_cells], overwrite=False)
+            np.memmap(self.file_path, dtype='int64', offset=2, mode='r+', shape=(1))[0] = matrix_cells
 
             # Zones
-            self.__set_matrix_elements__(offset = 10, dsize=(1), dtype='int32', values=[self.zones], overwrite=False)
+            np.memmap(self.file_path, dtype='int32', offset=10, mode='r+', shape=(1))[0] = self.zones
             
             # Matrix cores
-            self.__set_matrix_elements__(offset=14, dsize=(1), dtype='int8', values=[self.cores], overwrite=False)
+            np.memmap(self.file_path, dtype='int8', offset=14, mode='r+', shape=(1))[0] = self.cores
             
             # Data type
-            self.__set_matrix_elements__(offset=15, dsize=(1), dtype='int8', values=[data_class], overwrite=False)
+            np.memmap(self.file_path, dtype='int8', offset=15, mode='r+', shape=(1))[0] = data_class
             
             # Data size
-            self.__set_matrix_elements__(offset=16, dsize=(1), dtype='int8', values=[data_size], overwrite=False)
+            np.memmap(self.file_path, dtype='int8', offset=16, mode='r+', shape=(1))[0] = data_size
             
             # core names
-            self.__set_matrix_elements__(offset=17, dsize=(self.cores), dtype='S' + str(CORE_NAME_MAX_LENGTH),
-                                         values=self.names, overwrite=False)
+            fp = np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=17, mode='r+', shape=(self.cores))
+            for i, v in enumerate(self.names):
+                fp[i] = v
+            fp.flush()
+            del fp
             
             # Index
-            self.__set_matrix_elements__(offset= 17 + CORE_NAME_MAX_LENGTH * self.cores, dsize=(self.zones),
-                                         dtype='int64', values=[], overwrite=False)
+            offset = 17 + CORE_NAME_MAX_LENGTH * self.cores
+            self.index = np.memmap(self.file_path, dtype='int64', offset=offset,
+                                   mode='r+', shape=(zones))
+            self.index.fill(0)
+            self.index.flush()
             
-            offset = 17 + CORE_NAME_MAX_LENGTH * self.cores + self.zones * 8
+            offset += self.zones * 8
             if self.compressed:
                 self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(matrix_cells, self.cores + 2))
             else:
                 self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(self.zones, self.zones, self.cores))
             self.matrix.fill(0)
             self.matrix.flush()
-
-            # Re-set index connection Index
-            self.index = np.memmap(self.file_path, dtype='int64', offset=17 + CORE_NAME_MAX_LENGTH * self.cores, mode='r+', shape=(zones))
-            self.index.fill(0)
-            self.index.flush()
-
-
-    def __set_matrix_elements__(self, offset, dsize, dtype, values, overwrite):
-        if overwrite:
-            fp = np.memmap(self.file_path, dtype=dtype, offset=offset, mode='w+', shape=(dsize))
-        else:
-            fp = np.memmap(self.file_path, dtype=dtype, offset=offset, mode='r+', shape=(dsize))
-            
-        for i, v in enumerate(values):
-            fp[i] = v
-        
-        fp.flush()
-        del fp
         
     def __getattr__(self, mat_name):
         if mat_name in self.names:
@@ -200,41 +194,28 @@ class AequilibraeMatrix():
         data_class = self.define_data_class()
 
         # GET File version
-        fp = np.memmap(self.file_path, dtype='int8', offset=0, mode='r+', shape=(1))
-        self.__version__ = fp[0]
+        self.__version__ = np.memmap(self.file_path, dtype='int8', offset=0, mode='r+', shape=(1))[0]
+        
         if self.__version__ != VERSION:
             raise ValueError ('Matrix formats do not match')
-        del fp
 
         # If matrix is compressed or not
-        fp = np.memmap(self.file_path, dtype='int8', offset=1, mode='r+', shape=(1))
-        self.compressed = fp[0]
-        del fp
-
+        self.compressed = np.memmap(self.file_path, dtype='int8', offset=1, mode='r+', shape=(1))[0]
+        
         # number matrix cells if compressed
-        fp = np.memmap(self.file_path, dtype='int64', offset=2, mode='r+', shape=(1))
-        matrix_cells = fp[0]
-        del fp
-
+        matrix_cells = np.memmap(self.file_path, dtype='int64', offset=2, mode='r+', shape=(1))[0]
+        
         # Zones
-        fp = np.memmap(self.file_path, dtype='int32', offset=10, mode='r+', shape=(1))
-        self.zones = fp[0]
-        del fp
-
+        self.zones = np.memmap(self.file_path, dtype='int32', offset=10, mode='r+', shape=(1))[0]
+        
         # Matrix cores
-        fp = np.memmap(self.file_path, dtype='int8', offset=14, mode='r+', shape=(1))
-        self.cores = fp[0]
-        del fp
+        self.cores = np.memmap(self.file_path, dtype='int8', offset=14, mode='r+', shape=(1))[0]
 
         # Data type
-        fp = np.memmap(self.file_path, dtype='int8', offset=15, mode='r+', shape=(1))
-        data_class = fp[0]
-        del fp
+        data_class = np.memmap(self.file_path, dtype='int8', offset=15, mode='r+', shape=(1))[0]
 
         # Data size
-        fp = np.memmap(self.file_path, dtype='int8', offset=16, mode='r+', shape=(1))
-        data_size = fp[0]
-        del fp
+        data_size = np.memmap(self.file_path, dtype='int8', offset=16, mode='r+', shape=(1))[0]
 
         if data_class == INT:
             if data_size == 1:
@@ -261,11 +242,7 @@ class AequilibraeMatrix():
                 self.data_type = np.float128
 
         # core names
-        fp = np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=17, mode='r+', shape=(self.cores))
-        self.names = []
-        for i in range(self.cores):
-            self.names.append(fp[i])
-        del fp
+        self.names = list(np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=17, mode='r+', shape=(self.cores)))
 
         # Index
         offset = 17 + CORE_NAME_MAX_LENGTH * self.cores

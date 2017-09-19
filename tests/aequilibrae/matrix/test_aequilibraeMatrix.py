@@ -8,7 +8,6 @@ from aequilibrae.matrix import AequilibraeMatrix
 
 zones = 50
 path_test =tempfile.gettempdir()
-path_test ='D:/'
 name_test = 'aequilibrae_matrix_test.aem'
 name_test = os.path.join(path_test, name_test)
 copy_matrix_name = os.path.join(path_test, 'aequilibrae_new_matrix_test.aem')
