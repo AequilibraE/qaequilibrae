@@ -90,55 +90,38 @@ class AequilibraeMatrix():
             data_class = self.define_data_class()
 
             # Writes file version
-            fp = np.memmap(self.file_path, dtype='int8', offset=0, mode='w+', shape=(1))
-            fp[0] = VERSION
             self.__version__ = VERSION
-            self.flush_and_close(fp)
 
+            # file version
+            self.__set_matrix_elements__(offset = 0, dsize=(1), dtype='int8', values=[VERSION], overwrite=True)
+            
             # If matrix is compressed or not
-            fp = np.memmap(self.file_path, dtype='int8', offset=1, mode='r+', shape=(1))
-            fp[0] = self.compressed
-            self.flush_and_close(fp)
-
+            self.__set_matrix_elements__(offset = 1, dsize=(1), dtype='int8', values=[self.compressed], overwrite=False)
+            
             # number matrix cells if compressed
-            fp = np.memmap(self.file_path, dtype='int64', offset=2, mode='r+', shape=(1))
-            fp[0] = matrix_cells
-            self.flush_and_close(fp)
+            self.__set_matrix_elements__(offset = 2, dsize=(1), dtype='int64', values=[matrix_cells], overwrite=False)
 
             # Zones
-            fp = np.memmap(self.file_path, dtype='int32', offset=10, mode='r+', shape=(1))
-            fp[0] = self.zones
-            self.flush_and_close(fp)
-
+            self.__set_matrix_elements__(offset = 10, dsize=(1), dtype='int32', values=[self.zones], overwrite=False)
+            
             # Matrix cores
-            fp = np.memmap(self.file_path, dtype='int8', offset=14, mode='r+', shape=(1))
-            fp[0] = self.cores
-            self.flush_and_close(fp)
-
+            self.__set_matrix_elements__(offset=14, dsize=(1), dtype='int8', values=[self.cores], overwrite=False)
+            
             # Data type
-            fp = np.memmap(self.file_path, dtype='int8', offset=15, mode='r+', shape=(1))
-            fp[0] = data_class
-            self.flush_and_close(fp)
-
+            self.__set_matrix_elements__(offset=15, dsize=(1), dtype='int8', values=[data_class], overwrite=False)
+            
             # Data size
-            fp = np.memmap(self.file_path, dtype='int8', offset=16, mode='r+', shape=(1))
-            fp[0] = data_size
-            self.flush_and_close(fp)
-
+            self.__set_matrix_elements__(offset=16, dsize=(1), dtype='int8', values=[data_size], overwrite=False)
+            
             # core names
-            fp = np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=17, mode='r+', shape=(self.cores))
-            for i in range(self.cores):
-                fp[i] = self.names[i]
-            self.flush_and_close(fp)
-
+            self.__set_matrix_elements__(offset=17, dsize=(self.cores), dtype='S' + str(CORE_NAME_MAX_LENGTH),
+                                         values=self.names, overwrite=False)
+            
             # Index
-            offset = 17 + CORE_NAME_MAX_LENGTH * self.cores
-            fp = np.memmap(self.file_path, dtype='int64', offset=offset, mode='r+', shape=(self.zones))
-            fp.fill(0)
-            self.flush_and_close(fp)
-
-            # DATA
-            offset += self.zones * 8
+            self.__set_matrix_elements__(offset= 17 + CORE_NAME_MAX_LENGTH * self.cores, dsize=(self.zones),
+                                         dtype='int64', values=[], overwrite=False)
+            
+            offset = 17 + CORE_NAME_MAX_LENGTH * self.cores + self.zones * 8
             if self.compressed:
                 self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(matrix_cells, self.cores + 2))
             else:
@@ -147,10 +130,23 @@ class AequilibraeMatrix():
             self.matrix.flush()
 
             # Re-set index connection Index
-            offset = 17 + CORE_NAME_MAX_LENGTH * self.cores
-            self.index = np.memmap(self.file_path, dtype='int64', offset=offset, mode='r+', shape=(zones))
+            self.index = np.memmap(self.file_path, dtype='int64', offset=17 + CORE_NAME_MAX_LENGTH * self.cores, mode='r+', shape=(zones))
+            self.index.fill(0)
             self.index.flush()
 
+
+    def __set_matrix_elements__(self, offset, dsize, dtype, values, overwrite):
+        if overwrite:
+            fp = np.memmap(self.file_path, dtype=dtype, offset=offset, mode='w+', shape=(dsize))
+        else:
+            fp = np.memmap(self.file_path, dtype=dtype, offset=offset, mode='r+', shape=(dsize))
+            
+        for i, v in enumerate(values):
+            fp[i] = v
+        
+        fp.flush()
+        del fp
+        
     def __getattr__(self, mat_name):
         if mat_name in self.names:
             return self.matrix[:, :, self.names.index(mat_name)]
@@ -162,6 +158,13 @@ class AequilibraeMatrix():
     def decompress(self):
         pass
 
+    def close(self, flush=True):
+        if flush:
+            self.matrix.flush()
+            self.index.flush()
+        del self.matrix
+        del self.index
+            
     def export(self, output_name, cores = None):
         extension = output_name.upper()[-3:]
         if cores is None:
@@ -361,15 +364,10 @@ class AequilibraeMatrix():
         return {self.index[i]: i for i in range(self.zones)}
 
     def define_data_class(self):
-        if self.data_type in [np.float16, np.float32, np.float64, np.float128]:
+        if self.data_type in [np.float16, np.float32, np.float64]:
             data_class = FLOAT
 
         if self.data_type in [np.int8, np.int16, np.int32, np.int64]:
             data_class = INT
 
         return data_class
-
-    @staticmethod
-    def flush_and_close(fp):
-        fp.flush()
-        del fp
