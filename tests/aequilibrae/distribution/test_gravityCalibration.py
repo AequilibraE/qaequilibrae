@@ -3,13 +3,15 @@ from unittest import TestCase
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.distribution import GravityCalibration
 import numpy as np
+import os, tempfile
 
 zones = 100
 
 # Impedance matrix_procedures
-args = {'zones': zones,
-        'cores': 1,
-        'names': ['impedance']}
+name_test = os.path.join(tempfile.gettempdir(), 'aequilibrae_matrix_test.aem')
+
+args = {'file_name': name_test,
+        'matrix_names': ['impedance']}
 
 impedance = AequilibraeMatrix(**args)
 impedance.impedance[:, :] = np.random.rand(zones, zones)[:,:]  * 1000

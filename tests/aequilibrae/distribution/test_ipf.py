@@ -1,5 +1,6 @@
 from unittest import TestCase
 import numpy as np
+import os, tempfile
 
 from aequilibrae.distribution import Ipf
 from aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
@@ -23,9 +24,9 @@ column_vector.columns[:] = np.random.rand(zones)[:] * 1000
 column_vector.columns[:] = column_vector.columns[:] * (row_vector.rows.sum()/column_vector.columns.sum())
 
 # seed matrix_procedures
-args = {'zones': zones,
-        'cores': 1,
-        'names': ['seed']}
+name_test = os.path.join(tempfile.gettempdir(), 'aequilibrae_matrix_test.aem')
+args = {'file_name': name_test,
+        'matrix_names': ['seed']}
 
 matrix = AequilibraeMatrix(**args)
 matrix.seed[:, :] = np.random.rand(zones, zones)[:,:]

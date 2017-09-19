@@ -2,8 +2,11 @@ from unittest import TestCase
 from aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
 from aequilibrae.distribution import SyntheticGravityModel, GravityApplication
 import numpy as np
+import tempfile
+import os
 
 zones = 10
+
 
 # row vector
 args = {'entries': zones,
@@ -25,9 +28,11 @@ column_vector.columns[:] = column_vector.index[:] + np.random.rand(zones)[:]
 column_vector.columns[:] = column_vector.columns[:] * (row_vector.rows.sum()/column_vector.columns.sum())
 
 # Impedance matrix_procedures
-args = {'zones': zones,
-        'cores': 1,
-        'names': ['impedance']}
+name_test = os.path.join(tempfile.gettempdir(), 'aequilibrae_matrix_test.aem')
+
+args = {'file_name': name_test,
+        'zones': zones,
+        'matrix_names': ['impedance']}
 
 matrix = AequilibraeMatrix(**args)
 
@@ -35,9 +40,6 @@ matrix = AequilibraeMatrix(**args)
 matrix.impedance[:, :] = np.random.rand(zones, zones)[:,:]
 matrix.index[:] = np.arange(matrix.zones) + 100
 matrix.computational_view(['impedance'])
-
-print matrix.matrix_view
-print matrix.matrix['impedance']
 
 model_expo = SyntheticGravityModel()
 model_expo.function = 'EXPO'

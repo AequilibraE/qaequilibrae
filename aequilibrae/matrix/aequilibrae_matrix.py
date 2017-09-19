@@ -47,7 +47,7 @@ class AequilibraeMatrix():
     def __init__(self, file_name=None, zones=None, matrix_names=None, data_type=np.float64, compressed=False):
         self.reserved_names = ['reserved_names', 'file_path', 'zones', 'names', 'cores', 'data_type',
                                'compressed', '__version__', 'index', 'matrix', 'matrix_hash',
-                               'rows', 'vector', 'columns', 'export']
+                               'rows', 'vector', 'columns', 'export', 'matrices']
 
         self.file_path = file_name
         self.zones = zones
@@ -140,7 +140,11 @@ class AequilibraeMatrix():
                 self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(self.zones, self.zones, self.cores))
             self.matrix.fill(0)
             self.matrix.flush()
-        
+
+            self.matrices = {}
+            for i, v in enumerate(self.names):
+                self.matrices[v] = self.matrix[:, :, i]
+
     def __getattr__(self, mat_name):
         if mat_name in self.names:
             return self.matrix[:, :, self.names.index(mat_name)]
@@ -265,7 +269,7 @@ class AequilibraeMatrix():
             if isinstance(core_list, list):
                 for i in core_list:
                     if i not in self.names:
-                        raise ValueError('Matrix core {} no available on this matrix').format(i)
+                        raise ValueError('Matrix core {} no available on this matrix'.format(i))
 
                 if len(core_list) > 1:
                     for i, x in enumerate(core_list[1:]):
@@ -278,14 +282,14 @@ class AequilibraeMatrix():
 
         self.view_names = core_list
         if len(core_list) == 1:
-            self.matrix_view = self.matrix[:, :, self.names.index(core_list[0]):self.names.index(core_list[0])+1]
+            # self.matrix_view = self.matrix[:, :, self.names.index(core_list[0]):self.names.index(core_list[0])+1]
+            self.matrix_view = self.matrix[:, :, self.names.index(core_list[0])]
         elif len(core_list) > 1:
             self.matrix_view = self.matrix[:, :, self.names.index(core_list[0]):self.names.index(core_list[-1])+1]
 
-    def copy(self, output_name, cores=None, compress=None):
+    def copy(self, output_name, cores=None, names=None, compress=None):
 
         if cores is None:
-
             copyfile(self.file_path, output_name)
             output = AequilibraeMatrix()
             output.load(output_name)
@@ -307,11 +311,20 @@ class AequilibraeMatrix():
 
             for i in cores:
                 if i not in self.names:
-                    raise ValueError('Matrix core {} not available on this matrix').format(i)
+                    raise ValueError('Matrix core {} not available on this matrix'.format(i))
+
+            if names is None:
+                names = cores
+            else:
+                if not isinstance(names, list):
+                    raise ValueError('Names need to be presented as list')
+
+                if len(names) != len(cores):
+                    raise ValueError('Number of cores to cpy and list of names are not compatible')
 
             output = AequilibraeMatrix(file_name=output_name,
                                        zones=self.zones,
-                                       matrix_names=cores,
+                                       matrix_names=names,
                                        data_type=self.data_type,
                                        compressed=bool(self.compressed))
 

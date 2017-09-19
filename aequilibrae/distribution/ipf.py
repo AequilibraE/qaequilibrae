@@ -26,6 +26,7 @@ import os
 import yaml
 from time import clock
 from ..matrix import AequilibraeMatrix, AequilibraEData
+import uuid, tempfile
 
 class Ipf:
     def __init__(self, **kwargs):
@@ -75,7 +76,7 @@ class Ipf:
         if self.matrix.matrix_view is None:
             raise ValueError('Matrix needs to be set for computation')
         else:
-            if self.matrix.matrix_view.shape[2] > 1:
+            if len(self.matrix.matrix_view.shape[:]) > 2:
                 raise ValueError("Matrix' computational view needs to be set for a single matrix core")
 
         if self.error is None:
@@ -107,11 +108,10 @@ class Ipf:
             max_iter = self.parameters['max iterations']
             conv_criteria = self.parameters['convergence level']
 
-            self.output = self.matrix.copy()
-            comput_core = self.output.view_names[0]
+            self.output = self.matrix.copy(os.path.join(tempfile.gettempdir(),'aequilibrae_matrix_' + str(uuid.uuid4()) + '.aem'))
             rows = self.rows.data[self.row_field]
             columns = self.columns.data[self.column_field]
-            tot_matrix = np.sum(self.output.matrix[comput_core][:, :])
+            tot_matrix = np.sum(self.output.matrix_view[:, :])
 
             # Reporting
             self.report.append('Target convergence criteria: ' + str(conv_criteria))
@@ -130,18 +130,18 @@ class Ipf:
             while self.gap > conv_criteria and iter < max_iter:
                 iter += 1
                 # computes factors for zones
-                marg_rows = self.tot_rows(self.output.matrix[comput_core][:,:])
+                marg_rows = self.tot_rows(self.output.matrix_view[:,:])
                 row_factor = self.factor(marg_rows, rows)
                 # applies factor
-                self.output.matrix[comput_core][:,:] = np.transpose(np.transpose(self.output.matrix[comput_core][:,:]) *
+                self.output.matrix_view[:,:] = np.transpose(np.transpose(self.output.matrix_view[:,:]) *
                                                                     np.transpose(row_factor))[:, :]
 
                 # computes factors for columns
-                marg_cols = self.tot_columns(self.output.matrix[comput_core][:,:])
+                marg_cols = self.tot_columns(self.output.matrix_view[:,:])
                 column_factor = self.factor(marg_cols, columns)
 
                 # applies factor
-                self.output.matrix[comput_core][:,:] = self.output.matrix[comput_core][:,:] * column_factor
+                self.output.matrix_view[:,:] = self.output.matrix_view[:,:] * column_factor
 
                 # increments iterarions and computes errors
                 self.gap = max(abs(1 - np.min(row_factor)), abs(np.max(row_factor) - 1), abs(1 - np.min(column_factor)),
