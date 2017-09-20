@@ -11,6 +11,7 @@ zones = 100
 name_test = os.path.join(tempfile.gettempdir(), 'aequilibrae_matrix_test.aem')
 
 args = {'file_name': name_test,
+        'zones': zones,
         'matrix_names': ['impedance']}
 
 impedance = AequilibraeMatrix(**args)
@@ -18,11 +19,11 @@ impedance.impedance[:, :] = np.random.rand(zones, zones)[:,:]  * 1000
 impedance.index[:] = np.arange(impedance.zones) + 100
 impedance.computational_view(['impedance'])
 
-args['names'] = ['matrix']
+args['matrix_names'] = ['base_matrix']
 matrix = AequilibraeMatrix(**args)
-matrix.matrix[:, :] = np.random.rand(zones, zones)[:,:]  * 1000
+matrix.base_matrix[:, :] = np.random.rand(zones, zones)[:,:]  * 1000
 matrix.index[:] = np.arange(matrix.zones) + 100
-matrix.computational_view(['matrix'])
+matrix.computational_view(['base_matrix'])
 
 
 

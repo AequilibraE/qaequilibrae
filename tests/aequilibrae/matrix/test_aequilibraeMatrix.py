@@ -41,7 +41,7 @@ class TestAequilibraeMatrix(TestCase):
             self.fail('Computational view returns the wrong number of matrices')
 
         self.new_matrix.computational_view(['mat'])
-        self.new_matrix.matrix_view[:, :, 0] = np.arange(zones**2).reshape(zones, zones)
+        self.new_matrix.matrix_view[:, :] = np.arange(zones**2).reshape(zones, zones)
         if np.sum(self.new_matrix.mat) != np.sum(self.new_matrix.matrix_view):
             self.fail('Assigning to matrix view did not work')
         self.new_matrix.close(True)

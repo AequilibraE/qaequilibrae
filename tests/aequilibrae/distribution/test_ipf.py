@@ -26,6 +26,7 @@ column_vector.columns[:] = column_vector.columns[:] * (row_vector.rows.sum()/col
 # seed matrix_procedures
 name_test = os.path.join(tempfile.gettempdir(), 'aequilibrae_matrix_test.aem')
 args = {'file_name': name_test,
+        'zones': zones,
         'matrix_names': ['seed']}
 
 matrix = AequilibraeMatrix(**args)

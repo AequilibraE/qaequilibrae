@@ -174,7 +174,7 @@ class GravityCalibration:
             if matrix.matrix_view is None:
                 raise ValueError(title + ' needs to be set for computation')
             else:
-                if matrix.matrix_view.shape[2] > 1:
+                if len(matrix.matrix_view.shape[:]) > 2:
                     raise ValueError(title + "' computational view needs to be set for a single matrix core")
 
             if np.sum(matrix.matrix_view.data) == 0:
@@ -191,7 +191,7 @@ class GravityCalibration:
         # Prepare the data for computation
         self.comput_core = self.matrix.view_names[0]
 
-        self.result_matrix = self.matrix.copy(cores=[self.comput_core], names=['gravity'])
+        self.result_matrix = self.matrix.copy(output_name='TEMP', cores=[self.comput_core], names=['gravity'])
 
         self.rows = AequilibraEData(entries=self.matrix.zones, fields=['rows'])
         self.rows.index[:] = self.matrix.index[:]

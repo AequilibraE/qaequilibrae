@@ -43,7 +43,7 @@ COMPRESSED = 1
 # except:
 #     pass
 
-class AequilibraeMatrix():
+class AequilibraeMatrix(object):
     def __init__(self, file_name=None, zones=None, matrix_names=None, data_type=np.float64, compressed=False):
         self.reserved_names = ['reserved_names', 'file_path', 'zones', 'names', 'cores', 'data_type',
                                'compressed', '__version__', 'index', 'matrix', 'matrix_hash',
@@ -80,6 +80,7 @@ class AequilibraeMatrix():
                 raise Exception(reserved + ' is a reserved name')
 
         self.matrix = None
+        self.matrices = None
         self.index = None
         self.matrix_view = None
         self.view_names = None
@@ -135,19 +136,22 @@ class AequilibraeMatrix():
             
             offset += self.zones * 8
             if self.compressed:
-                self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(matrix_cells, self.cores + 2))
+                self.matrices = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(matrix_cells, self.cores + 2))
             else:
-                self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(self.zones, self.zones, self.cores))
-            self.matrix.fill(0)
-            self.matrix.flush()
+                self.matrices = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(self.zones, self.zones, self.cores))
+            self.matrices.fill(0)
+            self.matrices.flush()
 
-            self.matrices = {}
+            self.matrix = {}
             for i, v in enumerate(self.names):
-                self.matrices[v] = self.matrix[:, :, i]
+                self.matrix[v] = self.matrices[:, :, i]
 
     def __getattr__(self, mat_name):
+        if mat_name in object.__dict__:
+            return self.__dict__[mat_name]
+
         if mat_name in self.names:
-            return self.matrix[:, :, self.names.index(mat_name)]
+            return self.matrix[mat_name]
 
         raise AttributeError("No such method or matrix core! --> " + str(mat_name))
 
@@ -158,9 +162,9 @@ class AequilibraeMatrix():
 
     def close(self, flush=True):
         if flush:
-            self.matrix.flush()
+            self.matrices.flush()
             self.index.flush()
-        del self.matrix
+        del self.matrices
         del self.index
             
     def export(self, output_name, cores = None):
@@ -255,10 +259,13 @@ class AequilibraeMatrix():
         # DATA
         offset += self.zones * 8
         if self.compressed:
-            self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(matrix_cells, self.cores + 2))
+            self.matrices = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(matrix_cells, self.cores + 2))
         else:
-            self.matrix = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(self.zones, self.zones, self.cores))
+            self.matrices = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+', shape=(self.zones, self.zones, self.cores))
 
+        self.matrix = {}
+        for i, v in enumerate(self.names):
+            self.matrix[v] = self.matrices[:, :, i]
 
     def computational_view(self, core_list = None):
         self.matrix_view = None
@@ -283,11 +290,15 @@ class AequilibraeMatrix():
         self.view_names = core_list
         if len(core_list) == 1:
             # self.matrix_view = self.matrix[:, :, self.names.index(core_list[0]):self.names.index(core_list[0])+1]
-            self.matrix_view = self.matrix[:, :, self.names.index(core_list[0])]
+            self.matrix_view = self.matrices[:, :, self.names.index(core_list[0])]
         elif len(core_list) > 1:
-            self.matrix_view = self.matrix[:, :, self.names.index(core_list[0]):self.names.index(core_list[-1])+1]
+            self.matrix_view = self.matrices[:, :, self.names.index(core_list[0]):self.names.index(core_list[-1])+1]
+
 
     def copy(self, output_name, cores=None, names=None, compress=None):
+
+        if output_name == 'TEMP':
+            output_name = self.random_name()
 
         if cores is None:
             copyfile(self.file_path, output_name)
@@ -330,9 +341,9 @@ class AequilibraeMatrix():
 
             output.index[:] = self.index[:]
             for i, c in enumerate(cores):
-                output.matrix[:, :, i] = self.matrix[:, :, self.names.index(c)]
+                output.matrices[:, :, i] = self.matrices[:, :, self.names.index(c)]
 
-            output.matrix.flush()
+            output.matrices.flush()
 
         return output
 
@@ -348,7 +359,7 @@ class AequilibraeMatrix():
         if len(self.view_names) > 1:
             raise ValueError('Vector for a multi-core matrix is ambiguous')
 
-        return self.matrix_view.astype(np.float).sum(axis=axis)[:,0]
+        return self.matrix_view.astype(np.float).sum(axis=axis)[:]
 
     def __builds_hash__(self):
         return {self.index[i]: i for i in range(self.zones)}
@@ -361,3 +372,7 @@ class AequilibraeMatrix():
             data_class = INT
 
         return data_class
+
+    @staticmethod
+    def random_name():
+        return os.path.join(tempfile.gettempdir(), 'Aequilibrae_matrix_' + str(uuid.uuid4()) + '.aem')

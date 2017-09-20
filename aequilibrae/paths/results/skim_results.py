@@ -29,9 +29,10 @@ class SkimResults:
         self.links = graph.num_links + 1
         self.num_skims = len(graph.skim_fields)
 
-        self.skims = AequilibraeMatrix(zones=self.zones, cores=self.num_skims, names=graph.skim_fields)
+        self.skims = AequilibraeMatrix(file_name=AequilibraeMatrix().random_name(), zones=self.zones, matrix_names=graph.skim_fields)
         self.skims.index[:] = np.arange(self.zones)[:]
         self.skims.computational_view(core_list=self.skims.names)
+        self.skims.matrix_view = self.skims.matrix_view.reshape(self.zones, self.zones, self.num_skims)
         self.__graph_id__ = graph.__id__
 
     def set_cores(self, cores):
