@@ -53,6 +53,7 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
         self.band_size = 10.0
         self.space_size = 0.0
         self.layer = None
+        self.expert_mode = False
         self.drive_side = get_parameter_chain(['system', 'driving side'])
 
         # layers and fields        # For adding skims
@@ -143,10 +144,17 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
 
     def execute_comparison(self):
         if self.check_inputs():
+            self.expert_mode = self.chk_expert_mode.isChecked()
             self.but_run.setEnabled(False)
             self.band_size = str(self.band_size)
             self.space_size = str(self.space_size)
 
+            if self.expert_mode:
+                QgsExpressionContextUtils.setProjectVariable('aeq_band_spacer', float(self.space_size))
+                QgsExpressionContextUtils.setProjectVariable('aeq_band_width', float(self.band_size))
+                self.space_size = '@aeq_band_spacer'
+                self.band_size = '@aeq_band_width'
+                
             # define the side of the plotting based on the side of the road the system has defined
             ab = -1
             if self.drive_side == 'right':
@@ -172,6 +180,10 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
                 values.append(self.layer.maximumValue(idx2_ba))
                 max_value = max(values)
 
+                if self.expert_mode:
+                    QgsExpressionContextUtils.setProjectVariable('aeq_band_max_value', float(max_value))
+                    max_value = '@aeq_band_max_value'
+
                 # We create the styles for AB and BA directions and add to the fields
                 for abb, aba, di, t in ([ab_base, ab_alt, ab, 'ab'],[ba_base, ba_alt, ba, 'ba']):
                     width = '(coalesce(scale_linear(min("' + abb + '","' + aba + '") , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
@@ -196,6 +208,10 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
                 ab_offset = '0'
                 ba_offset = '0'
 
+                if self.expert_mode:
+                    QgsExpressionContextUtils.setProjectVariable('aeq_band_max_value', float(max_value))
+                    max_value = '@aeq_band_max_value'
+                
             # We now create the positive and negative bandwidths for each side of the link
             styles = []
             styles.append((ab_base, ab_alt, ab, ab_offset))
