@@ -44,13 +44,16 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
 
-        self.common_colour = "0, 0, 0, 255"
-        self.positive_color = "0, 174, 116, 255"
-        self.negative_color = "218, 0, 3, 255"
-
+        self.positive_color.setColor(QColor(0, 174, 116, 255))
+        self.negative_color.setColor(QColor(218, 0, 3, 255))
+        self.common_flow_color.setColor(QColor(0, 0, 0, 255))
+        self.radio_diff.toggled.connect(self.show_color_composite)
+        self.radio_compo.toggled.connect(self.show_color_composite)
+        
         self.band_size = 10.0
-        self.space_size = 0.01
+        self.space_size = 0.0
         self.layer = None
+        self.expert_mode = False
         self.drive_side = get_parameter_chain(['system', 'driving side'])
 
         # layers and fields        # For adding skims
@@ -64,9 +67,9 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
         self.ba_FieldComboBoxAlt.currentIndexChanged.connect(partial(self.choose_a_field, 'alt_BA'))
 
         # space slider
-        self.slider_spacer.setMinimum(1)
+        self.slider_spacer.setMinimum(0)
         self.slider_spacer.setMaximum(30)
-        self.slider_spacer.setValue(1)
+        self.slider_spacer.setValue(0)
         self.slider_spacer.setTickPosition(QSlider.TicksBelow)
         self.slider_spacer.setTickInterval(10)
         self.slider_spacer.valueChanged.connect(self.spacevaluechange)
@@ -84,7 +87,12 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
         self.sizevaluechange()
         self.spacevaluechange()
         self.set_initial_value_if_available()
-
+        self.show_color_composite()
+        
+    def show_color_composite(self):
+        self.common_label.setVisible(self.radio_compo.isChecked())
+        self.common_flow_color.setVisible(self.radio_compo.isChecked())
+        
     def choose_a_field(self, modified):
         if modified[0:3] == 'bas':
             self.choose_field_indeed(modified, self.ab_FieldComboBoxBase, self.ba_FieldComboBoxBase)
@@ -136,10 +144,17 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
 
     def execute_comparison(self):
         if self.check_inputs():
+            self.expert_mode = self.chk_expert_mode.isChecked()
             self.but_run.setEnabled(False)
             self.band_size = str(self.band_size)
             self.space_size = str(self.space_size)
 
+            if self.expert_mode:
+                QgsExpressionContextUtils.setProjectVariable('aeq_band_spacer', float(self.space_size))
+                QgsExpressionContextUtils.setProjectVariable('aeq_band_width', float(self.band_size))
+                self.space_size = '@aeq_band_spacer'
+                self.band_size = '@aeq_band_width'
+                
             # define the side of the plotting based on the side of the road the system has defined
             ab = -1
             if self.drive_side == 'right':
@@ -165,11 +180,16 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
                 values.append(self.layer.maximumValue(idx2_ba))
                 max_value = max(values)
 
+                if self.expert_mode:
+                    QgsExpressionContextUtils.setProjectVariable('aeq_band_max_value', float(max_value))
+                    max_value = '@aeq_band_max_value'
+
                 # We create the styles for AB and BA directions and add to the fields
                 for abb, aba, di, t in ([ab_base, ab_alt, ab, 'ab'],[ba_base, ba_alt, ba, 'ba']):
                     width = '(coalesce(scale_linear(min("' + abb + '","' + aba + '") , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
                     offset = str(di) + '*(' + width + '/2 + ' + self.space_size + ')'
-                    symbol_layer = self.create_style(width, offset, self.common_colour)
+                    line_pattern = 'if (max(("' + abb + '"+"' + aba +  '"),0) = 0,' + "'no', 'solid')"
+                    symbol_layer = self.create_style(width, offset, self.text_color(self.common_flow_color), line_pattern)
                     self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
                     if t == 'ab':
                         ab_offset = str(di) + '*(' + width + ' + ' + self.space_size + ')'
@@ -188,17 +208,23 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
                 ab_offset = '0'
                 ba_offset = '0'
 
+                if self.expert_mode:
+                    QgsExpressionContextUtils.setProjectVariable('aeq_band_max_value', float(max_value))
+                    max_value = '@aeq_band_max_value'
+                
             # We now create the positive and negative bandwidths for each side of the link
             styles = []
-            styles.append((ab_base, ab_alt, self.positive_color, ab, ab_offset))
-            styles.append((ab_alt, ab_base, self.negative_color, ab, ab_offset))
-            styles.append((ba_base, ba_alt, self.positive_color, ba, ba_offset))
-            styles.append((ba_alt, ba_base, self.negative_color, ba, ba_offset))
-
+            styles.append((ab_base, ab_alt, ab, ab_offset))
+            styles.append((ba_base, ba_alt, ba, ba_offset))
+            
             for i in styles:
-                width = '(coalesce(scale_linear(max("' + i[0] + '"-"' + i[1] + '",0) , 0,' + str(max_value) + ', 0, ' + self.band_size + '), 0))'
-                offset = i[4] + '+' + str(i[3]) + '*(' + width + '/2 + ' + self.space_size + ')'
-                symbol_layer = self.create_style(width, offset, i[2])
+                width = '(coalesce(scale_linear(abs("' + i[0] + '"-"' + i[1] + '") , 0,' + \
+                        str(max_value) + ', 0, ' + self.band_size + '), 0))'
+                offset = i[3] + '+' + str(i[2]) + '*(' + width + '/2 + ' + self.space_size + ')'
+                line_pattern = 'if (("' + i[0] + '"-"' +  i[1] + '") = 0,' + "'no', 'solid')"
+                color = 'if (max(("' + i[0] + '"-"' + i[1] + '"),0) = 0,' + self.text_color(self.negative_color) + \
+                        ', ' + self.text_color(self.positive_color) + ')'
+                symbol_layer = self.create_style(width, offset, color, line_pattern)
                 self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
 
             self.layer.triggerRepaint()
@@ -212,19 +238,23 @@ class CompareScenariosDialog(QDialog, FORM_CLASS):
             return False
         return True
 
-    def create_style(self, width, offset, color):
+    def create_style(self, width, offset, color, line_pattern):
         symbol_layer = QgsSimpleLineSymbolLayerV2.create({})
         props = symbol_layer.properties()
         props['width_dd_expression'] = width
         props['offset_dd_expression'] = offset
-
-        props['line_color'] = color
+        props['line_style_expression'] = line_pattern
+        props['color_dd_expression'] = color
         symbol_layer = QgsSimpleLineSymbolLayerV2.create(props)
         return symbol_layer
 
     def exit_procedure(self):
         self.close()
 
-
+    def text_color(self, some_color_btn):
+        str_color = str(some_color_btn.color().getRgb())
+        str_color = str_color.replace("(", "")
+        return "'" + str_color.replace(")", "") + "'"
+       
 if __name__ == '__main__':
     main()

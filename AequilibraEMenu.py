@@ -43,6 +43,8 @@ no_binary = False
 old_binary = False
 try:
     from aequilibrae.paths import VERSION
+
+    # logger((VERSION, VERSION_GRAPH))
     if VERSION != VERSION_GRAPH:
         old_binary = True
 except:
@@ -69,7 +71,7 @@ class AequilibraEMenu:
     def initGui(self):
         #Removes temporary files
         self.removes_temporary_files()
-        
+
         # CREATING MASTER MENU HEAD
         self.AequilibraE_menu = QMenu(QCoreApplication.translate("AequilibraE", "AequilibraE"))
         self.iface.mainWindow().menuBar().insertMenu(self.iface.firstRightStandardMenu().menuAction(),

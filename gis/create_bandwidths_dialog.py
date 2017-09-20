@@ -58,6 +58,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.space_size = 0.01
         self.layer = None
         self.ramps = None
+        self.expert_mode = False
         self.drive_side = get_parameter_chain(['system', 'driving side'])
 
         # layers and fields        # For adding skims
@@ -293,6 +294,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.rdo_scale_custom.blockSignals(False)
         
     def add_bands_to_map(self):
+        self.expert_mode = self.chk_expert_mode.isChecked()
         for item in [self.gbox_scale, self.but_run, self.but_set_scale, self.mMapLayerComboBox, self.but_add_band,
                      self.rdo_color, self.rdo_ramp]:
             item.setEnabled(False)
@@ -332,6 +334,14 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         if max_value < 0:
             max_value = max(values)
 
+        if self.expert_mode:
+            QgsExpressionContextUtils.setProjectVariable('aeq_band_max_value', max_value)
+            QgsExpressionContextUtils.setProjectVariable('aeq_band_spacer', float(space_size))
+            QgsExpressionContextUtils.setProjectVariable('aeq_band_width', band_size)
+            max_value = '@aeq_band_max_value'
+            space_size = '@aeq_band_spacer'
+            band_size = '@aeq_band_width'
+            
         for s in [bands_ab, bands_ba]:
             acc_offset = '0'
             for field, side, clr, direc in s:
@@ -343,6 +353,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 props['offset_dd_expression'] = acc_offset + '+' + str(side) + ' * (coalesce(scale_linear("' + field + \
                                                 '", 0, ' + str(max_value) + ', 0, ' + band_size + '), 0)/2 + ' + \
                                                 space_size + ')'
+                props['line_style_expression'] = 'if ("' + field + '" = 0,' + "'no', 'solid')"
+                
                 if isinstance(clr, dict):
                     if direc == 'ab':
                         props['color_dd_expression'] = "ramp_color(\'" + clr[

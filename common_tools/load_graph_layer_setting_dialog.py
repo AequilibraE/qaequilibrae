@@ -104,11 +104,11 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, FORM_CLASS):
                 self.node_fields = [field.name() for field in layer.pendingFields()]
                 self.node_keys = {}
                 self.index = QgsSpatialIndex()
+                self.node_layer = layer
                 for feature in layer.getFeatures():
                     self.index.insertFeature(feature)
                     self.node_keys[feature.id()] = feature.attributes()
-                self.node_layer = layer
-                self.node_id = self.cb_data_field.currentText()
+                
             else:
                 self.line_layer = layer
 
@@ -146,7 +146,8 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, FORM_CLASS):
             for feat in self.line_layer.getFeatures():
                 link_id = feat.attributes()[idx]
                 self.link_features[link_id] = feat
-
+        self.node_id = self.cb_data_field.currentText()
+        
         self.exit_procedure()
 
     def exit_procedure(self):
