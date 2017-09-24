@@ -7,17 +7,15 @@ import numpy as np
 
 from aequilibrae.matrix import AequilibraEData
 
-path_test =tempfile.gettempdir()
-name_test = 'aequilibrae_database_' + str(uuid.uuid4().hex) + '.aed'
+file_path = AequilibraEData().random_name()
 
 class TestAequilibraEData(TestCase):
     def test___init__(self):
         # Generates the dataset
-        args = {'file_path': path_test,
-                'file_name': name_test,
+        args = {'file_path': file_path,
                 'entries': 100,
-                'fields': ['d', 'data2', 'data3'],
-                'types': [np.float64, np.float32, np.int8]}
+                'field_names': ['d', 'data2', 'data3'],
+                'data_types': [np.float64, np.float32, np.int8]}
 
         dataset = AequilibraEData(**args)
 
@@ -36,7 +34,7 @@ class TestAequilibraEData(TestCase):
     def test_load(self):
         # re-imports the dataset
         a = AequilibraEData()
-        a.load(os.path.join(path_test, name_test))
+        a.load(file_path)
 
 
         # checks if the values were properly saved

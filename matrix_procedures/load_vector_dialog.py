@@ -31,7 +31,6 @@ from functools import partial
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 
-
 from load_vector_class import LoadVector
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_vector_loader.ui'))
@@ -49,6 +48,7 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
         self.vector = None
         self.error = None
         self.selected_fields = None
+        self.worker_thread = None
         self.ignore_fields = []
         self.single_use = kwargs.get("single_use", True)
 
@@ -62,6 +62,7 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
         self.but_removes_from_links.clicked.connect(self.removes_fields)
         # For adding skims
         self.but_load.clicked.connect(self.load_from_aequilibrae_format)
+        self.but_save_and_use.clicked.connect(self.load_the_vector)
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
@@ -190,30 +191,18 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
         self.error = None
 
         if self.radio_layer_matrix.isChecked():
-            if self.field_from.currentIndex() < 0 or self.field_from.currentIndex() < 0 or self.field_cells.currentIndex() < 0:
+            if self.cob_data_layer.currentIndex() < 0 or self.cob_index_field.currentIndex() < 0:
                 self.error = 'Invalid field chosen'
 
-            if self.error is None:
-                idx1 = self.layer.fieldNameIndex(self.field_from.currentText())
-                idx3 = self.layer.fieldNameIndex(self.field_cells.currentText())
-                idx = [idx1, idx3]
+            index_field = self.cob_index_field.currentText()
+            if index_field in self.selected_fields:
+                self.selected_fields.remove(index_field)
 
-                self.worker_thread = LoadVector(qgis.utils.iface.mainWindow(), self.layer, idx)
+            if len(self.selected_fields) > 0:
+                self.worker_thread = LoadVector(qgis.utils.iface.mainWindow(), layer=self.layer, index_field=index_field, fields=self.selected_fields)
                 self.run_thread()
-
-        if self.radio_npy_matrix.isChecked():
-            file_types = "NumPY array(*.npy)"
-            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.path, file_types)
-            try:
-                vector = np.load(new_name)
-                if len(vector.shape[:]) == 1:
-                    self.vector = vector
-                    self.exit_procedure()
-                else:
-                    self.error = 'Numpy array needs to be 2 dimensional. Matrix provided has ' + str(len(matrix.shape[:]))
-            except:
-                pass
-
+            else:
+                qgis.utils.iface.messageBar().pushMessage("Error:", "One cannot load a dataset with indices only", level=1)
         if self.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
 

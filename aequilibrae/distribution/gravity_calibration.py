@@ -193,11 +193,11 @@ class GravityCalibration:
 
         self.result_matrix = self.matrix.copy(output_name='TEMP', cores=[self.comput_core], names=['gravity'])
 
-        self.rows = AequilibraEData(entries=self.matrix.zones, fields=['rows'])
+        self.rows = AequilibraEData(entries=self.matrix.zones, field_names=['rows'], memory_mode=True)
         self.rows.index[:] = self.matrix.index[:]
         self.rows.rows[:] = self.matrix.rows()[:]
 
-        self.columns = AequilibraEData(entries=self.matrix.zones, fields=['columns'])
+        self.columns = AequilibraEData(entries=self.matrix.zones, field_names=['columns'], memory_mode=True)
         self.columns.index[:] = self.matrix.index[:]
         self.columns.columns[:] = self.matrix.columns()[:]
 

@@ -32,81 +32,90 @@ from numpy.lib.format import open_memmap
 # except:
 #     pass
 
+MEMORY = 1
+DISK = 0
 
-class AequilibraEData():
-    def __init__(self, **kwargs):
-        self.file_path = kwargs.get('file_path', tempfile.gettempdir())
-        self.file_name = kwargs.get('file_name', 'aequilibrae_database_' + str(uuid.uuid4().hex) + '.aed')
+class AequilibraEData(object):
+    def __init__(self, file_path=None, entries=1, field_names=None, data_types=None, memory_mode=False):
+        self.data = None
+        if file_path is not None or memory_mode:
+            if field_names is None:
+                field_names = ['data']
 
-        self.aeq_index_type = np.int64
+            if data_types is None:
+                data_types = [np.float64]
 
-        self.complete_path = os.path.join(self.file_path, self.file_name)
+            self.reserved_names = ['file_path', 'file_name', 'file_folder', 'entries', 'data',
+                                   'fields', 'data_types', 'num_fields', 'reserved_names', 'aeq_index_type',
+                                   'index', 'memory_mode']
 
-        self.entries = kwargs.get('entries', 1)
+            self.file_path = file_path
+            self.entries = entries
+            self.fields = field_names
+            self.data_types = data_types
+            self.aeq_index_type = np.int64
 
-        self.fields = kwargs.get('fields', 'default_data')
+            if memory_mode:
+                self.memory_mode = MEMORY
+            else:
+                self.memory_mode = DISK
+                if self.file_path is None:
+                    self.file_path = self.random_name()
 
-        self.data_types = kwargs.get('types', np.float64)
+            # Consistency checks
+            if not isinstance(self.fields, list):
+                raise ValueError('Titles for fields, "field_names", needs to be a list')
 
+            if not isinstance(self.data_types, list):
+                raise ValueError('Data types, "data_types", needs to be a list')
+            else:
+                for dt in self.data_types:
+                    if not isinstance(dt, type):
+                        raise ValueError('Data types need to be Python or Numpy data types')
 
-        """TODO:
-        list the appropriate reserved names"""
-        self.reserved_names = ['file_path', 'file_name', 'complete_path', 'entries', 'data',
-                               'fields', 'data_types', 'num_fields', 'reserved_names', 'aeq_index_type']
-        if isinstance(self.fields, str):
-            self.fields = [self.fields]
+            for field in self.fields:
+                if field in self.reserved_names:
+                    raise Exception(field + ' is a reserved name. You cannot use it as a field name')
 
-        if isinstance(self.data_types, type):
-            self.data_types = [self.data_types]
+            self.num_fields = len(self.fields)
 
-        if not isinstance(self.fields, list) or not isinstance(self.data_types, list):
-            raise Exception('Fields names and data types need to be lists')
+            dtype = [('index', self.aeq_index_type)]
+            dtype.extend([(self.fields[i].encode('utf-8'), self.data_types[i]) for i in range(self.num_fields)])
 
-        self.num_fields = len(self.fields)
-
-        if len(self.data_types) != self.num_fields:
-            raise Exception('Lists of fields and types need to have the same dimension')
-
-        if 'index' in self.fields:
-            if self.data_types[self.fields.index("index")] != self.aeq_index_type:
-                raise Exception('Index type needs to be NumPY int64')
-        else:
-            self.fields = ['index'] + self.fields
-            self.data_types = [self.aeq_index_type] + self.data_types
-
-        dtype = [(self.fields[i].encode('utf-8'), self.data_types[i]) for i in range(self.num_fields + 1)]
-
-        for field in self.fields:
-            if field in self.reserved_names:
-                raise Exception(field + ' is a reserved name. You cannot use it as a field name')
-
-        # the file
-        self.data = open_memmap(self.complete_path, mode='w+', dtype=dtype, shape=(self.entries,))
+            # the file
+            if self.memory_mode:
+                self.data = np.recarray((self.entries,), dtype=dtype)
+            else:
+                self.data = open_memmap(self.file_path, mode='w+', dtype=dtype, shape=(self.entries,))
 
     def __getattr__(self, field_name):
 
-        if field_name == 'index':
-            return self.data['index']
+        if field_name in object.__dict__:
+            return self.__dict__[field_name]
 
-        if field_name.lower() == 'data':
-            return self.data
+        if self.data is not None:
+            if field_name in self.fields:
+                return self.data[field_name]
 
-        if field_name in self.fields:
-            return self.data[field_name]
+            if field_name == 'index':
+                return self.data['index']
 
-        raise AttributeError("No such method or data field! --> " + str(field_name))
-
+            raise AttributeError("No such method or data field! --> " + str(field_name))
+        else:
+            raise AttributeError("Data container is empty")
     def load(self, file_path):
         f = open(file_path)
-        self.complete_path = os.path.realpath(f.name)
+        self.file_path = os.path.realpath(f.name)
         f.close()
 
-        self.file_path, self.file_name = os.path.split(self.complete_path)
-
         # Map in memory and load matrix_procedures names plus dimensions
-        self.data = open_memmap(self.complete_path, mode='r+')
+        self.data = open_memmap(self.file_path, mode='r+')
 
         self.entries = self.data.shape[0]
         self.fields = [x for x in self.data.dtype.fields if x != 'index']
         self.num_fields = len(self.fields)
         self.data_types = [self.data[x].dtype.type for x in self.fields]
+
+    @staticmethod
+    def random_name():
+        return os.path.join(tempfile.gettempdir(), 'Aequilibrae_data_' + str(uuid.uuid4()) + '.aed')

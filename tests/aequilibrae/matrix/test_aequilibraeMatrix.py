@@ -7,11 +7,9 @@ import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
 
 zones = 50
-path_test =tempfile.gettempdir()
-name_test = 'aequilibrae_matrix_test.aem'
-name_test = os.path.join(path_test, name_test)
-copy_matrix_name = os.path.join(path_test, AequilibraeMatrix().random_name())
-csv_export_name = os.path.join(path_test, AequilibraeMatrix().random_name() + '.csv')
+name_test = AequilibraeMatrix().random_name()
+copy_matrix_name = AequilibraeMatrix().random_name()
+csv_export_name = copy_matrix_name + '.csv'
 class TestAequilibraeMatrix(TestCase):
     def test___init__(self):
         os.remove(name_test) if os.path.exists(name_test) else None

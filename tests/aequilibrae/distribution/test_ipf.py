@@ -10,21 +10,22 @@ zones = 100
 
 # row vector
 args = {'entries': zones,
-        'fields': ['rows'],
-        'types': [np.float64]}
+        'field_names': ['rows'],
+        'data_types': [np.float64],
+        'memory_mode': True}
 row_vector = AequilibraEData(**args)
 row_vector.rows[:] = np.random.rand(zones)[:] * 1000
-
+row_vector.index[:] = np.arange(zones)[:]
 # column vector
-args['fields'] = ['columns']
+args['field_names'] = ['columns']
 column_vector = AequilibraEData(**args)
 column_vector.columns[:] = np.random.rand(zones)[:] * 1000
-
+column_vector.index[:] = np.arange(zones)[:]
 # balance vectors
 column_vector.columns[:] = column_vector.columns[:] * (row_vector.rows.sum()/column_vector.columns.sum())
 
 # seed matrix_procedures
-name_test = os.path.join(tempfile.gettempdir(), 'aequilibrae_matrix_test.aem')
+name_test = AequilibraeMatrix().random_name()
 args = {'file_name': name_test,
         'zones': zones,
         'matrix_names': ['seed']}
@@ -32,6 +33,7 @@ args = {'file_name': name_test,
 matrix = AequilibraeMatrix(**args)
 matrix.seed[:, :] = np.random.rand(zones, zones)[:,:]
 matrix.computational_view(['seed'])
+matrix.index[:] = np.arange(zones)[:]
 
 
 class TestIpf(TestCase):

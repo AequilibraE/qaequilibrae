@@ -10,15 +10,16 @@ zones = 10
 
 # row vector
 args = {'entries': zones,
-        'fields': ['rows'],
-        'types': [np.float64]}
+        'field_names': ['rows'],
+        'data_types': [np.float64],
+        'memory_mode': True}
 
 row_vector = AequilibraEData(**args)
 row_vector.index[:] = np.arange(row_vector.entries) + 100
 row_vector.rows[:] = row_vector.index[:] + np.random.rand(zones)[:]
 
 # column vector
-args['fields'] = ['columns']
+args['field_names'] = ['columns']
 column_vector = AequilibraEData(**args)
 column_vector.index[:] = np.arange(column_vector.entries) + 100
 column_vector.columns[:] = column_vector.index[:] + np.random.rand(zones)[:]
