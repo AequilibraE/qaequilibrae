@@ -208,8 +208,9 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
             elif param == 'REBLOCKED MATRICES':
                 self.matrix = self.worker_thread.matrix
-                if self.output_name is not None:
-                    self.matrix.save_to_disk(file_path=self.output_name, compressed=self.compressed.isChecked())
+                if self.compressed.isChecked():
+                    pass
+                    # compression not implemented yet
                 self.exit_procedure()
 
     def load_the_matrix(self):
@@ -319,9 +320,8 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         if self.output_name is None:
             self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices)
         else:
-            _, file_name = os.path.split(self.output_name[:-3] + 'npy')
             self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse,
-                                                  matrices=self.matrices, file_name=file_name)
+                                                  matrices=self.matrices, file_name=self.output_name)
         self.run_thread()
 
 

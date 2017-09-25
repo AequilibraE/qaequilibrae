@@ -303,16 +303,18 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.matrix = None
 
     def display_matrix_or_not(self):
+        self.matrix_core.clear()
         if self.display_matrix.isChecked() and self.matrix is not None:
+            for n in self.matrix.names:
+                self.matrix_core.addItem(n)
+
             row_headers = []
             col_headers = []
-            for i in range(self.matrix.shape[0]):
-                row_headers.append(str(i))
+            for i in range(self.matrix.zones):
+                row_headers.append(self.matrix.index[i])
+                col_headers.append(self.matrix.index[i])
 
-            for j in range(self.matrix.shape[1]):
-                col_headers.append(str(j))
-
-            m = NumpyModel(self.matrix, col_headers, row_headers)
+            m = NumpyModel(self.matrix.matrix[str(self.matrix_core.currentText())], col_headers, row_headers)
             self.matrix_viewer.setModel(m)
         else:
             self.matrix_viewer.clearSpans()

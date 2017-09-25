@@ -96,7 +96,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
 
             if self.matrix is not None:
                 table = self.tbl_array_cores
-                table.setRowCount(self.matrix.num_matrices)
+                table.setRowCount(self.matrix.cores)
                 for i, mat in enumerate(self.matrix.names):
                     item1 = QTableWidgetItem(mat)
                     item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)

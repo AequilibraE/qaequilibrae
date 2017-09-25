@@ -24,7 +24,7 @@ from PyQt4.QtCore import *
 import numpy as np
 from ..common_tools.worker_thread import WorkerThread
 import struct
-from aequilibrae.matrix import AequilibraEData
+from ..aequilibrae.matrix import AequilibraEData
 
 class LoadVector(WorkerThread):
     def __init__(self, parentThread, layer, index_field, fields):

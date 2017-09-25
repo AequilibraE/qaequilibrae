@@ -462,6 +462,9 @@
    </property>
   </widget>
   <widget class="QCheckBox" name="compressed">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -474,7 +477,7 @@
     <string>Compress outputs</string>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </widget>
   <zorder>matrix_list_view</zorder>

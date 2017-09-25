@@ -69,6 +69,7 @@ class LoadMatrix(WorkerThread):
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (0))
             self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), ("Converting to a NumPy array"))
             matrix1 = np.array(matrix)  # transform the list of lists in NumPy array
+            del matrix
 
             # Bring it all to memory mapped
             self.matrix = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
@@ -111,8 +112,7 @@ class MatrixReblocking(WorkerThread):
         WorkerThread.__init__(self, parentThread)
         self.matrices = kwargs.get('matrices')
         self.sparse = kwargs.get('sparse', False)
-        self.file_location = kwargs.get('path', tempfile.gettempdir())
-        self.file_name = kwargs.get('file_name', 'aequilibrae_array_' + str(uuid.uuid4().hex) + '.aem')
+        self.file_name = kwargs.get('file_name', AequilibraeMatrix().random_name())
 
         self.num_matrices = len(self.matrices.keys())
         self.matrix_hash = {}
@@ -156,9 +156,8 @@ class MatrixReblocking(WorkerThread):
             for i, j in enumerate(indices):
                 index[j] = i
 
-        self.matrix = AequilibraeMatrix(file_location = self.file_location, file_name = self.file_name,
-                                        zones=compact_shape, cores=self.num_matrices, names=self.matrices.keys(),
-                                        dtype = np.float64)
+        self.matrix = AequilibraeMatrix(file_name = self.file_name, zones=compact_shape,
+                                        matrix_names=self.matrices.keys(), data_type = np.float64)
 
         self.matrix.index[:] = indices[:]
 
