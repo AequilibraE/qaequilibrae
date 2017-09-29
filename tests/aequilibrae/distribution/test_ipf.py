@@ -30,7 +30,8 @@ args = {'file_name': name_test,
         'zones': zones,
         'matrix_names': ['seed']}
 
-matrix = AequilibraeMatrix(**args)
+matrix = AequilibraeMatrix()
+matrix.create_empty(**args)
 matrix.seed[:, :] = np.random.rand(zones, zones)[:,:]
 matrix.computational_view(['seed'])
 matrix.index[:] = np.arange(zones)[:]

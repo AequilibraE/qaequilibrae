@@ -64,7 +64,7 @@ class LoadMatrix(WorkerThread):
                 if P % 1000 == 0:
                     self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
                     self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                              ("Loading matrix_procedures: " + str(P) + "/" + str(feat_count)))
+                              ("Loading matrix: " + str(P) + "/" + str(feat_count)))
 
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (0))
             self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), ("Converting to a NumPy array"))
@@ -156,8 +156,10 @@ class MatrixReblocking(WorkerThread):
             for i, j in enumerate(indices):
                 index[j] = i
 
-        self.matrix = AequilibraeMatrix(file_name = self.file_name, zones=compact_shape,
-                                        matrix_names=self.matrices.keys(), data_type = np.float64)
+        self.matrix = AequilibraeMatrix()
+        names = [str(n) for n in self.matrices.keys()]
+        self.matrix.create_empty(file_name = self.file_name, zones=compact_shape,
+                                 matrix_names=names, data_type = np.float64)
 
         self.matrix.index[:] = indices[:]
 

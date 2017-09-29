@@ -35,7 +35,8 @@ args = {'file_name': name_test,
         'zones': zones,
         'matrix_names': ['impedance']}
 
-matrix = AequilibraeMatrix(**args)
+matrix = AequilibraeMatrix()
+matrix.create_empty(**args)
 
 # randoms = np.random.randint(5, size=(2, 4))
 matrix.impedance[:, :] = np.random.rand(zones, zones)[:,:]

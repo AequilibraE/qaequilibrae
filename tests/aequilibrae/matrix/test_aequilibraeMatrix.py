@@ -15,9 +15,11 @@ class TestAequilibraeMatrix(TestCase):
         os.remove(name_test) if os.path.exists(name_test) else None
         args = {'file_name': name_test,
                 'zones': zones,
-                'matrix_names': ['mat', 'seed', 'dist']}
+                'matrix_names': ['mat', 'seed', 'dist'],
+                'index_names':['my indices']}
 
-        matrix = AequilibraeMatrix(**args)
+        matrix = AequilibraeMatrix()
+        matrix.create_empty(**args)
 
         matrix.index[:] = np.arange(matrix.zones) + 100
         matrix.mat[:,:] = np.random.rand(matrix.zones,matrix.zones)[:,:]
