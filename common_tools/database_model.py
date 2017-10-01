@@ -34,10 +34,16 @@ from auxiliary_functions import logger
 # Adaptations to work with a view of an arbitrary set of fields on a recarray by the author
 
 class DatabaseModel(QtCore.QAbstractTableModel):
-    def __init__(self, aeq_dataset, parent=None):
+    def __init__(self, aeq_dataset, separator, decimals, parent=None):
         QtCore.QAbstractTableModel.__init__(self, parent)
         self._array = aeq_dataset
-        self.row_headers_data = ['{:,}'.format(x) for x in aeq_dataset.index[:]]
+        self.separator = separator
+        self.decimals = decimals
+
+        if self.separator:
+            self.row_headers_data = ['{:,}'.format(x) for x in aeq_dataset.index[:]]
+        else:
+            self.row_headers_data = [str(x) for x in aeq_dataset.index[:]]
 
         self.types = []
         self.header_data = []
@@ -63,17 +69,21 @@ class DatabaseModel(QtCore.QAbstractTableModel):
             if role == Qt.DisplayRole:
                 row = index.row()
                 col = index.column()
-                """
-                TODO:
-                Allow user to control display format
-                """
-                if self.types[col] == 0:
-                    return '{:,}'.format(self._array.data[self.header_data[col]][row])
-                if self.types[col] == 1:
-                    return '{:,.4f}'.format(self._array.data[self.header_data[col]][row])
-                else:
-                    return str(self._array.data[self.header_data[col]][row])
 
+                if self.separator:
+                    if self.types[col] == 0:
+                        return '{:,}'.format(self._array.data[self.header_data[col]][row])
+                    if self.types[col] == 1:
+                        return ('{:,.' + str(self.decimals) + 'f}').format(self._array.data[self.header_data[col]][row])
+                    else:
+                        return str(self._array.data[self.header_data[col]][row])
+                else:
+                    if self.types[col] == 0:
+                        return '{:}'.format(self._array.data[self.header_data[col]][row])
+                    if self.types[col] == 1:
+                        return ('{:.' + str(self.decimals) + 'f}').format(self._array.data[self.header_data[col]][row])
+                    else:
+                        return str(self._array.data[self.header_data[col]][row])
 
     def headerData(self, col, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
