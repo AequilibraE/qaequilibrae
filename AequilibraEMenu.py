@@ -35,7 +35,7 @@ from .distribution_procedures import IpfDialog, ApplyGravityDialog, CalibrateGra
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
-from .matrix_procedures import LoadMatrixDialog, LoadVectorDialog
+from .matrix_procedures import LoadMatrixDialog, LoadVectorDialog, DisplayVectorDialog
 import tempfile, glob
 from .aequilibrae.__version__ import version as VERSION_GRAPH
 
@@ -118,6 +118,12 @@ class AequilibraEMenu:
         self.load_database_action = QAction(icon, u"Import dataset", self.iface.mainWindow())
         QObject.connect(self.load_database_action, SIGNAL("triggered()"), self.run_load_database)
         self.matrix_menu.addAction(self.load_database_action)
+
+        # Displaying Database
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_display_dataset.png")
+        self.display_database_action = QAction(icon, u"Display dataset", self.iface.mainWindow())
+        QObject.connect(self.display_database_action, SIGNAL("triggered()"), self.run_display_dataset)
+        self.matrix_menu.addAction(self.display_database_action)
 
 
         # # ########################################################################
@@ -291,6 +297,11 @@ class AequilibraEMenu:
 
     def run_load_database(self):
         dlg2 = LoadVectorDialog(self.iface, single_use=False)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_display_dataset(self):
+        dlg2 = DisplayVectorDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

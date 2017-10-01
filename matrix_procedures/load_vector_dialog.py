@@ -30,10 +30,12 @@ import sys, os
 from functools import partial
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
+from ..common_tools.get_output_file_name import GetOutputFileName
 
 from load_vector_class import LoadVector
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_vector_loader.ui'))
+
 
 class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface, **kwargs):
@@ -42,6 +44,7 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.path = standard_path()
 
+        self.output_name = None
         self.layer = None
         self.zones = None
         self.cells = None
@@ -63,6 +66,7 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
         # For adding skims
         self.but_load.clicked.connect(self.load_from_aequilibrae_format)
         self.but_save_and_use.clicked.connect(self.load_the_vector)
+        self.but_import_and_use.clicked.connect(self.load_just_to_use)
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
@@ -139,7 +143,6 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
 
         self.set_tables_with_fields()
 
-
     def load_fields_to_combo_boxes(self):
         self.cob_index_field.clear()
 
@@ -157,12 +160,15 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
         self.set_tables_with_fields()
 
     def run_thread(self):
+
         QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
         QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
         QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
                         self.finished_threaded_procedure)
 
-        self.load.setEnabled(False)
+        self.chb_all_fields.setEnabled(False)
+        self.but_load.setEnabled(False)
+        self.but_save_and_use.setEnabled(False)
         self.worker_thread.start()
         self.exec_()
 
@@ -174,23 +180,30 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
         self.progressbar.setValue(val)
 
     def finished_threaded_procedure(self, param):
-        self.load.setEnabled(True)
+        self.but_load.setEnabled(True)
+        self.but_save_and_use.setEnabled(True)
+        self.chb_all_fields.setEnabled(True)
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Error while loading vector:", self.worker_thread.error,
                                                       level=1)
         else:
             self.vector = self.worker_thread.vector
-            self.exit_procedure()
-
+        self.exit_procedure()
 
     def load_from_aequilibrae_format(self):
         pass
 
-
     def load_the_vector(self):
-        self.error = None
+        if  self.single_use:
+            self.output_name = None
+        else:
+            self.error = None
+            self.output_name, _ = GetOutputFileName(self, 'AequilibraE dataset',
+                                                ["Aequilibrae dataset(*.aed)"], '.aed', self.path)
+            if self.output_name is None:
+                self.error = 'No name provided for the output file'
 
-        if self.radio_layer_matrix.isChecked():
+        if self.radio_layer_matrix.isChecked() and self.error is None:
             if self.cob_data_layer.currentIndex() < 0 or self.cob_index_field.currentIndex() < 0:
                 self.error = 'Invalid field chosen'
 
@@ -199,12 +212,18 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
                 self.selected_fields.remove(index_field)
 
             if len(self.selected_fields) > 0:
-                self.worker_thread = LoadVector(qgis.utils.iface.mainWindow(), layer=self.layer, index_field=index_field, fields=self.selected_fields)
+                self.worker_thread = LoadVector(qgis.utils.iface.mainWindow(), layer=self.layer,
+                                                index_field=index_field, fields=self.selected_fields,
+                                                file_name=self.output_name)
                 self.run_thread()
             else:
                 qgis.utils.iface.messageBar().pushMessage("Error:", "One cannot load a dataset with indices only", level=1)
         if self.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+
+    def load_just_to_use(self):
+        self.single_use = True
+        self.load_the_vector()
 
     def exit_procedure(self):
         self.close()

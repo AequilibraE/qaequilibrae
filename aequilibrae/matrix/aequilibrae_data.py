@@ -36,18 +36,24 @@ MEMORY = 1
 DISK = 0
 
 class AequilibraEData(object):
-    def __init__(self, file_path=None, entries=1, field_names=None, data_types=None, memory_mode=False):
+    def __init__(self):
         self.data = None
+        self.file_path = None
+        self.entries = None
+        self.fields = None
+        self.num_fields = None
+        self.data_types = None
+        self.aeq_index_type = None
+        self.memory_mode = None
+
+    def create_empty(self, file_path=None, entries=1, field_names=None, data_types=None, memory_mode=False):
+
         if file_path is not None or memory_mode:
             if field_names is None:
                 field_names = ['data']
 
             if data_types is None:
                 data_types = [np.float64]
-
-            self.reserved_names = ['file_path', 'file_name', 'file_folder', 'entries', 'data',
-                                   'fields', 'data_types', 'num_fields', 'reserved_names', 'aeq_index_type',
-                                   'index', 'memory_mode']
 
             self.file_path = file_path
             self.entries = entries
@@ -68,13 +74,14 @@ class AequilibraEData(object):
 
             if not isinstance(self.data_types, list):
                 raise ValueError('Data types, "data_types", needs to be a list')
-            else:
-                for dt in self.data_types:
-                    if not isinstance(dt, type):
-                        raise ValueError('Data types need to be Python or Numpy data types')
+            # The check below is not working properly with the QGIS importer
+            # else:
+            #     for dt in self.data_types:
+            #         if not isinstance(dt, type):
+            #             raise ValueError('Data types need to be Python or Numpy data types')
 
             for field in self.fields:
-                if field in self.reserved_names:
+                if field in object.__dict__:
                     raise Exception(field + ' is a reserved name. You cannot use it as a field name')
 
             self.num_fields = len(self.fields)
@@ -103,6 +110,7 @@ class AequilibraEData(object):
             raise AttributeError("No such method or data field! --> " + str(field_name))
         else:
             raise AttributeError("Data container is empty")
+
     def load(self, file_path):
         f = open(file_path)
         self.file_path = os.path.realpath(f.name)

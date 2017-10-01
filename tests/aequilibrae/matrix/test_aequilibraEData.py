@@ -8,16 +8,16 @@ import numpy as np
 from aequilibrae.matrix import AequilibraEData
 
 file_path = AequilibraEData().random_name()
+args = {'file_path': file_path,
+        'entries': 100,
+        'field_names': ['d', 'data2', 'data3'],
+        'data_types': [np.float64, np.float32, np.int8]}
 
 class TestAequilibraEData(TestCase):
     def test___init__(self):
         # Generates the dataset
-        args = {'file_path': file_path,
-                'entries': 100,
-                'field_names': ['d', 'data2', 'data3'],
-                'data_types': [np.float64, np.float32, np.int8]}
-
-        dataset = AequilibraEData(**args)
+        dataset = AequilibraEData()
+        dataset.create_empty(**args)
 
         dataset.index[:] = np.arange(dataset.entries) + 100
         dataset.d[:] = dataset.index[:]**2
@@ -43,3 +43,7 @@ class TestAequilibraEData(TestCase):
 
         if int(a.d[70]) != 28900:
             self.fail("Value for data field test was not as expected")
+
+        for f in a.fields:
+            if f not in args['field_names']:
+                self.fail("Could not retrieve all fields")

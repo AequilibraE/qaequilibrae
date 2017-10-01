@@ -19,59 +19,76 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
+import qgis
 from qgis.core import *
 from PyQt4.QtCore import *
 import numpy as np
 from ..common_tools.worker_thread import WorkerThread
 import struct
 from ..aequilibrae.matrix import AequilibraEData
+from ..common_tools.global_parameters import *
+from ..common_tools import logger
 
 class LoadVector(WorkerThread):
-    def __init__(self, parentThread, layer, index_field, fields):
+    def __init__(self, parentThread, layer, index_field, fields, file_name):
         WorkerThread.__init__(self, parentThread)
         self.layer = layer
         self.index_field = index_field
         self.fields = fields
         self.error = None
         self.python_version = (8 * struct.calcsize("P"))
+        self.output = AequilibraEData()
+        self.output_name = file_name
 
     def doWork(self):
-        # idx = self.idx
-        # feat_count = self.layer.featureCount()
-        # self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (feat_count))
-        #
-        # idx1 = idx[0]
-        # idx2 = idx[1]
-        # # We read all the vectors and put in a list of lists
-        # vector = []
-        # P = 0
-        # for feat in self.layer.getFeatures():
-        #     P += 1
-        #     a = feat.attributes()[idx1]
-        #     b = feat.attributes()[idx2]
-        #     vector.append([a, b])
-        #     if P % 100 == 0:
-        #         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
-        #
-        # vector = np.array(vector)  # transform the list of lists in NumPy array
-        #
-        # # bincount has odd behavior on 32 vs 64, so we need to control for that
-        # if self.python_version == 32:
-        #     zones = np.bincount(vector[:,0].astype(np.int32))
-        # else:
-        #     zones = np.bincount(vector[:, 0].astype(np.int64))
-        #
-        # if np.max(zones)  > 1:
-        #     self.error = 'Zone field is not unique'
-        # else:
-        #     zones = np.max(vector[:, 0]) + 1
-        #     vec = np.zeros(zones)
-        #     vec[vector[:, 0].astype(int)] = vector[:, 1]
-        #
-        #     self.vector = vec
+        feat_count = self.layer.featureCount()
+        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (feat_count))
+
+        # Create specification for the output file
+        datafile_spec = {}
+        datafile_spec['entries'] = feat_count
+        if self.output_name is None:
+            datafile_spec['memory_mode'] = True
+        else:
+            datafile_spec['memory_mode'] = False
+        fields = []
+        types = []
+        idxs = []
+        for field in self.layer.dataProvider().fields().toList():
+            if field.name() in self.fields:
+                if field.type() in integer_types:
+                    types.append('<i8')
+                elif field.type() in float_types:
+                    types.append('<f8')
+                elif field.type() in string_types:
+                    types.append('S' + str(field.length()))
+                else:
+                    print field.type()
+                    self.error = 'Field {} does has a type not supported.'.format(str(field.name()))
+                    break
+                fields.append(str(field.name()))
+                idxs.append(self.layer.fieldNameIndex(field.name()))
+
+        index_idx = self.layer.fieldNameIndex(self.index_field)
+        datafile_spec['field_names'] = fields
+        datafile_spec['data_types'] = types
+        datafile_spec['file_path'] = self.output_name
+
         if self.error is None:
-            self.data = AequilibraEData()
+            logger(fields)
+            logger(types)
+            self.output.create_empty(**datafile_spec)
+
+            # Get all the data
+            for p, feat in enumerate(self.layer.getFeatures()):
+                for idx, field in zip(idxs, fields):
+                    if not isinstance(feat.attributes()[idx], QPyNullVariant):
+                        self.output.data[field][p] = feat.attributes()[idx]
+                self.output.index[p] = feat.attributes()[index_idx]
+                self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (p))
 
 
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(feat_count)))
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'Vector loaded')
+            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(feat_count)))
+        else:
+            self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'Vector loaded')
+            # qgis.utils.iface.messageBar().pushMessage(self.error)
