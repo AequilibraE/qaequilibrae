@@ -2,8 +2,8 @@
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
 
- Name:       Loads Vectors from file/layer
- Purpose:    Loads GUI for loading vector arrays from differencet sources
+ Name:       Loads Datasets from file/layer
+ Purpose:    Loads GUI for loading datasets arrays from different sources
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -12,33 +12,27 @@
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    2016-08-15
- Updated:    15/08/2017
+ Created:    2016-08-15 (Initially as vector loading)
+ Updated:    2017-10-02
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
-import qgis
 from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-import numpy as np
-
-import sys, os
 from functools import partial
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
-
-from load_vector_class import LoadVector
+from load_dataset_class import LoadDataset
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_vector_loader.ui'))
 
 
-class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
-    def __init__(self, iface, **kwargs):
+class LoadDatasetDialog(QtGui.QDialog, FORM_CLASS):
+    def __init__(self, iface, single_use=True):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
@@ -52,8 +46,9 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
         self.error = None
         self.selected_fields = None
         self.worker_thread = None
+        self.dataset = None
         self.ignore_fields = []
-        self.single_use = kwargs.get("single_use", True)
+        self.single_use = single_use
 
         self.radio_layer_matrix.clicked.connect(partial(self.size_it_accordingly, False))
         self.radio_aequilibrae.clicked.connect(partial(self.size_it_accordingly, False))
@@ -101,7 +96,7 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
                     table.setRowCount(table.rowCount() + 1)
                     item1 = QTableWidgetItem(field)
                     item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                    table.setItem(table.rowCount() -1, 0, item1)
+                    table.setItem(table.rowCount() - 1, 0, item1)
 
     def size_it_accordingly(self, final=False):
         def set_size(w, h):
@@ -127,7 +122,8 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
 
     def removes_fields(self):
         for i in self.table_fields_to_import.selectedRanges():
-            old_fields = [self.table_fields_to_import.item(row, 0).text() for row in xrange(i.topRow(), i.bottomRow() + 1)]
+            old_fields = [self.table_fields_to_import.item(row, 0).text() for
+                          row in xrange(i.topRow(), i.bottomRow() + 1)]
 
             self.ignore_fields.extend(old_fields)
             self.selected_fields = [x for x in self.selected_fields if x not in old_fields]
@@ -161,8 +157,10 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
 
     def run_thread(self):
 
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"),
+                        self.progress_value_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
+                        self.progress_range_from_thread)
         QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
                         self.finished_threaded_procedure)
 
@@ -187,19 +185,19 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Error while loading vector:", self.worker_thread.error,
                                                       level=1)
         else:
-            self.vector = self.worker_thread.vector
+            self.dataset = self.worker_thread.output
         self.exit_procedure()
 
     def load_from_aequilibrae_format(self):
         pass
 
     def load_the_vector(self):
-        if  self.single_use:
+        if self.single_use:
             self.output_name = None
         else:
             self.error = None
             self.output_name, _ = GetOutputFileName(self, 'AequilibraE dataset',
-                                                ["Aequilibrae dataset(*.aed)"], '.aed', self.path)
+                                                    ["Aequilibrae dataset(*.aed)"], '.aed', self.path)
             if self.output_name is None:
                 self.error = 'No name provided for the output file'
 
@@ -212,12 +210,13 @@ class LoadVectorDialog(QtGui.QDialog, FORM_CLASS):
                 self.selected_fields.remove(index_field)
 
             if len(self.selected_fields) > 0:
-                self.worker_thread = LoadVector(qgis.utils.iface.mainWindow(), layer=self.layer,
-                                                index_field=index_field, fields=self.selected_fields,
-                                                file_name=self.output_name)
+                self.worker_thread = LoadDataset(qgis.utils.iface.mainWindow(), layer=self.layer,
+                                                 index_field=index_field, fields=self.selected_fields,
+                                                 file_name=self.output_name)
                 self.run_thread()
             else:
-                qgis.utils.iface.messageBar().pushMessage("Error:", "One cannot load a dataset with indices only", level=1)
+                qgis.utils.iface.messageBar().pushMessage("Error:", "One cannot load a dataset with indices only",
+                                                          level=1)
         if self.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
 

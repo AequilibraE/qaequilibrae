@@ -12,7 +12,7 @@
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    2017-10-30
+ Created:    2017-10-02
  Updated:
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
@@ -37,7 +37,9 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/u
 
 from PyQt4.QtGui import QHBoxLayout, QTableView, QTableWidget, QPushButton, QVBoxLayout
 from PyQt4.QtGui import QComboBox, QCheckBox, QSpinBox, QWidget, QLabel, QSpacerItem
-class DisplayVectorDialog(QtGui.QDialog, FORM_CLASS):
+
+
+class DisplayDatasetDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface, **kwargs):
         QDialog.__init__(self)
         self.iface = iface
@@ -98,42 +100,42 @@ class DisplayVectorDialog(QtGui.QDialog, FORM_CLASS):
                 self.but_load.setText('working...')
                 self.but_load.setEnabled(False)
                 self.dataset.load(self.data_path)
-
-                self.format_showing()
-                self.but_load.setVisible(False)
             except:
                 self.error = 'Could not load dataset'
 
-        if self.error is not None:
+        if self.error is None:
+            self.format_showing()
+            self.but_load.setVisible(False)
+        else:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
 
     def format_showing(self):
-        decimals = self.decimals.value()
-        separator = self.thousand_separator.isChecked()
-        m = DatabaseModel(self.dataset, separator, decimals)
-        self.table.clearSpans()
-        self.table.setModel(m)
+        if self.dataset.entries is not None:
+            decimals = self.decimals.value()
+            separator = self.thousand_separator.isChecked()
+            m = DatabaseModel(self.dataset, separator, decimals)
+            self.table.clearSpans()
+            self.table.setModel(m)
 
-        # We chose to use QTableView. However, if we want to allow the user to edit the dataset
-        # The we need to allow them to switch to the slower QTableWidget
-        # Code below
+            # We chose to use QTableView. However, if we want to allow the user to edit the dataset
+            # The we need to allow them to switch to the slower QTableWidget
+            # Code below
 
-        # self.table = QTableWidget(self.dataset.entries, self.dataset.num_fields)
-        # self.table.setHorizontalHeaderLabels(self.dataset.fields)
-        # self.table.setObjectName('data_viewer')
-        #
-        # self.table.setVerticalHeaderLabels([str(x) for x in self.dataset.index[:]])
-        # self.table.clearContents()
-        #
-        # for i in range(self.dataset.entries):
-        #     for j, f in enumerate(self.dataset.fields):
-        #         item1 = QTableWidgetItem(str(self.dataset.data[f][i]))
-        #         item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-        #         self.table.setItem(i, j, item1)
+            # self.table = QTableWidget(self.dataset.entries, self.dataset.num_fields)
+            # self.table.setHorizontalHeaderLabels(self.dataset.fields)
+            # self.table.setObjectName('data_viewer')
+            #
+            # self.table.setVerticalHeaderLabels([str(x) for x in self.dataset.index[:]])
+            # self.table.clearContents()
+            #
+            # for i in range(self.dataset.entries):
+            #     for j, f in enumerate(self.dataset.fields):
+            #         item1 = QTableWidgetItem(str(self.dataset.data[f][i]))
+            #         item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            #         self.table.setItem(i, j, item1)
 
-
-        self.setLayout(self._layout)
-        self.resize(700, 500)
+            self.setLayout(self._layout)
+            self.resize(700, 500)
 
     def exit_procedure(self):
         self.close()

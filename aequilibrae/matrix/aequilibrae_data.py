@@ -35,6 +35,7 @@ from numpy.lib.format import open_memmap
 MEMORY = 1
 DISK = 0
 
+
 class AequilibraEData(object):
     def __init__(self):
         self.data = None

@@ -29,7 +29,7 @@ import numpy as np
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
-from ..matrix_procedures import LoadMatrixDialog, LoadVectorDialog
+from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog
 
 
 from apply_gravity_procedure import ApplyGravityProcedure
@@ -178,7 +178,7 @@ class ApplyGravityDialog(QDialog, FORM_CLASS):
             self.lbl_imped.setPixmap(self.loaded_pic)
 
     def find_vectors(self, destination):
-        dlg2 = LoadVectorDialog(self.iface)
+        dlg2 = LoadDatasetDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
         if dlg2.vector is not None:

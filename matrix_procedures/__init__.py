@@ -1,4 +1,4 @@
 from load_matrix_class import LoadMatrix
 from load_matrix_dialog import LoadMatrixDialog
-from load_vector_dialog import LoadVectorDialog
-from display_vector_dialog import DisplayVectorDialog
+from load_dataset_dialog import LoadDatasetDialog
+from display_dataset_dialog import DisplayDatasetDialog

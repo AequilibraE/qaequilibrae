@@ -35,7 +35,7 @@ from .distribution_procedures import IpfDialog, ApplyGravityDialog, CalibrateGra
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
-from .matrix_procedures import LoadMatrixDialog, LoadVectorDialog, DisplayVectorDialog
+from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayDatasetDialog
 import tempfile, glob
 from .aequilibrae.__version__ import version as VERSION_GRAPH
 
@@ -296,12 +296,12 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_load_database(self):
-        dlg2 = LoadVectorDialog(self.iface, single_use=False)
+        dlg2 = LoadDatasetDialog(self.iface, single_use=False)
         dlg2.show()
         dlg2.exec_()
 
     def run_display_dataset(self):
-        dlg2 = DisplayVectorDialog(self.iface)
+        dlg2 = DisplayDatasetDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

@@ -29,7 +29,7 @@ import warnings
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog, GetOutputFileName
-from ..matrix_procedures import LoadMatrixDialog, LoadVectorDialog
+from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog
 from ipf_procedure import IpfProcedure
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_ipf.ui'))
@@ -111,7 +111,7 @@ class IpfDialog(QDialog, FORM_CLASS):
             self.matrix_total.setText("Matrix total: " + "{:,.2f}".format(float(tot)))
 
     def find_vectors(self, destination):
-        dlg2 = LoadVectorDialog(self.iface)
+        dlg2 = LoadDatasetDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
         if dlg2.vector is not None:
