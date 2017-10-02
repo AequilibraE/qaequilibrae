@@ -13,12 +13,14 @@ args = {'entries': zones,
         'field_names': ['rows'],
         'data_types': [np.float64],
         'memory_mode': True}
-row_vector = AequilibraEData(**args)
+row_vector = AequilibraEData()
+row_vector.create_empty(**args)
 row_vector.rows[:] = np.random.rand(zones)[:] * 1000
 row_vector.index[:] = np.arange(zones)[:]
 # column vector
 args['field_names'] = ['columns']
-column_vector = AequilibraEData(**args)
+column_vector = AequilibraEData()
+column_vector.create_empty(**args)
 column_vector.columns[:] = np.random.rand(zones)[:] * 1000
 column_vector.index[:] = np.arange(zones)[:]
 # balance vectors
