@@ -1,14 +1,9 @@
-""" TODO:
-IMPLEMENT THIS CLASS
-"""
-
-
 """
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
 
- Name:       Loads GUI for creating desire lines
- Purpose:    Creatind desire and delaunay lines
+ Name:       Loads Matrix Visualizer
+ Purpose:    allowing user to see matrices loaded in AequilibraE format
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -17,161 +12,58 @@ IMPLEMENT THIS CLASS
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    2016-07-01
- Updated:    2017-06-25
+ Created:    2016-10-02
+ Updated:
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
-import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import uic
-import sys
-import os
-import numpy as np
-from scipy.sparse import coo_matrix
-
-from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
-
-from ..common_tools import NumpyModel
-from ..matrix_procedures import LoadMatrixDialog
-from ..common_tools import ReportDialog
-
-from desire_lines_procedure import DesireLinesProcedure
+from ..aequilibrae.matrix import AequilibraeMatrix
+from ..common_tools.get_output_file_name import GetOutputFileName
+from display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_data_viewer.ui'))
 
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_DesireLines.ui'))
-
-class DesireLinesDialog(QDialog, FORM_CLASS):
-    def __init__(self, iface):
+class DisplayMatrixDialog(QDialog, FORM_CLASS):
+    def __init__(self, iface, **kwargs):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-        self.error = None
-        self.validtypes = numeric_types
-        self.tot_skims = 0
-        self.name_skims = 0
-        self.matrix = None
         self.path = standard_path()
-        self.zones = None
-        self.columns = None
-        self.matrix_hash =None
+        self.error = None
+        self.data_path = None
+        self.dataset = AequilibraeMatrix()
+        self.but_load.setText('Load matrix')
+        self.but_load.clicked.connect(self.load_the_vector)
 
-        # FIRST, we connect slot signals
-        # For changing the input matrix_procedures
-        self.but_load_new_matrix.clicked.connect(self.find_matrices)
+    def load_the_vector(self):
+        self.error = None
+        self.data_path, _ = GetOutputFileName(self, 'AequilibraE matrix',
+                                              ["Aequilibrae matrix(*.aem)"], '.aem', self.path)
 
-        self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
-        self.chb_display_matrix.stateChanged.connect(self.add_matrix_to_viewer)
-        self.cbb_matrix_cores.currentIndexChanged.connect(self.add_matrix_to_viewer)
+        if self.data_path is None:
+            self.error = 'Path provided is not a valid matrix'
 
-        # Create desire lines
-        self.create_dl.clicked.connect(self.run)
-
-        # cancel button
-        self.cancel.clicked.connect(self.exit_procedure)
-
-        # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
-            if 'wkbType' in dir(layer):
-                if layer.wkbType() in poly_types or layer.wkbType() in point_types:
-                    self.zoning_layer.addItem(layer.name())
-
-                    self.progress_label.setVisible(False)
-                    self.progressbar.setVisible(False)
-
-    def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.job_finished_from_thread)
-        self.worker_thread.start()
-        self.exec_()
-
-    def load_fields_to_combo_boxes(self):
-        self.zone_id_field.clear()
-        if self.zoning_layer.currentIndex() >= 0:
-            layer = get_vector_layer_by_name(self.zoning_layer.currentText())
-            for field in layer.dataProvider().fields().toList():
-                if field.type() in numeric_types:
-                    self.zone_id_field.addItem(field.name())
-
-    def add_matrix_to_viewer(self):
-        """
-            procedure to add the matrix_procedures to the viewer
-        """
-        if self.matrix is not None:
-            mat_name = self.cbb_matrix_cores.currentText()
-            m = NumpyModel(self.matrix.matrix[mat_name], self.matrix['index'][:], self.matrix['index'][:])
-            self.matrix_viewer.clearSpans()
-            self.matrix_viewer.setModel(m)
-
-    def find_matrices(self):
-        dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True)
-        dlg2.show()
-        dlg2.exec_()
-        self.chb_display_matrix.setChecked(False)
-        if dlg2.matrix is not None:
-            self.matrix = dlg2.matrix
-            self.cbb_matrix_cores.clear()
-            k = 0
-            for i in self.matrix.names:
-                self.cbb_matrix_cores.addItem(i)
-                k += 1
-
-    def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val[1])
-
-    def progress_value_from_thread(self, value):
-        self.progressbar.setValue(value[1])
-
-    def progress_text_from_thread(self, value):
-        self.progress_label.setText(value[1])
-
-    def job_finished_from_thread(self, success):
-        if self.worker_thread.error is not None:
-            self.exit_procedure()
-            self.throws_error(self.worker_thread.error)
-
-        else:
+        if self.error is None:
             try:
-                QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
+                self.but_load.setText('working...')
+                self.but_load.setEnabled(False)
+                self.dataset.load(self.data_path)
             except:
-                self.worker_thread.report.append('Could not load desire lines to map')
-            if self.worker_thread.report:
-                dlg2 = ReportDialog(self.iface, self.worker_thread.report)
-                dlg2.show()
-                dlg2.exec_()
-        self.exit_procedure()
+                self.error = 'Could not load matrix'
 
-    def run(self):
-        if self.matrix is not None:
-
-            self.lbl_funding1.setVisible(False)
-            self.lbl_funding2.setVisible(False)
-            self.progress_label.setVisible(True)
-            self.progressbar.setVisible(True)
-
-            dl_type = 'DesireLines'
-            if self.radio_delaunay.isChecked():
-                dl_type = 'DelaunayLines'
-
-            self.worker_thread = DesireLinesProcedure(qgis.utils.iface.mainWindow(), self.zoning_layer.currentText(),
-                                                      self.zone_id_field.currentText(), self.matrix, self.matrix_hash, dl_type)
-            self.run_thread()
+        if self.error is None:
+            dlg2 = DisplayAequilibraEFormatsDialog(self.iface, self.dataset)
+            dlg2.show()
+            dlg2.exec_()
+            self.exit_procedure()
         else:
-            qgis.utils.iface.messageBar().pushMessage("Matrix not loaded", '', level=3)
-
-    def throws_error(self, error_message):
-        error_message = ["*** ERROR ***", error_message]
-        dlg2 = ReportDialog(self.iface, error_message)
-        dlg2.show()
-        dlg2.exec_()
+            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
 
     def exit_procedure(self):
         self.close()

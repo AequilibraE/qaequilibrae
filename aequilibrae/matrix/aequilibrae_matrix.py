@@ -76,7 +76,7 @@ class AequilibraeMatrix(object):
         self.file_path = None
         self.zones = None
         self.cores = 0
-        self.data_type = None
+        self.dtype = None
         self.num_indices = None
         self.index_names = None
         self.compressed = NOT_COMPRESSED
@@ -90,7 +90,7 @@ class AequilibraeMatrix(object):
         self.matrices = None
         self.cores = None
         self.zones = None
-        self.data_type = None
+        self.dtype = None
         self.names = None
         self.__version__ = VERSION       # Writes file version
 
@@ -100,7 +100,7 @@ class AequilibraeMatrix(object):
         self.file_path = file_name
         self.zones = zones
         self.index_names = index_names
-        self.data_type = data_type
+        self.dtype = data_type
 
         # Matrix compression still not supported
         if compressed:
@@ -179,25 +179,25 @@ class AequilibraeMatrix(object):
 
         if data_class == INT:
             if data_size == 1:
-                self.data_type = np.int8
+                self.dtype = np.int8
             elif data_size == 2:
-                self.data_type = np.int16
+                self.dtype = np.int16
             elif data_size == 4:
-                self.data_type = np.int32
+                self.dtype = np.int32
             elif data_size == 8:
-                self.data_type = np.int64
+                self.dtype = np.int64
             elif data_size == 16:
-                self.data_type = np.int128
+                self.dtype = np.int128
 
         if data_class == FLOAT:
             if data_size == 2:
-                self.data_type = np.float16
+                self.dtype = np.float16
             elif data_size == 4:
-                self.data_type = np.float32
+                self.dtype = np.float32
             elif data_size == 8:
-                self.data_type = np.float64
+                self.dtype = np.float64
             elif data_size == 16:
-                self.data_type = np.float128
+                self.dtype = np.float128
 
         # core names
         self.names = list(np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=18, mode='r+',
@@ -217,10 +217,10 @@ class AequilibraeMatrix(object):
         # DATA
         offset += self.zones * 8 * self.num_indices
         if self.compressed:
-            self.matrices = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+',
+            self.matrices = np.memmap(self.file_path, dtype=self.dtype, offset=offset, mode='r+',
                                       shape=(matrix_cells, self.cores + 2))
         else:
-            self.matrices = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+',
+            self.matrices = np.memmap(self.file_path, dtype=self.dtype, offset=offset, mode='r+',
                                       shape=(self.zones, self.zones, self.cores))
 
         self.matrix = {}
@@ -251,7 +251,7 @@ class AequilibraeMatrix(object):
         np.memmap(self.file_path, dtype='uint8', offset=16, mode='r+', shape=1)[0] = data_class
 
         # Data size
-        data_size = np.dtype(self.data_type).itemsize
+        data_size = np.dtype(self.dtype).itemsize
         np.memmap(self.file_path, dtype='uint8', offset=17, mode='r+', shape=1)[0] = data_size
 
         # core names
@@ -280,12 +280,16 @@ class AequilibraeMatrix(object):
 
         offset += self.zones * 8 * self.num_indices
         if self.compressed:
-            self.matrices = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+',
+            self.matrices = np.memmap(self.file_path, dtype=self.dtype, offset=offset, mode='r+',
                                       shape=(matrix_cells, self.cores + 2))
         else:
-            self.matrices = np.memmap(self.file_path, dtype=self.data_type, offset=offset, mode='r+',
+            self.matrices = np.memmap(self.file_path, dtype=self.dtype, offset=offset, mode='r+',
                                       shape=(self.zones, self.zones, self.cores))
-        self.matrices.fill(0)
+
+        if np.issubdtype(self.dtype, np.integer):
+            self.matrices.fill(np.iinfo(self.dtype).min)
+        else:
+            self.matrices.fill(np.nan)
         self.matrices.flush()
 
         self.matrix = {}
@@ -440,7 +444,7 @@ class AequilibraeMatrix(object):
                                 zones=self.zones,
                                 matrix_names=names,
                                 index_names=self.index_names,
-                                data_type=self.data_type,
+                                data_type=self.dtype,
                                 compressed=bool(compress))
 
             output.indices[:] = self.indices[:]
@@ -468,9 +472,9 @@ class AequilibraeMatrix(object):
         return {self.index[i]: i for i in range(self.zones)}
 
     def define_data_class(self):
-        if self.data_type in [np.float16, np.float32, np.float64]:
+        if self.dtype in [np.float16, np.float32, np.float64]:
             data_class = FLOAT
-        elif self.data_type in [np.int8, np.int16, np.int32, np.int64]:
+        elif self.dtype in [np.int8, np.int16, np.int32, np.int64]:
             data_class = INT
         else:
             raise ValueError('Data type not supported. You can choose Integers of 8, 16, 32 and 64 bits, '

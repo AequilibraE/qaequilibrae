@@ -38,7 +38,6 @@ class LoadMatrix(WorkerThread):
         self.numpy_file = kwargs.get('file_path')
         self.layer = kwargs.get('layer')
         self.idx = kwargs.get('idx')
-        self.filler = kwargs.get('filler', 0)
         self.sparse = kwargs.get('sparse', False)
 
         self.matrix = None
@@ -175,8 +174,16 @@ class MatrixReblocking(WorkerThread):
             else:
                 k += 1
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 1)
+
+            mat['flow'][mat['flow']==0] = np.inf
+
             self.matrix.matrix[mat_name][:,:] = coo_matrix((mat['flow'], (mat['from'], mat['to'])),
                                            shape=(compact_shape, compact_shape)).toarray().astype(np.float64)
+
+            self.matrix.matrix[mat_name][self.matrix.matrix[mat_name]==0] = np.nan
+            self.matrix.matrix[mat_name][self.matrix.matrix[mat_name]==np.inf] = 0
+
+
             del(mat)
 
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Matrix Reblocking finalized")
