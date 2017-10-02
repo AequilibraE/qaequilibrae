@@ -12,7 +12,7 @@
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    2016-07-30
+ Created:    2016-07-30 (originally onto a single numpy array)
  Updated:    2017-06-07
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
