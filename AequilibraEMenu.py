@@ -31,7 +31,7 @@ from PyQt4.QtGui import *
 
 from .common_tools import ParameterDialog, logger, ReportDialog
 from binary_downloader_class import BinaryDownloaderDialog
-from .distribution_procedures import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
+from .distribution_procedures import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog, DistributionModelsDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
@@ -155,12 +155,11 @@ class AequilibraEMenu:
         QObject.connect(self.calibrate_gravity_action, SIGNAL("triggered()"), self.run_calibrate_gravity)
         self.trip_distribution_menu.addAction(self.calibrate_gravity_action)
 
-        #
-        # # Trip Distribution
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
-        # self.trip_distr_action = QAction(icon, u"Trip Distribution", self.iface.mainWindow())
-        # QObject.connect(self.trip_distr_action, SIGNAL("triggered()"), self.run_trip_distr)
-        # self.trip_distribution_menu.addAction(self.trip_distr_action)
+        # Trip Distribution
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
+        self.trip_distr_action = QAction(icon, u"Trip Distribution", self.iface.mainWindow())
+        QObject.connect(self.trip_distr_action, SIGNAL("triggered()"), self.run_distribution_models)
+        self.trip_distribution_menu.addAction(self.trip_distr_action)
 
         # ########################################################################
         # ###################  PATH COMPUTATION SUB-MENU   #######################
@@ -351,6 +350,11 @@ class AequilibraEMenu:
 
     def run_apply_gravity(self):
         dlg2 = ApplyGravityDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_distribution_models(self):
+        dlg2 = DistributionModelsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

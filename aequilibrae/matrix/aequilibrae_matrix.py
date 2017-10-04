@@ -75,7 +75,6 @@ class AequilibraeMatrix(object):
 
         self.file_path = None
         self.zones = None
-        self.cores = 0
         self.dtype = None
         self.num_indices = None
         self.index_names = None

@@ -21,7 +21,6 @@ class TestAequilibraEData(TestCase):
 
         dataset.index[:] = np.arange(dataset.entries) + 100
         dataset.d[:] = dataset.index[:]**2
-
         if dataset.index[70] != 170:
             self.fail()
 

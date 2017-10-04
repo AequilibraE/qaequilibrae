@@ -42,7 +42,6 @@ class LoadDatasetDialog(QtGui.QDialog, FORM_CLASS):
         self.layer = None
         self.zones = None
         self.cells = None
-        self.vector = None
         self.error = None
         self.selected_fields = None
         self.worker_thread = None
@@ -213,6 +212,7 @@ class LoadDatasetDialog(QtGui.QDialog, FORM_CLASS):
                 self.worker_thread = LoadDataset(qgis.utils.iface.mainWindow(), layer=self.layer,
                                                  index_field=index_field, fields=self.selected_fields,
                                                  file_name=self.output_name)
+                self.size_it_accordingly(True)
                 self.run_thread()
             else:
                 qgis.utils.iface.messageBar().pushMessage("Error:", "One cannot load a dataset with indices only",
