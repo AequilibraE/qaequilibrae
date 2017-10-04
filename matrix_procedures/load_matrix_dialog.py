@@ -241,7 +241,6 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
             self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type='numpy', file_path=new_name)
 
-
         if self.radio_aeq_matrix.isChecked():
             file_types = ["AequilibraE Matrix(*.aem)"]
             default_type = '.aem'

@@ -12,7 +12,7 @@
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    2017-10-02
+ Created:    2017-10-05
  Updated:
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
@@ -27,7 +27,7 @@ from functools import partial
 import numpy as np
 import os
 import yaml
-from ..matrix_procedures import LoadMatrixDialog
+from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
 from calibrate_gravity_procedure import CalibrateGravityProcedure
@@ -35,7 +35,6 @@ from ..common_tools.get_output_file_name import GetOutputFileName
 from ..aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_distribution.ui'))
-
 
 class DistributionModelsDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, mode=None):
@@ -71,6 +70,9 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
                                                               self.cob_seed_mat, self.cob_seed_field, "matrix"))
 
         self.but_run.clicked.connect(self.run)
+        self.but_cancel.clicked.connect(self.exit_procedure)
+        self.table_datasets.doubleClicked.connect(self.matrix_and_data_double_clicked)
+        self.table_matrices.doubleClicked.connect(self.matrix_and_data_double_clicked)
 
         if mode is not None:
             if mode == "ipf":
@@ -79,6 +81,18 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
                 self.rdo_apply_gravity.setChecked(True)
             if mode == "calibrate":
                 self.rdo_calibrate_gravity.setChecked(True)
+
+    def matrix_and_data_double_clicked(self, mi):
+        row = mi.row()
+        if row > -1:
+            if self.sender().objectName() == 'table_matrices':
+                obj_to_view = self.table_matrices.item(row, 0).text()
+                dlg2 = DisplayAequilibraEFormatsDialog(self.iface, self.matrices[obj_to_view])
+            else:
+                obj_to_view = self.table_datasets.item(row, 0).text()
+                dlg2 = DisplayAequilibraEFormatsDialog(self.iface, self.datasets[obj_to_view])
+            dlg2.show()
+            dlg2.exec_()
 
     def configure_inputs(self):
         self.resize(452, 334)
@@ -111,40 +125,32 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         self.rdo_calibrate_gravity.setEnabled(False)
 
     def load_datasets(self):
-        dataset_name = self.browse_outfile('aed')
+        dlg2 = LoadDatasetDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+        if isinstance(dlg2.dataset, AequilibraEData):
+            dataset_name = dlg2.dataset.file_path
 
-        if dataset_name is not None:
-            try:
-                dataset = AequilibraEData()
-                dataset.load(dataset_name)
-
-                data_name = os.path.splitext(os.path.basename(dataset_name))[0]
-                data_name = self.find_non_conflicting_name(data_name, self.datasets)
-                self.datasets[data_name] = dataset
-                self.add_to_table(self.datasets, self.table_datasets)
-                self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
-                self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
-                logger(1)
-            except:
-                self.error = 'Could not load file. It might be corrupted or might not be a valid AequilibraE file'
+            data_name = os.path.splitext(os.path.basename(dataset_name))[0]
+            data_name = self.find_non_conflicting_name(data_name, self.datasets)
+            self.datasets[data_name] = dataset = dlg2.dataset
+            self.add_to_table(self.datasets, self.table_datasets)
+            self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
+            self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
 
     def load_matrices(self):
-        matrix_name = self.browse_outfile('aem')
+        dlg2 = LoadMatrixDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+        if isinstance(dlg2.matrix, AequilibraeMatrix):
+            matrix_name = dlg2.matrix.file_path
 
-        if matrix_name is not None:
-            try:
-                matrix = AequilibraeMatrix()
-                matrix.load(matrix_name)
-
-                matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
-                matrix_name = self.find_non_conflicting_name(matrix_name, self.matrices)
-                self.matrices[matrix_name] = matrix
-                self.add_to_table(self.matrices, self.table_matrices)
-                self.load_comboboxes(self.matrices.keys(), self.cob_imped_mat)
-                self.load_comboboxes(self.matrices.keys(), self.cob_seed_mat)
-
-            except:
-                self.error = 'Could not load file. It might be corrupted or might not be a valid AequilibraE file'
+            matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
+            matrix_name = self.find_non_conflicting_name(matrix_name, self.matrices)
+            self.matrices[matrix_name] = dlg2.matrix
+            self.add_to_table(self.matrices, self.table_matrices)
+            self.load_comboboxes(self.matrices.keys(), self.cob_imped_mat)
+            self.load_comboboxes(self.matrices.keys(), self.cob_seed_mat)
 
     def change_vector_field(self, cob_orig, cob_dest, dt):
         cob_dest.clear()
