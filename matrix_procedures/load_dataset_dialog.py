@@ -26,6 +26,7 @@ from functools import partial
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
+from ..aequilibrae.matrix import AequilibraEData
 from load_dataset_class import LoadDataset
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_vector_loader.ui'))
@@ -188,7 +189,14 @@ class LoadDatasetDialog(QtGui.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def load_from_aequilibrae_format(self):
-        pass
+        out_name, _ = GetOutputFileName(self, 'AequilibraE dataset', ["Aequilibrae dataset(*.aed)"], '.aed', self.path)
+        try:
+            self.dataset = AequilibraEData()
+            self.dataset.load(out_name)
+        except:
+            self.error = 'Could not load file. It might be corrupted or might not be a valid AequilibraE file'
+        self.exit_procedure()
+
 
     def load_the_vector(self):
         if self.single_use:
