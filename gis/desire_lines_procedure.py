@@ -124,8 +124,10 @@ class DesireLinesProcedure(WorkerThread):
                     else:
                         qgs_points.append(None)
     
+                # node_pairs = np.meshgrid(qgs_points, qgs_points)
                 # def dl(a, b, flows):
-    
+                #     pass
+                
                 desireline_link_id = 1
                 q = 0
                 all_features = []
