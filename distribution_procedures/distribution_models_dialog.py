@@ -30,11 +30,23 @@ import yaml
 from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
+from ..aequilibrae.distribution import SyntheticGravityModel
+from ..aequilibrae.distribution.synthetic_gravity_model import valid_functions
+from ipf_procedure import IpfProcedure
 from calibrate_gravity_procedure import CalibrateGravityProcedure
+from apply_gravity_procedure import ApplyGravityProcedure
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_distribution.ui'))
+
+"""
+TODO
+Add the Combobox with type of models for the user to change if wanted
+Block the table fields that cannot be changed (parameters that do not exist for a function)
+Or not show those parameters altogether
+"""
+
 
 class DistributionModelsDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, mode=None):
@@ -45,10 +57,13 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
         self.error = None
         self.report = None
+        self.job_queue = OrderedDict()
+        self.model = SyntheticGravityModel()
+        self.model.function = "GAMMA"
 
         self.matrices = OrderedDict()
         self.datasets = OrderedDict()
-        self.job = None
+        self.job = mode
 
         self.model_tabs.setVisible(False)
         self.resize(239, 120)
@@ -58,6 +73,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
         self.but_load_data.clicked.connect(self.load_datasets)
         self.but_load_mat.clicked.connect(self.load_matrices)
+        self.but_load_model.clicked.connect(self.load_model)
 
         self.cob_prod_data.currentIndexChanged.connect(partial(self.change_vector_field,
                                                                self.cob_prod_data, self.cob_prod_field, "data"))
@@ -70,17 +86,25 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
                                                               self.cob_seed_mat, self.cob_seed_field, "matrix"))
 
         self.but_run.clicked.connect(self.run)
+        self.but_queue.clicked.connect(self.add_job_to_queue)
         self.but_cancel.clicked.connect(self.exit_procedure)
         self.table_datasets.doubleClicked.connect(self.matrix_and_data_double_clicked)
         self.table_matrices.doubleClicked.connect(self.matrix_and_data_double_clicked)
+
+        self.table_jobs.setColumnWidth(0, 50)
+        self.table_jobs.setColumnWidth(1, 250)
+        self.table_jobs.setColumnWidth(2, 90)
 
         if mode is not None:
             if mode == "ipf":
                 self.rdo_ipf.setChecked(True)
             if mode == "apply":
-                self.rdo_apply_gravity.setChecked(True)
+                self.rdo_apply_gravity.setCheckmodeled(True)
             if mode == "calibrate":
                 self.rdo_calibrate_gravity.setChecked(True)
+
+        self.user_chosen_model = None
+        self.update_model_parameters()
 
     def matrix_and_data_double_clicked(self, mi):
         row = mi.row()
@@ -124,6 +148,52 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         self.rdo_apply_gravity.setEnabled(False)
         self.rdo_calibrate_gravity.setEnabled(False)
 
+    def change_model_by_user(self):
+        self.model.function = self.user_chosen_model.currentText()
+        self.update_model_parameters()
+
+    def update_model_parameters(self):
+        self.user_chosen_model = QComboBox()
+        for f in valid_functions:
+            self.user_chosen_model.addItem(f)
+        # self.user_chosen_model.blockSignals(True)
+        self.user_chosen_model.setCurrentIndex(valid_functions.index(self.model.function))
+        # self.user_chosen_model.blockSignals(False)
+        self.user_chosen_model.currentIndexChanged.connect(self.change_model_by_user)
+
+        self.table_model.setRowCount(2)
+        self.table_model.setItem(0, 0, QTableWidgetItem('Function'))
+
+        self.table_model.setCellWidget(0, 1, self.user_chosen_model)
+
+        i = 2
+        if self.model.function in ['POWER', 'GAMMA']:
+            i = 3
+            self.table_model.setItem(1, 0, QTableWidgetItem('Alpha'))
+            val = self.model.alpha
+            if val is None:
+                val = 0
+            item0 = QDoubleSpinBox()
+            item0.setMinimum(-5000)
+            item0.setMaximum(5000)
+            item0.setDecimals(7)
+            item0.setValue(float(val))
+            self.table_model.setCellWidget(1, 1, item0)
+
+        if self.model.function in ['EXPO', 'GAMMA']:
+            self.table_model.setRowCount(i)
+            self.table_model.setItem(i-1, 0, QTableWidgetItem('Beta'))
+            val = self.model.beta
+            if val is None:
+                val = 0
+            item = QDoubleSpinBox()
+            item.setMinimum(-5000)
+            item.setMaximum(5000)
+
+            item.setDecimals(7)
+            item.setValue(float(val))
+            self.table_model.setCellWidget(i-1, 1, item)
+
     def load_datasets(self):
         dlg2 = LoadDatasetDialog(self.iface)
         dlg2.show()
@@ -151,6 +221,14 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
             self.add_to_table(self.matrices, self.table_matrices)
             self.load_comboboxes(self.matrices.keys(), self.cob_imped_mat)
             self.load_comboboxes(self.matrices.keys(), self.cob_seed_mat)
+
+    def load_model(self):
+        file_name = self.browse_outfile('mod')
+        try:
+            self.model.load(file_name)
+            self.update_model_parameters()
+        except:
+            qgis.utils.iface.messageBar().pushMessage("Error", "Could not load model", level=3)
 
     def change_vector_field(self, cob_orig, cob_dest, dt):
         cob_dest.clear()
@@ -185,7 +263,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         table.setColumnWidth(1, 80)
         table.clearContents()
         table.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
-        self.count = table.setRowCount(len(dictio.keys()))
+        table.setRowCount(len(dictio.keys()))
 
         for i, data_name in enumerate(dictio.keys()):
             table.setItem(i, 0, QTableWidgetItem(data_name))
@@ -203,6 +281,85 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         ft = file_types[file_type]
         file_chosen, _ = GetOutputFileName(self, ft[0], [ft[1]], ft[2], self.path)
         return file_chosen
+
+    def add_job_to_queue(self):
+        if self.check_data():
+            if self.job != 'ipf':
+                imped_matrix = self.matrices[self.cob_imped_mat.currentText()]
+                imped_matrix.computational_view([self.cob_imped_field.currentText()])
+
+            if self.job != 'apply':
+                seed_matrix = self.matrices[self.cob_seed_mat.currentText()]
+                seed_matrix.computational_view([self.cob_seed_field.currentText()])
+
+            if self.job != 'calibrate':
+                prod_vec = self.datasets[self.cob_prod_data.currentText()]
+                prod_field = self.cob_prod_field.currentText()
+                atra_vec = self.datasets[self.cob_atra_data.currentText()]
+                atra_field = self.cob_atra_field.currentText()
+
+            if self.job == 'ipf':
+                out_name = self.browse_outfile('aem')
+                if out_name is not None:
+                    args = {'matrix': seed_matrix,
+                            'rows': prod_vec,
+                            'row_fields': prod_field,
+                            'columns': atra_vec,
+                            'column_field': atra_field}
+                    worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), **args)
+                    self.add_job_to_list(worker_thread, out_name)
+
+            if self.job == 'apply':
+                out_name = self.browse_outfile('aem')
+                if out_name is not None:
+                    for i in xrange(1, self.table_model.rowCount()):
+                        if str(self.table_model.item(i, 0).text()) == 'Alpha':
+                            self.model.alpha = float(self.table_model.cellWidget(i, 1).value())
+                        if str(self.table_model.item(i, 0).text()) == 'Beta':
+                            self.model.beta = float(self.table_model.cellWidget(i, 1).value())
+
+                    args = {'matrix': imped_matrix,
+                            'rows': prod_vec,
+                            'row_fields': prod_field,
+                            'columns': atra_vec,
+                            'column_field': atra_field}
+                    worker_thread = ApplyGravityProcedure(qgis.utils.iface.mainWindow(), **args)
+                    self.add_job_to_list(worker_thread, out_name)
+
+            if self.job == 'calibrate':
+                out_name = self.browse_outfile('aem')
+                if out_name is not None:
+                    if self.rdo_expo.isChecked():
+                        func_name = 'EXPO'
+                    if self.rdo_power.isChecked():
+                        func_name = 'POWER'
+                    if self.rdo_gamma.isChecked():
+                        func_name = 'GAMMA'
+                    if self.rdo_friction.isChecked():
+                        func_name = 'FRICTION'
+
+                    args = {'matrix': imped_matrix,
+                            'impedance': imped_matrix,
+                            'function': func_name}
+
+                    worker_thread = CalibrateGravityProcedure(qgis.utils.iface.mainWindow(), **args)
+                    self.add_job_to_list(worker_thread, out_name)
+
+
+    def add_job_to_list(self, job, out_name):
+        self.job_queue[out_name] = job
+
+        self.table_jobs.clearContents()
+        self.table_jobs.setRowCount(len(self.job_queue.keys()))
+
+        for i, j in enumerate(self.job_queue.keys()):
+            data_name = os.path.splitext(os.path.basename(j))[0]
+            self.table_jobs.setItem(i, 0, QTableWidgetItem(str(i + 1)))
+            self.table_jobs.setItem(i, 1, QTableWidgetItem(data_name))
+            self.table_jobs.setItem(i, 2, QTableWidgetItem('Queued'))
+
+
+
 
     def run(self):
         if self.check_data():

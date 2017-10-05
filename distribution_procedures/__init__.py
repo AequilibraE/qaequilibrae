@@ -23,3 +23,6 @@ from apply_gravity_dialog import ApplyGravityDialog
 from calibrate_gravity_dialog import CalibrateGravityDialog
 from ipf_dialog import IpfDialog
 from distribution_models_dialog import DistributionModelsDialog
+from ipf_procedure import IpfProcedure
+from calibrate_gravity_procedure import CalibrateGravityProcedure
+from apply_gravity_procedure import ApplyGravityProcedure

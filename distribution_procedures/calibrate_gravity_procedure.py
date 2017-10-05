@@ -30,9 +30,9 @@ from aequilibrae.distribution import GravityCalibration
 
 
 class CalibrateGravityProcedure(WorkerThread):
-    def __init__(self, parentThread,  observed, impedance, function):
+    def __init__(self, parentThread,  **kwargs):
         WorkerThread.__init__(self, parentThread)
-        self.gravity = GravityCalibration(observed, impedance, function)
+        self.gravity = GravityCalibration(**kwargs)
         self.error = None
 
     def doWork(self):

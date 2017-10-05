@@ -30,9 +30,9 @@ from ..common_tools import WorkerThread
 from aequilibrae.distribution import Ipf
 
 class IpfProcedure(WorkerThread):
-    def __init__(self, parentThread, seed, rows, columns):
+    def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
-        self.ipf = Ipf(seed, rows, columns)
+        self.ipf = Ipf(**kwargs)
 
     def doWork(self):
         self.ipf.fit()
