@@ -109,41 +109,54 @@ class DesireLinesProcedure(WorkerThread):
 
 
             if self.dl_type == "DesireLines":
-                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Creating Desire Lines"))
-                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, self.matrix.zones**2/2))
-
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0, "Creating Desire Lines"))
+                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"),
+                          (0, self.matrix.shape[0] * self.matrix.shape[1] / 2))
+    
+                # create a_points and b_points
+                qgs_points = []
+                for i in range(self.matrix.zones):
+                    a_node = reverse_hash[i]
+                    if a_node in all_centroids.keys():
+                        a_point = all_centroids[a_node]
+                        a_point = QgsPoint(a_point[0], a_point[1])
+                        qgs_points.append(a_point)
+                    else:
+                        qgs_points.append(None)
+    
+                # def dl(a, b, flows):
+    
                 desireline_link_id = 1
                 q = 0
                 all_features = []
-                for i in range(mat_view.shape[0]):
-                    if np.sum(mat_view[i, :, :]) > 0:
-                        a_node = reverse_hash[i]
-                        for j in xrange(i + 1, mat_view.shape[1]):
-                            q += 1
-                            b_node = reverse_hash[j]
-                            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
-                            if np.sum(mat_view[i, j, :]) + np.sum(mat_view[j, i, :]) > 0:
-                                if a_node in all_centroids.keys() and b_node in all_centroids.keys():
-                                    a_point = all_centroids[a_node]
-                                    a_point = QgsPoint(a_point[0], a_point[1])
-                                    b_point = all_centroids[b_node]
-                                    b_point = QgsPoint(b_point[0], b_point[1])
-                                    dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
-                                    feature = QgsFeature()
-                                    feature.setGeometry(QgsGeometry.fromPolyline([a_point, b_point]))
-                                    attrs = [desireline_link_id, int(a_node), int(b_node), 0, dist]
-                                    for c in range(classes):
-                                        attrs.extend([float(mat_view[i, j, c]), float(mat_view[j, i, c]),
-                                                       float(mat_view[i, j, c]) + float(mat_view[j, i, c])])
-
-                                    feature.setAttributes(attrs)
-                                    all_features.append(feature)
-                                    desireline_link_id += 1
+                for i in range(self.matrix.zones):
+                    if np.sum(self.matrix[i, :]) > 0:
+                        a_point = qgs_points[i]
+                        if a_point is not None:
+                            for j in xrange(i + 1, self.matrix.zones):
+                                q += 1
+                                b_point = qgs_points[j]
+                                if b_point is not None:
+                                    self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
+                                    if self.matrix[i, j] + self.matrix[j, i] > 0:
+                                        dist = QgsGeometry().fromPoint(a_point).distance(
+                                            QgsGeometry().fromPoint(b_point))
+                                        feature = QgsFeature()
+                                        feature.setGeometry(QgsGeometry.fromPolyline([a_point, b_point]))
+                                        feature.setAttributes([desireline_link_id, int(reverse_hash[i]),
+                                                               int(reverse_hash[j]), 0, dist,
+                                                               float(self.matrix[i, j]), float(self.matrix[j, i]),
+                                                               float(self.matrix[i, j] + self.matrix[j, i])])
+                                        all_features.append(feature)
+                                        desireline_link_id += 1
                                 else:
-                                    tu = (a_node, b_node, np.sum(mat_view[i, j, :]), np.sum(mat_view[j, i, :]))
-                                    self.report.append('No centroids available to depict flow between node {0} and node {1}. Total AB flow was equal to {2} and total BA flow was equal to {3}'.format(*tu))
+                                    if self.matrix[i, j] + self.matrix[j, i] > 0:
+                                        tu = (reverse_hash[i], reverse_hash[j], self.matrix[i, j], self.matrix[j, i])
+                                        self.report.append(
+                                            'No centroids available to depict flow between node {0} and node {1}. '
+                                            'AB flow was equal to {2} and BA flow was equal to {3}'.format(*tu))
                     else:
-                        q += self.matrix.zones
+                        q += self.matrix.shape[1]
                         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
 
 
