@@ -31,7 +31,7 @@ from PyQt4.QtGui import *
 
 from .common_tools import ParameterDialog, logger, ReportDialog
 from binary_downloader_class import BinaryDownloaderDialog
-from .distribution_procedures import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog, DistributionModelsDialog
+from .distribution_procedures import DistributionModelsDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
@@ -344,12 +344,12 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_calibrate_gravity(self):
-        dlg2 = CalibrateGravityDialog(self.iface)
+        dlg2 = DistributionModelsDialog(self.iface, 'calibrate')
         dlg2.show()
         dlg2.exec_()
 
     def run_apply_gravity(self):
-        dlg2 = ApplyGravityDialog(self.iface)
+        dlg2 = DistributionModelsDialog(self.iface, 'apply')
         dlg2.show()
         dlg2.exec_()
 
@@ -412,7 +412,7 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_ipf(self):
-        dlg2 = IpfDialog(self.iface)
+        dlg2 = DistributionModelsDialog(self.iface, 'ipf')
         dlg2.show()
         dlg2.exec_()
 

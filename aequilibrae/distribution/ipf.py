@@ -39,6 +39,7 @@ class Ipf:
         # row vector
         self.rows = kwargs.get('rows', None)
         self.row_field = kwargs.get('row_field', None)
+        self.output_name = kwargs.get('output', AequilibraeMatrix().random_name())
 
         # Column vector
         self.columns = kwargs.get('columns', None)
@@ -108,7 +109,7 @@ class Ipf:
             max_iter = self.parameters['max iterations']
             conv_criteria = self.parameters['convergence level']
 
-            self.output = self.matrix.copy(os.path.join(tempfile.gettempdir(),'aequilibrae_matrix_' + str(uuid.uuid4()) + '.aem'))
+            self.output = self.matrix.copy(self.output_name)
             rows = self.rows.data[self.row_field]
             columns = self.columns.data[self.column_field]
             tot_matrix = np.sum(self.output.matrix_view[:, :])

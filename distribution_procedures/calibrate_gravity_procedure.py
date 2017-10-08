@@ -34,10 +34,11 @@ class CalibrateGravityProcedure(WorkerThread):
         WorkerThread.__init__(self, parentThread)
         self.gravity = GravityCalibration(**kwargs)
         self.error = None
+        self.report = None
+        self.model = None
 
     def doWork(self):
         self.gravity.calibrate()
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),0)
-
-if __name__ == '__main__':
-    main()
+        self.report = self.gravity.report
+        self.model = self.gravity.model
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),"calibrate")

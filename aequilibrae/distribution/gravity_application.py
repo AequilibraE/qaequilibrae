@@ -60,6 +60,7 @@ class GravityApplication:
         self.impedance = kwargs.get('impedance')
         self.model = kwargs.get('model')
         self.core_name = kwargs.get('output_core','gravity')
+        self.output_name  =kwargs.get('output', AequilibraeMatrix().random_name())
         self.output = None
         self.gap = np.inf
 
@@ -68,9 +69,7 @@ class GravityApplication:
         t= clock()
         max_cost = self.parameters['max trip length']
         # We create the output
-        self.core_name = 'gravity'
-        name_test = os.path.join(tempfile.gettempdir(), 'aequilibrae_array_impedance.aem')
-        self.output = self.impedance.copy(name_test, cores=self.impedance.view_names, names=[self.core_name])
+        self.output = self.impedance.copy(self.output_name, cores=self.impedance.view_names, names=[self.core_name])
         self.output.computational_view([self.core_name])
 
         # We apply the function
