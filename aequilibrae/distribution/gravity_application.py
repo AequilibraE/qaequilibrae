@@ -73,7 +73,7 @@ class GravityApplication:
         self.output = self.impedance.copy(self.output_name, cores=self.impedance.view_names, names=[self.core_name])
         self.output.computational_view([self.core_name])
         if self.nan_as_zero:
-            np.nan_to_num(self.output.matrix_view, False)
+            self.output.matrix_view[:,:] = np.nan_to_num(self.output.matrix_view)[:,:]
 
         # We apply the function
         self.apply_function()

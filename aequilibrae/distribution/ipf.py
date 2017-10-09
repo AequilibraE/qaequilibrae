@@ -124,7 +124,7 @@ class Ipf:
 
             self.output = self.matrix.copy(self.output_name)
             if self.nan_as_zero:
-                np.nan_to_num(self.output.matrix_view, False)
+                self.output.matrix_view[:,:] = np.nan_to_num(self.output.matrix_view)[:,:]
 
             rows = self.rows.data[self.row_field]
             columns = self.columns.data[self.column_field]
@@ -138,7 +138,7 @@ class Ipf:
             self.report.append('Columns: ' + str(self.columns.entries))
 
             self.report.append('Total of seed matrix: ' + "{:28,.4f}".format(float(tot_matrix)))
-            self.report.append('Total of target vectors: ' + "{:25,.4f}".format(float(rows.nansum())))
+            self.report.append('Total of target vectors: ' + "{:25,.4f}".format(float(np.nansum(rows))))
             self.report.append('')
             self.report.append('Iteration,   Convergence')
             self.gap = conv_criteria + 1

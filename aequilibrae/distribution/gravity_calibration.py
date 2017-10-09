@@ -177,7 +177,7 @@ class GravityCalibration:
                 if len(matrix.matrix_view.shape[:]) > 2:
                     raise ValueError(title + "' computational view needs to be set for a single matrix core")
 
-            if np.numsum(matrix.matrix_view.data) == 0:
+            if np.nansum(matrix.matrix_view.data) == 0:
                 raise ValueError(title + 'has only zero values')
             if np.nanmin(matrix.matrix_view.data) < 0:
                 raise ValueError(title + 'has negative values')
