@@ -66,6 +66,16 @@ class Ipf:
         if not isinstance(self.matrix, AequilibraeMatrix):
             raise TypeError('Seed matrix needs to be an instance of AequilibraEMatrix')
 
+        # Check data type
+        if not np.issubdtype(self.matrix.dtype, np.float):
+            raise ValueError('Seed matrix need to be a float type')
+
+        if not np.issubdtype(self.rows.data[self.row_field].dtype, np.float):
+            raise ValueError('production/rows vector must be a float type')
+
+        if not np.issubdtype(self.columns.data[self.column_field].dtype, np.float):
+            raise ValueError('Attraction/columns vector must be a float type')
+
         # Check data dimensions
         if not np.array_equal(self.rows.index, self.columns.index):
             raise ValueError('Indices from row vector do not match those from column vector')
