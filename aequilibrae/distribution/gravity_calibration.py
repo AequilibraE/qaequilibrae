@@ -99,8 +99,8 @@ class GravityCalibration:
 
             #weighted average cost
             self.report.append('Iteration: 1')
-            cstar = np.sum(self.impedance.matrix[self.impedance_core][:,:] * self.result_matrix.gravity[:, :]  * a) / \
-                    np.sum(self.result_matrix.gravity[:, :]  * a)
+            cstar = np.nansum(self.impedance.matrix[self.impedance_core][:,:] * self.result_matrix.gravity[:, :]  * a) / \
+                    np.nansum(self.result_matrix.gravity[:, :]  * a)
 
             b0 = 1 / cstar
 
@@ -120,7 +120,7 @@ class GravityCalibration:
             cm = self.apply_gravity()
             for i in self.gravity.report:
                 self.report.append('       ' + i)
-            self.report.append('Error: ' +  "{:.2E}".format(float(np.sum(abs((bm / bm1) - 1)))))
+            self.report.append('Error: ' +  "{:.2E}".format(float(np.nansum(abs((bm / bm1) - 1)))))
             self.report.append('')
             cm1 = c0
 
@@ -138,7 +138,7 @@ class GravityCalibration:
 
             for i in self.gravity.report:
                 self.report.append('       ' + i)
-            self.report.append('Error: ' + "{:.2E}".format(float(np.sum(abs((bm / bm1) - 1)))))
+            self.report.append('Error: ' + "{:.2E}".format(float(np.nansum(abs((bm / bm1) - 1)))))
             self.report.append('')
 
             # compute convergence criteria
@@ -177,9 +177,9 @@ class GravityCalibration:
                 if len(matrix.matrix_view.shape[:]) > 2:
                     raise ValueError(title + "' computational view needs to be set for a single matrix core")
 
-            if np.sum(matrix.matrix_view.data) == 0:
+            if np.numsum(matrix.matrix_view.data) == 0:
                 raise ValueError(title + 'has only zero values')
-            if np.min(matrix.matrix_view.data) < 0:
+            if np.nanmin(matrix.matrix_view.data) < 0:
                 raise ValueError(title + 'has negative values')
 
         # Augment parameters if we happen to have only passed one
@@ -219,8 +219,8 @@ class GravityCalibration:
         self.gravity.apply()
         self.result_matrix = self.gravity.output
 
-        return np.sum(self.impedance.matrix[self.impedance_core][:,:] * self.result_matrix.gravity[:, :]) \
-               / np.sum(self.result_matrix.gravity[:, :])
+        return np.nansum(self.impedance.matrix[self.impedance_core][:,:] * self.result_matrix.gravity[:, :]) \
+               / np.nansum(self.result_matrix.gravity[:, :])
 
     def get_parameters(self):
         par = Parameters().parameters

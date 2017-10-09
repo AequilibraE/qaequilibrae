@@ -61,6 +61,7 @@ class GravityApplication:
         self.model = kwargs.get('model')
         self.core_name = kwargs.get('output_core','gravity')
         self.output_name  =kwargs.get('output', AequilibraeMatrix().random_name())
+        self.nan_as_zero = kwargs.get('nan_as_zero', True)
         self.output = None
         self.gap = np.inf
 
@@ -71,6 +72,8 @@ class GravityApplication:
         # We create the output
         self.output = self.impedance.copy(self.output_name, cores=self.impedance.view_names, names=[self.core_name])
         self.output.computational_view([self.core_name])
+        if self.nan_as_zero:
+            np.nan_to_num(self.output.matrix_view, False)
 
         # We apply the function
         self.apply_function()
@@ -81,7 +84,7 @@ class GravityApplication:
             self.output.matrix_view[:, :] = a * self.output.matrix_view[:, :]
 
         # We adjust the total of the self.output
-        total_factor = np.sum(self.rows.data[self.row_field]) / np.sum(self.output.matrix_view[:, :])
+        total_factor = np.nansum(self.rows.data[self.row_field]) / np.nansum(self.output.matrix_view[:, :])
         self.output.matrix_view[:, :] = self.output.matrix_view[:, :] * total_factor
 
         # And adjust with a fratar
@@ -106,8 +109,8 @@ class GravityApplication:
         self.report.append('')
         self.report.append('')
 
-        self.report.append('Total of matrix: ' + "{:15,.4f}".format(float(np.sum(self.output.matrix_view))))
-        self.report.append('Intrazonal flow: ' + "{:15,.4f}".format(float(np.trace(self.output.matrix_view))))
+        self.report.append('Total of matrix: ' + "{:15,.4f}".format(float(np.nansum(self.output.matrix_view))))
+        self.report.append('Intrazonal flow: ' + "{:15,.4f}".format(float(np.nansum(np.diagonal(self.output.matrix_view)))))
         self.report.append('Running time: ' + str(round(clock()-t, 3)))
 
         for i in glob.glob(tempfile.gettempdir() + '*.aem'):
@@ -166,8 +169,8 @@ class GravityApplication:
                 raise ValueError("Matrix' computational view needs to be set for a single matrix core")
 
         # check balancing:
-        sum_rows = np.sum(self.rows.data[self.row_field])
-        sum_cols = np.sum(self.columns.data[self.column_field])
+        sum_rows = np.nansum(self.rows.data[self.row_field])
+        sum_cols = np.nansum(self.columns.data[self.column_field])
         if abs(sum_rows - sum_cols) > self.parameters['balancing tolerance']:
             raise ValueError( 'Vectors are not balanced')
         else:

@@ -36,6 +36,9 @@ class Ipf:
         # Seed matrix
         self.matrix = kwargs.get('matrix', None)
 
+        # NaN as zero
+        self.nan_as_zero = kwargs.get('nan_as_zero', True)
+
         # row vector
         self.rows = kwargs.get('rows', None)
         self.row_field = kwargs.get('row_field', None)
@@ -92,8 +95,8 @@ class Ipf:
 
         if self.error is None:
             # check balancing:
-            sum_rows = np.sum(self.rows.data[self.row_field])
-            sum_cols = np.sum(self.columns.data[self.column_field])
+            sum_rows = np.nansum(self.rows.data[self.row_field])
+            sum_cols = np.nansum(self.columns.data[self.column_field])
             if abs(sum_rows - sum_cols) > self.parameters['balancing tolerance']:
                 self.error = 'Vectors are not balanced'
             else:
@@ -120,9 +123,12 @@ class Ipf:
             conv_criteria = self.parameters['convergence level']
 
             self.output = self.matrix.copy(self.output_name)
+            if self.nan_as_zero:
+                np.nan_to_num(self.output.matrix_view, False)
+
             rows = self.rows.data[self.row_field]
             columns = self.columns.data[self.column_field]
-            tot_matrix = np.sum(self.output.matrix_view[:, :])
+            tot_matrix = np.nansum(self.output.matrix_view[:, :])
 
             # Reporting
             self.report.append('Target convergence criteria: ' + str(conv_criteria))
@@ -132,7 +138,7 @@ class Ipf:
             self.report.append('Columns: ' + str(self.columns.entries))
 
             self.report.append('Total of seed matrix: ' + "{:28,.4f}".format(float(tot_matrix)))
-            self.report.append('Total of target vectors: ' + "{:25,.4f}".format(float(rows.sum())))
+            self.report.append('Total of target vectors: ' + "{:25,.4f}".format(float(rows.nansum())))
             self.report.append('')
             self.report.append('Iteration,   Convergence')
             self.gap = conv_criteria + 1
@@ -158,15 +164,15 @@ class Ipf:
                 self.gap = max(abs(1 - np.min(row_factor)), abs(np.max(row_factor) - 1), abs(1 - np.min(column_factor)),
                             abs(np.max(column_factor) - 1))
 
-                self.report.append(str(iter) + '   ,   ' + str("{:4,.10f}".format(float(np.sum(self.gap)))))
+                self.report.append(str(iter) + '   ,   ' + str("{:4,.10f}".format(float(np.nansum(self.gap)))))
 
             self.report.append('')
             self.report.append('Running time: ' + str("{:4,.3f}".format(clock()-t)) + 's')
     def tot_rows(self, matrix):
-        return np.sum(matrix, axis=1)
+        return np.nansum(matrix, axis=1)
 
     def tot_columns(self, matrix):
-        return np.sum(matrix, axis=0)
+        return np.nansum(matrix, axis=0)
 
     def factor(self, marginals, targets):
         f = np.divide(targets, marginals)  # We compute the factors
