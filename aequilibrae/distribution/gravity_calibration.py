@@ -44,6 +44,7 @@ class GravityCalibration:
         self.__required_parameters = ['max trip length', 'max iterations', 'max error']
         self.parameters = kwargs.get('parameters', self.get_parameters())
 
+        self.nan_as_zero = kwargs.get('nan_as_zero', False)
         self.matrix = kwargs.get('matrix')
         self.impedance = kwargs.get('impedance')
         deterrence_function = str(kwargs.get('function', '')).upper()
@@ -213,7 +214,8 @@ class GravityCalibration:
                 'columns': self.columns,
                 'column_field': 'columns',
                 'model': self.model,
-                'parameters': self.parameters}
+                'parameters': self.parameters,
+                'nan_as_zero': self.nan_as_zero}
 
         self.gravity = GravityApplication(**args)
         self.gravity.apply()

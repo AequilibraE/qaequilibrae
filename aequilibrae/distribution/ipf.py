@@ -176,11 +176,7 @@ class Ipf:
 
     def factor(self, marginals, targets):
         f = np.divide(targets, marginals)  # We compute the factors
-        f[f == np.NINF] = 1  # And treat the errors, with the infinites first
-        f = f + 1  # and the NaN second
-        f = np.nan_to_num(f)  # The sequence of operations is just a resort to
-        f[f == 0] = 2  # use at most numpy functions as possible instead of pure Python
-        f = f - 1
+        f[f == np.NINF] = 1  # And treat the errors
         return f
 
     def get_parameters(self, model):

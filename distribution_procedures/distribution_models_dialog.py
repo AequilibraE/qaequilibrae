@@ -122,7 +122,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         self.resize(511, 334)
         self.model_tabs.setEnabled(True)
         self.model_tabs.setVisible(True)
-
+        self.progressbar.setVisible(False)
         to_remove = []
         if self.rdo_ipf.isChecked():
             self.job = 'ipf'
@@ -308,7 +308,8 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
                             'row_fields': prod_field,
                             'columns': atra_vec,
                             'column_field': atra_field,
-                            'output': out_name}
+                            'output': out_name,
+                            'nan_as_zero': self.chb_empty_as_zero.isChecked()}
                     worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), **args)
 
             if self.job == 'apply':
@@ -325,7 +326,8 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
                             'row_fields': prod_field,
                             'columns': atra_vec,
                             'column_field': atra_field,
-                            'output': out_name}
+                            'output': out_name,
+                            'nan_as_zero': self.chb_empty_as_zero.isChecked()}
                     worker_thread = ApplyGravityProcedure(qgis.utils.iface.mainWindow(), **args)
 
             if self.job == 'calibrate':
@@ -342,9 +344,11 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
                     args = {'matrix': imped_matrix,
                             'impedance': imped_matrix,
-                            'function': func_name}
+                            'function': func_name,
+                            'nan_as_zero': self.chb_empty_as_zero.isChecked()}
                     worker_thread = CalibrateGravityProcedure(qgis.utils.iface.mainWindow(), **args)
 
+            self.chb_empty_as_zero.setEnabled(False)
             self.add_job_to_list(worker_thread, out_name)
 
     def add_job_to_list(self, job, out_name):
@@ -360,6 +364,8 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
             self.table_jobs.setItem(i, 2, QTableWidgetItem('Queued'))
 
     def run(self):
+        self.progressbar.setVisible(True)
+        self.chb_empty_as_zero.setVisible(False)
         for out_name in self.job_queue.keys():
             self.worker_thread = self.job_queue[out_name]
             self.run_thread()

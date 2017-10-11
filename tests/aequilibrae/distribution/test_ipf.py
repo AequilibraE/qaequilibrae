@@ -36,6 +36,7 @@ matrix = AequilibraeMatrix()
 matrix.create_empty(**args)
 matrix.seed[:, :] = np.random.rand(zones, zones)[:,:]
 matrix.computational_view(['seed'])
+matrix.matrix_view[1,1] = np.nan
 matrix.index[:] = np.arange(zones)[:]
 
 
@@ -46,17 +47,23 @@ class TestIpf(TestCase):
                 'rows': row_vector,
                 'row_field': 'rows',
                 'columns': column_vector,
-                'column_field': 'columns'}
+                'column_field': 'columns',
+                'nan_as_zero': False}
 
         fratar = Ipf(**args)
         fratar.fit()
 
         result = fratar.output
-
-        if result.seed.sum() != result.seed.sum():
+        if (np.nansum(result.matrix_view) - np.nansum(row_vector.data['rows'])) > 0.001:
+            print fratar.gap
+            for f in fratar.report:
+                print f
             self.fail('Ipf did not converge')
 
         if fratar.gap > fratar.parameters['convergence level']:
+            print fratar.gap
+            for f in fratar.report:
+                print f
             self.fail('Ipf did not converge')
 
 

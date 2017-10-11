@@ -61,7 +61,7 @@ class GravityApplication:
         self.model = kwargs.get('model')
         self.core_name = kwargs.get('output_core','gravity')
         self.output_name  =kwargs.get('output', AequilibraeMatrix().random_name())
-        self.nan_as_zero = kwargs.get('nan_as_zero', True)
+        self.nan_as_zero = kwargs.get('nan_as_zero', False)
         self.output = None
         self.gap = np.inf
 
@@ -89,7 +89,8 @@ class GravityApplication:
 
         # And adjust with a fratar
         ipf = Ipf(matrix=self.output, rows=self.rows, columns=self.columns,
-                  column_field=self.column_field, row_field=self.row_field)
+                  column_field=self.column_field, row_field=self.row_field,
+                  nan_as_zero=self.nan_as_zero)
 
         # We use the model application parameters in case they were provided
         # not the standard way of using this tool)
