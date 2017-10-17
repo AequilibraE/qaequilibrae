@@ -237,7 +237,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             default_type = '.npy'
             box_name = 'Matrix Loader'
             new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
-            self.__current_name = new_name
+            self.__current_name = os.path.split(new_name)[1].split('.')[0]
 
             self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type='numpy', file_path=new_name)
 
