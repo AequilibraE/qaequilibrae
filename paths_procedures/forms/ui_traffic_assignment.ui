@@ -36,62 +36,6 @@
    <property name="currentIndex">
     <number>0</number>
    </property>
-   <widget class="QWidget" name="widget">
-    <attribute name="title">
-     <string>Demand</string>
-    </attribute>
-    <widget class="QPushButton" name="but_load_new_matrix">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>13</y>
-       <width>211</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Load new matrix</string>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="display_matrix">
-     <property name="geometry">
-      <rect>
-       <x>500</x>
-       <y>20</y>
-       <width>111</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Display Matrix</string>
-     </property>
-    </widget>
-    <widget class="QTableView" name="matrix_viewer">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>50</y>
-       <width>591</width>
-       <height>291</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="matrix_core">
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>13</y>
-       <width>211</width>
-       <height>30</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
    <widget class="QWidget" name="tab_2">
     <attribute name="title">
      <string>Network</string>
@@ -177,17 +121,35 @@
      </column>
     </widget>
    </widget>
-   <widget class="QWidget" name="tab_4">
+   <widget class="QWidget" name="widget">
     <attribute name="title">
-     <string>Skims</string>
+     <string>Demand</string>
     </attribute>
-    <widget class="QTableWidget" name="skim_list">
+    <widget class="QPushButton" name="but_load_new_matrix">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>80</y>
-       <width>571</width>
-       <height>261</height>
+       <y>13</y>
+       <width>281</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Load matrix</string>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="table_matrix_list">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>285</width>
+       <height>291</height>
       </rect>
      </property>
      <property name="accessibleName">
@@ -203,56 +165,147 @@
       <number>0</number>
      </property>
      <property name="columnCount">
-      <number>1</number>
+      <number>2</number>
      </property>
      <attribute name="verticalHeaderDefaultSectionSize">
       <number>27</number>
      </attribute>
      <column>
       <property name="text">
-       <string>Skim name</string>
+       <string>Matrix name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Index</string>
       </property>
      </column>
     </widget>
-    <widget class="QPushButton" name="add_skim">
+    <widget class="QTableWidget" name="table_matrices_to_assign">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>50</y>
+       <width>285</width>
+       <height>291</height>
+      </rect>
+     </property>
+     <property name="accessibleName">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="rowCount">
+      <number>0</number>
+     </property>
+     <property name="columnCount">
+      <number>2</number>
+     </property>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>27</number>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Matrix name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Matrix core</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QLabel" name="lbl">
+     <property name="geometry">
+      <rect>
+       <x>401</x>
+       <y>18</y>
+       <width>141</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Matrices to assign</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_4">
+    <attribute name="title">
+     <string>Skims</string>
+    </attribute>
+    <widget class="QTableWidget" name="skim_list_table">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>49</y>
-       <width>571</width>
-       <height>24</height>
+       <y>50</y>
+       <width>591</width>
+       <height>291</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Add Skim</string>
+     <property name="accessibleName">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
-    </widget>
-    <widget class="QComboBox" name="skim_field">
-     <property name="geometry">
-      <rect>
-       <x>60</x>
-       <y>17</y>
-       <width>531</width>
-       <height>30</height>
-      </rect>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
      </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="rowCount">
+      <number>0</number>
+     </property>
+     <property name="columnCount">
+      <number>2</number>
+     </property>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>27</number>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>Compute</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Skim name</string>
+      </property>
+     </column>
     </widget>
     <widget class="QLabel" name="lblnodematch_12">
      <property name="geometry">
       <rect>
        <x>25</x>
        <y>24</y>
-       <width>121</width>
+       <width>151</width>
        <height>16</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <pointsize>10</pointsize>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
       </font>
      </property>
      <property name="text">
-      <string>Field</string>
+      <string>Skims to compute</string>
      </property>
     </widget>
    </widget>

@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-30
- Updated:... 2017-06-07
+ Updated:... 2017-10-15
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -31,13 +31,14 @@ from functools import partial
 import numpy as np
 import uuid
 import shutil
+from collections import OrderedDict
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
 from ..matrix_procedures import LoadMatrixDialog
 from ..common_tools import ReportDialog
-from ..common_tools import NumpyModel
 from ..common_tools import GetOutputFolderName, GetOutputFileName
+from ..aequilibrae.matrix import AequilibraeMatrix
 
 from traffic_assignment_procedure import TrafficAssignmentProcedure
 from load_select_link_query_builder_dialog import LoadSelectLinkQueryBuilderDialog
@@ -64,14 +65,15 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.output = None
         self.report = None
         self.method = {}
-
+        self.matrices = OrderedDict()
+        self.assignable = AequilibraeMatrix()
+        self.skims = []
         self.matrix = None
         self.graph = Graph()
         self.results = AssignmentResults()
 
         # Signals for the matrix_procedures tab
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
-        self.display_matrix.stateChanged.connect(self.display_matrix_or_not)
 
         # Signals from the Network tab
         self.load_graph_from_file.clicked.connect(self.load_graph)
@@ -89,7 +91,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.cb_choose_algorithm.currentIndexChanged.connect(self.changing_algorithm)
 
         # slots for skim tab
-        self.add_skim.clicked.connect(self.select_skim)
+        self.but_build_query.clicked.connect(partial(self.build_query, 'select link'))
 
         self.changing_algorithm()
 
@@ -127,62 +129,14 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.do_extract_link_flows.setEnabled(False)
         self.but_build_query_extract.setEnabled(False)
         self.list_link_extraction.setEnabled(False)
+        self.new_matrix_to_assign()
 
-
-    def build_query(self, purpose):
-        if purpose == 'select link':
-            button = self.but_build_query
-            message = 'Select Link Analysis'
-            table = self.select_link_list
-            counter = self.tot_crit_link_queries
-
-        if purpose == 'Link flow extraction':
-            button = self.but_build_query_extract
-            message = 'Link flow extraction'
-            table = self.list_link_extraction
-            counter = self.tot_link_flow_extract
-
-        button.setEnabled(False)
-        dlg2 = LoadSelectLinkQueryBuilderDialog(self.iface, self.graph.graph, message)
-        dlg2.exec_()
-
-        if dlg2.links is not None:
-            table.setRowCount(counter + 1)
-            text = ''
-            for i in dlg2.links:
-                text = text + ', (' + i[0].encode('utf-8') + ', "' + i[1].encode('utf-8') + '")'
-            text = text[2:]
-            table.setItem(counter, 0, QTableWidgetItem(text))
-            table.setItem(counter, 1, QTableWidgetItem(dlg2.query_type))
-            table.setItem(counter, 2, QTableWidgetItem(dlg2.query_name))
-            del_button = QPushButton('X')
-            del_button.clicked.connect(partial(self.click_button_inside_the_list, purpose))
-            table.setCellWidget(counter, 3, del_button)
-            counter += 1
-
-        if purpose == 'select link':
-            self.tot_crit_link_queries = counter
-
-        elif purpose == 'Link flow extraction':
-            self.tot_link_flow_extract = counter
-
-        button.setEnabled(True)
-
-    def click_button_inside_the_list(self, purpose):
-        if purpose == 'select link':
-            table = self.select_link_list
-        elif purpose == 'Link flow extraction':
-            table = self.list_link_extraction
-
-        button = self.sender()
-        index = self.select_link_list.indexAt(button.pos())
-        row = index.row()
-        table.removeRow(row)
-
-        if purpose == 'select link':
-            self.tot_crit_link_queries -= 1
-        elif purpose == 'Link flow extraction':
-            self.tot_link_flow_extract -= 1
+        self.table_matrix_list.setColumnWidth(0, 135)
+        self.table_matrix_list.setColumnWidth(1, 135)
+        self.table_matrices_to_assign.setColumnWidth(0, 125)
+        self.table_matrices_to_assign.setColumnWidth(1, 125)
+        self.skim_list_table.setColumnWidth(0, 70)
+        self.skim_list_table.setColumnWidth(1, 490)
 
     def choose_folder_for_outputs(self):
         new_name = GetOutputFolderName(self.path, 'Output folder for traffic assignment')
@@ -192,9 +146,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         else:
             self.output_path = None
             self.lbl_output.setText(new_name)
-
-    def select_skim(self):
-        pass
 
     def load_graph(self):
         self.lbl_graphfile.setText('')
@@ -207,17 +158,14 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         if graph_file is not None:
             self.graph.load_from_disk(graph_file)
 
-            not_considering_list = self.graph.required_default_fields
-            not_considering_list.pop(-1)
-            not_considering_list.append('id')
-            not_considering_list.append('direction')
-
-            for i in list(self.graph.graph.dtype.names):
-                if i not in not_considering_list:
-                    self.minimizing_field.addItem(i)
+            fields = list(set(self.graph.graph.dtype.names) - set(self.graph.required_default_fields))
+            print fields
+            print self.graph.required_default_fields
+            print self.graph.graph.dtype.names
+            self.minimizing_field.addItems(fields)
+            self.update_skim_list(fields)
             self.lbl_graphfile.setText(graph_file)
 
-            self.results.prepare(self.graph)
             cores = get_parameter_chain(['system', 'cpus'])
             self.results.set_cores(cores)
 
@@ -244,39 +192,20 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.graph_properties_table.setItem(2, 1, QTableWidgetItem(str(self.graph.num_nodes)))
 
             self.graph_properties_table.setItem(3, 0, QTableWidgetItem('Number of centroids'))
-            self.graph_properties_table.setItem(3, 1, QTableWidgetItem(str(self.graph.centroids)))
+            self.number_of_zones = QSpinBox()
+            self.number_of_zones.setMinimum(0)
+            self.number_of_zones.setMaximum(self.graph.num_nodes)
+            self.number_of_zones.setValue(self.graph.centroids)
+            self.graph_properties_table.setCellWidget(3, 1, self.number_of_zones)
 
             self.graph_properties_table.setItem(4, 0, QTableWidgetItem('Block flows through centroids'))
-            chb2 = QCheckBox()
-            chb2.setChecked(self.graph.block_centroid_flows)
-            self.graph_properties_table.setCellWidget(4, 1, centers_item(chb2))
-
-
+            self.block_centroid_flows = QCheckBox()
+            self.block_centroid_flows.setChecked(self.graph.block_centroid_flows)
+            self.graph_properties_table.setCellWidget(4, 1, centers_item(self.block_centroid_flows))
+            # self.graph_properties_table.itemChanged.connect(self.update_graph)
         else:
             self.graph = Graph()
         self.set_behavior_special_analysis()
-
-    def set_behavior_special_analysis(self):
-        if self.graph.num_links < 1:
-            behavior = False
-        else:
-            behavior = True
-
-        self.do_path_file.setEnabled(behavior)
-
-        # This line of code turns off the features of select link analysis and link flow extraction while these
-        #features are still being developed
-        behavior = False
-
-        self.do_select_link.setEnabled(behavior)
-        self.do_extract_link_flows.setEnabled(behavior)
-
-        self.but_build_query.setEnabled(behavior * self.do_select_link.isChecked())
-        self.select_link_list.setEnabled(behavior * self.do_select_link.isChecked())
-
-        self.list_link_extraction.setEnabled(behavior * self.do_extract_link_flows.isChecked())
-        self.but_build_query_extract.setEnabled(behavior * self.do_extract_link_flows.isChecked())
-
 
     def changing_algorithm(self):
         if self.cb_choose_algorithm.currentText() == 'All-Or-Nothing':
@@ -292,32 +221,19 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.worker_thread.start()
         self.exec_()
 
-    def find_matrices(self):
-        dlg2 = LoadMatrixDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-        if dlg2.matrix is not None:
-            self.matrix = dlg2.matrix
-            self.display_matrix_or_not()
-        else:
-            self.matrix = None
+    def update_matrix_list(self):
+        self.table_matrix_list.clearContents()
+        self.table_matrix_list.clearContents()
+        self.table_matrix_list.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.table_matrix_list.setRowCount(len(self.matrices.keys()))
 
-    def display_matrix_or_not(self):
-        self.matrix_core.clear()
-        if self.display_matrix.isChecked() and self.matrix is not None:
-            for n in self.matrix.names:
-                self.matrix_core.addItem(n)
+        for i, data_name in enumerate(self.matrices.keys()):
+            self.table_matrix_list.setItem(i, 0, QTableWidgetItem(data_name))
 
-            row_headers = []
-            col_headers = []
-            for i in range(self.matrix.zones):
-                row_headers.append(self.matrix.index[i])
-                col_headers.append(self.matrix.index[i])
-
-            m = NumpyModel(self.matrix.matrix[str(self.matrix_core.currentText())], col_headers, row_headers)
-            self.matrix_viewer.setModel(m)
-        else:
-            self.matrix_viewer.clearSpans()
+            cbox = QComboBox()
+            for idx in self.matrices[data_name].index_names:
+                cbox.addItem(str(idx))
+            self.table_matrix_list.setCellWidget(i, 1, cbox)
 
     def job_finished_from_thread(self, success):
         if self.worker_thread.report:
@@ -334,7 +250,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.set_output_names()
             self.progressbar0.setVisible(True)
             self.worker_thread = TrafficAssignmentProcedure(qgis.utils.iface.mainWindow(), self.matrix, self.graph,
-                                                       self.results, self.method)
+                                                            self.results, self.method)
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Input error", self.error, level=3)
@@ -453,6 +369,203 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         #         shutil.move(self.link_extract.temp_file + '.aed', self.link_extract.output_name[:-3] + 'aed')
 
         self.exit_procedure()
+
+# Procedures related to critical analysis. Not yet fully implemented
+    def build_query(self, purpose):
+        if purpose == 'select link':
+            button = self.but_build_query
+            message = 'Select Link Analysis'
+            table = self.select_link_list
+            counter = self.tot_crit_link_queries
+
+        if purpose == 'Link flow extraction':
+            button = self.but_build_query_extract
+            message = 'Link flow extraction'
+            table = self.list_link_extraction
+            counter = self.tot_link_flow_extract
+
+        button.setEnabled(False)
+        dlg2 = LoadSelectLinkQueryBuilderDialog(self.iface, self.graph.graph, message)
+        dlg2.exec_()
+
+        if dlg2.links is not None:
+            table.setRowCount(counter + 1)
+            text = ''
+            for i in dlg2.links:
+                text = text + ', (' + i[0].encode('utf-8') + ', "' + i[1].encode('utf-8') + '")'
+            text = text[2:]
+            table.setItem(counter, 0, QTableWidgetItem(text))
+            table.setItem(counter, 1, QTableWidgetItem(dlg2.query_type))
+            table.setItem(counter, 2, QTableWidgetItem(dlg2.query_name))
+            del_button = QPushButton('X')
+            del_button.clicked.connect(partial(self.click_button_inside_the_list, purpose))
+            table.setCellWidget(counter, 3, del_button)
+            counter += 1
+
+        if purpose == 'select link':
+            self.tot_crit_link_queries = counter
+
+        elif purpose == 'Link flow extraction':
+            self.tot_link_flow_extract = counter
+
+        button.setEnabled(True)
+
+    def click_button_inside_the_list(self, purpose):
+        if purpose == 'select link':
+            table = self.select_link_list
+        elif purpose == 'Link flow extraction':
+            table = self.list_link_extraction
+
+        button = self.sender()
+        index = self.select_link_list.indexAt(button.pos())
+        row = index.row()
+        table.removeRow(row)
+
+        if purpose == 'select link':
+            self.tot_crit_link_queries -= 1
+        elif purpose == 'Link flow extraction':
+            self.tot_link_flow_extract -= 1
+
+    def set_behavior_special_analysis(self):
+        if self.graph.num_links < 1:
+            behavior = False
+        else:
+            behavior = True
+
+        self.do_path_file.setEnabled(behavior)
+
+        # This line of code turns off the features of select link analysis and link flow extraction while these
+        #features are still being developed
+        behavior = False
+
+        self.do_select_link.setEnabled(behavior)
+        self.do_extract_link_flows.setEnabled(behavior)
+
+        self.but_build_query.setEnabled(behavior * self.do_select_link.isChecked())
+        self.select_link_list.setEnabled(behavior * self.do_select_link.isChecked())
+
+        self.list_link_extraction.setEnabled(behavior * self.do_extract_link_flows.isChecked())
+        self.but_build_query_extract.setEnabled(behavior * self.do_extract_link_flows.isChecked())
+
+    def update_skim_list(self, skims):
+        self.skim_list_table.clearContents()
+        self.skim_list_table.setRowCount(len(skims))
+
+        for i, skm in enumerate(skims):
+            self.skim_list_table.setItem(i, 1, QTableWidgetItem(skm))
+            chb = QCheckBox()
+            my_widget = QWidget()
+            lay_out = QHBoxLayout(my_widget)
+            lay_out.addWidget(chb)
+            lay_out.setAlignment(Qt.AlignCenter)
+            lay_out.setContentsMargins(0, 0, 0, 0)
+            my_widget.setLayout(lay_out)
+
+            self.skim_list_table.setCellWidget(i, 0, my_widget)
+
+    # All Matrix loading and assignables selection
+    def find_matrices(self):
+        dlg2 = LoadMatrixDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+        if dlg2.matrix is not None:
+            matrix_name = dlg2.matrix.file_path
+            matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
+            matrix_name = self.find_non_conflicting_name(matrix_name, self.matrices)
+            self.matrices[matrix_name] = dlg2.matrix
+            self.update_matrix_list()
+
+            row_count = self.table_matrices_to_assign.rowCount()
+            new_matrix = list(self.matrices.keys())[-1]
+
+            for i in range(row_count):
+                cb = self.table_matrices_to_assign.cellWidget(i, 0)
+                cb.insertItem(-1, new_matrix)
+
+    def find_non_conflicting_name(self, data_name, dictio):
+        if data_name in dictio:
+            i = 1
+            new_data_name = data_name + '_' + str(i)
+            while new_data_name in dictio:
+                i += 1
+                new_data_name = data_name + '_' + str(i)
+            data_name = new_data_name
+        return data_name
+
+    def changed_assignable_matrix(self, mi):
+        chb = self.sender()
+        mat_name = chb.currentText()
+
+        table = self.table_matrices_to_assign
+        for row in range(table.rowCount()):
+            if table.cellWidget(row, 0) == chb:
+                break
+
+        if len(mat_name) == 0:
+            if row + 1 < table.rowCount():
+                self.table_matrices_to_assign.removeRow(row)
+        else:
+            mat_cores = self.matrices[mat_name].names
+            cbox2 = QComboBox()
+            cbox2.addItems(mat_cores)
+            self.table_matrices_to_assign.setCellWidget(row, 1, cbox2)
+
+            if row + 1 == table.rowCount():
+                self.new_matrix_to_assign()
+
+    def new_matrix_to_assign(self):
+        # We edit ALL the combo boxes to have the current list of matrices
+        row_count = self.table_matrices_to_assign.rowCount()
+        self.table_matrices_to_assign.setRowCount(row_count + 1)
+
+        cbox = QComboBox()
+        cbox.addItems(list(self.matrices.keys()))
+        cbox.addItem('')
+        cbox.setCurrentIndex(cbox.count()-1)
+        cbox.currentIndexChanged.connect(self.changed_assignable_matrix)
+        self.table_matrices_to_assign.setCellWidget(row_count, 0, cbox)
+
+# Run preparation procedures
+    def change_graph_settings(self):
+        skims = []
+        table = self.skim_list_table
+        for i in table.rowCount:
+            for chb in table.cellWidget(i, 0).findChildren(QCheckBox):
+                if chb.isChecked():
+                    skims.append(table.item(i, 1).text())
+
+        if len(skims) == 0:
+            skims = False
+
+        self.graph.set_graph(centroids=self.number_of_zones.value(),
+                             cost_field=self.minimizing_field.currentText(),
+                             skim_fields=skims,
+                             block_centroid_flows=self.block_centroid_flows.isChecked())
+
+    def prepare_assignable_matrices(self):
+        table = self.table_matrices_to_assign
+        idx = None
+        mat_names = []
+        for row in range(table.rowCount() - 1):
+            mat = table.cellWidget(row, 0).currentText()
+            core = table.cellWidget(row, 1).currentText()
+            if idx is None:
+                idx = self.matrices[mat].index
+            if not np.array_equal(idx,self.matrices[mat].index):
+                self.error = 'Assignable matrices have mismatching indices'
+            if core in mat_names:
+                self.error = 'Assignable matrices cannot have same names'
+            mat_names.append(core)
+
+        self.assignable.create_empty(file_name=self.assignable.random_name(),
+                                     zones=idx.shape[0],
+                                     matrix_names=mat_names)
+        self.assignable.index[:] = idx[:]
+
+        for row in range(table.rowCount() - 1):
+            mat = table.cellWidget(row, 0).currentText()
+            core = table.cellWidget(row, 1).currentText()
+            self.assignable.matrix[core][:, :] = self.matrices[mat].matrix[core][:, :]
 
     def exit_procedure(self):
         self.close()

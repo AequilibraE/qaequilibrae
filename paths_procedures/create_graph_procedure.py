@@ -142,5 +142,7 @@ class GraphCreation(WorkerThread):
                 self.graph.__field_name__ = None
                 self.graph.__layer_name__ = None
 
-        self.report.append(reporter('Process finished', 0))
+                self.report.append(reporter('Process finished', 0))
+            else:
+                self.report.append(self.error)
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), None)
