@@ -400,9 +400,9 @@ class AequilibraeMatrix(object):
         elif len(core_list) > 1:
             self.matrix_view = self.matrices[:, :, self.names.index(core_list[0]):self.names.index(core_list[-1]) + 1]
 
-    def copy(self, output_name, cores=None, names=None, compress=None):
+    def copy(self, output_name=None, cores=None, names=None, compress=None):
 
-        if output_name == 'TEMP':
+        if output_name is None:
             output_name = self.random_name()
 
         if cores is None:
@@ -458,6 +458,11 @@ class AequilibraeMatrix(object):
 
     def columns(self):
         return self.vector(axis=1)
+
+    def nan_to_num(self):
+        if np.issubdtype(self.dtype, np.float) and self.matrix_view is not None:
+            for m in self.view_names:
+                self.matrix[m][:,:] = np.nan_to_num(self.matrix[m])[:,:]
 
     def vector(self, axis):
         if self.view_names is None:

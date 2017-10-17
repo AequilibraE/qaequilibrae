@@ -49,6 +49,10 @@ class GravityCalibration:
         self.impedance = kwargs.get('impedance')
         deterrence_function = str(kwargs.get('function', '')).upper()
 
+        if self.nan_as_zero:
+            self.matrix = self.matrix.copy()
+            self.impedance = self.impedance.copy()
+
         self.result_matrix = None
         self.rows = None
         self.columns = None
@@ -192,7 +196,7 @@ class GravityCalibration:
         # Prepare the data for computation
         self.comput_core = self.matrix.view_names[0]
 
-        self.result_matrix = self.matrix.copy(output_name='TEMP', cores=[self.comput_core], names=['gravity'])
+        self.result_matrix = self.matrix.copy(cores=[self.comput_core], names=['gravity'])
 
         self.rows = AequilibraEData()
         self.rows.create_empty(entries=self.matrix.zones, field_names=['rows'], memory_mode=True)
