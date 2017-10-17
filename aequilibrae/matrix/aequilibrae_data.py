@@ -37,6 +37,7 @@ DISK = 0
 
 
 class AequilibraEData(object):
+
     def __init__(self):
         self.data = None
         self.file_path = None
@@ -48,6 +49,16 @@ class AequilibraEData(object):
         self.memory_mode = None
 
     def create_empty(self, file_path=None, entries=1, field_names=None, data_types=None, memory_mode=False):
+        """
+        :param file_path: Optional. Full path for the output data file. If *memory_false* is 'false' and path is missing,
+        then the file is created in the temp folder
+        :param entries: Number of records in the dataset. Default is 1
+        :param field_names: List of field names for this dataset. If no list is provided, the field 'data' will be created
+        :param data_types: List of data types for the dataset. Types need to be NumPy data types (e.g. np.int16,
+        np.float64). If no list of types are provided, type will be *np.float64*
+        :param memory_mode: If true, dataset will be kept in memory. If false, the dataset will  be a memory-mapped numpy array
+        :return: # nothing. Associates a dataset with the AequilibraEData object
+        """
 
         if file_path is not None or memory_mode:
             if field_names is None:
@@ -113,6 +124,10 @@ class AequilibraEData(object):
             raise AttributeError("Data container is empty")
 
     def load(self, file_path):
+        """
+        :param file_path: Full file path to the AequilibraEDataset to be loaded
+        :return: Loads the dataset into the AequilibraEData instance
+        """
         f = open(file_path)
         self.file_path = os.path.realpath(f.name)
         f.close()
