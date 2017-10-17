@@ -53,7 +53,8 @@ class Graph:
         @type graph: Numpy record array
         """
 
-        self.required_default_fields = ['link_id', 'a_node', 'b_node', 'direction']
+        self.required_default_fields = []
+        self.reset_single_fields()
         self.other_fields = ''
         self.date = str(datetime.now())
 
@@ -531,7 +532,7 @@ class Graph:
 
     # We return the list of the fields that are the same for both directions to their initial states
     def reset_single_fields(self):
-        self.required_default_fields = ['link_id', 'a_node', 'b_node', 'direction', 'length']
+        self.required_default_fields = ['link_id', 'a_node', 'b_node', 'direction', 'length', 'id']
 
     # We add a new fields that is the same for both directions
     def add_single_field(self, new_field):
