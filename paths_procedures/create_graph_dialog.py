@@ -151,7 +151,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         if self.network_layer.currentIndex() >= 0:
             self.layer = get_vector_layer_by_name(self.network_layer.currentText())
             for field in self.layer.pendingFields().toList():
-                if field not in reserved_fields:
+                if field.name() not in reserved_fields:
                     if field.type() in integer_types:
                         for combo in i_types:
                             combo.addItem(field.name())

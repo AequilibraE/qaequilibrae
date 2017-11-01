@@ -23,7 +23,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>130</y>
+     <y>140</y>
      <width>511</width>
      <height>261</height>
     </rect>
@@ -70,7 +70,7 @@
   <widget class="QCheckBox" name="chk_dual_fields">
    <property name="geometry">
     <rect>
-     <x>301</x>
+     <x>288</x>
      <y>63</y>
      <width>101</width>
      <height>17</height>
@@ -109,7 +109,7 @@
   <widget class="QCheckBox" name="links_are_bi_directional">
    <property name="geometry">
     <rect>
-     <x>301</x>
+     <x>288</x>
      <y>100</y>
      <width>161</width>
      <height>20</height>
@@ -131,9 +131,9 @@
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>60</y>
+     <y>57</y>
      <width>191</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
@@ -159,9 +159,9 @@
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>97</y>
+     <y>95</y>
      <width>191</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
@@ -327,7 +327,7 @@
      <x>30</x>
      <y>410</y>
      <width>121</width>
-     <height>23</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="font">
@@ -345,7 +345,7 @@
      <x>170</x>
      <y>410</y>
      <width>351</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="font">
@@ -375,9 +375,9 @@
   <widget class="QPushButton" name="but_advanced">
    <property name="geometry">
     <rect>
-     <x>450</x>
+     <x>440</x>
      <y>55</y>
-     <width>71</width>
+     <width>81</width>
      <height>61</height>
     </rect>
    </property>
@@ -387,17 +387,38 @@
     </font>
    </property>
    <property name="text">
-    <string>Advanced</string>
+    <string>Centroids</string>
    </property>
   </widget>
   <widget class="QgsMapLayerComboBox" name="network_layer">
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>20</y>
-     <width>431</width>
-     <height>24</height>
+     <y>17</y>
+     <width>311</width>
+     <height>30</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="use_link_selection">
+   <property name="geometry">
+    <rect>
+     <x>406</x>
+     <y>23</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string> Selected links only</string>
    </property>
   </widget>
  </widget>

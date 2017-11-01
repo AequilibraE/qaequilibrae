@@ -44,13 +44,9 @@ COMPRESSED = 1
 
 """
 TODO:
-Add a set_index method?
-
-Add an aggregate method?
+Add an aggregate method
 
 Add check that the index 1 (or zero) has only unique values?
-
-Write a white paper on the matrix and its specification? 1 pager like bcolz, describing overhead and all?
 """
 
 """

@@ -52,6 +52,11 @@ except:
 sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_traffic_assignment.ui'))
 
+"""
+TODO
+Add check for matrix index uniqueness and compatibility with assignment (0-n) size
+
+"""
 
 class TrafficAssignmentDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -159,9 +164,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.graph.load_from_disk(graph_file)
 
             fields = list(set(self.graph.graph.dtype.names) - set(self.graph.required_default_fields))
-            print fields
-            print self.graph.required_default_fields
-            print self.graph.graph.dtype.names
             self.minimizing_field.addItems(fields)
             self.update_skim_list(fields)
             self.lbl_graphfile.setText(graph_file)
@@ -202,7 +204,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.block_centroid_flows = QCheckBox()
             self.block_centroid_flows.setChecked(self.graph.block_centroid_flows)
             self.graph_properties_table.setCellWidget(4, 1, centers_item(self.block_centroid_flows))
-            # self.graph_properties_table.itemChanged.connect(self.update_graph)
         else:
             self.graph = Graph()
         self.set_behavior_special_analysis()
@@ -220,20 +221,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
                         self.job_finished_from_thread)
         self.worker_thread.start()
         self.exec_()
-
-    def update_matrix_list(self):
-        self.table_matrix_list.clearContents()
-        self.table_matrix_list.clearContents()
-        self.table_matrix_list.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
-        self.table_matrix_list.setRowCount(len(self.matrices.keys()))
-
-        for i, data_name in enumerate(self.matrices.keys()):
-            self.table_matrix_list.setItem(i, 0, QTableWidgetItem(data_name))
-
-            cbox = QComboBox()
-            for idx in self.matrices[data_name].index_names:
-                cbox.addItem(str(idx))
-            self.table_matrix_list.setCellWidget(i, 1, cbox)
 
     def job_finished_from_thread(self, success):
         if self.worker_thread.report:
@@ -273,7 +260,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
 
     def check_data(self):
         self.error = None
-
+        # self.consolidate
         if self.matrix is None:
             self.error = 'Demand matrix_procedures missing'
 
@@ -283,9 +270,9 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         if self.output_path is None:
             self.error = 'Parameters for output missing'
 
-        if self.results.zones != np.max(self.matrix.shape[:]):
+        if self.results.zones != self.matrix.zones:
             self.error = 'Number of zones in the graph ({0}) does not match the number of ' \
-                         'zones in your matrix_procedures ({1})'.format(self.results.zones, np.max(self.matrix.shape[:]))
+                         'zones in your matrix_procedures ({1})'.format(self.results.zones, self.matrix.zones)
 
         if self.error is not None:
             return False
@@ -464,6 +451,20 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.skim_list_table.setCellWidget(i, 0, my_widget)
 
     # All Matrix loading and assignables selection
+    def update_matrix_list(self):
+        self.table_matrix_list.clearContents()
+        self.table_matrix_list.clearContents()
+        self.table_matrix_list.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.table_matrix_list.setRowCount(len(self.matrices.keys()))
+
+        for i, data_name in enumerate(self.matrices.keys()):
+            self.table_matrix_list.setItem(i, 0, QTableWidgetItem(data_name))
+
+            cbox = QComboBox()
+            for idx in self.matrices[data_name].index_names:
+                cbox.addItem(str(idx))
+            self.table_matrix_list.setCellWidget(i, 1, cbox)
+
     def find_matrices(self):
         dlg2 = LoadMatrixDialog(self.iface)
         dlg2.show()
@@ -524,6 +525,20 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         cbox.setCurrentIndex(cbox.count()-1)
         cbox.currentIndexChanged.connect(self.changed_assignable_matrix)
         self.table_matrices_to_assign.setCellWidget(row_count, 0, cbox)
+
+    def consolidate_matrices_in_assignable(self):
+        list_names = list(self.matrices.keys())
+        if len(list_names):
+            zones = self.matrices[list_names[0]].zones
+            for m in list_names:
+                if zones != self.matrices[m].zones:
+                    self.error = 'Assignable matrix dimensions are not compatible'
+
+            if self.error is None:
+                self.matrix = AequilibraeMatrix()
+                self.matrix.create_empty(zones=zones, matrix_names=list_names)
+        else:
+            self.error = 'You need to have at least one matrix to assign'
 
 # Run preparation procedures
     def change_graph_settings(self):

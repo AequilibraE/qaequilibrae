@@ -21,6 +21,17 @@
 Original Algorithm for Shortest path (Dijkstra with a Fibonacci heap) was written by Jake Vanderplas <vanderplas@astro.washington.edu> under license: BSD, (C) 2012
  """
 
+"""
+TODO:
+LIST OF ALL THE THINGS WE NEED TO DO TO NOT HAVE TO HAVE nodes 1..n as CENTROIDS. ARBITRARY NUMBERING
+
+- Checks of weather the centroid we are computing path from is a centroid and/or exists in the graph
+- Re-write function **blocking_centroid_flows**
+- Re-write function **network_loading** on the part of loading flows to centroids
+
+"""
+
+
 cimport numpy as np
 cimport cython
 

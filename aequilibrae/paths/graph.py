@@ -19,6 +19,17 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
+"""
+TODO:
+LIST OF ALL THE THINGS WE NEED TO DO TO NOT HAVE TO HAVE nodes 1..n as CENTROIDS. ARBITRARY NUMBERING
+
+- Change logic of the information about centroids to include a list of centroids, not only the max number
+
+
+"""
+
+
+
 import numpy as np
 import os, csv
 import cPickle
@@ -62,6 +73,7 @@ class Graph:
 
         self.num_links = -1
         self.num_nodes = -1
+        self.num_zones = -1
         self.network = False  # This method will hold ALL information on the network
         self.graph = False  # This method will hold an array with ALL fields in the graph.
 
@@ -441,12 +453,16 @@ class Graph:
                 self.b_node = self.graph['b_node']
 
     # We set which are the fields that are going to be minimized in this file
+    # TODO: Change the call for all the uses on this function
     def set_graph(self, centroids=None, cost_field=None, skim_fields=False, block_centroid_flows=False):
         """
         :type self: object
         :type skim_fields: list of fields for skims
         """
+
+        # TODO: change check to an is_array
         if centroids is not None:
+            self.num_zones = centroids.shape[0]
             self.centroids = centroids
         self.block_centroid_flows = block_centroid_flows
 
