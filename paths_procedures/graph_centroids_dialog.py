@@ -31,7 +31,7 @@ sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/advanced_graph_details.ui'))
 
 
-class GraphAdvancedFeatures(QtGui.QDialog, FORM_CLASS):
+class GraphCentroids(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
         QtGui.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
         self.iface = iface
@@ -78,12 +78,13 @@ class GraphAdvancedFeatures(QtGui.QDialog, FORM_CLASS):
             self.centroids = []
             for feat in features:
                 self.centroids.append(feat.attributes()[idx])
-            self.centroids = np.array(self.centroids)
+            self.centroids = sorted(self.centroids)
+            self.centroids = np.array(self.centroids).astype(np.int64)
             if self.centroids.min() <= 0:
                 self.error = 'Centroid IDs need to be positive'
             else:
                 if np.bincount(self.centroids).max() > 1:
-                    self.error = 'Centroids field is not unique'
+                    self.error = 'Centroid IDs are not unique'
             self.num_zones = self.centroids.shape[0]
 
         else:

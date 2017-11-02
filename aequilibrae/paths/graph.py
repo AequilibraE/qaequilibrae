@@ -454,25 +454,43 @@ class Graph:
 
     # We set which are the fields that are going to be minimized in this file
     # TODO: Change the call for all the uses on this function
-    def set_graph(self, centroids=None, cost_field=None, skim_fields=False, block_centroid_flows=False):
+    def set_graph(self, centroids=None, cost_field=None, skim_fields=False, block_centroid_flows=None):
         """
-        :type self: object
+        :type centroids: Numpy array
+        :type cost_field
+        :type block_centroid_flows
         :type skim_fields: list of fields for skims
+        :type self: object
         """
 
         # TODO: change check to an is_array
         if centroids is not None:
-            self.num_zones = centroids.shape[0]
-            self.centroids = centroids
-        self.block_centroid_flows = block_centroid_flows
+            if isinstance(centroids, np.array):
+                if np.issubdtype(centroids, np.int64):
+                    self.num_zones = centroids.shape[0]
+                    self.centroids = centroids
+                else:
+                    return 'centroids needw to be an array of integers 64 bits'
+            else:
+                return 'centroids need to be a NumPy array of integers 64 bits'
+
+        if block_centroid_flows is not None:
+            if isinstance(block_centroid_flows, bool):
+                self.block_centroid_flows = block_centroid_flows
+            else:
+                return 'block_centroid_flows needs to be a boolean'
+
 
         if cost_field is not None:
-            self.cost_field = cost_field
-            if self.graph[cost_field].dtype == np.float64:
-                self.cost = self.graph[cost_field]
+            if cost_field in self.graph.dtype.names:
+                self.cost_field = cost_field
+                if self.graph[cost_field].dtype == np.float64:
+                    self.cost = self.graph[cost_field]
+                else:
+                    print 'Cost field with wrong type. Converting to float64'
+                    self.cost = self.graph[cost_field].astype(np.float64)
             else:
-                print 'Cost field with wrong type. Converting to float64'
-                self.cost = self.graph[cost_field].astype(np.float64)
+                return 'cost_field not available in the graph:', self.graph.dtype.names
 
         if self.cost is not None:
             if not skim_fields:
@@ -480,7 +498,12 @@ class Graph:
             else:
                 s = [self.cost_field]
                 for i in skim_fields:
-                    s.append(i)
+                    if s in self.graph.dtype.names:
+                        s.append(i)
+                    else:
+                        self.skim_fields = None
+                        self.skims = None
+                        return 'Skim', s, ' not available in the graph:', self.graph.dtype.names
                 skim_fields = s
         else:
             if skim_fields:

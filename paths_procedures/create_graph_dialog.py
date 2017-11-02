@@ -36,7 +36,7 @@ from ..common_tools.global_parameters import *
 from ..common_tools import GetOutputFileName, ReportDialog
 
 from create_graph_procedure import GraphCreation
-from graph_advanced_features import GraphAdvancedFeatures
+from graph_centroids_dialog import GraphCentroids
 
 from qgis.gui import QgsMapLayerProxyModel
 
@@ -57,6 +57,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         self.cost_field = None
         self.link_id = None
         self.direction_field = None
+        self.num_zones = -1
 
         self.progressbar0.setVisible(False)
         self.progress_label0.setVisible(False)
@@ -182,7 +183,6 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             q.toggled.connect(self.handleItemClicked)
             chk2 = centralized_widget(q)
 
-
             self.fields_lst.setCellWidget(self.fields, 2, chk)
             self.fields_lst.setCellWidget(self.fields, 3, chk2)
 
@@ -252,12 +252,12 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             qradio.blockSignals(False)
 
     def call_advanced_features(self):
-        dlg2 = GraphAdvancedFeatures(self.iface)
+        dlg2 = GraphCentroids(self.iface)
         dlg2.show()
         dlg2.exec_()
         self.centroids = dlg2.centroids
         self.block_through_centroids = dlg2.block_through_centroids
-        self.selected_only = dlg2.selected_only
+        self.num_zones = dlg2.num_zones
 
     def run_thread(self):
 
