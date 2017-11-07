@@ -37,7 +37,6 @@ from datetime import datetime
 import uuid
 from ..__version__ import version as VERSION
 
-
 '''description: Description of the graph (OPTIONAL)
     num_links: Number of directed links in the graph
     num_nodes: number of nodes in the graph
@@ -363,6 +362,7 @@ class Graph:
         self.ids = self.graph['id']
         self.b_node = self.graph['b_node']
 
+# TODO: Check why is there an error with the cost field is not float
     def prepare_graph(self):
         if not self.network_ok:
             raise ValueError('Network not yet properly loaded')
@@ -456,21 +456,27 @@ class Graph:
     # TODO: Change the call for all the uses on this function
     def set_graph(self, centroids=None, cost_field=None, skim_fields=False, block_centroid_flows=None):
         """
-        :type centroids: Numpy array
+        :type centroids: Numpy arrayof centroid IDs. Mandatory type Int64, unique and positive
         :type cost_field
-        :type block_centroid_flows
+        :type block_cen troid_flows
         :type skim_fields: list of fields for skims
         :type self: object
         """
 
         # TODO: change check to an is_array
         if centroids is not None:
-            if isinstance(centroids, np.array):
-                if np.issubdtype(centroids, np.int64):
+            if isinstance(centroids, np.ndarray):
+                if np.issubdtype(centroids.dtype, np.integer):
+                    if centroids.min() <= 0:
+                        return 'Centroid IDs need to be positive'
+                    else:
+                        if np.bincount(centroids).max() > 1:
+                            return 'Centroid IDs are not unique'
+
                     self.num_zones = centroids.shape[0]
                     self.centroids = centroids
                 else:
-                    return 'centroids needw to be an array of integers 64 bits'
+                    return 'centroids need to be an array of integers 64 bits'
             else:
                 return 'centroids need to be a NumPy array of integers 64 bits'
 

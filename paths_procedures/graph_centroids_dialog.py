@@ -41,7 +41,6 @@ class GraphCentroids(QtGui.QDialog, FORM_CLASS):
         self.block_through_centroids = False
         self.centroids = None
         self.error = None
-        self.layer = None
         self.num_zones = -1
 
         self.chb_set_centroids.stateChanged.connect(self.check_centroids_option)
@@ -60,34 +59,49 @@ class GraphCentroids(QtGui.QDialog, FORM_CLASS):
 
     def changed_layer(self):
         self.cob_centroid_id.clear()
-        if self.cob_centroids_layer.currentIndex() > 0:
+        if self.cob_centroids_layer.currentLayer() is not None:
             for field in self.cob_centroids_layer.currentLayer().pendingFields().toList():
                 if field.type() in integer_types:
                     self.cob_centroid_id.addItem(field.name())
 
     def exit_procedure(self):
-        if self.chb_set_centroids.isChecked() and self.cob_centroid_id.currentIndex() > 0:
-            self.block_through_centroids = self.path_through_centroids.isChecked()
+        if self.chb_set_centroids.isChecked() and self.cob_centroid_id.currentIndex() >= 0:
+            self.block_through_centroids = self.chb_path_through_centroids.isChecked()
 
-            if self.use_link_selection.isChecked():
-                features = self.layer.selectedFeatures()
+            if self.chb_use_node_selection.isChecked():
+                features = self.cob_centroids_layer.currentLayer().selectedFeatures()
+                if not features:
+                    self.error = "No centroids selected"
             else:
-                features = self.layer.getFeatures()
+                features = self.cob_centroids_layer.currentLayer().getFeatures()
 
-            idx = self.layer.fieldNameIndex(self.cob_centroid_id.currentText())
-            self.centroids = []
-            for feat in features:
-                self.centroids.append(feat.attributes()[idx])
-            self.centroids = sorted(self.centroids)
-            self.centroids = np.array(self.centroids).astype(np.int64)
-            if self.centroids.min() <= 0:
-                self.error = 'Centroid IDs need to be positive'
+            if self.error is None:
+                idx = self.cob_centroids_layer.currentLayer().fieldNameIndex(self.cob_centroid_id.currentText())
+                centroids = []
+                for feat in features:
+                    centroids.append(int(feat.attributes()[idx]))
+                centroids = sorted(centroids)
+                self.centroids = np.array(centroids).astype(np.int64)
+
+                if self.centroids.min() <= 0:
+                    self.error = 'Centroid IDs need to be positive'
+                else:
+                    if np.bincount(self.centroids).max() > 1:
+                        self.error = 'Centroid IDs are not unique'
+                self.num_zones = self.centroids.shape[0]
             else:
-                if np.bincount(self.centroids).max() > 1:
-                    self.error = 'Centroid IDs are not unique'
-            self.num_zones = self.centroids.shape[0]
-
+                self.centroids = None
+                self.num_zones = -1
+            self.close()
         else:
-            self.centroids = None
-            self.num_zones = -1
-        self.close()
+            pass
+
+''' To get from rules
+layer = QgsMapLayerRegistry.instance().mapLayersByName('Nodes')[0]
+renderer = layer.rendererV2()
+renderer_type = renderer.type()
+groups = renderer.legendSymbolItemsV2()
+
+if renderer_type == 'RuleRenderer':
+  
+  '''

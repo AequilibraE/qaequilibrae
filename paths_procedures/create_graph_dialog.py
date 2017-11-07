@@ -18,18 +18,12 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-
-import sys
 from functools import partial
-
-import os
-import numpy as np
-import qgis
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from qgis.core import *
 from PyQt4 import uic
+from qgis.gui import QgsMapLayerProxyModel
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
@@ -37,8 +31,6 @@ from ..common_tools import GetOutputFileName, ReportDialog
 
 from create_graph_procedure import GraphCreation
 from graph_centroids_dialog import GraphCentroids
-
-from qgis.gui import QgsMapLayerProxyModel
 
 #sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_Create_Graph.ui'))
@@ -287,7 +279,6 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.worker_thread.error,
                                                       level=1)
         else:
-
             if self.centroids is None:
                 self.worker_thread.graph.set_graph(cost_field=self.cost_field,
                                                    block_centroid_flows=self.block_through_centroids)
@@ -299,6 +290,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Finished. ", 'Graph saved successfully', level=3)
 
         self.exit_procedure()
+
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
@@ -393,7 +385,6 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
 
             self.lbl_funding1.setVisible(False)
             self.lbl_funding2.setVisible(False)
-
             self.worker_thread = GraphCreation(qgis.utils.iface.mainWindow(), self.layer, self.link_id, self.direction_field, self.fields_to_add,
                                                self.selected_only)
             self.run_thread()
