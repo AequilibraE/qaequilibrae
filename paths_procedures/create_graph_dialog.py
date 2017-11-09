@@ -280,11 +280,14 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
                                                       level=1)
         else:
             if self.centroids is None:
-                self.worker_thread.graph.set_graph(cost_field=self.cost_field,
-                                                   block_centroid_flows=self.block_through_centroids)
+                error = self.worker_thread.graph.set_graph(cost_field=self.cost_field,
+                                                   block_centroid_flows=self.block_through_centroids,
+                                                   raise_errors=False)
             else:
-                self.worker_thread.graph.set_graph(centroids=self.centroids, cost_field=self.cost_field,
-                                                   block_centroid_flows=self.block_through_centroids)
+                error = self.worker_thread.graph.set_graph(centroids=self.centroids, cost_field=self.cost_field,
+                                                   block_centroid_flows=self.block_through_centroids,
+                                                   raise_errors=False)
+
 
             self.worker_thread.graph.save_to_disk(self.output)
             qgis.utils.iface.messageBar().pushMessage("Finished. ", 'Graph saved successfully', level=3)
@@ -292,6 +295,11 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         self.exit_procedure()
 
         if self.worker_thread.report:
+            if not error:
+                self.worker_thread.report.append('\n\n\n')
+                self.worker_thread.report.append('##########   EXCEPTION:    ##########')
+                self.worker_thread.report.append(error)
+
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
             dlg2.exec_()

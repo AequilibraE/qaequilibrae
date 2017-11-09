@@ -25,7 +25,7 @@ class SkimResults:
     def prepare(self, graph):
 
         self.nodes = graph.num_nodes + 1
-        self.zones = graph.centroids + 1
+        self.zones = graph.num_zones
         self.links = graph.num_links + 1
         self.num_skims = len(graph.skim_fields)
 

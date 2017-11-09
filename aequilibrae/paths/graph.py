@@ -88,7 +88,7 @@ class Graph:
         self.block_centroid_flows = False
         self.penalty_through_centroids = np.inf
 
-        self.centroids = 0  # ID of the highest node in the network that is a centroid
+        self.centroids = None  # NumPy array of centroid IDs
 
         self.status = 'NO network loaded'
         self.network_ok = False
@@ -454,37 +454,43 @@ class Graph:
 
     # We set which are the fields that are going to be minimized in this file
     # TODO: Change the call for all the uses on this function
-    def set_graph(self, centroids=None, cost_field=None, skim_fields=False, block_centroid_flows=None):
+    def set_graph(self, centroids=None, cost_field=None, skim_fields=False, block_centroid_flows=None,
+                        raise_errors=True):
         """
-        :type centroids: Numpy arrayof centroid IDs. Mandatory type Int64, unique and positive
+        :type centroids: Numpy array of centroid IDs. Mandatory type Int64, unique and positive
         :type cost_field
-        :type block_cen troid_flows
+        :type block_centroid_flows
         :type skim_fields: list of fields for skims
         :type self: object
         """
 
-        # TODO: change check to an is_array
+        def return_exception(msg):
+            if raise_errors:
+                raise ValueError(msg)
+            else:
+                return msg
+
         if centroids is not None:
             if isinstance(centroids, np.ndarray):
                 if np.issubdtype(centroids.dtype, np.integer):
                     if centroids.min() <= 0:
-                        return 'Centroid IDs need to be positive'
+                        return_exception('Centroid IDs need to be positive')
                     else:
                         if np.bincount(centroids).max() > 1:
-                            return 'Centroid IDs are not unique'
+                            return_exception('Centroid IDs are not unique')
 
                     self.num_zones = centroids.shape[0]
                     self.centroids = centroids
                 else:
-                    return 'centroids need to be an array of integers 64 bits'
+                    return_exception('centroids need to be an array of integers 64 bits')
             else:
-                return 'centroids need to be a NumPy array of integers 64 bits'
+                return_exception('centroids need to be a NumPy array of integers 64 bits')
 
         if block_centroid_flows is not None:
             if isinstance(block_centroid_flows, bool):
                 self.block_centroid_flows = block_centroid_flows
             else:
-                return 'block_centroid_flows needs to be a boolean'
+                return_exception('block_centroid_flows needs to be a boolean')
 
 
         if cost_field is not None:
@@ -493,10 +499,10 @@ class Graph:
                 if self.graph[cost_field].dtype == np.float64:
                     self.cost = self.graph[cost_field]
                 else:
-                    print 'Cost field with wrong type. Converting to float64'
+                    return_exception('Cost field with wrong type. Converting to float64')
                     self.cost = self.graph[cost_field].astype(np.float64)
             else:
-                return 'cost_field not available in the graph:', self.graph.dtype.names
+                return_exception('cost_field not available in the graph:' + str(self.graph.dtype.names))
 
         if self.cost is not None:
             if not skim_fields:
@@ -509,11 +515,11 @@ class Graph:
                     else:
                         self.skim_fields = None
                         self.skims = None
-                        return 'Skim', s, ' not available in the graph:', self.graph.dtype.names
+                        return_exception('Skim', s, ' not available in the graph:', self.graph.dtype.names)
                 skim_fields = s
         else:
             if skim_fields:
-                print 'Before setting skims, you need to set the cost field'
+                return_exception('Before setting skims, you need to set the cost field')
 
         t = False
         for i in skim_fields:
@@ -531,17 +537,21 @@ class Graph:
                 self.skims[:, i] = self.graph[j]
         self.skim_fields = skim_fields
 
+        return True
+
     # Procedure to pickle graph and save to disk
     def save_to_disk(self, filename):
         mygraph = {}
         mygraph['description'] = self.description
         mygraph['num_links'] = self.num_links
         mygraph['num_nodes'] = self.num_nodes
+        mygraph['num_zones'] = self.num_zones
         mygraph['network'] = self.network
         mygraph['graph'] = self.graph
         mygraph['fs'] = self.fs
         mygraph['b_node'] = self.b_node
         mygraph['cost'] = self.cost
+        mygraph['cost_field'] = self.cost_field
         mygraph['skims'] = self.skims
         mygraph['ids'] = self.ids
         mygraph['block_centroid_flows'] = self.block_centroid_flows
@@ -559,11 +569,13 @@ class Graph:
         self.description = mygraph['description']
         self.num_links = mygraph['num_links']
         self.num_nodes = mygraph['num_nodes']
+        self.num_zones = mygraph['num_zones']
         self.network = mygraph['network']
         self.graph = mygraph['graph']
         self.fs = mygraph['fs']
         self.b_node = mygraph['b_node']
         self.cost = mygraph['cost']
+        self.cost_field = mygraph['cost_field']
         self.skims = mygraph['skims']
         self.ids = mygraph['ids']
         self.block_centroid_flows = mygraph['block_centroid_flows']

@@ -1,25 +1,31 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis projectname="" version="2.18.12">
+<qgis projectname="" version="2.18.14">
   <title></title>
   <autotransaction active="0"/>
   <evaluateDefaultValues active="0"/>
   <layer-tree-group expanded="1" checked="Qt::Checked" name="">
     <customproperties/>
-    <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Final_Network20170829180551114" source="/media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/AequilibraE/Example Data/CharterTowers/Final_Network.shp" name="Final_Network">
-      <customproperties/>
+    <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="Final_Network20171108074259391" source="/home/pedro/.qgis2/python/plugins/AequilibraE/tests/data/Final_Network.shp" name="Final_Network">
+      <customproperties>
+        <property key="legend/expressionFilter" value=""/>
+        <property key="legend/expressionFilterEnabled" value="false"/>
+      </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="all_nodes20170829180546262" source="/media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/AequilibraE/Example Data/CharterTowers/all_nodes.shp" name="all_nodes">
-      <customproperties/>
+    <layer-tree-layer expanded="1" providerKey="ogr" checked="Qt::Checked" id="all_nodes20171108074502583" source="/home/pedro/.qgis2/python/plugins/AequilibraE/tests/data/all_nodes.shp" name="all_nodes">
+      <customproperties>
+        <property key="legend/expressionFilter" value=""/>
+        <property key="legend/expressionFilterEnabled" value="true"/>
+      </customproperties>
     </layer-tree-layer>
   </layer-tree-group>
   <relations/>
   <mapcanvas>
     <units>degrees</units>
     <extent>
-      <xmin>146.21051574957118646</xmin>
-      <ymin>-20.10861764984357336</ymin>
-      <xmax>146.32141464956976051</xmax>
-      <ymax>-20.04404684984384488</ymax>
+      <xmin>146.2856424765146528</xmin>
+      <ymin>-20.06957738649882472</ymin>
+      <xmax>146.29512388138155643</xmax>
+      <ymax>-20.05910621509862679</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>0</projections>
@@ -40,25 +46,31 @@
   </mapcanvas>
   <layer-tree-canvas>
     <custom-order enabled="0">
-      <item>all_nodes20170829180546262</item>
-      <item>Final_Network20170829180551114</item>
+      <item>Final_Network20171108074259391</item>
+      <item>all_nodes20171108074502583</item>
     </custom-order>
   </layer-tree-canvas>
   <legend updateDrawingOrder="true">
     <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="Final_Network" showFeatureCount="0">
       <filegroup open="true" hidden="false">
-        <legendlayerfile isInOverview="0" layerid="Final_Network20170829180551114" visible="1"/>
+        <legendlayerfile isInOverview="0" layerid="Final_Network20171108074259391" visible="1"/>
       </filegroup>
     </legendlayer>
     <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="all_nodes" showFeatureCount="0">
       <filegroup open="true" hidden="false">
-        <legendlayerfile isInOverview="0" layerid="all_nodes20170829180546262" visible="1"/>
+        <legendlayerfile isInOverview="0" layerid="all_nodes20171108074502583" visible="1"/>
       </filegroup>
     </legendlayer>
   </legend>
   <projectlayers>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
-      <id>Final_Network20170829180551114</id>
+      <extent>
+        <xmin>146.24489299999999048</xmin>
+        <ymin>-20.09922899999995849</ymin>
+        <xmax>146.29431212371096649</xmax>
+        <ymax>-20.04465100000004085</ymax>
+      </extent>
+      <id>Final_Network20171108074259391</id>
       <datasource>./Final_Network.shp</datasource>
       <keywordList>
         <value></value>
@@ -106,6 +118,12 @@
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
         <edittype widgetv2type="TextEdit" name="dir">
+          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+        </edittype>
+        <edittype widgetv2type="TextEdit" name="link_id">
+          <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
+        </edittype>
+        <edittype widgetv2type="TextEdit" name="distance">
           <widgetv2config IsMultiline="0" fieldEditable="1" constraint="" UseHtml="0" labelOnTop="0" constraintDescription="" notNull="0"/>
         </edittype>
       </edittypes>
@@ -157,7 +175,6 @@
       </renderer-v2>
       <labeling type="simple"/>
       <customproperties>
-        <property key="embeddedWidgets/count" value="0"/>
         <property key="labeling" value="pal"/>
         <property key="labeling/addDirectionSymbol" value="false"/>
         <property key="labeling/angleOffset" value="0"/>
@@ -353,7 +370,7 @@
         </symbol>
       </SingleCategoryDiagramRenderer>
       <DiagramLayerSettings yPosColumn="-1" showColumn="-1" linePlacementFlags="10" placement="2" dist="0" xPosColumn="-1" priority="0" obstacle="0" zIndex="0" showAll="1"/>
-      <annotationform>.</annotationform>
+      <annotationform>../../../../../..</annotationform>
       <aliases>
         <alias field="Length" index="0" name=""/>
         <alias field="Cap_AB" index="1" name=""/>
@@ -363,6 +380,8 @@
         <alias field="A_NODE" index="5" name=""/>
         <alias field="B_NODE" index="6" name=""/>
         <alias field="dir" index="7" name=""/>
+        <alias field="link_id" index="8" name=""/>
+        <alias field="distance" index="9" name=""/>
       </aliases>
       <excludeAttributesWMS/>
       <excludeAttributesWFS/>
@@ -380,10 +399,10 @@
           <column width="-1" hidden="1" type="actions"/>
         </columns>
       </attributetableconfig>
-      <editform>.</editform>
+      <editform>../../../../../..</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
-      <editforminitfilepath>.</editforminitfilepath>
+      <editforminitfilepath>../../../../../..</editforminitfilepath>
       <editforminitcode><![CDATA[# -*- coding: utf-8 -*-
 """
 QGIS forms can have a Python function that is called when the form is
@@ -417,17 +436,13 @@ def my_form_open(dialog, layer, feature):
         <default field="A_NODE" expression=""/>
         <default field="B_NODE" expression=""/>
         <default field="dir" expression=""/>
+        <default field="link_id" expression=""/>
+        <default field="distance" expression=""/>
       </defaults>
       <previewExpression>COALESCE( "Length", '&lt;NULL>' )</previewExpression>
     </maplayer>
     <maplayer simplifyAlgorithm="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="0" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" readOnly="0" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
-      <extent>
-        <xmin>146.24489299999999048</xmin>
-        <ymin>-20.10614699999999999</ymin>
-        <xmax>146.35051100000001156</xmax>
-        <ymax>-20.04465100000000177</ymax>
-      </extent>
-      <id>all_nodes20170829180546262</id>
+      <id>all_nodes20171108074502583</id>
       <datasource>./all_nodes.shp</datasource>
       <keywordList>
         <value></value>
@@ -531,7 +546,6 @@ def my_form_open(dialog, layer, feature):
       </renderer-v2>
       <labeling type="simple"/>
       <customproperties>
-        <property key="embeddedWidgets/count" value="0"/>
         <property key="labeling" value="pal"/>
         <property key="labeling/addDirectionSymbol" value="false"/>
         <property key="labeling/angleOffset" value="0"/>
@@ -541,7 +555,7 @@ def my_form_open(dialog, layer, feature):
         <property key="labeling/bufferColorB" value="255"/>
         <property key="labeling/bufferColorG" value="255"/>
         <property key="labeling/bufferColorR" value="255"/>
-        <property key="labeling/bufferDraw" value="false"/>
+        <property key="labeling/bufferDraw" value="true"/>
         <property key="labeling/bufferJoinStyle" value="128"/>
         <property key="labeling/bufferNoFill" value="false"/>
         <property key="labeling/bufferSize" value="1"/>
@@ -555,13 +569,13 @@ def my_form_open(dialog, layer, feature):
         <property key="labeling/dist" value="0"/>
         <property key="labeling/distInMapUnits" value="false"/>
         <property key="labeling/distMapUnitScale" value="0,0,0,0,0,0"/>
-        <property key="labeling/drawLabels" value="false"/>
-        <property key="labeling/enabled" value="false"/>
-        <property key="labeling/fieldName" value=""/>
+        <property key="labeling/drawLabels" value="true"/>
+        <property key="labeling/enabled" value="true"/>
+        <property key="labeling/fieldName" value="if (ID&lt;100, ID, '')"/>
         <property key="labeling/fitInPolygonOnly" value="false"/>
         <property key="labeling/fontCapitals" value="0"/>
         <property key="labeling/fontFamily" value="Noto Sans"/>
-        <property key="labeling/fontItalic" value="false"/>
+        <property key="labeling/fontItalic" value="true"/>
         <property key="labeling/fontLetterSpacing" value="0"/>
         <property key="labeling/fontLimitPixelSize" value="false"/>
         <property key="labeling/fontMaxPixelSize" value="10000"/>
@@ -571,7 +585,7 @@ def my_form_open(dialog, layer, feature):
         <property key="labeling/fontSizeMapUnitScale" value="0,0,0,0,0,0"/>
         <property key="labeling/fontStrikeout" value="false"/>
         <property key="labeling/fontUnderline" value="false"/>
-        <property key="labeling/fontWeight" value="50"/>
+        <property key="labeling/fontWeight" value="75"/>
         <property key="labeling/fontWordSpacing" value="0"/>
         <property key="labeling/formatNumbers" value="false"/>
         <property key="labeling/isExpression" value="true"/>
@@ -727,23 +741,23 @@ def my_form_open(dialog, layer, feature):
         </symbol>
       </SingleCategoryDiagramRenderer>
       <DiagramLayerSettings yPosColumn="-1" showColumn="-1" linePlacementFlags="10" placement="0" dist="0" xPosColumn="-1" priority="0" obstacle="0" zIndex="0" showAll="1"/>
-      <annotationform>.</annotationform>
+      <annotationform>../../../../../..</annotationform>
       <aliases>
         <alias field="ID" index="0" name=""/>
       </aliases>
       <excludeAttributesWMS/>
       <excludeAttributesWFS/>
       <attributeactions default="-1"/>
-      <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
+      <attributetableconfig actionWidgetStyle="dropDown" sortExpression="&quot;ID&quot;" sortOrder="0">
         <columns>
           <column width="-1" hidden="0" type="field" name="ID"/>
           <column width="-1" hidden="1" type="actions"/>
         </columns>
       </attributetableconfig>
-      <editform>.</editform>
+      <editform>../../../../../..</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
-      <editforminitfilepath>.</editforminitfilepath>
+      <editforminitfilepath>../../../../../..</editforminitfilepath>
       <editforminitcode><![CDATA[# -*- coding: utf-8 -*-
 """
 QGIS forms can have a Python function that is called when the form is
@@ -797,16 +811,16 @@ def my_form_open(dialog, layer, feature):
       <CanvasColorBluePart type="int">255</CanvasColorBluePart>
     </Gui>
     <Digitizing>
-      <DefaultSnapToleranceUnit type="int">1</DefaultSnapToleranceUnit>
+      <DefaultSnapToleranceUnit type="int">2</DefaultSnapToleranceUnit>
       <LayerSnappingList type="QStringList">
-        <value>Final_Network20170829180551114</value>
-        <value>all_nodes20170829180546262</value>
+        <value>Final_Network20171108074259391</value>
+        <value>all_nodes20171108074502583</value>
       </LayerSnappingList>
       <LayerSnappingEnabledList type="QStringList">
         <value>disabled</value>
         <value>disabled</value>
       </LayerSnappingEnabledList>
-      <SnappingMode type="QString">all_layers</SnappingMode>
+      <SnappingMode type="QString">current_layer</SnappingMode>
       <AvoidIntersectionsList type="QStringList"/>
       <LayerSnappingToleranceUnitList type="QStringList">
         <value>2</value>
@@ -816,8 +830,8 @@ def my_form_open(dialog, layer, feature):
         <value>to_vertex_and_segment</value>
         <value>to_vertex_and_segment</value>
       </LayerSnapToList>
-      <DefaultSnapType type="QString">to vertex</DefaultSnapType>
-      <DefaultSnapTolerance type="double">30</DefaultSnapTolerance>
+      <DefaultSnapType type="QString">off</DefaultSnapType>
+      <DefaultSnapTolerance type="double">0</DefaultSnapTolerance>
       <LayerSnappingToleranceList type="QStringList">
         <value>0.000000</value>
         <value>0.000000</value>

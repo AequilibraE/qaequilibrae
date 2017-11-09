@@ -5,6 +5,7 @@ import numpy as np
 from aequilibrae.paths import Graph
 from os.path import join
 import sys
+from parameters_test import centroids
 
 # Adds the folder with the data to the path and collects the paths to the files
 lib_path = os.path.abspath(os.path.join('..', '..'))
@@ -12,12 +13,13 @@ sys.path.append(lib_path)
 from data import path_test, test_graph, test_network
 
 
-
 class TestGraph(TestCase):
+
     def test_create_from_geography(self):
         self.graph = Graph()
         self.graph.create_from_geography(
             test_network, 'link_id', 'dir', 'distance', skim_fields = [], anode="A_NODE", bnode="B_NODE")
+        self.graph.set_graph(centroids=centroids, cost_field='distance', block_centroid_flows=True)
 
     def test_load_network_from_csv(self):
         pass
@@ -36,8 +38,8 @@ class TestGraph(TestCase):
 
     def test_set_graph(self):
         self.test_prepare_graph()
-        self.graph.set_graph(centroids=30, cost_field='distance',block_centroid_flows=True)
-        if self.graph.centroids != 30:
+        self.graph.set_graph(centroids=centroids, cost_field='distance',block_centroid_flows=True)
+        if self.graph.num_zones != centroids.shape[0]:
             self.fail('Number of centroids not properly set')
         if self.graph.num_links != 222:
             self.fail('Number of links not properly set')
@@ -62,6 +64,7 @@ class TestGraph(TestCase):
                        ('b_nodes', new_graph.b_node, reference_graph.b_node),
                        ('Forward-Star', new_graph.fs, reference_graph.fs),
                        ('cost', new_graph.cost, reference_graph.cost),
+                       ('centroids', new_graph.centroids, reference_graph.centroids),
                        ('skims', new_graph.skims, reference_graph.skims),
                        ('link ids', new_graph.ids, reference_graph.ids),
                        ('Network', new_graph.network, reference_graph.network)]
@@ -72,7 +75,7 @@ class TestGraph(TestCase):
 
         comparisons = [('nodes', new_graph.num_nodes, reference_graph.num_nodes),
                        ('links', new_graph.num_links, reference_graph.num_links),
-                       ('centroids', new_graph.centroids, reference_graph.centroids),
+                       ('zones', new_graph.num_zones, reference_graph.num_zones),
                        ('block through centroids', new_graph.block_centroid_flows, reference_graph.block_centroid_flows),
                        ('Graph ID', new_graph.__id__, self.graph_id),
                        ('Graph Version', new_graph.__version__, self.graph_version)]

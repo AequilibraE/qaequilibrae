@@ -11,6 +11,7 @@ lib_path = os.path.abspath(os.path.join('..', '..'))
 sys.path.append(lib_path)
 from data import path_test, test_graph
 
+from parameters_test import centroids
 
 
 class TestNetwork_skimming(TestCase):
@@ -18,7 +19,7 @@ class TestNetwork_skimming(TestCase):
         # graph
         g = Graph()
         g.load_from_disk(test_graph)
-        g.set_graph(centroids=26, cost_field='distance', skim_fields=None)
+        g.set_graph(centroids=centroids, cost_field='distance', skim_fields=None)
         # None implies that only the cost field will be skimmed
 
         # skimming results
