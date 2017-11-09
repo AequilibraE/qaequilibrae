@@ -99,7 +99,7 @@ class DesireLinesProcedure(WorkerThread):
                               QgsField("direct", QVariant.Int),
                               QgsField("length",  QVariant.Double),
                               QgsField("ab_flow",  QVariant.Double),
-                              QgsField("ab_flow",  QVariant.Double),
+                              QgsField("ba_flow",  QVariant.Double),
                               QgsField("tot_flow",  QVariant.Double)])
             desireline_layer.updateFields()
 
