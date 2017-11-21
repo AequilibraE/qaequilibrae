@@ -33,7 +33,8 @@ from aequilibrae.paths import Graph
 from ..common_tools import WorkerThread, reporter, logger
 
 class GraphCreation(WorkerThread):
-    def __init__(self, parentThread, net_layer, link_id, direction_field, fields_to_add, selected_only):
+    def __init__(self, parentThread, net_layer, link_id, direction_field,
+                       fields_to_add, selected_only, centroids):
         WorkerThread.__init__(self, parentThread)
         self.net_layer = net_layer
         self.link_id = link_id
@@ -42,6 +43,7 @@ class GraphCreation(WorkerThread):
         self.selected_only = selected_only
         self.features = None
         self.error = None
+        self.centroids = centroids
         self.report = []
         self.feat_count = 0
 
@@ -77,8 +79,7 @@ class GraphCreation(WorkerThread):
             self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.feat_count)
 
             self.graph = Graph()
-
-            all_types = [np.int32, np.int32, np.int32, np.int8]
+            all_types = [self.graph._Graph__integer_type, self.graph._Graph__integer_type, self.graph._Graph__integer_type, np.int8]
             all_titles = [reserved_fields.link_id, reserved_fields.a_node, reserved_fields.b_node, reserved_fields.direction]
 
             for name_field, values in self.fields_to_add.iteritems():
@@ -137,7 +138,7 @@ class GraphCreation(WorkerThread):
                 self.graph.type_loaded = 'NETWORK'
                 self.graph.status = 'OK'
                 self.graph.network_ok = True
-                self.graph.prepare_graph()
+                self.graph.prepare_graph(self.centroids)
                 self.graph.__source__ = None
                 self.graph.__field_name__ = None
                 self.graph.__layer_name__ = None

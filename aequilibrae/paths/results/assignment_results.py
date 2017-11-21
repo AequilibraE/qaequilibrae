@@ -43,6 +43,8 @@ class AssignmentResults:
         self.zones = -1
         self.links = -1
         self.__graph_id__ = None
+        self.__float_type = None
+        self.__integer_type = None
 
         self.lids = None
         self.direcs = None
@@ -55,6 +57,10 @@ class AssignmentResults:
         :param matrix: AequilibraE Matrix properly set for computation using matrix.computational_view([matrix list])
         :return:
         """
+
+        self.__float_type = graph.__float_type
+        self.__integer_type = graph.__integer_type
+
         if matrix.view_names is None:
             raise ('Please set the matrix_procedures computational view')
         else:
@@ -85,9 +91,9 @@ class AssignmentResults:
             print 'Exception: Assignment results object was not yet prepared/initialized'
 
     def __redim(self):
-        self.link_loads = np.zeros((self.links, self.classes['number']), np.float64)
-        self.skims = np.zeros((self.zones, self.zones, self.num_skims), np.float64)
-        self.no_path = np.zeros((self.zones, self.zones), dtype=np.int32)
+        self.link_loads = np.zeros((self.links, self.classes['number']), self.__float_type)
+        self.skims = np.zeros((self.zones, self.zones, self.num_skims), self.__float_type)
+        self.no_path = np.zeros((self.zones, self.zones), dtype=self.__integer_type)
 
         self.reset()
 
@@ -136,6 +142,7 @@ class AssignmentResults:
                 if path_result[-3:].lower() != 'aep':
                     path_result += '.aep'
 
+                # This is the only place where we keep 32bits, as going 64 bits would explode the file size
                 if self.nodes > 0 and self.zones > 0:
                     a = open_memmap(path_result, dtype=np.int32, mode='w+', shape=(self.zones,self.nodes, 2))
 
@@ -217,7 +224,7 @@ class AssignmentResults:
 
             path_file = path_file = self.path_file['results']
             for i in range(self.zones):
-                data = np.zeros((self.nodes, 3), np.int64)
+                data = np.zeros((self.nodes, 3), self.__float_type)
                 data[:,0].fill(i)
                 data[:,1] = path_file[i,:,0]
                 data[:,2] = path_file[i,:,1]

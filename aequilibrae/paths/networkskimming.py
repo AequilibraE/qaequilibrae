@@ -50,7 +50,7 @@ def network_skimming(graph, results, origins=None):
     aux_res.prepare(graph, results)
 
     if origins is None:
-        origins = [i for i in range(results.zones)]
+        origins = list(graph.centroids)
     # catch errors
     if graph.cost_field is None:
         raise ValueError('The graph was not set for computation. Use graph.set_graph')

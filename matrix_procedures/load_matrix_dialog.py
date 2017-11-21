@@ -44,7 +44,7 @@ except:
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_matrix_loader.ui'))
 
-
+# TODO: Add possibility to add a centroid list to guarantee the match between matrix index and graph
 class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface, **kwargs):
         QDialog.__init__(self)

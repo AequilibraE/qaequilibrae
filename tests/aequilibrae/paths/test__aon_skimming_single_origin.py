@@ -22,7 +22,8 @@ class TestSkimming_single_origin(TestCase):
         # graph
         g = Graph()
         g.load_from_disk(test_graph)
-        g.set_graph(centroids=centroids, cost_field='distance', skim_fields=None)
+        g.set_graph(cost_field='distance', skim_fields=None)
+        # g.block_centroid_flows = False
         # None implies that only the cost field will be skimmed
 
         # skimming results

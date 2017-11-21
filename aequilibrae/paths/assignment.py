@@ -44,7 +44,6 @@ except:
 def main():
     pass
 
-
 def all_or_nothing(matrix, graph, results):
     aux_res = MultiThreadedAoN()
     aux_res.prepare(graph, results)
@@ -52,11 +51,17 @@ def all_or_nothing(matrix, graph, results):
     # catch errors
     if results.__graph_id__ is None:
         raise ValueError('The results object was not prepared. Use results.prepare(graph)')
+
     elif results.__graph_id__ != graph.__id__:
         raise ValueError('The results object was prepared for a different graph')
+
     elif matrix.matrix_view is None:
         raise ValueError('Matrix was not prepared for assignment. '
                          'Please create a matrix_procedures view with all classes you want to assign')
+
+    elif not np.array_equal(matrix.index, graph.centroids):
+        raise ValueError('Matrix and graph do not have compatible set of centroids.')
+
     else:
         mat = matrix.matrix_view
         pool = ThreadPool(results.cores)

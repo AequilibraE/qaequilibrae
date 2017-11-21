@@ -185,7 +185,6 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                     matrix_cores_to_use.append(mat)
 
         if len(matrix_cores_to_use) > 0:
-            logger(matrix_cores_to_use)
             self.matrix.computational_view(matrix_cores_to_use)
         else:
             return False

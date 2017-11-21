@@ -18,8 +18,9 @@ class TestGraph(TestCase):
     def test_create_from_geography(self):
         self.graph = Graph()
         self.graph.create_from_geography(
-            test_network, 'link_id', 'dir', 'distance', skim_fields = [], anode="A_NODE", bnode="B_NODE")
-        self.graph.set_graph(centroids=centroids, cost_field='distance', block_centroid_flows=True)
+            test_network, 'link_id', 'dir', 'distance', centroids=centroids, skim_fields = [], anode="A_NODE",
+            bnode="B_NODE")
+        self.graph.set_graph(cost_field='distance', block_centroid_flows=True)
 
     def test_load_network_from_csv(self):
         pass
@@ -29,7 +30,7 @@ class TestGraph(TestCase):
 
     def test_prepare_graph(self):
         self.test_create_from_geography()
-        self.graph.prepare_graph()
+        self.graph.prepare_graph(centroids)
 
         reference_graph = Graph()
         reference_graph.load_from_disk(test_graph)
@@ -38,13 +39,13 @@ class TestGraph(TestCase):
 
     def test_set_graph(self):
         self.test_prepare_graph()
-        self.graph.set_graph(centroids=centroids, cost_field='distance',block_centroid_flows=True)
+        self.graph.set_graph(cost_field='distance',block_centroid_flows=True)
         if self.graph.num_zones != centroids.shape[0]:
             self.fail('Number of centroids not properly set')
         if self.graph.num_links != 222:
             self.fail('Number of links not properly set')
-        if self.graph.num_nodes != 169:
-            self.fail('Number of nodes not properly set')
+        if self.graph.num_nodes != 93:
+            self.fail('Number of nodes not properly set - ' + str(self.graph.num_nodes))
 
     def test_save_to_disk(self):
         self.test_create_from_geography()
