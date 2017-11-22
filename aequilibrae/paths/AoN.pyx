@@ -50,7 +50,7 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
     # Origin index is the index of the matrix we are assigning
     # this is used as index for the skim matrices
     # orig is the ID of the actual centroid
-    # Is is used to actual path computation and to refer to outputs of path computaiton
+    # Is is used to actual path computation and to refer to outputs of path computation
 
     orig = origin
     origin_index = graph.nodes_to_indices[orig]
@@ -86,7 +86,7 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
 
     # views from the result object
     cdef double [:, :] final_skim_matrices_view = result.skims.matrix_view[origin_index, :, :]
-    cdef unsigned long [:] no_path_view = result.no_path[orig, :]
+    cdef unsigned long [:] no_path_view = result.no_path[origin_index, :]
 
     # views from the aux-result object
     cdef unsigned long [:] predecessors_view = aux_result.predecessors[:, curr_thread]
@@ -99,7 +99,7 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
 
     # path file variables
     # 'origin', 'node', 'predecessor', 'connector'
-    posit = origin_index * graph.num_nodes * result.path_file['results']
+    posit = origin_index * graph.num_nodes * result.path_file['save']
     posit1 = posit + graph.num_nodes
 
     cdef unsigned int [:] pred_view = result.path_file['results'].predecessor[posit:posit1]
@@ -108,7 +108,7 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
     cdef unsigned int [:] n_view = result.path_file['results'].node[posit:posit1]
 
     # select link variables
-    cdef double [:, :] sel_link_view = result.critical_links['results'][orig,:,:]
+    cdef double [:, :] sel_link_view = result.critical_links['results'].matrix_view[origin_index,:,:]
     cdef unsigned long [:] aux_link_flows_view = aux_link_flows
 
     #Now we do all procedures with NO GIL
