@@ -443,9 +443,13 @@ class Graph:
                 # Create the graph-specific node numbers
                 self.all_nodes = np.unique(np.hstack((self.network['a_node'],self.network['b_node']))).astype(self.__integer_type)
                 # We put the centroids as the first N elements of this array
-                self.all_nodes = np.hstack((centroids, np.delete(self.all_nodes, centroids))).astype(self.__integer_type)
+                for i in self.centroids:
+                    self.all_nodes = np.delete(self.all_nodes, np.argwhere(self.all_nodes==i))
+
+                self.all_nodes = np.hstack((centroids, self.all_nodes)).astype(self.__integer_type)
                 self.num_nodes = self.all_nodes.shape[0]
-                self.nodes_to_indices = np.zeros(int(self.all_nodes.max()) + 1, self.__integer_type)
+                self.nodes_to_indices = np.empty(int(self.all_nodes.max()) + 1, self.__integer_type)
+                self.nodes_to_indices.fill(-1)
                 self.nodes_to_indices[self.all_nodes] = np.arange(self.num_nodes)
 
                 for i in all_titles:
@@ -484,7 +488,7 @@ class Graph:
                 del ind
 
                 self.graph['id'] = np.arange(self.num_links)
-                self.fs = np.zeros(self.num_nodes + 2, dtype=self.__integer_type)  # NOT SURE IF IT SHOULD BE +1 OR +2. SINCE IT IS WORKING AND DOES NOT AFFECT RESULTS, LEAVING AS +2 FOR NOW
+                self.fs = np.zeros(self.num_nodes + 1, dtype=self.__integer_type)  # NOT SURE IF IT SHOULD BE +1 OR +2. SINCE IT IS WORKING AND DOES NOT AFFECT RESULTS, LEAVING AS +2 FOR NOW
 
                 a = self.graph['a_node'][0]
                 p = 0
@@ -500,7 +504,7 @@ class Graph:
                 for j in xrange(p, self.num_nodes):
                     self.fs[j + 1] = k
 
-                self.fs[self.num_nodes +1] = self.graph.shape[0]  # IF ENDS UP BEING +2 IN THE COMMENT ON LINE 299, THEN THIS LINE BECOMES IRRELEVANT
+                self.fs[self.num_nodes] = self.graph.shape[0]
                 self.ids = self.graph['id']
                 self.b_node = np.array(self.graph['b_node'], self.__integer_type)
 
@@ -569,15 +573,9 @@ class Graph:
         return True
 
     def set_blocked_centroid_flows(self, blocking):
-
         if self.num_zones > 0:
             self.block_centroid_flows = blocking
             self.b_node = np.array(self.graph['b_node'], self.__integer_type)
-
-            if blocking:
-                for i in self.centroids:
-                    for j in xrange(self.fs[i], self.fs[i + 1]):
-                        self.b_node[i] = i  # We make the link end in itself.
         else:
             raise ValueError ('You can only block flows through centroids after setting the centroids')
 
@@ -590,6 +588,9 @@ class Graph:
         mygraph['num_nodes'] = self.num_nodes
         mygraph['network'] = self.network
         mygraph['graph'] = self.graph
+        mygraph['all_nodes'] = self.all_nodes
+        mygraph['nodes_to_indices'] = self.nodes_to_indices
+        mygraph['num_nodes'] = self.num_nodes
         mygraph['fs'] = self.fs
         mygraph['b_node'] = self.b_node
         mygraph['cost'] = self.cost
@@ -613,6 +614,9 @@ class Graph:
         self.num_nodes = mygraph['num_nodes']
         self.network = mygraph['network']
         self.graph = mygraph['graph']
+        self.all_nodes = mygraph['all_nodes']
+        self.nodes_to_indices = mygraph['nodes_to_indices']
+        self.num_nodes = mygraph['num_nodes']
         self.fs = mygraph['fs']
         self.b_node = mygraph['b_node']
         self.cost = mygraph['cost']

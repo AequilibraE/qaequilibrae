@@ -48,12 +48,12 @@ class TestNetwork_skimming(TestCase):
 
         aux_res = MultiThreadedNetworkSkimming()
         aux_res.prepare(g, res)
-        a = skimming_single_origin(1, g, res, aux_res, 0)
+        a = skimming_single_origin(26, g, res, aux_res, 0)
 
 
         a = network_skimming(g, res)
 
-        tot = np.sum(res.skims.distance[:, :])
+        tot = np.nanmax(res.skims.distance[:, :])
 
         if tot > 10e10:
             self.fail('Skimming was not successful. At least one np.inf returned.')

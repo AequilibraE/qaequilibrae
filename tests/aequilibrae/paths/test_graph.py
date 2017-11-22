@@ -68,7 +68,9 @@ class TestGraph(TestCase):
                        ('centroids', new_graph.centroids, reference_graph.centroids),
                        ('skims', new_graph.skims, reference_graph.skims),
                        ('link ids', new_graph.ids, reference_graph.ids),
-                       ('Network', new_graph.network, reference_graph.network)]
+                       ('Network', new_graph.network, reference_graph.network),
+                       ('All Nodes', new_graph.all_nodes, reference_graph.all_nodes),
+                       ('Nodes to indices', new_graph.nodes_to_indices, reference_graph.nodes_to_indices)]
 
         for comparison, newg, refg in comparisons:
             if not np.array_equal(newg, refg):

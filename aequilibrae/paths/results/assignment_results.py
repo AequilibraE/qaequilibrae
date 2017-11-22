@@ -5,7 +5,7 @@ import sqlite3
 import sys
 import os
 from numpy.lib.format import open_memmap
-from ...matrix import AequilibraeMatrix
+from ...matrix import AequilibraeMatrix, AequilibraEData
 
 """
 TO-DO:
@@ -134,17 +134,22 @@ class AssignmentResults:
                                }
 
     def setSavePathFile(self, save=False, path_result=None):
-        a = np.zeros((max(1,self.zones), 1, 2), dtype=np.int32)
+        # Fields: Origin, Node, Predecessor
+        # Number of records: Origins * Nodes
+        a = AequilibraEData()
+        d1 = max(1,self.zones)
+        d2 = 1
+
         if save:
             if path_result is None:
                 warnings.warn("Path file not set properly. Need to specify output file too")
             else:
-                if path_result[-3:].lower() != 'aep':
-                    path_result += '.aep'
-
                 # This is the only place where we keep 32bits, as going 64 bits would explode the file size
                 if self.nodes > 0 and self.zones > 0:
-                    a = open_memmap(path_result, dtype=np.int32, mode='w+', shape=(self.zones,self.nodes, 2))
+                    d1 = self.zones
+                    d2 = self.nodes
+
+        a.create_empty(file_path=path_result, entries=d1*d2, field_names=['origin', 'node', 'predecessor', 'connector'], data_types=[np.uint32, np.uint32, np.uint32])
 
         self.path_file = {'save': save,
                           'results': a

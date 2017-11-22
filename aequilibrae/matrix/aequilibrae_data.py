@@ -65,7 +65,7 @@ class AequilibraEData(object):
                 field_names = ['data']
 
             if data_types is None:
-                data_types = [np.float64]
+                data_types = [np.float64] * len(field_names)
 
             self.file_path = file_path
             self.entries = entries

@@ -48,7 +48,9 @@ def all_or_nothing(matrix, graph, results):
     aux_res = MultiThreadedAoN()
     aux_res.prepare(graph, results)
 
-    # catch errors
+    if results.__graph_id__ != graph.__id__:
+        raise ValueError("Results object not prepared. Use --> results.prepare(graph)")
+
     if results.__graph_id__ is None:
         raise ValueError('The results object was not prepared. Use results.prepare(graph)')
 
@@ -63,15 +65,22 @@ def all_or_nothing(matrix, graph, results):
         raise ValueError('Matrix and graph do not have compatible set of centroids.')
 
     else:
+        origins = list(matrix.index)
         mat = matrix.matrix_view
         pool = ThreadPool(results.cores)
         all_threads = {'count': 0}
         report = []
-        for O in range(matrix.zones):
-            if np.sum(mat[O, :, :]) > 0:
-                pool.apply_async(func_assig_thread, args=(O, matrix, graph, results, aux_res, all_threads, report))
-        pool.close()
-        pool.join()
+        for orig in origins:
+            if np.sum(mat[orig, :, :]) > 0:
+                if orig >= graph.nodes_to_indices.shape[0]:
+                    report.append("Centroid " + str(orig) + " does not exist in the graph")
+
+                elif graph.fs[orig] == graph.fs[orig + 1]:
+                    report.append("Centroid " + str(orig) + " does not exist in the graph")
+                else:
+                    pool.apply_async(func_assig_thread, args=(orig, matrix, graph, results, aux_res, all_threads, report))
+                    pool.close()
+                    pool.join()
     results.link_loads = np.sum(aux_res.temp_link_loads, axis=2)
     del aux_res
     return report
