@@ -71,16 +71,14 @@ def all_or_nothing(matrix, graph, results):
         all_threads = {'count': 0}
         report = []
         for orig in matrix.index:
-            if np.sum(mat[graph.nodes_to_indices[orig], :, :]) > 0:
+            i = graph.nodes_to_indices[orig]
+            if np.nansum(mat[i, :, :]) > 0:
                 if orig >= graph.nodes_to_indices.shape[0]:
                     report.append("Centroid " + str(orig) + " does not exist in the graph")
-
                 elif graph.fs[int(orig)] == graph.fs[int(orig + 1)]:
                     report.append("Centroid " + str(orig) + " does not exist in the graph")
                 else:
-                    func_assig_thread(orig, matrix, graph, results, aux_res, all_threads, report)
-                    print orig
-                    # pool.apply_async(func_assig_thread, args=(orig, matrix, graph, results, aux_res, all_threads, report))
+                    pool.apply_async(func_assig_thread, args=(orig, matrix, graph, results, aux_res, all_threads, report))
         pool.close()
         pool.join()
     results.link_loads = np.sum(aux_res.temp_link_loads, axis=2)

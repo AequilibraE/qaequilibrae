@@ -488,7 +488,7 @@ class Graph:
                 del ind
 
                 self.graph['id'] = np.arange(self.num_links)
-                self.fs = np.zeros(self.num_nodes + 1, dtype=self.__integer_type)  # NOT SURE IF IT SHOULD BE +1 OR +2. SINCE IT IS WORKING AND DOES NOT AFFECT RESULTS, LEAVING AS +2 FOR NOW
+                self.fs = np.zeros(self.num_nodes + 1, dtype=self.__integer_type)
 
                 a = self.graph['a_node'][0]
                 p = 0

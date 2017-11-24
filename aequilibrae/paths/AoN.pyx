@@ -93,8 +93,8 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
     cdef double [:, :] skim_matrix_view = aux_result.temporary_skims[:, :, curr_thread]
     cdef unsigned long [:] reached_first_view = aux_result.reached_first[:, curr_thread]
     cdef unsigned long [:] conn_view = aux_result.connectors[:, curr_thread]
-    cdef double [:, :] link_loads_view = aux_result.temp_link_loads[:, curr_thread]
-    cdef double [:, :] node_load_view = aux_result.temp_node_loads[:, curr_thread]
+    cdef double [:, :] link_loads_view = aux_result.temp_link_loads[:, :, curr_thread]
+    cdef double [:, :] node_load_view = aux_result.temp_node_loads[:, :, curr_thread]
     cdef unsigned long [:] b_nodes_view = aux_result.temp_b_nodes[:, curr_thread]
 
     # path file variables
@@ -129,8 +129,7 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
                          conn_view,
                          reached_first_view)
 
-        network_loading(origin_index,
-                        classes,
+        network_loading(classes,
                         demand_view,
                         predecessors_view,
                         conn_view,
@@ -176,13 +175,13 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
                                          aux_link_flows_view,
                                          sel_link_view,
                                          query_type)
+
     return origin
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False) # turn of bounds-checking for entire function
-cpdef void network_loading(long origin,
-                           long classes,
+cpdef void network_loading(long classes,
                            double[:, :] demand,
                            unsigned long [:] pred,
                            unsigned long [:] conn,

@@ -171,7 +171,8 @@ class AssignmentResults:
                           'results': a
                           }
 
-    def save_to_disk(self, output='loads', output_file_name ='link_flows', file_type='csv'):
+    # TODO: Transform the 'res' object in AequilibraeData
+    def save_to_disk(self, output='loads', output_file_name ='link_flows', file_type='aed'):
         ''' Function to write to disk all outputs computed during assignment
     Args:
         output: 'loads', for writing the link loads
@@ -179,41 +180,59 @@ class AssignmentResults:
 
         output_file_name: Name of the file, with extension
 
-        file_type: 'csv', for comma-separated files
+        file_type: 'aeq', for AequilibraE datasets
+                   'csv', for comma-separated files
                    'sqlite' for sqlite databases
     Returns:
         Nothing'''
-        headers = ['link']
+        fields = []
         if output == 'loads':
-            dt = [('Link ID', np.int)]
             for n in self.classes['names']:
-                dt.extend([(n + '_ab', np.float), (n + '_ba', np.float), (n + '_tot', np.float)])
-                headers.extend(n + '_ab', n + '_ba', n + '_tot')
-            res = np.zeros((np.max(self.lids) + 1, self.classes['number']), dtype=dt)
+                fields.extend([n + '_ab', n + '_ba', n + '_tot'])
+            types = [np.float64] * len(fields)
 
-            res['Link ID'][:] = np.arange(np.max(self.lids) + 1)[:]
+            if file_type == 'aed':
+                file_name = output_file_name
+                if file_name[-3:] != 'aed':
+                    file_name = file_name + '.aed'
+                memory_mode = False
+            else:
+                memory_mode = True
+                file_name = None
+
+
+            entries = int(np.unique(self.lids).shape[0])
+            res = AequilibraEData()
+            res.create_empty(file_path=file_name, memory_mode=memory_mode, entries=entries,
+                             field_names=fields, data_types=types)
+
+            res.index[:] = np.unique(self.lids)[:]
+
+            indexing = np.zeros(int(self.lids.max())+1, np.uint64)
+            indexing[res.index[:]] = np.arange(entries)
 
             # Indices of links BA and AB
-            ABs = self.direcs < 0
-            BAs = self.direcs > 0
-            ab_ids = self.lids[ABs]
-            ba_ids = self.lids[BAs]
+            ABs = self.direcs > 0
+            BAs = self.direcs < 0
+            ab_ids = indexing[self.lids[ABs]]
+            ba_ids = indexing[self.lids[BAs]]
 
             # Link flows
-            link_flows = self.link_loads[:-1, :]
-            for i in enumerate(self.classes['names']):
-                n = self.classes['names'][i]
+            link_flows = self.link_loads[:, :]
+            for i, n in enumerate(self.classes['names']):
                 # AB Flows
-                res[n + '_ab'][ab_ids] = link_flows[ABs, :]
+                res.data[n + '_ab'][ab_ids] = link_flows[ABs, :]
                 # BA Flows
-                res[n + '_ba'][ba_ids] = link_flows[BAs, :]
+                res.data[n + '_ba'][ba_ids] = link_flows[BAs, :]
 
                 # Tot Flow
-                res[n + '_tot'] = res[n + '_ab'] + res[n + '_ba']
+                res.data[n + '_tot'] = res.data[n + '_ab'] + res.data[n + '_ba']
 
             # Save to disk
             if file_type == 'csv':
-                np.savetxt(output_file_name, res, fmt="%d "+",%1.10f"*3, header=headers)
+                fmt = "%d"+",%10.5f"*(3* len(self.classes['names']))
+                # res = res.reshape((np.max(self.lids) + 1, 1 + 3 * len(self.classes['names'])))
+                np.savetxt(output_file_name, res[np.newaxis,:], fmt=fmt, delimiter=',', header=','.join(headers))
 
             if file_type == 'sqlite':
             # Connecting to the database file

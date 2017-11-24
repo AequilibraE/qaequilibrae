@@ -140,6 +140,10 @@ class AequilibraEData(object):
         self.num_fields = len(self.fields)
         self.data_types = [self.data[x].dtype.type for x in self.fields]
 
+    def export(self, file_name, file_type='csv'):
+        pass
+        # This method is needed for traffic assignment results
+
     @staticmethod
     def random_name():
         return os.path.join(tempfile.gettempdir(), 'Aequilibrae_data_' + str(uuid.uuid4()) + '.aed')

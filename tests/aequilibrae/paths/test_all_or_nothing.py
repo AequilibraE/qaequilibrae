@@ -21,7 +21,7 @@ class TestAll_or_nothing(TestCase):
 
 
         # Prepares the matrix for assignment
-        args = {'file_name': AequilibraeMatrix().random_name(),
+        args = {'file_name': '/tmp/my_matrix.aem',
                 'zones': g.num_zones,
                 'matrix_names': ['mat'],
                 'index_names': ['my indices']}
@@ -30,8 +30,7 @@ class TestAll_or_nothing(TestCase):
         matrix.create_empty(**args)
 
         matrix.index[:] = g.centroids[:]
-        matrix.mat[:, :] = np.random.rand(matrix.zones, matrix.zones)[:, :]
-        matrix.mat[:, :] = matrix.mat[:, :] * (1000 / np.sum(matrix.mat[:, :]))
+        matrix.mat.fill(1)
         matrix.computational_view(['mat'])
 
         # Performs assignment
@@ -39,4 +38,5 @@ class TestAll_or_nothing(TestCase):
         res.prepare(g, matrix)
 
         all_or_nothing(matrix, g, res)
+        res.save_to_disk(output_file_name='/tmp/link_loads.aed', file_type='aed')
         self.fail('Assignment failed')
