@@ -32,17 +32,22 @@ class TestAequilibraEData(TestCase):
 
     def test_load(self):
         # re-imports the dataset
-        a = AequilibraEData()
-        a.load(file_path)
+        self.ad = AequilibraEData()
+        self.ad.load(file_path)
 
 
         # checks if the values were properly saved
-        if a.index[70] != 170:
+        if self.ad.index[70] != 170:
             self.fail("Value for data index test was not as expected")
 
-        if int(a.d[70]) != 28900:
+        if int(self.ad.d[70]) != 28900:
             self.fail("Value for data field test was not as expected")
 
-        for f in a.fields:
+        for f in self.ad.fields:
             if f not in args['field_names']:
                 self.fail("Could not retrieve all fields")
+
+    def test_export(self):
+        self.test_load()
+
+        self.ad.export('/tmp/aequilibrae_data_example.csv')

@@ -172,19 +172,20 @@ class AssignmentResults:
                           }
 
     # TODO: Transform the 'res' object in AequilibraeData
-    def save_to_disk(self, output='loads', output_file_name ='link_flows', file_type='aed'):
+    def save_to_disk(self, file_name, output='loads'):
         ''' Function to write to disk all outputs computed during assignment
     Args:
         output: 'loads', for writing the link loads
                 'path_file', for writing the path file to a format different than the native binary
 
-        output_file_name: Name of the file, with extension
-
-        file_type: 'aeq', for AequilibraE datasets
-                   'csv', for comma-separated files
-                   'sqlite' for sqlite databases
+        file_name: Name of the file, with extension. Valid extensions are:
+                   1. 'aed', for AequilibraE datasets. (Nearly zero overhead)
+                   2. 'csv', for comma-separated files
+                   3. 'sqlite' for sqlite databases
     Returns:
         Nothing'''
+
+        file_type = os.path.splitext(file_name)[1]
         fields = []
         if output == 'loads':
             for n in self.classes['names']:
@@ -192,18 +193,18 @@ class AssignmentResults:
             types = [np.float64] * len(fields)
 
             if file_type == 'aed':
-                file_name = output_file_name
+                aed_file_name = file_name
                 if file_name[-3:] != 'aed':
-                    file_name = file_name + '.aed'
+                    aed_file_name = aed_file_name + '.aed'
                 memory_mode = False
             else:
                 memory_mode = True
-                file_name = None
+                aed_file_name = None
 
 
             entries = int(np.unique(self.lids).shape[0])
             res = AequilibraEData()
-            res.create_empty(file_path=file_name, memory_mode=memory_mode, entries=entries,
+            res.create_empty(file_path=aed_file_name, memory_mode=memory_mode, entries=entries,
                              field_names=fields, data_types=types)
 
             res.index[:] = np.unique(self.lids)[:]
@@ -229,48 +230,11 @@ class AssignmentResults:
                 res.data[n + '_tot'] = res.data[n + '_ab'] + res.data[n + '_ba']
 
             # Save to disk
-            if file_type == 'csv':
-                fmt = "%d"+",%10.5f"*(3* len(self.classes['names']))
-                # res = res.reshape((np.max(self.lids) + 1, 1 + 3 * len(self.classes['names'])))
-                np.savetxt(output_file_name, res[np.newaxis,:], fmt=fmt, delimiter=',', header=','.join(headers))
+            if file_type != 'aed':
+                res.export(file_name)
 
-            if file_type == 'sqlite':
-            # Connecting to the database file
-                conn = sqlite3.connect(output_file_name)
-                c = conn.cursor()
-            # Creating the flows table
-                c.execute('''DROP TABLE IF EXISTS link_flows''')
-                fi = ''
-                qm = '?'
-                for f in headers[1:]:
-                    fi += ', ' + f + ' REAL'
-                    qm += ', ?'
-
-                c.execute('''CREATE TABLE link_flows (link_id INTEGER PRIMARY KEY''' + fi + ')''')
-                c.execute('BEGIN TRANSACTION')
-                c.executemany('INSERT INTO link_flows VALUES (' + qm + ')', res)
-                c.execute('END TRANSACTION')
-                conn.commit()
-                conn.close()
-
+            del res
+        # TODO: Re-factor the exporting of the path file within the AequilibraeData format
         elif output == 'path_file':
-            conn = sqlite3.connect(output_file_name)
-            c = conn.cursor()
-
-            # Creating the flows table
-            c.execute('''DROP TABLE IF EXISTS path_file''')
-            c.execute('''CREATE TABLE path_file (origin_zone INTEGER, node INTEGER, predecessor INTEGER)''')
-            c.execute('BEGIN TRANSACTION')
-
-            path_file = path_file = self.path_file['results']
-            for i in range(self.zones):
-                data = np.zeros((self.nodes, 3), self.__float_type)
-                data[:,0].fill(i)
-                data[:,1] = path_file[i,:,0]
-                data[:,2] = path_file[i,:,1]
-                c.executemany('''INSERT INTO path_file VALUES(?, ?, ?)''', data)
-            c.execute('END TRANSACTION')
-            conn.commit()
-            conn.close()
-
+            pass
 

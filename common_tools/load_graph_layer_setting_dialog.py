@@ -41,7 +41,6 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
         self.field_types = {}
-        self.centroids = None
         self.node_layer = None
         self.line_layer = None
         self.index = None
@@ -120,13 +119,11 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, FORM_CLASS):
         else:
             new_name = QFileDialog.getOpenFileName(None, 'Result file', self.graph_file_name.text(), file_types)
         self.cb_minimizing.clear()
-        self.all_centroids.setText('')
         self.block_paths.setChecked(False)
         try:
             self.graph_file_name.setText(new_name)
             self.graph.load_from_disk(new_name)
 
-            self.all_centroids.setText(str(self.graph.centroids))
             if self.graph.block_centroid_flows:
                 self.block_paths.setChecked(True)
             graph_fields = list(self.graph.graph.dtype.names)

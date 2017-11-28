@@ -38,5 +38,8 @@ class TestAll_or_nothing(TestCase):
         res.prepare(g, matrix)
 
         all_or_nothing(matrix, g, res)
-        res.save_to_disk(output_file_name='/tmp/link_loads.aed', file_type='aed')
+        res.save_to_disk('/tmp/link_loads.aed')
+        res.save_to_disk('/tmp/link_loads.csv')
+
+        # TODO: Inserte the check for whether this worked
         self.fail('Assignment failed')

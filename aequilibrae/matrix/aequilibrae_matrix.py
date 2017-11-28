@@ -472,9 +472,9 @@ class AequilibraeMatrix(object):
         return {self.index[i]: i for i in range(self.zones)}
 
     def define_data_class(self):
-        if self.dtype in [np.float16, np.float32, np.float64]:
+        if np.issubdtype(self.dtype, np.float):
             data_class = FLOAT
-        elif self.dtype in [np.int8, np.int16, np.int32, np.int64]:
+        elif np.issubdtype(self.dtype, np.integer):
             data_class = INT
         else:
             raise ValueError('Data type not supported. You can choose Integers of 8, 16, 32 and 64 bits, '

@@ -320,11 +320,11 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         # Save link flows to disk
         if self.do_output_to_sqlite.isChecked():
             self.results.save_to_disk(output='loads',
-                                      output_file_name = os.path.join(self.output_path, 'link_flows.db'),
+                                      file_name= os.path.join(self.output_path, 'link_flows.db'),
                                       file_type='sqlite')
         else:
             self.results.save_to_disk(output='loads',
-                                      output_file_name = os.path.join(self.output_path, 'link_flows.csv'),
+                                      file_name= os.path.join(self.output_path, 'link_flows.csv'),
                                       file_type='csv')
 
         # save Path file if that is the case
@@ -332,7 +332,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             if self.method['algorithm'] == 'AoN':
                 if self.do_output_to_sqlite.isChecked():
                     self.results.save_to_disk(output='path_file',
-                                              output_file_name = os.path.join(self.output_path, 'path_file.db'),
+                                              file_name= os.path.join(self.output_path, 'path_file.db'),
                                               file_type='sqlite')
                 else:
                     shutil.move(self.path_file.temp_file + '.aep', self.path_file.output_name + '.aep')

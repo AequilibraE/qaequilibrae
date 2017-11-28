@@ -311,28 +311,29 @@ cdef void blocking_centroid_flows(unsigned long action,
         for i in xrange(fs[orig], fs[orig + 1]):
             temp_b_nodes[i] = orig
 
+# TODO: This code is not yet skimming, so mileposts are completely wrong
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
 def path_computation(origin, destination, graph, results):
-    cdef ITYPE_t nodes, orig, D, p, b
+    cdef ITYPE_t nodes, orig, dest, p, b, origin_index, dest_index
     cdef long i, j, skims, a, block_flows_through_centroids
 
+    orig = origin
+    dest = destination
+    origin_index = graph.nodes_to_indices[orig]
+    dest_index = graph.nodes_to_indices[dest]
     if results.__graph_id__ != graph.__id__:
         return "Results object not prepared. Use --> results.prepare(graph)"
 
     # Consistency checks
     if origin >= graph.fs.shape[0]:
-        return "Node " + str(origin) + " is outside the range of nodes in the graph"
-
-    if graph.fs[origin] == graph.fs[origin+1]:
-        return "Node " + str(origin) + " does not exist in the graph"
+        raise ValueError ("Node " + str(origin) + " is outside the range of nodes in the graph")
 
     if VERSION != graph.__version__:
         return 'This graph was created for a different version of AequilibraE. Please re-create it'
+
     #We transform the python variables in Cython variables
-    orig = origin
-    D = destination
     nodes = graph.num_nodes
 
      # initializes skim_matrix for output
@@ -364,11 +365,12 @@ def path_computation(origin, destination, graph, results):
         if block_flows_through_centroids: # Unblocks the centroid if that is the case
             b = 0
             blocking_centroid_flows(b,
-                                    orig,
+                                    origin_index,
                                     graph_fs_view,
                                     b_nodes_view,
                                     original_b_nodes_view)
-        w = path_finding(orig,
+
+        w = path_finding(origin_index,
                          g_view,
                          b_nodes_view,
                          graph_fs_view,
@@ -380,25 +382,26 @@ def path_computation(origin, destination, graph, results):
         if block_flows_through_centroids: # Unblocks the centroid if that is the case
             b = 1
             blocking_centroid_flows(b,
-                                    orig,
+                                    origin_index,
                                     graph_fs_view,
                                     b_nodes_view,
                                     original_b_nodes_view)
-    if 0<= D < results.nodes:
-        p = predecessors_view[D]
+
+    if 0<= dest_index < results.nodes:
         all_connectors = []
-        all_nodes = [D]
-        milepost = [skim_matrix_view[D]]
-        if p >= 0:
-            while p > 0:
-                all_connectors.append(conn_view[D])
+        all_nodes = [dest_index]
+        milepost = [skim_matrix_view[dest_index]]
+        p = dest_index
+        if p != origin_index:
+            while p != origin_index:
+                p = predecessors_view[p]
+                all_connectors.append(conn_view[dest_index])
                 all_nodes.append(p)
                 milepost.append(skim_matrix_view[p])
-                D = p
-                p = predecessors_view[p]
-            results.path = np.asarray(all_connectors, np.int64)[::-1]
-            results.path_nodes = np.asarray(all_nodes, np.int64)[::-1]
-            results.milepost =  np.asarray(milepost, np.float64)[::-1]
+                dest_index = p
+            results.path = np.asarray(all_connectors, graph.default_types('int'))[::-1]
+            results.path_nodes = graph.all_nodes[np.asarray(all_nodes, graph.default_types('int'))][::-1]
+            results.milepost =  np.asarray(milepost, graph.default_types('int'))[::-1]
 
             del all_nodes
             del all_connectors

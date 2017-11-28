@@ -25,6 +25,7 @@ import uuid
 import tempfile
 import os
 from numpy.lib.format import open_memmap
+import sqlite3
 
 # Necessary in case we are no the QGIS world
 # try:
@@ -34,7 +35,6 @@ from numpy.lib.format import open_memmap
 
 MEMORY = 1
 DISK = 0
-
 
 class AequilibraEData(object):
 
@@ -71,7 +71,7 @@ class AequilibraEData(object):
             self.entries = entries
             self.fields = field_names
             self.data_types = data_types
-            self.aeq_index_type = np.int64
+            self.aeq_index_type = np.uint64
 
             if memory_mode:
                 self.memory_mode = MEMORY
@@ -132,7 +132,7 @@ class AequilibraEData(object):
         self.file_path = os.path.realpath(f.name)
         f.close()
 
-        # Map in memory and load matrix_procedures names plus dimensions
+        # Map in memory and load data names plus dimensions
         self.data = open_memmap(self.file_path, mode='r+')
 
         self.entries = self.data.shape[0]
@@ -140,9 +140,46 @@ class AequilibraEData(object):
         self.num_fields = len(self.fields)
         self.data_types = [self.data[x].dtype.type for x in self.fields]
 
-    def export(self, file_name, file_type='csv'):
-        pass
-        # This method is needed for traffic assignment results
+    def export(self, file_name, table_name='table'):
+        """
+        :param file_name: File name with PATH and extension (csv, or sqlite3, sqlite or db)
+        :param table_name: It only applies if you are saving to an SQLite table. Otherwise ignored
+        :return:
+        """
+
+        file_type = os.path.splitext(file_name)[1]
+        headers = ['index']
+        headers.extend(self.fields)
+
+        a = self.data[np.newaxis,:][0]
+        if file_type == '.csv':
+            fmt = "%d"
+            for dt in self.data_types:
+                if np.issubdtype(dt, np.float):
+                    fmt += ',%f'
+                elif np.issubdtype(dt, np.integer):
+                    fmt += ',%d'
+            np.savetxt(file_name, self.data[np.newaxis,:][0], delimiter=',', fmt=fmt, header=','.join(headers),
+                       comments='')
+
+        elif file_type in ['.sqlite', '.sqlite3', '.db']:
+            # Connecting to the database file
+            conn = sqlite3.connect(file_name)
+            c = conn.cursor()
+            # Creating the flows table
+            c.execute('''DROP TABLE IF EXISTS ''' + table_name)
+            fi = ''
+            qm = '?'
+            for f in headers[1:]:
+                fi += ', ' + f + ' REAL'
+                qm += ', ?'
+
+            c.execute('''CREATE TABLE ''' + table_name + ''' (link_id INTEGER PRIMARY KEY''' + fi + ')''')
+            c.execute('BEGIN TRANSACTION')
+            c.executemany('INSERT INTO ' + table_name + ' VALUES (' + qm + ')', res)
+            c.execute('END TRANSACTION')
+            conn.commit()
+            conn.close()
 
     @staticmethod
     def random_name():
