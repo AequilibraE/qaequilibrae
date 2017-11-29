@@ -26,10 +26,10 @@
   <mapcanvas>
     <units>degrees</units>
     <extent>
-      <xmin>146.26421920526499321</xmin>
-      <ymin>-20.0936467856047436</ymin>
-      <xmax>146.30214482473260773</xmax>
-      <ymax>-20.05176210000395187</ymax>
+      <xmin>146.28298001143164697</xmin>
+      <ymin>-20.07123919356403974</ymin>
+      <xmax>146.2924614162985506</xmax>
+      <ymax>-20.06076802216384181</ymax>
     </extent>
     <rotation>0</rotation>
     <projections>0</projections>
@@ -73,7 +73,7 @@
     </legendlayer>
   </legend>
   <projectlayers>
-    <maplayer minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
+    <maplayer minimumScale="-4.65661e-10" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Line" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
       <extent>
         <xmin>146.24489299999999048</xmin>
         <ymin>-20.09922899999995849</ymin>
@@ -209,9 +209,9 @@
         <property key="labeling/dist" value="0"/>
         <property key="labeling/distInMapUnits" value="false"/>
         <property key="labeling/distMapUnitScale" value="0,0,0,0,0,0"/>
-        <property key="labeling/drawLabels" value="false"/>
-        <property key="labeling/enabled" value="false"/>
-        <property key="labeling/fieldName" value=""/>
+        <property key="labeling/drawLabels" value="true"/>
+        <property key="labeling/enabled" value="true"/>
+        <property key="labeling/fieldName" value="concat( to_string(to_int(&quot;distance&quot;)), '  (',  &quot;link_id&quot;, ')')"/>
         <property key="labeling/fitInPolygonOnly" value="false"/>
         <property key="labeling/fontCapitals" value="0"/>
         <property key="labeling/fontFamily" value="Noto Sans"/>
@@ -316,7 +316,7 @@
         <property key="labeling/textColorA" value="255"/>
         <property key="labeling/textColorB" value="0"/>
         <property key="labeling/textColorG" value="0"/>
-        <property key="labeling/textColorR" value="0"/>
+        <property key="labeling/textColorR" value="255"/>
         <property key="labeling/textTransp" value="0"/>
         <property key="labeling/upsidedownLabels" value="0"/>
         <property key="labeling/useSubstitutions" value="false"/>
@@ -352,12 +352,12 @@
         <multilineenabled fieldname="" on=""/>
         <selectedonly on=""/>
       </labelattributes>
-      <SingleCategoryDiagramRenderer diagramType="Histogram">
+      <LinearlyInterpolatedDiagramRenderer upperValue="0" lowerHeight="0" upperHeight="50" lowerValue="0" diagramType="Histogram" upperWidth="50" classificationAttributeExpression="" lowerWidth="0">
         <DiagramCategory penColor="#000000" labelPlacementMethod="XHeight" penWidth="0" diagramOrientation="Up" minimumSize="0" barWidth="5" penAlpha="255" maxScaleDenominator="1e+08" backgroundColor="#ffffff" transparency="0" width="15" scaleDependency="Area" backgroundAlpha="255" angleOffset="1440" scaleBasedVisibility="0" enabled="0" height="15" sizeType="MM" minScaleDenominator="inf">
           <fontProperties description="Noto Sans,9,-1,5,50,0,0,0,0,0" style=""/>
           <attribute field="" color="#000000" label=""/>
         </DiagramCategory>
-      </SingleCategoryDiagramRenderer>
+      </LinearlyInterpolatedDiagramRenderer>
       <DiagramLayerSettings yPosColumn="-1" linePlacementFlags="10" placement="2" dist="0" xPosColumn="-1" priority="0" obstacle="0" zIndex="0" showAll="1"/>
       <annotationform>../../../../../..</annotationform>
       <aliases>
@@ -538,7 +538,7 @@ def my_form_open(dialog, layer, feature):
         <property key="labeling/distMapUnitScale" value="0,0,0,0,0,0"/>
         <property key="labeling/drawLabels" value="true"/>
         <property key="labeling/enabled" value="true"/>
-        <property key="labeling/fieldName" value="if (ID&lt;100, ID, '')"/>
+        <property key="labeling/fieldName" value="ID"/>
         <property key="labeling/fitInPolygonOnly" value="false"/>
         <property key="labeling/fontCapitals" value="0"/>
         <property key="labeling/fontFamily" value="Noto Sans"/>
@@ -555,7 +555,7 @@ def my_form_open(dialog, layer, feature):
         <property key="labeling/fontWeight" value="75"/>
         <property key="labeling/fontWordSpacing" value="0"/>
         <property key="labeling/formatNumbers" value="false"/>
-        <property key="labeling/isExpression" value="true"/>
+        <property key="labeling/isExpression" value="false"/>
         <property key="labeling/labelOffsetInMapUnits" value="true"/>
         <property key="labeling/labelOffsetMapUnitScale" value="0,0,0,0,0,0"/>
         <property key="labeling/labelPerPart" value="false"/>

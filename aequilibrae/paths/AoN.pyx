@@ -311,7 +311,7 @@ cdef void blocking_centroid_flows(unsigned long action,
         for i in xrange(fs[orig], fs[orig + 1]):
             temp_b_nodes[i] = orig
 
-# TODO: This code is not yet skimming, so mileposts are completely wrong
+
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
@@ -349,7 +349,7 @@ def path_computation(origin, destination, graph, results):
     cdef unsigned long [:] original_b_nodes_view = graph.graph['b_node']
     cdef unsigned long [:] graph_fs_view = graph.fs
     cdef double [:, :] graph_skim_view = graph.skims
-    cdef unsigned long [:] ids_graph_view = graph.graph['link_id']
+    cdef unsigned long [:] ids_graph_view = graph.ids
     block_flows_through_centroids = graph.block_centroid_flows
 
     cdef unsigned long [:] predecessors_view = results.predecessors
@@ -390,22 +390,24 @@ def path_computation(origin, destination, graph, results):
     if 0<= dest_index < results.nodes:
         all_connectors = []
         all_nodes = [dest_index]
-        milepost = [skim_matrix_view[dest_index]]
+        mileposts = []
         p = dest_index
         if p != origin_index:
             while p != origin_index:
                 p = predecessors_view[p]
-                all_connectors.append(conn_view[dest_index])
+                connector = conn_view[dest_index]
+                all_connectors.append(graph.graph['link_id'][connector])
+                mileposts.append(g_view[connector])
                 all_nodes.append(p)
-                milepost.append(skim_matrix_view[p])
                 dest_index = p
             results.path = np.asarray(all_connectors, graph.default_types('int'))[::-1]
             results.path_nodes = graph.all_nodes[np.asarray(all_nodes, graph.default_types('int'))][::-1]
-            results.milepost =  np.asarray(milepost, graph.default_types('int'))[::-1]
+            mileposts.append(0)
+            results.milepost =  np.cumsum(mileposts[::-1])
 
             del all_nodes
             del all_connectors
-            del milepost
+            del mileposts
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
@@ -607,8 +609,7 @@ cpdef int path_finding(long origin,
                     connectors[j_current] = ids[j]
 
                 elif current_node.val > v.val + weight:
-                    decrease_val(&heap, current_node,
-                                 v.val + weight)
+                    decrease_val(&heap, current_node, v.val + weight)
                     pred[j_current] = v.index
                     #The link that took us to such node
                     connectors[j_current] = ids[j]

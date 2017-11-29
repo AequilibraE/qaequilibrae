@@ -40,5 +40,5 @@ class TestPathResults(TestCase):
         if list(self.r.path_nodes) != [5, 168, 166, 27]:
             self.fail('Path computation failed. Wrong sequence of path nodes')
 
-        if list(self.r.milepost) != [100, 101, 102]:
+        if list(self.r.milepost) != [0, 341, 1398, 2162]:
             self.fail('Path computation failed. Wrong milepost results')
