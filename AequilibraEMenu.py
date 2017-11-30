@@ -175,7 +175,7 @@ class AequilibraEMenu:
 
         # Graph generation
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_graph_creation.png")
-        self.graph_creation_action = QAction(icon, u"Create the graph", self.iface.mainWindow())
+        self.graph_creation_action = QAction(icon, u"Create graph", self.iface.mainWindow())
         QObject.connect(self.graph_creation_action, SIGNAL("triggered()"), self.run_create_graph)
         self.assignment_menu.addAction(self.graph_creation_action)
 

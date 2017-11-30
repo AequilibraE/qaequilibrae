@@ -165,7 +165,7 @@ class ShortestPathDialog(QtGui.QDialog, FORM_CLASS):
                 vl.updateFields()  # tell the vector layer to fetch changes from the provider
 
                 # add a feature
-                all_links=[]
+                all_links = []
                 for k in self.res.path:
                     fet = self.link_features[k]
                     all_links.append(fet)

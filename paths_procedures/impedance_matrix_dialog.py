@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/09/2016
+ Updated:    30/10/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ from qgis.core import *
 import qgis
 from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QObject, SIGNAL
+from PyQt4.QtCore import QObject, SIGNAL, Qt
 import sys, os
 import numpy as np
 
@@ -57,8 +57,9 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.load_graph_from_file.clicked.connect(self.loaded_new_graph_from_file)
 
         # For adding skims
-        self.bt_add_skim.clicked.connect(self.add_to_skim_list)
-        self.skim_list.doubleClicked.connect(self.slot_double_clicked)
+        # self.bt_add_skim.clicked.connect(self.add_to_skim_list)
+        self.but_adds_to_links.clicked.connect(self.append_to_list)
+        self.but_removes_from_links.clicked.connect(self.removes_fields)
 
         # RUN skims
         self.select_result.clicked.connect(self.browse_outfile)
@@ -68,10 +69,47 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
         # SECOND, we set visibility for sections that should not be shown when the form opens (overlapping items)
         #        and re-dimension the items that need re-dimensioning
         self.hide_all_progress_bars()
-        self.skim_list.setColumnWidth(0, 567)
+        self.available_skims_table.setColumnWidth(0, 245)
+        self.skim_list.setColumnWidth(0, 245)
 
         # loads default path from parameters
         self.path = standard_path()
+
+    def removes_fields(self):
+        table = self.available_skims_table
+        final_table = self.skim_list
+
+        for i in final_table.selectedRanges():
+            old_fields = [final_table.item(row, 0).text() for row in xrange(i.topRow(), i.bottomRow() + 1)]
+
+            for row in xrange(i.bottomRow(), i.topRow() - 1, -1):
+                final_table.removeRow(row)
+
+            counter = table.rowCount()
+            for field in old_fields:
+                table.setRowCount(counter + 1)
+                item1 = QTableWidgetItem(field)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                table.setItem(counter, 0, item1)
+                counter += 1
+
+    def append_to_list(self):
+        table = self.available_skims_table
+        final_table = self.skim_list
+
+        for i in table.selectedRanges():
+            new_fields = [table.item(row,0).text() for row in xrange(i.topRow(), i.bottomRow()+1)]
+
+            for row in xrange(i.bottomRow(), i.topRow() - 1, -1):
+                table.removeRow (row)
+
+            counter = final_table.rowCount()
+            for field in new_fields:
+                final_table.setRowCount(counter + 1)
+                item1 = QTableWidgetItem(field)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                final_table.setItem(counter, 0, item1)
+                counter += 1
 
     def hide_all_progress_bars(self):
         self.progressbar.setVisible(False)
@@ -84,24 +122,21 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
         new_name, file_type = GetOutputFileName(self, 'Graph file', file_types, ".aeg", self.path)
         self.cb_minimizing.clear()
-        self.cb_skims.clear()
-        self.all_centroids.setText('')
+        self.available_skims_table.clearContents()
         self.block_paths.setChecked(False)
         if new_name is not None:
             self.graph_file_name.setText(new_name)
             self.graph = Graph()
             self.graph.load_from_disk(new_name)
 
-            self.all_centroids.setText(str(self.graph.centroids))
-            if self.graph.block_centroid_flows:
-                self.block_paths.setChecked(True)
+            self.block_paths.setChecked(self.graph.block_centroid_flows)
             graph_fields = list(self.graph.graph.dtype.names)
-            self.skimmeable_fields = [x for x in graph_fields if
-                                      x not in ['link_id', 'a_node', 'b_node', 'direction', 'id', ]]
+            self.skimmeable_fields = self.graph.available_skims()
 
+            self.available_skims_table.setRowCount(len(self.skimmeable_fields))
             for q in self.skimmeable_fields:
                 self.cb_minimizing.addItem(q)
-                self.cb_skims.addItem(q)
+                self.available_skims_table.setItem(0, 0, QTableWidgetItem(q))
 
     def add_to_skim_list(self):
         if self.cb_skims.currentIndex() >= 0:
