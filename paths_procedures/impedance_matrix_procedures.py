@@ -41,7 +41,6 @@ class ComputeDistMatrix(WorkerThread):
         WorkerThread.__init__(self, parentThread)
         self.graph = graph
         self.result = result
-        self.skim_matrices = np.zeros((result.zones, result.zones, result.num_skims), np.float64)
         self.error = None
         self.report = []
         self.performed = 0
@@ -50,13 +49,13 @@ class ComputeDistMatrix(WorkerThread):
         centroids = self.graph.centroids + 1
 
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), 'Computing Impedance matrix_procedures')
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.graph.centroids)
+        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.graph.num_zones)
         self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
 
         aux_res = MultiThreadedNetworkSkimming()
         aux_res.prepare(self.graph, self.result)
 
-        origins = [i for i in range(self.result.zones)]
+        origins = list(self.graph.centroids)
 
         # catch errors
         if self.graph.cost_field is None:
@@ -73,7 +72,7 @@ class ComputeDistMatrix(WorkerThread):
             pool.close()
             pool.join()
 
-        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), self.graph.centroids)
+        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), self.graph.num_zones)
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Saving Outputs")
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), None)
 

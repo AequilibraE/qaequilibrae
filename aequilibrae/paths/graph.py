@@ -12,8 +12,8 @@
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    June/05/2015
- Updated:    25/02/2017
+ Created:    05/June/2015
+ Updated:    03/Dec/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -542,12 +542,13 @@ class Graph:
             else:
                 s = [self.cost_field]
                 for i in skim_fields:
-                    if s in self.graph.dtype.names:
-                        s.append(i)
+                    if i in self.graph.dtype.names:
+                        if i not in s:
+                            s.append(i)
                     else:
                         self.skim_fields = None
                         self.skims = None
-                        raise ValueError('Skim', s, ' not available in the graph:', self.graph.dtype.names)
+                        raise ValueError('Skim', i, ' not available in the graph:', self.graph.dtype.names)
                 skim_fields = s
         else:
             if skim_fields:

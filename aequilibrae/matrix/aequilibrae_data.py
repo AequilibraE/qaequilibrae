@@ -35,6 +35,8 @@ import sqlite3
 
 MEMORY = 1
 DISK = 0
+data_export_types = ['aed', 'csv', 'sqlite']
+
 
 class AequilibraEData(object):
 

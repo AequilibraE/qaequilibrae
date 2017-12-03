@@ -64,7 +64,7 @@ Shape:      1      |  [cores]   |    [indices]     |   [zones, indices]    |    
 Offset:     17     |     18     |  18 + 50*cores   | 18 + 50*cores + Y*20  |   18 + 50*cores + Y*20 + Y*zones*8   |
 
 """
-
+matrix_export_types = ["Aequilibrae matrix (*.aem)", "Comma-separated file (*.csv)"]
 
 class AequilibraeMatrix(object):
     def __init__(self):
@@ -88,6 +88,7 @@ class AequilibraeMatrix(object):
         self.dtype = None
         self.names = None
         self.__version__ = VERSION       # Writes file version
+
 
     def create_empty(self, file_name=None, zones=None, matrix_names=None, data_type=np.float64,
                      index_names=None, compressed=False):
@@ -337,11 +338,23 @@ class AequilibraeMatrix(object):
         del self.index
             
     def export(self, output_name, cores=None):
-        extension = output_name.upper()[-3:]
+        fname, file_extension = os.path.splitext(output_name.upper())
+
+        print output_name
+        print fname
+        print file_extension
+        file_extension = file_extension.encode('utf-8')
+
+        if file_extension not in ['.AEM', '.CSV']:
+            raise ValueError('File extension %d not implemented yet', file_extension)
+
         if cores is None:
             cores = self.names
 
-        if extension == 'CSV':
+        if file_extension == '.AEM':
+            self.copy(output_name=output_name, cores=cores)
+
+        if file_extension == '.CSV':
             names = self.view_names
             self.computational_view(cores)
             output = open(output_name, 'w')
@@ -362,8 +375,7 @@ class AequilibraeMatrix(object):
             output.flush()
             output.close()
             self.computational_view(names)
-        else:
-            warnings.warn('File extension not implemented yet')
+
 
     def load(self, file_path):
         self.file_path = file_path
@@ -397,7 +409,6 @@ class AequilibraeMatrix(object):
             self.matrix_view = self.matrices[:, :, self.names.index(core_list[0]):self.names.index(core_list[-1]) + 1]
 
     def copy(self, output_name=None, cores=None, names=None, compress=None):
-
         if output_name is None:
             output_name = self.random_name()
 

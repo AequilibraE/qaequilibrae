@@ -23,12 +23,15 @@
 import sys
 sys.dont_write_bytecode = True
 
-try:
-    import qgis
-    from qgis.core import *
-    from PyQt4.QtCore import SIGNAL
-except:
-    pass
+# # In case we are inside PyQGIS
+# try:
+#     import qgis
+#     from qgis.core import *
+#     from PyQt4.QtCore import SIGNAL
+#     inside_qgis = True
+# except:
+#     pass
+#     inside_qgis = False
 
 import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
@@ -48,6 +51,11 @@ def main():
 def network_skimming(graph, results, origins=None):
     aux_res = MultiThreadedNetworkSkimming()
     aux_res.prepare(graph, results)
+
+    # if inside_qgis:
+    #     self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), 'Computing Impedance matrix_procedures')
+    #     self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), graph.num_zones)
+    #     self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
 
     if origins is None:
         origins = list(graph.centroids)
