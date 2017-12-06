@@ -222,9 +222,9 @@
     <widget class="QLabel" name="lbl">
      <property name="geometry">
       <rect>
-       <x>401</x>
+       <x>413</x>
        <y>18</y>
-       <width>141</width>
+       <width>111</width>
        <height>20</height>
       </rect>
      </property>
@@ -236,7 +236,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Matrices to assign</string>
+      <string>Traffic classes</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -655,7 +655,7 @@
       <property name="geometry">
        <rect>
         <x>150</x>
-        <y>50</y>
+        <y>31</y>
         <width>451</width>
         <height>51</height>
        </rect>
@@ -679,7 +679,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>49</y>
+        <y>30</y>
         <width>121</width>
         <height>24</height>
        </rect>
@@ -688,30 +688,46 @@
        <string>Results</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="do_output_to_sqlite">
+     <widget class="QRadioButton" name="do_output_to_csv">
       <property name="geometry">
        <rect>
-        <x>380</x>
-        <y>10</y>
-        <width>231</width>
+        <x>30</x>
+        <y>100</y>
+        <width>61</width>
         <height>22</height>
        </rect>
       </property>
       <property name="text">
-       <string>Final outputs to SQLite</string>
+       <string>CSV</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="do_output_to_csv">
+     <widget class="QRadioButton" name="do_output_to_sqlite">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>10</y>
-        <width>231</width>
+        <x>90</x>
+        <y>100</y>
+        <width>71</width>
         <height>22</height>
        </rect>
       </property>
       <property name="text">
-       <string>Final outputs to CSVs</string>
+       <string>SQLite</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="do_output_to_aequilibrae">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>100</y>
+        <width>101</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Aequilibrae</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>

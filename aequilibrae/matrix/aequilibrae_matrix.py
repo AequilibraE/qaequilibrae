@@ -70,7 +70,6 @@ class AequilibraeMatrix(object):
     def __init__(self):
 
         self.file_path = None
-        self.zones = None
         self.dtype = None
         self.num_indices = None
         self.index_names = None
@@ -129,7 +128,7 @@ class AequilibraeMatrix(object):
         else:
             if isinstance(matrix_names, list) or isinstance(matrix_names, tuple):
                 for mat_name in matrix_names:
-                    if isinstance(mat_name, str):
+                    if isinstance(mat_name, str) or isinstance(mat_name, unicode):
                         if mat_name in object.__dict__:
                             raise ValueError(mat_name + ' is a reserved name')
                         if len(mat_name) > CORE_NAME_MAX_LENGTH:
@@ -140,7 +139,7 @@ class AequilibraeMatrix(object):
             else:
                 raise Exception('Matrix names need to be provided as a list')
 
-        self.names = matrix_names
+        self.names = [x.encode('utf-8') for x in matrix_names]
         self.cores = len(self.names)
         if None not in [self.file_path, self.zones]:
             self.__write__()
@@ -339,11 +338,6 @@ class AequilibraeMatrix(object):
             
     def export(self, output_name, cores=None):
         fname, file_extension = os.path.splitext(output_name.upper())
-
-        print output_name
-        print fname
-        print file_extension
-        file_extension = file_extension.encode('utf-8')
 
         if file_extension not in ['.AEM', '.CSV']:
             raise ValueError('File extension %d not implemented yet', file_extension)

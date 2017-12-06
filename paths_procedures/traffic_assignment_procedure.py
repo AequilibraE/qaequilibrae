@@ -52,38 +52,47 @@ class TrafficAssignmentProcedure(WorkerThread):
 
     def doWork(self):
 
-        self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), self.matrix.shape[0])
+        self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), self.matrix.zones)
         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 0)
-        # If we are going to perform All or Nothing
-        if self.method['algorithm'] == 'AoN':
-            pool = ThreadPool(self.results.cores)
-            self.all_threads['count'] = 0
-            for O in range(self.results.zones):
-                a = self.matrix[O, :]
-                if np.sum(a) > 0:
-                    pool.apply_async(self.func_assig_thread, args=(O, a))
-            pool.close()
-            pool.join()
 
-        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), self.matrix.shape[0])
-        self.results.link_loads = np.sum(self.aux_res.temp_link_loads, axis=1)
+        self.matrix.matrix_view = self.matrix.matrix_view.reshape((self.graph.num_zones, self.graph.num_zones,
+                                                                   self.results.classes['number']))
+        mat = self.matrix.matrix_view
+        pool = ThreadPool(self.results.cores)
+        self.all_threads = {'count': 0}
+        for orig in self.matrix.index:
+            i = self.graph.nodes_to_indices[orig]
+            if np.nansum(mat[i, :, :]) > 0:
+                if orig >= self.graph.nodes_to_indices.shape[0]:
+                    self.report.append("Centroid " + str(orig) + " does not exist in the graph")
+                elif self.graph.fs[int(orig)] == self.graph.fs[int(orig + 1)]:
+                    self.report.append("Centroid " + str(orig) + " does not exist in the graph")
+                else:
+                    pool.apply_async(self.func_assig_thread, args=(orig))
+                    # self.func_assig_thread(orig)
+        pool.close()
+        pool.join()
+
+        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), self.matrix.zones)
+        self.results.link_loads = np.sum(self.aux_res.temp_link_loads, axis=2)
 
         self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Saving Outputs")
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), None)
 
 
-    def func_assig_thread(self, O, a):
+    def func_assig_thread(self, O):
         if thread.get_ident() in self.all_threads:
             th = self.all_threads[thread.get_ident()]
         else:
             self.all_threads[thread.get_ident()] = self.all_threads['count']
             th = self.all_threads['count']
             self.all_threads['count'] += 1
-        a = one_to_all(O, a, self.graph, self.results, self.aux_res, th)
-        if a != O:
-            self.report.append(a)
+        x = one_to_all(O, self.matrix, self.graph, self.results, self.aux_res, th)
+        if x != O:
+            self.report.append(x)
+
 
 
         self.performed += 1
         self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), self.performed)
-        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), str(self.performed) + ' / ' + str(self.matrix.shape[0]-1))
+        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), str(self.performed) + ' / ' + str(self.matrix.zones))

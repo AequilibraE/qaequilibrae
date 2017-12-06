@@ -12,8 +12,7 @@ distribution:
     max iterations: 5000
 system:
   cpus: 4
-  default_directory: ///media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/AequilibraE/Example
-    Data/CharterTowers
+  default_directory: //home/pedro/.qgis2/python/plugins/AequilibraE/tests/data
   driving side: right
   logging: false
   report zeros: 1

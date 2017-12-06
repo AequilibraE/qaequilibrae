@@ -77,7 +77,7 @@ class AssignmentResults:
             self.centroids = graph.centroids
             self.links = graph.num_links
             self.num_skims = graph.skims.shape[1]
-            self.skim_names = graph.skim_fields
+            self.skim_names = [x.encode('utf-8') for x in graph.skim_fields]
             self.lids = graph.graph['link_id']
             self.direcs = graph.graph['direction']
             self.__redim()
@@ -91,12 +91,13 @@ class AssignmentResults:
             self.skims.matrices.fill(0)
             self.no_path.fill(0)
         else:
-            print 'Exception: Assignment results object was not yet prepared/initialized'
+            raise ValueError('Exception: Assignment results object was not yet prepared/initialized')
 
     def __redim(self):
         self.link_loads = np.zeros((self.links, self.classes['number']), self.__float_type)
         self.skims = np.zeros((self.zones, self.zones, self.num_skims), self.__float_type)
         self.skims = AequilibraeMatrix()
+
         self.skims.create_empty(file_name=self.skims.random_name(), zones=self.zones, matrix_names=self.skim_names)
         self.skims.index[:] = self.centroids[:]
         self.skims.computational_view()
@@ -185,17 +186,16 @@ class AssignmentResults:
     Returns:
         Nothing'''
 
-        file_type = os.path.splitext(file_name)[1]
+        fname, file_type = os.path.splitext(file_name.upper())
+
         fields = []
         if output == 'loads':
             for n in self.classes['names']:
                 fields.extend([n + '_ab', n + '_ba', n + '_tot'])
             types = [np.float64] * len(fields)
 
-            if file_type == 'aed':
+            if file_type == '.AED':
                 aed_file_name = file_name
-                if file_name[-3:] != 'aed':
-                    aed_file_name = aed_file_name + '.aed'
                 memory_mode = False
             else:
                 memory_mode = True

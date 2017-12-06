@@ -52,11 +52,6 @@ except:
 sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_traffic_assignment.ui'))
 
-"""
-TODO
-Add check for matrix index uniqueness and compatibility with assignment (0-n) size
-
-"""
 
 class TrafficAssignmentDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -67,11 +62,9 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.output_path = None
         self.temp_path = None
         self.error = None
-        self.output = None
         self.report = None
         self.method = {}
         self.matrices = OrderedDict()
-        self.assignable = AequilibraeMatrix()
         self.skims = []
         self.matrix = None
         self.graph = Graph()
@@ -112,7 +105,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             table.setColumnWidth(3, 40)
 
         self.graph_properties_table.setColumnWidth(0,190)
-        self.graph_properties_table.setColumnWidth(1,240)
+        self.graph_properties_table.setColumnWidth(1, 240)
         #critical link
         self.but_build_query.clicked.connect(partial(self.build_query, 'select link'))
         self.do_select_link.stateChanged.connect(self.set_behavior_special_analysis)
@@ -181,24 +174,16 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
                 cell_widget.setLayout(lay_out)
                 return cell_widget
 
+            items = [['Graph ID', self.graph.__id__],
+                     ['Number of links', self.graph.num_links],
+                     ['Number of nodes', self.graph.num_nodes],
+                     ['Number of centroids', self.graph.num_zones]]
+
             self.graph_properties_table.clearContents()
             self.graph_properties_table.setRowCount(5)
-
-            self.graph_properties_table.setItem(0, 0, QTableWidgetItem('Graph ID'))
-            self.graph_properties_table.setItem(0, 1, QTableWidgetItem(self.graph.__id__))
-
-            self.graph_properties_table.setItem(1, 0, QTableWidgetItem('Number of links'))
-            self.graph_properties_table.setItem(1, 1, QTableWidgetItem(str(self.graph.num_links)))
-
-            self.graph_properties_table.setItem(2, 0, QTableWidgetItem('Number of nodes'))
-            self.graph_properties_table.setItem(2, 1, QTableWidgetItem(str(self.graph.num_nodes)))
-
-            self.graph_properties_table.setItem(3, 0, QTableWidgetItem('Number of centroids'))
-            self.number_of_zones = QSpinBox()
-            self.number_of_zones.setMinimum(0)
-            self.number_of_zones.setMaximum(self.graph.num_nodes)
-            self.number_of_zones.setValue(self.graph.centroids)
-            self.graph_properties_table.setCellWidget(3, 1, self.number_of_zones)
+            for i, item in enumerate(items):
+                self.graph_properties_table.setItem(i, 0, QTableWidgetItem(item[0]))
+                self.graph_properties_table.setItem(i, 1, QTableWidgetItem(str(item[1])))
 
             self.graph_properties_table.setItem(4, 0, QTableWidgetItem('Block flows through centroids'))
             self.block_centroid_flows = QCheckBox()
@@ -223,32 +208,32 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.exec_()
 
     def job_finished_from_thread(self, success):
-        if self.worker_thread.report:
-            self.report = self.worker_thread.report
-        else:
-            self.output = self.results.link_loads
-            self.report = self.worker_thread.report
+        self.report = self.worker_thread.report
+        self.produce_all_outputs()
 
-            self.produce_all_outputs()
         self.exit_procedure()
 
     def run(self):
         if self.check_data():
             self.set_output_names()
             self.progressbar0.setVisible(True)
+            # try:
             self.worker_thread = TrafficAssignmentProcedure(qgis.utils.iface.mainWindow(), self.matrix, self.graph,
                                                             self.results, self.method)
             self.run_thread()
+            logger(self.worker_thread.report)
+            # except ValueError as error:
+            #     qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
         else:
             qgis.utils.iface.messageBar().pushMessage("Input error", self.error, level=3)
 
     def set_output_names(self):
-        self.path_file.temp_file = os.path.join(self.temp_path, 'path_file')
+        self.path_file.temp_file = os.path.join(self.temp_path, 'path_file.aed')
         self.path_file.output_name = os.path.join(self.output_path, 'path_file')
         self.path_file.extension = 'aed'
 
         if self.do_path_file.isChecked():
-            self.results.setSavePathFile(save=True,path_result=self.path_file.temp_file)
+            self.results.setSavePathFile(save=True, path_result=self.path_file.temp_file)
 
         self.link_extract.temp_file = os.path.join(self.temp_path, 'link_extract')
         self.link_extract.output_name = os.path.join(self.output_path, 'link_extract')
@@ -260,28 +245,30 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
 
     def check_data(self):
         self.error = None
-        # self.consolidate
-        if self.matrix is None:
-            self.error = 'Demand matrix_procedures missing'
+
+        self.change_graph_settings()
 
         if not self.graph.num_links:
             self.error = 'Graph was not loaded'
+            return False
+
+        self.matrix = None
+        self.prepare_assignable_matrices()
+        if self.matrix is None:
+            self.error = 'Demand matrix missing'
+            return False
+
 
         if self.output_path is None:
             self.error = 'Parameters for output missing'
-
-        if self.results.zones != self.matrix.zones:
-            self.error = 'Number of zones in the graph ({0}) does not match the number of ' \
-                         'zones in your matrix_procedures ({1})'.format(self.results.zones, self.matrix.zones)
-
-        if self.error is not None:
             return False
 
-        else:
-            self.temp_path = os.path.join(self.output_path, 'temp')
-            if not os.path.exists(self.temp_path):
-                os.makedirs(self.temp_path)
-            return True
+        self.temp_path = os.path.join(self.output_path, 'temp')
+        if not os.path.exists(self.temp_path):
+            os.makedirs(self.temp_path)
+
+        self.results.prepare(self.graph, self.matrix)
+        return True
 
     def load_assignment_queries(self):
         # First we load the assignment queries
@@ -315,28 +302,24 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
     def progress_text_from_thread(self, val):
         self.progress_label0.setText(val)
 
+    # TODO: Write code to export skims
     def produce_all_outputs(self):
 
+        extension = 'aed'
+        if not self.do_output_to_aequilibrae.isChecked():
+            extension = 'csv'
+            if self.do_output_to_sqlite.isChecked():
+                extension = 'sqlite'
+
         # Save link flows to disk
-        if self.do_output_to_sqlite.isChecked():
-            self.results.save_to_disk(output='loads',
-                                      file_name= os.path.join(self.output_path, 'link_flows.db'),
-                                      file_type='sqlite')
-        else:
-            self.results.save_to_disk(output='loads',
-                                      file_name= os.path.join(self.output_path, 'link_flows.csv'),
-                                      file_type='csv')
+        self.results.save_to_disk(os.path.join(self.output_path, 'link_flows.' + extension), output='loads')
 
         # save Path file if that is the case
         if self.do_path_file.isChecked():
             if self.method['algorithm'] == 'AoN':
                 if self.do_output_to_sqlite.isChecked():
-                    self.results.save_to_disk(output='path_file',
-                                              file_name= os.path.join(self.output_path, 'path_file.db'),
-                                              file_type='sqlite')
-                else:
-                    shutil.move(self.path_file.temp_file + '.aep', self.path_file.output_name + '.aep')
-                    shutil.move(self.path_file.temp_file + '.aed', self.path_file.output_name + '.aed')
+                    self.results.save_to_disk(file_name= os.path.join(self.output_path, 'path_file.' + extension),
+                                              output='path_file')
 
 
         # if self.do_select_link.isChecked():
@@ -355,7 +338,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         #         shutil.move(self.link_extract.temp_file + '.aep', self.link_extract.output_name)
         #         shutil.move(self.link_extract.temp_file + '.aed', self.link_extract.output_name[:-3] + 'aed')
 
-        self.exit_procedure()
 
 # Procedures related to critical analysis. Not yet fully implemented
     def build_query(self, purpose):
@@ -526,61 +508,52 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         cbox.currentIndexChanged.connect(self.changed_assignable_matrix)
         self.table_matrices_to_assign.setCellWidget(row_count, 0, cbox)
 
-    def consolidate_matrices_in_assignable(self):
-        list_names = list(self.matrices.keys())
-        if len(list_names):
-            zones = self.matrices[list_names[0]].zones
-            for m in list_names:
-                if zones != self.matrices[m].zones:
-                    self.error = 'Assignable matrix dimensions are not compatible'
 
-            if self.error is None:
-                self.matrix = AequilibraeMatrix()
-                self.matrix.create_empty(zones=zones, matrix_names=list_names)
+    def prepare_assignable_matrices(self):
+        table = self.table_matrices_to_assign
+        idx = self.graph.centroids
+        mat_names = []
+        if table.rowCount() > 1:
+            for row in range(table.rowCount() - 1):
+                mat = table.cellWidget(row, 0).currentText()
+                core = table.cellWidget(row, 1).currentText()
+
+                if not np.array_equal(idx,self.matrices[mat].index):
+                    self.error = 'Assignable matrix ' + mat + ' has indices that do not match the centroids'
+                if core in mat_names:
+                    self.error = 'Assignable matrices cannot have same names'
+                mat_names.append(core.encode('utf-8'))
+
+            self.matrix = AequilibraeMatrix()
+            self.matrix.create_empty(file_name=self.matrix.random_name(),
+                                         zones=idx.shape[0],
+                                         matrix_names=mat_names)
+            self.matrix.index[:] = idx[:]
+
+            for row in range(table.rowCount() - 1):
+                mat = table.cellWidget(row, 0).currentText()
+                core = table.cellWidget(row, 1).currentText()
+                self.matrix.matrix[core][:, :] = self.matrices[mat].matrix[core][:, :]
+            self.matrix.computational_view()
         else:
             self.error = 'You need to have at least one matrix to assign'
 
-# Run preparation procedures
+        # Run preparation procedures
     def change_graph_settings(self):
         skims = []
         table = self.skim_list_table
-        for i in table.rowCount:
+        for i in range(table.rowCount()):
             for chb in table.cellWidget(i, 0).findChildren(QCheckBox):
                 if chb.isChecked():
-                    skims.append(table.item(i, 1).text())
+                    skims.append(table.item(i, 1).text().encode('utf-8'))
 
         if len(skims) == 0:
             skims = False
 
-        self.graph.set_graph(centroids=self.number_of_zones.value(),
-                             cost_field=self.minimizing_field.currentText(),
+        self.graph.set_graph(cost_field=self.minimizing_field.currentText(),
                              skim_fields=skims,
                              block_centroid_flows=self.block_centroid_flows.isChecked())
 
-    def prepare_assignable_matrices(self):
-        table = self.table_matrices_to_assign
-        idx = None
-        mat_names = []
-        for row in range(table.rowCount() - 1):
-            mat = table.cellWidget(row, 0).currentText()
-            core = table.cellWidget(row, 1).currentText()
-            if idx is None:
-                idx = self.matrices[mat].index
-            if not np.array_equal(idx,self.matrices[mat].index):
-                self.error = 'Assignable matrices have mismatching indices'
-            if core in mat_names:
-                self.error = 'Assignable matrices cannot have same names'
-            mat_names.append(core)
-
-        self.assignable.create_empty(file_name=self.assignable.random_name(),
-                                     zones=idx.shape[0],
-                                     matrix_names=mat_names)
-        self.assignable.index[:] = idx[:]
-
-        for row in range(table.rowCount() - 1):
-            mat = table.cellWidget(row, 0).currentText()
-            core = table.cellWidget(row, 1).currentText()
-            self.assignable.matrix[core][:, :] = self.matrices[mat].matrix[core][:, :]
 
     def exit_procedure(self):
         self.close()
