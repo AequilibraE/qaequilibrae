@@ -119,7 +119,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.link_extract = OutputType()
 
         # Disabling resources not yet implemented
-        self.do_output_to_csv.setEnabled(False)
         self.do_select_link.setEnabled(False)
         self.but_build_query.setEnabled(False)
         self.select_link_list.setEnabled(False)

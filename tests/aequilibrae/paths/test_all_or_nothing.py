@@ -23,15 +23,16 @@ class TestAll_or_nothing(TestCase):
         # Prepares the matrix for assignment
         args = {'file_name': '/tmp/my_matrix.aem',
                 'zones': g.num_zones,
-                'matrix_names': ['mat'],
+                'matrix_names': ['cars', 'trucks'],
                 'index_names': ['my indices']}
 
         matrix = AequilibraeMatrix()
         matrix.create_empty(**args)
 
         matrix.index[:] = g.centroids[:]
-        matrix.mat.fill(1)
-        matrix.computational_view(['mat'])
+        matrix.cars.fill(1)
+        matrix.trucks.fill(1)
+        matrix.computational_view(['cars'])
 
         # Performs assignment
         res = AssignmentResults()
@@ -41,5 +42,16 @@ class TestAll_or_nothing(TestCase):
         res.save_to_disk('/tmp/link_loads.aed')
         res.save_to_disk('/tmp/link_loads.csv')
 
-        # TODO: Inserte the check for whether this worked
+
+        matrix.computational_view()
+        # Performs assignment
+        res = AssignmentResults()
+        res.prepare(g, matrix)
+
+        all_or_nothing(matrix, g, res)
+        res.save_to_disk('/tmp/link_loads_2_classes.aed')
+        res.save_to_disk('/tmp/link_loads_2_classes.csv')
+
+
+    # TODO: Inserte the check for whether this worked
         self.fail('Assignment failed')

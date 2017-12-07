@@ -142,7 +142,7 @@ class AequilibraEData(object):
         self.num_fields = len(self.fields)
         self.data_types = [self.data[x].dtype.type for x in self.fields]
 
-    def export(self, file_name, table_name='table'):
+    def export(self, file_name, table_name='aequilibrae_table'):
         """
         :param file_name: File name with PATH and extension (csv, or sqlite3, sqlite or db)
         :param table_name: It only applies if you are saving to an SQLite table. Otherwise ignored

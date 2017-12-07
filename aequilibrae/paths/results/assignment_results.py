@@ -190,6 +190,7 @@ class AssignmentResults:
 
         fields = []
         if output == 'loads':
+            table_name = 'link_loads'
             for n in self.classes['names']:
                 fields.extend([n + '_ab', n + '_ba', n + '_tot'])
             types = [np.float64] * len(fields)
@@ -231,7 +232,7 @@ class AssignmentResults:
 
             # Save to disk
             if file_type != 'aed':
-                res.export(file_name)
+                res.export(file_name, table_name=table_name)
 
             del res
         # TODO: Re-factor the exporting of the path file within the AequilibraeData format
