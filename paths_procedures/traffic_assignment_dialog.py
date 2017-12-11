@@ -13,24 +13,19 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-30
- Updated:... 2017-10-15
+ Updated:... 2017-12-11
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
-import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4 import QtGui, QtCore, uic
-from qgis.gui import QgsMapLayerProxyModel, QgsFieldProxyModel
+from PyQt4 import QtGui, uic
+from qgis.gui import QgsMapLayerProxyModel
 import sys
-import os
 from functools import partial
 import numpy as np
-import uuid
-import shutil
 from collections import OrderedDict
 
 from ..common_tools.global_parameters import *
@@ -40,12 +35,11 @@ from ..common_tools import ReportDialog
 from ..common_tools import GetOutputFolderName, GetOutputFileName
 from ..aequilibrae.matrix import AequilibraeMatrix
 
-from traffic_assignment_procedure import TrafficAssignmentProcedure
 from load_select_link_query_builder_dialog import LoadSelectLinkQueryBuilderDialog
 
 no_binary = False
 try:
-    from aequilibrae.paths import Graph, AssignmentResults
+    from aequilibrae.paths import Graph, AssignmentResults, allOrNothing
 except:
     no_binary = True
 
@@ -69,6 +63,8 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.matrix = None
         self.graph = Graph()
         self.results = AssignmentResults()
+        self.block_centroid_flows = None
+        self.worker_thread = None
 
         # Signals for the matrix_procedures tab
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
@@ -104,9 +100,10 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             table.setColumnWidth(2, 150)
             table.setColumnWidth(3, 40)
 
-        self.graph_properties_table.setColumnWidth(0,190)
+        self.graph_properties_table.setColumnWidth(0, 190)
         self.graph_properties_table.setColumnWidth(1, 240)
-        #critical link
+
+        # critical link
         self.but_build_query.clicked.connect(partial(self.build_query, 'select link'))
         self.do_select_link.stateChanged.connect(self.set_behavior_special_analysis)
         self.tot_crit_link_queries = 0
@@ -150,7 +147,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         file_types = ["AequilibraE graph(*.aeg)"]
         default_type = '.aeg'
         box_name = 'Traffic Assignment'
-        graph_file, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
+        graph_file, _ = GetOutputFileName(self, box_name, file_types, default_type, self.path)
 
         if graph_file is not None:
             self.graph.load_from_disk(graph_file)
@@ -164,10 +161,10 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.results.set_cores(cores)
 
             # show graph properties
-            def centers_item(item):
+            def centers_item(qt_item):
                 cell_widget = QWidget()
                 lay_out = QHBoxLayout(cell_widget)
-                lay_out.addWidget(item)
+                lay_out.addWidget(qt_item)
                 lay_out.setAlignment(Qt.AlignCenter)
                 lay_out.setContentsMargins(0, 0, 0, 0)
                 cell_widget.setLayout(lay_out)
@@ -197,16 +194,12 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.method['algorithm'] = 'AoN'
 
     def run_thread(self):
-        self.progress_label0.setVisible(True)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.job_finished_from_thread)
+
+        QObject.connect(self.worker_thread, SIGNAL("assignment"), self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 
-    def job_finished_from_thread(self, success):
+    def job_finished_from_thread(self):
         self.report = self.worker_thread.report
         self.produce_all_outputs()
 
@@ -215,14 +208,15 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
     def run(self):
         if self.check_data():
             self.set_output_names()
+            self.progress_label0.setVisible(True)
             self.progressbar0.setVisible(True)
-            # try:
-            self.worker_thread = TrafficAssignmentProcedure(qgis.utils.iface.mainWindow(), self.matrix, self.graph,
-                                                            self.results, self.method)
-            self.run_thread()
-            logger(self.worker_thread.report)
-            # except ValueError as error:
-            #     qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
+            self.progressbar0.setRange(0, self.graph.num_zones)
+            try:
+                if self.method['algorithm'] == 'AoN':
+                    self.worker_thread = allOrNothing(self.matrix, self.graph, self.results)
+                self.run_thread()
+            except ValueError as error:
+                qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
         else:
             qgis.utils.iface.messageBar().pushMessage("Input error", self.error, level=3)
 
@@ -257,7 +251,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.error = 'Demand matrix missing'
             return False
 
-
         if self.output_path is None:
             self.error = 'Parameters for output missing'
             return False
@@ -271,9 +264,9 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
 
     def load_assignment_queries(self):
         # First we load the assignment queries
-        query_labels=[]
+        query_labels = []
         query_elements = []
-        query_types=[]
+        query_types = []
         if self.tot_crit_link_queries:
             for i in range(self.tot_crit_link_queries):
                 links = eval(self.select_link_list.item(i, 0).text())
@@ -282,28 +275,29 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
 
                 for l in links:
                     d = directions_dictionary[l[1]]
-                    lk = self.graph.ids[(self.graph.graph['link_id'] == int(l[0])) & (self.graph.graph['direction'] == d)]
+                    lk = self.graph.ids[(self.graph.graph['link_id'] == int(l[0])) &
+                                        (self.graph.graph['direction'] == d)]
 
                 query_labels.append(query_name)
                 query_elements.append(lk)
-                query_types(query_type)
+                query_types.append(query_type)
 
         self.critical_queries = {'labels': query_labels,
                                  'elements': query_elements,
                                  ' type': query_types}
 
-    def progress_range_from_thread(self, val):
-        self.progressbar0.setRange(0, val)
-
-    def progress_value_from_thread(self, val):
-        self.progressbar0.setValue(val)
-
-    def progress_text_from_thread(self, val):
-        self.progress_label0.setText(val)
+    def signal_handler(self, val):
+        if val[0] == 'zones finalized':
+            self.progressbar0.setValue(val[1])
+        elif val[0] == 'text AoN':
+            self.progress_label0.setText(val[1])
+        elif val[0] == 'finished_threaded_procedure':
+            self.job_finished_from_thread()
 
     # TODO: Write code to export skims
     def produce_all_outputs(self):
 
+        logger(self.results.link_loads)
         extension = 'aed'
         if not self.do_output_to_aequilibrae.isChecked():
             extension = 'csv'
@@ -317,9 +311,8 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         if self.do_path_file.isChecked():
             if self.method['algorithm'] == 'AoN':
                 if self.do_output_to_sqlite.isChecked():
-                    self.results.save_to_disk(file_name= os.path.join(self.output_path, 'path_file.' + extension),
+                    self.results.save_to_disk(file_name=os.path.join(self.output_path, 'path_file.' + extension),
                                               output='path_file')
-
 
         # if self.do_select_link.isChecked():
         #     if self.method['algorithm'] == 'AoN':
@@ -345,8 +338,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             message = 'Select Link Analysis'
             table = self.select_link_list
             counter = self.tot_crit_link_queries
-
-        if purpose == 'Link flow extraction':
+        else:
             button = self.but_build_query_extract
             message = 'Link flow extraction'
             table = self.list_link_extraction
@@ -381,7 +373,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
     def click_button_inside_the_list(self, purpose):
         if purpose == 'select link':
             table = self.select_link_list
-        elif purpose == 'Link flow extraction':
+        else:
             table = self.list_link_extraction
 
         button = self.sender()
@@ -403,7 +395,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.do_path_file.setEnabled(behavior)
 
         # This line of code turns off the features of select link analysis and link flow extraction while these
-        #features are still being developed
+        # features are still being developed
         behavior = False
 
         self.do_select_link.setEnabled(behavior)
@@ -552,7 +544,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
         self.graph.set_graph(cost_field=self.minimizing_field.currentText(),
                              skim_fields=skims,
                              block_centroid_flows=self.block_centroid_flows.isChecked())
-
 
     def exit_procedure(self):
         self.close()
