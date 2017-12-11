@@ -114,4 +114,3 @@ class allOrNothing(WorkerThread):
         self.emit(SIGNAL("assignment"), ['zones finalized', self.cumulative])
         txt = str(self.cumulative) + ' / ' + str(self.matrix.zones)
         self.emit(SIGNAL("assignment"), ['text AoN', txt])
-        sleep(1)

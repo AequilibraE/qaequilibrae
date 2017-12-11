@@ -40,6 +40,7 @@ class DisplayMatrixDialog(QDialog, FORM_CLASS):
         self.dataset = AequilibraeMatrix()
         self.but_load.setText('Load matrix')
         self.but_load.clicked.connect(self.load_the_vector)
+        self.load_the_vector()
 
     def load_the_vector(self):
         self.error = None

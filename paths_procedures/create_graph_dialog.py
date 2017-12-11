@@ -283,19 +283,19 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.worker_thread.error,
                                                       level=1)
         else:
-            error = None
+            self.error = None
             try:
                 self.worker_thread.graph.set_graph(cost_field=self.cost_field,
                                                        block_centroid_flows=self.block_through_centroids)
-            except Exception as error:
-                self.output.append(error)
+            except Exception as self.error:
+                self.output.append(self.error)
             self.worker_thread.graph.save_to_disk(self.output)
             qgis.utils.iface.messageBar().pushMessage("Finished. ", 'Graph saved successfully', level=3)
 
         self.exit_procedure()
 
         if self.worker_thread.report:
-            if error is not None:
+            if self.error is not None:
                 self.worker_thread.report.append('\n\n\n')
                 self.worker_thread.report.append('##########   EXCEPTION:    ##########')
                 self.worker_thread.report.append(error)
