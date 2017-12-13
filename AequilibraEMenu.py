@@ -35,7 +35,7 @@ from .distribution_procedures import DistributionModelsDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
-from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayDatasetDialog, DisplayMatrixDialog
+from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayDatasetDialog, DisplayMatrixDialog, MatrixManipulationDialog
 import tempfile, glob
 from .aequilibrae.__version__ import version as VERSION_GRAPH
 
@@ -310,7 +310,8 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_display_matrix(self):
-        dlg2 = DisplayMatrixDialog(self.iface)
+        # dlg2 = DisplayMatrixDialog(self.iface)
+        dlg2 = MatrixManipulationDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

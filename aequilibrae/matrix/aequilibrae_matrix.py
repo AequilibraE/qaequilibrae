@@ -33,6 +33,8 @@ FLOAT = 1
 COMPLEX = 2
 CORE_NAME_MAX_LENGTH = 50
 INDEX_NAME_MAX_LENGTH = 20
+MATRIX_NAME_MAX_LENGTH = 20
+MATRIX_DESCRIPTION_MAX_LENGTH = 144  # Why not a tweet?
 NOT_COMPRESSED = 0
 COMPRESSED = 1
 
@@ -58,10 +60,15 @@ Shape:      1   |       1       |           1                |     1      |     
 Offset:     0   |       1       |           2                |     10     |     14     |      15          |    16     |
 
 
-What:    Data size | Core names |   index names    |      indices          |             Matrin-1                 |
-Size:     uint8    |     S50    |      S20         |      uint64           |      f(Data type, Data size)         |
-Shape:      1      |  [cores]   |    [indices]     |   [zones, indices]    |       [zones, zones, cores]          |
-Offset:     17     |     18     |  18 + 50*cores   | 18 + 50*cores + Y*20  |   18 + 50*cores + Y*20 + Y*zones*8   |
+What:    Data size |  matrix name | matrix description | Core names |   index names    |
+Size:     uint8    |     S20      |          S144      |    S50     |      S20         |
+Shape:      1      |      1       |            1       |  [cores]   |    [indices]     |
+Offset:     17     |     18       |          38        |     182    |  182 + 50*cores  |
+
+What:         indices          |             Matrin-1                 |
+Size:         uint64           |      f(Data type, Data size)         |
+Shape:     [zones, indices]    |       [zones, zones, cores]          |
+Offset:  18 + 50*cores + Y*20  |   18 + 50*cores + Y*20 + Y*zones*8   | 
 
 """
 matrix_export_types = ["Aequilibrae matrix (*.aem)", "Comma-separated file (*.csv)"]
@@ -86,6 +93,8 @@ class AequilibraeMatrix(object):
         self.zones = None
         self.dtype = None
         self.names = None
+        self.name = None
+        self.description = None
         self.__version__ = VERSION       # Writes file version
 
 
@@ -194,12 +203,22 @@ class AequilibraeMatrix(object):
             elif data_size == 16:
                 self.dtype = np.float128
 
+        # matrix name
+        self.name = np.memmap(self.file_path, dtype='S' + str(MATRIX_NAME_MAX_LENGTH), offset=18, mode='r+',
+                                    shape=1)[0]
+
+        # matrix description
+        offset = 18 + MATRIX_NAME_MAX_LENGTH
+        self.description = np.memmap(self.file_path, dtype='S' + str(MATRIX_DESCRIPTION_MAX_LENGTH), offset=offset,
+                                          mode='r+', shape=1)[0]
+
         # core names
-        self.names = list(np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=18, mode='r+',
+        offset += MATRIX_DESCRIPTION_MAX_LENGTH
+        self.names = list(np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=offset, mode='r+',
                                     shape=self.cores))
 
         # Index names
-        offset = 18 + CORE_NAME_MAX_LENGTH * self.cores
+        offset += CORE_NAME_MAX_LENGTH * self.cores
         self.index_names = list(np.memmap(self.file_path, dtype='S' + str(INDEX_NAME_MAX_LENGTH), offset=offset,
                                           mode='r+', shape=self.num_indices))
 
@@ -249,15 +268,25 @@ class AequilibraeMatrix(object):
         data_size = np.dtype(self.dtype).itemsize
         np.memmap(self.file_path, dtype='uint8', offset=17, mode='r+', shape=1)[0] = data_size
 
+        # matrix name
+        np.memmap(self.file_path, dtype='S' + str(MATRIX_NAME_MAX_LENGTH), offset=18, mode='r+',
+                       shape=1)[0] = self.name
+
+        # matrix description
+        offset = 18 + MATRIX_NAME_MAX_LENGTH
+        np.memmap(self.file_path, dtype='S' + str(MATRIX_DESCRIPTION_MAX_LENGTH), offset=offset, mode='r+',
+                       shape=1)[0] = self.description
+
         # core names
-        fp = np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=18, mode='r+', shape=self.cores)
+        offset += MATRIX_DESCRIPTION_MAX_LENGTH
+        fp = np.memmap(self.file_path, dtype='S' + str(CORE_NAME_MAX_LENGTH), offset=offset, mode='r+', shape=self.cores)
         for i, v in enumerate(self.names):
             fp[i] = v
         fp.flush()
         del fp
 
         # Index names
-        offset = 18 + CORE_NAME_MAX_LENGTH * self.cores
+        offset += CORE_NAME_MAX_LENGTH * self.cores
         fp = np.memmap(self.file_path, dtype='S' + str(INDEX_NAME_MAX_LENGTH), offset=offset, mode='r+',
                        shape=self.num_indices)
         for i, v in enumerate(self.index_names):
@@ -485,6 +514,22 @@ class AequilibraeMatrix(object):
             raise ValueError('Data type not supported. You can choose Integers of 8, 16, 32 and 64 bits, '
                              'or floats with 16, 32 or 64 bits')
         return data_class
+
+    def setName(self, matrix_name):
+        if matrix_name is not None:
+            if len(str(matrix_name)) > MATRIX_NAME_MAX_LENGTH:
+                matrix_name = str(matrix_name)[0:MATRIX_NAME_MAX_LENGTH]
+
+            np.memmap(self.file_path, dtype='S' + str(MATRIX_NAME_MAX_LENGTH), offset=18, mode='r+',
+                      shape=1)[0] = matrix_name
+
+    def setDescription(self, matrix_description):
+        if matrix_description is not None:
+            if len(str(matrix_description)) > MATRIX_DESCRIPTION_MAX_LENGTH:
+                matrix_description = str(matrix_description)[0:MATRIX_DESCRIPTION_MAX_LENGTH]
+
+            np.memmap(self.file_path, dtype='S' + str(MATRIX_NAME_MAX_LENGTH), offset=18 + MATRIX_NAME_MAX_LENGTH,
+                      mode='r+', shape=1)[0] = matrix_description
 
     @staticmethod
     def random_name():

@@ -1,8 +1,8 @@
 from unittest import TestCase
 import os
-import tempfile
-
+import datetime
 import numpy as np
+import random
 
 from aequilibrae.matrix import AequilibraeMatrix
 
@@ -26,6 +26,8 @@ class TestAequilibraeMatrix(TestCase):
         matrix.index[:] = np.arange(matrix.zones) + 100
         matrix.mat[:, :] = np.random.rand(matrix.zones, matrix.zones)[:, :]
         matrix.mat[:, :] = matrix.mat[:, :] * (1000 / np.sum(matrix.mat[:, :]))
+        matrix.setName('Test matrix - ' + str(random.randint(1, 10)))
+        matrix.setDescription('Generated at ' + datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"))
         matrix.close(True)
         del (matrix)
 
@@ -46,6 +48,8 @@ class TestAequilibraeMatrix(TestCase):
         self.new_matrix.matrix_view[:, :] = np.arange(zones ** 2).reshape(zones, zones)
         if np.sum(self.new_matrix.mat) != np.sum(self.new_matrix.matrix_view):
             self.fail('Assigning to matrix view did not work')
+        self.new_matrix.setName('Test matrix - ' + str(random.randint(1, 10)))
+        self.new_matrix.setDescription('Generated at ' + datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"))
         self.new_matrix.close(True)
 
     def test_copy(self):
