@@ -10,6 +10,7 @@ lib_path = os.path.abspath(os.path.join('..', '..'))
 sys.path.append(lib_path)
 from data import path_test, test_graph
 
+
 # TODO: Add checks for results for this test (Assignment AoN)
 class TestAllOrNothing(TestCase):
     def test_execute(self):
@@ -18,7 +19,6 @@ class TestAllOrNothing(TestCase):
         g.load_from_disk(test_graph)
         g.set_graph(cost_field='distance', skim_fields=None)
         # None implies that only the cost field will be skimmed
-
 
         # Prepares the matrix for assignment
         args = {'file_name': '/tmp/my_matrix.aem',
@@ -43,7 +43,6 @@ class TestAllOrNothing(TestCase):
 
         res.save_to_disk('/tmp/link_loads.aed')
         res.save_to_disk('/tmp/link_loads.csv')
-
 
         matrix.computational_view()
         # Performs assignment

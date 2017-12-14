@@ -180,9 +180,6 @@ class MatrixManipulationDialog(QtGui.QDialog, FORM_CLASS):
         self.frame_math_simple_1.setVisible(bsc)
         self.frame_math_simple_2.setVisible(bsc)
 
-
-
-
     def export(self):
         new_name, file_type = GetOutputFileName(self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.path)
         if new_name is not None:

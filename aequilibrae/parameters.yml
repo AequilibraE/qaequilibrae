@@ -1,5 +1,5 @@
 assignment:
-  frank-wolfe:
+  Equilibrium:
     rgap: 1.0e-05
 distribution:
   gravity:
@@ -12,8 +12,9 @@ distribution:
     max iterations: 5000
 system:
   cpus: 4
-  default_directory: //home/pedro/.qgis2/python/plugins/AequilibraE/tests/data
-  driving side: right
-  logging: false
-  report zeros: 1
+  default_directory: /home/pedro/.qgis2/python/plugins/AequilibraE/tests/data
   temp directory: /temp
+  driving side: right
+  logging: False
+  report zeros: 1
+

@@ -310,8 +310,8 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_display_matrix(self):
-        # dlg2 = DisplayMatrixDialog(self.iface)
-        dlg2 = MatrixManipulationDialog(self.iface)
+        dlg2 = DisplayMatrixDialog(self.iface)
+        # dlg2 = MatrixManipulationDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

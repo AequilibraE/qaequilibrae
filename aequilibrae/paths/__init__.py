@@ -13,7 +13,7 @@ from graph import Graph
 from .results import *
 from multi_threaded_aon import MultiThreadedAoN
 from multi_threaded_skimming import MultiThreadedNetworkSkimming
-from networkskimming import network_skimming
+from network_skimming import NetworkSkimming
 from all_or_nothing import allOrNothing
 
 try:

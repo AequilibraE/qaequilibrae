@@ -19,28 +19,23 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-
 import sys
 sys.dont_write_bytecode = True
 
-try:
-    import qgis
-    from qgis.core import *
-    from PyQt4.QtCore import SIGNAL
-except:
-    pass
-
-from time import sleep
 import numpy as np
-from multiprocessing.dummy import Pool as ThreadPool
 import thread
+from multiprocessing.dummy import Pool as ThreadPool
+try:
+    from PyQt4.QtCore import SIGNAL
+    pyqt = True
+except:
+    pyqt = False
 
 from multi_threaded_aon import MultiThreadedAoN
-no_binaries = False
 try:
     from AoN import one_to_all, path_computation
 except:
-    no_binaries = True
+    pass
 
 from ..utils import WorkerThread
 
@@ -76,7 +71,8 @@ class allOrNothing(WorkerThread):
         self.execute()
 
     def execute(self):
-        self.emit(SIGNAL("assignment"), ['zones finalized', 0])
+        if pyqt:
+            self.emit(SIGNAL("assignment"), ['zones finalized', 0])
 
         self.aux_res.prepare(self.graph, self.results)
         self.matrix.matrix_view = self.matrix.matrix_view.reshape((self.graph.num_zones, self.graph.num_zones,
@@ -97,8 +93,9 @@ class allOrNothing(WorkerThread):
         pool.join()
         self.results.link_loads = np.sum(self.aux_res.temp_link_loads, axis=2)
 
-        self.emit(SIGNAL("assignment"), ['text AoN', "Saving Outputs"])
-        self.emit(SIGNAL("assignment"), ['finished_threaded_procedure', None])
+        if pyqt:
+            self.emit(SIGNAL("assignment"), ['text AoN', "Saving Outputs"])
+            self.emit(SIGNAL("assignment"), ['finished_threaded_procedure', None])
 
     def func_assig_thread(self, O, all_threads):
         if thread.get_ident() in all_threads:
@@ -111,6 +108,7 @@ class allOrNothing(WorkerThread):
         self.cumulative += 1
         if x != O:
             self.report.append(x)
-        self.emit(SIGNAL("assignment"), ['zones finalized', self.cumulative])
-        txt = str(self.cumulative) + ' / ' + str(self.matrix.zones)
-        self.emit(SIGNAL("assignment"), ['text AoN', txt])
+        if pyqt:
+            self.emit(SIGNAL("assignment"), ['zones finalized', self.cumulative])
+            txt = str(self.cumulative) + ' / ' + str(self.matrix.zones)
+            self.emit(SIGNAL("assignment"), ['text AoN', txt])

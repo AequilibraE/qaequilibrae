@@ -19,17 +19,12 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
-import qgis
 from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
 from PyQt4.QtCore import QObject, SIGNAL, Qt
-import sys, os
-import numpy as np
 
-from impedance_matrix_procedures import ComputeDistMatrix
-from aequilibrae.paths import Graph, SkimResults
-from aequilibrae.matrix import AequilibraeMatrix, matrix_export_types
+from aequilibrae.paths import Graph, SkimResults, NetworkSkimming
+from aequilibrae.matrix import matrix_export_types
 from ..common_tools import GetOutputFileName
 from ..common_tools import ReportDialog
 from ..common_tools.auxiliary_functions import *
@@ -150,34 +145,23 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
             self.imped_results = new_name.encode('utf-8')
 
     def run_thread(self):
-
         self.do_dist_matrix.setVisible(False)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
-                        self.progress_range_from_thread)
-
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.finished_threaded_procedure)
-
+        self.progressbar.setRange(0, self.graph.num_zones)
+        QObject.connect(self.worker_thread, SIGNAL("skimming"), self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 
-    # VAL and VALUE have the following structure: (bar/text ID, value)
-    def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val)
+    def signal_handler(self, val):
+        if val[0] == 'zones finalized':
+            self.progressbar.setValue(val[1])
+        elif val[0] == 'text skimming':
+            self.progress_label.setText(val[1])
+        elif val[0] == 'finished_threaded_procedure':
+            self.finished_threaded_procedure()
 
-    def progress_value_from_thread(self, val):
-        self.progressbar.setValue(val)
-
-    def progress_text_from_thread(self, val):
-        self.progress_label.setText(val)
-
-    def finished_threaded_procedure(self, val):
+    def finished_threaded_procedure(self):
         self.report = self.worker_thread.report
-
         self.result.skims.export(self.imped_results)
-
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results
@@ -199,8 +183,11 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
             self.funding2.setVisible(False)
             self.progressbar.setVisible(True)
             self.progress_label.setVisible(True)
-            self.worker_thread = ComputeDistMatrix(qgis.utils.iface.mainWindow(), self.graph, self.result)
-            self.run_thread()
+            self.worker_thread = NetworkSkimming(self.graph, self.result)
+            try:
+                self.run_thread()
+            except ValueError as error:
+                qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
         else:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=3)
 
