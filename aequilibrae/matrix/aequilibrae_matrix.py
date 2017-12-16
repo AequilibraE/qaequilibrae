@@ -38,18 +38,9 @@ MATRIX_DESCRIPTION_MAX_LENGTH = 144  # Why not a tweet?
 NOT_COMPRESSED = 0
 COMPRESSED = 1
 
-# Necessary in case we are no the QGIS world
-# try:
-#     from common_tools.auxiliary_functions import logger
-# except:
-#     pass
+# TODO:  Add an aggregate method
+# TODO: Add check that the index 1 (or zero) has only unique values?
 
-"""
-TODO:
-Add an aggregate method
-
-Add check that the index 1 (or zero) has only unique values?
-"""
 
 """
 Matrix structure
@@ -72,6 +63,7 @@ Offset:  18 + 50*cores + Y*20  |   18 + 50*cores + Y*20 + Y*zones*8   |
 
 """
 matrix_export_types = ["Aequilibrae matrix (*.aem)", "Comma-separated file (*.csv)"]
+
 
 class AequilibraeMatrix(object):
     def __init__(self):

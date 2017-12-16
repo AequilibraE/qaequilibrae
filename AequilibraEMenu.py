@@ -44,7 +44,6 @@ old_binary = False
 try:
     from aequilibrae.paths import release_name as VERSION
 
-    logger((VERSION, VERSION_GRAPH))
     if VERSION != VERSION_GRAPH:
         old_binary = True
 except:
@@ -52,6 +51,7 @@ except:
 
 sys.dont_write_bytecode = True
 import os.path
+
 
 class AequilibraEMenu:
     def __init__(self, iface):

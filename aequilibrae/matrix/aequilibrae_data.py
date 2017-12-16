@@ -27,12 +27,6 @@ import os
 from numpy.lib.format import open_memmap
 import sqlite3
 
-# Necessary in case we are no the QGIS world
-# try:
-#     from common_tools.auxiliary_functions import logger
-# except:
-#     pass
-
 MEMORY = 1
 DISK = 0
 data_export_types = ['aed', 'csv', 'sqlite']
