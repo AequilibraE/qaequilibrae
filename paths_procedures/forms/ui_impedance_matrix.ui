@@ -10,13 +10,13 @@
     <x>0</x>
     <y>0</y>
     <width>625</width>
-    <height>372</height>
+    <height>439</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>627</width>
-    <height>372</height>
+    <width>627000</width>
+    <height>372000</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -25,373 +25,307 @@
   <property name="modal">
    <bool>false</bool>
   </property>
-  <widget class="QLabel" name="funding1">
-   <property name="geometry">
-    <rect>
-     <x>33</x>
-     <y>340</y>
-     <width>321</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Development partially funded by:</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="funding2">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>338</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string> www.ipea.gov.br</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::PlainText</enum>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>10</y>
-     <width>591</width>
-     <height>121</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>GRAPH</string>
-   </property>
-   <widget class="QPushButton" name="load_graph_from_file">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>23</y>
-      <width>121</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load Graph file</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="graph_file_name">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>23</y>
-      <width>431</width>
-      <height>24</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="cb_minimizing">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>53</y>
-      <width>211</width>
-      <height>24</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="progress_label_2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>56</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Minimize field:</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="block_paths">
-    <property name="geometry">
-     <rect>
-      <x>380</x>
-      <y>56</y>
-      <width>201</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Block paths through centroids</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="rdo_all_nodes">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>90</y>
-      <width>161</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ALL nodes to ALL nodes</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="rdo_centroids_only">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>90</y>
-      <width>151</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Centroids to centroids</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="rdo_custom_nodes">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>380</x>
-      <y>90</y>
-      <width>151</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Custom set of nodes</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>129</y>
-     <width>591</width>
-     <height>201</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>SKIMS</string>
-   </property>
-   <widget class="QTableWidget" name="skim_list">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>20</y>
-      <width>271</width>
-      <height>171</height>
-     </rect>
-    </property>
-    <property name="accessibleName">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="selectionMode">
-     <enum>QAbstractItemView::SingleSelection</enum>
-    </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectRows</enum>
-    </property>
-    <property name="rowCount">
-     <number>0</number>
-    </property>
-    <property name="columnCount">
-     <number>1</number>
-    </property>
-    <attribute name="verticalHeaderDefaultSectionSize">
-     <number>27</number>
-    </attribute>
-    <column>
-     <property name="text">
-      <string>Compute skims</string>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="4">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>121</height>
+      </size>
      </property>
-    </column>
-   </widget>
-   <widget class="QTableWidget" name="available_skims_table">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>271</width>
-      <height>171</height>
-     </rect>
-    </property>
-    <property name="accessibleName">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="selectionMode">
-     <enum>QAbstractItemView::SingleSelection</enum>
-    </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectRows</enum>
-    </property>
-    <property name="rowCount">
-     <number>0</number>
-    </property>
-    <property name="columnCount">
-     <number>1</number>
-    </property>
-    <attribute name="verticalHeaderDefaultSectionSize">
-     <number>27</number>
-    </attribute>
-    <column>
-     <property name="text">
-      <string>Available skims</string>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>121</height>
+      </size>
      </property>
-    </column>
-   </widget>
-   <widget class="QToolButton" name="but_adds_to_links">
-    <property name="geometry">
-     <rect>
-      <x>285</x>
-      <y>77</y>
-      <width>21</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>...</string>
-    </property>
-    <property name="toolButtonStyle">
-     <enum>Qt::ToolButtonIconOnly</enum>
-    </property>
-    <property name="arrowType">
-     <enum>Qt::RightArrow</enum>
-    </property>
-   </widget>
-   <widget class="QToolButton" name="but_removes_from_links">
-    <property name="geometry">
-     <rect>
-      <x>285</x>
-      <y>97</y>
-      <width>21</width>
-      <height>19</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>...</string>
-    </property>
-    <property name="toolButtonStyle">
-     <enum>Qt::ToolButtonIconOnly</enum>
-    </property>
-    <property name="arrowType">
-     <enum>Qt::LeftArrow</enum>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QLabel" name="progress_label">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>336</y>
-     <width>241</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>Status Message 0</string>
-   </property>
-  </widget>
-  <widget class="QProgressBar" name="progressbar">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>335</y>
-     <width>331</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="palette">
-    <palette>
-     <active>
-      <colorrole role="Highlight">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>0</red>
-         <green>170</green>
-         <blue>0</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </active>
-     <inactive>
-      <colorrole role="Highlight">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>240</red>
-         <green>240</green>
-         <blue>240</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </inactive>
-     <disabled>
-      <colorrole role="Highlight">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>51</red>
-         <green>153</green>
-         <blue>255</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </disabled>
-    </palette>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
-   <property name="textVisible">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="do_dist_matrix">
-   <property name="geometry">
-    <rect>
-     <x>410</x>
-     <y>331</y>
-     <width>191</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Compute</string>
-   </property>
-  </widget>
+     <property name="title">
+      <string>GRAPH</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="2" colspan="3">
+       <widget class="QLineEdit" name="graph_file_name"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="progress_label_2">
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Minimize field:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QRadioButton" name="rdo_centroids_only">
+        <property name="text">
+         <string>Centroids to centroids</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QRadioButton" name="rdo_custom_nodes">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Custom set of nodes</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QPushButton" name="load_graph_from_file">
+        <property name="maximumSize">
+         <size>
+          <width>148</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Load Graph file</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="3">
+       <widget class="QRadioButton" name="rdo_all_nodes">
+        <property name="text">
+         <string>ALL nodes to ALL nodes</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="3">
+       <widget class="QComboBox" name="cb_minimizing"/>
+      </item>
+      <item row="1" column="4">
+       <widget class="QCheckBox" name="block_paths">
+        <property name="text">
+         <string>Block paths through centroids</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="4">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>SKIMS</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="2" rowspan="7">
+       <widget class="QTableWidget" name="skim_list">
+        <property name="accessibleName">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="rowCount">
+         <number>0</number>
+        </property>
+        <property name="columnCount">
+         <number>1</number>
+        </property>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>27</number>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Compute skims</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item row="0" column="0" rowspan="7">
+       <widget class="QTableWidget" name="available_skims_table">
+        <property name="accessibleName">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <property name="rowCount">
+         <number>0</number>
+        </property>
+        <property name="columnCount">
+         <number>1</number>
+        </property>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>27</number>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Available skims</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QToolButton" name="but_adds_to_links">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonIconOnly</enum>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::RightArrow</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="4" column="1">
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="3" column="1">
+       <widget class="QToolButton" name="but_removes_from_links">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonIconOnly</enum>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::LeftArrow</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="funding1">
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Development partially funded by:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLabel" name="funding2">
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string> www.ipea.gov.br</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <widget class="QPushButton" name="do_dist_matrix">
+     <property name="text">
+      <string>Compute</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="3">
+    <widget class="QProgressBar" name="progressbar">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="Highlight">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>170</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="Highlight">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>240</red>
+           <green>240</green>
+           <blue>240</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="Highlight">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>51</red>
+           <green>153</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="textVisible">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <widget class="QLabel" name="progress_label">
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Status Message 0</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
   <zorder>progressbar</zorder>
   <zorder>progress_label</zorder>
   <zorder>funding1</zorder>
