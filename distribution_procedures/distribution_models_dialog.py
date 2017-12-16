@@ -40,11 +40,7 @@ from ..aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_distribution.ui'))
 
-"""
-TO-DO:
-Implement consideration of the "empty as zeros" for ALL distrbution models
-Should force inputs for trip distirbution to be of FLOAT type 
-"""
+# TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
 
 
 class DistributionModelsDialog(QDialog, FORM_CLASS):
@@ -94,6 +90,10 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         self.table_jobs.setColumnWidth(1, 295)
         self.table_jobs.setColumnWidth(2, 90)
 
+        self.but_run.setVisible(False)
+        self.but_queue.setVisible(False)
+        self.but_cancel.setVisible(False)
+
         if mode is not None:
             if mode == "ipf":
                 self.rdo_ipf.setChecked(True)
@@ -119,6 +119,10 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
             dlg2.exec_()
 
     def configure_inputs(self):
+        self.but_run.setVisible(True)
+        self.but_queue.setVisible(True)
+        self.but_cancel.setVisible(True)
+
         self.resize(511, 334)
         self.model_tabs.setEnabled(True)
         self.model_tabs.setVisible(True)
