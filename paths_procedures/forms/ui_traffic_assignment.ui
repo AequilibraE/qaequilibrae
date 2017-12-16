@@ -19,720 +19,707 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QTabWidget" name="tabWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>641</width>
-     <height>391</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <widget class="QWidget" name="tab_2">
-    <attribute name="title">
-     <string>Network</string>
-    </attribute>
-    <widget class="QComboBox" name="minimizing_field">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>82</y>
-       <width>461</width>
-       <height>30</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="ba_time_lbl">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>89</y>
-       <width>151</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Minimizing field</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="load_graph_from_file">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>30</y>
-       <width>91</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Load Graph</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lbl_graphfile">
-     <property name="geometry">
-      <rect>
-       <x>153</x>
-       <y>35</y>
-       <width>471</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Load graph *.aeg</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="graph_properties_table">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>120</y>
-       <width>461</width>
-       <height>231</height>
-      </rect>
-     </property>
-     <column>
-      <property name="text">
-       <string>Property</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Value</string>
-      </property>
-     </column>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="widget">
-    <attribute name="title">
-     <string>Demand</string>
-    </attribute>
-    <widget class="QPushButton" name="but_load_new_matrix">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>13</y>
-       <width>281</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Load matrix</string>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="table_matrix_list">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>50</y>
-       <width>285</width>
-       <height>291</height>
-      </rect>
-     </property>
-     <property name="accessibleName">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="rowCount">
-      <number>0</number>
-     </property>
-     <property name="columnCount">
-      <number>2</number>
-     </property>
-     <attribute name="verticalHeaderDefaultSectionSize">
-      <number>27</number>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Matrix name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Index</string>
-      </property>
-     </column>
-    </widget>
-    <widget class="QTableWidget" name="table_matrices_to_assign">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>50</y>
-       <width>285</width>
-       <height>291</height>
-      </rect>
-     </property>
-     <property name="accessibleName">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="rowCount">
-      <number>0</number>
-     </property>
-     <property name="columnCount">
-      <number>2</number>
-     </property>
-     <attribute name="verticalHeaderDefaultSectionSize">
-      <number>27</number>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Matrix name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Matrix core</string>
-      </property>
-     </column>
-    </widget>
-    <widget class="QLabel" name="lbl">
-     <property name="geometry">
-      <rect>
-       <x>413</x>
-       <y>18</y>
-       <width>111</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Traffic classes</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab_4">
-    <attribute name="title">
-     <string>Skims</string>
-    </attribute>
-    <widget class="QTableWidget" name="skim_list_table">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>50</y>
-       <width>591</width>
-       <height>291</height>
-      </rect>
-     </property>
-     <property name="accessibleName">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="rowCount">
-      <number>0</number>
-     </property>
-     <property name="columnCount">
-      <number>2</number>
-     </property>
-     <attribute name="verticalHeaderDefaultSectionSize">
-      <number>27</number>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Compute</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Skim name</string>
-      </property>
-     </column>
-    </widget>
-    <widget class="QLabel" name="lblnodematch_12">
-     <property name="geometry">
-      <rect>
-       <x>25</x>
-       <y>24</y>
-       <width>151</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Skims to compute</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab_3">
-    <attribute name="title">
-     <string>Critical analysis</string>
-    </attribute>
-    <widget class="QTableWidget" name="select_link_list">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>50</y>
-       <width>611</width>
-       <height>291</height>
-      </rect>
-     </property>
-     <property name="accessibleName">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="rowCount">
-      <number>0</number>
-     </property>
-     <property name="columnCount">
-      <number>4</number>
-     </property>
-     <attribute name="verticalHeaderDefaultSectionSize">
-      <number>27</number>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Links</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Type</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Query name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Del</string>
-      </property>
-     </column>
-    </widget>
-    <widget class="QCheckBox" name="do_select_link">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>15</y>
-       <width>141</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Select link analysis</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="but_build_query">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>540</x>
-       <y>11</y>
-       <width>81</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Build Query</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab_5">
-    <attribute name="title">
-     <string>Link flow extraction</string>
-    </attribute>
-    <widget class="QTableWidget" name="list_link_extraction">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>50</y>
-       <width>611</width>
-       <height>291</height>
-      </rect>
-     </property>
-     <property name="accessibleName">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <property name="rowCount">
-      <number>0</number>
-     </property>
-     <property name="columnCount">
-      <number>4</number>
-     </property>
-     <attribute name="verticalHeaderDefaultSectionSize">
-      <number>27</number>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>Links</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Type</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Query name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Del</string>
-      </property>
-     </column>
-    </widget>
-    <widget class="QCheckBox" name="do_extract_link_flows">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>15</y>
-       <width>191</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Perform link flow extraction</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="but_build_query_extract">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>540</x>
-       <y>11</y>
-       <width>81</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Build Query</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab">
-    <attribute name="title">
-     <string>Assignment</string>
-    </attribute>
-    <widget class="QPushButton" name="do_assignment">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>290</y>
-       <width>351</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>ASSIGN</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="cancel_all">
-     <property name="geometry">
-      <rect>
-       <x>410</x>
-       <y>290</y>
-       <width>131</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>CANCEL</string>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="cb_choose_algorithm">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>18</y>
-       <width>531</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="maxVisibleItems">
-      <number>10</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="lblnodematch_13">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>24</y>
-       <width>121</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Algorithm</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="progress_label0">
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>329</y>
-       <width>301</width>
-       <height>21</height>
-      </rect>
-     </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QTabWidget" name="tabWidget">
      <property name="font">
       <font>
        <pointsize>9</pointsize>
       </font>
      </property>
-     <property name="text">
-      <string>Status Message 0</string>
-     </property>
-    </widget>
-    <widget class="QProgressBar" name="progressbar0">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>9</x>
-       <y>327</y>
-       <width>231</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="palette">
-      <palette>
-       <active>
-        <colorrole role="Highlight">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>0</red>
-           <green>170</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </active>
-       <inactive>
-        <colorrole role="Highlight">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>240</red>
-           <green>240</green>
-           <blue>240</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </inactive>
-       <disabled>
-        <colorrole role="Highlight">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>51</red>
-           <green>153</green>
-           <blue>255</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </disabled>
-      </palette>
-     </property>
-     <property name="value">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <property name="textVisible">
-      <bool>true</bool>
-     </property>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Network</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0" colspan="2">
+        <widget class="QFrame" name="frame">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="1">
+           <widget class="QLabel" name="lbl_graphfile">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Load graph *.aeg</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="load_graph_from_file">
+            <property name="maximumSize">
+             <size>
+              <width>100</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Load Graph</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>108</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="1" rowspan="4">
+        <widget class="QTableWidget" name="graph_properties_table">
+         <column>
+          <property name="text">
+           <string>Property</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Value</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="ba_time_lbl">
+         <property name="text">
+          <string>Minimizing field</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QComboBox" name="minimizing_field">
+         <property name="minimumSize">
+          <size>
+           <width>120</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>108</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="widget">
+      <attribute name="title">
+       <string>Demand</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="QPushButton" name="but_load_new_matrix">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Load matrix</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="lbl">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Traffic classes</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignHCenter|Qt::AlignTop</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QTableWidget" name="table_matrix_list">
+         <property name="accessibleName">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="rowCount">
+          <number>0</number>
+         </property>
+         <property name="columnCount">
+          <number>2</number>
+         </property>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>27</number>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Matrix name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Index</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QTableWidget" name="table_matrices_to_assign">
+         <property name="accessibleName">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="rowCount">
+          <number>0</number>
+         </property>
+         <property name="columnCount">
+          <number>2</number>
+         </property>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>27</number>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Matrix name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Matrix core</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_4">
+      <attribute name="title">
+       <string>Skims</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <widget class="QLabel" name="lblnodematch_12">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Skims to compute</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QTableWidget" name="skim_list_table">
+         <property name="accessibleName">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="rowCount">
+          <number>0</number>
+         </property>
+         <property name="columnCount">
+          <number>2</number>
+         </property>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>27</number>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Compute</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Skim name</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Critical analysis</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="do_select_link">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Select link analysis</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="but_build_query">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>81</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Build Query</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QTableWidget" name="select_link_list">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="accessibleName">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="rowCount">
+          <number>0</number>
+         </property>
+         <property name="columnCount">
+          <number>4</number>
+         </property>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>27</number>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Links</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Query name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Del</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_5">
+      <attribute name="title">
+       <string>Link flow extraction</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_7">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="do_extract_link_flows">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>Perform link flow extraction</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="but_build_query_extract">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>81</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Build Query</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QTableWidget" name="list_link_extraction">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="accessibleName">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="rowCount">
+          <number>0</number>
+         </property>
+         <property name="columnCount">
+          <number>4</number>
+         </property>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>27</number>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Links</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Type</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Query name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Del</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Assignment</string>
+      </attribute>
+      <widget class="QPushButton" name="do_assignment">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>290</y>
+         <width>351</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>ASSIGN</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="cancel_all">
+       <property name="geometry">
+        <rect>
+         <x>410</x>
+         <y>290</y>
+         <width>131</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>CANCEL</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="cb_choose_algorithm">
+       <property name="geometry">
+        <rect>
+         <x>80</x>
+         <y>18</y>
+         <width>531</width>
+         <height>30</height>
+        </rect>
+       </property>
+       <property name="maxVisibleItems">
+        <number>10</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="lblnodematch_13">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>24</y>
+         <width>121</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Algorithm</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="progress_label0">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>329</y>
+         <width>301</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Status Message 0</string>
+       </property>
+      </widget>
+      <widget class="QProgressBar" name="progressbar0">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>327</y>
+         <width>231</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="Highlight">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>170</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="Highlight">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>240</red>
+             <green>240</green>
+             <blue>240</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="Highlight">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>51</red>
+             <green>153</green>
+             <blue>255</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="textVisible">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="do_path_file">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>171</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Save complete path file</string>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>621</width>
+         <height>181</height>
+        </rect>
+       </property>
+       <property name="acceptDrops">
+        <bool>false</bool>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="title">
+        <string>Outputs</string>
+       </property>
+       <widget class="QLabel" name="lbl_output">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>31</y>
+          <width>451</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Output</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="select_output_folder">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>121</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Results</string>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="do_output_to_csv">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>100</y>
+          <width>61</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>CSV</string>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="do_output_to_sqlite">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>100</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>SQLite</string>
+        </property>
+       </widget>
+       <widget class="QRadioButton" name="do_output_to_aequilibrae">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>100</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Aequilibrae</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+     </widget>
     </widget>
-    <widget class="QCheckBox" name="do_path_file">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>60</y>
-       <width>171</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Save complete path file</string>
-     </property>
-    </widget>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>90</y>
-       <width>621</width>
-       <height>181</height>
-      </rect>
-     </property>
-     <property name="acceptDrops">
-      <bool>false</bool>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="title">
-      <string>Outputs</string>
-     </property>
-     <widget class="QLabel" name="lbl_output">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>31</y>
-        <width>451</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>9</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Output</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="select_output_folder">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>121</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Results</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="do_output_to_csv">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>100</y>
-        <width>61</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>CSV</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="do_output_to_sqlite">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>100</y>
-        <width>71</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>SQLite</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="do_output_to_aequilibrae">
-      <property name="geometry">
-       <rect>
-        <x>180</x>
-        <y>100</y>
-        <width>101</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Aequilibrae</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </widget>
-   </widget>
-  </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
