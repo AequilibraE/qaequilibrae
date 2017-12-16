@@ -17,6 +17,6 @@ from network_skimming import NetworkSkimming
 from all_or_nothing import allOrNothing
 
 try:
-    from AoN import one_to_all, skimming_single_origin, path_computation, VERSION
+    from AoN import one_to_all, skimming_single_origin, path_computation, release_name
 except:
     pass

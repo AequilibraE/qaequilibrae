@@ -29,7 +29,7 @@ from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from .common_tools import ParameterDialog, logger, ReportDialog
+from .common_tools import ParameterDialog, logger, ReportDialog, AboutDialog
 from binary_downloader_class import BinaryDownloaderDialog
 from .distribution_procedures import DistributionModelsDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
@@ -37,14 +37,14 @@ from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTrans
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayDatasetDialog, DisplayMatrixDialog, MatrixManipulationDialog
 import tempfile, glob
-from .aequilibrae.__version__ import version as VERSION_GRAPH
+from .aequilibrae.__version__ import release_name as VERSION_GRAPH
 
 no_binary = False
 old_binary = False
 try:
-    from aequilibrae.paths import VERSION
+    from aequilibrae.paths import release_name as VERSION
 
-    # logger((VERSION, VERSION_GRAPH))
+    logger((VERSION, VERSION_GRAPH))
     if VERSION != VERSION_GRAPH:
         old_binary = True
 except:
@@ -69,7 +69,7 @@ class AequilibraEMenu:
             self.iface.addPluginToMenu("&AequilibraE", submenu.menuAction())
 
     def initGui(self):
-        #Removes temporary files
+        # Removes temporary files
         self.removes_temporary_files()
 
         # CREATING MASTER MENU HEAD
@@ -248,6 +248,12 @@ class AequilibraEMenu:
         QObject.connect(self.parameters_action, SIGNAL("triggered()"), self.run_change_parameters)
         self.AequilibraE_menu.addAction(self.parameters_action)
 
+         # About
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_parameters.png")
+        self.about_action = QAction(icon, u"About", self.iface.mainWindow())
+        QObject.connect(self.about_action, SIGNAL("triggered()"), self.run_about)
+        self.AequilibraE_menu.addAction(self.about_action)
+
         # Download binaries
         if no_binary:
             icon = QIcon(os.path.dirname(__file__) + "/icons/icon_binaries.png")
@@ -260,9 +266,10 @@ class AequilibraEMenu:
             report = ['You have an old version of the AequilibraE binaries']
             report.append('To fix this issue, please do the following:')
             report.append('     1. Uninstall AequilibraE')
-            report.append('     2. Re-install AequilibraE from the official repository')
-            report.append('     3. Download the new binaries from the Menu Aequilibrae-Download Binaries')
-            report.append('     4. Re-start QGIS')
+            report.append('     2. Re-start QGIS')
+            report.append('     3. Re-install AequilibraE from the official repository')
+            report.append('     4. Download the new binaries from the Menu Aequilibrae-Download Binaries')
+            report.append('     5. Re-start QGIS')
             dlg2 = ReportDialog(self.iface, report)
             dlg2.show()
             dlg2.exec_()
@@ -291,6 +298,11 @@ class AequilibraEMenu:
 
     def run_change_parameters(self):
         dlg2 = ParameterDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_about(self):
+        dlg2 = AboutDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

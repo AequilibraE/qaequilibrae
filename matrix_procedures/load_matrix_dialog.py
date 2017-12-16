@@ -275,7 +275,6 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.matrix_list_view.blockSignals(True)
         i = 0
         for key, value in self.matrices.iteritems():
-            logger(value)
             r = np.unique(value['from']).shape[0]
             c = np.unique(value['to']).shape[0]
             dimensions = "{:,}".format(r) + " x " + "{:,}".format(c)

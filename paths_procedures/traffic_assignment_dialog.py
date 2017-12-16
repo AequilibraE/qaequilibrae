@@ -297,7 +297,6 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
     # TODO: Write code to export skims
     def produce_all_outputs(self):
 
-        logger(self.results.link_loads)
         extension = 'aed'
         if not self.do_output_to_aequilibrae.isChecked():
             extension = 'csv'

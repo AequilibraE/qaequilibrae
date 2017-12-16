@@ -16,4 +16,4 @@ cdef double INFINITE = 1.79769313e+308
 
 VERSION = 0.4
 MINOR_VRSN = 0
-release_name = "This_rocks"
+release_name = "Karlsruhe"

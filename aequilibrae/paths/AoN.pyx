@@ -36,7 +36,7 @@ cimport cython
 
 include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
-from ..__version__ import version as VERSION
+from ..__version__ import release_name as VERSION
 
 
 @cython.wraparound(False)
@@ -316,7 +316,7 @@ cdef void blocking_centroid_flows(unsigned long action,
 @cython.embedsignature(True)
 @cython.boundscheck(False)
 def path_computation(origin, destination, graph, results):
-    cdef ITYPE_t nodes, orig, dest, p, b, origin_index, dest_index
+    cdef ITYPE_t nodes, orig, dest, p, b, origin_index, dest_index, connector
     cdef long i, j, skims, a, block_flows_through_centroids
 
     orig = origin
