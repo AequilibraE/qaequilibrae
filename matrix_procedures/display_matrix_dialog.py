@@ -39,10 +39,10 @@ class DisplayMatrixDialog(QDialog, FORM_CLASS):
         self.data_path = None
         self.dataset = AequilibraeMatrix()
         self.but_load.setText('Load matrix')
-        self.but_load.clicked.connect(self.load_the_vector)
-        self.load_the_vector()
+        self.but_load.clicked.connect(self.load_the_matrix)
+        self.load_the_matrix()
 
-    def load_the_vector(self):
+    def load_the_matrix(self):
         self.error = None
         self.data_path, _ = GetOutputFileName(self, 'AequilibraE matrix',
                                               ["Aequilibrae matrix(*.aem)"], '.aem', self.path)
@@ -58,6 +58,8 @@ class DisplayMatrixDialog(QDialog, FORM_CLASS):
             except:
                 self.error = 'Could not load matrix'
 
+        self.but_load.setText('Load matrix')
+        self.but_load.setEnabled(True)
         if self.error is None:
             dlg2 = DisplayAequilibraEFormatsDialog(self.iface, self.dataset)
             dlg2.show()
