@@ -40,12 +40,7 @@ from ..aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_distribution.ui'))
 
-"""
-TODO
-Add the Combobox with type of models for the user to change if wanted
-Block the table fields that cannot be changed (parameters that do not exist for a function)
-Or not show those parameters altogether
-"""
+# TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
 
 
 class DistributionModelsDialog(QDialog, FORM_CLASS):
@@ -92,16 +87,21 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         self.table_matrices.doubleClicked.connect(self.matrix_and_data_double_clicked)
 
         self.table_jobs.setColumnWidth(0, 50)
-        self.table_jobs.setColumnWidth(1, 250)
+        self.table_jobs.setColumnWidth(1, 295)
         self.table_jobs.setColumnWidth(2, 90)
+
+        self.but_run.setVisible(False)
+        self.but_queue.setVisible(False)
+        self.but_cancel.setVisible(False)
 
         if mode is not None:
             if mode == "ipf":
                 self.rdo_ipf.setChecked(True)
             if mode == "apply":
-                self.rdo_apply_gravity.setCheckmodeled(True)
+                self.rdo_apply_gravity.setChecked(True)
             if mode == "calibrate":
                 self.rdo_calibrate_gravity.setChecked(True)
+            self.configure_inputs()
 
         self.user_chosen_model = None
         self.update_model_parameters()
@@ -119,30 +119,36 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
             dlg2.exec_()
 
     def configure_inputs(self):
-        self.resize(452, 334)
+        self.but_run.setVisible(True)
+        self.but_queue.setVisible(True)
+        self.but_cancel.setVisible(True)
+
+        self.resize(511, 334)
         self.model_tabs.setEnabled(True)
         self.model_tabs.setVisible(True)
-
+        self.progressbar.setVisible(False)
+        to_remove = []
         if self.rdo_ipf.isChecked():
             self.job = 'ipf'
+            self.setWindowTitle('AequilibraE - Iterative Proportional Fitting')
             self.model_tabs.setTabText(4, "Seed matrix")
-            self.model_tabs.removeTab(6)
-            self.model_tabs.removeTab(5)
-            self.model_tabs.removeTab(3)
+            to_remove = [6, 5, 3]
 
         if self.rdo_apply_gravity.isChecked():
+            self.setWindowTitle('AequilibraE - Apply gravity model')
             self.job = 'apply'
-            self.model_tabs.removeTab(6)
-            self.model_tabs.removeTab(4)
+            to_remove = [6, 4]
 
         if self.rdo_calibrate_gravity.isChecked():
             self.job = 'calibrate'
+            self.setWindowTitle('AequilibraE - Calibrate gravity model')
             self.model_tabs.setTabText(4, "Observed matrix")
-            self.model_tabs.removeTab(5)
-            self.model_tabs.removeTab(2)
-            self.model_tabs.removeTab(0)
+            to_remove = [5, 2, 0]
             self.rdo_gamma.setEnabled(False)
             self.rdo_friction.setEnabled(False)
+
+        for i in to_remove:
+            self.model_tabs.removeTab(i)
 
         self.rdo_ipf.setEnabled(False)
         self.rdo_apply_gravity.setEnabled(False)
@@ -259,7 +265,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         return data_name
 
     def add_to_table(self, dictio, table):
-        table.setColumnWidth(0, 190)
+        table.setColumnWidth(0, 235)
         table.setColumnWidth(1, 80)
         table.clearContents()
         table.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
@@ -305,9 +311,10 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
                             'rows': prod_vec,
                             'row_fields': prod_field,
                             'columns': atra_vec,
-                            'column_field': atra_field}
+                            'column_field': atra_field,
+                            'output': out_name,
+                            'nan_as_zero': self.chb_empty_as_zero.isChecked()}
                     worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), **args)
-                    self.add_job_to_list(worker_thread, out_name)
 
             if self.job == 'apply':
                 out_name = self.browse_outfile('aem')
@@ -322,9 +329,10 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
                             'rows': prod_vec,
                             'row_fields': prod_field,
                             'columns': atra_vec,
-                            'column_field': atra_field}
+                            'column_field': atra_field,
+                            'output': out_name,
+                            'nan_as_zero': self.chb_empty_as_zero.isChecked()}
                     worker_thread = ApplyGravityProcedure(qgis.utils.iface.mainWindow(), **args)
-                    self.add_job_to_list(worker_thread, out_name)
 
             if self.job == 'calibrate':
                 out_name = self.browse_outfile('aem')
@@ -340,11 +348,12 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
                     args = {'matrix': imped_matrix,
                             'impedance': imped_matrix,
-                            'function': func_name}
-
+                            'function': func_name,
+                            'nan_as_zero': self.chb_empty_as_zero.isChecked()}
                     worker_thread = CalibrateGravityProcedure(qgis.utils.iface.mainWindow(), **args)
-                    self.add_job_to_list(worker_thread, out_name)
 
+            self.chb_empty_as_zero.setEnabled(False)
+            self.add_job_to_list(worker_thread, out_name)
 
     def add_job_to_list(self, job, out_name):
         self.job_queue[out_name] = job
@@ -358,17 +367,20 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
             self.table_jobs.setItem(i, 1, QTableWidgetItem(data_name))
             self.table_jobs.setItem(i, 2, QTableWidgetItem('Queued'))
 
-
-
-
     def run(self):
-        if self.check_data():
-            pass
-            # self.worker_thread = CalibrateGravityProcedure(qgis.utils.iface.mainWindow(), self.observed, self.impedance,
-            #                                                self.function)
-            # self.run_thread()
-        else:
-            qgis.utils.iface.messageBar().pushMessage("Input error", self.error, level=3)
+        self.progressbar.setVisible(True)
+        self.chb_empty_as_zero.setVisible(False)
+        for out_name in self.job_queue.keys():
+            self.worker_thread = self.job_queue[out_name]
+            self.run_thread()
+
+
+        if self.job != 'calibrate':
+            self.worker_thread.model.save(out_name)
+
+
+        self.exit_procedure()
+
 
     def check_data(self):
         self.error = None
@@ -418,13 +430,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
     def job_finished_from_thread(self, success):
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
-        else:
-            self.report = self.worker_thread.gravity.report
-            stream = open(self.result_file, 'w')
-            yaml.dump(self.worker_thread.gravity.model, stream, default_flow_style=False)
-            stream.close()
-
-        self.exit_procedure()
+        self.report.extend(self.worker_thread.report)
 
     def exit_procedure(self):
         self.close()

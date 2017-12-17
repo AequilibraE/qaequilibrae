@@ -8,7 +8,7 @@ import os, tempfile
 zones = 100
 
 # Impedance matrix_procedures
-name_test = os.path.join(tempfile.gettempdir(), 'aequilibrae_matrix_test.aem')
+name_test = AequilibraeMatrix().random_name()
 
 args = {'file_name': name_test,
         'zones': zones,
@@ -33,7 +33,8 @@ class TestGravityCalibration(TestCase):
     def test_calibrate(self):
         args = {'impedance': impedance,
                 'matrix': matrix,
-                'function': 'expo'}
+                'function': 'power',
+                'nan_to_zero': False}
 
         distributed_matrix = GravityCalibration(**args)
         distributed_matrix.calibrate()

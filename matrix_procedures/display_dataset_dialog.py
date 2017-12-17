@@ -39,6 +39,7 @@ class DisplayDatasetDialog(QtGui.QDialog, FORM_CLASS):
         self.data_path = None
         self.dataset = AequilibraEData()
         self.but_load.clicked.connect(self.load_the_vector)
+        self.load_the_vector()
 
     def load_the_vector(self):
         self.error = None
@@ -56,6 +57,8 @@ class DisplayDatasetDialog(QtGui.QDialog, FORM_CLASS):
             except:
                 self.error = 'Could not load dataset'
 
+        self.but_load.setText('Load data')
+        self.but_load.setEnabled(True)
         if self.error is None:
             dlg2 = DisplayAequilibraEFormatsDialog(self.iface, self.dataset)
             dlg2.show()

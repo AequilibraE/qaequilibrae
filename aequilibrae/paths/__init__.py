@@ -11,11 +11,12 @@ __date__ = "$Date: 2017-02-25$"
 
 from graph import Graph
 from .results import *
-from assignment import *
 from multi_threaded_aon import MultiThreadedAoN
 from multi_threaded_skimming import MultiThreadedNetworkSkimming
-from networkskimming import network_skimming
+from network_skimming import NetworkSkimming
+from all_or_nothing import allOrNothing
+
 try:
-    from AoN import one_to_all, skimming_single_origin, path_computation, VERSION
+    from AoN import one_to_all, skimming_single_origin, path_computation, VERSION_COMPILED
 except:
     pass

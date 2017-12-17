@@ -6,6 +6,7 @@ from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths import skimming_single_origin
 from aequilibrae.paths.multi_threaded_skimming import MultiThreadedNetworkSkimming
 import numpy as np
+from parameters_test import centroids
 
 # Adds the folder with the data to the path and collects the paths to the files
 lib_path = os.path.abspath(os.path.join('..', '..'))
@@ -16,12 +17,13 @@ from data import path_test, test_graph
 class TestSkimming_single_origin(TestCase):
     def test_skimming_single_origin(self):
 
-        origin =1
+        origin = 1
 
         # graph
         g = Graph()
         g.load_from_disk(test_graph)
-        g.set_graph(centroids=26, cost_field='distance', skim_fields=None)
+        g.set_graph(cost_field='distance', skim_fields=None)
+        # g.block_centroid_flows = False
         # None implies that only the cost field will be skimmed
 
         # skimming results

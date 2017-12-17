@@ -18,29 +18,19 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-
-import sys
 from functools import partial
-
-import os
-import numpy as np
-import qgis
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from qgis.core import *
-from PyQt4 import uic
+from qgis.gui import QgsMapLayerProxyModel
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools import GetOutputFileName, ReportDialog
 
 from create_graph_procedure import GraphCreation
-from graph_advanced_features import GraphAdvancedFeatures
+from graph_centroids_dialog import GraphCentroids
 
-from qgis.gui import QgsMapLayerProxyModel
-
-#sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_Create_Graph.ui'))
 
 
@@ -50,6 +40,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         self.validtypes = integer_types + float_types
         self.iface = iface
         self.setupUi(self)
+        self.layer = None
         self.centroids = None
         self.block_through_centroids = False
         self.selected_only = False
@@ -57,6 +48,8 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         self.cost_field = None
         self.link_id = None
         self.direction_field = None
+        self.num_zones = -1
+        self.error = None
 
         self.progressbar0.setVisible(False)
         self.progress_label0.setVisible(False)
@@ -90,6 +83,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         self.dual_fields()
         self.bi_directional()
         self.load_fields_to_combo_boxes()
+        self.check_if_ready()
 
     def bi_directional(self):
         if self.links_are_bi_directional.isChecked():
@@ -151,7 +145,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         if self.network_layer.currentIndex() >= 0:
             self.layer = get_vector_layer_by_name(self.network_layer.currentText())
             for field in self.layer.pendingFields().toList():
-                if field not in reserved_fields:
+                if field.name() not in reserved_fields:
                     if field.type() in integer_types:
                         for combo in i_types:
                             combo.addItem(field.name())
@@ -169,7 +163,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
 
             def centralized_widget(widget):
                 my_widget = QWidget()
-                #chk_bx.setCheckState(Qt.Checked) # If we wanted them all checked by default
+                # chk_bx.setCheckState(Qt.Checked) # If we wanted them all checked by default
                 lay_out = QHBoxLayout(my_widget)
                 lay_out.addWidget(widget)
                 lay_out.setAlignment(Qt.AlignCenter)
@@ -181,7 +175,6 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             q = QRadioButton()
             q.toggled.connect(self.handleItemClicked)
             chk2 = centralized_widget(q)
-
 
             self.fields_lst.setCellWidget(self.fields, 2, chk)
             self.fields_lst.setCellWidget(self.fields, 3, chk2)
@@ -226,6 +219,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
                         cmb_bx.addItem(f)
                     cmb_bx.setCurrentIndex(cmb_bx.findText(field, Qt.MatchFixedString))
                     add_new_field_to_list(field, cmb_bx)
+        self.check_if_ready()
 
     def handleItemClicked(self):
         box = self.sender()
@@ -250,14 +244,16 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             qradio.blockSignals(True)
             qradio.setChecked(True)
             qradio.blockSignals(False)
+        self.check_if_ready()
 
     def call_advanced_features(self):
-        dlg2 = GraphAdvancedFeatures(self.iface)
+        dlg2 = GraphCentroids(self.iface)
         dlg2.show()
         dlg2.exec_()
         self.centroids = dlg2.centroids
         self.block_through_centroids = dlg2.block_through_centroids
-        self.selected_only = dlg2.selected_only
+        self.num_zones = dlg2.num_zones
+        self.check_if_ready()
 
     def run_thread(self):
 
@@ -287,19 +283,23 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.worker_thread.error,
                                                       level=1)
         else:
-
-            if self.centroids is None:
+            self.error = None
+            try:
                 self.worker_thread.graph.set_graph(cost_field=self.cost_field,
-                                                   block_centroid_flows=self.block_through_centroids)
-            else:
-                self.worker_thread.graph.set_graph(centroids=self.centroids, cost_field=self.cost_field,
-                                                   block_centroid_flows=self.block_through_centroids)
-
+                                                       block_centroid_flows=self.block_through_centroids)
+            except Exception as self.error:
+                self.output.append(self.error)
             self.worker_thread.graph.save_to_disk(self.output)
             qgis.utils.iface.messageBar().pushMessage("Finished. ", 'Graph saved successfully', level=3)
 
         self.exit_procedure()
+
         if self.worker_thread.report:
+            if self.error is not None:
+                self.worker_thread.report.append('\n\n\n')
+                self.worker_thread.report.append('##########   EXCEPTION:    ##########')
+                self.worker_thread.report.append(error)
+
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
             dlg2.exec_()
@@ -308,10 +308,63 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         new_name, file_type = GetOutputFileName(self, 'Graph File', ["Aequilibrae Graph(*.aeg)"], ".aeg", self.path)
         if new_name is not None:
             outbox.setText(new_name)
+            self.check_if_ready()
 
     def run_graph_creation(self):  # CREATING GRAPH
+        self.check_if_ready()
+
+        if self.error is None:
+            self.fields_to_add = {}
+            for i in range(self.fields):
+                for chkbox in self.fields_lst.cellWidget(i, 2).findChildren(QCheckBox):
+                    break
+                if chkbox.isChecked():
+                    field_name = self.fields_lst.item(i, 0).text()
+                    if field_name[-1] == '*':
+                        field_name = field_name[0:-1]
+                        ab_field = field_name + 'AB'
+                        ba_field = field_name + 'BA'
+                        if field_name[-1] == '_' and len(field_name) > 1:
+                            field_name = field_name[0:-1]
+                        self.fields_to_add[field_name] = (self.layer.fieldNameIndex(ab_field),
+                                                          self.layer.fieldNameIndex(ba_field))
+                    else:
+                        if self.chk_dual_fields.isChecked():
+                            if self.links_are_bi_directional.isChecked():
+                                self.fields_to_add[field_name] = (self.layer.fieldNameIndex(field_name),
+                                                                  self.layer.fieldNameIndex(field_name))
+                            else:
+                                self.fields_to_add[field_name] = (self.layer.fieldNameIndex(field_name), -1)
+                        else:
+                            if self.links_are_bi_directional.isChecked():
+                                for cmb2 in self.fields_lst.cellWidget(i, 1).findChildren(QComboBox):
+                                    break
+                                b_field = cmb2.currentText()
+                                self.fields_to_add[field_name] = (
+                                self.layer.fieldNameIndex(field_name), self.layer.fieldNameIndex(b_field))
+                            else:
+                                self.fields_to_add[field_name] = (self.layer.fieldNameIndex(field_name), -1)
+
+        if self.error == None:
+            self.progressbar0.setVisible(True)
+            self.progress_label0.setVisible(True)
+
+            self.lbl_funding1.setVisible(False)
+            self.lbl_funding2.setVisible(False)
+            self.worker_thread = GraphCreation(qgis.utils.iface.mainWindow(), self.layer,
+                                               self.link_id, self.direction_field, self.fields_to_add,
+                                               self.selected_only, self.centroids)
+            self.run_thread()
+        else:
+            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.error, level=3)
+
+    def check_if_ready(self):
+        self.but_create_graph.setEnabled(False)
+        ready = True
         self.error = None
-        text = ''
+
+        if self.centroids is None:
+            ready = False
 
         self.layer = get_vector_layer_by_name(self.network_layer.currentText())
         if self.layer is None:
@@ -337,6 +390,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         if self.error is None:
             a = self.layer.fieldNameIndex("A_NODE")
             b = self.layer.fieldNameIndex("B_NODE")
+            text =  ''
             if a < 0:
                 text = 'No A_NODE field\n'
             if b < 0:
@@ -356,49 +410,11 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             if self.cost_field is None:
                 self.error = 'Cost field not selected'
 
+        if self.error is not None:
+            ready = False
 
-        if self.error is None:
-            self.fields_to_add = {}
-            for i in range(self.fields):
-                for chkbox in self.fields_lst.cellWidget(i, 2).findChildren(QCheckBox):
-                    break
-                if chkbox.isChecked():
-                    field_name = self.fields_lst.item(i, 0).text()
-                    if field_name[-1] == '*':
-                        field_name = field_name[0:-1]
-                        ab_field = field_name + 'AB'
-                        ba_field = field_name + 'BA'
-                        if field_name[-1] == '_' and len(field_name) > 1:
-                            field_name = field_name[0:-1]
-                        self.fields_to_add[field_name] = (self.layer.fieldNameIndex(ab_field), self.layer.fieldNameIndex(ba_field))
-                    else:
-                        if self.chk_dual_fields.isChecked():
-                            if self.links_are_bi_directional.isChecked():
-                                self.fields_to_add[field_name] = (self.layer.fieldNameIndex(field_name), self.layer.fieldNameIndex(field_name))
-                            else:
-                                self.fields_to_add[field_name] = (self.layer.fieldNameIndex(field_name), -1)
-                        else:
-                            if self.links_are_bi_directional.isChecked():
-                                for cmb2 in self.fields_lst.cellWidget(i, 1).findChildren(QComboBox):
-                                    break
-                                b_field = cmb2.currentText()
-                                self.fields_to_add[field_name] = (
-                                self.layer.fieldNameIndex(field_name), self.layer.fieldNameIndex(b_field))
-                            else:
-                                self.fields_to_add[field_name] = (self.layer.fieldNameIndex(field_name), -1)
-
-        if self.error == None:
-            self.progressbar0.setVisible(True)
-            self.progress_label0.setVisible(True)
-
-            self.lbl_funding1.setVisible(False)
-            self.lbl_funding2.setVisible(False)
-
-            self.worker_thread = GraphCreation(qgis.utils.iface.mainWindow(), self.layer, self.link_id, self.direction_field, self.fields_to_add,
-                                               self.selected_only)
-            self.run_thread()
-        else:
-            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.error, level=3)
+        if ready:
+            self.but_create_graph.setEnabled(True)
 
     def exit_procedure(self):
         self.close()

@@ -21,14 +21,14 @@
 
 from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
-from ..common_tools import DatabaseModel, NumpyModel
+from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
 from ..aequilibrae.matrix import AequilibraeMatrix
 from ..common_tools.auxiliary_functions import *
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_data_viewer.ui'))
 
 from PyQt4.QtGui import QHBoxLayout, QTableView, QTableWidget, QPushButton, QVBoxLayout
-from PyQt4.QtGui import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
+from PyQt4.QtGui import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QPushButton
 
 
 class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
@@ -41,9 +41,9 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
         self.data_path = None
         self.data_to_show = datasource
         if isinstance(datasource, AequilibraeMatrix):
-            self.data_type = 'matrix'
+            self.data_type = 'Matrix'
         else:
-            self.data_type = 'dataset'
+            self.data_type = 'Dataset'
 
     # Elements that will be used during the displaying
         self._layout = QVBoxLayout()
@@ -77,7 +77,7 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
         self._layout.addItem(self.show_layout)
 
         # differentiates between matrix and dataset
-        if self.data_type == 'matrix':
+        if self.data_type == 'Matrix':
             self.data_to_show.computational_view([self.data_to_show.names[0]])
             # Matrices need cores and indices to be set as well
             self.mat_layout = QHBoxLayout()
@@ -96,11 +96,20 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
             self._layout.addItem(self.mat_layout)
             self.change_matrix_cores()
 
+
+        self.but_export = QPushButton()
+        self.but_export.setText('Export')
+        self.but_export.clicked.connect(self.export)
+
         self.but_close = QPushButton()
         self.but_close.clicked.connect(self.exit_procedure)
         self.but_close.setText('Close')
-        self._layout.addWidget(self.but_close)
 
+        self.but_layout = QHBoxLayout()
+        self.but_layout.addWidget(self.but_export)
+        self.but_layout.addWidget(self.but_close)
+
+        self._layout.addItem(self.but_layout)
 
         # We chose to use QTableView. However, if we want to allow the user to edit the dataset
         # The we need to allow them to switch to the slower QTableWidget
@@ -138,6 +147,10 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
         self.data_to_show.set_index(0)
         self.format_showing()
 
+    def export(self):
+        new_name, file_type = GetOutputFileName(self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.path)
+        if new_name is not None:
+            self.data_to_show.export(new_name)
 
     def exit_procedure(self):
         self.close()

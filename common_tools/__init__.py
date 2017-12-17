@@ -29,3 +29,4 @@ from database_model import DatabaseModel
 from parameters_dialog import ParameterDialog
 from report_dialog import ReportDialog
 from worker_thread import WorkerThread
+from about_dialog import AboutDialog

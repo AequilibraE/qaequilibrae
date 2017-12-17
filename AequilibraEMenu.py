@@ -29,22 +29,21 @@ from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from .common_tools import ParameterDialog, logger, ReportDialog
+from .common_tools import ParameterDialog, logger, ReportDialog, AboutDialog
 from binary_downloader_class import BinaryDownloaderDialog
-from .distribution_procedures import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog, DistributionModelsDialog
+from .distribution_procedures import DistributionModelsDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
-from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayDatasetDialog, DisplayMatrixDialog
+from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayDatasetDialog, DisplayMatrixDialog, MatrixManipulationDialog
 import tempfile, glob
-from .aequilibrae.__version__ import version as VERSION_GRAPH
+from .aequilibrae.__version__ import binary_version as VERSION
 
 no_binary = False
 old_binary = False
 try:
-    from aequilibrae.paths import VERSION
-
-    # logger((VERSION, VERSION_GRAPH))
+    from aequilibrae.paths import VERSION_COMPILED as VERSION_GRAPH
+    logger([VERSION, VERSION_GRAPH])
     if VERSION != VERSION_GRAPH:
         old_binary = True
 except:
@@ -52,6 +51,7 @@ except:
 
 sys.dont_write_bytecode = True
 import os.path
+
 
 class AequilibraEMenu:
     def __init__(self, iface):
@@ -69,7 +69,7 @@ class AequilibraEMenu:
             self.iface.addPluginToMenu("&AequilibraE", submenu.menuAction())
 
     def initGui(self):
-        #Removes temporary files
+        # Removes temporary files
         self.removes_temporary_files()
 
         # CREATING MASTER MENU HEAD
@@ -175,7 +175,7 @@ class AequilibraEMenu:
 
         # Graph generation
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_graph_creation.png")
-        self.graph_creation_action = QAction(icon, u"Create the graph", self.iface.mainWindow())
+        self.graph_creation_action = QAction(icon, u"Create graph", self.iface.mainWindow())
         QObject.connect(self.graph_creation_action, SIGNAL("triggered()"), self.run_create_graph)
         self.assignment_menu.addAction(self.graph_creation_action)
 
@@ -248,6 +248,12 @@ class AequilibraEMenu:
         QObject.connect(self.parameters_action, SIGNAL("triggered()"), self.run_change_parameters)
         self.AequilibraE_menu.addAction(self.parameters_action)
 
+         # About
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_parameters.png")
+        self.about_action = QAction(icon, u"About", self.iface.mainWindow())
+        QObject.connect(self.about_action, SIGNAL("triggered()"), self.run_about)
+        self.AequilibraE_menu.addAction(self.about_action)
+
         # Download binaries
         if no_binary:
             icon = QIcon(os.path.dirname(__file__) + "/icons/icon_binaries.png")
@@ -260,9 +266,10 @@ class AequilibraEMenu:
             report = ['You have an old version of the AequilibraE binaries']
             report.append('To fix this issue, please do the following:')
             report.append('     1. Uninstall AequilibraE')
-            report.append('     2. Re-install AequilibraE from the official repository')
-            report.append('     3. Download the new binaries from the Menu Aequilibrae-Download Binaries')
-            report.append('     4. Re-start QGIS')
+            report.append('     2. Re-start QGIS')
+            report.append('     3. Re-install AequilibraE from the official repository')
+            report.append('     4. Download the new binaries from the Menu Aequilibrae-Download Binaries')
+            report.append('     5. Re-start QGIS')
             dlg2 = ReportDialog(self.iface, report)
             dlg2.show()
             dlg2.exec_()
@@ -294,6 +301,11 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
+    def run_about(self):
+        dlg2 = AboutDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
     def run_load_matrices(self):
         dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=False)
         dlg2.show()
@@ -311,6 +323,7 @@ class AequilibraEMenu:
 
     def run_display_matrix(self):
         dlg2 = DisplayMatrixDialog(self.iface)
+        # dlg2 = MatrixManipulationDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
@@ -344,12 +357,12 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_calibrate_gravity(self):
-        dlg2 = CalibrateGravityDialog(self.iface)
+        dlg2 = DistributionModelsDialog(self.iface, 'calibrate')
         dlg2.show()
         dlg2.exec_()
 
     def run_apply_gravity(self):
-        dlg2 = ApplyGravityDialog(self.iface)
+        dlg2 = DistributionModelsDialog(self.iface, 'apply')
         dlg2.show()
         dlg2.exec_()
 
@@ -412,7 +425,7 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_ipf(self):
-        dlg2 = IpfDialog(self.iface)
+        dlg2 = DistributionModelsDialog(self.iface, 'ipf')
         dlg2.show()
         dlg2.exec_()
 

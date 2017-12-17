@@ -44,7 +44,7 @@ except:
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_matrix_loader.ui'))
 
-
+# TODO: Add possibility to add a centroid list to guarantee the match between matrix index and graph
 class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface, **kwargs):
         QDialog.__init__(self)
@@ -237,7 +237,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             default_type = '.npy'
             box_name = 'Matrix Loader'
             new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
-            self.__current_name = new_name
+            self.__current_name = os.path.split(new_name)[1].split('.')[0]
 
             self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type='numpy', file_path=new_name)
 
@@ -275,7 +275,6 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.matrix_list_view.blockSignals(True)
         i = 0
         for key, value in self.matrices.iteritems():
-            logger(value)
             r = np.unique(value['from']).shape[0]
             c = np.unique(value['to']).shape[0]
             dimensions = "{:,}".format(r) + " x " + "{:,}".format(c)

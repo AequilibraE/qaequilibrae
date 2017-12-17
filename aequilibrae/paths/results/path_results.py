@@ -18,19 +18,22 @@ class PathResults:
         self.nodes = -1
         self.zones = -1
         self.num_skims = -1
+        self.__integer_type = None
+        self.__float_type = None
         self.__graph_id__ = None
 
     def prepare(self, graph):
-
+        self.__integer_type = graph.default_types('int')
+        self.__float_type = graph.default_types('float')
         self.nodes = graph.num_nodes + 1
         self.zones = graph.centroids + 1
         self.links = graph.num_links + 1
         self.num_skims = graph.skims.shape[1]
 
-        self.predecessors = np.zeros(self.nodes, dtype=np.int32)
-        self.connectors = np.zeros(self.nodes, dtype=np.int32)
-        self.reached_first = np.zeros(self.nodes, dtype=np.int32)
-        self.temporary_skims = np.zeros((self.nodes, self.num_skims), np.float64)
+        self.predecessors = np.zeros(self.nodes, dtype=self.__integer_type)
+        self.connectors = np.zeros(self.nodes, dtype=self.__integer_type)
+        self.reached_first = np.zeros(self.nodes, dtype=self.__integer_type)
+        self.temporary_skims = np.zeros((self.nodes, self.num_skims), self.__float_type)
         self.__graph_id__ = graph.__id__
 
     def reset(self):

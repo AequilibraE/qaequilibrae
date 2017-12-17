@@ -44,9 +44,14 @@ class GravityCalibration:
         self.__required_parameters = ['max trip length', 'max iterations', 'max error']
         self.parameters = kwargs.get('parameters', self.get_parameters())
 
+        self.nan_as_zero = kwargs.get('nan_as_zero', False)
         self.matrix = kwargs.get('matrix')
         self.impedance = kwargs.get('impedance')
         deterrence_function = str(kwargs.get('function', '')).upper()
+
+        if self.nan_as_zero:
+            self.matrix = self.matrix.copy()
+            self.impedance = self.impedance.copy()
 
         self.result_matrix = None
         self.rows = None
@@ -99,8 +104,8 @@ class GravityCalibration:
 
             #weighted average cost
             self.report.append('Iteration: 1')
-            cstar = np.sum(self.impedance.matrix[self.impedance_core][:,:] * self.result_matrix.gravity[:, :]  * a) / \
-                    np.sum(self.result_matrix.gravity[:, :]  * a)
+            cstar = np.nansum(self.impedance.matrix[self.impedance_core][:,:] * self.result_matrix.gravity[:, :]  * a) / \
+                    np.nansum(self.result_matrix.gravity[:, :]  * a)
 
             b0 = 1 / cstar
 
@@ -120,7 +125,7 @@ class GravityCalibration:
             cm = self.apply_gravity()
             for i in self.gravity.report:
                 self.report.append('       ' + i)
-            self.report.append('Error: ' +  "{:.2E}".format(float(np.sum(abs((bm / bm1) - 1)))))
+            self.report.append('Error: ' +  "{:.2E}".format(float(np.nansum(abs((bm / bm1) - 1)))))
             self.report.append('')
             cm1 = c0
 
@@ -138,7 +143,7 @@ class GravityCalibration:
 
             for i in self.gravity.report:
                 self.report.append('       ' + i)
-            self.report.append('Error: ' + "{:.2E}".format(float(np.sum(abs((bm / bm1) - 1)))))
+            self.report.append('Error: ' + "{:.2E}".format(float(np.nansum(abs((bm / bm1) - 1)))))
             self.report.append('')
 
             # compute convergence criteria
@@ -177,9 +182,9 @@ class GravityCalibration:
                 if len(matrix.matrix_view.shape[:]) > 2:
                     raise ValueError(title + "' computational view needs to be set for a single matrix core")
 
-            if np.sum(matrix.matrix_view.data) == 0:
+            if np.nansum(matrix.matrix_view.data) == 0:
                 raise ValueError(title + 'has only zero values')
-            if np.min(matrix.matrix_view.data) < 0:
+            if np.nanmin(matrix.matrix_view.data) < 0:
                 raise ValueError(title + 'has negative values')
 
         # Augment parameters if we happen to have only passed one
@@ -191,7 +196,7 @@ class GravityCalibration:
         # Prepare the data for computation
         self.comput_core = self.matrix.view_names[0]
 
-        self.result_matrix = self.matrix.copy(output_name='TEMP', cores=[self.comput_core], names=['gravity'])
+        self.result_matrix = self.matrix.copy(cores=[self.comput_core], names=['gravity'])
 
         self.rows = AequilibraEData()
         self.rows.create_empty(entries=self.matrix.zones, field_names=['rows'], memory_mode=True)
@@ -213,14 +218,15 @@ class GravityCalibration:
                 'columns': self.columns,
                 'column_field': 'columns',
                 'model': self.model,
-                'parameters': self.parameters}
+                'parameters': self.parameters,
+                'nan_as_zero': self.nan_as_zero}
 
         self.gravity = GravityApplication(**args)
         self.gravity.apply()
         self.result_matrix = self.gravity.output
 
-        return np.sum(self.impedance.matrix[self.impedance_core][:,:] * self.result_matrix.gravity[:, :]) \
-               / np.sum(self.result_matrix.gravity[:, :])
+        return np.nansum(self.impedance.matrix[self.impedance_core][:,:] * self.result_matrix.gravity[:, :]) \
+               / np.nansum(self.result_matrix.gravity[:, :])
 
     def get_parameters(self):
         par = Parameters().parameters

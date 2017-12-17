@@ -18,8 +18,6 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-
-from qgis.core import *
 from PyQt4.QtCore import *
 import sys
 import os
@@ -29,14 +27,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 from ..common_tools import WorkerThread
 from aequilibrae.distribution import Ipf
 
+
 class IpfProcedure(WorkerThread):
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
         self.ipf = Ipf(**kwargs)
+        self.report = None
 
     def doWork(self):
         self.ipf.fit()
+        self.report = self.ipf.report
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),0)
-
-if __name__ == '__main__':
-    main()
+        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),0)

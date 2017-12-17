@@ -25,7 +25,7 @@ class SkimResults:
     def prepare(self, graph):
 
         self.nodes = graph.num_nodes + 1
-        self.zones = graph.centroids + 1
+        self.zones = graph.num_zones
         self.links = graph.num_links + 1
         self.num_skims = len(graph.skim_fields)
 
@@ -33,7 +33,7 @@ class SkimResults:
         self.skims.create_empty(file_name=AequilibraeMatrix().random_name(),
                                 zones=self.zones,
                                 matrix_names=graph.skim_fields)
-        self.skims.index[:] = np.arange(self.zones)[:]
+        self.skims.index[:] = graph.centroids[:]
         self.skims.computational_view(core_list=self.skims.names)
         self.skims.matrix_view = self.skims.matrix_view.reshape(self.zones, self.zones, self.num_skims)
         self.__graph_id__ = graph.__id__

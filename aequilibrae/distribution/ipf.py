@@ -36,9 +36,13 @@ class Ipf:
         # Seed matrix
         self.matrix = kwargs.get('matrix', None)
 
+        # NaN as zero
+        self.nan_as_zero = kwargs.get('nan_as_zero', True)
+
         # row vector
         self.rows = kwargs.get('rows', None)
         self.row_field = kwargs.get('row_field', None)
+        self.output_name = kwargs.get('output', AequilibraeMatrix().random_name())
 
         # Column vector
         self.columns = kwargs.get('columns', None)
@@ -65,6 +69,16 @@ class Ipf:
         if not isinstance(self.matrix, AequilibraeMatrix):
             raise TypeError('Seed matrix needs to be an instance of AequilibraEMatrix')
 
+        # Check data type
+        if not np.issubdtype(self.matrix.dtype, np.float):
+            raise ValueError('Seed matrix need to be a float type')
+
+        if not np.issubdtype(self.rows.data[self.row_field].dtype, np.float):
+            raise ValueError('production/rows vector must be a float type')
+
+        if not np.issubdtype(self.columns.data[self.column_field].dtype, np.float):
+            raise ValueError('Attraction/columns vector must be a float type')
+
         # Check data dimensions
         if not np.array_equal(self.rows.index, self.columns.index):
             raise ValueError('Indices from row vector do not match those from column vector')
@@ -81,8 +95,8 @@ class Ipf:
 
         if self.error is None:
             # check balancing:
-            sum_rows = np.sum(self.rows.data[self.row_field])
-            sum_cols = np.sum(self.columns.data[self.column_field])
+            sum_rows = np.nansum(self.rows.data[self.row_field])
+            sum_cols = np.nansum(self.columns.data[self.column_field])
             if abs(sum_rows - sum_cols) > self.parameters['balancing tolerance']:
                 self.error = 'Vectors are not balanced'
             else:
@@ -108,10 +122,13 @@ class Ipf:
             max_iter = self.parameters['max iterations']
             conv_criteria = self.parameters['convergence level']
 
-            self.output = self.matrix.copy(os.path.join(tempfile.gettempdir(),'aequilibrae_matrix_' + str(uuid.uuid4()) + '.aem'))
+            self.output = self.matrix.copy(self.output_name)
+            if self.nan_as_zero:
+                self.output.matrix_view[:,:] = np.nan_to_num(self.output.matrix_view)[:,:]
+
             rows = self.rows.data[self.row_field]
             columns = self.columns.data[self.column_field]
-            tot_matrix = np.sum(self.output.matrix_view[:, :])
+            tot_matrix = np.nansum(self.output.matrix_view[:, :])
 
             # Reporting
             self.report.append('Target convergence criteria: ' + str(conv_criteria))
@@ -121,7 +138,7 @@ class Ipf:
             self.report.append('Columns: ' + str(self.columns.entries))
 
             self.report.append('Total of seed matrix: ' + "{:28,.4f}".format(float(tot_matrix)))
-            self.report.append('Total of target vectors: ' + "{:25,.4f}".format(float(rows.sum())))
+            self.report.append('Total of target vectors: ' + "{:25,.4f}".format(float(np.nansum(rows))))
             self.report.append('')
             self.report.append('Iteration,   Convergence')
             self.gap = conv_criteria + 1
@@ -147,23 +164,19 @@ class Ipf:
                 self.gap = max(abs(1 - np.min(row_factor)), abs(np.max(row_factor) - 1), abs(1 - np.min(column_factor)),
                             abs(np.max(column_factor) - 1))
 
-                self.report.append(str(iter) + '   ,   ' + str("{:4,.10f}".format(float(np.sum(self.gap)))))
+                self.report.append(str(iter) + '   ,   ' + str("{:4,.10f}".format(float(np.nansum(self.gap)))))
 
             self.report.append('')
             self.report.append('Running time: ' + str("{:4,.3f}".format(clock()-t)) + 's')
     def tot_rows(self, matrix):
-        return np.sum(matrix, axis=1)
+        return np.nansum(matrix, axis=1)
 
     def tot_columns(self, matrix):
-        return np.sum(matrix, axis=0)
+        return np.nansum(matrix, axis=0)
 
     def factor(self, marginals, targets):
         f = np.divide(targets, marginals)  # We compute the factors
-        f[f == np.NINF] = 1  # And treat the errors, with the infinites first
-        f = f + 1  # and the NaN second
-        f = np.nan_to_num(f)  # The sequence of operations is just a resort to
-        f[f == 0] = 2  # use at most numpy functions as possible instead of pure Python
-        f = f - 1
+        f[f == np.NINF] = 1  # And treat the errors
         return f
 
     def get_parameters(self, model):

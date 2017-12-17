@@ -1,19 +1,20 @@
 assignment:
-  frank-wolfe:
+  Equilibrium:
     rgap: 1.0e-05
 distribution:
   gravity:
     max error: 0.0001
     max iterations: 100
-    max trip length: -1  # negative number means no limit
+    max trip length: -1
   ipf:
     balancing tolerance: 0.001
     convergence level: 0.0001
     max iterations: 5000
 system:
   cpus: 4
-  default_directory: /media/pedro/LargeDrive/ - Delaunay Lines/Examples/AUS
-  driving side: right
-  logging: false
-  report zeros: 1
+  default_directory: /home/pedro/.qgis2/python/plugins/AequilibraE/tests/data
   temp directory: /temp
+  driving side: right
+  logging: False
+  report zeros: 1
+

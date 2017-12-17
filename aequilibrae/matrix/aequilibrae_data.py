@@ -25,18 +25,15 @@ import uuid
 import tempfile
 import os
 from numpy.lib.format import open_memmap
-
-# Necessary in case we are no the QGIS world
-# try:
-#     from common_tools.auxiliary_functions import logger
-# except:
-#     pass
+import sqlite3
 
 MEMORY = 1
 DISK = 0
+data_export_types = ['aed', 'csv', 'sqlite']
 
 
 class AequilibraEData(object):
+
     def __init__(self):
         self.data = None
         self.file_path = None
@@ -48,19 +45,29 @@ class AequilibraEData(object):
         self.memory_mode = None
 
     def create_empty(self, file_path=None, entries=1, field_names=None, data_types=None, memory_mode=False):
+        """
+        :param file_path: Optional. Full path for the output data file. If *memory_false* is 'false' and path is missing,
+        then the file is created in the temp folder
+        :param entries: Number of records in the dataset. Default is 1
+        :param field_names: List of field names for this dataset. If no list is provided, the field 'data' will be created
+        :param data_types: List of data types for the dataset. Types need to be NumPy data types (e.g. np.int16,
+        np.float64). If no list of types are provided, type will be *np.float64*
+        :param memory_mode: If true, dataset will be kept in memory. If false, the dataset will  be a memory-mapped numpy array
+        :return: # nothing. Associates a dataset with the AequilibraEData object
+        """
 
         if file_path is not None or memory_mode:
             if field_names is None:
                 field_names = ['data']
 
             if data_types is None:
-                data_types = [np.float64]
+                data_types = [np.float64] * len(field_names)
 
             self.file_path = file_path
             self.entries = entries
             self.fields = field_names
             self.data_types = data_types
-            self.aeq_index_type = np.int64
+            self.aeq_index_type = np.uint64
 
             if memory_mode:
                 self.memory_mode = MEMORY
@@ -113,17 +120,62 @@ class AequilibraEData(object):
             raise AttributeError("Data container is empty")
 
     def load(self, file_path):
+        """
+        :param file_path: Full file path to the AequilibraEDataset to be loaded
+        :return: Loads the dataset into the AequilibraEData instance
+        """
         f = open(file_path)
         self.file_path = os.path.realpath(f.name)
         f.close()
 
-        # Map in memory and load matrix_procedures names plus dimensions
+        # Map in memory and load data names plus dimensions
         self.data = open_memmap(self.file_path, mode='r+')
 
         self.entries = self.data.shape[0]
         self.fields = [x for x in self.data.dtype.fields if x != 'index']
         self.num_fields = len(self.fields)
         self.data_types = [self.data[x].dtype.type for x in self.fields]
+
+    def export(self, file_name, table_name='aequilibrae_table'):
+        """
+        :param file_name: File name with PATH and extension (csv, or sqlite3, sqlite or db)
+        :param table_name: It only applies if you are saving to an SQLite table. Otherwise ignored
+        :return:
+        """
+
+        file_type = os.path.splitext(file_name)[1]
+        headers = ['index']
+        headers.extend(self.fields)
+
+        a = self.data[np.newaxis,:][0]
+        if file_type == '.csv':
+            fmt = "%d"
+            for dt in self.data_types:
+                if np.issubdtype(dt, np.float):
+                    fmt += ',%f'
+                elif np.issubdtype(dt, np.integer):
+                    fmt += ',%d'
+            np.savetxt(file_name, self.data[np.newaxis,:][0], delimiter=',', fmt=fmt, header=','.join(headers),
+                       comments='')
+
+        elif file_type in ['.sqlite', '.sqlite3', '.db']:
+            # Connecting to the database file
+            conn = sqlite3.connect(file_name)
+            c = conn.cursor()
+            # Creating the flows table
+            c.execute('''DROP TABLE IF EXISTS ''' + table_name)
+            fi = ''
+            qm = '?'
+            for f in headers[1:]:
+                fi += ', ' + f + ' REAL'
+                qm += ', ?'
+
+            c.execute('''CREATE TABLE ''' + table_name + ''' (link_id INTEGER PRIMARY KEY''' + fi + ')''')
+            c.execute('BEGIN TRANSACTION')
+            c.executemany('INSERT INTO ' + table_name + ' VALUES (' + qm + ')', res)
+            c.execute('END TRANSACTION')
+            conn.commit()
+            conn.close()
 
     @staticmethod
     def random_name():

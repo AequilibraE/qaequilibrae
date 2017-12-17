@@ -13,15 +13,11 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    30/10/2016
- Updated:
+ Updated:    07/10/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-
-from apply_gravity_dialog import ApplyGravityDialog
-from calibrate_gravity_dialog import CalibrateGravityDialog
-from ipf_dialog import IpfDialog
 from distribution_models_dialog import DistributionModelsDialog
 from ipf_procedure import IpfProcedure
 from calibrate_gravity_procedure import CalibrateGravityProcedure

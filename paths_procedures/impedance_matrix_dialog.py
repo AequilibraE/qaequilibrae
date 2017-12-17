@@ -13,23 +13,18 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/09/2016
+ Updated:    30/10/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
-import qgis
 from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QObject, SIGNAL
-import sys, os
-import numpy as np
+from PyQt4.QtCore import QObject, SIGNAL, Qt
 
-from impedance_matrix_procedures import ComputeDistMatrix
-from aequilibrae.paths import Graph
-from aequilibrae.paths import SkimResults
+from aequilibrae.paths import Graph, SkimResults, NetworkSkimming
+from aequilibrae.matrix import matrix_export_types
 from ..common_tools import GetOutputFileName
 from ..common_tools import ReportDialog
 from ..common_tools.auxiliary_functions import *
@@ -49,29 +44,70 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.validtypes = integer_types + float_types
         self.tot_skims = 0
         self.name_skims = 0
+        self.graph = None
         self.skimmeable_fields = []
         self.skim_fields = []
+        self.error = None
         # FIRST, we connect slot signals
 
         # For loading a new graph
         self.load_graph_from_file.clicked.connect(self.loaded_new_graph_from_file)
 
         # For adding skims
-        self.bt_add_skim.clicked.connect(self.add_to_skim_list)
-        self.skim_list.doubleClicked.connect(self.slot_double_clicked)
-
-        # RUN skims
-        self.select_result.clicked.connect(self.browse_outfile)
+        # self.bt_add_skim.clicked.connect(self.add_to_skim_list)
+        self.but_adds_to_links.clicked.connect(self.append_to_list)
+        self.but_removes_from_links.clicked.connect(self.removes_fields)
 
         self.do_dist_matrix.clicked.connect(self.run_skimming)
 
         # SECOND, we set visibility for sections that should not be shown when the form opens (overlapping items)
         #        and re-dimension the items that need re-dimensioning
         self.hide_all_progress_bars()
-        self.skim_list.setColumnWidth(0, 567)
+        self.available_skims_table.setColumnWidth(0, 245)
+        self.skim_list.setColumnWidth(0, 245)
+        self.available_skims_table.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.skim_list.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
 
         # loads default path from parameters
         self.path = standard_path()
+
+    def removes_fields(self):
+        table = self.available_skims_table
+        final_table = self.skim_list
+
+        for i in final_table.selectedRanges():
+            old_fields = [final_table.item(row, 0).text() for row in xrange(i.topRow(), i.bottomRow() + 1)]
+
+            for row in xrange(i.bottomRow(), i.topRow() - 1, -1):
+                final_table.removeRow(row)
+
+            counter = table.rowCount()
+            for field in old_fields:
+                table.setRowCount(counter + 1)
+                item1 = QTableWidgetItem(field)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                table.setItem(counter, 0, item1)
+                counter += 1
+
+    def append_to_list(self):
+        table = self.available_skims_table
+        final_table = self.skim_list
+
+        for i in table.selectedRanges():
+            new_fields = [table.item(row,0).text() for row in xrange(i.topRow(), i.bottomRow()+1)]
+
+            for f in new_fields:
+                self.skim_fields.append(f.encode('utf-8'))
+            for row in xrange(i.bottomRow(), i.topRow() - 1, -1):
+                table.removeRow (row)
+
+            counter = final_table.rowCount()
+            for field in new_fields:
+                final_table.setRowCount(counter + 1)
+                item1 = QTableWidgetItem(field)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                final_table.setItem(counter, 0, item1)
+                counter += 1
 
     def hide_all_progress_bars(self):
         self.progressbar.setVisible(False)
@@ -84,113 +120,87 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
         new_name, file_type = GetOutputFileName(self, 'Graph file', file_types, ".aeg", self.path)
         self.cb_minimizing.clear()
-        self.cb_skims.clear()
-        self.all_centroids.setText('')
+        self.available_skims_table.clearContents()
         self.block_paths.setChecked(False)
+        self.graph = None
         if new_name is not None:
             self.graph_file_name.setText(new_name)
             self.graph = Graph()
             self.graph.load_from_disk(new_name)
 
-            self.all_centroids.setText(str(self.graph.centroids))
-            if self.graph.block_centroid_flows:
-                self.block_paths.setChecked(True)
+            self.block_paths.setChecked(self.graph.block_centroid_flows)
             graph_fields = list(self.graph.graph.dtype.names)
-            self.skimmeable_fields = [x for x in graph_fields if
-                                      x not in ['link_id', 'a_node', 'b_node', 'direction', 'id', ]]
+            self.skimmeable_fields = self.graph.available_skims()
 
+            self.available_skims_table.setRowCount(len(self.skimmeable_fields))
             for q in self.skimmeable_fields:
                 self.cb_minimizing.addItem(q)
-                self.cb_skims.addItem(q)
-
-    def add_to_skim_list(self):
-        if self.cb_skims.currentIndex() >= 0:
-            self.tot_skims += 1
-            self.skim_list.setRowCount(self.tot_skims)
-            self.skim_list.setItem(self.tot_skims - 1, 0, QtGui.QTableWidgetItem((self.cb_skims.currentText())))
-            self.skim_fields.append(self.cb_skims.currentText())
-            self.cb_skims.removeItem(self.cb_skims.currentIndex())
-
-    def slot_double_clicked(self, mi):
-        row = mi.row()
-        if row > -1:
-            self.cb_skims.addItem(self.skim_list.item(row, 0).text())
-            self.skim_fields.pop(row)
-            self.skim_list.removeRow(row)
-            self.tot_skims -= 1
+                self.available_skims_table.setItem(0, 0, QTableWidgetItem(q))
 
     def browse_outfile(self):
-        file_types = "Comma-Separated files(*.csv)"
-        def_type='.csv'
-        if self.radio_aequilibrae.isChecked():
-            file_types = "AequilibraE Array(*.aem)"
-            def_type = 'aem'
-
-        new_name, _ = GetOutputFileName(self, 'AequilibraE impedance computation', [file_types], def_type, self.path)
-
-        self.imped_results.setText('')
+        self.imped_results = None
+        new_name, extension = GetOutputFileName(self, 'AequilibraE impedance computation', matrix_export_types,
+                                                '.aem', self.path)
         if new_name is not None:
-            self.imped_results.setText(new_name)
+            self.imped_results = new_name.encode('utf-8')
 
     def run_thread(self):
-
         self.do_dist_matrix.setVisible(False)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
-                        self.progress_range_from_thread)
-
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.finished_threaded_procedure)
-
+        self.progressbar.setRange(0, self.graph.num_zones)
+        QObject.connect(self.worker_thread, SIGNAL("skimming"), self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 
-    # VAL and VALUE have the following structure: (bar/text ID, value)
-    def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val)
+    def signal_handler(self, val):
+        if val[0] == 'zones finalized':
+            self.progressbar.setValue(val[1])
+        elif val[0] == 'text skimming':
+            self.progress_label.setText(val[1])
+        elif val[0] == 'finished_threaded_procedure':
+            self.finished_threaded_procedure()
 
-    def progress_value_from_thread(self, val):
-        self.progressbar.setValue(val)
-
-    def progress_text_from_thread(self, val):
-        self.progress_label.setText(val)
-
-    def finished_threaded_procedure(self, val):
+    def finished_threaded_procedure(self):
         self.report = self.worker_thread.report
-
-        if self.radio_aequilibrae.isChecked():
-            self.result.skims.save_to_disk(file_path=self.imped_results.text(), compressed=True)
-        if self.radio_csv.isChecked():
-            self.result.skims.export(self.imped_results.text())
+        self.result.skims.export(self.imped_results)
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results
-        centroids = int(self.all_centroids.text())
-        cost_field = self.cb_minimizing.currentText()
-        block_paths = False
-        if self.block_paths.isChecked():
-            block_paths = True
 
-        if centroids > 0:
-            # Guarantees that there is only one copy of the minimizing value in there
-            if cost_field in self.skim_fields:
-                self.skim_fields.remove(cost_field)
+        if self.error is None:
+            self.browse_outfile()
+            cost_field = self.cb_minimizing.currentText().encode('utf-8')
 
-            self.graph.set_graph(centroids, cost_field, self.skim_fields, block_paths)
+            # We prepare the graph to set all nodes as centroids
+            if self.rdo_all_nodes.isChecked():
+                self.graph.prepare_graph(self.graph.all_nodes)
+
+            self.graph.set_graph(cost_field=cost_field, skim_fields=self.skim_fields,
+                                 block_centroid_flows=self.block_paths.isChecked())
+
             self.result.prepare(self.graph)
-        else:
-            qgis.utils.iface.messageBar().pushMessage("Nothing to run.", 'Number of centroids set to zero', level=3)
 
-        if len(self.imped_results.text()) == 0:
-            qgis.utils.iface.messageBar().pushMessage("Cannot run.", 'No output file provided', level=3)
-        else:
             self.funding1.setVisible(False)
             self.funding2.setVisible(False)
             self.progressbar.setVisible(True)
             self.progress_label.setVisible(True)
-            self.worker_thread = ComputeDistMatrix(qgis.utils.iface.mainWindow(), self.graph, self.result)
-            self.run_thread()
+            self.worker_thread = NetworkSkimming(self.graph, self.result)
+            try:
+                self.run_thread()
+            except ValueError as error:
+                qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
+        else:
+            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=3)
+
+    def check_inputs(self):
+        self.error = None
+        if self.rdo_all_nodes.isChecked() and self.block_paths.isChecked():
+            self.error = 'It is not possible to trace paths between all nodes while blocking flows through centroids'
+
+        if self.graph is None:
+            self.error = 'No graph loaded'
+
+        if len(self.skim_fields) < 1:
+            self.error = 'No skim fields provided'
 
     def exit_procedure(self):
         self.close()
