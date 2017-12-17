@@ -16,4 +16,5 @@ cdef double INFINITE = 1.79769313e+308
 
 VERSION = 0.4
 MINOR_VRSN = 0
+binary_version = 0.4
 release_name = "Karlsruhe"

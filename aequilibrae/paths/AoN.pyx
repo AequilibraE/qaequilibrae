@@ -36,7 +36,7 @@ cimport cython
 
 include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
-from ..__version__ import release_name as VERSION
+from ..__version__ import binary_version as VERSION_COMPILED
 
 
 @cython.wraparound(False)

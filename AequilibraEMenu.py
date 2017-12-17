@@ -37,13 +37,13 @@ from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTrans
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayDatasetDialog, DisplayMatrixDialog, MatrixManipulationDialog
 import tempfile, glob
-from .aequilibrae.__version__ import release_name as VERSION_GRAPH
+from .aequilibrae.__version__ import binary_version as VERSION
 
 no_binary = False
 old_binary = False
 try:
-    from aequilibrae.paths import release_name as VERSION
-
+    from aequilibrae.paths import VERSION_COMPILED as VERSION_GRAPH
+    logger([VERSION, VERSION_GRAPH])
     if VERSION != VERSION_GRAPH:
         old_binary = True
 except:
