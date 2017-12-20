@@ -45,6 +45,8 @@ except:
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_matrix_loader.ui'))
 
 # TODO: Add possibility to add a centroid list to guarantee the match between matrix index and graph
+# TODO: Allow user to import multiple matrices from CSV at once (like an export from TransCad or FAF data)
+# TODO: Add a remove button to the list of matrices to be loaded. Remove double-click
 class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface, **kwargs):
         QDialog.__init__(self)
@@ -96,17 +98,23 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
     def resizing(self):
         if self.radio_aeq_matrix.isChecked():
+            self.group_combo.setVisible(False)
+            self.group_list.setVisible(False)
+            self.group_buttons.setVisible(False)
             self.setMaximumSize(QSize(127, 176))
             self.resize(127, 176)
             self.but_permanent_save.setVisible(False)
         else:
+            self.group_combo.setVisible(True)
+            self.group_list.setVisible(True)
+            self.group_buttons.setVisible(True)
             self.matrix_list_view.setColumnWidth(0, 180)
             self.matrix_list_view.setColumnWidth(1, 100)
             self.matrix_list_view.setColumnWidth(2, 125)
             self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
             self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
-            self.setMaximumSize(QSize(501, 349))
-            self.resize(501, 349)
+            self.setMaximumSize(QSize(100000, 100000))
+            self.resize(542, 427)
             self.but_permanent_save.setVisible(True)
         
         self.but_save_for_single_use.setEnabled(False)

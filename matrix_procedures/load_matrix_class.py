@@ -62,8 +62,9 @@ class LoadMatrix(WorkerThread):
                 matrix.append([a, b, c])
                 if P % 1000 == 0:
                     self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
+
                     self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                              ("Loading matrix: " + str(P) + "/" + str(feat_count)))
+                              ("Loading matrix: " + "{:,}".format(P) + "/" + "{:,}".format(feat_count)))
 
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (0))
             self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), ("Converting to a NumPy array"))

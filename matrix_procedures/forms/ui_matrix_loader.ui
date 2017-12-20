@@ -9,14 +9,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>501</width>
-    <height>349</height>
+    <width>542</width>
+    <height>427</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="maximumSize">
    <size>
-    <width>501</width>
-    <height>349</height>
+    <width>5010</width>
+    <height>3490</height>
    </size>
   </property>
   <property name="font">
@@ -34,471 +40,528 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QPushButton" name="but_load">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>140</y>
-     <width>91</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="palette">
-    <palette>
-     <active>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </active>
-     <inactive>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </inactive>
-     <disabled>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </disabled>
-    </palette>
-   </property>
-   <property name="text">
-    <string>LOAD</string>
-   </property>
-  </widget>
-  <widget class="QProgressBar" name="progressbar">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>177</y>
-     <width>31</width>
-     <height>161</height>
-    </rect>
-   </property>
-   <property name="palette">
-    <palette>
-     <active>
-      <colorrole role="Highlight">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>0</red>
-         <green>170</green>
-         <blue>0</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </active>
-     <inactive>
-      <colorrole role="Highlight">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>240</red>
-         <green>240</green>
-         <blue>240</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </inactive>
-     <disabled>
-      <colorrole role="Highlight">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>51</red>
-         <green>153</green>
-         <blue>255</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </disabled>
-    </palette>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
-   <property name="textVisible">
-    <bool>true</bool>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
-   </property>
-   <property name="textDirection">
-    <enum>QProgressBar::BottomToTop</enum>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="field_cells">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>104</y>
-     <width>261</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="maxVisibleItems">
-    <number>10</number>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="field_from">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>42</y>
-     <width>261</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="maxVisibleItems">
-    <number>10</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbl_matrix">
-   <property name="geometry">
-    <rect>
-     <x>151</x>
-     <y>15</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Matrix core</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbl_from">
-   <property name="geometry">
-    <rect>
-     <x>151</x>
-     <y>46</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>From</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbl_flow">
-   <property name="geometry">
-    <rect>
-     <x>151</x>
-     <y>108</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Flow</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="matrix_layer">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>11</y>
-     <width>261</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="maxVisibleItems">
-    <number>10</number>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbl_to">
-   <property name="geometry">
-    <rect>
-     <x>151</x>
-     <y>77</y>
-     <width>121</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>To</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="field_to">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>73</y>
-     <width>261</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="maxVisibleItems">
-    <number>10</number>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radio_omx_matrix">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>108</y>
-     <width>61</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>OMX</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radio_npy_matrix">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>77</y>
-     <width>71</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Numpy</string>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radio_layer_matrix">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>46</y>
-     <width>91</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Open layer</string>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="but_save_for_single_use">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>140</y>
-     <width>91</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="palette">
-    <palette>
-     <active>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </active>
-     <inactive>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </inactive>
-     <disabled>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </disabled>
-    </palette>
-   </property>
-   <property name="text">
-    <string>Single use</string>
-   </property>
-  </widget>
-  <widget class="QTableWidget" name="matrix_list_view">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>177</y>
-     <width>441</width>
-     <height>161</height>
-    </rect>
-   </property>
-   <column>
-    <property name="text">
-     <string>Name</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Dimensions</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Total</string>
-    </property>
-   </column>
-  </widget>
-  <widget class="QLabel" name="progress_label">
-   <property name="geometry">
-    <rect>
-     <x>299</x>
-     <y>142</y>
-     <width>191</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QRadioButton" name="radio_aeq_matrix">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>15</y>
-     <width>101</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>AequilibraE</string>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="but_permanent_save">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>105</x>
-     <y>140</y>
-     <width>91</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="palette">
-    <palette>
-     <active>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </active>
-     <inactive>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </inactive>
-     <disabled>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </disabled>
-    </palette>
-   </property>
-   <property name="text">
-    <string>Save</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="compressed">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>350</x>
-     <y>143</y>
-     <width>141</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Compress outputs</string>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <zorder>matrix_list_view</zorder>
-  <zorder>but_load</zorder>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="group_combo">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>361</width>
+       <height>131</height>
+      </size>
+     </property>
+     <widget class="QComboBox" name="field_cells">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>100</y>
+        <width>261</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="maxVisibleItems">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lbl_flow">
+      <property name="geometry">
+       <rect>
+        <x>11</x>
+        <y>104</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Flow</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lbl_from">
+      <property name="geometry">
+       <rect>
+        <x>11</x>
+        <y>42</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>From</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lbl_matrix">
+      <property name="geometry">
+       <rect>
+        <x>11</x>
+        <y>11</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Matrix core</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="field_from">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>38</y>
+        <width>261</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="maxVisibleItems">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="field_to">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>69</y>
+        <width>261</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="maxVisibleItems">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="matrix_layer">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>7</y>
+        <width>261</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="maxVisibleItems">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lbl_to">
+      <property name="geometry">
+       <rect>
+        <x>11</x>
+        <y>73</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>To</string>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>131</height>
+      </size>
+     </property>
+     <widget class="QRadioButton" name="radio_omx_matrix">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>104</y>
+        <width>61</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OMX</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="radio_layer_matrix">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>42</y>
+        <width>91</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Open layer</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="radio_aeq_matrix">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>11</y>
+        <width>101</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>AequilibraE</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="radio_npy_matrix">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>73</y>
+        <width>71</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Numpy</string>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="group_list">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QTableWidget" name="matrix_list_view">
+        <column>
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Dimensions</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Total</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QProgressBar" name="progressbar">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="palette">
+         <palette>
+          <active>
+           <colorrole role="Highlight">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>0</red>
+              <green>170</green>
+              <blue>0</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </active>
+          <inactive>
+           <colorrole role="Highlight">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>240</red>
+              <green>240</green>
+              <blue>240</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </inactive>
+          <disabled>
+           <colorrole role="Highlight">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>51</red>
+              <green>153</green>
+              <blue>255</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </disabled>
+         </palette>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="textVisible">
+         <bool>true</bool>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="textDirection">
+         <enum>QProgressBar::BottomToTop</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="but_load">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="palette">
+         <palette>
+          <active>
+           <colorrole role="Button">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>180</red>
+              <green>180</green>
+              <blue>180</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </active>
+          <inactive>
+           <colorrole role="Button">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>180</red>
+              <green>180</green>
+              <blue>180</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </inactive>
+          <disabled>
+           <colorrole role="Button">
+            <brush brushstyle="SolidPattern">
+             <color alpha="255">
+              <red>180</red>
+              <green>180</green>
+              <blue>180</blue>
+             </color>
+            </brush>
+           </colorrole>
+          </disabled>
+         </palette>
+        </property>
+        <property name="text">
+         <string>LOAD</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QGroupBox" name="group_buttons">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>400</width>
+          <height>0</height>
+         </size>
+        </property>
+        <widget class="QCheckBox" name="compressed">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>245</x>
+           <y>4</y>
+           <width>141</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Compress outputs</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <widget class="QLabel" name="progress_label">
+         <property name="geometry">
+          <rect>
+           <x>194</x>
+           <y>3</y>
+           <width>221</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="but_permanent_save">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>1</y>
+           <width>91</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>180</red>
+               <green>180</green>
+               <blue>180</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>180</red>
+               <green>180</green>
+               <blue>180</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>180</red>
+               <green>180</green>
+               <blue>180</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="text">
+          <string>Save</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="but_save_for_single_use">
+         <property name="geometry">
+          <rect>
+           <x>95</x>
+           <y>1</y>
+           <width>91</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>180</red>
+               <green>180</green>
+               <blue>180</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>180</red>
+               <green>180</green>
+               <blue>180</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Button">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>180</red>
+               <green>180</green>
+               <blue>180</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="text">
+          <string>Single use</string>
+         </property>
+        </widget>
+        <zorder>progress_label</zorder>
+        <zorder>compressed</zorder>
+        <zorder>but_permanent_save</zorder>
+        <zorder>but_save_for_single_use</zorder>
+        <zorder>matrix_list_view</zorder>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+  <zorder>groupBox</zorder>
+  <zorder>group_combo</zorder>
+  <zorder>group_list</zorder>
   <zorder>progressbar</zorder>
-  <zorder>field_cells</zorder>
-  <zorder>field_from</zorder>
-  <zorder>lbl_matrix</zorder>
-  <zorder>lbl_from</zorder>
-  <zorder>lbl_flow</zorder>
-  <zorder>matrix_layer</zorder>
-  <zorder>lbl_to</zorder>
-  <zorder>field_to</zorder>
-  <zorder>radio_omx_matrix</zorder>
-  <zorder>radio_npy_matrix</zorder>
-  <zorder>radio_layer_matrix</zorder>
-  <zorder>but_save_for_single_use</zorder>
-  <zorder>progress_label</zorder>
-  <zorder>radio_aeq_matrix</zorder>
-  <zorder>but_permanent_save</zorder>
-  <zorder>compressed</zorder>
+  <zorder>matrix_list_view</zorder>
+  <zorder>groupBox_2</zorder>
  </widget>
  <resources/>
  <connections/>
