@@ -150,20 +150,16 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
     def progress_text_from_thread(self, value):
         self.progress_label.setText(value[1])
 
-    def job_finished_from_thread(self, success):
-        if self.worker_thread.error is not None:
-            self.exit_procedure()
-            self.throws_error(self.worker_thread.error)
-
-        else:
-            try:
-                QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
-            except:
-                self.worker_thread.report.append('Could not load desire lines to map')
-            if self.worker_thread.report:
-                dlg2 = ReportDialog(self.iface, self.worker_thread.report)
-                dlg2.show()
-                dlg2.exec_()
+    def job_finished_from_thread(self, t):
+        logger('entered thread ending')
+        try:
+            QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
+        except:
+            self.worker_thread.report.append('Could not load desire lines to map')
+        if self.worker_thread.report:
+            dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+            dlg2.show()
+            dlg2.exec_()
         self.exit_procedure()
 
     def check_all_inputs(self):
@@ -186,11 +182,13 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
 
         if len(matrix_cores_to_use) > 0:
             self.matrix.computational_view(matrix_cores_to_use)
+            if len(matrix_cores_to_use) == 1:
+                self.matrix.matrix_view = self.matrix.matrix_view.reshape((self.matrix.zones, self.matrix.zones, 1))
         else:
             return False
 
-        # We build the matrix_procedures hash from the matrix_procedures index
-        self.matrix_hash = copy.deepcopy(self.matrix.matrix_hash)
+        # list of zones from the matrix
+        self.zones = self.matrix.index[:]
 
         return True
 

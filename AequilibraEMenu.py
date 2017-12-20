@@ -43,7 +43,6 @@ no_binary = False
 old_binary = False
 try:
     from aequilibrae.paths import VERSION_COMPILED as VERSION_GRAPH
-    logger([VERSION, VERSION_GRAPH])
     if VERSION != VERSION_GRAPH:
         old_binary = True
 except:

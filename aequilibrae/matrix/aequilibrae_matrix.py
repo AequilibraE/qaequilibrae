@@ -232,6 +232,7 @@ class AequilibraeMatrix(object):
         self.matrix = {}
         for i, v in enumerate(self.names):
             self.matrix[v] = self.matrices[:, :, i]
+        self.__builds_hash__()
 
     def __write__(self):
         np.memmap(self.file_path, dtype='uint8', offset=0, mode='w+', shape=1)[0] = self.__version__
@@ -325,6 +326,7 @@ class AequilibraeMatrix(object):
         else:
             raise ValueError('Index {} not available. Choose one of {}'.format(index_to_set, str(self.index_names)))
         self.index = self.indices[:, index_to_set]
+
     def __getattr__(self, mat_name):
         if mat_name in object.__dict__:
             return self.__dict__[mat_name]
@@ -471,6 +473,7 @@ class AequilibraeMatrix(object):
             output.indices[:] = self.indices[:]
             for i, c in enumerate(cores):
                 output.matrices[:, :, i] = self.matrices[:, :, self.names.index(c)]
+            output.__builds_hash__()
             output.matrices.flush()
 
         return output

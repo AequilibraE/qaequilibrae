@@ -26,6 +26,7 @@ import itertools
 import numpy as np
 import struct
 from ..common_tools.auxiliary_functions import *
+from ..common_tools import logger
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import AssignmentResults
 
@@ -54,40 +55,37 @@ class DesireLinesProcedure(WorkerThread):
         self.error = None
         self.matrix_hash = matrix_hash
         self.report = []
+        self.nodes_to_indices = {matrix.index[x]: x for x in range(matrix.zones)}
         self.python_version = (8 * struct.calcsize("P"))
 
         if error:
             self.error = 'Scipy and/or Numpy not installed'
+            self.report.append(self.error)
         self.procedure = "ASSIGNMENT"
 
     def doWork(self):
         if self.error is None:
-            mat_view = self.matrix.matrix_view
-            classes = mat_view.shape[2]
+            # In case we have only one class
+            classes = self.matrix.matrix_view.shape[2]
+
             layer = get_vector_layer_by_name(self.layer)
             idx = layer.fieldNameIndex(self.id_field)
 
-            matrix_nodes = max(self.matrix_hash.values()) + 1
-            featcount = layer.featureCount()
-            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, featcount))
+            feature_count = layer.featureCount()
+            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, feature_count))
 
             all_centroids = {}
             P = 0
             for feat in layer.getFeatures():
                 P += 1
                 self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, int(P)))
-                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Loading Layer Features: " + str(P) + "/" + str(featcount)))
+                self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Loading Layer Features: " + str(P) + "/" + str(feature_count)))
 
                 geom = feat.geometry()
                 if geom is not None:
                     point = list(geom.centroid().asPoint())
                     centroid_id = feat.attributes()[idx]
                     all_centroids[centroid_id] = point
-
-                    if centroid_id not in self.matrix_hash.keys():
-                        self.matrix_hash[centroid_id] = matrix_nodes
-                        matrix_nodes += 1
-            reverse_hash = {v: k for k, v in self.matrix_hash.iteritems()}
 
             #Creating resulting layer
             EPSG_code = int(layer.crs().authid().split(":")[1])
@@ -107,22 +105,21 @@ class DesireLinesProcedure(WorkerThread):
             dlpr.addAttributes(fields)
             desireline_layer.updateFields()
 
-
             if self.dl_type == "DesireLines":
                 self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), (0,"Creating Desire Lines"))
-                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, self.matrix.zones**2/2))
+                self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), (0, self.matrix.zones ** 2 / 2))
 
                 desireline_link_id = 1
                 q = 0
                 all_features = []
-                for i in range(mat_view.shape[0]):
-                    if np.sum(mat_view[i, :, :]) > 0:
-                        a_node = reverse_hash[i]
-                        for j in xrange(i + 1, mat_view.shape[1]):
-                            q += 1
-                            b_node = reverse_hash[j]
-                            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
-                            if np.sum(mat_view[i, j, :]) + np.sum(mat_view[j, i, :]) > 0:
+                for i in range(self.matrix.zones):
+                    a_node = self.matrix.index[i]
+                    if np.sum(self.matrix.matrix_view[i, :, :]) + np.sum(self.matrix.matrix_view[:, i, :]) > 0:
+                        columns_with_filled_cells = np.nonzero(np.sum(self.matrix.matrix_view[i, :, :], axis=1))
+                        logger(columns_with_filled_cells)
+                        for j in columns_with_filled_cells[0]:
+                            if np.sum(self.matrix.matrix_view[i, j, :]) + np.sum(self.matrix.matrix_view[j, i, :]) > 0:
+                                b_node = self.matrix.index[j]
                                 if a_node in all_centroids.keys() and b_node in all_centroids.keys():
                                     a_point = all_centroids[a_node]
                                     a_point = QgsPoint(a_point[0], a_point[1])
@@ -133,25 +130,31 @@ class DesireLinesProcedure(WorkerThread):
                                     feature.setGeometry(QgsGeometry.fromPolyline([a_point, b_point]))
                                     attrs = [desireline_link_id, int(a_node), int(b_node), 0, dist]
                                     for c in range(classes):
-                                        attrs.extend([float(mat_view[i, j, c]), float(mat_view[j, i, c]),
-                                                       float(mat_view[i, j, c]) + float(mat_view[j, i, c])])
+                                        attrs.extend([float(self.matrix.matrix_view[i, j, c]),
+                                                      float(self.matrix.matrix_view[j, i, c]),
+                                                       float(self.matrix.matrix_view[i, j, c]) +
+                                                      float(self.matrix.matrix_view[j, i, c])])
 
                                     feature.setAttributes(attrs)
                                     all_features.append(feature)
                                     desireline_link_id += 1
                                 else:
-                                    tu = (a_node, b_node, np.sum(mat_view[i, j, :]), np.sum(mat_view[j, i, :]))
-                                    self.report.append('No centroids available to depict flow between node {0} and node {1}. Total AB flow was equal to {2} and total BA flow was equal to {3}'.format(*tu))
-                    else:
-                        q += self.matrix.zones
-                        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
+                                    tu = (a_node, b_node, np.sum(self.matrix.matrix_view[i, j, :]),
+                                          np.sum(self.matrix.matrix_view[j, i, :]))
+                                    self.report.append('No centroids available to depict flow between node {0} and node'
+                                                       '{1}. Total AB flow was equal to {2} and total BA flow was '
+                                                       'equal to {3}'.format(*tu))
+                                    logger(self.report)
 
+                    q += self.matrix.zones
+                    self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), (0, q))
+                logger('finished creating the layer')
 
                 if desireline_link_id > 1:
                     a = dlpr.addFeatures(all_features)
                     self.result_layer = desireline_layer
                 else:
-                    self.error = 'Nothing to show'
+                    self.report.append('Nothing to show')
 
             elif self.dl_type == "DelaunayLines":
 
@@ -278,4 +281,5 @@ class DesireLinesProcedure(WorkerThread):
                 a = dlpr.addFeatures(features)
                 self.result_layer = desireline_layer
 
+        logger('emitting end')
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), True)
