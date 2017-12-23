@@ -31,7 +31,7 @@ class TestAllOrNothing(TestCase):
 
         matrix.index[:] = g.centroids[:]
         matrix.cars.fill(1)
-        matrix.trucks.fill(1)
+        matrix.trucks.fill(2)
         matrix.computational_view(['cars'])
 
         # Performs assignment

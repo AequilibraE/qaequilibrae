@@ -172,8 +172,7 @@ class AssignmentResults:
                           'results': a
                           }
 
-    # TODO: Transform the 'res' object in AequilibraeData
-    def save_to_disk(self, file_name, output='loads'):
+    def save_to_disk(self, file_name=None, output='loads'):
         ''' Function to write to disk all outputs computed during assignment
     Args:
         output: 'loads', for writing the link loads
@@ -186,7 +185,12 @@ class AssignmentResults:
     Returns:
         Nothing'''
 
-        fname, file_type = os.path.splitext(file_name.upper())
+        if file_name is None:
+            memory=True
+            file_type = 'MEMORY'
+        else:
+            memory = False
+            fname, file_type = os.path.splitext(file_name.upper())
 
         fields = []
         if output == 'loads':
@@ -223,18 +227,21 @@ class AssignmentResults:
             link_flows = self.link_loads[:, :]
             for i, n in enumerate(self.classes['names']):
                 # AB Flows
-                res.data[n + '_ab'][ab_ids] = link_flows[ABs, :]
+                res.data[n + '_ab'][ab_ids] = np.nan_to_num(link_flows[ABs, i])
                 # BA Flows
-                res.data[n + '_ba'][ba_ids] = link_flows[BAs, :]
+                res.data[n + '_ba'][ba_ids] = np.nan_to_num(link_flows[BAs, i])
 
                 # Tot Flow
                 res.data[n + '_tot'] = res.data[n + '_ab'] + res.data[n + '_ba']
 
             # Save to disk
-            if file_type != 'aed':
-                res.export(file_name, table_name=table_name)
+            if file_name is None:
+                return res
+            else:
+                if file_type != 'aed':
+                    res.export(file_name, table_name=table_name)
+                del res
 
-            del res
         # TODO: Re-factor the exporting of the path file within the AequilibraeData format
         elif output == 'path_file':
             pass

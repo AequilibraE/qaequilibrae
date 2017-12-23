@@ -12,9 +12,8 @@ distribution:
     max iterations: 5000
 system:
   cpus: 4
-  default_directory: /home/pedro/.qgis2/python/plugins/AequilibraE/tests/data
-  temp directory: /temp
+  default_directory: /home/pedro/Downloads/TRASH
   driving side: right
-  logging: False
+  logging: false
   report zeros: 1
-
+  temp directory: /temp

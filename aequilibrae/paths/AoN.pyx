@@ -55,7 +55,7 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
     orig = origin
     origin_index = graph.nodes_to_indices[orig]
 
-    if VERSION != graph.__version__:
+    if VERSION_COMPILED != graph.__version__:
         raise ValueError('This graph was created for a different version of AequilibraE. Please re-create it')
 
     if result.critical_links['save']:
@@ -330,7 +330,7 @@ def path_computation(origin, destination, graph, results):
     if origin >= graph.fs.shape[0]:
         raise ValueError ("Node " + str(origin) + " is outside the range of nodes in the graph")
 
-    if VERSION != graph.__version__:
+    if VERSION_COMPILED != graph.__version__:
         return 'This graph was created for a different version of AequilibraE. Please re-create it'
 
     #We transform the python variables in Cython variables
@@ -438,7 +438,7 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
     if graph_fs[orig] == graph_fs[orig + 1]:
         return "Centroid " + str(orig) + " does not exist in the graph"
 
-    if VERSION != graph.__version__:
+    if VERSION_COMPILED != graph.__version__:
         return 'This graph was created for a different version of AequilibraE. Please re-create it'
 
     nodes = graph.num_nodes + 1

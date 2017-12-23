@@ -30,7 +30,7 @@ import os, csv
 import cPickle
 from datetime import datetime
 import uuid
-from ..__version__ import version as VERSION
+from ..__version__ import binary_version as VERSION
 
 '''description: Description of the graph (OPTIONAL)
     num_links: Number of directed links in the graph
@@ -408,7 +408,6 @@ class Graph:
             raise ValueError('Centroids need to be a NumPy array of integers 64 bits')
         self.build_derived_properties()
 
-
         if not self.network_ok:
             raise ValueError('Network not yet properly loaded')
         else:
@@ -427,14 +426,12 @@ class Graph:
                          ('b_node', self.__integer_type),
                          ('direction', np.int8),
                          ('id', self.__integer_type)]
-
                 for i in all_titles:
                     if i not in self.required_default_fields and i[0:-3] not in self.required_default_fields:
                         if i[-3:] != '_ab':
                             dtype.append((i[0:-3], self.network[i].dtype))
 
                 self.graph = np.zeros(self.num_links, dtype=dtype)
-
                 a1 = negs.shape[0]
                 a2 = a1 + poss.shape[0]
                 a3 = a2 + zers.shape[0]
@@ -486,7 +483,6 @@ class Graph:
                 ind = np.lexsort((self.graph['b_node'], self.graph['a_node']))
                 self.graph = self.graph[ind]
                 del ind
-
                 self.graph['id'] = np.arange(self.num_links)
                 self.fs = np.zeros(self.num_nodes + 1, dtype=self.__integer_type)
 
@@ -524,19 +520,19 @@ class Graph:
             else:
                 raise ValueError('block_centroid_flows needs to be a boolean')
 
-
         if cost_field is not None:
             if cost_field in self.graph.dtype.names:
                 self.cost_field = cost_field
                 if self.graph[cost_field].dtype == self.__float_type:
                     self.cost = self.graph[cost_field]
                 else:
-                    raise ValueError('Cost field with wrong type. Converting to float64')
                     self.cost = self.graph[cost_field].astype(self.__float_type)
+                    Warning ('Cost field with wrong type. Converting to float64')
+
             else:
                 raise ValueError('cost_field not available in the graph:' + str(self.graph.dtype.names))
 
-        if self.cost is not None:
+        if self.cost_field is not None:
             if not skim_fields:
                 skim_fields = [self.cost_field]
             else:
@@ -562,7 +558,7 @@ class Graph:
         self.skims = np.zeros((self.num_links, len(skim_fields) + 1), self.__float_type)
 
         if t:
-            print 'Some skim field with wrong type. Converting to float64'
+            Warning('Some skim field with wrong type. Converting to float64')
             for i, j in enumerate(skim_fields):
                 self.skims[:, i] = self.graph[j].astype(self.__float_type)
         else:
@@ -597,6 +593,7 @@ class Graph:
         mygraph['cost'] = self.cost
         mygraph['cost_field'] = self.cost_field
         mygraph['skims'] = self.skims
+        mygraph['skim_fields'] = self.skim_fields
         mygraph['ids'] = self.ids
         mygraph['block_centroid_flows'] = self.block_centroid_flows
         mygraph['centroids'] = self.centroids
@@ -623,6 +620,7 @@ class Graph:
         self.cost = mygraph['cost']
         self.cost_field = mygraph['cost_field']
         self.skims = mygraph['skims']
+        self.skim_fields = mygraph['skim_fields']
         self.ids = mygraph['ids']
         self.block_centroid_flows = mygraph['block_centroid_flows']
         self.centroids = mygraph['centroids']
@@ -640,7 +638,7 @@ class Graph:
 
     # We return the list of the fields that are the same for both directions to their initial states
     def reset_single_fields(self):
-        self.required_default_fields = ['link_id', 'a_node', 'b_node', 'direction', 'length', 'id']
+        self.required_default_fields = ['link_id', 'a_node', 'b_node', 'direction', 'id']
 
     # We add a new fields that is the same for both directions
     def add_single_field(self, new_field):
@@ -734,3 +732,17 @@ class Graph:
         else:
             raise ValueError('WRONG TYPE OR NULL VALUE')
         return def_type
+
+
+import tempfile
+def logger(message):
+    debug_file = tempfile.gettempdir() + '/aequilibrae.log'
+    if not os.path.exists(debug_file):
+        o = open(debug_file, 'w')
+    else:
+        o = open(debug_file, 'a')
+    if type(message) in [list, tuple, dict]:
+        message = str(message)
+    print >>o, message
+    o.flush()
+    o.close()

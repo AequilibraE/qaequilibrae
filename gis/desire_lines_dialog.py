@@ -117,11 +117,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         return cell_widget
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.job_finished_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("assignment"), self.signal_handler)
+        QObject.connect(self.worker_thread, SIGNAL("desire_lines"), self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 
@@ -141,17 +138,24 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             self.matrix = dlg2.matrix
             self.set_show_matrices()
 
-    def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val[1])
+    def signal_handler(self, val):
+        # Signals that will come from traffic assignment
+        if val[0] == 'zones finalized':
+            self.progressbar.setValue(val[1])
+        elif val[0] == 'text AoN':
+            self.progress_label.setText(val[1])
 
-    def progress_value_from_thread(self, value):
-        self.progressbar.setValue(value[1])
+        # Signals that will come from desire lines procedure
+        elif val[0] == 'job_size_dl':
+            self.progressbar.setRange(0, val[1])
+        elif val[0] == 'jobs_done_dl':
+            self.progressbar.setValue(val[1])
+        elif val[0] == 'text_dl':
+            self.progress_label.setText(val[1])
+        elif val[0] == 'finished_desire_lines_procedure':
+            self.job_finished_from_thread()
 
-    def progress_text_from_thread(self, value):
-        self.progress_label.setText(value[1])
-
-    def job_finished_from_thread(self, t):
-        logger('entered thread ending')
+    def job_finished_from_thread(self):
         try:
             QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
         except:

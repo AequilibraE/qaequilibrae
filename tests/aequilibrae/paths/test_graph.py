@@ -25,9 +25,6 @@ class TestGraph(TestCase):
     def test_load_network_from_csv(self):
         pass
 
-    def test_load_graph_from_csv(self):
-        pass
-
     def test_prepare_graph(self):
         self.test_create_from_geography()
         self.graph.prepare_graph(centroids)

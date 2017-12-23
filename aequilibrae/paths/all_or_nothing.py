@@ -7,7 +7,7 @@
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
- Last edited by: Pedro Camrgo
+ Last edited by: Pedro Camargo
 
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
@@ -83,12 +83,11 @@ class allOrNothing(WorkerThread):
         for orig in self.matrix.index:
             i = self.graph.nodes_to_indices[orig]
             if np.nansum(mat[i, :, :]) > 0:
-                if orig >= self.graph.nodes_to_indices.shape[0]:
-                    self.report.append("Centroid " + str(orig) + " does not exist in the graph")
-                elif self.graph.fs[int(orig)] == self.graph.fs[int(orig + 1)]:
-                    self.report.append("Centroid " + str(orig) + " does not exist in the graph")
+                if self.graph.fs[i] == self.graph.fs[i+1]:
+                    self.report.append("Centroid " + str(orig) + " is not connected")
                 else:
                     pool.apply_async(self.func_assig_thread, args=(orig, all_threads))
+                    # self.func_assig_thread(orig, all_threads)
         pool.close()
         pool.join()
         self.results.link_loads = np.sum(self.aux_res.temp_link_loads, axis=2)
