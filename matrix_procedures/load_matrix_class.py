@@ -90,7 +90,8 @@ class LoadMatrix(WorkerThread):
                 if len(mat.shape[:]) == 2:
                     mat = coo_matrix(mat)
                     cells = int(mat.row.shape[0])
-                    self.matrix = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
+                    self.matrix = np.memmap(os.path.join(tempfile.gettempdir(), AequilibraeMatrix().random_name() +
+                                                         '.mat'),
                                             dtype=[('from', np.uint64), ('to', np.uint64), ('flow', np.float64)],
                                             mode='w+',
                                             shape=(cells, ))
@@ -110,6 +111,7 @@ class LoadMatrix(WorkerThread):
 class MatrixReblocking(WorkerThread):
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
+        self.matrix = AequilibraeMatrix()
         self.matrices = kwargs.get('matrices')
         self.sparse = kwargs.get('sparse', False)
         self.file_name = kwargs.get('file_name', AequilibraeMatrix().random_name())
@@ -141,25 +143,27 @@ class MatrixReblocking(WorkerThread):
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
 
             compact_shape = int(indices.shape[0])
-            index = np.zeros(np.max(indices) + 1, np.uint64)
 
-            for i, j in enumerate(indices):
-                index[j] = i
+            # index = np.zeros(np.max(indices) + 1, np.uint64)
+            #
+            # for i, j in enumerate(indices):
+            #     index[j] = i
         else:
             compact_shape = 0
             for mat_name, mat in self.matrices.iteritems():
                 compact_shape = np.max(compact_shape, mat.shape[0])
 
             indices = np.arange(compact_shape)
-            index = np.zeros(np.max(indices) + 1, np.uint64)
+            # index = np.zeros(np.max(indices) + 1, np.uint64)
+            #
+            # for i, j in enumerate(indices):
+            #     index[j] = i
 
-            for i, j in enumerate(indices):
-                index[j] = i
+        new_index = {k: i for i, k in enumerate(indices)}
 
-        self.matrix = AequilibraeMatrix()
         names = [str(n) for n in self.matrices.keys()]
-        self.matrix.create_empty(file_name = self.file_name, zones=compact_shape,
-                                 matrix_names=names, data_type = np.float64)
+        self.matrix.create_empty(file_name=self.file_name, zones=compact_shape, matrix_names=names,
+                                 data_type=np.float64)
 
         self.matrix.index[:] = indices[:]
 
@@ -168,24 +172,29 @@ class MatrixReblocking(WorkerThread):
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Reblocking matrices")
         for mat_name, mat in self.matrices.iteritems():
             if self.sparse:
+                new_mat = np.copy(mat)
+                for j, v in new_index.iteritems():
+                    new_mat['from'][mat['from']==j] = v
+                    new_mat['to'][mat['to']==j] = v
                 k += 1
-                mat['from'][:] = index[mat['from']][:]
-                mat['to'][:] = index[mat['to']][:]
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), k)
             else:
                 k += 1
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 1)
 
-            mat['flow'][mat['flow']==0] = np.inf
+            # In order to differentiate the zeros from the NaNs in the future matrix
+            new_mat['flow'][new_mat['flow']==0] = np.inf
 
-            self.matrix.matrix[mat_name][:,:] = coo_matrix((mat['flow'], (mat['from'], mat['to'])),
+            # Uses SciPy Sparse matrices to build the compact one
+            self.matrix.matrix[mat_name][:,:] = coo_matrix((new_mat['flow'], (new_mat['from'], new_mat['to'])),
                                            shape=(compact_shape, compact_shape)).toarray().astype(np.float64)
 
+            # In order to differentiate the zeros from the NaNs in the future matrix
             self.matrix.matrix[mat_name][self.matrix.matrix[mat_name]==0] = np.nan
             self.matrix.matrix[mat_name][self.matrix.matrix[mat_name]==np.inf] = 0
 
-
             del(mat)
+            del(new_mat)
 
         self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Matrix Reblocking finalized")
         self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'REBLOCKED MATRICES')
