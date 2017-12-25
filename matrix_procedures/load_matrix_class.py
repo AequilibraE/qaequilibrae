@@ -73,7 +73,7 @@ class LoadMatrix(WorkerThread):
 
             # Bring it all to memory mapped
             self.matrix = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
-                               dtype=[('from', np.int64), ('to', np.int64), ('flow', np.float64)],
+                               dtype=[('from', np.uint64), ('to', np.uint64), ('flow', np.float64)],
                                mode='w+',
                                shape=(int(matrix1.shape[0]), ))
 
@@ -91,7 +91,7 @@ class LoadMatrix(WorkerThread):
                     mat = coo_matrix(mat)
                     cells = int(mat.row.shape[0])
                     self.matrix = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
-                                            dtype=[('from', np.int64), ('to', np.int64), ('flow', np.float64)],
+                                            dtype=[('from', np.uint64), ('to', np.uint64), ('flow', np.float64)],
                                             mode='w+',
                                             shape=(cells, ))
                     self.matrix['from'][:] = mat.row[:]
@@ -141,7 +141,7 @@ class MatrixReblocking(WorkerThread):
                 self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
 
             compact_shape = int(indices.shape[0])
-            index = np.zeros(np.max(indices) + 1, np.int64)
+            index = np.zeros(np.max(indices) + 1, np.uint64)
 
             for i, j in enumerate(indices):
                 index[j] = i
@@ -151,7 +151,7 @@ class MatrixReblocking(WorkerThread):
                 compact_shape = np.max(compact_shape, mat.shape[0])
 
             indices = np.arange(compact_shape)
-            index = np.zeros(np.max(indices) + 1, np.int64)
+            index = np.zeros(np.max(indices) + 1, np.uint64)
 
             for i, j in enumerate(indices):
                 index[j] = i

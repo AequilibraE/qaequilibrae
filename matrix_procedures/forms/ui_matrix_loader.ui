@@ -417,7 +417,7 @@
          <property name="geometry">
           <rect>
            <x>245</x>
-           <y>4</y>
+           <y>6</y>
            <width>141</width>
            <height>17</height>
           </rect>
@@ -432,9 +432,9 @@
         <widget class="QLabel" name="progress_label">
          <property name="geometry">
           <rect>
-           <x>194</x>
+           <x>94</x>
            <y>3</y>
-           <width>221</width>
+           <width>321</width>
            <height>20</height>
           </rect>
          </property>
@@ -450,8 +450,8 @@
           <rect>
            <x>0</x>
            <y>1</y>
-           <width>91</width>
-           <height>23</height>
+           <width>85</width>
+           <height>27</height>
           </rect>
          </property>
          <property name="palette">
@@ -498,10 +498,10 @@
         <widget class="QPushButton" name="but_save_for_single_use">
          <property name="geometry">
           <rect>
-           <x>95</x>
-           <y>1</y>
-           <width>91</width>
-           <height>23</height>
+           <x>90</x>
+           <y>0</y>
+           <width>85</width>
+           <height>27</height>
           </rect>
          </property>
          <property name="palette">
@@ -549,7 +549,6 @@
         <zorder>compressed</zorder>
         <zorder>but_permanent_save</zorder>
         <zorder>but_save_for_single_use</zorder>
-        <zorder>matrix_list_view</zorder>
        </widget>
       </item>
      </layout>
@@ -559,8 +558,6 @@
   <zorder>groupBox</zorder>
   <zorder>group_combo</zorder>
   <zorder>group_list</zorder>
-  <zorder>progressbar</zorder>
-  <zorder>matrix_list_view</zorder>
   <zorder>groupBox_2</zorder>
  </widget>
  <resources/>
