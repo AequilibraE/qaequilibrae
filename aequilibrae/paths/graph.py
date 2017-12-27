@@ -399,7 +399,7 @@ class Graph:
                 if centroids.min() <= 0:
                     raise ValueError('Centroid IDs need to be positive')
                 else:
-                    if np.bincount(centroids).max() > 1:
+                    if centroids.shape[0] != np.unique(centroids).shape[0]:
                         raise ValueError('Centroid IDs are not unique')
                 self.centroids = centroids
             else:
@@ -667,8 +667,7 @@ class Graph:
 
                 # Uniqueness of the id
         link_ids = self.network['link_id'].astype(np.int)
-        a = np.bincount(link_ids)
-        if np.max(a) > 1:
+        if link_ids.shape[0] != np.unique(link_ids).shape[0]:
             self.status = '"link_id" field not unique'
 
             # Direction values
@@ -692,8 +691,8 @@ class Graph:
                 self.status = 'Field "%s" in the network array has the wrong type. Please refer to the documentation' % field
 
                 # Uniqueness of the graph id
-        a = np.bincount(self.graph['id'].astype(np.int))
-        if np.max(a) > 1:
+        a = self.graph['id'].astype(np.int)
+        if a.shape[0] != np.unique(a).shape[0]:
             self.status = '"id" field not unique'
 
         a = np.bincount(self.graph['link_id'].astype(np.int))

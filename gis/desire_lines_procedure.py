@@ -29,6 +29,7 @@ from ..common_tools.auxiliary_functions import *
 from ..common_tools import logger
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import AssignmentResults
+from collections import OrderedDict
 
 error = False
 try:
@@ -80,7 +81,6 @@ class DesireLinesProcedure(WorkerThread):
                 P += 1
                 self.emit(SIGNAL("desire_lines"), ('jobs_done_dl', P))
                 self.emit(SIGNAL("desire_lines"), ('text_dl',"Loading Layer Features: " + str(P) + "/" + str(feature_count)))
-
                 geom = feat.geometry()
                 if geom is not None:
                     point = list(geom.centroid().asPoint())
@@ -166,15 +166,18 @@ class DesireLinesProcedure(WorkerThread):
 
             elif self.dl_type == "DelaunayLines":
 
-                self.emit(SIGNAL("desire_lines"), ('text_dl', "Computing Delaunay Triangles"))
+                self.emit(SIGNAL("desire_lines"), ('text_dl', "Building Delaunay dataset"))
                 points = []
                 node_id_in_delaunay_results = {}
                 i = 0
+                self.emit(SIGNAL("desire_lines"), ('job_size_dl', len(all_centroids)))
                 for k, v in all_centroids.iteritems():
+                    self.emit(SIGNAL("desire_lines"), ('jobs_done_dl', i))
                     points.append(v)
                     node_id_in_delaunay_results[i] = k
                     i += 1
 
+                self.emit(SIGNAL("desire_lines"), ('text_dl', "Computing Delaunay Triangles"))
                 tri = Delaunay(np.array(points))
 
                 # We process all the triangles to only get each edge once
@@ -185,12 +188,15 @@ class DesireLinesProcedure(WorkerThread):
                 else:
                     all_edges = tri.simplices
 
-                for triangle in all_edges:
+                self.emit(SIGNAL("desire_lines"), ('job_size_dl', len(all_edges)))
+                for j, triangle in enumerate(all_edges):
+                    self.emit(SIGNAL("desire_lines"), ('jobs_done_dl', j))
                     links = list(itertools.combinations(triangle, 2))
                     for i in links:
-                        l= [min(i[0],i[1]), max(i[0],i[1])]
-                        if l not in edges:
-                            edges.append(l)
+                        edges.append([min(i[0],i[1]), max(i[0],i[1])])
+
+                self.emit(SIGNAL("desire_lines"), ('text_dl', "Building Delaunay Network: Getting unique edges"))
+                edges = OrderedDict((str(x), x) for x in edges).values()
 
                 # Writing Delaunay layer
                 self.emit(SIGNAL("desire_lines"), ('text_dl', "Building Delaunay Network: Assembling Layer"))
@@ -198,24 +204,26 @@ class DesireLinesProcedure(WorkerThread):
                 desireline_link_id = 1
                 data = []
                 dl_ids_on_links = {}
-                for edge in edges:
-                        a_node = node_id_in_delaunay_results[edge[0]]
-                        a_point = all_centroids[a_node]
-                        a_point = QgsPoint(a_point[0], a_point[1])
-                        b_node = node_id_in_delaunay_results[edge[1]]
-                        b_point = all_centroids[b_node]
-                        b_point = QgsPoint(b_point[0], b_point[1])
-                        dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
-                        line = []
-                        line.append(desireline_link_id)
-                        line.append(a_node)
-                        line.append(b_node)
-                        line.append(dist)
-                        line.append(dist)
-                        line.append(0)
-                        data.append(line)
-                        dl_ids_on_links[desireline_link_id] = [a_node, b_node, 0, dist]
-                        desireline_link_id += 1
+                self.emit(SIGNAL("desire_lines"), ('job_size_dl', len(edges)))
+                for j, edge in enumerate(edges):
+                    self.emit(SIGNAL("desire_lines"), ('jobs_done_dl', j))
+                    a_node = node_id_in_delaunay_results[edge[0]]
+                    a_point = all_centroids[a_node]
+                    a_point = QgsPoint(a_point[0], a_point[1])
+                    b_node = node_id_in_delaunay_results[edge[1]]
+                    b_point = all_centroids[b_node]
+                    b_point = QgsPoint(b_point[0], b_point[1])
+                    dist = QgsGeometry().fromPoint(a_point).distance(QgsGeometry().fromPoint(b_point))
+                    line = []
+                    line.append(desireline_link_id)
+                    line.append(a_node)
+                    line.append(b_node)
+                    line.append(dist)
+                    line.append(dist)
+                    line.append(0)
+                    data.append(line)
+                    dl_ids_on_links[desireline_link_id] = [a_node, b_node, 0, dist]
+                    desireline_link_id += 1
 
                 self.emit(SIGNAL("desire_lines"), ('text_dl', "Building graph"))
                 network = np.asarray(data)
@@ -228,8 +236,6 @@ class DesireLinesProcedure(WorkerThread):
                 all_types = [itype, itype, itype, ftype, ftype, np.int8]
                 all_titles = ['link_id', 'a_node', 'b_node', 'distance_ab', 'distance_ba', 'direction']
                 dt = [(t, d) for t, d in zip(all_titles, all_types)]
-
-
                 self.graph.network = np.zeros(network.shape[0], dtype=dt)
 
                 for k, t in enumerate(dt):
@@ -242,8 +248,8 @@ class DesireLinesProcedure(WorkerThread):
                 try:
                     self.graph.prepare_graph(self.matrix.index.astype(np.int64))
                     self.graph.set_graph(cost_field='distance', skim_fields=False, block_centroid_flows=False)
-                    self.results = AssignmentResults()
 
+                    self.results = AssignmentResults()
                     self.results.prepare(self.graph, self.matrix)
                     self.emit(SIGNAL("desire_lines"), ('text_dl', "Assigning demand"))
                     self.emit(SIGNAL("desire_lines"), ('job_size_dl', self.matrix.index.shape[0]))
@@ -251,7 +257,6 @@ class DesireLinesProcedure(WorkerThread):
                     assigner = allOrNothing(self.matrix, self.graph, self.results)
                     assigner.execute()
                     self.report = assigner.report
-                    # logger(self.results.link_flows)
                     self.emit(SIGNAL("desire_lines"), ('text_dl', "Collecting results"))
                     link_loads = self.results.save_to_disk()
                     self.emit(SIGNAL("desire_lines"), ('text_dl', "Building resulting layer"))
