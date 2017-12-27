@@ -3,7 +3,7 @@ from unittest import TestCase
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import SkimResults
 from aequilibrae.matrix import AequilibraeMatrix
-from aequilibrae.paths import network_skimming, skimming_single_origin
+from aequilibrae.paths import NetworkSkimming, skimming_single_origin
 import numpy as np
 
 # Adds the folder with the data to the path and collects the paths to the files
@@ -51,12 +51,13 @@ class TestNetwork_skimming(TestCase):
         a = skimming_single_origin(26, g, res, aux_res, 0)
 
 
-        a = network_skimming(g, res)
+        skm = NetworkSkimming(g, res)
+        skm.execute()
 
         tot = np.nanmax(res.skims.distance[:, :])
 
         if tot > 10e10:
             self.fail('Skimming was not successful. At least one np.inf returned.')
 
-        if a:
-            self.fail('Skimming returned an error:' + str(a))
+        if skm.report:
+            self.fail('Skimming returned an error:' + str(skm.report))
