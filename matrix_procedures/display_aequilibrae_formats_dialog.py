@@ -22,7 +22,7 @@
 from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
-from ..aequilibrae.matrix import AequilibraeMatrix
+from ..aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
 from ..common_tools.auxiliary_functions import *
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_data_viewer.ui'))
@@ -32,18 +32,33 @@ from PyQt4.QtGui import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QPu
 
 
 class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
-    def __init__(self, iface, datasource):
+    def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-        self.path = standard_path()
+
         self.error = None
-        self.data_path = None
-        self.data_to_show = datasource
-        if isinstance(datasource, AequilibraeMatrix):
-            self.data_type = 'Matrix'
-        else:
-            self.data_type = 'Dataset'
+
+        self.error = None
+        self.data_path, self.data_type = GetOutputFileName(self, 'AequilibraE custom formats',
+                                         ["Aequilibrae dataset(*.aed)", "Aequilibrae matrix(*.aem)"], '.aed', standard_path())
+        self.data_type = self.data_type.upper()
+
+        if self.data_path is None:
+            self.error = 'Path provided is not a valid dataset'
+            self.exit_with_error()
+
+        if self.data_type == 'AED':
+            self.data_to_show = AequilibraEData()
+        elif self.data_type == 'AEM':
+            self.data_to_show = AequilibraeMatrix()
+
+        try:
+            self.data_to_show.load(self.data_path)
+        except:
+            self.error = 'Could not load dataset'
+            self.exit_with_error()
+
 
     # Elements that will be used during the displaying
         self._layout = QVBoxLayout()
@@ -77,7 +92,7 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
         self._layout.addItem(self.show_layout)
 
         # differentiates between matrix and dataset
-        if self.data_type == 'Matrix':
+        if self.data_type == 'AEM':
             self.data_to_show.computational_view([self.data_to_show.names[0]])
             # Matrices need cores and indices to be set as well
             self.mat_layout = QHBoxLayout()
@@ -151,6 +166,10 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
         new_name, file_type = GetOutputFileName(self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.path)
         if new_name is not None:
             self.data_to_show.export(new_name)
+
+    def exit_with_error(self):
+        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+        self.exit_procedure()
 
     def exit_procedure(self):
         self.close()

@@ -35,7 +35,7 @@ from .distribution_procedures import DistributionModelsDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
-from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayDatasetDialog, DisplayMatrixDialog, MatrixManipulationDialog
+from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog,  MatrixManipulationDialog
 import tempfile, glob
 from .aequilibrae.__version__ import binary_version as VERSION
 
@@ -101,10 +101,16 @@ class AequilibraEMenu:
         self.network_menu.addAction(self.create_transponet_action)
 
         # ########################################################################
-        # #################  MATRIX MANIPULATION SUB-MENU  #######################
+        # ####################  DATA UTILITIES SUB-MENU  #########################
 
         self.matrix_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Data"))
         self.aequilibrae_add_submenu(self.matrix_menu)
+
+        # Displaying Aequilibrae custom data formats
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_display_custom_formats.png")
+        self.display_custom_formats_action = QAction(icon, u"Display AequilibraE formats", self.iface.mainWindow())
+        QObject.connect(self.display_custom_formats_action, SIGNAL("triggered()"), self.run_display_aequilibrae_formats)
+        self.matrix_menu.addAction(self.display_custom_formats_action)
 
         # Loading matrices
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
@@ -112,23 +118,11 @@ class AequilibraEMenu:
         QObject.connect(self.load_matrix_action, SIGNAL("triggered()"), self.run_load_matrices)
         self.matrix_menu.addAction(self.load_matrix_action)
 
-        # Displaying Matrix
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_display_dmatrix.png")
-        self.display_matrix_action = QAction(icon, u"Display matrix", self.iface.mainWindow())
-        QObject.connect(self.display_matrix_action, SIGNAL("triggered()"), self.run_display_matrix)
-        self.matrix_menu.addAction(self.display_matrix_action)
-
         # Loading Database
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dataset.png")
         self.load_database_action = QAction(icon, u"Import dataset", self.iface.mainWindow())
         QObject.connect(self.load_database_action, SIGNAL("triggered()"), self.run_load_database)
         self.matrix_menu.addAction(self.load_database_action)
-
-        # Displaying Database
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_display_dataset.png")
-        self.display_database_action = QAction(icon, u"Display dataset", self.iface.mainWindow())
-        QObject.connect(self.display_database_action, SIGNAL("triggered()"), self.run_display_dataset)
-        self.matrix_menu.addAction(self.display_database_action)
 
         # # ########################################################################
         # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -315,14 +309,8 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    def run_display_dataset(self):
-        dlg2 = DisplayDatasetDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-
-    def run_display_matrix(self):
-        dlg2 = DisplayMatrixDialog(self.iface)
-        # dlg2 = MatrixManipulationDialog(self.iface)
+    def run_display_aequilibrae_formats(self):
+        dlg2 = DisplayAequilibraEFormatsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
