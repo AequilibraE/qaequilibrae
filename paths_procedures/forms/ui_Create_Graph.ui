@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>429</width>
-    <height>510</height>
+    <width>524</width>
+    <height>539</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -255,11 +255,6 @@
        </widget>
       </item>
      </layout>
-     <zorder>lblnodematch_11</zorder>
-     <zorder>network_layer</zorder>
-     <zorder>lblnodematch_11</zorder>
-     <zorder>network_layer</zorder>
-     <zorder>use_link_selection</zorder>
     </widget>
    </item>
    <item row="3" column="0" colspan="7">
