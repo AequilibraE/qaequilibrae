@@ -58,7 +58,7 @@ class Graph:
         @type graph: Numpy record array
         """
 
-        self.__integer_type = np.uint64
+        self.__integer_type = np.int64
         self.__float_type = np.float64
 
         self.required_default_fields = []

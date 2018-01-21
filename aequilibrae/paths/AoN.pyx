@@ -77,25 +77,25 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
     classes = matrix.matrix_view.shape[2]
 
     # views from the graph
-    cdef unsigned long [:] graph_fs_view = graph.fs
+    cdef long long [:] graph_fs_view = graph.fs
     cdef double [:] g_view = graph.cost
-    cdef unsigned long [:] ids_graph_view = graph.ids
-    cdef unsigned long [:] all_nodes_view = graph.all_nodes
-    cdef unsigned long [:] original_b_nodes_view = graph.graph['b_node']
+    cdef long long [:] ids_graph_view = graph.ids
+    cdef long long [:] all_nodes_view = graph.all_nodes
+    cdef long long [:] original_b_nodes_view = graph.graph['b_node']
     cdef double [:, :] graph_skim_view = graph.skims
 
     # views from the result object
     cdef double [:, :] final_skim_matrices_view = result.skims.matrix_view[origin_index, :, :]
-    cdef unsigned long [:] no_path_view = result.no_path[origin_index, :]
+    cdef long long [:] no_path_view = result.no_path[origin_index, :]
 
     # views from the aux-result object
-    cdef unsigned long [:] predecessors_view = aux_result.predecessors[:, curr_thread]
+    cdef long long [:] predecessors_view = aux_result.predecessors[:, curr_thread]
     cdef double [:, :] skim_matrix_view = aux_result.temporary_skims[:, :, curr_thread]
-    cdef unsigned long [:] reached_first_view = aux_result.reached_first[:, curr_thread]
-    cdef unsigned long [:] conn_view = aux_result.connectors[:, curr_thread]
+    cdef long long [:] reached_first_view = aux_result.reached_first[:, curr_thread]
+    cdef long long [:] conn_view = aux_result.connectors[:, curr_thread]
     cdef double [:, :] link_loads_view = aux_result.temp_link_loads[:, :, curr_thread]
     cdef double [:, :] node_load_view = aux_result.temp_node_loads[:, :, curr_thread]
-    cdef unsigned long [:] b_nodes_view = aux_result.temp_b_nodes[:, curr_thread]
+    cdef long long [:] b_nodes_view = aux_result.temp_b_nodes[:, curr_thread]
 
     # path file variables
     # 'origin', 'node', 'predecessor', 'connector'
@@ -109,7 +109,7 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
 
     # select link variables
     cdef double [:, :] sel_link_view = result.critical_links['results'].matrix_view[origin_index,:,:]
-    cdef unsigned long [:] aux_link_flows_view = aux_link_flows
+    cdef long long [:] aux_link_flows_view = aux_link_flows
 
     #Now we do all procedures with NO GIL
     with nogil:
@@ -183,17 +183,17 @@ def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
 @cython.boundscheck(False) # turn of bounds-checking for entire function
 cpdef void network_loading(long classes,
                            double[:, :] demand,
-                           unsigned long [:] pred,
-                           unsigned long [:] conn,
+                           long long [:] pred,
+                           long long [:] conn,
                            double[:, :] link_loads,
-                           unsigned long [:] no_path,
-                           unsigned long [:] reached_first,
+                           long long [:] no_path,
+                           long long [:] reached_first,
                            double [:, :] node_load,
                            long found) nogil:
 
-    cdef unsigned long i, j, predecessor, connector, node
-    cdef unsigned long zones = demand.shape[0]
-    cdef unsigned long N = node_load.shape[0]
+    cdef long long i, j, predecessor, connector, node
+    cdef long long zones = demand.shape[0]
+    cdef long long N = node_load.shape[0]
 
     # Clean the node load array
     for i in range(N):
@@ -245,9 +245,9 @@ cdef return_an_int_view(input):
 cpdef void perform_select_link_analysis(long origin,
                                         int classes,
                                         double[:, :] demand,
-                                        unsigned long [:] pred,
-                                        unsigned long [:] conn,
-                                        unsigned long [:] aux_link_flows,
+                                        long long [:] pred,
+                                        long long [:] conn,
+                                        long long [:] aux_link_flows,
                                         double [:, :] critical_array,
                                         int query_type) nogil:
     cdef unsigned int t_origin
@@ -278,14 +278,14 @@ cpdef void perform_select_link_analysis(long origin,
 @cython.boundscheck(False)
 cpdef void put_path_file_on_disk(unsigned int orig,
                                  unsigned int [:] pred,
-                                 unsigned long [:] predecessors,
+                                 long long [:] predecessors,
                                  unsigned int [:] conn,
-                                 unsigned long [:] connectors,
-                                 unsigned long [:] all_nodes,
+                                 long long [:] connectors,
+                                 long long [:] all_nodes,
                                  unsigned int [:] origins_to_write,
                                  unsigned int [:] nodes_to_write) nogil:
-    cdef unsigned long i
-    cdef unsigned long k = pred.shape[0]
+    cdef long long i
+    cdef long long k = pred.shape[0]
 
     for i in range(k):
         origins_to_write[i] = orig
@@ -297,12 +297,12 @@ cpdef void put_path_file_on_disk(unsigned int orig,
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
-cdef void blocking_centroid_flows(unsigned long action,
-                                  unsigned long orig,
-                                  unsigned long [:] fs,
-                                  unsigned long [:] temp_b_nodes,
-                                  unsigned long [:] real_b_nodes) nogil:
-    cdef unsigned long i
+cdef void blocking_centroid_flows(int action,
+                                  long long orig,
+                                  long long [:] fs,
+                                  long long [:] temp_b_nodes,
+                                  long long [:] real_b_nodes) nogil:
+    cdef long long i
 
     if action == 0: # We are unblocking
         for i in xrange(fs[orig], fs[orig + 1]):
@@ -346,19 +346,19 @@ def path_computation(origin, destination, graph, results):
     #In order to release the GIL for this procedure, we create all the
     #memmory views we will need
     cdef double [:] g_view = graph.cost
-    cdef unsigned long [:] original_b_nodes_view = graph.graph['b_node']
-    cdef unsigned long [:] graph_fs_view = graph.fs
+    cdef long long [:] original_b_nodes_view = graph.graph['b_node']
+    cdef long long [:] graph_fs_view = graph.fs
     cdef double [:, :] graph_skim_view = graph.skims
-    cdef unsigned long [:] ids_graph_view = graph.ids
+    cdef long long [:] ids_graph_view = graph.ids
     block_flows_through_centroids = graph.block_centroid_flows
 
-    cdef unsigned long [:] predecessors_view = results.predecessors
-    cdef unsigned long [:] conn_view = results.connectors
+    cdef long long [:] predecessors_view = results.predecessors
+    cdef long long [:] conn_view = results.connectors
     cdef double [:, :] skim_matrix_view = results.temporary_skims
-    cdef unsigned long [:] reached_first_view = results.reached_first
+    cdef long long [:] reached_first_view = results.reached_first
 
     new_b_nodes = graph.b_node.copy()
-    cdef unsigned long [:] b_nodes_view = new_b_nodes
+    cdef long long [:] b_nodes_view = new_b_nodes
 
     #Now we do all procedures with NO GIL
     with nogil:
@@ -419,7 +419,7 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
     :param results:
     :return:
     """
-    cdef unsigned long nodes, orig, origin_index, i, block_flows_through_centroids, skims, zones, b
+    cdef long long nodes, orig, origin_index, i, block_flows_through_centroids, skims, zones, b
     #We transform the python variables in Cython variables
     orig = origin
     origin_index = graph.nodes_to_indices[orig]
@@ -450,19 +450,19 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
     # memory views we will need
 
     # views from the graph
-    cdef unsigned long [:] graph_fs_view = graph.fs
+    cdef long long [:] graph_fs_view = graph.fs
     cdef double [:] g_view = graph.cost
-    cdef unsigned long [:] ids_graph_view = graph.ids
-    cdef unsigned long [:] original_b_nodes_view = graph.b_node
+    cdef long long [:] ids_graph_view = graph.ids
+    cdef long long [:] original_b_nodes_view = graph.b_node
     cdef double [:, :] graph_skim_view = graph.skims[:, :]
 
     cdef double [:, :] final_skim_matrices_view = result.skims.matrix_view[origin_index, :, :]
 
     # views from the aux-result object
-    cdef unsigned long [:] predecessors_view = aux_result.predecessors[:, curr_thread]
-    cdef unsigned long [:] reached_first_view = aux_result.reached_first[:, curr_thread]
-    cdef unsigned long [:] conn_view = aux_result.connectors[:, curr_thread]
-    cdef unsigned long [:] b_nodes_view = aux_result.temp_b_nodes[:, curr_thread]
+    cdef long long [:] predecessors_view = aux_result.predecessors[:, curr_thread]
+    cdef long long [:] reached_first_view = aux_result.reached_first[:, curr_thread]
+    cdef long long [:] conn_view = aux_result.connectors[:, curr_thread]
+    cdef long long [:] b_nodes_view = aux_result.temp_b_nodes[:, curr_thread]
     cdef double [:, :] skim_matrix_view = aux_result.temporary_skims[:, :, curr_thread]
 
     #Now we do all procedures with NO GIL
@@ -511,13 +511,13 @@ cpdef void skim_multiple_fields(long origin,
                                 long zones,
                                 long skims,
                                 double[:, :] node_skims,
-                                unsigned long [:] pred,
-                                unsigned long [:] conn,
+                                long long [:] pred,
+                                long long [:] conn,
                                 double[:, :] graph_costs,
-                                unsigned long [:] reached_first,
+                                long long [:] reached_first,
                                 long found,
                                 double [:,:] final_skims) nogil:
-    cdef unsigned long i, node, predecessor, connector, j
+    cdef long long i, node, predecessor, connector, j
 
     # sets all skims to infinity
     for i in range(nodes):
@@ -558,12 +558,12 @@ cpdef void skim_multiple_fields(long origin,
 @cython.boundscheck(False) # turn of bounds-checking for entire function
 cpdef int path_finding(long origin,
                        double[:] graph_costs,
-                       unsigned long [:] csr_indices,
-                       unsigned long [:] graph_fs,
-                       unsigned long [:] pred,
-                       unsigned long [:] ids,
-                       unsigned long [:] connectors,
-                       unsigned long [:] reached_first) nogil:
+                       long long [:] csr_indices,
+                       long long [:] graph_fs,
+                       long long [:] pred,
+                       long long [:] ids,
+                       long long [:] connectors,
+                       long long [:] reached_first) nogil:
 
     cdef unsigned int N = graph_costs.shape[0]
     cdef unsigned int M = pred.shape[0]

@@ -11,7 +11,7 @@ distribution:
     convergence level: 0.0001
     max iterations: 5000
 system:
-  cpus: 4
+  cpus: 8
   default_directory: /media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/AequilibraE/Testing
     data/Assignment
   driving side: right
