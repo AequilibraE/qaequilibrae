@@ -19,8 +19,8 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
 from PyQt4.QtCore import *
+
 
 class WorkerThread(QThread):
     def __init__(self, parentThread):
