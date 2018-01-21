@@ -39,7 +39,7 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
         QtGui.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-        self.valid_layer_types = point_types + line_types + poly_types
+        self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
 
         self.fromtype = None
         self.frommatchingtype = None
@@ -83,7 +83,7 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
                 self.fromfield.addItem(field.name())
 
             self.enclosed.setEnabled(True)
-            if layer.wkbType() not in poly_types:
+            if layer.wkbType() not in [poly_types, multi_poly]:
                 self.enclosed.setEnabled(False)
                 if self.enclosed.isChecked:
                     self.touching.setChecked(True)
