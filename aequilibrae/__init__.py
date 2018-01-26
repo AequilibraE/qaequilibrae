@@ -14,5 +14,6 @@ from . import paths  # We import the graph
 from . import distribution
 from . import matrix
 from . import utils
+from . import transit
 import reserved_fields
 from parameters import Parameters
