@@ -16,7 +16,6 @@ class TestGTFS(TestCase):
     def test_load_calendar_dates(self):
         self.get_data()
         self.gtfs.load_calendar_dates()
-        print self.gtfs.schedule_exceptions
         self.assertEqual(self.gtfs.schedule_exceptions, set(['FULLW']), 'calendar_dates.txt was read wrong')
 
     def test_load_agency(self):
@@ -44,9 +43,20 @@ class TestGTFS(TestCase):
 
     def test_load_trips(self):
         self.get_data()
+        self.gtfs.load_trips()
         # self.fail()
+
+    def test_load_shapes(self):
+        self.get_data()
+        self.gtfs.load_shapes()
+
+    def test_get_routes_shapes(self):
+        self.get_data()
+        self.gtfs.load_trips()
+        self.gtfs.load_routes()
+        self.gtfs.load_shapes()
+
 
     def get_data(self):
         self.gtfs = GTFS()
         self.gtfs.source_folder = gtfs_folder
-

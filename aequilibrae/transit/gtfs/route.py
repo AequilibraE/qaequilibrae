@@ -1,4 +1,3 @@
-from collections import OrderedDict
 class Route:
     """
     Represents each one of the routes in a GTFS dataset (from https://developers.google.com/transit/gtfs/reference/)
@@ -26,8 +25,10 @@ class Route:
     * **text_color** `(route_text_color)` **Optional** The route_text_color field can be used to specify a legible color to use for text drawn against a background of route_color. The color must be provided as a six-character hexadecimal number, for example, FFD700. If no color is specified, the default text color is black (000000). The color difference between route_color and route_text_color should provide sufficient contrast when viewed on a black and white screen.
     * **sort_order** `(route_sort_order)` **Optional** The route_sort_order field can be used to order the routes in a way which is ideal for presentation to customers. It must be a non-negative integer. Routes with smaller route_sort_order values should be displayed before routes with larger route_sort_order values.
 
+    # Routes are associated with trips
     """
     def __init__(self):
+        # Fields from the routes.txt
         self.id = None
         self.agency_id = None
         self.short_name = None
@@ -39,4 +40,11 @@ class Route:
         self.text_color = None
         self.sort_order = None
 
-        self.stops = OrderedDict()
+        # Will contain the list of all trips for this route
+        self.trips = []
+
+        # Will contain all shapes for the route
+        self.shapes = None
+
+        # Will contain the list of all the stops in the stop
+        self.stops = []

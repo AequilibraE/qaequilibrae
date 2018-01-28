@@ -25,40 +25,32 @@ class GTFS:
     def __init__(self):
         self.source_folder = None
         self.agency = Agency()
+        self.trips = None
         self.num_routes = None
         self.routes = {}
         self.stops = {}
         self.calendar_dates = {}
+        self.available_files = {}
+        self.shapes = {}
         self.schedule_exceptions = None
     
     def load(self, path_to_folder):
         self.source_folder = path_to_folder
-        self.load_stops()
+
         self.load_agency()
-        self.load_calendar_dates()
+        self.load_stops()
         self.load_routes()
+        self.load_trips()
+        self.load_stop_times()
+        self.load_calendar()
+        self.load_calendar_dates()
+        self.load_shapes()
 
-    def load_calendar_dates(self):
-        agency_file = os.path.join(self.source_folder, 'calendar_dates.txt')
-        if not os.path.isfile(agency_file):
-            return
-
-        data = self.open(agency_file)
-        all_exceptions = []
-        for i in range(data.shape[0]):
-            cd = CalendarDates()
-            # Required fields
-            cd.service_id = data['service_id'][i]
-            cd.date = data['date'][i]
-            cd.exception_type = data['exception_type'][i]
-            all_exceptions.append(cd.service_id)
-            self.calendar_dates[i] = cd
-        self.schedule_exceptions = set(all_exceptions)
-        del all_exceptions
-        del data
+        self.get_routes_shapes()
 
     def load_agency(self):
         agency_file = os.path.join(self.source_folder, 'agency.txt')
+        self.available_files['agency.txt'] = True
         data = self.open(agency_file)
         self.agency.email = data['agency_id']
         self.agency.name = data['agency_name']
@@ -70,6 +62,7 @@ class GTFS:
 
     def load_stops(self):
         stops_file = os.path.join(self.source_folder, 'stops.txt')
+        self.available_files['stops.txt'] = True
         data = self.open(stops_file)
 
         # Iterate over all the stops and puts them in the stops dictionary
@@ -98,6 +91,7 @@ class GTFS:
 
     def load_routes(self):
         routes_file = os.path.join(self.source_folder, 'routes.txt')
+        self.available_files['routes.txt'] = True
         data = self.open(routes_file)
 
         # Iterate over all the stops and puts them in the stops dictionary
@@ -122,6 +116,71 @@ class GTFS:
         del data
 
     def load_trips(self):
+        trips_file = os.path.join(self.source_folder, 'trips.txt')
+        self.available_files['trips.txt'] = True
+
+        self.trips = self.open(trips_file)
+
+    def load_stop_times(self):
+        stop_times_file = os.path.join(self.source_folder, 'stop_times.txt')
+        self.available_files['stop_times.txt'] = True
+        self.stop_times = self.open(stop_times_file)
+
+    def load_calendar(self):
+        pass
+
+    def load_calendar_dates(self):
+        agency_file = os.path.join(self.source_folder, 'calendar_dates.txt')
+        if not os.path.isfile(agency_file):
+            self.available_files['calendar_dates.txt'] = False
+            return
+
+        self.available_files['calendar_dates.txt'] = True
+        data = self.open(agency_file)
+        all_exceptions = []
+        for i in range(data.shape[0]):
+            cd = CalendarDates()
+            # Required fields
+            cd.service_id = data['service_id'][i]
+            cd.date = data['date'][i]
+            cd.exception_type = data['exception_type'][i]
+            all_exceptions.append(cd.service_id)
+            self.calendar_dates[i] = cd
+        self.schedule_exceptions = set(all_exceptions)
+        del all_exceptions
+        del data
+
+    def load_shapes(self):
+        # TODO: Add the info from field "shape_dist_traveled"
+        shapes_file = os.path.join(self.source_folder, 'shapes.txt')
+        if not os.path.isfile(shapes_file):
+            self.available_files['shapes.txt'] = False
+            return
+
+        self.available_files['shapes.txt'] = True
+        data = self.open(shapes_file)
+
+        all_shapes = list(np.unique(data['shape_id']))
+
+        for shp in all_shapes:
+            trace = data[data['shape_id']==shp]
+            trace = np.sort(trace,order=['shape_pt_sequence'])
+            coords = np.core.defchararray.add(trace['shape_pt_lon'].astype(str), ' ')
+            coords = np.core.defchararray.add(coords, trace['shape_pt_lat'].astype(str))
+            coords = ', '.join(list(coords))
+            self.shapes[shp] = '"LINESTRING(' + coords + ')"'
+
+    def get_routes_shapes(self):
+        for rt in self.routes.keys():
+            trips = self.trips[self.trips['route_id']==rt]['shape_id']
+            if self.available_files['shapes.txt']:
+                self.routes[rt].shapes = {t: self.shapes[t] for t in trips}
+            else:
+                for t in trips:
+                    stop_times = self.stop_times[self.stop_times['trip_id']==t]
+
+
+    def get_routes_stops(self):
         pass
 
     @staticmethod
@@ -131,9 +190,3 @@ class GTFS:
         content = [str(unicode(x.strip(codecs.BOM_UTF8), 'utf-8')) for x in data.dtype.names]
         data.dtype.names = content
         return data
-        
-
-    
-    
-
-        

@@ -38,6 +38,7 @@ from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, Shor
 from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog,  MatrixManipulationDialog
 import tempfile, glob
 from .aequilibrae.__version__ import binary_version as VERSION
+from transitfeed import *
 
 no_binary = False
 old_binary = False

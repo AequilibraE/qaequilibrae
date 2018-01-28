@@ -1,1 +1,1 @@
-from aequilibrae.transit.gtfs import GTFS
+from . import gtfs
