@@ -56,7 +56,13 @@ class TestGTFS(TestCase):
         self.gtfs.load_routes()
         self.gtfs.load_shapes()
 
+    def test_load_from_folder(self):
+        self.get_data()
+        output_db = '/tmp/test1.db'
+        self.gtfs.load_from_folder(gtfs_folder, output_db)
+        # os.unlink(output_db)
 
     def get_data(self):
         self.gtfs = GTFS()
         self.gtfs.source_folder = gtfs_folder
+
