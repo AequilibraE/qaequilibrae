@@ -39,45 +39,6 @@ class GTFS:
     def load_from_file(self, file_path, save_db=False, memory_db=False):
         pass
 
-    def _load_from_zip(self, file_path):
-        # TODO: Unzip to temp folder
-        self.load_from_folder()
-        #TODO: delete temp folder
-
-    def load_from_folder(self, path_to_folder, save_db=None, memory_db=False):
-        self.source_folder = path_to_folder
-
-        if save_db is None:
-            if not memory_db:
-                save_db = ":memory:"
-        else:
-            if memory_db:
-                raise ValueError("You can't have a file name and have the file in memory at the same time")
-
-        a = create_gtfsdb(save_db)
-        self.database = a.create_database()
-
-        tables = ['agency', 'routes', 'trips', "stop_times"]
-        for tbl in tables:
-            self._load_tables(a, tbl)
-
-    def _load_tables(self, a, table_name):
-        # Agency
-        file_to_open = table_name + '.txt'
-        data_file = os.path.join(self.source_folder, file_to_open)
-        self.available_files[file_to_open] = True
-        data = self.open(data_file, column_order= a.column_order[file_to_open])
-        dt = tuple(data.tolist())
-        cols = data.dtype.names
-        fields = ','.join(len(cols)*["?"])
-        if not isinstance(dt[0], tuple):
-            dt = [dt]
-
-        self.database.cursor().executemany("INSERT into " + table_name + " (" + ",".join(cols) + ") VALUES(" + fields + ")", dt)
-
-        self.database.commit()
-
-
     def load(self, path_to_folder):
         self.source_folder = path_to_folder
 
