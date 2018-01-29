@@ -1,9 +1,11 @@
 import sqlite3
 from collections import OrderedDict
-import os
+import os, shutil
 import numpy as np
 import codecs
 import copy
+from ...reference_files import spatialite_database
+
 
 #TODO : Add control for mandatory and optional files
 class create_gtfsdb:
@@ -11,6 +13,7 @@ class create_gtfsdb:
         self.conn = None
         self.cursor = None
         self.__max_chunk_size = None
+        self.spatialite_enabled = False
         self.available_files = {}
         OrderedDict([('s',(1,2)),('p',(3,4)),('a',(5,6)),('m',(7,8))])
         self.column_order = {'agency.txt': OrderedDict([('agency_id', str),
@@ -84,7 +87,8 @@ class create_gtfsdb:
             if isinstance(chunk_size, int):
                 self.__max_chunk_size = chunk_size
 
-    def create_database(self, save_db=None, memory_db=False, overwrite=False):
+    def create_database(self, save_db=None, memory_db=False, overwrite=False, spatialite_enabled=False):
+        self.spatialite_enabled = spatialite_enabled
         self.__create_database(save_db, memory_db, overwrite)
         return self.conn
 
@@ -93,9 +97,13 @@ class create_gtfsdb:
         self.load_from_folder()
         #TODO: delete temp folder
 
-    def load_from_folder(self, path_to_folder, save_db=None, memory_db=False, overwrite=False):
+    def load_from_folder(self, path_to_folder, save_db=None, memory_db=False, overwrite=False, spatialite_enabled=False):
         self.source_folder = path_to_folder
+        self.spatialite_enabled = spatialite_enabled
 
+        if spatialite_enabled and memory_db:
+            raise ValueError('Spatialite is only supported on disk')
+        
         # In case we have not create the database yet
         if self.conn is None:
             self.__create_database(save_db, memory_db, overwrite)
@@ -115,10 +123,13 @@ class create_gtfsdb:
         if not overwrite:
             if os.path.isfile(os.path.join(save_db)):
                 raise ValueError("Output database exists. Please use overwrite=True or choose a different path/name")
-
+        
+        if self.spatialite_enabled:
+            shutil.copy(spatialite_database, save_db)
+            
         self.conn = sqlite3.connect(save_db)
         self.cursor = self.conn.cursor()
-
+        
         # enable extension loading
         self.conn.enable_load_extension(True)
 
@@ -284,11 +295,9 @@ class create_gtfsdb:
         else:
             new_data = data
         return new_data
-    # "SELECT InitSpatialMetaData()"
-    # "SELECT AddGeometryColumn( 'links', 'geometry', 4326, 'LINESTRING', 'XY' )"
+    #
+    # "SELECT AddGeometryColumn( 'stops', 'geometry', 4326, 'LINESTRING', 'XY' )"
     # "SELECT CreateSpatialIndex( 'links' , 'geometry' )"
     # '''CREATE INDEX links_a_node_idx ON links (a_node)'''
     # '''CREATE INDEX links_b_node_idx ON links (b_node)'''
     #
-    # cur.execute("CREATE TABLE definitions (def_id INTEGER, def TEXT,"
-    #             "word_def INTEGER, FOREIGN KEY(word_def) REFERENCES vocab(vocab_id))")

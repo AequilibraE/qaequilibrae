@@ -10,7 +10,7 @@ from data import gtfs_folder, gtfs_db_output
 class TestCreate_gtfsdb(TestCase):
     def test_create_database(self):
         self.gtfs = create_gtfsdb()
-        self.gtfs.create_database(save_db=gtfs_db_output, overwrite=True)
+        self.gtfs.create_database(save_db=gtfs_db_output, overwrite=True, spatialite_enabled=True)
 
     def test_create_agency_table(self):
         # self.fail()
