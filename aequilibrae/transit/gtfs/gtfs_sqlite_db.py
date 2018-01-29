@@ -8,6 +8,7 @@ from ...reference_files import spatialite_database
 
 
 #TODO : Add control for mandatory and optional files
+#TODO: Add constraints for non-negative and limited options (o,1,2, etc) for fields through foreign keys
 class create_gtfsdb:
     def __init__(self):
         self.conn = None
@@ -78,7 +79,31 @@ class create_gtfsdb:
                                                                 ('payment_method', int),
                                                                 ('transfers', int),
                                                                 ('agency_id', str),
-                                                                ('transfer_duration', float)])
+                                                                ('transfer_duration', float)]),
+                             
+                             'fare_rules.txt': OrderedDict([('fare_id', str),
+                                                            ('route_id', str),
+                                                            ('origin_id', str),
+                                                            ('destination_id', str),
+                                                            ('contains_id', str)]),
+                             
+                             'frequencies.txt': OrderedDict([('trip_id', str),
+                                                             ('start_time', str),
+                                                             ('end_time', str),
+                                                             ('headway_secs', str),
+                                                             ('exact_times', int)]),
+                             
+                             'transfers.txt': OrderedDict([('from_stop_id', str),
+                                                           ('to_stop_id', str),
+                                                           ('transfer_type', int),
+                                                           ('min_transfer_time', int)]),
+                             
+                             'feed_info.txt': OrderedDict([('feed_publisher_name', str),
+                                                           ('feed_publisher_url', str),
+                                                           ('feed_lang', str),
+                                                           ('feed_start_date', str),
+                                                           ('feed_end_date', str),
+                                                           ('feed_version', str)])
                              }
         self.set_chunk_size(30000)
 
@@ -108,7 +133,7 @@ class create_gtfsdb:
         if self.conn is None:
             self.__create_database(save_db, memory_db, overwrite)
 
-        tables = ['agency', 'routes', 'trips', "stop_times", "calendar", "calendar_dates", "fare_attributes"]
+        tables = [x.split('.')[0] for x in self.column_order.keys()]
         for tbl in tables:
             self.__load_tables(tbl)
 
@@ -143,6 +168,10 @@ class create_gtfsdb:
         self.__create_calendar_table()
         self.__create_calendar_dates_table()
         self.__create_fare_attributes_table()
+        self.__create_fare_rules_table()
+        self.__create_frequencies_table()
+        self.__create_transfers_table()
+        self.__create_feed_info_table()
         self.conn.commit()
 
     def __create_agency_table(self):
@@ -245,6 +274,50 @@ class create_gtfsdb:
 
         self.cursor.execute(create_query)
 
+    def __create_fare_rules_table(self):
+        self.cursor.execute('DROP TABLE IF EXISTS fare_rules')
+        create_query = '''CREATE TABLE 'fare_rules' (fare_id VARCHAR NOT NULL,
+                                                     route_id VARCHAR,
+                                                     origin_id VARCHAR,
+                                                     destination_id VARCHAR,
+                                                     contains_id VARCHAR,
+                                                     FOREIGN KEY(fare_id) REFERENCES fare_attributes(fare_id)
+                                                     FOREIGN KEY(route_id) REFERENCES routes(route_id)
+                                                     FOREIGN KEY(origin_id) REFERENCES stops(stop_id)
+                                                     FOREIGN KEY(contains_id) REFERENCES stops(stop_id)
+                                                     FOREIGN KEY(destination_id) REFERENCES stops(stop_id));'''
+        self.cursor.execute(create_query)
+
+    def __create_frequencies_table(self):
+        self.cursor.execute('DROP TABLE IF EXISTS frequencies')
+        create_query = '''CREATE TABLE 'frequencies' (trip_id VARCHAR NOT NULL,
+                                                     start_time VARCHAR NOT NULL,
+                                                     end_time VARCHAR NOT NULL,
+                                                     headway_secs VARCHAR NOT NULL,
+                                                     exact_times NUMERIC,
+                                                     FOREIGN KEY(trip_id) REFERENCES trips(trip_id));'''
+        self.cursor.execute(create_query)
+
+    def __create_transfers_table(self):
+        self.cursor.execute('DROP TABLE IF EXISTS transfers')
+        create_query = '''CREATE TABLE 'transfers' (from_stop_id VARCHAR NOT NULL,
+                                                    to_stop_id VARCHAR NOT NULL,
+                                                    transfer_type NUMERIC NOT NULL,
+                                                    min_transfer_time NUMERIC NOT NULL,
+                                                    FOREIGN KEY(from_stop_id) REFERENCES stops(stop_id)
+                                                    FOREIGN KEY(to_stop_id) REFERENCES stops(stop_id));'''
+        self.cursor.execute(create_query)
+
+    def __create_feed_info_table(self):
+        self.cursor.execute('DROP TABLE IF EXISTS feed_info')
+        create_query = '''CREATE TABLE 'feed_info' (feed_publisher_name VARCHAR NOT NULL,
+                                                    feed_publisher_url VARCHAR NOT NULL,
+                                                    feed_lang VARCHAR NOT NULL,
+                                                    feed_start_date VARCHAR,
+                                                    feed_end_date VARCHAR,
+                                                    feed_version VARCHAR);'''
+        self.cursor.execute(create_query)
+
     def __load_tables(self, table_name):
         # Agency
         file_to_open = table_name + '.txt'
@@ -258,13 +331,15 @@ class create_gtfsdb:
         dt = tuple(data.tolist())
         cols = data.dtype.names
         fields = ','.join(len(cols)*["?"])
-        if not isinstance(dt[0], tuple):
-            dt = [dt]
-
-        self.cursor.executemany("INSERT into " + table_name + " (" + ",".join(cols) + ") VALUES(" + fields + ")", dt)
-
-        self.conn.commit()
-
+        try:
+            if not isinstance(dt[0], tuple):
+                dt = [dt]
+            self.cursor.executemany("INSERT into " + table_name + " (" + ",".join(cols) + ") VALUES(" + fields + ")",
+                                    dt)
+            self.conn.commit()
+        except:
+            pass
+        
     @staticmethod
     def open(file_name, column_order=False):
         # Read the stops and cleans the names of the columns
