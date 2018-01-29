@@ -5,7 +5,7 @@ import numpy as np
 import codecs
 import copy
 
-
+#TODO : Add control for mandatory and optional files
 class create_gtfsdb:
     def __init__(self):
         self.conn = None
@@ -63,7 +63,20 @@ class create_gtfsdb:
                                                             ('saturday', int),
                                                             ('sunday', int),
                                                             ('start_date', str),
-                                                            ('end_date', str)])}
+                                                            ('end_date', str)]),
+                             
+                             'calendar_dates.txt': OrderedDict([('service_id', str),
+                                                                ('date', str),
+                                                                ('exception_type', int)]),
+
+                             'fare_attributes.txt': OrderedDict([('fare_id', str),
+                                                                ('price', float),
+                                                                ('currency_type', str),
+                                                                ('payment_method', int),
+                                                                ('transfers', int),
+                                                                ('agency_id', str),
+                                                                ('transfer_duration', float)])
+                             }
         self.set_chunk_size(30000)
 
     def set_chunk_size(self, chunk_size):
@@ -72,10 +85,24 @@ class create_gtfsdb:
                 self.__max_chunk_size = chunk_size
 
     def create_database(self, save_db=None, memory_db=False, overwrite=False):
-
-
         self.__create_database(save_db, memory_db, overwrite)
         return self.conn
+
+    def load_from_zip(self, file_path):
+        # TODO: Unzip to temp folder
+        self.load_from_folder()
+        #TODO: delete temp folder
+
+    def load_from_folder(self, path_to_folder, save_db=None, memory_db=False, overwrite=False):
+        self.source_folder = path_to_folder
+
+        # In case we have not create the database yet
+        if self.conn is None:
+            self.__create_database(save_db, memory_db, overwrite)
+
+        tables = ['agency', 'routes', 'trips', "stop_times", "calendar", "calendar_dates", "fare_attributes"]
+        for tbl in tables:
+            self.__load_tables(tbl)
 
     def __create_database(self, save_db, memory_db, overwrite):
         if save_db is None:
@@ -103,6 +130,8 @@ class create_gtfsdb:
         self.__create_trips_table()
         self.__create_stop_times_table()
         self.__create_calendar_table()
+        self.__create_calendar_dates_table()
+        self.__create_fare_attributes_table()
         self.conn.commit()
 
     def __create_agency_table(self):
@@ -167,6 +196,15 @@ class create_gtfsdb:
 
         self.cursor.execute(create_query)
 
+    def __create_calendar_dates_table(self):
+        # TODO: Add foreign key to calendar.txt
+        self.cursor.execute('DROP TABLE IF EXISTS calendar_dates')
+        create_query = '''CREATE TABLE 'calendar_dates' (service_id VARCHAR NOT NULL,
+                                                   'date' VARCHAR NOT NULL,
+                                                   exception_type NUMERIC NOT NULL,
+                                                   FOREIGN KEY(service_id) REFERENCES trips(service_id));'''
+        self.cursor.execute(create_query)
+
     def __create_stop_times_table(self):
         self.cursor.execute('DROP TABLE IF EXISTS stop_times')
         create_query = '''CREATE TABLE 'stop_times' (trip_id VARCHAR NOT NULL,
@@ -184,21 +222,17 @@ class create_gtfsdb:
 
         self.cursor.execute(create_query)
 
-    def load_from_zip(self, file_path):
-        # TODO: Unzip to temp folder
-        self.load_from_folder()
-        #TODO: delete temp folder
+    def __create_fare_attributes_table(self):
+        self.cursor.execute('DROP TABLE IF EXISTS fare_attributes')
+        create_query = '''CREATE TABLE 'fare_attributes' (fare_id VARCHAR NOT NULL,
+                                                          price NUMERIC NOT NULL,
+                                                          currency_type VARCHAR NOT NULL,
+                                                          payment_method NUMERIC NOT NULL,
+                                                          transfers NUMERIC,
+                                                          agency_id VARCHAR,
+                                                          transfer_duration NUMERIC);'''
 
-    def load_from_folder(self, path_to_folder, save_db=None, memory_db=False, overwrite=False):
-        self.source_folder = path_to_folder
-
-        # In case we have not create the database yet
-        if self.conn is None:
-            self.__create_database(save_db, memory_db, overwrite)
-
-        tables = ['agency', 'routes', 'trips', "stop_times", "calendar"]
-        for tbl in tables:
-            self.__load_tables(tbl)
+        self.cursor.execute(create_query)
 
     def __load_tables(self, table_name):
         # Agency
