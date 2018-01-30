@@ -156,6 +156,10 @@ class create_gtfsdb:
         for tbl in tables:
             self.__load_tables(tbl)
 
+        if self.spatialite_enabled:
+            self.__create_geometry()
+        self.conn.commit()
+
     def __create_database(self, save_db, memory_db, overwrite):
         if save_db is None:
             if not memory_db:
@@ -167,19 +171,17 @@ class create_gtfsdb:
         if not overwrite:
             if os.path.isfile(os.path.join(save_db)):
                 raise ValueError("Output database exists. Please use overwrite=True or choose a different path/name")
-        
+        else:
+            if os.path.isfile(save_db):
+                os.unlink(save_db)
+
         if self.spatialite_enabled:
             shutil.copy(spatialite_database, save_db)
             
         self.conn = sqlite3.connect(save_db)
         self.cursor = self.conn.cursor()
-        
-        # enable extension loading
-        self.conn.enable_load_extension(True)
 
         self.__create_empty_tables()
-        if self.spatialite_enabled:
-            self.__create_geometry()
 
     def __create_empty_tables(self):
         self.__create_agency_table()
@@ -389,6 +391,10 @@ class create_gtfsdb:
             pass
         
     def __create_geometry(self):
+        # enable extension loading
+        self.conn.enable_load_extension(True)
+        self.cursor.execute("SELECT load_extension('mod_spatialite')")
+        self.conn.commit()
     # We need to create two things here:
         #  1. A geometry column in the stops table
         # 2. A list of shapes corresponding to each trip
@@ -398,10 +404,54 @@ class create_gtfsdb:
         # 1 is done
         self.cursor.execute("SELECT AddGeometryColumn( 'stops', 'geometry', 4326, 'POINT', 'XY' );")
         self.cursor.execute("update stops set geometry=MakePoint(stop_lon ,stop_lat, 4326);")
-        self.cursor.execute("SELECT CreateSpatialIndex( 'nodes' , 'geometry' );")
+        self.cursor.execute("SELECT CreateSpatialIndex( 'stops' , 'geometry' );")
         
-        #
-    
+        # 2
+
+        # We create the table to hold the shapes for each route
+        self.cursor.execute('DROP TABLE IF EXISTS shape_routes')
+        #TODO: Add foreign key to calendar_dates.txt
+        create_query = '''CREATE TABLE 'shape_routes' (route_id VARCHAR,
+                                                       trip_id VARCHAR,
+                                                       shape_id VARCHAR,
+                                                       FOREIGN KEY(route_id) REFERENCES routes(route_id)
+                                                       FOREIGN KEY(trip_id) REFERENCES trips(trip_id));'''
+        self.cursor.execute(create_query)
+        self.cursor.execute("SELECT AddGeometryColumn( 'shape_routes', 'geometry', 4326, 'LINESTRING', 'XY' );")
+        self.cursor.execute("SELECT CreateSpatialIndex( 'shape_routes' , 'geometry' );")
+
+        # We check if we have shapes in the shape layer
+        shape_ids = self.cursor.execute("SELECT DISTINCT shape_id from shapes;").fetchall()
+        shape_ids = [str(x[0]) for x in shape_ids]
+        if len(shape_ids) > 0:
+            for shp in shape_ids:
+                qry = self.cursor.execute("SELECT route_id, trip_id from trips where shape_id=" + shp).fetchall()
+                if len(qry) > 0:
+                    route_id, trip_id = qry[0]
+
+                    points = self.cursor.execute("SELECT shape_pt_lon, shape_pt_lat from shapes where shape_id=" + shp +
+                                                 " order by shape_pt_sequence").fetchall()
+                    txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " +str(x[1]) for x in points]) + ")"
+                    sql = "INSERT INTO shape_routes (route_id, trip_id, shape_id, geometry) " \
+                          "VALUES (?,?,?," + "LineFromText('" + txt + "', 4326))"
+                    self.cursor.execute(sql,(route_id, trip_id, shp))
+        else:
+            trip_ids = self.cursor.execute("SELECT DISTINCT trip_id from trips;").fetchall()
+            trip_ids = [str(x[0]) for x in trip_ids]
+            for trip_id in trip_ids:
+                route_id = self.cursor.execute("SELECT route_id from trips where trip_id=" + trip_id).fetchone()[0]
+
+                sql = "SELECT stop_lon, stop_lat FROM stop_times INNER JOIN stops" \
+                      " ON stop_times.stop_id = stops.stop_id WHERE stop_times.trip_id='" + trip_id + \
+                      "' order by stop_times.stop_sequence"
+                qry = self.cursor.execute(sql).fetchall()
+                txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " +str(x[1]) for x in qry]) + ")"
+                sql = "INSERT INTO shape_routes (route_id, trip_id, geometry) " \
+                      "VALUES (?,?," + "LineFromText('" + txt + "', 4326))"
+                self.cursor.execute(sql,(route_id, trip_id))
+
+        self.conn.commit()
+
     @staticmethod
     def open(file_name, column_order=False):
         # Read the stops and cleans the names of the columns
