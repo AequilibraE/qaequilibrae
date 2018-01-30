@@ -11,6 +11,7 @@ class TestCreate_gtfsdb(TestCase):
     def test_create_database(self):
         self.gtfs = create_gtfsdb()
         self.gtfs.create_database(save_db=gtfs_db_output, overwrite=True, spatialite_enabled=True)
+        self.gtfs.conn.close()
 
     def test_create_agency_table(self):
         # self.fail()
