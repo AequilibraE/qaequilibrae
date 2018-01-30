@@ -124,8 +124,6 @@ class create_gtfsdb:
                                                         ('shape_pt_sequence', int),
                                                         ('shape_dist_traveled', float)])
                              }
-        self.geo_enabled_tables = {'stops.txt':['POINT', ('stop_lat', 'stop_lon')]}
-        
         self.set_chunk_size(30000)
 
     def set_chunk_size(self, chunk_size):
@@ -180,6 +178,8 @@ class create_gtfsdb:
         self.conn.enable_load_extension(True)
 
         self.__create_empty_tables()
+        if self.spatialite_enabled:
+            self.__create_geometry()
 
     def __create_empty_tables(self):
         self.__create_agency_table()
@@ -388,6 +388,20 @@ class create_gtfsdb:
         except:
             pass
         
+    def __create_geometry(self):
+    # We need to create two things here:
+        #  1. A geometry column in the stops table
+        # 2. A list of shapes corresponding to each trip
+            # Do we add a shape for each trip?
+            # Do we add a shape to each route?
+
+        # 1 is done
+        self.cursor.execute("SELECT AddGeometryColumn( 'stops', 'geometry', 4326, 'POINT', 'XY' );")
+        self.cursor.execute("update stops set geometry=MakePoint(stop_lon ,stop_lat, 4326);")
+        self.cursor.execute("SELECT CreateSpatialIndex( 'nodes' , 'geometry' );")
+        
+        #
+    
     @staticmethod
     def open(file_name, column_order=False):
         # Read the stops and cleans the names of the columns
