@@ -103,8 +103,29 @@ class create_gtfsdb:
                                                            ('feed_lang', str),
                                                            ('feed_start_date', str),
                                                            ('feed_end_date', str),
-                                                           ('feed_version', str)])
+                                                           ('feed_version', str)]),
+
+                             'stops.txt': OrderedDict([('stop_id', str),
+                                                       ('stop_code', str),
+                                                       ('stop_name', str),
+                                                       ('stop_desc', str),
+                                                       ('stop_lat', float),
+                                                       ('stop_lon', float),
+                                                       ('zone_id', str),
+                                                       ('stop_url', str),
+                                                       ('location_type', int),
+                                                       ('parent_station', str),
+                                                       ('stop_timezone', str),
+                                                       ('wheelchair_boarding', int)]),
+                             
+                             'shapes.txt': OrderedDict([('shape_id', str),
+                                                        ('shape_pt_lat', float),
+                                                        ('shape_pt_lon', float),
+                                                        ('shape_pt_sequence', int),
+                                                        ('shape_dist_traveled', float)])
                              }
+        self.geo_enabled_tables = {'stops.txt':['POINT', ('stop_lat', 'stop_lon')]}
+        
         self.set_chunk_size(30000)
 
     def set_chunk_size(self, chunk_size):
@@ -172,6 +193,8 @@ class create_gtfsdb:
         self.__create_frequencies_table()
         self.__create_transfers_table()
         self.__create_feed_info_table()
+        self.__create_stops_table()
+        self.__create_shapes_table()
         self.conn.commit()
 
     def __create_agency_table(self):
@@ -316,6 +339,31 @@ class create_gtfsdb:
                                                     feed_start_date VARCHAR,
                                                     feed_end_date VARCHAR,
                                                     feed_version VARCHAR);'''
+        self.cursor.execute(create_query)
+
+    def __create_stops_table(self):
+        self.cursor.execute('DROP TABLE IF EXISTS stops')
+        create_query = '''CREATE TABLE 'stops' (stop_id VARCHAR PRIMARY KEY UNIQUE NOT NULL,
+                                                stop_code VARCHAR,
+                                                stop_name VARCHAR NOT NULL,
+                                                stop_desc VARCHAR,
+                                                stop_lat NUMERIC NOT NULL,
+                                                stop_lon NUMERIC NOT NULL,
+                                                zone_id VARCHAR,
+                                                stop_url VARCHAR,
+                                                location_type NUMERIC,
+                                                parent_station VARCHAR,
+                                                stop_timezone VARCHAR,
+                                                wheelchair_boarding NUMERIC);'''
+        self.cursor.execute(create_query)
+
+    def __create_shapes_table(self):
+        self.cursor.execute('DROP TABLE IF EXISTS shapes')
+        create_query = '''CREATE TABLE 'shapes' (shape_id VARCHAR NOT NULL,
+                                                 shape_pt_lat NUMERIC NOT NULL,
+                                                 shape_pt_lon NUMERIC NOT NULL,
+                                                 shape_pt_sequence NUMERIC NOT NULL,
+                                                 shape_dist_traveled NUMERIC);'''
         self.cursor.execute(create_query)
 
     def __load_tables(self, table_name):
