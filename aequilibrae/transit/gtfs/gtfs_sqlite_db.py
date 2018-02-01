@@ -272,7 +272,8 @@ class create_gtfsdb:
 
     def __create_stop_times_table(self):
         self.cursor.execute('DROP TABLE IF EXISTS stop_times')
-        create_query = '''CREATE TABLE 'stop_times' (trip_id VARCHAR NOT NULL,
+        create_query = '''CREATE TABLE 'stop_times' (stop_time_id INTEGER PRIMARY KEY NOT NULL,
+                                                     trip_id VARCHAR NOT NULL,
                                                      arrival_time VARCHAR NOT NULL,
                                                      departure_time VARCHAR NOT NULL,
                                                      stop_id VARCHAR NOT NULL,
@@ -412,6 +413,7 @@ class create_gtfsdb:
         create_query = '''CREATE TABLE 'shape_routes' (route_id VARCHAR,
                                                        trip_id VARCHAR,
                                                        shape_id VARCHAR,
+                                                       route_text_color VARCHAR,
                                                        FOREIGN KEY(route_id) REFERENCES routes(route_id)
                                                        FOREIGN KEY(trip_id) REFERENCES trips(trip_id));'''
         self.cursor.execute(create_query)
@@ -430,9 +432,10 @@ class create_gtfsdb:
                     points = self.cursor.execute("SELECT shape_pt_lon, shape_pt_lat from shapes where shape_id=" + shp +
                                                  " order by shape_pt_sequence").fetchall()
                     txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " +str(x[1]) for x in points]) + ")"
-                    sql = "INSERT INTO shape_routes (route_id, trip_id, shape_id, geometry) " \
-                          "VALUES (?,?,?," + "LineFromText('" + txt + "', 4326))"
-                    self.cursor.execute(sql,(route_id, trip_id, shp))
+                    route_text_color = self.cursor.execute("SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
+                    sql = "INSERT INTO shape_routes (route_id, trip_id, shape_id, route_text_color, geometry)" + \
+                          "VALUES (?,?,?,?," + "LineFromText('" + txt + "', 4326))"
+                    self.cursor.execute(sql,(route_id, trip_id, shp, route_text_color[0]))
         else:
             trip_ids = self.cursor.execute("SELECT DISTINCT trip_id from trips;").fetchall()
             trip_ids = [str(x[0]) for x in trip_ids]
@@ -444,20 +447,21 @@ class create_gtfsdb:
                       "' order by stop_times.stop_sequence"
                 qry = self.cursor.execute(sql).fetchall()
                 txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " +str(x[1]) for x in qry]) + ")"
-                sql = "INSERT INTO shape_routes (route_id, trip_id, geometry) " \
+                route_text_color = self.cursor.execute("SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
+                sql = "INSERT INTO shape_routes (route_id, trip_id, route_text_color, geometry) " \
                       "VALUES (?,?," + "LineFromText('" + txt + "', 4326))"
-                self.cursor.execute(sql,(route_id, trip_id))
+                self.cursor.execute(sql,(route_id, trip_id, route_text_color))
 
-
-        # add all the stops in the table
-        self.cursor.execute('''CREATE VIEW shape_stops
-                                as
+        # creates the stops table with route ID info
+        self.cursor.execute('''CREATE TABLE 'shape_stops'
+                                AS
+                                SELECT
+                                a.stop_time_id,
                                 a.trip_id,
                                 a.stop_id,
                                 c.route_id,
                                 b.stop_lon,
-                                b.stop_lat,
-                                b.geometry
+                                b.stop_lat
                                 FROM
                                 stop_times a
                                 inner join
@@ -465,43 +469,11 @@ class create_gtfsdb:
                                 on a.stop_id  = b.stop_id
                                 inner join
                                 trips c
-                                on a.trip_id = c.trip_id''')
-        self.cursor.execute(''' INSERT INTO views_geometry_columns
-                                (view_name, view_geometry, view_rowid, f_table_name, f_geometry_column)
-                                VALUES ('shape_stops', 'geometry', 'rowid', 'stop_times', 'geometry');
-                                        ''')
+                                on a.trip_id = c.trip_id;''')
 
-
-        # We check if we have shapes in the shape layer
-        shape_ids = self.cursor.execute("SELECT DISTINCT shape_id from shapes;").fetchall()
-        shape_ids = [str(x[0]) for x in shape_ids]
-        if len(shape_ids) > 0:
-            for shp in shape_ids:
-                qry = self.cursor.execute("SELECT route_id, trip_id from trips where shape_id=" + shp).fetchall()
-                if len(qry) > 0:
-                    route_id, trip_id = qry[0]
-
-                    points = self.cursor.execute("SELECT shape_pt_lon, shape_pt_lat from shapes where shape_id=" + shp +
-                                                 " order by shape_pt_sequence").fetchall()
-                    txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " +str(x[1]) for x in points]) + ")"
-                    sql = "INSERT INTO shape_routes (route_id, trip_id, shape_id, geometry) " \
-                          "VALUES (?,?,?," + "LineFromText('" + txt + "', 4326))"
-                    self.cursor.execute(sql,(route_id, trip_id, shp))
-        else:
-            trip_ids = self.cursor.execute("SELECT DISTINCT trip_id from trips;").fetchall()
-            trip_ids = [str(x[0]) for x in trip_ids]
-            for trip_id in trip_ids:
-                route_id = self.cursor.execute("SELECT route_id from trips where trip_id=" + trip_id).fetchone()[0]
-
-                sql = "SELECT stop_lon, stop_lat FROM stop_times INNER JOIN stops" \
-                      " ON stop_times.stop_id = stops.stop_id WHERE stop_times.trip_id='" + trip_id + \
-                      "' order by stop_times.stop_sequence"
-                qry = self.cursor.execute(sql).fetchall()
-                txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " +str(x[1]) for x in qry]) + ")"
-                sql = "INSERT INTO shape_routes (route_id, trip_id, geometry) " \
-                      "VALUES (?,?," + "LineFromText('" + txt + "', 4326))"
-                self.cursor.execute(sql,(route_id, trip_id))
-
+        self.cursor.execute("SELECT AddGeometryColumn( 'shape_stops', 'geometry', 4326, 'POINT', 'XY' );")
+        self.cursor.execute("update shape_stops set geometry=MakePoint(stop_lon ,stop_lat, 4326);")
+        self.cursor.execute("SELECT CreateSpatialIndex( 'shape_stops' , 'geometry' );")
         self.conn.commit()
 
     @staticmethod
@@ -529,14 +501,6 @@ class create_gtfsdb:
                 new_data = np.array(data, new_data_dt)
             else:
                 new_data = data
-
-
         else:
             new_data = data
         return new_data
-    #
-    # "SELECT AddGeometryColumn( 'stops', 'geometry', 4326, 'LINESTRING', 'XY' )"
-    # "SELECT CreateSpatialIndex( 'links' , 'geometry' )"
-    # '''CREATE INDEX links_a_node_idx ON links (a_node)'''
-    # '''CREATE INDEX links_b_node_idx ON links (b_node)'''
-    #
