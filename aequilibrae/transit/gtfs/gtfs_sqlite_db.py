@@ -395,19 +395,17 @@ class create_gtfsdb:
         self.conn.enable_load_extension(True)
         self.cursor.execute("SELECT load_extension('mod_spatialite')")
         self.conn.commit()
-    # We need to create two things here:
-        #  1. A geometry column in the stops table
-        # 2. A list of shapes corresponding to each trip
-            # Do we add a shape for each trip?
-            # Do we add a shape to each route?
+    # We need to create three things here:
+        # 1. A geometry column in the stops table
+        # 2. A layer of shapes corresponding to each trip
+        # 3. A layer of shapes with all the stops for each trip that can be query'd by route_id
 
-        # 1 is done
+        # 1
         self.cursor.execute("SELECT AddGeometryColumn( 'stops', 'geometry', 4326, 'POINT', 'XY' );")
         self.cursor.execute("update stops set geometry=MakePoint(stop_lon ,stop_lat, 4326);")
         self.cursor.execute("SELECT CreateSpatialIndex( 'stops' , 'geometry' );")
         
         # 2
-
         # We create the table to hold the shapes for each route
         self.cursor.execute('DROP TABLE IF EXISTS shape_routes')
         #TODO: Add foreign key to calendar_dates.txt
@@ -419,6 +417,60 @@ class create_gtfsdb:
         self.cursor.execute(create_query)
         self.cursor.execute("SELECT AddGeometryColumn( 'shape_routes', 'geometry', 4326, 'LINESTRING', 'XY' );")
         self.cursor.execute("SELECT CreateSpatialIndex( 'shape_routes' , 'geometry' );")
+
+        # We check if we have shapes in the shape layer
+        shape_ids = self.cursor.execute("SELECT DISTINCT shape_id from shapes;").fetchall()
+        shape_ids = [str(x[0]) for x in shape_ids]
+        if len(shape_ids) > 0:
+            for shp in shape_ids:
+                qry = self.cursor.execute("SELECT route_id, trip_id from trips where shape_id=" + shp).fetchall()
+                if len(qry) > 0:
+                    route_id, trip_id = qry[0]
+
+                    points = self.cursor.execute("SELECT shape_pt_lon, shape_pt_lat from shapes where shape_id=" + shp +
+                                                 " order by shape_pt_sequence").fetchall()
+                    txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " +str(x[1]) for x in points]) + ")"
+                    sql = "INSERT INTO shape_routes (route_id, trip_id, shape_id, geometry) " \
+                          "VALUES (?,?,?," + "LineFromText('" + txt + "', 4326))"
+                    self.cursor.execute(sql,(route_id, trip_id, shp))
+        else:
+            trip_ids = self.cursor.execute("SELECT DISTINCT trip_id from trips;").fetchall()
+            trip_ids = [str(x[0]) for x in trip_ids]
+            for trip_id in trip_ids:
+                route_id = self.cursor.execute("SELECT route_id from trips where trip_id=" + trip_id).fetchone()[0]
+
+                sql = "SELECT stop_lon, stop_lat FROM stop_times INNER JOIN stops" \
+                      " ON stop_times.stop_id = stops.stop_id WHERE stop_times.trip_id='" + trip_id + \
+                      "' order by stop_times.stop_sequence"
+                qry = self.cursor.execute(sql).fetchall()
+                txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " +str(x[1]) for x in qry]) + ")"
+                sql = "INSERT INTO shape_routes (route_id, trip_id, geometry) " \
+                      "VALUES (?,?," + "LineFromText('" + txt + "', 4326))"
+                self.cursor.execute(sql,(route_id, trip_id))
+
+
+        # add all the stops in the table
+        self.cursor.execute('''CREATE VIEW shape_stops
+                                as
+                                a.trip_id,
+                                a.stop_id,
+                                c.route_id,
+                                b.stop_lon,
+                                b.stop_lat,
+                                b.geometry
+                                FROM
+                                stop_times a
+                                inner join
+                                stops  b
+                                on a.stop_id  = b.stop_id
+                                inner join
+                                trips c
+                                on a.trip_id = c.trip_id''')
+        self.cursor.execute(''' INSERT INTO views_geometry_columns
+                                (view_name, view_geometry, view_rowid, f_table_name, f_geometry_column)
+                                VALUES ('shape_stops', 'geometry', 'rowid', 'stop_times', 'geometry');
+                                        ''')
+
 
         # We check if we have shapes in the shape layer
         shape_ids = self.cursor.execute("SELECT DISTINCT shape_id from shapes;").fetchall()

@@ -35,7 +35,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../../matrix_procedures/icon.png</normaloff>../../matrix_procedures/icon.png</iconset>
+    <normaloff>../../../../../../matrix_procedures/icon.png</normaloff>../../../../../../matrix_procedures/icon.png</iconset>
   </property>
   <property name="modal">
    <bool>false</bool>
