@@ -155,6 +155,8 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         if layer_type == 'nodes':
             table = self.table_available_node_field
             final_table = self.table_node_fields
+            # TODO : Change for the method .currentlayer()
+            # Repeat the change throughout
             self.node_layer = get_vector_layer_by_name(self.node_layers_list.currentText())
             required_fields = self.required_fields_nodes
             if self.node_layer:

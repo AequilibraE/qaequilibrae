@@ -117,7 +117,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         i, j = 'AB', 'BA'
 
         if modified == i:
-            text = self.ab_FieldComboBox.currentText()
+            text = self.ab_FieldComboBox.currentText().upper()
             if i in text:
                 text = text.replace(i, j)
                 index = self.ba_FieldComboBox.findText(text, Qt.MatchFixedString)
@@ -125,7 +125,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                     self.ba_FieldComboBox.setCurrentIndex(index)
 
         if modified == j:
-            text = self.ba_FieldComboBox.currentText()
+            text = self.ba_FieldComboBox.currentText().upper()
             if j in text:
                 text = text.replace(j, i)
                 index = self.ab_FieldComboBox.findText(text, Qt.MatchFixedString)

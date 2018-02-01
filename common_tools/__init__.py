@@ -19,16 +19,14 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from load_matrix_class import LoadMatrix
-from load_matrix_dialog import LoadMatrixDialog
-from load_vector_class import LoadVector
-from load_vector_dialog import LoadVectorDialog
-from worker_thread import WorkerThread
-from report_dialog import ReportDialog
-from numpy_model import NumpyModel
+from auxiliary_functions import *
 from get_output_file_name import GetOutputFileName
 from get_output_file_name import GetOutputFolderName
 from link_query_model import LinkQueryModel
 from load_graph_layer_setting_dialog import LoadGraphLayerSettingDialog
+from numpy_model import NumpyModel
+from database_model import DatabaseModel
 from parameters_dialog import ParameterDialog
-from auxiliary_functions import *
+from report_dialog import ReportDialog
+from worker_thread import WorkerThread
+from about_dialog import AboutDialog

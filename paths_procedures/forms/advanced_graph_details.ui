@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>advanced_graph_details</class>
+ <widget class="QDialog" name="advanced_graph_details">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>329</width>
+    <height>246</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Graph Centroids setting</string>
+  </property>
+  <widget class="QPushButton" name="but_ok">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>210</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="chb_set_centroids">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>10</y>
+     <width>111</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Set centroids</string>
+   </property>
+  </widget>
+  <widget class="QFrame" name="frm_all_items">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>40</y>
+     <width>311</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QCheckBox" name="chb_path_through_centroids">
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>120</y>
+      <width>251</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Block path through connectors</string>
+    </property>
+   </widget>
+   <widget class="QgsMapLayerComboBox" name="cob_centroids_layer">
+    <property name="geometry">
+     <rect>
+      <x>67</x>
+      <y>11</y>
+      <width>241</width>
+      <height>30</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblnodematch_11">
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>18</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Layer</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblnodematch_12">
+    <property name="geometry">
+     <rect>
+      <x>14</x>
+      <y>57</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>ID field</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chb_use_node_selection">
+    <property name="geometry">
+     <rect>
+      <x>67</x>
+      <y>90</y>
+      <width>131</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Selected nodes only</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cob_centroid_id">
+    <property name="geometry">
+     <rect>
+      <x>67</x>
+      <y>49</y>
+      <width>241</width>
+      <height>30</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>chb_path_through_centroids</tabstop>
+  <tabstop>chb_set_centroids</tabstop>
+  <tabstop>but_ok</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

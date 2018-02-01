@@ -3,7 +3,7 @@
  Package:    AequilibraE
 
  Name:       Loads GUI for creating desire lines
- Purpose:    Creatind desire and delaunay lines
+ Purpose:    Creating desire and delaunay lines
 
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-01
- Updated:    2017-05-07
+ Updated:    2017-06-25
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -23,17 +23,16 @@ from qgis.core import *
 import qgis
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4 import uic
+from PyQt4 import uic, QtCore
 import sys
 import os
-import numpy as np
-from scipy.sparse import coo_matrix
+import copy
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
 
 from ..common_tools import NumpyModel
-from ..common_tools import LoadMatrixDialog
+from ..matrix_procedures import LoadMatrixDialog
 from ..common_tools import ReportDialog
 
 from desire_lines_procedure import DesireLinesProcedure
@@ -43,7 +42,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/u
 
 class DesireLinesDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
         self.iface = iface
         self.setupUi(self)
         self.error = None
@@ -54,13 +53,19 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.path = standard_path()
         self.zones = None
         self.columns = None
-        self.matrix_hash =None
+        self.matrix_hash = {}
+
+        self.setMaximumSize(QSize(383, 385))
+        self.resize(383, 385)
 
         # FIRST, we connect slot signals
-        # For changing the input matrix
+        # For changing the input matrix_procedures
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
 
         self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+
+        self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
+
 
         # Create desire lines
         self.create_dl.clicked.connect(self.run)
@@ -74,15 +79,46 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 if layer.wkbType() in poly_types or layer.wkbType() in point_types:
                     self.zoning_layer.addItem(layer.name())
 
-                    self.progress_label.setVisible(True)
-                    self.progressbar.setVisible(True)
+                    self.progress_label.setVisible(False)
+                    self.progressbar.setVisible(False)
+
+    def set_show_matrices(self):
+        self.tbl_array_cores.clear()
+        if self.chb_use_all_matrices.isChecked():
+            self.resize(383, 385)
+            self.setMaximumSize(QSize(383, 385))
+        else:
+            self.setMaximumSize(QSize(710, 385))
+            self.resize(710, 385)
+            self.tbl_array_cores.setColumnWidth(0, 200)
+            self.tbl_array_cores.setColumnWidth(1, 80)
+            self.tbl_array_cores.setHorizontalHeaderLabels(["Matrix","Use?"])
+
+            if self.matrix is not None:
+                table = self.tbl_array_cores
+                table.setRowCount(self.matrix.cores)
+                for i, mat in enumerate(self.matrix.names):
+                    item1 = QTableWidgetItem(mat)
+                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    table.setItem(i, 0, item1)
+
+                    chb1 = QCheckBox()
+                    chb1.setChecked(True)
+                    chb1.setEnabled(True)
+                    table.setCellWidget(i, 1, self.centers_item(chb1))
+
+    def centers_item(self, item):
+        cell_widget = QWidget()
+        lay_out = QHBoxLayout(cell_widget)
+        lay_out.addWidget(item)
+        lay_out.setAlignment(Qt.AlignCenter)
+        lay_out.setContentsMargins(0, 0, 0, 0)
+        cell_widget.setLayout(lay_out)
+        return cell_widget
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.job_finished_from_thread)
+        QObject.connect(self.worker_thread, SIGNAL("assignment"), self.signal_handler)
+        QObject.connect(self.worker_thread, SIGNAL("desire_lines"), self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 
@@ -94,60 +130,83 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 if field.type() in numeric_types:
                     self.zone_id_field.addItem(field.name())
 
-    def add_matrix_to_viewer(self, titles):
-        """
-            procedure to add the matrix to the viewer
-        """
-        if self.matrix is not None:
-            self.zones = self.matrix.shape[0]
-
-            m = NumpyModel(self.matrix, titles, titles)
-            self.matrix_viewer.setModel(m)
-
     def find_matrices(self):
-        dlg2 = LoadMatrixDialog(self.iface, sparse=True)
+        dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=True)
         dlg2.show()
         dlg2.exec_()
         if dlg2.matrix is not None:
             self.matrix = dlg2.matrix
-            self.matrix, self.matrix_hash, titles = self.reblocks_matrix(self.matrix)
-            if self.chb_display_matrix.isChecked():
-                self.add_matrix_to_viewer(titles)
+            self.set_show_matrices()
 
-            self.chb_display_matrix.setEnabled(False)
+    def signal_handler(self, val):
+        # Signals that will come from traffic assignment
+        if val[0] == 'zones finalized':
+            self.progressbar.setValue(val[1])
+        elif val[0] == 'text AoN':
+            self.progress_label.setText(val[1])
 
-    def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val[1])
+        # Signals that will come from desire lines procedure
+        elif val[0] == 'job_size_dl':
+            self.progressbar.setRange(0, val[1])
+        elif val[0] == 'jobs_done_dl':
+            self.progressbar.setValue(val[1])
+        elif val[0] == 'text_dl':
+            self.progress_label.setText(val[1])
+        elif val[0] == 'finished_desire_lines_procedure':
+            self.job_finished_from_thread()
 
-    def progress_value_from_thread(self, value):
-        self.progressbar.setValue(value[1])
-
-    def progress_text_from_thread(self, value):
-        self.progress_label.setText(value[1])
-
-    def job_finished_from_thread(self, success):
-        if self.worker_thread.error is not None:
-            self.exit_procedure()
-            self.throws_error(self.worker_thread.error)
-
-        else:
-            try:
-                QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
-            except:
-                self.worker_thread.report.append('Could not load desire lines to map')
-            if self.worker_thread.report:
-                dlg2 = ReportDialog(self.iface, self.worker_thread.report)
-                dlg2.show()
-                dlg2.exec_()
+    def job_finished_from_thread(self):
+        try:
+            QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
+        except:
+            self.worker_thread.report.append('Could not load desire lines to map')
+        if self.worker_thread.report:
+            dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+            dlg2.show()
+            dlg2.exec_()
         self.exit_procedure()
 
-    def run(self):
-        if self.matrix is not None:
+    def check_all_inputs(self):
+        if self.matrix is None:
+            return False
 
+        if self.zoning_layer.currentIndex() < 0:
+            return False
+
+        if self.zone_id_field.currentIndex() < 0:
+            return False
+
+        if self.chb_use_all_matrices.isChecked():
+            matrix_cores_to_use = self.matrix.names
+        else:
+            matrix_cores_to_use = []
+            for i, mat in enumerate(self.matrix.names):
+                if self.tbl_array_cores.cellWidget(i, 1).findChildren(QCheckBox)[0].isChecked():
+                    matrix_cores_to_use.append(mat)
+
+        if len(matrix_cores_to_use) > 0:
+            self.matrix.computational_view(matrix_cores_to_use)
+            if len(matrix_cores_to_use) == 1:
+                self.matrix.matrix_view = self.matrix.matrix_view.reshape((self.matrix.zones, self.matrix.zones, 1))
+        else:
+            return False
+
+        # list of zones from the matrix
+        self.zones = self.matrix.index[:]
+
+        return True
+
+
+    def run(self):
+        if self.check_all_inputs():
+        # Sets the visual of the tool
             self.lbl_funding1.setVisible(False)
             self.lbl_funding2.setVisible(False)
             self.progress_label.setVisible(True)
             self.progressbar.setVisible(True)
+            self.setMaximumSize(QSize(383, 444))
+            self.resize(383, 444)
+
 
             dl_type = 'DesireLines'
             if self.radio_delaunay.isChecked():
@@ -157,35 +216,13 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                                                         self.zone_id_field.currentText(), self.matrix, self.matrix_hash, dl_type)
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage("Matrix not loaded", '', level=3)
+            qgis.utils.iface.messageBar().pushMessage("Inputs not loaded properly. You need the layer and at least one matrix_procedures core", '', level=3)
 
     def throws_error(self, error_message):
         error_message = ["*** ERROR ***", error_message]
         dlg2 = ReportDialog(self.iface, error_message)
         dlg2.show()
         dlg2.exec_()
-
-    def reblocks_matrix(self, sparse_matrix):
-        # Gets all non-zero coordinates and makes sure that they are considered
-        froms = sparse_matrix.row
-        tos =  sparse_matrix.col
-        data = sparse_matrix.data
-
-        all_indices = np.hstack((froms, tos))
-        indices = np.unique(all_indices)
-        compact_shape = indices.shape[0]
-
-        # Builds the hash
-        matrix_hash = {}
-        titles = []
-        for i in range(compact_shape):
-            matrix_hash[indices[i]] = i
-            froms[froms == indices[i]] = matrix_hash[indices[i]]
-            tos[tos == indices[i]] = matrix_hash[indices[i]]
-            titles.append(indices[i])
-        matrix = coo_matrix((data, (froms, tos)), shape=(compact_shape, compact_shape)).toarray().astype(np.float64)
-        return matrix, matrix_hash, titles
-
 
     def exit_procedure(self):
         self.close()

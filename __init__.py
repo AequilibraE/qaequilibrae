@@ -21,6 +21,7 @@
 
 # This portion of the script initializes the plugin, making it known to QGIS.
 import sys
+
 sys.dont_write_bytecode = True
 
 sys.path.append("C:/Users/Pedro/.qgis2/python/plugins/AequilibraE/")

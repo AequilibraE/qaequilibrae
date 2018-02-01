@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    2016-12-21
+ Updated:    2017-10-02
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -29,30 +29,25 @@ from qgis.core import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from .common_tools import ParameterDialog, logger, ReportDialog
+from .common_tools import ParameterDialog, logger, ReportDialog, AboutDialog
 from binary_downloader_class import BinaryDownloaderDialog
-from .distribution import IpfDialog, ApplyGravityDialog, CalibrateGravityDialog
+from .distribution_procedures import DistributionModelsDialog
 from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominatorDialog, SimpleTagDialog, CompareScenariosDialog
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
-from .paths import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
+from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
+from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog,  MatrixManipulationDialog
 import tempfile, glob
+from .aequilibrae.__version__ import binary_version as VERSION
 
 no_binary = False
 old_binary = False
 try:
-    from aequilibrae.paths import VERSION
-    VERSION_GRAPH = ''
-    a = open(os.path.join(os.path.dirname(__file__), 'aequilibrae/paths/parameters.pxi'), 'r')
-    for i in a.readlines():
-        if 'VERSION' in i and 'SUB' not in i:
-            VERSION_GRAPH = i[11:-2]
-
-    # logger((VERSION, VERSION_GRAPH))
+    from aequilibrae.paths import VERSION_COMPILED as VERSION_GRAPH
     if VERSION != VERSION_GRAPH:
         old_binary = True
 except:
     no_binary = True
-    
+
 sys.dont_write_bytecode = True
 import os.path
 
@@ -73,6 +68,8 @@ class AequilibraEMenu:
             self.iface.addPluginToMenu("&AequilibraE", submenu.menuAction())
 
     def initGui(self):
+        # Removes temporary files
+        self.removes_temporary_files()
 
         # CREATING MASTER MENU HEAD
         self.AequilibraE_menu = QMenu(QCoreApplication.translate("AequilibraE", "AequilibraE"))
@@ -103,6 +100,30 @@ class AequilibraEMenu:
         QObject.connect(self.create_transponet_action, SIGNAL("triggered()"), self.run_create_transponet)
         self.network_menu.addAction(self.create_transponet_action)
 
+        # ########################################################################
+        # ####################  DATA UTILITIES SUB-MENU  #########################
+
+        self.matrix_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Data"))
+        self.aequilibrae_add_submenu(self.matrix_menu)
+
+        # Displaying Aequilibrae custom data formats
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_display_custom_formats.png")
+        self.display_custom_formats_action = QAction(icon, u"Display AequilibraE formats", self.iface.mainWindow())
+        QObject.connect(self.display_custom_formats_action, SIGNAL("triggered()"), self.run_display_aequilibrae_formats)
+        self.matrix_menu.addAction(self.display_custom_formats_action)
+
+        # Loading matrices
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
+        self.load_matrix_action = QAction(icon, u"Import matrices", self.iface.mainWindow())
+        QObject.connect(self.load_matrix_action, SIGNAL("triggered()"), self.run_load_matrices)
+        self.matrix_menu.addAction(self.load_matrix_action)
+
+        # Loading Database
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dataset.png")
+        self.load_database_action = QAction(icon, u"Import dataset", self.iface.mainWindow())
+        QObject.connect(self.load_database_action, SIGNAL("triggered()"), self.run_load_database)
+        self.matrix_menu.addAction(self.load_database_action)
+
         # # ########################################################################
         # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
 
@@ -127,12 +148,11 @@ class AequilibraEMenu:
         QObject.connect(self.calibrate_gravity_action, SIGNAL("triggered()"), self.run_calibrate_gravity)
         self.trip_distribution_menu.addAction(self.calibrate_gravity_action)
 
-        #
-        # # Trip Distribution
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
-        # self.trip_distr_action = QAction(icon, u"Trip Distribution", self.iface.mainWindow())
-        # QObject.connect(self.trip_distr_action, SIGNAL("triggered()"), self.run_trip_distr)
-        # self.trip_distribution_menu.addAction(self.trip_distr_action)
+        # Trip Distribution
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
+        self.trip_distr_action = QAction(icon, u"Trip Distribution", self.iface.mainWindow())
+        QObject.connect(self.trip_distr_action, SIGNAL("triggered()"), self.run_distribution_models)
+        self.trip_distribution_menu.addAction(self.trip_distr_action)
 
         # ########################################################################
         # ###################  PATH COMPUTATION SUB-MENU   #######################
@@ -148,7 +168,7 @@ class AequilibraEMenu:
 
         # Graph generation
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_graph_creation.png")
-        self.graph_creation_action = QAction(icon, u"Create the graph", self.iface.mainWindow())
+        self.graph_creation_action = QAction(icon, u"Create graph", self.iface.mainWindow())
         QObject.connect(self.graph_creation_action, SIGNAL("triggered()"), self.run_create_graph)
         self.assignment_menu.addAction(self.graph_creation_action)
 
@@ -221,31 +241,35 @@ class AequilibraEMenu:
         QObject.connect(self.parameters_action, SIGNAL("triggered()"), self.run_change_parameters)
         self.AequilibraE_menu.addAction(self.parameters_action)
 
+         # About
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_parameters.png")
+        self.about_action = QAction(icon, u"About", self.iface.mainWindow())
+        QObject.connect(self.about_action, SIGNAL("triggered()"), self.run_about)
+        self.AequilibraE_menu.addAction(self.about_action)
+
         # Download binaries
         if no_binary:
             icon = QIcon(os.path.dirname(__file__) + "/icons/icon_binaries.png")
             self.binary_action = QAction(icon, u"Download binaries", self.iface.mainWindow())
             QObject.connect(self.binary_action, SIGNAL("triggered()"), self.run_binary_donwload)
             self.AequilibraE_menu.addAction(self.binary_action)
-            
-            
+
+
         if old_binary:
             report = ['You have an old version of the AequilibraE binaries']
             report.append('To fix this issue, please do the following:')
             report.append('     1. Uninstall AequilibraE')
-            report.append('     2. Re-install AequilibraE from the official repository')
-            report.append('     3. Download the new binaries from the Menu Aequilibrae-Download Binaries')
-            report.append('     4. Re-start QGIS')
+            report.append('     2. Re-start QGIS')
+            report.append('     3. Re-install AequilibraE from the official repository')
+            report.append('     4. Download the new binaries from the Menu Aequilibrae-Download Binaries')
+            report.append('     5. Re-start QGIS')
             dlg2 = ReportDialog(self.iface, report)
             dlg2.show()
             dlg2.exec_()
     #########################################################################
 
     def unload(self):
-        # Removes all the temporary files from previous uses
-        p = tempfile.gettempdir() + '/aequilibrae_*'
-        for f in glob.glob(p):
-            os.unlink(f)
+        self.removes_temporary_files()
 
         # unloads the add-on
         if self.AequilibraE_menu is not None:
@@ -256,9 +280,37 @@ class AequilibraEMenu:
             self.iface.removePluginMenu("&AequilibraE", self.trip_distribution_menu.menuAction())
             self.iface.removePluginMenu("&AequilibraE", self.gis_tools_menu.menuAction())
 
+    def removes_temporary_files(self):
+        # Removes all the temporary files from previous uses
+        p = tempfile.gettempdir() + '/aequilibrae_*'
+        for f in glob.glob(p):
+            try:
+                os.unlink(f)
+            except:
+                pass
 
     def run_change_parameters(self):
         dlg2 = ParameterDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_about(self):
+        dlg2 = AboutDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_load_matrices(self):
+        dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=False)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_load_database(self):
+        dlg2 = LoadDatasetDialog(self.iface, single_use=False)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_display_aequilibrae_formats(self):
+        dlg2 = DisplayAequilibraEFormatsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
@@ -292,12 +344,17 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_calibrate_gravity(self):
-        dlg2 = CalibrateGravityDialog(self.iface)
+        dlg2 = DistributionModelsDialog(self.iface, 'calibrate')
         dlg2.show()
         dlg2.exec_()
 
     def run_apply_gravity(self):
-        dlg2 = ApplyGravityDialog(self.iface)
+        dlg2 = DistributionModelsDialog(self.iface, 'apply')
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_distribution_models(self):
+        dlg2 = DistributionModelsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
@@ -355,7 +412,7 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_ipf(self):
-        dlg2 = IpfDialog(self.iface)
+        dlg2 = DistributionModelsDialog(self.iface, 'ipf')
         dlg2.show()
         dlg2.exec_()
 

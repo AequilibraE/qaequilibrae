@@ -11,6 +11,6 @@ __version__ = "1.0"
 __revision__ = "$Revision: 1 $"
 __date__ = "$Date: 2016-07-02$"
 
-from AssignmentResults import AssignmentResults
-from PathResults import PathResults
-from memory_mapped_files_handling import saveDataFileDictionary
+from assignment_results import AssignmentResults
+from path_results import PathResults
+from skim_results import SkimResults

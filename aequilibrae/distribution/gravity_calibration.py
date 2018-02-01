@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    22/10/2016
- Updated:    22/10/2016
+ Updated:    02/10/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -27,39 +27,62 @@
 
 import sys, os
 from time import clock, strftime, gmtime
-from gravity_application import GravityApplication
+from gravity_application import GravityApplication, SyntheticGravityModel
+from ..matrix import AequilibraeMatrix, AequilibraEData
 import numpy as np
 import sys
 import yaml
+from ..parameters import Parameters
 
 class GravityCalibration:
     """"
         where function is: 'EXPO' or 'POWER'. 'GAMMA' and 'FRICTION FACTORS' to be implemented at a later time
         parameters are: 'max trip length'
         """
-    def __init__(self, matrix=None, cost_matrix=None, function=None, parameters=None):
+    def __init__(self, **kwargs):
 
         self.__required_parameters = ['max trip length', 'max iterations', 'max error']
-        if parameters is None:
-            parameters = self.get_parameters('gravity')
+        self.parameters = kwargs.get('parameters', self.get_parameters())
 
-        self.matrix = matrix
+        self.nan_as_zero = kwargs.get('nan_as_zero', False)
+        self.matrix = kwargs.get('matrix')
+        self.impedance = kwargs.get('impedance')
+        deterrence_function = str(kwargs.get('function', '')).upper()
+
+        if self.nan_as_zero:
+            self.matrix = self.matrix.copy()
+            self.impedance = self.impedance.copy()
+
         self.result_matrix = None
-        self.cost_matrix = cost_matrix
-        self.function = function.upper()
-        self.parameters = parameters
+        self.rows = None
+        self.columns = None
+        self.gap = np.inf
 
         self.error = None
         self.gravity = None
-        self.report = ['  #####    GRAVITY CALIBRATION    #####  ', '']
+
+        self.comput_core = None
+        self.impedance_core = None
 
         self.itera = 0
         self.max_iter = None
         self.max_error = None
-        self.conv = np.inf
-        self.report.append('')
-        self.report.append('Functional form: ' + self.function)
-        self.model = {'function': function}
+        self.gap = np.inf
+
+        self.report = ['  #####    GRAVITY CALIBRATION    #####  ', '']
+        self.report.append('Functional form: ' + deterrence_function)
+        self.model = SyntheticGravityModel()
+        if deterrence_function not in self.model.valid_functions:
+            raise ValueError ('Function needs to be one of these: ' + ', '.join(self.model.valid_functions))
+        else:
+            self.model.function = deterrence_function
+
+    def assemble_model(self, b1):
+        # NEED TO SET PARAMETERS #
+        if self.model.function == "EXPO":
+            self.model.beta = float(b1)
+        elif self.model.function == "POWER":
+            self.model.alpha = float(b1)
 
     def calibrate(self):
         t = clock()
@@ -69,108 +92,144 @@ class GravityCalibration:
         self.max_iter = self.parameters['max iterations']
         self.max_error = self.parameters['max error']
 
+
         # Check the inputs
         self.check_inputs()
-        if self.error is None:
-            if self.function in ["EXPO", "POWER"]:
+        if self.model.function in ["EXPO", "POWER"]:
+            # filtering for all costs over limit
 
-                def assemble_model(b1):
-                    # NEED TO SET PARAMETERS #
-                    if self.function == "EXPO":
-                        self.model['parameters'] = {'beta': float(b1)}
-                    elif self.function == "POWER":
-                        self.model['parameters'] = {'alpha': float(b1)}
+            a = 1
+            if max_cost > 0:
+                a = (self.impedance.matrix[self.impedance_core][:, :] < max_cost).astype(int)
 
-                # filtering for all costs over limit
-                a = (self.matrix < max_cost).astype(int)
+            #weighted average cost
+            self.report.append('Iteration: 1')
+            cstar = np.nansum(self.impedance.matrix[self.impedance_core][:,:] * self.result_matrix.gravity[:, :]  * a) / \
+                    np.nansum(self.result_matrix.gravity[:, :]  * a)
 
-                #weighted average cost
-                self.report.append('Iteration: 1')
-                cstar = np.sum(self.matrix * self.cost_matrix * a) / np.sum(self.matrix * a)
-                b0 = 1 / cstar
+            b0 = 1 / cstar
 
-                assemble_model(b0)
-                c0 = self.apply_gravity()
-                for i in self.gravity.report:
-                    self.report.append('       ' + i)
-                self.report.append('')
-                self.report.append('')
+            self.assemble_model(b0)
+            c0 = self.apply_gravity()
+            for i in self.gravity.report:
+                self.report.append('       ' + i)
+            self.report.append('')
+            self.report.append('')
 
-                bm1 = b0
-                bm = b0 * c0 / cstar
+            bm1 = b0
+            bm = b0 * c0 / cstar
 
-                self.report.append('Iteration: 2')
-                assemble_model(bm)
-                cm = self.apply_gravity()
-                for i in self.gravity.report:
-                    self.report.append('       ' + i)
-                self.report.append('Error: ' +  "{:.2E}".format(np.sum(abs((bm / bm1) - 1))))
-                self.report.append('')
-                cm1 = c0
+            self.report.append('Iteration: 2')
+            self.assemble_model(bm)
 
-            # While the max iterations has not been reached and the error is still too large
-            self.itera = 2
-            while self.itera < self.max_iter and self.conv > self.max_error:
-                self.report.append('Iteration: ' + str(self.itera + 1))
-                aux = bm
-                bm = ((cstar - cm1) * bm - (cstar - cm) * bm) / (cm - cm1)
-                bm1 = aux
-                cm1 = cm
+            cm = self.apply_gravity()
+            for i in self.gravity.report:
+                self.report.append('       ' + i)
+            self.report.append('Error: ' +  "{:.2E}".format(float(np.nansum(abs((bm / bm1) - 1)))))
+            self.report.append('')
+            cm1 = c0
 
-                assemble_model(bm1)
-                cm = self.apply_gravity()
+        # While the max iterations has not been reached and the error is still too large
+        self.itera = 2
+        while self.itera < self.max_iter and self.gap > self.max_error:
+            self.report.append('Iteration: ' + str(self.itera + 1))
+            aux = bm
+            bm = ((cstar - cm1) * bm - (cstar - cm) * bm) / (cm - cm1)
+            bm1 = aux
+            cm1 = cm
 
-                for i in self.gravity.report:
-                    self.report.append('       ' + i)
-                self.report.append('Error: ' + "{:.2E}".format(np.sum(abs((bm / bm1) - 1))))
-                self.report.append('')
+            self.assemble_model(bm1)
+            cm = self.apply_gravity()
 
-                # compute convergence criteria
-                self.conv = abs((bm / bm1) - 1)
-                self.itera += 1
+            for i in self.gravity.report:
+                self.report.append('       ' + i)
+            self.report.append('Error: ' + "{:.2E}".format(float(np.nansum(abs((bm / bm1) - 1)))))
+            self.report.append('')
 
-            if self.itera == self.max_iter:
-                self.report.append("DID NOT CONVERGE. Stopped in  " + str(self.itera) + "  with a global error of " + str(self.conv))
-            else:
-                self.report.append("Converged in " + str(self.itera) + "  iterations to a global error of " + str(self.conv))
-            s = clock() - t
-            m, s1 = divmod(s, 60)
-            s -= m * 60
-            h, m = divmod(m, 60)
-            t =  "%d:%02d:%2.4f" % (h, m, s)
+            # compute convergence criteria
+            self.gap = abs((bm / bm1) - 1)
+            self.itera += 1
 
-            self.report.append('Running time: ' + t)
+        if self.itera == self.max_iter:
+            self.report.append("DID NOT CONVERGE. Stopped in  " + str(self.itera) + "  with a global error of " + str(self.gap))
         else:
-            self.report.append(self.error)
+            self.report.append("Converged in " + str(self.itera) + "  iterations to a global error of " + str(self.gap))
+        s = clock() - t
+        m, s1 = divmod(s, 60)
+        s -= m * 60
+        h, m = divmod(m, 60)
+        t =  "%d:%02d:%2.4f" % (h, m, s)
+
+        self.report.append('Running time: ' + t)
 
     def check_inputs(self):
-        if self.matrix.shape[:] != self.cost_matrix.shape[:]:
-            self.error = "Observed matrix and cost matrix do not have the same dimensions"
+        if not isinstance(self.impedance, AequilibraeMatrix):
+            raise TypeError('Impedance matrix needs to be an instance of AequilibraEMatrix')
 
-        elif not np.sum(self.matrix):
-            self.error = 'Observed matrix has no flows'
+        if not isinstance(self.matrix, AequilibraeMatrix):
+            raise TypeError('Observed matrix needs to be an instance of AequilibraEMatrix')
 
-        elif not np.sum(self.cost_matrix):
-            self.error = 'Cost matrix is all zero'
+        # Check data dimensions
+        if not np.array_equal(self.impedance.index, self.impedance.index):
+            raise ValueError('Indices from impedance matrix do not match those from seed matrix')
 
-        elif not np.sum(self.cost_matrix * self.matrix):
-            self.error = 'All cells with positive flows have zero costs'
+        # Check if matrices were set for computation
+        mats = [(self.matrix, 'Observed matrix'), (self.impedance, 'Impedance matrix')]
+        for matrix, title in mats:
+            if matrix.matrix_view is None:
+                raise ValueError(title + ' needs to be set for computation')
+            else:
+                if len(matrix.matrix_view.shape[:]) > 2:
+                    raise ValueError(title + "' computational view needs to be set for a single matrix core")
 
-        elif np.min(self.cost_matrix) < 0:
-            self.error = 'Cost matrix has negative values'
+            if np.nansum(matrix.matrix_view.data) == 0:
+                raise ValueError(title + 'has only zero values')
+            if np.nanmin(matrix.matrix_view.data) < 0:
+                raise ValueError(title + 'has negative values')
 
-        elif np.min(self.matrix) < 0:
-            self.error = 'Observed matrix has negative values'
+        # Augment parameters if we happen to have only passed one
+        default_parameters = self.get_parameters()
+        for para in self.__required_parameters:
+            if para not in self.parameters:
+                self.parameters[para] = default_parameters[para]
+
+        # Prepare the data for computation
+        self.comput_core = self.matrix.view_names[0]
+
+        self.result_matrix = self.matrix.copy(cores=[self.comput_core], names=['gravity'])
+
+        self.rows = AequilibraEData()
+        self.rows.create_empty(entries=self.matrix.zones, field_names=['rows'], memory_mode=True)
+        self.rows.index[:] = self.matrix.index[:]
+        self.rows.rows[:] = self.matrix.rows()[:]
+
+        self.columns = AequilibraEData()
+        self.columns.create_empty(entries=self.matrix.zones, field_names=['columns'], memory_mode=True)
+        self.columns.index[:] = self.matrix.index[:]
+        self.columns.columns[:] = self.matrix.columns()[:]
+
+
+        self.impedance_core = self.impedance.view_names[0]
 
     def apply_gravity(self):
-        self.gravity = GravityApplication(rows=np.sum(self.matrix, axis=0), columns=np.sum(self.matrix, axis=1),
-                                          impedance=self.cost_matrix, model=self.model, parameters=self.parameters)
+        args = {'impedance': self.impedance,
+                'rows': self.rows,
+                'row_field': 'rows',
+                'columns': self.columns,
+                'column_field': 'columns',
+                'model': self.model,
+                'parameters': self.parameters,
+                'nan_as_zero': self.nan_as_zero}
+
+        self.gravity = GravityApplication(**args)
         self.gravity.apply()
         self.result_matrix = self.gravity.output
-        return np.sum(self.result_matrix * self.cost_matrix) / np.sum(self.result_matrix)
 
-    def get_parameters(self, model):
-        path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        with open(path + '/parameters.yml', 'r') as yml:
-            path = yaml.safe_load(yml)
-        return path['distribution'][model]
+        return np.nansum(self.impedance.matrix[self.impedance_core][:,:] * self.result_matrix.gravity[:, :]) \
+               / np.nansum(self.result_matrix.gravity[:, :])
+
+    def get_parameters(self):
+        par = Parameters().parameters
+        para = par['distribution']['ipf'].copy()
+        para.update(par['distribution']['gravity'])
+        return para

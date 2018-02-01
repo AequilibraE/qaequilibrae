@@ -16,11 +16,11 @@ class BinaryDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
         error = True
-        self.linux64 = 'https://goo.gl/Xx7iQH'
+        self.linux64 = 'https://goo.gl/4NF6jY'
         # self.linux32 = 'http://www.aequilibrae.com/binaries/v.0.3.3/AoN_linux64.so'
-        self.windows32 = 'https://goo.gl/tpqE4o'
-        self.windows64 = 'https://goo.gl/WfaJ4p'
-        self.mac = 'https://goo.gl/hwd8iN'
+        self.windows32 = 'https://goo.gl/S9eeGm'
+        self.windows64 = 'https://goo.gl/Su6fne'
+        self.mac = 'https://goo.gl/hhf66E'
 
         self.local_path = os.path.dirname(os.path.abspath(__file__)) + '/aequilibrae/paths/AoN.so'
         plat = platform.system()
