@@ -1,6 +1,6 @@
 This Add-on for QGIS is developed with the intention to provide transportation planning tools in a GIS environment
 This add-on is FREE and open source.
-It can also be used on a Python shell. For initial instruction on how to do it, access http://www.xl-optim.com/new-version-of-aequilibrae/
+It can also be used on a Python shell. For initial instruction on how to do it, access https://github.com/AequilibraE/examples_api
 
 Last Version:  0.4.0
 Release date: February-1-2018
