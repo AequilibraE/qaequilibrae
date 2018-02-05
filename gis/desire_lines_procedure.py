@@ -251,7 +251,6 @@ class DesireLinesProcedure(WorkerThread):
 
                     self.results = AssignmentResults()
                     self.results.prepare(self.graph, self.matrix)
-                    self.results.save_to_disk('E:/trash.csv')
                     self.emit(SIGNAL("desire_lines"), ('text_dl', "Assigning demand"))
                     self.emit(SIGNAL("desire_lines"), ('job_size_dl', self.matrix.index.shape[0]))
 
