@@ -170,7 +170,7 @@ class SimpleTAG(WorkerThread):
                 # The problem with the "nearest" search is that we cannot swear by it when we are using only spatial
                 # indexes. For this reason we will compute a fixed number of nearest neighbors and then get the
                 # distance for each one of them
-                pt = geom.centroid()
+                pt = geom.centroid().asPoint()
                 s = self.sequence_of_searches[1]
                 nearest = self.index_from.nearestNeighbor(pt, s)
                 dists = np.zeros(len(nearest))
