@@ -42,7 +42,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/u
 
 class DesireLinesDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
+        QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.error = None
