@@ -4,38 +4,50 @@ import os, shutil
 import numpy as np
 import codecs
 import copy
+import zipfile
 from ...reference_files import spatialite_database
+from ...utils import WorkerThread
+
+try:
+    from PyQt4.QtCore import SIGNAL
+
+    pyqt = True
+except:
+    pyqt = False
 
 
-#TODO : Add control for mandatory and optional files
-#TODO: Add constraints for non-negative and limited options (o,1,2, etc) for fields through foreign keys
-class create_gtfsdb:
+# TODO : Add control for mandatory and optional files
+# TODO: Add constraints for non-negative and limited options (o,1,2, etc) for fields through foreign keys
+class create_gtfsdb(WorkerThread):
     def __init__(self):
+        WorkerThread.__init__(self, None)
         self.conn = None
         self.cursor = None
         self.__max_chunk_size = None
         self.spatialite_enabled = False
         self.available_files = {}
-        OrderedDict([('s',(1,2)),('p',(3,4)),('a',(5,6)),('m',(7,8))])
+        self.source = None
+        self.source_path = None
+        OrderedDict([('s', (1, 2)), ('p', (3, 4)), ('a', (5, 6)), ('m', (7, 8))])
         self.column_order = {'agency.txt': OrderedDict([('agency_id', str),
-                                                       ('agency_name', str),
-                                                       ('agency_url', str),
-                                                       ('agency_timezone', str),
-                                                       ('agency_lang', str),
-                                                       ('agency_phone', str),
-                                                       ('agency_fare_url', str),
-                                                       ('agency_email', str)]),
+                                                        ('agency_name', str),
+                                                        ('agency_url', str),
+                                                        ('agency_timezone', str),
+                                                        ('agency_lang', str),
+                                                        ('agency_phone', str),
+                                                        ('agency_fare_url', str),
+                                                        ('agency_email', str)]),
 
                              'routes.txt': OrderedDict([('route_id', str),
-                                                       ('agency_id', str),
-                                                       ('route_short_name', str),
-                                                       ('route_long_name', str),
-                                                       ('route_desc', str),
-                                                       ('route_type', int),
-                                                       ('route_url', str),
-                                                       ('route_color', str),
-                                                       ('route_text_color', str),
-                                                       ('route_sort_order', int)]),
+                                                        ('agency_id', str),
+                                                        ('route_short_name', str),
+                                                        ('route_long_name', str),
+                                                        ('route_desc', str),
+                                                        ('route_type', int),
+                                                        ('route_url', str),
+                                                        ('route_color', str),
+                                                        ('route_text_color', str),
+                                                        ('route_sort_order', int)]),
 
                              'trips.txt': OrderedDict([('route_id', str),
                                                        ('service_id', str),
@@ -59,45 +71,45 @@ class create_gtfsdb:
                                                             ('timepoint', int)]),
 
                              'calendar.txt': OrderedDict([('service_id', str),
-                                                            ('monday', int),
-                                                            ('tuesday', int),
-                                                            ('wednesday', int),
-                                                            ('thursday', int),
-                                                            ('friday', int),
-                                                            ('saturday', int),
-                                                            ('sunday', int),
-                                                            ('start_date', str),
-                                                            ('end_date', str)]),
-                             
+                                                          ('monday', int),
+                                                          ('tuesday', int),
+                                                          ('wednesday', int),
+                                                          ('thursday', int),
+                                                          ('friday', int),
+                                                          ('saturday', int),
+                                                          ('sunday', int),
+                                                          ('start_date', str),
+                                                          ('end_date', str)]),
+
                              'calendar_dates.txt': OrderedDict([('service_id', str),
                                                                 ('date', str),
                                                                 ('exception_type', int)]),
 
                              'fare_attributes.txt': OrderedDict([('fare_id', str),
-                                                                ('price', float),
-                                                                ('currency_type', str),
-                                                                ('payment_method', int),
-                                                                ('transfers', int),
-                                                                ('agency_id', str),
-                                                                ('transfer_duration', float)]),
-                             
+                                                                 ('price', float),
+                                                                 ('currency_type', str),
+                                                                 ('payment_method', int),
+                                                                 ('transfers', int),
+                                                                 ('agency_id', str),
+                                                                 ('transfer_duration', float)]),
+
                              'fare_rules.txt': OrderedDict([('fare_id', str),
                                                             ('route_id', str),
                                                             ('origin_id', str),
                                                             ('destination_id', str),
                                                             ('contains_id', str)]),
-                             
+
                              'frequencies.txt': OrderedDict([('trip_id', str),
                                                              ('start_time', str),
                                                              ('end_time', str),
                                                              ('headway_secs', str),
                                                              ('exact_times', int)]),
-                             
+
                              'transfers.txt': OrderedDict([('from_stop_id', str),
                                                            ('to_stop_id', str),
                                                            ('transfer_type', int),
                                                            ('min_transfer_time', int)]),
-                             
+
                              'feed_info.txt': OrderedDict([('feed_publisher_name', str),
                                                            ('feed_publisher_url', str),
                                                            ('feed_lang', str),
@@ -117,7 +129,7 @@ class create_gtfsdb:
                                                        ('parent_station', str),
                                                        ('stop_timezone', str),
                                                        ('wheelchair_boarding', int)]),
-                             
+
                              'shapes.txt': OrderedDict([('shape_id', str),
                                                         ('shape_pt_lat', float),
                                                         ('shape_pt_lon', float),
@@ -136,31 +148,46 @@ class create_gtfsdb:
         self.__create_database(save_db, memory_db, overwrite)
         return self.conn
 
-    def load_from_zip(self, file_path):
-        # TODO: Unzip to temp folder
-        self.load_from_folder()
-        #TODO: delete temp folder
+    def load_from_zip(self, file_path, save_db=None, memory_db=False, overwrite=False,
+                      spatialite_enabled=False):
+        self.source = 'zip'
+        self.load_from_folder(file_path, save_db, memory_db, overwrite, spatialite_enabled)
+        if pyqt:
+            self.emit(SIGNAL("converting_gtfs"), ['finished_threaded_procedure', None])
 
-    def load_from_folder(self, path_to_folder, save_db=None, memory_db=False, overwrite=False, spatialite_enabled=False):
-        self.source_folder = path_to_folder
+    def load_from_folder(self, path_to_folder, save_db=None, memory_db=False, overwrite=False,
+                         spatialite_enabled=False):
+        self.source_path = path_to_folder
         self.spatialite_enabled = spatialite_enabled
-
+        if self.source is None:
+            self.source = 'folder'
         if spatialite_enabled and memory_db:
             raise ValueError('Spatialite is only supported on disk')
-        
+
         # In case we have not create the database yet
         if self.conn is None:
+            if pyqt:
+                self.emit(SIGNAL("converting_gtfs"), ['text', 'Creating container database'])
             self.__create_database(save_db, memory_db, overwrite)
 
+        # Import all tables to SQLITE
         tables = [x.split('.')[0] for x in self.column_order.keys()]
-        for tbl in tables:
+        for i, tbl in enumerate(tables):
+            if pyqt:
+                self.emit(SIGNAL("converting_gtfs"), ['text', 'Loading data from file: ' + tbl])
             self.__load_tables(tbl)
+            if pyqt:
+                self.emit(SIGNAL("converting_gtfs"), ['files counter', i + 1])
 
+        # Creates the geometry
         if self.spatialite_enabled:
             self.__create_geometry()
         self.conn.commit()
 
     def __create_database(self, save_db, memory_db, overwrite):
+        if pyqt:
+            self.emit(SIGNAL("converting_gtfs"), ['text', 'Creating empty database'])
+
         if save_db is None:
             if not memory_db:
                 save_db = ":memory:"
@@ -177,7 +204,7 @@ class create_gtfsdb:
 
         if self.spatialite_enabled:
             shutil.copy(spatialite_database, save_db)
-            
+
         self.conn = sqlite3.connect(save_db)
         self.cursor = self.conn.cursor()
 
@@ -229,7 +256,7 @@ class create_gtfsdb:
 
     def __create_trips_table(self):
         self.cursor.execute('DROP TABLE IF EXISTS trips')
-        #TODO: Add foreign key to calendar_dates.txt
+        # TODO: Add foreign key to calendar_dates.txt
         create_query = '''CREATE TABLE 'trips' (route_id VARCHAR NOT NULL,
                                                 service_id VARCHAR NOT NULL,
                                                 trip_id VARCHAR PRIMARY KEY UNIQUE NOT NULL,
@@ -370,18 +397,28 @@ class create_gtfsdb:
         self.cursor.execute(create_query)
 
     def __load_tables(self, table_name):
-        # Agency
-        file_to_open = table_name + '.txt'
-        data_file = os.path.join(self.source_folder, file_to_open)
-        if not os.path.isfile(data_file):
-            self.available_files[file_to_open] = False
-            return
 
+        # create the file name
+        file_to_open = table_name + '.txt'
+
+        # Check if exists
+        if self.source == 'folder':
+            data_file = os.path.join(self.source_path, file_to_open)
+            if not os.path.isfile(data_file):
+                self.available_files[file_to_open] = False
+                return
+        else:
+            zip_container = zipfile.ZipFile(self.source_path)
+            data_file = zip_container.open(table_name, 'r')
+            if file_to_open in zip_container.namelist():
+                self.available_files[file_to_open] = False
+            else:
+                return
         self.available_files[file_to_open] = True
-        data = self.open(data_file, column_order= self.column_order[file_to_open])
+        data = self.open(data_file, column_order=self.column_order[file_to_open])
         dt = tuple(data.tolist())
         cols = data.dtype.names
-        fields = ','.join(len(cols)*["?"])
+        fields = ','.join(len(cols) * ["?"])
         try:
             if not isinstance(dt[0], tuple):
                 dt = [dt]
@@ -390,26 +427,33 @@ class create_gtfsdb:
             self.conn.commit()
         except:
             pass
-        
+
     def __create_geometry(self):
         # enable extension loading
         self.conn.enable_load_extension(True)
         self.cursor.execute("SELECT load_extension('mod_spatialite')")
         self.conn.commit()
-    # We need to create three things here:
+        # We need to create three things here:
         # 1. A geometry column in the stops table
         # 2. A layer of shapes corresponding to each trip
         # 3. A layer of shapes with all the stops for each trip that can be query'd by route_id
 
         # 1
+        if pyqt:
+            self.emit(SIGNAL("converting_gtfs"), ['text', 'Creating stops geometry'])
+            self.emit(SIGNAL("converting_gtfs"), ['files counter', 14])
+
         self.cursor.execute("SELECT AddGeometryColumn( 'stops', 'geometry', 4326, 'POINT', 'XY' );")
         self.cursor.execute("update stops set geometry=MakePoint(stop_lon ,stop_lat, 4326);")
         self.cursor.execute("SELECT CreateSpatialIndex( 'stops' , 'geometry' );")
-        
+
         # 2
+        if pyqt:
+            self.emit(SIGNAL("converting_gtfs"), ['text', 'Creating routes geometry'])
+            self.emit(SIGNAL("converting_gtfs"), ['files counter', 15])
         # We create the table to hold the shapes for each route
         self.cursor.execute('DROP TABLE IF EXISTS shape_routes')
-        #TODO: Add foreign key to calendar_dates.txt
+        # TODO: Add foreign key to calendar_dates.txt
         create_query = '''CREATE TABLE 'shape_routes' (route_id VARCHAR,
                                                        trip_id VARCHAR,
                                                        shape_id VARCHAR,
@@ -424,35 +468,52 @@ class create_gtfsdb:
         shape_ids = self.cursor.execute("SELECT DISTINCT shape_id from shapes;").fetchall()
         shape_ids = [str(x[0]) for x in shape_ids]
         if len(shape_ids) > 0:
-            for shp in shape_ids:
+            if pyqt:
+                self.emit(SIGNAL("converting_gtfs"), ['max chunk counter', len(shape_ids)])
+
+            for i, shp in enumerate(shape_ids):
+                if pyqt:
+                    self.emit(SIGNAL("converting_gtfs"), ['chunk counter', i])
+
                 qry = self.cursor.execute("SELECT route_id, trip_id from trips where shape_id=" + shp).fetchall()
                 if len(qry) > 0:
                     route_id, trip_id = qry[0]
 
                     points = self.cursor.execute("SELECT shape_pt_lon, shape_pt_lat from shapes where shape_id=" + shp +
                                                  " order by shape_pt_sequence").fetchall()
-                    txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " +str(x[1]) for x in points]) + ")"
-                    route_text_color = self.cursor.execute("SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
+                    txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " + str(x[1]) for x in points]) + ")"
+                    route_text_color = \
+                    self.cursor.execute("SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
                     sql = "INSERT INTO shape_routes (route_id, trip_id, shape_id, route_text_color, geometry)" + \
                           "VALUES (?,?,?,?," + "LineFromText('" + txt + "', 4326))"
-                    self.cursor.execute(sql,(route_id, trip_id, shp, route_text_color[0]))
+                    self.cursor.execute(sql, (route_id, trip_id, shp, route_text_color[0]))
         else:
             trip_ids = self.cursor.execute("SELECT DISTINCT trip_id from trips;").fetchall()
             trip_ids = [str(x[0]) for x in trip_ids]
-            for trip_id in trip_ids:
+            if pyqt:
+                self.emit(SIGNAL("converting_gtfs"), ['max chunk counter', len(trip_ids)])
+
+            for i, trip_id in enumerate(trip_ids):
+                if pyqt:
+                    self.emit(SIGNAL("converting_gtfs"), ['chunk counter', i])
+
                 route_id = self.cursor.execute("SELECT route_id from trips where trip_id=" + trip_id).fetchone()[0]
 
                 sql = "SELECT stop_lon, stop_lat FROM stop_times INNER JOIN stops" \
                       " ON stop_times.stop_id = stops.stop_id WHERE stop_times.trip_id='" + trip_id + \
                       "' order by stop_times.stop_sequence"
                 qry = self.cursor.execute(sql).fetchall()
-                txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " +str(x[1]) for x in qry]) + ")"
-                route_text_color = self.cursor.execute("SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
+                txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " + str(x[1]) for x in qry]) + ")"
+                route_text_color = \
+                self.cursor.execute("SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
                 sql = "INSERT INTO shape_routes (route_id, trip_id, route_text_color, geometry) " \
                       "VALUES (?,?," + "LineFromText('" + txt + "', 4326))"
-                self.cursor.execute(sql,(route_id, trip_id, route_text_color))
+                self.cursor.execute(sql, (route_id, trip_id, route_text_color))
 
         # creates the stops table with route ID info
+        if pyqt:
+            self.emit(SIGNAL("converting_gtfs"), ['text', 'Associating routes and stops'])
+
         self.cursor.execute('''CREATE TABLE 'shape_stops'
                                 AS
                                 SELECT
@@ -479,7 +540,7 @@ class create_gtfsdb:
     @staticmethod
     def open(file_name, column_order=False):
         # Read the stops and cleans the names of the columns
-        data = np.genfromtxt(file_name, delimiter=',', names=True, dtype=None,)
+        data = np.genfromtxt(file_name, delimiter=',', names=True, dtype=None, )
         content = [str(unicode(x.strip(codecs.BOM_UTF8), 'utf-8')) for x in data.dtype.names]
         data.dtype.names = content
         if column_order:
@@ -497,10 +558,25 @@ class create_gtfsdb:
 
             new_data_dt = [(f, column_order[f]) for f in col_names]
 
-            if int(data.shape.__len__())> 0:
+            if int(data.shape.__len__()) > 0:
                 new_data = np.array(data, new_data_dt)
             else:
                 new_data = data
         else:
             new_data = data
         return new_data
+
+class import_gtfsdb_from_zip(WorkerThread):
+    def __init__(self, file_path, save_db, memory_db=False, overwrite=False, spatialite_enabled=False):
+        WorkerThread.__init__(self, None)
+        self.file_path = file_path
+        self.save_db = save_db
+        self.memory_db = memory_db
+        self.overwrite = overwrite
+        self.spatialite_enabled = spatialite_enabled
+
+        self.gtfs_job = create_gtfsdb()
+
+    def doWork(self):
+        self.gtfs_job.load_from_zip(self.file_path, self.save_db, self.memory_db, self.overwrite,
+                                    self.spatialite_enabled)
