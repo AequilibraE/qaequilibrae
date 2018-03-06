@@ -21,8 +21,6 @@ class AssignmentResults:
         self.critical={required:{"links":[lnk_id1, lnk_id2, ..., lnk_idn], "path file": False}, results:{}}
         """
         self.link_loads = None       # The actual results for assignment
-        self.centroids = None
-        self.skim_names = None
         self.skims = None            # The array of skims
         self.no_path = None          # The list os paths
         self.num_skims = None        # number of skims that will be computed. Depends on the setting of the graph provided
@@ -55,7 +53,7 @@ class AssignmentResults:
     # In case we want to do by hand, we can prepare each method individually
     def prepare(self, graph, matrix):
         """
-        :param graph: Needs to have been set with number of centroids and list of skims (if any)
+        :param graph: AequilibraE graph. Needs to have been set with number of centroids and list of skims (if any)
         :type graph: Graph
         :param matrix: AequilibraE Matrix properly set for computation using matrix.computational_view([matrix list])
         :type matrix: AequilibraeMatrix

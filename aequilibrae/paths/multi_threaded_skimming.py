@@ -21,7 +21,7 @@ class MultiThreadedNetworkSkimming:
 
         for i in range(results.cores):
             self.temp_b_nodes[:, i] = graph.b_node[:]
-
+            
     def reset(self, graph, results):
         self.predecessors.fill(0)
         self.temporary_skims.fill(0)

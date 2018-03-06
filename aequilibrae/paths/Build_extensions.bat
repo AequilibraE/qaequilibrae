@@ -1,1 +1,1 @@
-python.exe setup_Assignment.py build_ext --inplace --compiler=msvc
+c:\python27\python.exe setup_Assignment.py build_ext --inplace --compiler=msvc

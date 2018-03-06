@@ -38,6 +38,7 @@ include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
 from ..__version__ import binary_version as VERSION_COMPILED
 from results import PathResults, AssignmentResults, SkimResults
+from graph import Graph
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
@@ -315,17 +316,21 @@ cdef void blocking_centroid_flows(int action,
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
-def path_computation(origin, destination, graph, results):
-    """"
-    :param graph: Needs to have been set with number of centroids and list of skims (if any)
-        :type graph: Graph
-        :param results: Path computation result
-        :type results: PathResults
-        :return:
+def path_computation(origin, destination, graph, results, skimming=False):
+    """
+    :param graph: AequilibraE graph. Needs to have been set with number of centroids and list of skims (if any)
+    :type graph: Graph
+    :param results: AequilibraE Matrix properly set for computation using matrix.computational_view([matrix list])
+    :type results: PathResults
+    :param skimming: if we will skim for all nodes or not
+    :type skimming: Boolean
+    :return:
     """
     cdef ITYPE_t nodes, orig, dest, p, b, origin_index, dest_index, connector
-    cdef long i, j, skims, a, block_flows_through_centroids
+    cdef long i, j, skims, a, block_flows_through_centroids, do_skimming
 
+    do_skimming = skimming
+    
     orig = origin
     dest = destination
     origin_index = graph.nodes_to_indices[orig]
@@ -360,7 +365,7 @@ def path_computation(origin, destination, graph, results):
 
     cdef long long [:] predecessors_view = results.predecessors
     cdef long long [:] conn_view = results.connectors
-    cdef double [:] skim_matrix_view = results.temporary_skims[:]
+    cdef double [:, :] skim_matrix_view = results.skims
     cdef long long [:] reached_first_view = results.reached_first
 
     new_b_nodes = graph.b_node.copy()
@@ -383,8 +388,18 @@ def path_computation(origin, destination, graph, results):
                          predecessors_view,
                          ids_graph_view,
                          conn_view,
-                         reached_first_view,
-                         skim_matrix_view)
+                         reached_first_view)
+        
+        if do_skimming:
+            skim_single_path(origin_index,
+                             nodes,
+                             skims,
+                             skim_matrix_view,
+                             predecessors_view,
+                             conn_view,
+                             graph_skim_view,
+                             reached_first_view,
+                             w)
 
         if block_flows_through_centroids: # Unblocks the centroid if that is the case
             b = 1
@@ -488,12 +503,11 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
                          predecessors_view,
                          ids_graph_view,
                          conn_view,
-                         reached_first_view,
-                         node_cost_view)
+                         reached_first_view)
 
         skim_multiple_fields(origin_index,
                              nodes,
-                             zones,
+                             zones, # ???????????????
                              skims,
                              skim_matrix_view,
                              predecessors_view,
@@ -502,7 +516,6 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
                              reached_first_view,
                              w,
                              final_skim_matrices_view)
-
         if block_flows_through_centroids: # Unblocks the centroid if that is the case
             b = 1
             blocking_centroid_flows(b,
@@ -552,6 +565,39 @@ cpdef void skim_multiple_fields(long origin,
         for j in range(skims):
             final_skims[i, j] = node_skims[i, j]
 
+@cython.wraparound(False)
+@cython.embedsignature(True)
+@cython.boundscheck(False) # turn of bounds-checking for entire function
+cpdef void skim_single_path(long origin,
+                            long nodes,
+                            long skims,
+                            double[:, :] node_skims,
+                            long long [:] pred,
+                            long long [:] conn,
+                            double[:, :] graph_costs,
+                            long long [:] reached_first,
+                            long found) nogil:
+    cdef long long i, node, predecessor, connector, j
+
+    # sets all skims to infinity
+    for i in range(nodes):
+        for j in range(skims):
+            node_skims[i, j] = INFINITE
+
+    # Zeroes the intrazonal cost
+    for j in range(skims):
+            node_skims[origin, j] = 0
+
+    # Cascade skimming
+    for i in xrange(1, found + 1):
+        node = reached_first[i]
+
+        # captures how we got to that node
+        predecessor = pred[node]
+        connector = conn[node]
+
+        for j in range(skims):
+            node_skims[node, j] = node_skims[predecessor, j] + graph_costs[connector, j]
 
 # ###########################################################################################################################
 #############################################################################################################################
@@ -572,8 +618,7 @@ cpdef int path_finding(long origin,
                        long long [:] pred,
                        long long [:] ids,
                        long long [:] connectors,
-                       long long [:] reached_first,
-                       double [:] cost_nodes) nogil:
+                       long long [:] reached_first) nogil:
 
     cdef unsigned int N = graph_costs.shape[0]
     cdef unsigned int M = pred.shape[0]
@@ -591,7 +636,6 @@ cpdef int path_finding(long origin,
     for i in range(M):
         pred[i] = -1
         connectors[i] = -1
-        cost_nodes[i] = INFINITE
 
     j_source = origin
     for k in range(N):
@@ -602,7 +646,6 @@ cpdef int path_finding(long origin,
 
     while heap.min_node:
         v = remove_min(&heap)
-        cost_nodes[v.index] = v.val
         reached_first[found] = v.index
         found += 1
         v.state = 1
