@@ -37,7 +37,7 @@ cimport cython
 include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
 from ..__version__ import binary_version as VERSION_COMPILED
-
+from results import PathResults, AssignmentResults, SkimResults
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
@@ -316,6 +316,13 @@ cdef void blocking_centroid_flows(int action,
 @cython.embedsignature(True)
 @cython.boundscheck(False)
 def path_computation(origin, destination, graph, results):
+    """"
+    :param graph: Needs to have been set with number of centroids and list of skims (if any)
+        :type graph: Graph
+        :param results: Path computation result
+        :type results: PathResults
+        :return:
+    """
     cdef ITYPE_t nodes, orig, dest, p, b, origin_index, dest_index, connector
     cdef long i, j, skims, a, block_flows_through_centroids
 
@@ -340,7 +347,6 @@ def path_computation(origin, destination, graph, results):
     # initializes predecessors  and link connectors for output
     results.predecessors.fill(-1)
     results.connectors.fill(-1)
-    results.temporary_skims.fill(-1)
     skims = results.num_skims
 
     #In order to release the GIL for this procedure, we create all the
@@ -354,7 +360,7 @@ def path_computation(origin, destination, graph, results):
 
     cdef long long [:] predecessors_view = results.predecessors
     cdef long long [:] conn_view = results.connectors
-    cdef double [:, :] skim_matrix_view = results.temporary_skims
+    cdef double [:] skim_matrix_view = results.temporary_skims[:]
     cdef long long [:] reached_first_view = results.reached_first
 
     new_b_nodes = graph.b_node.copy()
@@ -377,7 +383,8 @@ def path_computation(origin, destination, graph, results):
                          predecessors_view,
                          ids_graph_view,
                          conn_view,
-                         reached_first_view)
+                         reached_first_view,
+                         skim_matrix_view)
 
         if block_flows_through_centroids: # Unblocks the centroid if that is the case
             b = 1
@@ -481,11 +488,12 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
                          predecessors_view,
                          ids_graph_view,
                          conn_view,
-                         reached_first_view)
+                         reached_first_view,
+                         node_cost_view)
 
         skim_multiple_fields(origin_index,
                              nodes,
-                             zones, # ???????????????
+                             zones,
                              skims,
                              skim_matrix_view,
                              predecessors_view,
@@ -494,6 +502,7 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
                              reached_first_view,
                              w,
                              final_skim_matrices_view)
+
         if block_flows_through_centroids: # Unblocks the centroid if that is the case
             b = 1
             blocking_centroid_flows(b,
@@ -563,7 +572,8 @@ cpdef int path_finding(long origin,
                        long long [:] pred,
                        long long [:] ids,
                        long long [:] connectors,
-                       long long [:] reached_first) nogil:
+                       long long [:] reached_first,
+                       double [:] cost_nodes) nogil:
 
     cdef unsigned int N = graph_costs.shape[0]
     cdef unsigned int M = pred.shape[0]
@@ -581,6 +591,7 @@ cpdef int path_finding(long origin,
     for i in range(M):
         pred[i] = -1
         connectors[i] = -1
+        cost_nodes[i] = INFINITE
 
     j_source = origin
     for k in range(N):
@@ -591,6 +602,7 @@ cpdef int path_finding(long origin,
 
     while heap.min_node:
         v = remove_min(&heap)
+        cost_nodes[v.index] = v.val
         reached_first[found] = v.index
         found += 1
         v.state = 1

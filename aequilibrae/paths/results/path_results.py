@@ -8,7 +8,7 @@ class PathResults:
         """
         self.predecessors = None
         self.connectors = None
-        self.temporary_skims = None
+        self.path_cost = None
         self.path = None
         self.path_nodes = None
         self.milepost = None
@@ -33,14 +33,14 @@ class PathResults:
         self.predecessors = np.zeros(self.nodes, dtype=self.__integer_type)
         self.connectors = np.zeros(self.nodes, dtype=self.__integer_type)
         self.reached_first = np.zeros(self.nodes, dtype=self.__integer_type)
-        self.temporary_skims = np.zeros((self.nodes, self.num_skims), self.__float_type)
+        self.path_cost = np.zeros(self.nodes, self.__float_type)
         self.__graph_id__ = graph.__id__
 
     def reset(self):
         if self.predecessors is not None:
             self.predecessors.fill(-1)
             self.connectors.fill(-1)
-            self.temporary_skims.fill(0)
+            self.path_cost.fill(0)
             self.path = None
             self.path_nodes = None
             self.milepost = None

@@ -21,3 +21,13 @@ class MultiThreadedNetworkSkimming:
 
         for i in range(results.cores):
             self.temp_b_nodes[:, i] = graph.b_node[:]
+
+    def reset(self, graph, results):
+        self.predecessors.fill(0)
+        self.temporary_skims.fill(0)
+        self.reached_first.fill(0)
+        self.connectors.fill(0)
+        self.temp_b_nodes.fill(0)
+
+        for i in range(results.cores):
+            self.temp_b_nodes[:, i] = graph.b_node[:]

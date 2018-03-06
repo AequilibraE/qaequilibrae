@@ -172,50 +172,53 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         return layer_fields, table, final_table, required_fields
 
     def changed_layer(self, layer_type):
-        layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
-        table.clearContents()
-        table.setRowCount(0)
-        # We create the comboboxes that will hold the definitions for all the fields that are mandatory for
-        # creating the appropriate triggers on the SQLite file
-        if layer_fields is not None:
-            fields = [field.name() for field in layer_fields]
+        try:
+            layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
+            table.clearContents()
+            table.setRowCount(0)
+            # We create the comboboxes that will hold the definitions for all the fields that are mandatory for
+            # creating the appropriate triggers on the SQLite file
+            if layer_fields is not None:
+                fields = [field.name() for field in layer_fields]
+                counter = 0
+                for field in fields:
+                    table.setRowCount(counter + 1)
+                    item1 = QTableWidgetItem(field)
+                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    table.setItem(counter, 0, item1)
+                    counter += 1
+                self.counter[layer_type] = counter
+
+            final_table.clearContents()
+            final_table.setRowCount(0)
+
             counter = 0
-            for field in fields:
-                table.setRowCount(counter + 1)
-                item1 = QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                table.setItem(counter, 0, item1)
-                counter += 1
-            self.counter[layer_type] = counter
-
-        final_table.clearContents()
-        final_table.setRowCount(0)
-
-        counter = 0
-        if layer_type == 'links':
-            init_fields = list(self.initializable_links.keys())
-        else:
-            init_fields = list(self.initializable_nodes.keys())
-            
-        for rf in required_fields:
-            final_table.setRowCount(counter + 1)
-            
-            item1 = QTableWidgetItem(rf)
-            item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            final_table.setItem(counter, 0, item1)
-
-            chb1 = QCheckBox()
-            if rf in init_fields:
-                chb1.setChecked(True)
-                chb1.stateChanged.connect(partial(self.set_field_to_default, layer_type))
+            if layer_type == 'links':
+                init_fields = list(self.initializable_links.keys())
             else:
-                chb1.setChecked(True)
-                chb1.stateChanged.connect(partial(self.set_field_to_default, layer_type))
-                chb1.setChecked(False)
-                chb1.setEnabled(False)
-            final_table.setCellWidget(counter, 1, self.centers_item(chb1))
-            counter += 1
-            
+                init_fields = list(self.initializable_nodes.keys())
+
+            for rf in required_fields:
+                final_table.setRowCount(counter + 1)
+
+                item1 = QTableWidgetItem(rf)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                final_table.setItem(counter, 0, item1)
+
+                chb1 = QCheckBox()
+                if rf in init_fields:
+                    chb1.setChecked(True)
+                    chb1.stateChanged.connect(partial(self.set_field_to_default, layer_type))
+                else:
+                    chb1.setChecked(True)
+                    chb1.stateChanged.connect(partial(self.set_field_to_default, layer_type))
+                    chb1.setChecked(False)
+                    chb1.setEnabled(False)
+                final_table.setCellWidget(counter, 1, self.centers_item(chb1))
+                counter += 1
+        except:
+            pass
+
     def centers_item(self, item):
         cell_widget = QWidget()
         lay_out = QHBoxLayout(cell_widget)

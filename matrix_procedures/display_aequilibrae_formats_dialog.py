@@ -163,7 +163,8 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
         self.format_showing()
 
     def export(self):
-        new_name, file_type = GetOutputFileName(self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.path)
+        new_name, file_type = GetOutputFileName(self, self.data_type, ["Comma-separated file(*.csv)"], ".csv",
+                                                self.data_path)
         if new_name is not None:
             self.data_to_show.export(new_name)
 
