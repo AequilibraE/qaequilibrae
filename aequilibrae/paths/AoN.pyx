@@ -31,10 +31,6 @@ include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
 from ..__version__ import binary_version as VERSION_COMPILED
 
-
-@cython.wraparound(False)
-@cython.embedsignature(True)
-@cython.boundscheck(False)
 def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
     cdef long nodes, orig, i, block_flows_through_centroids, classes, b, origin_index, zones, posit, posit1
     cdef int critical_queries = 0
@@ -306,19 +302,14 @@ cdef void blocking_centroid_flows(int action,
 
 
 
-@cython.wraparound(False)
-@cython.embedsignature(True)
-@cython.boundscheck(False)
-def path_computation(origin, destination, graph, results, skimming=False):
+def path_computation(origin, destination, graph, results):
     """
     :param graph: AequilibraE graph. Needs to have been set with number of centroids and list of skims (if any)
     :param results: AequilibraE Matrix properly set for computation using matrix.computational_view([matrix list])
     :param skimming: if we will skim for all nodes or not
     """
     cdef ITYPE_t nodes, orig, dest, p, b, origin_index, dest_index, connector
-    cdef long i, j, skims, a, block_flows_through_centroids, do_skimming
-
-    do_skimming = skimming
+    cdef long i, j, skims, a, block_flows_through_centroids
 
     orig = origin
     dest = destination
@@ -379,16 +370,15 @@ def path_computation(origin, destination, graph, results, skimming=False):
                          conn_view,
                          reached_first_view)
 
-        if do_skimming:
-            skim_single_path(origin_index,
-                             nodes,
-                             skims,
-                             skim_matrix_view,
-                             predecessors_view,
-                             conn_view,
-                             graph_skim_view,
-                             reached_first_view,
-                             w)
+        skim_single_path(origin_index,
+                         nodes,
+                         skims,
+                         skim_matrix_view,
+                         predecessors_view,
+                         conn_view,
+                         graph_skim_view,
+                         reached_first_view,
+                         w)
 
         if block_flows_through_centroids: # Unblocks the centroid if that is the case
             b = 1
@@ -409,7 +399,7 @@ def path_computation(origin, destination, graph, results, skimming=False):
                 connector = conn_view[dest_index]
                 all_connectors.append(graph.graph['link_id'][connector])
                 mileposts.append(g_view[connector])
-                all_nodes.append(p)
+                all_nodes.append(graph.all_nodes[p])
                 dest_index = p
             results.path = np.asarray(all_connectors, graph.default_types('int'))[::-1]
             results.path_nodes = graph.all_nodes[np.asarray(all_nodes, graph.default_types('int'))][::-1]
@@ -422,9 +412,6 @@ def path_computation(origin, destination, graph, results, skimming=False):
 
 
 
-@cython.wraparound(False)
-@cython.embedsignature(True)
-@cython.boundscheck(False)
 def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
     """
     :param origin:
@@ -522,14 +509,14 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
 @cython.embedsignature(True)
 @cython.boundscheck(False) # turn of bounds-checking for entire function
 cdef void skim_single_path(long origin,
-                            long nodes,
-                            long skims,
-                            double[:, :] node_skims,
-                            long long [:] pred,
-                            long long [:] conn,
-                            double[:, :] graph_costs,
-                            long long [:] reached_first,
-                            long found) nogil:
+                           long nodes,
+                           long skims,
+                           double[:, :] node_skims,
+                           long long [:] pred,
+                           long long [:] conn,
+                           double[:, :] graph_costs,
+                           long long [:] reached_first,
+                           long found) nogil:
     cdef long long i, node, predecessor, connector, j
 
     # sets all skims to infinity
@@ -876,4 +863,3 @@ cdef FibonacciNode* remove_min(FibonacciHeap* heap) nogil:
         temp = temp_right
 
     return out
-
