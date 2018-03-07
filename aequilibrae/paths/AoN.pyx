@@ -1,33 +1,26 @@
 """
  -----------------------------------------------------------------------------------------------------------
  Package:    AequilibraE
-
  Name:       Core path computation algorithms
  Purpose:    Implement shortest path and network loading routines
-
  Original Author:  Pedro Camargo (c@margo.co)
  Contributors:
  Last edited by: Pedro Camrgo
-
  Website:    www.AequilibraE.com
  Repository:  https://github.com/AequilibraE/AequilibraE
-
  Created:    15/09/2013
  Updated:    30/Nov/2017
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
-
 Original Algorithm for Shortest path (Dijkstra with a Fibonacci heap) was written by Jake Vanderplas <vanderplas@astro.washington.edu> under license: BSD, (C) 2012
  """
 
 """
 TODO:
 LIST OF ALL THE THINGS WE NEED TO DO TO NOT HAVE TO HAVE nodes 1..n as CENTROIDS. ARBITRARY NUMBERING
-
 - Checks of weather the centroid we are computing path from is a centroid and/or exists in the graph
 - Re-write function **network_loading** on the part of loading flows to centroids
-
 """
 
 
@@ -37,8 +30,7 @@ cimport cython
 include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
 from ..__version__ import binary_version as VERSION_COMPILED
-from results import PathResults, AssignmentResults, SkimResults
-from graph import Graph
+
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
@@ -313,24 +305,21 @@ cdef void blocking_centroid_flows(int action,
             temp_b_nodes[i] = orig
 
 
+
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False)
 def path_computation(origin, destination, graph, results, skimming=False):
     """
     :param graph: AequilibraE graph. Needs to have been set with number of centroids and list of skims (if any)
-    :type graph: Graph
     :param results: AequilibraE Matrix properly set for computation using matrix.computational_view([matrix list])
-    :type results: PathResults
     :param skimming: if we will skim for all nodes or not
-    :type skimming: Boolean
-    :return:
     """
     cdef ITYPE_t nodes, orig, dest, p, b, origin_index, dest_index, connector
     cdef long i, j, skims, a, block_flows_through_centroids, do_skimming
 
     do_skimming = skimming
-    
+
     orig = origin
     dest = destination
     origin_index = graph.nodes_to_indices[orig]
@@ -389,7 +378,7 @@ def path_computation(origin, destination, graph, results, skimming=False):
                          ids_graph_view,
                          conn_view,
                          reached_first_view)
-        
+
         if do_skimming:
             skim_single_path(origin_index,
                              nodes,
@@ -430,6 +419,8 @@ def path_computation(origin, destination, graph, results, skimming=False):
             del all_nodes
             del all_connectors
             del mileposts
+
+
 
 @cython.wraparound(False)
 @cython.embedsignature(True)
@@ -525,6 +516,43 @@ def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
                                     original_b_nodes_view)
     return orig
 
+
+
+@cython.wraparound(False)
+@cython.embedsignature(True)
+@cython.boundscheck(False) # turn of bounds-checking for entire function
+cdef void skim_single_path(long origin,
+                            long nodes,
+                            long skims,
+                            double[:, :] node_skims,
+                            long long [:] pred,
+                            long long [:] conn,
+                            double[:, :] graph_costs,
+                            long long [:] reached_first,
+                            long found) nogil:
+    cdef long long i, node, predecessor, connector, j
+
+    # sets all skims to infinity
+    for i in range(nodes):
+        for j in range(skims):
+            node_skims[i, j] = INFINITE
+
+    # Zeroes the intrazonal cost
+    for j in range(skims):
+            node_skims[origin, j] = 0
+
+    # Cascade skimming
+    for i in xrange(1, found + 1):
+        node = reached_first[i]
+
+        # captures how we got to that node
+        predecessor = pred[node]
+        connector = conn[node]
+
+        for j in range(skims):
+            node_skims[node, j] = node_skims[predecessor, j] + graph_costs[connector, j]
+
+
 @cython.wraparound(False)
 @cython.embedsignature(True)
 @cython.boundscheck(False) # turn of bounds-checking for entire function
@@ -565,39 +593,6 @@ cpdef void skim_multiple_fields(long origin,
         for j in range(skims):
             final_skims[i, j] = node_skims[i, j]
 
-@cython.wraparound(False)
-@cython.embedsignature(True)
-@cython.boundscheck(False) # turn of bounds-checking for entire function
-cpdef void skim_single_path(long origin,
-                            long nodes,
-                            long skims,
-                            double[:, :] node_skims,
-                            long long [:] pred,
-                            long long [:] conn,
-                            double[:, :] graph_costs,
-                            long long [:] reached_first,
-                            long found) nogil:
-    cdef long long i, node, predecessor, connector, j
-
-    # sets all skims to infinity
-    for i in range(nodes):
-        for j in range(skims):
-            node_skims[i, j] = INFINITE
-
-    # Zeroes the intrazonal cost
-    for j in range(skims):
-            node_skims[origin, j] = 0
-
-    # Cascade skimming
-    for i in xrange(1, found + 1):
-        node = reached_first[i]
-
-        # captures how we got to that node
-        predecessor = pred[node]
-        connector = conn[node]
-
-        for j in range(skims):
-            node_skims[node, j] = node_skims[predecessor, j] + graph_costs[connector, j]
 
 # ###########################################################################################################################
 #############################################################################################################################
@@ -881,3 +876,4 @@ cdef FibonacciNode* remove_min(FibonacciHeap* heap) nogil:
         temp = temp_right
 
     return out
+
