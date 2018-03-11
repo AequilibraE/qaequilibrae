@@ -388,7 +388,7 @@ def path_computation(origin, destination, graph, results):
                                     b_nodes_view,
                                     original_b_nodes_view)
 
-    if 0<= dest_index < results.nodes:
+    if predecessors_view[dest_index] > 0:
         all_connectors = []
         all_nodes = [dest_index]
         mileposts = []
@@ -399,7 +399,7 @@ def path_computation(origin, destination, graph, results):
                 connector = conn_view[dest_index]
                 all_connectors.append(graph.graph['link_id'][connector])
                 mileposts.append(g_view[connector])
-                all_nodes.append(graph.all_nodes[p])
+                all_nodes.append(p)
                 dest_index = p
             results.path = np.asarray(all_connectors, graph.default_types('int'))[::-1]
             results.path_nodes = graph.all_nodes[np.asarray(all_nodes, graph.default_types('int'))][::-1]
