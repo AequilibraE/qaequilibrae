@@ -319,8 +319,8 @@ def path_computation(origin, destination, graph, results):
         return "Results object not prepared. Use --> results.prepare(graph)"
 
     # Consistency checks
-    if origin >= graph.fs.shape[0]:
-        raise ValueError ("Node " + str(origin) + " is outside the range of nodes in the graph")
+    # if origin >= graph.fs.shape[0]:
+    #     raise ValueError ("Node " + str(origin) + " is outside the range of nodes in the graph")
 
     if VERSION_COMPILED != graph.__version__:
         return 'This graph was created for a different version of AequilibraE. Please re-create it'
