@@ -26,6 +26,8 @@ LIST OF ALL THE THINGS WE NEED TO DO TO NOT HAVE TO HAVE nodes 1..n as CENTROIDS
 
 cimport numpy as np
 cimport cython
+from graph import Graph
+from results import PathResults
 
 include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
@@ -303,6 +305,7 @@ cdef void blocking_centroid_flows(int action,
 
 
 def path_computation(origin, destination, graph, results):
+    # type: (int, int, Graph, PathResults) -> (None)
     """
     :param graph: AequilibraE graph. Needs to have been set with number of centroids and list of skims (if any)
     :param results: AequilibraE Matrix properly set for computation using matrix.computational_view([matrix list])
@@ -311,6 +314,8 @@ def path_computation(origin, destination, graph, results):
     cdef ITYPE_t nodes, orig, dest, p, b, origin_index, dest_index, connector
     cdef long i, j, skims, a, block_flows_through_centroids
 
+    results.origin = origin
+    results.destination = destination
     orig = origin
     dest = destination
     origin_index = graph.nodes_to_indices[orig]
@@ -409,8 +414,6 @@ def path_computation(origin, destination, graph, results):
             del all_nodes
             del all_connectors
             del mileposts
-
-
 
 def skimming_single_origin(origin, graph, result, aux_result, curr_thread):
     """
