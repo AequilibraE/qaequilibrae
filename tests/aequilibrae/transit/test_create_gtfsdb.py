@@ -21,9 +21,9 @@ class TestCreate_gtfsdb(TestCase):
         # self.fail()
         pass
 
-    # def test_load_from_folder(self):
-    #     self.gtfs = create_gtfsdb()
-    #     self.gtfs.load_from_folder(gtfs_folder, save_db=gtfs_db_output, overwrite=True, spatialite_enabled=True)
+    def test_load_from_folder(self):
+        self.gtfs = create_gtfsdb()
+        self.gtfs.load_from_folder(gtfs_folder, save_db=gtfs_db_output, overwrite=True, spatialite_enabled=True)
 
     def test_load_from_zip(self):
         self.gtfs = create_gtfsdb()
