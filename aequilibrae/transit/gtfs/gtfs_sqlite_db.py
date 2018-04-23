@@ -409,10 +409,10 @@ class create_gtfsdb(WorkerThread):
                 return
         else:
             zip_container = zipfile.ZipFile(self.source_path)
-            data_file = zip_container.open(table_name, 'r')
             if file_to_open in zip_container.namelist():
-                self.available_files[file_to_open] = False
+                data_file = zip_container.open(file_to_open, 'r')
             else:
+                self.available_files[file_to_open] = False
                 return
         self.available_files[file_to_open] = True
         data = self.open(data_file, column_order=self.column_order[file_to_open])
