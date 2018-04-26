@@ -32,6 +32,13 @@ class TestPathResults(TestCase):
         except:
             self.fail('Path result resetting failed')
 
+    def test_update_trace(self):
+        self.test_prepare()
+        try:
+            self.r.reset()
+        except:
+            self.fail('Path result resetting failed')
+
         path_computation(origin, dest, self.g, self.r)
 
         if list(self.r.path) != [53, 52, 13]:

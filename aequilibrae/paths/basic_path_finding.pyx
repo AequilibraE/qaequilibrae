@@ -22,14 +22,10 @@ LIST OF ALL THE THINGS WE NEED TO DO TO NOT HAVE TO HAVE nodes 1..n as CENTROIDS
 - Checks of weather the centroid we are computing path from is a centroid and/or exists in the graph
 - Re-write function **network_loading** on the part of loading flows to centroids
 """
-
-
-cimport numpy as np
 cimport cython
 
 include 'parameters.pxi'
 from libc.stdlib cimport abort, malloc, free
-from ..__version__ import binary_version as VERSION_COMPILED
 
 @cython.wraparound(False)
 @cython.embedsignature(True)

@@ -22,14 +22,12 @@ LIST OF ALL THE THINGS WE NEED TO DO TO NOT HAVE TO HAVE nodes 1..n as CENTROIDS
 - Re-write function **network_loading** on the part of loading flows to centroids
 """
 
-
 cimport numpy as np
-cimport cython
 
 # include 'parameters.pxi'
 include 'basic_path_finding.pyx'
 from libc.stdlib cimport abort, malloc, free
-from ..__version__ import binary_version as VERSION_COMPILED
+from __version__ import binary_version as VERSION_COMPILED
 
 def one_to_all(origin, matrix, graph, result, aux_result, curr_thread):
     cdef long nodes, orig, i, block_flows_through_centroids, classes, b, origin_index, zones, posit, posit1

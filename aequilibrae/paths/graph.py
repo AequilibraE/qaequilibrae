@@ -30,7 +30,7 @@ import os, csv
 import cPickle
 from datetime import datetime
 import uuid
-from ..__version__ import binary_version as VERSION
+from __version__ import binary_version as VERSION
 
 '''description: Description of the graph (OPTIONAL)
     num_links: Number of directed links in the graph
