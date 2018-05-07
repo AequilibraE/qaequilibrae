@@ -6,7 +6,7 @@ import sys
 import os
 from numpy.lib.format import open_memmap
 from ...matrix import AequilibraeMatrix, AequilibraEData
-
+from ..graph import Graph
 """
 TO-DO:
 1. Create a file type for memory-mapped path files
@@ -54,7 +54,9 @@ class AssignmentResults:
     def prepare(self, graph, matrix):
         """
         :param graph: AequilibraE graph. Needs to have been set with number of centroids and list of skims (if any)
+        :type graph: Graph
         :param matrix: AequilibraE Matrix properly set for computation using matrix.computational_view([matrix list])
+        :type matrix: AequilibraeMatrix
         :return:
         """
 

@@ -10,7 +10,7 @@ Imports AequilibraE modules
 import sys
 sys.dont_write_bytecode = True
 
-from . import paths  # We import the graph
+from . import paths
 from . import distribution
 from . import matrix
 from . import utils
