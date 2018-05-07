@@ -20,10 +20,10 @@
  """
 import yaml
 
-
 valid_functions = ['EXPO', 'GAMMA', 'POWER']
 members = ['function', 'alpha', 'beta']
 model_type = 'SyntheticGravityModel'
+
 
 class SyntheticGravityModel:
     def __init__(self):
@@ -78,12 +78,11 @@ class SyntheticGravityModel:
     def save(self, file_name):
         filename = str(file_name)
         if file_name[-4:].upper() != '.MOD':
-            file += '.mod'
+            file_name += '.mod'
 
         model = {model_type:
                      {'function': self.function,
-                      'alpha':    self.alpha,
-                      'beta':     self.beta}}
+                      'alpha': self.alpha,
+                      'beta': self.beta}}
 
         yaml.dump(model, open(file_name, 'w'), default_flow_style=False)
-

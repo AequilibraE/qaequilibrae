@@ -4,7 +4,7 @@ from aequilibrae.paths import path_computation, Graph
 from aequilibrae.paths.results import PathResults
 
 # Adds the folder with the data to the path and collects the paths to the files
-lib_path = os.path.abspath(os.path.join('..', '..'))
+lib_path = os.path.abspath(os.path.join('..', '../tests'))
 sys.path.append(lib_path)
 from data import path_test, test_graph
 

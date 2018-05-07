@@ -32,32 +32,29 @@ from datetime import datetime
 import uuid
 from __version__ import binary_version as VERSION
 
-'''description: Description of the graph (OPTIONAL)
-    num_links: Number of directed links in the graph
-    num_nodes: number of nodes in the graph
 
-    nodes_fs: Numpy array with the indices of each node in the forward star.
-                       DIMENSION: # Of nodes +1
-                       TYPE: numpy.int64
-
-    network:  Numpy record array with arbitrary number of fields (and titles of columns) corresponding to each link
-                       DIMENSION: # Of links
-                       TYPE: mixed
-
-    cost:     Name of the field to be minimized.
-                       TYPE: String
-
-    skims:    Name of the skim fields.
-                       TYPE: String list  (OPTIONAL)
-'''
 
 
 class Graph:
     def __init__(self):
-        """
-        @type graph: Numpy record array
-        """
+        '''description: Description of the graph (OPTIONAL)
+            num_links: Number of directed links in the graph
+            num_nodes: number of nodes in the graph
 
+            nodes_fs: Numpy array with the indices of each node in the forward star.
+                               DIMENSION: # Of nodes +1
+                               TYPE: numpy.int64
+
+            network:  Numpy record array with arbitrary number of fields (and titles of columns) corresponding to each link
+                               DIMENSION: # Of links
+                               TYPE: mixed
+
+            cost:     Name of the field to be minimized.
+                               TYPE: String
+
+            skims:    Name of the skim fields.
+                               TYPE: String list  (OPTIONAL)
+        '''
         self.__integer_type = np.int64
         self.__float_type = np.float64
 
