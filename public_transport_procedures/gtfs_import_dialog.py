@@ -35,7 +35,7 @@ from ..common_tools import GetOutputFileName
 from PyQt4.QtGui import QHBoxLayout, QVBoxLayout, QGridLayout
 from PyQt4.QtGui import QProgressBar, QLabel, QWidget, QPushButton, QSpacerItem
 
-from aequilibrae.transit.gtfs import gtfs_sqlite_db
+from aequilibrae.transit.gtfs import create_gtfsdb
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), '../common_tools/forms/ui_empty.ui'))
 
@@ -64,7 +64,6 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
 
         if self.data_path is None:
             self.exit_procedure()
-
 
         self._run_layout = QGridLayout()
 
@@ -110,10 +109,11 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
 
         self.exit_procedure()
 
-
     def run(self):
         self.running = True
-        self.worker_thread = gtfs_sqlite_db.load_from_zip()
+        self.worker_thread = create_gtfsdb()
+        self.worker_thread.load_from_zip(self.data_path, save_db=self.output_path, overwrite=True,
+                                         spatialite_enabled=True)
         self.run_thread()
 
     def signal_handler(self, val):

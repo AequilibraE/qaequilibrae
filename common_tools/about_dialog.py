@@ -43,7 +43,7 @@ class AboutDialog(QtGui.QDialog, FORM_CLASS):
         repository = 'https://github.com/AequilibraE/AequilibraE'
         self.wiki = "https://github.com/aequilibrae/aequilibrae/wiki"
         sponsors = ['IPEA (2015)']
-        developers = ['Pedro Camargo', 'Jamie Cook (MacOS binaries)']
+        developers = ['Pedro Camargo','Yu-Chu Huang' ,'Jamie Cook (MacOS binaries)']
 
         self.all_items = []
         self.all_items.append(['Version name', release_name])

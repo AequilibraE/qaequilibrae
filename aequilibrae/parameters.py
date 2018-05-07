@@ -1,7 +1,6 @@
 import os
 import yaml
 
-
 class Parameters:
     def __init__(self):
         self.path = os.path.dirname(os.path.realpath(__file__))

@@ -148,8 +148,7 @@ class create_gtfsdb(WorkerThread):
         self.__create_database(save_db, memory_db, overwrite)
         return self.conn
 
-    def load_from_zip(self, file_path, save_db=None, memory_db=False, overwrite=False,
-                      spatialite_enabled=False):
+    def load_from_zip(self, file_path, save_db=None, memory_db=False, spatialite_enabled=False, overwrite=False):
         self.source = 'zip'
         self.load_from_folder(file_path, save_db, memory_db, overwrite, spatialite_enabled)
         if pyqt:
@@ -398,6 +397,10 @@ class create_gtfsdb(WorkerThread):
 
     def __load_tables(self, table_name):
 
+        # list fields from table
+        cursor = self.cursor.execute('select * from ' + table_name)
+        available_columns = [description[0].lower() for description in cursor.description]
+
         # create the file name
         file_to_open = table_name + '.txt'
 
@@ -416,8 +419,15 @@ class create_gtfsdb(WorkerThread):
                 return
         self.available_files[file_to_open] = True
         data = self.open(data_file, column_order=self.column_order[file_to_open])
-        dt = tuple(data.tolist())
+
+        # we check which columns in the table structure are available in the dataset
+        correspondence = []
+        for col in data.dtype.names:
+            if col in available_columns:
+                correspondence.append(col)
+        data = data[correspondence]
         cols = data.dtype.names
+        dt = tuple(data.tolist())
         fields = ','.join(len(cols) * ["?"])
         try:
             if not isinstance(dt[0], tuple):
@@ -483,7 +493,8 @@ class create_gtfsdb(WorkerThread):
                                                  " order by shape_pt_sequence").fetchall()
                     txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " + str(x[1]) for x in points]) + ")"
                     route_text_color = \
-                    self.cursor.execute("SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
+                        self.cursor.execute(
+                            "SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
                     sql = "INSERT INTO shape_routes (route_id, trip_id, shape_id, route_text_color, geometry)" + \
                           "VALUES (?,?,?,?," + "LineFromText('" + txt + "', 4326))"
                     self.cursor.execute(sql, (route_id, trip_id, shp, route_text_color[0]))
@@ -505,7 +516,7 @@ class create_gtfsdb(WorkerThread):
                 qry = self.cursor.execute(sql).fetchall()
                 txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " + str(x[1]) for x in qry]) + ")"
                 route_text_color = \
-                self.cursor.execute("SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
+                    self.cursor.execute("SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
                 sql = "INSERT INTO shape_routes (route_id, trip_id, route_text_color, geometry) " \
                       "VALUES (?,?," + "LineFromText('" + txt + "', 4326))"
                 self.cursor.execute(sql, (route_id, trip_id, route_text_color))
@@ -540,6 +551,7 @@ class create_gtfsdb(WorkerThread):
     @staticmethod
     def open(file_name, column_order=False):
         # Read the stops and cleans the names of the columns
+        # TODO: Create a procedure to avoid interpreting commas inside text as new separators. See https://stackoverflow.com/questions/28444272/numpy-loadtxt-how-to-ignore-comma-delimiters-that-appear-inside-quotes
         data = np.genfromtxt(file_name, delimiter=',', names=True, dtype=None, )
         content = [str(unicode(x.strip(codecs.BOM_UTF8), 'utf-8')) for x in data.dtype.names]
         data.dtype.names = content
@@ -565,6 +577,7 @@ class create_gtfsdb(WorkerThread):
         else:
             new_data = data
         return new_data
+
 
 class import_gtfsdb_from_zip(WorkerThread):
     def __init__(self, file_path, save_db, memory_db=False, overwrite=False, spatialite_enabled=False):

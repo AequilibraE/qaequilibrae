@@ -36,7 +36,7 @@ from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominat
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog,  MatrixManipulationDialog
-from .transit_procedures import GtfsImportDialog
+from .public_transport_procedures import GtfsImportDialog
 import tempfile, glob
 from .aequilibrae.__version__ import binary_version as VERSION
 
