@@ -13,80 +13,66 @@
   <property name="windowTitle">
    <string>AequilibraE - Parameters</string>
   </property>
-  <widget class="QPushButton" name="but_save">
-   <property name="geometry">
-    <rect>
-     <x>115</x>
-     <y>450</y>
-     <width>101</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Save to disk</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="but_close">
-   <property name="geometry">
-    <rect>
-     <x>580</x>
-     <y>450</y>
-     <width>101</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Cancel and close</string>
-   </property>
-  </widget>
-  <widget class="QsciScintilla" name="text_box">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>681</width>
-     <height>431</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string/>
-   </property>
-   <property name="whatsThis">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="but_validate">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>450</y>
-     <width>101</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Validate</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="but_defaults">
-   <property name="geometry">
-    <rect>
-     <x>470</x>
-     <y>450</y>
-     <width>101</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Reset to defaults</string>
-   </property>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="1">
+    <widget class="QPushButton" name="but_save">
+     <property name="text">
+      <string>Save to disk</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QPushButton" name="but_defaults">
+     <property name="text">
+      <string>Reset to defaults</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="QPushButton" name="but_close">
+     <property name="text">
+      <string>Cancel and close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QPushButton" name="but_validate">
+     <property name="text">
+      <string>Validate</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="5">
+    <widget class="QsciScintilla" name="text_box">
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="whatsThis">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>
    <class>QsciScintilla</class>
    <extends>QFrame</extends>
    <header>Qsci/qsciscintilla.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

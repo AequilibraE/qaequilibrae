@@ -12,8 +12,7 @@ distribution:
     max iterations: 5000
 system:
   cpus: 8
-  default_directory: /media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/AequilibraE/Testing
-    data/Assignment
+  default_directory: C:\Users\pedro.camargo\Documents\sourcecode\drt
   driving side: right
   logging: false
   report zeros: 1
