@@ -5,6 +5,8 @@ import numpy as np
 import codecs
 import copy
 import zipfile
+import csv
+from tempfile import gettempdir
 from ...reference_files import spatialite_database
 from ...utils import WorkerThread
 
@@ -485,19 +487,22 @@ class create_gtfsdb(WorkerThread):
                 if pyqt:
                     self.emit(SIGNAL("converting_gtfs"), ['chunk counter', i])
 
-                qry = self.cursor.execute("SELECT route_id, trip_id from trips where shape_id=" + shp).fetchall()
+                qry = self.cursor.execute("SELECT route_id, trip_id from trips where shape_id='" + shp + "'").fetchall()
                 if len(qry) > 0:
                     route_id, trip_id = qry[0]
 
-                    points = self.cursor.execute("SELECT shape_pt_lon, shape_pt_lat from shapes where shape_id=" + shp +
-                                                 " order by shape_pt_sequence").fetchall()
+                    points = self.cursor.execute("SELECT shape_pt_lon, shape_pt_lat from shapes where shape_id='" + str(shp) +
+                                                 "' order by shape_pt_sequence").fetchall()
                     txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " + str(x[1]) for x in points]) + ")"
                     route_text_color = \
                         self.cursor.execute(
-                            "SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
-                    sql = "INSERT INTO shape_routes (route_id, trip_id, shape_id, route_text_color, geometry)" + \
-                          "VALUES (?,?,?,?," + "LineFromText('" + txt + "', 4326))"
-                    self.cursor.execute(sql, (route_id, trip_id, shp, route_text_color[0]))
+                            "SELECT route_text_color from routes where route_id='" + str(route_id) + "'").fetchall()
+                    if len(route_text_color):
+                        route_text_color = route_text_color[0]
+                        if len(route_text_color)> 0:
+                            sql = "INSERT INTO shape_routes (route_id, trip_id, shape_id, route_text_color, geometry)" + \
+                                  "VALUES (?,?,?,?," + "LineFromText('" + str(txt) + "', 4326))"
+                            self.cursor.execute(sql, (route_id, trip_id, shp, route_text_color[0]))
         else:
             trip_ids = self.cursor.execute("SELECT DISTINCT trip_id from trips;").fetchall()
             trip_ids = [str(x[0]) for x in trip_ids]
@@ -508,15 +513,15 @@ class create_gtfsdb(WorkerThread):
                 if pyqt:
                     self.emit(SIGNAL("converting_gtfs"), ['chunk counter', i])
 
-                route_id = self.cursor.execute("SELECT route_id from trips where trip_id=" + trip_id).fetchone()[0]
+                route_id = self.cursor.execute("SELECT route_id from trips where trip_id='" + str(trip_id) + "'").fetchone()[0]
 
                 sql = "SELECT stop_lon, stop_lat FROM stop_times INNER JOIN stops" \
-                      " ON stop_times.stop_id = stops.stop_id WHERE stop_times.trip_id='" + trip_id + \
+                      " ON stop_times.stop_id = stops.stop_id WHERE stop_times.trip_id='" + str(trip_id) + \
                       "' order by stop_times.stop_sequence"
                 qry = self.cursor.execute(sql).fetchall()
                 txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " + str(x[1]) for x in qry]) + ")"
                 route_text_color = \
-                    self.cursor.execute("SELECT route_text_color from routes where route_id=" + route_id).fetchall()[0]
+                    self.cursor.execute("SELECT route_text_color from routes where route_id='" + str(route_id) +"'").fetchall()[0]
                 sql = "INSERT INTO shape_routes (route_id, trip_id, route_text_color, geometry) " \
                       "VALUES (?,?," + "LineFromText('" + txt + "', 4326))"
                 self.cursor.execute(sql, (route_id, trip_id, route_text_color))
@@ -552,7 +557,24 @@ class create_gtfsdb(WorkerThread):
     def open(file_name, column_order=False):
         # Read the stops and cleans the names of the columns
         # TODO: Create a procedure to avoid interpreting commas inside text as new separators. See https://stackoverflow.com/questions/28444272/numpy-loadtxt-how-to-ignore-comma-delimiters-that-appear-inside-quotes
-        data = np.genfromtxt(file_name, delimiter=',', names=True, dtype=None, )
+        # Clean the file to remove the commas from inside text fields
+        tmp_file = os.path.join(gettempdir(), 'gtfs_temp_file.txt')
+
+        if isinstance(file_name, str):
+            ft = csv.reader(open(file_name, 'r'))
+        else:
+            ft = csv.reader(file_name)
+        a = []
+        for x in ft:
+            a.append([y.replace(',', '-') for y in x])
+
+        txt = open(tmp_file, 'w')
+        for x in a:
+            txt.write(','.join(x) + '\n')
+        txt.flush()
+        txt.close()
+
+        data = np.genfromtxt(tmp_file, delimiter=',', names=True, dtype=None, )
         content = [str(unicode(x.strip(codecs.BOM_UTF8), 'utf-8')) for x in data.dtype.names]
         data.dtype.names = content
         if column_order:
