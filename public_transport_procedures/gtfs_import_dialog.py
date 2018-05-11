@@ -32,8 +32,6 @@ from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
 from ..common_tools import GetOutputFileName
-from PyQt4.QtGui import QHBoxLayout, QVBoxLayout, QGridLayout
-from PyQt4.QtGui import QProgressBar, QLabel, QWidget, QPushButton, QSpacerItem
 
 from aequilibrae.transit.gtfs import create_gtfsdb
 
@@ -53,49 +51,89 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         self.report = None
         self.worker_thread = None
         self.running = False
-        self.data_path, self.data_type = GetOutputFileName(self, 'GTFS Feeds in ZIP format',
-                                                           ["GTFS Feed(*.zip)"], '.zip', standard_path())
-
-        if self.data_path is None:
-            self.exit_procedure()
-
-        self.output_path, data_type = GetOutputFileName(self, 'SpatiaLite table',
-                                                        ["Sqlite(*.sqlite)"], '.sqlite', standard_path())
-
-        if self.data_path is None:
-            self.exit_procedure()
+        # self.data_path, self.data_type = GetOutputFileName(self, 'GTFS Feeds in ZIP format',
+        #                                                    ["GTFS Feed(*.zip)"], '.zip', standard_path())
+        #
+        # self.output_path, data_type = GetOutputFileName(self, 'SpatiaLite table',
+        #                                                 ["Sqlite(*.sqlite)"], '.sqlite', standard_path())
 
         self._run_layout = QGridLayout()
 
-        # We know how many files we will have, so we can do some of the setup now
+        # Source GTFS
+        self.but_choose_gtfs = QPushButton()
+        self.but_choose_gtfs.setFixedSize(100, 30)
+        self.but_choose_gtfs.setText('GTFS Source')
+        self.gtfs_source = QLineEdit()
+        self.source_frame = QHBoxLayout()
+        self.source_frame.addWidget(self.but_choose_gtfs, 1)
+        self.source_frame.addWidget(self.gtfs_source, 0)
+        self.source_widget = QWidget()
+        self.source_widget.setLayout(self.source_frame)
+
+        # Output sqlite
+        self.but_choose_dest = QPushButton()
+        self.but_choose_dest.setFixedSize(100, 30)
+        self.but_choose_dest.setText('Output')
+        self.gtfs_output = QLineEdit()
+        output_frame = QHBoxLayout()
+        output_frame.addWidget(self.but_choose_dest, 1)
+        output_frame.addWidget(self.gtfs_output, 0)
+        self.output_widget = QWidget()
+        self.output_widget.setLayout(output_frame)
+
+        # Spatialite or not
+        self.spatial = QCheckBox()
+        self.spatial.setChecked(True)
+        self.spatial.setText('Create spatial components')
+        options_frame = QHBoxLayout()
+        options_frame.addWidget(self.spatial, 1)
+        self.options_widget = QWidget()
+        self.options_widget.setLayout(options_frame)
+
+
+        # action buttons
+        self.but_process = QPushButton()
+        self.but_process.setText('Run')
+        self.but_process.clicked.connect(self.run)
+
+        self.but_cancel = QPushButton()
+        self.but_cancel.setText('Cancel')
+        self.but_cancel.clicked.connect(self.exit_procedure)
+
+        spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        but_frame = QHBoxLayout()
+        but_frame.addWidget(self.but_cancel, 1)
+        but_frame.addItem(spacer)
+        but_frame.addWidget(self.but_process, 1)
+        self.but_widget = QWidget()
+        self.but_widget.setLayout(but_frame)
+
+        # Progress bars and messagers
+        self.progress_frame = QVBoxLayout()
         self.status_bar_files = QProgressBar()
+        self.progress_frame.addWidget(self.status_bar_files)
+
         self.status_label_file = QLabel()
-        self.status_label_file.setText('Extracting: ' + self.data_path)
-        self._run_layout.addWidget(self.status_bar_files)
-        self._run_layout.addWidget(self.status_label_file)
+        self.status_label_file.setText('Extracting: ')
+        self.progress_frame.addWidget(self.status_label_file)
 
         self.status_bar_chunks = QProgressBar()
-        self._run_layout.addWidget(self.status_bar_chunks)
+        self.progress_frame.addWidget(self.status_bar_chunks)
 
-        self.but_close = QPushButton()
-        self.but_close.clicked.connect(self.exit_procedure)
-        self.but_close.setText('Cancel and close')
-        self._run_layout.addWidget(self.but_close)
+        self.progress_widget = QWidget()
+        self.progress_widget.setLayout(self.progress_frame)
+        self.progress_widget.setVisible(False)
+
+
+        self._run_layout.addWidget(self.progress_widget)
+        self._run_layout.addWidget(self.source_widget)
+        self._run_layout.addWidget(self.output_widget)
+        self._run_layout.addWidget(self.options_widget)
+        self._run_layout.addWidget(self.but_widget)
+
 
         self.setLayout(self._run_layout)
         self.resize(600, 135)
-
-        self.run()
-
-    def import_gtfs_process(self):
-        self.resize_to_start_process()
-        # new_name = GetOutputFolderName(self.path, 'Output folder for traffic assignment')
-        # if new_name:
-        #     self.output_path = new_name
-        #     self.lbl_output.setText(new_name)
-        # else:
-        #     self.output_path = None
-        #     self.lbl_output.setText(new_name)
 
     def run_thread(self):
 
@@ -110,10 +148,22 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def run(self):
+        data_source = self.gtfs_source.text()
+        output_file = self.gtfs_output.text()
+        if not os.path.isfile(data_source):
+            qgis.utils.iface.messageBar().pushMessage("Data source does not exist", '', level=3)
+            return
+
         self.running = True
+        self.source_widget.setVisible(False)
+        self.output_widget.setVisible(False)
+        self.but_process.setEnabled(False)
+        self.options_widget.setEnabled(False)
+        self.progress_widget.setVisible(True)
+
         self.worker_thread = create_gtfsdb()
-        self.worker_thread.load_from_zip(self.data_path, save_db=self.output_path, overwrite=True,
-                                         spatialite_enabled=True)
+        self.worker_thread.load_from_zip(data_source, save_db=output_file, overwrite=True,
+                                         spatialite_enabled=self.spatial.isChecked())
         self.run_thread()
 
     def signal_handler(self, val):

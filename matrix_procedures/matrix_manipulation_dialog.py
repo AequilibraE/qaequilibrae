@@ -30,9 +30,6 @@ from functools import partial
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_matrix_viewer.ui'))
 
-from PyQt4.QtGui import QHBoxLayout, QTableView, QTableWidget, QPushButton, QVBoxLayout, QTabWidget, QGridLayout
-from PyQt4.QtGui import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QPushButton
-
 
 class MatrixManipulationDialog(QtGui.QDialog, FORM_CLASS):
     def __init__(self, iface):
