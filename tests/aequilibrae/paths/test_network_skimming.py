@@ -7,7 +7,7 @@ from aequilibrae.paths import NetworkSkimming, skimming_single_origin
 import numpy as np
 
 # Adds the folder with the data to the path and collects the paths to the files
-lib_path = os.path.abspath(os.path.join('..', '../tests'))
+lib_path = os.path.abspath(os.path.join('..', '..'))
 sys.path.append(lib_path)
 from data import path_test, test_graph
 
