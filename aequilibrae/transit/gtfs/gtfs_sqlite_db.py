@@ -6,9 +6,11 @@ import codecs
 import copy
 import zipfile
 import csv
+import logging
 from tempfile import gettempdir
 from ...reference_files import spatialite_database
 from ...utils import WorkerThread
+from ...parameters import Parameters
 
 try:
     from PyQt4.QtCore import SIGNAL
@@ -19,17 +21,72 @@ except:
 
 
 # TODO : Add control for mandatory and optional files
-# TODO: Add constraints for non-negative and limited options (o,1,2, etc) for fields through foreign keys
+# TODO: Add constraints for non-negative and limited options (0,1,2, etc) for fields through foreign keys
 class create_gtfsdb(WorkerThread):
-    def __init__(self):
+    def __init__(self, file_path, save_db, memory_db=False, spatialite_enabled=False, overwrite=False):
         WorkerThread.__init__(self, None)
         self.conn = None
         self.cursor = None
         self.__max_chunk_size = None
-        self.spatialite_enabled = False
+        self.spatialite_enabled = spatialite_enabled
         self.available_files = {}
-        self.source = None
-        self.source_path = None
+        self.source_path = file_path
+        self.save_db = save_db
+        self.memory_db = memory_db
+        self.overwrite = overwrite
+        self.report = []
+        # self.logger = logger
+        self.logger = logging.getLogger('aequilibrae')
+        self.logging = Parameters().parameters['system']['logging']
+
+        if self.logging:
+            self.logger.info('Starting GTFS import')
+            self.logger.info("      " + self.source_path)
+            self.logger.info("      " + str(self.save_db))
+
+        if os.path.isfile(self.source_path):
+            zip_container = zipfile.ZipFile(self.source_path)
+            ret = zip_container.testzip()
+            if ret is not None:
+                print "First bad file in zip: %s" % ret
+            else:
+                self.source = "zip"
+        elif os.path.isdir(self.source_path):
+            self.source = 'folder'
+        else:
+            msg = 'Source needs to be zip file or directory/folder'
+            self.logger.error(msg)
+            raise ValueError(msg)
+
+        # Input consistency checks
+        if self.source is None:
+            msg = "Input is neither a zip file nor a folder"
+            self.logger.error("      " + msg)
+            raise ValueError(msg)
+
+        if spatialite_enabled and memory_db:
+            msg = 'Spatialite is only supported on disk'
+            self.logger.error("      " + msg)
+            raise ValueError(msg)
+
+        if not self.overwrite:
+            if os.path.isfile(os.path.join(save_db)):
+                msg = 'Output database exists. Please use overwrite=True or choose a different path/name'
+                self.logger.error("      " + msg)
+                raise ValueError(msg)
+        else:
+            if os.path.isfile(save_db):
+                os.unlink(save_db)
+
+        if self.save_db is None:
+            if not self.memory_db:
+                save_db = ":memory:"
+        else:
+            if self.memory_db:
+                msg = "You can't have a file name and have the file in memory at the same time"
+                self.logger.error("      " + msg)
+                raise ValueError(msg)
+
         OrderedDict([('s', (1, 2)), ('p', (3, 4)), ('a', (5, 6)), ('m', (7, 8))])
         self.column_order = {'agency.txt': OrderedDict([('agency_id', str),
                                                         ('agency_name', str),
@@ -139,43 +196,34 @@ class create_gtfsdb(WorkerThread):
                                                         ('shape_dist_traveled', float)])
                              }
         self.set_chunk_size(30000)
+        if self.logging:
+            self.logger.info('      No errors found in initial checking')
+            self.logger.info('      source: ' + self.source)
 
     def set_chunk_size(self, chunk_size):
         if chunk_size is not None:
             if isinstance(chunk_size, int):
                 self.__max_chunk_size = chunk_size
 
-    def create_database(self, save_db=None, memory_db=False, overwrite=False, spatialite_enabled=False):
-        self.spatialite_enabled = spatialite_enabled
-        self.__create_database(save_db, memory_db, overwrite)
-        return self.conn
-
-    def load_from_zip(self, file_path, save_db=None, memory_db=False, spatialite_enabled=False, overwrite=False):
-        self.source = 'zip'
-        self.load_from_folder(file_path, save_db, memory_db, overwrite, spatialite_enabled)
-        if pyqt:
-            self.emit(SIGNAL("converting_gtfs"), ['finished_threaded_procedure', None])
-
-    def load_from_folder(self, path_to_folder, save_db=None, memory_db=False, overwrite=False,
-                         spatialite_enabled=False):
-        self.source_path = path_to_folder
-        self.spatialite_enabled = spatialite_enabled
-        if self.source is None:
-            self.source = 'folder'
-        if spatialite_enabled and memory_db:
-            raise ValueError('Spatialite is only supported on disk')
-
+    def import_gtfs(self):
         # In case we have not create the database yet
         if self.conn is None:
             if pyqt:
                 self.emit(SIGNAL("converting_gtfs"), ['text', 'Creating container database'])
-            self.__create_database(save_db, memory_db, overwrite)
+            self.create_database()
 
         # Import all tables to SQLITE
         tables = [x.split('.')[0] for x in self.column_order.keys()]
+        if self.spatialite_enabled:
+            self.emit(SIGNAL("converting_gtfs"), ['total files', 16])
+        else:
+            self.emit(SIGNAL("converting_gtfs"), ['total files', 14])
+
         for i, tbl in enumerate(tables):
             if pyqt:
                 self.emit(SIGNAL("converting_gtfs"), ['text', 'Loading data from file: ' + tbl])
+            if self.logging:
+                self.logger.info('      loading table ' + tbl)
             self.__load_tables(tbl)
             if pyqt:
                 self.emit(SIGNAL("converting_gtfs"), ['files counter', i + 1])
@@ -184,29 +232,17 @@ class create_gtfsdb(WorkerThread):
         if self.spatialite_enabled:
             self.__create_geometry()
         self.conn.commit()
+        self.conn.close()
+        self.emit(SIGNAL("converting_gtfs"), ['finished_threaded_procedure', 0])
 
-    def __create_database(self, save_db, memory_db, overwrite):
+    def create_database(self):
         if pyqt:
             self.emit(SIGNAL("converting_gtfs"), ['text', 'Creating empty database'])
 
-        if save_db is None:
-            if not memory_db:
-                save_db = ":memory:"
-        else:
-            if memory_db:
-                raise ValueError("You can't have a file name and have the file in memory at the same time")
-
-        if not overwrite:
-            if os.path.isfile(os.path.join(save_db)):
-                raise ValueError("Output database exists. Please use overwrite=True or choose a different path/name")
-        else:
-            if os.path.isfile(save_db):
-                os.unlink(save_db)
-
         if self.spatialite_enabled:
-            shutil.copy(spatialite_database, save_db)
+            shutil.copy(spatialite_database, self.save_db)
 
-        self.conn = sqlite3.connect(save_db)
+        self.conn = sqlite3.connect(self.save_db)
         self.cursor = self.conn.cursor()
 
         self.__create_empty_tables()
@@ -409,18 +445,28 @@ class create_gtfsdb(WorkerThread):
         # Check if exists
         if self.source == 'folder':
             data_file = os.path.join(self.source_path, file_to_open)
+            self.logger.warning('          ' + data_file)
             if not os.path.isfile(data_file):
                 self.available_files[file_to_open] = False
+                if self.logging:
+                    self.logger.warning('          Table ' + table_name + ' not available')
                 return
+            else:
+                data_file = open(data_file, 'r')
         else:
             zip_container = zipfile.ZipFile(self.source_path)
             if file_to_open in zip_container.namelist():
                 data_file = zip_container.open(file_to_open, 'r')
             else:
                 self.available_files[file_to_open] = False
+                if self.logging:
+                    self.logger.warning('          Table ' + table_name + ' not available')
                 return
+
         self.available_files[file_to_open] = True
         data = self.open(data_file, column_order=self.column_order[file_to_open])
+        # if self.logging:
+        #     self.logger.warning('          # of records: ' + str(len(data)))
 
         # we check which columns in the table structure are available in the dataset
         correspondence = []
@@ -437,8 +483,9 @@ class create_gtfsdb(WorkerThread):
             self.cursor.executemany("INSERT into " + table_name + " (" + ",".join(cols) + ") VALUES(" + fields + ")",
                                     dt)
             self.conn.commit()
-        except:
-            pass
+        except Exception as e:
+            self.logger.error('Could not load data from table ' + table_name)
+            self.logger.error(str(e))
 
     def __create_geometry(self):
         # enable extension loading
@@ -452,7 +499,7 @@ class create_gtfsdb(WorkerThread):
 
         # 1
         if pyqt:
-            self.emit(SIGNAL("converting_gtfs"), ['text', 'Creating stops geometry'])
+            self.emit(SIGNAL("converting_gtfs"), ['text', "Creating stops' geometry"])
             self.emit(SIGNAL("converting_gtfs"), ['files counter', 14])
 
         self.cursor.execute("SELECT AddGeometryColumn( 'stops', 'geometry', 4326, 'POINT', 'XY' );")
@@ -461,7 +508,7 @@ class create_gtfsdb(WorkerThread):
 
         # 2
         if pyqt:
-            self.emit(SIGNAL("converting_gtfs"), ['text', 'Creating routes geometry'])
+            self.emit(SIGNAL("converting_gtfs"), ['text', "Creating routes' geometry"])
             self.emit(SIGNAL("converting_gtfs"), ['files counter', 15])
         # We create the table to hold the shapes for each route
         self.cursor.execute('DROP TABLE IF EXISTS shape_routes')
@@ -491,15 +538,16 @@ class create_gtfsdb(WorkerThread):
                 if len(qry) > 0:
                     route_id, trip_id = qry[0]
 
-                    points = self.cursor.execute("SELECT shape_pt_lon, shape_pt_lat from shapes where shape_id='" + str(shp) +
-                                                 "' order by shape_pt_sequence").fetchall()
+                    points = self.cursor.execute(
+                        "SELECT shape_pt_lon, shape_pt_lat from shapes where shape_id='" + str(shp) +
+                        "' order by shape_pt_sequence").fetchall()
                     txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " + str(x[1]) for x in points]) + ")"
                     route_text_color = \
                         self.cursor.execute(
                             "SELECT route_text_color from routes where route_id='" + str(route_id) + "'").fetchall()
                     if len(route_text_color):
                         route_text_color = route_text_color[0]
-                        if len(route_text_color)> 0:
+                        if len(route_text_color) > 0:
                             sql = "INSERT INTO shape_routes (route_id, trip_id, shape_id, route_text_color, geometry)" + \
                                   "VALUES (?,?,?,?," + "LineFromText('" + str(txt) + "', 4326))"
                             self.cursor.execute(sql, (route_id, trip_id, shp, route_text_color[0]))
@@ -513,7 +561,8 @@ class create_gtfsdb(WorkerThread):
                 if pyqt:
                     self.emit(SIGNAL("converting_gtfs"), ['chunk counter', i])
 
-                route_id = self.cursor.execute("SELECT route_id from trips where trip_id='" + str(trip_id) + "'").fetchone()[0]
+                route_id = \
+                self.cursor.execute("SELECT route_id from trips where trip_id='" + str(trip_id) + "'").fetchone()[0]
 
                 sql = "SELECT stop_lon, stop_lat FROM stop_times INNER JOIN stops" \
                       " ON stop_times.stop_id = stops.stop_id WHERE stop_times.trip_id='" + str(trip_id) + \
@@ -521,14 +570,15 @@ class create_gtfsdb(WorkerThread):
                 qry = self.cursor.execute(sql).fetchall()
                 txt = 'LINESTRING (' + ', '.join([str(x[0]) + " " + str(x[1]) for x in qry]) + ")"
                 route_text_color = \
-                    self.cursor.execute("SELECT route_text_color from routes where route_id='" + str(route_id) +"'").fetchall()[0]
+                    self.cursor.execute(
+                        "SELECT route_text_color from routes where route_id='" + str(route_id) + "'").fetchall()[0]
                 sql = "INSERT INTO shape_routes (route_id, trip_id, route_text_color, geometry) " \
                       "VALUES (?,?," + "LineFromText('" + txt + "', 4326))"
                 self.cursor.execute(sql, (route_id, trip_id, route_text_color))
 
         # creates the stops table with route ID info
         if pyqt:
-            self.emit(SIGNAL("converting_gtfs"), ['text', 'Associating routes and stops'])
+            self.emit(SIGNAL("converting_gtfs"), ['text', 'Associating routes and stops. Sit tight'])
 
         self.cursor.execute('''CREATE TABLE 'shape_stops'
                                 AS
@@ -554,16 +604,13 @@ class create_gtfsdb(WorkerThread):
         self.conn.commit()
 
     @staticmethod
-    def open(file_name, column_order=False):
+    def open(data_file, column_order=False):
         # Read the stops and cleans the names of the columns
         # TODO: Create a procedure to avoid interpreting commas inside text as new separators. See https://stackoverflow.com/questions/28444272/numpy-loadtxt-how-to-ignore-comma-delimiters-that-appear-inside-quotes
         # Clean the file to remove the commas from inside text fields
         tmp_file = os.path.join(gettempdir(), 'gtfs_temp_file.txt')
 
-        if isinstance(file_name, str):
-            ft = csv.reader(open(file_name, 'r'))
-        else:
-            ft = csv.reader(file_name)
+        ft = csv.reader(data_file)
         a = []
         for x in ft:
             a.append([y.replace(',', '-') for y in x])
@@ -599,19 +646,3 @@ class create_gtfsdb(WorkerThread):
         else:
             new_data = data
         return new_data
-
-
-class import_gtfsdb_from_zip(WorkerThread):
-    def __init__(self, file_path, save_db, memory_db=False, overwrite=False, spatialite_enabled=False):
-        WorkerThread.__init__(self, None)
-        self.file_path = file_path
-        self.save_db = save_db
-        self.memory_db = memory_db
-        self.overwrite = overwrite
-        self.spatialite_enabled = spatialite_enabled
-
-        self.gtfs_job = create_gtfsdb()
-
-    def doWork(self):
-        self.gtfs_job.load_from_zip(self.file_path, self.save_db, self.memory_db, self.overwrite,
-                                    self.spatialite_enabled)

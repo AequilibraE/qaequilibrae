@@ -14,6 +14,6 @@ system:
   cpus: 8
   default_directory: C:\Users\pedro.camargo\Documents\sourcecode\drt
   driving side: right
-  logging: false
+  logging: true
   report zeros: 1
   temp directory: /temp

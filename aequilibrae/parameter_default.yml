@@ -15,5 +15,5 @@ system:
   default_directory: /media/pedro/LargeDrive/GOOGLE_DRIVES/UCI/DATA/Pedro/AequilibraE testing data/Assignment
   temp directory: /temp
   driving side: left
-  logging: False
+  logging: true
   report zeros: 1

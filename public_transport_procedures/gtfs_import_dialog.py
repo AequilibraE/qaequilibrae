@@ -19,6 +19,7 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
+import logging
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4 import QtGui, uic
@@ -30,8 +31,7 @@ from collections import OrderedDict
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
-from ..common_tools import ReportDialog
-from ..common_tools import GetOutputFileName
+from ..common_tools import ReportDialog, GetOutputFileName, GetOutputFolderName
 
 from aequilibrae.transit.gtfs import create_gtfsdb
 
@@ -51,16 +51,28 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         self.report = None
         self.worker_thread = None
         self.running = False
-        # self.data_path, self.data_type = GetOutputFileName(self, 'GTFS Feeds in ZIP format',
-        #                                                    ["GTFS Feed(*.zip)"], '.zip', standard_path())
-        #
-        # self.output_path, data_type = GetOutputFileName(self, 'SpatiaLite table',
-        #                                                 ["Sqlite(*.sqlite)"], '.sqlite', standard_path())
+        self.logger = logging.getLogger('aequilibrae')
 
         self._run_layout = QGridLayout()
 
+        # Source type for the GTFS
+        self.choose_zip = QRadioButton()
+        self.choose_zip.setText('Source is zip file')
+        self.choose_zip.setChecked(True)
+
+        self.choose_folder = QRadioButton()
+        self.choose_folder.setText('Source is folder')
+        self.choose_folder.setChecked(False)
+
+        self.source_type_frame = QHBoxLayout()
+        self.source_type_frame.addWidget(self.choose_zip)
+        self.source_type_frame.addWidget(self.choose_folder)
+        self.source_type_widget = QWidget()
+        self.source_type_widget.setLayout(self.source_type_frame)
+
         # Source GTFS
         self.but_choose_gtfs = QPushButton()
+        self.but_choose_gtfs.clicked.connect(self.find_input)
         self.but_choose_gtfs.setFixedSize(100, 30)
         self.but_choose_gtfs.setText('GTFS Source')
         self.gtfs_source = QLineEdit()
@@ -72,6 +84,7 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
 
         # Output sqlite
         self.but_choose_dest = QPushButton()
+        self.but_choose_dest.clicked.connect(self.set_output_db)
         self.but_choose_dest.setFixedSize(100, 30)
         self.but_choose_dest.setText('Output')
         self.gtfs_output = QLineEdit()
@@ -89,7 +102,6 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         options_frame.addWidget(self.spatial, 1)
         self.options_widget = QWidget()
         self.options_widget.setLayout(options_frame)
-
 
         # action buttons
         self.but_process = QPushButton()
@@ -124,13 +136,12 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         self.progress_widget.setLayout(self.progress_frame)
         self.progress_widget.setVisible(False)
 
-
         self._run_layout.addWidget(self.progress_widget)
         self._run_layout.addWidget(self.source_widget)
+        self._run_layout.addWidget(self.source_type_widget)
         self._run_layout.addWidget(self.output_widget)
         self._run_layout.addWidget(self.options_widget)
         self._run_layout.addWidget(self.but_widget)
-
 
         self.setLayout(self._run_layout)
         self.resize(600, 135)
@@ -138,12 +149,26 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
     def run_thread(self):
 
         QObject.connect(self.worker_thread, SIGNAL("converting_gtfs"), self.signal_handler)
-        self.worker_thread.start()
+        self.worker_thread.import_gtfs()
         self.exec_()
+
+    def find_input(self):
+        if self.choose_zip.isChecked():
+            new_name, type = GetOutputFileName(self, 'GTFS Feed', ["Zip containers(*.zip)"], '.zip', self.path)
+        else:
+            new_name = GetOutputFolderName(self.path, 'GTFS Feed')
+
+        if new_name is not None:
+            self.gtfs_source.setText(new_name)
+
+    def set_output_db(self):
+        new_name, type = GetOutputFileName(self, 'SQLite Database', ["SQLite(*.sqlite)", "SQLite(*.db)"], '.sqlite',
+                                           self.path)
+        if new_name is not None:
+            self.gtfs_output.setText(new_name)
 
     def job_finished_from_thread(self):
         self.report = self.worker_thread.report
-        self.produce_all_outputs()
 
         self.exit_procedure()
 
@@ -151,19 +176,21 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         data_source = self.gtfs_source.text()
         output_file = self.gtfs_output.text()
         if not os.path.isfile(data_source):
-            qgis.utils.iface.messageBar().pushMessage("Data source does not exist", '', level=3)
-            return
+            if not os.path.isdir(data_source):
+                qgis.utils.iface.messageBar().pushMessage("Data source does not exist", '', level=3)
+                return
 
         self.running = True
         self.source_widget.setVisible(False)
         self.output_widget.setVisible(False)
         self.but_process.setEnabled(False)
-        self.options_widget.setEnabled(False)
+        self.options_widget.setVisible(False)
+        self.source_type_widget.setVisible(False)
         self.progress_widget.setVisible(True)
 
-        self.worker_thread = create_gtfsdb()
-        self.worker_thread.load_from_zip(data_source, save_db=output_file, overwrite=True,
-                                         spatialite_enabled=self.spatial.isChecked())
+        self.logger.info(data_source)
+        self.worker_thread = create_gtfsdb(data_source, save_db=output_file, overwrite=True,
+                                           spatialite_enabled=self.spatial.isChecked())
         self.run_thread()
 
     def signal_handler(self, val):
@@ -172,6 +199,9 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
 
         elif val[0] == 'files counter':
             self.status_bar_files.setValue(val[1])
+
+        elif val[0] == 'total files':
+            self.status_bar_files.setMaximum(val[1])
 
         elif val[0] == 'chunk counter':
             self.status_bar_chunks.setValue(val[1])
