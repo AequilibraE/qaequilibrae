@@ -2,7 +2,7 @@ import os
 import tempfile
 import uuid
 from unittest import TestCase
-
+import tempfile
 import numpy as np
 
 from aequilibrae.matrix import AequilibraEData
@@ -49,5 +49,5 @@ class TestAequilibraEData(TestCase):
 
     def test_export(self):
         self.test_load()
-
-        self.ad.export('/tmp/aequilibrae_data_example.csv')
+        temp_name = os.path.join(tempfile.gettempdir(), 'aequilibrae_data_example.csv')
+        self.ad.export(temp_name)

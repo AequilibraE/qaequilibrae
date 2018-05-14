@@ -82,20 +82,19 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             self.output_type = 'Poly'
 
         elif self.from_layer.wkbType() in self.poly_types + self.line_types and \
-             self.to_layer.wkbType() in self.poly_types + self.line_types:
+                self.to_layer.wkbType() in self.poly_types + self.line_types:
             lcd_layer = QgsVectorLayer("MultiLineString?crs=epsg:" + str(epsg_code), "output", "memory")
             self.output_type = 'Line'
         else:
             lcd_layer = QgsVectorLayer("MultiPoint?crs=epsg:" + str(epsg_code), "output", "memory")
             self.output_type = 'Point'
 
-
         lcdpr = lcd_layer.dataProvider()
         lcdpr.addAttributes([QgsField("Part_ID", QVariant.Int),
                              QgsField(ffield, self.from_layer.fields().field(idx).type()),
                              QgsField(tfield, self.to_layer.fields().field(fid).type()),
-                             QgsField('P-' + str(ffield) , QVariant.Double), # percentage of the from field
-                             QgsField('P-' + str(tfield), QVariant.Double)]) # percentage of the to field
+                             QgsField('P-' + str(ffield), QVariant.Double),  # percentage of the from field
+                             QgsField('P-' + str(tfield), QVariant.Double)])  # percentage of the to field
         lcd_layer.updateFields()
 
         # PROGRESS BAR
@@ -138,7 +137,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                                 merged[f].setGeometry(aux)
                             part_id += 1
 
-                #Find the part that does not intersect anything
+                # Find the part that does not intersect anything
                 if uncovered is not None:
                     if uncovered.area() > 0:
                         feature = QgsFeature()
@@ -155,7 +154,9 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         part_id += 1
 
             self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), fc)
-            self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Running Analysis (' +"{:,}".format(fc) + '/' + "{:,}".format(self.from_layer.featureCount()) + ')')
+            self.emit(SIGNAL("ProgressText( PyQt_PyObject )"),
+                      'Running Analysis (' + "{:,}".format(fc) + '/' + "{:,}".format(
+                          self.from_layer.featureCount()) + ')')
 
         # Find the features on TO that have no correspondence in FROM
         for f, feature in merged.iteritems():
@@ -202,4 +203,3 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             else:
                 geometry = QgsGeometry.fromPoint(g.asPoint())
         return geometry, stat
-
