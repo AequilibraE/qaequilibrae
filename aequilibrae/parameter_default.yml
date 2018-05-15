@@ -1,6 +1,6 @@
 assignment:
   Equilibrium:
-    rgap: 1.0e-05
+    rgap: 1.0e-03
 distribution:
   gravity:
     max error: 0.0001

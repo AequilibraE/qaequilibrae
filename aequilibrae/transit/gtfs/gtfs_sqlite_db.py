@@ -19,7 +19,6 @@ try:
 except:
     pyqt = False
 
-
 # TODO : Add control for mandatory and optional files
 # TODO: Add constraints for non-negative and limited options (0,1,2, etc) for fields through foreign keys
 class create_gtfsdb(WorkerThread):
@@ -37,12 +36,15 @@ class create_gtfsdb(WorkerThread):
         self.report = []
         # self.logger = logger
         self.logger = logging.getLogger('aequilibrae')
-        self.logging = Parameters().parameters['system']['logging']
+        log_level = Parameters().parameters['system']['logging']
+        if isinstance(log_level, str):
+            log_level = log_level.upper()
+        if log_level in logging._levelNames.keys():
+            self.logger.setLevel(log_level)
 
-        if self.logging:
-            self.logger.info('Starting GTFS import')
-            self.logger.info("      " + self.source_path)
-            self.logger.info("      " + str(self.save_db))
+        self.logger.info('Starting GTFS import')
+        self.logger.info("      " + self.source_path)
+        self.logger.info("      " + str(self.save_db))
 
         if os.path.isfile(self.source_path):
             zip_container = zipfile.ZipFile(self.source_path)
@@ -196,9 +198,8 @@ class create_gtfsdb(WorkerThread):
                                                         ('shape_dist_traveled', float)])
                              }
         self.set_chunk_size(30000)
-        if self.logging:
-            self.logger.info('      No errors found in initial checking')
-            self.logger.info('      source: ' + self.source)
+        self.logger.info('      No errors found in initial checking')
+        self.logger.info('      source: ' + self.source)
 
     def set_chunk_size(self, chunk_size):
         if chunk_size is not None:
@@ -222,8 +223,7 @@ class create_gtfsdb(WorkerThread):
         for i, tbl in enumerate(tables):
             if pyqt:
                 self.emit(SIGNAL("converting_gtfs"), ['text', 'Loading data from file: ' + tbl])
-            if self.logging:
-                self.logger.info('      loading table ' + tbl)
+            self.logger.info('      loading table ' + tbl)
             self.__load_tables(tbl)
             if pyqt:
                 self.emit(SIGNAL("converting_gtfs"), ['files counter', i + 1])
@@ -448,8 +448,7 @@ class create_gtfsdb(WorkerThread):
             self.logger.warning('          ' + data_file)
             if not os.path.isfile(data_file):
                 self.available_files[file_to_open] = False
-                if self.logging:
-                    self.logger.warning('          Table ' + table_name + ' not available')
+                self.logger.warning('          Table ' + table_name + ' not available')
                 return
             else:
                 data_file = open(data_file, 'r')
@@ -459,14 +458,11 @@ class create_gtfsdb(WorkerThread):
                 data_file = zip_container.open(file_to_open, 'r')
             else:
                 self.available_files[file_to_open] = False
-                if self.logging:
-                    self.logger.warning('          Table ' + table_name + ' not available')
+                self.logger.warning('          Table ' + table_name + ' not available')
                 return
 
         self.available_files[file_to_open] = True
         data = self.open(data_file, column_order=self.column_order[file_to_open])
-        # if self.logging:
-        #     self.logger.warning('          # of records: ' + str(len(data)))
 
         # we check which columns in the table structure are available in the dataset
         correspondence = []
