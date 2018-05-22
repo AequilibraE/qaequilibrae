@@ -19,6 +19,7 @@ try:
 except:
     pyqt = False
 
+
 # TODO : Add control for mandatory and optional files
 # TODO: Add constraints for non-negative and limited options (0,1,2, etc) for fields through foreign keys
 class create_gtfsdb(WorkerThread):
@@ -558,7 +559,7 @@ class create_gtfsdb(WorkerThread):
                     self.emit(SIGNAL("converting_gtfs"), ['chunk counter', i])
 
                 route_id = \
-                self.cursor.execute("SELECT route_id from trips where trip_id='" + str(trip_id) + "'").fetchone()[0]
+                    self.cursor.execute("SELECT route_id from trips where trip_id='" + str(trip_id) + "'").fetchone()[0]
 
                 sql = "SELECT stop_lon, stop_lat FROM stop_times INNER JOIN stops" \
                       " ON stop_times.stop_id = stops.stop_id WHERE stop_times.trip_id='" + str(trip_id) + \

@@ -22,7 +22,7 @@ class Agency:
 
     * **email** `(agency_email)` **Optional** - Contains a single valid email address actively monitored by the agency’s customer service department. This email address will be considered a direct contact point where transit riders can reach a customer service representative at the agency.
     """
-    
+
     def __init__(self):
         """
         Initializes the class with members corresponding to all fields in the GTFS specification. See Stop class
