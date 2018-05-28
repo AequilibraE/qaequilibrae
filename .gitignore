@@ -9,6 +9,11 @@
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/dictionaries
+.idea/AequilibraE.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/
@@ -71,7 +76,7 @@ fabric.properties
 aequilibrae/paths/AoN.pyd
 aequilibrae/paths/basic_path_finding.html
 aequilibrae/paths/parameters.html
-
+aequilibrae/paths/build/*
 
 
 # End of https://www.gitignore.io/api/jetbrains
