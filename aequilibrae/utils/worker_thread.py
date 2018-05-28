@@ -19,20 +19,28 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from PyQt4.QtCore import *
+try:
+    from PyQt4.QtCore import QThread, SIGNAL
+except:
+    from PyQt5.QtCore import QThread
+    from PyQt5.QtCore import pyqtSignal as SIGNAL
 
 
 class WorkerThread(QThread):
     def __init__(self, parentThread):
         QThread.__init__(self, parentThread)
+
     def run(self):
         self.running = True
         success = self.doWork()
         self.emit(SIGNAL("jobFinished(PyQt_PyObject)"), success)
+
     def stop(self):
         self.running = False
         pass
+
     def doWork(self):
         return True
+
     def cleanUp(self):
         pass

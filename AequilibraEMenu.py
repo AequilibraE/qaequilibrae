@@ -36,6 +36,7 @@ from .gis import DesireLinesDialog, CreateBandwidthsDialog, LeastCommonDenominat
 from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
 from .paths_procedures import GraphCreationDialog, TrafficAssignmentDialog, ShortestPathDialog, ImpedanceMatrixDialog
 from .matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog,  MatrixManipulationDialog
+from .public_transport_procedures import GtfsImportDialog
 import tempfile, glob
 from .aequilibrae.__version__ import binary_version as VERSION
 
@@ -160,12 +161,6 @@ class AequilibraEMenu:
         self.assignment_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Paths and assignment"))
         self.aequilibrae_add_submenu(self.assignment_menu)
 
-        # MATRIX HOLDER
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
-        #    self.matrix_holder_action = QAction(icon,u"Matrices holder", self.iface.mainWindow())
-        #    QObject.connect(self.matrix_holder_action, SIGNAL("triggered()"),self.run_matrix_holder)
-        #    self.assignment_menu.addAction(self.matrix_holder_action)
-
         # Graph generation
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_graph_creation.png")
         self.graph_creation_action = QAction(icon, u"Create graph", self.iface.mainWindow())
@@ -189,7 +184,18 @@ class AequilibraEMenu:
         self.traffic_assignment_action = QAction(icon, u"Traffic Assignment", self.iface.mainWindow())
         QObject.connect(self.traffic_assignment_action, SIGNAL("triggered()"), self.run_traffic_assig)
         self.assignment_menu.addAction(self.traffic_assignment_action)
-        #########################################################################
+
+        # ########################################################################
+        # #######################  TRANSIT SUB-MENU   ###########################
+
+        self.transit_menu = QMenu(QCoreApplication.translate("AequilibraE", "&Public Transport"))
+        self.aequilibrae_add_submenu(self.transit_menu)
+
+        # Graph generation
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_import_gtfs.png")
+        self.gtfs_import_action = QAction(icon, u"Convert GTFS to SpatiaLite", self.iface.mainWindow())
+        QObject.connect(self.gtfs_import_action, SIGNAL("triggered()"), self.run_import_gtfs)
+        self.transit_menu.addAction(self.gtfs_import_action)
 
         # ########################################################################
         # #################        GIS TOOLS SUB-MENU    #########################
@@ -382,6 +388,11 @@ class AequilibraEMenu:
             dlg2 = TrafficAssignmentDialog(self.iface)
             dlg2.show()
             dlg2.exec_()
+
+    def run_import_gtfs(self):
+        dlg2 = GtfsImportDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_simple_tag(self):
         dlg2 = SimpleTagDialog(self.iface)

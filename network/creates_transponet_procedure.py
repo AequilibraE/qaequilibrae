@@ -27,6 +27,8 @@ from ..common_tools.auxiliary_functions import *
 from pyspatialite import dbapi2 as db
 from ..common_tools.global_parameters import *
 from ..common_tools import WorkerThread
+from aequilibrae import spatialite_database
+
 
 class CreatesTranspoNetProcedure(WorkerThread):
     def __init__(self, parentThread, output_file,
@@ -48,8 +50,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
     def doWork(self):
         self.emit_messages(message='Sit tight. Initializing Spatialite layer set', value=0, max_val=1)
         
-        copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'default_transponet.sqlite'),
-                 self.output_file)
+        copyfile(spatialite_database, self.output_file)
         self.run_series_of_queries(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), 'queries_for_empty_file.sql'))
 
