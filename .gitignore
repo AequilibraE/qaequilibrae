@@ -67,4 +67,11 @@ fabric.properties
 .idea/sonarlint
 
 
+# Build of plugin
+aequilibrae/paths/AoN.pyd
+aequilibrae/paths/basic_path_finding.html
+aequilibrae/paths/parameters.html
+
+
+
 # End of https://www.gitignore.io/api/jetbrains
