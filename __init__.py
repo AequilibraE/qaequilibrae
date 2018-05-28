@@ -24,9 +24,6 @@ import sys
 
 sys.dont_write_bytecode = True
 
-sys.path.append("C:/Users/Pedro/.qgis2/python/plugins/AequilibraE/")
-
-
 def classFactory(iface):
     from AequilibraEMenu import AequilibraEMenu
     return AequilibraEMenu(iface)
