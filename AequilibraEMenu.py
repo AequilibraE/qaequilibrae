@@ -25,20 +25,20 @@ import os
 import sys
 import qgis
 from qgis.core import *
-
+from qgis.PyQt import QtWidgets
+from qgis.PyQt.QtWidgets import QAction
 
 # This is how QtCore and QtGui imports change
-#from PyQt4.QtCore import *
+# from PyQt4.QtCore import *
 from qgis.PyQt.QtCore import *
 
 # from PyQt4.QtGui import *
 from qgis.PyQt.QtGui import *
 
-
 from common_tools import ParameterDialog
-from common_tools import logger
-from common_tools import ReportDialog
-from common_tools import AboutDialog
+# from common_tools import logger
+# from common_tools import ReportDialog
+# from common_tools import AboutDialog
 
 # from binary_downloader_class import BinaryDownloaderDialog
 # from .distribution_procedures import DistributionModelsDialog
@@ -48,7 +48,6 @@ from common_tools import AboutDialog
 # from .gis import CreateBandwidthsDialog
 # from .gis import LeastCommonDenominatorDialog
 # from .gis import SimpleTagDialog
-
 
 
 # from .network import NetworkPreparationDialog, AddConnectorsDialog, CreatesTranspoNetDialog
@@ -70,7 +69,8 @@ old_binary = False
 sys.dont_write_bytecode = True
 import os.path
 
-class AequilibraEMenu:
+
+class AequilibraEMenu(object):
     def __init__(self, iface):
         self.iface = iface
         self.AequilibraE_menu = None
@@ -262,14 +262,16 @@ class AequilibraEMenu:
         # Change parameters
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_parameters.png")
         self.parameters_action = QAction(icon, u"Parameters", self.iface.mainWindow())
-        QObject.connect(self.parameters_action, SIGNAL("triggered()"), self.run_change_parameters)
+        self.parameters_action.triggered.connect(self.run_change_parameters)
+        self.parameters_action.setEnabled(True)  # Need to add this row for all actions
+        # QObject.connect(self.parameters_action, SIGNAL("triggered()"), self.run_change_parameters)
         self.AequilibraE_menu.addAction(self.parameters_action)
 
-         # About
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_parameters.png")
-        self.about_action = QAction(icon, u"About", self.iface.mainWindow())
-        QObject.connect(self.about_action, SIGNAL("triggered()"), self.run_about)
-        self.AequilibraE_menu.addAction(self.about_action)
+        # About
+        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_parameters.png")
+        # self.about_action = QAction(icon, u"About", self.iface.mainWindow())
+        # QObject.connect(self.about_action, SIGNAL("triggered()"), self.run_about)
+        # self.AequilibraE_menu.addAction(self.about_action)
 
         # # Download binaries
         # if no_binary:
@@ -290,6 +292,7 @@ class AequilibraEMenu:
         #     dlg2 = ReportDialog(self.iface, report)
         #     dlg2.show()
         #     dlg2.exec_()
+
     #########################################################################
 
     def unload(self):
@@ -320,10 +323,10 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    def run_about(self):
-        dlg2 = AboutDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+    # def run_about(self):
+    #     dlg2 = AboutDialog(self.iface)
+    #     dlg2.show()
+    #     dlg2.exec_()
 
     # def run_load_matrices(self):
     #     dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=False)

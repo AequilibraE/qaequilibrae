@@ -21,11 +21,11 @@
 
 # This portion of the script initializes the plugin, making it known to QGIS.
 import sys
+from .AequilibraEMenu import AequilibraEMenu
 
 sys.dont_write_bytecode = True
 
 def classFactory(iface):
-    from AequilibraEMenu import AequilibraEMenu
     return AequilibraEMenu(iface)
 
 

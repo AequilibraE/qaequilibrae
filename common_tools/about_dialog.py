@@ -19,12 +19,13 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from PyQt4 import QtGui, uic
-from PyQt4.QtGui import *
+from qgis.PyQt.QtGui import *
+from qgis.PyQt import QtGui
+from qgis.PyQt import uic
 import webbrowser
 
 import os
-from auxiliary_functions import standard_path
+from .auxiliary_functions import standard_path
 from ..aequilibrae.paths import release_name, release_version
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_about.ui'))
