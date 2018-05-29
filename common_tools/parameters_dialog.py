@@ -30,12 +30,10 @@ from qgis.PyQt.Qsci import QsciLexerYAML
 from qgis.PyQt.QtGui import *
 from qgis.PyQt import QtWidgets, uic
 
-import sys
 import os
 import yaml
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_parameters.ui'))
-
 
 class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
     # def __init__(self, iface):
