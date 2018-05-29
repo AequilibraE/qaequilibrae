@@ -37,6 +37,7 @@ from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 
 from common_tools import ParameterDialog
+
 # from common_tools import logger
 # from common_tools import ReportDialog
 # from common_tools import AboutDialog
@@ -354,36 +355,42 @@ class AequilibraEMenu(object):
         #         pass
 
     def run_change_parameters(self):
+        # pass
         dlg2 = ParameterDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
     def run_about(self):
         pass
+
     #     dlg2 = AboutDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_load_matrices(self):
         pass
+
     #     dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=False)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_load_database(self):
         pass
+
     #     dlg2 = LoadDatasetDialog(self.iface, single_use=False)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_display_aequilibrae_formats(self):
         pass
+
     #     dlg2 = DisplayAequilibraEFormatsDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_binary_donwload(self):
         pass
+
     #     dlg2 = BinaryDownloaderDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
@@ -391,6 +398,7 @@ class AequilibraEMenu(object):
     # run method that calls the network preparation section of the code
     def run_net_prep(self):
         pass
+
     #     dlg2 = NetworkPreparationDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
@@ -399,6 +407,7 @@ class AequilibraEMenu(object):
     # run method that calls the network preparation section of the code
     def run_create_transponet(self):
         pass
+
     #     dlg2 = CreatesTranspoNetDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
@@ -406,36 +415,42 @@ class AequilibraEMenu(object):
 
     def run_add_connectors(self):
         pass
+
     #     dlg2 = AddConnectorsDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_create_graph(self):
         pass
+
     #     dlg2 = GraphCreationDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_calibrate_gravity(self):
         pass
+
     #     dlg2 = DistributionModelsDialog(self.iface, 'calibrate')
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_apply_gravity(self):
         pass
+
     #     dlg2 = DistributionModelsDialog(self.iface, 'apply')
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_distribution_models(self):
         pass
+
     #     dlg2 = DistributionModelsDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_shortest_path(self):
         pass
+
     #     if no_binary:
     #         self.message_binary()
     #     else:
@@ -445,6 +460,7 @@ class AequilibraEMenu(object):
 
     def run_dist_matrix(self):
         pass
+
     #     if no_binary:
     #         self.message_binary()
     #     else:
@@ -454,6 +470,7 @@ class AequilibraEMenu(object):
 
     def run_traffic_assig(self):
         pass
+
     #     # show the dialog
     #     if no_binary:
     #         self.message_binary()
@@ -464,24 +481,28 @@ class AequilibraEMenu(object):
 
     def run_import_gtfs(self):
         pass
+
     #     dlg2 = GtfsImportDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_simple_tag(self):
         pass
+
     #     dlg2 = SimpleTagDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_lcd(self):
         pass
+
     #     dlg2 = LeastCommonDenominatorDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_dlines(self):
         pass
+
     #     if no_binary:
     #         self.message_binary()
     #     else:
@@ -491,18 +512,21 @@ class AequilibraEMenu(object):
 
     def run_bandwidth(self):
         pass
+
     #     dlg2 = CreateBandwidthsDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_scenario_comparison(self):
         pass
+
     #     dlg2 = CompareScenariosDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
 
     def run_ipf(self):
         pass
+
     #     dlg2 = DistributionModelsDialog(self.iface, 'ipf')
     #     dlg2.show()
     #     dlg2.exec_()
