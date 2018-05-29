@@ -36,7 +36,7 @@ from qgis.PyQt.QtCore import *
 # from PyQt4.QtGui import *
 from qgis.PyQt.QtGui import *
 
-from common_tools.parameters_dialog import ParameterDialog
+from common_tools import ParameterDialog
 # from common_tools import logger
 # from common_tools import ReportDialog
 # from common_tools import AboutDialog
