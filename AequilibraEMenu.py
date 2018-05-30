@@ -36,39 +36,39 @@ from qgis.PyQt.QtCore import *
 # from PyQt4.QtGui import *
 from qgis.PyQt.QtGui import *
 
-from common_tools import ParameterDialog
+from .common_tools import ParameterDialog
 
-# from common_tools import logger
-# from common_tools import ReportDialog
-# from common_tools import AboutDialog
+# from .common_tools import logger
+# from .common_tools import ReportDialog
+# from .common_tools import AboutDialog
 
-# from binary_downloader_class import BinaryDownloaderDialog
-# from distribution_procedures import DistributionModelsDialog
+# from .binary_downloader_class import BinaryDownloaderDialog
+# from .distribution_procedures import DistributionModelsDialog
 
-# from gis import CompareScenariosDialog
-# from gis import DesireLinesDialog
-# from gis import CreateBandwidthsDialog
-# from gis import LeastCommonDenominatorDialog
-# from gis import SimpleTagDialog
+# from .gis import CompareScenariosDialog
+# from .gis import DesireLinesDialog
+# from .gis import CreateBandwidthsDialog
+# from .gis import LeastCommonDenominatorDialog
+# from .gis import SimpleTagDialog
 
-# from network import NetworkPreparationDialog
-# from network import AddConnectorsDialog
-# from network import CreatesTranspoNetDialog
+# from .network import NetworkPreparationDialog
+# from .network import AddConnectorsDialog
+# from .network import CreatesTranspoNetDialog
 
-# from paths_procedures import GraphCreationDialog
-# from paths_procedures import TrafficAssignmentDialog
-# from paths_procedures import ShortestPathDialog
-# from paths_procedures import ImpedanceMatrixDialog
+# from .paths_procedures import GraphCreationDialog
+# from .paths_procedures import TrafficAssignmentDialog
+# from .paths_procedures import ShortestPathDialog
+# from .paths_procedures import ImpedanceMatrixDialog
 
-# from matrix_procedures import LoadMatrixDialog
-# from matrix_procedures import LoadDatasetDialog
-# from matrix_procedures import DisplayAequilibraEFormatsDialog
-# from matrix_procedures import MatrixManipulationDialog
+# from .matrix_procedures import LoadMatrixDialog
+# from .matrix_procedures import LoadDatasetDialog
+# from .matrix_procedures import DisplayAequilibraEFormatsDialog
+# from .matrix_procedures import MatrixManipulationDialog
 
-# from public_transport_procedures import GtfsImportDialog
+# from .public_transport_procedures import GtfsImportDialog
 
 
-# from aequilibrae.__version__ import binary_version as VERSION
+# from .aequilibrae.__version__ import binary_version as VERSION
 
 no_binary = False
 old_binary = False
