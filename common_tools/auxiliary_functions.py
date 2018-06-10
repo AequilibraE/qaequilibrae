@@ -20,7 +20,7 @@
  """
 
 import qgis
-from qgis.core import QgsMapLayerRegistry
+from qgis.core import QgsProject
 import math
 import os
 import yaml
@@ -75,7 +75,7 @@ def get_parameters_group(group=None):
         return {}
 
 def get_vector_layer_by_name(layer_name):
-    layer = QgsMapLayerRegistry.instance().mapLayersByName(layer_name)
+    layer = QgsProject.instance().mapLayersByName(layer_name)
     if not layer:
         return None
     else:
