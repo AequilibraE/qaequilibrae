@@ -62,8 +62,6 @@ class LeastCommonDenominatorProcedure(WorkerThread):
 
         # We create an spatial self.index to hold all the features of the layer that will receive the data
         # And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
-        # self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.to_layer.dataProvider().featureCount())
-        # self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Building Spatial Index')
         self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
         self.ProgressText.emit("Building Spatial Index")
         allfeatures = {}
@@ -73,10 +71,8 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             allfeatures[feature.id()] = feature
             merged[feature.id()] = feature
             self.index.insertFeature(feature)
-            # self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), i)
             self.ProgressValue.emit(i)
 
-        # self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Duplicating Layers')
         self.ProgressText.emit("Duplicating Layers")
         self.all_attr = {}
         # We create the memory layer that will have the analysis result, which is the lowest common
@@ -103,8 +99,6 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         lcd_layer.updateFields()
 
         # PROGRESS BAR
-        # self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.from_layer.dataProvider().featureCount())
-        # self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Running Analysis')
         self.ProgressMaxValue.emit(self.from_layer.dataProvider().featureCount())
         self.ProgressText.emit("Running Analysis")
         part_id = 1
@@ -160,10 +154,6 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         features.append(feature)
                         part_id += 1
 
-            # self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), fc)
-            # self.emit(SIGNAL("ProgressText( PyQt_PyObject )"),
-            #           'Running Analysis (' + "{:,}".format(fc) + '/' + "{:,}".format(
-            #               self.from_layer.featureCount()) + ')')
             self.ProgressValue.emit(fc)
             self.ProgressText.emit('Running Analysis (' + "{:,}".format(fc) + '/' + "{:,}".format(
                           self.from_layer.featureCount()) + ')')
@@ -190,8 +180,6 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             a = lcdpr.addFeatures(features)
         self.result = lcd_layer
 
-        # self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), self.from_layer.dataProvider().featureCount())
-        # self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), "procedure")
         self.ProgressValue.emit(self.from_layer.dataProvider().featureCount())
         self.finished_threaded_procedure.emit("procedure")
 

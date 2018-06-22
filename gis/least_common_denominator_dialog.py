@@ -19,11 +19,8 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-# from qgis.core import QgsMapLayerRegistry
 from qgis.core import QgsProject
-# from PyQt4.QtCore import QObject, SIGNAL
 from qgis.PyQt.QtCore import QObject
-# from PyQt4 import QtGui, uic
 from qgis.PyQt import QtWidgets, uic
 import qgis
 import sys
@@ -79,15 +76,10 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.tofield.addItem(field.name())
 
     def run_thread(self):
-        # QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        # QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
-        # QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
         self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
         self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
         self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
 
-        # QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-        #                 self.finished_threaded_procedure)
         self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
         self.OK.setEnabled(False)
         self.worker_thread.start()
