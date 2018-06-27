@@ -48,7 +48,7 @@ from .common_tools import ParameterDialog
 # from .gis import CompareScenariosDialog
 # from .gis import DesireLinesDialog
 # from .gis import CreateBandwidthsDialog
-# from .gis import LeastCommonDenominatorDialog
+from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 
 # from .network import NetworkPreparationDialog
@@ -262,13 +262,13 @@ class AequilibraEMenu(object):
         self.simple_tag_action.setEnabled(True)
         self.gis_tools_menu.addAction(self.simple_tag_action)
 
-    #     # Lowest common denominator
-    #     icon = QIcon(os.path.dirname(__file__) + "/icons/icon_lcd.png")
-    #     self.lcd_action = QAction(icon, u"Lowest common denominator", self.iface.mainWindow())
-    #     self.lcd_action.triggered.connect(self.run_lcd)
-    #     self.lcd_action.setEnabled(True)
-    #     self.gis_tools_menu.addAction(self.lcd_action)
-    #     #
+        # Lowest common denominator
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_lcd.png")
+        self.lcd_action = QAction(icon, u"Lowest common denominator", self.iface.mainWindow())
+        self.lcd_action.triggered.connect(self.run_lcd)
+        self.lcd_action.setEnabled(True)
+        self.gis_tools_menu.addAction(self.lcd_action)
+
     #     # # Desire lines
     #     icon = QIcon(os.path.dirname(__file__) + "/icons/icon_desire_lines.png")
     #     self.dlines_action = QAction(icon, u"Desire Lines", self.iface.mainWindow())
@@ -494,11 +494,11 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_lcd(self):
-        pass
+        # pass
 
-    #     dlg2 = LeastCommonDenominatorDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = LeastCommonDenominatorDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_dlines(self):
         pass
