@@ -32,11 +32,11 @@ import sys
 import os
 from ..common_tools.auxiliary_functions import *
 from point_tool import PointTool
-from aequilibrae.paths.results import PathResults
+from ..aequilibrae.aequilibrae.paths.results import PathResults
 
 no_binary = False
 try:
-    from aequilibrae.paths import path_computation
+    from ..aequilibrae.aequilibrae.paths import path_computation
 except:
     no_binary = True
 

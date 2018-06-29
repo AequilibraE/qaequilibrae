@@ -22,10 +22,10 @@
 from PyQt4.QtCore import *
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from ..common_tools import WorkerThread
-from aequilibrae.distribution import GravityApplication
+from ..aequilibrae.aequilibrae.distribution import GravityApplication
 
 
 class ApplyGravityProcedure(WorkerThread):

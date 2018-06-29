@@ -26,7 +26,7 @@ from functools import partial
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
-from ..aequilibrae.matrix import AequilibraEData
+from ..aequilibrae.aequilibrae.matrix import AequilibraEData
 from load_dataset_class import LoadDataset
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_vector_loader.ui'))

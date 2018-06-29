@@ -23,8 +23,8 @@ from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
 from PyQt4.QtCore import QObject, SIGNAL, Qt
 
-from aequilibrae.paths import Graph, SkimResults, NetworkSkimming
-from aequilibrae.matrix import matrix_export_types
+from ..aequilibrae.aequilibrae.paths import Graph, SkimResults, NetworkSkimming
+from ..aequilibrae.aequilibrae.matrix import matrix_export_types
 from ..common_tools import GetOutputFileName
 from ..common_tools import ReportDialog
 from ..common_tools.auxiliary_functions import *
