@@ -20,18 +20,20 @@
  """
 
 from qgis.core import *
-from PyQt4 import QtGui, uic
-from PyQt4.QtGui import *
+from qgis.PyQt import QtWidgets, uic
+from .get_output_file_name import GetOutputFileName
+import qgis
 
 import sys
 import os
-from auxiliary_functions import standard_path
+from .auxiliary_functions import standard_path
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_report.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_report.ui'))
 
-class ReportDialog(QtGui.QDialog, FORM_CLASS):
+
+class ReportDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface, reporting):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
@@ -44,15 +46,11 @@ class ReportDialog(QtGui.QDialog, FORM_CLASS):
 
     def save_log(self):
         file_types = "Text files(*.txt)"
-        new_name = QFileDialog.getSaveFileName(None, 'Save log', self.path, file_types)
-        if len(new_name) > 0:
-            if new_name[-3].upper() != 'TXT':
-                new_name = new_name + '.txt'
-            outp = open(new_name, 'w')
-            for t in self.reporting:
-                print >> outp, t
-            outp.flush()
-            outp.close()
+        new_name, _ = GetOutputFileName(self, 'Save procedure log', file_types, '.txt', self.path)
+        if new_name is not None:
+            with open(new_name, 'w') as outp:
+                for t in self.reporting:
+                    outp.write(t)
             self.exit_procedure()
 
     def exit_procedure(self):
