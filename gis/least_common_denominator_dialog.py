@@ -19,15 +19,15 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import QgsMapLayerRegistry
-from PyQt4.QtCore import QObject, SIGNAL
-from PyQt4 import QtGui, uic
+from qgis.core import QgsProject
+from qgis.PyQt.QtCore import QObject
+from qgis.PyQt import QtWidgets, uic
 import qgis
 import sys
 import os
 
 # For the GIS tools portion
-from least_common_denominator_procedure import LeastCommonDenominatorProcedure
+from .least_common_denominator_procedure import LeastCommonDenominatorProcedure
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import get_vector_layer_by_name
@@ -39,9 +39,9 @@ from functools import partial
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_least_common_denominator.ui'))
 
-class LeastCommonDenominatorDialog(QtGui.QDialog, FORM_CLASS):
+class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QtGui.QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
@@ -66,22 +66,21 @@ class LeastCommonDenominatorDialog(QtGui.QDialog, FORM_CLASS):
             self.fromfield.clear()
             if self.fromlayer.currentIndex() >= 0:
                 layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
-                for field in layer.pendingFields().toList():
+                for field in layer.fields().toList():
                     self.fromfield.addItem(field.name())
         else:
             self.tofield.clear()
             if self.tolayer.currentIndex() >= 0:
                 layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
-                for field in layer.pendingFields().toList():
+                for field in layer.fields().toList():
                     self.tofield.addItem(field.name())
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
 
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.finished_threaded_procedure)
+        self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
         self.OK.setEnabled(False)
         self.worker_thread.start()
         self.exec_()
@@ -97,7 +96,7 @@ class LeastCommonDenominatorDialog(QtGui.QDialog, FORM_CLASS):
 
     def finished_threaded_procedure(self, procedure):
         if self.worker_thread.error is None:
-            QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result)
+            QgsProject.instance().addMapLayer(self.worker_thread.result)
         else:
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.worker_thread.error,
                                                       level=3)

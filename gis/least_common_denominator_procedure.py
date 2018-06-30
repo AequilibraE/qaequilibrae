@@ -18,13 +18,14 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-from PyQt4.QtCore import QVariant, SIGNAL
+# from PyQt4.QtCore import QVariant, SIGNAL
+from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsCoordinateTransform, QgsSpatialIndex, QgsFeature, QgsGeometry, QgsField, QgsVectorLayer
 import copy
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
-from ..common_tools import WorkerThread
+from ..common_tools.worker_thread import WorkerThread
 
 
 class LeastCommonDenominatorProcedure(WorkerThread):
@@ -56,13 +57,13 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                                                     self.to_layer.dataProvider().crs())
 
         # FIELDS INDICES
-        idx = self.from_layer.fieldNameIndex(ffield)
-        fid = self.to_layer.fieldNameIndex(tfield)
+        idx = self.from_layer.dataProvider().fieldNameIndex(ffield)
+        fid = self.to_layer.dataProvider().fieldNameIndex(tfield)
 
         # We create an spatial self.index to hold all the features of the layer that will receive the data
         # And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.to_layer.dataProvider().featureCount())
-        self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Building Spatial Index')
+        self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
+        self.ProgressText.emit("Building Spatial Index")
         allfeatures = {}
         merged = {}
         self.index = QgsSpatialIndex()
@@ -70,9 +71,9 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             allfeatures[feature.id()] = feature
             merged[feature.id()] = feature
             self.index.insertFeature(feature)
-            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), i)
+            self.ProgressValue.emit(i)
 
-        self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Duplicating Layers')
+        self.ProgressText.emit("Duplicating Layers")
         self.all_attr = {}
         # We create the memory layer that will have the analysis result, which is the lowest common
         # denominator of both layers
@@ -98,8 +99,8 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         lcd_layer.updateFields()
 
         # PROGRESS BAR
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.from_layer.dataProvider().featureCount())
-        self.emit(SIGNAL("ProgressText( PyQt_PyObject )"), 'Running Analysis')
+        self.ProgressMaxValue.emit(self.from_layer.dataProvider().featureCount())
+        self.ProgressText.emit("Running Analysis")
         part_id = 1
         features = []
         for fc, feat in enumerate(self.from_layer.getFeatures()):
@@ -153,13 +154,12 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         features.append(feature)
                         part_id += 1
 
-            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), fc)
-            self.emit(SIGNAL("ProgressText( PyQt_PyObject )"),
-                      'Running Analysis (' + "{:,}".format(fc) + '/' + "{:,}".format(
+            self.ProgressValue.emit(fc)
+            self.ProgressText.emit('Running Analysis (' + "{:,}".format(fc) + '/' + "{:,}".format(
                           self.from_layer.featureCount()) + ')')
 
         # Find the features on TO that have no correspondence in FROM
-        for f, feature in merged.iteritems():
+        for f, feature in merged.items():
             geom = feature.geometry()
             aux, statt = self.find_geometry(allfeatures[f].geometry())
             if geom.area() > 0:
@@ -180,26 +180,26 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             a = lcdpr.addFeatures(features)
         self.result = lcd_layer
 
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), self.from_layer.dataProvider().featureCount())
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), "procedure")
+        self.ProgressValue.emit(self.from_layer.dataProvider().featureCount())
+        self.finished_threaded_procedure.emit("procedure")
 
     def find_geometry(self, g):
         if self.output_type == 'Poly':
             stat = g.area()
             if g.isMultipart():
-                geometry = QgsGeometry.fromMultiPolygon(g.asMultiPolygon())
+                geometry = QgsGeometry.fromMultiPolygonXY(g.asMultiPolygon())
             else:
-                geometry = QgsGeometry.fromPolygon(g.asPolygon())
+                geometry = QgsGeometry.fromPolygonXY(g.asPolygon())
         elif self.output_type == 'Line':
             stat = g.length()
             if g.isMultipart():
-                geometry = QgsGeometry.fromMultiLineString(g.asMultiPolyLine())
+                geometry = QgsGeometry.fromMultiPolylineXY(g.asMultiPolyLine())
             else:
-                geometry = QgsGeometry.fromLineString(g.asPoly())
+                geometry = QgsGeometry.fromPolyline(g.asPoly())
         else:
             stat = 1
             if g.isMultipart():
-                geometry = QgsGeometry.fromMultiPoint(g.asMultiPoint())
+                geometry = QgsGeometry.fromMultiPointXY(g.asMultiPoint())
             else:
-                geometry = QgsGeometry.fromPoint(g.asPoint())
+                geometry = QgsGeometry.fromPointXY(g.asPoint())
         return geometry, stat
