@@ -22,10 +22,10 @@
 import qgis
 from functools import partial
 from qgis.core import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import uic
-from qgis.gui import QgsMapLayerProxyModel
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtWidgets import *
+from qgis.PyQt import uic
+from PyQt5.QtGui import QColor
 import sys
 import os
 import copy
@@ -33,11 +33,11 @@ import copy
 from random import randint
 from ..common_tools.auxiliary_functions import *
 
-from set_color_ramps_dialog import LoadColorRampSelector
-from bandwidth_scale_dialog import BandwidthScaleDialog
+from .set_color_ramps_dialog import LoadColorRampSelector
+from .bandwidth_scale_dialog import BandwidthScaleDialog
 
 sys.modules['qgsfieldcombobox'] = qgis.gui
-sys.modules['qgscolorbuttonv2'] = qgis.gui
+sys.modules['qgscolorbutton'] = qgis.gui
 sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_bandwidths.ui'))
 
@@ -153,8 +153,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         
     def add_to_bands_list(self):
         if self.ab_FieldComboBox.currentIndex() >= 0 and self.ba_FieldComboBox.currentIndex() >= 0:
-            ab_band = self.layer.fieldNameIndex(self.ab_FieldComboBox.currentText())
-            ba_band = self.layer.fieldNameIndex(self.ba_FieldComboBox.currentText())
+            ab_band = self.layer.dataProvider().fieldNameIndex(self.ab_FieldComboBox.currentText())
+            ba_band = self.layer.dataProvider().fieldNameIndex(self.ba_FieldComboBox.currentText())
 
             self.bands_list.setRowCount(self.tot_bands + 1)
 
@@ -316,7 +316,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         for i in range(self.tot_bands):
             for j in range(2):
                 field = self.bands_list.item(i, j).text()
-                idx = self.layer.fieldNameIndex(field)
+                idx = self.layer.dataProvider().fieldNameIndex(field)
                 if max_value < 0:
                     values.append(self.layer.maximumValue(idx))
 
@@ -325,7 +325,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 # link the band needs to be. Try it out. it works!!
                 #bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).backgroundColor()))
             if len(self.bands_list.item(i, 2).text()) == 0:
-                cl = self.bands_list.item(i, 2).backgroundColor()
+                cl = self.bands_list.item(i, 2).background().color()
             else:
                 cl = eval(self.bands_list.item(i, 2).text())
             bands_ab.append((self.bands_list.item(i, 0).text(), ab, cl, 'ab'))
@@ -345,7 +345,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         for s in [bands_ab, bands_ba]:
             acc_offset = '0'
             for field, side, clr, direc in s:
-                symbol_layer = QgsSimpleLineSymbolLayerV2.create({})
+                symbol_layer = QgsSimpleLineSymbolLayer.create({})
                 props = symbol_layer.properties()
                 width = '(coalesce(scale_linear("' + field + '", 0, ' + str(max_value) + ', 0, ' + band_size + '), 0))'
                 props['width_dd_expression'] = width
@@ -368,8 +368,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                     props['line_color'] = str(clr.getRgb()[0]) + ',' + str(clr.getRgb()[1]) + ',' + str(clr.getRgb()[2]) + ',' \
                                           + str(clr.getRgb()[3])
 
-                symbol_layer = QgsSimpleLineSymbolLayerV2.create(props)
-                self.layer.rendererV2().symbol().appendSymbolLayer(symbol_layer)
+                symbol_layer = QgsSimpleLineSymbolLayer.create(props)
+                self.layer.renderer().symbol().appendSymbolLayer(symbol_layer)
 
                 acc_offset = acc_offset + ' + ' + str(side) + '*(' + width + '+' + space_size + ')'
 

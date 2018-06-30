@@ -26,9 +26,9 @@ from qgsmaplayercombobox import QgsMapLayerComboBox
 import qgis
 from functools import partial
 from qgis.core import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import uic
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtWidgets import *
+from qgis.PyQt import uic
 import sys
 import os
 
@@ -44,7 +44,7 @@ class LoadColorRampSelector(QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
         self.layer = layer
-        myStyle = QgsStyleV2().defaultStyle()
+        myStyle = QgsStyle().defaultStyle()
 
         self.defaultColorRampNames = myStyle.colorRampNames()
 
