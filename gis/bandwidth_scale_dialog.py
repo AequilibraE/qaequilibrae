@@ -22,9 +22,9 @@
 import copy
 import qgis
 from qgis.core import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import uic
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtWidgets import *
+from qgis.PyQt import uic
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
