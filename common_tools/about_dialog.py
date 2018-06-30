@@ -60,7 +60,7 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
         self.all_items.append(['AequilibraE Version name', release_name])
         self.all_items.append(['AequilibraE Version number', release_version])
         self.all_items.append(['GUI version', b])
-        self.all_items.append(['Repository', repository])
+        self.all_items.append(['GUI Repository', repository])
         self.all_items.append(['Minimum QGIS', '3.0'])
         self.all_items.append(['Developers', developers])
         self.all_items.append(['Sponsors', sponsors])
