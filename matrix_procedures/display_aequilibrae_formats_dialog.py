@@ -22,7 +22,7 @@
 from PyQt4 import QtGui, uic
 from PyQt4.QtGui import *
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
-from ..aequilibrae.aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
+from aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
 from ..common_tools.auxiliary_functions import *
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_data_viewer.ui'))

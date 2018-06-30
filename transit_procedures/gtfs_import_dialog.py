@@ -35,7 +35,7 @@ from ..common_tools import GetOutputFileName
 from PyQt4.QtGui import QHBoxLayout, QVBoxLayout, QGridLayout
 from PyQt4.QtGui import QProgressBar, QLabel, QWidget, QPushButton, QSpacerItem
 
-from ..aequilibrae.aequilibrae.transit.gtfs import gtfs_sqlite_db
+from aequilibrae.transit.gtfs import gtfs_sqlite_db
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), '../common_tools/forms/ui_empty.ui'))
 

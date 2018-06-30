@@ -28,7 +28,7 @@ import webbrowser
 import os
 from os.path import dirname, abspath
 from .auxiliary_functions import standard_path
-from ..aequilibrae.aequilibrae.paths import release_name, release_version
+from aequilibrae.paths import release_name, release_version
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_about.ui'))
 

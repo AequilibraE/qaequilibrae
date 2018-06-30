@@ -28,8 +28,8 @@ import sys
 import os
 import struct
 
-from ..aequilibrae.aequilibrae import reserved_fields
-from ..aequilibrae.aequilibrae.paths import Graph
+from aequilibrae import reserved_fields
+from aequilibrae.paths import Graph
 from ..common_tools import WorkerThread, reporter, logger
 
 class GraphCreation(WorkerThread):

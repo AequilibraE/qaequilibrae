@@ -27,7 +27,7 @@ from ..common_tools.auxiliary_functions import *
 from pyspatialite import dbapi2 as db
 from ..common_tools.global_parameters import *
 from ..common_tools import WorkerThread
-from ..aequilibrae.aequilibrae import spatialite_database
+from aequilibrae import spatialite_database
 
 
 class CreatesTranspoNetProcedure(WorkerThread):

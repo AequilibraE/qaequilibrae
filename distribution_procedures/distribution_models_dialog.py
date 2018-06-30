@@ -31,12 +31,12 @@ from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequ
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
 from ..common_tools.get_output_file_name import GetOutputFileName
-from ..aequilibrae.aequilibrae.distribution import SyntheticGravityModel
-from ..aequilibrae.aequilibrae.distribution.synthetic_gravity_model import valid_functions
-from ..aequilibrae.aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
-from ipf_procedure import IpfProcedure
-from calibrate_gravity_procedure import CalibrateGravityProcedure
-from apply_gravity_procedure import ApplyGravityProcedure
+from aequilibrae.distribution import SyntheticGravityModel
+from aequilibrae.distribution.synthetic_gravity_model import valid_functions
+from aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
+from .ipf_procedure import IpfProcedure
+from .calibrate_gravity_procedure import CalibrateGravityProcedure
+from .apply_gravity_procedure import ApplyGravityProcedure
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_distribution.ui'))
 

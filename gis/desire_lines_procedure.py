@@ -27,8 +27,9 @@ import numpy as np
 import struct
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import logger
-from ..aequilibrae.aequilibrae.paths import Graph
-from ..aequilibrae.aequilibrae.paths.results import AssignmentResults
+import aequilibrae
+from aequilibrae.paths import Graph
+from aequilibrae.paths.results import AssignmentResults
 from collections import OrderedDict
 
 error = False
@@ -39,7 +40,7 @@ except:
 
 no_binary = False
 try:
-    from ..aequilibrae.aequilibrae.paths import allOrNothing
+    from aequilibrae.paths import allOrNothing
 except:
     no_binary = True
 

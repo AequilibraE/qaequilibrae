@@ -33,7 +33,7 @@ from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog, GetOutputFileName, GetOutputFolderName
 
-from ..aequilibrae.aequilibrae.transit.gtfs import create_gtfsdb
+from aequilibrae.transit.gtfs import create_gtfsdb
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), '../common_tools/forms/ui_empty.ui'))
 

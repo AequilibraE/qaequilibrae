@@ -25,7 +25,7 @@ import os
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
 
 from ..common_tools import WorkerThread
-from ..aequilibrae.aequilibrae.distribution import Ipf
+from aequilibrae.distribution import Ipf
 
 
 class IpfProcedure(WorkerThread):

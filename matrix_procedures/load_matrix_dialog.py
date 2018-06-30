@@ -34,7 +34,7 @@ from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.report_dialog import ReportDialog
 from load_matrix_class import LoadMatrix, MatrixReblocking
-from ..aequilibrae.aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.matrix import AequilibraeMatrix
 
 no_omx = False
 try:
