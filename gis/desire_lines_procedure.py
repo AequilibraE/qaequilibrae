@@ -27,6 +27,7 @@ import numpy as np
 import struct
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import logger
+import aequilibrae
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import AssignmentResults
 from collections import OrderedDict
