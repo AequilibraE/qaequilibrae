@@ -20,7 +20,7 @@
  """
 
 from qgis.core import *
-from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
 from qgis.PyQt.QtCore import Qt
 import qgis
@@ -84,7 +84,7 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
     def set_show_matrices(self):
         self.tbl_array_cores.clear()
         if self.chb_use_all_matrices.isChecked():
-            self.resize(383, 385)
+            self.resize(QtCore.QSize(383, 385))
             self.setMaximumSize(383, 385)
         else:
             self.setMaximumSize(710, 385)
