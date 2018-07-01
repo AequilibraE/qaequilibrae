@@ -40,7 +40,7 @@ from .common_tools import ParameterDialog
 
 # from .common_tools import logger
 # from .common_tools import ReportDialog
-# from .common_tools import AboutDialog
+from .common_tools import AboutDialog
 
 # from .binary_downloader_class import BinaryDownloaderDialog
 # from .distribution_procedures import DistributionModelsDialog
@@ -68,12 +68,12 @@ from .gis import SimpleTagDialog
 # from .public_transport_procedures import GtfsImportDialog
 
 
-# from .aequilibrae.__version__ import binary_version as VERSION
+# from .aequilibrae.aequilibrae.__version__ import binary_version as VERSION
 
 no_binary = False
 old_binary = False
 # try:
-#     from aequilibrae.paths import VERSION_COMPILED as VERSION_GRAPH
+#     from aequilibrae.aequilibrae.paths import VERSION_COMPILED as VERSION_GRAPH
 #     if VERSION != VERSION_GRAPH:
 #         old_binary = True
 # except:
@@ -361,11 +361,11 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_about(self):
-        pass
+        # pass
 
-    #     dlg2 = AboutDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = AboutDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_load_matrices(self):
         pass

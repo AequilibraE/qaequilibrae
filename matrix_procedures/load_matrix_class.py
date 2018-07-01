@@ -27,7 +27,7 @@ from scipy.sparse import coo_matrix
 import numpy as np
 from PyQt4.QtCore import *
 
-from ..aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.matrix import AequilibraeMatrix
 from ..common_tools.worker_thread import WorkerThread
 
 

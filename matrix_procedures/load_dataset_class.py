@@ -23,7 +23,7 @@ from PyQt4.QtCore import *
 import numpy as np
 from ..common_tools.worker_thread import WorkerThread
 import struct
-from ..aequilibrae.matrix import AequilibraEData
+from aequilibrae.matrix import AequilibraEData
 from ..common_tools.global_parameters import *
 
 
