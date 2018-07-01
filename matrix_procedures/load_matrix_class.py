@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30
- Updated:    2017-10-02
+ Updated:    2018-07-01
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ import uuid
 from scipy.sparse import coo_matrix
 
 import numpy as np
-from PyQt4.QtCore import *
+from qgis.PyQt.QtCore import *
 
 from aequilibrae.matrix import AequilibraeMatrix
 from ..common_tools.worker_thread import WorkerThread
@@ -47,9 +47,9 @@ class LoadMatrix(WorkerThread):
 
     def doWork(self):
         if self.matrix_type == 'layer':
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Loading from table")
+            self.ProgressText.emit("Loading from table")
             feat_count = self.layer.featureCount()
-            self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), (feat_count))
+            self.ProgressMaxValue.emit(feat_count)
 
             # We read all the vectors and put in a list of lists
             matrix = []
@@ -61,32 +61,31 @@ class LoadMatrix(WorkerThread):
                 c = feat.attributes()[self.idx[2]]
                 matrix.append([a, b, c])
                 if P % 1000 == 0:
-                    self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (int(P)))
+                    self.ProgressValue.emit(int(P))
+                    self.ProgressText.emit(("Loading matrix: " + "{:,}".format(P) + "/" + "{:,}".format(feat_count)))
 
-                    self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),
-                              ("Loading matrix: " + "{:,}".format(P) + "/" + "{:,}".format(feat_count)))
+            self.ProgressValue.emit(0)
+            self.ProgressText.emit("Converting to a NumPy array")
 
-            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), (0))
-            self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), ("Converting to a NumPy array"))
             matrix1 = np.array(matrix)  # transform the list of lists in NumPy array
             del matrix
 
             # Bring it all to memory mapped
-            self.matrix = np.memmap(os.path.join(tempfile.gettempdir(),'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
-                               dtype=[('from', np.uint64), ('to', np.uint64), ('flow', np.float64)],
-                               mode='w+',
-                               shape=(int(matrix1.shape[0]), ))
-
+            self.matrix = np.memmap(
+                os.path.join(tempfile.gettempdir(), 'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
+                dtype=[('from', np.uint64), ('to', np.uint64), ('flow', np.float64)],
+                mode='w+',
+                shape=(int(matrix1.shape[0]),))
 
             self.matrix['from'] = matrix1[:, 0]
             self.matrix['to'] = matrix1[:, 1]
             self.matrix['flow'] = matrix1[:, 2]
-            del(matrix1)
+            del (matrix1)
 
         elif self.matrix_type == 'numpy':
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Loading from NumPY")
+            self.ProgressText.emit("Loading from NumPy")
             try:
-                mat= np.load(self.numpy_file)
+                mat = np.load(self.numpy_file)
                 if len(mat.shape[:]) == 2:
                     mat = coo_matrix(mat)
                     cells = int(mat.row.shape[0])
@@ -94,18 +93,19 @@ class LoadMatrix(WorkerThread):
                                                          '.mat'),
                                             dtype=[('from', np.uint64), ('to', np.uint64), ('flow', np.float64)],
                                             mode='w+',
-                                            shape=(cells, ))
+                                            shape=(cells,))
                     self.matrix['from'][:] = mat.row[:]
                     self.matrix['to'] = mat.col[:]
                     self.matrix['flow'][:] = mat.data[:]
-                    del(mat)
+                    del (mat)
                 else:
-                    self.report.append('Numpy array needs to be 2 dimensional. Matrix provided has ' + str(len(mat.shape[:])))
+                    self.report.append(
+                        'Numpy array needs to be 2 dimensional. Matrix provided has ' + str(len(mat.shape[:])))
             except:
                 self.report.append('Could not load array')
 
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), '')
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'LOADED-MATRIX')
+            self.ProgressText.emit("")
+            self.finished_threaded_procedure.emit("LOADED-MATRIX")
 
 
 class MatrixReblocking(WorkerThread):
@@ -124,9 +124,10 @@ class MatrixReblocking(WorkerThread):
     def doWork(self):
         if self.sparse:
             # Builds the hash
-            self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.num_matrices)
-            self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Building correspondence")
-            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
+            self.ProgressMaxValue.emit(self.num_matrices)
+            self.ProgressValue.emit(0)
+            self.ProgressText.emit("Building correspondence")
+
             indices = None
             p = 0
             for mat_name, mat in self.matrices.iteritems():
@@ -140,24 +141,13 @@ class MatrixReblocking(WorkerThread):
                     all_indices = np.hstack((indices, froms, tos))
                 indices = np.unique(all_indices)
                 p += 1
-                self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
-
+                self.ProgressValue.emit(p)
             compact_shape = int(indices.shape[0])
-
-            # index = np.zeros(np.max(indices) + 1, np.uint64)
-            #
-            # for i, j in enumerate(indices):
-            #     index[j] = i
         else:
             compact_shape = 0
             for mat_name, mat in self.matrices.iteritems():
                 compact_shape = np.max(compact_shape, mat.shape[0])
-
             indices = np.arange(compact_shape)
-            # index = np.zeros(np.max(indices) + 1, np.uint64)
-            #
-            # for i, j in enumerate(indices):
-            #     index[j] = i
 
         new_index = {k: i for i, k in enumerate(indices)}
 
@@ -168,34 +158,38 @@ class MatrixReblocking(WorkerThread):
         self.matrix.index[:] = indices[:]
 
         k = 0
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.num_matrices)
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Reblocking matrices")
+        self.ProgressMaxValue.emit(self.num_matrices)
+        self.ProgressText.emit("Reblocking matrices")
+
+        new_mat = None
         for mat_name, mat in self.matrices.iteritems():
             if self.sparse:
                 new_mat = np.copy(mat)
-                for j, v in new_index.iteritems():
-                    new_mat['from'][mat['from']==j] = v
-                    new_mat['to'][mat['to']==j] = v
+                for j, v in new_index.items():
+                    new_mat['from'][mat['from'] == j] = v
+                    new_mat['to'][mat['to'] == j] = v
                 k += 1
-                self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), k)
+                self.ProgressValue.emit(k)
             else:
                 k += 1
-                self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 1)
+                self.ProgressValue.emit(1)
 
             # In order to differentiate the zeros from the NaNs in the future matrix
-            new_mat['flow'][new_mat['flow']==0] = np.inf
+            if new_mat is None:
+                raise ValueError('Could not create reblocked matrix.')
+            new_mat['flow'][new_mat['flow'] == 0] = np.inf
 
             # Uses SciPy Sparse matrices to build the compact one
-            self.matrix.matrix[mat_name][:,:] = coo_matrix((new_mat['flow'], (new_mat['from'], new_mat['to'])),
-                                           shape=(compact_shape, compact_shape)).toarray().astype(np.float64)
+            self.matrix.matrix[mat_name][:, :] = coo_matrix((new_mat['flow'], (new_mat['from'], new_mat['to'])),
+                                                            shape=(compact_shape, compact_shape)).toarray().astype(
+                np.float64)
 
             # In order to differentiate the zeros from the NaNs in the future matrix
-            self.matrix.matrix[mat_name][self.matrix.matrix[mat_name]==0] = np.nan
-            self.matrix.matrix[mat_name][self.matrix.matrix[mat_name]==np.inf] = 0
+            self.matrix.matrix[mat_name][self.matrix.matrix[mat_name] == 0] = np.nan
+            self.matrix.matrix[mat_name][self.matrix.matrix[mat_name] == np.inf] = 0
 
-            del(mat)
-            del(new_mat)
+            del (mat)
+            del (new_mat)
 
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"), "Matrix Reblocking finalized")
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'REBLOCKED MATRICES')
-
+        self.ProgressText.emit("Matrix Reblocking finalized")
+        self.finished_threaded_procedure.emit("REBLOCKED MATRICES")

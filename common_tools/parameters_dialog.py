@@ -43,7 +43,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
 
-        self.path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/"
+        self.path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/aequilibrae/"
         self.default_values = None
         self.parameter_values = None
         self.current_data = None
