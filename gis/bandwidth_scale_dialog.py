@@ -114,7 +114,7 @@ class BandwidthScaleDialog(QDialog, FORM_CLASS):
                 fields = [self.cbb_field_to_scale_from.currentText()]
             
             for f in fields:
-                idx = self.layer.fieldNameIndex(f)
+                idx = self.layer.dataProvider().fieldNameIndex(f)
                 max_flow = max(max_flow, self.layer.maximumValue(idx))
                 
         self.box_ref_value.setText("{:3,.2f}".format(max_flow))

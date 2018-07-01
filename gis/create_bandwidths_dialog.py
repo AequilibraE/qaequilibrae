@@ -335,9 +335,9 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             max_value = max(values)
 
         if self.expert_mode:
-            QgsExpressionContextUtils.setProjectVariable('aeq_band_max_value', max_value)
-            QgsExpressionContextUtils.setProjectVariable('aeq_band_spacer', float(space_size))
-            QgsExpressionContextUtils.setProjectVariable('aeq_band_width', band_size)
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'aeq_band_max_value', max_value)
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'aeq_band_spacer', float(space_size))
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'aeq_band_width', band_size)
             max_value = '@aeq_band_max_value'
             space_size = '@aeq_band_spacer'
             band_size = '@aeq_band_width'

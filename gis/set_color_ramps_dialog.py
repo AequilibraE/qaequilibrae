@@ -99,7 +99,7 @@ class LoadColorRampSelector(QDialog, FORM_CLASS):
             max_box.setText(str(maxval))
 
         def find_max_min (field):
-            idx = self.layer.fieldNameIndex(field)
+            idx = self.layer.dataProvider().fieldNameIndex(field)
             minval = round(self.layer.minimumValue(idx), 2)
             maxval = round(self.layer.maximumValue(idx), 2)
             return minval, maxval
@@ -139,12 +139,12 @@ class LoadColorRampSelector(QDialog, FORM_CLASS):
         if action:
             self.resize(589, 238)
             self.cbb_ab_field.clear()
-            for field in self.layer.pendingFields().toList():
-                self.cbb_ab_field.addItem(field.name())
+            for field in self.layer.fields().names():
+                self.cbb_ab_field.addItem(field)
         else:
             self.resize(341, 238)
             self.cbb_ab_field.clear()
-            fields = [x.name().lower() for x in self.layer.pendingFields().toList()]
+            fields = self.layer.fields().names()
             for field in fields:
                 if '_ab' in field:
                     if field.replace('_ab', '_ba') in fields:
@@ -156,6 +156,8 @@ class LoadColorRampSelector(QDialog, FORM_CLASS):
                         fields.remove(field.replace('_ba', '_ab'))
                         field = field.replace('_ba', '_*')
                         self.cbb_ab_field.addItem(field)
+                else:
+                    self.cbb_ab_field.addItem(field)
 
         #self.cbb_ba_color.setVisible(False)
 
