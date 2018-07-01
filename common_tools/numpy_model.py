@@ -19,15 +19,17 @@
  -----------------------------------------------------------------------------------------------------------
  """
 import numpy as np
-from PyQt4 import QtCore
-from PyQt4.QtCore import *
+from qgis.PyQt import QtWidgets, uic, QtCore
+from qgis.PyQt.QtCore import *
+import qgis
+
 Qt = QtCore.Qt
 
-    
-#This class was adapted from https://www.mail-archive.com/pyqt@riverbankcomputing.com/msg17575.html
-#Provided by David Douard
 
-#adaptations for headers come from: http://stackoverflow.com/questions/14135543/how-to-set-the-qtableview-header-name-in-pyqt4
+# This class was adapted from https://www.mail-archive.com/pyqt@riverbankcomputing.com/msg17575.html
+# Provided by David Douard
+
+# adaptations for headers come from: http://stackoverflow.com/questions/14135543/how-to-set-the-qtableview-header-name-in-pyqt4
 
 class NumpyModel(QtCore.QAbstractTableModel):
     def __init__(self, aeq_matrix, separator, decimals, parent=None):
@@ -80,12 +82,11 @@ class NumpyModel(QtCore.QAbstractTableModel):
                     else:
                         return ('{:' + separator + '.' + str(self.decimals) + 'f}').format(
                             self._array.matrix_view[row, col])
-                
+
     def headerData(self, col, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self.header_data[col]
         if role == Qt.DisplayRole and orientation != Qt.Horizontal:
             return self.row_headers_data[col]
-        
+
         return QAbstractTableModel.headerData(self, col, orientation, role)
-                
