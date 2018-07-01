@@ -155,7 +155,6 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
             self.job_finished_from_thread()
 
     def job_finished_from_thread(self):
-        QgsProject.instance().addMapLayer(self.worker_thread.result_layer)
         try:
             QgsProject.instance().addMapLayer(self.worker_thread.result_layer)
         except:
