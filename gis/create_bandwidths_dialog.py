@@ -87,7 +87,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.rdo_color.toggled.connect(self.color_origins)
 
         self.rdo_scale_auto.toggled.connect(self.set_new_scale)
-        self.rdo_scale_custom.toggled.connect(self.set_new_scale)
+        # self.rdo_scale_custom.toggled.connect(self.set_new_scale)
         
         self.rdo_ramp.toggled.connect(self.color_origins)
         self.but_run.clicked.connect(self.add_bands_to_map)
