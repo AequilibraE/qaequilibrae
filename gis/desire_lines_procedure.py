@@ -254,7 +254,6 @@ class DesireLinesProcedure(WorkerThread):
                 self.graph.type_loaded = 'NETWORK'
                 self.graph.status = 'OK'
                 self.graph.network_ok = True
-                # try:
                 self.graph.prepare_graph(self.matrix.index.astype(np.int64))
                 self.graph.set_graph(cost_field='distance', skim_fields=False, block_centroid_flows=False)
 
@@ -295,7 +294,5 @@ class DesireLinesProcedure(WorkerThread):
                     features.append(feature)
                 a = dlpr.addFeatures(features)
                 self.result_layer = desireline_layer
-                # except ValueError as error:
-                #     self.report = [error.message]
 
         self.desire_lines.emit(('finished_desire_lines_procedure', 0))
