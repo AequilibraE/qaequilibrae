@@ -55,7 +55,7 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.columns = None
         self.matrix_hash = {}
 
-        self.setMaximumSize(383, 385)
+        self.setMaximumSize(QtCore.QSize(383, 385))
         self.resize(383, 385)
 
         # FIRST, we connect slot signals
@@ -84,10 +84,10 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
     def set_show_matrices(self):
         self.tbl_array_cores.clear()
         if self.chb_use_all_matrices.isChecked():
-            self.resize(QtCore.QSize(383, 385))
-            self.setMaximumSize(383, 385)
+            self.resize(383, 385)
+            self.setMaximumSize(QtCore.QSize(383, 385))
         else:
-            self.setMaximumSize(710, 385)
+            self.setMaximumSize(QtCore.QSize(710, 385))
             self.resize(710, 385)
             self.tbl_array_cores.setColumnWidth(0, 200)
             self.tbl_array_cores.setColumnWidth(1, 80)
@@ -204,7 +204,7 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
             self.lbl_funding2.setVisible(False)
             self.progress_label.setVisible(True)
             self.progressbar.setVisible(True)
-            self.setMaximumSize(383, 444)
+            self.setMaximumSize(QtCore.QSize(383, 444))
             self.resize(383, 444)
 
 
