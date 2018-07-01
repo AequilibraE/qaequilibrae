@@ -33,7 +33,7 @@ from ..common_tools.auxiliary_functions import *
 from ..matrix_procedures import LoadMatrixDialog
 from ..common_tools import ReportDialog
 from ..common_tools import GetOutputFolderName, GetOutputFileName
-from ..aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.matrix import AequilibraeMatrix
 
 from load_select_link_query_builder_dialog import LoadSelectLinkQueryBuilderDialog
 

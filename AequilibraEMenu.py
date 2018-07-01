@@ -40,13 +40,13 @@ from .common_tools import ParameterDialog
 
 # from .common_tools import logger
 # from .common_tools import ReportDialog
-# from .common_tools import AboutDialog
+from .common_tools import AboutDialog
 
 # from .binary_downloader_class import BinaryDownloaderDialog
 # from .distribution_procedures import DistributionModelsDialog
 
 # from .gis import CompareScenariosDialog
-# from .gis import DesireLinesDialog
+from .gis import DesireLinesDialog
 from .gis import CreateBandwidthsDialog
 from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
@@ -60,7 +60,7 @@ from .gis import SimpleTagDialog
 # from .paths_procedures import ShortestPathDialog
 # from .paths_procedures import ImpedanceMatrixDialog
 
-# from .matrix_procedures import LoadMatrixDialog
+from .matrix_procedures import LoadMatrixDialog
 # from .matrix_procedures import LoadDatasetDialog
 # from .matrix_procedures import DisplayAequilibraEFormatsDialog
 # from .matrix_procedures import MatrixManipulationDialog
@@ -68,12 +68,12 @@ from .gis import SimpleTagDialog
 # from .public_transport_procedures import GtfsImportDialog
 
 
-# from .aequilibrae.__version__ import binary_version as VERSION
+# from .aequilibrae.aequilibrae.__version__ import binary_version as VERSION
 
 no_binary = False
 old_binary = False
 # try:
-#     from aequilibrae.paths import VERSION_COMPILED as VERSION_GRAPH
+#     from aequilibrae.aequilibrae.paths import VERSION_COMPILED as VERSION_GRAPH
 #     if VERSION != VERSION_GRAPH:
 #         old_binary = True
 # except:
@@ -269,20 +269,20 @@ class AequilibraEMenu(object):
         self.lcd_action.setEnabled(True)
         self.gis_tools_menu.addAction(self.lcd_action)
 
-    #     # # Desire lines
-    #     icon = QIcon(os.path.dirname(__file__) + "/icons/icon_desire_lines.png")
-    #     self.dlines_action = QAction(icon, u"Desire Lines", self.iface.mainWindow())
-    #     self.dlines_action.triggered.connect(self.run_dlines)
-    #     self.dlines_action.setEnabled(True)
-    #     self.gis_tools_menu.addAction(self.dlines_action)
-    #     #
-        # # Bandwidths
+        # Desire lines
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_desire_lines.png")
+        self.dlines_action = QAction(icon, u"Desire Lines", self.iface.mainWindow())
+        self.dlines_action.triggered.connect(self.run_dlines)
+        self.dlines_action.setEnabled(True)
+        self.gis_tools_menu.addAction(self.dlines_action)
+
+        # Bandwidths
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_bandwidths.png")
         self.bandwidth_action = QAction(icon, u"Stacked Bandwidth", self.iface.mainWindow())
         self.bandwidth_action.triggered.connect(self.run_bandwidth)
         self.bandwidth_action.setEnabled(True)
         self.gis_tools_menu.addAction(self.bandwidth_action)
-        #
+
     #     # # Scenario comparison
     #     icon = QIcon(os.path.dirname(__file__) + "/icons/icon_scenario_comparison.png")
     #     self.scenario_comparison_action = QAction(icon, u"Scenario Comparison", self.iface.mainWindow())
@@ -361,18 +361,16 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_about(self):
-        pass
+        # pass
 
-    #     dlg2 = AboutDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = AboutDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_load_matrices(self):
-        pass
-
-    #     dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=False)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=False)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_load_database(self):
         pass
@@ -501,14 +499,12 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_dlines(self):
-        pass
-
-    #     if no_binary:
-    #         self.message_binary()
-    #     else:
-    #         dlg2 = DesireLinesDialog(self.iface)
-    #         dlg2.show()
-    #         dlg2.exec_()
+        if no_binary:
+            self.message_binary()
+        else:
+            dlg2 = DesireLinesDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
 
     def run_bandwidth(self):
         # pass

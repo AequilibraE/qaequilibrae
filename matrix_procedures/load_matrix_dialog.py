@@ -20,12 +20,12 @@
  """
 
 from qgis.core import *
+from qgis.PyQt import QtWidgets, uic, QtCore
+from qgis.PyQt.QtCore import Qt
 import qgis
-from PyQt4 import QtGui, uic
 from scipy.sparse import coo_matrix
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
 import numpy as np
+from qgis.PyQt.QtWidgets import QTableWidgetItem
 
 import sys
 import os
@@ -33,8 +33,8 @@ from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.report_dialog import ReportDialog
-from load_matrix_class import LoadMatrix, MatrixReblocking
-from ..aequilibrae.matrix import AequilibraeMatrix
+from .load_matrix_class import LoadMatrix, MatrixReblocking
+from aequilibrae.matrix import AequilibraeMatrix
 
 no_omx = False
 try:
@@ -47,9 +47,9 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/u
 # TODO: Add possibility to add a centroid list to guarantee the match between matrix index and graph
 # TODO: Allow user to import multiple matrices from CSV at once (like an export from TransCad or FAF data)
 # TODO: Add a remove button to the list of matrices to be loaded. Remove double-click
-class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
+class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface, **kwargs):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
@@ -86,7 +86,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.but_permanent_save.clicked.connect(self.get_name_and_save_to_disk)
 
         # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
+        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
             if 'wkbType' in dir(layer):
                 if layer.wkbType() == 100:
                     self.matrix_layer.addItem(layer.name())
@@ -101,7 +101,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             self.group_combo.setVisible(False)
             self.group_list.setVisible(False)
             self.group_buttons.setVisible(False)
-            self.setMaximumSize(QSize(127, 176))
+            self.setMaximumSize(127, 176)
             self.resize(127, 176)
             self.but_permanent_save.setVisible(False)
         else:
@@ -113,7 +113,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
             self.matrix_list_view.setColumnWidth(2, 125)
             self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
             self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
-            self.setMaximumSize(QSize(100000, 100000))
+            self.setMaximumSize(QtCore.QSize(100000, 100000))
             self.resize(542, 427)
             self.but_permanent_save.setVisible(True)
         
@@ -169,12 +169,10 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
                     self.field_cells.addItem(field.name())
 
     def run_thread(self):
-
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.finished_threaded_procedure)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
+        self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
 
         self.but_load.setEnabled(False)
         self.worker_thread.start()
@@ -282,7 +280,7 @@ class LoadMatrixDialog(QtGui.QDialog, FORM_CLASS):
 
         self.matrix_list_view.blockSignals(True)
         i = 0
-        for key, value in self.matrices.iteritems():
+        for key, value in self.matrices.items():
             r = np.unique(value['from']).shape[0]
             c = np.unique(value['to']).shape[0]
             dimensions = "{:,}".format(r) + " x " + "{:,}".format(c)

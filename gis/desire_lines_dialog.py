@@ -20,10 +20,10 @@
  """
 
 from qgis.core import *
+from qgis.PyQt import QtWidgets, uic, QtCore
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
+from qgis.PyQt.QtCore import Qt
 import qgis
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import uic, QtCore
 import sys
 import os
 import copy
@@ -35,14 +35,14 @@ from ..common_tools import NumpyModel
 from ..matrix_procedures import LoadMatrixDialog
 from ..common_tools import ReportDialog
 
-from desire_lines_procedure import DesireLinesProcedure
+from .desire_lines_procedure import DesireLinesProcedure
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_DesireLines.ui'))
 
-class DesireLinesDialog(QDialog, FORM_CLASS):
+class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.error = None
@@ -55,7 +55,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.columns = None
         self.matrix_hash = {}
 
-        self.setMaximumSize(QSize(383, 385))
+        self.setMaximumSize(QtCore.QSize(383, 385))
         self.resize(383, 385)
 
         # FIRST, we connect slot signals
@@ -74,11 +74,10 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.cancel.clicked.connect(self.exit_procedure)
 
         # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
+        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
             if 'wkbType' in dir(layer):
                 if layer.wkbType() in poly_types or layer.wkbType() in point_types:
                     self.zoning_layer.addItem(layer.name())
-
                     self.progress_label.setVisible(False)
                     self.progressbar.setVisible(False)
 
@@ -86,9 +85,9 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.tbl_array_cores.clear()
         if self.chb_use_all_matrices.isChecked():
             self.resize(383, 385)
-            self.setMaximumSize(QSize(383, 385))
+            self.setMaximumSize(QtCore.QSize(383, 385))
         else:
-            self.setMaximumSize(QSize(710, 385))
+            self.setMaximumSize(QtCore.QSize(710, 385))
             self.resize(710, 385)
             self.tbl_array_cores.setColumnWidth(0, 200)
             self.tbl_array_cores.setColumnWidth(1, 80)
@@ -117,8 +116,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         return cell_widget
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("assignment"), self.signal_handler)
-        QObject.connect(self.worker_thread, SIGNAL("desire_lines"), self.signal_handler)
+        self.worker_thread.assignment.connect(self.signal_handler)
+        self.worker_thread.desire_lines.connect(self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 
@@ -157,7 +156,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
 
     def job_finished_from_thread(self):
         try:
-            QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.result_layer)
+            QgsProject.instance().addMapLayer(self.worker_thread.result_layer)
         except:
             self.worker_thread.report.append('Could not load desire lines to map')
         if self.worker_thread.report:
@@ -204,7 +203,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             self.lbl_funding2.setVisible(False)
             self.progress_label.setVisible(True)
             self.progressbar.setVisible(True)
-            self.setMaximumSize(QSize(383, 444))
+            self.setMaximumSize(QtCore.QSize(383, 444))
             self.resize(383, 444)
 
 

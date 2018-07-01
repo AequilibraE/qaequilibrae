@@ -1,9 +1,5 @@
 from qgis.core import *
 
-# point_types = [QGis.WKBPoint, QGis.WKBMultiPoint, QGis.WKBPoint25D, QGis.WKBMultiPoint25D]
-# line_types =  [QGis.WKBLineString, QGis.WKBMultiLineString, QGis.WKBLineString25D, QGis.WKBMultiLineString25D]
-# poly_types = [QGis.WKBPolygon, QGis.WKBMultiPolygon, QGis.WKBPolygon25D, QGis.WKBMultiPolygon25D]
-
 point_types = [QgsWkbTypes.Point, QgsWkbTypes.Point25D]
 line_types =  [QgsWkbTypes.LineString, QgsWkbTypes.LineString25D]
 poly_types = [QgsWkbTypes.Polygon, QgsWkbTypes.Polygon25D]
