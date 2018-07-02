@@ -22,9 +22,9 @@
 import copy
 import qgis
 from qgis.core import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import uic
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtWidgets import *
+from qgis.PyQt import uic
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
@@ -114,7 +114,7 @@ class BandwidthScaleDialog(QDialog, FORM_CLASS):
                 fields = [self.cbb_field_to_scale_from.currentText()]
             
             for f in fields:
-                idx = self.layer.fieldNameIndex(f)
+                idx = self.layer.dataProvider().fieldNameIndex(f)
                 max_flow = max(max_flow, self.layer.maximumValue(idx))
                 
         self.box_ref_value.setText("{:3,.2f}".format(max_flow))

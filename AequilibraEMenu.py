@@ -47,7 +47,7 @@ from .common_tools import AboutDialog
 
 # from .gis import CompareScenariosDialog
 from .gis import DesireLinesDialog
-# from .gis import CreateBandwidthsDialog
+from .gis import CreateBandwidthsDialog
 from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 
@@ -269,20 +269,20 @@ class AequilibraEMenu(object):
         self.lcd_action.setEnabled(True)
         self.gis_tools_menu.addAction(self.lcd_action)
 
-    #     # # Desire lines
+        # Desire lines
         icon = QIcon(os.path.dirname(__file__) + "/icons/icon_desire_lines.png")
         self.dlines_action = QAction(icon, u"Desire Lines", self.iface.mainWindow())
         self.dlines_action.triggered.connect(self.run_dlines)
         self.dlines_action.setEnabled(True)
         self.gis_tools_menu.addAction(self.dlines_action)
 
-    #     # # Bandwidths
-    #     icon = QIcon(os.path.dirname(__file__) + "/icons/icon_bandwidths.png")
-    #     self.bandwidth_action = QAction(icon, u"Stacked Bandwidth", self.iface.mainWindow())
-    #     self.bandwidth_action.triggered.connect(self.run_bandwidth)
-    #     self.bandwidth_action.setEnabled(True)
-    #     self.gis_tools_menu.addAction(self.bandwidth_action)
-    #     #
+        # Bandwidths
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_bandwidths.png")
+        self.bandwidth_action = QAction(icon, u"Stacked Bandwidth", self.iface.mainWindow())
+        self.bandwidth_action.triggered.connect(self.run_bandwidth)
+        self.bandwidth_action.setEnabled(True)
+        self.gis_tools_menu.addAction(self.bandwidth_action)
+
     #     # # Scenario comparison
     #     icon = QIcon(os.path.dirname(__file__) + "/icons/icon_scenario_comparison.png")
     #     self.scenario_comparison_action = QAction(icon, u"Scenario Comparison", self.iface.mainWindow())
@@ -507,11 +507,11 @@ class AequilibraEMenu(object):
             dlg2.exec_()
 
     def run_bandwidth(self):
-        pass
+        # pass
 
-    #     dlg2 = CreateBandwidthsDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = CreateBandwidthsDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_scenario_comparison(self):
         pass

@@ -19,7 +19,7 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-# from .create_bandwidths_dialog import CreateBandwidthsDialog
+from .create_bandwidths_dialog import CreateBandwidthsDialog
 from .desire_lines_dialog import DesireLinesDialog
 from .least_common_denominator_dialog import LeastCommonDenominatorDialog
 from .simple_tag_dialog import SimpleTagDialog
