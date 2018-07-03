@@ -21,24 +21,29 @@
 
 import qgis
 from qgis.core import *
-from PyQt4.QtGui import *
-from PyQt4.Qsci import QsciLexerYAML
-from PyQt4 import uic
 
-import sys
+# from PyQt4.QtGui import *
+# from PyQt4.Qsci import QsciLexerYAML
+# from PyQt4 import uic
+
+from qgis.PyQt.Qsci import QsciLexerYAML
+from qgis.PyQt.QtGui import *
+from qgis.PyQt import QtWidgets, uic
+
 import os
 import yaml
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_parameters.ui'))
 
-
-class ParameterDialog(QDialog, FORM_CLASS):
-    def __init__(self, iface):
-        QDialog.__init__(self)
+class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
+    # def __init__(self, iface):
+    def __init__(self, iface, parent=None):
+        super(ParameterDialog, self).__init__(parent)
+        # QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
-        self.path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/"
+        self.path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/aequilibrae/"
         self.default_values = None
         self.parameter_values = None
         self.current_data = None
@@ -84,8 +89,10 @@ class ParameterDialog(QDialog, FORM_CLASS):
 
         if self.error:
             self.but_save.setEnabled(False)
-            qgis.utils.iface.messageBar().pushMessage("Error", "Parameter structure was compromised. Please reset "
+            self.iface.messageBar().pushMessage("Error", "Parameter structure was compromised. Please reset "
                                                                "to defaults", level=3, duration=10)
+            # qgis.utils.iface.messageBar().pushMessage("Error", "Parameter structure was compromised. Please reset "
+            #                                                    "to defaults", level=3, duration=10)
         else:
             self.but_save.setEnabled(True)
 

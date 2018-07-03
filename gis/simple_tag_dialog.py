@@ -20,23 +20,22 @@
  """
 
 from qgis.core import *
-from PyQt4.QtCore import *
-from PyQt4 import QtGui, uic
+from qgis.PyQt import QtWidgets, uic
 import qgis
 import sys
 import os
 
 # For the GIS tools portion
-from simple_tag_procedure import SimpleTAG
+from .simple_tag_procedure import SimpleTAG
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import  get_vector_layer_by_name
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_simple_tag.ui'))
 
-class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
+class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QtGui.QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
@@ -44,11 +43,11 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
         self.fromtype = None
         self.frommatchingtype = None
 
-        QObject.connect(self.fromlayer, SIGNAL("currentIndexChanged(QString)"), self.set_from_fields)
-        QObject.connect(self.tolayer, SIGNAL("currentIndexChanged(QString)"), self.set_to_fields)
-        QObject.connect(self.fromfield, SIGNAL("currentIndexChanged(QString)"), self.reload_fields)
-        QObject.connect(self.matchingfrom, SIGNAL("currentIndexChanged(QString)"), self.reload_fields_matching)
-        QObject.connect(self.needsmatching, SIGNAL("stateChanged(int)"), self.works_field_matching)
+        self.fromlayer.currentIndexChanged.connect(self.set_from_fields)
+        self.tolayer.currentIndexChanged.connect(self.set_to_fields)
+        self.fromfield.currentIndexChanged.connect(self.reload_fields)
+        self.matchingfrom.currentIndexChanged.connect(self.reload_fields_matching)
+        self.needsmatching.stateChanged.connect(self.works_field_matching)
 
         self.OK.clicked.connect(self.run)
 
@@ -70,7 +69,7 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
         if self.tolayer.currentIndex() >= 0:
             self.matchingto.clear()
             layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
-            for field in layer.pendingFields().toList():
+            for field in layer.fields().toList():
                 self.matchingto.addItem(field.name())
 
     def set_from_fields(self):
@@ -79,7 +78,7 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
         if self.fromlayer.currentIndex() >= 0:
             layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
 
-            for field in layer.pendingFields().toList():
+            for field in layer.fields().toList():
                 self.fromfield.addItem(field.name())
 
             self.enclosed.setEnabled(True)
@@ -98,7 +97,7 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
         if self.tolayer.currentIndex() >= 0:
             layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
 
-            for field in layer.pendingFields().toList():
+            for field in layer.fields().toList():
                 self.tofield.addItem(field.name())
         if self.needsmatching.isChecked():
             self.works_field_matching()
@@ -116,12 +115,12 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
 
             if self.fromlayer.currentIndex() >= 0:
                 layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
-                for field in layer.pendingFields().toList():
+                for field in layer.fields().toList():
                     self.matchingfrom.addItem(field.name())
 
             if self.tolayer.currentIndex() >= 0:
                 layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
-                for field in layer.pendingFields().toList():
+                for field in layer.fields().toList():
                     self.matchingto.addItem(field.name())
         else:
             self.matchingfrom.setVisible(False)
@@ -135,23 +134,23 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
 
         if self.fromlayer.currentIndex() >= 0:
             layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
-            for field in layer.pendingFields().toList():
+            for field in layer.fields().toList():
                 if self.fromfield.currentText() == field.name():
                     self.fromtype = field.type()
 
         if self.needsmatching.isChecked():
             if self.fromlayer.currentIndex() >= 0:
                 layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
-                for field in layer.pendingFields().toList():
+                for field in layer.fields().toList():
                     if self.matchingfrom.currentText() == field.name():
                         self.frommatchingtype = field.type()
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
 
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.finished_threaded_procedure)
+        self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
+
         self.OK.setEnabled(False)
         self.worker_thread.start()
         self.exec_()

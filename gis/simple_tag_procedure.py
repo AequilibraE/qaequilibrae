@@ -20,11 +20,12 @@
  """
 
 from qgis.core import *
-from PyQt4.QtCore import *
+# from PyQt4.QtCore import *
+from qgis.PyQt.QtCore import *
 import numpy as np
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
-from ..common_tools import WorkerThread
+from ..common_tools.worker_thread import WorkerThread
 
 
 def main():
@@ -63,14 +64,14 @@ class SimpleTAG(WorkerThread):
                                                     self.to_layer.dataProvider().crs())
 
         # PROGRESS BAR
-        self.emit( SIGNAL( "ProgressMaxValue( PyQt_PyObject )" ), self.to_layer.dataProvider().featureCount())
+        self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
 
         # FIELDS INDICES
-        idx = self.from_layer.fieldNameIndex(ffield)
-        fid = self.to_layer.fieldNameIndex(tfield)
+        idx = self.from_layer.dataProvider().fieldNameIndex(ffield)
+        fid = self.to_layer.dataProvider().fieldNameIndex(tfield)
         if self.fmatch is not None:
-            idq = self.from_layer.fieldNameIndex(self.fmatch)
-            idq2 = self.to_layer.fieldNameIndex(tmatch)
+            idq = self.from_layer.dataProvider().fieldNameIndex(self.fmatch)
+            idq2 = self.to_layer.dataProvider().fieldNameIndex(tmatch)
             
             self.from_match = {feature.id(): feature.attributes()[idq] for (feature) in self.from_layer.getFeatures()}
             self.to_match = {feature.id(): feature.attributes()[idq2] for (feature) in self.to_layer.getFeatures()}
@@ -102,23 +103,24 @@ class SimpleTAG(WorkerThread):
 
     #If target layer is a point layer
         for i, feat in enumerate(self.to_layer.getFeatures()):
-            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), i)
+            self.ProgressValue
+            self.ProgressValue.emit(i)
 
             self.chooses_match(feat)
             if feat.id() not in self.all_attr:
                 self.all_attr[feat.id()] = None
 
-        self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
+        self.ProgressValue.emit(0)
         for i, feat in enumerate(self.to_layer.getFeatures()):
-            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), i)
+            self.ProgressValue.emit(i)
             if self.all_attr[feat.id()] is not None:
                 a = self.to_layer.dataProvider().changeAttributeValues({feat.id(): {fid: self.all_attr[feat.id()]}})
 
         self.to_layer.commitChanges()
         self.to_layer.updateFields()
         
-        self.emit( SIGNAL( "ProgressValue( PyQt_PyObject )" ), self.to_layer.dataProvider().featureCount())
-        self.emit( SIGNAL( "finished_threaded_procedure( PyQt_PyObject )" ), "procedure")
+        self.ProgressValue.emit(self.to_layer.dataProvider().featureCount())
+        self.finished_threaded_procedure.emit("procedure")
 
     def chooses_match(self, feat):
         geom = feat.geometry()
