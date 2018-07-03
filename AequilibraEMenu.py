@@ -45,7 +45,7 @@ from .common_tools import AboutDialog
 # from .binary_downloader_class import BinaryDownloaderDialog
 # from .distribution_procedures import DistributionModelsDialog
 
-# from .gis import CompareScenariosDialog
+from .gis import CompareScenariosDialog
 from .gis import DesireLinesDialog
 from .gis import CreateBandwidthsDialog
 from .gis import LeastCommonDenominatorDialog
@@ -223,11 +223,11 @@ class AequilibraEMenu(object):
         # self.assignment_menu.addAction(self.dist_matrix_action)
 
         # # Traffic Assignment
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_assignment.png")
-        # self.traffic_assignment_action = QAction(icon, u"Traffic Assignment", self.iface.mainWindow())
-        # self.traffic_assignment_action.triggered.connect(self.run_traffic_assig)
-        # self.traffic_assignment_action.setEnabled(True)
-        # self.assignment_menu.addAction(self.traffic_assignment_action)
+        #         # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_assignment.png")
+        #         # self.traffic_assignment_action = QAction(icon, u"Traffic Assignment", self.iface.mainWindow())
+        #         # self.traffic_assignment_action.triggered.connect(self.run_traffic_assig)
+        #         # self.traffic_assignment_action.setEnabled(True)
+        #         # self.assignment_menu.addAction(self.traffic_assignment_action)
 
         # # ########################################################################
         # # #######################  TRANSIT SUB-MENU   ###########################
@@ -283,12 +283,12 @@ class AequilibraEMenu(object):
         self.bandwidth_action.setEnabled(True)
         self.gis_tools_menu.addAction(self.bandwidth_action)
 
-    #     # # Scenario comparison
-    #     icon = QIcon(os.path.dirname(__file__) + "/icons/icon_scenario_comparison.png")
-    #     self.scenario_comparison_action = QAction(icon, u"Scenario Comparison", self.iface.mainWindow())
-    #     self.scenario_comparison_action.triggered.connect(self.run_scenario_comparison)
-    #     self.scenario_comparison_action.setEnabled(True)
-    #     self.gis_tools_menu.addAction(self.scenario_comparison_action)
+        # Scenario comparison
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_scenario_comparison.png")
+        self.scenario_comparison_action = QAction(icon, u"Scenario Comparison", self.iface.mainWindow())
+        self.scenario_comparison_action.triggered.connect(self.run_scenario_comparison)
+        self.scenario_comparison_action.setEnabled(True)
+        self.gis_tools_menu.addAction(self.scenario_comparison_action)
 
         # ########################################################################
         # #################          LOOSE STUFF         #########################
@@ -514,11 +514,11 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_scenario_comparison(self):
-        pass
+        # pass
 
-    #     dlg2 = CompareScenariosDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = CompareScenariosDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_ipf(self):
         pass
