@@ -51,7 +51,7 @@ from .gis import CreateBandwidthsDialog
 from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 
-# from .network import NetworkPreparationDialog
+from .network import NetworkPreparationDialog
 # from .network import AddConnectorsDialog
 # from .network import CreatesTranspoNetDialog
 
@@ -110,15 +110,15 @@ class AequilibraEMenu(object):
         # # ########################################################################
         # # ################# NETWORK MANIPULATION SUB-MENU  #######################
 
-        # self.network_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Network Manipulation"))
-        # self.aequilibrae_add_submenu(self.network_menu)
+        self.network_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Network Manipulation"))
+        self.aequilibrae_add_submenu(self.network_menu)
 
-        # # Network preparation
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
-        # self.network_prep_action = QAction(icon, u"Network Preparation", self.iface.mainWindow())
-        # self.network_prep_action.triggered.connect(self.run_net_prep)
-        # self.network_prep_action.setEnabled(True)
-        # self.network_menu.addAction(self.network_prep_action)
+        # Network preparation
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
+        self.network_prep_action = QAction(icon, u"Network Preparation", self.iface.mainWindow())
+        self.network_prep_action.triggered.connect(self.run_net_prep)
+        self.network_prep_action.setEnabled(True)
+        self.network_menu.addAction(self.network_prep_action)
 
         # # Adding Connectors
         # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
@@ -395,12 +395,12 @@ class AequilibraEMenu(object):
 
     # run method that calls the network preparation section of the code
     def run_net_prep(self):
-        pass
+        # pass
 
-    #     dlg2 = NetworkPreparationDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
-    #     # If we wanted modal, we would eliminate the dlg2.show()
+        dlg2 = NetworkPreparationDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+        # If we wanted modal, we would eliminate the dlg2.show()
 
     # run method that calls the network preparation section of the code
     def run_create_transponet(self):
