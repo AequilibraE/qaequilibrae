@@ -52,7 +52,7 @@ from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 
 from .network import NetworkPreparationDialog
-# from .network import AddConnectorsDialog
+from .network import AddConnectorsDialog
 # from .network import CreatesTranspoNetDialog
 
 # from .paths_procedures import GraphCreationDialog
@@ -120,12 +120,12 @@ class AequilibraEMenu(object):
         self.network_prep_action.setEnabled(True)
         self.network_menu.addAction(self.network_prep_action)
 
-        # # Adding Connectors
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
-        # self.add_connectors_action = QAction(icon, u"Adding Connectors", self.iface.mainWindow())
-        # self.add_connectors_action.triggered.connect(self.run_add_connectors)
-        # self.add_connectors_action.setEnabled(True)
-        # self.network_menu.addAction(self.add_connectors_action)
+        # Adding Connectors
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
+        self.add_connectors_action = QAction(icon, u"Adding Connectors", self.iface.mainWindow())
+        self.add_connectors_action.triggered.connect(self.run_add_connectors)
+        self.add_connectors_action.setEnabled(True)
+        self.network_menu.addAction(self.add_connectors_action)
 
         # # Creating TranspoNet
         # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
@@ -412,11 +412,11 @@ class AequilibraEMenu(object):
     #     # If we wanted modal, we would eliminate the dlg2.show()
 
     def run_add_connectors(self):
-        pass
+        # pass
 
-    #     dlg2 = AddConnectorsDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = AddConnectorsDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_create_graph(self):
         pass

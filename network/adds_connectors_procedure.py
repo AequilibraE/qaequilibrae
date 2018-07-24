@@ -20,7 +20,7 @@
  """
 
 from qgis.core import *
-from PyQt4.QtCore import *
+from qgis.PyQt.QtCore import *
 from ..common_tools.auxiliary_functions import *
 
 from ..common_tools.global_parameters import *
@@ -52,20 +52,20 @@ class AddsConnectorsProcedure(WorkerThread):
         centroids = get_vector_layer_by_name(self.centroid_layer_name)
         links = get_vector_layer_by_name(self.link_layer_name)
 
-        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Duplicating layers")
-        self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), 2)
+        self.ProgressText.emit("Duplicating layers")
+        self.ProgressMaxValue.emit(2)
         # We create the new line layer
         new_line_layer = self.duplicate_layer(links, 'LineString', self.new_line_layer_name)
 
         # Create new node layer
-        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 1)
+        self.ProgressValue.emit(1)
         new_node_layer = self.duplicate_layer(nodes, 'Point', self.new_node_layer_name)
 
         # Now we start to set the field for writing the new data
-        idx = nodes.fieldNameIndex(self.node_ids)
-        idx2 = centroids.fieldNameIndex(self.centroids_ids)
-        anode = links.fieldNameIndex("A_NODE")
-        bnode = links.fieldNameIndex("B_NODE")
+        idx = nodes.dataProvider().fieldNameIndex(self.node_ids)
+        idx2 = centroids.dataProvider().fieldNameIndex(self.centroids_ids)
+        anode = links.dataProvider().fieldNameIndex("A_NODE")
+        bnode = links.dataProvider().fieldNameIndex("B_NODE")
         ids=[]
 
         if anode < 0 or bnode < 0:
@@ -73,8 +73,8 @@ class AddsConnectorsProcedure(WorkerThread):
             return None
 
         # Create the spatial index with nodes
-        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 0)
-        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Creating Spatial Index")
+        self.ProgressValue.emit(0)
+        self.ProgressText.emit("Creating Spatial Index")
         index = QgsSpatialIndex()
         MyFeatures = nodes.getFeatures()
         featcount = nodes.featureCount()
@@ -82,10 +82,10 @@ class AddsConnectorsProcedure(WorkerThread):
             MyFeatures = nodes.selectedFeatures()
             featcount = nodes.selectedFeatureCount()
 
-        self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), featcount)
+        self.ProgressMaxValue.emit(featcount)
         P = 0
         for feat in MyFeatures:
-            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), P)
+            self.ProgressValue.emit(P)
             a = index.insertFeature(feat)
             i_d = feat.attributes()[idx]
             if i_d in ids:
@@ -101,32 +101,32 @@ class AddsConnectorsProcedure(WorkerThread):
         added_centroids = []
         added_nodes = []
         featcount = centroids.featureCount()
-        self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), featcount)
-        self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), 0)
-        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Creating centroid connectors")
+        self.ProgressMaxValue.emit(featcount)
+        self.ProgressValue.emit(0)
+        self.ProgressText.emit("Creating centroid connectors")
 
         for feat in centroids.getFeatures():
             P += 1
-            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), int(P))
+            self.ProgressValue.emit(int(P))
             nearest = index.nearestNeighbor(feat.geometry().asPoint(), max_connectors)
 
             lon1, lat1 = feat.geometry().asPoint()
             found = 0
             for i in range(max_connectors):
                 fid = nearest[i]
-                nfeat = nodes.getFeatures(QgsFeatureRequest(fid)).next()
+                nfeat = nodes.getFeatures(QgsFeatureRequest(fid)).__next__()
                 lon2, lat2 = nfeat.geometry().asPoint()
                 dist = haversine(lon1, lat1, lon2, lat2)
                 if dist <= self.max_length:
                     found += 1
-                    line = QgsGeometry.fromPolyline([feat.geometry().asPoint(), nfeat.geometry().asPoint()])
-                    seg = QgsFeature(links.pendingFields())
+                    line = QgsGeometry.fromPolylineXY([feat.geometry().asPoint(), nfeat.geometry().asPoint()])
+                    seg = QgsFeature(links.fields())
                     a = seg.setGeometry(line)
                     a = seg.setAttribute(anode, feat.attributes()[idx2])
                     a = seg.setAttribute(bnode, nfeat.attributes()[idx])
                     a = added_centroids.append(seg)
             if found > 0:
-                seg = QgsFeature(nodes.pendingFields())
+                seg = QgsFeature(nodes.fields())
                 a = seg.setGeometry(feat.geometry())
                 a = seg.setAttribute(idx, feat.attributes()[idx2])
                 a = added_nodes.append(seg)
@@ -134,15 +134,15 @@ class AddsConnectorsProcedure(WorkerThread):
             a = new_line_layer.dataProvider().addFeatures(added_centroids)
             a = new_node_layer.dataProvider().addFeatures(added_nodes)
 
-        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Saving new line layer")
+        self.ProgressText.emit("Saving new line layer")
         new_line_layer.commitChanges()
         self.new_node_layer = new_node_layer
 
-        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "Saving new node layer")
+        self.ProgressText.emit("Saving new node layer")
         new_node_layer.commitChanges()
         self.new_line_layer = new_line_layer
 
-        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "DONE")
+        self.ProgressText.emit("DONE")
 
     def duplicate_layer(self, original_layer, layer_type, layer_name):
         epsg_code = int(original_layer.crs().authid().split(":")[1])
