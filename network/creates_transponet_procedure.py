@@ -22,9 +22,9 @@
 
 from shutil import copyfile
 from qgis.core import *
-from PyQt4.QtCore import *
+from qgis.PyQt.QtCore import *
 from ..common_tools.auxiliary_functions import *
-from pyspatialite import dbapi2 as db
+from sqlite3 import dbapi2 as db
 from ..common_tools.global_parameters import *
 from ..common_tools import WorkerThread
 from aequilibrae import spatialite_database
@@ -76,12 +76,12 @@ class CreatesTranspoNetProcedure(WorkerThread):
         self.run_series_of_queries(
            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'triggers.sql'))
 
-        self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), "DONE")
+        self.ProgressText.emit("DONE")
 
     # Adds the non-standard fields to a layer
     def additional_fields_to_layers(self, conn, table, layer, layer_fields, required_fields):
         curr = conn.cursor()
-        fields = layer.pendingFields()
+        fields = layer.fields()
         string_fields = []
         
         for f in set(layer_fields.keys()) - set(required_fields):
@@ -115,7 +115,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         for j, f in enumerate(layer.getFeatures()):
             self.emit_messages(value=j)
             attributes = []
-            for k, val in layer_fields.iteritems():
+            for k, val in layer_fields.items():
                 if val < 0:
                     attributes.append(str(initializable_fields[k]))
                 else:
@@ -128,7 +128,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
             attributes = ', '.join(attributes)
             sql = 'INSERT INTO ' + table + ' (' + field_titles + ', geometry) '
             sql += "VALUES (" + attributes + ", "
-            sql += "GeomFromText('" + f.geometry().exportToWkt().upper() + "', " + str(
+            sql += "GeomFromText('" + f.geometry().asWkt().upper() + "', " + str(
                 layer.crs().authid().split(":")[1]) + "))"
 
             try:
@@ -143,18 +143,18 @@ class CreatesTranspoNetProcedure(WorkerThread):
         curr.close()
 
     def convert_data(self, value):
-        if type(value) == QPyNullVariant:
+        if type(value) == NULL:
             return 'NULL'
         else:
             return str(value).replace('"', "'")
             
     def emit_messages(self, message='', value = -1, max_val = -1):
         if len(message) > 0:
-            self.emit(SIGNAL("ProgressText (PyQt_PyObject)"), message)
+            self.ProgressText.emit(message)
         if value >= 0:
-            self.emit(SIGNAL("ProgressValue(PyQt_PyObject)"), value)
+            self.ProgressValue.emit(value)
         if max_val >= 0:
-            self.emit(SIGNAL("ProgressMaxValue(PyQt_PyObject)"), max_val)
+            self.ProgressMaxValue.emit(max_val)
 
     def run_series_of_queries(self, queries):
 

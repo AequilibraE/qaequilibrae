@@ -53,7 +53,7 @@ from .gis import SimpleTagDialog
 
 from .network import NetworkPreparationDialog
 from .network import AddConnectorsDialog
-# from .network import CreatesTranspoNetDialog
+from .network import CreatesTranspoNetDialog
 
 # from .paths_procedures import GraphCreationDialog
 # from .paths_procedures import TrafficAssignmentDialog
@@ -127,12 +127,12 @@ class AequilibraEMenu(object):
         self.add_connectors_action.setEnabled(True)
         self.network_menu.addAction(self.add_connectors_action)
 
-        # # Creating TranspoNet
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
-        # self.create_transponet_action = QAction(icon, u"Create TranspoNet", self.iface.mainWindow())
-        # self.create_transponet_action.triggered.connect(self.run_create_transponet)
-        # self.create_transponet_action.setEnabled(True)
-        # self.network_menu.addAction(self.create_transponet_action)
+        # Creating TranspoNet
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
+        self.create_transponet_action = QAction(icon, u"Create TranspoNet", self.iface.mainWindow())
+        self.create_transponet_action.triggered.connect(self.run_create_transponet)
+        self.create_transponet_action.setEnabled(True)
+        self.network_menu.addAction(self.create_transponet_action)
 
         # # ########################################################################
         # # ####################  DATA UTILITIES SUB-MENU  #########################
@@ -404,12 +404,12 @@ class AequilibraEMenu(object):
 
     # run method that calls the network preparation section of the code
     def run_create_transponet(self):
-        pass
+        # pass
 
-    #     dlg2 = CreatesTranspoNetDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
-    #     # If we wanted modal, we would eliminate the dlg2.show()
+        dlg2 = CreatesTranspoNetDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+        # If we wanted modal, we would eliminate the dlg2.show()
 
     def run_add_connectors(self):
         # pass
