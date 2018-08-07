@@ -13,15 +13,18 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2017-10-05
- Updated:
+ Updated:    2018-08-08
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import QtGui, uic
+from qgis.core import *
+from qgis.PyQt import QtWidgets, uic, QtCore
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox
+from qgis.PyQt.QtCore import Qt
+import qgis
+
 from collections import OrderedDict
 from functools import partial
 import numpy as np
@@ -40,12 +43,13 @@ from .apply_gravity_procedure import ApplyGravityProcedure
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_distribution.ui'))
 
+
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
 
 
-class DistributionModelsDialog(QDialog, FORM_CLASS):
+class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface, mode=None):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
@@ -188,7 +192,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
         if self.model.function in ['EXPO', 'GAMMA']:
             self.table_model.setRowCount(i)
-            self.table_model.setItem(i-1, 0, QTableWidgetItem('Beta'))
+            self.table_model.setItem(i - 1, 0, QTableWidgetItem('Beta'))
             val = self.model.beta
             if val is None:
                 val = 0
@@ -198,7 +202,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
             item.setDecimals(7)
             item.setValue(float(val))
-            self.table_model.setCellWidget(i-1, 1, item)
+            self.table_model.setCellWidget(i - 1, 1, item)
 
     def load_datasets(self):
         dlg2 = LoadDatasetDialog(self.iface)
@@ -374,13 +378,10 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
             self.worker_thread = self.job_queue[out_name]
             self.run_thread()
 
-
         if self.job != 'calibrate':
             self.worker_thread.model.save(out_name)
 
-
         self.exit_procedure()
-
 
     def check_data(self):
         self.error = None
