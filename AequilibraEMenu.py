@@ -24,6 +24,7 @@
 import os
 import sys
 import qgis
+import aequilibrae
 # import tempfile, glob
 # from qgis.core import *
 from qgis.PyQt import QtWidgets
@@ -61,7 +62,7 @@ from .network import AddConnectorsDialog
 # from .paths_procedures import ImpedanceMatrixDialog
 
 from .matrix_procedures import LoadMatrixDialog
-# from .matrix_procedures import LoadDatasetDialog
+from .matrix_procedures import LoadDatasetDialog
 from .matrix_procedures import DisplayAequilibraEFormatsDialog
 # from .matrix_procedures import MatrixManipulationDialog
 
@@ -147,19 +148,19 @@ class AequilibraEMenu(object):
         self.display_custom_formats_action.setEnabled(True)
         self.matrix_menu.addAction(self.display_custom_formats_action)
 
-        # # Loading matrices
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
-        # self.load_matrix_action = QAction(icon, u"Import matrices", self.iface.mainWindow())
-        # self.load_matrix_action.triggered.connect(self.run_load_matrices)
-        # self.load_matrix_action.setEnabled(True)
-        # self.matrix_menu.addAction(self.load_matrix_action)
+        # Loading matrices
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
+        self.load_matrix_action = QAction(icon, u"Import matrices", self.iface.mainWindow())
+        self.load_matrix_action.triggered.connect(self.run_load_matrices)
+        self.load_matrix_action.setEnabled(True)
+        self.matrix_menu.addAction(self.load_matrix_action)
 
         # # Loading Database
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dataset.png")
-        # self.load_database_action = QAction(icon, u"Import dataset", self.iface.mainWindow())
-        # self.load_database_action.triggered.connect(self.run_load_database)
-        # self.load_database_action.setEnabled(True)
-        # self.matrix_menu.addAction(self.load_database_action)
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dataset.png")
+        self.load_database_action = QAction(icon, u"Import dataset", self.iface.mainWindow())
+        self.load_database_action.triggered.connect(self.run_load_database)
+        self.load_database_action.setEnabled(True)
+        self.matrix_menu.addAction(self.load_database_action)
 
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -370,11 +371,9 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_load_database(self):
-        pass
-
-    #     dlg2 = LoadDatasetDialog(self.iface, single_use=False)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = LoadDatasetDialog(self.iface, single_use=False)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_display_aequilibrae_formats(self):
         dlg2 = DisplayAequilibraEFormatsDialog(self.iface)

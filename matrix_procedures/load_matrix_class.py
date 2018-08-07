@@ -104,8 +104,8 @@ class LoadMatrix(WorkerThread):
             except:
                 self.report.append('Could not load array')
 
-            self.ProgressText.emit("")
-            self.finished_threaded_procedure.emit("LOADED-MATRIX")
+        self.ProgressText.emit("")
+        self.finished_threaded_procedure.emit("LOADED-MATRIX")
 
 
 class MatrixReblocking(WorkerThread):
@@ -130,7 +130,7 @@ class MatrixReblocking(WorkerThread):
 
             indices = None
             p = 0
-            for mat_name, mat in self.matrices.iteritems():
+            for mat_name, mat in self.matrices.items():
                 # Gets all non-zero coordinates and makes sure that they are considered
                 froms = mat['from']
                 tos = mat['to']
@@ -145,7 +145,7 @@ class MatrixReblocking(WorkerThread):
             compact_shape = int(indices.shape[0])
         else:
             compact_shape = 0
-            for mat_name, mat in self.matrices.iteritems():
+            for mat_name, mat in self.matrices.items():
                 compact_shape = np.max(compact_shape, mat.shape[0])
             indices = np.arange(compact_shape)
 
@@ -162,7 +162,7 @@ class MatrixReblocking(WorkerThread):
         self.ProgressText.emit("Reblocking matrices")
 
         new_mat = None
-        for mat_name, mat in self.matrices.iteritems():
+        for mat_name, mat in self.matrices.items():
             if self.sparse:
                 new_mat = np.copy(mat)
                 for j, v in new_index.items():
