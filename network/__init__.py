@@ -19,6 +19,6 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from network_preparation_dialog import NetworkPreparationDialog
-from adds_connectors_dialog import AddConnectorsDialog
-from creates_transponet_dialog import CreatesTranspoNetDialog
+from .network_preparation_dialog import NetworkPreparationDialog
+from .adds_connectors_dialog import AddConnectorsDialog
+# from .creates_transponet_dialog import CreatesTranspoNetDialog

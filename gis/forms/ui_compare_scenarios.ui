@@ -339,7 +339,7 @@
    <property name="title">
     <string>Colors</string>
    </property>
-   <widget class="QgsColorButtonV2" name="common_flow_color">
+   <widget class="QgsColorButton" name="common_flow_color">
     <property name="geometry">
      <rect>
       <x>320</x>
@@ -352,7 +352,7 @@
      <string>Common</string>
     </property>
    </widget>
-   <widget class="QgsColorButtonV2" name="positive_color">
+   <widget class="QgsColorButton" name="positive_color">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -378,7 +378,7 @@
      <string>Negative differences</string>
     </property>
    </widget>
-   <widget class="QgsColorButtonV2" name="negative_color">
+   <widget class="QgsColorButton" name="negative_color">
     <property name="geometry">
      <rect>
       <x>165</x>
@@ -421,9 +421,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QgsColorButtonV2</class>
+   <class>QgsColorButton</class>
    <extends>QToolButton</extends>
-   <header>qgscolorbuttonv2.h</header>
+   <header>qgscolorbutton.h</header>
   </customwidget>
   <customwidget>
    <class>QgsFieldComboBox</class>

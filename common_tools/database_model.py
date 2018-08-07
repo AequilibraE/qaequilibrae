@@ -20,8 +20,7 @@
  """
 
 import numpy as np
-from PyQt4 import QtCore
-from PyQt4.QtCore import *
+from qgis.PyQt import QtCore
 Qt = QtCore.Qt
 
 # This class was adapted from https://www.mail-archive.com/pyqt@riverbankcomputing.com/msg17575.html
@@ -108,4 +107,4 @@ class DatabaseModel(QtCore.QAbstractTableModel):
         if role == Qt.DisplayRole and orientation != Qt.Horizontal:
             return self.row_headers_data[col]
         
-        return QAbstractTableModel.headerData(self, col, orientation, role)
+        return QtCore.QAbstractTableModel.headerData(self, col, orientation, role)

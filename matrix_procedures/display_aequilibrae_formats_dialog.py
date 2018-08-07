@@ -19,21 +19,23 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from PyQt4 import QtGui, uic
-from PyQt4.QtGui import *
+from qgis.core import *
+from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
+from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QTableWidget, QPushButton, QVBoxLayout
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QPushButton
+
+
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
-from ..aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
+from aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
 from ..common_tools.auxiliary_functions import *
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_data_viewer.ui'))
-
-from PyQt4.QtGui import QHBoxLayout, QTableView, QTableWidget, QPushButton, QVBoxLayout
-from PyQt4.QtGui import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QPushButton
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_data_viewer.ui'))
 
 
-class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
+
+class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
@@ -41,12 +43,14 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
 
         self.error = None
         self.data_path, self.data_type = GetOutputFileName(self, 'AequilibraE custom formats',
-                                         ["Aequilibrae dataset(*.aed)", "Aequilibrae matrix(*.aem)"], '.aed', standard_path())
-        self.data_type = self.data_type.upper()
+                                                           ["Aequilibrae dataset(*.aed)", "Aequilibrae matrix(*.aem)"],
+                                                           '.aed', standard_path())
 
-        if self.data_path is None:
+        if self.data_type is None:
             self.error = 'Path provided is not a valid dataset'
             self.exit_with_error()
+
+        self.data_type = self.data_type.upper()
 
         if self.data_type == 'AED':
             self.data_to_show = AequilibraEData()
@@ -59,8 +63,7 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
             self.error = 'Could not load dataset'
             self.exit_with_error()
 
-
-    # Elements that will be used during the displaying
+        # Elements that will be used during the displaying
         self._layout = QVBoxLayout()
         self.table = QTableView()
         self._layout.addWidget(self.table)
@@ -75,7 +78,7 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
         self.thousand_separator.toggled.connect(self.format_showing)
         self.show_layout.addWidget(self.thousand_separator)
 
-        self.spacer = QSpacerItem(5, 0, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.spacer = QSpacerItem(5, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.show_layout.addItem(self.spacer)
 
         # Decimals
@@ -110,7 +113,6 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
             self.mat_layout.addWidget(self.idx_list)
             self._layout.addItem(self.mat_layout)
             self.change_matrix_cores()
-
 
         self.but_export = QPushButton()
         self.but_export.setText('Export')
@@ -159,7 +161,7 @@ class DisplayAequilibraEFormatsDialog(QtGui.QDialog, FORM_CLASS):
 
     def change_matrix_cores(self):
         self.data_to_show.computational_view([self.mat_list.currentText()])
-        self.data_to_show.set_index(0)
+        self.data_to_show.set_index(self.data_to_show.index_names[0])
         self.format_showing()
 
     def export(self):

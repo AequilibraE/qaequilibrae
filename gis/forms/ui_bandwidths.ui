@@ -325,7 +325,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QgsColorButtonV2" name="mColorButton">
+     <widget class="QgsColorButton" name="mColorButton">
       <property name="geometry">
        <rect>
         <x>420</x>
@@ -414,9 +414,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QgsColorButtonV2</class>
+   <class>QgsColorButton</class>
    <extends>QToolButton</extends>
-   <header>qgscolorbuttonv2.h</header>
+   <header>qgscolorbutton.h</header>
   </customwidget>
   <customwidget>
    <class>QgsFieldComboBox</class>
