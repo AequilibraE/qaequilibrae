@@ -21,7 +21,7 @@
 
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic, QtCore
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
 from qgis.PyQt.QtCore import Qt
 import qgis
 
@@ -210,13 +210,13 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2.exec_()
         if isinstance(dlg2.dataset, AequilibraEData):
             dataset_name = dlg2.dataset.file_path
-
-            data_name = os.path.splitext(os.path.basename(dataset_name))[0]
-            data_name = self.find_non_conflicting_name(data_name, self.datasets)
-            self.datasets[data_name] = dataset = dlg2.dataset
-            self.add_to_table(self.datasets, self.table_datasets)
-            self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
-            self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
+            if dataset_name is not None:
+                data_name = os.path.splitext(os.path.basename(dataset_name))[0]
+                data_name = self.find_non_conflicting_name(data_name, self.datasets)
+                self.datasets[data_name] = dataset = dlg2.dataset
+                self.add_to_table(self.datasets, self.table_datasets)
+                self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
+                self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
 
     def load_matrices(self):
         dlg2 = LoadMatrixDialog(self.iface)
@@ -224,13 +224,13 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2.exec_()
         if isinstance(dlg2.matrix, AequilibraeMatrix):
             matrix_name = dlg2.matrix.file_path
-
-            matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
-            matrix_name = self.find_non_conflicting_name(matrix_name, self.matrices)
-            self.matrices[matrix_name] = dlg2.matrix
-            self.add_to_table(self.matrices, self.table_matrices)
-            self.load_comboboxes(self.matrices.keys(), self.cob_imped_mat)
-            self.load_comboboxes(self.matrices.keys(), self.cob_seed_mat)
+            if matrix_name is not None:
+                matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
+                matrix_name = self.find_non_conflicting_name(matrix_name, self.matrices)
+                self.matrices[matrix_name] = dlg2.matrix
+                self.add_to_table(self.matrices, self.table_matrices)
+                self.load_comboboxes(self.matrices.keys(), self.cob_imped_mat)
+                self.load_comboboxes(self.matrices.keys(), self.cob_seed_mat)
 
     def load_model(self):
         file_name = self.browse_outfile('mod')
@@ -272,7 +272,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         table.setColumnWidth(0, 235)
         table.setColumnWidth(1, 80)
         table.clearContents()
-        table.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         table.setRowCount(len(dictio.keys()))
 
         for i, data_name in enumerate(dictio.keys()):
