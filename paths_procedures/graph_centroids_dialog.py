@@ -20,8 +20,9 @@
  """
 
 import sys
-from qgis.gui import QgsMapLayerProxyModel  # , QgsFieldProxyModel
-from PyQt4 import QtGui, QtCore, uic
+import qgis
+from qgis.PyQt.QtCore import *
+from qgis.PyQt import QtWidgets, uic
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import integer_types
 import numpy as np
@@ -31,9 +32,10 @@ sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/advanced_graph_details.ui'))
 
 
-class GraphCentroids(QtGui.QDialog, FORM_CLASS):
+class GraphCentroids(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QtGui.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
+        # QtWidgets.QtGui.QDialog.__init__(self, None, Qt.WindowStaysOnTopHint)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.field_types = {}

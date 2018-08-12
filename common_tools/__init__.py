@@ -19,11 +19,11 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-# from .auxiliary_functions import *
+from .auxiliary_functions import *
 from .get_output_file_name import GetOutputFileName
-# from .get_output_file_name import GetOutputFolderName
-# from .link_query_model import LinkQueryModel
-# from .load_graph_layer_setting_dialog import LoadGraphLayerSettingDialog
+from .get_output_file_name import GetOutputFolderName
+from .link_query_model import LinkQueryModel
+from .load_graph_layer_setting_dialog import LoadGraphLayerSettingDialog
 from .numpy_model import NumpyModel
 from .database_model import DatabaseModel
 from .parameters_dialog import ParameterDialog

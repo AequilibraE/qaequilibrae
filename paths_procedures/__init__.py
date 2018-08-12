@@ -19,7 +19,7 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from traffic_assignment_dialog import TrafficAssignmentDialog
-from create_graph_dialog import GraphCreationDialog
-from show_shortest_path_dialog import ShortestPathDialog
-from impedance_matrix_dialog import ImpedanceMatrixDialog
+from .traffic_assignment_dialog import TrafficAssignmentDialog
+from .create_graph_dialog import GraphCreationDialog
+from .show_shortest_path_dialog import ShortestPathDialog
+from .impedance_matrix_dialog import ImpedanceMatrixDialog

@@ -13,30 +13,30 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30
- Updated:    2017-05-04
+ Updated:    2018-08-12
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 from functools import partial
-from PyQt4 import QtGui, uic
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from qgis.gui import QgsMapLayerProxyModel
+from qgis.core import *
+import qgis
+from qgis.PyQt.QtCore import *
+from qgis.PyQt import QtWidgets, uic
 
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools import GetOutputFileName, ReportDialog
 
-from create_graph_procedure import GraphCreation
-from graph_centroids_dialog import GraphCentroids
+from .create_graph_procedure import GraphCreation
+from .graph_centroids_dialog import GraphCentroids
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_Create_Graph.ui'))
 
 
-class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
+class GraphCreationDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.validtypes = integer_types + float_types
         self.iface = iface
         self.setupUi(self)
@@ -286,8 +286,9 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
             self.error = None
             try:
                 self.worker_thread.graph.set_graph(cost_field=self.cost_field,
-                                                       block_centroid_flows=self.block_through_centroids)
-            except Exception as self.error:
+                                                   block_centroid_flows=self.block_through_centroids)
+            except Exception as e:
+                self.error = e
                 self.output.append(self.error)
             self.worker_thread.graph.save_to_disk(self.output)
             qgis.utils.iface.messageBar().pushMessage("Finished. ", 'Graph saved successfully', level=3)
@@ -341,7 +342,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
                                     break
                                 b_field = cmb2.currentText()
                                 self.fields_to_add[field_name] = (
-                                self.layer.fieldNameIndex(field_name), self.layer.fieldNameIndex(b_field))
+                                    self.layer.fieldNameIndex(field_name), self.layer.fieldNameIndex(b_field))
                             else:
                                 self.fields_to_add[field_name] = (self.layer.fieldNameIndex(field_name), -1)
 
@@ -390,7 +391,7 @@ class GraphCreationDialog(QtGui.QDialog, FORM_CLASS):
         if self.error is None:
             a = self.layer.fieldNameIndex("A_NODE")
             b = self.layer.fieldNameIndex("B_NODE")
-            text =  ''
+            text = ''
             if a < 0:
                 text = 'No A_NODE field\n'
             if b < 0:

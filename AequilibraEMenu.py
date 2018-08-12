@@ -56,10 +56,10 @@ from .network import NetworkPreparationDialog
 from .network import AddConnectorsDialog
 # from .network import CreatesTranspoNetDialog
 
-# from .paths_procedures import GraphCreationDialog
-# from .paths_procedures import TrafficAssignmentDialog
-# from .paths_procedures import ShortestPathDialog
-# from .paths_procedures import ImpedanceMatrixDialog
+from .paths_procedures import GraphCreationDialog
+from .paths_procedures import TrafficAssignmentDialog
+from .paths_procedures import ShortestPathDialog
+from .paths_procedures import ImpedanceMatrixDialog
 
 from .matrix_procedures import LoadMatrixDialog
 from .matrix_procedures import LoadDatasetDialog
@@ -200,36 +200,36 @@ class AequilibraEMenu(object):
         # # ########################################################################
         # # ###################  PATH COMPUTATION SUB-MENU   #######################
 
-        # self.assignment_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Paths and assignment"))
-        # self.aequilibrae_add_submenu(self.assignment_menu)
+        self.assignment_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Paths and assignment"))
+        self.aequilibrae_add_submenu(self.assignment_menu)
 
-        # # Graph generation
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_graph_creation.png")
-        # self.graph_creation_action = QAction(icon, u"Create graph", self.iface.mainWindow())
-        # self.graph_creation_action.triggered.connect(self.run_create_graph)
-        # self.graph_creation_action.setEnabled(True)
-        # self.assignment_menu.addAction(self.graph_creation_action)
+        # Graph generation
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_graph_creation.png")
+        self.graph_creation_action = QAction(icon, u"Create graph", self.iface.mainWindow())
+        self.graph_creation_action.triggered.connect(self.run_create_graph)
+        self.graph_creation_action.setEnabled(True)
+        self.assignment_menu.addAction(self.graph_creation_action)
 
-        # # Shortest path computation
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/single_shortest_path.png")
-        # self.shortest_path_action = QAction(icon, u"Shortest path", self.iface.mainWindow())
-        # self.shortest_path_action.triggered.connect(self.run_shortest_path)
-        # self.shortest_path_action.setEnabled(True)
-        # self.assignment_menu.addAction(self.shortest_path_action)
+        # Shortest path computation
+        icon = QIcon(os.path.dirname(__file__) + "/icons/single_shortest_path.png")
+        self.shortest_path_action = QAction(icon, u"Shortest path", self.iface.mainWindow())
+        self.shortest_path_action.triggered.connect(self.run_shortest_path)
+        self.shortest_path_action.setEnabled(True)
+        self.assignment_menu.addAction(self.shortest_path_action)
 
-        # # Distance matrix generation
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dist_matrix.png")
-        # self.dist_matrix_action = QAction(icon, u"Impedance matrix", self.iface.mainWindow())
-        # self.dist_matrix_action.triggered.connect(self.run_dist_matrix)
-        # self.dist_matrix_action.setEnabled(True)
-        # self.assignment_menu.addAction(self.dist_matrix_action)
+        # Distance matrix generation
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dist_matrix.png")
+        self.dist_matrix_action = QAction(icon, u"Impedance matrix", self.iface.mainWindow())
+        self.dist_matrix_action.triggered.connect(self.run_dist_matrix)
+        self.dist_matrix_action.setEnabled(True)
+        self.assignment_menu.addAction(self.dist_matrix_action)
 
-        # # Traffic Assignment
-        #         # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_assignment.png")
-        #         # self.traffic_assignment_action = QAction(icon, u"Traffic Assignment", self.iface.mainWindow())
-        #         # self.traffic_assignment_action.triggered.connect(self.run_traffic_assig)
-        #         # self.traffic_assignment_action.setEnabled(True)
-        #         # self.assignment_menu.addAction(self.traffic_assignment_action)
+        # Traffic Assignment
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_assignment.png")
+        self.traffic_assignment_action = QAction(icon, u"Traffic Assignment", self.iface.mainWindow())
+        self.traffic_assignment_action.triggered.connect(self.run_traffic_assig)
+        self.traffic_assignment_action.setEnabled(True)
+        self.assignment_menu.addAction(self.traffic_assignment_action)
 
         # # ########################################################################
         # # #######################  TRANSIT SUB-MENU   ###########################
@@ -412,11 +412,9 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_create_graph(self):
-        pass
-
-    #     dlg2 = GraphCreationDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = GraphCreationDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_calibrate_gravity(self):
         dlg2 = DistributionModelsDialog(self.iface, 'calibrate')
@@ -434,35 +432,29 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_shortest_path(self):
-        pass
-
-    #     if no_binary:
-    #         self.message_binary()
-    #     else:
-    #         dlg2 = ShortestPathDialog(self.iface)
-    #         dlg2.show()
-    #         dlg2.exec_()
+        if no_binary:
+            self.message_binary()
+        else:
+            dlg2 = ShortestPathDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
 
     def run_dist_matrix(self):
-        pass
-
-    #     if no_binary:
-    #         self.message_binary()
-    #     else:
-    #         dlg2 = ImpedanceMatrixDialog(self.iface)
-    #         dlg2.show()
-    #         dlg2.exec_()
+        if no_binary:
+            self.message_binary()
+        else:
+            dlg2 = ImpedanceMatrixDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
 
     def run_traffic_assig(self):
-        pass
-
-    #     # show the dialog
-    #     if no_binary:
-    #         self.message_binary()
-    #     else:
-    #         dlg2 = TrafficAssignmentDialog(self.iface)
-    #         dlg2.show()
-    #         dlg2.exec_()
+        # show the dialog
+        if no_binary:
+            self.message_binary()
+        else:
+            dlg2 = TrafficAssignmentDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
 
     def run_import_gtfs(self):
         pass

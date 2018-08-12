@@ -18,10 +18,11 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-
-from PyQt4 import QtGui, uic
-from PyQt4.QtGui import *
-from PyQt4.QtCore import QObject, SIGNAL, Qt
+from qgis.core import *
+import qgis
+from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QTableWidgetItem, QAbstractItemView
 
 from aequilibrae.paths import Graph, SkimResults, NetworkSkimming
 from aequilibrae.matrix import matrix_export_types
@@ -30,13 +31,13 @@ from ..common_tools import ReportDialog
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 
-#sys.modules['qgsmaplayercombobox'] = qgis.gui
+# sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_impedance_matrix.ui'))
 
 
-class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
+class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
@@ -65,8 +66,8 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
         self.hide_all_progress_bars()
         self.available_skims_table.setColumnWidth(0, 245)
         self.skim_list.setColumnWidth(0, 245)
-        self.available_skims_table.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
-        self.skim_list.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.available_skims_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.skim_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         # loads default path from parameters
         self.path = standard_path()
@@ -78,7 +79,7 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
         for i in final_table.selectedRanges():
             old_fields = [final_table.item(row, 0).text() for row in xrange(i.topRow(), i.bottomRow() + 1)]
 
-            for row in xrange(i.bottomRow(), i.topRow() - 1, -1):
+            for row in range(i.bottomRow(), i.topRow() - 1, -1):
                 final_table.removeRow(row)
 
             counter = table.rowCount()
@@ -94,12 +95,12 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
         final_table = self.skim_list
 
         for i in table.selectedRanges():
-            new_fields = [table.item(row,0).text() for row in xrange(i.topRow(), i.bottomRow()+1)]
+            new_fields = [table.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
 
             for f in new_fields:
                 self.skim_fields.append(f.encode('utf-8'))
-            for row in xrange(i.bottomRow(), i.topRow() - 1, -1):
-                table.removeRow (row)
+            for row in range(i.bottomRow(), i.topRow() - 1, -1):
+                table.removeRow(row)
 
             counter = final_table.rowCount()
             for field in new_fields:
@@ -147,7 +148,7 @@ class ImpedanceMatrixDialog(QtGui.QDialog, FORM_CLASS):
     def run_thread(self):
         self.do_dist_matrix.setVisible(False)
         self.progressbar.setRange(0, self.graph.num_zones)
-        QObject.connect(self.worker_thread, SIGNAL("skimming"), self.signal_handler)
+        self.worker_thread.skimming.connect(self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 

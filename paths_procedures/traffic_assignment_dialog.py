@@ -19,10 +19,11 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import QtGui, uic
-from qgis.gui import QgsMapLayerProxyModel
+from qgis.core import *
+import qgis
+from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt import QtWidgets, uic
 import sys
 from functools import partial
 import numpy as np
@@ -35,7 +36,7 @@ from ..common_tools import ReportDialog
 from ..common_tools import GetOutputFolderName, GetOutputFileName
 from aequilibrae.matrix import AequilibraeMatrix
 
-from load_select_link_query_builder_dialog import LoadSelectLinkQueryBuilderDialog
+from .load_select_link_query_builder_dialog import LoadSelectLinkQueryBuilderDialog
 
 no_binary = False
 try:
@@ -47,9 +48,9 @@ sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_traffic_assignment.ui'))
 
 
-class TrafficAssignmentDialog(QDialog, FORM_CLASS):
+class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
@@ -194,8 +195,8 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
             self.method['algorithm'] = 'AoN'
 
     def run_thread(self):
-
-        QObject.connect(self.worker_thread, SIGNAL("assignment"), self.signal_handler)
+        self.worker_thread.assignment.connect(self.signal_handler)
+        # QObject.connect(self.worker_thread, SIGNAL("assignment"), self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 
