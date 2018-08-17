@@ -24,18 +24,20 @@ from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
 import qgis
 from scipy.sparse import coo_matrix
+import logging
 import numpy as np
 from qgis.PyQt.QtWidgets import QTableWidgetItem
 
 import sys
 import os
+from ..common_tools.all_layers_from_toc import all_layers_from_toc
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.report_dialog import ReportDialog
 from .load_matrix_class import LoadMatrix, MatrixReblocking
 from aequilibrae.matrix import AequilibraeMatrix
-
+import aequilibrae
 no_omx = False
 try:
     import openmatrix as omx
@@ -66,7 +68,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.matrix = None
         self.error = None
         self.__current_name = None
-
+        self.logger = aequilibrae.logger
         self.radio_layer_matrix.clicked.connect(self.change_matrix_type)
         self.radio_npy_matrix.clicked.connect(self.change_matrix_type)
         self.radio_aeq_matrix.clicked.connect(self.change_matrix_type)
@@ -86,11 +88,10 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_permanent_save.clicked.connect(self.get_name_and_save_to_disk)
 
         # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
+        for layer in all_layers_from_toc():  # We iterate through all layers
             if 'wkbType' in dir(layer):
                 if layer.wkbType() == 100:
                     self.matrix_layer.addItem(layer.name())
-
         if no_omx:
             self.radio_omx_matrix.setEnabled(False)
 
@@ -230,9 +231,9 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.compressed.setVisible(False)
                 self.progress_label.setVisible(True)
                 self.__current_name = self.matrix_layer.currentText().lower().replace(' ', '_')
-                idx1 = self.layer.fieldNameIndex(self.field_from.currentText())
-                idx2 = self.layer.fieldNameIndex(self.field_to.currentText())
-                idx3 = self.layer.fieldNameIndex(self.field_cells.currentText())
+                idx1 = self.layer.dataProvider().fieldNameIndex(self.field_from.currentText())
+                idx2 = self.layer.dataProvider().fieldNameIndex(self.field_to.currentText())
+                idx3 = self.layer.dataProvider().fieldNameIndex(self.field_cells.currentText())
                 idx = [idx1, idx2, idx3]
 
                 self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type='layer', layer=self.layer, idx=idx,

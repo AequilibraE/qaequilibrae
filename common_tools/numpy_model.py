@@ -89,4 +89,4 @@ class NumpyModel(QtCore.QAbstractTableModel):
         if role == Qt.DisplayRole and orientation != Qt.Horizontal:
             return self.row_headers_data[col]
 
-        return QAbstractTableModel.headerData(self, col, orientation, role)
+        return QtCore.QAbstractTableModel.headerData(self, col, orientation, role)

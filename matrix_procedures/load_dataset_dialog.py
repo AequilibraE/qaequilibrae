@@ -19,22 +19,27 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from PyQt4 import QtGui, uic
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from qgis.core import *
+from qgis.PyQt import QtWidgets, uic, QtCore
+from qgis.PyQt.QtCore import Qt
+import qgis
+from qgis.PyQt.QtWidgets import QTableWidgetItem
+
+
 from functools import partial
+from ..common_tools.all_layers_from_toc import all_layers_from_toc
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
 from aequilibrae.matrix import AequilibraEData
-from load_dataset_class import LoadDataset
+from .load_dataset_class import LoadDataset
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_vector_loader.ui'))
 
 
-class LoadDatasetDialog(QtGui.QDialog, FORM_CLASS):
+class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface, single_use=True):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
@@ -64,7 +69,7 @@ class LoadDatasetDialog(QtGui.QDialog, FORM_CLASS):
         self.but_import_and_use.clicked.connect(self.load_just_to_use)
 
         # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
+        for layer in all_layers_from_toc():  # We iterate through all layers
             if 'wkbType' in dir(layer):
                 if layer.wkbType() in [100] + point_types + poly_types:
                     self.cob_data_layer.addItem(layer.name())
@@ -100,7 +105,7 @@ class LoadDatasetDialog(QtGui.QDialog, FORM_CLASS):
 
     def size_it_accordingly(self, final=False):
         def set_size(w, h):
-            self.setMaximumSize(QSize(w, h))
+            self.setMaximumSize(QtCore.QSize(w, h))
             self.resize(w, h)
 
         if self.radio_aequilibrae.isChecked():
@@ -156,13 +161,9 @@ class LoadDatasetDialog(QtGui.QDialog, FORM_CLASS):
         self.set_tables_with_fields()
 
     def run_thread(self):
-
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"),
-                        self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
-                        self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.finished_threaded_procedure)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
 
         self.chb_all_fields.setEnabled(False)
         self.but_load.setEnabled(False)

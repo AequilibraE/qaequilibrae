@@ -24,6 +24,7 @@
 import os
 import sys
 import qgis
+import aequilibrae
 # import tempfile, glob
 # from qgis.core import *
 from qgis.PyQt import QtWidgets
@@ -61,8 +62,8 @@ from .network import AddConnectorsDialog
 # from .paths_procedures import ImpedanceMatrixDialog
 
 from .matrix_procedures import LoadMatrixDialog
-# from .matrix_procedures import LoadDatasetDialog
-# from .matrix_procedures import DisplayAequilibraEFormatsDialog
+from .matrix_procedures import LoadDatasetDialog
+from .matrix_procedures import DisplayAequilibraEFormatsDialog
 # from .matrix_procedures import MatrixManipulationDialog
 
 # from .public_transport_procedures import GtfsImportDialog
@@ -137,29 +138,29 @@ class AequilibraEMenu(object):
         # # ########################################################################
         # # ####################  DATA UTILITIES SUB-MENU  #########################
 
-        # self.matrix_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Data"))
-        # self.aequilibrae_add_submenu(self.matrix_menu)
+        self.matrix_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Data"))
+        self.aequilibrae_add_submenu(self.matrix_menu)
 
-        # # Displaying Aequilibrae custom data formats
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_display_custom_formats.png")
-        # self.display_custom_formats_action = QAction(icon, u"Display AequilibraE formats", self.iface.mainWindow())
-        # self.display_custom_formats_action.triggered.connect(self.run_display_aequilibrae_formats)
-        # self.display_custom_formats_action.setEnabled(True)
-        # self.matrix_menu.addAction(self.display_custom_formats_action)
+        # Displaying Aequilibrae custom data formats
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_display_custom_formats.png")
+        self.display_custom_formats_action = QAction(icon, u"Display AequilibraE formats", self.iface.mainWindow())
+        self.display_custom_formats_action.triggered.connect(self.run_display_aequilibrae_formats)
+        self.display_custom_formats_action.setEnabled(True)
+        self.matrix_menu.addAction(self.display_custom_formats_action)
 
-        # # Loading matrices
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
-        # self.load_matrix_action = QAction(icon, u"Import matrices", self.iface.mainWindow())
-        # self.load_matrix_action.triggered.connect(self.run_load_matrices)
-        # self.load_matrix_action.setEnabled(True)
-        # self.matrix_menu.addAction(self.load_matrix_action)
+        # Loading matrices
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
+        self.load_matrix_action = QAction(icon, u"Import matrices", self.iface.mainWindow())
+        self.load_matrix_action.triggered.connect(self.run_load_matrices)
+        self.load_matrix_action.setEnabled(True)
+        self.matrix_menu.addAction(self.load_matrix_action)
 
         # # Loading Database
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dataset.png")
-        # self.load_database_action = QAction(icon, u"Import dataset", self.iface.mainWindow())
-        # self.load_database_action.triggered.connect(self.run_load_database)
-        # self.load_database_action.setEnabled(True)
-        # self.matrix_menu.addAction(self.load_database_action)
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dataset.png")
+        self.load_database_action = QAction(icon, u"Import dataset", self.iface.mainWindow())
+        self.load_database_action.triggered.connect(self.run_load_database)
+        self.load_database_action.setEnabled(True)
+        self.matrix_menu.addAction(self.load_database_action)
 
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -312,7 +313,7 @@ class AequilibraEMenu(object):
         if no_binary:
             icon = QIcon(os.path.dirname(__file__) + "/icons/icon_binaries.png")
             self.binary_action = QAction(icon, u"Download binaries", self.iface.mainWindow())
-            self.binary_action.triggered.connect(self.run_binary_donwload)
+            self.binary_action.triggered.connect(self.run_binary_download)
             self.binary_action.setEnabled(True)
             self.AequilibraE_menu.addAction(self.binary_action)
         #
@@ -355,14 +356,11 @@ class AequilibraEMenu(object):
         #         pass
 
     def run_change_parameters(self):
-        # pass
         dlg2 = ParameterDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
     def run_about(self):
-        # pass
-
         dlg2 = AboutDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
@@ -373,20 +371,16 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_load_database(self):
-        pass
-
-    #     dlg2 = LoadDatasetDialog(self.iface, single_use=False)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = LoadDatasetDialog(self.iface, single_use=False)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_display_aequilibrae_formats(self):
-        pass
+        dlg2 = DisplayAequilibraEFormatsDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
-    #     dlg2 = DisplayAequilibraEFormatsDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
-
-    def run_binary_donwload(self):
+    def run_binary_download(self):
         pass
 
     #     dlg2 = BinaryDownloaderDialog(self.iface)
@@ -395,8 +389,6 @@ class AequilibraEMenu(object):
 
     # run method that calls the network preparation section of the code
     def run_net_prep(self):
-        # pass
-
         dlg2 = NetworkPreparationDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
