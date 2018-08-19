@@ -27,7 +27,7 @@ from qgis.PyQt import QtWidgets, uic
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools import GetOutputFileName, ReportDialog
-
+from qgis.PyQt.QtWidgets import QComboBox, QTableWidgetItem, QCheckBox, QHBoxLayout, QRadioButton, QWidget
 from .create_graph_procedure import GraphCreation
 from .graph_centroids_dialog import GraphCentroids
 
@@ -144,7 +144,7 @@ class GraphCreationDialog(QtWidgets.QDialog, FORM_CLASS):
         all_fields = []
         if self.network_layer.currentIndex() >= 0:
             self.layer = get_vector_layer_by_name(self.network_layer.currentText())
-            for field in self.layer.pendingFields().toList():
+            for field in self.layer.dataProvider().fields().toList():
                 if field.name() not in reserved_fields:
                     if field.type() in integer_types:
                         for combo in i_types:
@@ -171,6 +171,7 @@ class GraphCreationDialog(QtWidgets.QDialog, FORM_CLASS):
                 my_widget.setLayout(lay_out)
                 return my_widget
 
+
             chk = centralized_widget(QCheckBox())
             q = QRadioButton()
             q.toggled.connect(self.handleItemClicked)
@@ -188,7 +189,7 @@ class GraphCreationDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.network_layer.currentIndex() >= 0:
 
             layer = get_vector_layer_by_name(self.network_layer.currentText())
-            all_fields = layer.pendingFields().toList()
+            all_fields = layer.dataProvider().fields().toList()
             fields = []
             for field in all_fields:
                 if field.type() in integer_types + float_types:
@@ -257,13 +258,10 @@ class GraphCreationDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run_thread(self):
 
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
-                        self.progress_range_from_thread)
-
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.finished_threaded_procedure)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
 
         self.worker_thread.start()
         self.exec_()
@@ -327,24 +325,24 @@ class GraphCreationDialog(QtWidgets.QDialog, FORM_CLASS):
                         ba_field = field_name + 'BA'
                         if field_name[-1] == '_' and len(field_name) > 1:
                             field_name = field_name[0:-1]
-                        self.fields_to_add[field_name] = (self.layer.fieldNameIndex(ab_field),
-                                                          self.layer.fieldNameIndex(ba_field))
+                        self.fields_to_add[field_name] = (self.layer.dataProvider().fieldNameIndex(ab_field),
+                                                          self.layer.dataProvider().fieldNameIndex(ba_field))
                     else:
                         if self.chk_dual_fields.isChecked():
                             if self.links_are_bi_directional.isChecked():
-                                self.fields_to_add[field_name] = (self.layer.fieldNameIndex(field_name),
-                                                                  self.layer.fieldNameIndex(field_name))
+                                self.fields_to_add[field_name] = (self.layer.dataProvider().fieldNameIndex(field_name),
+                                                                  self.layer.dataProvider().fieldNameIndex(field_name))
                             else:
-                                self.fields_to_add[field_name] = (self.layer.fieldNameIndex(field_name), -1)
+                                self.fields_to_add[field_name] = (self.layer.dataProvider().fieldNameIndex(field_name), -1)
                         else:
                             if self.links_are_bi_directional.isChecked():
                                 for cmb2 in self.fields_lst.cellWidget(i, 1).findChildren(QComboBox):
                                     break
                                 b_field = cmb2.currentText()
                                 self.fields_to_add[field_name] = (
-                                    self.layer.fieldNameIndex(field_name), self.layer.fieldNameIndex(b_field))
+                                    self.layer.dataProvider().fieldNameIndex(field_name), self.layer.dataProvider().fieldNameIndex(b_field))
                             else:
-                                self.fields_to_add[field_name] = (self.layer.fieldNameIndex(field_name), -1)
+                                self.fields_to_add[field_name] = (self.layer.dataProvider().fieldNameIndex(field_name), -1)
 
         if self.error == None:
             self.progressbar0.setVisible(True)
@@ -376,7 +374,7 @@ class GraphCreationDialog(QtWidgets.QDialog, FORM_CLASS):
             self.error = 'No file name was provided for the graph'
 
         if self.error is None:
-            self.link_id = self.layer.fieldNameIndex(self.cmb_link_id.currentText())
+            self.link_id = self.layer.dataProvider().fieldNameIndex(self.cmb_link_id.currentText())
             if self.link_id < 0:
                 self.error = 'ID Field not provided\n'
 
@@ -384,13 +382,13 @@ class GraphCreationDialog(QtWidgets.QDialog, FORM_CLASS):
             # Indices for the fields with time
             self.direction_field = None
             if self.links_are_bi_directional.isChecked():
-                self.direction_field = self.layer.fieldNameIndex(self.cmb_direction_field.currentText())
+                self.direction_field = self.layer.dataProvider().fieldNameIndex(self.cmb_direction_field.currentText())
                 if self.direction_field < 0:
                     self.error = 'Direction field not selected\n'
 
         if self.error is None:
-            a = self.layer.fieldNameIndex("A_NODE")
-            b = self.layer.fieldNameIndex("B_NODE")
+            a = self.layer.dataProvider().fieldNameIndex("A_NODE")
+            b = self.layer.dataProvider().fieldNameIndex("B_NODE")
             text = ''
             if a < 0:
                 text = 'No A_NODE field\n'

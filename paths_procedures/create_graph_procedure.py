@@ -73,6 +73,11 @@ class GraphCreation(WorkerThread):
                 self.error = 'IDs are not unique.'
                 self.report.append(self.error)
 
+        def only_str(input):
+            if isinstance(input, bytes):
+                return input.decode('utf-8')
+            return input
+
         if self.error is None:
             self.report.append(reporter('Loading data from layer', 0))
             self.ProgressText.emit("Loading data from layer")
@@ -86,15 +91,15 @@ class GraphCreation(WorkerThread):
                           reserved_fields.direction]
 
             for name_field, values in self.fields_to_add.items():
-                all_titles.append((name_field + '_ab').encode('ascii', 'ignore'))
+                all_titles.append((only_str(name_field) + '_ab'))
                 all_types.append(np.float64)
-                all_titles.append((name_field + '_ba').encode('ascii', 'ignore'))
+                all_titles.append((only_str(name_field )+ '_ba'))
                 all_types.append(np.float64)
 
             dt = [(t, d) for t, d in zip(all_titles, all_types)]
 
-            a_node = self.net_layer.fieldNameIndex(reserved_fields.a_node)
-            b_node = self.net_layer.fieldNameIndex(reserved_fields.b_node)
+            a_node = self.net_layer.dataProvider().fieldNameIndex(reserved_fields.a_node)
+            b_node = self.net_layer.dataProvider().fieldNameIndex(reserved_fields.b_node)
             data = []
 
             for p, feat in enumerate(self.features):
@@ -131,7 +136,6 @@ class GraphCreation(WorkerThread):
             if self.error is None:
                 self.report.append(reporter('Converting data to graph', 0))
                 network = np.asarray(data)
-
                 self.graph.network = np.zeros(network.shape[0], dtype=dt)
 
                 for k, t in enumerate(dt):

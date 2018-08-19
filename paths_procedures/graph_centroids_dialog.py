@@ -21,6 +21,7 @@
 
 import sys
 import qgis
+from qgis.core import *
 from qgis.PyQt.QtCore import *
 from qgis.PyQt import QtWidgets, uic
 from ..common_tools.auxiliary_functions import *
@@ -62,7 +63,7 @@ class GraphCentroids(QtWidgets.QDialog, FORM_CLASS):
     def changed_layer(self):
         self.cob_centroid_id.clear()
         if self.cob_centroids_layer.currentLayer() is not None:
-            for field in self.cob_centroids_layer.currentLayer().pendingFields().toList():
+            for field in self.cob_centroids_layer.currentLayer().dataProvider().fields().toList():
                 if field.type() in integer_types:
                     self.cob_centroid_id.addItem(field.name())
 
@@ -78,7 +79,7 @@ class GraphCentroids(QtWidgets.QDialog, FORM_CLASS):
                 features = self.cob_centroids_layer.currentLayer().getFeatures()
 
             if self.error is None:
-                idx = self.cob_centroids_layer.currentLayer().fieldNameIndex(self.cob_centroid_id.currentText())
+                idx = self.cob_centroids_layer.currentLayer().dataProvider().fieldNameIndex(self.cob_centroid_id.currentText())
                 centroids = []
                 for feat in features:
                     centroids.append(int(feat.attributes()[idx]))
