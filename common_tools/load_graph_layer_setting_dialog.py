@@ -101,7 +101,7 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
                     combofield.addItem(field.name())
             if node_layer:
                 # We create the spatial index used to associate the click to the network nodes
-                self.node_fields = [field.name() for field in layer.pendingFields()]
+                self.node_fields = [field.name() for field in layer.dataProvider().fields().toList()]
                 self.node_keys = {}
                 self.index = QgsSpatialIndex()
                 self.node_layer = layer
@@ -114,12 +114,8 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def loaded_new_graph_from_file(self):
         file_types = "AequilibraE graph(*.aeg)"
+        new_name, type = GetOutputFileName(self, 'Result file', [file_types], '.aeg', self.path)
 
-        if len(self.graph_file_name.text()) == 0:
-            new_name, type = GetOutputFileName(self, 'Result file', [file_types], '.aeg', self.path)
-        else:
-
-            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.graph_file_name.text(), file_types)
         self.cb_minimizing.clear()
         self.block_paths.setChecked(False)
         try:
@@ -140,7 +136,7 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def returns_configuration(self):
         if self.link_features is None:
-            idx = self.line_layer.fieldNameIndex(self.cb_link_id_field.currentText())
+            idx = self.line_layer.dataProvider().fieldNameIndex(self.cb_link_id_field.currentText())
             self.link_features = {}
             for feat in self.line_layer.getFeatures():
                 link_id = feat.attributes()[idx]
