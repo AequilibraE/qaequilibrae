@@ -20,6 +20,7 @@
  """
 from qgis.core import *
 import qgis
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QTableWidgetItem, QAbstractItemView
@@ -77,7 +78,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         final_table = self.skim_list
 
         for i in final_table.selectedRanges():
-            old_fields = [final_table.item(row, 0).text() for row in xrange(i.topRow(), i.bottomRow() + 1)]
+            old_fields = [final_table.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
 
             for row in range(i.bottomRow(), i.topRow() - 1, -1):
                 final_table.removeRow(row)
@@ -98,7 +99,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             new_fields = [table.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
 
             for f in new_fields:
-                self.skim_fields.append(f.encode('utf-8'))
+                self.skim_fields.append(self.only_str(f))
             for row in range(i.bottomRow(), i.topRow() - 1, -1):
                 table.removeRow(row)
 
@@ -143,7 +144,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         new_name, extension = GetOutputFileName(self, 'AequilibraE impedance computation', matrix_export_types,
                                                 '.aem', self.path)
         if new_name is not None:
-            self.imped_results = new_name.encode('utf-8')
+            self.imped_results = new_name
 
     def run_thread(self):
         self.do_dist_matrix.setVisible(False)
@@ -162,14 +163,14 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def finished_threaded_procedure(self):
         self.report = self.worker_thread.report
-        self.result.skims.export(self.imped_results)
+        self.result.skims.export(self.only_str(self.imped_results))
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results
 
         if self.error is None:
             self.browse_outfile()
-            cost_field = self.cb_minimizing.currentText().encode('utf-8')
+            cost_field = self.cb_minimizing.currentText()
 
             # We prepare the graph to set all nodes as centroids
             if self.rdo_all_nodes.isChecked():
@@ -191,6 +192,12 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
         else:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=3)
+
+    @staticmethod
+    def only_str(str_input):
+        if isinstance(str_input, bytes):
+            return str_input.decode('utf-8')
+        return str_input
 
     def check_inputs(self):
         self.error = None
