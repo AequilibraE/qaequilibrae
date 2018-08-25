@@ -112,5 +112,11 @@ def reporter(message, tabs=0):
     return ' ' * tabs + t + ' - ' + str(message)
 
 
+def only_str(str_input):
+    if isinstance(str_input, bytes):
+        return str_input.decode('utf-8')
+    return str_input
+
+
 if __name__ == '__main__':
     main()

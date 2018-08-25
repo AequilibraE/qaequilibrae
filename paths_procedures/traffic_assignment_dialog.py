@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-30
- Updated:... 2017-12-11
+ Updated:... 2018-08-25
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ from collections import OrderedDict
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
 from ..matrix_procedures import LoadMatrixDialog
-from ..common_tools import ReportDialog
+from ..common_tools import ReportDialog, only_str
 from ..common_tools import GetOutputFolderName, GetOutputFileName
 from aequilibrae.matrix import AequilibraeMatrix
 
@@ -247,7 +247,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             return False
 
         self.matrix = None
-        self.prepare_assignable_matrices()
+        if not self.prepare_assignable_matrices():
+            return False
+
         if self.matrix is None:
             self.error = 'Demand matrix missing'
             return False
@@ -330,8 +332,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         #         shutil.move(self.link_extract.temp_file + '.aep', self.link_extract.output_name)
         #         shutil.move(self.link_extract.temp_file + '.aed', self.link_extract.output_name[:-3] + 'aed')
 
-
-# Procedures related to critical analysis. Not yet fully implemented
+    # Procedures related to critical analysis. Not yet fully implemented
     def build_query(self, purpose):
         if purpose == 'select link':
             button = self.but_build_query
@@ -352,7 +353,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             table.setRowCount(counter + 1)
             text = ''
             for i in dlg2.links:
-                text = text + ', (' + i[0].encode('utf-8') + ', "' + i[1].encode('utf-8') + '")'
+                text = text + ', (' + only_str(i[0]) + ', "' + only_str(i[1]) + '")'
             text = text[2:]
             table.setItem(counter, 0, QTableWidgetItem(text))
             table.setItem(counter, 1, QTableWidgetItem(dlg2.query_type))
@@ -427,7 +428,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def update_matrix_list(self):
         self.table_matrix_list.clearContents()
         self.table_matrix_list.clearContents()
-        self.table_matrix_list.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.table_matrix_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table_matrix_list.setRowCount(len(self.matrices.keys()))
 
         for i, data_name in enumerate(self.matrices.keys()):
@@ -495,10 +496,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         cbox = QComboBox()
         cbox.addItems(list(self.matrices.keys()))
         cbox.addItem('')
-        cbox.setCurrentIndex(cbox.count()-1)
+        cbox.setCurrentIndex(cbox.count() - 1)
         cbox.currentIndexChanged.connect(self.changed_assignable_matrix)
         self.table_matrices_to_assign.setCellWidget(row_count, 0, cbox)
-
 
     def prepare_assignable_matrices(self):
         table = self.table_matrices_to_assign
@@ -509,34 +509,63 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 mat = table.cellWidget(row, 0).currentText()
                 core = table.cellWidget(row, 1).currentText()
 
-                if not np.array_equal(idx,self.matrices[mat].index):
-                    self.error = 'Assignable matrix ' + mat + ' has indices that do not match the centroids'
+                mat_index = self.matrices[mat].index
+                if not np.array_equal(idx, mat_index):
+                    no_zones = [item for item in mat_index if item not in idx]
+                    # We only return an error if the matrix has too many centroids
+                    if no_zones:
+                        self.error = 'Assignable matrix has centroids that do not exist in the network: {}'.format(
+                            ','.join([str(x) for x in no_zones]))
+                        return False
                 if core in mat_names:
                     self.error = 'Assignable matrices cannot have same names'
-                mat_names.append(core.encode('utf-8'))
+                    return False
+                mat_names.append(only_str(core))
 
             self.matrix = AequilibraeMatrix()
             self.matrix.create_empty(file_name=self.matrix.random_name(),
-                                         zones=idx.shape[0],
-                                         matrix_names=mat_names)
+                                     zones=idx.shape[0],
+                                     matrix_names=mat_names)
             self.matrix.index[:] = idx[:]
 
             for row in range(table.rowCount() - 1):
                 mat = table.cellWidget(row, 0).currentText()
                 core = table.cellWidget(row, 1).currentText()
-                self.matrix.matrix[core][:, :] = self.matrices[mat].matrix[core][:, :]
+                src_mat = self.matrices[mat].matrix[core]
+                dest_mat = self.matrix.matrix[core]
+
+                rows = src_mat.shape[0]
+                cols = src_mat.shape[1]
+                dest_mat[:rows, :cols] = src_mat[:, :]
+
+                # Inserts cols and rows that don;t exist
+                if rows != self.matrix.zones:
+                    src_index = list(self.matrices[mat].index[:])
+                    for i, row in enumerate(idx):
+                        if row not in src_index:
+                            dest_mat[i + 1:, :] = dest_mat[i:-1, :]
+                            dest_mat[i, :] = 0
+
+                if cols != self.matrix.zones:
+                    for j, col in enumerate(idx):
+                        if col not in src_index:
+                            dest_mat[:, j + 1:] = dest_mat[:, j:-1]
+                            dest_mat[:, j] = 0
+
             self.matrix.computational_view()
         else:
             self.error = 'You need to have at least one matrix to assign'
+            return False
 
-        # Run preparation procedures
+        return True
+
     def change_graph_settings(self):
         skims = []
         table = self.skim_list_table
         for i in range(table.rowCount()):
             for chb in table.cellWidget(i, 0).findChildren(QCheckBox):
                 if chb.isChecked():
-                    skims.append(table.item(i, 1).text().encode('utf-8'))
+                    skims.append(only_str(table.item(i, 1).text()))
 
         if len(skims) == 0:
             skims = False
