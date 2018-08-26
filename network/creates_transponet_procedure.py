@@ -24,7 +24,7 @@ from shutil import copyfile
 from qgis.core import *
 from qgis.PyQt.QtCore import *
 from ..common_tools.auxiliary_functions import *
-from sqlite3 import dbapi2 as db
+# from sqlite3 import dbapi2 as db
 from ..common_tools.global_parameters import *
 from ..common_tools import WorkerThread
 from aequilibrae import spatialite_database
@@ -54,7 +54,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         self.run_series_of_queries(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), 'queries_for_empty_file.sql'))
 
-        conn = db.connect(self.output_file)
+        conn = qgis.utils.spatialite_connect(self.output_file)
 
         self.emit_messages(message='Adding non-mandatory link fields', value=0, max_val=1)
 
@@ -158,7 +158,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
     def run_series_of_queries(self, queries):
 
-        conn = db.connect(self.output_file)
+        conn = qgis.utils.spatialite_connect(self.output_file)
         curr = conn.cursor()
         # Reads all commands
         sql_file = open(queries, 'r')
