@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    2018-05-28
+ Updated:    2018-08-08
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ from .common_tools import ParameterDialog
 from .common_tools import AboutDialog
 
 # from .binary_downloader_class import BinaryDownloaderDialog
-# from .distribution_procedures import DistributionModelsDialog
+from .distribution_procedures import DistributionModelsDialog
 
 from .gis import CompareScenariosDialog
 from .gis import DesireLinesDialog
@@ -64,6 +64,7 @@ from .network import AddConnectorsDialog
 from .matrix_procedures import LoadMatrixDialog
 from .matrix_procedures import LoadDatasetDialog
 from .matrix_procedures import DisplayAequilibraEFormatsDialog
+
 # from .matrix_procedures import MatrixManipulationDialog
 
 # from .public_transport_procedures import GtfsImportDialog
@@ -165,36 +166,36 @@ class AequilibraEMenu(object):
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
 
-        # self.trip_distribution_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Trip Distribution"))
-        # self.aequilibrae_add_submenu(self.trip_distribution_menu)
+        self.trip_distribution_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Trip Distribution"))
+        self.aequilibrae_add_submenu(self.trip_distribution_menu)
 
-        # # # IPF
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_ipf.png")
-        # self.ipf_action = QAction(icon, u"Iterative proportional fitting", self.iface.mainWindow())
-        # self.ipf_action.triggered.connect(self.run_ipf)
-        # self.ipf_action.setEnabled(True)
-        # self.trip_distribution_menu.addAction(self.ipf_action)
+        # # IPF
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_ipf.png")
+        self.ipf_action = QAction(icon, u"Iterative proportional fitting", self.iface.mainWindow())
+        self.ipf_action.triggered.connect(self.run_ipf)
+        self.ipf_action.setEnabled(True)
+        self.trip_distribution_menu.addAction(self.ipf_action)
 
-        # # # Apply Gravity
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_apply_gravity.png")
-        # self.apply_gravity_action = QAction(icon, u"Apply Gravity Model", self.iface.mainWindow())
-        # self.apply_gravity_action.triggered.connect(self.run_apply_gravity)
-        # self.apply_gravity_action.setEnabled(True)
-        # self.trip_distribution_menu.addAction(self.apply_gravity_action)
+        # # Apply Gravity
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_apply_gravity.png")
+        self.apply_gravity_action = QAction(icon, u"Apply Gravity Model", self.iface.mainWindow())
+        self.apply_gravity_action.triggered.connect(self.run_apply_gravity)
+        self.apply_gravity_action.setEnabled(True)
+        self.trip_distribution_menu.addAction(self.apply_gravity_action)
 
-        # # # Calibrate Gravity
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_calibrate_gravity.png")
-        # self.calibrate_gravity_action = QAction(icon, u"Calibrate Gravity Model", self.iface.mainWindow())
-        # self.calibrate_gravity_action.triggered.connect(self.run_calibrate_gravity)
-        # self.calibrate_gravity_action.setEnabled(True)
-        # self.trip_distribution_menu.addAction(self.calibrate_gravity_action)
+        # # Calibrate Gravity
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_calibrate_gravity.png")
+        self.calibrate_gravity_action = QAction(icon, u"Calibrate Gravity Model", self.iface.mainWindow())
+        self.calibrate_gravity_action.triggered.connect(self.run_calibrate_gravity)
+        self.calibrate_gravity_action.setEnabled(True)
+        self.trip_distribution_menu.addAction(self.calibrate_gravity_action)
 
-        # # Trip Distribution
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
-        # self.trip_distr_action = QAction(icon, u"Trip Distribution", self.iface.mainWindow())
-        # self.trip_distr_action.triggered.connect(self.run_distribution_models)
-        # self.trip_distr_action.setEnabled(True)
-        # self.trip_distribution_menu.addAction(self.trip_distr_action)
+        # Trip Distribution
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
+        self.trip_distr_action = QAction(icon, u"Trip Distribution", self.iface.mainWindow())
+        self.trip_distr_action.triggered.connect(self.run_distribution_models)
+        self.trip_distr_action.setEnabled(True)
+        self.trip_distribution_menu.addAction(self.trip_distr_action)
 
         # # ########################################################################
         # # ###################  PATH COMPUTATION SUB-MENU   #######################
@@ -418,25 +419,19 @@ class AequilibraEMenu(object):
     #     dlg2.exec_()
 
     def run_calibrate_gravity(self):
-        pass
-
-    #     dlg2 = DistributionModelsDialog(self.iface, 'calibrate')
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = DistributionModelsDialog(self.iface, 'calibrate')
+        dlg2.show()
+        dlg2.exec_()
 
     def run_apply_gravity(self):
-        pass
-
-    #     dlg2 = DistributionModelsDialog(self.iface, 'apply')
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = DistributionModelsDialog(self.iface, 'apply')
+        dlg2.show()
+        dlg2.exec_()
 
     def run_distribution_models(self):
-        pass
-
-    #     dlg2 = DistributionModelsDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = DistributionModelsDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_shortest_path(self):
         pass
@@ -513,11 +508,9 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_ipf(self):
-        pass
-
-    #     dlg2 = DistributionModelsDialog(self.iface, 'ipf')
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = DistributionModelsDialog(self.iface, 'ipf')
+        dlg2.show()
+        dlg2.exec_()
 
     def message_binary(self):
         pass

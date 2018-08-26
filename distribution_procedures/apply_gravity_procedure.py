@@ -13,21 +13,19 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-03
- Updated:    2017-10-10
+ Updated:    2018-08-08
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-from PyQt4.QtCore import *
-import sys
-import os
+from qgis.PyQt.QtCore import *
 from ..common_tools import WorkerThread
 from aequilibrae.distribution import GravityApplication
 
 
 class ApplyGravityProcedure(WorkerThread):
-    def __init__(self, parentThread,  **kwargs):
+    def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
         self.gravity = GravityApplication(**kwargs)
         self.error = None
@@ -35,4 +33,4 @@ class ApplyGravityProcedure(WorkerThread):
     def doWork(self):
         self.gravity.apply()
         self.report = self.gravity.report
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 0)
+        self.finished_threaded_procedure.emit(0)

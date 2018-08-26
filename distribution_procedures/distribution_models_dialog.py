@@ -13,15 +13,18 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2017-10-05
- Updated:
+ Updated:    2018-08-08
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import QtGui, uic
+from qgis.core import *
+from qgis.PyQt import QtWidgets, uic, QtCore
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
+from qgis.PyQt.QtCore import Qt
+import qgis
+
 from collections import OrderedDict
 from functools import partial
 import numpy as np
@@ -40,12 +43,13 @@ from .apply_gravity_procedure import ApplyGravityProcedure
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_distribution.ui'))
 
+
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
 
 
-class DistributionModelsDialog(QDialog, FORM_CLASS):
+class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface, mode=None):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
@@ -188,7 +192,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
         if self.model.function in ['EXPO', 'GAMMA']:
             self.table_model.setRowCount(i)
-            self.table_model.setItem(i-1, 0, QTableWidgetItem('Beta'))
+            self.table_model.setItem(i - 1, 0, QTableWidgetItem('Beta'))
             val = self.model.beta
             if val is None:
                 val = 0
@@ -198,7 +202,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
             item.setDecimals(7)
             item.setValue(float(val))
-            self.table_model.setCellWidget(i-1, 1, item)
+            self.table_model.setCellWidget(i - 1, 1, item)
 
     def load_datasets(self):
         dlg2 = LoadDatasetDialog(self.iface)
@@ -206,13 +210,13 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         dlg2.exec_()
         if isinstance(dlg2.dataset, AequilibraEData):
             dataset_name = dlg2.dataset.file_path
-
-            data_name = os.path.splitext(os.path.basename(dataset_name))[0]
-            data_name = self.find_non_conflicting_name(data_name, self.datasets)
-            self.datasets[data_name] = dataset = dlg2.dataset
-            self.add_to_table(self.datasets, self.table_datasets)
-            self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
-            self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
+            if dataset_name is not None:
+                data_name = os.path.splitext(os.path.basename(dataset_name))[0]
+                data_name = self.find_non_conflicting_name(data_name, self.datasets)
+                self.datasets[data_name] = dataset = dlg2.dataset
+                self.add_to_table(self.datasets, self.table_datasets)
+                self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
+                self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
 
     def load_matrices(self):
         dlg2 = LoadMatrixDialog(self.iface)
@@ -220,13 +224,13 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         dlg2.exec_()
         if isinstance(dlg2.matrix, AequilibraeMatrix):
             matrix_name = dlg2.matrix.file_path
-
-            matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
-            matrix_name = self.find_non_conflicting_name(matrix_name, self.matrices)
-            self.matrices[matrix_name] = dlg2.matrix
-            self.add_to_table(self.matrices, self.table_matrices)
-            self.load_comboboxes(self.matrices.keys(), self.cob_imped_mat)
-            self.load_comboboxes(self.matrices.keys(), self.cob_seed_mat)
+            if matrix_name is not None:
+                matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
+                matrix_name = self.find_non_conflicting_name(matrix_name, self.matrices)
+                self.matrices[matrix_name] = dlg2.matrix
+                self.add_to_table(self.matrices, self.table_matrices)
+                self.load_comboboxes(self.matrices.keys(), self.cob_imped_mat)
+                self.load_comboboxes(self.matrices.keys(), self.cob_seed_mat)
 
     def load_model(self):
         file_name = self.browse_outfile('mod')
@@ -268,7 +272,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         table.setColumnWidth(0, 235)
         table.setColumnWidth(1, 80)
         table.clearContents()
-        table.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         table.setRowCount(len(dictio.keys()))
 
         for i, data_name in enumerate(dictio.keys()):
@@ -374,13 +378,10 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
             self.worker_thread = self.job_queue[out_name]
             self.run_thread()
 
-
         if self.job != 'calibrate':
             self.worker_thread.model.save(out_name)
 
-
         self.exit_procedure()
-
 
     def check_data(self):
         self.error = None
