@@ -20,7 +20,7 @@
  """
 # from PyQt4.QtCore import QVariant, SIGNAL
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsCoordinateTransform, QgsSpatialIndex, QgsFeature, QgsGeometry, QgsField, QgsVectorLayer
+from qgis.core import QgsCoordinateTransform, QgsSpatialIndex, QgsFeature, QgsGeometry, QgsField, QgsVectorLayer, QgsProject
 import copy
 
 from ..common_tools.auxiliary_functions import *
@@ -54,7 +54,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         self.transform = None
         if self.from_layer.dataProvider().crs() != self.to_layer.dataProvider().crs():
             self.transform = QgsCoordinateTransform(self.from_layer.dataProvider().crs(),
-                                                    self.to_layer.dataProvider().crs())
+                                                    self.to_layer.dataProvider().crs(), QgsProject.instance())
 
         # FIELDS INDICES
         idx = self.from_layer.dataProvider().fieldNameIndex(ffield)
