@@ -1,24 +1,45 @@
 """
-/***************************************************************************
- AequilibraE - www.aequilibrae.com
- 
-    Name:        QGIS plugin initializer
-                              -------------------
-        begin                : 2014-03-19
-        copyright            : AequilibraE developers 2014
-        Original Author: Pedro Camargo pedro@xl-optim.com
-        Contributors: 
-        Licence: See LICENSE.TXT
- ***************************************************************************/
+=============
+Core AequilibraE
+=============
+
+Imports AequilibraE modules
 
 """
-
-# This portion of the script initializes the plugin, making it known to QGIS.
 import sys
-
 sys.dont_write_bytecode = True
 
-from . import paths  # We import the graph
+from . import paths
 from . import distribution
-# from .assignment import *
-# from . import results
+from . import matrix
+from . import utils
+from . import transit
+import reserved_fields
+from parameters import Parameters
+from .reference_files import spatialite_database
+
+
+from parameters import Parameters
+import logging
+import tempfile
+import os
+
+# CREATE THE LOGGER
+temp_folder = Parameters().parameters['system']['temp directory']
+if not os.path.isdir(temp_folder):
+    temp_folder = tempfile.gettempdir()
+
+log_file = os.path.join(temp_folder, 'aequilibrae.log')
+if not os.path.isfile(log_file):
+    a = open(log_file, 'w')
+    a.close()
+
+logger = logging.getLogger('aequilibrae')
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+if not len(logger.handlers):
+    ch = logging.FileHandler(log_file)
+    ch.setFormatter(formatter)
+    ch.setLevel(logging.DEBUG)
+    logger.addHandler(ch)

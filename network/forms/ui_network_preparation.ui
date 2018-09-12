@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TQ_NetPrep</class>
+ <widget class="QDialog" name="TQ_NetPrep">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>774</width>
+    <height>311</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>AequilibraE - Network Preparation</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>140</y>
+     <width>741</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="title">
+    <string>Nodes layer</string>
+   </property>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>25</x>
+      <y>96</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Node Layer fields</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioUseNodes">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>24</y>
+      <width>151</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Use node layer</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioNewNodes">
+    <property name="geometry">
+     <rect>
+      <x>172</x>
+      <y>23</y>
+      <width>171</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Create node layer</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>25</x>
+      <y>95</y>
+      <width>171</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Node numbering start</string>
+    </property>
+    <property name="buddy">
+     <cstring>label_3</cstring>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="np_node_start">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>179</x>
+      <y>91</y>
+      <width>71</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>25</x>
+      <y>62</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Node Layer</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>25</x>
+      <y>58</y>
+      <width>101</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Node layer name</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="OutNodes">
+    <property name="geometry">
+     <rect>
+      <x>135</x>
+      <y>56</y>
+      <width>561</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>Enter name for node layer with centroids</string>
+    </property>
+   </widget>
+   <widget class="QgsMapLayerComboBox" name="cbb_node_layer">
+    <property name="geometry">
+     <rect>
+      <x>164</x>
+      <y>56</y>
+      <width>541</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QgsFieldComboBox" name="cbb_node_fields">
+    <property name="geometry">
+     <rect>
+      <x>164</x>
+      <y>91</y>
+      <width>541</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+   <zorder>OutNodes</zorder>
+   <zorder>cbb_node_layer</zorder>
+   <zorder>label_2</zorder>
+   <zorder>radioUseNodes</zorder>
+   <zorder>radioNewNodes</zorder>
+   <zorder>label_3</zorder>
+   <zorder>np_node_start</zorder>
+   <zorder>label_4</zorder>
+   <zorder>label_9</zorder>
+   <zorder>cbb_node_fields</zorder>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>741</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="title">
+    <string>Links layer</string>
+   </property>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>31</y>
+      <width>181</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Network Layer</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_8">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>65</y>
+      <width>111</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Line layer name</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="OutLinks">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>64</y>
+      <width>561</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>Enter name for new network layer</string>
+    </property>
+   </widget>
+   <widget class="QgsMapLayerComboBox" name="cbb_line_layer">
+    <property name="geometry">
+     <rect>
+      <x>149</x>
+      <y>30</y>
+      <width>561</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QProgressBar" name="progressbar">
+   <property name="geometry">
+    <rect>
+     <x>22</x>
+     <y>279</y>
+     <width>261</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>170</green>
+         <blue>0</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>240</red>
+         <green>240</green>
+         <blue>240</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>51</red>
+         <green>153</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="progress_label">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>280</y>
+     <width>261</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushOK">
+   <property name="geometry">
+    <rect>
+     <x>612</x>
+     <y>279</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Run!</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushClose">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>279</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsFieldComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsfieldcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>cbb_line_layer</tabstop>
+  <tabstop>OutLinks</tabstop>
+  <tabstop>radioNewNodes</tabstop>
+  <tabstop>radioUseNodes</tabstop>
+  <tabstop>OutNodes</tabstop>
+  <tabstop>cbb_node_layer</tabstop>
+  <tabstop>np_node_start</tabstop>
+  <tabstop>pushOK</tabstop>
+  <tabstop>pushClose</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
