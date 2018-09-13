@@ -355,14 +355,11 @@ class AequilibraEMenu(object):
         #         pass
 
     def run_change_parameters(self):
-        # pass
         dlg2 = ParameterDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
     def run_about(self):
-        # pass
-
         dlg2 = AboutDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
@@ -395,8 +392,6 @@ class AequilibraEMenu(object):
 
     # run method that calls the network preparation section of the code
     def run_net_prep(self):
-        # pass
-
         dlg2 = NetworkPreparationDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
@@ -404,16 +399,12 @@ class AequilibraEMenu(object):
 
     # run method that calls the network preparation section of the code
     def run_create_transponet(self):
-        # pass
-
         dlg2 = CreatesTranspoNetDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
         # If we wanted modal, we would eliminate the dlg2.show()
 
     def run_add_connectors(self):
-        # pass
-
         dlg2 = AddConnectorsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
@@ -485,15 +476,11 @@ class AequilibraEMenu(object):
     #     dlg2.exec_()
 
     def run_simple_tag(self):
-        # pass
-
         dlg2 = SimpleTagDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
     def run_lcd(self):
-        # pass
-
         dlg2 = LeastCommonDenominatorDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
@@ -507,15 +494,11 @@ class AequilibraEMenu(object):
             dlg2.exec_()
 
     def run_bandwidth(self):
-        # pass
-
         dlg2 = CreateBandwidthsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
     def run_scenario_comparison(self):
-        # pass
-
         dlg2 = CompareScenariosDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
