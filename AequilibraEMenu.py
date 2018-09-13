@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    2018-05-28
+ Updated:    2018-08-08
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -24,6 +24,7 @@
 import os
 import sys
 import qgis
+import aequilibrae
 # import tempfile, glob
 # from qgis.core import *
 from qgis.PyQt import QtWidgets
@@ -43,7 +44,7 @@ from .common_tools import ParameterDialog
 from .common_tools import AboutDialog
 
 # from .binary_downloader_class import BinaryDownloaderDialog
-# from .distribution_procedures import DistributionModelsDialog
+from .distribution_procedures import DistributionModelsDialog
 
 from .gis import CompareScenariosDialog
 from .gis import DesireLinesDialog
@@ -61,8 +62,9 @@ from .network import CreatesTranspoNetDialog
 # from .paths_procedures import ImpedanceMatrixDialog
 
 from .matrix_procedures import LoadMatrixDialog
-# from .matrix_procedures import LoadDatasetDialog
-# from .matrix_procedures import DisplayAequilibraEFormatsDialog
+from .matrix_procedures import LoadDatasetDialog
+from .matrix_procedures import DisplayAequilibraEFormatsDialog
+
 # from .matrix_procedures import MatrixManipulationDialog
 
 # from .public_transport_procedures import GtfsImportDialog
@@ -137,63 +139,63 @@ class AequilibraEMenu(object):
         # # ########################################################################
         # # ####################  DATA UTILITIES SUB-MENU  #########################
 
-        # self.matrix_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Data"))
-        # self.aequilibrae_add_submenu(self.matrix_menu)
+        self.matrix_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Data"))
+        self.aequilibrae_add_submenu(self.matrix_menu)
 
-        # # Displaying Aequilibrae custom data formats
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_display_custom_formats.png")
-        # self.display_custom_formats_action = QAction(icon, u"Display AequilibraE formats", self.iface.mainWindow())
-        # self.display_custom_formats_action.triggered.connect(self.run_display_aequilibrae_formats)
-        # self.display_custom_formats_action.setEnabled(True)
-        # self.matrix_menu.addAction(self.display_custom_formats_action)
+        # Displaying Aequilibrae custom data formats
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_display_custom_formats.png")
+        self.display_custom_formats_action = QAction(icon, u"Display AequilibraE formats", self.iface.mainWindow())
+        self.display_custom_formats_action.triggered.connect(self.run_display_aequilibrae_formats)
+        self.display_custom_formats_action.setEnabled(True)
+        self.matrix_menu.addAction(self.display_custom_formats_action)
 
-        # # Loading matrices
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
-        # self.load_matrix_action = QAction(icon, u"Import matrices", self.iface.mainWindow())
-        # self.load_matrix_action.triggered.connect(self.run_load_matrices)
-        # self.load_matrix_action.setEnabled(True)
-        # self.matrix_menu.addAction(self.load_matrix_action)
+        # Loading matrices
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
+        self.load_matrix_action = QAction(icon, u"Import matrices", self.iface.mainWindow())
+        self.load_matrix_action.triggered.connect(self.run_load_matrices)
+        self.load_matrix_action.setEnabled(True)
+        self.matrix_menu.addAction(self.load_matrix_action)
 
         # # Loading Database
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dataset.png")
-        # self.load_database_action = QAction(icon, u"Import dataset", self.iface.mainWindow())
-        # self.load_database_action.triggered.connect(self.run_load_database)
-        # self.load_database_action.setEnabled(True)
-        # self.matrix_menu.addAction(self.load_database_action)
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dataset.png")
+        self.load_database_action = QAction(icon, u"Import dataset", self.iface.mainWindow())
+        self.load_database_action.triggered.connect(self.run_load_database)
+        self.load_database_action.setEnabled(True)
+        self.matrix_menu.addAction(self.load_database_action)
 
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
 
-        # self.trip_distribution_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Trip Distribution"))
-        # self.aequilibrae_add_submenu(self.trip_distribution_menu)
+        self.trip_distribution_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Trip Distribution"))
+        self.aequilibrae_add_submenu(self.trip_distribution_menu)
 
-        # # # IPF
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_ipf.png")
-        # self.ipf_action = QAction(icon, u"Iterative proportional fitting", self.iface.mainWindow())
-        # self.ipf_action.triggered.connect(self.run_ipf)
-        # self.ipf_action.setEnabled(True)
-        # self.trip_distribution_menu.addAction(self.ipf_action)
+        # # IPF
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_ipf.png")
+        self.ipf_action = QAction(icon, u"Iterative proportional fitting", self.iface.mainWindow())
+        self.ipf_action.triggered.connect(self.run_ipf)
+        self.ipf_action.setEnabled(True)
+        self.trip_distribution_menu.addAction(self.ipf_action)
 
-        # # # Apply Gravity
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_apply_gravity.png")
-        # self.apply_gravity_action = QAction(icon, u"Apply Gravity Model", self.iface.mainWindow())
-        # self.apply_gravity_action.triggered.connect(self.run_apply_gravity)
-        # self.apply_gravity_action.setEnabled(True)
-        # self.trip_distribution_menu.addAction(self.apply_gravity_action)
+        # # Apply Gravity
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_apply_gravity.png")
+        self.apply_gravity_action = QAction(icon, u"Apply Gravity Model", self.iface.mainWindow())
+        self.apply_gravity_action.triggered.connect(self.run_apply_gravity)
+        self.apply_gravity_action.setEnabled(True)
+        self.trip_distribution_menu.addAction(self.apply_gravity_action)
 
-        # # # Calibrate Gravity
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_calibrate_gravity.png")
-        # self.calibrate_gravity_action = QAction(icon, u"Calibrate Gravity Model", self.iface.mainWindow())
-        # self.calibrate_gravity_action.triggered.connect(self.run_calibrate_gravity)
-        # self.calibrate_gravity_action.setEnabled(True)
-        # self.trip_distribution_menu.addAction(self.calibrate_gravity_action)
+        # # Calibrate Gravity
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_calibrate_gravity.png")
+        self.calibrate_gravity_action = QAction(icon, u"Calibrate Gravity Model", self.iface.mainWindow())
+        self.calibrate_gravity_action.triggered.connect(self.run_calibrate_gravity)
+        self.calibrate_gravity_action.setEnabled(True)
+        self.trip_distribution_menu.addAction(self.calibrate_gravity_action)
 
-        # # Trip Distribution
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
-        # self.trip_distr_action = QAction(icon, u"Trip Distribution", self.iface.mainWindow())
-        # self.trip_distr_action.triggered.connect(self.run_distribution_models)
-        # self.trip_distr_action.setEnabled(True)
-        # self.trip_distribution_menu.addAction(self.trip_distr_action)
+        # Trip Distribution
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
+        self.trip_distr_action = QAction(icon, u"Trip Distribution", self.iface.mainWindow())
+        self.trip_distr_action.triggered.connect(self.run_distribution_models)
+        self.trip_distr_action.setEnabled(True)
+        self.trip_distribution_menu.addAction(self.trip_distr_action)
 
         # # ########################################################################
         # # ###################  PATH COMPUTATION SUB-MENU   #######################
@@ -312,7 +314,7 @@ class AequilibraEMenu(object):
         if no_binary:
             icon = QIcon(os.path.dirname(__file__) + "/icons/icon_binaries.png")
             self.binary_action = QAction(icon, u"Download binaries", self.iface.mainWindow())
-            self.binary_action.triggered.connect(self.run_binary_donwload)
+            self.binary_action.triggered.connect(self.run_binary_download)
             self.binary_action.setEnabled(True)
             self.AequilibraE_menu.addAction(self.binary_action)
         #
@@ -370,20 +372,16 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_load_database(self):
-        pass
-
-    #     dlg2 = LoadDatasetDialog(self.iface, single_use=False)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = LoadDatasetDialog(self.iface, single_use=False)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_display_aequilibrae_formats(self):
-        pass
+        dlg2 = DisplayAequilibraEFormatsDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
-    #     dlg2 = DisplayAequilibraEFormatsDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
-
-    def run_binary_donwload(self):
+    def run_binary_download(self):
         pass
 
     #     dlg2 = BinaryDownloaderDialog(self.iface)
@@ -417,25 +415,19 @@ class AequilibraEMenu(object):
     #     dlg2.exec_()
 
     def run_calibrate_gravity(self):
-        pass
-
-    #     dlg2 = DistributionModelsDialog(self.iface, 'calibrate')
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = DistributionModelsDialog(self.iface, 'calibrate')
+        dlg2.show()
+        dlg2.exec_()
 
     def run_apply_gravity(self):
-        pass
-
-    #     dlg2 = DistributionModelsDialog(self.iface, 'apply')
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = DistributionModelsDialog(self.iface, 'apply')
+        dlg2.show()
+        dlg2.exec_()
 
     def run_distribution_models(self):
-        pass
-
-    #     dlg2 = DistributionModelsDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = DistributionModelsDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_shortest_path(self):
         pass
@@ -504,11 +496,9 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_ipf(self):
-        pass
-
-    #     dlg2 = DistributionModelsDialog(self.iface, 'ipf')
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = DistributionModelsDialog(self.iface, 'ipf')
+        dlg2.show()
+        dlg2.exec_()
 
     def message_binary(self):
         pass

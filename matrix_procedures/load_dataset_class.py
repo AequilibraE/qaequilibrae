@@ -67,9 +67,9 @@ class LoadDataset(WorkerThread):
                     self.error = 'Field {} does has a type not supported.'.format(str(field.name()))
                     break
                 fields.append(str(field.name()))
-                idxs.append(self.layer.fieldNameIndex(field.name()))
+                idxs.append(self.layer.dataProvider().fieldNameIndex(field.name()))
 
-        index_idx = self.layer.fieldNameIndex(self.index_field)
+        index_idx = self.layer.dataProvider().fieldNameIndex(self.index_field)
         datafile_spec['field_names'] = fields
         datafile_spec['data_types'] = types
         datafile_spec['file_path'] = self.output_name
@@ -80,7 +80,7 @@ class LoadDataset(WorkerThread):
             # Get all the data
             for p, feat in enumerate(self.layer.getFeatures()):
                 for idx, field, empty in zip(idxs, fields, empties):
-                    if isinstance(feat.attributes()[idx], QVariant.value()):
+                    if feat.attributes()[idx] == QVariant():
                         self.output.data[field][p] = empty
                     else:
                         self.output.data[field][p] = feat.attributes()[idx]
