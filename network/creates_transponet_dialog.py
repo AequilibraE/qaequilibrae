@@ -165,7 +165,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
             self.link_layer = get_vector_layer_by_name(self.link_layers_list.currentText())
             required_fields = self.required_fields_links
             if self.link_layer:
-                layer_fields = self.link_layer.fields()
+                layer_fields = self.link_layer.dataProvider().fields()
 
         return layer_fields, table, final_table, required_fields
 

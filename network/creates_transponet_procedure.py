@@ -24,7 +24,6 @@ from shutil import copyfile
 from qgis.core import *
 from qgis.PyQt.QtCore import *
 from ..common_tools.auxiliary_functions import *
-# from sqlite3 import dbapi2 as db
 from ..common_tools.global_parameters import *
 from ..common_tools import WorkerThread
 from aequilibrae import spatialite_database
@@ -81,7 +80,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
     # Adds the non-standard fields to a layer
     def additional_fields_to_layers(self, conn, table, layer, layer_fields, required_fields):
         curr = conn.cursor()
-        fields = layer.fields()
+        fields = layer.dataProvider().fields()
         string_fields = []
         
         for f in set(layer_fields.keys()) - set(required_fields):
