@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AequilibraE - TranpoNet preparation</string>
+   <string>AequilibraE - TranspoNet preparation</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0" rowspan="2">

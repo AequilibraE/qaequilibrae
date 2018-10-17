@@ -22,25 +22,23 @@
 
 import qgis
 from qgis.core import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import uic
 import sys
-from qgis.gui import QgsMapLayerProxyModel
 import os
+from qgis.PyQt.QtCore import *
+from qgis.PyQt import QtWidgets, uic
 from ..common_tools.global_parameters import *
-from ..common_tools import GetOutputFileName
+from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
 from functools import partial
-from creates_transponet_procedure import CreatesTranspoNetProcedure
+from .creates_transponet_procedure import CreatesTranspoNetProcedure
 
 sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_transponet_construction.ui'))
 
-class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
+class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
@@ -104,9 +102,9 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
 
         for i in final_table.selectedRanges():
-            old_fields = [final_table.item(row, 0).text() for row in xrange(i.topRow(), i.bottomRow() + 1)]
+            old_fields = [final_table.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
             
-            for row in xrange(i.bottomRow(), i.topRow() - 1, -1):
+            for row in range(i.bottomRow(), i.topRow() - 1, -1):
                 if final_table.item(row, 0).text() in required_fields:
                     break
                 final_table.removeRow(row)
@@ -115,7 +113,7 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
             for field in old_fields:
                 if field not in required_fields:
                     table.setRowCount(counter + 1)
-                    item1 = QTableWidgetItem(field)
+                    item1 = QtWidgets.QTableWidgetItem(field)
                     item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                     table.setItem(counter, 0, item1)
                     counter += 1
@@ -123,25 +121,25 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
     def append_to_list(self, layer_type):
         layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
         for i in table.selectedRanges():
-            new_fields = [table.item(row,0).text() for row in xrange(i.topRow(), i.bottomRow()+1)]
+            new_fields = [table.item(row,0).text() for row in range(i.topRow(), i.bottomRow()+1)]
 
-            for row in xrange(i.bottomRow(), i.topRow() - 1, -1):
+            for row in range(i.bottomRow(), i.topRow() - 1, -1):
                 table.removeRow (row)
 
             counter = final_table.rowCount()
             for field in new_fields:
                 final_table.setRowCount(counter + 1)
-                item1 = QTableWidgetItem(field)
+                item1 = QtWidgets.QTableWidgetItem(field)
                 item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
     
-                chb1 = QCheckBox()
+                chb1 = QtWidgets.QCheckBox()
                 chb1.setChecked(False)
                 chb1.setEnabled(False)
                 chb1.stateChanged.connect(self.keep_checked)
                 final_table.setCellWidget(counter, 1, self.centers_item(chb1))
 
-                cbb = QComboBox()
+                cbb = QtWidgets.QComboBox()
                 cbb.addItem(field)
                 final_table.setCellWidget(counter, 2, self.centers_item(cbb))
                 counter += 1
@@ -160,14 +158,14 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
             self.node_layer = get_vector_layer_by_name(self.node_layers_list.currentText())
             required_fields = self.required_fields_nodes
             if self.node_layer:
-                layer_fields = self.node_layer.pendingFields()
+                layer_fields = self.node_layer.fields()
         if layer_type == 'links':
             table = self.table_available_link_fields
             final_table = self.table_link_fields
             self.link_layer = get_vector_layer_by_name(self.link_layers_list.currentText())
             required_fields = self.required_fields_links
             if self.link_layer:
-                layer_fields = self.link_layer.pendingFields()
+                layer_fields = self.link_layer.dataProvider().fields()
 
         return layer_fields, table, final_table, required_fields
 
@@ -183,7 +181,7 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
                 counter = 0
                 for field in fields:
                     table.setRowCount(counter + 1)
-                    item1 = QTableWidgetItem(field)
+                    item1 = QtWidgets.QTableWidgetItem(field)
                     item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                     table.setItem(counter, 0, item1)
                     counter += 1
@@ -201,11 +199,11 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
             for rf in required_fields:
                 final_table.setRowCount(counter + 1)
 
-                item1 = QTableWidgetItem(rf)
+                item1 = QtWidgets.QTableWidgetItem(rf)
                 item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
 
-                chb1 = QCheckBox()
+                chb1 = QtWidgets.QCheckBox()
                 if rf in init_fields:
                     chb1.setChecked(True)
                     chb1.stateChanged.connect(partial(self.set_field_to_default, layer_type))
@@ -220,8 +218,8 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
             pass
 
     def centers_item(self, item):
-        cell_widget = QWidget()
-        lay_out = QHBoxLayout(cell_widget)
+        cell_widget = QtWidgets.QWidget()
+        lay_out = QtWidgets.QHBoxLayout(cell_widget)
         lay_out.addWidget(item)
         lay_out.setAlignment(Qt.AlignCenter)
         lay_out.setContentsMargins(0, 0, 0, 0)
@@ -240,9 +238,9 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
                     break
     
             if ch_box.isChecked():
-                final_table.setCellWidget(row, 2, QWidget())
+                final_table.setCellWidget(row, 2, QtWidgets.QWidget())
             else:
-                cbb = QComboBox()
+                cbb = QtWidgets.QComboBox()
                 for i in layer_fields:
                     cbb.addItem(i.name())
                 final_table.setCellWidget(row, 2, self.centers_item(cbb))
@@ -273,12 +271,12 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
             fields = {}
             for row in range(table.rowCount()):
                 f = table.item(row, 0).text()
-                if table.cellWidget(row, 1).findChildren(QCheckBox)[0].isChecked():
+                if table.cellWidget(row, 1).findChildren(QtWidgets.QCheckBox)[0].isChecked():
                     val = -1
                 else:
-                    widget = table.cellWidget(row, 2).findChildren(QComboBox)[0]
+                    widget = table.cellWidget(row, 2).findChildren(QtWidgets.QComboBox)[0]
                     source_name = widget.currentText()
-                    val = layer.fieldNameIndex(source_name)
+                    val = layer.dataProvider().fieldNameIndex(source_name)
                 fields[f] = val
                         
             return fields
@@ -290,11 +288,10 @@ class CreatesTranspoNetDialog(QDialog, FORM_CLASS):
         self.close()
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
-                        self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("jobFinished( PyQt_PyObject )"), self.job_finished_from_thread)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.jobFinished.connect(self.job_finished_from_thread)
         self.worker_thread.start()
         self.show()
 
