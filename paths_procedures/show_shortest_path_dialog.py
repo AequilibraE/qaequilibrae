@@ -18,20 +18,20 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-
-from qgis.core import *
 import qgis
+from qgis.core import *
 from qgis.gui import QgsMapToolEmitPoint
-from PyQt4 import QtGui
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
-from PyQt4 import uic, QtCore
+from qgis.utils import iface
+from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt import QtCore
+from qgis.PyQt import QtWidgets, uic
 from random import randint
 
 import sys
 import os
 from ..common_tools.auxiliary_functions import *
-from point_tool import PointTool
+from .point_tool import PointTool
 from aequilibrae.paths.results import PathResults
 
 no_binary = False
@@ -42,15 +42,17 @@ except:
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
-#sys.modules['qgsmaplayercombobox'] = qgis.gui
+# sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_compute_path.ui'))
 
 from ..common_tools import LoadGraphLayerSettingDialog
 
-class ShortestPathDialog(QtGui.QDialog, FORM_CLASS):
+
+class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
+    clickTool = PointTool(iface.mapCanvas())
     def __init__(self, iface):
-        QDialog.__init__(self)
-        QtGui.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
+        # QtWidgets.QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self, None, Qt.WindowStaysOnTopHint)
         self.iface = iface
         self.setupUi(self)
         self.field_types = {}
@@ -61,7 +63,6 @@ class ShortestPathDialog(QtGui.QDialog, FORM_CLASS):
         self.node_fields = None
         self.index = None
         self.matrix = None
-        self.clickTool = PointTool(self.iface.mapCanvas())
         self.path = standard_path()
         self.node_id = None
 
@@ -94,24 +95,25 @@ class ShortestPathDialog(QtGui.QDialog, FORM_CLASS):
         self.link_features = None
 
     def search_for_point_from(self):
+        self.clickTool.clicked.connect(self.fill_path_from)
         self.iface.mapCanvas().setMapTool(self.clickTool)
-        QObject.connect(self.clickTool, SIGNAL("clicked"), self.fill_path_from)
         self.from_but.setEnabled(False)
 
     def search_for_point_to(self):
         self.iface.mapCanvas().setMapTool(self.clickTool)
-        QObject.connect(self.clickTool, SIGNAL("clicked"), self.fill_path_to)
+        self.clickTool.clicked.connect(self.fill_path_to)
         self.to_but.setEnabled(False)
 
     def search_for_point_to_after_from(self):
         self.iface.mapCanvas().setMapTool(self.clickTool)
-        QObject.connect(self.clickTool, SIGNAL("clicked"), self.fill_path_to)
+        self.clickTool.clicked.connect(self.fill_path_to)
 
     def fill_path_to(self):
         self.to_node = self.find_point()
         self.path_to.setText(str(self.to_node))
         self.to_but.setEnabled(True)
 
+    @QtCore.pyqtSlot()
     def fill_path_from(self):
         self.from_node = self.find_point()
         self.path_from.setText(str(self.from_node))
@@ -174,30 +176,15 @@ class ShortestPathDialog(QtGui.QDialog, FORM_CLASS):
                 pr.addFeatures(all_links)
 
                 # add layer to the map
-                QgsMapLayerRegistry.instance().addMapLayer(vl)
+                QgsProject.instance().addMapLayer(vl)
 
-                # format the layer with a thick line
-                registry = QgsSymbolLayerV2Registry.instance()
-                lineMeta = registry.symbolLayerMetadata("SimpleLine")
-                symbol = QgsLineSymbolV2()
-                lineLayer = lineMeta.createSymbolLayer({'width': '1', 'color': self.random_rgb(), 'offset': '0',
-                                                        'penstyle': 'solid', 'use_custom_dash': '0',
-                                                        'joinstyle': 'bevel', 'capstyle': 'square'})
-                symbol.deleteSymbolLayer(0)
-                symbol.appendSymbolLayer(lineLayer)
-                renderer = QgsSingleSymbolRendererV2(symbol)
-                vl.setRendererV2(renderer)
+                symbol = vl.renderer().symbol()
+                symbol.setWidth(1)
                 qgis.utils.iface.mapCanvas().refresh()
 
             else:
                 qgis.utils.iface.messageBar().pushMessage("No path between " + self.path_from.text() +
                                                           ' and ' + self.path_to.text(), '', level=3)
-
-    def random_rgb(self):
-        rgb = ''
-        for i in range(3):
-            rgb = rgb + str(randint(0, 255)) + ','
-        return rgb[:-1]
 
     def exit_procedure(self):
         self.close()

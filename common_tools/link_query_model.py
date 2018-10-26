@@ -20,15 +20,15 @@
  """
 
 from qgis.core import *
-from PyQt4 import QtCore
-from PyQt4.QtCore import *
-Qt = QtCore.Qt
+import qgis
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtCore import Qt
 
     
 # Largely adapted from http://stackoverflow.com/questions/28033633/using-large-record-set-with-qtableview-and-qabstracttablemodel-retrieve-visib
 #Answer by Phil Cooper
 
-class LinkQueryModel(QtCore.QAbstractTableModel):
+class LinkQueryModel(QAbstractTableModel):
     def __init__(self, narray, headerdata, parent=None, *args):
         QAbstractTableModel.__init__(self, parent, *args)
         self._array = narray

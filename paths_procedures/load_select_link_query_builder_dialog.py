@@ -20,9 +20,11 @@
  """
 # Filtering largely adapted from http://stackoverflow.com/questions/34252413/how-to-create-a-filter-for-qtablewidget
 
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtGui import *
-from PyQt4 import uic
+from qgis.core import *
+import qgis
+from qgis.PyQt.QtCore import *
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtWidgets import QPushButton
 import numpy as np
 
 import sys
@@ -34,9 +36,9 @@ from ..common_tools import LinkQueryModel
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_link_query_builder.ui'))
 
 
-class LoadSelectLinkQueryBuilderDialog(QtGui.QDialog, FORM_CLASS):
+class LoadSelectLinkQueryBuilderDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface, graph, window_title):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.graph = graph
@@ -72,7 +74,7 @@ class LoadSelectLinkQueryBuilderDialog(QtGui.QDialog, FORM_CLASS):
         self.model = LinkQueryModel(self.data, ['Link ID', 'Dir'])
 
         # filter proxy model
-        filter_proxy_model = QtGui.QSortFilterProxyModel()
+        filter_proxy_model = QSortFilterProxyModel()
         filter_proxy_model.setSourceModel(self.model)
         filter_proxy_model.setFilterKeyColumn(0)  # third column
 
@@ -106,19 +108,19 @@ class LoadSelectLinkQueryBuilderDialog(QtGui.QDialog, FORM_CLASS):
                 column = index.column() - columns[0]
                 table[row][column] = str(index.data())
 
-        for i in table:
-            if len(i[0]):
-                self.selected_links.setRowCount(self.tot_links + 1)
-                link_id = i[0]
-                self.selected_links.setItem(self.tot_links, 0, QTableWidgetItem(link_id))
+            for i in table:
+                if len(i[0]):
+                    self.selected_links.setRowCount(self.tot_links + 1)
+                    link_id = i[0]
+                    self.selected_links.setItem(self.tot_links, 0, QTableWidgetItem(link_id))
 
-                direc = i[1]
-                self.selected_links.setItem(self.tot_links, 1, QTableWidgetItem(direc))
+                    direc = i[1]
+                    self.selected_links.setItem(self.tot_links, 1, QTableWidgetItem(direc))
 
-                del_button = QPushButton('X')
-                del_button.clicked.connect(self.click_button_inside_the_list)
-                self.selected_links.setCellWidget(self.tot_links, 2, del_button)
-                self.tot_links += 1
+                    del_button = QPushButton('X')
+                    del_button.clicked.connect(self.click_button_inside_the_list)
+                    self.selected_links.setCellWidget(self.tot_links, 2, del_button)
+                    self.tot_links += 1
         self.check_preparedness()
 
     def click_button_inside_the_list(self):

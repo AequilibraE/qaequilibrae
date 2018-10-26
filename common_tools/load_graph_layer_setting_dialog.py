@@ -21,23 +21,24 @@
 
 from qgis.core import *
 import qgis
-from PyQt4 import QtGui, uic, QtCore
-from PyQt4.QtGui import *
+from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
+from qgis.PyQt.QtGui import *
+
 
 import sys
 import os
 from functools import partial
 from ..common_tools.auxiliary_functions import *
+from ..common_tools import GetOutputFileName
 from ..common_tools.global_parameters import *
-from ..aequilibrae.paths import Graph
-
+from aequilibrae.paths import Graph
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_load_network_info.ui'))
 
-class LoadGraphLayerSettingDialog(QtGui.QDialog, FORM_CLASS):
+class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
-        QtGui.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
+        # QtWidgets.QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
         self.iface = iface
         self.setupUi(self)
         self.field_types = {}
@@ -69,7 +70,7 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, FORM_CLASS):
         self.do_load_graph.clicked.connect(self.returns_configuration)
 
         # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.legendInterface().layers():  # We iterate through all layers
+        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
             if 'wkbType' in dir(layer):
                 if layer.wkbType() in point_types:
                     self.cb_node_layer.addItem(layer.name())
@@ -100,7 +101,7 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, FORM_CLASS):
                     combofield.addItem(field.name())
             if node_layer:
                 # We create the spatial index used to associate the click to the network nodes
-                self.node_fields = [field.name() for field in layer.pendingFields()]
+                self.node_fields = [field.name() for field in layer.dataProvider().fields().toList()]
                 self.node_keys = {}
                 self.index = QgsSpatialIndex()
                 self.node_layer = layer
@@ -113,11 +114,8 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, FORM_CLASS):
 
     def loaded_new_graph_from_file(self):
         file_types = "AequilibraE graph(*.aeg)"
+        new_name, type = GetOutputFileName(self, 'Result file', [file_types], '.aeg', self.path)
 
-        if len(self.graph_file_name.text()) == 0:
-            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.path, file_types)
-        else:
-            new_name = QFileDialog.getOpenFileName(None, 'Result file', self.graph_file_name.text(), file_types)
         self.cb_minimizing.clear()
         self.block_paths.setChecked(False)
         try:
@@ -138,7 +136,7 @@ class LoadGraphLayerSettingDialog(QtGui.QDialog, FORM_CLASS):
 
     def returns_configuration(self):
         if self.link_features is None:
-            idx = self.line_layer.fieldNameIndex(self.cb_link_id_field.currentText())
+            idx = self.line_layer.dataProvider().fieldNameIndex(self.cb_link_id_field.currentText())
             self.link_features = {}
             for feat in self.line_layer.getFeatures():
                 link_id = feat.attributes()[idx]
