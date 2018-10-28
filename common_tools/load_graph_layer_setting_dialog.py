@@ -24,16 +24,22 @@ import qgis
 from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
 from qgis.PyQt.QtGui import *
 
-
 import sys
 import os
 from functools import partial
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import GetOutputFileName
 from ..common_tools.global_parameters import *
-from aequilibrae.paths import Graph
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_load_network_info.ui'))
+try:
+    from aequilibrae.paths import Graph
+
+    no_binary = False
+except:
+    no_binary = True
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_load_network_info.ui'))
+
 
 class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -108,7 +114,7 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
                 for feature in layer.getFeatures():
                     self.index.insertFeature(feature)
                     self.node_keys[feature.id()] = feature.attributes()
-                
+
             else:
                 self.line_layer = layer
 
@@ -142,7 +148,7 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
                 link_id = feat.attributes()[idx]
                 self.link_features[link_id] = feat
         self.node_id = self.cb_data_field.currentText()
-        
+
         self.exit_procedure()
 
     def exit_procedure(self):

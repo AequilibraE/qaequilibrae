@@ -23,8 +23,9 @@
 # noinspection PyUnresolvedReferences
 import os
 import sys
+sys.dont_write_bytecode = True
+import os.path
 import qgis
-import aequilibrae
 # import tempfile, glob
 # from qgis.core import *
 from qgis.PyQt import QtWidgets
@@ -43,23 +44,16 @@ from .common_tools import ParameterDialog
 # from .common_tools import ReportDialog
 from .common_tools import AboutDialog
 
-# from .binary_downloader_class import BinaryDownloaderDialog
+from .binary_downloader_class import BinaryDownloaderDialog
 from .distribution_procedures import DistributionModelsDialog
 
 from .gis import CompareScenariosDialog
-from .gis import DesireLinesDialog
 from .gis import CreateBandwidthsDialog
 from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 
 from .network import NetworkPreparationDialog
 from .network import AddConnectorsDialog
-from .network import CreatesTranspoNetDialog
-
-from .paths_procedures import GraphCreationDialog
-from .paths_procedures import TrafficAssignmentDialog
-from .paths_procedures import ShortestPathDialog
-from .paths_procedures import ImpedanceMatrixDialog
 
 from .matrix_procedures import LoadMatrixDialog
 from .matrix_procedures import LoadDatasetDialog
@@ -69,20 +63,22 @@ from .matrix_procedures import DisplayAequilibraEFormatsDialog
 
 # from .public_transport_procedures import GtfsImportDialog
 
+# Procedures that depend on AequilibraE
+try:
+    from .gis import DesireLinesDialog
+    from .network import CreatesTranspoNetDialog
+    from .paths_procedures import GraphCreationDialog
+    from .paths_procedures import TrafficAssignmentDialog
+    from .paths_procedures import ShortestPathDialog
+    from .paths_procedures import ImpedanceMatrixDialog
 
-# from .aequilibrae.aequilibrae.__version__ import binary_version as VERSION
+    no_binary = False
+except:
+    no_binary = True
 
-no_binary = False
-old_binary = False
-# try:
-#     from aequilibrae.aequilibrae.paths import VERSION_COMPILED as VERSION_GRAPH
-#     if VERSION != VERSION_GRAPH:
-#         old_binary = True
-# except:
-#     no_binary = True
 
-sys.dont_write_bytecode = True
-import os.path
+
+
 
 
 class AequilibraEMenu(object):
@@ -382,11 +378,9 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_binary_download(self):
-        pass
-
-    #     dlg2 = BinaryDownloaderDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = BinaryDownloaderDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     # run method that calls the network preparation section of the code
     def run_net_prep(self):
@@ -397,9 +391,12 @@ class AequilibraEMenu(object):
 
     # run method that calls the network preparation section of the code
     def run_create_transponet(self):
-        dlg2 = CreatesTranspoNetDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+        if no_binary:
+            self.message_binary()
+        else:
+            dlg2 = CreatesTranspoNetDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
         # If we wanted modal, we would eliminate the dlg2.show()
 
     def run_add_connectors(self):
@@ -408,9 +405,12 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def run_create_graph(self):
-        dlg2 = GraphCreationDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+        if no_binary:
+            self.message_binary()
+        else:
+            dlg2 = GraphCreationDialog(self.iface)
+            dlg2.show()
+            dlg2.exec_()
 
     def run_calibrate_gravity(self):
         dlg2 = DistributionModelsDialog(self.iface, 'calibrate')
@@ -444,7 +444,6 @@ class AequilibraEMenu(object):
             dlg2.exec_()
 
     def run_traffic_assig(self):
-        # show the dialog
         if no_binary:
             self.message_binary()
         else:
@@ -454,7 +453,6 @@ class AequilibraEMenu(object):
 
     def run_import_gtfs(self):
         pass
-
     #     dlg2 = GtfsImportDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
@@ -493,7 +491,6 @@ class AequilibraEMenu(object):
         dlg2.exec_()
 
     def message_binary(self):
-        pass
-    #     qgis.utils.iface.messageBar().pushMessage("Binary Error: ",
-    #                                               "Please download it from the repository using the downloader from the menu",
-    #                                               level=3)
+        qgis.utils.iface.messageBar().pushMessage("Binary Error: ",
+                                                  "Please download it from the repository using the downloader from the menu",
+                                                  level=3)

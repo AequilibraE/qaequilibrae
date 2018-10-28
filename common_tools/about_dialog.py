@@ -28,7 +28,12 @@ import webbrowser
 import os
 from os.path import dirname, abspath
 from .auxiliary_functions import standard_path
-from aequilibrae.paths import release_name, release_version
+
+try:
+    from aequilibrae.paths import release_name, release_version
+except:
+    release_name =  'No Binaries available'
+    release_version = 'No Binaries available'
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_about.ui'))
 
