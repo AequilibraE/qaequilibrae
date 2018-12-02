@@ -23,6 +23,7 @@
 # noinspection PyUnresolvedReferences
 import os
 import sys
+
 sys.dont_write_bytecode = True
 import os.path
 import qgis
@@ -64,21 +65,19 @@ from .matrix_procedures import DisplayAequilibraEFormatsDialog
 # from .public_transport_procedures import GtfsImportDialog
 
 # Procedures that depend on AequilibraE
+no_binary = False
 try:
+    from .aequilibrae.aequilibrae.paths import allOrNothing
+except ImportError:
+    no_binary = True
+
+if not no_binary:
     from .gis import DesireLinesDialog
     from .network import CreatesTranspoNetDialog
     from .paths_procedures import GraphCreationDialog
     from .paths_procedures import TrafficAssignmentDialog
     from .paths_procedures import ShortestPathDialog
     from .paths_procedures import ImpedanceMatrixDialog
-
-    no_binary = False
-except:
-    no_binary = True
-
-
-
-
 
 
 class AequilibraEMenu(object):
@@ -453,6 +452,7 @@ class AequilibraEMenu(object):
 
     def run_import_gtfs(self):
         pass
+
     #     dlg2 = GtfsImportDialog(self.iface)
     #     dlg2.show()
     #     dlg2.exec_()
