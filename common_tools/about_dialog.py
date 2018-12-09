@@ -30,7 +30,8 @@ from os.path import dirname, abspath
 from .auxiliary_functions import standard_path
 from aequilibrae.paths import release_name, release_version
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_about.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_about.ui'))
+
 
 class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -45,23 +46,27 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
         repository = 'https://github.com/AequilibraE/AequilibraE-GUI'
         self.wiki = "https://github.com/aequilibrae/aequilibrae/wiki"
         sponsors = ['IPEA (2015)']
-        developers = ['Pedro Camargo','Yu-Chu Huang' ,'Jamie Cook (MacOS binaries)']
+        developers = ['Pedro Camargo', 'Yu-Chu Huang', 'Jamie Cook (MacOS binaries)']
 
         d = dirname(dirname(abspath(__file__)))
         my_file = os.path.join(d, 'metadata.txt')
         b = '?'
+        version = '?'
         with open(my_file, 'r') as a:
             for line in a.readlines():
-                if line[:7] == 'version':
-                    b = line[8:]
-                    break
+                if 'version=' in line:
+                    b = line.find('=')
+                    b = line[b + 1:]
+                elif 'qgisMinimumVersion' in line:
+                    version = line.find('=')
+                    version = line[version + 1:]
 
         self.all_items = []
         self.all_items.append(['AequilibraE Version name', release_name])
         self.all_items.append(['AequilibraE Version number', release_version])
         self.all_items.append(['GUI version', b])
         self.all_items.append(['GUI Repository', repository])
-        self.all_items.append(['Minimum QGIS', '3.0'])
+        self.all_items.append(['Minimum QGIS', version])
         self.all_items.append(['Developers', developers])
         self.all_items.append(['Sponsors', sponsors])
 
@@ -78,7 +83,7 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
                 lv = QtWidgets.QListWidget()
                 lv.addItems(t)
                 self.about_table.setCellWidget(row_count, 0, lv)
-                self.about_table.setRowHeight(row_count, len(t)*self.about_table.rowHeight(row_count))
+                self.about_table.setRowHeight(row_count, len(t) * self.about_table.rowHeight(row_count))
             else:
                 self.about_table.setItem(row_count, 0, QtWidgets.QTableWidgetItem(str(t)))
 
