@@ -26,7 +26,7 @@ from qgis.PyQt.QtCore import *
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools import WorkerThread
-from aequilibrae import spatialite_database
+from aequilibrae.reference_files import spatialite_database
 
 
 class CreatesTranspoNetProcedure(WorkerThread):

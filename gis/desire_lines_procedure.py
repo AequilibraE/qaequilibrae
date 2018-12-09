@@ -34,17 +34,17 @@ from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths.results import AssignmentResults
 from collections import OrderedDict
 
+from scipy.spatial import Delaunay
 error = False
-try:
-    from scipy.spatial import Delaunay
-except:
-    error = True
 
 no_binary = False
-try:
-    from aequilibrae.paths import allOrNothing
-except:
-    no_binary = True
+from aequilibrae.paths import allOrNothing
+
+#
+# try:
+#
+# except:
+#     no_binary = True
 
 from ..common_tools import WorkerThread
 

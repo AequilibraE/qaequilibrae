@@ -24,7 +24,6 @@ import sys
 sys.dont_write_bytecode = True
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "aequilibrae")))
-import aequilibrae
 
 def classFactory(iface):
     from .AequilibraEMenu import AequilibraEMenu
