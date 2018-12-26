@@ -313,7 +313,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 if out_name is not None:
                     args = {'matrix': seed_matrix,
                             'rows': prod_vec,
-                            'row_fields': prod_field,
+                            'row_field': prod_field,
                             'columns': atra_vec,
                             'column_field': atra_field,
                             'output': out_name,
@@ -358,7 +358,8 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
             self.chb_empty_as_zero.setEnabled(False)
             self.add_job_to_list(worker_thread, out_name)
-
+        else:
+            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.error, level=3)
     def add_job_to_list(self, job, out_name):
         self.job_queue[out_name] = job
 
@@ -378,7 +379,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.worker_thread = self.job_queue[out_name]
             self.run_thread()
 
-        if self.job != 'calibrate':
+        if self.job == 'calibrate':
             self.worker_thread.model.save(out_name)
 
         self.exit_procedure()
@@ -386,6 +387,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def check_data(self):
         self.error = None
 
+        # Check for missing info
         if self.job != 'calibrate':
             if self.cob_prod_field.currentIndex() < 0:
                 self.error = 'Production vector is missing'
@@ -401,8 +403,35 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.cob_imped_field.currentIndex() < 0:
                 self.error = 'Impedance matrix is missing'
 
-        # if self.result_file is None:
-        #     self.error = 'Parameters for output missing'
+        # Check for mismatched data
+        if self.job == 'calibrate':
+            imped_mat = self.matrices[self.cob_imped_mat.currentText()]
+            seed_mat = self.matrices[self.cob_seed_mat.currentText()]
+            if imped_mat.index[:] != seed_mat.index[:]:
+                self.error = 'Indices for input and seed matrices do not match'
+        else:
+            prod_vec = self.datasets[self.cob_prod_data.currentText()]
+            atra_vec = self.datasets[self.cob_atra_data.currentText()]
+
+        if self.job == 'apply':
+            imped_mat = self.matrices[self.cob_imped_mat.currentText()]
+            if prod_vec.index != imped_mat.index:
+                self.error = 'Impedance matrix and productions vector have mismatched indices'
+
+            # No need to check with the matrix, as if they both match the matrix it is all good
+            if atra_vec.index != imped_mat.index:
+                self.error = 'Impedance matrix and attractions vector have mismatched indices'
+
+        if self.job == 'ipf':
+            seed_mat = self.matrices[self.cob_seed_mat.currentText()]
+
+            if prod_vec.index != seed_mat.index:
+                self.error = 'Seed matrix and productions vector have mismatched indices'
+
+            # No need to check with the matrix, as if they both match the matrix it is all good
+            if atra_vec.index != seed_mat.index:
+                self.error = 'Seed matrix and attractions vector have mismatched indices'
+
 
         if self.error is not None:
             return False
@@ -410,14 +439,12 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             return True
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
-                        self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.job_finished_from_thread)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.finished_threaded_procedure.connect(self.job_finished_from_thread)
         self.worker_thread.start()
-        self.exec_()
+        self.show()
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
