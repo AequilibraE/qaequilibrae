@@ -24,6 +24,7 @@ from qgis.PyQt import QtWidgets, uic
 import qgis
 from qgis.PyQt import QtGui
 import webbrowser
+import yaml
 
 import os
 from os.path import dirname, abspath
@@ -49,10 +50,11 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
 
         repository = 'https://github.com/AequilibraE/AequilibraE-GUI'
         self.wiki = "https://github.com/aequilibrae/aequilibrae/wiki"
-        sponsors = ['IPEA (2015)']
-        developers = ['Pedro Camargo','Yu-Chu Huang' ,'Jamie Cook (MacOS binaries)']
 
         d = dirname(dirname(abspath(__file__)))
+        with open(os.path.join(d,'meta.yaml'), 'r') as yml:
+            par = yaml.load(yml)
+
         my_file = os.path.join(d, 'metadata.txt')
         b = '?'
         with open(my_file, 'r') as a:
@@ -67,8 +69,8 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
         self.all_items.append(['GUI version', b])
         self.all_items.append(['GUI Repository', repository])
         self.all_items.append(['Minimum QGIS', '3.0'])
-        self.all_items.append(['Developers', developers])
-        self.all_items.append(['Sponsors', sponsors])
+        self.all_items.append(['Developers', par['developers']])
+        self.all_items.append(['Sponsors', par['sponsors']])
 
         self.assemble()
 
