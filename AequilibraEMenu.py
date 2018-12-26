@@ -24,11 +24,12 @@
 import os
 import sys
 import tempfile
+import glob
 
 sys.dont_write_bytecode = True
 import os.path
 import qgis
-# import tempfile, glob
+
 # from qgis.core import *
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtWidgets import QAction
@@ -334,10 +335,8 @@ class AequilibraEMenu(object):
 
         # unload the aequilibrae engine
         all_pkgs = [pkg for pkg in sys.modules if 'aequilibrae' in pkg]
-        for pkg in sys.modules:
-            if 'aequilibrae' in pkg:
-                all_pkgs
-                del sys.modules[pkg]
+        for pkg in all_pkgs:
+            del sys.modules[pkg]
         # unloads the add-on
         if self.AequilibraE_menu is not None:
             self.iface.mainWindow().menuBar().removeAction(self.AequilibraE_menu.menuAction())
