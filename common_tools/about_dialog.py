@@ -33,10 +33,11 @@ from .auxiliary_functions import standard_path
 try:
     from aequilibrae.paths import release_name, release_version
 except:
-    release_name =  'No Binaries available'
+    release_name = 'No Binaries available'
     release_version = 'No Binaries available'
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_about.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_about.ui'))
+
 
 class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -52,7 +53,7 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
         self.wiki = "https://github.com/aequilibrae/aequilibrae/wiki"
 
         d = dirname(dirname(abspath(__file__)))
-        with open(os.path.join(d,'meta.yaml'), 'r') as yml:
+        with open(os.path.join(d, 'meta.yaml'), 'r') as yml:
             par = yaml.load(yml)
 
         my_file = os.path.join(d, 'metadata.txt')
@@ -85,7 +86,7 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
                 lv = QtWidgets.QListWidget()
                 lv.addItems(t)
                 self.about_table.setCellWidget(row_count, 0, lv)
-                self.about_table.setRowHeight(row_count, len(t)*self.about_table.rowHeight(row_count))
+                self.about_table.setRowHeight(row_count, len(t) * self.about_table.rowHeight(row_count))
             else:
                 self.about_table.setItem(row_count, 0, QtWidgets.QTableWidgetItem(str(t)))
 

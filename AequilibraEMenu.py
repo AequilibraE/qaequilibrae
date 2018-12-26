@@ -23,6 +23,7 @@
 # noinspection PyUnresolvedReferences
 import os
 import sys
+import tempfile
 
 sys.dont_write_bytecode = True
 import os.path
@@ -331,6 +332,12 @@ class AequilibraEMenu(object):
     def unload(self):
         self.removes_temporary_files()
 
+        # unload the aequilibrae engine
+        all_pkgs = [pkg for pkg in sys.modules if 'aequilibrae' in pkg]
+        for pkg in sys.modules:
+            if 'aequilibrae' in pkg:
+                all_pkgs
+                del sys.modules[pkg]
         # unloads the add-on
         if self.AequilibraE_menu is not None:
             self.iface.mainWindow().menuBar().removeAction(self.AequilibraE_menu.menuAction())
@@ -342,14 +349,14 @@ class AequilibraEMenu(object):
             self.iface.removePluginMenu("&AequilibraE", self.gis_tools_menu.menuAction())
 
     def removes_temporary_files(self):
-        pass
+        # pass
         # Removes all the temporary files from previous uses
-        # p = tempfile.gettempdir() + '/aequilibrae_*'
-        # for f in glob.glob(p):
-        #     try:
-        #         os.unlink(f)
-        #     except:
-        #         pass
+        p = tempfile.gettempdir() + '/aequilibrae_*'
+        for f in glob.glob(p):
+            try:
+                os.unlink(f)
+            except:
+                pass
 
     def run_change_parameters(self):
         dlg2 = ParameterDialog(self.iface)
