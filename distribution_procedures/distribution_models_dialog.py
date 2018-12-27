@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2017-10-05
- Updated:    2018-08-08
+ Updated:    2018-12-27
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.path = standard_path()
 
         self.error = None
-        self.report = None
+        self.report = []
         self.job_queue = OrderedDict()
         self.model = SyntheticGravityModel()
         self.model.function = "GAMMA"
@@ -323,15 +323,16 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.job == 'apply':
                 out_name = self.browse_outfile('aem')
                 if out_name is not None:
-                    for i in xrange(1, self.table_model.rowCount()):
+                    for i in range(1, self.table_model.rowCount()):
                         if str(self.table_model.item(i, 0).text()) == 'Alpha':
                             self.model.alpha = float(self.table_model.cellWidget(i, 1).value())
                         if str(self.table_model.item(i, 0).text()) == 'Beta':
                             self.model.beta = float(self.table_model.cellWidget(i, 1).value())
 
-                    args = {'matrix': imped_matrix,
+                    args = {'impedance': imped_matrix,
                             'rows': prod_vec,
-                            'row_fields': prod_field,
+                            'row_field': prod_field,
+                            'model': self.model,
                             'columns': atra_vec,
                             'column_field': atra_field,
                             'output': out_name,
@@ -403,36 +404,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.cob_imped_field.currentIndex() < 0:
                 self.error = 'Impedance matrix is missing'
 
-        # Check for mismatched data
-        if self.job == 'calibrate':
-            imped_mat = self.matrices[self.cob_imped_mat.currentText()]
-            seed_mat = self.matrices[self.cob_seed_mat.currentText()]
-            if imped_mat.index[:] != seed_mat.index[:]:
-                self.error = 'Indices for input and seed matrices do not match'
-        else:
-            prod_vec = self.datasets[self.cob_prod_data.currentText()]
-            atra_vec = self.datasets[self.cob_atra_data.currentText()]
-
-        if self.job == 'apply':
-            imped_mat = self.matrices[self.cob_imped_mat.currentText()]
-            if prod_vec.index != imped_mat.index:
-                self.error = 'Impedance matrix and productions vector have mismatched indices'
-
-            # No need to check with the matrix, as if they both match the matrix it is all good
-            if atra_vec.index != imped_mat.index:
-                self.error = 'Impedance matrix and attractions vector have mismatched indices'
-
-        if self.job == 'ipf':
-            seed_mat = self.matrices[self.cob_seed_mat.currentText()]
-
-            if prod_vec.index != seed_mat.index:
-                self.error = 'Seed matrix and productions vector have mismatched indices'
-
-            # No need to check with the matrix, as if they both match the matrix it is all good
-            if atra_vec.index != seed_mat.index:
-                self.error = 'Seed matrix and attractions vector have mismatched indices'
-
-
         if self.error is not None:
             return False
         else:
@@ -456,8 +427,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progress_label.setText(value[1])
 
     def job_finished_from_thread(self, success):
-        if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
+        error = self.worker_thread.error
+        if error is not None:
+            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", error.args[0], level=3)
         self.report.extend(self.worker_thread.report)
 
     def exit_procedure(self):
