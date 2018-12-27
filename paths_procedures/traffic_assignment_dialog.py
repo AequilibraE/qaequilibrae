@@ -120,6 +120,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.do_select_link.setEnabled(False)
         self.but_build_query.setEnabled(False)
         self.select_link_list.setEnabled(False)
+        self.skim_list_table.setEnabled(False)
 
         self.do_extract_link_flows.setEnabled(False)
         self.but_build_query_extract.setEnabled(False)
