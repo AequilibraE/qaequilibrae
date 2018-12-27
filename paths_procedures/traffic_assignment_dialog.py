@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-30
- Updated:... 2018-08-25
+ Updated:... 2018-12-27
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -315,6 +315,10 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 if self.do_output_to_sqlite.isChecked():
                     self.results.save_to_disk(file_name=os.path.join(self.output_path, 'path_file.' + extension),
                                               output='path_file')
+
+        # Saves output skims
+        if self.skim_list_table.rowCount() > 0:
+            self.results.skims.copy(os.path.join(self.output_path, 'skims.aem'))
 
         # if self.do_select_link.isChecked():
         #     if self.method['algorithm'] == 'AoN':
