@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/10/2016
+ Updated:    2018-12-28
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -75,21 +75,20 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def set_from_fields(self):
         self.fromfield.clear()
 
+        # Decide if it has area:
         if self.fromlayer.currentIndex() >= 0:
             layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
 
             for field in layer.fields().toList():
                 self.fromfield.addItem(field.name())
 
-            self.enclosed.setEnabled(True)
-            if layer.wkbType() not in [poly_types, multi_poly]:
-                self.enclosed.setEnabled(False)
-                if self.enclosed.isChecked:
-                    self.touching.setChecked(True)
+            if self.tolayer.currentIndex() >= 0:
+                self.set_available_operations()
 
         if self.needsmatching.isChecked():
             self.works_field_matching()
         self.matches_types()
+
 
     def set_to_fields(self):
         self.tofield.clear()
@@ -99,8 +98,34 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
 
             for field in layer.fields().toList():
                 self.tofield.addItem(field.name())
+
+            if self.fromlayer.currentIndex() >= 0:
+                self.set_available_operations()
+
         if self.needsmatching.isChecked():
             self.works_field_matching()
+
+    def set_available_operations(self):
+        # Enclosed is possible every time there is a layer of polygons
+        # Touching does not make sense where there are nodes - We do NOT want to take care of the point on line
+        #                                                      or on top of point
+
+        # Check if we have polygons
+
+        flayer = get_vector_layer_by_name(self.fromlayer.currentText())
+        tlayer = get_vector_layer_by_name(self.tolayer.currentText())
+
+        # polygon layers
+        if flayer.wkbType() in poly_types + multi_poly or tlayer.wkbType() in poly_types + multi_poly:
+            self.enclosed.setEnabled(True)
+        else:
+            self.enclosed.setEnabled(False)
+
+        # point layers
+        if flayer.wkbType() in point_types + multi_point or tlayer.wkbType() in point_types + multi_point:
+            self.touching.setEnabled(False)
+        else:
+            self.touching.setEnabled(True)
 
     def works_field_matching(self):
 
@@ -204,8 +229,4 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", '  Try again', level=3)
 
     def unload(self):
-        if self.use_node_ids.isChecked():
-            updates_a_b_nodes(self.linelayers.currentText(), self.nodelayers.currentText(),
-                              self.node_fields.currentText())
-        else:
-            updates_a_b_nodes(self.linelayers.currentText(), new_layer=self.out_nodes.text)
+        pass

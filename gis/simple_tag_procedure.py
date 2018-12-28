@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/09/2016
+ Updated:    2018-12-28
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -26,53 +26,59 @@ import numpy as np
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools.worker_thread import WorkerThread
-
-
-def main():
-    pass
+from ..common_tools.global_parameters import *
 
 
 class SimpleTAG(WorkerThread):
     def __init__(self, parentThread, flayer, tlayer, ffield, tfield, fmatch, tmatch, operation):
         WorkerThread.__init__(self, parentThread)
-        self.flayer = flayer
-        self.tlayer = tlayer
         self.ffield = ffield
         self.tfield = tfield
         self.fmatch = fmatch
         self.tmatch = tmatch
         self.operation = operation
+        self.transform = None
         self.error = None
-
-        self.sequence_of_searches = [1, 5, 10, 20]  # The second element of this list is the number of nearest
-                                                    # neighbors that will have actual distances computed for
-                                                    # in order to find the actual nearest neighor (avoid the error)
-                                                    # of the spatial index
-    def doWork(self):
-        flayer = self.flayer
-        tlayer = self.tlayer
-        ffield = self.ffield
-        tfield = self.tfield
-        tmatch = self.tmatch
-
         self.from_layer = get_vector_layer_by_name(flayer)
         self.to_layer = get_vector_layer_by_name(tlayer)
 
-        self.transform = None
-        if self.from_layer.dataProvider().crs() != self.to_layer.dataProvider().crs():
-            self.transform = QgsCoordinateTransform(self.from_layer.dataProvider().crs(),
-                                                    self.to_layer.dataProvider().crs())
+        # Layer types
+        if self.from_layer.wkbType() in point_types + multi_point:
+            self.ftype = 'point'
+        elif self.from_layer.wkbType() in line_types + multi_line:
+            self.ftype = 'line'
+        else:
+            self.ftype = 'area'
+
+        if self.to_layer.wkbType() in point_types + multi_point:
+            self.ttype = 'point'
+        elif self.to_layer.wkbType() in line_types + multi_line:
+            self.ttype = 'line'
+        else:
+            self.ttype = 'area'
+
+        # Search parameters
+        self.sequence_of_searches = [1, 5, 10, 20]  # The second element of this list is the number of nearest
+        # neighbors that will have actual distances computed for
+        # in order to find the actual nearest neighor (avoid the error)
+        # of the spatial index
+
+    def doWork(self):
+        EPSG1 = QgsCoordinateReferenceSystem(int(self.from_layer.crs().authid().split(":")[1]))
+        EPSG2 = QgsCoordinateReferenceSystem(int(self.to_layer.crs().authid().split(":")[1]))
+        if EPSG1 != EPSG2:
+            self.transform = QgsCoordinateTransform(EPSG1, EPSG2, QgsProject.instance())
 
         # PROGRESS BAR
         self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
 
         # FIELDS INDICES
-        idx = self.from_layer.dataProvider().fieldNameIndex(ffield)
-        fid = self.to_layer.dataProvider().fieldNameIndex(tfield)
+        idx = self.from_layer.dataProvider().fieldNameIndex(self.ffield)
+        fid = self.to_layer.dataProvider().fieldNameIndex(self.tfield)
         if self.fmatch is not None:
             idq = self.from_layer.dataProvider().fieldNameIndex(self.fmatch)
-            idq2 = self.to_layer.dataProvider().fieldNameIndex(tmatch)
-            
+            idq2 = self.to_layer.dataProvider().fieldNameIndex(self.tmatch)
+
             self.from_match = {feature.id(): feature.attributes()[idq] for (feature) in self.from_layer.getFeatures()}
             self.to_match = {feature.id(): feature.attributes()[idq2] for (feature) in self.to_layer.getFeatures()}
 
@@ -83,10 +89,10 @@ class SimpleTAG(WorkerThread):
         for feature in allfeatures.values():
             self.index.insertFeature(feature)
         self.all_attr = {}
-        
+
         # Dictionary with the FROM values
         self.from_val = {feature.id(): feature.attributes()[idx] for (feature) in self.from_layer.getFeatures()}
-        self.from_count = len(self.from_val.keys()) #Number of features in the source layer
+        self.from_count = len(self.from_val.keys())  # Number of features in the source layer
 
         # Appending the line below would secure perfect results, but yields a VERY slow algorithm for when
         # matches are not found
@@ -99,11 +105,8 @@ class SimpleTAG(WorkerThread):
         for feat in self.from_features.values():
             self.index_from.insertFeature(feat)
 
-        #Now we will have the code for all the possible configurations of input layer and output layer
-
-    #If target layer is a point layer
+        # Now we will have the code for all the possible configurations of input layer and output layer
         for i, feat in enumerate(self.to_layer.getFeatures()):
-            self.ProgressValue
             self.ProgressValue.emit(i)
 
             self.chooses_match(feat)
@@ -118,7 +121,7 @@ class SimpleTAG(WorkerThread):
 
         self.to_layer.commitChanges()
         self.to_layer.updateFields()
-        
+
         self.ProgressValue.emit(self.to_layer.dataProvider().featureCount())
         self.finished_threaded_procedure.emit("procedure")
 
