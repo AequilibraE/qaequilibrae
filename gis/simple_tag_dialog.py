@@ -39,6 +39,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
         self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
+        self.geography_types = [None, None]
 
         self.fromtype = None
         self.frommatchingtype = None
@@ -58,6 +59,12 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.fromlayer.addItem(layer.name())
                     self.tolayer.addItem(layer.name())
 
+
+        self.enclosed.setToolTip('If source layer is a polygon, source needs to enclose target.  If only target is '
+                                 'a polygon, target needs to enclose source. First found record is used')
+
+        self.touching.setToolTip('Criteria to choose when there are multiple matches is largest area or length matched')
+        self.closest.setToolTip('Heuristic procedure that only computes the actual distance to the nearest neighbors')
         self.works_field_matching()
 
     def reload_fields(self):
@@ -127,6 +134,20 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             self.touching.setEnabled(True)
 
+        if flayer.wkbType() in poly_types + multi_poly:
+            self.geography_types[0] = 'polygon'
+        elif flayer.wkbType() in line_types + multi_line:
+            self.geography_types[0] = 'linestring'
+        else:
+            self.geography_types[0] = 'point'
+
+        if tlayer.wkbType() in poly_types + multi_poly:
+            self.geography_types[1] = 'polygon'
+        elif tlayer.wkbType() in line_types + multi_line:
+            self.geography_types[1] = 'linestring'
+        else:
+            self.geography_types[1] = 'point'
+
     def works_field_matching(self):
 
         self.matchingfrom.clear()
@@ -173,7 +194,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def run_thread(self):
         self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
         self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
-
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
         self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
 
         self.OK.setEnabled(False)
@@ -185,6 +206,9 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def progress_value_from_thread(self, value):
         self.progressbar.setValue(value)
+
+    def progress_text_from_thread(self, value):
+        self.lbl_operation.setText(value)
 
     def finished_threaded_procedure(self, procedure):
         if self.worker_thread.error is not None:
@@ -223,7 +247,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if not error:
             self.worker_thread = SimpleTAG(qgis.utils.iface.mainWindow(), flayer, tlayer, ffield, tfield, fmatch,
-                                           tmatch, operation)
+                                           tmatch, operation, self.geography_types)
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", '  Try again', level=3)

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>453</height>
+    <height>471</height>
    </rect>
   </property>
   <property name="font">
@@ -282,7 +282,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>420</y>
+     <y>430</y>
      <width>251</width>
      <height>23</height>
     </rect>
@@ -295,13 +295,26 @@
    <property name="geometry">
     <rect>
      <x>300</x>
-     <y>420</y>
+     <y>430</y>
      <width>75</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
     <string>OK</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lbl_operation">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>408</y>
+     <width>211</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Waiting for inputs</string>
    </property>
   </widget>
  </widget>
