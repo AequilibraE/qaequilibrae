@@ -38,6 +38,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         self.error = None
         self.result = None
         self.output_type = None
+        self.transform = None
         self.poly_types = poly_types + multi_poly
         self.line_types = line_types + multi_line
         self.point_types = point_types + multi_point
@@ -51,10 +52,10 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         self.from_layer = get_vector_layer_by_name(flayer)
         self.to_layer = get_vector_layer_by_name(tlayer)
 
-        self.transform = None
-        if self.from_layer.dataProvider().crs() != self.to_layer.dataProvider().crs():
-            self.transform = QgsCoordinateTransform(self.from_layer.dataProvider().crs(),
-                                                    self.to_layer.dataProvider().crs(), QgsProject.instance())
+        EPSG1 = QgsCoordinateReferenceSystem(int(self.from_layer.crs().authid().split(":")[1]))
+        EPSG2 = QgsCoordinateReferenceSystem(int(self.to_layer.crs().authid().split(":")[1]))
+        if EPSG1 != EPSG2:
+            self.transform = QgsCoordinateTransform(EPSG1, EPSG2, QgsProject.instance())
 
         # FIELDS INDICES
         idx = self.from_layer.dataProvider().fieldNameIndex(ffield)
@@ -64,6 +65,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         # And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
         self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
         self.ProgressText.emit("Building Spatial Index")
+        self.ProgressValue.emit(0)
         allfeatures = {}
         merged = {}
         self.index = QgsSpatialIndex()
@@ -101,13 +103,15 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         # PROGRESS BAR
         self.ProgressMaxValue.emit(self.from_layer.dataProvider().featureCount())
         self.ProgressText.emit("Running Analysis")
+        self.ProgressValue.emit(0)
         part_id = 1
         features = []
+        areas = {}
         for fc, feat in enumerate(self.from_layer.getFeatures()):
             geom = feat.geometry()
             if geom is not None:
                 if self.transform is not None:
-                    a = geom.transform(self.transform)
+                    geom = geom.transform(self.transform)
                 geometry, statf = self.find_geometry(geom)
                 uncovered, statf = self.find_geometry(geom)
                 # uncovered = copy.deepcopy(geometry)
@@ -123,6 +127,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         geo, statt = self.find_geometry(allfeatures[f].geometry())
                         perct = stati / statt
                         percf = stati / statf
+                        areas[f] = statt
                         feature.setAttributes([part_id,
                                                feat.attributes()[idx],
                                                allfeatures[f].attributes()[fid],
@@ -161,12 +166,11 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         # Find the features on TO that have no correspondence in FROM
         for f, feature in merged.items():
             geom = feature.geometry()
-            aux, statt = self.find_geometry(allfeatures[f].geometry())
             if geom.area() > 0:
                 feature = QgsFeature()
                 geo, stati = self.find_geometry(geom)
                 feature.setGeometry(geo)
-                perct = stati / statt
+                perct = stati / areas[f]
                 percf = 0
                 feature.setAttributes([part_id,
                                        '',
