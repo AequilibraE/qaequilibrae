@@ -86,7 +86,10 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.spacevaluechange()
         self.set_initial_value_if_available()
         self.show_color_composite()
-        
+        self.base_group_box.setToolTip('This is the reference case, to which the differences will refer to')
+        self.alt_group_box.setToolTip('This is the alternative')
+        self.color_group_box.setToolTip('It will be BASE minus ALTERNATIVE')
+
     def show_color_composite(self):
         self.common_label.setVisible(self.radio_compo.isChecked())
         self.common_flow_color.setVisible(self.radio_compo.isChecked())
@@ -169,6 +172,10 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
             idx2_ab = self.layer.dataProvider().fieldNameIndex(ab_alt)
             idx2_ba = self.layer.dataProvider().fieldNameIndex(ba_alt)
 
+            # Create new simple stype
+            symbol = QgsLineSymbol.createSimple({'name': 'square', 'color': 'red'})
+            self.layer.renderer().setSymbol(symbol)
+
             # Create the bandwidths for the comon flow, if requested
             if self.radio_compo.isChecked():
                 values = []
@@ -225,6 +232,8 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
                 symbol_layer = self.create_style(width, offset, color, line_pattern)
                 self.layer.renderer().symbol().appendSymbolLayer(symbol_layer)
 
+            # Deletes the pre-existing style
+            self.layer.renderer().symbol().deleteSymbolLayer(0)
             self.layer.triggerRepaint()
             self.exit_procedure()
 
