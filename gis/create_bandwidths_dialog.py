@@ -308,6 +308,10 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             ab = 1
         ba = - ab
 
+        # Create new simple stype
+        symbol = QgsLineSymbol.createSimple({'name': 'square', 'color': 'red'})
+        self.layer.renderer().setSymbol(symbol)
+
         bands_ab = []
         bands_ba = []
         # go through all the fields that will be used to find the maximum value. This will be used
@@ -373,6 +377,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
                 acc_offset = acc_offset + ' + ' + str(side) + '*(' + width + '+' + space_size + ')'
 
+        self.layer.renderer().symbol().deleteSymbolLayer(0)
         self.layer.triggerRepaint()
         self.exit_procedure()
 
