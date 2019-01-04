@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-03
- Updated:    2018-08-08
+ Updated:    2018-12-27
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -30,11 +30,14 @@ class CalibrateGravityProcedure(WorkerThread):
         WorkerThread.__init__(self, parentThread)
         self.gravity = GravityCalibration(**kwargs)
         self.error = None
-        self.report = None
+        self.report = []
         self.model = None
 
     def doWork(self):
-        self.gravity.calibrate()
-        self.report = self.gravity.report
-        self.model = self.gravity.model
+        try:
+            self.gravity.calibrate()
+            self.report = self.gravity.report
+            self.model = self.gravity.model
+        except ValueError as e:
+            self.error = e
         self.finished_threaded_procedure.emit("calibrate")

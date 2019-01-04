@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-03
- Updated:    2018-08-08
+ Updated:    2018-12-27
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -25,12 +25,17 @@ from aequilibrae.distribution import GravityApplication
 
 
 class ApplyGravityProcedure(WorkerThread):
+
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
         self.gravity = GravityApplication(**kwargs)
         self.error = None
+        self.report = []
 
     def doWork(self):
-        self.gravity.apply()
-        self.report = self.gravity.report
+        try:
+            self.gravity.apply()
+            self.report = self.gravity.report
+        except ValueError as e:
+            self.error = e
         self.finished_threaded_procedure.emit(0)

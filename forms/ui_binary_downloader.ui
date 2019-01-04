@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>To provide fast algorithms, AequilibraE relies on compiled code, which is not allowed in the QGIS plugin repository. To circumvent this  restriction, you need to explicitly agree to download the compiled components of AequilibraE. This operation will only have to be performed once each time you update AequilibraE</string>
+    <string>To provide fast algorithms, AequilibraE relies on compiled code, which is not allowed in the QGIS plugin repository. To comply with this  restriction while still providing high performance, we require you to explicitly agree to download the compiled components of AequilibraE. This operation will only have to be performed once each time you update AequilibraE</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>

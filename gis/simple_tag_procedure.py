@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/09/2016
+ Updated:    2018-12-28
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -26,84 +26,98 @@ import numpy as np
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools.worker_thread import WorkerThread
-
-
-def main():
-    pass
+from ..common_tools.global_parameters import *
 
 
 class SimpleTAG(WorkerThread):
-    def __init__(self, parentThread, flayer, tlayer, ffield, tfield, fmatch, tmatch, operation):
+    def __init__(self, parentThread, flayer, tlayer, ffield, tfield, fmatch, tmatch, operation, geo_types):
         WorkerThread.__init__(self, parentThread)
-        self.flayer = flayer
-        self.tlayer = tlayer
         self.ffield = ffield
         self.tfield = tfield
         self.fmatch = fmatch
         self.tmatch = tmatch
         self.operation = operation
+        self.geo_types = geo_types
+        self.transform = None
         self.error = None
-
-        self.sequence_of_searches = [1, 5, 10, 20]  # The second element of this list is the number of nearest
-                                                    # neighbors that will have actual distances computed for
-                                                    # in order to find the actual nearest neighor (avoid the error)
-                                                    # of the spatial index
-    def doWork(self):
-        flayer = self.flayer
-        tlayer = self.tlayer
-        ffield = self.ffield
-        tfield = self.tfield
-        tmatch = self.tmatch
-
         self.from_layer = get_vector_layer_by_name(flayer)
         self.to_layer = get_vector_layer_by_name(tlayer)
 
-        self.transform = None
-        if self.from_layer.dataProvider().crs() != self.to_layer.dataProvider().crs():
-            self.transform = QgsCoordinateTransform(self.from_layer.dataProvider().crs(),
-                                                    self.to_layer.dataProvider().crs())
+        # Layer types
+        if self.from_layer.wkbType() in point_types + multi_point:
+            self.ftype = 'point'
+        elif self.from_layer.wkbType() in line_types + multi_line:
+            self.ftype = 'line'
+        else:
+            self.ftype = 'area'
+
+        if self.to_layer.wkbType() in point_types + multi_point:
+            self.ttype = 'point'
+        elif self.to_layer.wkbType() in line_types + multi_line:
+            self.ttype = 'line'
+        else:
+            self.ttype = 'area'
+
+        # Search parameters
+        self.sequence_of_searches = [1, 5, 10, 20]  # The second element of this list is the number of nearest
+        # neighbors that will have actual distances computed for
+        # in order to find the actual nearest neighor (avoid the error)
+        # of the spatial index
+
+    def doWork(self):
+        self.ProgressText.emit('Initializing')
+        self.ProgressValue.emit(0)
+
+        # And a dictionaries that will hold all the features IDs found to intersect with each feature in the spatial index
+        self.from_features = {feature.id(): feature for (feature) in self.from_layer.getFeatures()}
+        allfeatures = {feature.id(): feature for (feature) in self.to_layer.getFeatures()}
+        EPSG1 = QgsCoordinateReferenceSystem(int(self.from_layer.crs().authid().split(":")[1]))
+        EPSG2 = QgsCoordinateReferenceSystem(int(self.to_layer.crs().authid().split(":")[1]))
+        if EPSG1 != EPSG2:
+            self.transform = QgsCoordinateTransform(EPSG1, EPSG2, QgsProject.instance())
 
         # PROGRESS BAR
         self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
 
         # FIELDS INDICES
-        idx = self.from_layer.dataProvider().fieldNameIndex(ffield)
-        fid = self.to_layer.dataProvider().fieldNameIndex(tfield)
+        idx = self.from_layer.dataProvider().fieldNameIndex(self.ffield)
+        fid = self.to_layer.dataProvider().fieldNameIndex(self.tfield)
         if self.fmatch is not None:
             idq = self.from_layer.dataProvider().fieldNameIndex(self.fmatch)
-            idq2 = self.to_layer.dataProvider().fieldNameIndex(tmatch)
-            
+            idq2 = self.to_layer.dataProvider().fieldNameIndex(self.tmatch)
+
             self.from_match = {feature.id(): feature.attributes()[idq] for (feature) in self.from_layer.getFeatures()}
             self.to_match = {feature.id(): feature.attributes()[idq2] for (feature) in self.to_layer.getFeatures()}
 
         # We create an spatial self.index to hold all the features of the layer that will receive the data
-        # And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
-        allfeatures = {feature.id(): feature for (feature) in self.to_layer.getFeatures()}
         self.index = QgsSpatialIndex()
-        for feature in allfeatures.values():
+        self.ProgressText.emit('Spatial index for target layer')
+        self.ProgressValue.emit(0)
+        for i, feature in enumerate(allfeatures.values()):
             self.index.insertFeature(feature)
+            self.ProgressValue.emit(i)
         self.all_attr = {}
-        
+
         # Dictionary with the FROM values
         self.from_val = {feature.id(): feature.attributes()[idx] for (feature) in self.from_layer.getFeatures()}
-        self.from_count = len(self.from_val.keys()) #Number of features in the source layer
+        self.from_count = len(self.from_val.keys())  # Number of features in the source layer
 
         # Appending the line below would secure perfect results, but yields a VERY slow algorithm for when
         # matches are not found
         # self.sequence_of_searches.append(self.from_count)
 
         # The spatial self.index for source layer
-        self.from_features = {feature.id(): feature for (feature) in self.from_layer.getFeatures()}
         self.index_from = QgsSpatialIndex()
-
+        self.ProgressText.emit('Spatial index for source layer')
+        self.ProgressValue.emit(0)
         for feat in self.from_features.values():
             self.index_from.insertFeature(feat)
+            self.ProgressValue.emit(i)
 
-        #Now we will have the code for all the possible configurations of input layer and output layer
-
-    #If target layer is a point layer
+        self.ProgressText.emit('Performing spatial matching')
+        self.ProgressValue.emit(0)
+        # Now we will have the code for all the possible configurations of input layer and output layer
         for i, feat in enumerate(self.to_layer.getFeatures()):
-            self.ProgressValue
             self.ProgressValue.emit(i)
 
             self.chooses_match(feat)
@@ -111,6 +125,7 @@ class SimpleTAG(WorkerThread):
                 self.all_attr[feat.id()] = None
 
         self.ProgressValue.emit(0)
+        self.ProgressText.emit('Writing data to target layer')
         for i, feat in enumerate(self.to_layer.getFeatures()):
             self.ProgressValue.emit(i)
             if self.all_attr[feat.id()] is not None:
@@ -118,7 +133,7 @@ class SimpleTAG(WorkerThread):
 
         self.to_layer.commitChanges()
         self.to_layer.updateFields()
-        
+
         self.ProgressValue.emit(self.to_layer.dataProvider().featureCount())
         self.finished_threaded_procedure.emit("procedure")
 
@@ -132,40 +147,37 @@ class SimpleTAG(WorkerThread):
                 nearest = self.index_from.intersects(geom.boundingBox())
 
                 if self.fmatch:
-                    near2 = []
-                    for n in nearest:
-                        if self.from_match[feat.id()] == self.to_match[n]:
-                            near2.append(n)
-                    nearest = near2
+                    nearest = [n for n in nearest if self.from_match[feat.id()] == self.to_match[n]]
 
                 if self.operation == "ENCLOSED":
-                    for n in nearest:
-                        if self.from_features[n].geometry().contains(geom):
-                            self.all_attr[feat.id()] = self.from_val[n]
-                            break
+                    if self.geo_types[0] == 'polygon':
+                        for n in nearest:
+                            if self.from_features[n].geometry().contains(geom):
+                                self.all_attr[feat.id()] = self.from_val[n]
+                                break
+                    # if we destination was the polygon
+                    else:
+                        for n in nearest:
+                            if geom.contains(self.from_features[n].geometry()):
+                                self.all_attr[feat.id()] = self.from_val[n]
+                                break
                 else:
                     # we will compute the overlaps to make sure we are keeping the best match. e.g. Largest area or largest
                     # length
                     current_max = [None, -1]
-                    relevant_types = line_types + poly_types
-                    ranking = False
-                    if self.from_layer.wkbType() in relevant_types and self.to_layer.wkbType() in relevant_types:
-                        ranking = True
-                        intersec = 'length'
-                        if self.from_layer.wkbType() in poly_types and self.to_layer.wkbType() in poly_types:
-                            intersec = 'area'
+                    intersec = 'length'
+                    if self.geo_types == ['polygon', 'polygon']:
+                        intersec = 'area'
 
                     for n in nearest:
-                        if ranking:
-                            intersection = self.from_features[n].geometry().intersection(geom)
-                            if intersection.geometry() is not None:
-                                if intersec == 'length':
-                                    aux = intersection.geometry().length()
-                                else:
-                                    aux = intersection.geometry().area()
-                                if aux > current_max[1]:
-                                    current_max[0] = self.from_val[n]
-                                    current_max[1] = aux
+                        intersection = self.from_features[n].geometry().intersection(geom)
+                        if intersection.geometry() is not None:
+                            if intersec == 'length':
+                                aux = intersection.geometry().length()
+                            else:
+                                aux = intersection.geometry().area()
+                            if aux > current_max[1]:
+                                current_max = [self.from_val[n], aux]
                     if current_max[0] is not None:
                         self.all_attr[feat.id()] = current_max[0]
             else:
@@ -181,17 +193,16 @@ class SimpleTAG(WorkerThread):
                     dists[k] = self.from_features[n].geometry().distance(geom)
                 min_index = np.argsort(dists)
 
-                for k in range(len(nearest)):
-                    n = nearest[min_index[k]]
-                    if self.fmatch:
-                        if self.from_match[feat.id()] == self.to_match[n]:
+                if feat.id() not in self.all_attr:
+                    for k in range(len(nearest)):
+                        n = nearest[min_index[k]]
+                        if self.fmatch:
+                            if self.from_match[feat.id()] == self.to_match[n]:
+                                self.all_attr[feat.id()] = self.from_val[n]
+                                break
+                        else:
                             self.all_attr[feat.id()] = self.from_val[n]
                             break
-                    else:
-                        self.all_attr[feat.id()] = self.from_val[n]
-                        break
-                    if feat.id() in self.all_attr:
-                        break
 
 
 if __name__ == '__main__':

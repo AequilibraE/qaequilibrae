@@ -172,6 +172,9 @@
        <property name="text">
         <string>Expert mode</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </widget>
     </widget>

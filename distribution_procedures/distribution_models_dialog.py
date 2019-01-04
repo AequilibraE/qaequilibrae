@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2017-10-05
- Updated:    2018-08-08
+ Updated:    2018-12-27
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.path = standard_path()
 
         self.error = None
-        self.report = None
+        self.report = []
         self.job_queue = OrderedDict()
         self.model = SyntheticGravityModel()
         self.model.function = "GAMMA"
@@ -313,7 +313,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 if out_name is not None:
                     args = {'matrix': seed_matrix,
                             'rows': prod_vec,
-                            'row_fields': prod_field,
+                            'row_field': prod_field,
                             'columns': atra_vec,
                             'column_field': atra_field,
                             'output': out_name,
@@ -323,15 +323,16 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.job == 'apply':
                 out_name = self.browse_outfile('aem')
                 if out_name is not None:
-                    for i in xrange(1, self.table_model.rowCount()):
+                    for i in range(1, self.table_model.rowCount()):
                         if str(self.table_model.item(i, 0).text()) == 'Alpha':
                             self.model.alpha = float(self.table_model.cellWidget(i, 1).value())
                         if str(self.table_model.item(i, 0).text()) == 'Beta':
                             self.model.beta = float(self.table_model.cellWidget(i, 1).value())
 
-                    args = {'matrix': imped_matrix,
+                    args = {'impedance': imped_matrix,
                             'rows': prod_vec,
-                            'row_fields': prod_field,
+                            'row_field': prod_field,
+                            'model': self.model,
                             'columns': atra_vec,
                             'column_field': atra_field,
                             'output': out_name,
@@ -358,7 +359,8 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
             self.chb_empty_as_zero.setEnabled(False)
             self.add_job_to_list(worker_thread, out_name)
-
+        else:
+            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.error, level=3)
     def add_job_to_list(self, job, out_name):
         self.job_queue[out_name] = job
 
@@ -378,7 +380,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.worker_thread = self.job_queue[out_name]
             self.run_thread()
 
-        if self.job != 'calibrate':
+        if self.job == 'calibrate':
             self.worker_thread.model.save(out_name)
 
         self.exit_procedure()
@@ -386,6 +388,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def check_data(self):
         self.error = None
 
+        # Check for missing info
         if self.job != 'calibrate':
             if self.cob_prod_field.currentIndex() < 0:
                 self.error = 'Production vector is missing'
@@ -401,23 +404,18 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.cob_imped_field.currentIndex() < 0:
                 self.error = 'Impedance matrix is missing'
 
-        # if self.result_file is None:
-        #     self.error = 'Parameters for output missing'
-
         if self.error is not None:
             return False
         else:
             return True
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
-                        self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.job_finished_from_thread)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.finished_threaded_procedure.connect(self.job_finished_from_thread)
         self.worker_thread.start()
-        self.exec_()
+        self.show()
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
@@ -429,8 +427,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progress_label.setText(value[1])
 
     def job_finished_from_thread(self, success):
-        if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
+        error = self.worker_thread.error
+        if error is not None:
+            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", error.args[0], level=3)
         self.report.extend(self.worker_thread.report)
 
     def exit_procedure(self):

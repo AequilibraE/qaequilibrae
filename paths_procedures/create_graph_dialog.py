@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30
- Updated:    2018-08-12
+ Updated:    2018-12-27
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -112,6 +112,10 @@ class GraphCreationDialog(QtWidgets.QDialog, FORM_CLASS):
             self.fields_lst.setColumnWidth(1, 180)
             self.fields_lst.horizontalHeaderItem(0).setText("AB field")
             self.fields_lst.setGeometry(QRect(10, 130, 511, 261))
+
+        policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                                       QtWidgets.QSizePolicy.Expanding)
+        self.fields_lst.setSizePolicy(policy)
         self.list_all_fields()
 
     def set_initial_value_if_available(self, all_fields):

@@ -55,7 +55,7 @@
     <string>Create comparison</string>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox">
+  <widget class="QGroupBox" name="base_group_box">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -117,7 +117,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_2">
+  <widget class="QGroupBox" name="alt_group_box">
    <property name="geometry">
     <rect>
      <x>240</x>
@@ -208,6 +208,9 @@
     </property>
     <property name="text">
      <string>Expert mode</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QSlider" name="slider_band_size">
@@ -327,7 +330,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_4">
+  <widget class="QGroupBox" name="color_group_box">
    <property name="geometry">
     <rect>
      <x>10</x>
