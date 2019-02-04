@@ -140,10 +140,10 @@ class DesireLinesProcedure(WorkerThread):
                                         feature.setGeometry(QgsGeometry.fromPolylineXY([a_point, b_point]))
                                         attrs = [desireline_link_id, int(a_node), int(b_node), 0, dist]
                                         for c in range(classes):
-                                            attrs.extend([float(self.matrix.matrix_view[i, j, c]),
-                                                          float(self.matrix.matrix_view[j, i, c]),
-                                                          float(self.matrix.matrix_view[i, j, c]) +
-                                                          float(self.matrix.matrix_view[j, i, c])])
+                                            attrs.extend([float(np.nansum(self.matrix.matrix_view[i, j, c])),
+                                                          float(np.nansum(self.matrix.matrix_view[j, i, c])),
+                                                          float(np.nansum(self.matrix.matrix_view[i, j, c])) +
+                                                          float(np.nansum(self.matrix.matrix_view[j, i, c]))])
 
                                         feature.setAttributes(attrs)
                                         all_features.append(feature)
