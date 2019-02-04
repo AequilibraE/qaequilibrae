@@ -35,6 +35,7 @@ from aequilibrae.paths.results import AssignmentResults
 from collections import OrderedDict
 
 from scipy.spatial import Delaunay
+
 error = False
 
 no_binary = False
@@ -121,10 +122,11 @@ class DesireLinesProcedure(WorkerThread):
                 for i in range(self.matrix.zones):
                     a_node = self.matrix.index[i]
                     if a_node in all_centroids.keys():
-                        if np.sum(self.matrix.matrix_view[i, :, :]) + np.sum(self.matrix.matrix_view[:, i, :]) > 0:
-                            columns_with_filled_cells = np.nonzero(np.sum(self.matrix.matrix_view[i, :, :], axis=1))
+                        if np.nansum(self.matrix.matrix_view[i, :, :]) + np.nansum(
+                                self.matrix.matrix_view[:, i, :]) > 0:
+                            columns_with_filled_cells = np.nonzero(np.nansum(self.matrix.matrix_view[i, :, :], axis=1))
                             for j in columns_with_filled_cells[0]:
-                                if np.sum(self.matrix.matrix_view[i, j, :]) + np.sum(
+                                if np.nansum(self.matrix.matrix_view[i, j, :]) + np.nansum(
                                         self.matrix.matrix_view[j, i, :]) > 0:
                                     b_node = self.matrix.index[j]
                                     if a_node in all_centroids.keys() and b_node in all_centroids.keys():
@@ -147,19 +149,19 @@ class DesireLinesProcedure(WorkerThread):
                                         all_features.append(feature)
                                         desireline_link_id += 1
                                     else:
-                                        tu = (a_node, b_node, np.sum(self.matrix.matrix_view[i, j, :]),
-                                              np.sum(self.matrix.matrix_view[j, i, :]))
+                                        tu = (a_node, b_node, np.nansum(self.matrix.matrix_view[i, j, :]),
+                                              np.nansum(self.matrix.matrix_view[j, i, :]))
                                         self.report.append(
                                             'No centroids available to depict flow between node {0} and node'
                                             '{1}. Total AB flow was equal to {2} and total BA flow was '
                                             'equal to {3}'.format(*tu))
-                                        unnasigned += np.sum(self.matrix.matrix_view[i, j, :]) + \
-                                                      np.sum(self.matrix.matrix_view[j, i, :])
+                                        unnasigned += np.nansum(self.matrix.matrix_view[i, j, :]) + \
+                                                      np.nansum(self.matrix.matrix_view[j, i, :])
                     else:
-                        tu = (a_node, np.sum(self.matrix.matrix_view[i, :, :]))
+                        tu = (a_node, np.nansum(self.matrix.matrix_view[i, :, :]))
                         self.report.append('No centroids available to depict flows from node {0} to all the others.'
                                            'Total flow from this zone is equal to {1}'.format(*tu))
-                        unnasigned += np.sum(self.matrix.matrix_view[i, :, :])
+                        unnasigned += np.nansum(self.matrix.matrix_view[i, :, :])
 
                     q += self.matrix.zones
                     self.desire_lines.emit(('jobs_done_dl', q))
