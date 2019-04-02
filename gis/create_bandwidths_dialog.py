@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-24
- Updated:    2017-07-24
+ Updated:    2019-04-03
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -357,7 +357,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 props['offset_dd_expression'] = acc_offset + '+' + str(side) + ' * (coalesce(scale_linear("' + field + \
                                                 '", 0, ' + str(max_value) + ', 0, ' + band_size + '), 0)/2 + ' + \
                                                 space_size + ')'
-                props['line_style_expression'] = 'if ("' + field + '" = 0,' + "'no', 'solid')"
+                props['line_style_expression'] = 'if (coalesce("' + field + '",0) = 0,' + "'no', 'solid')"
                 
                 if isinstance(clr, dict):
                     if direc == 'ab':
