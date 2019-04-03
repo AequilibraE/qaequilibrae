@@ -52,9 +52,15 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pushOK.clicked.connect(self.run)
         self.pushClose.clicked.connect(self.exit_procedure)
 
-        # We load the line and node layers existing in our canvas
-        self.cbb_line_layer.setFilters(QgsMapLayerProxyModel.LineLayer)
-        self.cbb_node_layer.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self.cbb_line_layer.clear()
+        self.cbb_node_layer.clear()
+
+        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
+            if 'wkbType' in dir(layer):
+                if layer.wkbType() in line_types:
+                    self.cbb_line_layer.addItem(layer.name())
+                if layer.wkbType() in point_types:
+                    self.cbb_node_layer.addItem(layer.name())
 
         # loads default path from parameters
         self.path = standard_path()
@@ -93,15 +99,12 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
                 i.setVisible(False)
             for i in for_using_existing_nodes:
                 i.setVisible(True)
-
-            self.cbb_node_layer.clear()
         else:
             for i in for_creating_nodes:
                 i.setVisible(True)
             for i in for_using_existing_nodes:
                 i.setVisible(False)
 
-            self.cbb_node_layer.clear()
             self.cbb_node_layer.hideEvent
             self.np_node_start.setEnabled(True)
 
