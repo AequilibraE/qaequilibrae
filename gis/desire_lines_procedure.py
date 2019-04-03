@@ -14,7 +14,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-01
- Updated:    2017-06-25
+ Updated:    2018-04-03
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -114,16 +114,15 @@ class DesireLinesProcedure(WorkerThread):
 
             if self.dl_type == "DesireLines":
                 self.desire_lines.emit(('text_dl', "Creating Desire Lines"))
-                self.desire_lines.emit(('job_size_dl', self.matrix.zones ** 2 / 2))
+                self.desire_lines.emit(('job_size_dl', self.matrix.zones))
 
                 desireline_link_id = 1
-                q = 0
                 all_features = []
                 for i in range(self.matrix.zones):
                     a_node = self.matrix.index[i]
                     if a_node in all_centroids.keys():
-                        if np.nansum(self.matrix.matrix_view[i, :, :]) + np.nansum(
-                                self.matrix.matrix_view[:, i, :]) > 0:
+                        if np.nansum(self.matrix.matrix_view[i, :, :]) + \
+                                np.nansum(self.matrix.matrix_view[:, i, :]) > 0:
                             columns_with_filled_cells = np.nonzero(np.nansum(self.matrix.matrix_view[i, :, :], axis=1))
                             for j in columns_with_filled_cells[0]:
                                 if np.nansum(self.matrix.matrix_view[i, j, :]) + np.nansum(
@@ -163,8 +162,7 @@ class DesireLinesProcedure(WorkerThread):
                                            'Total flow from this zone is equal to {1}'.format(*tu))
                         unnasigned += np.nansum(self.matrix.matrix_view[i, :, :])
 
-                    q += self.matrix.zones
-                    self.desire_lines.emit(('jobs_done_dl', q))
+                    self.desire_lines.emit(('jobs_done_dl', i))
                 if unnasigned > 0:
                     self.report.append('Total non assigned flows (not counting intrazonals):' + str(unnasigned))
 
