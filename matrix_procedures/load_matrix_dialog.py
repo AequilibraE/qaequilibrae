@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30 (originally onto a single numpy array)
- Updated:    2017-06-07
+ Updated:    2019-04-09
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -38,13 +38,15 @@ from ..common_tools.report_dialog import ReportDialog
 from .load_matrix_class import LoadMatrix, MatrixReblocking
 from aequilibrae.matrix import AequilibraeMatrix
 import aequilibrae
+
 no_omx = False
 try:
     import openmatrix as omx
 except:
     no_omx = True
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_matrix_loader.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_matrix_loader.ui'))
+
 
 # TODO: Add possibility to add a centroid list to guarantee the match between matrix index and graph
 # TODO: Allow user to import multiple matrices from CSV at once (like an export from TransCad or FAF data)
@@ -79,12 +81,12 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Buttons
         self.but_load.clicked.connect(self.load_the_matrix)
-        
+
         if self.allow_single_use:
             self.but_save_for_single_use.clicked.connect(self.prepare_final_matrix)
         else:
             self.but_save_for_single_use.setVisible(False)
-            
+
         self.but_permanent_save.clicked.connect(self.get_name_and_save_to_disk)
 
         # THIRD, we load layers in the canvas to the combo-boxes
@@ -117,7 +119,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.setMaximumSize(QtCore.QSize(100000, 100000))
             self.resize(542, 427)
             self.but_permanent_save.setVisible(True)
-        
+
         self.but_save_for_single_use.setEnabled(False)
         self.but_permanent_save.setEnabled(False)
 
@@ -199,13 +201,13 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             if param == 'LOADED-MATRIX':
                 self.compressed.setVisible(True)
                 self.progress_label.setVisible(False)
-                
+
                 if self.__current_name in self.matrices.keys():
                     i = 1
                     while self.__current_name + '_' + str(i) in self.matrices.keys():
                         i += 1
                     self.__current_name = self.__current_name + '_' + str(i)
-                    
+
                 self.matrices[self.__current_name] = self.worker_thread.matrix
                 self.matrix_count += 1
                 self.update_matrix_list()
@@ -230,7 +232,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.error is None:
                 self.compressed.setVisible(False)
                 self.progress_label.setVisible(True)
-                self.__current_name = self.matrix_layer.currentText().lower().replace(' ', '_')
+                self.__current_name = self.field_cells.currentText().lower().replace(' ', '_')
                 idx1 = self.layer.dataProvider().fieldNameIndex(self.field_from.currentText())
                 idx2 = self.layer.dataProvider().fieldNameIndex(self.field_to.currentText())
                 idx3 = self.layer.dataProvider().fieldNameIndex(self.field_cells.currentText())
@@ -275,7 +277,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             self.but_save_for_single_use.setEnabled(False)
             self.but_permanent_save.setEnabled(False)
-            
+
         self.matrix_list_view.clearContents()
         self.matrix_list_view.setRowCount(self.matrix_count)
 
@@ -301,6 +303,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.matrix_list_view.blockSignals(False)
 
     def change_matrix_name(self, item):
+        self.matrix_list_view.blockSignals(True)
         row = item.row()
         new_name = self.matrix_list_view.item(row, 0).text().lower().replace(' ', '_')
         item_1 = QTableWidgetItem(new_name)
@@ -313,22 +316,24 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         for old_key in self.matrices.keys():
             if old_key not in current_names:
                 self.matrices[new_name] = self.matrices.pop(old_key)
+        self.matrix_list_view.blockSignals(False)
 
     def get_name_and_save_to_disk(self):
-        self.output_name, _ = GetOutputFileName(self, 'AequilibraE matrix', ["Aequilibrae Matrix(*.aem)"], '.aem', self.path)
+        self.output_name, _ = GetOutputFileName(self, 'AequilibraE matrix', ["Aequilibrae Matrix(*.aem)"], '.aem',
+                                                self.path)
         self.prepare_final_matrix()
-        
+
     def prepare_final_matrix(self):
         self.compressed.setVisible(False)
         self.progress_label.setVisible(True)
-        
+
         if self.output_name is None:
-            self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices)
+            self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse,
+                                                  matrices=self.matrices)
         else:
             self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse,
                                                   matrices=self.matrices, file_name=self.output_name)
         self.run_thread()
-
 
     def exit_procedure(self):
         self.close()
