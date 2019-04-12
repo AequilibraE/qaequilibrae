@@ -13,42 +13,42 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/10/2016
+ Updated:    2018-12-28
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
 from qgis.core import *
-from PyQt4.QtCore import *
-from PyQt4 import QtGui, uic
+from qgis.PyQt import QtWidgets, uic
 import qgis
 import sys
 import os
 
 # For the GIS tools portion
-from simple_tag_procedure import SimpleTAG
+from .simple_tag_procedure import SimpleTAG
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import  get_vector_layer_by_name
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_simple_tag.ui'))
 
-class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
+class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QtGui.QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
+        self.geography_types = [None, None]
 
         self.fromtype = None
         self.frommatchingtype = None
 
-        QObject.connect(self.fromlayer, SIGNAL("currentIndexChanged(QString)"), self.set_from_fields)
-        QObject.connect(self.tolayer, SIGNAL("currentIndexChanged(QString)"), self.set_to_fields)
-        QObject.connect(self.fromfield, SIGNAL("currentIndexChanged(QString)"), self.reload_fields)
-        QObject.connect(self.matchingfrom, SIGNAL("currentIndexChanged(QString)"), self.reload_fields_matching)
-        QObject.connect(self.needsmatching, SIGNAL("stateChanged(int)"), self.works_field_matching)
+        self.fromlayer.currentIndexChanged.connect(self.set_from_fields)
+        self.tolayer.currentIndexChanged.connect(self.set_to_fields)
+        self.fromfield.currentIndexChanged.connect(self.reload_fields)
+        self.matchingfrom.currentIndexChanged.connect(self.reload_fields_matching)
+        self.needsmatching.stateChanged.connect(self.works_field_matching)
 
         self.OK.clicked.connect(self.run)
 
@@ -59,6 +59,12 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
                     self.fromlayer.addItem(layer.name())
                     self.tolayer.addItem(layer.name())
 
+
+        self.enclosed.setToolTip('If source layer is a polygon, source needs to enclose target.  If only target is '
+                                 'a polygon, target needs to enclose source. First found record is used')
+
+        self.touching.setToolTip('Criteria to choose when there are multiple matches is largest area or length matched')
+        self.closest.setToolTip('Heuristic procedure that only computes the actual distance to the nearest neighbors')
         self.works_field_matching()
 
     def reload_fields(self):
@@ -70,27 +76,26 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
         if self.tolayer.currentIndex() >= 0:
             self.matchingto.clear()
             layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
-            for field in layer.pendingFields().toList():
+            for field in layer.fields().toList():
                 self.matchingto.addItem(field.name())
 
     def set_from_fields(self):
         self.fromfield.clear()
 
+        # Decide if it has area:
         if self.fromlayer.currentIndex() >= 0:
             layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
 
-            for field in layer.pendingFields().toList():
+            for field in layer.fields().toList():
                 self.fromfield.addItem(field.name())
 
-            self.enclosed.setEnabled(True)
-            if layer.wkbType() not in [poly_types, multi_poly]:
-                self.enclosed.setEnabled(False)
-                if self.enclosed.isChecked:
-                    self.touching.setChecked(True)
+            if self.tolayer.currentIndex() >= 0:
+                self.set_available_operations()
 
         if self.needsmatching.isChecked():
             self.works_field_matching()
         self.matches_types()
+
 
     def set_to_fields(self):
         self.tofield.clear()
@@ -98,10 +103,50 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
         if self.tolayer.currentIndex() >= 0:
             layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
 
-            for field in layer.pendingFields().toList():
+            for field in layer.fields().toList():
                 self.tofield.addItem(field.name())
+
+            if self.fromlayer.currentIndex() >= 0:
+                self.set_available_operations()
+
         if self.needsmatching.isChecked():
             self.works_field_matching()
+
+    def set_available_operations(self):
+        # Enclosed is possible every time there is a layer of polygons
+        # Touching does not make sense where there are nodes - We do NOT want to take care of the point on line
+        #                                                      or on top of point
+
+        # Check if we have polygons
+
+        flayer = get_vector_layer_by_name(self.fromlayer.currentText())
+        tlayer = get_vector_layer_by_name(self.tolayer.currentText())
+
+        # polygon layers
+        if flayer.wkbType() in poly_types + multi_poly or tlayer.wkbType() in poly_types + multi_poly:
+            self.enclosed.setEnabled(True)
+        else:
+            self.enclosed.setEnabled(False)
+
+        # point layers
+        if flayer.wkbType() in point_types + multi_point or tlayer.wkbType() in point_types + multi_point:
+            self.touching.setEnabled(False)
+        else:
+            self.touching.setEnabled(True)
+
+        if flayer.wkbType() in poly_types + multi_poly:
+            self.geography_types[0] = 'polygon'
+        elif flayer.wkbType() in line_types + multi_line:
+            self.geography_types[0] = 'linestring'
+        else:
+            self.geography_types[0] = 'point'
+
+        if tlayer.wkbType() in poly_types + multi_poly:
+            self.geography_types[1] = 'polygon'
+        elif tlayer.wkbType() in line_types + multi_line:
+            self.geography_types[1] = 'linestring'
+        else:
+            self.geography_types[1] = 'point'
 
     def works_field_matching(self):
 
@@ -116,12 +161,12 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
 
             if self.fromlayer.currentIndex() >= 0:
                 layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
-                for field in layer.pendingFields().toList():
+                for field in layer.fields().toList():
                     self.matchingfrom.addItem(field.name())
 
             if self.tolayer.currentIndex() >= 0:
                 layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
-                for field in layer.pendingFields().toList():
+                for field in layer.fields().toList():
                     self.matchingto.addItem(field.name())
         else:
             self.matchingfrom.setVisible(False)
@@ -135,23 +180,23 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
 
         if self.fromlayer.currentIndex() >= 0:
             layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
-            for field in layer.pendingFields().toList():
+            for field in layer.fields().toList():
                 if self.fromfield.currentText() == field.name():
                     self.fromtype = field.type()
 
         if self.needsmatching.isChecked():
             if self.fromlayer.currentIndex() >= 0:
                 layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
-                for field in layer.pendingFields().toList():
+                for field in layer.fields().toList():
                     if self.matchingfrom.currentText() == field.name():
                         self.frommatchingtype = field.type()
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.progress_range_from_thread)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
+        self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
 
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.finished_threaded_procedure)
         self.OK.setEnabled(False)
         self.worker_thread.start()
         self.exec_()
@@ -161,6 +206,9 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
 
     def progress_value_from_thread(self, value):
         self.progressbar.setValue(value)
+
+    def progress_text_from_thread(self, value):
+        self.lbl_operation.setText(value)
 
     def finished_threaded_procedure(self, procedure):
         if self.worker_thread.error is not None:
@@ -199,14 +247,10 @@ class SimpleTagDialog(QtGui.QDialog, FORM_CLASS):
 
         if not error:
             self.worker_thread = SimpleTAG(qgis.utils.iface.mainWindow(), flayer, tlayer, ffield, tfield, fmatch,
-                                           tmatch, operation)
+                                           tmatch, operation, self.geography_types)
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", '  Try again', level=3)
 
     def unload(self):
-        if self.use_node_ids.isChecked():
-            updates_a_b_nodes(self.linelayers.currentText(), self.nodelayers.currentText(),
-                              self.node_fields.currentText())
-        else:
-            updates_a_b_nodes(self.linelayers.currentText(), new_layer=self.out_nodes.text)
+        pass

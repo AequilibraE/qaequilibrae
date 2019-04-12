@@ -13,17 +13,17 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-08-15 (Initially as vector loading)
- Updated:    2017-10-02
+ Updated:    2018-07-01
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-from PyQt4.QtCore import *
+from qgis.PyQt.QtCore import *
 import numpy as np
 from ..common_tools.worker_thread import WorkerThread
 import struct
-from ..aequilibrae.matrix import AequilibraEData
+from aequilibrae.matrix import AequilibraEData
 from ..common_tools.global_parameters import *
 
 
@@ -40,7 +40,7 @@ class LoadDataset(WorkerThread):
 
     def doWork(self):
         feat_count = self.layer.featureCount()
-        self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), feat_count)
+        self.ProgressMaxValue.emit(feat_count)
 
         # Create specification for the output file
         datafile_spec = {'entries': feat_count}
@@ -64,13 +64,12 @@ class LoadDataset(WorkerThread):
                     types.append('S' + str(field.length()))
                     empties.append('')
                 else:
-                    print field.type()
                     self.error = 'Field {} does has a type not supported.'.format(str(field.name()))
                     break
                 fields.append(str(field.name()))
-                idxs.append(self.layer.fieldNameIndex(field.name()))
+                idxs.append(self.layer.dataProvider().fieldNameIndex(field.name()))
 
-        index_idx = self.layer.fieldNameIndex(self.index_field)
+        index_idx = self.layer.dataProvider().fieldNameIndex(self.index_field)
         datafile_spec['field_names'] = fields
         datafile_spec['data_types'] = types
         datafile_spec['file_path'] = self.output_name
@@ -81,12 +80,12 @@ class LoadDataset(WorkerThread):
             # Get all the data
             for p, feat in enumerate(self.layer.getFeatures()):
                 for idx, field, empty in zip(idxs, fields, empties):
-                    if isinstance(feat.attributes()[idx], QPyNullVariant):
+                    if feat.attributes()[idx] == QVariant():
                         self.output.data[field][p] = empty
                     else:
                         self.output.data[field][p] = feat.attributes()[idx]
                 self.output.index[p] = feat.attributes()[index_idx]
-                self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
+                self.ProgressValue.emit(p)
 
-            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), int(feat_count))
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), 'Done')
+            self.ProgressValue.emit(feat_count)
+        self.finished_threaded_procedure.emit('Done')

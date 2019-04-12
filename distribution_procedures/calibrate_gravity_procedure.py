@@ -13,32 +13,31 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-10-03
- Updated:
+ Updated:    2018-12-27
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-from qgis.core import *
-from PyQt4.QtCore import *
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
+from qgis.PyQt.QtCore import *
 
 from ..common_tools import WorkerThread
 from aequilibrae.distribution import GravityCalibration
 
 
 class CalibrateGravityProcedure(WorkerThread):
-    def __init__(self, parentThread,  **kwargs):
+    def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
         self.gravity = GravityCalibration(**kwargs)
         self.error = None
-        self.report = None
+        self.report = []
         self.model = None
 
     def doWork(self):
-        self.gravity.calibrate()
-        self.report = self.gravity.report
-        self.model = self.gravity.model
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),"calibrate")
+        try:
+            self.gravity.calibrate()
+            self.report = self.gravity.report
+            self.model = self.gravity.model
+        except ValueError as e:
+            self.error = e
+        self.finished_threaded_procedure.emit("calibrate")

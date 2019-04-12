@@ -1,9 +1,11 @@
 # From http://gis.stackexchange.com/questions/45094/how-to-programatically-check-for-a-mouse-click-in-qgis
 # By Nathan Woodrow
 from qgis.gui import QgsMapTool
-from PyQt4.QtCore import *
+from qgis.PyQt.QtCore import *
+
 
 class PointTool(QgsMapTool):
+    clicked = pyqtSignal(object)
     def __init__(self, canvas):
         QgsMapTool.__init__(self, canvas)
         self.canvas = canvas
@@ -21,12 +23,12 @@ class PointTool(QgsMapTool):
         point = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
 
     def canvasReleaseEvent(self, event):
-        #Get the click
+        # Get the click
         x = event.pos().x()
         y = event.pos().y()
 
         self.point = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
-        self.emit(SIGNAL("clicked"),1)
+        self.clicked.emit(1)
 
     def activate(self):
         pass

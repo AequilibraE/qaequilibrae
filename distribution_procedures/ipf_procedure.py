@@ -13,29 +13,29 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-09-29
- Updated:    2016-10-03
+ Updated:    2018-12-27
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-from PyQt4.QtCore import *
-import sys
-import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"..")))
-
-from ..common_tools import WorkerThread
+import qgis
+from qgis.PyQt.QtCore import *
 from aequilibrae.distribution import Ipf
+from ..common_tools import WorkerThread
 
 
 class IpfProcedure(WorkerThread):
+
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
         self.ipf = Ipf(**kwargs)
-        self.report = None
+        self.error = None
+        self.report = []
 
     def doWork(self):
-        self.ipf.fit()
-        self.report = self.ipf.report
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),0)
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),0)
+        try:
+            self.ipf.fit()
+            self.report = self.ipf.report
+        except ValueError as e:
+            self.error = e
+        self.finished_threaded_procedure.emit(0)

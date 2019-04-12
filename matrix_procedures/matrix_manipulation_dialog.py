@@ -24,7 +24,7 @@ from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciLexerPython
 
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
-from ..aequilibrae.matrix import AequilibraeMatrix
+from ..aequilibrae.aequilibrae.matrix import AequilibraeMatrix
 from ..common_tools.auxiliary_functions import *
 from functools import partial
 

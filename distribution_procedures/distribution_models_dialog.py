@@ -13,15 +13,18 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2017-10-05
- Updated:
+ Updated:    2018-12-27
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import QtGui, uic
+from qgis.core import *
+from qgis.PyQt import QtWidgets, uic, QtCore
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
+from qgis.PyQt.QtCore import Qt
+import qgis
+
 from collections import OrderedDict
 from functools import partial
 import numpy as np
@@ -30,28 +33,29 @@ import yaml
 from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
-from ..aequilibrae.distribution import SyntheticGravityModel
-from ..aequilibrae.distribution.synthetic_gravity_model import valid_functions
-from ipf_procedure import IpfProcedure
-from calibrate_gravity_procedure import CalibrateGravityProcedure
-from apply_gravity_procedure import ApplyGravityProcedure
 from ..common_tools.get_output_file_name import GetOutputFileName
-from ..aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
+from aequilibrae.distribution import SyntheticGravityModel
+from aequilibrae.distribution.synthetic_gravity_model import valid_functions
+from aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
+from .ipf_procedure import IpfProcedure
+from .calibrate_gravity_procedure import CalibrateGravityProcedure
+from .apply_gravity_procedure import ApplyGravityProcedure
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_distribution.ui'))
+
 
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
 
 
-class DistributionModelsDialog(QDialog, FORM_CLASS):
+class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface, mode=None):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
 
         self.error = None
-        self.report = None
+        self.report = []
         self.job_queue = OrderedDict()
         self.model = SyntheticGravityModel()
         self.model.function = "GAMMA"
@@ -188,7 +192,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
         if self.model.function in ['EXPO', 'GAMMA']:
             self.table_model.setRowCount(i)
-            self.table_model.setItem(i-1, 0, QTableWidgetItem('Beta'))
+            self.table_model.setItem(i - 1, 0, QTableWidgetItem('Beta'))
             val = self.model.beta
             if val is None:
                 val = 0
@@ -198,7 +202,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
             item.setDecimals(7)
             item.setValue(float(val))
-            self.table_model.setCellWidget(i-1, 1, item)
+            self.table_model.setCellWidget(i - 1, 1, item)
 
     def load_datasets(self):
         dlg2 = LoadDatasetDialog(self.iface)
@@ -206,13 +210,13 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         dlg2.exec_()
         if isinstance(dlg2.dataset, AequilibraEData):
             dataset_name = dlg2.dataset.file_path
-
-            data_name = os.path.splitext(os.path.basename(dataset_name))[0]
-            data_name = self.find_non_conflicting_name(data_name, self.datasets)
-            self.datasets[data_name] = dataset = dlg2.dataset
-            self.add_to_table(self.datasets, self.table_datasets)
-            self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
-            self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
+            if dataset_name is not None:
+                data_name = os.path.splitext(os.path.basename(dataset_name))[0]
+                data_name = self.find_non_conflicting_name(data_name, self.datasets)
+                self.datasets[data_name] = dataset = dlg2.dataset
+                self.add_to_table(self.datasets, self.table_datasets)
+                self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
+                self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
 
     def load_matrices(self):
         dlg2 = LoadMatrixDialog(self.iface)
@@ -220,13 +224,13 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         dlg2.exec_()
         if isinstance(dlg2.matrix, AequilibraeMatrix):
             matrix_name = dlg2.matrix.file_path
-
-            matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
-            matrix_name = self.find_non_conflicting_name(matrix_name, self.matrices)
-            self.matrices[matrix_name] = dlg2.matrix
-            self.add_to_table(self.matrices, self.table_matrices)
-            self.load_comboboxes(self.matrices.keys(), self.cob_imped_mat)
-            self.load_comboboxes(self.matrices.keys(), self.cob_seed_mat)
+            if matrix_name is not None:
+                matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
+                matrix_name = self.find_non_conflicting_name(matrix_name, self.matrices)
+                self.matrices[matrix_name] = dlg2.matrix
+                self.add_to_table(self.matrices, self.table_matrices)
+                self.load_comboboxes(self.matrices.keys(), self.cob_imped_mat)
+                self.load_comboboxes(self.matrices.keys(), self.cob_seed_mat)
 
     def load_model(self):
         file_name = self.browse_outfile('mod')
@@ -268,7 +272,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         table.setColumnWidth(0, 235)
         table.setColumnWidth(1, 80)
         table.clearContents()
-        table.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         table.setRowCount(len(dictio.keys()))
 
         for i, data_name in enumerate(dictio.keys()):
@@ -309,7 +313,7 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
                 if out_name is not None:
                     args = {'matrix': seed_matrix,
                             'rows': prod_vec,
-                            'row_fields': prod_field,
+                            'row_field': prod_field,
                             'columns': atra_vec,
                             'column_field': atra_field,
                             'output': out_name,
@@ -319,15 +323,16 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
             if self.job == 'apply':
                 out_name = self.browse_outfile('aem')
                 if out_name is not None:
-                    for i in xrange(1, self.table_model.rowCount()):
+                    for i in range(1, self.table_model.rowCount()):
                         if str(self.table_model.item(i, 0).text()) == 'Alpha':
                             self.model.alpha = float(self.table_model.cellWidget(i, 1).value())
                         if str(self.table_model.item(i, 0).text()) == 'Beta':
                             self.model.beta = float(self.table_model.cellWidget(i, 1).value())
 
-                    args = {'matrix': imped_matrix,
+                    args = {'impedance': imped_matrix,
                             'rows': prod_vec,
-                            'row_fields': prod_field,
+                            'row_field': prod_field,
+                            'model': self.model,
                             'columns': atra_vec,
                             'column_field': atra_field,
                             'output': out_name,
@@ -354,7 +359,8 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
 
             self.chb_empty_as_zero.setEnabled(False)
             self.add_job_to_list(worker_thread, out_name)
-
+        else:
+            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.error, level=3)
     def add_job_to_list(self, job, out_name):
         self.job_queue[out_name] = job
 
@@ -374,17 +380,15 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
             self.worker_thread = self.job_queue[out_name]
             self.run_thread()
 
-
-        if self.job != 'calibrate':
+        if self.job == 'calibrate':
             self.worker_thread.model.save(out_name)
 
-
         self.exit_procedure()
-
 
     def check_data(self):
         self.error = None
 
+        # Check for missing info
         if self.job != 'calibrate':
             if self.cob_prod_field.currentIndex() < 0:
                 self.error = 'Production vector is missing'
@@ -400,23 +404,18 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
             if self.cob_imped_field.currentIndex() < 0:
                 self.error = 'Impedance matrix is missing'
 
-        # if self.result_file is None:
-        #     self.error = 'Parameters for output missing'
-
         if self.error is not None:
             return False
         else:
             return True
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
-                        self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("finished_threaded_procedure( PyQt_PyObject )"),
-                        self.job_finished_from_thread)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.finished_threaded_procedure.connect(self.job_finished_from_thread)
         self.worker_thread.start()
-        self.exec_()
+        self.show()
 
     def progress_range_from_thread(self, val):
         self.progressbar.setRange(0, val[1])
@@ -428,8 +427,9 @@ class DistributionModelsDialog(QDialog, FORM_CLASS):
         self.progress_label.setText(value[1])
 
     def job_finished_from_thread(self, success):
-        if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.worker_thread.error, level=3)
+        error = self.worker_thread.error
+        if error is not None:
+            qgis.utils.iface.messageBar().pushMessage("Procedure error: ", error.args[0], level=3)
         self.report.extend(self.worker_thread.report)
 
     def exit_procedure(self):

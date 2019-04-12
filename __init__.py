@@ -21,14 +21,12 @@
 
 # This portion of the script initializes the plugin, making it known to QGIS.
 import sys
-
 sys.dont_write_bytecode = True
-
-sys.path.append("C:/Users/Pedro/.qgis2/python/plugins/AequilibraE/")
-
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "aequilibrae")))
 
 def classFactory(iface):
-    from AequilibraEMenu import AequilibraEMenu
+    from .AequilibraEMenu import AequilibraEMenu
     return AequilibraEMenu(iface)
 
 

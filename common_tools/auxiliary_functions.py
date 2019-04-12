@@ -20,15 +20,17 @@
  """
 
 import qgis
-from qgis.core import QgsMapLayerRegistry
+from qgis.core import QgsProject
 import math
 import os
 import yaml
 import tempfile
 from time import localtime, strftime
 
+
 def main():
     pass
+
 
 def user_message(message, level):
     if level == "WARNING":
@@ -38,9 +40,11 @@ def user_message(message, level):
 
     qgis.utils.iface.messageBar().pushMessage(message, '', level=level)
 
+
 # Just a shorthand function to return the current standard path
 def standard_path():
     return get_parameter_chain(['system', 'default_directory'])
+
 
 def tempPath():
     tmp_path = get_parameter_chain(['system', 'temp directory'])
@@ -48,6 +52,7 @@ def tempPath():
         return tmp_path
     else:
         return tempfile.gettempdir()
+
 
 # Returns the parameter for a given hierarchy of groups in a dictionary of dictionaries (recovered from a yml)
 def get_parameter_chain(chain):
@@ -62,9 +67,10 @@ def get_parameter_chain(chain):
             g = {}
     return g
 
+
 # Recovers a group of parameters (or the entire yml) as a dictionary of dictionaries
 def get_parameters_group(group=None):
-    path = os.path.dirname(os.path.dirname(__file__))  + "/aequilibrae/"
+    path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/aequilibrae/"
     with open(path + 'parameters.yml', 'r') as yml:
         path = yaml.safe_load(yml)
     if group is None:
@@ -74,12 +80,14 @@ def get_parameters_group(group=None):
     else:
         return {}
 
+
 def get_vector_layer_by_name(layer_name):
-    layer = QgsMapLayerRegistry.instance().mapLayersByName(layer_name)
+    layer = QgsProject.instance().mapLayersByName(layer_name)
     if not layer:
         return None
     else:
         return layer[0]
+
 
 # Haversine formula here:
 # http://gis.stackexchange.com/questions/44064/how-to-calculate-distances-in-a-point-sequence/56589#56589
@@ -99,22 +107,15 @@ def haversine(lon1, lat1, lon2, lat2):
     return meters
 
 
-def logger(message):
-    debug_file = tempfile.gettempdir() + '/aequilibrae.log'
-    if not os.path.exists(debug_file):
-        o = open(debug_file, 'w')
-    else:
-        o = open(debug_file, 'a')
-    if type(message) in [list, tuple, dict]:
-        message = str(message)
-    print >>o, message
-    o.flush()
-    o.close()
-
-
 def reporter(message, tabs=0):
     t = strftime("%Y-%m-%d %H:%M:%S", localtime())
-    return ' ' * tabs + t + ' - ' +str(message)
+    return ' ' * tabs + t + ' - ' + str(message)
+
+
+def only_str(str_input):
+    if isinstance(str_input, bytes):
+        return str_input.decode('utf-8')
+    return str_input
 
 
 if __name__ == '__main__':

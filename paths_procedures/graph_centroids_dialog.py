@@ -20,8 +20,10 @@
  """
 
 import sys
-from qgis.gui import QgsMapLayerProxyModel  # , QgsFieldProxyModel
-from PyQt4 import QtGui, QtCore, uic
+import qgis
+from qgis.core import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt import QtWidgets, uic
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import integer_types
 import numpy as np
@@ -31,9 +33,10 @@ sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/advanced_graph_details.ui'))
 
 
-class GraphCentroids(QtGui.QDialog, FORM_CLASS):
+class GraphCentroids(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QtGui.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
+        # QtWidgets.QtGui.QDialog.__init__(self, None, Qt.WindowStaysOnTopHint)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.field_types = {}
@@ -60,7 +63,7 @@ class GraphCentroids(QtGui.QDialog, FORM_CLASS):
     def changed_layer(self):
         self.cob_centroid_id.clear()
         if self.cob_centroids_layer.currentLayer() is not None:
-            for field in self.cob_centroids_layer.currentLayer().pendingFields().toList():
+            for field in self.cob_centroids_layer.currentLayer().dataProvider().fields().toList():
                 if field.type() in integer_types:
                     self.cob_centroid_id.addItem(field.name())
 
@@ -76,7 +79,7 @@ class GraphCentroids(QtGui.QDialog, FORM_CLASS):
                 features = self.cob_centroids_layer.currentLayer().getFeatures()
 
             if self.error is None:
-                idx = self.cob_centroids_layer.currentLayer().fieldNameIndex(self.cob_centroid_id.currentText())
+                idx = self.cob_centroids_layer.currentLayer().dataProvider().fieldNameIndex(self.cob_centroid_id.currentText())
                 centroids = []
                 for feat in features:
                     centroids.append(int(feat.attributes()[idx]))

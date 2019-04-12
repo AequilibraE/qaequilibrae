@@ -21,10 +21,8 @@
 
 import qgis
 from qgis.core import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import uic
-from qgis.gui import QgsMapLayerProxyModel
+from qgis.PyQt.QtCore import *
+from qgis.PyQt import QtWidgets, uic
 from functools import partial
 
 from ..common_tools.auxiliary_functions import *
@@ -32,15 +30,15 @@ import sys
 import os
 from ..common_tools.global_parameters import *
 
-from adds_connectors_procedure import AddsConnectorsProcedure
+from .adds_connectors_procedure import AddsConnectorsProcedure
 
 sys.modules['qgsfieldcombobox'] = qgis.gui
 sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_connecting_centroids.ui'))
 
-class AddConnectorsDialog(QDialog, FORM_CLASS):
+class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
@@ -54,7 +52,7 @@ class AddConnectorsDialog(QDialog, FORM_CLASS):
         self.NodeLayer.layerChanged.connect(partial(self.set_fields,'nodes'))
         self.CentroidLayer.layerChanged.connect(partial(self.set_fields,'centroids'))
 
-        for i in xrange(1, 21):
+        for i in range(1, 21):
             self.NumberConnectors.addItem(str(i))
 
         # We load the line and node layers existing in our canvas
@@ -73,11 +71,10 @@ class AddConnectorsDialog(QDialog, FORM_CLASS):
             self.MaxLength.setEnabled(True)
 
     def run_thread(self):
-        QObject.connect(self.worker_thread, SIGNAL("ProgressValue( PyQt_PyObject )"), self.progress_value_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressText( PyQt_PyObject )"), self.progress_text_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("ProgressMaxValue( PyQt_PyObject )"),
-                        self.progress_range_from_thread)
-        QObject.connect(self.worker_thread, SIGNAL("jobFinished( PyQt_PyObject )"), self.job_finished_from_thread)
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.jobFinished.connect(self.job_finished_from_thread)
         self.worker_thread.start()
         self.show()
 
@@ -103,8 +100,8 @@ class AddConnectorsDialog(QDialog, FORM_CLASS):
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Node layer error: ", self.worker_thread.error, level=3)
         else:
-            QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_node_layer)
-            QgsMapLayerRegistry.instance().addMapLayer(self.worker_thread.new_line_layer)
+            QgsProject.instance().addMapLayer(self.worker_thread.new_node_layer)
+            QgsProject.instance().addMapLayer(self.worker_thread.new_line_layer)
         self.exit_procedure()
 
     def run(self):

@@ -21,20 +21,21 @@
 
 import qgis
 from qgis.core import *
-from PyQt4.QtCore import *
+from qgis.PyQt.QtCore import *
 import time
 import numpy as np
 import sys
 import os
 import struct
 
-import aequilibrae.reserved_fields as reserved_fields
+from aequilibrae import reserved_fields
 from aequilibrae.paths import Graph
-from ..common_tools import WorkerThread, reporter, logger
+from ..common_tools import WorkerThread, reporter
+
 
 class GraphCreation(WorkerThread):
     def __init__(self, parentThread, net_layer, link_id, direction_field,
-                       fields_to_add, selected_only, centroids):
+                 fields_to_add, selected_only, centroids):
         WorkerThread.__init__(self, parentThread)
         self.net_layer = net_layer
         self.link_id = link_id
@@ -61,7 +62,7 @@ class GraphCreation(WorkerThread):
 
         # Checking ID uniqueness
         self.report.append(reporter("Checking ID uniqueness", 0))
-        self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Checking ID uniqueness. Please wait")
+        self.ProgressText.emit("Checking ID uniqueness. Please wait")
         all_ids = self.net_layer.uniqueValues(self.link_id)
 
         if NULL in all_ids:
@@ -72,26 +73,33 @@ class GraphCreation(WorkerThread):
                 self.error = 'IDs are not unique.'
                 self.report.append(self.error)
 
+        def only_str(input):
+            if isinstance(input, bytes):
+                return input.decode('utf-8')
+            return input
+
         if self.error is None:
             self.report.append(reporter('Loading data from layer', 0))
-            self.emit(SIGNAL("ProgressText ( PyQt_PyObject )"),"Loading data from layer")
-            self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), 0)
-            self.emit(SIGNAL("ProgressMaxValue( PyQt_PyObject )"), self.feat_count)
+            self.ProgressText.emit("Loading data from layer")
+            self.ProgressValue.emit(0)
+            self.ProgressMaxValue.emit(self.feat_count)
 
             self.graph = Graph()
-            all_types = [self.graph._Graph__integer_type, self.graph._Graph__integer_type, self.graph._Graph__integer_type, np.int8]
-            all_titles = [reserved_fields.link_id, reserved_fields.a_node, reserved_fields.b_node, reserved_fields.direction]
+            all_types = [self.graph._Graph__integer_type, self.graph._Graph__integer_type,
+                         self.graph._Graph__integer_type, np.int8]
+            all_titles = [reserved_fields.link_id, reserved_fields.a_node, reserved_fields.b_node,
+                          reserved_fields.direction]
 
-            for name_field, values in self.fields_to_add.iteritems():
-                all_titles.append((name_field + '_ab').encode('ascii','ignore'))
+            for name_field, values in self.fields_to_add.items():
+                all_titles.append((only_str(name_field) + '_ab'))
                 all_types.append(np.float64)
-                all_titles.append((name_field + '_ba').encode('ascii','ignore'))
+                all_titles.append((only_str(name_field )+ '_ba'))
                 all_types.append(np.float64)
 
             dt = [(t, d) for t, d in zip(all_titles, all_types)]
 
-            a_node = self.net_layer.fieldNameIndex(reserved_fields.a_node)
-            b_node = self.net_layer.fieldNameIndex(reserved_fields.b_node)
+            a_node = self.net_layer.dataProvider().fieldNameIndex(reserved_fields.a_node)
+            b_node = self.net_layer.dataProvider().fieldNameIndex(reserved_fields.b_node)
             data = []
 
             for p, feat in enumerate(self.features):
@@ -105,7 +113,7 @@ class GraphCreation(WorkerThread):
                     line.append(1)
 
                 # We append the data fields now
-                for k, v in self.fields_to_add.iteritems():
+                for k, v in self.fields_to_add.items():
                     a, b = v
                     line.append(feat.attributes()[a])
                     if self.bi_directional:
@@ -123,16 +131,15 @@ class GraphCreation(WorkerThread):
                 data.append(line)
 
                 if p % 50 == 0:
-                    self.emit(SIGNAL("ProgressValue( PyQt_PyObject )"), p)
+                    self.ProgressValue.emit(p)
 
             if self.error is None:
                 self.report.append(reporter('Converting data to graph', 0))
                 network = np.asarray(data)
-
                 self.graph.network = np.zeros(network.shape[0], dtype=dt)
 
                 for k, t in enumerate(dt):
-                    self.graph.network[t[0]] = network[:,k].astype(t[1])
+                    self.graph.network[t[0]] = network[:, k].astype(t[1])
                 del network
 
                 self.graph.type_loaded = 'NETWORK'
@@ -146,4 +153,4 @@ class GraphCreation(WorkerThread):
                 self.report.append(reporter('Process finished', 0))
             else:
                 self.report.append(self.error)
-        self.emit(SIGNAL("finished_threaded_procedure( PyQt_PyObject )"), None)
+        self.finished_threaded_procedure.emit(None)
