@@ -183,16 +183,6 @@
      <string>Enter name for node layer with centroids</string>
     </property>
    </widget>
-   <widget class="QgsMapLayerComboBox" name="cbb_node_layer">
-    <property name="geometry">
-     <rect>
-      <x>164</x>
-      <y>56</y>
-      <width>541</width>
-      <height>24</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QgsFieldComboBox" name="cbb_node_fields">
     <property name="geometry">
      <rect>
@@ -203,8 +193,17 @@
      </rect>
     </property>
    </widget>
+   <widget class="QComboBox" name="cbb_node_layer">
+    <property name="geometry">
+     <rect>
+      <x>164</x>
+      <y>56</y>
+      <width>541</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
    <zorder>OutNodes</zorder>
-   <zorder>cbb_node_layer</zorder>
    <zorder>label_2</zorder>
    <zorder>radioUseNodes</zorder>
    <zorder>radioNewNodes</zorder>
@@ -213,6 +212,7 @@
    <zorder>label_4</zorder>
    <zorder>label_9</zorder>
    <zorder>cbb_node_fields</zorder>
+   <zorder>cbb_node_layer</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
@@ -288,7 +288,7 @@
      <string>Enter name for new network layer</string>
     </property>
    </widget>
-   <widget class="QgsMapLayerComboBox" name="cbb_line_layer">
+   <widget class="QComboBox" name="cbb_line_layer">
     <property name="geometry">
      <rect>
       <x>149</x>
@@ -400,19 +400,12 @@
    <extends>QComboBox</extends>
    <header>qgsfieldcombobox.h</header>
   </customwidget>
-  <customwidget>
-   <class>QgsMapLayerComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qgsmaplayercombobox.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>cbb_line_layer</tabstop>
   <tabstop>OutLinks</tabstop>
   <tabstop>radioNewNodes</tabstop>
   <tabstop>radioUseNodes</tabstop>
   <tabstop>OutNodes</tabstop>
-  <tabstop>cbb_node_layer</tabstop>
   <tabstop>np_node_start</tabstop>
   <tabstop>pushOK</tabstop>
   <tabstop>pushClose</tabstop>
