@@ -106,11 +106,13 @@ class DesireLinesProcedure(WorkerThread):
 
             if self.dl_type == "DesireLines":
                 items = []
+                max_zone = self.matrix.index[:].max().astype(np.int64)
                 for i, j in all_centroids.items():
-                    items.append((i, j[0], j[1]))
+                    if i <= max_zone:
+                        items.append((i, j[0], j[1]))
                 coords = np.array(items)
 
-                coord_index = np.zeros((self.matrix.index[:].max().astype(np.int64) + 1, 2))
+                coord_index = np.zeros((max_zone + 1, 2))
                 coord_index[coords[:, 0].astype(np.int64), 0] = coords[:, 1]
                 coord_index[coords[:, 0].astype(np.int64), 1] = coords[:, 2]
 
