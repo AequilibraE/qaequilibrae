@@ -307,7 +307,7 @@ class DesireLinesProcedure(WorkerThread):
                 self.graph.status = 'OK'
                 self.graph.network_ok = True
                 self.graph.prepare_graph(self.matrix.index.astype(np.int64))
-                self.graph.set_graph(cost_field='distance', skim_fields=False, block_centroid_flows=False)
+                self.graph.set_graph(cost_field='distance', skim_fields=[], block_centroid_flows=False)
 
                 self.results = AssignmentResults()
                 self.results.prepare(self.graph, self.matrix)
