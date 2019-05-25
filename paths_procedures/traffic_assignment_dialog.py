@@ -538,7 +538,7 @@ class TrafficAssignmentDialog(QDialog, FORM_CLASS):
                     skims.append(table.item(i, 1).text().encode('utf-8'))
 
         if len(skims) == 0:
-            skims = False
+            skims = []
 
         self.graph.set_graph(cost_field=self.minimizing_field.currentText(),
                              skim_fields=skims,
