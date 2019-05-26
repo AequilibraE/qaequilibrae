@@ -18,21 +18,19 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
+import sys
+
 import qgis
-from qgis.core import *
-from qgis.gui import QgsMapToolEmitPoint
-from qgis.utils import iface
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtCore import *
+from aequilibrae.paths.results import PathResults
 from qgis.PyQt import QtCore
 from qgis.PyQt import QtWidgets, uic
-from random import randint
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtWidgets import *
+from qgis.core import *
+from qgis.utils import iface
 
-import sys
-import os
-from ..common_tools.auxiliary_functions import *
 from .point_tool import PointTool
-from aequilibrae.paths.results import PathResults
+from ..common_tools.auxiliary_functions import *
 
 no_binary = False
 try:
@@ -50,6 +48,7 @@ from ..common_tools import LoadGraphLayerSettingDialog
 
 class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
     clickTool = PointTool(iface.mapCanvas())
+
     def __init__(self, iface):
         # QtWidgets.QDialog.__init__(self)
         QtWidgets.QDialog.__init__(self, None, Qt.WindowStaysOnTopHint)
@@ -88,6 +87,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             self.node_fields = dlg2.node_fields
             self.index = dlg2.index
             self.graph = dlg2.graph
+            self.cb_link_id_field = dlg2.cb_link_id_field
             self.res.prepare(self.graph)
             self.do_dist_matrix.setEnabled(True)
 
@@ -141,46 +141,41 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             path_computation(int(self.path_from.text()), int(self.path_to.text()), self.graph, self.res)
 
             if self.res.path is not None:
-                ## If you want to do selections instead of new layers, this is how to do it
+                # If you want to do selections instead of new layers
+                if self.rdo_selection.isChecked():
+                    f = self.cb_link_id_field
+                    t = ''
+                    for k in self.res.path[:-1]:
+                        t = t + f + "=" + str(k) + ' or '
+                    t = t + f + "=" + str(self.res.path[-1])
 
-                # f = self.cb_link_id_field.currentText()
-                # t = ''
-                # for k in self.res.path[:-1]:
-                #     t = t + f + "=" + str(k) + ' or '
-                # t = t + f + "=" + str(self.res.path[-1])
-                # expr = QgsExpression(t)
-                # it = self.line_layer.getFeatures(QgsFeatureRequest(expr))
-                #
-                # ids = [i.id() for i in it]
-                # self.line_layer.setSelectedFeatures(ids)
-
+                    self.line_layer.selectByExpression(t)
                 # If you want to create new layers
-                # This way is MUCH faster
+                else:
+                    crs = self.line_layer.dataProvider().crs().authid()
+                    vl = QgsVectorLayer("LineString?crs={}".format(crs), self.path_from.text() +
+                                        " to " + self.path_to.text(), "memory")
+                    pr = vl.dataProvider()
 
-                crs = self.line_layer.dataProvider().crs().authid()
-                vl = QgsVectorLayer("LineString?crs={}".format(crs), self.path_from.text() +
-                                    " to " + self.path_to.text(), "memory")
-                pr = vl.dataProvider()
+                    # add fields
+                    pr.addAttributes(self.line_layer.dataProvider().fields())
+                    vl.updateFields()  # tell the vector layer to fetch changes from the provider
 
-                # add fields
-                pr.addAttributes(self.line_layer.dataProvider().fields())
-                vl.updateFields()  # tell the vector layer to fetch changes from the provider
+                    # add a feature
+                    all_links = []
+                    for k in self.res.path:
+                        fet = self.link_features[k]
+                        all_links.append(fet)
 
-                # add a feature
-                all_links = []
-                for k in self.res.path:
-                    fet = self.link_features[k]
-                    all_links.append(fet)
+                    # add all links to the temp layer
+                    pr.addFeatures(all_links)
 
-                # add all links to the temp layer
-                pr.addFeatures(all_links)
+                    # add layer to the map
+                    QgsProject.instance().addMapLayer(vl)
 
-                # add layer to the map
-                QgsProject.instance().addMapLayer(vl)
-
-                symbol = vl.renderer().symbol()
-                symbol.setWidth(1)
-                qgis.utils.iface.mapCanvas().refresh()
+                    symbol = vl.renderer().symbol()
+                    symbol.setWidth(1)
+                    qgis.utils.iface.mapCanvas().refresh()
 
             else:
                 qgis.utils.iface.messageBar().pushMessage("No path between " + self.path_from.text() +
