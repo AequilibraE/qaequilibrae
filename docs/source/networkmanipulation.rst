@@ -1,5 +1,5 @@
 Network Manipulation
-==========================
+====================
 
 .. toctree::
    :maxdepth: 2
