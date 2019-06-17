@@ -413,6 +413,9 @@ class GraphCreationDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.cost_field is None:
                 self.error = 'Cost field not selected'
 
+            elif self.cost_field[-2:] == '_*':
+                self.cost_field = self.cost_field[:-2]
+
         if self.error is not None:
             ready = False
 
