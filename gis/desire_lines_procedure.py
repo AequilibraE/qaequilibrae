@@ -105,11 +105,11 @@ class DesireLinesProcedure(WorkerThread):
                               QgsField("distance", QVariant.Double)]
 
             if self.dl_type == "DesireLines":
-                max_zone = self.matrix.index[:].max().astype(np.int64)
-                items = [(i, j[0], j[1]) for i, j in all_centroids.items() if i <= max_zone]
+                max_zone = self.matrix.index[:].max().astype(np.int64) + 1
+                items = [(i, j[0], j[1]) for i, j in all_centroids.items() if i < max_zone]
                 coords = np.array(items)
 
-                coord_index = np.zeros((max_zone + 1, 2))
+                coord_index = np.zeros((max_zone, 2))
                 coord_index[coords[:, 0].astype(np.int64), 0] = coords[:, 1]
                 coord_index[coords[:, 0].astype(np.int64), 1] = coords[:, 2]
 
