@@ -22,7 +22,7 @@ you are looking to use.
 
    installation
    example
-   networkmanipulation
+..   networkmanipulation
    data
    tripdistribution
    pathscomputation
