@@ -6,9 +6,11 @@ resources not easily available from other open-source packages in the Python (Nu
 
 If you still need to install AequilibraE, then go to the `installation instructions <installation.html>`__
 
-If you have already installed AequilibraE, but you are are somewhat puzzled by its menus and interfaces or if you are
-just starting in the world of transportation modelling then the best place to start is in our short end-to-end
-`tutorial <example.html>`__
+If you have already installed AequilibraE, but you are are somewhat puzzled by its menus and interfaces (or if you are
+just starting in the world of transportation modelling) then the best place to start is with our series of tutorials
+for end to end transportation modelling They are the following:
+
+* `Building networks from scratch (from OSM, actually) <networksfromscratch.html>`__
 
 
 Contents
@@ -21,9 +23,10 @@ you are looking to use.
    :maxdepth: 1
 
    installation
-   example
-..   networkmanipulation
-   data
+   networksfromscratch
+   networkmanipulation
+
+..   data
    tripdistribution
    pathscomputation
    gistools

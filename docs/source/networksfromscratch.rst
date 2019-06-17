@@ -1,5 +1,5 @@
-From start to end
-=================
+Building networks from scratch
+==============================
 
 .. toctree::
    :maxdepth: 1
@@ -15,6 +15,8 @@ modelling portion of the model.
 
 The files used in this example are available in a separate
 `GitHub repository <https://github.com/AequilibraE/AliceSprings>`_
+
+* Reading about the `basic concepts <networkmanipulation.html>`__ behind AequilibraE's networks is probably a good idea
 
 Sourcing the data
 -----------------
@@ -32,14 +34,6 @@ In this example the zoning system is derived from SA1s, which is the smallest un
 available by the Australian Bureau of Statistics (ABS). One could decide to go down to meshblocks, but the added
 complexity that arise from the lack of full demographic data from the ABS is not justifiable for the development of
 this example.
-
-* Demand:
-There is no Household Travel Survey (HTS) for Alice Springs that we know of, so we have borrowed data from
-.. Transit network / GTFS
-..  Socio-economic data:
-
-
-..  Other:
 
 
 Building the network
@@ -79,7 +73,7 @@ though **many links were tagged as being bridges**, so we used all links for bot
 .. image:: images/network_edit_splitting.png
     :width: 800
     :align: center
-    :alt: First step
+    :alt: Splits links
 
 
 If you want to experiment with spliting only links that are not tagged as bridges or tunnels, you can load the same
@@ -88,7 +82,7 @@ layer twice and filter one of them no everything except tunnels and bridges.
 .. image:: images/network_edit_filter.png
     :width: 800
     :align: center
-    :alt: First step
+    :alt: Filtering layer
 
 
 After spliting the links, we ended up with a link layer with MultiLineString features (where lines are not necessarily
@@ -115,7 +109,7 @@ which is an AequilibraE tool.
 .. image:: images/network_edit_network_preparation.png
     :width: 800
     :align: center
-    :alt: Multipart to Singleparts
+    :alt: Network preparation
 
 In this case we chose to add nodes with IDs starting in 1,001, as we will reserve all nodes from 1 to 1,000 for centroid
 connectors, external stations and other special uses (we are not planning to use all that range and that is not
@@ -158,7 +152,7 @@ maximum distance unresstricted and add a single connector per zone.
 .. image:: images/network_edit_adding_connectors.png
     :width: 800
     :align: center
-    :alt: Zones to centroids
+    :alt: Adding connectors
 
 Creating a consistent network
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -188,16 +182,24 @@ With all the preparation work done, one can create the final network using the l
 menu in AequilibraE.
 
 
-Accessing **AequilibraE > Network Manipulation > Network Preparation**, the user is presented with the following screen.
+Accessing **AequilibraE > Network Manipulation > Create Transponet**, the user is presented with the following screen.
 
 .. image:: images/network_edit_creating_transponet.png
     :width: 800
     :align: center
-    :alt: Zones to centroids
+    :alt: Creates Transponet
 
 
-After running this tool a sqlite file (spatialite enabled) will be created.
+After running this tool a sqlite file (spatialite enabled) will be created and you can edit the network (create, move
+or delete links and nodes) and both layers (including node *ID* and *A_Node*/*B_Node* fields) will remain consistent
+with each other.
 
+Other resources
+~~~~~~~~~~~~~~~
 
-Trip Generation
----------------
+There is an excellent tutorial from Roberta Maletta using AequilibraE 0.4 that is still very much current
+
+.. raw:: html
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/mHeCfNuuTkQ" frameborder="0"
+    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
