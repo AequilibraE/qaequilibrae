@@ -8,8 +8,7 @@ GIS Tools
 Simple TAG
 ~~~~~~~~~~~~~~~~~~~~
 
-Reference TransCad?
-
+pass
 
 Lowest Common denominator
 -------------------------
@@ -18,7 +17,23 @@ pass
 
 Desire Lines
 -----------------
-pass
+
+AequilibraE is now capable of doing two types of desire lines
+
+
+If you ar enew to AequilibraE and are trying use this tool for the first time, we recommend you first take a look at
+the section on * `importing matrices into AequilibraE format <data.html>`__. In our experience, that is where most
+people find themselves stranded.
+
+
+
+.. image:: images/gis_desire_lines.png
+    :width: 800
+    :align: center
+    :alt: Desire Lines menu
+
+
+
 
 
 Stacked Bandwidth
