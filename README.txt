@@ -5,7 +5,7 @@ It can also be used on a Python shell. For initial instruction on how to do it, 
 Last Version:  0.5.0
 Release date: January-2019
 
-For more details: www.aequilibrae.com and www.xl-optim.com
+For more details: www.aequilibrae.com/qgis and www.xl-optim.com
 
 
 
