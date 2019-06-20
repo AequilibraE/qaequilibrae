@@ -131,13 +131,12 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.graph.load_from_disk(new_name)
 
             self.block_paths.setChecked(self.graph.block_centroid_flows)
-            graph_fields = list(self.graph.graph.dtype.names)
             self.skimmeable_fields = self.graph.available_skims()
 
             self.available_skims_table.setRowCount(len(self.skimmeable_fields))
-            for q in self.skimmeable_fields:
+            for i, q in enumerate(self.skimmeable_fields):
                 self.cb_minimizing.addItem(q)
-                self.available_skims_table.setItem(0, 0, QTableWidgetItem(q))
+                self.available_skims_table.setItem(i, 0, QTableWidgetItem(q))
 
     def browse_outfile(self):
         self.imped_results = None
