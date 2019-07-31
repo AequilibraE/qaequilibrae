@@ -15,18 +15,30 @@ Network basics
 AequilibraE is built upon a few basic concepts that need to be clear before you do any modelling with it. They are
 the following:
 
-* Links can be bi-directional: This varies from platform to platform, but in **AequilibraE** we do not distinguish
+* **Links can be bi-directional**: This varies from platform to platform, but in **AequilibraE** we do not distinguish
   between the network file and the graph, which gets built from the network on demand. Therefore all **AequilibraE**
-  networks have a field for direction with values in the set [-1, 0, 1], which indicate BA only flow, bi-directional,
-  and AB only flow respectively.
+  networks have a field for direction
 
-* AequilibraE has a few reserved fields for the network, which are "link_id", "a_node", "b_node", "direction", "id"
+.. note::
+   * If **direction = -1**, then we the link allows **BA flow only**
+   * If **direction = -1**, then we the link allows flows in **both directions**
+   * If **direction = 1**, then we the link allows **AB flow only**
 
-* AequilibraE can deal with an arbitrary set of IDs for links and nodes, but we vectorize a lot of operations for
+
+* **AequilibraE can deal with an arbitrary set of IDs for links and nodes**, but we vectorize a lot of operations for
   faster performance, which means that you will be using a LOT more memory you would if you use large IDs for nodes
   and links without actually needing it.  You may also explode memory or the Numpy Numerical types. A good practice is
   to keep IDs as low as possible, but in general, if you get too close to 922,337,203,685,4775,807, you will certainly
   break things, regardless of your system capabilities.
+
+.. note::
+   **AequilibraE has a few reserved fields** for the network, which are
+    * "link_id"
+    * "a_node"
+    * "b_node"
+    * "direction"
+    * "id"
+
 
 Network preparation
 -------------------
@@ -105,5 +117,5 @@ This is what i looks like
 
 Creating TranspoNet
 -------------------
-pass
+Transponet
 

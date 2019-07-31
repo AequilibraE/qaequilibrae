@@ -31,6 +31,15 @@ We also assume you are using `PyCharm <https://www.jetbrains.com/pycharm>`_, whi
 
 If you are using a different IDE, we would welcome if you could contribute with insctruction to set that up.
 
+Cloning the computational engine as submodule
+---------------------------------------------
+
+git submodule update --init --recursive
+
+git submodule update --recursive --remote
+
+
+
 Non-Windows
 ~~~~~~~~~~~
 ::

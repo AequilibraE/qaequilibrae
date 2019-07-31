@@ -25,7 +25,7 @@ Sourcing the data
 
 For this example we will use Open-Street Maps data, which is the most widely available data out there.
 There is an `online tool <http://osm-traffic.com/>`_ that is pretty good to download very target data (such as that for
-Alice Springs), you can also download the entire thing from `Geofrabik <http://download.geofabrik.de/>`_
+Alice Springs), you can also download the entire thing from `Geofabrik <http://download.geofabrik.de/>`_
 
 
 * Zoning System:
