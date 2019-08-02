@@ -32,9 +32,10 @@ from ..common_tools.global_parameters import *
 
 from .adds_connectors_procedure import AddsConnectorsProcedure
 
-sys.modules['qgsfieldcombobox'] = qgis.gui
-sys.modules['qgsmaplayercombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_connecting_centroids.ui'))
+sys.modules["qgsfieldcombobox"] = qgis.gui
+sys.modules["qgsmaplayercombobox"] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_connecting_centroids.ui"))
+
 
 class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -49,8 +50,8 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pushOK.clicked.connect(self.run)
         self.pushClose.clicked.connect(self.exit_procedure)
 
-        self.NodeLayer.layerChanged.connect(partial(self.set_fields,'nodes'))
-        self.CentroidLayer.layerChanged.connect(partial(self.set_fields,'centroids'))
+        self.NodeLayer.layerChanged.connect(partial(self.set_fields, "nodes"))
+        self.CentroidLayer.layerChanged.connect(partial(self.set_fields, "centroids"))
 
         for i in range(1, 21):
             self.NumberConnectors.addItem(str(i))
@@ -62,8 +63,8 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # default directory
         self.path = standard_path()
-        self.set_fields('nodes')
-        self.set_fields('centroids')
+        self.set_fields("nodes")
+        self.set_fields("centroids")
 
     def allows_distance(self):
         self.MaxLength.setEnabled(False)
@@ -88,7 +89,7 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progress_label.setText(value)
 
     def set_fields(self, lyr):
-        if lyr in ['nodes', 'centroids']:
+        if lyr in ["nodes", "centroids"]:
             if lyr == "nodes":
                 self.NodeField.setLayer(self.NodeLayer.currentLayer())
 
@@ -113,16 +114,18 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.SelectedNodes.isChecked():
             selection_only = True
 
-        parameters = [self.NodeLayer.currentText(),
-                      self.LineLayer.currentText(),
-                      self.CentroidLayer.currentText(),
-                      self.NodeField.currentText(),
-                      self.CentroidField.currentText(),
-                      max_length,
-                      int(self.NumberConnectors.currentText()),
-                      self.OutLinks.text(),
-                      self.OutNodes.text(),
-                      selection_only]
+        parameters = [
+            self.NodeLayer.currentText(),
+            self.LineLayer.currentText(),
+            self.CentroidLayer.currentText(),
+            self.NodeField.currentText(),
+            self.CentroidField.currentText(),
+            max_length,
+            int(self.NumberConnectors.currentText()),
+            self.OutLinks.text(),
+            self.OutNodes.text(),
+            selection_only,
+        ]
 
         #  WE NEED TO ADD SOME ERROR TREATMENT CODE HERE
 

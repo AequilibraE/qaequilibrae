@@ -19,18 +19,24 @@
  -----------------------------------------------------------------------------------------------------------
  """
 from qgis.core import QgsVectorGradientColorRampV2
+
 AequilibraERamps = {}
 
-BlueGreenYellowRedBlack = QgsVectorGradientColorRampV2.create({'color1': '36,219,255', # Blue from 0 forward
-                                                         'color2': '0,0,0', #Black at 100%
-                                                         'stops': '0.25;0,230,0:' # Green from 25% forward
-                                                                  '0.50;255,248,0:' # Yellow from 50% forward
-                                                                  '0.75;252,0,0'}) #Red from 75% forward
-AequilibraERamps['Blue-Green-Yellow-Red-Black'] = BlueGreenYellowRedBlack
+BlueGreenYellowRedBlack = QgsVectorGradientColorRampV2.create(
+    {
+        "color1": "36,219,255",  # Blue from 0 forward
+        "color2": "0,0,0",  # Black at 100%
+        "stops": "0.25;0,230,0:" "0.50;255,248,0:" "0.75;252,0,0",  # Green from 25% forward  # Yellow from 50% forward
+    }
+)  # Red from 75% forward
+AequilibraERamps["Blue-Green-Yellow-Red-Black"] = BlueGreenYellowRedBlack
 
 
-GreenYellowRedBlack = QgsVectorGradientColorRampV2.create({'color1': '0,230,0',  # Green from 0% forward
-                                                         'color2': '0,0,0', #Black at 100%
-                                                         'stops': '0.25;255,248,0:'  # Yellow from 25% forward
-                                                                  '0.50;252,0,0'})  # Red from 50% forward
-AequilibraERamps['Green-Yellow-Red-Black'] = GreenYellowRedBlack
+GreenYellowRedBlack = QgsVectorGradientColorRampV2.create(
+    {
+        "color1": "0,230,0",  # Green from 0% forward
+        "color2": "0,0,0",  # Black at 100%
+        "stops": "0.25;255,248,0:" "0.50;252,0,0",  # Yellow from 25% forward
+    }
+)  # Red from 50% forward
+AequilibraERamps["Green-Yellow-Red-Black"] = GreenYellowRedBlack

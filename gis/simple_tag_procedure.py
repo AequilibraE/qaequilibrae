@@ -20,6 +20,7 @@
  """
 
 from qgis.core import *
+
 # from PyQt4.QtCore import *
 from qgis.PyQt.QtCore import *
 import numpy as np
@@ -45,18 +46,18 @@ class SimpleTAG(WorkerThread):
 
         # Layer types
         if self.from_layer.wkbType() in point_types + multi_point:
-            self.ftype = 'point'
+            self.ftype = "point"
         elif self.from_layer.wkbType() in line_types + multi_line:
-            self.ftype = 'line'
+            self.ftype = "line"
         else:
-            self.ftype = 'area'
+            self.ftype = "area"
 
         if self.to_layer.wkbType() in point_types + multi_point:
-            self.ttype = 'point'
+            self.ttype = "point"
         elif self.to_layer.wkbType() in line_types + multi_line:
-            self.ttype = 'line'
+            self.ttype = "line"
         else:
-            self.ttype = 'area'
+            self.ttype = "area"
 
         # Search parameters
         self.sequence_of_searches = [1, 5, 10, 20]  # The second element of this list is the number of nearest
@@ -65,7 +66,7 @@ class SimpleTAG(WorkerThread):
         # of the spatial index
 
     def doWork(self):
-        self.ProgressText.emit('Initializing')
+        self.ProgressText.emit("Initializing")
         self.ProgressValue.emit(0)
 
         # And a dictionaries that will hold all the features IDs found to intersect with each feature in the spatial index
@@ -91,7 +92,7 @@ class SimpleTAG(WorkerThread):
 
         # We create an spatial self.index to hold all the features of the layer that will receive the data
         self.index = QgsSpatialIndex()
-        self.ProgressText.emit('Spatial index for target layer')
+        self.ProgressText.emit("Spatial index for target layer")
         self.ProgressValue.emit(0)
         for i, feature in enumerate(allfeatures.values()):
             self.index.insertFeature(feature)
@@ -108,13 +109,13 @@ class SimpleTAG(WorkerThread):
 
         # The spatial self.index for source layer
         self.index_from = QgsSpatialIndex()
-        self.ProgressText.emit('Spatial index for source layer')
+        self.ProgressText.emit("Spatial index for source layer")
         self.ProgressValue.emit(0)
         for feat in self.from_features.values():
             self.index_from.insertFeature(feat)
             self.ProgressValue.emit(i)
 
-        self.ProgressText.emit('Performing spatial matching')
+        self.ProgressText.emit("Performing spatial matching")
         self.ProgressValue.emit(0)
         # Now we will have the code for all the possible configurations of input layer and output layer
         for i, feat in enumerate(self.to_layer.getFeatures()):
@@ -125,7 +126,7 @@ class SimpleTAG(WorkerThread):
                 self.all_attr[feat.id()] = None
 
         self.ProgressValue.emit(0)
-        self.ProgressText.emit('Writing data to target layer')
+        self.ProgressText.emit("Writing data to target layer")
         for i, feat in enumerate(self.to_layer.getFeatures()):
             self.ProgressValue.emit(i)
             if self.all_attr[feat.id()] is not None:
@@ -150,7 +151,7 @@ class SimpleTAG(WorkerThread):
                     nearest = [n for n in nearest if self.from_match[feat.id()] == self.to_match[n]]
 
                 if self.operation == "ENCLOSED":
-                    if self.geo_types[0] == 'polygon':
+                    if self.geo_types[0] == "polygon":
                         for n in nearest:
                             if self.from_features[n].geometry().contains(geom):
                                 self.all_attr[feat.id()] = self.from_val[n]
@@ -165,14 +166,14 @@ class SimpleTAG(WorkerThread):
                     # we will compute the overlaps to make sure we are keeping the best match. e.g. Largest area or largest
                     # length
                     current_max = [None, -1]
-                    intersec = 'length'
-                    if self.geo_types == ['polygon', 'polygon']:
-                        intersec = 'area'
+                    intersec = "length"
+                    if self.geo_types == ["polygon", "polygon"]:
+                        intersec = "area"
 
                     for n in nearest:
                         intersection = self.from_features[n].geometry().intersection(geom)
                         if intersection.geometry() is not None:
-                            if intersec == 'length':
+                            if intersec == "length":
                                 aux = intersection.geometry().length()
                             else:
                                 aux = intersection.geometry().area()
@@ -205,5 +206,5 @@ class SimpleTAG(WorkerThread):
                             break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

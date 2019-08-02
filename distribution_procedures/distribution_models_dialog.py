@@ -41,7 +41,7 @@ from .ipf_procedure import IpfProcedure
 from .calibrate_gravity_procedure import CalibrateGravityProcedure
 from .apply_gravity_procedure import ApplyGravityProcedure
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_distribution.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_distribution.ui"))
 
 
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
@@ -74,15 +74,19 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_load_mat.clicked.connect(self.load_matrices)
         self.but_load_model.clicked.connect(self.load_model)
 
-        self.cob_prod_data.currentIndexChanged.connect(partial(self.change_vector_field,
-                                                               self.cob_prod_data, self.cob_prod_field, "data"))
-        self.cob_atra_data.currentIndexChanged.connect(partial(self.change_vector_field,
-                                                               self.cob_atra_data, self.cob_atra_field, "data"))
+        self.cob_prod_data.currentIndexChanged.connect(
+            partial(self.change_vector_field, self.cob_prod_data, self.cob_prod_field, "data")
+        )
+        self.cob_atra_data.currentIndexChanged.connect(
+            partial(self.change_vector_field, self.cob_atra_data, self.cob_atra_field, "data")
+        )
 
-        self.cob_imped_mat.currentIndexChanged.connect(partial(self.change_vector_field,
-                                                               self.cob_imped_mat, self.cob_imped_field, "matrix"))
-        self.cob_seed_mat.currentIndexChanged.connect(partial(self.change_vector_field,
-                                                              self.cob_seed_mat, self.cob_seed_field, "matrix"))
+        self.cob_imped_mat.currentIndexChanged.connect(
+            partial(self.change_vector_field, self.cob_imped_mat, self.cob_imped_field, "matrix")
+        )
+        self.cob_seed_mat.currentIndexChanged.connect(
+            partial(self.change_vector_field, self.cob_seed_mat, self.cob_seed_field, "matrix")
+        )
 
         self.but_run.clicked.connect(self.run)
         self.but_queue.clicked.connect(self.add_job_to_queue)
@@ -113,7 +117,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def matrix_and_data_double_clicked(self, mi):
         row = mi.row()
         if row > -1:
-            if self.sender().objectName() == 'table_matrices':
+            if self.sender().objectName() == "table_matrices":
                 obj_to_view = self.table_matrices.item(row, 0).text()
                 dlg2 = DisplayAequilibraEFormatsDialog(self.iface, self.matrices[obj_to_view])
             else:
@@ -133,19 +137,19 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progressbar.setVisible(False)
         to_remove = []
         if self.rdo_ipf.isChecked():
-            self.job = 'ipf'
-            self.setWindowTitle('AequilibraE - Iterative Proportional Fitting')
+            self.job = "ipf"
+            self.setWindowTitle("AequilibraE - Iterative Proportional Fitting")
             self.model_tabs.setTabText(4, "Seed matrix")
             to_remove = [6, 5, 3]
 
         if self.rdo_apply_gravity.isChecked():
-            self.setWindowTitle('AequilibraE - Apply gravity model')
-            self.job = 'apply'
+            self.setWindowTitle("AequilibraE - Apply gravity model")
+            self.job = "apply"
             to_remove = [6, 4]
 
         if self.rdo_calibrate_gravity.isChecked():
-            self.job = 'calibrate'
-            self.setWindowTitle('AequilibraE - Calibrate gravity model')
+            self.job = "calibrate"
+            self.setWindowTitle("AequilibraE - Calibrate gravity model")
             self.model_tabs.setTabText(4, "Observed matrix")
             to_remove = [5, 2, 0]
             self.rdo_gamma.setEnabled(False)
@@ -172,14 +176,14 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.user_chosen_model.currentIndexChanged.connect(self.change_model_by_user)
 
         self.table_model.setRowCount(2)
-        self.table_model.setItem(0, 0, QTableWidgetItem('Function'))
+        self.table_model.setItem(0, 0, QTableWidgetItem("Function"))
 
         self.table_model.setCellWidget(0, 1, self.user_chosen_model)
 
         i = 2
-        if self.model.function in ['POWER', 'GAMMA']:
+        if self.model.function in ["POWER", "GAMMA"]:
             i = 3
-            self.table_model.setItem(1, 0, QTableWidgetItem('Alpha'))
+            self.table_model.setItem(1, 0, QTableWidgetItem("Alpha"))
             val = self.model.alpha
             if val is None:
                 val = 0
@@ -190,9 +194,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             item0.setValue(float(val))
             self.table_model.setCellWidget(1, 1, item0)
 
-        if self.model.function in ['EXPO', 'GAMMA']:
+        if self.model.function in ["EXPO", "GAMMA"]:
             self.table_model.setRowCount(i)
-            self.table_model.setItem(i - 1, 0, QTableWidgetItem('Beta'))
+            self.table_model.setItem(i - 1, 0, QTableWidgetItem("Beta"))
             val = self.model.beta
             if val is None:
                 val = 0
@@ -233,7 +237,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.load_comboboxes(self.matrices.keys(), self.cob_seed_mat)
 
     def load_model(self):
-        file_name = self.browse_outfile('mod')
+        file_name = self.browse_outfile("mod")
         try:
             self.model.load(file_name)
             self.update_model_parameters()
@@ -246,8 +250,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         if len(d) > 0:
             if dt == "data":
                 for f in self.datasets[d].fields:
-                    if np.issubdtype(self.datasets[d].data[f].dtype, np.integer) or \
-                            np.issubdtype(self.datasets[d].data[f].dtype, np.float):
+                    if np.issubdtype(self.datasets[d].data[f].dtype, np.integer) or np.issubdtype(
+                        self.datasets[d].data[f].dtype, np.float
+                    ):
                         cob_dest.addItem(f)
             else:
                 for f in self.matrices[d].names:
@@ -261,10 +266,10 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def find_non_conflicting_name(self, data_name, dictio):
         if data_name in dictio:
             i = 1
-            new_data_name = data_name + '_' + str(i)
+            new_data_name = data_name + "_" + str(i)
             while new_data_name in dictio:
                 i += 1
-                new_data_name = data_name + '_' + str(i)
+                new_data_name = data_name + "_" + str(i)
             data_name = new_data_name
         return data_name
 
@@ -284,9 +289,11 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def browse_outfile(self, file_type):
 
-        file_types = {'aed': ['AequilibraE dataset', "Aequilibrae dataset(*.aed)", '.aed'],
-                      'mod': ['Model file', 'Model file(*.mod)', '.mod'],
-                      'aem': ['AequilibraE matrix', "Aequilibrae matrix(*.aem)", '.aem']}
+        file_types = {
+            "aed": ["AequilibraE dataset", "Aequilibrae dataset(*.aed)", ".aed"],
+            "mod": ["Model file", "Model file(*.mod)", ".mod"],
+            "aem": ["AequilibraE matrix", "Aequilibrae matrix(*.aem)", ".aem"],
+        }
 
         ft = file_types[file_type]
         file_chosen, _ = GetOutputFileName(self, ft[0], [ft[1]], ft[2], self.path)
@@ -294,73 +301,80 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def add_job_to_queue(self):
         if self.check_data():
-            if self.job != 'ipf':
+            if self.job != "ipf":
                 imped_matrix = self.matrices[self.cob_imped_mat.currentText()]
                 imped_matrix.computational_view([self.cob_imped_field.currentText()])
 
-            if self.job != 'apply':
+            if self.job != "apply":
                 seed_matrix = self.matrices[self.cob_seed_mat.currentText()]
                 seed_matrix.computational_view([self.cob_seed_field.currentText()])
 
-            if self.job != 'calibrate':
+            if self.job != "calibrate":
                 prod_vec = self.datasets[self.cob_prod_data.currentText()]
                 prod_field = self.cob_prod_field.currentText()
                 atra_vec = self.datasets[self.cob_atra_data.currentText()]
                 atra_field = self.cob_atra_field.currentText()
 
-            if self.job == 'ipf':
-                out_name = self.browse_outfile('aem')
+            if self.job == "ipf":
+                out_name = self.browse_outfile("aem")
                 if out_name is not None:
-                    args = {'matrix': seed_matrix,
-                            'rows': prod_vec,
-                            'row_field': prod_field,
-                            'columns': atra_vec,
-                            'column_field': atra_field,
-                            'output': out_name,
-                            'nan_as_zero': self.chb_empty_as_zero.isChecked()}
+                    args = {
+                        "matrix": seed_matrix,
+                        "rows": prod_vec,
+                        "row_field": prod_field,
+                        "columns": atra_vec,
+                        "column_field": atra_field,
+                        "output": out_name,
+                        "nan_as_zero": self.chb_empty_as_zero.isChecked(),
+                    }
                     worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), **args)
 
-            if self.job == 'apply':
-                out_name = self.browse_outfile('aem')
+            if self.job == "apply":
+                out_name = self.browse_outfile("aem")
                 if out_name is not None:
                     for i in range(1, self.table_model.rowCount()):
-                        if str(self.table_model.item(i, 0).text()) == 'Alpha':
+                        if str(self.table_model.item(i, 0).text()) == "Alpha":
                             self.model.alpha = float(self.table_model.cellWidget(i, 1).value())
-                        if str(self.table_model.item(i, 0).text()) == 'Beta':
+                        if str(self.table_model.item(i, 0).text()) == "Beta":
                             self.model.beta = float(self.table_model.cellWidget(i, 1).value())
 
-                    args = {'impedance': imped_matrix,
-                            'rows': prod_vec,
-                            'row_field': prod_field,
-                            'model': self.model,
-                            'columns': atra_vec,
-                            'column_field': atra_field,
-                            'output': out_name,
-                            'nan_as_zero': self.chb_empty_as_zero.isChecked()}
+                    args = {
+                        "impedance": imped_matrix,
+                        "rows": prod_vec,
+                        "row_field": prod_field,
+                        "model": self.model,
+                        "columns": atra_vec,
+                        "column_field": atra_field,
+                        "output": out_name,
+                        "nan_as_zero": self.chb_empty_as_zero.isChecked(),
+                    }
                     worker_thread = ApplyGravityProcedure(qgis.utils.iface.mainWindow(), **args)
 
-            if self.job == 'calibrate':
-                out_name = self.browse_outfile('aem')
+            if self.job == "calibrate":
+                out_name = self.browse_outfile("aem")
                 if out_name is not None:
                     if self.rdo_expo.isChecked():
-                        func_name = 'EXPO'
+                        func_name = "EXPO"
                     if self.rdo_power.isChecked():
-                        func_name = 'POWER'
+                        func_name = "POWER"
                     if self.rdo_gamma.isChecked():
-                        func_name = 'GAMMA'
+                        func_name = "GAMMA"
                     if self.rdo_friction.isChecked():
-                        func_name = 'FRICTION'
+                        func_name = "FRICTION"
 
-                    args = {'matrix': imped_matrix,
-                            'impedance': imped_matrix,
-                            'function': func_name,
-                            'nan_as_zero': self.chb_empty_as_zero.isChecked()}
+                    args = {
+                        "matrix": imped_matrix,
+                        "impedance": imped_matrix,
+                        "function": func_name,
+                        "nan_as_zero": self.chb_empty_as_zero.isChecked(),
+                    }
                     worker_thread = CalibrateGravityProcedure(qgis.utils.iface.mainWindow(), **args)
 
             self.chb_empty_as_zero.setEnabled(False)
             self.add_job_to_list(worker_thread, out_name)
         else:
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.error, level=3)
+
     def add_job_to_list(self, job, out_name):
         self.job_queue[out_name] = job
 
@@ -371,7 +385,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             data_name = os.path.splitext(os.path.basename(j))[0]
             self.table_jobs.setItem(i, 0, QTableWidgetItem(str(i + 1)))
             self.table_jobs.setItem(i, 1, QTableWidgetItem(data_name))
-            self.table_jobs.setItem(i, 2, QTableWidgetItem('Queued'))
+            self.table_jobs.setItem(i, 2, QTableWidgetItem("Queued"))
 
     def run(self):
         self.progressbar.setVisible(True)
@@ -380,7 +394,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.worker_thread = self.job_queue[out_name]
             self.run_thread()
 
-        if self.job == 'calibrate':
+        if self.job == "calibrate":
             self.worker_thread.model.save(out_name)
 
         self.exit_procedure()
@@ -389,20 +403,20 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = None
 
         # Check for missing info
-        if self.job != 'calibrate':
+        if self.job != "calibrate":
             if self.cob_prod_field.currentIndex() < 0:
-                self.error = 'Production vector is missing'
+                self.error = "Production vector is missing"
 
             if self.cob_atra_field.currentIndex() < 0:
-                self.error = 'Attraction vector is missing'
+                self.error = "Attraction vector is missing"
 
-        if self.job != 'apply':
+        if self.job != "apply":
             if self.cob_seed_field.currentIndex() < 0:
-                self.error = 'Observed (seed) matrix is missing'
+                self.error = "Observed (seed) matrix is missing"
 
-        if self.job != 'ipf':
+        if self.job != "ipf":
             if self.cob_imped_field.currentIndex() < 0:
-                self.error = 'Impedance matrix is missing'
+                self.error = "Impedance matrix is missing"
 
         if self.error is not None:
             return False

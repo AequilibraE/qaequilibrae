@@ -33,7 +33,8 @@ from qgis.PyQt import QtWidgets, uic
 import os
 import yaml
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_parameters.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_parameters.ui"))
+
 
 class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
     # def __init__(self, iface):
@@ -50,7 +51,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = False
         # Configures the text editor
         font = QFont()
-        font.setFamily('Courier')
+        font.setFamily("Courier")
         font.setFixedPitch(True)
         font.setPointSize(12)
         lexer = QsciLexerYAML()
@@ -69,14 +70,14 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
 
     # Load the current parameters onto the GUI
     def load_original_data(self):
-        with open(self.path + 'parameters.yml', 'r') as yml:
+        with open(self.path + "parameters.yml", "r") as yml:
             self.parameter_values = yaml.safe_load(yml)
         pretty_data = yaml.dump(self.parameter_values, default_flow_style=False)
         self.text_box.setText(str(pretty_data))
 
     # Read defaults to memory
     def load_defaults(self):
-        with open(self.path + 'parameter_default.yml', 'r') as yml:
+        with open(self.path + "parameter_default.yml", "r") as yml:
             self.default_values = yaml.safe_load(yml)
 
     def validate_data(self):
@@ -89,8 +90,9 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if self.error:
             self.but_save.setEnabled(False)
-            self.iface.messageBar().pushMessage("Error", "Parameter structure was compromised. Please reset "
-                                                               "to defaults", level=3, duration=10)
+            self.iface.messageBar().pushMessage(
+                "Error", "Parameter structure was compromised. Please reset " "to defaults", level=3, duration=10
+            )
             # qgis.utils.iface.messageBar().pushMessage("Error", "Parameter structure was compromised. Please reset "
             #                                                    "to defaults", level=3, duration=10)
         else:
@@ -120,10 +122,10 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
     def save_new_parameters(self):
         self.validate_data()
         if not self.error:
-            stream = open(self.path + '/parameters.yml', 'w')
+            stream = open(self.path + "/parameters.yml", "w")
             yaml.dump(self.current_data, stream, default_flow_style=False)
             stream.close()
-            self.but_close.setText('Close')
+            self.but_close.setText("Close")
 
     def load_default_data(self):
         pretty_data = yaml.dump(self.default_values, default_flow_style=False)

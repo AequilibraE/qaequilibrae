@@ -37,7 +37,8 @@ from functools import partial
 #####################################################################################################
 ###################################        SIMPLE TAG          ######################################
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_least_common_denominator.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_least_common_denominator.ui"))
+
 
 class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -50,19 +51,19 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
         # self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
         self.valid_layer_types = poly_types + multi_poly
 
-        self.fromlayer.currentIndexChanged.connect(partial(self.reload_fields, 'from'))
-        self.tolayer.currentIndexChanged.connect(partial(self.reload_fields, 'to'))
+        self.fromlayer.currentIndexChanged.connect(partial(self.reload_fields, "from"))
+        self.tolayer.currentIndexChanged.connect(partial(self.reload_fields, "to"))
         self.OK.clicked.connect(self.run)
 
         # We load the node and area layers existing in our canvas
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if 'wkbType' in dir(layer):
+            if "wkbType" in dir(layer):
                 if layer.wkbType() in self.valid_layer_types:
                     self.fromlayer.addItem(layer.name())
                     self.tolayer.addItem(layer.name())
 
     def reload_fields(self, box):
-        if box == 'from':
+        if box == "from":
             self.fromfield.clear()
             if self.fromlayer.currentIndex() >= 0:
                 layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
@@ -98,14 +99,19 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.worker_thread.error is None:
             QgsProject.instance().addMapLayer(self.worker_thread.result)
         else:
-            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.worker_thread.error,
-                                                      level=3)
+            qgis.utils.iface.messageBar().pushMessage(
+                "Input data not provided correctly", self.worker_thread.error, level=3
+            )
         self.close()
 
     def run(self):
         error = None
-        if self.fromlayer.currentIndex() < 0 or self.fromfield.currentIndex() < 0 or \
-           self.tolayer.currentIndex() < 0 or self.tofield.currentIndex() < 0:
+        if (
+            self.fromlayer.currentIndex() < 0
+            or self.fromfield.currentIndex() < 0
+            or self.tolayer.currentIndex() < 0
+            or self.tofield.currentIndex() < 0
+        ):
             error = "ComboBox with ilegal value"
 
         flayer = self.fromlayer.currentText()
@@ -116,11 +122,12 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
         layer1 = get_vector_layer_by_name(self.fromlayer.currentText()).wkbType()
         layer2 = get_vector_layer_by_name(self.tolayer.currentText()).wkbType()
         if layer1 in point_types and layer2 in point_types:
-            error = 'It is not sensible to have two point layers for this analysis'
+            error = "It is not sensible to have two point layers for this analysis"
 
         if error is None:
-            self.worker_thread = \
-                LeastCommonDenominatorProcedure(qgis.utils.iface.mainWindow(), flayer, tlayer, ffield, tfield)
+            self.worker_thread = LeastCommonDenominatorProcedure(
+                qgis.utils.iface.mainWindow(), flayer, tlayer, ffield, tfield
+            )
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly. ", error, level=3)

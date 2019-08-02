@@ -45,7 +45,7 @@ try:
 except:
     no_omx = True
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_matrix_loader.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_loader.ui"))
 
 
 # TODO: Add possibility to add a centroid list to guarantee the match between matrix index and graph
@@ -57,9 +57,9 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
-        self.sparse = kwargs.get('sparse', False)
-        self.multiple = kwargs.get('multiple', True)
-        self.allow_single_use = kwargs.get('single_use', False)
+        self.sparse = kwargs.get("sparse", False)
+        self.multiple = kwargs.get("multiple", True)
+        self.allow_single_use = kwargs.get("single_use", False)
         self.output_name = None
         self.layer = None
         self.orig = None
@@ -91,7 +91,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in all_layers_from_toc():  # We iterate through all layers
-            if 'wkbType' in dir(layer):
+            if "wkbType" in dir(layer):
                 if layer.wkbType() == 100:
                     self.matrix_layer.addItem(layer.name())
         if no_omx:
@@ -141,15 +141,15 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             member.setVisible(False)
 
         if self.radio_layer_matrix.isChecked():
-            self.lbl_matrix.setText('Matrix')
-            self.lbl_from.setText('From')
+            self.lbl_matrix.setText("Matrix")
+            self.lbl_from.setText("From")
             for member in all_members:
                 member.setVisible(True)
             self.load_fields_to_combo_boxes()
 
         if self.radio_omx_matrix.isChecked():
-            self.lbl_matrix.setText('Matrix core')
-            self.lbl_from.setText('Indices')
+            self.lbl_matrix.setText("Matrix core")
+            self.lbl_from.setText("Indices")
             for member in members:
                 member.setVisible(True)
 
@@ -198,15 +198,15 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             dlg2.show()
             dlg2.exec_()
         else:
-            if param == 'LOADED-MATRIX':
+            if param == "LOADED-MATRIX":
                 self.compressed.setVisible(True)
                 self.progress_label.setVisible(False)
 
                 if self.__current_name in self.matrices.keys():
                     i = 1
-                    while self.__current_name + '_' + str(i) in self.matrices.keys():
+                    while self.__current_name + "_" + str(i) in self.matrices.keys():
                         i += 1
-                    self.__current_name = self.__current_name + '_' + str(i)
+                    self.__current_name = self.__current_name + "_" + str(i)
 
                 self.matrices[self.__current_name] = self.worker_thread.matrix
                 self.matrix_count += 1
@@ -215,7 +215,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 if self.multiple == False:
                     self.update_matrix_hashes()
 
-            elif param == 'REBLOCKED MATRICES':
+            elif param == "REBLOCKED MATRICES":
                 self.matrix = self.worker_thread.matrix
                 if self.compressed.isChecked():
                     pass
@@ -226,34 +226,39 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = None
         self.worker_thread = None
         if self.radio_layer_matrix.isChecked():
-            if self.field_from.currentIndex() < 0 or self.field_from.currentIndex() < 0 or self.field_cells.currentIndex() < 0:
-                self.error = 'Invalid field chosen'
+            if (
+                self.field_from.currentIndex() < 0
+                or self.field_from.currentIndex() < 0
+                or self.field_cells.currentIndex() < 0
+            ):
+                self.error = "Invalid field chosen"
 
             if self.error is None:
                 self.compressed.setVisible(False)
                 self.progress_label.setVisible(True)
-                self.__current_name = self.field_cells.currentText().lower().replace(' ', '_')
+                self.__current_name = self.field_cells.currentText().lower().replace(" ", "_")
                 idx1 = self.layer.dataProvider().fieldNameIndex(self.field_from.currentText())
                 idx2 = self.layer.dataProvider().fieldNameIndex(self.field_to.currentText())
                 idx3 = self.layer.dataProvider().fieldNameIndex(self.field_cells.currentText())
                 idx = [idx1, idx2, idx3]
 
-                self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type='layer', layer=self.layer, idx=idx,
-                                                sparse=self.sparse)
+                self.worker_thread = LoadMatrix(
+                    qgis.utils.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
+                )
 
         if self.radio_npy_matrix.isChecked():
             file_types = ["NumPY array(*.npy)"]
-            default_type = '.npy'
-            box_name = 'Matrix Loader'
+            default_type = ".npy"
+            box_name = "Matrix Loader"
             new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
-            self.__current_name = os.path.split(new_name)[1].split('.')[0]
+            self.__current_name = os.path.split(new_name)[1].split(".")[0]
 
-            self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type='numpy', file_path=new_name)
+            self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type="numpy", file_path=new_name)
 
         if self.radio_aeq_matrix.isChecked():
             file_types = ["AequilibraE Matrix(*.aem)"]
-            default_type = '.aem'
-            box_name = 'AequilibraE Matrix'
+            default_type = ".aem"
+            box_name = "AequilibraE Matrix"
             new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
             if new_name is not None:
                 self.matrix = AequilibraeMatrix()
@@ -284,10 +289,10 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.matrix_list_view.blockSignals(True)
         i = 0
         for key, value in self.matrices.items():
-            r = np.unique(value['from']).shape[0]
-            c = np.unique(value['to']).shape[0]
+            r = np.unique(value["from"]).shape[0]
+            c = np.unique(value["to"]).shape[0]
             dimensions = "{:,}".format(r) + " x " + "{:,}".format(c)
-            total = "{:,.2f}".format(float(value['flow'].sum()))
+            total = "{:,.2f}".format(float(value["flow"].sum()))
             item_1 = QTableWidgetItem(key)
             self.matrix_list_view.setItem(i, 0, item_1)
 
@@ -305,7 +310,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
     def change_matrix_name(self, item):
         self.matrix_list_view.blockSignals(True)
         row = item.row()
-        new_name = self.matrix_list_view.item(row, 0).text().lower().replace(' ', '_')
+        new_name = self.matrix_list_view.item(row, 0).text().lower().replace(" ", "_")
         item_1 = QTableWidgetItem(new_name)
         self.matrix_list_view.setItem(row, 0, item_1)
 
@@ -319,8 +324,9 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.matrix_list_view.blockSignals(False)
 
     def get_name_and_save_to_disk(self):
-        self.output_name, _ = GetOutputFileName(self, 'AequilibraE matrix', ["Aequilibrae Matrix(*.aem)"], '.aem',
-                                                self.path)
+        self.output_name, _ = GetOutputFileName(
+            self, "AequilibraE matrix", ["Aequilibrae Matrix(*.aem)"], ".aem", self.path
+        )
         self.prepare_final_matrix()
 
     def prepare_final_matrix(self):
@@ -328,11 +334,13 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progress_label.setVisible(True)
 
         if self.output_name is None:
-            self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse,
-                                                  matrices=self.matrices)
+            self.worker_thread = MatrixReblocking(
+                qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices
+            )
         else:
-            self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse,
-                                                  matrices=self.matrices, file_name=self.output_name)
+            self.worker_thread = MatrixReblocking(
+                qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
+            )
         self.run_thread()
 
     def exit_procedure(self):

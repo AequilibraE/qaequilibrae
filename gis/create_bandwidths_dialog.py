@@ -36,40 +36,38 @@ from ..common_tools.auxiliary_functions import *
 from .set_color_ramps_dialog import LoadColorRampSelector
 from .bandwidth_scale_dialog import BandwidthScaleDialog
 
-sys.modules['qgsfieldcombobox'] = qgis.gui
-sys.modules['qgscolorbutton'] = qgis.gui
-sys.modules['qgsmaplayercombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_bandwidths.ui'))
+sys.modules["qgsfieldcombobox"] = qgis.gui
+sys.modules["qgscolorbutton"] = qgis.gui
+sys.modules["qgsmaplayercombobox"] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_bandwidths.ui"))
+
 
 class CreateBandwidthsDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-        
+
         self.tot_bands = 0
-        self.default_scale = {'width': 10,
-                              'spacing': 0.1,
-                              'max_flow': -1}
-        
+        self.default_scale = {"width": 10, "spacing": 0.1, "max_flow": -1}
+
         self.scale = copy.deepcopy(self.default_scale)
-        
+
         self.band_size = 10.0
         self.space_size = 0.01
         self.layer = None
         self.ramps = None
         self.expert_mode = False
-        self.drive_side = get_parameter_chain(['system', 'driving side'])
+        self.drive_side = get_parameter_chain(["system", "driving side"])
 
         # layers and fields        # For adding skims
         self.mMapLayerComboBox.layerChanged.connect(self.add_fields_to_cboxes)
         self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.LineLayer)
-        
 
-        self.ab_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, 'AB'))
-        self.ba_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, 'BA'))
+        self.ab_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, "AB"))
+        self.ba_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, "BA"))
 
-        #List of bands
+        # List of bands
         self.bands_list.setColumnWidth(0, 210)
         self.bands_list.setColumnWidth(1, 210)
         self.bands_list.setColumnWidth(2, 110)
@@ -88,14 +86,14 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
         self.rdo_scale_auto.toggled.connect(self.set_new_scale)
         # self.rdo_scale_custom.toggled.connect(self.set_new_scale)
-        
+
         self.rdo_ramp.toggled.connect(self.color_origins)
         self.but_run.clicked.connect(self.add_bands_to_map)
         self.but_run.setEnabled(False)
 
         self.but_load_ramp.clicked.connect(self.load_ramp_action)
         self.but_set_scale.clicked.connect(self.load_scale_setter)
-        
+
         self.add_fields_to_cboxes()
         self.random_rgb()
         self.set_initial_value_if_available()
@@ -112,9 +110,9 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             self.load_scale_setter()
         else:
             self.scale = copy.deepcopy(self.default_scale)
-            
+
     def choose_a_field(self, modified):
-        i, j = 'AB', 'BA'
+        i, j = "AB", "BA"
 
         if modified == i:
             text = self.ab_FieldComboBox.currentText().upper()
@@ -136,7 +134,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         all_items = [self.ab_FieldComboBox.itemText(i) for i in range(self.ab_FieldComboBox.count())]
 
         for i in all_items:
-            if 'AB' in i:
+            if "AB" in i:
                 index = self.ab_FieldComboBox.findText(i, Qt.MatchFixedString)
                 if index >= 0:
                     self.ab_FieldComboBox.setCurrentIndex(index)
@@ -150,7 +148,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             self.ba_FieldComboBox.setLayer(self.layer)
         else:
             self.but_load_ramp.setEnabled(False)
-        
+
     def add_to_bands_list(self):
         if self.ab_FieldComboBox.currentIndex() >= 0 and self.ba_FieldComboBox.currentIndex() >= 0:
             ab_band = self.layer.dataProvider().fieldNameIndex(self.ab_FieldComboBox.currentText())
@@ -164,7 +162,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
             # color
             if self.ramps is None:
-                self.bands_list.setItem(self.tot_bands, 2, QTableWidgetItem(''))
+                self.bands_list.setItem(self.tot_bands, 2, QTableWidgetItem(""))
                 self.bands_list.item(self.tot_bands, 2).setBackground(self.mColorButton.color())
             else:
                 self.bands_list.setItem(self.tot_bands, 2, QTableWidgetItem(str(self.ramps)))
@@ -181,7 +179,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             button_down.setArrowType(Qt.DownArrow)
             button_down.clicked.connect(self.click_button_inside_the_list)
 
-            del_button = QPushButton('X')
+            del_button = QPushButton("X")
             del_button.clicked.connect(self.click_button_inside_the_list)
 
             layout = QHBoxLayout()
@@ -205,7 +203,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         parent = button.parent()
 
         for i in range(self.tot_bands):
-            if self.bands_list.cellWidget(i,3) is parent:
+            if self.bands_list.cellWidget(i, 3) is parent:
                 row = i
                 break
 
@@ -214,9 +212,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             if q is button:
                 column = i
 
-
         # if we clicked the "remove button"
-        if column == 0 and row < self.tot_bands -1:
+        if column == 0 and row < self.tot_bands - 1:
             low_cl = self.bands_list.item(row + 1, 2).backgroundColor()
             low_ab = self.bands_list.item(row + 1, 0).text()
             low_ba = self.bands_list.item(row + 1, 1).text()
@@ -224,7 +221,6 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             top_cl = self.bands_list.item(row, 2).backgroundColor()
             top_ab = self.bands_list.item(row, 0).text()
             top_ba = self.bands_list.item(row, 1).text()
-
 
             self.bands_list.setItem(row, 0, QTableWidgetItem(low_ab))
             self.bands_list.setItem(row, 1, QTableWidgetItem(low_ba))
@@ -247,8 +243,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             self.bands_list.setItem(row, 1, QTableWidgetItem(top_ba))
             self.bands_list.item(row, 2).setBackground(top_cl)
 
-            self.bands_list.setItem(row -1, 0, QTableWidgetItem(low_ab))
-            self.bands_list.setItem(row -1, 1, QTableWidgetItem(low_ba))
+            self.bands_list.setItem(row - 1, 0, QTableWidgetItem(low_ab))
+            self.bands_list.setItem(row - 1, 1, QTableWidgetItem(low_ba))
             self.bands_list.item(row - 1, 2).setBackground(low_cl)
 
         elif column == 2:
@@ -275,7 +271,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             if dlg2.results is not None:
                 self.ramps = dlg2.results
                 self.txt_ramp.setText(str(self.ramps))
-                
+
     def load_scale_setter(self):
         if self.layer is not None:
             self.ramps = None
@@ -292,24 +288,31 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             self.rdo_scale_custom.setChecked(True)
         self.rdo_scale_auto.blockSignals(False)
         self.rdo_scale_custom.blockSignals(False)
-        
+
     def add_bands_to_map(self):
         self.expert_mode = self.chk_expert_mode.isChecked()
-        for item in [self.gbox_scale, self.but_run, self.but_set_scale, self.mMapLayerComboBox, self.but_add_band,
-                     self.rdo_color, self.rdo_ramp]:
+        for item in [
+            self.gbox_scale,
+            self.but_run,
+            self.but_set_scale,
+            self.mMapLayerComboBox,
+            self.but_add_band,
+            self.rdo_color,
+            self.rdo_ramp,
+        ]:
             item.setEnabled(False)
-        
-        band_size = str(self.scale['width'])
-        space_size = str(self.scale['spacing'])
-        max_value = self.scale['max_flow']
+
+        band_size = str(self.scale["width"])
+        space_size = str(self.scale["spacing"])
+        max_value = self.scale["max_flow"]
         # define the side of the plotting based on the side of the road the system has defined
         ab = -1
-        if self.drive_side == 'right':
+        if self.drive_side == "right":
             ab = 1
-        ba = - ab
+        ba = -ab
 
         # Create new simple stype
-        symbol = QgsLineSymbol.createSimple({'name': 'square', 'color': 'red'})
+        symbol = QgsLineSymbol.createSimple({"name": "square", "color": "red"})
         self.layer.renderer().setSymbol(symbol)
 
         bands_ab = []
@@ -327,55 +330,91 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 # we also build a list of bands to construct
                 # The function "(2 * j -1) * ba"  maps the index j {1,2} and the direction to the side of the
                 # link the band needs to be. Try it out. it works!!
-                #bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).backgroundColor()))
+                # bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).backgroundColor()))
             if len(self.bands_list.item(i, 2).text()) == 0:
                 cl = self.bands_list.item(i, 2).background().color()
             else:
                 cl = eval(self.bands_list.item(i, 2).text())
-            bands_ab.append((self.bands_list.item(i, 0).text(), ab, cl, 'ab'))
-            bands_ba.append((self.bands_list.item(i, 1).text(), ba, cl, 'ba'))
-        
+            bands_ab.append((self.bands_list.item(i, 0).text(), ab, cl, "ab"))
+            bands_ba.append((self.bands_list.item(i, 1).text(), ba, cl, "ba"))
+
         if max_value < 0:
             max_value = max(values)
 
         if self.expert_mode:
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'aeq_band_max_value', max_value)
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'aeq_band_spacer', float(space_size))
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 'aeq_band_width', band_size)
-            max_value = '@aeq_band_max_value'
-            space_size = '@aeq_band_spacer'
-            band_size = '@aeq_band_width'
-            
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_max_value", max_value)
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_spacer", float(space_size))
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_width", band_size)
+            max_value = "@aeq_band_max_value"
+            space_size = "@aeq_band_spacer"
+            band_size = "@aeq_band_width"
+
         for s in [bands_ab, bands_ba]:
-            acc_offset = '0'
+            acc_offset = "0"
             for field, side, clr, direc in s:
                 symbol_layer = QgsSimpleLineSymbolLayer.create({})
                 props = symbol_layer.properties()
-                width = '(coalesce(scale_linear("' + field + '", 0, ' + str(max_value) + ', 0, ' + band_size + '), 0))'
-                props['width_dd_expression'] = width
+                width = '(coalesce(scale_linear("' + field + '", 0, ' + str(max_value) + ", 0, " + band_size + "), 0))"
+                props["width_dd_expression"] = width
 
-                props['offset_dd_expression'] = acc_offset + '+' + str(side) + ' * (coalesce(scale_linear("' + field + \
-                                                '", 0, ' + str(max_value) + ', 0, ' + band_size + '), 0)/2 + ' + \
-                                                space_size + ')'
-                props['line_style_expression'] = 'if (coalesce("' + field + '",0) = 0,' + "'no', 'solid')"
-                
+                props["offset_dd_expression"] = (
+                    acc_offset
+                    + "+"
+                    + str(side)
+                    + ' * (coalesce(scale_linear("'
+                    + field
+                    + '", 0, '
+                    + str(max_value)
+                    + ", 0, "
+                    + band_size
+                    + "), 0)/2 + "
+                    + space_size
+                    + ")"
+                )
+                props["line_style_expression"] = 'if (coalesce("' + field + '",0) = 0,' + "'no', 'solid')"
+
                 if isinstance(clr, dict):
-                    if direc == 'ab':
-                        props['color_dd_expression'] = "ramp_color(\'" + clr[
-                            'color ab'] + "\',scale_linear(" + '"' + clr['ramp ab'] + '", ' + str(clr[
-                                                                'min ab']) + ', ' + str(clr['max ab']) + ', 0, 1))'
+                    if direc == "ab":
+                        props["color_dd_expression"] = (
+                            "ramp_color('"
+                            + clr["color ab"]
+                            + "',scale_linear("
+                            + '"'
+                            + clr["ramp ab"]
+                            + '", '
+                            + str(clr["min ab"])
+                            + ", "
+                            + str(clr["max ab"])
+                            + ", 0, 1))"
+                        )
                     else:
-                        props['color_dd_expression'] = "ramp_color(\'" + clr[
-                            'color ba'] + "\',scale_linear(" + '"' + clr['ramp ba'] + '", ' + str(clr[
-                                                                'min ba']) + ', ' + str(clr['max ba']) + ', 0, 1))'
+                        props["color_dd_expression"] = (
+                            "ramp_color('"
+                            + clr["color ba"]
+                            + "',scale_linear("
+                            + '"'
+                            + clr["ramp ba"]
+                            + '", '
+                            + str(clr["min ba"])
+                            + ", "
+                            + str(clr["max ba"])
+                            + ", 0, 1))"
+                        )
                 else:
-                    props['line_color'] = str(clr.getRgb()[0]) + ',' + str(clr.getRgb()[1]) + ',' + str(clr.getRgb()[2]) + ',' \
-                                          + str(clr.getRgb()[3])
+                    props["line_color"] = (
+                        str(clr.getRgb()[0])
+                        + ","
+                        + str(clr.getRgb()[1])
+                        + ","
+                        + str(clr.getRgb()[2])
+                        + ","
+                        + str(clr.getRgb()[3])
+                    )
 
                 symbol_layer = QgsSimpleLineSymbolLayer.create(props)
                 self.layer.renderer().symbol().appendSymbolLayer(symbol_layer)
 
-                acc_offset = acc_offset + ' + ' + str(side) + '*(' + width + '+' + space_size + ')'
+                acc_offset = acc_offset + " + " + str(side) + "*(" + width + "+" + space_size + ")"
 
         self.layer.renderer().symbol().deleteSymbolLayer(0)
         self.layer.triggerRepaint()

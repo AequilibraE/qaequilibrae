@@ -43,13 +43,14 @@ except:
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
 # sys.modules['qgsmaplayercombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_compute_path.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_compute_path.ui"))
 
 from ..common_tools import LoadGraphLayerSettingDialog
 
 
 class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
     clickTool = PointTool(iface.mapCanvas())
+
     def __init__(self, iface):
         # QtWidgets.QDialog.__init__(self)
         QtWidgets.QDialog.__init__(self, None, Qt.WindowStaysOnTopHint)
@@ -158,8 +159,9 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                 # This way is MUCH faster
 
                 crs = self.line_layer.dataProvider().crs().authid()
-                vl = QgsVectorLayer("LineString?crs={}".format(crs), self.path_from.text() +
-                                    " to " + self.path_to.text(), "memory")
+                vl = QgsVectorLayer(
+                    "LineString?crs={}".format(crs), self.path_from.text() + " to " + self.path_to.text(), "memory"
+                )
                 pr = vl.dataProvider()
 
                 # add fields
@@ -183,8 +185,9 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                 qgis.utils.iface.mapCanvas().refresh()
 
             else:
-                qgis.utils.iface.messageBar().pushMessage("No path between " + self.path_from.text() +
-                                                          ' and ' + self.path_to.text(), '', level=3)
+                qgis.utils.iface.messageBar().pushMessage(
+                    "No path between " + self.path_from.text() + " and " + self.path_to.text(), "", level=3
+                )
 
     def exit_procedure(self):
         self.close()

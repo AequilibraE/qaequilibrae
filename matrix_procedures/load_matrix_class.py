@@ -34,11 +34,11 @@ from ..common_tools.worker_thread import WorkerThread
 class LoadMatrix(WorkerThread):
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
-        self.matrix_type = kwargs.get('type')
-        self.numpy_file = kwargs.get('file_path')
-        self.layer = kwargs.get('layer')
-        self.idx = kwargs.get('idx')
-        self.sparse = kwargs.get('sparse', False)
+        self.matrix_type = kwargs.get("type")
+        self.numpy_file = kwargs.get("file_path")
+        self.layer = kwargs.get("layer")
+        self.idx = kwargs.get("idx")
+        self.sparse = kwargs.get("sparse", False)
 
         self.matrix = None
         self.matrix_hash = None
@@ -46,7 +46,7 @@ class LoadMatrix(WorkerThread):
         self.report = []
 
     def doWork(self):
-        if self.matrix_type == 'layer':
+        if self.matrix_type == "layer":
             self.ProgressText.emit("Loading from table")
             feat_count = self.layer.featureCount()
             self.ProgressMaxValue.emit(feat_count)
@@ -72,37 +72,40 @@ class LoadMatrix(WorkerThread):
 
             # Bring it all to memory mapped
             self.matrix = np.memmap(
-                os.path.join(tempfile.gettempdir(), 'aequilibrae_temp_file_' + str(uuid.uuid4().hex) + '.mat'),
-                dtype=[('from', np.uint64), ('to', np.uint64), ('flow', np.float64)],
-                mode='w+',
-                shape=(int(matrix1.shape[0]),))
+                os.path.join(tempfile.gettempdir(), "aequilibrae_temp_file_" + str(uuid.uuid4().hex) + ".mat"),
+                dtype=[("from", np.uint64), ("to", np.uint64), ("flow", np.float64)],
+                mode="w+",
+                shape=(int(matrix1.shape[0]),),
+            )
 
-            self.matrix['from'] = matrix1[:, 0]
-            self.matrix['to'] = matrix1[:, 1]
-            self.matrix['flow'] = matrix1[:, 2]
-            del (matrix1)
+            self.matrix["from"] = matrix1[:, 0]
+            self.matrix["to"] = matrix1[:, 1]
+            self.matrix["flow"] = matrix1[:, 2]
+            del matrix1
 
-        elif self.matrix_type == 'numpy':
+        elif self.matrix_type == "numpy":
             self.ProgressText.emit("Loading from NumPy")
             try:
                 mat = np.load(self.numpy_file)
                 if len(mat.shape[:]) == 2:
                     mat = coo_matrix(mat)
                     cells = int(mat.row.shape[0])
-                    self.matrix = np.memmap(os.path.join(tempfile.gettempdir(), AequilibraeMatrix().random_name() +
-                                                         '.mat'),
-                                            dtype=[('from', np.uint64), ('to', np.uint64), ('flow', np.float64)],
-                                            mode='w+',
-                                            shape=(cells,))
-                    self.matrix['from'][:] = mat.row[:]
-                    self.matrix['to'] = mat.col[:]
-                    self.matrix['flow'][:] = mat.data[:]
-                    del (mat)
+                    self.matrix = np.memmap(
+                        os.path.join(tempfile.gettempdir(), AequilibraeMatrix().random_name() + ".mat"),
+                        dtype=[("from", np.uint64), ("to", np.uint64), ("flow", np.float64)],
+                        mode="w+",
+                        shape=(cells,),
+                    )
+                    self.matrix["from"][:] = mat.row[:]
+                    self.matrix["to"] = mat.col[:]
+                    self.matrix["flow"][:] = mat.data[:]
+                    del mat
                 else:
                     self.report.append(
-                        'Numpy array needs to be 2 dimensional. Matrix provided has ' + str(len(mat.shape[:])))
+                        "Numpy array needs to be 2 dimensional. Matrix provided has " + str(len(mat.shape[:]))
+                    )
             except:
-                self.report.append('Could not load array')
+                self.report.append("Could not load array")
 
         self.ProgressText.emit("")
         self.finished_threaded_procedure.emit("LOADED-MATRIX")
@@ -112,9 +115,9 @@ class MatrixReblocking(WorkerThread):
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
         self.matrix = AequilibraeMatrix()
-        self.matrices = kwargs.get('matrices')
-        self.sparse = kwargs.get('sparse', False)
-        self.file_name = kwargs.get('file_name', AequilibraeMatrix().random_name())
+        self.matrices = kwargs.get("matrices")
+        self.sparse = kwargs.get("sparse", False)
+        self.file_name = kwargs.get("file_name", AequilibraeMatrix().random_name())
 
         self.num_matrices = len(self.matrices.keys())
         self.matrix_hash = {}
@@ -132,8 +135,8 @@ class MatrixReblocking(WorkerThread):
             p = 0
             for mat_name, mat in self.matrices.items():
                 # Gets all non-zero coordinates and makes sure that they are considered
-                froms = mat['from']
-                tos = mat['to']
+                froms = mat["from"]
+                tos = mat["to"]
 
                 if indices is None:
                     all_indices = np.hstack((froms, tos))
@@ -152,8 +155,9 @@ class MatrixReblocking(WorkerThread):
         new_index = {k: i for i, k in enumerate(indices)}
 
         names = [str(n) for n in self.matrices.keys()]
-        self.matrix.create_empty(file_name=self.file_name, zones=compact_shape, matrix_names=names,
-                                 data_type=np.float64)
+        self.matrix.create_empty(
+            file_name=self.file_name, zones=compact_shape, matrix_names=names, data_type=np.float64
+        )
 
         self.matrix.index[:] = indices[:]
 
@@ -166,8 +170,8 @@ class MatrixReblocking(WorkerThread):
             if self.sparse:
                 new_mat = np.copy(mat)
                 for j, v in new_index.items():
-                    new_mat['from'][mat['from'] == j] = v
-                    new_mat['to'][mat['to'] == j] = v
+                    new_mat["from"][mat["from"] == j] = v
+                    new_mat["to"][mat["to"] == j] = v
                 k += 1
                 self.ProgressValue.emit(k)
             else:
@@ -176,20 +180,22 @@ class MatrixReblocking(WorkerThread):
 
             # In order to differentiate the zeros from the NaNs in the future matrix
             if new_mat is None:
-                raise ValueError('Could not create reblocked matrix.')
-            new_mat['flow'][new_mat['flow'] == 0] = np.inf
+                raise ValueError("Could not create reblocked matrix.")
+            new_mat["flow"][new_mat["flow"] == 0] = np.inf
 
             # Uses SciPy Sparse matrices to build the compact one
-            self.matrix.matrix[mat_name][:, :] = coo_matrix((new_mat['flow'], (new_mat['from'], new_mat['to'])),
-                                                            shape=(compact_shape, compact_shape)).toarray().astype(
-                np.float64)
+            self.matrix.matrix[mat_name][:, :] = (
+                coo_matrix((new_mat["flow"], (new_mat["from"], new_mat["to"])), shape=(compact_shape, compact_shape))
+                .toarray()
+                .astype(np.float64)
+            )
 
             # In order to differentiate the zeros from the NaNs in the future matrix
             self.matrix.matrix[mat_name][self.matrix.matrix[mat_name] == 0] = np.nan
             self.matrix.matrix[mat_name][self.matrix.matrix[mat_name] == np.inf] = 0
 
-            del (mat)
-            del (new_mat)
+            del mat
+            del new_mat
 
         self.ProgressText.emit("Matrix Reblocking finalized")
         self.finished_threaded_procedure.emit("REBLOCKED MATRICES")

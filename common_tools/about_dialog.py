@@ -33,10 +33,10 @@ from .auxiliary_functions import standard_path
 try:
     from aequilibrae.paths import release_name, release_version
 except:
-    release_name = 'No Binaries available'
-    release_version = 'No Binaries available'
+    release_name = "No Binaries available"
+    release_version = "No Binaries available"
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_about.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_about.ui"))
 
 
 class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -49,29 +49,29 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_mailing.clicked.connect(self.go_to_mailing_list)
         self.but_close.clicked.connect(self.exit_procedure)
 
-        repository = 'https://github.com/AequilibraE/AequilibraE-GUI'
+        repository = "https://github.com/AequilibraE/AequilibraE-GUI"
         self.wiki = "https://github.com/aequilibrae/aequilibrae/wiki"
 
         d = dirname(dirname(abspath(__file__)))
-        with open(os.path.join(d, 'meta.yaml'), 'r') as yml:
+        with open(os.path.join(d, "meta.yaml"), "r") as yml:
             par = yaml.load(yml)
 
-        my_file = os.path.join(d, 'metadata.txt')
-        b = '?'
-        with open(my_file, 'r') as a:
+        my_file = os.path.join(d, "metadata.txt")
+        b = "?"
+        with open(my_file, "r") as a:
             for line in a.readlines():
-                if line[:7] == 'version':
+                if line[:7] == "version":
                     b = line[8:]
                     break
 
         self.all_items = []
-        self.all_items.append(['AequilibraE Version name', release_name])
-        self.all_items.append(['AequilibraE Version number', release_version])
-        self.all_items.append(['GUI version', b])
-        self.all_items.append(['GUI Repository', repository])
-        self.all_items.append(['Minimum QGIS', '3.0'])
-        self.all_items.append(['Developers', par['developers']])
-        self.all_items.append(['Sponsors', par['sponsors']])
+        self.all_items.append(["AequilibraE Version name", release_name])
+        self.all_items.append(["AequilibraE Version number", release_version])
+        self.all_items.append(["GUI version", b])
+        self.all_items.append(["GUI Repository", repository])
+        self.all_items.append(["Minimum QGIS", "3.0"])
+        self.all_items.append(["Developers", par["developers"]])
+        self.all_items.append(["Sponsors", par["sponsors"]])
 
         self.assemble()
 

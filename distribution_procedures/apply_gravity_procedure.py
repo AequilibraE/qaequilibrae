@@ -25,7 +25,6 @@ from aequilibrae.distribution import GravityApplication
 
 
 class ApplyGravityProcedure(WorkerThread):
-
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
         self.gravity = GravityApplication(**kwargs)

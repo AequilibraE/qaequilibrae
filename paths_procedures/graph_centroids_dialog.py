@@ -28,9 +28,9 @@ from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import integer_types
 import numpy as np
 
-sys.modules['qgsmaplayercombobox'] = qgis.gui
+sys.modules["qgsmaplayercombobox"] = qgis.gui
 # sys.modules['qgsfieldcombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/advanced_graph_details.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/advanced_graph_details.ui"))
 
 
 class GraphCentroids(QtWidgets.QDialog, FORM_CLASS):
@@ -55,9 +55,9 @@ class GraphCentroids(QtWidgets.QDialog, FORM_CLASS):
         self.frm_all_items.setEnabled(self.chb_set_centroids.isChecked())
         if not self.chb_set_centroids.isChecked():
             self.centroids = None
-            self.but_ok.setText('Cancel')
+            self.but_ok.setText("Cancel")
         else:
-            self.but_ok.setText('Ok')
+            self.but_ok.setText("Ok")
             self.changed_layer()
 
     def changed_layer(self):
@@ -79,7 +79,11 @@ class GraphCentroids(QtWidgets.QDialog, FORM_CLASS):
                 features = self.cob_centroids_layer.currentLayer().getFeatures()
 
             if self.error is None:
-                idx = self.cob_centroids_layer.currentLayer().dataProvider().fieldNameIndex(self.cob_centroid_id.currentText())
+                idx = (
+                    self.cob_centroids_layer.currentLayer()
+                    .dataProvider()
+                    .fieldNameIndex(self.cob_centroid_id.currentText())
+                )
                 centroids = []
                 for feat in features:
                     centroids.append(int(feat.attributes()[idx]))
@@ -87,10 +91,10 @@ class GraphCentroids(QtWidgets.QDialog, FORM_CLASS):
                 self.centroids = np.array(centroids).astype(np.int64)
 
                 if self.centroids.min() <= 0:
-                    self.error = 'Centroid IDs need to be positive'
+                    self.error = "Centroid IDs need to be positive"
                 else:
                     if np.bincount(self.centroids).max() > 1:
-                        self.error = 'Centroid IDs are not unique'
+                        self.error = "Centroid IDs are not unique"
                 self.num_zones = self.centroids.shape[0]
             else:
                 self.centroids = None
@@ -99,7 +103,8 @@ class GraphCentroids(QtWidgets.QDialog, FORM_CLASS):
         else:
             pass
 
-''' To get from rules
+
+""" To get from rules
 layer = QgsMapLayerRegistry.instance().mapLayersByName('Nodes')[0]
 renderer = layer.rendererV2()
 renderer_type = renderer.type()
@@ -107,4 +112,4 @@ groups = renderer.legendSymbolItemsV2()
 
 if renderer_type == 'RuleRenderer':
   
-  '''
+  """

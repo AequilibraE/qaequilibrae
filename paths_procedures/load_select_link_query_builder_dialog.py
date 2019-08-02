@@ -32,8 +32,8 @@ from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools import LinkQueryModel
 
-#sys.modules['qgsmaplayercombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_link_query_builder.ui'))
+# sys.modules['qgsmaplayercombobox'] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_link_query_builder.ui"))
 
 
 class LoadSelectLinkQueryBuilderDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -50,28 +50,29 @@ class LoadSelectLinkQueryBuilderDialog(QtWidgets.QDialog, FORM_CLASS):
         self.operation = None
         self.tot_links = 0
         self.query_name = None
-        self.query_type = 'or'
+        self.query_type = "or"
         self.links = None
-        dtype = [('link_id', np.int32),
-                 ('a_node', np.int32),
-                 ('b_node', np.int32),
-                 ('direction', np.int8),
-                 ('id', np.int32),
-                 ('length', np.float64)]
+        dtype = [
+            ("link_id", np.int32),
+            ("a_node", np.int32),
+            ("b_node", np.int32),
+            ("direction", np.int8),
+            ("id", np.int32),
+            ("length", np.float64),
+        ]
 
-        dt = [('link_id', np.int32),
-              ('direction', '|S2')]
+        dt = [("link_id", np.int32), ("direction", "|S2")]
 
         self.data = np.zeros(graph.shape[0], dtype=dt)
 
-        self.data['link_id'][:] = graph['link_id'][:]
+        self.data["link_id"][:] = graph["link_id"][:]
 
-        self.data['direction'][graph['direction'] < 0] = 'BA'
-        self.data['direction'][graph['direction'] > 0] = 'AB'
+        self.data["direction"][graph["direction"] < 0] = "BA"
+        self.data["direction"][graph["direction"] > 0] = "AB"
 
-        self.data.sort(order='link_id')
+        self.data.sort(order="link_id")
 
-        self.model = LinkQueryModel(self.data, ['Link ID', 'Dir'])
+        self.model = LinkQueryModel(self.data, ["Link ID", "Dir"])
 
         # filter proxy model
         filter_proxy_model = QSortFilterProxyModel()
@@ -102,7 +103,7 @@ class LoadSelectLinkQueryBuilderDialog(QtWidgets.QDialog, FORM_CLASS):
             columns = sorted(index.column() for index in selection)
             rowcount = rows[-1] - rows[0] + 1
             colcount = columns[-1] - columns[0] + 1
-            table = [[''] * colcount for _ in range(rowcount)]
+            table = [[""] * colcount for _ in range(rowcount)]
             for index in selection:
                 row = index.row() - rows[0]
                 column = index.column() - columns[0]
@@ -117,7 +118,7 @@ class LoadSelectLinkQueryBuilderDialog(QtWidgets.QDialog, FORM_CLASS):
                     direc = i[1]
                     self.selected_links.setItem(self.tot_links, 1, QTableWidgetItem(direc))
 
-                    del_button = QPushButton('X')
+                    del_button = QPushButton("X")
                     del_button.clicked.connect(self.click_button_inside_the_list)
                     self.selected_links.setCellWidget(self.tot_links, 2, del_button)
                     self.tot_links += 1
@@ -142,10 +143,10 @@ class LoadSelectLinkQueryBuilderDialog(QtWidgets.QDialog, FORM_CLASS):
         for i in range(self.tot_links):
             link_id = self.selected_links.item(i, 0).text()
             direc = self.selected_links.item(i, 1).text()
-            self.links.append((link_id,direc))
+            self.links.append((link_id, direc))
 
         if self.radio_and.isChecked():
-            self.query_type = 'and'
+            self.query_type = "and"
 
         self.exit_procedure()
 

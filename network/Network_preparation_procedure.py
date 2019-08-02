@@ -26,9 +26,18 @@ from ..common_tools.auxiliary_functions import *
 from ..common_tools import WorkerThread
 from ..common_tools.global_parameters import *
 
+
 class NetworkPreparationProcedure(WorkerThread):
-    def __init__(self, parentThread, line_layer, new_line_layer, node_layer=False, node_ids=False,
-                 new_node_layer=False, node_start=0):
+    def __init__(
+        self,
+        parentThread,
+        line_layer,
+        new_line_layer,
+        node_layer=False,
+        node_ids=False,
+        new_node_layer=False,
+        node_start=0,
+    ):
 
         WorkerThread.__init__(self, parentThread)
         self.line_layer = line_layer
@@ -54,12 +63,12 @@ class NetworkPreparationProcedure(WorkerThread):
         P = 0
         # We create the new line layer and load it in memory
         epsg_code = int(layer.crs().authid().split(":")[1])
-        new_line_layer = self.duplicate_layer(layer, 'Linestring', self.new_line_layer)
+        new_line_layer = self.duplicate_layer(layer, "Linestring", self.new_line_layer)
         self.ProgressValue.emit(1)
 
         # Add the A_Node and B_node fields to the layer
         field_names = [x.name().upper() for x in new_line_layer.dataProvider().fields().toList()]
-        add_fields = ['A_NODE', 'B_NODE']
+        add_fields = ["A_NODE", "B_NODE"]
         for f in add_fields:
             if f not in field_names:
                 res = new_line_layer.dataProvider().addAttributes([QgsField(f, QVariant.Int)])
@@ -82,7 +91,7 @@ class NetworkPreparationProcedure(WorkerThread):
                 index.insertFeature(feat)
                 i_d = feat.attributes()[idx]
                 if i_d in ids:
-                    self.error = "ID " + str(i_d) + ' is non unique in your selected field'
+                    self.error = "ID " + str(i_d) + " is non unique in your selected field"
                     self.report.append(self.error)
                 if i_d < 0:
                     self.error = "Negative node ID in your selected field"
@@ -99,7 +108,7 @@ class NetworkPreparationProcedure(WorkerThread):
                     self.ProgressText.emit("Processing links: " + str(P) + "/" + str(feat_count))
 
                     # We search for matches for all AB nodes
-                    ab_nodes = [('A_NODE', 0), ('B_NODE', -1)]
+                    ab_nodes = [("A_NODE", 0), ("B_NODE", -1)]
                     for field, position in ab_nodes:
                         node_ab = list(feat.geometry().asPolyline())[position]
                         # We compute the closest node
@@ -116,8 +125,8 @@ class NetworkPreparationProcedure(WorkerThread):
                             ids = nfeat.attributes()[idx]
                             new_line_layer.dataProvider().changeAttributeValues({feat.id(): {fid: int(ids)}})
 
-                        else: # If not, we throw an error
-                            self.error = 'CORRESPONDING NODE NOTE FOUND. Link: ' + str(feat.attributes())
+                        else:  # If not, we throw an error
+                            self.error = "CORRESPONDING NODE NOTE FOUND. Link: " + str(feat.attributes())
                             self.report.append(self.error)
                             break
                     if self.error is not None:
@@ -128,9 +137,16 @@ class NetworkPreparationProcedure(WorkerThread):
         else:
             self.ProgressMaxValue.emit(feat_count)
             #  Create node layer
-            new_node_layer = QgsVectorLayer('Point?crs=epsg:' + str(epsg_code) + '&field=ID:integer', self.new_node_layer, "memory")
-            DTYPE = [('LAT', np.float64), ('LONG', np.float64), ('LINK ID', np.int64),
-                     ('POSITION', np.int64), ('NODE ID', np.int64)]
+            new_node_layer = QgsVectorLayer(
+                "Point?crs=epsg:" + str(epsg_code) + "&field=ID:integer", self.new_node_layer, "memory"
+            )
+            DTYPE = [
+                ("LAT", np.float64),
+                ("LONG", np.float64),
+                ("LINK ID", np.int64),
+                ("POSITION", np.int64),
+                ("NODE ID", np.int64),
+            ]
 
             all_nodes = np.zeros(feat_count * 2, dtype=DTYPE)
 
@@ -161,7 +177,7 @@ class NetworkPreparationProcedure(WorkerThread):
                     l += 1
 
             # Now we sort the nodes and assign IDs to them
-            all_nodes = np.sort(all_nodes, order=['LAT', 'LONG'])
+            all_nodes = np.sort(all_nodes, order=["LAT", "LONG"])
 
             lat0 = -100000.0
             longit0 = -100000.0
@@ -169,7 +185,7 @@ class NetworkPreparationProcedure(WorkerThread):
             P = 0
 
             self.ProgressMaxValue.emit(feat_count * 2)
-            self.ProgressText.emit("Computing node IDs: " + str(0)+"/" + str(feat_count * 2))
+            self.ProgressText.emit("Computing node IDs: " + str(0) + "/" + str(feat_count * 2))
             self.ProgressMaxValue.emit(feat_count * 2)
 
             for i in all_nodes:
@@ -188,7 +204,7 @@ class NetworkPreparationProcedure(WorkerThread):
                     self.ProgressText.emit("Computing node IDs: " + str(P) + "/" + str(feat_count * 2))
 
             self.ProgressValue.emit(int(feat_count * 2))
-            self.ProgressText.emit("Computing node IDs: " + str(feat_count * 2)+"/" + str(feat_count * 2))
+            self.ProgressText.emit("Computing node IDs: " + str(feat_count * 2) + "/" + str(feat_count * 2))
 
             # And we write the node layer as well
             node_id0 = -1
@@ -204,7 +220,7 @@ class NetworkPreparationProcedure(WorkerThread):
                     feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(lat, longit)))
                     feature.setAttributes([int(node_id)])
                     cfeatures.append(feature)
-#                    new_node_layer.dataProvider().addFeatures([feature])
+                    #                    new_node_layer.dataProvider().addFeatures([feature])
                     node_id0 = node_id
 
                 if P % 500 == 0:
@@ -239,7 +255,7 @@ class NetworkPreparationProcedure(WorkerThread):
                     self.ProgressText.emit("Writing node IDs to links: " + str(P) + "/" + str(feat_count * 2))
 
             self.ProgressValue.emit(int(P))
-            self.ProgressText.emit("Writing node IDs to links: " + str(P)+"/" + str(feat_count * 2))
+            self.ProgressText.emit("Writing node IDs to links: " + str(P) + "/" + str(feat_count * 2))
 
             new_line_layer.commitChanges()
             self.new_line_layer = new_line_layer

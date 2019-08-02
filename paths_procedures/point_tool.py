@@ -6,6 +6,7 @@ from qgis.PyQt.QtCore import *
 
 class PointTool(QgsMapTool):
     clicked = pyqtSignal(object)
+
     def __init__(self, canvas):
         QgsMapTool.__init__(self, canvas)
         self.canvas = canvas

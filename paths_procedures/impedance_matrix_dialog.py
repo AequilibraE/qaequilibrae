@@ -33,7 +33,7 @@ from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 
 # sys.modules['qgsmaplayercombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_impedance_matrix.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_impedance_matrix.ui"))
 
 
 class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -115,12 +115,12 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progressbar.setVisible(False)
         self.progress_label.setVisible(False)
         self.progressbar.setValue(0)
-        self.progress_label.setText('')
+        self.progress_label.setText("")
 
     def loaded_new_graph_from_file(self):
         file_types = ["AequilibraE graph(*.aeg)"]
 
-        new_name, file_type = GetOutputFileName(self, 'Graph file', file_types, ".aeg", self.path)
+        new_name, file_type = GetOutputFileName(self, "Graph file", file_types, ".aeg", self.path)
         self.cb_minimizing.clear()
         self.available_skims_table.clearContents()
         self.block_paths.setChecked(False)
@@ -140,8 +140,9 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def browse_outfile(self):
         self.imped_results = None
-        new_name, extension = GetOutputFileName(self, 'AequilibraE impedance computation', matrix_export_types,
-                                                '.aem', self.path)
+        new_name, extension = GetOutputFileName(
+            self, "AequilibraE impedance computation", matrix_export_types, ".aem", self.path
+        )
         if new_name is not None:
             self.imped_results = new_name
 
@@ -153,11 +154,11 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exec_()
 
     def signal_handler(self, val):
-        if val[0] == 'zones finalized':
+        if val[0] == "zones finalized":
             self.progressbar.setValue(val[1])
-        elif val[0] == 'text skimming':
+        elif val[0] == "text skimming":
             self.progress_label.setText(val[1])
-        elif val[0] == 'finished_threaded_procedure':
+        elif val[0] == "finished_threaded_procedure":
             self.finished_threaded_procedure()
 
     def finished_threaded_procedure(self):
@@ -175,8 +176,9 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.rdo_all_nodes.isChecked():
                 self.graph.prepare_graph(self.graph.all_nodes)
 
-            self.graph.set_graph(cost_field=cost_field, skim_fields=self.skim_fields,
-                                 block_centroid_flows=self.block_paths.isChecked())
+            self.graph.set_graph(
+                cost_field=cost_field, skim_fields=self.skim_fields, block_centroid_flows=self.block_paths.isChecked()
+            )
 
             self.result.prepare(self.graph)
 
@@ -195,19 +197,19 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
     @staticmethod
     def only_str(str_input):
         if isinstance(str_input, bytes):
-            return str_input.decode('utf-8')
+            return str_input.decode("utf-8")
         return str_input
 
     def check_inputs(self):
         self.error = None
         if self.rdo_all_nodes.isChecked() and self.block_paths.isChecked():
-            self.error = 'It is not possible to trace paths between all nodes while blocking flows through centroids'
+            self.error = "It is not possible to trace paths between all nodes while blocking flows through centroids"
 
         if self.graph is None:
-            self.error = 'No graph loaded'
+            self.error = "No graph loaded"
 
         if len(self.skim_fields) < 1:
-            self.error = 'No skim fields provided'
+            self.error = "No skim fields provided"
 
     def exit_procedure(self):
         self.close()

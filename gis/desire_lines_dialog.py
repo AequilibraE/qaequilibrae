@@ -38,7 +38,8 @@ from ..common_tools import ReportDialog
 from .desire_lines_procedure import DesireLinesProcedure
 
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_DesireLines.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_DesireLines.ui"))
+
 
 class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -66,7 +67,6 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
 
-
         # Create desire lines
         self.create_dl.clicked.connect(self.run)
 
@@ -75,7 +75,7 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if 'wkbType' in dir(layer):
+            if "wkbType" in dir(layer):
                 if layer.wkbType() in poly_types or layer.wkbType() in point_types:
                     self.zoning_layer.addItem(layer.name())
                     self.progress_label.setVisible(False)
@@ -91,7 +91,7 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
             self.resize(710, 385)
             self.tbl_array_cores.setColumnWidth(0, 200)
             self.tbl_array_cores.setColumnWidth(1, 80)
-            self.tbl_array_cores.setHorizontalHeaderLabels(["Matrix","Use?"])
+            self.tbl_array_cores.setHorizontalHeaderLabels(["Matrix", "Use?"])
 
             if self.matrix is not None:
                 table = self.tbl_array_cores
@@ -139,26 +139,26 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def signal_handler(self, val):
         # Signals that will come from traffic assignment
-        if val[0] == 'zones finalized':
+        if val[0] == "zones finalized":
             self.progressbar.setValue(val[1])
-        elif val[0] == 'text AoN':
+        elif val[0] == "text AoN":
             self.progress_label.setText(val[1])
 
         # Signals that will come from desire lines procedure
-        elif val[0] == 'job_size_dl':
+        elif val[0] == "job_size_dl":
             self.progressbar.setRange(0, val[1])
-        elif val[0] == 'jobs_done_dl':
+        elif val[0] == "jobs_done_dl":
             self.progressbar.setValue(val[1])
-        elif val[0] == 'text_dl':
+        elif val[0] == "text_dl":
             self.progress_label.setText(val[1])
-        elif val[0] == 'finished_desire_lines_procedure':
+        elif val[0] == "finished_desire_lines_procedure":
             self.job_finished_from_thread()
 
     def job_finished_from_thread(self):
         try:
             QgsProject.instance().addMapLayer(self.worker_thread.result_layer)
         except:
-            self.worker_thread.report.append('Could not load desire lines to map')
+            self.worker_thread.report.append("Could not load desire lines to map")
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
@@ -195,10 +195,9 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
 
         return True
 
-
     def run(self):
         if self.check_all_inputs():
-        # Sets the visual of the tool
+            # Sets the visual of the tool
             self.lbl_funding1.setVisible(False)
             self.lbl_funding2.setVisible(False)
             self.progress_label.setVisible(True)
@@ -206,16 +205,23 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
             self.setMaximumSize(QtCore.QSize(383, 444))
             self.resize(383, 444)
 
-
-            dl_type = 'DesireLines'
+            dl_type = "DesireLines"
             if self.radio_delaunay.isChecked():
-                dl_type = 'DelaunayLines'
+                dl_type = "DelaunayLines"
 
-            self.worker_thread = DesireLinesProcedure(qgis.utils.iface.mainWindow(), self.zoning_layer.currentText(),
-                                                        self.zone_id_field.currentText(), self.matrix, self.matrix_hash, dl_type)
+            self.worker_thread = DesireLinesProcedure(
+                qgis.utils.iface.mainWindow(),
+                self.zoning_layer.currentText(),
+                self.zone_id_field.currentText(),
+                self.matrix,
+                self.matrix_hash,
+                dl_type,
+            )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage("Inputs not loaded properly. You need the layer and at least one matrix_procedures core", '', level=3)
+            qgis.utils.iface.messageBar().pushMessage(
+                "Inputs not loaded properly. You need the layer and at least one matrix_procedures core", "", level=3
+            )
 
     def throws_error(self, error_message):
         error_message = ["*** ERROR ***", error_message]
