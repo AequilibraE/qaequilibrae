@@ -28,8 +28,20 @@ from ..common_tools import WorkerThread
 
 
 class AddsConnectorsProcedure(WorkerThread):
-    def __init__(self, parentThread, node_layer_name, link_layer_name, centroid_layer_name, node_ids, centroids_ids,
-                 max_length, max_connectors, new_line_layer_name, new_node_layer_name, selection_only):
+    def __init__(
+        self,
+        parentThread,
+        node_layer_name,
+        link_layer_name,
+        centroid_layer_name,
+        node_ids,
+        centroids_ids,
+        max_length,
+        max_connectors,
+        new_line_layer_name,
+        new_node_layer_name,
+        selection_only,
+    ):
         WorkerThread.__init__(self, parentThread)
         self.link_layer_name = link_layer_name
         self.node_layer_name = node_layer_name
@@ -55,21 +67,21 @@ class AddsConnectorsProcedure(WorkerThread):
         self.ProgressText.emit("Duplicating layers")
         self.ProgressMaxValue.emit(2)
         # We create the new line layer
-        new_line_layer = self.duplicate_layer(links, 'LineString', self.new_line_layer_name)
+        new_line_layer = self.duplicate_layer(links, "LineString", self.new_line_layer_name)
 
         # Create new node layer
         self.ProgressValue.emit(1)
-        new_node_layer = self.duplicate_layer(nodes, 'Point', self.new_node_layer_name)
+        new_node_layer = self.duplicate_layer(nodes, "Point", self.new_node_layer_name)
 
         # Now we start to set the field for writing the new data
         idx = nodes.dataProvider().fieldNameIndex(self.node_ids)
         idx2 = centroids.dataProvider().fieldNameIndex(self.centroids_ids)
         anode = links.dataProvider().fieldNameIndex("A_NODE")
         bnode = links.dataProvider().fieldNameIndex("B_NODE")
-        ids=[]
+        ids = []
 
         if anode < 0 or bnode < 0:
-            self.error = 'Line layer does not have A_Node and B_Node fields. Run network preparation first'
+            self.error = "Line layer does not have A_Node and B_Node fields. Run network preparation first"
             return None
 
         # Create the spatial index with nodes
@@ -89,9 +101,9 @@ class AddsConnectorsProcedure(WorkerThread):
             a = index.insertFeature(feat)
             i_d = feat.attributes()[idx]
             if i_d in ids:
-                self.error = "ID " + str(i_d) + ' is non unique in your selected field'
+                self.error = "ID " + str(i_d) + " is non unique in your selected field"
                 return None
-            if i_d<0:
+            if i_d < 0:
                 self.error = "Negative node ID in your selected field"
                 return None
             ids.append(i_d)

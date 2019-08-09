@@ -37,7 +37,7 @@ from PyQt4.QtGui import QProgressBar, QLabel, QWidget, QPushButton, QSpacerItem
 
 from aequilibrae.transit.gtfs import gtfs_sqlite_db
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), '../common_tools/forms/ui_empty.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
 
 class GtfsImportDialog(QDialog, FORM_CLASS):
@@ -53,25 +53,26 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         self.report = None
         self.worker_thread = None
         self.running = False
-        self.data_path, self.data_type = GetOutputFileName(self, 'GTFS Feeds in ZIP format',
-                                                           ["GTFS Feed(*.zip)"], '.zip', standard_path())
+        self.data_path, self.data_type = GetOutputFileName(
+            self, "GTFS Feeds in ZIP format", ["GTFS Feed(*.zip)"], ".zip", standard_path()
+        )
 
         if self.data_path is None:
             self.exit_procedure()
 
-        self.output_path, data_type = GetOutputFileName(self, 'SpatiaLite table',
-                                                        ["Sqlite(*.sqlite)"], '.sqlite', standard_path())
+        self.output_path, data_type = GetOutputFileName(
+            self, "SpatiaLite table", ["Sqlite(*.sqlite)"], ".sqlite", standard_path()
+        )
 
         if self.data_path is None:
             self.exit_procedure()
-
 
         self._run_layout = QGridLayout()
 
         # We know how many files we will have, so we can do some of the setup now
         self.status_bar_files = QProgressBar()
         self.status_label_file = QLabel()
-        self.status_label_file.setText('Extracting: ' + self.data_path)
+        self.status_label_file.setText("Extracting: " + self.data_path)
         self._run_layout.addWidget(self.status_bar_files)
         self._run_layout.addWidget(self.status_label_file)
 
@@ -80,7 +81,7 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
 
         self.but_close = QPushButton()
         self.but_close.clicked.connect(self.exit_procedure)
-        self.but_close.setText('Cancel and close')
+        self.but_close.setText("Cancel and close")
         self._run_layout.addWidget(self.but_close)
 
         self.setLayout(self._run_layout)
@@ -110,26 +111,25 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
 
         self.exit_procedure()
 
-
     def run(self):
         self.running = True
         self.worker_thread = gtfs_sqlite_db.load_from_zip()
         self.run_thread()
 
     def signal_handler(self, val):
-        if val[0] == 'text':
+        if val[0] == "text":
             self.status_label_file.setText(val[1])
 
-        elif val[0] == 'files counter':
+        elif val[0] == "files counter":
             self.status_bar_files.setValue(val[1])
 
-        elif val[0] == 'chunk counter':
+        elif val[0] == "chunk counter":
             self.status_bar_chunks.setValue(val[1])
 
-        elif val[0] == 'max chunk counter':
+        elif val[0] == "max chunk counter":
             self.status_bar_chunks.setMaximum(val[1])
 
-        elif val[0] == 'finished_threaded_procedure':
+        elif val[0] == "finished_threaded_procedure":
             self.job_finished_from_thread()
 
     def exit_procedure(self):

@@ -34,8 +34,7 @@ from ..common_tools import WorkerThread, reporter
 
 
 class GraphCreation(WorkerThread):
-    def __init__(self, parentThread, net_layer, link_id, direction_field,
-                 fields_to_add, selected_only, centroids):
+    def __init__(self, parentThread, net_layer, link_id, direction_field, fields_to_add, selected_only, centroids):
         WorkerThread.__init__(self, parentThread)
         self.net_layer = net_layer
         self.link_id = link_id
@@ -70,30 +69,38 @@ class GraphCreation(WorkerThread):
             self.report.append(self.error)
         else:
             if len(all_ids) < self.feat_count:
-                self.error = 'IDs are not unique.'
+                self.error = "IDs are not unique."
                 self.report.append(self.error)
 
         def only_str(input):
             if isinstance(input, bytes):
-                return input.decode('utf-8')
+                return input.decode("utf-8")
             return input
 
         if self.error is None:
-            self.report.append(reporter('Loading data from layer', 0))
+            self.report.append(reporter("Loading data from layer", 0))
             self.ProgressText.emit("Loading data from layer")
             self.ProgressValue.emit(0)
             self.ProgressMaxValue.emit(self.feat_count)
 
             self.graph = Graph()
-            all_types = [self.graph._Graph__integer_type, self.graph._Graph__integer_type,
-                         self.graph._Graph__integer_type, np.int8]
-            all_titles = [reserved_fields.link_id, reserved_fields.a_node, reserved_fields.b_node,
-                          reserved_fields.direction]
+            all_types = [
+                self.graph._Graph__integer_type,
+                self.graph._Graph__integer_type,
+                self.graph._Graph__integer_type,
+                np.int8,
+            ]
+            all_titles = [
+                reserved_fields.link_id,
+                reserved_fields.a_node,
+                reserved_fields.b_node,
+                reserved_fields.direction,
+            ]
 
             for name_field, values in self.fields_to_add.items():
-                all_titles.append((only_str(name_field) + '_ab'))
+                all_titles.append((only_str(name_field) + "_ab"))
                 all_types.append(np.float64)
-                all_titles.append((only_str(name_field )+ '_ba'))
+                all_titles.append((only_str(name_field) + "_ba"))
                 all_types.append(np.float64)
 
             dt = [(t, d) for t, d in zip(all_titles, all_types)]
@@ -123,8 +130,8 @@ class GraphCreation(WorkerThread):
 
                 for k in line:
                     if k == NULL:
-                        t = ','.join([str(x) for x in line])
-                        self.error = 'Field with NULL value - ID:' + str(line[0]) + "  /  " + t
+                        t = ",".join([str(x) for x in line])
+                        self.error = "Field with NULL value - ID:" + str(line[0]) + "  /  " + t
                         break
                 if self.error is not None:
                     break
@@ -134,7 +141,7 @@ class GraphCreation(WorkerThread):
                     self.ProgressValue.emit(p)
 
             if self.error is None:
-                self.report.append(reporter('Converting data to graph', 0))
+                self.report.append(reporter("Converting data to graph", 0))
                 network = np.asarray(data)
                 self.graph.network = np.zeros(network.shape[0], dtype=dt)
 
@@ -142,15 +149,15 @@ class GraphCreation(WorkerThread):
                     self.graph.network[t[0]] = network[:, k].astype(t[1])
                 del network
 
-                self.graph.type_loaded = 'NETWORK'
-                self.graph.status = 'OK'
+                self.graph.type_loaded = "NETWORK"
+                self.graph.status = "OK"
                 self.graph.network_ok = True
                 self.graph.prepare_graph(self.centroids)
                 self.graph.__source__ = None
                 self.graph.__field_name__ = None
                 self.graph.__layer_name__ = None
 
-                self.report.append(reporter('Process finished', 0))
+                self.report.append(reporter("Process finished", 0))
             else:
                 self.report.append(self.error)
         self.finished_threaded_procedure.emit(None)

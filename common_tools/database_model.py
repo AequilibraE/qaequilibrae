@@ -21,6 +21,7 @@
 
 import numpy as np
 from qgis.PyQt import QtCore
+
 Qt = QtCore.Qt
 
 # This class was adapted from https://www.mail-archive.com/pyqt@riverbankcomputing.com/msg17575.html
@@ -38,7 +39,7 @@ class DatabaseModel(QtCore.QAbstractTableModel):
         self.separator = separator
         self.decimals = decimals
         if self.separator:
-            self.row_headers_data = ['{:,}'.format(x) for x in aeq_dataset.index[:]]
+            self.row_headers_data = ["{:,}".format(x) for x in aeq_dataset.index[:]]
         else:
             self.row_headers_data = [str(x) for x in aeq_dataset.index[:]]
 
@@ -58,7 +59,7 @@ class DatabaseModel(QtCore.QAbstractTableModel):
                     self.empties.append(np.nan)
                 else:
                     self.types.append(2)
-                    self.empties.append('')
+                    self.empties.append("")
 
     def rowCount(self, parent=None):
         return self._array.data.shape[0]
@@ -75,29 +76,31 @@ class DatabaseModel(QtCore.QAbstractTableModel):
                 if self.separator:
                     if self.types[col] == 0:
                         if self._array.data[self.header_data[col]][row] == self.empties[col]:
-                            return ''
+                            return ""
                         else:
-                            return '{:,}'.format(self._array.data[self.header_data[col]][row])
+                            return "{:,}".format(self._array.data[self.header_data[col]][row])
                     if self.types[col] == 1:
                         if self._array.data[self.header_data[col]][row] == self.empties[col]:
-                            return ''
+                            return ""
                         else:
-                            return ('{:,.' + str(self.decimals) + 'f}').format(
-                                     self._array.data[self.header_data[col]][row])
+                            return ("{:,." + str(self.decimals) + "f}").format(
+                                self._array.data[self.header_data[col]][row]
+                            )
                     else:
                         return str(self._array.data[self.header_data[col]][row])
                 else:
                     if self.types[col] == 0:
                         if self._array.data[self.header_data[col]][row] == self.empties[col]:
-                            return ''
+                            return ""
                         else:
-                            return '{:}'.format(self._array.data[self.header_data[col]][row])
+                            return "{:}".format(self._array.data[self.header_data[col]][row])
                     if self.types[col] == 1:
                         if self._array.data[self.header_data[col]][row] == self.empties[col]:
-                            return ''
+                            return ""
                         else:
-                            return ('{:.' + str(self.decimals) + 'f}').format(
-                                      self._array.data[self.header_data[col]][row])
+                            return ("{:." + str(self.decimals) + "f}").format(
+                                self._array.data[self.header_data[col]][row]
+                            )
                     else:
                         return str(self._array.data[self.header_data[col]][row])
 
@@ -106,5 +109,5 @@ class DatabaseModel(QtCore.QAbstractTableModel):
             return self.header_data[col]
         if role == Qt.DisplayRole and orientation != Qt.Horizontal:
             return self.row_headers_data[col]
-        
+
         return QtCore.QAbstractTableModel.headerData(self, col, orientation, role)

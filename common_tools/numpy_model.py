@@ -31,6 +31,7 @@ Qt = QtCore.Qt
 
 # adaptations for headers come from: http://stackoverflow.com/questions/14135543/how-to-set-the-qtableview-header-name-in-pyqt4
 
+
 class NumpyModel(QtCore.QAbstractTableModel):
     def __init__(self, aeq_matrix, separator, decimals, parent=None):
         QtCore.QAbstractTableModel.__init__(self, parent)
@@ -38,8 +39,8 @@ class NumpyModel(QtCore.QAbstractTableModel):
         self.separator = separator
         self.decimals = decimals
         if self.separator:
-            self.row_headers_data = ['{:,}'.format(x) for x in aeq_matrix.index[:]]
-            self.header_data = ['{:,}'.format(x) for x in aeq_matrix.index[:]]
+            self.row_headers_data = ["{:,}".format(x) for x in aeq_matrix.index[:]]
+            self.header_data = ["{:,}".format(x) for x in aeq_matrix.index[:]]
         else:
             self.row_headers_data = [str(x) for x in aeq_matrix.index[:]]
             self.header_data = [str(x) for x in aeq_matrix.index[:]]
@@ -66,22 +67,24 @@ class NumpyModel(QtCore.QAbstractTableModel):
                 row = index.row()
                 col = index.column()
 
-                separator = ''
+                separator = ""
                 if self.separator:
-                    separator = ','
+                    separator = ","
 
                 if np.issubdtype(self._array.dtype, np.integer):
                     if self._array.matrix_view[row, col] == self.empties:
-                        return ''
+                        return ""
                     else:
-                        return ('{:' + separator + '.' + str(self.decimals) + 'f}').format(
-                            self._array.matrix_view[row, col])
+                        return ("{:" + separator + "." + str(self.decimals) + "f}").format(
+                            self._array.matrix_view[row, col]
+                        )
                 else:
                     if np.isnan(self._array.matrix_view[row, col]):
-                        return ''
+                        return ""
                     else:
-                        return ('{:' + separator + '.' + str(self.decimals) + 'f}').format(
-                            self._array.matrix_view[row, col])
+                        return ("{:" + separator + "." + str(self.decimals) + "f}").format(
+                            self._array.matrix_view[row, col]
+                        )
 
     def headerData(self, col, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
