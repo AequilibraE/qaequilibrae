@@ -18,18 +18,30 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
+import logging
+import numpy as np
 
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QTableWidget, QPushButton, QVBoxLayout
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QPushButton
 
-
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
-from aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
+
 from ..common_tools.auxiliary_functions import *
+from aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
+
+# Checks if we can display OMX
+try:
+    import openmatrix as omx
+
+    has_omx = True
+except ModuleNotFoundError as e:
+    logger = logging.getLogger("aequilibrae")
+    logger.error(e.name)
+    has_omx = False
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -40,31 +52,51 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.error = None
 
+        formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)"]
+        if has_omx:
+            formats.insert(1, "Open Matrix(*.omx)")
         self.error = None
         self.data_path, self.data_type = GetOutputFileName(
             self,
             "AequilibraE custom formats",
-            ["Aequilibrae dataset(*.aed)", "Aequilibrae matrix(*.aem)"],
-            ".aed",
+            formats,
+            ".aem",
             standard_path(),
         )
 
         if self.data_type is None:
             self.error = "Path provided is not a valid dataset"
             self.exit_with_error()
+        else:
+            self.data_type = self.data_type.upper()
 
-        self.data_type = self.data_type.upper()
+        if self.data_type in ["AED", "AEM"]:
+            if self.data_type == "AED":
+                self.data_to_show = AequilibraEData()
+            elif self.data_type == "AEM":
+                self.data_to_show = AequilibraeMatrix()
 
-        if self.data_type == "AED":
-            self.data_to_show = AequilibraEData()
-        elif self.data_type == "AEM":
+            try:
+                self.data_to_show.load(self.data_path)
+                self.list_cores = self.data_to_show.names
+                self.list_indices = self.data_to_show.index_names
+            except:
+                self.error = "Could not load dataset"
+                self.exit_with_error()
+
+        elif self.data_type == "OMX":
+            self.omx = omx.open_file(self.data_path, 'r')
+            self.list_cores = self.omx.list_matrices()
+            self.list_indices = self.omx.list_mappings()
             self.data_to_show = AequilibraeMatrix()
 
-        try:
-            self.data_to_show.load(self.data_path)
-        except:
-            self.error = "Could not load dataset"
-            self.exit_with_error()
+        # differentiates between AEM AND OMX
+        if self.data_type == "AEM":
+            self.data_to_show.computational_view([self.data_to_show.names[0]])
+        elif self.data_type == "OMX":
+            self.data_to_show.matrix_view = np.array(self.omx[self.list_cores[0]])
+            self.data_to_show.index = np.array(list(self.omx.mapping(self.list_indices[0]).keys()))
+
 
         # Elements that will be used during the displaying
         self._layout = QVBoxLayout()
@@ -98,20 +130,21 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self._layout.addItem(self.show_layout)
 
         # differentiates between matrix and dataset
-        if self.data_type == "AEM":
-            self.data_to_show.computational_view([self.data_to_show.names[0]])
+        if self.data_type in ["AEM", "OMX"]:
             # Matrices need cores and indices to be set as well
             self.mat_layout = QHBoxLayout()
             self.mat_list = QComboBox()
-            for n in self.data_to_show.names:
+
+            for n in self.list_cores:
                 self.mat_list.addItem(n)
 
             self.mat_list.currentIndexChanged.connect(self.change_matrix_cores)
             self.mat_layout.addWidget(self.mat_list)
 
             self.idx_list = QComboBox()
-            for i in self.data_to_show.index_names:
+            for i in self.list_indices:
                 self.idx_list.addItem(i)
+
             self.idx_list.currentIndexChanged.connect(self.change_matrix_cores)
             self.mat_layout.addWidget(self.idx_list)
             self._layout.addItem(self.mat_layout)
@@ -163,9 +196,16 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.table.setModel(m)
 
     def change_matrix_cores(self):
-        self.data_to_show.computational_view([self.mat_list.currentText()])
-        self.data_to_show.set_index(self.data_to_show.index_names[0])
-        self.format_showing()
+        idx = self.idx_list.currentText()
+        core = self.mat_list.currentText()
+        if self.data_type == "AEM":
+            self.data_to_show.computational_view([core])
+            self.data_to_show.set_index(idx)
+            self.format_showing()
+        elif self.data_type == "OMX":
+            self.data_to_show.matrix_view = np.array(self.omx[core])
+            self.data_to_show.index = np.array(list(self.omx.mapping(idx).keys()))
+            self.format_showing()
 
     def export(self):
         new_name, file_type = GetOutputFileName(
