@@ -3,7 +3,7 @@ This add-on is FREE and open source.
 It can also be used on a Python shell. For initial instruction on how to do it, access https://github.com/AequilibraE/examples_api
 
 Last Version:  0.5.1
-Release date: January-2019
+Release date: September-2019
 
 For more details: www.aequilibrae.com/qgis and www.xl-optim.com
 
