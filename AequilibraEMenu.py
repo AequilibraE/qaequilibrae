@@ -48,6 +48,7 @@ from .common_tools import ParameterDialog
 from .common_tools import AboutDialog
 
 from .binary_downloader_class import BinaryDownloaderDialog
+from .download_extra_packages_class import DownloadExtraPackages
 from .distribution_procedures import DistributionModelsDialog
 
 from .gis import CompareScenariosDialog
@@ -80,6 +81,12 @@ if not no_binary:
     from .paths_procedures import TrafficAssignmentDialog
     from .paths_procedures import ShortestPathDialog
     from .paths_procedures import ImpedanceMatrixDialog
+
+extra_packages = True
+try:
+    import openmatrix as omx
+except ImportError:
+    extra_packages = False
 
 
 class AequilibraEMenu(object):
@@ -315,6 +322,14 @@ class AequilibraEMenu(object):
             self.binary_action.triggered.connect(self.run_binary_download)
             self.binary_action.setEnabled(True)
             self.AequilibraE_menu.addAction(self.binary_action)
+
+        # Download extra packages
+        if not extra_packages:
+            icon = QIcon(os.path.dirname(__file__) + "/icons/icon_extra_packages.png")
+            self.extra_action = QAction(icon, "Install extra packages", self.iface.mainWindow())
+            self.extra_action.triggered.connect(self.install_extra_packages)
+            self.extra_action.setEnabled(True)
+            self.AequilibraE_menu.addAction(self.extra_action)
         #
         #
         # if old_binary:
@@ -380,6 +395,11 @@ class AequilibraEMenu(object):
 
     def run_display_aequilibrae_formats(self):
         dlg2 = DisplayAequilibraEFormatsDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def install_extra_packages(self):
+        dlg2 = DownloadExtraPackages(self.iface)
         dlg2.show()
         dlg2.exec_()
 
