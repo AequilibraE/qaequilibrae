@@ -95,7 +95,7 @@ class SimpleTAG(WorkerThread):
         self.ProgressText.emit("Spatial index for target layer")
         self.ProgressValue.emit(0)
         for i, feature in enumerate(allfeatures.values()):
-            self.index.insertFeature(feature)
+            self.index.addFeature(feature)
             self.ProgressValue.emit(i)
         self.all_attr = {}
 
@@ -111,12 +111,14 @@ class SimpleTAG(WorkerThread):
         self.index_from = QgsSpatialIndex()
         self.ProgressText.emit("Spatial index for source layer")
         self.ProgressValue.emit(0)
+        self.ProgressMaxValue.emit(self.from_layer.dataProvider().featureCount())
         for feat in self.from_features.values():
-            self.index_from.insertFeature(feat)
+            self.index_from.addFeature(feat)
             self.ProgressValue.emit(i)
 
         self.ProgressText.emit("Performing spatial matching")
         self.ProgressValue.emit(0)
+        self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
         # Now we will have the code for all the possible configurations of input layer and output layer
         for i, feat in enumerate(self.to_layer.getFeatures()):
             self.ProgressValue.emit(i)
