@@ -25,6 +25,7 @@ you are looking to use.
    installation
    networksfromscratch
    networkmanipulation
+   engine
 
 ..   data
    tripdistribution
