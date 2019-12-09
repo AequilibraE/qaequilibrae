@@ -18,7 +18,7 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-
+import importlib.util as iutil
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
@@ -39,11 +39,10 @@ from .load_matrix_class import LoadMatrix, MatrixReblocking
 from aequilibrae.matrix import AequilibraeMatrix
 import aequilibrae
 
-no_omx = False
-try:
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
+if has_omx:
     import openmatrix as omx
-except:
-    no_omx = True
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_loader.ui"))
 
@@ -94,8 +93,8 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             if "wkbType" in dir(layer):
                 if layer.wkbType() == 100:
                     self.matrix_layer.addItem(layer.name())
-        if no_omx:
-            self.radio_omx_matrix.setEnabled(False)
+
+        self.radio_omx_matrix.setEnabled(has_omx)
 
         self.resizing()
 
@@ -266,8 +265,14 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.exit_procedure()
 
         if self.radio_omx_matrix.isChecked():
-            pass
-            # Still not implemented
+            file_types = ["AequilibraE Matrix(*.omx)"]
+            default_type = ".omx"
+            box_name = "Open Matrix"
+            new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
+            if new_name is not None:
+                self.matrix = AequilibraeMatrix()
+                self.matrix.load(new_name)
+                self.exit_procedure()
 
         if self.worker_thread is not None:
             self.run_thread()
