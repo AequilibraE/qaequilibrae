@@ -176,9 +176,8 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.rdo_all_nodes.isChecked():
                 self.graph.prepare_graph(self.graph.all_nodes)
 
-            self.graph.set_graph(
-                cost_field=cost_field, skim_fields=self.skim_fields, block_centroid_flows=self.block_paths.isChecked()
-            )
+            self.graph.set_graph(cost_field=cost_field, block_centroid_flows=self.block_paths.isChecked())
+            self.graph.set_skimming(self.skim_fields)
 
             self.result.prepare(self.graph)
 

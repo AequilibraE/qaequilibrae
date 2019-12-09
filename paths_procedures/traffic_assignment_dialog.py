@@ -120,7 +120,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.do_select_link.setEnabled(False)
         self.but_build_query.setEnabled(False)
         self.select_link_list.setEnabled(False)
-        self.skim_list_table.setEnabled(False)
 
         self.do_extract_link_flows.setEnabled(False)
         self.but_build_query_extract.setEnabled(False)
@@ -283,7 +282,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     d = directions_dictionary[l[1]]
                     lk = self.graph.ids[
                         (self.graph.graph["link_id"] == int(l[0])) & (self.graph.graph["direction"] == d)
-                    ]
+                        ]
 
                 query_labels.append(query_name)
                 query_elements.append(lk)
@@ -549,13 +548,13 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     src_index = list(self.matrices[mat].index[:])
                     for i, row in enumerate(idx):
                         if row not in src_index:
-                            dest_mat[i + 1 :, :] = dest_mat[i:-1, :]
+                            dest_mat[i + 1:, :] = dest_mat[i:-1, :]
                             dest_mat[i, :] = 0
 
                 if cols != self.matrix.zones:
                     for j, col in enumerate(idx):
                         if col not in src_index:
-                            dest_mat[:, j + 1 :] = dest_mat[:, j:-1]
+                            dest_mat[:, j + 1:] = dest_mat[:, j:-1]
                             dest_mat[:, j] = 0
 
             self.matrix.computational_view()
@@ -578,9 +577,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.graph.set_graph(
             cost_field=self.minimizing_field.currentText(),
-            skim_fields=skims,
             block_centroid_flows=self.block_centroid_flows.isChecked(),
         )
+        self.graph.set_skimming(skim_fields=skims)
 
     def exit_procedure(self):
         self.close()
