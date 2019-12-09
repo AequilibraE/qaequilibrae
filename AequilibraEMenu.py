@@ -65,7 +65,7 @@ from .matrix_procedures import DisplayAequilibraEFormatsDialog
 
 # from .matrix_procedures import MatrixManipulationDialog
 
-# from .public_transport_procedures import GtfsImportDialog
+from .public_transport_procedures import GtfsImportDialog
 
 # Procedures that depend on AequilibraE
 no_binary = False
@@ -239,15 +239,15 @@ class AequilibraEMenu(object):
         # # ########################################################################
         # # #######################  TRANSIT SUB-MENU   ###########################
 
-        # self.transit_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Public Transport"))
-        # self.aequilibrae_add_submenu(self.transit_menu)
+        self.transit_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Public Transport"))
+        self.aequilibrae_add_submenu(self.transit_menu)
 
-        # # Graph generation
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_import_gtfs.png")
-        # self.gtfs_import_action = QAction(icon, u"Convert GTFS to SpatiaLite", self.iface.mainWindow())
-        # self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
-        # self.gtfs_import_action.setEnabled(True)
-        # self.transit_menu.addAction(self.gtfs_import_action)
+        # Graph generation
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_import_gtfs.png")
+        self.gtfs_import_action = QAction(icon, u"Convert GTFS to SpatiaLite", self.iface.mainWindow())
+        self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
+        self.gtfs_import_action.setEnabled(True)
+        self.transit_menu.addAction(self.gtfs_import_action)
 
         # ########################################################################
         # #################        GIS TOOLS SUB-MENU    #########################
@@ -478,11 +478,9 @@ class AequilibraEMenu(object):
             dlg2.exec_()
 
     def run_import_gtfs(self):
-        pass
-
-    #     dlg2 = GtfsImportDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+        dlg2 = GtfsImportDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_simple_tag(self):
         dlg2 = SimpleTagDialog(self.iface)
