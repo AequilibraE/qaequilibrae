@@ -67,6 +67,7 @@ from .matrix_procedures import DisplayAequilibraEFormatsDialog
 
 from .public_transport_procedures import GtfsImportDialog
 
+from .project_procedures import ProjectFromOSMDialog
 # Procedures that depend on AequilibraE
 no_binary = False
 try:
@@ -248,6 +249,19 @@ class AequilibraEMenu(object):
         self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
         self.gtfs_import_action.setEnabled(True)
         self.transit_menu.addAction(self.gtfs_import_action)
+
+         # # ########################################################################
+        # # #######################   PROJECT SUB-MENU   ############################
+
+        self.project_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Project"))
+        self.aequilibrae_add_submenu(self.project_menu)
+
+        # Graph generation
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_import_gtfs.png")
+        self.project_from_osm_action = QAction(icon, u"Create project from OSM", self.iface.mainWindow())
+        self.project_from_osm_action.triggered.connect(self.run_project_from_osm)
+        self.project_from_osm_action.setEnabled(True)
+        self.project_menu.addAction(self.project_from_osm_action)
 
         # ########################################################################
         # #################        GIS TOOLS SUB-MENU    #########################
@@ -479,6 +493,11 @@ class AequilibraEMenu(object):
 
     def run_import_gtfs(self):
         dlg2 = GtfsImportDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+
+    def run_project_from_osm(self):
+        dlg2 = ProjectFromOSMDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
