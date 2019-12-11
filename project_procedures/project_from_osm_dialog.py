@@ -12,11 +12,11 @@ from collections import OrderedDict
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
-from ..common_tools import ReportDialog, GetOutputFileName, GetOutputFolderName
+from ..common_tools import ReportDialog, GetOutputFileName, standard_path
 
-from aequilibrae.transit.gtfs import create_gtfsdb
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
+
 
 # extent = iface.mapCanvas().extent()
 # geometry = QgsGeometry().fromRect(extent)
@@ -34,7 +34,6 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
 
         self.path = standard_path()
-        self.temp_path = None
         self.error = None
         self.report = None
         self.worker_thread = None
@@ -157,7 +156,6 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.buttons_widget = QWidget()
         self.buttons_widget.setLayout(self.buttons_frame)
 
-
         self._run_layout.addWidget(self.source_type_widget)
         self._run_layout.addWidget(self.modes_widget)
         self._run_layout.addWidget(self.fields_widget)
@@ -167,7 +165,9 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.resize(300, 400)
 
     def choose_output(self):
-        pass
+        new_name, file_type = GetOutputFileName(self, '', ["SQLite database(*.sqlite)"], ".sqlite", self.path)
+        if new_name is not None:
+            self.output_path.setText(new_name)
 
     def run(self):
         pass
