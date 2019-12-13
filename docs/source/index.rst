@@ -23,6 +23,7 @@ you are looking to use.
    :maxdepth: 1
 
    installation
+   project
    networksfromscratch
    networkmanipulation
    engine

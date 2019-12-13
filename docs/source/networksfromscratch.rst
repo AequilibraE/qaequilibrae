@@ -27,6 +27,9 @@ For this example we will use Open-Street Maps data, which is the most widely ava
 There is an `online tool <http://osm-traffic.com/>`_ that is pretty good to download very target data (such as that for
 Alice Springs), you can also download the entire thing from `Geofabrik <http://download.geofabrik.de/>`_
 
+Since AequilibraE for QGIS allows for direct download of OSM data since its 0.5.3 version, you can use the facility
+described on `Build a project from OSM <project.html>`__ and then go straight to adding centroids and connectors to
+the network, as described further down this tutorial.
 
 * Zoning System:
 
