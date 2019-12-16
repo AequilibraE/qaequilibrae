@@ -29,6 +29,7 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.report = []
         self.worker_thread = None
         self.running = False
+        self.bbox = None
         self.logger = logging.getLogger("aequilibrae")
 
         self._run_layout = QGridLayout()
@@ -147,25 +148,31 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run(self):
         if self.choose_canvas.isChecked():
-            self.report.append('Chose to download network for canvas area')
+            self.report.append(reporter('Chose to download network for canvas area'))
             e = self.iface.mapCanvas().extent()
             bbox = [e.xMinimum(), e.yMinimum(), e.xMaximum(), e.yMaximum()]
         else:
-            self.report.append('Chose to download network for place')
+            self.report.append(reporter('Chose to download network for place'))
             bbox, r = placegetter(self.place.text())
             self.report.extend(r)
 
-        if bbox is not None:
-            self.report.append(
-                'Downloading network for bounding box ({} {}, {}, {})'.format(bbox[0], bbox[1], bbox[2], bbox[3]))
+        if bbox is None:
+            self.leave()
 
+        self.report.append(reporter(
+            'Downloading network for bounding box ({} {}, {}, {})'.format(bbox[0], bbox[1], bbox[2], bbox[3])))
+
+        self.bbox = bbox
+
+        # geometry = feature.geometry()
+        #
+        # d = QgsDistanceArea()
+        # d.convertAreaMeasurement(d.measureArea(geometry),QgsUnitTypes.AreaSquareMeters)
+
+    def leave(self):
         dlg2 = ReportDialog(self.iface, self.report)
         dlg2.show()
         dlg2.exec_()
-            # geometry = feature.geometry()
-            #
-            # d = QgsDistanceArea()
-            # d.convertAreaMeasurement(d.measureArea(geometry),QgsUnitTypes.AreaSquareMeters)
 
     def change_place_type(self):
         if self.choose_place.isChecked():
