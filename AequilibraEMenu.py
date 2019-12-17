@@ -77,7 +77,7 @@ except ImportError:
 
 if not no_binary:
     from .gis import DesireLinesDialog
-    from .network import CreatesTranspoNetDialog
+    from .project_procedures import CreatesTranspoNetDialog
     from .paths_procedures import GraphCreationDialog
     from .paths_procedures import TrafficAssignmentDialog
     from .paths_procedures import ShortestPathDialog
@@ -135,12 +135,6 @@ class AequilibraEMenu(object):
         self.add_connectors_action.setEnabled(True)
         self.network_menu.addAction(self.add_connectors_action)
 
-        # Creating TranspoNet
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
-        self.create_transponet_action = QAction(icon, "Create TranspoNet", self.iface.mainWindow())
-        self.create_transponet_action.triggered.connect(self.run_create_transponet)
-        self.create_transponet_action.setEnabled(True)
-        self.network_menu.addAction(self.create_transponet_action)
 
         # # ########################################################################
         # # ####################  DATA UTILITIES SUB-MENU  #########################
@@ -262,6 +256,13 @@ class AequilibraEMenu(object):
         self.project_from_osm_action.triggered.connect(self.run_project_from_osm)
         self.project_from_osm_action.setEnabled(True)
         self.project_menu.addAction(self.project_from_osm_action)
+
+        # Project from layers
+        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
+        self.create_transponet_action = QAction(icon, "Create Project from layers", self.iface.mainWindow())
+        self.create_transponet_action.triggered.connect(self.run_create_transponet)
+        self.create_transponet_action.setEnabled(True)
+        self.project_menu.addAction(self.create_transponet_action)
 
         # ########################################################################
         # #################        GIS TOOLS SUB-MENU    #########################

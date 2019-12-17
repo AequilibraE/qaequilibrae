@@ -26,11 +26,11 @@ import sys
 import os
 from qgis.PyQt.QtCore import *
 from qgis.PyQt import QtWidgets, uic
+from functools import partial
 from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
-from functools import partial
 from .creates_transponet_procedure import CreatesTranspoNetProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui

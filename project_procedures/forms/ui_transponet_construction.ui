@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AequilibraE - TranspoNet preparation</string>
+   <string>AequilibraE - Create project from layers</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0" rowspan="2">
@@ -203,7 +203,7 @@
            <string>Initialize?</string>
           </property>
           <property name="textAlignment">
-           <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+           <set>AlignCenter</set>
           </property>
          </column>
          <column>
