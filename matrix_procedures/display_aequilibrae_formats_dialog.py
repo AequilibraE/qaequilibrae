@@ -20,7 +20,7 @@
  """
 import logging
 import numpy as np
-
+import importlib.util as iutil
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QTableWidget, QPushButton, QVBoxLayout
@@ -34,14 +34,8 @@ from aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 
 # Checks if we can display OMX
-try:
-    import openmatrix as omx
-
-    has_omx = True
-except ModuleNotFoundError as e:
-    logger = logging.getLogger("aequilibrae")
-    logger.error(e.name)
-    has_omx = False
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -96,7 +90,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         elif self.data_type == "OMX":
             self.data_to_show.matrix_view = np.array(self.omx[self.list_cores[0]])
             self.data_to_show.index = np.array(list(self.omx.mapping(self.list_indices[0]).keys()))
-
 
         # Elements that will be used during the displaying
         self._layout = QVBoxLayout()
