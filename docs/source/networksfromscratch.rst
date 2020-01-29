@@ -181,11 +181,13 @@ to what is needed.
 Link IDs were created automatically in QGIS using the field calculator, capacities were ignored and length was also
 computed in QGIS after re-projecting the network.
 
-With all the preparation work done, one can create the final network using the last tool in the network manipulation
-menu in AequilibraE.
+After all field preparation is done, one can import those layers into an AequilibraE project
+using a dedicated tool in the **Project** menu in AequilibraE.
 
 
-Accessing **AequilibraE > Network Manipulation > Create Transponet**, the user is presented with the following screen.
+Accessing **AequilibraE > Project > Create Project from Layers**, the user is presented with the
+following screen.
+
 
 .. image:: images/network_edit_creating_transponet.png
     :width: 800

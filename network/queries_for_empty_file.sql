@@ -26,7 +26,7 @@ CREATE TABLE 'links' (
   'length' REAL
 );
 #
-SELECT AddGeometryColumn( 'links', 'geometry', DEFAULT_CRS, 'LINESTRING', 'XY' );
+SELECT AddGeometryColumn( 'links', 'geometry', '4326', 'LINESTRING', 'XY' );
 #
 SELECT CreateSpatialIndex( 'links' , 'geometry' );
 #

@@ -8,7 +8,7 @@ The AequilibraE project is the newest portion of the `aequilibrae API <www.aequi
 , and therefore the least mature.
 
 The API will soon bring much more sophisticated features, but the initial capability inside
-QGIS is probably the most relevant for most users for now.
+QGIS is probably the most relevant for the majority of users right now.
 
 Transponet
 ~~~~~~~~~~
