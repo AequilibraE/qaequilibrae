@@ -29,7 +29,7 @@ from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerI
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
 
 from ..common_tools.auxiliary_functions import *
-from aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
+from aequilibrae.matrix import AequilibraeMatrix, AequilibraeData
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 
@@ -66,7 +66,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if self.data_type in ["AED", "AEM"]:
             if self.data_type == "AED":
-                self.data_to_show = AequilibraEData()
+                self.data_to_show = AequilibraeData()
             elif self.data_type == "AEM":
                 self.data_to_show = AequilibraeMatrix()
 

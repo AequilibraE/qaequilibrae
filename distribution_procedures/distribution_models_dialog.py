@@ -36,7 +36,7 @@ from ..common_tools import ReportDialog
 from ..common_tools.get_output_file_name import GetOutputFileName
 from aequilibrae.distribution import SyntheticGravityModel
 from aequilibrae.distribution.synthetic_gravity_model import valid_functions
-from aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
+from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
 from .ipf_procedure import IpfProcedure
 from .calibrate_gravity_procedure import CalibrateGravityProcedure
 from .apply_gravity_procedure import ApplyGravityProcedure
@@ -212,7 +212,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2 = LoadDatasetDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
-        if isinstance(dlg2.dataset, AequilibraEData):
+        if isinstance(dlg2.dataset, AequilibraeData):
             dataset_name = dlg2.dataset.file_path
             if dataset_name is not None:
                 data_name = os.path.splitext(os.path.basename(dataset_name))[0]
@@ -282,7 +282,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         for i, data_name in enumerate(dictio.keys()):
             table.setItem(i, 0, QTableWidgetItem(data_name))
-            if isinstance(dictio[data_name], AequilibraEData):
+            if isinstance(dictio[data_name], AequilibraeData):
                 table.setItem(i, 1, QTableWidgetItem(str(dictio[data_name].num_fields)))
             else:
                 table.setItem(i, 1, QTableWidgetItem(str(dictio[data_name].cores)))

@@ -23,7 +23,7 @@ from qgis.PyQt.QtCore import *
 import numpy as np
 from ..common_tools.worker_thread import WorkerThread
 import struct
-from aequilibrae.matrix import AequilibraEData
+from aequilibrae.matrix import AequilibraeData
 from ..common_tools.global_parameters import *
 
 
@@ -35,7 +35,7 @@ class LoadDataset(WorkerThread):
         self.fields = fields
         self.error = None
         self.python_version = 8 * struct.calcsize("P")
-        self.output = AequilibraEData()
+        self.output = AequilibraeData()
         self.output_name = file_name
 
     def doWork(self):
