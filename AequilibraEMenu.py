@@ -25,10 +25,12 @@ import os
 import sys
 import tempfile
 import glob
-from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QListWidget, QListWidgetItem, QAbstractItemView, QAction, QVBoxLayout, QToolBar, QToolButton, QMenu, QPushButton
+from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QListWidget, QListWidgetItem, QAbstractItemView, QAction, \
+    QVBoxLayout, QToolBar, QToolButton, QMenu, QPushButton, QTabWidget, QLabel
 import qgis
 from qgis.core import QgsWkbTypes, QgsAnnotationManager, QgsProject, QgsGeometry, QgsRectangle, QgsTextAnnotation
 from qgis.gui import QgsMapTool, QgsRubberBand
+
 sys.dont_write_bytecode = True
 import os.path
 
@@ -40,11 +42,10 @@ from qgis.PyQt.QtCore import *
 # from PyQt4.QtGui import *
 from qgis.PyQt.QtGui import *
 
-from .common_tools import ParameterDialog
+from .common_tools import ParameterDialog, GetOutputFileName
 
-# from .common_tools import logger
-# from .common_tools import ReportDialog
 from .common_tools import AboutDialog
+from .common_tools.auxiliary_functions import standard_path
 
 from .binary_downloader_class import BinaryDownloaderDialog
 from .download_extra_packages_class import DownloadExtraPackages
@@ -67,12 +68,15 @@ from .matrix_procedures import DisplayAequilibraEFormatsDialog
 from .public_transport_procedures import GtfsImportDialog
 
 from .project_procedures import ProjectFromOSMDialog
+
 # Procedures that depend on AequilibraE
 no_binary = False
 try:
     from .aequilibrae.aequilibrae.paths import allOrNothing
 except ImportError:
     no_binary = True
+
+from .aequilibrae.aequilibrae.project import Project
 
 if not no_binary:
     from .gis import DesireLinesDialog
@@ -92,20 +96,44 @@ except ImportError:
 class AequilibraEMenu:
 
     def __init__(self, iface):
-        
+
         self.translator = None
         self.iface = iface
-        
+        self.project = None  # type: Project
+
         self.dock = QDockWidget(self.trlt('AequilibraE'))
         self.manager = QWidget()
 
-        # The toolbar will hold everything
-        toolbar = QToolBar()
-        toolbar.setOrientation(2)
+        # The self.toolbar will hold everything
+        self.toolbar = QToolBar()
+        self.toolbar.setOrientation(2)
+
+        # # ########################################################################
+        # # #######################   PROJECT SUB-MENU   ############################
+
+        projectMenu = QMenu()
+        self.open_project_action = QAction(self.trlt('Open Project'), self.manager)
+        self.open_project_action.triggered.connect(self.run_load_project)
+        projectMenu.addAction(self.open_project_action)
+
+        self.project_from_osm_action = QAction(self.trlt('Create project from OSM'), self.manager)
+        self.project_from_osm_action.triggered.connect(self.run_project_from_osm)
+        projectMenu.addAction(self.project_from_osm_action)
+
+        self.create_transponet_action = QAction(self.trlt('Create Project from layers'), self.manager)
+        self.create_transponet_action.triggered.connect(self.run_create_transponet)
+        projectMenu.addAction(self.create_transponet_action)
+
+        projectButton = QToolButton()
+        projectButton.setText(self.trlt('Project'))
+        projectButton.setPopupMode(2)
+        projectButton.setMenu(projectMenu)
+
+        self.toolbar.addWidget(projectButton)
 
         # # ########################################################################
         # # ################# NETWORK MANIPULATION SUB-MENU  #######################
-        
+
         netMenu = QMenu()
         self.action_netPrep = QAction(self.trlt('Network Preparation'), self.manager)
         self.action_netPrep.triggered.connect(self.run_net_prep)
@@ -120,7 +148,7 @@ class AequilibraEMenu:
         netbutton.setMenu(netMenu)
         netbutton.setPopupMode(2)
 
-        toolbar.addWidget(netbutton)
+        self.toolbar.addWidget(netbutton)
         # # ########################################################################
         # # ####################  DATA UTILITIES SUB-MENU  #########################
 
@@ -142,8 +170,7 @@ class AequilibraEMenu:
         databutton.setPopupMode(2)
         databutton.setMenu(dataMenu)
 
-        toolbar.addWidget(databutton)
-
+        self.toolbar.addWidget(databutton)
 
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -170,8 +197,7 @@ class AequilibraEMenu:
         distributionButton.setPopupMode(2)
         distributionButton.setMenu(distMenu)
 
-        toolbar.addWidget(distributionButton)
-
+        self.toolbar.addWidget(distributionButton)
 
         # # ########################################################################
         # # ###################  PATH COMPUTATION SUB-MENU   #######################
@@ -197,7 +223,7 @@ class AequilibraEMenu:
         pathButton.setPopupMode(2)
         pathButton.setMenu(pathMenu)
 
-        toolbar.addWidget(pathButton)
+        self.toolbar.addWidget(pathButton)
 
         # # ########################################################################
         # # #######################  TRANSIT SUB-MENU   ###########################
@@ -211,27 +237,7 @@ class AequilibraEMenu:
         transitButton.setPopupMode(2)
         transitButton.setMenu(transitMenu)
 
-        toolbar.addWidget(transitButton)
-
-        # # ########################################################################
-        # # #######################   PROJECT SUB-MENU   ############################
-
-        projectMenu = QMenu()
-        self.project_from_osm_action = QAction(self.trlt('Create project from OSM'), self.manager)
-        self.project_from_osm_action.triggered.connect(self.run_project_from_osm)
-        projectMenu.addAction(self.project_from_osm_action)
-
-        self.create_transponet_action = QAction(self.trlt('Create Project from layers'), self.manager)
-        self.create_transponet_action.triggered.connect(self.run_create_transponet)
-        projectMenu.addAction(self.create_transponet_action)
-
-        projectButton = QToolButton()
-        projectButton.setText(self.trlt('Project'))
-        projectButton.setPopupMode(2)
-        projectButton.setMenu(projectMenu)
-
-        toolbar.addWidget(projectButton)
-
+        self.toolbar.addWidget(transitButton)
 
         # ########################################################################
         # #################        GIS TOOLS SUB-MENU    #########################
@@ -262,8 +268,7 @@ class AequilibraEMenu:
         gisButton.setPopupMode(2)
         gisButton.setMenu(gisMenu)
 
-        toolbar.addWidget(gisButton)
-
+        self.toolbar.addWidget(gisButton)
 
         # ########################################################################
         # #################          LOOSE STUFF         #########################
@@ -271,45 +276,50 @@ class AequilibraEMenu:
         parametersButton = QToolButton()
         parametersButton.setText(self.trlt('Parameters'))
         parametersButton.clicked.connect(self.run_change_parameters)
-        toolbar.addWidget(parametersButton)
+        self.toolbar.addWidget(parametersButton)
 
         aboutButton = QToolButton()
         aboutButton.setText(self.trlt('About'))
         aboutButton.clicked.connect(self.run_about)
-        toolbar.addWidget(aboutButton)
+        self.toolbar.addWidget(aboutButton)
 
         if no_binary:
             binariesButton = QToolButton()
             binariesButton.setText(self.trlt('Download binaries'))
             binariesButton.clicked.connect(self.run_binary_download)
-            toolbar.addWidget(binariesButton)
+            self.toolbar.addWidget(binariesButton)
 
         if not extra_packages:
             xtrapkgButton = QToolButton()
             xtrapkgButton.setText(self.trlt('Install extra packages'))
             xtrapkgButton.clicked.connect(self.install_extra_packages)
-            toolbar.addWidget(xtrapkgButton)
+            self.toolbar.addWidget(xtrapkgButton)
+
+        # ########################################################################
+        # #################        PROJECT MANAGER       #########################
+
+        self.projectManager = QTabWidget()
+        self.toolbar.addWidget(self.projectManager)
 
         # # # ########################################################################
-        toolbar.setIconSize(QSize(16, 16))
-        
+        self.toolbar.setIconSize(QSize(16, 16))
+
         p1_vertical = QVBoxLayout()
-        p1_vertical.setContentsMargins(0,0,0,0)
-        p1_vertical.addWidget(toolbar)
+        p1_vertical.setContentsMargins(0, 0, 0, 0)
+        p1_vertical.addWidget(self.toolbar)
         self.manager.setLayout(p1_vertical)
-        
+
         self.dock.setWidget(self.manager)
         self.dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
-        
-    
+
     def unload(self):
         del self.dock
-        
+
     def trlt(self, message):
         # In the near future, we will use this function to automatically translate the AequilibraE menu
         # To any language we can get people to translate it to
-        #return QCoreApplication.translate('AequilibraE', message)
+        # return QCoreApplication.translate('AequilibraE', message)
         return message
 
     def initGui(self):
@@ -324,6 +334,37 @@ class AequilibraEMenu:
                 os.unlink(f)
             except:
                 pass
+
+    def run_load_project(self):
+        formats = ["AequilibraE Project(*.sqlite)"]
+        path, dtype = GetOutputFileName(QtWidgets.QDialog(), "AequilibraE Project", formats, ".sqlite",
+                                        standard_path(), )
+
+        # Cleans the project descriptor
+        tab_count = 1
+        for i in range(tab_count):
+            self.projectManager.removeTab(i)
+
+        if dtype is not None:
+            self.project = Project(path)
+
+            descr = QWidget()
+            descrlayout = QVBoxLayout()
+            # We create a tab with the main description of the project
+            p1 = QLabel('Project: {}'.format(path))
+            descrlayout.addWidget(p1)
+
+            p2 = QLabel('Modes: {}'.format(', '.join(self.project.network.modes())))
+            descrlayout.addWidget(p2)
+
+            p3 = QLabel('Total Links: {:,}'.format(self.project.network.count_links()))
+            descrlayout.addWidget(p3)
+
+            p4 = QLabel('Total Nodes: {:,}'.format(self.project.network.count_nodes()))
+            descrlayout.addWidget(p4)
+
+            descr.setLayout(descrlayout)
+            self.projectManager.addTab(descr, "Project")
 
     def run_change_parameters(self):
         dlg2 = ParameterDialog(self.iface)
