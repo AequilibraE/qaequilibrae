@@ -232,7 +232,16 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
             max_length = float(self.MaxLength.text())
         else:
             max_length = 1000000000000
+
         self.link_types = []
+        for i in range(self.list_types.rowCount()):
+            if self.list_types.item(i, 0).isSelected():
+                self.link_types.append(self.list_types.item(i, 0).text())
+
+        # If we selected all, we don;t need to filter by it
+        if len(self.link_types) == self.list_types.rowCount():
+            self.link_types = []
+
         parameters = [self.project.path_to_file,
                       self.CentroidLayer.currentText(),
                       self.CentroidField.currentText(),
