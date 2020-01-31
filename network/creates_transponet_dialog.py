@@ -33,8 +33,9 @@ from ..common_tools import ReportDialog
 from functools import partial
 from .creates_transponet_procedure import CreatesTranspoNetProcedure
 
-sys.modules['qgsmaplayercombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_transponet_construction.ui'))
+sys.modules["qgsmaplayercombobox"] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_transponet_construction.ui"))
+
 
 class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -45,17 +46,28 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.missing_data = -1
         self.path = standard_path()
 
-        self.required_fields_links = ['link_id', 'a_node', 'b_node', 'direction', 'length', 'capacity_ab',
-                                      'capacity_ba', 'speed_ab', 'speed_ba']
-        
-        self.initializable_links= {'direction': 0,
-                                   'capacity_ab': self.missing_data,
-                                   'capacity_ba': self.missing_data,
-                                   'speed_ab': self.missing_data,
-                                   'speed_ba': self.missing_data}
+        self.required_fields_links = [
+            "link_id",
+            "a_node",
+            "b_node",
+            "direction",
+            "length",
+            "capacity_ab",
+            "capacity_ba",
+            "speed_ab",
+            "speed_ba",
+        ]
+
+        self.initializable_links = {
+            "direction": 0,
+            "capacity_ab": self.missing_data,
+            "capacity_ba": self.missing_data,
+            "speed_ab": self.missing_data,
+            "speed_ba": self.missing_data,
+        }
         self.initializable_nodes = {}
-        
-        self.required_fields_nodes = ['node_id']
+
+        self.required_fields_nodes = ["node_id"]
 
         self.link_layer = False
         self.node_layer = False
@@ -63,10 +75,10 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.counter = {}
         self.output_file = False
         self.error = None
-        self.node_layers_list.layerChanged.connect(partial (self.changed_layer, 'nodes'))
+        self.node_layers_list.layerChanged.connect(partial(self.changed_layer, "nodes"))
         self.node_layers_list.setFilters(QgsMapLayerProxyModel.PointLayer)
 
-        self.link_layers_list.layerChanged.connect(partial (self.changed_layer, 'links'))
+        self.link_layers_list.layerChanged.connect(partial(self.changed_layer, "links"))
         self.link_layers_list.setFilters(QgsMapLayerProxyModel.LineLayer)
         self.node_fields = []
         self.link_fields = []
@@ -75,9 +87,9 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.report = None
 
         if self.node_layers_list.currentIndex() >= 0:
-            self.changed_layer('nodes')
+            self.changed_layer("nodes")
         if self.link_layers_list.currentIndex() >= 0:
-            self.changed_layer('links')
+            self.changed_layer("links")
 
         self.progressbar.setVisible(False)
         self.progress_label.setVisible(False)
@@ -91,24 +103,24 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.table_node_fields.setColumnWidth(0, 120)
         self.table_node_fields.setColumnWidth(1, 60)
         self.table_node_fields.setColumnWidth(2, 130)
-        
-        self.but_adds_to_links.clicked.connect(partial (self.append_to_list, 'links'))
-        self.but_adds_to_nodes.clicked.connect(partial (self.append_to_list, 'nodes'))
-        
-        self.but_removes_from_links.clicked.connect(partial (self.removes_fields, 'links'))
-        self.but_removes_from_nodes.clicked.connect(partial (self.removes_fields, 'nodes'))
-    
+
+        self.but_adds_to_links.clicked.connect(partial(self.append_to_list, "links"))
+        self.but_adds_to_nodes.clicked.connect(partial(self.append_to_list, "nodes"))
+
+        self.but_removes_from_links.clicked.connect(partial(self.removes_fields, "links"))
+        self.but_removes_from_nodes.clicked.connect(partial(self.removes_fields, "nodes"))
+
     def removes_fields(self, layer_type):
         layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
 
         for i in final_table.selectedRanges():
             old_fields = [final_table.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
-            
+
             for row in range(i.bottomRow(), i.topRow() - 1, -1):
                 if final_table.item(row, 0).text() in required_fields:
                     break
                 final_table.removeRow(row)
-    
+
             counter = table.rowCount()
             for field in old_fields:
                 if field not in required_fields:
@@ -117,14 +129,14 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                     item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                     table.setItem(counter, 0, item1)
                     counter += 1
-    
+
     def append_to_list(self, layer_type):
         layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
         for i in table.selectedRanges():
-            new_fields = [table.item(row,0).text() for row in range(i.topRow(), i.bottomRow()+1)]
+            new_fields = [table.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
 
             for row in range(i.bottomRow(), i.topRow() - 1, -1):
-                table.removeRow (row)
+                table.removeRow(row)
 
             counter = final_table.rowCount()
             for field in new_fields:
@@ -132,7 +144,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 item1 = QtWidgets.QTableWidgetItem(field)
                 item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
-    
+
                 chb1 = QtWidgets.QCheckBox()
                 chb1.setChecked(False)
                 chb1.setEnabled(False)
@@ -143,14 +155,14 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 cbb.addItem(field)
                 final_table.setCellWidget(counter, 2, self.centers_item(cbb))
                 counter += 1
-                
+
     def keep_checked(self):
         ch_box = self.sender()
         ch_box.setChecked(True)
-            
+
     def __find_layer_changed(self, layer_type):
         layer_fields = None
-        if layer_type == 'nodes':
+        if layer_type == "nodes":
             table = self.table_available_node_field
             final_table = self.table_node_fields
             # TODO : Change for the method .currentlayer()
@@ -159,7 +171,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
             required_fields = self.required_fields_nodes
             if self.node_layer:
                 layer_fields = self.node_layer.fields()
-        if layer_type == 'links':
+        if layer_type == "links":
             table = self.table_available_link_fields
             final_table = self.table_link_fields
             self.link_layer = get_vector_layer_by_name(self.link_layers_list.currentText())
@@ -191,7 +203,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
             final_table.setRowCount(0)
 
             counter = 0
-            if layer_type == 'links':
+            if layer_type == "links":
                 init_fields = list(self.initializable_links.keys())
             else:
                 init_fields = list(self.initializable_nodes.keys())
@@ -225,10 +237,10 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
         return cell_widget
-    
+
     def set_field_to_default(self, layer_type):
         layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
-        
+
         if layer_fields is not None:
             ch_box = self.sender()
             parent = ch_box.parent()
@@ -236,7 +248,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 if final_table.cellWidget(i, 1) is parent:
                     row = i
                     break
-    
+
             if ch_box.isChecked():
                 final_table.setCellWidget(row, 2, QtWidgets.QWidget())
             else:
@@ -247,18 +259,19 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def create_net(self):
         self.assembles_data()
-        self.output_file, file_type = GetOutputFileName(self, 'TranspoNet', ["SQLite(*.sqlite)"], ".sqlite",
-                                                        self.path)
-        
-        parameters = [self.output_file,
-                      self.node_layer,
-                      self.node_fields,
-                      self.required_fields_nodes,
-                      self.initializable_nodes,
-                      self.link_layer,
-                      self.link_fields,
-                      self.required_fields_links,
-                      self.initializable_links]
+        self.output_file, file_type = GetOutputFileName(self, "TranspoNet", ["SQLite(*.sqlite)"], ".sqlite", self.path)
+
+        parameters = [
+            self.output_file,
+            self.node_layer,
+            self.node_fields,
+            self.required_fields_nodes,
+            self.initializable_nodes,
+            self.link_layer,
+            self.link_fields,
+            self.required_fields_links,
+            self.initializable_links,
+        ]
 
         self.but_create_network_file.setVisible(False)
         self.progressbar.setVisible(True)
@@ -278,7 +291,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                     source_name = widget.currentText()
                     val = layer.dataProvider().fieldNameIndex(source_name)
                 fields[f] = val
-                        
+
             return fields
 
         self.node_fields = compile_fields(self.node_layer, self.table_node_fields)

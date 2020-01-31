@@ -44,8 +44,8 @@ try:
 except:
     no_binary = True
 
-sys.modules['qgsmaplayercombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_traffic_assignment.ui'))
+sys.modules["qgsmaplayercombobox"] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_traffic_assignment.ui"))
 
 
 class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -82,11 +82,11 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.cancel_all.clicked.connect(self.exit_procedure)
         self.select_output_folder.clicked.connect(self.choose_folder_for_outputs)
 
-        self.cb_choose_algorithm.addItem('All-Or-Nothing')
+        self.cb_choose_algorithm.addItem("All-Or-Nothing")
         self.cb_choose_algorithm.currentIndexChanged.connect(self.changing_algorithm)
 
         # slots for skim tab
-        self.but_build_query.clicked.connect(partial(self.build_query, 'select link'))
+        self.but_build_query.clicked.connect(partial(self.build_query, "select link"))
 
         self.changing_algorithm()
 
@@ -105,13 +105,13 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.graph_properties_table.setColumnWidth(1, 240)
 
         # critical link
-        self.but_build_query.clicked.connect(partial(self.build_query, 'select link'))
+        self.but_build_query.clicked.connect(partial(self.build_query, "select link"))
         self.do_select_link.stateChanged.connect(self.set_behavior_special_analysis)
         self.tot_crit_link_queries = 0
         self.critical_output = OutputType()
 
         # link flow extraction
-        self.but_build_query_extract.clicked.connect(partial(self.build_query, 'Link flow extraction'))
+        self.but_build_query_extract.clicked.connect(partial(self.build_query, "Link flow extraction"))
         self.do_extract_link_flows.stateChanged.connect(self.set_behavior_special_analysis)
         self.tot_link_flow_extract = 0
         self.link_extract = OutputType()
@@ -135,7 +135,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.skim_list_table.setColumnWidth(1, 490)
 
     def choose_folder_for_outputs(self):
-        new_name = GetOutputFolderName(self.path, 'Output folder for traffic assignment')
+        new_name = GetOutputFolderName(self.path, "Output folder for traffic assignment")
         if new_name:
             self.output_path = new_name
             self.lbl_output.setText(new_name)
@@ -144,11 +144,11 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             self.lbl_output.setText(new_name)
 
     def load_graph(self):
-        self.lbl_graphfile.setText('')
+        self.lbl_graphfile.setText("")
 
         file_types = ["AequilibraE graph(*.aeg)"]
-        default_type = '.aeg'
-        box_name = 'Traffic Assignment'
+        default_type = ".aeg"
+        box_name = "Traffic Assignment"
         graph_file, _ = GetOutputFileName(self, box_name, file_types, default_type, self.path)
 
         if graph_file is not None:
@@ -159,7 +159,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             self.update_skim_list(fields)
             self.lbl_graphfile.setText(graph_file)
 
-            cores = get_parameter_chain(['system', 'cpus'])
+            cores = get_parameter_chain(["system", "cpus"])
             self.results.set_cores(cores)
 
             # show graph properties
@@ -172,10 +172,12 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 cell_widget.setLayout(lay_out)
                 return cell_widget
 
-            items = [['Graph ID', self.graph.__id__],
-                     ['Number of links', self.graph.num_links],
-                     ['Number of nodes', self.graph.num_nodes],
-                     ['Number of centroids', self.graph.num_zones]]
+            items = [
+                ["Graph ID", self.graph.__id__],
+                ["Number of links", self.graph.num_links],
+                ["Number of nodes", self.graph.num_nodes],
+                ["Number of centroids", self.graph.num_zones],
+            ]
 
             self.graph_properties_table.clearContents()
             self.graph_properties_table.setRowCount(5)
@@ -183,7 +185,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.graph_properties_table.setItem(i, 0, QTableWidgetItem(item[0]))
                 self.graph_properties_table.setItem(i, 1, QTableWidgetItem(str(item[1])))
 
-            self.graph_properties_table.setItem(4, 0, QTableWidgetItem('Block flows through centroids'))
+            self.graph_properties_table.setItem(4, 0, QTableWidgetItem("Block flows through centroids"))
             self.block_centroid_flows = QCheckBox()
             self.block_centroid_flows.setChecked(self.graph.block_centroid_flows)
             self.graph_properties_table.setCellWidget(4, 1, centers_item(self.block_centroid_flows))
@@ -192,8 +194,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.set_behavior_special_analysis()
 
     def changing_algorithm(self):
-        if self.cb_choose_algorithm.currentText() == 'All-Or-Nothing':
-            self.method['algorithm'] = 'AoN'
+        if self.cb_choose_algorithm.currentText() == "All-Or-Nothing":
+            self.method["algorithm"] = "AoN"
 
     def run_thread(self):
         self.worker_thread.assignment.connect(self.signal_handler)
@@ -214,7 +216,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             self.progressbar0.setVisible(True)
             self.progressbar0.setRange(0, self.graph.num_zones)
             try:
-                if self.method['algorithm'] == 'AoN':
+                if self.method["algorithm"] == "AoN":
                     self.worker_thread = allOrNothing(self.matrix, self.graph, self.results)
                 self.run_thread()
             except ValueError as error:
@@ -223,20 +225,20 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Input error", self.error, level=3)
 
     def set_output_names(self):
-        self.path_file.temp_file = os.path.join(self.temp_path, 'path_file.aed')
-        self.path_file.output_name = os.path.join(self.output_path, 'path_file')
-        self.path_file.extension = 'aed'
+        self.path_file.temp_file = os.path.join(self.temp_path, "path_file.aed")
+        self.path_file.output_name = os.path.join(self.output_path, "path_file")
+        self.path_file.extension = "aed"
 
         if self.do_path_file.isChecked():
             self.results.setSavePathFile(save=True, path_result=self.path_file.temp_file)
 
-        self.link_extract.temp_file = os.path.join(self.temp_path, 'link_extract')
-        self.link_extract.output_name = os.path.join(self.output_path, 'link_extract')
-        self.link_extract.extension = 'aed'
+        self.link_extract.temp_file = os.path.join(self.temp_path, "link_extract")
+        self.link_extract.output_name = os.path.join(self.output_path, "link_extract")
+        self.link_extract.extension = "aed"
 
-        self.critical_output.temp_file = os.path.join(self.temp_path, 'critical_output')
-        self.critical_output.output_name = os.path.join(self.output_path, 'critical_output')
-        self.critical_output.extension = 'aed'
+        self.critical_output.temp_file = os.path.join(self.temp_path, "critical_output")
+        self.critical_output.output_name = os.path.join(self.output_path, "critical_output")
+        self.critical_output.extension = "aed"
 
     def check_data(self):
         self.error = None
@@ -244,7 +246,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.change_graph_settings()
 
         if not self.graph.num_links:
-            self.error = 'Graph was not loaded'
+            self.error = "Graph was not loaded"
             return False
 
         self.matrix = None
@@ -252,14 +254,14 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             return False
 
         if self.matrix is None:
-            self.error = 'Demand matrix missing'
+            self.error = "Demand matrix missing"
             return False
 
         if self.output_path is None:
-            self.error = 'Parameters for output missing'
+            self.error = "Parameters for output missing"
             return False
 
-        self.temp_path = os.path.join(self.output_path, 'temp')
+        self.temp_path = os.path.join(self.output_path, "temp")
         if not os.path.exists(self.temp_path):
             os.makedirs(self.temp_path)
 
@@ -279,47 +281,47 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
                 for l in links:
                     d = directions_dictionary[l[1]]
-                    lk = self.graph.ids[(self.graph.graph['link_id'] == int(l[0])) &
-                                        (self.graph.graph['direction'] == d)]
+                    lk = self.graph.ids[
+                        (self.graph.graph["link_id"] == int(l[0])) & (self.graph.graph["direction"] == d)
+                    ]
 
                 query_labels.append(query_name)
                 query_elements.append(lk)
                 query_types.append(query_type)
 
-        self.critical_queries = {'labels': query_labels,
-                                 'elements': query_elements,
-                                 ' type': query_types}
+        self.critical_queries = {"labels": query_labels, "elements": query_elements, " type": query_types}
 
     def signal_handler(self, val):
-        if val[0] == 'zones finalized':
+        if val[0] == "zones finalized":
             self.progressbar0.setValue(val[1])
-        elif val[0] == 'text AoN':
+        elif val[0] == "text AoN":
             self.progress_label0.setText(val[1])
-        elif val[0] == 'finished_threaded_procedure':
+        elif val[0] == "finished_threaded_procedure":
             self.job_finished_from_thread()
 
     # TODO: Write code to export skims
     def produce_all_outputs(self):
 
-        extension = 'aed'
+        extension = "aed"
         if not self.do_output_to_aequilibrae.isChecked():
-            extension = 'csv'
+            extension = "csv"
             if self.do_output_to_sqlite.isChecked():
-                extension = 'sqlite'
+                extension = "sqlite"
 
         # Save link flows to disk
-        self.results.save_to_disk(os.path.join(self.output_path, 'link_flows.' + extension), output='loads')
+        self.results.save_to_disk(os.path.join(self.output_path, "link_flows." + extension), output="loads")
 
         # save Path file if that is the case
         if self.do_path_file.isChecked():
-            if self.method['algorithm'] == 'AoN':
+            if self.method["algorithm"] == "AoN":
                 if self.do_output_to_sqlite.isChecked():
-                    self.results.save_to_disk(file_name=os.path.join(self.output_path, 'path_file.' + extension),
-                                              output='path_file')
+                    self.results.save_to_disk(
+                        file_name=os.path.join(self.output_path, "path_file." + extension), output="path_file"
+                    )
 
         # Saves output skims
         if self.skim_list_table.rowCount() > 0:
-            self.results.skims.copy(os.path.join(self.output_path, 'skims.aem'))
+            self.results.skims.copy(os.path.join(self.output_path, "skims.aem"))
 
         # if self.do_select_link.isChecked():
         #     if self.method['algorithm'] == 'AoN':
@@ -339,14 +341,14 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
     # Procedures related to critical analysis. Not yet fully implemented
     def build_query(self, purpose):
-        if purpose == 'select link':
+        if purpose == "select link":
             button = self.but_build_query
-            message = 'Select Link Analysis'
+            message = "Select Link Analysis"
             table = self.select_link_list
             counter = self.tot_crit_link_queries
         else:
             button = self.but_build_query_extract
-            message = 'Link flow extraction'
+            message = "Link flow extraction"
             table = self.list_link_extraction
             counter = self.tot_link_flow_extract
 
@@ -356,28 +358,28 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if dlg2.links is not None:
             table.setRowCount(counter + 1)
-            text = ''
+            text = ""
             for i in dlg2.links:
-                text = text + ', (' + only_str(i[0]) + ', "' + only_str(i[1]) + '")'
+                text = text + ", (" + only_str(i[0]) + ', "' + only_str(i[1]) + '")'
             text = text[2:]
             table.setItem(counter, 0, QTableWidgetItem(text))
             table.setItem(counter, 1, QTableWidgetItem(dlg2.query_type))
             table.setItem(counter, 2, QTableWidgetItem(dlg2.query_name))
-            del_button = QPushButton('X')
+            del_button = QPushButton("X")
             del_button.clicked.connect(partial(self.click_button_inside_the_list, purpose))
             table.setCellWidget(counter, 3, del_button)
             counter += 1
 
-        if purpose == 'select link':
+        if purpose == "select link":
             self.tot_crit_link_queries = counter
 
-        elif purpose == 'Link flow extraction':
+        elif purpose == "Link flow extraction":
             self.tot_link_flow_extract = counter
 
         button.setEnabled(True)
 
     def click_button_inside_the_list(self, purpose):
-        if purpose == 'select link':
+        if purpose == "select link":
             table = self.select_link_list
         else:
             table = self.list_link_extraction
@@ -387,9 +389,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         row = index.row()
         table.removeRow(row)
 
-        if purpose == 'select link':
+        if purpose == "select link":
             self.tot_crit_link_queries -= 1
-        elif purpose == 'Link flow extraction':
+        elif purpose == "Link flow extraction":
             self.tot_link_flow_extract -= 1
 
     def set_behavior_special_analysis(self):
@@ -465,10 +467,10 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def find_non_conflicting_name(self, data_name, dictio):
         if data_name in dictio:
             i = 1
-            new_data_name = data_name + '_' + str(i)
+            new_data_name = data_name + "_" + str(i)
             while new_data_name in dictio:
                 i += 1
-                new_data_name = data_name + '_' + str(i)
+                new_data_name = data_name + "_" + str(i)
             data_name = new_data_name
         return data_name
 
@@ -500,7 +502,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         cbox = QComboBox()
         cbox.addItems(list(self.matrices.keys()))
-        cbox.addItem('')
+        cbox.addItem("")
         cbox.setCurrentIndex(cbox.count() - 1)
         cbox.currentIndexChanged.connect(self.changed_assignable_matrix)
         self.table_matrices_to_assign.setCellWidget(row_count, 0, cbox)
@@ -519,18 +521,17 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     no_zones = [item for item in mat_index if item not in idx]
                     # We only return an error if the matrix has too many centroids
                     if no_zones:
-                        self.error = 'Assignable matrix has centroids that do not exist in the network: {}'.format(
-                            ','.join([str(x) for x in no_zones]))
+                        self.error = "Assignable matrix has centroids that do not exist in the network: {}".format(
+                            ",".join([str(x) for x in no_zones])
+                        )
                         return False
                 if core in mat_names:
-                    self.error = 'Assignable matrices cannot have same names'
+                    self.error = "Assignable matrices cannot have same names"
                     return False
                 mat_names.append(only_str(core))
 
             self.matrix = AequilibraeMatrix()
-            self.matrix.create_empty(file_name=self.matrix.random_name(),
-                                     zones=idx.shape[0],
-                                     matrix_names=mat_names)
+            self.matrix.create_empty(file_name=self.matrix.random_name(), zones=idx.shape[0], matrix_names=mat_names)
             self.matrix.index[:] = idx[:]
 
             for row in range(table.rowCount() - 1):
@@ -548,18 +549,18 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     src_index = list(self.matrices[mat].index[:])
                     for i, row in enumerate(idx):
                         if row not in src_index:
-                            dest_mat[i + 1:, :] = dest_mat[i:-1, :]
+                            dest_mat[i + 1 :, :] = dest_mat[i:-1, :]
                             dest_mat[i, :] = 0
 
                 if cols != self.matrix.zones:
                     for j, col in enumerate(idx):
                         if col not in src_index:
-                            dest_mat[:, j + 1:] = dest_mat[:, j:-1]
+                            dest_mat[:, j + 1 :] = dest_mat[:, j:-1]
                             dest_mat[:, j] = 0
 
             self.matrix.computational_view()
         else:
-            self.error = 'You need to have at least one matrix to assign'
+            self.error = "You need to have at least one matrix to assign"
             return False
 
         return True
@@ -575,9 +576,11 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         if len(skims) == 0:
             skims = []
 
-        self.graph.set_graph(cost_field=self.minimizing_field.currentText(),
-                             skim_fields=skims,
-                             block_centroid_flows=self.block_centroid_flows.isChecked())
+        self.graph.set_graph(
+            cost_field=self.minimizing_field.currentText(),
+            skim_fields=skims,
+            block_centroid_flows=self.block_centroid_flows.isChecked(),
+        )
 
     def exit_procedure(self):
         self.close()
@@ -587,7 +590,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             dlg2.exec_()
 
 
-class OutputType():
+class OutputType:
     def __init__(self):
         self.temp_file = None
         self.extension = None

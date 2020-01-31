@@ -35,7 +35,7 @@ from ..common_tools import ReportDialog, GetOutputFileName, GetOutputFolderName
 
 from aequilibrae.transit.gtfs import create_gtfsdb
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), '../common_tools/forms/ui_empty.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
 
 class GtfsImportDialog(QDialog, FORM_CLASS):
@@ -51,17 +51,17 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         self.report = None
         self.worker_thread = None
         self.running = False
-        self.logger = logging.getLogger('aequilibrae')
+        self.logger = logging.getLogger("aequilibrae")
 
         self._run_layout = QGridLayout()
 
         # Source type for the GTFS
         self.choose_zip = QRadioButton()
-        self.choose_zip.setText('Source is zip file')
+        self.choose_zip.setText("Source is zip file")
         self.choose_zip.setChecked(True)
 
         self.choose_folder = QRadioButton()
-        self.choose_folder.setText('Source is folder')
+        self.choose_folder.setText("Source is folder")
         self.choose_folder.setChecked(False)
 
         self.source_type_frame = QHBoxLayout()
@@ -74,7 +74,7 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         self.but_choose_gtfs = QPushButton()
         self.but_choose_gtfs.clicked.connect(self.find_input)
         self.but_choose_gtfs.setFixedSize(100, 30)
-        self.but_choose_gtfs.setText('GTFS Source')
+        self.but_choose_gtfs.setText("GTFS Source")
         self.gtfs_source = QLineEdit()
         self.source_frame = QHBoxLayout()
         self.source_frame.addWidget(self.but_choose_gtfs, 1)
@@ -86,7 +86,7 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         self.but_choose_dest = QPushButton()
         self.but_choose_dest.clicked.connect(self.set_output_db)
         self.but_choose_dest.setFixedSize(100, 30)
-        self.but_choose_dest.setText('Output')
+        self.but_choose_dest.setText("Output")
         self.gtfs_output = QLineEdit()
         output_frame = QHBoxLayout()
         output_frame.addWidget(self.but_choose_dest, 1)
@@ -97,7 +97,7 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         # Spatialite or not
         self.spatial = QCheckBox()
         self.spatial.setChecked(True)
-        self.spatial.setText('Create spatial components')
+        self.spatial.setText("Create spatial components")
         options_frame = QHBoxLayout()
         options_frame.addWidget(self.spatial, 1)
         self.options_widget = QWidget()
@@ -105,11 +105,11 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
 
         # action buttons
         self.but_process = QPushButton()
-        self.but_process.setText('Run')
+        self.but_process.setText("Run")
         self.but_process.clicked.connect(self.run)
 
         self.but_cancel = QPushButton()
-        self.but_cancel.setText('Cancel')
+        self.but_cancel.setText("Cancel")
         self.but_cancel.clicked.connect(self.exit_procedure)
 
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
@@ -126,7 +126,7 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         self.progress_frame.addWidget(self.status_bar_files)
 
         self.status_label_file = QLabel()
-        self.status_label_file.setText('Extracting: ')
+        self.status_label_file.setText("Extracting: ")
         self.progress_frame.addWidget(self.status_label_file)
 
         self.status_bar_chunks = QProgressBar()
@@ -154,16 +154,17 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
 
     def find_input(self):
         if self.choose_zip.isChecked():
-            new_name, type = GetOutputFileName(self, 'GTFS Feed', ["Zip containers(*.zip)"], '.zip', self.path)
+            new_name, type = GetOutputFileName(self, "GTFS Feed", ["Zip containers(*.zip)"], ".zip", self.path)
         else:
-            new_name = GetOutputFolderName(self.path, 'GTFS Feed')
+            new_name = GetOutputFolderName(self.path, "GTFS Feed")
 
         if new_name is not None:
             self.gtfs_source.setText(new_name)
 
     def set_output_db(self):
-        new_name, type = GetOutputFileName(self, 'SQLite Database', ["SQLite(*.sqlite)", "SQLite(*.db)"], '.sqlite',
-                                           self.path)
+        new_name, type = GetOutputFileName(
+            self, "SQLite Database", ["SQLite(*.sqlite)", "SQLite(*.db)"], ".sqlite", self.path
+        )
         if new_name is not None:
             self.gtfs_output.setText(new_name)
 
@@ -177,7 +178,7 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         output_file = self.gtfs_output.text()
         if not os.path.isfile(data_source):
             if not os.path.isdir(data_source):
-                qgis.utils.iface.messageBar().pushMessage("Data source does not exist", '', level=3)
+                qgis.utils.iface.messageBar().pushMessage("Data source does not exist", "", level=3)
                 return
 
         self.running = True
@@ -189,27 +190,28 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
         self.progress_widget.setVisible(True)
 
         self.logger.info(data_source)
-        self.worker_thread = create_gtfsdb(data_source, save_db=output_file, overwrite=True,
-                                           spatialite_enabled=self.spatial.isChecked())
+        self.worker_thread = create_gtfsdb(
+            data_source, save_db=output_file, overwrite=True, spatialite_enabled=self.spatial.isChecked()
+        )
         self.run_thread()
 
     def signal_handler(self, val):
-        if val[0] == 'text':
+        if val[0] == "text":
             self.status_label_file.setText(val[1])
 
-        elif val[0] == 'files counter':
+        elif val[0] == "files counter":
             self.status_bar_files.setValue(val[1])
 
-        elif val[0] == 'total files':
+        elif val[0] == "total files":
             self.status_bar_files.setMaximum(val[1])
 
-        elif val[0] == 'chunk counter':
+        elif val[0] == "chunk counter":
             self.status_bar_chunks.setValue(val[1])
 
-        elif val[0] == 'max chunk counter':
+        elif val[0] == "max chunk counter":
             self.status_bar_chunks.setMaximum(val[1])
 
-        elif val[0] == 'finished_threaded_procedure':
+        elif val[0] == "finished_threaded_procedure":
             self.job_finished_from_thread()
 
     def exit_procedure(self):

@@ -29,9 +29,10 @@ import os
 from .simple_tag_procedure import SimpleTAG
 
 from ..common_tools.global_parameters import *
-from ..common_tools.auxiliary_functions import  get_vector_layer_by_name
+from ..common_tools.auxiliary_functions import get_vector_layer_by_name
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__),  'forms/ui_simple_tag.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_simple_tag.ui"))
+
 
 class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
@@ -54,17 +55,18 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # We load the node and area layers existing in our canvas
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if 'wkbType' in dir(layer):
+            if "wkbType" in dir(layer):
                 if layer.wkbType() in self.valid_layer_types:
                     self.fromlayer.addItem(layer.name())
                     self.tolayer.addItem(layer.name())
 
+        self.enclosed.setToolTip(
+            "If source layer is a polygon, source needs to enclose target.  If only target is "
+            "a polygon, target needs to enclose source. First found record is used"
+        )
 
-        self.enclosed.setToolTip('If source layer is a polygon, source needs to enclose target.  If only target is '
-                                 'a polygon, target needs to enclose source. First found record is used')
-
-        self.touching.setToolTip('Criteria to choose when there are multiple matches is largest area or length matched')
-        self.closest.setToolTip('Heuristic procedure that only computes the actual distance to the nearest neighbors')
+        self.touching.setToolTip("Criteria to choose when there are multiple matches is largest area or length matched")
+        self.closest.setToolTip("Heuristic procedure that only computes the actual distance to the nearest neighbors")
         self.works_field_matching()
 
     def reload_fields(self):
@@ -95,7 +97,6 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.needsmatching.isChecked():
             self.works_field_matching()
         self.matches_types()
-
 
     def set_to_fields(self):
         self.tofield.clear()
@@ -135,18 +136,18 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             self.touching.setEnabled(True)
 
         if flayer.wkbType() in poly_types + multi_poly:
-            self.geography_types[0] = 'polygon'
+            self.geography_types[0] = "polygon"
         elif flayer.wkbType() in line_types + multi_line:
-            self.geography_types[0] = 'linestring'
+            self.geography_types[0] = "linestring"
         else:
-            self.geography_types[0] = 'point'
+            self.geography_types[0] = "point"
 
         if tlayer.wkbType() in poly_types + multi_poly:
-            self.geography_types[1] = 'polygon'
+            self.geography_types[1] = "polygon"
         elif tlayer.wkbType() in line_types + multi_line:
-            self.geography_types[1] = 'linestring'
+            self.geography_types[1] = "linestring"
         else:
-            self.geography_types[1] = 'point'
+            self.geography_types[1] = "point"
 
     def works_field_matching(self):
 
@@ -212,14 +213,22 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def finished_threaded_procedure(self, procedure):
         if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", self.worker_thread.error,
-                                                      level=3)
+            qgis.utils.iface.messageBar().pushMessage(
+                "Input data not provided correctly", self.worker_thread.error, level=3
+            )
         self.close()
 
     def run(self):
         error = False
-        if min(self.fromlayer.currentIndex(), self.fromfield.currentIndex(),
-               self.tolayer.currentIndex(), self.tofield.currentIndex()) < 0:
+        if (
+            min(
+                self.fromlayer.currentIndex(),
+                self.fromfield.currentIndex(),
+                self.tolayer.currentIndex(),
+                self.tofield.currentIndex(),
+            )
+            < 0
+        ):
             error = True
 
         if self.needsmatching.isChecked():
@@ -246,11 +255,20 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             operation = "CLOSEST"
 
         if not error:
-            self.worker_thread = SimpleTAG(qgis.utils.iface.mainWindow(), flayer, tlayer, ffield, tfield, fmatch,
-                                           tmatch, operation, self.geography_types)
+            self.worker_thread = SimpleTAG(
+                qgis.utils.iface.mainWindow(),
+                flayer,
+                tlayer,
+                ffield,
+                tfield,
+                fmatch,
+                tmatch,
+                operation,
+                self.geography_types,
+            )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", '  Try again', level=3)
+            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", "  Try again", level=3)
 
     def unload(self):
         pass

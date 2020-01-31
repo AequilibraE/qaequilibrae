@@ -20,7 +20,15 @@
  """
 # from PyQt4.QtCore import QVariant, SIGNAL
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsCoordinateTransform, QgsSpatialIndex, QgsFeature, QgsGeometry, QgsField, QgsVectorLayer, QgsProject
+from qgis.core import (
+    QgsCoordinateTransform,
+    QgsSpatialIndex,
+    QgsFeature,
+    QgsGeometry,
+    QgsField,
+    QgsVectorLayer,
+    QgsProject,
+)
 import copy
 
 from ..common_tools.auxiliary_functions import *
@@ -82,22 +90,28 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         epsg_code = int(self.to_layer.crs().authid().split(":")[1])
         if self.from_layer.wkbType() in self.poly_types and self.to_layer.wkbType() in self.poly_types:
             lcd_layer = QgsVectorLayer("MultiPolygon?crs=epsg:" + str(epsg_code), "output", "memory")
-            self.output_type = 'Poly'
+            self.output_type = "Poly"
 
-        elif self.from_layer.wkbType() in self.poly_types + self.line_types and \
-                self.to_layer.wkbType() in self.poly_types + self.line_types:
+        elif (
+            self.from_layer.wkbType() in self.poly_types + self.line_types
+            and self.to_layer.wkbType() in self.poly_types + self.line_types
+        ):
             lcd_layer = QgsVectorLayer("MultiLineString?crs=epsg:" + str(epsg_code), "output", "memory")
-            self.output_type = 'Line'
+            self.output_type = "Line"
         else:
             lcd_layer = QgsVectorLayer("MultiPoint?crs=epsg:" + str(epsg_code), "output", "memory")
-            self.output_type = 'Point'
+            self.output_type = "Point"
 
         lcdpr = lcd_layer.dataProvider()
-        lcdpr.addAttributes([QgsField("Part_ID", QVariant.Int),
-                             QgsField(ffield, self.from_layer.fields().field(idx).type()),
-                             QgsField(tfield, self.to_layer.fields().field(fid).type()),
-                             QgsField('P-' + str(ffield), QVariant.Double),  # percentage of the from field
-                             QgsField('P-' + str(tfield), QVariant.Double)])  # percentage of the to field
+        lcdpr.addAttributes(
+            [
+                QgsField("Part_ID", QVariant.Int),
+                QgsField(ffield, self.from_layer.fields().field(idx).type()),
+                QgsField(tfield, self.to_layer.fields().field(fid).type()),
+                QgsField("P-" + str(ffield), QVariant.Double),  # percentage of the from field
+                QgsField("P-" + str(tfield), QVariant.Double),
+            ]
+        )  # percentage of the to field
         lcd_layer.updateFields()
 
         # PROGRESS BAR
@@ -128,11 +142,9 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         perct = stati / statt
                         percf = stati / statf
                         areas[f] = statt
-                        feature.setAttributes([part_id,
-                                               feat.attributes()[idx],
-                                               allfeatures[f].attributes()[fid],
-                                               percf,
-                                               perct])
+                        feature.setAttributes(
+                            [part_id, feat.attributes()[idx], allfeatures[f].attributes()[fid], percf, perct]
+                        )
                         features.append(feature)
 
                         # prepare the data for the non overlapping
@@ -151,17 +163,14 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         feature.setGeometry(geo)
                         perct = 0
                         percf = stati / statf
-                        feature.setAttributes([part_id,
-                                               feat.attributes()[idx],
-                                               '',
-                                               percf,
-                                               perct])
+                        feature.setAttributes([part_id, feat.attributes()[idx], "", percf, perct])
                         features.append(feature)
                         part_id += 1
 
             self.ProgressValue.emit(fc)
-            self.ProgressText.emit('Running Analysis (' + "{:,}".format(fc) + '/' + "{:,}".format(
-                          self.from_layer.featureCount()) + ')')
+            self.ProgressText.emit(
+                "Running Analysis (" + "{:,}".format(fc) + "/" + "{:,}".format(self.from_layer.featureCount()) + ")"
+            )
 
         # Find the features on TO that have no correspondence in FROM
         for f, feature in merged.items():
@@ -172,11 +181,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                 feature.setGeometry(geo)
                 perct = stati / areas[f]
                 percf = 0
-                feature.setAttributes([part_id,
-                                       '',
-                                       allfeatures[f].attributes()[fid],
-                                       percf,
-                                       perct])
+                feature.setAttributes([part_id, "", allfeatures[f].attributes()[fid], percf, perct])
                 features.append(feature)
                 part_id += 1
 
@@ -188,13 +193,13 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         self.finished_threaded_procedure.emit("procedure")
 
     def find_geometry(self, g):
-        if self.output_type == 'Poly':
+        if self.output_type == "Poly":
             stat = g.area()
             if g.isMultipart():
                 geometry = QgsGeometry.fromMultiPolygonXY(g.asMultiPolygon())
             else:
                 geometry = QgsGeometry.fromPolygonXY(g.asPolygon())
-        elif self.output_type == 'Line':
+        elif self.output_type == "Line":
             stat = g.length()
             if g.isMultipart():
                 geometry = QgsGeometry.fromMultiPolylineXY(g.asMultiPolyLine())

@@ -38,16 +38,16 @@ def user_message(message, level):
     if level == "ERROR":
         level = 3
 
-    qgis.utils.iface.messageBar().pushMessage(message, '', level=level)
+    qgis.utils.iface.messageBar().pushMessage(message, "", level=level)
 
 
 # Just a shorthand function to return the current standard path
 def standard_path():
-    return get_parameter_chain(['system', 'default_directory'])
+    return get_parameter_chain(["system", "default_directory"])
 
 
 def tempPath():
-    tmp_path = get_parameter_chain(['system', 'temp directory'])
+    tmp_path = get_parameter_chain(["system", "temp directory"])
     if os.path.isdir(tmp_path):
         return tmp_path
     else:
@@ -71,7 +71,7 @@ def get_parameter_chain(chain):
 # Recovers a group of parameters (or the entire yml) as a dictionary of dictionaries
 def get_parameters_group(group=None):
     path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/aequilibrae/"
-    with open(path + 'parameters.yml', 'r') as yml:
+    with open(path + "parameters.yml", "r") as yml:
         path = yaml.safe_load(yml)
     if group is None:
         return path
@@ -109,14 +109,14 @@ def haversine(lon1, lat1, lon2, lat2):
 
 def reporter(message, tabs=0):
     t = strftime("%Y-%m-%d %H:%M:%S", localtime())
-    return ' ' * tabs + t + ' - ' + str(message)
+    return " " * tabs + t + " - " + str(message)
 
 
 def only_str(str_input):
     if isinstance(str_input, bytes):
-        return str_input.decode('utf-8')
+        return str_input.decode("utf-8")
     return str_input
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

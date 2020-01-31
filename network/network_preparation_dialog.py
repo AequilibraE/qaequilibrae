@@ -31,9 +31,9 @@ from ..common_tools import ReportDialog
 
 from .Network_preparation_procedure import NetworkPreparationProcedure
 
-sys.modules['qgsmaplayercombobox'] = qgis.gui
-sys.modules['qgsfieldcombobox'] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_network_preparation.ui'))
+sys.modules["qgsmaplayercombobox"] = qgis.gui
+sys.modules["qgsfieldcombobox"] = qgis.gui
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_network_preparation.ui"))
 
 
 class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -56,7 +56,7 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
         self.cbb_node_layer.clear()
 
         for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if 'wkbType' in dir(layer):
+            if "wkbType" in dir(layer):
                 if layer.wkbType() in line_types:
                     self.cbb_line_layer.addItem(layer.name())
                 if layer.wkbType() in point_types:
@@ -125,18 +125,25 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         if self.radioUseNodes.isChecked():
             self.pushOK.setEnabled(False)
-            self.worker_thread = NetworkPreparationProcedure(qgis.utils.iface.mainWindow(), self.cbb_line_layer.currentText(),
-                                                             self.OutLinks.text(), self.cbb_node_layer.currentText(),
-                                                             self.cbb_node_fields.currentText())
+            self.worker_thread = NetworkPreparationProcedure(
+                qgis.utils.iface.mainWindow(),
+                self.cbb_line_layer.currentText(),
+                self.OutLinks.text(),
+                self.cbb_node_layer.currentText(),
+                self.cbb_node_fields.currentText(),
+            )
             self.run_thread()
 
         else:
             self.pushOK.setEnabled(False)
-            self.worker_thread = NetworkPreparationProcedure(qgis.utils.iface.mainWindow(), self.cbb_line_layer.currentText(),
-                                                             self.OutLinks.text(), new_node_layer=self.OutNodes.text(),
-                                                             node_start = int(self.np_node_start.text()))
+            self.worker_thread = NetworkPreparationProcedure(
+                qgis.utils.iface.mainWindow(),
+                self.cbb_line_layer.currentText(),
+                self.OutLinks.text(),
+                new_node_layer=self.OutNodes.text(),
+                node_start=int(self.np_node_start.text()),
+            )
             self.run_thread()
 
     def exit_procedure(self):
         self.close()
-

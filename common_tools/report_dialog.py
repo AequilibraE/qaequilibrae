@@ -28,7 +28,7 @@ import sys
 import os
 from .auxiliary_functions import standard_path
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'forms/ui_report.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_report.ui"))
 
 
 class ReportDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -46,9 +46,9 @@ class ReportDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def save_log(self):
         file_types = "Text files(*.txt)"
-        new_name, _ = GetOutputFileName(self, 'Save procedure log', file_types, '.txt', self.path)
+        new_name, _ = GetOutputFileName(self, "Save procedure log", file_types, ".txt", self.path)
         if new_name is not None:
-            with open(new_name, 'w') as outp:
+            with open(new_name, "w") as outp:
                 for t in self.reporting:
                     outp.write(t)
             self.exit_procedure()

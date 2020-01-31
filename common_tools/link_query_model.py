@@ -24,9 +24,10 @@ import qgis
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtCore import Qt
 
-    
+
 # Largely adapted from http://stackoverflow.com/questions/28033633/using-large-record-set-with-qtableview-and-qabstracttablemodel-retrieve-visib
-#Answer by Phil Cooper
+# Answer by Phil Cooper
+
 
 class LinkQueryModel(QAbstractTableModel):
     def __init__(self, narray, headerdata, parent=None, *args):
@@ -42,7 +43,7 @@ class LinkQueryModel(QAbstractTableModel):
 
     def data(self, index, role):
         if index.isValid():
-            if  role == Qt.DisplayRole:
+            if role == Qt.DisplayRole:
                 return str(self._array[index.row()][index.column()])
 
     def headerData(self, col, orientation, role=Qt.DisplayRole):
