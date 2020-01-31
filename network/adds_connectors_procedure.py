@@ -13,15 +13,18 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-07-30
- Updated:    21/12/2016
+ Updated:    30/01/2020
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
 
+from typing import List
 from qgis.core import *
 from qgis.PyQt.QtCore import *
 from ..common_tools.auxiliary_functions import *
+from sqlite3 import Connection as sqlc
+import qgis
 
 from ..common_tools.global_parameters import *
 from ..common_tools import WorkerThread
@@ -29,141 +32,148 @@ from ..common_tools import WorkerThread
 
 class AddsConnectorsProcedure(WorkerThread):
     def __init__(
-        self,
-        parentThread,
-        node_layer_name,
-        link_layer_name,
-        centroid_layer_name,
-        node_ids,
-        centroids_ids,
-        max_length,
-        max_connectors,
-        new_line_layer_name,
-        new_node_layer_name,
-        selection_only,
+            self,
+            parentThread,
+            project: str,
+            centroid_layer_name: str,
+            centroids_ids: str,
+            max_length: int,
+            max_connectors: int,
+            allowed_link_types: List[str],
     ):
         WorkerThread.__init__(self, parentThread)
-        self.link_layer_name = link_layer_name
-        self.node_layer_name = node_layer_name
+        self.conn = project
         self.centroid_layer_name = centroid_layer_name
-        self.node_ids = node_ids
         self.centroids_ids = centroids_ids
-        if max_length is None:
-            max_length = 1000000000000
         self.max_length = max_length
         self.max_connectors = max_connectors
-        self.new_line_layer_name = new_line_layer_name
-        self.new_node_layer_name = new_node_layer_name
-        self.selection_only = selection_only
+        self.allowed_link_types = allowed_link_types
         self.error = None
+        self.insert_qry = """INSERT INTO links (direction, modes, link_type, geometry) 
+                             VALUES({}, GeomFromText("{}", 4326))"""
 
     def doWork(self):
-        max_connectors = self.max_connectors
+        self.conn = qgis.utils.spatialite_connect(self.conn)
+        cursor = self.conn.cursor()
 
-        nodes = get_vector_layer_by_name(self.node_layer_name)
+        cursor.execute("select mode_id from modes;")
+        modes = cursor.fetchall()
+        modes = [x[0] for x in modes]
+
+        # TODO: Create a negative for the case only a few are selected to be excluded?
+        link_types = ''
+        if self.allowed_link_types:
+            link_types = ['links.link_type ="{}"'.format(x) for x in self.allowed_link_types]
+            link_types = ' AND ({}) '.format(' OR '.join(link_types))
+
+        # The missing pieces in this query are: centroid's longitude, centroid's latitude, selection of link
+        # types acceptable to have connectors linked AND the number of connectors we are interested in
+        sql = """SELECT distinct node_id, AsText(nodes.geometry), links.modes, GLength(makeline(nodes.geometry,  
+                 GeomFromText("Point ({long} {lat})", 4326)))
+                 as distance FROM nodes
+                 INNER JOIN links on links.a_node = nodes.node_id
+                 where nodes.ROWID in 
+                 (SELECT ROWID FROM SpatialIndex WHERE f_table_name = 'nodes' AND
+                      search_frame = Buffer(GeomFromText("Point ({long} {lat})", 4326), {circle}))
+                 {link_types}  
+                 UNION 
+                 SELECT distinct node_id, AsText(nodes.geometry), links.modes, GLength(makeline(nodes.geometry,  
+                 GeomFromText("Point ({long} {lat})", 4326)))
+                 as distance FROM nodes
+                 INNER JOIN links on links.b_node = nodes.node_id
+                 where nodes.ROWID in 
+                 (SELECT ROWID FROM SpatialIndex WHERE f_table_name = 'nodes' AND
+                       search_frame = Buffer(GeomFromText("Point ({long} {lat})", 4326), {circle}))
+                 {link_types}  
+                 ORDER BY distance
+                 limit {connectors}"""
+
+        missing_mode_sql = """SELECT distinct node_id, AsText(nodes.geometry), links.modes, 
+                              GLength(makeline(nodes.geometry, GeomFromText("Point ({long} {lat})", 4326)))
+                              as distance FROM nodes
+                              INNER JOIN links on links.a_node = nodes.node_id
+                              where nodes.ROWID in 
+                              (SELECT ROWID FROM SpatialIndex WHERE f_table_name = 'nodes' AND
+                                   search_frame = Buffer(GeomFromText("Point ({long} {lat})", 4326), {circle}))
+                              AND instr(modes, "{srch_mode}") > 0 
+                              {link_types}  
+                              UNION 
+                              SELECT distinct node_id, AsText(nodes.geometry), links.modes,
+                              GLength(makeline(nodes.geometry, GeomFromText("Point ({long} {lat})", 4326)))
+                              as distance FROM nodes
+                              INNER JOIN links on links.b_node = nodes.node_id
+                              where nodes.ROWID in 
+                              (SELECT ROWID FROM SpatialIndex WHERE f_table_name = 'nodes' AND
+                                    search_frame = Buffer(GeomFromText("Point ({long} {lat})", 4326), {circle}))
+                              AND instr(modes, "{srch_mode}") > 0 
+                              {link_types}  
+                              ORDER BY distance
+                              limit 1"""
+
+        node_sql = """update nodes set node_id={nodeid}, is_centroid=1
+                      where nodes.ROWID in
+                      (SELECT ROWID FROM SpatialIndex WHERE f_table_name = 'nodes' AND
+                      search_frame = GeomFromText("Point ({lon} {lat})", 4326))"""
+
         centroids = get_vector_layer_by_name(self.centroid_layer_name)
-        links = get_vector_layer_by_name(self.link_layer_name)
-
-        self.ProgressText.emit("Duplicating layers")
-        self.ProgressMaxValue.emit(2)
-        # We create the new line layer
-        new_line_layer = self.duplicate_layer(links, "LineString", self.new_line_layer_name)
-
-        # Create new node layer
-        self.ProgressValue.emit(1)
-        new_node_layer = self.duplicate_layer(nodes, "Point", self.new_node_layer_name)
 
         # Now we start to set the field for writing the new data
-        idx = nodes.dataProvider().fieldNameIndex(self.node_ids)
         idx2 = centroids.dataProvider().fieldNameIndex(self.centroids_ids)
-        anode = links.dataProvider().fieldNameIndex("A_NODE")
-        bnode = links.dataProvider().fieldNameIndex("B_NODE")
-        ids = []
 
-        if anode < 0 or bnode < 0:
-            self.error = "Line layer does not have A_Node and B_Node fields. Run network preparation first"
-            return None
-
-        # Create the spatial index with nodes
-        self.ProgressValue.emit(0)
-        self.ProgressText.emit("Creating Spatial Index")
-        index = QgsSpatialIndex()
-        MyFeatures = nodes.getFeatures()
-        featcount = nodes.featureCount()
-        if self.selection_only:
-            MyFeatures = nodes.selectedFeatures()
-            featcount = nodes.selectedFeatureCount()
-
-        self.ProgressMaxValue.emit(featcount)
-        P = 0
-        for feat in MyFeatures:
-            self.ProgressValue.emit(P)
-            a = index.insertFeature(feat)
-            i_d = feat.attributes()[idx]
-            if i_d in ids:
-                self.error = "ID " + str(i_d) + " is non unique in your selected field"
-                return None
-            if i_d < 0:
-                self.error = "Negative node ID in your selected field"
-                return None
-            ids.append(i_d)
-            P += 1
-
-        P = 0
-        added_centroids = []
-        added_nodes = []
         featcount = centroids.featureCount()
         self.ProgressMaxValue.emit(featcount)
         self.ProgressValue.emit(0)
         self.ProgressText.emit("Creating centroid connectors")
 
-        for feat in centroids.getFeatures():
-            P += 1
-            self.ProgressValue.emit(int(P))
-            nearest = index.nearestNeighbor(feat.geometry().asPoint(), max_connectors)
+        for counter, feat in enumerate(centroids.getFeatures()):
+            circle = 0.001
+            centroid_id = feat.attributes()[idx2]
+            self.ProgressValue.emit(int(counter))
 
-            lon1, lat1 = feat.geometry().asPoint()
-            found = 0
-            for i in range(max_connectors):
-                fid = nearest[i]
-                nfeat = nodes.getFeatures(QgsFeatureRequest(fid)).__next__()
-                lon2, lat2 = nfeat.geometry().asPoint()
-                dist = haversine(lon1, lat1, lon2, lat2)
-                if dist <= self.max_length:
-                    found += 1
-                    line = QgsGeometry.fromPolylineXY([feat.geometry().asPoint(), nfeat.geometry().asPoint()])
-                    seg = QgsFeature(links.fields())
-                    a = seg.setGeometry(line)
-                    a = seg.setAttribute(anode, feat.attributes()[idx2])
-                    a = seg.setAttribute(bnode, nfeat.attributes()[idx])
-                    a = added_centroids.append(seg)
-            if found > 0:
-                seg = QgsFeature(nodes.fields())
-                a = seg.setGeometry(feat.geometry())
-                a = seg.setAttribute(idx, feat.attributes()[idx2])
-                a = added_nodes.append(seg)
-        if len(added_centroids) > 0:
-            a = new_line_layer.dataProvider().addFeatures(added_centroids)
-            a = new_node_layer.dataProvider().addFeatures(added_nodes)
+            lon, lat = feat.geometry().asPoint()
 
-        self.ProgressText.emit("Saving new line layer")
-        new_line_layer.commitChanges()
-        self.new_node_layer = new_node_layer
+            avail_nodes = 0
+            attempts = 0
+            while avail_nodes < self.max_connectors:
+                qry = sql.format(long=lon, lat=lat, circle=circle, link_types=link_types,
+                                 connectors=self.max_connectors)
+                cursor.execute(qry)
+                nodes = cursor.fetchall()
+                node_ids = list(set([x[0] for x in nodes]))
+                avail_nodes = len(node_ids)
+                circle *= 2
+                attempts += 1
+                if attempts > 14:
+                    break
+            # Mode specific
+            modes_found = ''.join([x[2] for x in nodes])
+            missing_modes = [x for x in modes if x not in modes_found]
+            mode_specific = {}
+            if missing_modes:
+                for m in missing_modes:
+                    circle = 0.002
+                    for attempts in range(20):
+                        qry = missing_mode_sql.format(long=lon, lat=lat, circle=circle, link_types=link_types,
+                                                      srch_mode=m)
+                        cursor.execute(qry)
+                        x = cursor.fetchall()
+                        if x:
+                            mode_specific[m] = x[0]
+                            break
+                        circle *= 2
 
-        self.ProgressText.emit("Saving new node layer")
-        new_node_layer.commitChanges()
-        self.new_line_layer = new_line_layer
+            modes_for_nodes = {x[0]: '' for x in nodes}
+            for node in nodes:
+                modes_for_nodes[node[0]] += "".join(set(node[2]))
 
+            for i, node in enumerate(nodes):
+                geometry = "LINESTRING ({} {}, {})".format(lon, lat, node[1][6:-1])
+                attributes = ", ".join(['0', "'{}'".format(modes_for_nodes[node[0]]), "'connector'"])
+                qry = self.insert_qry.format(attributes, geometry)
+                cursor.execute(qry)
+                print(qry)
+                qry = node_sql.format(nodeid=centroid_id, lon=lon, lat=lat)
+                cursor.execute(qry)
+                print(qry)
+        self.conn.commit()
         self.ProgressText.emit("DONE")
-
-    def duplicate_layer(self, original_layer, layer_type, layer_name):
-        epsg_code = int(original_layer.crs().authid().split(":")[1])
-        feats = [feat for feat in original_layer.getFeatures()]
-        duplicate_layer = QgsVectorLayer(layer_type + "?crs=epsg:" + str(epsg_code), layer_name, "memory")
-        new_layer_data = duplicate_layer.dataProvider()
-        attr = original_layer.dataProvider().fields().toList()
-        new_layer_data.addAttributes(attr)
-        duplicate_layer.updateFields()
-        new_layer_data.addFeatures(feats)
-        del feats
-        return duplicate_layer

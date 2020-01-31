@@ -20,7 +20,7 @@ in any minimaly capable GIS (i.e. one that supports SpatiaLite layers) or even
 programatically.
 
 
-Network Import from OSM
+Create project from OSM
 ~~~~~~~~~~~~~~~~~~~~~~~
 However, its first feature is the capability of importing networks directly from
 `Open Street Maps <www.openstreetmap.org>`_ into AequilibraE's efficient TranspoNet
@@ -37,7 +37,7 @@ For this reason, I have ported some of Geoff's code into AequilibraE (modificati
 quite heavy, however), and was ultimately able to bring this feature to life.
 
 
-Network from layers
+Project from layers
 ~~~~~~~~~~~~~~~~~~~
 
 The AequilibraE project can also be bootstrapped from existing line and node layers obtained

@@ -21,7 +21,7 @@ the following:
 
 .. note::
    * If **direction = -1**, then we the link allows **BA flow only**
-   * If **direction = -1**, then we the link allows flows in **both directions**
+   * If **direction = 0**, then we the link allows flows in **both directions**
    * If **direction = 1**, then we the link allows **AB flow only**
 
 
@@ -37,7 +37,9 @@ the following:
     * "a_node"
     * "b_node"
     * "direction"
-    * "id"
+    * "modes"
+    * "link_type"
+
 
 
 Network preparation
@@ -96,23 +98,37 @@ If you prefer a video tutorial, you can access
 Adding Connectors
 -----------------
 
-Before we describe what this tool can do for you, let's just remember that there is a virtually unlimited number of
-things that can go awfully wrong when we edit netwokrs with automated procedures, and we highly recommend that you
-inspect the results of this tool **CAREFULLY**.
+New in version 0.6 of AequilibraE, centroid connectors can now only be added to
+`AequilibraE projects <http://www.aequilibrae.com/python/V.0.6.0/project.html>`_
+, and no longer generates new layers during the process.
 
-This tool is meant to be ran AFTER the network has been prepared, as it will augment the node layer with the centroids
-and create a new link network with the centroid connectors added.
+Before we describe what this tool can do for you, however, let's just remember
+that there is a virtually unlimited number of things that can go awfully wrong
+when we edit networks with automated procedures, and we highly recommend that
+you **BACKUP YOUR DATA** prior to running this procedure and that you inspect
+the results of this tool **CAREFULLY**.
 
+The **GUI** for this procedure is fairly straightforward, as shown below.
 
-**GUI**
-
-This is what i looks like
-
-.. image:: images/network_edit_adding_connectors.png
-    :width: 800
+.. image:: images/add_conectors_to_project.png
+    :width: 827
     :align: center
     :alt: Adding connectors
 
+One would notice that nowhere in the **GUI** one can indicate which modes they
+want to see the network connected for or how to control how many connectors per
+mode will be created.  Although it could be implemented, such a solution would
+be convoluted and there is probably no good reason to do so.
+
+Instead, we have chosen to develop the procedure with the following criteira:
+
+* All modes will be connected to links where those modes are allowed.
+* When considering number of connectors per centroid, there is no guarantee that
+  each and every mode will have that number of connectors. If a particular mode
+  only available rather far from the centroid, it is likely that a single
+  connector to that mode will be created for that centroid
+* When considering the maximum length of connectors, the **GUI** returns to the
+  user the list of centroids/modes that could not be connected.
 
 
 Creating TranspoNet

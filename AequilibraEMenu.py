@@ -347,6 +347,7 @@ class AequilibraEMenu:
 
         if dtype is not None:
             self.project = Project(path)
+            self.project.conn = qgis.utils.spatialite_connect(path)
 
             descr = QWidget()
             descrlayout = QVBoxLayout()
@@ -419,7 +420,7 @@ class AequilibraEMenu:
         # If we wanted modal, we would eliminate the dlg2.show()
 
     def run_add_connectors(self):
-        dlg2 = AddConnectorsDialog(self.iface)
+        dlg2 = AddConnectorsDialog(self.iface, self.project)
         dlg2.show()
         dlg2.exec_()
 
