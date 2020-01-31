@@ -573,7 +573,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     skims.append(only_str(table.item(i, 1).text()))
 
         if len(skims) == 0:
-            skims = False
+            skims = []
 
         self.graph.set_graph(
             cost_field=self.minimizing_field.currentText(),
