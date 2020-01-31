@@ -152,7 +152,7 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
                 link_id = feat.attributes()[idx]
                 self.link_features[link_id] = feat
         self.node_id = self.cb_data_field.currentText()
-
+        self.cb_link_id_field = self.cb_link_id_field.currentText()
         self.exit_procedure()
 
     def exit_procedure(self):
