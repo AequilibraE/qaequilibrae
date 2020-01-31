@@ -143,44 +143,47 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.res.path is not None:
                 # If you want to do selections instead of new layers
                 if self.rdo_selection.isChecked():
-                    f = self.cb_link_id_field
-                    t = ''
-                    for k in self.res.path[:-1]:
-                        t = t + f + "=" + str(k) + ' or '
-                    t = t + f + "=" + str(self.res.path[-1])
+                    self.create_path_with_selection()
 
-                    self.line_layer.selectByExpression(t)
                 # If you want to create new layers
                 else:
-                    crs = self.line_layer.dataProvider().crs().authid()
-                    vl = QgsVectorLayer("LineString?crs={}".format(crs), self.path_from.text() +
-                                        " to " + self.path_to.text(), "memory")
-                    pr = vl.dataProvider()
-
-                    # add fields
-                    pr.addAttributes(self.line_layer.dataProvider().fields())
-                    vl.updateFields()  # tell the vector layer to fetch changes from the provider
-
-                    # add a feature
-                    all_links = []
-                    for k in self.res.path:
-                        fet = self.link_features[k]
-                        all_links.append(fet)
-
-                    # add all links to the temp layer
-                    pr.addFeatures(all_links)
-
-                    # add layer to the map
-                    QgsProject.instance().addMapLayer(vl)
-
-                    symbol = vl.renderer().symbol()
-                    symbol.setWidth(1)
-                    qgis.utils.iface.mapCanvas().refresh()
+                    self.create_path_with_scratch_layer()
 
             else:
                 qgis.utils.iface.messageBar().pushMessage(
                     "No path between " + self.path_from.text() + " and " + self.path_to.text(), "", level=3
                 )
+
+    def create_path_with_selection(self):
+        f = self.cb_link_id_field
+        t = " or ".join([f"{f}={k}" for k in self.res.path])
+        self.line_layer.selectByExpression(t)
+
+    def create_path_with_scratch_layer(self):
+        crs = self.line_layer.dataProvider().crs().authid()
+        vl = QgsVectorLayer("LineString?crs={}".format(crs), self.path_from.text() +
+                            " to " + self.path_to.text(), "memory")
+        pr = vl.dataProvider()
+
+        # add fields
+        pr.addAttributes(self.line_layer.dataProvider().fields())
+        vl.updateFields()  # tell the vector layer to fetch changes from the provider
+
+        # add a feature
+        all_links = []
+        for k in self.res.path:
+            fet = self.link_features[k]
+            all_links.append(fet)
+
+        # add all links to the temp layer
+        pr.addFeatures(all_links)
+
+        # add layer to the map
+        QgsProject.instance().addMapLayer(vl)
+
+        symbol = vl.renderer().symbol()
+        symbol.setWidth(1)
+        qgis.utils.iface.mapCanvas().refresh()
 
     def exit_procedure(self):
         self.close()
