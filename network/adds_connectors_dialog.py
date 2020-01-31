@@ -223,7 +223,8 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
     def job_finished_from_thread(self, success):
         self.but_process.setEnabled(True)
         if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error during procedure: ", self.worker_thread.error, level=3)
+            qgis.utils.iface.messageBar().pushMessage("Error during procedure: ", self.worker_thread.error,
+                                                      level=Qgis.Warning, duration=6)
         self.exit_procedure()
 
     def run(self):

@@ -25,6 +25,7 @@ from qgis.PyQt.QtCore import *
 from ..common_tools.auxiliary_functions import *
 from sqlite3 import Connection as sqlc
 import qgis
+import numpy as np
 
 from ..common_tools.global_parameters import *
 from ..common_tools import WorkerThread
@@ -55,6 +56,40 @@ class AddsConnectorsProcedure(WorkerThread):
     def doWork(self):
         self.conn = qgis.utils.spatialite_connect(self.conn)
         cursor = self.conn.cursor()
+
+        # Checking with the centroid IDs overlap with Node IDs
+        self.ProgressText.emit("Checking uniqueness of IDs")
+        cursor.execute('SELECT node_id from nodes')
+        node_ids = cursor.fetchall()
+        node_ids = np.array(node_ids)
+        node_ids=node_ids[:,0]
+        centroids = get_vector_layer_by_name(self.centroid_layer_name)
+
+        # Now we start to set the field for writing the new data
+        idx2 = centroids.dataProvider().fieldNameIndex(self.centroids_ids)
+
+        featcount = centroids.featureCount()
+        self.ProgressMaxValue.emit(featcount)
+        self.ProgressValue.emit(0)
+
+        centroid_list = []
+        for counter, feat in enumerate(centroids.getFeatures()):
+            centroid_id = feat.attributes()[idx2]
+            self.ProgressValue.emit(int(counter))
+            centroid_list.append(centroid_id)
+        centroid_list = np.array(centroid_list)
+
+        if centroid_list.shape[0] > np.unique(centroid_list).shape[0]:
+            self.error = 'Centroid IDs are not unique'
+            self.ProgressText.emit("DONE")
+            return
+
+        intersect = np.intersect1d(centroid_list, node_ids)
+
+        if intersect.shape[0] > 0:
+            self.error = 'Centroid IDs overlap node IDs'
+            self.ProgressText.emit("DONE")
+            return
 
         cursor.execute("select mode_id from modes;")
         modes = cursor.fetchall()
@@ -115,13 +150,6 @@ class AddsConnectorsProcedure(WorkerThread):
                       (SELECT ROWID FROM SpatialIndex WHERE f_table_name = 'nodes' AND
                       search_frame = GeomFromText("Point ({lon} {lat})", 4326))"""
 
-        centroids = get_vector_layer_by_name(self.centroid_layer_name)
-
-        # Now we start to set the field for writing the new data
-        idx2 = centroids.dataProvider().fieldNameIndex(self.centroids_ids)
-
-        featcount = centroids.featureCount()
-        self.ProgressMaxValue.emit(featcount)
         self.ProgressValue.emit(0)
         self.ProgressText.emit("Creating centroid connectors")
 
