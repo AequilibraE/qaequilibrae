@@ -81,7 +81,6 @@ from aequilibrae.project import Project
 if not no_binary:
     from .gis import DesireLinesDialog
     from .project_procedures import CreatesTranspoNetDialog
-    from .paths_procedures import GraphCreationDialog
     from .paths_procedures import TrafficAssignmentDialog
     from .paths_procedures import ShortestPathDialog
     from .paths_procedures import ImpedanceMatrixDialog
@@ -202,9 +201,6 @@ class AequilibraEMenu:
         # # ########################################################################
         # # ###################  PATH COMPUTATION SUB-MENU   #######################
         pathMenu = QMenu()
-        self.graph_creation_action = QAction(self.trlt('Create graph'), self.manager)
-        self.graph_creation_action.triggered.connect(self.run_create_graph)
-        pathMenu.addAction(self.graph_creation_action)
 
         self.shortest_path_action = QAction(self.trlt('Shortest path'), self.manager)
         self.shortest_path_action.triggered.connect(self.run_shortest_path)
@@ -348,7 +344,7 @@ class AequilibraEMenu:
         if dtype is not None:
             self.project = Project(path)
             self.project.conn = qgis.utils.spatialite_connect(path)
-
+            self.project.network.conn = self.project.conn
             descr = QWidget()
             descrlayout = QVBoxLayout()
             # We create a tab with the main description of the project
@@ -424,14 +420,6 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    def run_create_graph(self):
-        if no_binary:
-            self.message_binary()
-        else:
-            dlg2 = GraphCreationDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
-
     def run_calibrate_gravity(self):
         dlg2 = DistributionModelsDialog(self.iface, "calibrate")
         dlg2.show()
@@ -451,9 +439,12 @@ class AequilibraEMenu:
         if no_binary:
             self.message_binary()
         else:
-            dlg2 = ShortestPathDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
+            if self.project is None:
+                self.show_message_no_project()
+            else:
+                dlg2 = ShortestPathDialog(self.iface, self.project)
+                dlg2.show()
+                dlg2.exec_()
 
     def run_dist_matrix(self):
         if no_binary:
@@ -518,3 +509,6 @@ class AequilibraEMenu:
         qgis.utils.iface.messageBar().pushMessage(
             "Binary Error: ", "Please download it from the repository using the downloader from the menu", level=3
         )
+
+    def show_message_no_project(self):
+        self.iface.messageBar().pushMessage("Error", "You need to load a project first", level=3, duration=10)
