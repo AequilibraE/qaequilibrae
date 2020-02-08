@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    2018-08-08
+ Updated:    2020-02-08
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -450,9 +450,12 @@ class AequilibraEMenu:
         if no_binary:
             self.message_binary()
         else:
-            dlg2 = ImpedanceMatrixDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
+            if self.project is None:
+                self.show_message_no_project()
+            else:
+                dlg2 = ImpedanceMatrixDialog(self.iface, self.project)
+                dlg2.show()
+                dlg2.exec_()
 
     def run_traffic_assig(self):
         if no_binary:
