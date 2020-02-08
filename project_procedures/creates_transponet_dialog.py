@@ -32,6 +32,8 @@ from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
 from .creates_transponet_procedure import CreatesTranspoNetProcedure
+from aequilibrae.project.network.network import Network
+from aequilibrae import Parameters
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_transponet_construction.ui"))
@@ -46,28 +48,9 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.missing_data = -1
         self.path = standard_path()
 
-        self.required_fields_links = [
-            "link_id",
-            "a_node",
-            "b_node",
-            "direction",
-            "length",
-            "capacity_ab",
-            "capacity_ba",
-            "speed_ab",
-            "speed_ba",
-        ]
+        self.required_fields_links = Network.req_link_flds
 
-        self.initializable_links = {
-            "direction": 0,
-            "capacity_ab": self.missing_data,
-            "capacity_ba": self.missing_data,
-            "speed_ab": self.missing_data,
-            "speed_ba": self.missing_data,
-        }
-        self.initializable_nodes = {}
-
-        self.required_fields_nodes = ["node_id"]
+        self.required_fields_nodes = Network.req_node_flds
 
         self.link_layer = False
         self.node_layer = False
@@ -162,6 +145,11 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def __find_layer_changed(self, layer_type):
         layer_fields = None
+        p = Parameters()
+
+        def fkey(f):
+            return list(f.keys())[0]
+
         if layer_type == "nodes":
             table = self.table_available_node_field
             final_table = self.table_node_fields
@@ -171,13 +159,33 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
             required_fields = self.required_fields_nodes
             if self.node_layer:
                 layer_fields = self.node_layer.fields()
+                layer_fields = [f for f in layer_fields if f.name().lower() not in Network.protected_fields]
+
+            flds = p.parameters["network"]["nodes"]["fields"]
+            ndflds = [f"{fkey(f)}" for f in flds if fkey(f).lower() not in Network.req_node_flds]
+            required_fields.extend(ndflds)
+
         if layer_type == "links":
             table = self.table_available_link_fields
             final_table = self.table_link_fields
             self.link_layer = get_vector_layer_by_name(self.link_layers_list.currentText())
             required_fields = self.required_fields_links
+
+            fields = p.parameters["network"]["links"]["fields"]
+            flds = fields["one-way"]
+
+            owlf = [f"{fkey(f)}" for f in flds if fkey(f).lower() not in Network.req_link_flds]
+
+            flds = fields["two-way"]
+            twlf = []
+            for f in flds:
+                twlf.extend([f"{fkey(f)}_ab", f"{fkey(f)}_ba"])
+
+            required_fields = required_fields + owlf + twlf
+
             if self.link_layer:
-                layer_fields = self.link_layer.dataProvider().fields()
+                layer_fields = self.link_layer.fields()
+                layer_fields = [f for f in layer_fields if f.name().lower() not in Network.protected_fields]
 
         return layer_fields, table, final_table, required_fields
 
@@ -204,9 +212,9 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
 
             counter = 0
             if layer_type == "links":
-                init_fields = list(self.initializable_links.keys())
+                init_fields = [x for x in required_fields if x not in Network.req_link_flds]
             else:
-                init_fields = list(self.initializable_nodes.keys())
+                init_fields = [x for x in required_fields if x not in Network.req_node_flds]
 
             for rf in required_fields:
                 final_table.setRowCount(counter + 1)
@@ -265,12 +273,8 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
             self.output_file,
             self.node_layer,
             self.node_fields,
-            self.required_fields_nodes,
-            self.initializable_nodes,
             self.link_layer,
             self.link_fields,
-            self.required_fields_links,
-            self.initializable_links,
         ]
 
         self.but_create_network_file.setVisible(False)

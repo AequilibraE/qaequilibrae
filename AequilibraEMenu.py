@@ -76,7 +76,7 @@ try:
 except ImportError:
     no_binary = True
 
-from .aequilibrae.aequilibrae.project import Project
+from aequilibrae.project import Project
 
 if not no_binary:
     from .gis import DesireLinesDialog

@@ -26,22 +26,19 @@ from qgis.PyQt.QtCore import *
 from ..common_tools.auxiliary_functions import *
 from ..common_tools.global_parameters import *
 from ..common_tools import WorkerThread
-from aequilibrae.reference_files import spatialite_database
+from aequilibrae.project import Project
+from aequilibrae import logger
 
 
 class CreatesTranspoNetProcedure(WorkerThread):
     def __init__(
-        self,
-        parentThread,
-        output_file,
-        node_layer,
-        node_fields,
-        required_fields_nodes,
-        initializable_nodes,
-        link_layer,
-        link_fields,
-        required_fields_links,
-        initializable_links,
+            self,
+            parentThread,
+            output_file,
+            node_layer,
+            node_fields,
+            link_layer,
+            link_fields,
     ):
         WorkerThread.__init__(self, parentThread)
 
@@ -49,55 +46,47 @@ class CreatesTranspoNetProcedure(WorkerThread):
         self.node_fields = node_fields
         self.link_fields = link_fields
         self.node_layer = node_layer
-        self.required_fields_nodes = required_fields_nodes
         self.link_layer = link_layer
-        self.required_fields_links = required_fields_links
-        self.initializable_links = initializable_links
-        self.initializable_nodes = initializable_nodes
         self.report = []
+        self.project: Project
 
     def doWork(self):
-        self.emit_messages(message="Sit tight. Initializing Spatialite layer set", value=0, max_val=1)
+        self.emit_messages(message="Initializing project", value=0, max_val=1)
+        self.project = Project(self.output_file, True)
+        self.project.conn.close()
+        self.project.conn = qgis.utils.spatialite_connect(self.output_file)
+        self.project.network.conn = self.project.conn
+        self.project.network.create_empty_tables()
 
-        copyfile(spatialite_database, self.output_file)
-        self.run_series_of_queries(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), "queries_for_empty_file.sql")
-        )
+        # Add the required extra fields to the link layer
+        self.emit_messages(message="Adding extra network data fields to database", value=0, max_val=1)
+        self.additional_fields_to_layers('links', self.link_layer, self.link_fields)
+        self.additional_fields_to_layers('nodes', self.node_layer, self.node_fields)
 
         conn = qgis.utils.spatialite_connect(self.output_file)
 
-        self.emit_messages(message="Adding non-mandatory link fields", value=0, max_val=1)
-
-        link_string_fields = self.additional_fields_to_layers(
-            conn, "links", self.link_layer, self.link_fields, self.required_fields_links
-        )
-
-        self.emit_messages(message="Adding non-mandatory node fields", value=0, max_val=1)
-        node_string_fields = self.additional_fields_to_layers(
-            conn, "nodes", self.node_layer, self.node_fields, self.required_fields_nodes
-        )
-
-        self.transfer_layer_features(
-            conn, "links", self.link_layer, self.link_fields, link_string_fields, self.initializable_links
-        )
-
-        self.transfer_layer_features(
-            conn, "nodes", self.node_layer, self.node_fields, node_string_fields, self.initializable_nodes
-        )
+        self.transfer_layer_features("links", self.link_layer, self.link_fields)
+        self.transfer_layer_features("nodes", self.node_layer, self.node_fields)
 
         self.emit_messages(message="Creating layer triggers", value=0, max_val=1)
-        # DONE
-        self.run_series_of_queries(os.path.join(os.path.dirname(os.path.abspath(__file__)), "triggers.sql"))
-
+        self.project.network.add_triggers()
+        self.emit_messages(message="Spatial indices", value=0, max_val=1)
+        self.project.network.add_spatial_index()
         self.ProgressText.emit("DONE")
 
     # Adds the non-standard fields to a layer
-    def additional_fields_to_layers(self, conn, table, layer, layer_fields, required_fields):
-        curr = conn.cursor()
+    def additional_fields_to_layers(self, table, layer, layer_fields):
+        curr = self.project.conn.cursor()
         fields = layer.dataProvider().fields()
         string_fields = []
 
-        for f in set(layer_fields.keys()) - set(required_fields):
+        curr.execute(f'PRAGMA table_info({table});')
+        field_names = curr.fetchall()
+        existing_fields = [f[1].lower() for f in field_names]
+
+        for f in set(layer_fields.keys()):
+            if f in existing_fields:
+                continue
             field = fields[layer_fields[f]]
             field_length = field.length()
             if not field.isNumeric():
@@ -111,48 +100,57 @@ class CreatesTranspoNetProcedure(WorkerThread):
             try:
                 sql = "alter table " + table + " add column " + f + " " + field_type + "(" + str(field_length) + ")"
                 curr.execute(sql)
-                conn.commit()
+                self.project.conn.commit()
             except:
+                logger.error(sql)
                 self.report.append("field " + str(f) + " could not be added")
         curr.close()
         return string_fields
 
-    def transfer_layer_features(self, conn, table, layer, layer_fields, string_fields, initializable_fields):
-        self.emit_messages(
-            message="Transferring features from " + table + "' layer", value=0, max_val=layer.featureCount()
-        )
-        curr = conn.cursor()
+    def transfer_layer_features(self, table, layer, layer_fields):
+        self.emit_messages(message=f"Transferring features from {table} layer", value=0, max_val=layer.featureCount())
+        curr = self.project.conn.cursor()
 
-        # We add the Nodes layer
-        field_titles = ", ".join(layer_fields.keys())
+        field_titles = ", ".join(list(layer_fields.keys()))
+        all_modes = set()
         for j, f in enumerate(layer.getFeatures()):
             self.emit_messages(value=j)
-            attributes = []
+            attrs = []
             for k, val in layer_fields.items():
                 if val < 0:
-                    attributes.append(str(initializable_fields[k]))
+                    attrs.append("NULL")
                 else:
-                    if k in string_fields:
-                        attributes.append('"' + self.convert_data(f.attributes()[val]) + '"')
+                    attr_val = self.convert_data(f.attributes()[val])
+                    if not str(attr_val).isnumeric():
+                        attrs.append(f'"{attr_val}"')
                     else:
-                        attributes.append(self.convert_data(f.attributes()[val]))
+                        attrs.append(attr_val)
 
-            attributes = ", ".join(attributes)
-            sql = "INSERT INTO " + table + " (" + field_titles + ", geometry) "
-            sql += "VALUES (" + attributes + ", "
-            sql += (
-                "GeomFromText('" + f.geometry().asWkt().upper() + "', " + str(layer.crs().authid().split(":")[1]) + "))"
-            )
+            attrs = ", ".join(attrs)
+            geom = f.geometry().asWkt().upper()
+            crs = str(layer.crs().authid().split(":")[1])
 
+            sql = f"INSERT INTO {table} ({field_titles} , geometry)  VALUES ({attrs} , GeomFromText('{geom}', {crs}))"
+
+            if table == 'links':
+                all_modes.update(list(f.attributes()[layer_fields['modes']]))
             try:
-                a = curr.execute(sql)
+                curr.execute(sql)
             except:
                 if f.id():
                     msg = "feature with id " + str(f.id()) + " could not be added to layer " + table
                 else:
                     msg = "feature with no node id present. It could not be added to layer " + table
                 self.report.append(msg)
-        conn.commit()
+
+        # We check if all modes exist
+        a = self.project.network.modes()
+        for x in all_modes:
+            if x not in a:
+                par = [f'"automatic_{x}"', f'"{x}"', '"Mode automatically added during project creation from layers"']
+                curr.execute(f'INSERT INTO "modes" (mode_name, mode_id, description) VALUES({",".join(par)})')
+                logger.info(f'New mode inserted during project creation {x}')
+        self.project.conn.commit()
         curr.close()
 
     def convert_data(self, value):
@@ -168,30 +166,3 @@ class CreatesTranspoNetProcedure(WorkerThread):
             self.ProgressValue.emit(value)
         if max_val >= 0:
             self.ProgressMaxValue.emit(max_val)
-
-    def run_series_of_queries(self, queries):
-
-        conn = qgis.utils.spatialite_connect(self.output_file)
-        curr = conn.cursor()
-        # Reads all commands
-        sql_file = open(queries, "r")
-        query_list = sql_file.read()
-        sql_file.close()
-        # Split individual commands
-        sql_commands_list = query_list.split("#")
-        # Run one query/command at a time
-        for cmd in sql_commands_list:
-            try:
-                curr.execute(self.sql_special_cases(cmd))
-            except:
-                self.report.append("query error: " + cmd)
-        conn.commit()
-        conn.close()
-
-    def sql_special_cases(self, cmd):
-        if "DEFAULT_CRS" in cmd:
-            if "links" in cmd:
-                cmd = cmd.replace("DEFAULT_CRS", str(self.link_layer.crs().authid().split(":")[1]))
-            else:
-                cmd = cmd.replace("DEFAULT_CRS", str(self.node_layer.crs().authid().split(":")[1]))
-        return cmd
