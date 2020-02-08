@@ -28,7 +28,7 @@ from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtWidgets import *
 from qgis.core import *
 from qgis.utils import iface
-
+from aequilibrae.project import Project
 from .point_tool import PointTool
 from ..common_tools.auxiliary_functions import *
 
@@ -40,7 +40,6 @@ except:
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
-# sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_compute_path.ui"))
 
 from ..common_tools import LoadGraphLayerSettingDialog
@@ -49,16 +48,17 @@ from ..common_tools import LoadGraphLayerSettingDialog
 class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
     clickTool = PointTool(iface.mapCanvas())
 
-    def __init__(self, iface):
+    def __init__(self, iface, project: Project):
         # QtWidgets.QDialog.__init__(self)
-        QtWidgets.QDialog.__init__(self, None, Qt.WindowStaysOnTopHint)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
+        self.project = project
         self.setupUi(self)
         self.field_types = {}
         self.centroids = None
         self.node_layer = None
         self.line_layer = None
-        self.node_keys = None
+        self.node_keys = {}
         self.node_fields = None
         self.index = None
         self.matrix = None
@@ -69,27 +69,53 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.link_features = None
 
         self.do_dist_matrix.setEnabled(False)
+        self.from_but.setEnabled(False)
+        self.to_but.setEnabled(False)
         self.load_graph_from_file.clicked.connect(self.prepare_graph_and_network)
         self.from_but.clicked.connect(self.search_for_point_from)
         self.to_but.clicked.connect(self.search_for_point_to)
         self.do_dist_matrix.clicked.connect(self.produces_path)
 
     def prepare_graph_and_network(self):
-        dlg2 = LoadGraphLayerSettingDialog(self.iface)
+        self.do_dist_matrix.setText('Loading data')
+        self.from_but.setEnabled(False)
+        self.to_but.setEnabled(False)
+        dlg2 = LoadGraphLayerSettingDialog(self.iface, self.project)
         dlg2.show()
         dlg2.exec_()
-        if dlg2.error is None and dlg2.graph_ok:
-            self.link_features = dlg2.link_features
-            self.line_layer = dlg2.line_layer
+        if len(dlg2.error) < 1:
+            self.mode = dlg2.mode
+            self.line_layer = get_vector_layer_by_name(dlg2.link_layer)
             self.node_layer = dlg2.node_layer
-            self.node_keys = dlg2.node_keys
-            self.node_id = dlg2.node_id
-            self.node_fields = dlg2.node_fields
-            self.index = dlg2.index
-            self.graph = dlg2.graph
-            self.cb_link_id_field = dlg2.cb_link_id_field
+            self.minimize_field = dlg2.minimize_field
+
+            if not self.mode in self.project.network.graphs:
+                self.project.network.build_graphs()
+
+            self.graph = self.project.network.graphs[self.mode]
+            self.graph.set_graph(self.minimize_field)
+            self.graph.set_skimming(self.minimize_field)
+            self.graph.set_blocked_centroid_flows(dlg2.block_connector)
             self.res.prepare(self.graph)
+
+            layer = get_vector_layer_by_name(self.node_layer)
+            self.node_fields = [field.name() for field in layer.dataProvider().fields().toList()]
+            self.index = QgsSpatialIndex()
+            self.node_layer = layer
+            for feature in layer.getFeatures():
+                self.index.addFeature(feature)
+                self.node_keys[feature.id()] = feature.attributes()
+
+            idx = self.line_layer.dataProvider().fieldNameIndex('link_id')
+            self.link_features = {}
+            for feat in self.line_layer.getFeatures():
+                link_id = feat.attributes()[idx]
+                self.link_features[link_id] = feat
+
+            self.do_dist_matrix.setText('Display')
             self.do_dist_matrix.setEnabled(True)
+            self.from_but.setEnabled(True)
+            self.to_but.setEnabled(True)
 
     def clear_memory_layer(self):
         self.link_features = None
@@ -128,7 +154,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             self.clickTool = PointTool(self.iface.mapCanvas())
             node_id = self.node_keys[nearest[0]]
 
-            index_field = self.node_fields.index(self.node_id)
+            index_field = self.node_fields.index('node_id')
             node_actual_id = node_id[index_field]
             return node_actual_id
         except:
@@ -155,7 +181,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                 )
 
     def create_path_with_selection(self):
-        f = self.cb_link_id_field
+        f = 'link_id'
         t = " or ".join([f"{f}={k}" for k in self.res.path])
         self.line_layer.selectByExpression(t)
 
