@@ -36,13 +36,11 @@ from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.report_dialog import ReportDialog
 from .load_matrix_class import LoadMatrix, MatrixReblocking
-from aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
 import aequilibrae
 
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None
-if has_omx:
-    import openmatrix as omx
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_loader.ui"))
 
@@ -221,21 +219,28 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                     # compression not implemented yet
                 self.exit_procedure()
 
+    def __create_appropriate_name(self, nm: str) -> str:
+        nm = nm.replace(" ", "_")
+        if len(nm) > CORE_NAME_MAX_LENGTH - 3:
+            nm = nm[:47]
+
+        return nm
+
     def load_the_matrix(self):
         self.error = None
         self.worker_thread = None
         if self.radio_layer_matrix.isChecked():
             if (
-                self.field_from.currentIndex() < 0
-                or self.field_from.currentIndex() < 0
-                or self.field_cells.currentIndex() < 0
+                    self.field_from.currentIndex() < 0
+                    or self.field_from.currentIndex() < 0
+                    or self.field_cells.currentIndex() < 0
             ):
                 self.error = "Invalid field chosen"
 
             if self.error is None:
                 self.compressed.setVisible(False)
                 self.progress_label.setVisible(True)
-                self.__current_name = self.field_cells.currentText().lower().replace(" ", "_")
+                self.__current_name = self.__create_appropriate_name(self.field_cells.currentText().lower())
                 idx1 = self.layer.dataProvider().fieldNameIndex(self.field_from.currentText())
                 idx2 = self.layer.dataProvider().fieldNameIndex(self.field_to.currentText())
                 idx3 = self.layer.dataProvider().fieldNameIndex(self.field_cells.currentText())

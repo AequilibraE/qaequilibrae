@@ -18,6 +18,7 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
+import sys
 import logging
 import numpy as np
 import importlib.util as iutil
@@ -43,7 +44,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-
+        self.data_to_show = None
         self.error = None
 
         formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)"]
@@ -58,12 +59,15 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             standard_path(),
         )
 
-        if self.data_type is None:
-            self.error = "Path provided is not a valid dataset"
-            self.exit_with_error()
-        else:
+        if self.data_type is not None:
             self.data_type = self.data_type.upper()
+            self.continue_with_data()
 
+        self.error = "Path provided is not a valid dataset"
+        self.exit_with_error()
+
+
+    def continue_with_data(self):
         if self.data_type in ["AED", "AEM"]:
             if self.data_type == "AED":
                 self.data_to_show = AequilibraeData()
@@ -157,28 +161,13 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self._layout.addItem(self.but_layout)
 
-        # We chose to use QTableView. However, if we want to allow the user to edit the dataset
-        # The we need to allow them to switch to the slower QTableWidget
-        # Code below
-
-        # self.table = QTableWidget(self.data_to_show.entries, self.data_to_show.num_fields)
-        # self.table.setHorizontalHeaderLabels(self.data_to_show.fields)
-        # self.table.setObjectName('data_viewer')
-        #
-        # self.table.setVerticalHeaderLabels([str(x) for x in self.data_to_show.index[:]])
-        # self.table.clearContents()
-        #
-        # for i in range(self.data_to_show.entries):
-        #     for j, f in enumerate(self.data_to_show.fields):
-        #         item1 = QTableWidgetItem(str(self.data_to_show.data[f][i]))
-        #         item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-        #         self.table.setItem(i, j, item1)
-
         self.resize(700, 500)
         self.setLayout(self._layout)
         self.format_showing()
 
     def format_showing(self):
+        if self.data_to_show is None:
+            return
         decimals = self.decimals.value()
         separator = self.thousand_separator.isChecked()
         if isinstance(self.data_to_show, AequilibraeMatrix):
@@ -209,7 +198,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def exit_with_error(self):
         qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
-        self.exit_procedure()
+        self.close()
 
     def exit_procedure(self):
+        self.show()
         self.close()
+        sys.exit(app.exec_())

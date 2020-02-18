@@ -167,8 +167,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         cost_field = self.cb_minimizing.currentText()
 
         mode = self.all_modes[self.cb_modes.currentText()]
-        if not mode in self.project.network.graphs:
-            self.project.network.build_graphs()
+        self.project.network.build_graphs()
         self.graph = self.project.network.graphs[mode]
 
         # We prepare the graph to set all nodes as centroids

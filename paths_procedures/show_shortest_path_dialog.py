@@ -83,7 +83,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2 = LoadGraphLayerSettingDialog(self.iface, self.project)
         dlg2.show()
         dlg2.exec_()
-        if len(dlg2.error) < 1:
+        if len(dlg2.error) < 1 and len(dlg2.mode) > 0:
             self.mode = dlg2.mode
             self.line_layer = get_vector_layer_by_name(dlg2.link_layer)
             self.node_layer = dlg2.node_layer
