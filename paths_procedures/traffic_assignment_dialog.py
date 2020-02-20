@@ -335,8 +335,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run_thread(self):
         self.worker_thread.assignment.connect(self.signal_handler)
-        self.worker_thread.equilibration.connect(self.equilibration_signal_handler)
-        # QObject.connect(self.worker_thread, SIGNAL("assignment"), self.signal_handler)
+        if self.cb_choose_algorithm.currentText() != 'all-or-nothing':
+            self.worker_thread.equilibration.connect(self.equilibration_signal_handler)
         self.worker_thread.start()
         self.exec_()
 
@@ -362,11 +362,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             # try:
             if True:
                 if algorithm == 'all-or-nothing':
-                    cls = self.traffic_classes[list(self.traffic_classes.keys())[0]]
-                    g = cls.graph
-                    mat = cls.matrix
-                    self.results = cls.results
-                    self.worker_thread = allOrNothing(self.matrix, self.graph, self.results)
+                    cls = [x for x in self.traffic_classes.values() if x is not None][0]
+                    self.worker_thread = allOrNothing(cls.matrix, cls.graph, cls.results)
                 else:
                     self.assignment.set_classes([x for x in self.traffic_classes.values() if x is not None])
                     self.assignment.set_vdf(self.cob_vdf.currentText())
@@ -409,6 +406,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             self.progress_label0.setText(val[1])
         elif val[0] == "finished_threaded_procedure":
             self.progressbar0.setValue(0)
+            if self.cb_choose_algorithm.currentText() == 'all-or-nothing':
+                self.job_finished_from_thread()
 
     def equilibration_signal_handler(self, val):
         if val[0] == "iterations":
@@ -420,6 +419,18 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
     # Save link flows to disk
     def produce_all_outputs(self):
+        fn = os.path.join(self.output_path, "skims.aem")
+
+        if self.cb_choose_algorithm.currentText() == 'all-or-nothing':
+            cls = [x for x in self.traffic_classes.values() if x is not None][0]
+            cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.csv"), output="loads")
+            cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.aed"), output="loads")
+            if has_omx:
+                cls.results.skims.export(os.path.join(self.output_path, "skims.omx"))
+            else:
+                cls.results.skims.export(fn)
+            return
+
         table = self.skim_list_table
         skim_names = []
         for i in range(table.rowCount()):
@@ -432,10 +443,12 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             if blended:
                 skim_names.append(f'{field}_{mode}_blended')
 
+        for cls in self.assignment.classes:
+            cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.csv"), output="loads")
+            cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.aed"), output="loads")
+
         # cls.results.skims.export(os.path.join(self.output_path, f'blended_skims_{cls.graph.mode}.aed'))
         if skim_names:
-            fn = os.path.join(self.output_path, "skims.aem")
-
             args = {'file_name': fn,
                     'zones': self.project.network.count_centroids(),
                     'matrix_names': skim_names}
@@ -464,11 +477,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 skims.close()
                 del skims
                 os.unlink(fn)
-
-        for cls in self.assignment.classes:
-            print(f'saving {cls.graph.mode}')
-            cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.csv"), output="loads")
-            cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.aed"), output="loads")
 
     def click_button_inside_the_list(self, purpose):
         if purpose == "select link":
