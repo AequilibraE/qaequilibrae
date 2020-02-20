@@ -37,6 +37,8 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 # Checks if we can display OMX
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None
+if has_omx:
+    import openmatrix as omx
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -59,13 +61,12 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             standard_path(),
         )
 
-        if self.data_type is not None:
+        if self.data_type is None:
+            self.error = "Path provided is not a valid dataset"
+            self.exit_with_error()
+        else:
             self.data_type = self.data_type.upper()
             self.continue_with_data()
-
-        self.error = "Path provided is not a valid dataset"
-        self.exit_with_error()
-
 
     def continue_with_data(self):
         if self.data_type in ["AED", "AEM"]:

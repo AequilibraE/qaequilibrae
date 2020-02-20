@@ -55,116 +55,94 @@
        <height>131</height>
       </size>
      </property>
-     <widget class="QComboBox" name="field_cells">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>100</y>
-        <width>261</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="maxVisibleItems">
-       <number>10</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lbl_flow">
-      <property name="geometry">
-       <rect>
-        <x>11</x>
-        <y>104</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Flow</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lbl_from">
-      <property name="geometry">
-       <rect>
-        <x>11</x>
-        <y>42</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>From</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lbl_matrix">
-      <property name="geometry">
-       <rect>
-        <x>11</x>
-        <y>11</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Matrix core</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="field_from">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>38</y>
-        <width>261</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="maxVisibleItems">
-       <number>10</number>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="field_to">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>69</y>
-        <width>261</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="maxVisibleItems">
-       <number>10</number>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="matrix_layer">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>7</y>
-        <width>261</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="maxVisibleItems">
-       <number>10</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lbl_to">
-      <property name="geometry">
-       <rect>
-        <x>11</x>
-        <y>73</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>To</string>
-      </property>
-     </widget>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbl_matrix">
+        <property name="text">
+         <string>Matrix core</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="matrix_layer">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maxVisibleItems">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lbl_from">
+        <property name="text">
+         <string>From</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="field_from">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maxVisibleItems">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lbl_to">
+        <property name="text">
+         <string>To</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="field_to">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maxVisibleItems">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lbl_flow">
+        <property name="text">
+         <string>Flow</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="field_cells">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maxVisibleItems">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="0" column="0">
@@ -181,70 +159,48 @@
        <height>131</height>
       </size>
      </property>
-     <widget class="QRadioButton" name="radio_omx_matrix">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>104</y>
-        <width>61</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>OMX</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radio_layer_matrix">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>42</y>
-        <width>91</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Open layer</string>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radio_aeq_matrix">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>11</y>
-        <width>101</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>AequilibraE</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radio_npy_matrix">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>73</y>
-        <width>71</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Numpy</string>
-      </property>
-     </widget>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="radio_aeq_matrix">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>AequilibraE</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QRadioButton" name="radio_layer_matrix">
+        <property name="text">
+         <string>Open layer</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="radio_npy_matrix">
+        <property name="text">
+         <string>Numpy</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QRadioButton" name="radio_omx_matrix">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>OMX</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="2" column="0" colspan="2">

@@ -97,7 +97,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.resizing()
 
     def resizing(self):
-        if self.radio_aeq_matrix.isChecked():
+        if self.radio_aeq_matrix.isChecked() or self.radio_omx_matrix.isChecked():
             self.group_combo.setVisible(False)
             self.group_list.setVisible(False)
             self.group_buttons.setVisible(False)
@@ -144,11 +144,11 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 member.setVisible(True)
             self.load_fields_to_combo_boxes()
 
-        if self.radio_omx_matrix.isChecked():
-            self.lbl_matrix.setText("Matrix core")
-            self.lbl_from.setText("Indices")
-            for member in members:
-                member.setVisible(True)
+        # if self.radio_omx_matrix.isChecked():
+        #     self.lbl_matrix.setText("Matrix core")
+        #     self.lbl_from.setText("Indices")
+        #     for member in members:
+        #         member.setVisible(True)
 
         self.resizing()
 

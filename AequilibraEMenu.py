@@ -25,6 +25,7 @@ import os
 import sys
 import tempfile
 import glob
+import importlib.util as iutil
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QListWidget, QListWidgetItem, QAbstractItemView, QAction, \
     QVBoxLayout, QToolBar, QToolButton, QMenu, QPushButton, QTabWidget, QLabel
 import qgis
@@ -86,9 +87,10 @@ if not no_binary:
     from .paths_procedures import ImpedanceMatrixDialog
 
 extra_packages = True
-try:
-    import openmatrix as omx
-except ImportError:
+# Checks if we can display OMX
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
+if not has_omx:
     extra_packages = False
 
 
@@ -461,9 +463,12 @@ class AequilibraEMenu:
         if no_binary:
             self.message_binary()
         else:
-            dlg2 = TrafficAssignmentDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
+            if self.project is None:
+                self.show_message_no_project()
+            else:
+                dlg2 = TrafficAssignmentDialog(self.iface, self.project)
+                dlg2.show()
+                dlg2.exec_()
 
     def run_import_gtfs(self):
         dlg2 = GtfsImportDialog(self.iface)
