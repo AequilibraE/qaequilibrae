@@ -75,10 +75,7 @@ class BandwidthScaleDialog(QDialog, FORM_CLASS):
 
     def add_fields_to_combobox(self):
         self.cbb_field_to_scale_from.clear()
-        fields = []
-        for field in self.layer.dataProvider().fields().toList():
-            if field.type() in integer_types + float_types:
-                fields.append(field.name())
+        fields = [x.name() for x in self.layer.fields() if x.type() in integer_types + float_types]
 
         if self.chb_dual.isChecked():
             for field in fields:
@@ -116,8 +113,9 @@ class BandwidthScaleDialog(QDialog, FORM_CLASS):
             else:
                 fields = [self.cbb_field_to_scale_from.currentText()]
 
+            fields = [x.name() for x in self.layer.fields()]
             for f in fields:
-                idx = self.layer.dataProvider().fieldNameIndex(f)
+                idx = fields.index(f)
                 max_flow = max(max_flow, self.layer.maximumValue(idx))
 
         self.box_ref_value.setText("{:3,.2f}".format(max_flow))

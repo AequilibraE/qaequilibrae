@@ -320,11 +320,12 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         # go through all the fields that will be used to find the maximum value. This will be used
         # to limit the size of bandwidth for all layers of bands
         values = []
+        all_fields = [x.name() for x in self.layer.fields()]
         for i in range(self.tot_bands):
             for j in range(2):
-                field = self.bands_list.item(i, j).text()
-                idx = self.layer.dataProvider().fieldNameIndex(field)
                 if max_value < 0:
+                    field = self.bands_list.item(i, j).text()
+                    idx = all_fields.index(field)
                     values.append(self.layer.maximumValue(idx))
 
                 # we also build a list of bands to construct
