@@ -1,8 +1,13 @@
-Network Manipulation
-====================
+.. _network_preparation:
+
+Network Preparation
+===================
 
 .. toctree::
    :maxdepth: 2
+
+.. TODO: NEED TO WRITE ABOUT MORE COMPREHENSIVE NETWORK PREPARATION
+.. including the addition of addition of unique link_id
 
 The network manipulation tool is designed to allow the user to go from a generic line layer all the way to a network
 with centroids and centroid connectors and that can be easily edited in any QGIS package that supports spatialite.
@@ -77,7 +82,7 @@ The tool can be accessed in the AequilibraE menu *AequilibraE > Network Manipula
 looks like this:
 
 .. image:: images/network_edit_network_preparation.png
-    :width: 800
+    :width: 774
     :align: center
     :alt: Network preparation
 
@@ -130,8 +135,4 @@ Instead, we have chosen to develop the procedure with the following criteira:
 * When considering the maximum length of connectors, the **GUI** returns to the
   user the list of centroids/modes that could not be connected.
 
-
-Creating TranspoNet
--------------------
-Transponet
 

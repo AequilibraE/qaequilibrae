@@ -81,6 +81,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.worker_thread = None
         self.all_modes = {}
         self.__populate_project_info()
+        self.rgap = 'Undefined'
+        self.iter = 0
+        self.miter = 1000
 
         # Signals for the matrix_procedures tab
         self.but_load_new_matrix.clicked.connect(self.find_matrices)
@@ -108,9 +111,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.rel_gap.setText(str(parameters["rgap"]))
         self.max_iter.setText(str(parameters["maximum_iterations"]))
 
-        # path file
-        self.path_file = OutputType()
-
         # Queries
         tables = [self.select_link_list, self.list_link_extraction]
         for table in tables:
@@ -121,18 +121,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.tbl_project_properties.setColumnWidth(0, 120)
         self.tbl_project_properties.setColumnWidth(1, 450)
-
-        # critical link
-        # self.but_build_query.clicked.connect(partial(self.build_query, "select link"))
-        # self.do_select_link.stateChanged.connect(self.set_behavior_special_analysis)
-        # self.tot_crit_link_queries = 0
-        # self.critical_output = OutputType()
-
-        # link flow extraction
-        # self.but_build_query_extract.clicked.connect(partial(self.build_query, "Link flow extraction"))
-        # self.do_extract_link_flows.stateChanged.connect(self.set_behavior_special_analysis)
-        # self.tot_link_flow_extract = 0
-        # self.link_extract = OutputType()
 
         # Disabling resources not yet implemented
         self.do_select_link.setEnabled(False)
@@ -349,17 +337,16 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         if self.check_data():
             algorithm = self.cb_choose_algorithm.currentText()
+            self.miter = int(self.max_iter.text())
             if algorithm != 'all-or-nothing':
                 for q in [self.progressbar1, self.progress_label1]:
                     q.setVisible(True)
-                self.progressbar1.setRange(0, int(self.max_iter.text()))
+                self.progressbar1.setRange(0, self.miter)
 
             for q in [self.progressbar0, self.progress_label0]:
                 q.setVisible(True)
                 self.progressbar0.setRange(0, self.project.network.count_centroids())
 
-            # self.set_output_names()
-            # try:
             if True:
                 if algorithm == 'all-or-nothing':
                     cls = [x for x in self.traffic_classes.values() if x is not None][0]
@@ -371,13 +358,10 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.assignment.set_capacity_field(self.cob_capacity.currentText())
                     self.assignment.set_time_field(self.cob_ffttime.currentText())
                     self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
-                    self.assignment.max_iter = int(self.max_iter.text())
+                    self.assignment.max_iter = self.miter
                     self.assignment.rgap_target = float(self.rel_gap.text())
                     self.worker_thread = self.assignment.assignment
                 self.run_thread()
-
-            # except ValueError as error:
-            #     qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
         else:
             qgis.utils.iface.messageBar().pushMessage("Input error", self.error, level=3)
 
@@ -412,10 +396,12 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def equilibration_signal_handler(self, val):
         if val[0] == "iterations":
             self.progressbar1.setValue(val[1])
-        elif val[0] == "text":
-            self.progress_label1.setText(val[1])
+            self.iter = val[1]
+        elif val[0] == "rgap":
+            self.rgap = val[1]
         elif val[0] == "finished_threaded_procedure":
             self.job_finished_from_thread()
+        self.progress_label1.setText(f'{self.iter}/{self.miter} - Rel. Gap {self.rgap:.2E}')
 
     # Save link flows to disk
     def produce_all_outputs(self):
@@ -478,46 +464,21 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 del skims
                 os.unlink(fn)
 
-    def click_button_inside_the_list(self, purpose):
-        if purpose == "select link":
-            table = self.select_link_list
-        else:
-            table = self.list_link_extraction
-
-        button = self.sender()
-        index = self.select_link_list.indexAt(button.pos())
-        row = index.row()
-        table.removeRow(row)
-
-        if purpose == "select link":
-            self.tot_crit_link_queries -= 1
-        elif purpose == "Link flow extraction":
-            self.tot_link_flow_extract -= 1
-
-    def update_matrix_list(self):
-        # All Matrix loading and assignables selection
-        self.table_matrix_list.clearContents()
-        self.table_matrix_list.clearContents()
-        self.table_matrix_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.table_matrix_list.setRowCount(len(self.matrices.keys()))
-
-        for i, data_name in enumerate(self.matrices.keys()):
-            self.table_matrix_list.setItem(i, 0, QTableWidgetItem(data_name))
-
-            cbox = QComboBox()
-            for idx in self.matrices[data_name].index_names:
-                cbox.addItem(str(idx))
-            self.table_matrix_list.setCellWidget(i, 1, cbox)
-
-    def find_non_conflicting_name(self, data_name, dictio):
-        if data_name in dictio:
-            i = 1
-            new_data_name = data_name + "_" + str(i)
-            while new_data_name in dictio:
-                i += 1
-                new_data_name = data_name + "_" + str(i)
-            data_name = new_data_name
-        return data_name
+    # def click_button_inside_the_list(self, purpose):
+    #     if purpose == "select link":
+    #         table = self.select_link_list
+    #     else:
+    #         table = self.list_link_extraction
+    #
+    #     button = self.sender()
+    #     index = self.select_link_list.indexAt(button.pos())
+    #     row = index.row()
+    #     table.removeRow(row)
+    #
+    #     if purpose == "select link":
+    #         self.tot_crit_link_queries -= 1
+    #     elif purpose == "Link flow extraction":
+    #         self.tot_link_flow_extract -= 1
 
     def change_graph_settings(self):
         for k, v in self.skims.items():
@@ -555,87 +516,3 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
             dlg2.exec_()
-
-    # def build_query(self, purpose):
-    #     # Procedures related to critical analysis. Not yet fully implemented
-    #     if purpose == "select link":
-    #         button = self.but_build_query
-    #         message = "Select Link Analysis"
-    #         table = self.select_link_list
-    #         counter = self.tot_crit_link_queries
-    #     else:
-    #         button = self.but_build_query_extract
-    #         message = "Link flow extraction"
-    #         table = self.list_link_extraction
-    #         counter = self.tot_link_flow_extract
-    #
-    #     button.setEnabled(False)
-    #     dlg2 = LoadSelectLinkQueryBuilderDialog(self.iface, self.graph.graph, message)
-    #     dlg2.exec_()
-    #
-    #     if dlg2.links is not None:
-    #         table.setRowCount(counter + 1)
-    #         text = ""
-    #         for i in dlg2.links:
-    #             text = text + ", (" + only_str(i[0]) + ', "' + only_str(i[1]) + '")'
-    #         text = text[2:]
-    #         table.setItem(counter, 0, QTableWidgetItem(text))
-    #         table.setItem(counter, 1, QTableWidgetItem(dlg2.query_type))
-    #         table.setItem(counter, 2, QTableWidgetItem(dlg2.query_name))
-    #         del_button = QPushButton("X")
-    #         del_button.clicked.connect(partial(self.click_button_inside_the_list, purpose))
-    #         table.setCellWidget(counter, 3, del_button)
-    #         counter += 1
-    #
-    #     if purpose == "select link":
-    #         self.tot_crit_link_queries = counter
-    #
-    #     elif purpose == "Link flow extraction":
-    #         self.tot_link_flow_extract = counter
-    #
-    #     button.setEnabled(True)
-
-    # def load_assignment_queries(self):
-    #     # First we load the assignment queries
-    #     query_labels = []
-    #     query_elements = []
-    #     query_types = []
-    #     if self.tot_crit_link_queries:
-    #         for i in range(self.tot_crit_link_queries):
-    #             links = eval(self.select_link_list.item(i, 0).text())
-    #             query_type = self.select_link_list.item(i, 1).text()
-    #             query_name = self.select_link_list.item(i, 2).text()
-    #
-    #             for l in links:
-    #                 d = directions_dictionary[l[1]]
-    #                 lk = self.graph.ids[
-    #                     (self.graph.graph["link_id"] == int(l[0])) & (self.graph.graph["direction"] == d)
-    #                     ]
-    #
-    #             query_labels.append(query_name)
-    #             query_elements.append(lk)
-    #             query_types.append(query_type)
-    #
-    #     self.critical_queries = {"labels": query_labels, "elements": query_elements, " type": query_types}
-    # def set_output_names(self):
-    #     self.path_file.temp_file = os.path.join(self.temp_path, "path_file.aed")
-    #     self.path_file.output_name = os.path.join(self.output_path, "path_file")
-    #     self.path_file.extension = "aed"
-    #
-    #     if self.do_path_file.isChecked():
-    #         self.results.setSavePathFile(save=True, path_result=self.path_file.temp_file)
-    #
-    #     self.link_extract.temp_file = os.path.join(self.temp_path, "link_extract")
-    #     self.link_extract.output_name = os.path.join(self.output_path, "link_extract")
-    #     self.link_extract.extension = "aed"
-    #
-    #     self.critical_output.temp_file = os.path.join(self.temp_path, "critical_output")
-    #     self.critical_output.output_name = os.path.join(self.output_path, "critical_output")
-    #     self.critical_output.extension = "aed"
-
-
-class OutputType:
-    def __init__(self):
-        self.temp_file = None
-        self.extension = None
-        self.output_name = None
