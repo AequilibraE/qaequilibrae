@@ -1,26 +1,3 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       QGIS menu
- Purpose:    Creates the QGIS menu for AequilibraE and connects with the appropriate classes
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2014-03-19
- Updated:    2020-02-08
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-# Import the PyQt and QGIS libraries
-# noinspection PyUnresolvedReferences
 import os
 import sys
 import tempfile
@@ -64,18 +41,16 @@ from .matrix_procedures import LoadMatrixDialog
 from .matrix_procedures import LoadDatasetDialog
 from .matrix_procedures import DisplayAequilibraEFormatsDialog
 
-# from .matrix_procedures import MatrixManipulationDialog
-
 from .public_transport_procedures import GtfsImportDialog
 
 from .project_procedures import ProjectFromOSMDialog
 
-# Procedures that depend on AequilibraE
 no_binary = False
 try:
     from .aequilibrae.aequilibrae.paths import allOrNothing
-except ImportError:
+except ImportError as e:
     no_binary = True
+    warn(f'AequilibraE binaries are not available {e.args}')
 
 from aequilibrae.project import Project
 
