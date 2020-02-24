@@ -44,6 +44,7 @@ from .matrix_procedures import DisplayAequilibraEFormatsDialog
 from .public_transport_procedures import GtfsImportDialog
 
 from .project_procedures import ProjectFromOSMDialog
+from warnings import warn
 
 no_binary = False
 try:
