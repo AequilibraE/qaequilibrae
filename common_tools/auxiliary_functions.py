@@ -1,24 +1,3 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       AequilibraE auxiliary Functions
- Purpose:
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2014-03-19
- Updated:    26/02/2017
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- ------------------auxiliary_functions-----------------------------------------------------------------------------------------
- """
-
 import qgis
 from qgis.core import QgsProject
 import math

@@ -56,7 +56,7 @@ except ImportError as e:
 from aequilibrae.project import Project
 
 if not no_binary:
-    from .gis import DesireLinesDialog
+    from .gis.desire_lines_dialog import DesireLinesDialog
     from .project_procedures import CreatesTranspoNetDialog
     from .paths_procedures import TrafficAssignmentDialog
     from .paths_procedures import ShortestPathDialog

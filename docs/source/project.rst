@@ -7,19 +7,8 @@ AequilibraE Project
 The AequilibraE project is one of the newest portions of the
 `aequilibrae API <www.aequilibrae.com/python>`_, and therefore not very mature.
 
-The API will soon bring much more sophisticated features, but the initial
-capability inside QGIS is probably the most relevant for the majority of users
-right now.
-
-Transponet
-~~~~~~~~~~
-
-A Transponet is a network scheme that allows the user to edit it while enforcing
-consistency between nodes and links. This consistency is enforced by a series of
-database triggers in the SpatiaLite backend and allows the layers to be edited
-in any minimaly capable GIS (i.e. one that supports SpatiaLite layers) or even
-programatically.
-
+For a better over.overview of the AequilibraE project, please check the
+documentation listed above, as this page is dedicated to a practical implementation
 
 Create project from OSM
 ~~~~~~~~~~~~~~~~~~~~~~~
