@@ -17,9 +17,6 @@ tutorials for end to end transportation modelling (still being produced).
 Contents
 --------
 
-If you know what you are doing and you just need to answer a quick question, then you can also go straight to the tool
-you are looking to use.
-
 .. toctree::
    :maxdepth: 1
 
@@ -27,6 +24,7 @@ you are looking to use.
    project
    networkmanipulation
    engine
+   tutorials_and_sample_data
 
 ..   data
    tripdistribution
@@ -47,6 +45,7 @@ of the new interface, we have prepared a little video tour.
     <iframe width="560" height="315" src="https://www.youtube.com/embed/oZEcjiBRaok"
      frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
      picture-in-picture" allowfullscreen></iframe>
+
 
 Indices and tables
 ==================

@@ -68,3 +68,19 @@ After running this tool a sqlite file (spatialite enabled) will be created and
 you can edit the network (create, move or delete links and nodes) and both
 layers (including node *ID* and *A_Node*/*B_Node* fields) will remain
 consistent with each other.
+
+
+Video tutorial
+~~~~~~~~~~~~~~
+
+If you want a summary of everything that was presented in this page, you can
+head over to YouTube to see a demonstration of how to download these projects.
+
+
+
+.. raw:: html
+
+    <iframe width="560" height="315" src="https://youtu.be/9PF2qHs2hUc" frameborder="0"
+    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
