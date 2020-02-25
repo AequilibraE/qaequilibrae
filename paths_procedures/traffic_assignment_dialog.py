@@ -184,6 +184,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         if dlg2.matrix is not None:
             matrix_name = dlg2.matrix.file_path
             matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
+            if self.matrix is not None:
+                self.matrix.close()
+                del self.matrix
             self.matrix = dlg2.matrix  # type: AequilibraeMatrix
             table = self.table_matrix_list
 

@@ -1,22 +1,23 @@
 AequilibraE
 ===========
 
-AequilibraE is the first comprehensive Python package for transportation modeling, and it aims to provide all the
-resources not easily available from other open-source packages in the Python (NumPy, really) ecosystem.
+AequilibraE is the first comprehensive Python package for transportation
+modeling, and it aims to provide all the resources not easily available from
+other open-source packages in the Python ecosystem or for any Open-Source GIS
+package.
 
-If you still need to install AequilibraE, then go to the `installation instructions <installation.html>`__
+If you still need to install AequilibraE, then go to the
+`installation instructions <installation.html>`__
 
-If you have already installed AequilibraE, but you are are somewhat puzzled by its menus and interfaces (or if you are
-just starting in the world of transportation modelling) then the best place to start is with our series of tutorials
-for end to end transportation modelling They are the following:
-
-* `Building networks from scratch (from OSM, actually) <networksfromscratch.html>`__
-
+If you have already installed AequilibraE, but you are are somewhat puzzled by
+its menus and interfaces (or if you are just starting in the world of
+transportation modelling) then the best place to start is with our series of
+tutorials for end to end transportation modelling (still being produced).
 
 Contents
 --------
 
-If you know what you are doing and you just need to answer a quick question, then you can also go straigth to the tool
+If you know what you are doing and you just need to answer a quick question, then you can also go straight to the tool
 you are looking to use.
 
 .. toctree::
@@ -24,7 +25,6 @@ you are looking to use.
 
    installation
    project
-   networksfromscratch
    networkmanipulation
    engine
 
@@ -36,6 +36,17 @@ you are looking to use.
    softwaredevelopment
    engine
 
+Quick Tour
+----------
+AequilibraE 0.6 for QGIS has brought substantial to the previous graphical
+interface, which might cause some confusion to old users. For a brief overview
+of the new interface, we have prepared a little video tour.
+
+.. raw:: html
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/oZEcjiBRaok"
+     frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
+     picture-in-picture" allowfullscreen></iframe>
 
 Indices and tables
 ==================
