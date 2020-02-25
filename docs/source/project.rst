@@ -28,6 +28,30 @@ For this reason, I have ported some of Geoff's code into AequilibraE
 (modifications were quite heavy, however), and was ultimately able to bring this
 feature to life.
 
+.. note::
+   Importing networks from OSM is a rather slow process, so we recommend that
+   you chose the area you are downloading it for carefully. The interface might
+   also freeze at times, so be patient!!!
+
+Importing networks from OSM can be done by choosing an area for download,
+defined as the current map canvas on QGIS...
+
+.. image:: images/model_from_canvas_area.png
+    :width: 999
+    :align: center
+    :alt: Download OSM networks for visible area
+
+
+... or for a named place.
+
+.. image:: images/model_from_place.png
+    :width: 1057
+    :align: center
+    :alt: Download OSM networks for named place
+
+
+
+
 
 Project from layers
 ~~~~~~~~~~~~~~~~~~~
@@ -59,24 +83,21 @@ AequilibraE.
 Accessing **AequilibraE > Project > Create Project from Layers**, the user is
 presented with the following screen.
 
-.. image:: images/network_edit_creating_transponet.png
+.. image:: images/project_from_layers.png
     :width: 1425
     :align: center
-    :alt: Creates Transponet
+    :alt: Create project from layers
 
 After running this tool a sqlite file (spatialite enabled) will be created and
 you can edit the network (create, move or delete links and nodes) and both
 layers (including node *ID* and *A_Node*/*B_Node* fields) will remain
 consistent with each other.
 
-
 Video tutorial
 ~~~~~~~~~~~~~~
 
 If you want a summary of everything that was presented in this page, you can
 head over to YouTube to see a demonstration of how to download these projects.
-
-
 
 .. raw:: html
 

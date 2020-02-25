@@ -103,7 +103,7 @@ best way of doing it is to run QGIS as an administrator and click on *install*
 .. image:: images/install_extra_packages.png
     :width: 781
     :align: center
-    :alt: Eighth step
+    :alt: Extra packages
 
 You will be asked to confirm your actions before AequilibraE attempts to install
 openmatrix with the screen shown below.
@@ -111,7 +111,7 @@ openmatrix with the screen shown below.
 .. image:: images/install_extra_packages_confirmation.png
     :width: 818
     :align: center
-    :alt: Eighth step
+    :alt: Confirmation
 
 If you have correctly installed it, the logging screen will clearly state that
 the process was successful, as shown below
@@ -119,14 +119,14 @@ the process was successful, as shown below
 .. image:: images/install_extra_packages_success.png
     :width: 971
     :align: center
-    :alt: Eighth step
+    :alt: Success
 
 And it would report failure in case something has gone wrong.
 
 .. image:: images/install_extra_packages_failure.png
     :width: 968
     :align: center
-    :alt: Eighth step
+    :alt: Failure
 
 A more detailed discussion on how this process works has been presented in the
 form of a blog post on
