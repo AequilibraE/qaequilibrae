@@ -108,7 +108,7 @@ best way of doing it is to run QGIS as an administrator and click on *install*
 You will be asked to confirm your actions before AequilibraE attempts to install
 openmatrix with the screen shown below.
 
-.. image:: images/install_extra_packages.png
+.. image:: images/install_extra_packages_confirmation.png
     :width: 818
     :align: center
     :alt: Eighth step
