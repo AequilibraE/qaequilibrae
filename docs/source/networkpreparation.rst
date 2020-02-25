@@ -13,13 +13,13 @@ Preparing a link network to be imported into an AequilibraE project consists of
 ensuring that all fields necessary for network import exist and are properly
 filled. These fields are :
 
-* "link_id"
-* "a_node"
-* "b_node"
-* "direction"
-* "distance"
-* "modes"
-* "link_type"
+* **link_id**
+* **a_node**
+* **b_node**
+* **direction**
+* **distance**
+* **modes**
+* **link_type**
 
 Below we give some directions on how to prepare each field.
 
