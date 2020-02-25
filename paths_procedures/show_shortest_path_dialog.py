@@ -21,6 +21,7 @@
 import sys
 
 import qgis
+from qgis.core import QgsVectorLayer
 from aequilibrae.paths.results import PathResults
 from qgis.PyQt import QtCore
 from qgis.PyQt import QtWidgets, uic
@@ -48,7 +49,7 @@ from ..common_tools import LoadGraphLayerSettingDialog
 class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
     clickTool = PointTool(iface.mapCanvas())
 
-    def __init__(self, iface, project: Project):
+    def __init__(self, iface, project: Project, link_layer: QgsVectorLayer, node_layer: QgsVectorLayer) -> None:
         # QtWidgets.QDialog.__init__(self)
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
@@ -56,8 +57,8 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.field_types = {}
         self.centroids = None
-        self.node_layer = None
-        self.line_layer = None
+        self.node_layer = node_layer
+        self.line_layer = link_layer
         self.node_keys = {}
         self.node_fields = None
         self.index = None
@@ -85,8 +86,6 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2.exec_()
         if len(dlg2.error) < 1 and len(dlg2.mode) > 0:
             self.mode = dlg2.mode
-            self.line_layer = get_vector_layer_by_name(dlg2.link_layer)
-            self.node_layer = dlg2.node_layer
             self.minimize_field = dlg2.minimize_field
 
             if not self.mode in self.project.network.graphs:
@@ -98,11 +97,9 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             self.graph.set_blocked_centroid_flows(dlg2.block_connector)
             self.res.prepare(self.graph)
 
-            layer = get_vector_layer_by_name(self.node_layer)
-            self.node_fields = [field.name() for field in layer.dataProvider().fields().toList()]
+            self.node_fields = [field.name() for field in self.node_layer.dataProvider().fields().toList()]
             self.index = QgsSpatialIndex()
-            self.node_layer = layer
-            for feature in layer.getFeatures():
+            for feature in self.node_layer.getFeatures():
                 self.index.addFeature(feature)
                 self.node_keys[feature.id()] = feature.attributes()
 

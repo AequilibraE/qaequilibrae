@@ -13,7 +13,7 @@ sys.dont_write_bytecode = True
 import os.path
 
 from qgis.PyQt import QtWidgets
-
+from qgis.core import QgsDataSourceUri, QgsVectorLayer
 # This is how QtCore and QtGui imports change
 from qgis.PyQt.QtCore import *
 
@@ -77,6 +77,8 @@ class AequilibraEMenu:
         self.translator = None
         self.iface = iface
         self.project = None  # type: Project
+        self.link_layer = None  # type: QgsVectorLayer
+        self.node_layer = None  # type: QgsVectorLayer
 
         self.dock = QDockWidget(self.trlt('AequilibraE'))
         self.manager = QWidget()
@@ -323,6 +325,17 @@ class AequilibraEMenu:
             self.project = Project(path)
             self.project.conn = qgis.utils.spatialite_connect(path)
             self.project.network.conn = self.project.conn
+
+            uri = QgsDataSourceUri()
+            uri.setDatabase(path)
+            uri.setDataSource('', 'links', 'geometry')
+            self.link_layer = QgsVectorLayer(uri.uri(), 'links', 'spatialite')
+            QgsProject.instance().addMapLayer(self.link_layer)
+
+            uri.setDataSource('', 'nodes', 'geometry')
+            self.node_layer = QgsVectorLayer(uri.uri(), 'nodes', 'spatialite')
+            QgsProject.instance().addMapLayer(self.node_layer)
+
             descr = QWidget()
             descrlayout = QVBoxLayout()
             # We create a tab with the main description of the project
@@ -420,7 +433,7 @@ class AequilibraEMenu:
             if self.project is None:
                 self.show_message_no_project()
             else:
-                dlg2 = ShortestPathDialog(self.iface, self.project)
+                dlg2 = ShortestPathDialog(self.iface, self.project, self.link_layer, self.node_layer)
                 dlg2.show()
                 dlg2.exec_()
 

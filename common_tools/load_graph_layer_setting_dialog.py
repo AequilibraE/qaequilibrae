@@ -66,23 +66,10 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
         for field in self.project.network.skimmable_fields():
             self.cb_minimizing.addItem(field)
 
-        # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if "wkbType" in dir(layer):
-                if layer.wkbType() in point_types:
-                    self.cb_node_layer.addItem(layer.name())
-
-                if layer.wkbType() in line_types:
-                    self.cb_link_layer.addItem(layer.name())
-
-        # loads default path from parameters
-        self.path = standard_path()
         self.do_load_graph.clicked.connect(self.exit_procedure)
 
     def exit_procedure(self):
         self.mode = self.all_modes[self.cb_modes.currentText()]
-        self.link_layer = self.cb_link_layer.currentText()
-        self.node_layer = self.cb_node_layer.currentText()
         self.minimize_field = self.cb_minimizing.currentText()
         self.block_connector = self.block_paths.isChecked()
         self.close()
