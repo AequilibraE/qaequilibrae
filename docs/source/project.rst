@@ -49,10 +49,6 @@ defined as the current map canvas on QGIS...
     :align: center
     :alt: Download OSM networks for named place
 
-
-
-
-
 Project from layers
 ~~~~~~~~~~~~~~~~~~~
 

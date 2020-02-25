@@ -23,8 +23,9 @@ Contents
    installation
    project
    networkmanipulation
-   engine
+   editingnetworks
    tutorials_and_sample_data
+   engine
 
 ..   data
    tripdistribution
