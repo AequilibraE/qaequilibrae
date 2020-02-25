@@ -34,9 +34,9 @@ Tour of the new interface
 
 .. raw:: html
 
-    <iframe width="560" height="315" src="https://youtu.be/9PF2qHs2hUc"
-     frameborder="0" allow="accelerometer; autoplay; encrypted-media;
-     gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/oZEcjiBRaok"
+     frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
+     picture-in-picture" allowfullscreen></iframe>
 
 Creating a project
 ------------------
@@ -52,7 +52,7 @@ Editing networks
 
 .. raw:: html
 
-    <iframe width="560" height="315" src="https://youtu.be/lAxY7E9g1Q8"
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/lAxY7E9g1Q8"
      frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
      picture-in-picture" allowfullscreen></iframe>
 
@@ -61,6 +61,6 @@ Traffic Assignment
 
 .. raw:: html
 
-    <iframe width="560" height="315" src="https://youtu.be/DRY4QpdX3qQ"
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/DRY4QpdX3qQ"
      frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
      picture-in-picture" allowfullscreen></iframe>
