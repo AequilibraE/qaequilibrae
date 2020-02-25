@@ -43,7 +43,7 @@ Creating a project
 
 .. raw:: html
 
-    <iframe width="560" height="315" src="https://youtu.be/9PF2qHs2hUc"
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/9PF2qHs2hUc"
      frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
      picture-in-picture" allowfullscreen></iframe>
 
