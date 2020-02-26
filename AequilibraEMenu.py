@@ -10,7 +10,8 @@ from qgis.core import QgsWkbTypes, QgsAnnotationManager, QgsProject, QgsGeometry
 from qgis.gui import QgsMapTool, QgsRubberBand
 
 sys.dont_write_bytecode = True
-import os.path
+import subprocess
+import webbrowser
 
 from qgis.PyQt import QtWidgets
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
@@ -259,6 +260,11 @@ class AequilibraEMenu:
         aboutButton.clicked.connect(self.run_about)
         self.toolbar.addWidget(aboutButton)
 
+        helpButton = QToolButton()
+        helpButton.setText(self.trlt('Help'))
+        helpButton.clicked.connect(self.run_help)
+        self.toolbar.addWidget(helpButton)
+
         if no_binary:
             binariesButton = QToolButton()
             binariesButton.setText(self.trlt('Download binaries'))
@@ -288,6 +294,13 @@ class AequilibraEMenu:
         self.dock.setWidget(self.manager)
         self.dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
+
+    def run_help(self):
+        url = 'http://aequilibrae.com/qgis'
+        if sys.platform == 'darwin':  # in case of OS X
+            subprocess.Popen(['open', url])
+        else:
+            webbrowser.open_new_tab(url)
 
     def unload(self):
         del self.dock
