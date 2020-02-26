@@ -8,50 +8,6 @@ Working with QGIS
 
 .. Bla bla bla that we will talk about centroids, snapping to vertex and GIS tricks
 
-
-.. _adding_centroids:
-
-Adding centroids
-----------------
-
-Starting in version 0.6 of AequilibraE, centroid connectors can now only be
-added to
-`AequilibraE projects <http://www.aequilibrae.com/python/V.0.6.0/project.html>`_
-, and no longer generates new layers during the process.
-
-Before we describe what this tool can do for you, however, let's just remember
-that there is a virtually unlimited number of things that can go awfully wrong
-when we edit networks with automated procedures, and we highly recommend that
-you **BACKUP YOUR DATA** prior to running this procedure and that you inspect
-the results of this tool **CAREFULLY**.
-
-The **GUI** for this procedure is fairly straightforward, as shown below.
-
-.. image:: images/add_connectors_to_project.png
-    :width: 827
-    :align: center
-    :alt: Adding connectors
-
-One would notice that nowhere in the **GUI** one can indicate which modes they
-want to see the network connected for or how to control how many connectors per
-mode will be created.  Although it could be implemented, such a solution would
-be convoluted and there is probably no good reason to do so.
-
-Instead, we have chosen to develop the procedure with the following criteria:
-
-* All modes will be connected to links where those modes are allowed.
-* When considering number of connectors per centroid, there is no guarantee that
-  each and every mode will have that number of connectors. If a particular mode
-  only available rather far from the centroid, it is likely that a single
-  connector to that mode will be created for that centroid
-* When considering the maximum length of connectors, the **GUI** returns to the
-  user the list of centroids/modes that could not be connected.
-
-Notice that in order to add centroids and their connectors to the network,
-we need to create the set of centroids we want to add to the network in a
-separate layer and to have a field that contains unique centroid IDs. These IDs
-also cannot exist in the set of node IDs that are already part of the map.
-
 Editing networks
 ----------------
 Editing an AequilibraE network is editing any other node and link layer in QGIS.
@@ -106,18 +62,8 @@ So if you are editing zoning layers, I highly recommend you go to the
 
 GIS tricks
 ----------
-
-We have chosen `Alice Springs <https://en.wikipedia.org/wiki/Alice_Springs>`_ as subject for this example, as that is a
-small and isolated city for which quite a bit of data is available and that lacks a transportation model, so actual
-practical use might be made of this in the future.
-
-As this tutorial is developed, software other than AequilibraE and QGIS will be used, most notably for the demand
-modelling portion of the model.
-
-The files used in this example are available in a separate
-`GitHub repository <https://github.com/AequilibraE/AliceSprings>`_
-
-* Reading about the `basic concepts <networkmanipulation.html>`__ behind AequilibraE's networks is probably a good idea
+There are some basic tools in QGIS that might come in handy when you are
+working with AequilibraE, so we have described a few of them here.
 
 .. _multipart_to_singlepart:
 
