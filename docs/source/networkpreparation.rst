@@ -1,6 +1,6 @@
 .. _network_preparation:
 
-Network Preparation
+Preparing a network
 ===================
 
 .. toctree::
@@ -41,7 +41,7 @@ to create the project.
     :align: center
     :alt: Creating Link IDs
 
-**Let's STRESS THIS**
+**LET'S STRESS THIS !!!!!!**
 
 **AequilibraE can deal with an arbitrary set of IDs for links and nodes**, but
 we vectorize a lot of operations for faster performance, which means that you

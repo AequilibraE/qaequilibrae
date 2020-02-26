@@ -1,3 +1,5 @@
+.. _aequilibrae_project:
+
 AequilibraE Project
 ===================
 

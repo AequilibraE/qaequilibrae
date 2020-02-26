@@ -28,13 +28,6 @@ Contents
    other
    engine
 
-..   data
-   tripdistribution
-   pathscomputation
-   gistools
-   other
-   softwaredevelopment
-   engine
 
 Quick Tour
 ----------
