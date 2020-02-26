@@ -65,13 +65,14 @@ class SimpleTAG(WorkerThread):
         # in order to find the actual nearest neighor (avoid the error)
         # of the spatial index
 
+        self.index = QgsSpatialIndex()
+        self.index_from = QgsSpatialIndex()
+        self.from_features = {}
+
     def doWork(self):
-        self.ProgressText.emit("Initializing")
+        self.ProgressText.emit("Initializing. Sit tight")
         self.ProgressValue.emit(0)
 
-        # And a dictionaries that will hold all the features IDs found to intersect with each feature in the spatial index
-        self.from_features = {feature.id(): feature for (feature) in self.from_layer.getFeatures()}
-        allfeatures = {feature.id(): feature for (feature) in self.to_layer.getFeatures()}
         EPSG1 = QgsCoordinateReferenceSystem(int(self.from_layer.crs().authid().split(":")[1]))
         EPSG2 = QgsCoordinateReferenceSystem(int(self.to_layer.crs().authid().split(":")[1]))
         if EPSG1 != EPSG2:
@@ -91,32 +92,36 @@ class SimpleTAG(WorkerThread):
             self.to_match = {feature.id(): feature.attributes()[idq2] for (feature) in self.to_layer.getFeatures()}
 
         # We create an spatial self.index to hold all the features of the layer that will receive the data
-        self.index = QgsSpatialIndex()
         self.ProgressText.emit("Spatial index for target layer")
         self.ProgressValue.emit(0)
-        for i, feature in enumerate(allfeatures.values()):
-            self.index.insertFeature(feature)
+        allfeatures = {}
+        for i, feature in enumerate(self.to_layer.getFeatures()):
+            self.index.addFeature(feature)
+            allfeatures[feature.id()] = feature
             self.ProgressValue.emit(i)
         self.all_attr = {}
-
-        # Dictionary with the FROM values
-        self.from_val = {feature.id(): feature.attributes()[idx] for (feature) in self.from_layer.getFeatures()}
-        self.from_count = len(self.from_val.keys())  # Number of features in the source layer
 
         # Appending the line below would secure perfect results, but yields a VERY slow algorithm for when
         # matches are not found
         # self.sequence_of_searches.append(self.from_count)
 
-        # The spatial self.index for source layer
-        self.index_from = QgsSpatialIndex()
+        # Dictionary with the FROM values
+        self.ProgressMaxValue.emit(self.from_layer.dataProvider().featureCount())
         self.ProgressText.emit("Spatial index for source layer")
-        self.ProgressValue.emit(0)
-        for feat in self.from_features.values():
-            self.index_from.insertFeature(feat)
+        self.from_val = {}
+        for i, feature in enumerate(self.from_layer.getFeatures()):
+            self.index_from.addFeature(feature)
             self.ProgressValue.emit(i)
+            self.from_val[feature.id()] = feature.attributes()[idx]
+            self.from_features[feature.id()] = feature
 
+        # The spatial self.index for source layer
+        self.ProgressValue.emit(0)
+
+        self.from_count = len(self.from_val.keys())  # Number of features in the source layer
         self.ProgressText.emit("Performing spatial matching")
         self.ProgressValue.emit(0)
+        self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
         # Now we will have the code for all the possible configurations of input layer and output layer
         for i, feat in enumerate(self.to_layer.getFeatures()):
             self.ProgressValue.emit(i)
