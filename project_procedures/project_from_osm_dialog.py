@@ -157,9 +157,10 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         modes = [list(k.keys())[0] for k in p['network']['modes']]
 
         self.progress_label.setText('Downloading data')
-        w = OSMDownloader(geometries, modes)
-        w.doWork()
+        self.downloader = OSMDownloader(geometries, modes)
+        self.run_download_thread()
 
+    def final_steps(self):
         self.project = Project(self.output_path.text(), True)
         self.project.network.create_empty_tables()
         curr = self.project.conn.cursor()
@@ -167,8 +168,13 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         curr.execute("""ALTER TABLE nodes ADD COLUMN osm_id integer""")
         self.project.conn.commit()
         self.project.conn.close()
-        self.builder = OSMBuilder(w.json, self.project.source)
+        self.builder = OSMBuilder(self.downloader.json, self.project.source)
         self.run_thread()
+
+    def run_download_thread(self):
+        self.downloader.downloading.connect(self.signal_downloader_handler)
+        self.downloader.start()
+        self.exec_()
 
     def run_thread(self):
         self.builder.building.connect(self.signal_handler)
@@ -186,6 +192,16 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2 = ReportDialog(self.iface, self.report)
         dlg2.show()
         dlg2.exec_()
+
+    def signal_downloader_handler(self, val):
+        if val[0] == "Value":
+            self.progressbar.setValue(val[1])
+        elif val[0] == "maxValue":
+            self.progressbar.setRange(0, val[1])
+        elif val[0] == "text":
+            self.progress_label.setText(val[1])
+        elif val[0] == "FinishedDownloading":
+            self.final_steps()
 
     def signal_handler(self, val):
         if val[0] == "Value":
