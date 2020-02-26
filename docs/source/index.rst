@@ -22,9 +22,10 @@ Contents
 
    installation
    project
-   networkmanipulation
+   networpreparation
    editingnetworks
    tutorials_and_sample_data
+   other
    engine
 
 ..   data
