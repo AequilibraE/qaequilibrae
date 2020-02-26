@@ -105,7 +105,7 @@ accessed through the menu  **Vector > Geometry Tools > Centroids**, as shown bel
 .. image:: images/network_edit_centroids_menu.png
     :width: 800
     :align: center
-    :alt: Zones to centroids
+    :alt: Polygons to centroids
 
 One should always remember to visually inspect the results of the automatic
 process, in this case looking for those centroids that were placed in awkward
