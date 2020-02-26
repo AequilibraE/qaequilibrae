@@ -22,7 +22,7 @@ Contents
 
    installation
    project
-   networpreparation
+   networkpreparation
    editingnetworks
    tutorials_and_sample_data
    other
