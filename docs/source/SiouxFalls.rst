@@ -11,18 +11,22 @@ Here we present an image-based example on a realistic modelling workflow
 for the beginner modeler out there. All the data used here can be downloaded
 at the :ref:`tutorial_sample_data` page.
 
-As to not upset those who think that Sioux Falls is not a realist example (you
+As to not upset those who think that Sioux Falls is not a realistic example (you
 would be right to think so), the example data is also available for the Chicago
 regional model, which has nearly 40,000 links and almost 1,800 zones.
+
+Got a bigger instance we could use as an example?  Send it over!
 
 
 Creating a project
 -------------------
 
-If we start from a set of layers that we have already prepared acording to the
-instructions on :ref:`network_preparation`
+IF all you have to start your project are the layers and matrices (or the demand
+model) from your original model, then we can import it into AequilibraE. Just
+Make sure that you followed the layer preparation instructions on
+:ref:`network_preparation`.
 
-The project creation resource lives under the project menu
+The project creation resource lives under the project menu.
 
 .. image:: images/create_project_from_layers.png
     :width: 479
