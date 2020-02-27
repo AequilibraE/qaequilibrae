@@ -31,7 +31,7 @@ The project creation resource lives under the project menu.
 .. image:: images/create_project_from_layers.png
     :width: 479
     :align: center
-    :alt:create_project_from_layers
+    :alt: create_project_from_layers
 
 The first 7 fields for links are mandatory, and one needs to associate the
 corresponding layer fields to the network fields.
@@ -44,7 +44,7 @@ screen
 .. image:: images/project_from_layers_links.png
     :width: 614
     :align: center
-    :alt:project_from_layers_links
+    :alt: project_from_layers_links
 
 
 In the case of the nodes layer, only two fields are mandatory.
@@ -52,7 +52,7 @@ In the case of the nodes layer, only two fields are mandatory.
 .. image:: images/project_from_layers_nodes.png
     :width: 614
     :align: center
-    :alt:project_from_layers_nodes
+    :alt: project_from_layers_nodes
 
 After filling all fields, it is just a matter of saving it!
 
