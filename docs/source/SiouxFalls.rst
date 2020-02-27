@@ -16,6 +16,42 @@ would be right to think so), the example data is also available for the Chicago
 regional model, which has nearly 40,000 links and almost 1,800 zones.
 
 
+Creating a project
+-------------------
+
+If we start from a set of layers that we have already prepared acording to the
+instructions on :ref:`network_preparation`
+
+The project creation resource lives under the project menu
+
+.. image:: images/create_project_from_layers.png
+    :width: 479
+    :align: center
+    :alt:create_project_from_layers
+
+The first 7 fields for links are mandatory, and one needs to associate the
+corresponding layer fields to the network fields.
+
+The other fields that will be listed on the left side come from the parameters
+file (see the manual for that portion for more details), but the user can add
+more fields from the layer, as all of them are listed on the left side of the
+screen
+
+.. image:: images/project_from_layers_links.png
+    :width: 614
+    :align: center
+    :alt:project_from_layers_links
+
+
+In the case of the nodes layer, only two fields are mandatory.
+
+.. image:: images/project_from_layers_nodes.png
+    :width: 614
+    :align: center
+    :alt:project_from_layers_nodes
+
+After filling all fields, it is just a matter of saving it!
+
 Opening the project
 -------------------
 
@@ -159,8 +195,9 @@ The tool for plotting link flows can be found under the GIS menu
     :align: center
     :alt: create_bands
 
-And we can algo control the overall look of these bands (thickness and
-separation between AB and BA flows) in the project properties.
+If you have selected the *Expert mode* in the previous screen, you can also
+control the overall look of these bands (thickness and separation between AB and
+BA flows) in the project properties.
 
 .. image:: images/project_properties.png
     :width: 421
