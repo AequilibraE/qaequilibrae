@@ -1,3 +1,5 @@
+.. _tutorial_sample_data:
+
 Tutorials and Sample data
 =========================
 

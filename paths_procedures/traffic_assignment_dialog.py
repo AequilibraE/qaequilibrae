@@ -233,6 +233,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             table.setCellWidget(i, 2, val_fld)
 
     def __create_traffic_class(self):
+        mode = self.cob_mode_for_class.currentText()
+        if len(mode) == 0:
+            return
         table = self.table_matrix_list
         user_classes = []
         for i in range(table.rowCount()):
@@ -245,7 +248,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.matrix.set_index(self.cob_matrix_indices.currentText())
 
-        mode = self.cob_mode_for_class.currentText()
         graph = self.project.network.graphs[self.all_modes[mode]]
         pce = self.pce_setter.value()
         assigclass = TrafficClass(graph, self.matrix)

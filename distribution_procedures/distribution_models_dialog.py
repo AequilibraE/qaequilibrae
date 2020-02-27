@@ -1,24 +1,4 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Trip distribution models
- Purpose:    Loads GUI for all of AequilibraE's distribution model procedures
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2017-10-05
- Updated:    2018-12-27
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
+import importlib.util as iutil
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
@@ -43,6 +23,8 @@ from .calibrate_gravity_procedure import CalibrateGravityProcedure
 from .apply_gravity_procedure import ApplyGravityProcedure
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_distribution.ui"))
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
 
 
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
@@ -292,13 +274,16 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def browse_outfile(self, file_type):
 
         file_types = {
-            "aed": ["AequilibraE dataset", "Aequilibrae dataset(*.aed)", ".aed"],
-            "mod": ["Model file", "Model file(*.mod)", ".mod"],
-            "aem": ["AequilibraE matrix", "Aequilibrae matrix(*.aem)", ".aem"],
+            "aed": ["AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed"],
+            "mod": ["Model file", ["Model file(*.mod)"], ".mod"],
+            "aem": ["Matrix", ["Aequilibrae matrix(*.aem)"], ".aem"],
         }
 
+        if has_omx:
+            file_types['aem'] = ["Matrix", ['Open Matrix(*.omx)', "Aequilibrae matrix(*.aem)"], ".omx"]
+
         ft = file_types[file_type]
-        file_chosen, _ = GetOutputFileName(self, ft[0], [ft[1]], ft[2], self.path)
+        file_chosen, _ = GetOutputFileName(self, ft[0], ft[1], ft[2], self.path)
         return file_chosen
 
     def add_job_to_queue(self):
@@ -327,7 +312,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                         "row_field": prod_field,
                         "columns": atra_vec,
                         "column_field": atra_field,
-                        "output": out_name,
                         "nan_as_zero": self.chb_empty_as_zero.isChecked(),
                     }
                     worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), **args)
@@ -402,8 +386,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.run_thread()
         except Exception as e:
             logger.error(e.args)
-        print(2)
-        self.exit_procedure()
 
     def check_data(self):
         self.error = None
@@ -452,9 +434,12 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", error.args[0], level=3)
         self.report.extend(self.worker_thread.report)
 
-        if success == "calibrate":
+        if success == 'calibrate':
             self.worker_thread.model.save(self.outfile)
-        print(1)
+
+        if success in ['apply_gravity', 'finishedIPF']:
+            self.worker_thread.output.export(self.outfile)
+        self.exit_procedure()
 
     def exit_procedure(self):
         self.close()

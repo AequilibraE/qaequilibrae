@@ -50,14 +50,18 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = None
 
         formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)"]
+
+        dflt = '.aem'
         if has_omx:
-            formats.insert(1, "Open Matrix(*.omx)")
+            formats.insert(0, "Open Matrix(*.omx)")
+            dflt = '.omx'
+
         self.error = None
         self.data_path, self.data_type = GetOutputFileName(
             self,
             "AequilibraE custom formats",
             formats,
-            ".aem",
+            dflt,
             standard_path(),
         )
 

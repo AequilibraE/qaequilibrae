@@ -26,6 +26,7 @@ Contents
    editingnetworks
    tutorials_and_sample_data
    other
+   SiouxFalls
    engine
 
 
