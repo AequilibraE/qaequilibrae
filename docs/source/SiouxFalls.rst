@@ -107,7 +107,79 @@ the bottom left of the screen.
 
 Desire Lines
 ------------
-One can also generate the
+One can also generate the desire lines and Delaunay lines for the demand matrix
+provided.
+
+.. image:: images/desire_lines_menu.png
+    :width: 448
+    :align: center
+    :alt: desire_lines_menu
+
+After selecting a matrix, the user can choose to un-check the *use all matrices*
+box and select which matrices they want to use (the list of matrices will only
+show if the option is un-checked).
+
+Make sure to select a *zone/node layer* and *node id* that is compatible with
+your matrix.
+
+The user also needs to choose if they want Delaunay lines
+
+.. image:: images/delaunay_results.png
+    :width: 797
+    :align: center
+    :alt: delaunay_results
+
+or desire lines
+
+.. image:: images/desire_lines_map.png
+    :width: 749
+    :align: center
+    :alt: desire_lines_map
+
+
+.. _plotting_flows:
+
+Plotting the flows
+------------------
+
+The tool for plotting link flows can be found under the GIS menu
+
+.. image:: images/select_stacked_bandwidth.png
+    :width: 520
+    :align: center
+    :alt: select_stacked_bandwidth
+
+.. image:: images/add_band.png
+    :width: 760
+    :align: center
+    :alt: add_band
+
+.. image:: images/create_bands.png
+    :width: 737
+    :align: center
+    :alt: create_bands
+
+And we can algo control the overall look of these bands (thickness and
+separation between AB and BA flows) in the project properties.
+
+.. image:: images/project_properties.png
+    :width: 421
+    :align: center
+    :alt: project_properties
+
+.. image:: images/edit_variables.png
+    :width: 886
+    :align: center
+    :alt: edit_variables
+
+And have our map!! ( You need to refresh or pan the map for it to redraw after
+changing the project variables)
+
+.. image:: images/bandwidth_maps.png
+    :width: 1142
+    :align: center
+    :alt: bandwidth_maps
+
 
 Traffic assignment with skimming
 --------------------------------
@@ -180,10 +252,8 @@ block flows through centroids for the reason discussed above.
     :alt: Setup assignment
 
 
-Plotting the flows
-------------------
-
-First we need to add the link flows CSV to the QGIS workspace
+In order to plot the flows as shown above, first we need to add the link flows
+CSV to the QGIS workspace
 
 .. image:: images/add_layer.png
     :width: 173
@@ -207,44 +277,7 @@ Then we join it with the link layer by accessing the link layer's properties
     :align: center
     :alt: link_join
 
-Then we plot the flows
-
-.. image:: images/select_stacked_bandwidth.png
-    :width: 520
-    :align: center
-    :alt: select_stacked_bandwidth
-
-.. image:: images/add_band.png
-    :width: 760
-    :align: center
-    :alt: add_band
-
-.. image:: images/create_bands.png
-    :width: 737
-    :align: center
-    :alt: create_bands
-
-And we can algo control the overall look of these bands (thickness and
-separation between AB and BA flows) in the propect properties.
-
-.. image:: images/project_properties.png
-    :width: 421
-    :align: center
-    :alt: project_properties
-
-.. image:: images/edit_variables.png
-    :width: 886
-    :align: center
-    :alt: edit_variables
-
-And have our map!! ( You need to refresh or pan the map for it to redraw after
-changing the project variables)
-
-.. image:: images/bandwidth_maps.png
-    :width: 1142
-    :align: center
-    :alt: bandwidth_maps
-
+Now we can revisit the instructions above for :ref:`plotting_flows`
 
 Gravity model calibration
 -------------------------
