@@ -242,6 +242,76 @@ changing the project variables)
     :alt: bandwidth_maps
 
 
+Gravity model calibration
+-------------------------
+Now that we have the demand model and a fully converged skim, we can calibrate a
+synthetic gravity model.
+
+We click on Trip distribution in the AequilibraE menu and select the Calibrate
+Gravity model option
+
+
+.. image:: images/trip_distribution_menu.png
+    :width: 478
+    :align: center
+    :alt: trip_distribution_menu
+
+.. image:: images/select_calibrate_gravity.png
+    :width: 320
+    :align: center
+    :alt: select_calibrate_gravity
+
+The firs thing to do is to load all matrices we will need (skim and demand).
+
+.. image:: images/calibrate_matrix_load_matrices.png
+    :width: 540
+    :align: center
+    :alt: calibrate_matrix_load_matrices
+
+Select which matrix/matrix core is to be used as the impedance matrix
+
+.. image:: images/calibrate_matrix_choose_skims.png
+    :width: 526
+    :align: center
+    :alt: calibrate_matrix_choose_skims
+
+Which one is the *observed* matrix
+
+.. image:: images/calibrate_matrix_choose_skims.png
+    :width: 526
+    :align: center
+    :alt: calibrate_matrix_choose_skims
+
+We then select which deterrence function we want to use and choose a file output
+for the model
+
+.. image:: images/calibrate_matrix_choose_output.png
+    :width: 1286
+    :align: center
+    :alt: calibrate_matrix_choose_output
+
+We can then run the procedure
+
+.. image:: images/calibrate_matrix_run.png
+    :width: 546
+    :align: center
+    :alt: calibrate_matrix_run
+
+Inspect the procedure output
+
+.. image:: images/calibrate_matrix_inspect_report.png
+    :width: 857
+    :align: center
+    :alt: calibrate_matrix_inspect_report
+
+The resulting file is of type *.mod, but that is just a YAML (text file).
+
+.. image:: images/calibrate_matrix_model_result.png
+    :width: 704
+    :align: center
+    :alt: calibrate_matrix_model_result
+
+
 Scenario Comparison
 ~~~~~~~~~~~~~~~~
 pass
