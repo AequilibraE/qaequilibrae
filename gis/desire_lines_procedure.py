@@ -127,8 +127,9 @@ class DesireLinesProcedure(WorkerThread):
 
                 total_mat = np.zeros((zones, zones), np.float64)
                 for i, mat in enumerate(self.matrix.view_names):
-                    arrays.append(self.matrix.matrix[mat].flatten())
-                    total_mat += self.matrix.matrix[mat]
+                    m = self.matrix.get_matrix(mat)
+                    total_mat += m
+                    arrays.append(m.flatten())
                     self.desire_lines.emit(('jobs_done_dl', i + 1))
 
                 # Eliminates the cells for which we don't have geography
@@ -306,7 +307,8 @@ class DesireLinesProcedure(WorkerThread):
                 self.graph.status = 'OK'
                 self.graph.network_ok = True
                 self.graph.prepare_graph(self.matrix.index.astype(np.int64))
-                self.graph.set_graph(cost_field="distance", block_centroid_flows=False)
+                self.graph.set_graph(cost_field="distance")
+                self.graph.set_blocked_centroid_flows(False)
 
                 self.results = AssignmentResults()
                 self.results.prepare(self.graph, self.matrix)
@@ -322,7 +324,7 @@ class DesireLinesProcedure(WorkerThread):
                 features = []
                 max_edges = len(edges)
                 self.desire_lines.emit(('job_size_dl', max_edges))
-                link_loads = self.results.save_to_disk()
+                link_loads = self.results.get_load_results()
                 for i, link_id in enumerate(link_loads.index):
                     self.desire_lines.emit(('jobs_done_dl', i))
                     a_node, b_node, direct, dist = dl_ids_on_links[link_id]

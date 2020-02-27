@@ -155,28 +155,9 @@ class AequilibraEMenu:
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
 
-        distMenu = QMenu()
-        self.ipf_action = QAction(self.trlt('Iterative proportional fitting'), self.manager)
-        self.ipf_action.triggered.connect(self.run_ipf)
-        distMenu.addAction(self.ipf_action)
-
-        self.apply_gravity_action = QAction(self.trlt('Apply Gravity Model'), self.manager)
-        self.apply_gravity_action.triggered.connect(self.run_apply_gravity)
-        distMenu.addAction(self.apply_gravity_action)
-
-        self.calibrate_gravity_action = QAction(self.trlt('Calibrate Gravity Model'), self.manager)
-        self.calibrate_gravity_action.triggered.connect(self.run_calibrate_gravity)
-        distMenu.addAction(self.calibrate_gravity_action)
-
-        self.trip_distr_action = QAction(self.trlt('Trip Distribution'), self.manager)
-        self.trip_distr_action.triggered.connect(self.run_distribution_models)
-        distMenu.addAction(self.trip_distr_action)
-
         distributionButton = QToolButton()
         distributionButton.setText(self.trlt('Trip Distribution'))
-        distributionButton.setPopupMode(2)
-        distributionButton.setMenu(distMenu)
-
+        distributionButton.clicked.connect(self.run_distribution_models)
         self.toolbar.addWidget(distributionButton)
 
         # # ########################################################################
@@ -424,15 +405,6 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    def run_calibrate_gravity(self):
-        dlg2 = DistributionModelsDialog(self.iface, "calibrate")
-        dlg2.show()
-        dlg2.exec_()
-
-    def run_apply_gravity(self):
-        dlg2 = DistributionModelsDialog(self.iface, "apply")
-        dlg2.show()
-        dlg2.exec_()
 
     def run_distribution_models(self):
         dlg2 = DistributionModelsDialog(self.iface)
@@ -507,11 +479,6 @@ class AequilibraEMenu:
 
     def run_scenario_comparison(self):
         dlg2 = CompareScenariosDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-
-    def run_ipf(self):
-        dlg2 = DistributionModelsDialog(self.iface, "ipf")
         dlg2.show()
         dlg2.exec_()
 

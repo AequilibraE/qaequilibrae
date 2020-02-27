@@ -33,10 +33,11 @@ import yaml
 from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
-from ..common_tools.get_output_file_name import GetOutputFileName
+from ..common_tools import GetOutputFileName
 from aequilibrae.distribution import SyntheticGravityModel
 from aequilibrae.distribution.synthetic_gravity_model import valid_functions
 from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
+from aequilibrae import logger
 from .ipf_procedure import IpfProcedure
 from .calibrate_gravity_procedure import CalibrateGravityProcedure
 from .apply_gravity_procedure import ApplyGravityProcedure
@@ -59,6 +60,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.job_queue = OrderedDict()
         self.model = SyntheticGravityModel()
         self.model.function = "GAMMA"
+        self.outfile = ''
 
         self.matrices = OrderedDict()
         self.datasets = OrderedDict()
@@ -251,7 +253,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if dt == "data":
                 for f in self.datasets[d].fields:
                     if np.issubdtype(self.datasets[d].data[f].dtype, np.integer) or np.issubdtype(
-                        self.datasets[d].data[f].dtype, np.float
+                            self.datasets[d].data[f].dtype, np.float
                     ):
                         cob_dest.addItem(f)
             else:
@@ -300,6 +302,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         return file_chosen
 
     def add_job_to_queue(self):
+        worker_thread = None
         if self.check_data():
             if self.job != "ipf":
                 imped_matrix = self.matrices[self.cob_imped_mat.currentText()]
@@ -351,7 +354,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                     worker_thread = ApplyGravityProcedure(qgis.utils.iface.mainWindow(), **args)
 
             if self.job == "calibrate":
-                out_name = self.browse_outfile("aem")
+                out_name = self.browse_outfile("mod")
                 if out_name is not None:
                     if self.rdo_expo.isChecked():
                         func_name = "EXPO"
@@ -371,6 +374,8 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                     worker_thread = CalibrateGravityProcedure(qgis.utils.iface.mainWindow(), **args)
 
             self.chb_empty_as_zero.setEnabled(False)
+            if worker_thread is None:
+                return
             self.add_job_to_list(worker_thread, out_name)
         else:
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.error, level=3)
@@ -390,13 +395,14 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         self.progressbar.setVisible(True)
         self.chb_empty_as_zero.setVisible(False)
-        for out_name in self.job_queue.keys():
-            self.worker_thread = self.job_queue[out_name]
-            self.run_thread()
-
-        if self.job == "calibrate":
-            self.worker_thread.model.save(out_name)
-
+        try:
+            for out_name in self.job_queue.keys():
+                self.outfile = out_name
+                self.worker_thread = self.job_queue[self.outfile]
+                self.run_thread()
+        except Exception as e:
+            logger.error(e.args)
+        print(2)
         self.exit_procedure()
 
     def check_data(self):
@@ -445,6 +451,10 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         if error is not None:
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", error.args[0], level=3)
         self.report.extend(self.worker_thread.report)
+
+        if success == "calibrate":
+            self.worker_thread.model.save(self.outfile)
+        print(1)
 
     def exit_procedure(self):
         self.close()
