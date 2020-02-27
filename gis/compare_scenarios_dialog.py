@@ -171,10 +171,12 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
             ba_base = self.ba_FieldComboBoxBase.currentText()
             ab_alt = self.ab_FieldComboBoxAlt.currentText()
             ba_alt = self.ba_FieldComboBoxAlt.currentText()
-            idx_ab = self.layer.dataProvider().fieldNameIndex(ab_base)
-            idx_ba = self.layer.dataProvider().fieldNameIndex(ba_base)
-            idx2_ab = self.layer.dataProvider().fieldNameIndex(ab_alt)
-            idx2_ba = self.layer.dataProvider().fieldNameIndex(ba_alt)
+            fields = [x.name() for x in self.layer.fields()]
+
+            idx_ab = fields.index(ab_base)
+            idx_ba = fields.index(ba_base)
+            idx2_ab = fields.index(ab_alt)
+            idx2_ba = fields.index(ba_alt)
 
             # Create new simple stype
             symbol = QgsLineSymbol.createSimple({"name": "square", "color": "red"})

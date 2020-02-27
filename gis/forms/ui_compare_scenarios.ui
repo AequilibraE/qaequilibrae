@@ -6,421 +6,316 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>471</width>
-    <height>495</height>
+    <width>486</width>
+    <height>410</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>471</width>
-    <height>495</height>
+    <width>486</width>
+    <height>410</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>AequilibraE - Scenario Comparison</string>
   </property>
-  <widget class="QgsMapLayerComboBox" name="mMapLayerComboBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>30</y>
-     <width>451</width>
-     <height>24</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>4</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Line layer</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="but_run">
-   <property name="geometry">
-    <rect>
-     <x>24</x>
-     <y>460</y>
-     <width>421</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Create comparison</string>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="base_group_box">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>70</y>
-     <width>221</width>
-     <height>161</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string/>
-   </property>
-   <property name="title">
-    <string>Base case</string>
-   </property>
-   <widget class="QgsFieldComboBox" name="ba_FieldComboBoxBase">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>120</y>
-      <width>191</width>
-      <height>24</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QgsFieldComboBox" name="ab_FieldComboBoxBase">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>191</width>
-      <height>24</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>BA Flow</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>AB Flow</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="alt_group_box">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>70</y>
-     <width>221</width>
-     <height>161</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Alternative</string>
-   </property>
-   <widget class="QgsFieldComboBox" name="ba_FieldComboBoxAlt">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>120</y>
-      <width>191</width>
-      <height>24</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QgsFieldComboBox" name="ab_FieldComboBoxAlt">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>191</width>
-      <height>24</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_9">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>90</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>BA Flow</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_10">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>AB Flow</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_3">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>240</y>
-     <width>451</width>
-     <height>101</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Formats</string>
-   </property>
-   <widget class="QCheckBox" name="chk_expert_mode">
-    <property name="geometry">
-     <rect>
-      <x>336</x>
-      <y>72</y>
-      <width>101</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reference band size and value are put on variables.&lt;/p&gt;&lt;p&gt;The user can control the map apperance by symply changing the values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="text">
-     <string>Expert mode</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QSlider" name="slider_band_size">
-    <property name="geometry">
-     <rect>
-      <x>173</x>
-      <y>52</y>
-      <width>111</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radio_compo">
-    <property name="geometry">
-     <rect>
-      <x>335</x>
-      <y>44</y>
-      <width>111</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>BASE minus ALTERNATIVE</string>
-    </property>
-    <property name="text">
-     <string>Composite</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radio_diff">
-    <property name="geometry">
-     <rect>
-      <x>335</x>
-      <y>17</y>
-      <width>101</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>BASE minus ALTERNATIVE</string>
-    </property>
-    <property name="text">
-     <string>Differences only</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QSlider" name="slider_spacer">
-    <property name="geometry">
-     <rect>
-      <x>6</x>
-      <y>57</y>
-      <width>121</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>100</number>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Horizontal</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>9</x>
-      <y>27</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Space between bands</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lbl_width">
-    <property name="geometry">
-     <rect>
-      <x>289</x>
-      <y>42</y>
-      <width>31</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>1.00</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="lbl_space">
-    <property name="geometry">
-     <rect>
-      <x>129</x>
-      <y>46</y>
-      <width>31</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>0.00</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>175</x>
-      <y>22</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Maximum band width</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="color_group_box">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>350</y>
-     <width>451</width>
-     <height>101</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Colors</string>
-   </property>
-   <widget class="QgsColorButton" name="common_flow_color">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>50</y>
-      <width>111</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Common</string>
-    </property>
-   </widget>
-   <widget class="QgsColorButton" name="positive_color">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>111</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Positive</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="negative_label">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>20</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Negative differences</string>
-    </property>
-   </widget>
-   <widget class="QgsColorButton" name="negative_color">
-    <property name="geometry">
-     <rect>
-      <x>165</x>
-      <y>50</y>
-      <width>111</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Negative</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="positive_label">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Positive differences</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="common_label">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>20</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Common flow</string>
-    </property>
-   </widget>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout_7">
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="base_group_box">
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="title">
+      <string>Base case</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>AB Flow</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QgsFieldComboBox" name="ab_FieldComboBoxBase"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>BA Flow</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QgsFieldComboBox" name="ba_FieldComboBoxBase"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QGroupBox" name="alt_group_box">
+     <property name="title">
+      <string>Alternative</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>AB Flow</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QgsFieldComboBox" name="ab_FieldComboBoxAlt"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>BA Flow</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QgsFieldComboBox" name="ba_FieldComboBoxAlt"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Formats</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QFrame" name="frame_3">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="1" column="0">
+          <widget class="QSlider" name="slider_spacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="lbl_space">
+           <property name="text">
+            <string>1.00</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Space between bands</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="1" column="0">
+          <widget class="QSlider" name="slider_band_size">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="lbl_width">
+           <property name="text">
+            <string>1.00</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Maximum band width</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QRadioButton" name="radio_diff">
+           <property name="toolTip">
+            <string>BASE minus ALTERNATIVE</string>
+           </property>
+           <property name="text">
+            <string>Differences only</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QRadioButton" name="radio_compo">
+           <property name="toolTip">
+            <string>BASE minus ALTERNATIVE</string>
+           </property>
+           <property name="text">
+            <string>Composite</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="chk_expert_mode">
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reference band size and value are put on variables.&lt;/p&gt;&lt;p&gt;The user can control the map apperance by symply changing the values&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Expert mode</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QGroupBox" name="color_group_box">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>80</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Colors</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <widget class="QLabel" name="positive_label">
+        <property name="text">
+         <string>Positive differences</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="negative_label">
+        <property name="text">
+         <string>Negative differences</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="common_label">
+        <property name="text">
+         <string>Common flow</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QgsColorButton" name="positive_color">
+        <property name="text">
+         <string>Positive</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QgsColorButton" name="negative_color">
+        <property name="text">
+         <string>Negative</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QgsColorButton" name="common_flow_color">
+        <property name="text">
+         <string>Common</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QPushButton" name="but_run">
+     <property name="text">
+      <string>Create comparison</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QFrame" name="frame_4">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Line layer</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QgsMapLayerComboBox" name="mMapLayerComboBox">
+        <property name="minimumSize">
+         <size>
+          <width>370</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>
