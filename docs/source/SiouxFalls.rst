@@ -311,6 +311,66 @@ The resulting file is of type *.mod, but that is just a YAML (text file).
     :align: center
     :alt: calibrate_matrix_model_result
 
+Forecast
+--------
+
+If one has future matrix vectors (there are some provided with the example
+dataset), they can either apply the Iterative Proportional Fitting (IPF)
+procedure available, or apply a gravity model just calibrated. Here we present
+the latter.
+
+.. image:: images/apply_gravity_menu.png
+    :width: 616
+    :align: center
+    :alt: apply_gravity_menu
+
+With the menu open, one loads the dataset(s) with the production/origin and
+attraction/destination vectors
+
+.. image:: images/apply_gravity_load_vectors.png
+    :width: 1061
+    :align: center
+    :alt: apply_gravity_load_vectors
+
+We also load the impedance/skim matrix to be used
+
+.. image:: images/apply_gravity_load_skims.png
+    :width: 1033
+    :align: center
+    :alt: apply_gravity_load_skims
+
+We select the production/attraction (origin/destination) vectors
+
+.. image:: images/apply_gravity_select_vectors.png
+    :width: 535
+    :align: center
+    :alt: apply_gravity_select_vectors
+
+And the impedance matrix to be used
+
+.. image:: images/apply_gravity_select_impedance_matrix.png
+    :width: 513
+    :align: center
+    :alt: apply_gravity_select_impedance_matrix
+
+The last input is the gravity model itself, which can be done by loading a
+model that has been previously calibrated, or by selecting the deterrence
+function from the drop-down menu and typing the corresponding parameter values.
+
+.. image:: images/apply_gravity_configure_model.png
+    :width: 526
+    :align: center
+    :alt: apply_gravity_configure_model
+
+To run the procedure, simply queue the job (and select the output wile with the
+screen that will open) and press *Run jobs*.
+
+.. image:: images/apply_gravity_queue_model.png
+    :width: 1116
+    :align: center
+    :alt: apply_gravity_queue_model
+
+
 
 Scenario Comparison
 ~~~~~~~~~~~~~~~~
