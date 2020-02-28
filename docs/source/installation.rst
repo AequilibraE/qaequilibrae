@@ -14,19 +14,19 @@ Step--by-step installation
 The steps for installing AequilibraE are the same as for any QGIS plugin
 
 .. image:: images/install_1.png
-    :scale: 100 %
+    :width: 1181
     :align: center
     :alt: First step
 
 
 .. image:: images/install_2.png
-    :scale: 100 %
+    :width: 1035
     :align: center
     :alt: Second step
 
 
 .. image:: images/install_3.png
-    :scale: 100 %
+    :width: 1062
     :align: center
     :alt: Third step
 
@@ -38,13 +38,13 @@ The steps for installing AequilibraE are the same as for any QGIS plugin
    for experimental plugins within the QGIS plugin manager.
 
 .. image:: images/install_4.png
-    :scale: 100 %
+    :width: 1234
     :align: center
     :alt: Fourth step
 
 
 .. image:: images/install_5.png
-    :scale: 100 %
+    :width: 1226
     :align: center
     :alt: Fifth step
 
@@ -54,7 +54,7 @@ is because you are missing some files.
 
 
 .. image:: images/no_binaries_error.png
-    :scale: 100 %
+    :width: 1099
     :align: center
     :alt: no_binaries_error
 
@@ -68,19 +68,19 @@ AequilibraE menu, but it does require restarting QGIS
 
 
 .. image:: images/install_6.png
-    :scale: 100 %
+    :width: 492
     :align: center
     :alt: Sixth step
 
 
 .. image:: images/install_7.png
-    :scale: 100 %
+    :width: 675
     :align: center
     :alt: Seventh step
 
 
 .. image:: images/install_8.png
-    :scale: 100 %
+    :width: 969
     :align: center
     :alt: Eighth step
 
@@ -102,7 +102,7 @@ best way of doing it is to run QGIS as an administrator and click on *install*
 *extra packages* from the AequilibraE menu, as shown below.
 
 .. image:: images/install_extra_packages.png
-    :scale: 100 %
+    :width: 781
     :align: center
     :alt: Extra packages
 
@@ -110,7 +110,7 @@ You will be asked to confirm your actions before AequilibraE attempts to install
 openmatrix with the screen shown below.
 
 .. image:: images/install_extra_packages_confirmation.png
-    :scale: 100 %
+    :width: 818
     :align: center
     :alt: Confirmation
 
@@ -118,14 +118,14 @@ If you have correctly installed it, the logging screen will clearly state that
 the process was successful, as shown below
 
 .. image:: images/install_extra_packages_success.png
-    :scale: 100 %
+    :width: 971
     :align: center
     :alt: Success
 
 And it would report failure in case something has gone wrong.
 
 .. image:: images/install_extra_packages_failure.png
-    :scale: 100 %
+    :width: 968
     :align: center
     :alt: Failure
 

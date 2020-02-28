@@ -28,7 +28,7 @@ people find themselves stranded.
 
 
 .. image:: images/gis_desire_lines.png
-    :scale: 100 %
+    :width: 800
     :align: center
     :alt: Desire Lines menu
 

@@ -29,7 +29,7 @@ Make sure that you followed the layer preparation instructions on
 The project creation resource lives under the project menu.
 
 .. image:: images/create_project_from_layers.png
-    :scale: 100 %
+    :width: 479
     :align: center
     :alt: create_project_from_layers
 
@@ -42,7 +42,7 @@ more fields from the layer, as all of them are listed on the left side of the
 screen
 
 .. image:: images/project_from_layers_links.png
-    :scale: 100 %
+    :width: 614
     :align: center
     :alt: project_from_layers_links
 
@@ -50,7 +50,7 @@ screen
 In the case of the nodes layer, only two fields are mandatory.
 
 .. image:: images/project_from_layers_nodes.png
-    :scale: 100 %
+    :width: 614
     :align: center
     :alt: project_from_layers_nodes
 
@@ -62,7 +62,7 @@ Opening the project
 Before we do anything else, we need to open the project.
 
 .. image:: images/opening_project.png
-    :scale: 100 %
+    :width: 560
     :align: center
     :alt: Opening the project
 
@@ -75,14 +75,14 @@ to see if the network is connected and if paths make sense.
 
 
 .. image:: images/path_computation_menu.png
-    :scale: 100 %
+    :width: 444
     :align: center
     :alt: path_computation_menu
 
 Before computing a path, we go to the configuration screen
 
 .. image:: images/configure_path_computation.png
-    :scale: 100 %
+    :width: 257
     :align: center
     :alt: configure_path_computation
 
@@ -92,7 +92,7 @@ case. For zones with a single connector per zone it is slightly faster to also
 deselect this option, but use this carefully.
 
 .. image:: images/path_computation_configuration.png
-    :scale: 100 %
+    :width: 282
     :align: center
     :alt: path_computation_configuration
 
@@ -102,7 +102,7 @@ created and formatted in a noticeable way. You can also select to have links
 selected in the layer, but only one path can be shown at at time if you do so.
 
 .. image:: images/paths_generated.png
-    :scale: 100 %
+    :width: 1696
     :align: center
     :alt: paths_generated
 
@@ -112,7 +112,7 @@ Skimming
 We can also skim the network to look into general connectivity of the network
 
 .. image:: images/skimming_menu.png
-    :scale: 100 %
+    :width: 507
     :align: center
     :alt: skimming_menu
 
@@ -124,14 +124,14 @@ when computing shortest paths and the fields we should skim when computing those
 paths.
 
 .. image:: images/performing_skimming.png
-    :scale: 100 %
+    :width: 675
     :align: center
     :alt: performing_skimming
 
 With the results computed (AEM or OMX), one can display them on the screen.
 
 .. image:: images/display_data.png
-    :scale: 100 %
+    :width: 485
     :align: center
     :alt: display_data
 
@@ -141,7 +141,7 @@ skims in this file by selecting the skim of choice in the drop down menu in
 the bottom left of the screen.
 
 .. image:: images/viewing_matrix.png
-    :scale: 100 %
+    :width: 1146
     :align: center
     :alt: viewing_matrix
 
@@ -151,7 +151,7 @@ One can also generate the desire lines and Delaunay lines for the demand matrix
 provided.
 
 .. image:: images/desire_lines_menu.png
-    :scale: 100 %
+    :width: 448
     :align: center
     :alt: desire_lines_menu
 
@@ -165,14 +165,14 @@ your matrix.
 The user also needs to choose if they want Delaunay lines
 
 .. image:: images/delaunay_results.png
-    :scale: 100 %
+    :width: 797
     :align: center
     :alt: delaunay_results
 
 or desire lines
 
 .. image:: images/desire_lines_map.png
-    :scale: 100 %
+    :width: 749
     :align: center
     :alt: desire_lines_map
 
@@ -186,17 +186,17 @@ The tool for plotting link flows you just saw above can be found under the GIS
 menu
 
 .. image:: images/select_stacked_bandwidth.png
-    :scale: 100 %
+    :width: 520
     :align: center
     :alt: select_stacked_bandwidth
 
 .. image:: images/add_band.png
-    :scale: 100 %
+    :width: 760
     :align: center
     :alt: add_band
 
 .. image:: images/create_bands.png
-    :scale: 100 %
+    :width: 737
     :align: center
     :alt: create_bands
 
@@ -205,12 +205,12 @@ control the overall look of these bands (thickness and separation between AB and
 BA flows) in the project properties.
 
 .. image:: images/project_properties.png
-    :scale: 100 %
+    :width: 421
     :align: center
     :alt: project_properties
 
 .. image:: images/edit_variables.png
-    :scale: 100 %
+    :width: 886
     :align: center
     :alt: edit_variables
 
@@ -218,7 +218,7 @@ And have our map!! ( You need to refresh or pan the map for it to redraw after
 changing the project variables)
 
 .. image:: images/bandwidth_maps.png
-    :scale: 100 %
+    :width: 1142
     :align: center
     :alt: bandwidth_maps
 
@@ -230,17 +230,17 @@ Having verified that the network seems to be in order, one can proceed to
 perform traffic assignment, since we have a demand matrix:
 
 .. image:: images/traffic_assignment.png
-    :scale: 100 %
+    :width: 877
     :align: center
     :alt: Calling assignment
 
 .. image:: images/project_overview.png
-    :scale: 100 %
+    :width: 877
     :align: center
     :alt: Project overview
 
 .. image:: images/traffic_open_matrix.png
-    :scale: 100 %
+    :width: 877
     :align: center
     :alt: Calling assignment
 
@@ -248,14 +248,14 @@ Matrices are provided in both OMX and AEM formats, so you are not required to
 install openmatrix.
 
 .. image:: images/choose_matrix.png
-    :scale: 100 %
+    :width: 1314
     :align: center
     :alt: Choose matrix
 
 For this example, we only add one traffic class for mode **c** (car)
 
 .. image:: images/add_traffic_class.png
-    :scale: 100 %
+    :width: 877
     :align: center
     :alt: Add traffic class
 
@@ -263,7 +263,7 @@ For this example, we only add one traffic class for mode **c** (car)
 To select skims, we need to choose which fields/modes we will skim
 
 .. image:: images/skim_field_selection.png
-    :scale: 100 %
+    :width: 877
     :align: center
     :alt: Skim selection
 
@@ -271,7 +271,7 @@ And if we want the skim for the last iteration (like we would for time) or if we
 want it averaged out for all iterations (properly averaged, that is).
 
 .. image:: images/skim_blended_versus_final.png
-    :scale: 100 %
+    :width: 877
     :align: center
     :alt: Skim iterations
 
@@ -289,7 +289,7 @@ assignment algorithm and the output folder. In this case, we again choose to not
 block flows through centroids for the reason discussed above.
 
 .. image:: images/setup_assignment.png
-    :scale: 100 %
+    :width: 898
     :align: center
     :alt: Setup assignment
 
@@ -298,24 +298,24 @@ In order to plot the flows as shown above, first we need to add the link flows
 CSV to the QGIS workspace
 
 .. image:: images/add_layer.png
-    :scale: 100 %
+    :width: 173
     :align: center
     :alt: add_layer
 
 .. image:: images/add_link_flows_to_map.png
-    :scale: 100 %
+    :width: 83
     :align: center
     :alt: add_link_flows_to_map
 
 Then we join it with the link layer by accessing the link layer's properties
 
 .. image:: images/layer_properties.png
-    :scale: 100 %
+    :width: 523
     :align: center
     :alt: layer_properties
 
 .. image:: images/link_join.png
-    :scale: 100 %
+    :width: 1449
     :align: center
     :alt: link_join
 
@@ -331,33 +331,33 @@ Gravity model option
 
 
 .. image:: images/trip_distribution_menu.png
-    :scale: 100 %
+    :width: 478
     :align: center
     :alt: trip_distribution_menu
 
 .. image:: images/select_calibrate_gravity.png
-    :scale: 100 %
+    :width: 241
     :align: center
     :alt: select_calibrate_gravity
 
 The first thing to do is to load all matrices we will need (skim and demand).
 
 .. image:: images/calibrate_matrix_load_matrices.png
-    :scale: 100 %
+    :width: 513
     :align: center
     :alt: calibrate_matrix_load_matrices
 
 Select which matrix/matrix core is to be used as the impedance matrix
 
 .. image:: images/calibrate_matrix_choose_skims.png
-    :scale: 100 %
+    :width: 513
     :align: center
     :alt: calibrate_matrix_choose_skims
 
 Which one is the *observed* matrix
 
 .. image:: images/calibrate_matrix_choose_observed.png
-    :scale: 100 %
+    :width: 513
     :align: center
     :alt: calibrate_matrix_choose_observed
 
@@ -365,28 +365,28 @@ We then select which deterrence function we want to use and choose a file output
 for the model
 
 .. image:: images/calibrate_matrix_choose_output.png
-    :scale: 100 %
+    :width: 1286
     :align: center
     :alt: calibrate_matrix_choose_output
 
 We can then run the procedure
 
 .. image:: images/calibrate_matrix_run.png
-    :scale: 100 %
+    :width: 513
     :align: center
     :alt: calibrate_matrix_run
 
 Inspect the procedure output
 
 .. image:: images/calibrate_matrix_inspect_report.png
-    :scale: 100 %
+    :width: 845
     :align: center
     :alt: calibrate_matrix_inspect_report
 
 The resulting file is of type *.mod, but that is just a YAML (text file).
 
 .. image:: images/calibrate_matrix_model_result.png
-    :scale: 100 %
+    :width: 704
     :align: center
     :alt: calibrate_matrix_model_result
 
@@ -399,7 +399,7 @@ procedure available, or apply a gravity model just calibrated. Here we present
 the latter.
 
 .. image:: images/apply_gravity_menu.png
-    :scale: 100 %
+    :width: 616
     :align: center
     :alt: apply_gravity_menu
 
@@ -407,28 +407,28 @@ With the menu open, one loads the dataset(s) with the production/origin and
 attraction/destination vectors
 
 .. image:: images/apply_gravity_load_vectors.png
-    :scale: 100 %
+    :width: 1061
     :align: center
     :alt: apply_gravity_load_vectors
 
 We also load the impedance/skim matrix to be used
 
 .. image:: images/apply_gravity_load_skims.png
-    :scale: 100 %
+    :width: 1033
     :align: center
     :alt: apply_gravity_load_skims
 
 We select the production/attraction (origin/destination) vectors
 
 .. image:: images/apply_gravity_select_vectors.png
-    :scale: 100 %
+    :width: 535
     :align: center
     :alt: apply_gravity_select_vectors
 
 And the impedance matrix to be used
 
 .. image:: images/apply_gravity_select_impedance_matrix.png
-    :scale: 100 %
+    :width: 513
     :align: center
     :alt: apply_gravity_select_impedance_matrix
 
@@ -437,7 +437,7 @@ model that has been previously calibrated, or by selecting the deterrence
 function from the drop-down menu and typing the corresponding parameter values.
 
 .. image:: images/apply_gravity_configure_model.png
-    :scale: 100 %
+    :width: 526
     :align: center
     :alt: apply_gravity_configure_model
 
@@ -445,7 +445,7 @@ To run the procedure, simply queue the job (and select the output wile with the
 screen that will open) and press *Run jobs*.
 
 .. image:: images/apply_gravity_queue_model.png
-    :scale: 100 %
+    :width: 1116
     :align: center
     :alt: apply_gravity_queue_model
 
@@ -465,7 +465,7 @@ understand.
 The scenario comparison tool is under the GIS menu
 
 .. image:: images/scenario_comparison_menu.png
-    :scale: 100 %
+    :width: 438
     :align: center
     :alt: scenario_comparison_menu
 
@@ -482,14 +482,14 @@ As it was the case for stacked bandwidth formatting, expert mode sets project
 variables as levers to change the map formatting.
 
 .. image:: images/scenario_comparison_configuration.png
-    :scale: 100 %
+    :width: 473
     :align: center
     :alt: scenario_comparison_configuration
 
 And this is what it looks like
 
 .. image:: images/scenario_comparison_map.png
-    :scale: 100 %
+    :width: 778
     :align: center
     :alt: scenario_comparison_map
 

@@ -40,7 +40,7 @@ Importing networks from OSM can be done by choosing an area for download,
 defined as the current map canvas on QGIS...
 
 .. image:: images/model_from_canvas_area.png
-    :scale: 100 %
+    :width: 999
     :align: center
     :alt: Download OSM networks for visible area
 
@@ -48,7 +48,7 @@ defined as the current map canvas on QGIS...
 ... or for a named place.
 
 .. image:: images/model_from_place.png
-    :scale: 100 %
+    :width: 1057
     :align: center
     :alt: Download OSM networks for named place
 
@@ -83,7 +83,7 @@ Accessing **AequilibraE > Project > Create Project from Layers**, the user is
 presented with the following screen.
 
 .. image:: images/project_from_layers.png
-    :scale: 100 %
+    :width: 1425
     :align: center
     :alt: Create project from layers
 
@@ -123,7 +123,7 @@ the results of this tool **CAREFULLY**.
 The **GUI** for this procedure is fairly straightforward, as shown below.
 
 .. image:: images/add_connectors_to_project.png
-    :scale: 100 %
+    :width: 827
     :align: center
     :alt: Adding connectors
 
