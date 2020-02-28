@@ -182,7 +182,8 @@ or desire lines
 Plotting the flows
 ------------------
 
-The tool for plotting link flows can be found under the GIS menu
+The tool for plotting link flows you just saw above can be found under the GIS
+menu
 
 .. image:: images/select_stacked_bandwidth.png
     :width: 520
@@ -229,17 +230,17 @@ Having verified that the network seems to be in order, one can proceed to
 perform traffic assignment, since we have a demand matrix:
 
 .. image:: images/traffic_assignment.png
-    :width: 783
+    :width: 877
     :align: center
     :alt: Calling assignment
 
 .. image:: images/project_overview.png
-    :width: 963
+    :width: 877
     :align: center
     :alt: Project overview
 
 .. image:: images/traffic_open_matrix.png
-    :width: 904
+    :width: 877
     :align: center
     :alt: Calling assignment
 
@@ -254,7 +255,7 @@ install openmatrix.
 For this example, we only add one traffic class for mode **c** (car)
 
 .. image:: images/add_traffic_class.png
-    :width: 951
+    :width: 877
     :align: center
     :alt: Add traffic class
 
@@ -262,7 +263,7 @@ For this example, we only add one traffic class for mode **c** (car)
 To select skims, we need to choose which fields/modes we will skim
 
 .. image:: images/skim_field_selection.png
-    :width: 896
+    :width: 877
     :align: center
     :alt: Skim selection
 
@@ -270,7 +271,7 @@ And if we want the skim for the last iteration (like we would for time) or if we
 want it averaged out for all iterations (properly averaged, that is).
 
 .. image:: images/skim_blended_versus_final.png
-    :width: 898
+    :width: 877
     :align: center
     :alt: Skim iterations
 
@@ -335,30 +336,30 @@ Gravity model option
     :alt: trip_distribution_menu
 
 .. image:: images/select_calibrate_gravity.png
-    :width: 320
+    :width: 241
     :align: center
     :alt: select_calibrate_gravity
 
-The firs thing to do is to load all matrices we will need (skim and demand).
+The first thing to do is to load all matrices we will need (skim and demand).
 
 .. image:: images/calibrate_matrix_load_matrices.png
-    :width: 540
+    :width: 513
     :align: center
     :alt: calibrate_matrix_load_matrices
 
 Select which matrix/matrix core is to be used as the impedance matrix
 
 .. image:: images/calibrate_matrix_choose_skims.png
-    :width: 526
+    :width: 513
     :align: center
     :alt: calibrate_matrix_choose_skims
 
 Which one is the *observed* matrix
 
-.. image:: images/calibrate_matrix_choose_skims.png
-    :width: 526
+.. image:: images/calibrate_matrix_choose_observed.png
+    :width: 513
     :align: center
-    :alt: calibrate_matrix_choose_skims
+    :alt: calibrate_matrix_choose_observed
 
 We then select which deterrence function we want to use and choose a file output
 for the model
@@ -371,14 +372,14 @@ for the model
 We can then run the procedure
 
 .. image:: images/calibrate_matrix_run.png
-    :width: 546
+    :width: 513
     :align: center
     :alt: calibrate_matrix_run
 
 Inspect the procedure output
 
 .. image:: images/calibrate_matrix_inspect_report.png
-    :width: 857
+    :width: 845
     :align: center
     :alt: calibrate_matrix_inspect_report
 
