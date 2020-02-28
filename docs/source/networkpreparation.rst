@@ -37,7 +37,7 @@ opportunity to indicate your field of choice to contain link ids when it is time
 to create the project.
 
 .. image:: images/create_link_id.png
-    :width: 859
+    :scale: 100 %
     :align: center
     :alt: Creating Link IDs
 
@@ -93,7 +93,7 @@ The tool can be accessed in the AequilibraE menu *AequilibraE > Network
 Manipulation > Network Preparation* , and it looks like this:
 
 .. image:: images/network_edit_network_preparation.png
-    :width: 774
+    :scale: 100 %
     :align: center
     :alt: Network preparation
 

@@ -27,7 +27,7 @@ disjoint. To enable this function, one can access the option
 *Snapping on Intersection* button, as depicted below
 
 .. image:: images/snapping_for_project.png
-    :width: 1056
+    :scale: 100 %
     :align: center
     :alt: Snapping to vertex for one project
 
@@ -36,7 +36,7 @@ To make this option default for all future projects, one can access the menu
 After that it is just a matter of enabling snapping by default, as shown below
 
 .. image:: images/snapping_for_all_future.png
-    :width: 1056
+    :scale: 100 %
     :align: center
     :alt: Snapping to vertex for all projects
 
@@ -86,7 +86,7 @@ standard tool, which can be accessed on  **Vector > Geometry Tools >**
 Running it looks like this:
 
 .. image:: images/network_edit_multipart_to_singlepart.png
-    :width: 800
+    :scale: 100 %
     :align: center
     :alt: Multipart to Singleparts
 
@@ -103,7 +103,7 @@ QGIS has straightforward tools to extract centroids from areas, which can be
 accessed through the menu  **Vector > Geometry Tools > Centroids**, as shown below
 
 .. image:: images/network_edit_centroids_menu.png
-    :width: 800
+    :scale: 100 %
     :align: center
     :alt: Polygons to centroids
 
