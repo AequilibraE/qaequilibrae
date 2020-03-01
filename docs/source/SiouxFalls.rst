@@ -1,3 +1,5 @@
+.. _sioux_falls:
+
 Sioux Falls
 ===========
 

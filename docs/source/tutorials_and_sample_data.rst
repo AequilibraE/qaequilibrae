@@ -6,6 +6,14 @@ Tutorials and Sample data
 .. toctree::
    :maxdepth: 2
 
+It is not our intention here to provide a transportation modeling course, so the
+material listed below assumes that you are somewhat familiar with traditional
+transport modeling.
+
+For an example workflow, check the comprehensive example we prepared for
+:ref:`sioux_falls`.
+
+Several portions of that work flow have also been reproduced in Python.
 
 Sample Data
 ~~~~~~~~~~~
