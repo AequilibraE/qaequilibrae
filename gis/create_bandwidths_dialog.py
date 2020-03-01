@@ -1,24 +1,3 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Main interface for creating stacked bandwidths for link layers
- Purpose:    Load GUI and user interface for the bandwidth creation
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-10-24
- Updated:    2019-04-03
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
 import qgis
 from functools import partial
 from qgis.core import *
@@ -113,6 +92,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
     def choose_a_field(self, modified):
         i, j = "AB", "BA"
+        if self.layer is None:
+            return
 
         if modified == i:
             text = self.ab_FieldComboBox.currentText().upper()
