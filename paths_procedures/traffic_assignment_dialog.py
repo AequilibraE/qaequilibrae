@@ -352,21 +352,20 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 q.setVisible(True)
                 self.progressbar0.setRange(0, self.project.network.count_centroids())
 
-            if True:
-                if algorithm == 'all-or-nothing':
-                    cls = [x for x in self.traffic_classes.values() if x is not None][0]
-                    self.worker_thread = allOrNothing(cls.matrix, cls.graph, cls.results)
-                else:
-                    self.assignment.set_classes([x for x in self.traffic_classes.values() if x is not None])
-                    self.assignment.set_vdf(self.cob_vdf.currentText())
-                    self.assignment.set_vdf_parameters(self.vdf_parameters)
-                    self.assignment.set_capacity_field(self.cob_capacity.currentText())
-                    self.assignment.set_time_field(self.cob_ffttime.currentText())
-                    self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
-                    self.assignment.max_iter = self.miter
-                    self.assignment.rgap_target = float(self.rel_gap.text())
-                    self.worker_thread = self.assignment.assignment
-                self.run_thread()
+            if algorithm == 'all-or-nothing':
+                cls = [x for x in self.traffic_classes.values() if x is not None][0]
+                self.worker_thread = allOrNothing(cls.matrix, cls.graph, cls.results)
+            else:
+                self.assignment.set_classes([x for x in self.traffic_classes.values() if x is not None])
+                self.assignment.set_vdf(self.cob_vdf.currentText())
+                self.assignment.set_vdf_parameters(self.vdf_parameters)
+                self.assignment.set_capacity_field(self.cob_capacity.currentText())
+                self.assignment.set_time_field(self.cob_ffttime.currentText())
+                self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
+                self.assignment.max_iter = self.miter
+                self.assignment.rgap_target = float(self.rel_gap.text())
+                self.worker_thread = self.assignment.assignment
+            self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage("Input error", self.error, level=3)
 
@@ -412,12 +411,13 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def produce_all_outputs(self):
         fn = os.path.join(self.output_path, "skims.aem")
 
+        fn_omx = os.path.join(self.output_path, "skims.omx")
         if self.cb_choose_algorithm.currentText() == 'all-or-nothing':
             cls = [x for x in self.traffic_classes.values() if x is not None][0]
             cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.csv"), output="loads")
             cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.aed"), output="loads")
             if has_omx:
-                cls.results.skims.export(os.path.join(self.output_path, "skims.omx"))
+                cls.results.skims.export(fn_omx)
             else:
                 cls.results.skims.export(fn)
             return
@@ -464,7 +464,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
             skims.index[:] = cls.matrix.index[:]
             if has_omx:
-                skims.export(os.path.join(self.output_path, "skims.omx"))
+                skims.export(fn_omx)
                 skims.close()
                 del skims
                 os.unlink(fn)
