@@ -98,7 +98,7 @@ deselect this option, but use this carefully.
     :align: center
     :alt: path_computation_configuration
 
-If we select that paths need to be in a separate layer, than every time you
+If we select that paths need to be in a separate layer, then every time you
 compute a path, a new layer with a copy of the links in that path will be
 created and formatted in a noticeable way. You can also select to have links
 selected in the layer, but only one path can be shown at at time if you do so.
@@ -118,7 +118,7 @@ We can also skim the network to look into general connectivity of the network
     :align: center
     :alt: skimming_menu
 
-To perform skim, we can select to compute a matrix from all nodes to all nodes,
+To perform skimming, we can select to compute a matrix from all nodes to all nodes,
 or from centroids to centroids, as well as to not allow flows through centroids.
 
 The main controls, however, are the mode to skim, the field we should minimize
@@ -443,7 +443,7 @@ function from the drop-down menu and typing the corresponding parameter values.
     :align: center
     :alt: apply_gravity_configure_model
 
-To run the procedure, simply queue the job (and select the output wile with the
+To run the procedure, simply queue the job (and select the output while with the
 screen that will open) and press *Run jobs*.
 
 .. image:: images/apply_gravity_queue_model.png

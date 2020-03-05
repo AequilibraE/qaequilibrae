@@ -32,7 +32,7 @@ Contents
 
 Quick Tour
 ----------
-AequilibraE 0.6 for QGIS has brought substantial to the previous graphical
+AequilibraE 0.6 for QGIS has brought substantial changes to the previous graphical
 interface, which might cause some confusion to old users. For a brief overview
 of the new interface, we have prepared a little video tour.
 

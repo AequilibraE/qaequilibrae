@@ -122,9 +122,9 @@ Links need to have directionality associated to them because **links can be**
 commercial platforms in the market. For this reason, one needs to have a field
 for link direction with values in the set [-1, 0, 1], where:
 
-* If **direction = -1**, then we the link allows **BA flow only**
-* If **direction = 0**, then we the link allows flows in **both directions**
-* If **direction = 1**, then we the link allows **AB flow only**
+* If **direction = -1**, then the link allows **BA flow only**
+* If **direction = 0**, then the link allows flows in **both directions**
+* If **direction = 1**, then the link allows **AB flow only**
 
 Distance
 --------
