@@ -9,7 +9,7 @@ AequilibraE Project
 The AequilibraE project is one of the newest portions of the
 `aequilibrae API <www.aequilibrae.com/python>`_, and therefore not very mature.
 
-For a better over.overview of the AequilibraE project, please check the
+For a better overview of the AequilibraE project, please check the
 documentation listed above, as this page is dedicated to a practical implementation
 
 Create project from OSM
@@ -137,7 +137,7 @@ Instead, we have chosen to develop the procedure with the following criteria:
 * All modes will be connected to links where those modes are allowed.
 * When considering number of connectors per centroid, there is no guarantee that
   each and every mode will have that number of connectors. If a particular mode
-  only available rather far from the centroid, it is likely that a single
+  is only available rather far from the centroid, it is likely that a single
   connector to that mode will be created for that centroid
 * When considering the maximum length of connectors, the **GUI** returns to the
   user the list of centroids/modes that could not be connected.
