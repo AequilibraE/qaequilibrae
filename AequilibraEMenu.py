@@ -21,7 +21,7 @@ from qgis.PyQt.QtCore import *
 # from PyQt4.QtGui import *
 from qgis.PyQt.QtGui import *
 
-from .common_tools import ParameterDialog, GetOutputFileName
+from .common_tools import ParameterDialog, GetOutputFileName, LogDialog
 
 from .common_tools import AboutDialog
 from .common_tools.auxiliary_functions import standard_path
@@ -241,6 +241,11 @@ class AequilibraEMenu:
         aboutButton.clicked.connect(self.run_about)
         self.toolbar.addWidget(aboutButton)
 
+        logButton = QToolButton()
+        logButton.setText(self.trlt('logfile'))
+        logButton.clicked.connect(self.run_log)
+        self.toolbar.addWidget(logButton)
+
         helpButton = QToolButton()
         helpButton.setText(self.trlt('Help'))
         helpButton.clicked.connect(self.run_help)
@@ -282,6 +287,11 @@ class AequilibraEMenu:
             subprocess.Popen(['open', url])
         else:
             webbrowser.open_new_tab(url)
+
+    def run_log(self):
+        dlg2 = LogDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def unload(self):
         del self.dock
