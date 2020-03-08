@@ -235,8 +235,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if dt == "data":
                 for f in self.datasets[d].fields:
                     if np.issubdtype(self.datasets[d].data[f].dtype, np.integer) or np.issubdtype(
-                            self.datasets[d].data[f].dtype, np.float
-                    ):
+                            self.datasets[d].data[f].dtype, np.float):
                         cob_dest.addItem(f)
             else:
                 for f in self.matrices[d].names:
