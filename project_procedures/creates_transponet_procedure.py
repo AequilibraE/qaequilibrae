@@ -1,25 +1,3 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Procedure for creating a TranspoNet from layers previously prepared
- Purpose:    TranspoNet creation
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
- Transponet Repository: https://github.com/AequilibraE/TranspoNet
-
- Created:    2017-05-03
- Updated:    2020-02-08
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
 from shutil import copyfile
 from qgis.core import *
 from qgis.PyQt.QtCore import *
@@ -137,10 +115,12 @@ class CreatesTranspoNetProcedure(WorkerThread):
             try:
                 curr.execute(sql)
             except:
+                logger.info(f'Failed inserting link {f.id()}')
+                logger.info(sql)
                 if f.id():
-                    msg = "feature with id " + str(f.id()) + " could not be added to layer " + table
+                    msg = f"feature with id {f.id()} could not be added to layer {table}"
                 else:
-                    msg = "feature with no node id present. It could not be added to layer " + table
+                    msg = f"feature with no node id present. It could not be added to layer {table}"
                 self.report.append(msg)
 
         # We check if all modes exist
