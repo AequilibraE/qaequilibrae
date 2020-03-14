@@ -267,6 +267,7 @@ class AequilibraEMenu:
         # #################        PROJECT MANAGER       #########################
 
         self.showing = QCheckBox()
+        self.showing.setText('Show project info')
         self.showing.setChecked(True)
         self.toolbar.addWidget(self.showing)
 
