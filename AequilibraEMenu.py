@@ -4,7 +4,7 @@ import tempfile
 import glob
 import importlib.util as iutil
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QListWidget, QListWidgetItem, QAbstractItemView, QAction, \
-    QVBoxLayout, QToolBar, QToolButton, QMenu, QPushButton, QTabWidget, QLabel
+    QVBoxLayout, QToolBar, QToolButton, QMenu, QPushButton, QTabWidget, QLabel, QCheckBox
 import qgis
 from qgis.core import QgsWkbTypes, QgsAnnotationManager, QgsProject, QgsGeometry, QgsRectangle, QgsTextAnnotation
 from qgis.gui import QgsMapTool, QgsRubberBand
@@ -266,10 +266,16 @@ class AequilibraEMenu:
         # ########################################################################
         # #################        PROJECT MANAGER       #########################
 
+        self.showing = QCheckBox()
+        self.showing.setChecked(True)
+        self.toolbar.addWidget(self.showing)
+
+        self.showing.toggled.connect(self.hide_info_pannel)
         self.projectManager = QTabWidget()
         self.toolbar.addWidget(self.projectManager)
 
         # # # ########################################################################
+        self.tabContents = []
         self.toolbar.setIconSize(QSize(16, 16))
 
         p1_vertical = QVBoxLayout()
@@ -315,6 +321,16 @@ class AequilibraEMenu:
             except:
                 pass
 
+    def hide_info_pannel(self):
+        if len(self.tabContents) > 0:
+            if self.showing.isChecked():
+                for v in self.tabContents:
+                    self.projectManager.addTab(v[0], v[1])
+            else:
+                tab_count = 1
+                for i in range(tab_count):
+                    self.projectManager.removeTab(i)
+
     def run_load_project(self):
         formats = ["AequilibraE Project(*.sqlite)"]
         path, dtype = GetOutputFileName(QtWidgets.QDialog(), "AequilibraE Project", formats, ".sqlite",
@@ -326,6 +342,8 @@ class AequilibraEMenu:
             self.projectManager.removeTab(i)
 
         if dtype is not None:
+            self.contents = []
+            self.showing.setVisible(True)
             self.project = Project(path)
             self.project.conn = qgis.utils.spatialite_connect(path)
             self.project.network.conn = self.project.conn
@@ -344,18 +362,15 @@ class AequilibraEMenu:
             descrlayout = QVBoxLayout()
             # We create a tab with the main description of the project
             p1 = QLabel('Project: {}'.format(path))
-            descrlayout.addWidget(p1)
-
             p2 = QLabel('Modes: {}'.format(', '.join(self.project.network.modes())))
-            descrlayout.addWidget(p2)
-
             p3 = QLabel('Total Links: {:,}'.format(self.project.network.count_links()))
-            descrlayout.addWidget(p3)
-
             p4 = QLabel('Total Nodes: {:,}'.format(self.project.network.count_nodes()))
-            descrlayout.addWidget(p4)
+
+            for p in [p1, p2, p3, p4]:
+                descrlayout.addWidget(p)
 
             descr.setLayout(descrlayout)
+            self.tabContents = [(descr, "Project")]
             self.projectManager.addTab(descr, "Project")
 
     def run_change_parameters(self):
