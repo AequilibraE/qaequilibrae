@@ -10,7 +10,7 @@ email=pedro@xl-optim.com
 repository= https://github.com/AequilibraE/AequilibraE-GUI
 tracker=https://github.com/aequilibrae/AequilibraE-GUI/issues
 icon=icon.png
-experimental=True
+experimental=False
 homepage=https://www.aequilibrae.com/qgis
 
 
