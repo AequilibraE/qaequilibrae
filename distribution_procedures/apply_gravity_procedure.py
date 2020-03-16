@@ -29,12 +29,14 @@ class ApplyGravityProcedure(WorkerThread):
         WorkerThread.__init__(self, parentThread)
         self.gravity = GravityApplication(**kwargs)
         self.error = None
+        self.output = None
         self.report = []
 
     def doWork(self):
         try:
             self.gravity.apply()
+            self.output = self.gravity.output
             self.report = self.gravity.report
         except ValueError as e:
             self.error = e
-        self.finished_threaded_procedure.emit(0)
+        self.finished_threaded_procedure.emit('apply_gravity')

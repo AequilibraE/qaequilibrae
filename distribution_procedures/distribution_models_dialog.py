@@ -1,24 +1,4 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Trip distribution models
- Purpose:    Loads GUI for all of AequilibraE's distribution model procedures
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2017-10-05
- Updated:    2018-12-27
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
+import importlib.util as iutil
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
@@ -33,15 +13,18 @@ import yaml
 from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
-from ..common_tools.get_output_file_name import GetOutputFileName
+from ..common_tools import GetOutputFileName
 from aequilibrae.distribution import SyntheticGravityModel
 from aequilibrae.distribution.synthetic_gravity_model import valid_functions
-from aequilibrae.matrix import AequilibraEData, AequilibraeMatrix
+from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
+from aequilibrae import logger
 from .ipf_procedure import IpfProcedure
 from .calibrate_gravity_procedure import CalibrateGravityProcedure
 from .apply_gravity_procedure import ApplyGravityProcedure
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_distribution.ui"))
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
 
 
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
@@ -59,6 +42,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.job_queue = OrderedDict()
         self.model = SyntheticGravityModel()
         self.model.function = "GAMMA"
+        self.outfile = ''
 
         self.matrices = OrderedDict()
         self.datasets = OrderedDict()
@@ -212,7 +196,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2 = LoadDatasetDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
-        if isinstance(dlg2.dataset, AequilibraEData):
+        if isinstance(dlg2.dataset, AequilibraeData):
             dataset_name = dlg2.dataset.file_path
             if dataset_name is not None:
                 data_name = os.path.splitext(os.path.basename(dataset_name))[0]
@@ -251,8 +235,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if dt == "data":
                 for f in self.datasets[d].fields:
                     if np.issubdtype(self.datasets[d].data[f].dtype, np.integer) or np.issubdtype(
-                        self.datasets[d].data[f].dtype, np.float
-                    ):
+                            self.datasets[d].data[f].dtype, np.float):
                         cob_dest.addItem(f)
             else:
                 for f in self.matrices[d].names:
@@ -282,7 +265,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         for i, data_name in enumerate(dictio.keys()):
             table.setItem(i, 0, QTableWidgetItem(data_name))
-            if isinstance(dictio[data_name], AequilibraEData):
+            if isinstance(dictio[data_name], AequilibraeData):
                 table.setItem(i, 1, QTableWidgetItem(str(dictio[data_name].num_fields)))
             else:
                 table.setItem(i, 1, QTableWidgetItem(str(dictio[data_name].cores)))
@@ -290,16 +273,20 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def browse_outfile(self, file_type):
 
         file_types = {
-            "aed": ["AequilibraE dataset", "Aequilibrae dataset(*.aed)", ".aed"],
-            "mod": ["Model file", "Model file(*.mod)", ".mod"],
-            "aem": ["AequilibraE matrix", "Aequilibrae matrix(*.aem)", ".aem"],
+            "aed": ["AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed"],
+            "mod": ["Model file", ["Model file(*.mod)"], ".mod"],
+            "aem": ["Matrix", ["Aequilibrae matrix(*.aem)"], ".aem"],
         }
 
+        if has_omx:
+            file_types['aem'] = ["Matrix", ['Open Matrix(*.omx)', "Aequilibrae matrix(*.aem)"], ".omx"]
+
         ft = file_types[file_type]
-        file_chosen, _ = GetOutputFileName(self, ft[0], [ft[1]], ft[2], self.path)
+        file_chosen, _ = GetOutputFileName(self, ft[0], ft[1], ft[2], self.path)
         return file_chosen
 
     def add_job_to_queue(self):
+        worker_thread = None
         if self.check_data():
             if self.job != "ipf":
                 imped_matrix = self.matrices[self.cob_imped_mat.currentText()]
@@ -324,7 +311,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                         "row_field": prod_field,
                         "columns": atra_vec,
                         "column_field": atra_field,
-                        "output": out_name,
                         "nan_as_zero": self.chb_empty_as_zero.isChecked(),
                     }
                     worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), **args)
@@ -351,7 +337,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                     worker_thread = ApplyGravityProcedure(qgis.utils.iface.mainWindow(), **args)
 
             if self.job == "calibrate":
-                out_name = self.browse_outfile("aem")
+                out_name = self.browse_outfile("mod")
                 if out_name is not None:
                     if self.rdo_expo.isChecked():
                         func_name = "EXPO"
@@ -371,6 +357,8 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                     worker_thread = CalibrateGravityProcedure(qgis.utils.iface.mainWindow(), **args)
 
             self.chb_empty_as_zero.setEnabled(False)
+            if worker_thread is None:
+                return
             self.add_job_to_list(worker_thread, out_name)
         else:
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", self.error, level=3)
@@ -390,14 +378,13 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         self.progressbar.setVisible(True)
         self.chb_empty_as_zero.setVisible(False)
-        for out_name in self.job_queue.keys():
-            self.worker_thread = self.job_queue[out_name]
-            self.run_thread()
-
-        if self.job == "calibrate":
-            self.worker_thread.model.save(out_name)
-
-        self.exit_procedure()
+        try:
+            for out_name in self.job_queue.keys():
+                self.outfile = out_name
+                self.worker_thread = self.job_queue[self.outfile]
+                self.run_thread()
+        except Exception as e:
+            logger.error(e.args)
 
     def check_data(self):
         self.error = None
@@ -445,6 +432,13 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         if error is not None:
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", error.args[0], level=3)
         self.report.extend(self.worker_thread.report)
+
+        if success == 'calibrate':
+            self.worker_thread.model.save(self.outfile)
+
+        if success in ['apply_gravity', 'finishedIPF']:
+            self.worker_thread.output.export(self.outfile)
+        self.exit_procedure()
 
     def exit_procedure(self):
         self.close()

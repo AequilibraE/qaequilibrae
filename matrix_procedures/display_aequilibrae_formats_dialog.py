@@ -18,9 +18,10 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
+import sys
 import logging
 import numpy as np
-
+import importlib.util as iutil
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QTableWidget, QPushButton, QVBoxLayout
@@ -29,19 +30,15 @@ from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerI
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
 
 from ..common_tools.auxiliary_functions import *
-from aequilibrae.matrix import AequilibraeMatrix, AequilibraEData
+from aequilibrae.matrix import AequilibraeMatrix, AequilibraeData
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 
 # Checks if we can display OMX
-try:
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
+if has_omx:
     import openmatrix as omx
-
-    has_omx = True
-except ModuleNotFoundError as e:
-    logger = logging.getLogger("aequilibrae")
-    logger.error(e.name)
-    has_omx = False
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -49,18 +46,22 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-
+        self.data_to_show = None
         self.error = None
 
         formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)"]
+
+        dflt = '.aem'
         if has_omx:
-            formats.insert(1, "Open Matrix(*.omx)")
+            formats.insert(0, "Open Matrix(*.omx)")
+            dflt = '.omx'
+
         self.error = None
         self.data_path, self.data_type = GetOutputFileName(
             self,
             "AequilibraE custom formats",
             formats,
-            ".aem",
+            dflt,
             standard_path(),
         )
 
@@ -69,10 +70,12 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.exit_with_error()
         else:
             self.data_type = self.data_type.upper()
+            self.continue_with_data()
 
+    def continue_with_data(self):
         if self.data_type in ["AED", "AEM"]:
             if self.data_type == "AED":
-                self.data_to_show = AequilibraEData()
+                self.data_to_show = AequilibraeData()
             elif self.data_type == "AEM":
                 self.data_to_show = AequilibraeMatrix()
 
@@ -96,7 +99,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         elif self.data_type == "OMX":
             self.data_to_show.matrix_view = np.array(self.omx[self.list_cores[0]])
             self.data_to_show.index = np.array(list(self.omx.mapping(self.list_indices[0]).keys()))
-
 
         # Elements that will be used during the displaying
         self._layout = QVBoxLayout()
@@ -164,28 +166,13 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self._layout.addItem(self.but_layout)
 
-        # We chose to use QTableView. However, if we want to allow the user to edit the dataset
-        # The we need to allow them to switch to the slower QTableWidget
-        # Code below
-
-        # self.table = QTableWidget(self.data_to_show.entries, self.data_to_show.num_fields)
-        # self.table.setHorizontalHeaderLabels(self.data_to_show.fields)
-        # self.table.setObjectName('data_viewer')
-        #
-        # self.table.setVerticalHeaderLabels([str(x) for x in self.data_to_show.index[:]])
-        # self.table.clearContents()
-        #
-        # for i in range(self.data_to_show.entries):
-        #     for j, f in enumerate(self.data_to_show.fields):
-        #         item1 = QTableWidgetItem(str(self.data_to_show.data[f][i]))
-        #         item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-        #         self.table.setItem(i, j, item1)
-
         self.resize(700, 500)
         self.setLayout(self._layout)
         self.format_showing()
 
     def format_showing(self):
+        if self.data_to_show is None:
+            return
         decimals = self.decimals.value()
         separator = self.thousand_separator.isChecked()
         if isinstance(self.data_to_show, AequilibraeMatrix):
@@ -216,7 +203,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def exit_with_error(self):
         qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
-        self.exit_procedure()
+        self.close()
 
     def exit_procedure(self):
+        self.show()
         self.close()
+        sys.exit(app.exec_())

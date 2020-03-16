@@ -1,24 +1,3 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Main interface for creating stacked bandwidths for link layers
- Purpose:    Load GUI and user interface for the bandwidth creation
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-10-24
- Updated:    2019-04-03
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
 import qgis
 from functools import partial
 from qgis.core import *
@@ -113,6 +92,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
     def choose_a_field(self, modified):
         i, j = "AB", "BA"
+        if self.layer is None:
+            return
 
         if modified == i:
             text = self.ab_FieldComboBox.currentText().upper()
@@ -320,11 +301,12 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         # go through all the fields that will be used to find the maximum value. This will be used
         # to limit the size of bandwidth for all layers of bands
         values = []
+        all_fields = [x.name() for x in self.layer.fields()]
         for i in range(self.tot_bands):
             for j in range(2):
-                field = self.bands_list.item(i, j).text()
-                idx = self.layer.dataProvider().fieldNameIndex(field)
                 if max_value < 0:
+                    field = self.bands_list.item(i, j).text()
+                    idx = all_fields.index(field)
                     values.append(self.layer.maximumValue(idx))
 
                 # we also build a list of bands to construct

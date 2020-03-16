@@ -18,7 +18,7 @@
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
  """
-
+import importlib.util as iutil
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
@@ -36,14 +36,11 @@ from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.report_dialog import ReportDialog
 from .load_matrix_class import LoadMatrix, MatrixReblocking
-from aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
 import aequilibrae
 
-no_omx = False
-try:
-    import openmatrix as omx
-except:
-    no_omx = True
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_loader.ui"))
 
@@ -94,13 +91,13 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             if "wkbType" in dir(layer):
                 if layer.wkbType() == 100:
                     self.matrix_layer.addItem(layer.name())
-        if no_omx:
-            self.radio_omx_matrix.setEnabled(False)
+
+        self.radio_omx_matrix.setEnabled(has_omx)
 
         self.resizing()
 
     def resizing(self):
-        if self.radio_aeq_matrix.isChecked():
+        if self.radio_aeq_matrix.isChecked() or self.radio_omx_matrix.isChecked():
             self.group_combo.setVisible(False)
             self.group_list.setVisible(False)
             self.group_buttons.setVisible(False)
@@ -147,11 +144,11 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 member.setVisible(True)
             self.load_fields_to_combo_boxes()
 
-        if self.radio_omx_matrix.isChecked():
-            self.lbl_matrix.setText("Matrix core")
-            self.lbl_from.setText("Indices")
-            for member in members:
-                member.setVisible(True)
+        # if self.radio_omx_matrix.isChecked():
+        #     self.lbl_matrix.setText("Matrix core")
+        #     self.lbl_from.setText("Indices")
+        #     for member in members:
+        #         member.setVisible(True)
 
         self.resizing()
 
@@ -222,21 +219,28 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                     # compression not implemented yet
                 self.exit_procedure()
 
+    def __create_appropriate_name(self, nm: str) -> str:
+        nm = nm.replace(" ", "_")
+        if len(nm) > CORE_NAME_MAX_LENGTH - 3:
+            nm = nm[:47]
+
+        return nm
+
     def load_the_matrix(self):
         self.error = None
         self.worker_thread = None
         if self.radio_layer_matrix.isChecked():
             if (
-                self.field_from.currentIndex() < 0
-                or self.field_from.currentIndex() < 0
-                or self.field_cells.currentIndex() < 0
+                    self.field_from.currentIndex() < 0
+                    or self.field_from.currentIndex() < 0
+                    or self.field_cells.currentIndex() < 0
             ):
                 self.error = "Invalid field chosen"
 
             if self.error is None:
                 self.compressed.setVisible(False)
                 self.progress_label.setVisible(True)
-                self.__current_name = self.field_cells.currentText().lower().replace(" ", "_")
+                self.__current_name = self.__create_appropriate_name(self.field_cells.currentText().lower())
                 idx1 = self.layer.dataProvider().fieldNameIndex(self.field_from.currentText())
                 idx2 = self.layer.dataProvider().fieldNameIndex(self.field_to.currentText())
                 idx3 = self.layer.dataProvider().fieldNameIndex(self.field_cells.currentText())
@@ -266,8 +270,14 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.exit_procedure()
 
         if self.radio_omx_matrix.isChecked():
-            pass
-            # Still not implemented
+            file_types = ["AequilibraE Matrix(*.omx)"]
+            default_type = ".omx"
+            box_name = "Open Matrix"
+            new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
+            if new_name is not None:
+                self.matrix = AequilibraeMatrix()
+                self.matrix.load(new_name)
+                self.exit_procedure()
 
         if self.worker_thread is not None:
             self.run_thread()

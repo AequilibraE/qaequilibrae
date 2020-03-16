@@ -19,4 +19,4 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from gtfs_import_dialog import GtfsImportDialog
+from .gtfs_import_dialog import GtfsImportDialog

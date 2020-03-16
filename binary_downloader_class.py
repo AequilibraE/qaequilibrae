@@ -30,6 +30,7 @@ class BinaryDownloaderDialog(QtWidgets.QDialog, FORM_CLASS):
         self.lbl_remote_path.setText("File download path: " + self.binary_path)
         self.lbl_local_path.setText("File local destination: " + self.local_path)
         self.but_download.clicked.connect(self.download_binary)
+        self.setModal(True)
 
     def download_binary(self):
         self.but_download.setEnabled(False)

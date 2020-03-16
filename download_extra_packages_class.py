@@ -25,6 +25,7 @@ class DownloadExtraPackages(QtWidgets.QDialog, FORM_CLASS):
 
         self.lbl_list_of_packages.setText(', '.join(self.packages))
         self.but_download.clicked.connect(self.download_package)
+        self.setModal(True)
 
     def download_package(self):
         lines = []

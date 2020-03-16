@@ -20,10 +20,11 @@
  """
 
 import logging
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import QtGui, uic
-from qgis.gui import QgsMapLayerProxyModel
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt import QtGui, QtWidgets, uic
+from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QHBoxLayout, QWidget, QLineEdit
+from qgis.PyQt.QtWidgets import QSpacerItem, QProgressBar, QLabel, QVBoxLayout, QSizePolicy, QCheckBox
 import sys
 from functools import partial
 import numpy as np
@@ -38,9 +39,9 @@ from aequilibrae.transit.gtfs import create_gtfsdb
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
 
-class GtfsImportDialog(QDialog, FORM_CLASS):
+class GtfsImportDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
@@ -148,7 +149,8 @@ class GtfsImportDialog(QDialog, FORM_CLASS):
 
     def run_thread(self):
 
-        QObject.connect(self.worker_thread, SIGNAL("converting_gtfs"), self.signal_handler)
+        self.worker_thread.converting_gtfs.connect(self.signal_handler)
+
         self.worker_thread.import_gtfs()
         self.exec_()
 

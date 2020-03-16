@@ -1,51 +1,30 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       QGIS menu
- Purpose:    Creates the QGIS menu for AequilibraE and connects with the appropriate classes
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2014-03-19
- Updated:    2018-08-08
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-# Import the PyQt and QGIS libraries
-# noinspection PyUnresolvedReferences
 import os
 import sys
 import tempfile
 import glob
+import importlib.util as iutil
+from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QListWidget, QListWidgetItem, QAbstractItemView, QAction, \
+    QVBoxLayout, QToolBar, QToolButton, QMenu, QPushButton, QTabWidget, QLabel, QCheckBox
+import qgis
+from qgis.core import QgsWkbTypes, QgsAnnotationManager, QgsProject, QgsGeometry, QgsRectangle, QgsTextAnnotation
+from qgis.gui import QgsMapTool, QgsRubberBand
 
 sys.dont_write_bytecode = True
-import os.path
-import qgis
+import subprocess
+import webbrowser
 
-# from qgis.core import *
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtWidgets import QAction
-
+from qgis.core import QgsDataSourceUri, QgsVectorLayer
 # This is how QtCore and QtGui imports change
-# from PyQt4.QtCore import *
 from qgis.PyQt.QtCore import *
 
 # from PyQt4.QtGui import *
 from qgis.PyQt.QtGui import *
 
-from .common_tools import ParameterDialog
+from .common_tools import ParameterDialog, GetOutputFileName, LogDialog
 
-# from .common_tools import logger
-# from .common_tools import ReportDialog
 from .common_tools import AboutDialog
+from .common_tools.auxiliary_functions import standard_path
 
 from .binary_downloader_class import BinaryDownloaderDialog
 from .download_extra_packages_class import DownloadExtraPackages
@@ -63,305 +42,275 @@ from .matrix_procedures import LoadMatrixDialog
 from .matrix_procedures import LoadDatasetDialog
 from .matrix_procedures import DisplayAequilibraEFormatsDialog
 
-# from .matrix_procedures import MatrixManipulationDialog
+from .public_transport_procedures import GtfsImportDialog
 
-# from .public_transport_procedures import GtfsImportDialog
+from .project_procedures import ProjectFromOSMDialog
+from warnings import warn
 
-# Procedures that depend on AequilibraE
 no_binary = False
 try:
     from .aequilibrae.aequilibrae.paths import allOrNothing
-except ImportError:
+except ImportError as e:
     no_binary = True
+    warn(f'AequilibraE binaries are not available {e.args}')
+
+from aequilibrae.project import Project
 
 if not no_binary:
-    from .gis import DesireLinesDialog
-    from .network import CreatesTranspoNetDialog
-    from .paths_procedures import GraphCreationDialog
+    from .gis.desire_lines_dialog import DesireLinesDialog
+    from .project_procedures import CreatesTranspoNetDialog
     from .paths_procedures import TrafficAssignmentDialog
     from .paths_procedures import ShortestPathDialog
     from .paths_procedures import ImpedanceMatrixDialog
 
 extra_packages = True
-try:
-    import openmatrix as omx
-except ImportError:
+# Checks if we can display OMX
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
+if not has_omx:
     extra_packages = False
 
 
-class AequilibraEMenu(object):
+class AequilibraEMenu:
+
     def __init__(self, iface):
+
+        self.translator = None
         self.iface = iface
-        self.AequilibraE_menu = None
-        self.network_menu = None
-        self.trip_distribution_menu = None
-        self.assignment_menu = None
-        self.gis_tools_menu = None
+        self.project = None  # type: Project
+        self.link_layer = None  # type: QgsVectorLayer
+        self.node_layer = None  # type: QgsVectorLayer
 
-    def aequilibrae_add_submenu(self, submenu):
-        if self.AequilibraE_menu is not None:
-            self.AequilibraE_menu.addMenu(submenu)
-        else:
-            self.iface.addPluginToMenu("&AequilibraE", submenu.menuAction())
+        self.dock = QDockWidget(self.trlt('AequilibraE'))
+        self.manager = QWidget()
 
-    def initGui(self):
-        # Removes temporary files
-        self.removes_temporary_files()
+        # The self.toolbar will hold everything
+        self.toolbar = QToolBar()
+        self.toolbar.setOrientation(2)
 
-        # CREATING MASTER MENU HEAD
-        self.AequilibraE_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "AequilibraE"))
-        self.iface.mainWindow().menuBar().insertMenu(
-            self.iface.firstRightStandardMenu().menuAction(), self.AequilibraE_menu
-        )
+        # # ########################################################################
+        # # #######################   PROJECT SUB-MENU   ############################
+
+        projectMenu = QMenu()
+        self.open_project_action = QAction(self.trlt('Open Project'), self.manager)
+        self.open_project_action.triggered.connect(self.run_load_project)
+        projectMenu.addAction(self.open_project_action)
+
+        self.project_from_osm_action = QAction(self.trlt('Create project from OSM'), self.manager)
+        self.project_from_osm_action.triggered.connect(self.run_project_from_osm)
+        projectMenu.addAction(self.project_from_osm_action)
+
+        self.create_transponet_action = QAction(self.trlt('Create Project from layers'), self.manager)
+        self.create_transponet_action.triggered.connect(self.run_create_transponet)
+        projectMenu.addAction(self.create_transponet_action)
+
+        projectButton = QToolButton()
+        projectButton.setText(self.trlt('Project'))
+        projectButton.setPopupMode(2)
+        projectButton.setMenu(projectMenu)
+
+        self.toolbar.addWidget(projectButton)
 
         # # ########################################################################
         # # ################# NETWORK MANIPULATION SUB-MENU  #######################
 
-        self.network_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Network Manipulation"))
-        self.aequilibrae_add_submenu(self.network_menu)
+        netMenu = QMenu()
+        self.action_netPrep = QAction(self.trlt('Network Preparation'), self.manager)
+        self.action_netPrep.triggered.connect(self.run_net_prep)
+        netMenu.addAction(self.action_netPrep)
 
-        # Network preparation
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
-        self.network_prep_action = QAction(icon, "Network Preparation", self.iface.mainWindow())
-        self.network_prep_action.triggered.connect(self.run_net_prep)
-        self.network_prep_action.setEnabled(True)
-        self.network_menu.addAction(self.network_prep_action)
-
-        # Adding Connectors
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
-        self.add_connectors_action = QAction(icon, "Adding Connectors", self.iface.mainWindow())
+        self.add_connectors_action = QAction(self.trlt('Add centroid connectors'), self.manager)
         self.add_connectors_action.triggered.connect(self.run_add_connectors)
-        self.add_connectors_action.setEnabled(True)
-        self.network_menu.addAction(self.add_connectors_action)
+        netMenu.addAction(self.add_connectors_action)
 
-        # Creating TranspoNet
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_network.png")
-        self.create_transponet_action = QAction(icon, "Create TranspoNet", self.iface.mainWindow())
-        self.create_transponet_action.triggered.connect(self.run_create_transponet)
-        self.create_transponet_action.setEnabled(True)
-        self.network_menu.addAction(self.create_transponet_action)
+        netbutton = QToolButton()
+        netbutton.setText(self.trlt('Network Manipulation'))
+        netbutton.setMenu(netMenu)
+        netbutton.setPopupMode(2)
 
+        self.toolbar.addWidget(netbutton)
         # # ########################################################################
         # # ####################  DATA UTILITIES SUB-MENU  #########################
 
-        self.matrix_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Data"))
-        self.aequilibrae_add_submenu(self.matrix_menu)
-
-        # Displaying Aequilibrae custom data formats
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_display_custom_formats.png")
-        self.display_custom_formats_action = QAction(icon, "Display AequilibraE formats", self.iface.mainWindow())
+        dataMenu = QMenu()
+        self.display_custom_formats_action = QAction(self.trlt('Display AequilibraE formats'), self.manager)
         self.display_custom_formats_action.triggered.connect(self.run_display_aequilibrae_formats)
-        self.display_custom_formats_action.setEnabled(True)
-        self.matrix_menu.addAction(self.display_custom_formats_action)
+        dataMenu.addAction(self.display_custom_formats_action)
 
-        # Loading matrices
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_matrices.png")
-        self.load_matrix_action = QAction(icon, "Import matrices", self.iface.mainWindow())
+        self.load_matrix_action = QAction(self.trlt('Import matrices'), self.manager)
         self.load_matrix_action.triggered.connect(self.run_load_matrices)
-        self.load_matrix_action.setEnabled(True)
-        self.matrix_menu.addAction(self.load_matrix_action)
+        dataMenu.addAction(self.load_matrix_action)
 
-        # # Loading Database
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dataset.png")
-        self.load_database_action = QAction(icon, "Import dataset", self.iface.mainWindow())
+        self.load_database_action = QAction(self.trlt('Import dataset'), self.manager)
         self.load_database_action.triggered.connect(self.run_load_database)
-        self.load_database_action.setEnabled(True)
-        self.matrix_menu.addAction(self.load_database_action)
+        dataMenu.addAction(self.load_database_action)
+
+        databutton = QToolButton()
+        databutton.setText(self.trlt('Data'))
+        databutton.setPopupMode(2)
+        databutton.setMenu(dataMenu)
+
+        self.toolbar.addWidget(databutton)
 
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
 
-        self.trip_distribution_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Trip Distribution"))
-        self.aequilibrae_add_submenu(self.trip_distribution_menu)
-
-        # # IPF
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_ipf.png")
-        self.ipf_action = QAction(icon, "Iterative proportional fitting", self.iface.mainWindow())
-        self.ipf_action.triggered.connect(self.run_ipf)
-        self.ipf_action.setEnabled(True)
-        self.trip_distribution_menu.addAction(self.ipf_action)
-
-        # # Apply Gravity
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_apply_gravity.png")
-        self.apply_gravity_action = QAction(icon, "Apply Gravity Model", self.iface.mainWindow())
-        self.apply_gravity_action.triggered.connect(self.run_apply_gravity)
-        self.apply_gravity_action.setEnabled(True)
-        self.trip_distribution_menu.addAction(self.apply_gravity_action)
-
-        # # Calibrate Gravity
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_calibrate_gravity.png")
-        self.calibrate_gravity_action = QAction(icon, "Calibrate Gravity Model", self.iface.mainWindow())
-        self.calibrate_gravity_action.triggered.connect(self.run_calibrate_gravity)
-        self.calibrate_gravity_action.setEnabled(True)
-        self.trip_distribution_menu.addAction(self.calibrate_gravity_action)
-
-        # Trip Distribution
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_distribution.png")
-        self.trip_distr_action = QAction(icon, "Trip Distribution", self.iface.mainWindow())
-        self.trip_distr_action.triggered.connect(self.run_distribution_models)
-        self.trip_distr_action.setEnabled(True)
-        self.trip_distribution_menu.addAction(self.trip_distr_action)
+        distributionButton = QToolButton()
+        distributionButton.setText(self.trlt('Trip Distribution'))
+        distributionButton.clicked.connect(self.run_distribution_models)
+        self.toolbar.addWidget(distributionButton)
 
         # # ########################################################################
         # # ###################  PATH COMPUTATION SUB-MENU   #######################
+        pathMenu = QMenu()
 
-        self.assignment_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Paths and assignment"))
-        self.aequilibrae_add_submenu(self.assignment_menu)
-
-        # Graph generation
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_graph_creation.png")
-        self.graph_creation_action = QAction(icon, "Create graph", self.iface.mainWindow())
-        self.graph_creation_action.triggered.connect(self.run_create_graph)
-        self.graph_creation_action.setEnabled(True)
-        self.assignment_menu.addAction(self.graph_creation_action)
-
-        # Shortest path computation
-        icon = QIcon(os.path.dirname(__file__) + "/icons/single_shortest_path.png")
-        self.shortest_path_action = QAction(icon, "Shortest path", self.iface.mainWindow())
+        self.shortest_path_action = QAction(self.trlt('Shortest path'), self.manager)
         self.shortest_path_action.triggered.connect(self.run_shortest_path)
-        self.shortest_path_action.setEnabled(True)
-        self.assignment_menu.addAction(self.shortest_path_action)
+        pathMenu.addAction(self.shortest_path_action)
 
-        # Distance matrix generation
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_dist_matrix.png")
-        self.dist_matrix_action = QAction(icon, "Impedance matrix", self.iface.mainWindow())
+        self.dist_matrix_action = QAction(self.trlt('Impedance matrix'), self.manager)
         self.dist_matrix_action.triggered.connect(self.run_dist_matrix)
-        self.dist_matrix_action.setEnabled(True)
-        self.assignment_menu.addAction(self.dist_matrix_action)
+        pathMenu.addAction(self.dist_matrix_action)
 
-        # Traffic Assignment
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_assignment.png")
-        self.traffic_assignment_action = QAction(icon, "Traffic Assignment", self.iface.mainWindow())
+        self.traffic_assignment_action = QAction(self.trlt('Traffic Assignment'), self.manager)
         self.traffic_assignment_action.triggered.connect(self.run_traffic_assig)
-        self.traffic_assignment_action.setEnabled(True)
-        self.assignment_menu.addAction(self.traffic_assignment_action)
+        pathMenu.addAction(self.traffic_assignment_action)
+
+        pathButton = QToolButton()
+        pathButton.setText(self.trlt('Paths and assignment'))
+        pathButton.setPopupMode(2)
+        pathButton.setMenu(pathMenu)
+
+        self.toolbar.addWidget(pathButton)
 
         # # ########################################################################
         # # #######################  TRANSIT SUB-MENU   ###########################
+        transitMenu = QMenu()
+        self.gtfs_import_action = QAction(self.trlt('Convert GTFS to SpatiaLite'), self.manager)
+        self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
+        transitMenu.addAction(self.gtfs_import_action)
 
-        # self.transit_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&Public Transport"))
-        # self.aequilibrae_add_submenu(self.transit_menu)
+        transitButton = QToolButton()
+        transitButton.setText(self.trlt('Public Transport'))
+        transitButton.setPopupMode(2)
+        transitButton.setMenu(transitMenu)
 
-        # # Graph generation
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_import_gtfs.png")
-        # self.gtfs_import_action = QAction(icon, u"Convert GTFS to SpatiaLite", self.iface.mainWindow())
-        # self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
-        # self.gtfs_import_action.setEnabled(True)
-        # self.transit_menu.addAction(self.gtfs_import_action)
+        self.toolbar.addWidget(transitButton)
 
         # ########################################################################
         # #################        GIS TOOLS SUB-MENU    #########################
 
-        self.gis_tools_menu = QtWidgets.QMenu(QCoreApplication.translate("AequilibraE", "&GIS tools"))
-        self.aequilibrae_add_submenu(self.gis_tools_menu)
-        #
-        # Node to area aggregation
-        # icon = QIcon(os.path.dirname(__file__) + "/icons/icon_node_to_area.png")
-        # self.node_to_area_action = QAction(icon, u"Aggregation: Node to Area", self.iface.mainWindow())
-        # self.node_to_area_action.triggered.connect(self.run_node_to_area)
-        # self.node_to_area_action.setEnabled(True)
-        # self.gis_tools_menu.addAction(self.node_to_area_action)
-
-        # Simple TAG
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_simple_tag.png")
-        self.simple_tag_action = QAction(icon, "Simple TAG", self.iface.mainWindow())
+        gisMenu = QMenu()
+        self.simple_tag_action = QAction(self.trlt('Simple tag'), self.manager)
         self.simple_tag_action.triggered.connect(self.run_simple_tag)
-        self.simple_tag_action.setEnabled(True)
-        self.gis_tools_menu.addAction(self.simple_tag_action)
+        gisMenu.addAction(self.simple_tag_action)
 
-        # Lowest common denominator
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_lcd.png")
-        self.lcd_action = QAction(icon, "Lowest common denominator", self.iface.mainWindow())
+        self.lcd_action = QAction(self.trlt('Lowest common denominator'), self.manager)
         self.lcd_action.triggered.connect(self.run_lcd)
-        self.lcd_action.setEnabled(True)
-        self.gis_tools_menu.addAction(self.lcd_action)
+        gisMenu.addAction(self.lcd_action)
 
-        # Desire lines
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_desire_lines.png")
-        self.dlines_action = QAction(icon, "Desire Lines", self.iface.mainWindow())
+        self.dlines_action = QAction(self.trlt('Desire Lines'), self.manager)
         self.dlines_action.triggered.connect(self.run_dlines)
-        self.dlines_action.setEnabled(True)
-        self.gis_tools_menu.addAction(self.dlines_action)
+        gisMenu.addAction(self.dlines_action)
 
-        # Bandwidths
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_bandwidths.png")
-        self.bandwidth_action = QAction(icon, "Stacked Bandwidth", self.iface.mainWindow())
+        self.bandwidth_action = QAction(self.trlt('Stacked Bandwidth'), self.manager)
         self.bandwidth_action.triggered.connect(self.run_bandwidth)
-        self.bandwidth_action.setEnabled(True)
-        self.gis_tools_menu.addAction(self.bandwidth_action)
+        gisMenu.addAction(self.bandwidth_action)
 
-        # Scenario comparison
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_scenario_comparison.png")
-        self.scenario_comparison_action = QAction(icon, "Scenario Comparison", self.iface.mainWindow())
+        self.scenario_comparison_action = QAction(self.trlt('Scenario Comparison'), self.manager)
         self.scenario_comparison_action.triggered.connect(self.run_scenario_comparison)
-        self.scenario_comparison_action.setEnabled(True)
-        self.gis_tools_menu.addAction(self.scenario_comparison_action)
+        gisMenu.addAction(self.scenario_comparison_action)
+
+        gisButton = QToolButton()
+        gisButton.setText(self.trlt('GIS'))
+        gisButton.setPopupMode(2)
+        gisButton.setMenu(gisMenu)
+
+        self.toolbar.addWidget(gisButton)
 
         # ########################################################################
         # #################          LOOSE STUFF         #########################
 
-        # Change parameters
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_parameters.png")
-        self.parameters_action = QAction(icon, "Parameters", self.iface.mainWindow())
-        self.parameters_action.triggered.connect(self.run_change_parameters)
-        self.parameters_action.setEnabled(True)  # Need to add this row for all actions
-        # QObject.connect(self.parameters_action, SIGNAL("triggered()"), self.run_change_parameters)
-        self.AequilibraE_menu.addAction(self.parameters_action)
+        parametersButton = QToolButton()
+        parametersButton.setText(self.trlt('Parameters'))
+        parametersButton.clicked.connect(self.run_change_parameters)
+        self.toolbar.addWidget(parametersButton)
 
-        # About
-        icon = QIcon(os.path.dirname(__file__) + "/icons/icon_parameters.png")
-        self.about_action = QAction(icon, "About", self.iface.mainWindow())
-        self.about_action.triggered.connect(self.run_about)
-        self.about_action.setEnabled(True)
-        self.AequilibraE_menu.addAction(self.about_action)
+        aboutButton = QToolButton()
+        aboutButton.setText(self.trlt('About'))
+        aboutButton.clicked.connect(self.run_about)
+        self.toolbar.addWidget(aboutButton)
 
-        # Download binaries
+        logButton = QToolButton()
+        logButton.setText(self.trlt('logfile'))
+        logButton.clicked.connect(self.run_log)
+        self.toolbar.addWidget(logButton)
+
+        helpButton = QToolButton()
+        helpButton.setText(self.trlt('Help'))
+        helpButton.clicked.connect(self.run_help)
+        self.toolbar.addWidget(helpButton)
+
         if no_binary:
-            icon = QIcon(os.path.dirname(__file__) + "/icons/icon_binaries.png")
-            self.binary_action = QAction(icon, "Download binaries", self.iface.mainWindow())
-            self.binary_action.triggered.connect(self.run_binary_download)
-            self.binary_action.setEnabled(True)
-            self.AequilibraE_menu.addAction(self.binary_action)
+            binariesButton = QToolButton()
+            binariesButton.setText(self.trlt('Download binaries'))
+            binariesButton.clicked.connect(self.run_binary_download)
+            self.toolbar.addWidget(binariesButton)
 
-        # Download extra packages
         if not extra_packages:
-            icon = QIcon(os.path.dirname(__file__) + "/icons/icon_extra_packages.png")
-            self.extra_action = QAction(icon, "Install extra packages", self.iface.mainWindow())
-            self.extra_action.triggered.connect(self.install_extra_packages)
-            self.extra_action.setEnabled(True)
-            self.AequilibraE_menu.addAction(self.extra_action)
-        #
-        #
-        # if old_binary:
-        #     report = ['You have an old version of the AequilibraE binaries']
-        #     report.append('To fix this issue, please do the following:')
-        #     report.append('     1. Uninstall AequilibraE')
-        #     report.append('     2. Re-start QGIS')
-        #     report.append('     3. Re-install AequilibraE from the official repository')
-        #     report.append('     4. Download the new binaries from the Menu Aequilibrae-Download Binaries')
-        #     report.append('     5. Re-start QGIS')
-        #     dlg2 = ReportDialog(self.iface, report)
-        #     dlg2.show()
-        #     dlg2.exec_()
+            xtrapkgButton = QToolButton()
+            xtrapkgButton.setText(self.trlt('Install extra packages'))
+            xtrapkgButton.clicked.connect(self.install_extra_packages)
+            self.toolbar.addWidget(xtrapkgButton)
 
-    #########################################################################
+        # ########################################################################
+        # #################        PROJECT MANAGER       #########################
+
+        self.showing = QCheckBox()
+        self.showing.setText('Show project info')
+        self.showing.setChecked(True)
+        self.toolbar.addWidget(self.showing)
+
+        self.showing.toggled.connect(self.hide_info_pannel)
+        self.projectManager = QTabWidget()
+        self.toolbar.addWidget(self.projectManager)
+
+        # # # ########################################################################
+        self.tabContents = []
+        self.toolbar.setIconSize(QSize(16, 16))
+
+        p1_vertical = QVBoxLayout()
+        p1_vertical.setContentsMargins(0, 0, 0, 0)
+        p1_vertical.addWidget(self.toolbar)
+        self.manager.setLayout(p1_vertical)
+
+        self.dock.setWidget(self.manager)
+        self.dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
+
+    def run_help(self):
+        url = 'http://aequilibrae.com/qgis'
+        if sys.platform == 'darwin':  # in case of OS X
+            subprocess.Popen(['open', url])
+        else:
+            webbrowser.open_new_tab(url)
+
+    def run_log(self):
+        dlg2 = LogDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def unload(self):
-        self.removes_temporary_files()
+        del self.dock
 
-        # unload the aequilibrae engine
-        all_pkgs = [pkg for pkg in sys.modules if "aequilibrae" in pkg]
-        for pkg in all_pkgs:
-            del sys.modules[pkg]
-        # unloads the add-on
-        if self.AequilibraE_menu is not None:
-            self.iface.mainWindow().menuBar().removeAction(self.AequilibraE_menu.menuAction())
-        else:
-            self.iface.removePluginMenu("&AequilibraE", self.network_menu.menuAction())
-            self.iface.removePluginMenu("&AequilibraE", self.assignment_menu.menuAction())
-            self.iface.removePluginMenu("&AequilibraE", self.transit_menu.menuAction())
-            self.iface.removePluginMenu("&AequilibraE", self.trip_distribution_menu.menuAction())
-            self.iface.removePluginMenu("&AequilibraE", self.gis_tools_menu.menuAction())
+    def trlt(self, message):
+        # In the near future, we will use this function to automatically translate the AequilibraE menu
+        # To any language we can get people to translate it to
+        # return QCoreApplication.translate('AequilibraE', message)
+        return message
+
+    def initGui(self):
+        pass
 
     def removes_temporary_files(self):
         # pass
@@ -372,6 +321,58 @@ class AequilibraEMenu(object):
                 os.unlink(f)
             except:
                 pass
+
+    def hide_info_pannel(self):
+        if len(self.tabContents) > 0:
+            if self.showing.isChecked():
+                for v in self.tabContents:
+                    self.projectManager.addTab(v[0], v[1])
+            else:
+                tab_count = 1
+                for i in range(tab_count):
+                    self.projectManager.removeTab(i)
+
+    def run_load_project(self):
+        formats = ["AequilibraE Project(*.sqlite)"]
+        path, dtype = GetOutputFileName(QtWidgets.QDialog(), "AequilibraE Project", formats, ".sqlite",
+                                        standard_path(), )
+
+        # Cleans the project descriptor
+        tab_count = 1
+        for i in range(tab_count):
+            self.projectManager.removeTab(i)
+
+        if dtype is not None:
+            self.contents = []
+            self.showing.setVisible(True)
+            self.project = Project(path)
+            self.project.conn = qgis.utils.spatialite_connect(path)
+            self.project.network.conn = self.project.conn
+
+            uri = QgsDataSourceUri()
+            uri.setDatabase(path)
+            uri.setDataSource('', 'links', 'geometry')
+            self.link_layer = QgsVectorLayer(uri.uri(), 'links', 'spatialite')
+            QgsProject.instance().addMapLayer(self.link_layer)
+
+            uri.setDataSource('', 'nodes', 'geometry')
+            self.node_layer = QgsVectorLayer(uri.uri(), 'nodes', 'spatialite')
+            QgsProject.instance().addMapLayer(self.node_layer)
+
+            descr = QWidget()
+            descrlayout = QVBoxLayout()
+            # We create a tab with the main description of the project
+            p1 = QLabel('Project: {}'.format(path))
+            p2 = QLabel('Modes: {}'.format(', '.join(self.project.network.modes())))
+            p3 = QLabel('Total Links: {:,}'.format(self.project.network.count_links()))
+            p4 = QLabel('Total Nodes: {:,}'.format(self.project.network.count_nodes()))
+
+            for p in [p1, p2, p3, p4]:
+                descrlayout.addWidget(p)
+
+            descr.setLayout(descrlayout)
+            self.tabContents = [(descr, "Project")]
+            self.projectManager.addTab(descr, "Project")
 
     def run_change_parameters(self):
         dlg2 = ParameterDialog(self.iface)
@@ -426,27 +427,10 @@ class AequilibraEMenu(object):
         # If we wanted modal, we would eliminate the dlg2.show()
 
     def run_add_connectors(self):
-        dlg2 = AddConnectorsDialog(self.iface)
+        dlg2 = AddConnectorsDialog(self.iface, self.project)
         dlg2.show()
         dlg2.exec_()
 
-    def run_create_graph(self):
-        if no_binary:
-            self.message_binary()
-        else:
-            dlg2 = GraphCreationDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
-
-    def run_calibrate_gravity(self):
-        dlg2 = DistributionModelsDialog(self.iface, "calibrate")
-        dlg2.show()
-        dlg2.exec_()
-
-    def run_apply_gravity(self):
-        dlg2 = DistributionModelsDialog(self.iface, "apply")
-        dlg2.show()
-        dlg2.exec_()
 
     def run_distribution_models(self):
         dlg2 = DistributionModelsDialog(self.iface)
@@ -457,32 +441,44 @@ class AequilibraEMenu(object):
         if no_binary:
             self.message_binary()
         else:
-            dlg2 = ShortestPathDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
+            if self.project is None:
+                self.show_message_no_project()
+            else:
+                dlg2 = ShortestPathDialog(self.iface, self.project, self.link_layer, self.node_layer)
+                dlg2.show()
+                dlg2.exec_()
 
     def run_dist_matrix(self):
         if no_binary:
             self.message_binary()
         else:
-            dlg2 = ImpedanceMatrixDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
+            if self.project is None:
+                self.show_message_no_project()
+            else:
+                dlg2 = ImpedanceMatrixDialog(self.iface, self.project)
+                dlg2.show()
+                dlg2.exec_()
 
     def run_traffic_assig(self):
         if no_binary:
             self.message_binary()
         else:
-            dlg2 = TrafficAssignmentDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
+            if self.project is None:
+                self.show_message_no_project()
+            else:
+                dlg2 = TrafficAssignmentDialog(self.iface, self.project)
+                dlg2.show()
+                dlg2.exec_()
 
     def run_import_gtfs(self):
-        pass
+        dlg2 = GtfsImportDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
-    #     dlg2 = GtfsImportDialog(self.iface)
-    #     dlg2.show()
-    #     dlg2.exec_()
+    def run_project_from_osm(self):
+        dlg2 = ProjectFromOSMDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
 
     def run_simple_tag(self):
         dlg2 = SimpleTagDialog(self.iface)
@@ -512,12 +508,10 @@ class AequilibraEMenu(object):
         dlg2.show()
         dlg2.exec_()
 
-    def run_ipf(self):
-        dlg2 = DistributionModelsDialog(self.iface, "ipf")
-        dlg2.show()
-        dlg2.exec_()
-
     def message_binary(self):
         qgis.utils.iface.messageBar().pushMessage(
             "Binary Error: ", "Please download it from the repository using the downloader from the menu", level=3
         )
+
+    def show_message_no_project(self):
+        self.iface.messageBar().pushMessage("Error", "You need to load a project first", level=3, duration=10)

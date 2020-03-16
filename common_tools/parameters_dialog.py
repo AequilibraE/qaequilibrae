@@ -1,31 +1,4 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Main interface for changing the algorithm parameters
- Purpose:    changing algorithm parameters
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-08-15
- Updated:    2016-10-03
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-import qgis
 from qgis.core import *
-
-# from PyQt4.QtGui import *
-# from PyQt4.Qsci import QsciLexerYAML
-# from PyQt4 import uic
-
 from qgis.PyQt.Qsci import QsciLexerYAML
 from qgis.PyQt.QtGui import *
 from qgis.PyQt import QtWidgets, uic
@@ -37,7 +10,6 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
-    # def __init__(self, iface):
     def __init__(self, iface, parent=None):
         super(ParameterDialog, self).__init__(parent)
         # QDialog.__init__(self)
@@ -57,6 +29,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         lexer = QsciLexerYAML()
         lexer.setDefaultFont(font)
         self.text_box.setLexer(lexer)
+        self.text_box.setFolding(self.text_box.PlainFoldStyle)
 
         # Load the data
         self.load_original_data()

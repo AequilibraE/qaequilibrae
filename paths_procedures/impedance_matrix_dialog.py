@@ -13,7 +13,7 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2014-03-19
- Updated:    30/10/2017
+ Updated:    2020-02-08
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -27,6 +27,7 @@ from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QTableWidgetI
 
 from aequilibrae.paths import Graph, SkimResults, NetworkSkimming
 from aequilibrae.matrix import matrix_export_types
+from aequilibrae.project import Project
 from ..common_tools import GetOutputFileName
 from ..common_tools import ReportDialog
 from ..common_tools.auxiliary_functions import *
@@ -37,11 +38,12 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, iface, project: Project):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
+        self.project = project
         self.result = SkimResults()
         self.validtypes = integer_types + float_types
         self.tot_skims = 0
@@ -49,17 +51,13 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.graph = None
         self.skimmeable_fields = []
         self.skim_fields = []
+        self.all_modes = {}
         self.error = None
+
         # FIRST, we connect slot signals
-
-        # For loading a new graph
-        self.load_graph_from_file.clicked.connect(self.loaded_new_graph_from_file)
-
         # For adding skims
-        # self.bt_add_skim.clicked.connect(self.add_to_skim_list)
         self.but_adds_to_links.clicked.connect(self.append_to_list)
         self.but_removes_from_links.clicked.connect(self.removes_fields)
-
         self.do_dist_matrix.clicked.connect(self.run_skimming)
 
         # SECOND, we set visibility for sections that should not be shown when the form opens (overlapping items)
@@ -72,6 +70,25 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # loads default path from parameters
         self.path = standard_path()
+
+        self.cb_minimizing.clear()
+        self.available_skims_table.clearContents()
+        self.block_paths.setChecked(True)
+        self.graph = None
+
+        curr = self.project.network.conn.cursor()
+        curr.execute("""select mode_name, mode_id from modes""")
+        for x in curr.fetchall():
+            self.cb_modes.addItem(f'{x[0]} ({x[1]})')
+            self.all_modes[f'{x[0]} ({x[1]})'] = x[1]
+
+        self.graph: Graph
+
+        self.skimmeable_fields = self.project.network.skimmable_fields()
+        self.available_skims_table.setRowCount(len(self.skimmeable_fields))
+        for i, q in enumerate(self.skimmeable_fields):
+            self.cb_minimizing.addItem(q)
+            self.available_skims_table.setItem(i, 0, QTableWidgetItem(q))
 
     def removes_fields(self):
         table = self.available_skims_table
@@ -117,27 +134,6 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progressbar.setValue(0)
         self.progress_label.setText("")
 
-    def loaded_new_graph_from_file(self):
-        file_types = ["AequilibraE graph(*.aeg)"]
-
-        new_name, file_type = GetOutputFileName(self, "Graph file", file_types, ".aeg", self.path)
-        self.cb_minimizing.clear()
-        self.available_skims_table.clearContents()
-        self.block_paths.setChecked(False)
-        self.graph = None
-        if new_name is not None:
-            self.graph_file_name.setText(new_name)
-            self.graph = Graph()
-            self.graph.load_from_disk(new_name)
-
-            self.block_paths.setChecked(self.graph.block_centroid_flows)
-            self.skimmeable_fields = self.graph.available_skims()
-
-            self.available_skims_table.setRowCount(len(self.skimmeable_fields))
-            for i, q in enumerate(self.skimmeable_fields):
-                self.cb_minimizing.addItem(q)
-                self.available_skims_table.setItem(i, 0, QTableWidgetItem(q))
-
     def browse_outfile(self):
         self.imped_results = None
         new_name, extension = GetOutputFileName(
@@ -167,32 +163,33 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results
+        self.browse_outfile()
+        cost_field = self.cb_minimizing.currentText()
 
-        if self.error is None:
-            self.browse_outfile()
-            cost_field = self.cb_minimizing.currentText()
+        mode = self.all_modes[self.cb_modes.currentText()]
+        self.project.network.build_graphs()
+        self.graph = self.project.network.graphs[mode]
 
-            # We prepare the graph to set all nodes as centroids
-            if self.rdo_all_nodes.isChecked():
-                self.graph.prepare_graph(self.graph.all_nodes)
+        # We prepare the graph to set all nodes as centroids
+        if self.rdo_all_nodes.isChecked():
+            self.graph.prepare_graph(self.graph.all_nodes)
 
-            self.graph.set_graph(
-                cost_field=cost_field, skim_fields=self.skim_fields, block_centroid_flows=self.block_paths.isChecked()
-            )
+        self.graph.set_graph(cost_field=self.cb_minimizing.currentText())
+        self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
 
-            self.result.prepare(self.graph)
+        self.graph.set_skimming(self.skim_fields)
 
-            self.funding1.setVisible(False)
-            self.funding2.setVisible(False)
-            self.progressbar.setVisible(True)
-            self.progress_label.setVisible(True)
-            self.worker_thread = NetworkSkimming(self.graph, self.result)
-            try:
-                self.run_thread()
-            except ValueError as error:
-                qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
-        else:
-            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=3)
+        self.result.prepare(self.graph)
+
+        self.funding1.setVisible(False)
+        self.funding2.setVisible(False)
+        self.progressbar.setVisible(True)
+        self.progress_label.setVisible(True)
+        self.worker_thread = NetworkSkimming(self.graph, self.result)
+        try:
+            self.run_thread()
+        except ValueError as error:
+            qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
 
     @staticmethod
     def only_str(str_input):
