@@ -70,6 +70,13 @@ has_omx = spec is not None
 if not has_omx:
     extra_packages = False
 
+gtools = True
+spec = iutil.find_spec("openmatrix")
+has_ortools = spec is not None
+
+if has_ortools:
+    from .routing_procedures import TSPDialog
+
 
 class AequilibraEMenu:
 
@@ -184,7 +191,22 @@ class AequilibraEMenu:
         self.toolbar.addWidget(pathButton)
 
         # # ########################################################################
-        # # #######################  TRANSIT SUB-MENU   ###########################
+        # # #######################   ROUTING SUB-MENU   ###########################
+        if has_ortools:
+            routingMenu = QMenu()
+            self.tsp_action = QAction(self.trlt('Travelling Salesman Problem'), self.manager)
+            self.tsp_action.triggered.connect(self.run_tsp)
+            routingMenu.addAction(self.tsp_action)
+
+            routingButton = QToolButton()
+            routingButton.setText(self.trlt('Routing'))
+            routingButton.setPopupMode(2)
+            routingButton.setMenu(routingMenu)
+
+            self.toolbar.addWidget(routingButton)
+
+        # # ########################################################################
+        # # #######################   TRANSIT SUB-MENU   ###########################
         transitMenu = QMenu()
         self.gtfs_import_action = QAction(self.trlt('Convert GTFS to SpatiaLite'), self.manager)
         self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
@@ -431,7 +453,6 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-
     def run_distribution_models(self):
         dlg2 = DistributionModelsDialog(self.iface)
         dlg2.show()
@@ -469,6 +490,14 @@ class AequilibraEMenu:
                 dlg2 = TrafficAssignmentDialog(self.iface, self.project)
                 dlg2.show()
                 dlg2.exec_()
+
+    def run_tsp(self):
+        if self.project is None:
+            self.show_message_no_project()
+        else:
+            dlg2 = TSPDialog(self.iface, self.project, self.link_layer, self.node_layer)
+            dlg2.show()
+            dlg2.exec_()
 
     def run_import_gtfs(self):
         dlg2 = GtfsImportDialog(self.iface)
