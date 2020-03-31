@@ -60,7 +60,7 @@ class TSPProcedure(WorkerThread):
             self.error = 'Solution not found'
             self.report.append(self.error)
         else:
-            self.report.append(f'Objective: {solution.ObjectiveValue() / self.mult}')
+            self.report.append(f'Objective function value: {solution.ObjectiveValue() / self.mult}')
             index = routing.Start(0)
             plan_output = 'Route:\n'
             route_distance = 0
@@ -73,7 +73,8 @@ class TSPProcedure(WorkerThread):
                 index = solution.Value(routing.NextVar(index))
                 route_distance += routing.GetArcCostForVehicle(previous_index, index, 0)
 
-            self.node_sequence.append(skm.index[manager.IndexToNode(index)])
-            plan_output += f' {manager.IndexToNode(index)}\n'
+            p = skm.index[manager.IndexToNode(index)]
+            self.node_sequence.append(p)
+            plan_output += f' {p}\n'
             self.report.append(plan_output)
         self.finished_threaded_procedure.emit("TSP")

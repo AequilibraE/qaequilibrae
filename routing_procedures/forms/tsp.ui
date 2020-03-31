@@ -34,7 +34,7 @@
       <item>
        <widget class="QRadioButton" name="rdo_selected">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="text">
          <string>Selected</string>
@@ -154,11 +154,14 @@
       </item>
       <item row="1" column="0" colspan="5">
        <widget class="QCheckBox" name="chb_block">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>Block flows through centroids</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
