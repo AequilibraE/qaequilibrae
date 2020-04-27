@@ -345,7 +345,8 @@ class AequilibraEMenu:
         if dtype is not None:
             self.contents = []
             self.showing.setVisible(True)
-            self.project = Project(path)
+            self.project = Project()
+            self.project.load(path)
             self.project.conn = qgis.utils.spatialite_connect(path)
             self.project.network.conn = self.project.conn
 
