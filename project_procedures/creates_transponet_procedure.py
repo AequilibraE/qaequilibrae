@@ -30,7 +30,8 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
     def doWork(self):
         self.emit_messages(message="Initializing project", value=0, max_val=1)
-        self.project = Project(self.output_file, True)
+        self.project = Project()
+        self.project.new(self.output_file)
         self.project.conn.close()
         self.project.conn = qgis.utils.spatialite_connect(self.output_file)
         self.project.network.conn = self.project.conn
