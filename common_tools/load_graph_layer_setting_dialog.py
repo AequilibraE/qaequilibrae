@@ -72,4 +72,5 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
         self.mode = self.all_modes[self.cb_modes.currentText()]
         self.minimize_field = self.cb_minimizing.currentText()
         self.block_connector = self.block_paths.isChecked()
+        self.remove_chosen_links = self.chb_chosen_links.isChecked()
         self.close()

@@ -456,7 +456,7 @@ class AequilibraEMenu:
             if self.project is None:
                 self.show_message_no_project()
             else:
-                dlg2 = ImpedanceMatrixDialog(self.iface, self.project)
+                dlg2 = ImpedanceMatrixDialog(self.iface, self.project, self.link_layer)
                 dlg2.show()
                 dlg2.exec_()
 
@@ -467,7 +467,7 @@ class AequilibraEMenu:
             if self.project is None:
                 self.show_message_no_project()
             else:
-                dlg2 = TrafficAssignmentDialog(self.iface, self.project)
+                dlg2 = TrafficAssignmentDialog(self.iface, self.project, self.link_layer)
                 dlg2.show()
                 dlg2.exec_()
 
