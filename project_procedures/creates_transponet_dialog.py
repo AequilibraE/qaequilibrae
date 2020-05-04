@@ -1,25 +1,3 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Main interface for creating a TranspoNet from layers previously prepared
- Purpose:    Load GUI and user interface for TranspoNet creation
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
- Transponet Repository: https://github.com/AequilibraE/TranspoNet
-
- Created:    2017-04-28
- Updated:    2020-02-08
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
 import qgis
 from qgis.core import *
 import sys
@@ -29,6 +7,7 @@ from qgis.PyQt import QtWidgets, uic
 from functools import partial
 from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
+from ..common_tools.all_layers_from_toc import all_layers_from_toc
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
 from .creates_transponet_procedure import CreatesTranspoNetProcedure
@@ -58,16 +37,22 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.counter = {}
         self.output_file = False
         self.error = None
-        self.node_layers_list.layerChanged.connect(partial(self.changed_layer, "nodes"))
-        self.node_layers_list.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self.node_layers_list.currentIndexChanged.connect(partial(self.changed_layer, "nodes"))
 
-        self.link_layers_list.layerChanged.connect(partial(self.changed_layer, "links"))
-        self.link_layers_list.setFilters(QgsMapLayerProxyModel.LineLayer)
+        self.link_layers_list.currentIndexChanged.connect(partial(self.changed_layer, "links"))
         self.node_fields = []
         self.link_fields = []
         self.node_field_indices = {}
         self.link_field_indices = {}
         self.report = None
+
+        for layer in all_layers_from_toc():  # We iterate through all layers
+            if "wkbType" in dir(layer):
+                if layer.wkbType() in line_types:
+                    self.link_layers_list.addItem(layer.name())
+
+                if layer.wkbType() in point_types:
+                    self.node_layers_list.addItem(layer.name())
 
         if self.node_layers_list.currentIndex() >= 0:
             self.changed_layer("nodes")
