@@ -4,13 +4,13 @@ qgisMinimumVersion=3.8
 qgisMaximumVersion=3.99
 description=Transportation modeling toolbox for QGIS
 about=AequilibraE is a transportation modelling toolbox modeled after the standard 4-step modeling process and according to the current state of the practice in transportation modeling. It includes procedures for the following activities--> NETWORK MANIPULATION: creation of node layers from line layers, automatic addition of centroid connectors, --> PATH COMPUTATION: computation and display of shortest paths, computation of impedance matrices and traffic assignment, --> TRIP DISTRIBUTION: Iterative proportional fitting (IPF), and calibration and application of synthetic gravity models, --> GIS SUPPORT: Computation of desire lines and delaunay lines, polygon overlay, GeoTag (spatial join without creating a third joined layer) and creation of stacked bandwidth maps & scenario comparison tool, GTFS import into sqlite -->All non-GIS features (assignment, path computation and trip distribution) can be accessed directly from a Python shell.
-version=0.6.2
+version=0.6.3
 author=Pedro Camargo
 email=pedro@xl-optim.com
 repository= https://github.com/AequilibraE/AequilibraE-GUI
 tracker=https://github.com/aequilibrae/AequilibraE-GUI/issues
 icon=icon.png
-experimental=False
+experimental=True
 homepage=https://www.aequilibrae.com/qgis
 
 
