@@ -103,7 +103,7 @@ class AddsConnectorsProcedure(WorkerThread):
 
         # The missing pieces in this query are: centroid's longitude, centroid's latitude, selection of link
         # types acceptable to have connectors linked AND the number of connectors we are interested in
-        sql = """SELECT distinct node_id, AsText(nodes.geometry), links.modes, GLength(makeline(nodes.geometry,  
+        sql = """SELECT distinct node_id, AsWKT(nodes.geometry), links.modes, GLength(makeline(nodes.geometry,  
                  GeomFromText("Point ({long} {lat})", 4326)))
                  as distance FROM nodes
                  INNER JOIN links on links.a_node = nodes.node_id
@@ -112,7 +112,7 @@ class AddsConnectorsProcedure(WorkerThread):
                       search_frame = Buffer(GeomFromText("Point ({long} {lat})", 4326), {circle}))
                  {link_types}  
                  UNION 
-                 SELECT distinct node_id, AsText(nodes.geometry), links.modes, GLength(makeline(nodes.geometry,  
+                 SELECT distinct node_id, AsWKT(nodes.geometry), links.modes, GLength(makeline(nodes.geometry,  
                  GeomFromText("Point ({long} {lat})", 4326)))
                  as distance FROM nodes
                  INNER JOIN links on links.b_node = nodes.node_id
@@ -123,7 +123,7 @@ class AddsConnectorsProcedure(WorkerThread):
                  ORDER BY distance
                  limit {connectors}"""
 
-        missing_mode_sql = """SELECT distinct node_id, AsText(nodes.geometry), links.modes, 
+        missing_mode_sql = """SELECT distinct node_id, AsWKT(nodes.geometry), links.modes, 
                               GLength(makeline(nodes.geometry, GeomFromText("Point ({long} {lat})", 4326)))
                               as distance FROM nodes
                               INNER JOIN links on links.a_node = nodes.node_id
@@ -133,7 +133,7 @@ class AddsConnectorsProcedure(WorkerThread):
                               AND instr(modes, "{srch_mode}") > 0 
                               {link_types}  
                               UNION 
-                              SELECT distinct node_id, AsText(nodes.geometry), links.modes,
+                              SELECT distinct node_id, AsWKT(nodes.geometry), links.modes,
                               GLength(makeline(nodes.geometry, GeomFromText("Point ({long} {lat})", 4326)))
                               as distance FROM nodes
                               INNER JOIN links on links.b_node = nodes.node_id
