@@ -61,10 +61,11 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, project: Project):
+    def __init__(self, iface, project: Project, link_layer):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.project = project
+        self.link_layer = link_layer
         self.setupUi(self)
         self.path = standard_path()
         self.output_path = None
@@ -249,6 +250,12 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.matrix.set_index(self.cob_matrix_indices.currentText())
 
         graph = self.project.network.graphs[self.all_modes[mode]]
+
+        if self.chb_chosen_links.isChecked():
+            idx = self.link_layer.dataProvider().fieldNameIndex('link_id')
+            remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
+            graph.exclude_links(remove)
+
         pce = self.pce_setter.value()
         assigclass = TrafficClass(graph, self.matrix)
         assigclass.set_pce(pce)

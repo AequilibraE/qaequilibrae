@@ -73,6 +73,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.continue_with_data()
 
     def continue_with_data(self):
+        self.setWindowTitle(f'File path:  {self.data_path}')
+
         if self.data_type in ["AED", "AEM"]:
             if self.data_type == "AED":
                 self.data_to_show = AequilibraeData()

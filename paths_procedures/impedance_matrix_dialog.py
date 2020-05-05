@@ -38,12 +38,13 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, project: Project):
+    def __init__(self, iface, project: Project, link_layer):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
         self.project = project
+        self.link_layer = link_layer
         self.result = SkimResults()
         self.validtypes = integer_types + float_types
         self.tot_skims = 0
@@ -74,15 +75,13 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.cb_minimizing.clear()
         self.available_skims_table.clearContents()
         self.block_paths.setChecked(True)
-        self.graph = None
+        self.graph = None  # type: Graph
 
         curr = self.project.network.conn.cursor()
         curr.execute("""select mode_name, mode_id from modes""")
         for x in curr.fetchall():
             self.cb_modes.addItem(f'{x[0]} ({x[1]})')
             self.all_modes[f'{x[0]} ({x[1]})'] = x[1]
-
-        self.graph: Graph
 
         self.skimmeable_fields = self.project.network.skimmable_fields()
         self.available_skims_table.setRowCount(len(self.skimmeable_fields))
@@ -141,6 +140,8 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         )
         if new_name is not None:
             self.imped_results = new_name
+            return True
+        return False
 
     def run_thread(self):
         self.do_dist_matrix.setVisible(False)
@@ -163,8 +164,8 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results
-        self.browse_outfile()
-        cost_field = self.cb_minimizing.currentText()
+        if not self.browse_outfile():
+            return
 
         mode = self.all_modes[self.cb_modes.currentText()]
         self.project.network.build_graphs()
@@ -176,6 +177,11 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.graph.set_graph(cost_field=self.cb_minimizing.currentText())
         self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
+
+        if self.chb_chosen_links.isChecked():
+            idx = self.link_layer.dataProvider().fieldNameIndex('link_id')
+            remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
+            self.graph.exclude_links(remove)
 
         self.graph.set_skimming(self.skim_fields)
 

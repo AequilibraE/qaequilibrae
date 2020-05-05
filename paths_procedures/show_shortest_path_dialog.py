@@ -91,10 +91,19 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             if not self.mode in self.project.network.graphs:
                 self.project.network.build_graphs()
 
-            self.graph = self.project.network.graphs[self.mode]
+            if dlg2.remove_chosen_links:
+                self.graph = self.project.network.graphs.pop(self.mode)
+            else:
+                self.graph = self.project.network.graphs[self.mode]
             self.graph.set_graph(self.minimize_field)
             self.graph.set_skimming(self.minimize_field)
             self.graph.set_blocked_centroid_flows(dlg2.block_connector)
+
+            if dlg2.remove_chosen_links:
+                idx = self.line_layer.dataProvider().fieldNameIndex('link_id')
+                remove = [feat.attributes()[idx] for feat in self.line_layer.selectedFeatures()]
+                self.graph.exclude_links(remove)
+
             self.res.prepare(self.graph)
 
             self.node_fields = [field.name() for field in self.node_layer.dataProvider().fields().toList()]
