@@ -450,9 +450,12 @@ class AequilibraEMenu:
         # If we wanted modal, we would eliminate the dlg2.show()
 
     def run_add_connectors(self):
-        dlg2 = AddConnectorsDialog(self.iface, self.project)
-        dlg2.show()
-        dlg2.exec_()
+        if self.project is None:
+            self.show_message_no_project()
+        else:
+            dlg2 = AddConnectorsDialog(self.iface, self.project)
+            dlg2.show()
+            dlg2.exec_()
 
     def run_distribution_models(self):
         dlg2 = DistributionModelsDialog(self.iface)

@@ -1,24 +1,3 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Adding centroid connectors procedure
- Purpose:    Executes centroid addition procedure in a separate thread
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-30
- Updated:    30/01/2020
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
 from typing import List
 from qgis.core import *
 from qgis.PyQt.QtCore import *
@@ -50,8 +29,8 @@ class AddsConnectorsProcedure(WorkerThread):
         self.max_connectors = max_connectors
         self.allowed_link_types = allowed_link_types
         self.error = None
-        self.insert_qry = """INSERT INTO links (direction, modes, link_type, geometry) 
-                             VALUES({}, GeomFromText("{}", 4326))"""
+        self.insert_qry = '''insert into links (modes, link_type, geometry) values 
+                (?, ?, SetSRID(makeline(GeomFromText(?, 4326), GeomFromWKB(?)), 4326))'''
 
     def doWork(self):
         self.conn = qgis.utils.spatialite_connect(self.conn)
@@ -62,7 +41,7 @@ class AddsConnectorsProcedure(WorkerThread):
         cursor.execute('SELECT node_id from nodes')
         node_ids = cursor.fetchall()
         node_ids = np.array(node_ids)
-        node_ids=node_ids[:,0]
+        node_ids = node_ids[:, 0]
         centroids = get_vector_layer_by_name(self.centroid_layer_name)
 
         # Now we start to set the field for writing the new data
@@ -103,7 +82,7 @@ class AddsConnectorsProcedure(WorkerThread):
 
         # The missing pieces in this query are: centroid's longitude, centroid's latitude, selection of link
         # types acceptable to have connectors linked AND the number of connectors we are interested in
-        sql = """SELECT distinct node_id, AsWKT(nodes.geometry), links.modes, GLength(makeline(nodes.geometry,  
+        sql = """SELECT distinct node_id, ST_AsBinary(nodes.geometry), links.modes, GLength(makeline(nodes.geometry,  
                  GeomFromText("Point ({long} {lat})", 4326)))
                  as distance FROM nodes
                  INNER JOIN links on links.a_node = nodes.node_id
@@ -112,7 +91,7 @@ class AddsConnectorsProcedure(WorkerThread):
                       search_frame = Buffer(GeomFromText("Point ({long} {lat})", 4326), {circle}))
                  {link_types}  
                  UNION 
-                 SELECT distinct node_id, AsWKT(nodes.geometry), links.modes, GLength(makeline(nodes.geometry,  
+                 SELECT distinct node_id, ST_AsBinary(nodes.geometry), links.modes, GLength(makeline(nodes.geometry,  
                  GeomFromText("Point ({long} {lat})", 4326)))
                  as distance FROM nodes
                  INNER JOIN links on links.b_node = nodes.node_id
@@ -123,7 +102,7 @@ class AddsConnectorsProcedure(WorkerThread):
                  ORDER BY distance
                  limit {connectors}"""
 
-        missing_mode_sql = """SELECT distinct node_id, AsWKT(nodes.geometry), links.modes, 
+        missing_mode_sql = """SELECT distinct node_id, ST_AsBinary(nodes.geometry), links.modes, 
                               GLength(makeline(nodes.geometry, GeomFromText("Point ({long} {lat})", 4326)))
                               as distance FROM nodes
                               INNER JOIN links on links.a_node = nodes.node_id
@@ -133,7 +112,7 @@ class AddsConnectorsProcedure(WorkerThread):
                               AND instr(modes, "{srch_mode}") > 0 
                               {link_types}  
                               UNION 
-                              SELECT distinct node_id, AsWKT(nodes.geometry), links.modes,
+                              SELECT distinct node_id, ST_AsBinary(nodes.geometry), links.modes,
                               GLength(makeline(nodes.geometry, GeomFromText("Point ({long} {lat})", 4326)))
                               as distance FROM nodes
                               INNER JOIN links on links.b_node = nodes.node_id
@@ -195,13 +174,9 @@ class AddsConnectorsProcedure(WorkerThread):
                 modes_for_nodes[node[0]] += "".join(set(node[2]))
 
             for i, node in enumerate(nodes):
-                geometry = "LINESTRING ({} {}, {})".format(lon, lat, node[1][6:-1])
-                attributes = ", ".join(['0', "'{}'".format(modes_for_nodes[node[0]]), "'connector'"])
-                qry = self.insert_qry.format(attributes, geometry)
-                cursor.execute(qry)
-                print(qry)
+                modes = modes_for_nodes[node[0]]
+                cursor.execute(self.insert_qry, (modes, 'connector', f'Point ({lon} {lat})', node[1]))
                 qry = node_sql.format(nodeid=centroid_id, lon=lon, lat=lat)
                 cursor.execute(qry)
-                print(qry)
         self.conn.commit()
         self.ProgressText.emit("DONE")
