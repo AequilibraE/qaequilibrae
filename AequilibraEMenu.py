@@ -20,7 +20,7 @@ from qgis.PyQt.QtCore import *
 
 from qgis.PyQt.QtGui import *
 
-from .common_tools import ParameterDialog, GetOutputFileName, LogDialog
+from .common_tools import ParameterDialog, LogDialog
 
 from .common_tools import AboutDialog
 from .common_tools.auxiliary_functions import standard_path
@@ -80,12 +80,11 @@ if has_ortools:
 class AequilibraEMenu:
 
     def __init__(self, iface):
-
+        self.geo_layers_list = ['links', 'nodes', 'zones']
         self.translator = None
         self.iface = iface
         self.project = None  # type: Project
-        self.link_layer = None  # type: QgsVectorLayer
-        self.node_layer = None  # type: QgsVectorLayer
+        self.layers = {} # type: Dict[QgsVectorLayer]
 
         self.dock = QDockWidget(self.trlt('AequilibraE'))
         self.manager = QWidget()
@@ -94,9 +93,9 @@ class AequilibraEMenu:
         self.toolbar = QToolBar()
         self.toolbar.setOrientation(2)
 
+
         # # ########################################################################
         # # #######################   PROJECT SUB-MENU   ############################
-
         projectMenu = QMenu()
         self.open_project_action = QAction(self.trlt('Open Project'), self.manager)
         self.open_project_action.triggered.connect(self.run_load_project)
@@ -312,6 +311,7 @@ class AequilibraEMenu:
         self.dock.setWidget(self.manager)
         self.dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
+        QgsProject.instance().layerRemoved.connect(self.layerRemoved)
 
     def run_help(self):
         url = 'http://aequilibrae.com/qgis'
@@ -378,35 +378,29 @@ class AequilibraEMenu:
                     return
                 else:
                     raise e
-            database = os.path.join(proj_path, "project_database.sqlite")
-            uri = QgsDataSourceUri()
-            uri.setDatabase(database)
-            uri.setDataSource('', 'links', 'geometry')
-            self.link_layer = QgsVectorLayer(uri.uri(), 'links', 'spatialite')
-            QgsProject.instance().addMapLayer(self.link_layer)
-
-            uri.setDataSource('', 'nodes', 'geometry')
-            self.node_layer = QgsVectorLayer(uri.uri(), 'nodes', 'spatialite')
-            QgsProject.instance().addMapLayer(self.node_layer)
             self.compute_statistics_box()
+
+    def layerRemoved(self, layer):
+        self.layers = {key: val for key, val in self.layers.items() if val[1] != layer}
 
     def compute_statistics_box(self):
         self.projectManager.clear()
 
-        # Basic statistics
-        basic_stats = QtWidgets.QTableWidget()
-        basic_stats.setRowCount(4)
-        basic_stats.setColumnCount(2)
-        basic_stats.horizontalHeader().setVisible(False)
-        basic_stats.verticalHeader().setVisible(False)
-        data = [['Project path', self.project.project_base_path],
-                ['Links', self.project.network.count_links()],
-                ['Nodes', self.project.network.count_nodes()],
-                ['Centroids', self.project.network.count_centroids()]]
-        for i, (key, val) in enumerate(data):
-            basic_stats.setItem(i, 0, QtWidgets.QTableWidgetItem(key))
-            basic_stats.setItem(i, 1, QtWidgets.QTableWidgetItem(str(val)))
-        self.projectManager.addTab(basic_stats, "Project")
+        descrlayout = QVBoxLayout()
+        self.layers_box = QtWidgets.QTableWidget()
+        self.layers_box.doubleClicked.connect(self.load_geo_layer)
+        self.layers_box.setColumnCount(1)
+        self.layers_box.setRowCount(len(self.geo_layers_list))
+        self.layers_box.horizontalHeader().setVisible(False)
+        self.layers_box.verticalHeader().setVisible(False)
+        for i, lyr in enumerate(self.geo_layers_list):
+            item1 = QtWidgets.QTableWidgetItem(lyr)
+            item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.layers_box.setItem(i, 0, item1)
+        descrlayout.addWidget(self.layers_box)
+        descr = QWidget()
+        descr.setLayout(descrlayout)
+        self.projectManager.addTab(descr, "Layers")
 
         # Modes table
         modes = [(md.mode_id, md.mode_name) for md in self.project.network.modes.all_modes().values()]
@@ -431,6 +425,34 @@ class AequilibraEMenu:
             link_types_table.setItem(i, 0, QtWidgets.QTableWidgetItem(ltype))
             link_types_table.setItem(i, 1, QtWidgets.QTableWidgetItem(ltype_id))
         self.projectManager.addTab(link_types_table, "Link Types")
+
+        # Basic statistics
+        basic_stats = QtWidgets.QTableWidget()
+        basic_stats.setRowCount(4)
+        basic_stats.setColumnCount(2)
+        basic_stats.horizontalHeader().setVisible(False)
+        basic_stats.verticalHeader().setVisible(False)
+        data = [['Project path', self.project.project_base_path],
+                ['Links', self.project.network.count_links()],
+                ['Nodes', self.project.network.count_nodes()],
+                ['Centroids', self.project.network.count_centroids()]]
+        for i, (key, val) in enumerate(data):
+            basic_stats.setItem(i, 0, QtWidgets.QTableWidgetItem(key))
+            basic_stats.setItem(i, 1, QtWidgets.QTableWidgetItem(str(val)))
+        self.projectManager.addTab(basic_stats, "Stats")
+
+    def load_geo_layer(self):
+        sel = self.layers_box.selectedItems()
+        lyr = [s.text() for s in sel][0]
+
+        if lyr not in self.layers:
+            uri = QgsDataSourceUri()
+            uri.setDatabase(self.project.path_to_file)
+            uri.setDataSource('', lyr, 'geometry')
+            layer = QgsVectorLayer(uri.uri(), lyr, 'spatialite')
+            self.layers[lyr] = [layer, layer.id()]
+        QgsProject.instance().addMapLayer(self.layers[lyr][0])
+        qgis.utils.iface.mapCanvas().refresh()
 
     def run_change_parameters(self):
         dlg2 = ParameterDialog(self.iface)
