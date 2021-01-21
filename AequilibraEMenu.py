@@ -348,20 +348,15 @@ class AequilibraEMenu:
                 pass
 
     def hide_info_pannel(self):
-        if len(self.tabContents) > 0:
-            if self.showing.isChecked():
-                for v in self.tabContents:
-                    self.projectManager.addTab(v[0], v[1])
-            else:
-                tab_count = 1
-                for i in range(tab_count):
-                    self.projectManager.removeTab(i)
+        if self.showing.isChecked():
+            self.compute_statistics_box()
+        else:
+            self.projectManager.clear()
 
     def run_close_project(self):
         self.project.close()
-        tab_count = 1
-        for i in range(tab_count):
-            self.projectManager.removeTab(i)
+        self.projectManager.clear()
+        self.project = None
 
     def run_load_project(self):
         proj_path = QtWidgets.QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
@@ -370,12 +365,19 @@ class AequilibraEMenu:
         tab_count = 1
         for i in range(tab_count):
             self.projectManager.removeTab(i)
-
-        if proj_path is not None:
+        if proj_path is not None and len(proj_path) > 0:
             self.contents = []
             self.showing.setVisible(True)
             self.project = Project()
-            self.project.load(proj_path)
+
+            try:
+                self.project.load(proj_path)
+            except FileNotFoundError as e:
+                if e.args[0] == 'Model does not exist. Check your path and try again':
+                    qgis.utils.iface.messageBar().pushMessage("FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL", level=1)
+                    return
+                else:
+                    raise e
             database = os.path.join(proj_path, "project_database.sqlite")
             uri = QgsDataSourceUri()
             uri.setDatabase(database)
@@ -386,28 +388,49 @@ class AequilibraEMenu:
             uri.setDataSource('', 'nodes', 'geometry')
             self.node_layer = QgsVectorLayer(uri.uri(), 'nodes', 'spatialite')
             QgsProject.instance().addMapLayer(self.node_layer)
+            self.compute_statistics_box()
 
-            descr = QWidget()
-            descrlayout = QVBoxLayout()
-            # We create a tab with the main description of the project
-            modes = [md.mode_name for md in self.project.network.modes.all_modes().values()]
-            link_types = [lt.link_type for lt in self.project.network.link_types.all_types().values()]
-            data_items = []
-            data_items.append(QLabel(f'Project: {proj_path}'))
+    def compute_statistics_box(self):
+        self.projectManager.clear()
 
-            data_items.append('Links: {:,}'.format(self.project.network.count_links()))
-            data_items.append('Nodes: {:,}'.format(self.project.network.count_nodes()))
-            data_items.append('Centroids: {:,}'.format(self.project.network.count_centroids()))
-            data_items.append('Modes:')
-            data_items.extend([f'  {md}' for md in modes] + [''])
-            data_items.append('Link Types:')
-            data_items.extend([f'  {lt}' for lt in link_types])
-            for p in data_items:
-                descrlayout.addWidget(QLabel(p))
+        # Basic statistics
+        basic_stats = QtWidgets.QTableWidget()
+        basic_stats.setRowCount(4)
+        basic_stats.setColumnCount(2)
+        basic_stats.horizontalHeader().setVisible(False)
+        basic_stats.verticalHeader().setVisible(False)
+        data = [['Project path', self.project.project_base_path],
+                ['Links', self.project.network.count_links()],
+                ['Nodes', self.project.network.count_nodes()],
+                ['Centroids', self.project.network.count_centroids()]]
+        for i, (key, val) in enumerate(data):
+            basic_stats.setItem(i, 0, QtWidgets.QTableWidgetItem(key))
+            basic_stats.setItem(i, 1, QtWidgets.QTableWidgetItem(str(val)))
+        self.projectManager.addTab(basic_stats, "Project")
 
-            descr.setLayout(descrlayout)
-            self.tabContents = [(descr, "Project")]
-            self.projectManager.addTab(descr, "Project")
+        # Modes table
+        modes = [(md.mode_id, md.mode_name) for md in self.project.network.modes.all_modes().values()]
+        modes_table = QtWidgets.QTableWidget()
+        modes_table.setRowCount(len(modes))
+        modes_table.setColumnCount(2)
+        modes_table.setHorizontalHeaderLabels(['mode name', 'mode id'])
+        modes_table.verticalHeader().setVisible(False)
+        for i, (mode_id, mode_name) in enumerate(modes):
+            modes_table.setItem(i, 0, QtWidgets.QTableWidgetItem(mode_name))
+            modes_table.setItem(i, 1, QtWidgets.QTableWidgetItem(mode_id))
+        self.projectManager.addTab(modes_table, "modes")
+
+        # Link types table
+        link_types = [(lt.link_type_id, lt.link_type) for lt in self.project.network.link_types.all_types().values()]
+        link_types_table = QtWidgets.QTableWidget()
+        link_types_table.setRowCount(len(link_types))
+        link_types_table.setColumnCount(2)
+        link_types_table.setHorizontalHeaderLabels(['Link type', 'Link type id'])
+        link_types_table.verticalHeader().setVisible(False)
+        for i, (ltype_id, ltype) in enumerate(link_types):
+            link_types_table.setItem(i, 0, QtWidgets.QTableWidgetItem(ltype))
+            link_types_table.setItem(i, 1, QtWidgets.QTableWidgetItem(ltype_id))
+        self.projectManager.addTab(link_types_table, "Link Types")
 
     def run_change_parameters(self):
         dlg2 = ParameterDialog(self.iface)
@@ -453,6 +476,10 @@ class AequilibraEMenu:
 
     # run method that calls the network preparation section of the code
     def run_create_transponet(self):
+        if self.project is not None:
+            self.message_project_already_open()
+            return
+
         if no_binary:
             self.message_binary()
         else:
@@ -518,6 +545,9 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def run_project_from_osm(self):
+        if self.project is not None:
+            self.message_project_already_open()
+            return
         dlg2 = ProjectFromOSMDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
@@ -557,3 +587,6 @@ class AequilibraEMenu:
 
     def show_message_no_project(self):
         self.iface.messageBar().pushMessage("Error", "You need to load a project first", level=3, duration=10)
+
+    def message_project_already_open(self):
+        self.iface.messageBar().pushMessage("You need to close the project currently open first", level=2, duration=10)
