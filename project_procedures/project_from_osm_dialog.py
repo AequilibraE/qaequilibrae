@@ -17,7 +17,6 @@ from aequilibrae.project import Project
 from aequilibrae.project.network import OSMDownloader
 from aequilibrae.project.network.osm_builder import OSMBuilder
 from aequilibrae.project.network.osm_utils.place_getter import placegetter
-from aequilibrae.project.network.osm_utils.osm_params import max_query_area_size
 from aequilibrae import Parameters
 
 # from .osm_utils.osm_params import *

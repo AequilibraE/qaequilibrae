@@ -18,7 +18,6 @@ from qgis.core import QgsDataSourceUri, QgsVectorLayer
 # This is how QtCore and QtGui imports change
 from qgis.PyQt.QtCore import *
 
-# from PyQt4.QtGui import *
 from qgis.PyQt.QtGui import *
 
 from .common_tools import ParameterDialog, GetOutputFileName, LogDialog
@@ -110,6 +109,10 @@ class AequilibraEMenu:
         self.create_transponet_action = QAction(self.trlt('Create Project from layers'), self.manager)
         self.create_transponet_action.triggered.connect(self.run_create_transponet)
         projectMenu.addAction(self.create_transponet_action)
+
+        self.close_project_action = QAction(self.trlt('Close project'), self.manager)
+        self.close_project_action.triggered.connect(self.run_close_project)
+        projectMenu.addAction(self.close_project_action)
 
         projectButton = QToolButton()
         projectButton.setText(self.trlt('Project'))
@@ -354,26 +357,28 @@ class AequilibraEMenu:
                 for i in range(tab_count):
                     self.projectManager.removeTab(i)
 
+    def run_close_project(self):
+        self.project.close()
+        tab_count = 1
+        for i in range(tab_count):
+            self.projectManager.removeTab(i)
+
     def run_load_project(self):
-        formats = ["AequilibraE Project(*.sqlite)"]
-        path, dtype = GetOutputFileName(QtWidgets.QDialog(), "AequilibraE Project", formats, ".sqlite",
-                                        standard_path(), )
+        proj_path = QtWidgets.QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
 
         # Cleans the project descriptor
         tab_count = 1
         for i in range(tab_count):
             self.projectManager.removeTab(i)
 
-        if dtype is not None:
+        if proj_path is not None:
             self.contents = []
             self.showing.setVisible(True)
             self.project = Project()
-            self.project.load(path)
-            self.project.conn = qgis.utils.spatialite_connect(path)
-            self.project.network.conn = self.project.conn
-
+            self.project.load(proj_path)
+            database = os.path.join(proj_path, "project_database.sqlite")
             uri = QgsDataSourceUri()
-            uri.setDatabase(path)
+            uri.setDatabase(database)
             uri.setDataSource('', 'links', 'geometry')
             self.link_layer = QgsVectorLayer(uri.uri(), 'links', 'spatialite')
             QgsProject.instance().addMapLayer(self.link_layer)
@@ -385,13 +390,20 @@ class AequilibraEMenu:
             descr = QWidget()
             descrlayout = QVBoxLayout()
             # We create a tab with the main description of the project
-            p1 = QLabel('Project: {}'.format(path))
-            p2 = QLabel('Modes: {}'.format(', '.join(self.project.network.modes())))
-            p3 = QLabel('Total Links: {:,}'.format(self.project.network.count_links()))
-            p4 = QLabel('Total Nodes: {:,}'.format(self.project.network.count_nodes()))
+            modes = [md.mode_name for md in self.project.network.modes.all_modes().values()]
+            link_types = [lt.link_type for lt in self.project.network.link_types.all_types().values()]
+            data_items = []
+            data_items.append(QLabel(f'Project: {proj_path}'))
 
-            for p in [p1, p2, p3, p4]:
-                descrlayout.addWidget(p)
+            data_items.append('Links: {:,}'.format(self.project.network.count_links()))
+            data_items.append('Nodes: {:,}'.format(self.project.network.count_nodes()))
+            data_items.append('Centroids: {:,}'.format(self.project.network.count_centroids()))
+            data_items.append('Modes:')
+            data_items.extend([f'  {md}' for md in modes] + [''])
+            data_items.append('Link Types:')
+            data_items.extend([f'  {lt}' for lt in link_types])
+            for p in data_items:
+                descrlayout.addWidget(QLabel(p))
 
             descr.setLayout(descrlayout)
             self.tabContents = [(descr, "Project")]
