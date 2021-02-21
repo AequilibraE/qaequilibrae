@@ -13,7 +13,6 @@
  Repository:  https://github.com/AequilibraE/AequilibraE
 
  Created:    2016-12-01
- Updated:
  Copyright:   (c) AequilibraE authors
  Licence:     See LICENSE.TXT
  -----------------------------------------------------------------------------------------------------------
@@ -25,12 +24,9 @@ from qgis.core import *
 from qgis.PyQt.QtCore import *
 from qgis.PyQt import QtGui, QtWidgets, uic
 import sys
-import os
 
 from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import *
-
-from random import randint
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgsmaplayercombobox"] = qgis.gui
@@ -161,9 +157,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.band_size = "@aeq_band_width"
 
             # define the side of the plotting based on the side of the road the system has defined
-            ab = -1
-            if self.drive_side == "right":
-                ab = 1
+            ab = 1 if self.drive_side == "right" else -1
             ba = -ab
 
             # fields
@@ -184,12 +178,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
 
             # Create the bandwidths for the comon flow, if requested
             if self.radio_compo.isChecked():
-                values = []
-                values.append(self.layer.maximumValue(idx_ab))
-                values.append(self.layer.maximumValue(idx_ba))
-                values.append(self.layer.maximumValue(idx2_ab))
-                values.append(self.layer.maximumValue(idx2_ba))
-                max_value = max(values)
+                max_value = max([self.layer.maximumValue(x) for x in [idx_ab, idx_ba, idx2_ab, idx2_ba]])
 
                 if self.expert_mode:
                     QgsExpressionContextUtils.setProjectVariable(
@@ -198,29 +187,17 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
                     max_value = "@aeq_band_max_value"
 
                 # We create the styles for AB and BA directions and add to the fields
+                text_color = self.text_color(self.common_flow_color)
                 for abb, aba, di, t in ([ab_base, ab_alt, ab, "ab"], [ba_base, ba_alt, ba, "ba"]):
-                    width = (
-                        '(coalesce(scale_linear(min("'
-                        + abb
-                        + '","'
-                        + aba
-                        + '") , 0,'
-                        + str(max_value)
-                        + ", 0, "
-                        + self.band_size
-                        + "), 0))"
-                    )
-                    offset = str(di) + "*(" + width + "/2 + " + self.space_size + ")"
-                    line_pattern = 'if (max(("' + abb + '"+"' + aba + '"),0) = 0,' + "'no', 'solid')"
-                    symbol_layer = self.create_style(
-                        width, offset, self.text_color(self.common_flow_color), line_pattern
-                    )
+                    width = f'(coalesce(scale_linear(min("{abb}","{aba}") , 0,{max_value},0,{self.band_size}), 0))'
+                    offset = f"{di}*({width}/2 + {self.space_size})"
+                    line_pattern = f'if (max(("{abb}"+"{aba}"),0) = 0,' + "'no', 'solid')"
+                    symbol_layer = self.create_style(width, offset, text_color, line_pattern)
                     self.layer.renderer().symbol().appendSymbolLayer(symbol_layer)
-                    if t == "ab":
-                        ab_offset = str(di) + "*(" + width + " + " + self.space_size + ")"
-                    else:
-                        ba_offset = str(di) + "*(" + width + " + " + self.space_size + ")"
+                    ab_offset = offset if t == "ab" else None
+                    ba_offset = offset if t != "ab" else None
 
+            # TODO: There has to be a better way to do this. Virtual fields and get the max/min of them?
             # If we want a plot of the differences only
             if self.radio_diff.isChecked():
                 # we compute the size of the differences
@@ -229,8 +206,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
                     diffs.append(abs(feat.attributes()[idx_ab] - feat.attributes()[idx2_ab]))
                     diffs.append(abs(feat.attributes()[idx_ba] - feat.attributes()[idx2_ba]))
                 max_value = max(diffs)
-                ab_offset = "0"
-                ba_offset = "0"
+                ab_offset = ba_offset = "0"
 
                 if self.expert_mode:
                     QgsExpressionContextUtils.setProjectVariable(
@@ -243,31 +219,14 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
             styles.append((ab_base, ab_alt, ab, ab_offset))
             styles.append((ba_base, ba_alt, ba, ba_offset))
 
+            pos_color = self.text_color(self.positive_color)
+            neg_color = self.text_color(self.negative_color)
+
             for i in styles:
-                width = (
-                    '(coalesce(scale_linear(abs("'
-                    + i[0]
-                    + '"-"'
-                    + i[1]
-                    + '") , 0,'
-                    + str(max_value)
-                    + ", 0, "
-                    + self.band_size
-                    + "), 0))"
-                )
-                offset = i[3] + "+" + str(i[2]) + "*(" + width + "/2 + " + self.space_size + ")"
-                line_pattern = 'if (("' + i[0] + '"-"' + i[1] + '") = 0,' + "'no', 'solid')"
-                color = (
-                    'if (max(("'
-                    + i[0]
-                    + '"-"'
-                    + i[1]
-                    + '"),0) = 0,'
-                    + self.text_color(self.negative_color)
-                    + ", "
-                    + self.text_color(self.positive_color)
-                    + ")"
-                )
+                width = f'(coalesce(scale_linear(abs("{i[0]}"-"{i[1]}") , 0,{max_value},0,{self.band_size}),0))'
+                offset = f"{i[3]}+{i[2]}*({width}/2 + {self.space_size})"
+                line_pattern = f'if (("{i[0]}"-"{i[1]}") = 0,' + "'no', 'solid')"
+                color = f'if(max(("{i[0]}"-"{i[1]}"),0) = 0,{neg_color},{pos_color})'
                 symbol_layer = self.create_style(width, offset, color, line_pattern)
                 self.layer.renderer().symbol().appendSymbolLayer(symbol_layer)
 
@@ -279,16 +238,10 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
     def check_inputs(self):
         if self.layer is None:
             return False
-        if (
-            min(
-                self.ab_FieldComboBoxBase.currentIndex(),
-                self.ba_FieldComboBoxBase.currentIndex(),
-                self.ab_FieldComboBoxAlt.currentIndex(),
-                self.ba_FieldComboBoxAlt.currentIndex(),
-            )
-            < 0
-        ):
-            return False
+        for combo in [self.ab_FieldComboBoxBase, self.ba_FieldComboBoxBase,
+                      self.ab_FieldComboBoxAlt, self.ba_FieldComboBoxAlt]:
+            if combo.currentIndex() < 0:
+                return False
         return True
 
     def create_style(self, width, offset, color, line_pattern):
