@@ -11,6 +11,7 @@ repository= https://github.com/AequilibraE/AequilibraE-GUI
 tracker=https://github.com/aequilibrae/AequilibraE-GUI/issues
 icon=icon.png
 experimental=True
+hasProcessingProvider=yes
 homepage=https://www.aequilibrae.com/qgis
 
 
