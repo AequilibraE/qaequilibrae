@@ -327,10 +327,7 @@ class AequilibraEMenu:
 
     def unload(self):
         del self.dock
-        try:
-            QgsApplication.processingRegistry().removeProvider(self.provider)
-        except:
-            pass
+        QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def trlt(self, message):
         # In the near future, we will use this function to automatically translate the AequilibraE menu
