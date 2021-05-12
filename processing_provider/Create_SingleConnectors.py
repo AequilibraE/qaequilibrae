@@ -20,14 +20,14 @@ class CreateSingleConnectors(QgsProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterField('centroidid', 'Centroid_id', type=QgsProcessingParameterField.Numeric, parentLayerParameterName='Centroidslayer', allowMultiple=False, defaultValue='node_id'))
         self.addParameter(QgsProcessingParameterNumber('StartconnectorIDat', 'Start connector ID at', type=QgsProcessingParameterNumber.Integer, defaultValue=1000))
         self.addParameter(QgsProcessingParameterString('Modes', 'Modes', multiLine=False, defaultValue='cbtw'))
-        self.addParameter(QgsProcessingParameterFeatureSink('Connectors', 'connectors', type=QgsProcessing.TypeVectorAnyGeometry, createByDefault=True, supportsAppend=True, defaultValue=None))
+        self.addParameter(QgsProcessingParameterFeatureSink('Connectors', 'connectors', type=QgsProcessing.TypeVectorAnyGeometry, createByDefault=True, defaultValue=None))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(9, model_feedback)
         results = {}
         outputs = {}
 
-        # Distance au plus proche centre (ligne vers centre)
+        #Generate connectors
         alg_params = {
             'FIELD': parameters['nodeid'],
             'HUBS': parameters['Nodeslayer'],
@@ -153,7 +153,7 @@ class CreateSingleConnectors(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
-        # Supprimer champs
+        # Deleting useless fields
         alg_params = {
             'COLUMN': parameters['centroidid'] + ';HubName;HubDist',
             'INPUT': outputs['Link_type']['OUTPUT'],

@@ -12,7 +12,7 @@ class CreateNodes(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         # (links without connectors)
         self.addParameter(QgsProcessingParameterVectorLayer('Linkslayer', 'Links layer', types=[QgsProcessing.TypeVectorLine], defaultValue=None))
-        self.addParameter(QgsProcessingParameterFeatureSink('Nodes', 'nodes', type=QgsProcessing.TypeVectorAnyGeometry, createByDefault=True, supportsAppend=True, defaultValue=None))
+        self.addParameter(QgsProcessingParameterFeatureSink('Nodes', 'nodes', type=QgsProcessing.TypeVectorAnyGeometry, createByDefault=True, defaultValue=None))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         # Use a multi-step feedback, so that individual child algorithm progress reports are adjusted for the
@@ -21,7 +21,7 @@ class CreateNodes(QgsProcessingAlgorithm):
         results = {}
         outputs = {}
 
-        # Extraire les extrem
+        # Extracting extremums
         alg_params = {
             'INPUT': parameters['Linkslayer'],
             'VERTICES': '0,-1',
@@ -33,7 +33,7 @@ class CreateNodes(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
-        # Supprimer les géométries dupliquées
+        # Deleting duplicates
         alg_params = {
             'INPUT': outputs['ExtraireLesExtrem']['OUTPUT'],
             'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
@@ -44,7 +44,7 @@ class CreateNodes(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
-        # Delete
+        # Delete useless fields
         alg_params = {
             'FIELDS_MAPPING': [],
             'INPUT': outputs['SupprimerLesGomtriesDupliques']['OUTPUT'],
