@@ -7,6 +7,12 @@ assignees: ''
 
 ---
 
+**BEFORE REQUESTING A FEATURE**
+
+1. Have you searched the documentation to make sure the feature is not there?
+2. Are you sure of the technical reasons that motivate your feature request?
+3. Have you consulted with the user and developer community? https://groups.google.com/g/aequilibrae5. 
+
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
