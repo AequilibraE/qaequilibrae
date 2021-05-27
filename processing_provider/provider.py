@@ -8,12 +8,14 @@ ProviderPath = os.path.dirname(__file__)
 
 from .Create_Nodes import CreateNodes
 from .Create_SingleConnectors import CreateSingleConnectors
+from .NodesID2Links import AddNodeInformationsToLinks
 
 class Provider(QgsProcessingProvider):
 
     def loadAlgorithms(self):
         self.addAlgorithm( CreateNodes() )
         self.addAlgorithm( CreateSingleConnectors() )
+        self.addAlgorithm( AddNodeInformationsToLinks() )
         # add additional algorithms here
         # self.addAlgorithm(MyOtherAlgorithm())
 
