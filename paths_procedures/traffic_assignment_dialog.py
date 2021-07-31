@@ -61,11 +61,10 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, project: Project, link_layer):
+    def __init__(self, iface, project: Project):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.project = project
-        self.link_layer = link_layer
         self.setupUi(self)
         self.path = standard_path()
         self.output_path = None

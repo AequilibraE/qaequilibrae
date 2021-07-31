@@ -1,0 +1,10 @@
+from ..project_procedures import ProjectFromOSMDialog
+
+
+def project_from_osm(qgis_project):
+    if qgis_project.project is not None:
+        qgis_project.message_project_already_open()
+        return
+    dlg2 = ProjectFromOSMDialog(qgis_project.iface)
+    dlg2.show()
+    dlg2.exec_()

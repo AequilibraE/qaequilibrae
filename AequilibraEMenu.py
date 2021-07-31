@@ -3,6 +3,7 @@ import sys
 import tempfile
 import glob
 import importlib.util as iutil
+from functools import partial
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QListWidget, QListWidgetItem, QAbstractItemView, QAction, \
     QVBoxLayout, QToolBar, QToolButton, QMenu, QPushButton, QTabWidget, QLabel, QCheckBox
 import qgis
@@ -20,6 +21,7 @@ from qgis.PyQt.QtCore import *
 
 from qgis.PyQt.QtGui import *
 
+from .menu_actions import run_load_project, project_from_osm
 from .common_tools import ParameterDialog, LogDialog
 
 from .common_tools import AboutDialog
@@ -43,7 +45,7 @@ from .matrix_procedures import DisplayAequilibraEFormatsDialog
 
 from .public_transport_procedures import GtfsImportDialog
 
-from .project_procedures import ProjectFromOSMDialog
+
 from warnings import warn
 
 no_binary = False
@@ -84,8 +86,7 @@ class AequilibraEMenu:
         self.translator = None
         self.iface = iface
         self.project = None  # type: Project
-        self.layers = {} # type: Dict[QgsVectorLayer]
-
+        self.layers = {}  # type: Dict[QgsVectorLayer]
         self.dock = QDockWidget(self.trlt('AequilibraE'))
         self.manager = QWidget()
 
@@ -93,199 +94,215 @@ class AequilibraEMenu:
         self.toolbar = QToolBar()
         self.toolbar.setOrientation(2)
 
+        self.menuActions = {'Project': [],
+                            'Network Manipulatiom': [],
+                            'Data': [],
+                            'Trip Distribution': [],
+                            'Routing':[],
+                            'Public Transport': [],
+                            'GIS': []}
+
+        # # #######################   PROJECT SUB-MENU   ############################
+        self.add_menu_action('Project', 'Open Project', partial(run_load_project, self))
+        self.add_menu_action('Project', 'Create project from OSM', partial(project_from_osm, self))
+        # self.add_menu_action('Project', 'Create Project from layers', partial(close_project, self))
+        # self.add_menu_action('Project', 'Close project', partial(close_project, self))
+
 
         # # ########################################################################
         # # #######################   PROJECT SUB-MENU   ############################
-        projectMenu = QMenu()
-        self.open_project_action = QAction(self.trlt('Open Project'), self.manager)
-        self.open_project_action.triggered.connect(self.run_load_project)
-        projectMenu.addAction(self.open_project_action)
-
-        self.project_from_osm_action = QAction(self.trlt('Create project from OSM'), self.manager)
-        self.project_from_osm_action.triggered.connect(self.run_project_from_osm)
-        projectMenu.addAction(self.project_from_osm_action)
-
-        self.create_transponet_action = QAction(self.trlt('Create Project from layers'), self.manager)
-        self.create_transponet_action.triggered.connect(self.run_create_transponet)
-        projectMenu.addAction(self.create_transponet_action)
-
-        self.close_project_action = QAction(self.trlt('Close project'), self.manager)
-        self.close_project_action.triggered.connect(self.run_close_project)
-        projectMenu.addAction(self.close_project_action)
-
-        projectButton = QToolButton()
-        projectButton.setText(self.trlt('Project'))
-        projectButton.setPopupMode(2)
-        projectButton.setMenu(projectMenu)
-
-        self.toolbar.addWidget(projectButton)
-
-        # # ########################################################################
-        # # ################# NETWORK MANIPULATION SUB-MENU  #######################
-
-        netMenu = QMenu()
-        self.action_netPrep = QAction(self.trlt('Network Preparation'), self.manager)
-        self.action_netPrep.triggered.connect(self.run_net_prep)
-        netMenu.addAction(self.action_netPrep)
-
-        self.add_connectors_action = QAction(self.trlt('Add centroid connectors'), self.manager)
-        self.add_connectors_action.triggered.connect(self.run_add_connectors)
-        netMenu.addAction(self.add_connectors_action)
-
-        netbutton = QToolButton()
-        netbutton.setText(self.trlt('Network Manipulation'))
-        netbutton.setMenu(netMenu)
-        netbutton.setPopupMode(2)
-
-        self.toolbar.addWidget(netbutton)
-        # # ########################################################################
-        # # ####################  DATA UTILITIES SUB-MENU  #########################
-
-        dataMenu = QMenu()
-        self.display_custom_formats_action = QAction(self.trlt('Display AequilibraE formats'), self.manager)
-        self.display_custom_formats_action.triggered.connect(self.run_display_aequilibrae_formats)
-        dataMenu.addAction(self.display_custom_formats_action)
-
-        self.load_matrix_action = QAction(self.trlt('Import matrices'), self.manager)
-        self.load_matrix_action.triggered.connect(self.run_load_matrices)
-        dataMenu.addAction(self.load_matrix_action)
-
-        self.load_database_action = QAction(self.trlt('Import dataset'), self.manager)
-        self.load_database_action.triggered.connect(self.run_load_database)
-        dataMenu.addAction(self.load_database_action)
-
-        databutton = QToolButton()
-        databutton.setText(self.trlt('Data'))
-        databutton.setPopupMode(2)
-        databutton.setMenu(dataMenu)
-
-        self.toolbar.addWidget(databutton)
+        # projectMenu = QMenu()
+        # self.open_project_action = QAction(self.trlt('Open Project'), self.manager)
+        # self.open_project_action.triggered.connect(self.run_load_project)
+        # projectMenu.addAction(self.open_project_action)
+        # #
+        # self.project_from_osm_action = QAction(self.trlt('Create project from OSM'), self.manager)
+        # self.project_from_osm_action.triggered.connect(self.run_project_from_osm)
+        # projectMenu.addAction(self.project_from_osm_action)
+        #
+        # self.create_transponet_action = QAction(self.trlt('Create Project from layers'), self.manager)
+        # self.create_transponet_action.triggered.connect(self.run_create_transponet)
+        # projectMenu.addAction(self.create_transponet_action)
+        #
+        # self.close_project_action = QAction(self.trlt('Close project'), self.manager)
+        # self.close_project_action.triggered.connect(self.run_close_project)
+        # projectMenu.addAction(self.close_project_action)
+        #
+        # projectButton = QToolButton()
+        # projectButton.setText(self.trlt('Project'))
+        # projectButton.setPopupMode(2)
+        # projectButton.setMenu(projectMenu)
+        #
+        # self.toolbar.addWidget(projectButton)
 
         # # # ########################################################################
-        # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
-
-        distributionButton = QToolButton()
-        distributionButton.setText(self.trlt('Trip Distribution'))
-        distributionButton.clicked.connect(self.run_distribution_models)
-        self.toolbar.addWidget(distributionButton)
-
+        # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
+        #
+        # netMenu = QMenu()
+        # self.action_netPrep = QAction(self.trlt('Network Preparation'), self.manager)
+        # self.action_netPrep.triggered.connect(self.run_net_prep)
+        # netMenu.addAction(self.action_netPrep)
+        #
+        # self.add_connectors_action = QAction(self.trlt('Add centroid connectors'), self.manager)
+        # self.add_connectors_action.triggered.connect(self.run_add_connectors)
+        # netMenu.addAction(self.add_connectors_action)
+        #
+        # netbutton = QToolButton()
+        # netbutton.setText(self.trlt('Network Manipulation'))
+        # netbutton.setMenu(netMenu)
+        # netbutton.setPopupMode(2)
+        #
+        # self.toolbar.addWidget(netbutton)
+        # # # ########################################################################
+        # # # ####################  DATA UTILITIES SUB-MENU  #########################
+        #
+        # dataMenu = QMenu()
+        # self.display_custom_formats_action = QAction(self.trlt('Display AequilibraE formats'), self.manager)
+        # self.display_custom_formats_action.triggered.connect(self.run_display_aequilibrae_formats)
+        # dataMenu.addAction(self.display_custom_formats_action)
+        #
+        # self.load_matrix_action = QAction(self.trlt('Import matrices'), self.manager)
+        # self.load_matrix_action.triggered.connect(self.run_load_matrices)
+        # dataMenu.addAction(self.load_matrix_action)
+        #
+        # self.load_database_action = QAction(self.trlt('Import dataset'), self.manager)
+        # self.load_database_action.triggered.connect(self.run_load_database)
+        # dataMenu.addAction(self.load_database_action)
+        #
+        # databutton = QToolButton()
+        # databutton.setText(self.trlt('Data'))
+        # databutton.setPopupMode(2)
+        # databutton.setMenu(dataMenu)
+        #
+        # self.toolbar.addWidget(databutton)
+        #
+        # # # # ########################################################################
+        # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
+        #
+        # distributionButton = QToolButton()
+        # distributionButton.setText(self.trlt('Trip Distribution'))
+        # distributionButton.clicked.connect(self.run_distribution_models)
+        # self.toolbar.addWidget(distributionButton)
+        #
+        # # # ########################################################################
+        # # # ###################  PATH COMPUTATION SUB-MENU   #######################
+        # pathMenu = QMenu()
+        #
+        # self.shortest_path_action = QAction(self.trlt('Shortest path'), self.manager)
+        # self.shortest_path_action.triggered.connect(self.run_shortest_path)
+        # pathMenu.addAction(self.shortest_path_action)
+        #
+        # self.dist_matrix_action = QAction(self.trlt('Impedance matrix'), self.manager)
+        # self.dist_matrix_action.triggered.connect(self.run_dist_matrix)
+        # pathMenu.addAction(self.dist_matrix_action)
+        #
+        # self.traffic_assignment_action = QAction(self.trlt('Traffic Assignment'), self.manager)
+        # self.traffic_assignment_action.triggered.connect(self.run_traffic_assig)
+        # pathMenu.addAction(self.traffic_assignment_action)
+        #
+        # pathButton = QToolButton()
+        # pathButton.setText(self.trlt('Paths and assignment'))
+        # pathButton.setPopupMode(2)
+        # pathButton.setMenu(pathMenu)
+        #
+        # self.toolbar.addWidget(pathButton)
+        #
+        # # # ########################################################################
+        # # # #######################   ROUTING SUB-MENU   ###########################
+        # if has_ortools:
+        #     routingMenu = QMenu()
+        #     self.tsp_action = QAction(self.trlt('Travelling Salesman Problem'), self.manager)
+        #     self.tsp_action.triggered.connect(self.run_tsp)
+        #     routingMenu.addAction(self.tsp_action)
+        #
+        #     routingButton = QToolButton()
+        #     routingButton.setText(self.trlt('Routing'))
+        #     routingButton.setPopupMode(2)
+        #     routingButton.setMenu(routingMenu)
+        #
+        #     self.toolbar.addWidget(routingButton)
+        #
+        # # # ########################################################################
+        # # # #######################   TRANSIT SUB-MENU   ###########################
+        # transitMenu = QMenu()
+        # self.gtfs_import_action = QAction(self.trlt('Convert GTFS to SpatiaLite'), self.manager)
+        # self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
+        # transitMenu.addAction(self.gtfs_import_action)
+        #
+        # transitButton = QToolButton()
+        # transitButton.setText(self.trlt('Public Transport'))
+        # transitButton.setPopupMode(2)
+        # transitButton.setMenu(transitMenu)
+        #
+        # self.toolbar.addWidget(transitButton)
+        #
         # # ########################################################################
-        # # ###################  PATH COMPUTATION SUB-MENU   #######################
-        pathMenu = QMenu()
+        # # #################        GIS TOOLS SUB-MENU    #########################
+        #
+        # gisMenu = QMenu()
+        # self.simple_tag_action = QAction(self.trlt('Simple tag'), self.manager)
+        # self.simple_tag_action.triggered.connect(self.run_simple_tag)
+        # gisMenu.addAction(self.simple_tag_action)
+        #
+        # self.lcd_action = QAction(self.trlt('Lowest common denominator'), self.manager)
+        # self.lcd_action.triggered.connect(self.run_lcd)
+        # gisMenu.addAction(self.lcd_action)
+        #
+        # self.dlines_action = QAction(self.trlt('Desire Lines'), self.manager)
+        # self.dlines_action.triggered.connect(self.run_dlines)
+        # gisMenu.addAction(self.dlines_action)
+        #
+        # self.bandwidth_action = QAction(self.trlt('Stacked Bandwidth'), self.manager)
+        # self.bandwidth_action.triggered.connect(self.run_bandwidth)
+        # gisMenu.addAction(self.bandwidth_action)
+        #
+        # self.scenario_comparison_action = QAction(self.trlt('Scenario Comparison'), self.manager)
+        # self.scenario_comparison_action.triggered.connect(self.run_scenario_comparison)
+        # gisMenu.addAction(self.scenario_comparison_action)
+        #
+        # gisButton = QToolButton()
+        # gisButton.setText(self.trlt('GIS'))
+        # gisButton.setPopupMode(2)
+        # gisButton.setMenu(gisMenu)
+        #
+        # self.toolbar.addWidget(gisButton)
 
-        self.shortest_path_action = QAction(self.trlt('Shortest path'), self.manager)
-        self.shortest_path_action.triggered.connect(self.run_shortest_path)
-        pathMenu.addAction(self.shortest_path_action)
-
-        self.dist_matrix_action = QAction(self.trlt('Impedance matrix'), self.manager)
-        self.dist_matrix_action.triggered.connect(self.run_dist_matrix)
-        pathMenu.addAction(self.dist_matrix_action)
-
-        self.traffic_assignment_action = QAction(self.trlt('Traffic Assignment'), self.manager)
-        self.traffic_assignment_action.triggered.connect(self.run_traffic_assig)
-        pathMenu.addAction(self.traffic_assignment_action)
-
-        pathButton = QToolButton()
-        pathButton.setText(self.trlt('Paths and assignment'))
-        pathButton.setPopupMode(2)
-        pathButton.setMenu(pathMenu)
-
-        self.toolbar.addWidget(pathButton)
-
+        self.build_menu()
         # # ########################################################################
-        # # #######################   ROUTING SUB-MENU   ###########################
-        if has_ortools:
-            routingMenu = QMenu()
-            self.tsp_action = QAction(self.trlt('Travelling Salesman Problem'), self.manager)
-            self.tsp_action.triggered.connect(self.run_tsp)
-            routingMenu.addAction(self.tsp_action)
+        # # #################          LOOSE STUFF         #########################
+        #
+        # parametersButton = QToolButton()
+        # parametersButton.setText(self.trlt('Parameters'))
+        # parametersButton.clicked.connect(self.run_change_parameters)
+        # self.toolbar.addWidget(parametersButton)
+        #
+        # aboutButton = QToolButton()
+        # aboutButton.setText(self.trlt('About'))
+        # aboutButton.clicked.connect(self.run_about)
+        # self.toolbar.addWidget(aboutButton)
+        #
+        # logButton = QToolButton()
+        # logButton.setText(self.trlt('logfile'))
+        # logButton.clicked.connect(self.run_log)
+        # self.toolbar.addWidget(logButton)
+        #
+        # helpButton = QToolButton()
+        # helpButton.setText(self.trlt('Help'))
+        # helpButton.clicked.connect(self.run_help)
+        # self.toolbar.addWidget(helpButton)
+        #
+        # if no_binary:
+        #     binariesButton = QToolButton()
+        #     binariesButton.setText(self.trlt('Download binaries'))
+        #     binariesButton.clicked.connect(self.run_binary_download)
+        #     self.toolbar.addWidget(binariesButton)
+        #
+        # if not extra_packages:
+        #     xtrapkgButton = QToolButton()
+        #     xtrapkgButton.setText(self.trlt('Install extra packages'))
+        #     xtrapkgButton.clicked.connect(self.install_extra_packages)
+        #     self.toolbar.addWidget(xtrapkgButton)
 
-            routingButton = QToolButton()
-            routingButton.setText(self.trlt('Routing'))
-            routingButton.setPopupMode(2)
-            routingButton.setMenu(routingMenu)
-
-            self.toolbar.addWidget(routingButton)
-
-        # # ########################################################################
-        # # #######################   TRANSIT SUB-MENU   ###########################
-        transitMenu = QMenu()
-        self.gtfs_import_action = QAction(self.trlt('Convert GTFS to SpatiaLite'), self.manager)
-        self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
-        transitMenu.addAction(self.gtfs_import_action)
-
-        transitButton = QToolButton()
-        transitButton.setText(self.trlt('Public Transport'))
-        transitButton.setPopupMode(2)
-        transitButton.setMenu(transitMenu)
-
-        self.toolbar.addWidget(transitButton)
-
-        # ########################################################################
-        # #################        GIS TOOLS SUB-MENU    #########################
-
-        gisMenu = QMenu()
-        self.simple_tag_action = QAction(self.trlt('Simple tag'), self.manager)
-        self.simple_tag_action.triggered.connect(self.run_simple_tag)
-        gisMenu.addAction(self.simple_tag_action)
-
-        self.lcd_action = QAction(self.trlt('Lowest common denominator'), self.manager)
-        self.lcd_action.triggered.connect(self.run_lcd)
-        gisMenu.addAction(self.lcd_action)
-
-        self.dlines_action = QAction(self.trlt('Desire Lines'), self.manager)
-        self.dlines_action.triggered.connect(self.run_dlines)
-        gisMenu.addAction(self.dlines_action)
-
-        self.bandwidth_action = QAction(self.trlt('Stacked Bandwidth'), self.manager)
-        self.bandwidth_action.triggered.connect(self.run_bandwidth)
-        gisMenu.addAction(self.bandwidth_action)
-
-        self.scenario_comparison_action = QAction(self.trlt('Scenario Comparison'), self.manager)
-        self.scenario_comparison_action.triggered.connect(self.run_scenario_comparison)
-        gisMenu.addAction(self.scenario_comparison_action)
-
-        gisButton = QToolButton()
-        gisButton.setText(self.trlt('GIS'))
-        gisButton.setPopupMode(2)
-        gisButton.setMenu(gisMenu)
-
-        self.toolbar.addWidget(gisButton)
-
-        # ########################################################################
-        # #################          LOOSE STUFF         #########################
-
-        parametersButton = QToolButton()
-        parametersButton.setText(self.trlt('Parameters'))
-        parametersButton.clicked.connect(self.run_change_parameters)
-        self.toolbar.addWidget(parametersButton)
-
-        aboutButton = QToolButton()
-        aboutButton.setText(self.trlt('About'))
-        aboutButton.clicked.connect(self.run_about)
-        self.toolbar.addWidget(aboutButton)
-
-        logButton = QToolButton()
-        logButton.setText(self.trlt('logfile'))
-        logButton.clicked.connect(self.run_log)
-        self.toolbar.addWidget(logButton)
-
-        helpButton = QToolButton()
-        helpButton.setText(self.trlt('Help'))
-        helpButton.clicked.connect(self.run_help)
-        self.toolbar.addWidget(helpButton)
-
-        if no_binary:
-            binariesButton = QToolButton()
-            binariesButton.setText(self.trlt('Download binaries'))
-            binariesButton.clicked.connect(self.run_binary_download)
-            self.toolbar.addWidget(binariesButton)
-
-        if not extra_packages:
-            xtrapkgButton = QToolButton()
-            xtrapkgButton.setText(self.trlt('Install extra packages'))
-            xtrapkgButton.clicked.connect(self.install_extra_packages)
-            self.toolbar.addWidget(xtrapkgButton)
 
         # ########################################################################
         # #################        PROJECT MANAGER       #########################
@@ -312,6 +329,42 @@ class AequilibraEMenu:
         self.dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
         QgsProject.instance().layerRemoved.connect(self.layerRemoved)
+
+    def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
+        if main_menu == 'AequilibraE':
+            action = QToolButton()
+            action.setText(text)
+            action.clicked.connect(function)
+        else:
+            action = QAction(text, self.manager)
+            action.triggered.connect(function)
+        if submenu is None:
+            self.menuActions[main_menu].append(action)
+        else:
+            self.menuActions[main_menu][submenu].append(action)
+
+
+    def build_menu(self):
+        for menu, actions in self.menuActions.items():
+            if menu == 'Polaris':
+                for action in actions:
+                    self.toolbar.addWidget(action)
+                continue
+            itemMenu = QMenu()
+            if isinstance(actions, dict):
+                for submenu, mini_actions in actions.items():
+                    new_sub_menu = itemMenu.addMenu(submenu)
+                    for mini_action in mini_actions:
+                        new_sub_menu.addAction(mini_action)
+            else:
+                for action in actions:
+                    itemMenu.addAction(action)
+            itemButton = QToolButton()
+            itemButton.setText(menu)
+            itemButton.setPopupMode(2)
+            itemButton.setMenu(itemMenu)
+
+            self.toolbar.addWidget(itemButton)
 
     def run_help(self):
         url = 'http://aequilibrae.com/qgis'
@@ -357,28 +410,6 @@ class AequilibraEMenu:
         self.project.close()
         self.projectManager.clear()
         self.project = None
-
-    def run_load_project(self):
-        proj_path = QtWidgets.QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
-
-        # Cleans the project descriptor
-        tab_count = 1
-        for i in range(tab_count):
-            self.projectManager.removeTab(i)
-        if proj_path is not None and len(proj_path) > 0:
-            self.contents = []
-            self.showing.setVisible(True)
-            self.project = Project()
-
-            try:
-                self.project.load(proj_path)
-            except FileNotFoundError as e:
-                if e.args[0] == 'Model does not exist. Check your path and try again':
-                    qgis.utils.iface.messageBar().pushMessage("FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL", level=1)
-                    return
-                else:
-                    raise e
-            self.compute_statistics_box()
 
     def layerRemoved(self, layer):
         self.layers = {key: val for key, val in self.layers.items() if val[1] != layer}
@@ -549,7 +580,7 @@ class AequilibraEMenu:
             if self.project is None:
                 self.show_message_no_project()
             else:
-                dlg2 = TrafficAssignmentDialog(self.iface, self.project, self.link_layer)
+                dlg2 = TrafficAssignmentDialog(self.iface, self.project)
                 dlg2.show()
                 dlg2.exec_()
 
@@ -566,13 +597,7 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    def run_project_from_osm(self):
-        if self.project is not None:
-            self.message_project_already_open()
-            return
-        dlg2 = ProjectFromOSMDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
+
 
     def run_simple_tag(self):
         dlg2 = SimpleTagDialog(self.iface)
