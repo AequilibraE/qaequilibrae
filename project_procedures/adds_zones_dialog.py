@@ -13,7 +13,7 @@ from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.all_layers_from_toc import all_layers_from_toc
 from ..common_tools.auxiliary_functions import *
 from ..common_tools import ReportDialog
-from .creates_transponet_procedure import CreatesTranspoNetProcedure
+from .add_zones_procedure import AddZonesProcedure
 from aequilibrae.project.network.network import Network
 from aequilibrae import Parameters
 
@@ -35,8 +35,35 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.cob_lyr.currentIndexChanged.connect(self.changed_layer)
         self.changed_layer()
 
+        self.progress_box.setVisible(False)
+
     def run(self):
-        pass
+        if self.cob_lyr.currentIndex() == -1:
+            return
+        layer = self.cob_lyr.currentLayer()
+        field_correspondence = {}
+
+        for row in range(self.table_fields.rowCount()):
+            f = self.table_fields.item(row, 1).text()
+            if not self.table_fields.cellWidget(row, 0).findChildren(QtWidgets.QCheckBox)[0].isChecked():
+                continue
+            widget = self.table_fields.cellWidget(row, 2).findChildren(QtWidgets.QComboBox)[0]
+            source_name = widget.currentText()
+            val = layer.dataProvider().fieldNameIndex(source_name)
+            field_correspondence[f] = val
+
+        self.setFixedHeight(65)
+        self.progress_box.setVisible(True)
+        self.input_box.setVisible(False)
+        self.worker_thread = AddZonesProcedure(qgis.utils.iface.mainWindow(), self.project, layer,
+                                               self.chb_select.isChecked(), field_correspondence)
+
+        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
+        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
+        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
+        self.worker_thread.jobFinished.connect(self.job_finished_from_thread)
+        self.worker_thread.start()
+        self.show()
 
     def changed_layer(self):
 
@@ -67,7 +94,6 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
                 cbb.addItem(i.name())
             self.table_fields.setCellWidget(counter, 2, self.centers_item(cbb))
 
-
     def centers_item(self, item):
         cell_widget = QWidget()
         lay_out = QHBoxLayout(cell_widget)
@@ -76,3 +102,15 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
         return cell_widget
+
+    def progress_range_from_thread(self, val):
+        self.progressbar.setRange(0, val)
+
+    def progress_value_from_thread(self, value):
+        self.progressbar.setValue(value)
+
+    def progress_text_from_thread(self, value):
+        self.progress_label.setText(value)
+
+    def job_finished_from_thread(self, success):
+        self.exit_procedure()
