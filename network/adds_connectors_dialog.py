@@ -37,17 +37,16 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../commo
 
 
 class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, project):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
 
         self.NewLinks = False
         self.NewNodes = False
-        self.project = project
-        if project is not None:
-            self.conn = project.conn
-            self.path_to_file = project.path_to_file
+        self.project = qgis_project. project
+        self.conn = self.project.conn
+        self.path_to_file = self.project.path_to_file
 
         self._run_layout = QGridLayout()
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
