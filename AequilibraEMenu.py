@@ -21,7 +21,7 @@ from qgis.PyQt.QtCore import *
 
 from qgis.PyQt.QtGui import *
 
-from .menu_actions import run_load_project, project_from_osm
+from .menu_actions import run_load_project, project_from_osm, run_create_transponet
 from .common_tools import ParameterDialog, LogDialog
 
 from .common_tools import AboutDialog
@@ -95,7 +95,7 @@ class AequilibraEMenu:
         self.toolbar.setOrientation(2)
 
         self.menuActions = {'Project': [],
-                            'Network Manipulatiom': [],
+                            'Network Manipulation': [],
                             'Data': [],
                             'Trip Distribution': [],
                             'Routing':[],
@@ -105,9 +105,8 @@ class AequilibraEMenu:
         # # #######################   PROJECT SUB-MENU   ############################
         self.add_menu_action('Project', 'Open Project', partial(run_load_project, self))
         self.add_menu_action('Project', 'Create project from OSM', partial(project_from_osm, self))
-        # self.add_menu_action('Project', 'Create Project from layers', partial(close_project, self))
-        # self.add_menu_action('Project', 'Close project', partial(close_project, self))
-
+        self.add_menu_action('Project', 'Create Project from layers', partial(run_create_transponet, self))
+        self.add_menu_action('Project', 'Close project', self.run_close_project)
 
         # # ########################################################################
         # # #######################   PROJECT SUB-MENU   ############################
@@ -407,6 +406,8 @@ class AequilibraEMenu:
             self.projectManager.clear()
 
     def run_close_project(self):
+        if self.project is None:
+            return
         self.project.close()
         self.projectManager.clear()
         self.project = None
@@ -527,19 +528,6 @@ class AequilibraEMenu:
         dlg2.exec_()
         # If we wanted modal, we would eliminate the dlg2.show()
 
-    # run method that calls the network preparation section of the code
-    def run_create_transponet(self):
-        if self.project is not None:
-            self.message_project_already_open()
-            return
-
-        if no_binary:
-            self.message_binary()
-        else:
-            dlg2 = CreatesTranspoNetDialog(self.iface)
-            dlg2.show()
-            dlg2.exec_()
-        # If we wanted modal, we would eliminate the dlg2.show()
 
     def run_add_connectors(self):
         dlg2 = AddConnectorsDialog(self.iface, self.project)

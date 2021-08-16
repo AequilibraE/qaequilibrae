@@ -22,10 +22,11 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../commo
 
 
 class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
+        self.qgis_project = qgis_project
 
         self.path = standard_path()
         self.error = None
@@ -34,7 +35,6 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.running = False
         self.bbox = None
         self.json = []
-        self.project = None
         self.logger = logging.getLogger("aequilibrae")
 
         self._run_layout = QGridLayout()
@@ -100,7 +100,13 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
     def choose_output(self):
         new_name = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", standard_path())
         if new_name is not None and len(new_name) > 0:
-            self.output_path.setText(new_name)
+
+            new_folder = 'new_project'
+            counter = 1
+            while isdir(join(new_name, new_folder)):
+                new_folder = f'new_project_{counter}'
+                counter += 1
+            self.output_path.setText(join(self.proj_folder, new_folder))
 
     def run(self):
         self.update_widget.setVisible(True)
@@ -115,10 +121,10 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
             bbox, r = placegetter(self.place.text())
             self.report.extend(r)
 
-        self.project = Project()
-        self.project.new(self.output_path.text())
-        self.project.network.netsignal.connect(self.signal_handler)
-        self.project.network.create_from_osm(west=bbox[0], south=bbox[1], east=bbox[2], north=bbox[3])
+        self.qgis_project.project = Project()
+        self.qgis_project.project.new(self.output_path.text())
+        self.qgis_project.project.network.netsignal.connect(self.signal_handler)
+        self.qgis_project.project.network.create_from_osm(west=bbox[0], south=bbox[1], east=bbox[2], north=bbox[3])
 
     def change_place_type(self):
         if self.choose_place.isChecked():
@@ -140,8 +146,8 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         elif val[0] == "text":
             self.progress_label.setText(val[1])
         elif val[0] == "finished_threaded_procedure":
-            l = self.project.network.count_links()
-            n = self.project.network.count_nodes()
+            l = self.qgis_project.project.network.count_links()
+            n = self.qgis_project.project.network.count_nodes()
             self.report.append(reporter(f'{l:,} links generated'))
             self.report.append(reporter(f'{n:,} nodes generated'))
             self.leave()

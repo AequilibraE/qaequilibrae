@@ -2,8 +2,10 @@ import qgis
 from qgis.core import *
 import sys
 import os
+from os.path import isdir, join
 from qgis.PyQt.QtCore import *
 from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtWidgets import QWidget, QFileDialog
 from functools import partial
 from ..common_tools.global_parameters import *
 from ..common_tools.get_output_file_name import GetOutputFileName
@@ -19,9 +21,10 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgisproject):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgisproject.iface
+        self.project = qgisproject
         self.setupUi(self)
 
         self.missing_data = -1
@@ -34,8 +37,9 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.link_layer = False
         self.node_layer = False
         self.but_create_network_file.clicked.connect(self.create_net)
+        self.but_choose_folder.clicked.connect(self.choose_folder)
         self.counter = {}
-        self.output_file = False
+        self.proj_folder = False
         self.error = None
         self.node_layers_list.currentIndexChanged.connect(partial(self.changed_layer, "nodes"))
 
@@ -250,17 +254,30 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                     cbb.addItem(i.name())
                 final_table.setCellWidget(row, 2, self.centers_item(cbb))
 
-    def create_net(self):
-        self.assembles_data()
-        self.output_file, file_type = GetOutputFileName(self, "TranspoNet", ["SQLite(*.sqlite)"], ".sqlite", self.path)
+    def choose_folder(self):
+        self.proj_folder = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", self.path)
+        if self.proj_folder is None or len(self.proj_folder) == 0:
+            return
+        new_folder = 'new_project'
+        counter = 1
+        while isdir(join(self.proj_folder, new_folder)):
+            new_folder = f'new_project_{counter}'
+            counter += 1
 
-        parameters = [
-            self.output_file,
-            self.node_layer,
-            self.node_fields,
-            self.link_layer,
-            self.link_fields,
-        ]
+        self.proj_folder = join(self.proj_folder, new_folder)
+        self.project_destination.setText(self.proj_folder)
+
+    def create_net(self):
+        self.proj_folder = self.project_destination.text()
+        if isdir(self.proj_folder):
+            counter = 1
+            while isdir(join(f'{self.proj_folder}{counter}')):
+                counter += 1
+            self.proj_folder = f'{self.proj_folder}{counter}'
+
+        self.assembles_data()
+
+        parameters = [self.proj_folder, self.node_layer, self.node_fields, self.link_layer, self.link_fields]
 
         self.but_create_network_file.setVisible(False)
         self.progressbar.setVisible(True)
