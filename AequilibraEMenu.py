@@ -21,7 +21,8 @@ from qgis.PyQt.QtCore import *
 
 from qgis.PyQt.QtGui import *
 
-from .menu_actions import run_load_project, project_from_osm, run_create_transponet
+from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
+from .menu_actions import run_add_zones
 from .common_tools import ParameterDialog, LogDialog
 
 from .common_tools import AboutDialog
@@ -36,7 +37,7 @@ from .gis import CreateBandwidthsDialog
 from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 
-from .network import NetworkPreparationDialog
+
 from .network import AddConnectorsDialog
 
 from .matrix_procedures import LoadMatrixDialog
@@ -106,36 +107,14 @@ class AequilibraEMenu:
         self.add_menu_action('Project', 'Open Project', partial(run_load_project, self))
         self.add_menu_action('Project', 'Create project from OSM', partial(project_from_osm, self))
         self.add_menu_action('Project', 'Create Project from layers', partial(run_create_transponet, self))
+        self.add_menu_action('Project', 'Add zoning data', partial(run_add_zones, self))
         self.add_menu_action('Project', 'Close project', self.run_close_project)
-
-        # # ########################################################################
-        # # #######################   PROJECT SUB-MENU   ############################
-        # projectMenu = QMenu()
-        # self.open_project_action = QAction(self.trlt('Open Project'), self.manager)
-        # self.open_project_action.triggered.connect(self.run_load_project)
-        # projectMenu.addAction(self.open_project_action)
-        # #
-        # self.project_from_osm_action = QAction(self.trlt('Create project from OSM'), self.manager)
-        # self.project_from_osm_action.triggered.connect(self.run_project_from_osm)
-        # projectMenu.addAction(self.project_from_osm_action)
-        #
-        # self.create_transponet_action = QAction(self.trlt('Create Project from layers'), self.manager)
-        # self.create_transponet_action.triggered.connect(self.run_create_transponet)
-        # projectMenu.addAction(self.create_transponet_action)
-        #
-        # self.close_project_action = QAction(self.trlt('Close project'), self.manager)
-        # self.close_project_action.triggered.connect(self.run_close_project)
-        # projectMenu.addAction(self.close_project_action)
-        #
-        # projectButton = QToolButton()
-        # projectButton.setText(self.trlt('Project'))
-        # projectButton.setPopupMode(2)
-        # projectButton.setMenu(projectMenu)
-        #
-        # self.toolbar.addWidget(projectButton)
 
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
+
+        self.add_menu_action('Network Manipulation', 'Network Preparation', partial(prepare_network, self))
+        self.add_menu_action('Network Manipulation', 'Add centroid connectors', partial(run_add_connectors, self))
         #
         # netMenu = QMenu()
         # self.action_netPrep = QAction(self.trlt('Network Preparation'), self.manager)
@@ -518,19 +497,6 @@ class AequilibraEMenu:
 
     def run_binary_download(self):
         dlg2 = BinaryDownloaderDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-
-    # run method that calls the network preparation section of the code
-    def run_net_prep(self):
-        dlg2 = NetworkPreparationDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-        # If we wanted modal, we would eliminate the dlg2.show()
-
-
-    def run_add_connectors(self):
-        dlg2 = AddConnectorsDialog(self.iface, self.project)
         dlg2.show()
         dlg2.exec_()
 
