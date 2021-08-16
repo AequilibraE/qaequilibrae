@@ -66,7 +66,8 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.show()
 
     def changed_layer(self):
-
+        if not self.project or not self.project.conn:
+            return
         ignore_fields = ['ogc_fid', 'geometry']
         not_initializable = ['zone_id']
 
