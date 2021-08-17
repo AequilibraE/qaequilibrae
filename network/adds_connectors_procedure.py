@@ -38,16 +38,16 @@ class AddsConnectorsProcedure(WorkerThread):
                  field=None):
         WorkerThread.__init__(self, parentThread)
 
-    self.qgis_project = qgis_project
-    self.project = qgis_project.project
-    self.conn = self.project.conn
-    self.link_types = link_types
-    self.radius = radius
-    self.modes = modes
-    self.num_connectors = num_connectors
-    self.source = source
-    self.layer = layer
-    self.field = field
+        self.qgis_project = qgis_project
+        self.project = qgis_project.project
+        self.conn = self.project.conn
+        self.link_types = link_types
+        self.radius = radius
+        self.modes = modes
+        self.num_connectors = num_connectors
+        self.source = source
+        self.layer = layer
+        self.field = field
 
     def doWork(self):
 
