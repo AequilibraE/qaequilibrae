@@ -56,7 +56,8 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progress_box.setVisible(True)
         self.input_box.setVisible(False)
         self.worker_thread = AddZonesProcedure(qgis.utils.iface.mainWindow(), self.project, layer,
-                                               self.chb_select.isChecked(), field_correspondence)
+                                               self.chb_select.isChecked(), self.chb_add_centroids.isChecked(),
+                                               field_correspondence)
 
         self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
         self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
