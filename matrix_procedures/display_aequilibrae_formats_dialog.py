@@ -42,12 +42,18 @@ if has_omx:
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, iface, file_path=''):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.data_to_show = None
         self.error = None
+
+        if len(file_path) > 0:
+            self.data_path = file_path
+            self.data_type = self.data_path[-3:].upper()
+            self.continue_with_data()
+            return
 
         formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)"]
 
@@ -56,7 +62,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             formats.insert(0, "Open Matrix(*.omx)")
             dflt = '.omx'
 
-        self.error = None
         self.data_path, self.data_type = GetOutputFileName(
             self,
             "AequilibraE custom formats",
@@ -210,4 +215,3 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def exit_procedure(self):
         self.show()
         self.close()
-        sys.exit(app.exec_())

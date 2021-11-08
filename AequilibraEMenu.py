@@ -22,7 +22,7 @@ from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 
 from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
-from .menu_actions import run_add_zones
+from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
 from .common_tools import ParameterDialog, LogDialog
 
 from .common_tools import AboutDialog
@@ -42,7 +42,6 @@ from .network import AddConnectorsDialog
 
 from .matrix_procedures import LoadMatrixDialog
 from .matrix_procedures import LoadDatasetDialog
-from .matrix_procedures import DisplayAequilibraEFormatsDialog
 
 from .public_transport_procedures import GtfsImportDialog
 
@@ -101,7 +100,8 @@ class AequilibraEMenu:
                             'Trip Distribution': [],
                             'Routing':[],
                             'Public Transport': [],
-                            'GIS': []}
+                            'GIS': [],
+                            'Utils': []}
 
         # # #######################   PROJECT SUB-MENU   ############################
         self.add_menu_action('Project', 'Open Project', partial(run_load_project, self))
@@ -115,24 +115,12 @@ class AequilibraEMenu:
 
         self.add_menu_action('Network Manipulation', 'Network Preparation', partial(prepare_network, self))
         self.add_menu_action('Network Manipulation', 'Add centroid connectors', partial(run_add_connectors, self))
-        #
-        # netMenu = QMenu()
-        # self.action_netPrep = QAction(self.trlt('Network Preparation'), self.manager)
-        # self.action_netPrep.triggered.connect(self.run_net_prep)
-        # netMenu.addAction(self.action_netPrep)
-        #
-        # self.add_connectors_action = QAction(self.trlt('Add centroid connectors'), self.manager)
-        # self.add_connectors_action.triggered.connect(self.run_add_connectors)
-        # netMenu.addAction(self.add_connectors_action)
-        #
-        # netbutton = QToolButton()
-        # netbutton.setText(self.trlt('Network Manipulation'))
-        # netbutton.setMenu(netMenu)
-        # netbutton.setPopupMode(2)
-        #
-        # self.toolbar.addWidget(netbutton)
+
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
+        self.add_menu_action('Data', 'Display project data', partial(run_show_project_data, self))
+
+        # self.add_menu_action('Data', 'Add centroid connectors', partial(run_add_connectors, self))
         #
         # dataMenu = QMenu()
         # self.display_custom_formats_action = QAction(self.trlt('Display AequilibraE formats'), self.manager)
@@ -244,6 +232,10 @@ class AequilibraEMenu:
         # gisButton.setMenu(gisMenu)
         #
         # self.toolbar.addWidget(gisButton)
+
+        # # ########################################################################
+        # # #################          Utils submenu         #########################
+        self.add_menu_action('Utils', 'Display Matrices and datasets', partial(display_aequilibrae_formats, self))
 
         self.build_menu()
         # # ########################################################################
@@ -482,11 +474,6 @@ class AequilibraEMenu:
 
     def run_load_database(self):
         dlg2 = LoadDatasetDialog(self.iface, single_use=False)
-        dlg2.show()
-        dlg2.exec_()
-
-    def run_display_aequilibrae_formats(self):
-        dlg2 = DisplayAequilibraEFormatsDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

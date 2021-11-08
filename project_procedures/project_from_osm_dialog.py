@@ -1,3 +1,4 @@
+from os.path import isdir, join
 import sys
 import logging
 from qgis.PyQt.QtCore import *
@@ -106,7 +107,7 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
             while isdir(join(new_name, new_folder)):
                 new_folder = f'new_project_{counter}'
                 counter += 1
-            self.output_path.setText(join(self.proj_folder, new_folder))
+            self.output_path.setText(join(new_name, new_folder))
 
     def run(self):
         self.update_widget.setVisible(True)
