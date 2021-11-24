@@ -19,6 +19,4 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from .traffic_assignment_dialog import TrafficAssignmentDialog
-from .show_shortest_path_dialog import ShortestPathDialog
-from .impedance_matrix_dialog import ImpedanceMatrixDialog
+from .action_run_shortest_path import run_shortest_path

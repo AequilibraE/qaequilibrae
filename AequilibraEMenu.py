@@ -26,25 +26,23 @@ from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_p
 from .menu_actions import run_distribution_models
 from .common_tools import ParameterDialog, LogDialog
 
+from .paths_procedures import run_shortest_path
 from .common_tools import AboutDialog
 from .common_tools.auxiliary_functions import standard_path
 
 from .binary_downloader_class import BinaryDownloaderDialog
 from .download_extra_packages_class import DownloadExtraPackages
 
-
 from .gis import CompareScenariosDialog
 from .gis import CreateBandwidthsDialog
 from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
-
 
 from .network import AddConnectorsDialog
 
 from .matrix_procedures import LoadDatasetDialog
 
 from .public_transport_procedures import GtfsImportDialog
-
 
 from warnings import warn
 
@@ -60,9 +58,6 @@ from aequilibrae.project import Project
 if not no_binary:
     from .gis.desire_lines_dialog import DesireLinesDialog
     from .project_procedures import CreatesTranspoNetDialog
-    from .paths_procedures import TrafficAssignmentDialog
-    from .paths_procedures import ShortestPathDialog
-    from .paths_procedures import ImpedanceMatrixDialog
 
 extra_packages = True
 # Checks if we can display OMX
@@ -89,6 +84,7 @@ class AequilibraEMenu:
         self.layers = {}  # type: Dict[QgsVectorLayer]
         self.dock = QDockWidget(self.trlt('AequilibraE'))
         self.manager = QWidget()
+        self.no_binary = no_binary
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -98,7 +94,8 @@ class AequilibraEMenu:
                             'Network Manipulation': [],
                             'Data': [],
                             'Trip Distribution': [],
-                            'Routing':[],
+                            'Paths and assignment': [],
+                            'Routing': [],
                             'Public Transport': [],
                             'GIS': [],
                             'Utils': []}
@@ -131,7 +128,8 @@ class AequilibraEMenu:
         # # # ###################  PATH COMPUTATION SUB-MENU   #######################
         # pathMenu = QMenu()
         #
-        # self.shortest_path_action = QAction(self.trlt('Shortest path'), self.manager)
+        self.add_menu_action('Paths and assignment', 'Shortest path', partial(run_shortest_path, self))
+        # self.shortest_path_action = QAction(self.trlt(''), self.manager)
         # self.shortest_path_action.triggered.connect(self.run_shortest_path)
         # pathMenu.addAction(self.shortest_path_action)
         #
@@ -250,7 +248,6 @@ class AequilibraEMenu:
         #     xtrapkgButton.clicked.connect(self.install_extra_packages)
         #     self.toolbar.addWidget(xtrapkgButton)
 
-
         # ########################################################################
         # #################        PROJECT MANAGER       #########################
 
@@ -259,7 +256,6 @@ class AequilibraEMenu:
         self.showing.setChecked(True)
         self.toolbar.addWidget(self.showing)
 
-        self.showing.toggled.connect(self.hide_info_pannel)
         self.projectManager = QTabWidget()
         self.toolbar.addWidget(self.projectManager)
 
@@ -289,7 +285,6 @@ class AequilibraEMenu:
             self.menuActions[main_menu].append(action)
         else:
             self.menuActions[main_menu][submenu].append(action)
-
 
     def build_menu(self):
         for menu, actions in self.menuActions.items():
@@ -347,12 +342,6 @@ class AequilibraEMenu:
             except:
                 pass
 
-    def hide_info_pannel(self):
-        if self.showing.isChecked():
-            self.compute_statistics_box()
-        else:
-            self.projectManager.clear()
-
     def run_close_project(self):
         if self.project is None:
             return
@@ -361,78 +350,38 @@ class AequilibraEMenu:
         self.project = None
 
     def layerRemoved(self, layer):
+        layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
+
+        # Clears the pool of layers
         self.layers = {key: val for key, val in self.layers.items() if val[1] != layer}
 
-    def compute_statistics_box(self):
-        self.projectManager.clear()
-
-        descrlayout = QVBoxLayout()
-        self.layers_box = QtWidgets.QTableWidget()
-        self.layers_box.doubleClicked.connect(self.load_geo_layer)
-        self.layers_box.setColumnCount(1)
-        self.layers_box.setRowCount(len(self.geo_layers_list))
-        self.layers_box.horizontalHeader().setVisible(False)
-        self.layers_box.verticalHeader().setVisible(False)
-        for i, lyr in enumerate(self.geo_layers_list):
-            item1 = QtWidgets.QTableWidgetItem(lyr)
-            item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            self.layers_box.setItem(i, 0, item1)
-        descrlayout.addWidget(self.layers_box)
-        descr = QWidget()
-        descr.setLayout(descrlayout)
-        self.projectManager.addTab(descr, "Layers")
-
-        # Modes table
-        modes = [(md.mode_id, md.mode_name) for md in self.project.network.modes.all_modes().values()]
-        modes_table = QtWidgets.QTableWidget()
-        modes_table.setRowCount(len(modes))
-        modes_table.setColumnCount(2)
-        modes_table.setHorizontalHeaderLabels(['mode name', 'mode id'])
-        modes_table.verticalHeader().setVisible(False)
-        for i, (mode_id, mode_name) in enumerate(modes):
-            modes_table.setItem(i, 0, QtWidgets.QTableWidgetItem(mode_name))
-            modes_table.setItem(i, 1, QtWidgets.QTableWidgetItem(mode_id))
-        self.projectManager.addTab(modes_table, "modes")
-
-        # Link types table
-        link_types = [(lt.link_type_id, lt.link_type) for lt in self.project.network.link_types.all_types().values()]
-        link_types_table = QtWidgets.QTableWidget()
-        link_types_table.setRowCount(len(link_types))
-        link_types_table.setColumnCount(2)
-        link_types_table.setHorizontalHeaderLabels(['Link type', 'Link type id'])
-        link_types_table.verticalHeader().setVisible(False)
-        for i, (ltype_id, ltype) in enumerate(link_types):
-            link_types_table.setItem(i, 0, QtWidgets.QTableWidgetItem(ltype))
-            link_types_table.setItem(i, 1, QtWidgets.QTableWidgetItem(ltype_id))
-        self.projectManager.addTab(link_types_table, "Link Types")
-
-        # Basic statistics
-        basic_stats = QtWidgets.QTableWidget()
-        basic_stats.setRowCount(4)
-        basic_stats.setColumnCount(2)
-        basic_stats.horizontalHeader().setVisible(False)
-        basic_stats.verticalHeader().setVisible(False)
-        data = [['Project path', self.project.project_base_path],
-                ['Links', self.project.network.count_links()],
-                ['Nodes', self.project.network.count_nodes()],
-                ['Centroids', self.project.network.count_centroids()]]
-        for i, (key, val) in enumerate(data):
-            basic_stats.setItem(i, 0, QtWidgets.QTableWidgetItem(key))
-            basic_stats.setItem(i, 1, QtWidgets.QTableWidgetItem(str(val)))
-        self.projectManager.addTab(basic_stats, "Stats")
+        # Re-creates in memory only the layer that was destroyed
+        for layer_name in layers_to_re_create:
+            self.create_layer_by_name(layer_name)
 
     def load_geo_layer(self):
-        sel = self.layers_box.selectedItems()
+        sel = self.geo_layers_table.selectedItems()
         lyr = [s.text() for s in sel][0]
+        self.load_layer_by_name(lyr)
 
-        if lyr not in self.layers:
-            uri = QgsDataSourceUri()
-            uri.setDatabase(self.project.path_to_file)
-            uri.setDataSource('', lyr, 'geometry')
-            layer = QgsVectorLayer(uri.uri(), lyr, 'spatialite')
-            self.layers[lyr] = [layer, layer.id()]
-        QgsProject.instance().addMapLayer(self.layers[lyr][0])
+    def load_layer_by_name(self, layer_name: str):
+        if layer_name.lower() not in self.layers:
+            print('Layer was not found, which is weird')
+            self.create_layer_by_name(layer_name)
+        layer = self.layers[layer_name.lower()][0]
+        QgsProject.instance().addMapLayer(layer)
         qgis.utils.iface.mapCanvas().refresh()
+
+    def create_layer_by_name(self, layer_name: str):
+        layer = self.create_loose_layer(layer_name)
+        self.layers[layer_name.lower()] = [layer, layer.id()]
+
+    def create_loose_layer(self, layer_name: str) -> QgsVectorLayer:
+        uri = QgsDataSourceUri()
+        uri.setDatabase(self.project.path_to_file)
+        uri.setDataSource('', layer_name, 'geometry')
+        layer = QgsVectorLayer(uri.uri(), layer_name, 'spatialite')
+        return layer
 
     def run_change_parameters(self):
         dlg2 = ParameterDialog(self.iface)
@@ -458,18 +407,6 @@ class AequilibraEMenu:
         dlg2 = BinaryDownloaderDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
-
-
-    def run_shortest_path(self):
-        if no_binary:
-            self.message_binary()
-        else:
-            if self.project is None:
-                self.show_message_no_project()
-            else:
-                dlg2 = ShortestPathDialog(self.iface, self.project, self.link_layer, self.node_layer)
-                dlg2.show()
-                dlg2.exec_()
 
     def run_dist_matrix(self):
         if no_binary:
@@ -505,8 +442,6 @@ class AequilibraEMenu:
         dlg2 = GtfsImportDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
-
-
 
     def run_simple_tag(self):
         dlg2 = SimpleTagDialog(self.iface)
@@ -546,3 +481,5 @@ class AequilibraEMenu:
 
     def message_project_already_open(self):
         self.iface.messageBar().pushMessage("You need to close the project currently open first", level=2, duration=10)
+
+
