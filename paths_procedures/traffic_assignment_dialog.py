@@ -1,47 +1,29 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Traffic assignment
- Purpose:    Loads GUI to perform traffic assignment procedures
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:   Pedro Camargo
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-10-30
- Updated:... 2018-12-27
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import *
-import qgis
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
-from qgis.PyQt.QtGui import *
-
-import sys
-from functools import partial
-import numpy as np
-from collections import OrderedDict
 import importlib.util as iutil
-from ..common_tools.global_parameters import *
-from ..common_tools.auxiliary_functions import *
-from ..matrix_procedures import LoadMatrixDialog
-from ..common_tools import ReportDialog, only_str
-from ..common_tools import GetOutputFolderName, GetOutputFileName
+import numpy as np
+import pandas as pd
+import sys
+import re
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import VDF, all_vdf_functions
-from .load_select_link_query_builder_dialog import LoadSelectLinkQueryBuilderDialog
+from collections import OrderedDict
+from functools import partial
+
+import qgis
 from aequilibrae import Parameters
+from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtWidgets import *
+from qgis.core import *
+from .load_select_link_query_builder_dialog import LoadSelectLinkQueryBuilderDialog
+from ..common_tools import GetOutputFolderName, GetOutputFileName
+from ..common_tools import ReportDialog, only_str
+from ..common_tools.auxiliary_functions import *
+from ..common_tools.global_parameters import *
+from ..matrix_procedures import LoadMatrixDialog
+from ..common_tools import PandasModel
 
 no_binary = False
 try:
@@ -61,10 +43,10 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, project: Project):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
-        self.project = project
+        self.iface = qgis_project.iface
+        self.project = qgis_project.project
         self.setupUi(self)
         self.path = standard_path()
         self.output_path = None
@@ -75,6 +57,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.assignment = TrafficAssignment()
         self.traffic_classes = {}
         self.vdf_parameters = {}
+        self.matrices = pd.DataFrame([])
         self.skims = {}
         self.matrix = None
         self.block_centroid_flows = None
@@ -86,17 +69,16 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.miter = 1000
 
         # Signals for the matrix_procedures tab
-        self.but_load_new_matrix.clicked.connect(self.find_matrices)
         self.but_add_skim.clicked.connect(self.__add_skimming)
         self.but_add_class.clicked.connect(self.__create_traffic_class)
+        self.cob_matrices.currentIndexChanged.connect(self.change_matrix_selected)
+
+        self.do_assignment.clicked.connect(self.run)
+        self.cancel_all.clicked.connect(self.exit_procedure)
 
         # Signals for the algorithm tab
         for q in [self.progressbar0, self.progressbar1, self.progress_label0, self.progress_label1]:
             q.setVisible(False)
-
-        self.do_assignment.clicked.connect(self.run)
-        self.cancel_all.clicked.connect(self.exit_procedure)
-        self.select_output_folder.clicked.connect(self.choose_folder_for_outputs)
 
         for algo in self.assignment.all_algorithms:
             self.cb_choose_algorithm.addItem(algo)
@@ -130,8 +112,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_build_query_extract.setEnabled(False)
         self.list_link_extraction.setEnabled(False)
 
-        self.table_matrix_list.setColumnWidth(0, 135)
-        self.table_matrix_list.setColumnWidth(1, 135)
         self.tbl_traffic_classes.setColumnWidth(0, 125)
         self.tbl_traffic_classes.setColumnWidth(1, 125)
         self.skim_list_table.setColumnWidth(0, 200)
@@ -144,6 +124,25 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.tbl_vdf_parameters.setColumnWidth(2, 140)
 
         self.__change_vdf()
+        self.change_matrix_selected()
+
+    def change_matrix_selected(self):
+        mat_name = self.cob_matrices.currentText()
+        if not mat_name:
+            return
+
+        if ' (OMX not available)' in mat_name:
+            df = pd.DataFrame([])
+            self.but_add_class.setEnabled(False)
+        else:
+            matrix = self.project.matrices.get_matrix(mat_name)
+            cores = matrix.names
+
+            totals = [f'{np.nansum(matrix.matrix[x]):,.1f}' for x in cores]
+            df = pd.DataFrame({'matrix_core': cores, 'total': totals})
+            self.but_add_class.setEnabled(True)
+        matrices_model = PandasModel(df)
+        self.tbl_core_list.setModel(matrices_model)
 
     def __populate_project_info(self):
         table = self.tbl_project_properties
@@ -170,40 +169,19 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         for m in modes:
             self.cob_mode_for_class.addItem(m)
 
-        self.project.network.build_graphs()
+        # self.project.network.build_graphs()
 
-        for cob in [self.cob_skims_available, self.cob_capacity, self.cob_ffttime]:
+        flds = self.project.network.skimmable_fields()
+        for cob in [self.cob_skims_available, self.cob_capacity, self.cob_ffttime, self.cob_fixed_cost]:
             cob.clear()
-            for x in self.project.network.skimmable_fields():
-                cob.addItem(x)
+            cob.addItems(flds)
 
-    def find_matrices(self):
-        dlg2 = LoadMatrixDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-        if dlg2.matrix is not None:
-            matrix_name = dlg2.matrix.file_path
-            matrix_name = os.path.splitext(os.path.basename(matrix_name))[0]
-            if self.matrix is not None:
-                self.matrix.close()
-                del self.matrix
-            self.matrix = dlg2.matrix  # type: AequilibraeMatrix
-            table = self.table_matrix_list
-
-            table.clearContents()
-            table.setRowCount(len(self.matrix.names))
-
-            for i, core in enumerate(self.matrix.names):
-                core_item = QTableWidgetItem(core)
-                core_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                table.setItem(i, 0, core_item)
-                chb = QCheckBox()
-                chb.setChecked(True)
-                table.setCellWidget(i, 1, chb)
-
-            self.cob_matrix_indices.clear()
-            for idx_nm in dlg2.matrix.index_names:
-                self.cob_matrix_indices.addItem(idx_nm)
+        self.matrices = self.project.matrices.list()
+        if not has_omx:
+            filter = self.matrices.file_name.str.contains('.omx', flags=re.IGNORECASE, regex=True)
+            self.matrices.loc[filter, 'name'] += ' (OMX not available)'
+        self.cob_matrices.clear()
+        self.cob_matrices.addItems(self.matrices['name'].tolist())
 
     def __edit_skimming_modes(self):
         self.cob_skim_mode.clear()
@@ -322,15 +300,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def __remove_class(self):
         self.__edit_skimming_modes()
-
-    def choose_folder_for_outputs(self):
-        new_name = GetOutputFolderName(self.path, "Output folder for traffic assignment")
-        if new_name:
-            self.output_path = new_name
-            self.lbl_output.setText(new_name)
-        else:
-            self.output_path = None
-            self.lbl_output.setText(new_name)
 
     def run_thread(self):
         self.worker_thread.assignment.connect(self.signal_handler)

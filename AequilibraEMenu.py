@@ -26,7 +26,7 @@ from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_p
 from .menu_actions import run_distribution_models
 from .common_tools import ParameterDialog, LogDialog
 
-from .paths_procedures import run_shortest_path, run_dist_matrix
+from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from .common_tools import AboutDialog
 from .common_tools.auxiliary_functions import standard_path
 
@@ -129,18 +129,8 @@ class AequilibraEMenu:
         #
         self.add_menu_action('Paths and assignment', 'Shortest path', partial(run_shortest_path, self))
         self.add_menu_action('Paths and assignment', 'Impedance matrix', partial(run_dist_matrix, self))
+        self.add_menu_action('Paths and assignment', 'Traffic Assignment', partial(run_traffic_assig, self))
 
-        # self.traffic_assignment_action = QAction(self.trlt('Traffic Assignment'), self.manager)
-        # self.traffic_assignment_action.triggered.connect(self.run_traffic_assig)
-        # pathMenu.addAction(self.traffic_assignment_action)
-        #
-        # pathButton = QToolButton()
-        # pathButton.setText(self.trlt('Paths and assignment'))
-        # pathButton.setPopupMode(2)
-        # pathButton.setMenu(pathMenu)
-        #
-        # self.toolbar.addWidget(pathButton)
-        #
         # # # ########################################################################
         # # # #######################   ROUTING SUB-MENU   ###########################
         # if has_ortools:
@@ -402,16 +392,6 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    def run_traffic_assig(self):
-        if no_binary:
-            self.message_binary()
-        else:
-            if self.project is None:
-                self.show_message_no_project()
-            else:
-                dlg2 = TrafficAssignmentDialog(self.iface, self.project)
-                dlg2.show()
-                dlg2.exec_()
 
     def run_tsp(self):
         if self.project is None:
