@@ -93,7 +93,7 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         modes = [item.text() for item in self.lst_modes.selectedItems()]
         modes = [self.modes[md] for md in modes]
 
-        parameters = {"project": self.qgis_project,
+        parameters = {"qgis_project": self.qgis_project,
                       "link_types": link_types,
                       "modes": modes,
                       "num_connectors": num_connectors,
@@ -104,7 +104,6 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         if source == "layer":
             parameters["layer"] = self.layer_box.currentLayer()
             parameters["field"] = self.field_box.currentField()
-
         self.worker_thread = AddsConnectorsProcedure(qgis.utils.iface.mainWindow(), **parameters)
         self.run_thread()
 
@@ -127,9 +126,10 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def job_finished_from_thread(self, success):
         self.but_process.setEnabled(True)
-        if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error during procedure: ", self.worker_thread.error,
-                                                      level=Qgis.Warning, duration=6)
+        self.project.network.refresh_connection()
+        self.project.network.links.refresh_connection()
+        self.project.network.nodes.refresh_connection()
+        self.project.zoning.refresh_connection()
         self.exit_procedure()
 
     def exit_procedure(self):
