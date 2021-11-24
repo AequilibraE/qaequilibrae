@@ -22,7 +22,8 @@ from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 
 from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
-from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
+from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
+from .menu_actions import run_distribution_models
 from .common_tools import ParameterDialog, LogDialog
 
 from .common_tools import AboutDialog
@@ -30,7 +31,7 @@ from .common_tools.auxiliary_functions import standard_path
 
 from .binary_downloader_class import BinaryDownloaderDialog
 from .download_extra_packages_class import DownloadExtraPackages
-from .distribution_procedures import DistributionModelsDialog
+
 
 from .gis import CompareScenariosDialog
 from .gis import CreateBandwidthsDialog
@@ -40,7 +41,6 @@ from .gis import SimpleTagDialog
 
 from .network import AddConnectorsDialog
 
-from .matrix_procedures import LoadMatrixDialog
 from .matrix_procedures import LoadDatasetDialog
 
 from .public_transport_procedures import GtfsImportDialog
@@ -119,37 +119,14 @@ class AequilibraEMenu:
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
         self.add_menu_action('Data', 'Display project data', partial(run_show_project_data, self))
+        self.add_menu_action('Data', 'Display AequilibraE formats', partial(display_aequilibrae_formats, self))
+        self.add_menu_action('Data', 'Import matrices', partial(load_matrices, self))
 
-        # self.add_menu_action('Data', 'Add centroid connectors', partial(run_add_connectors, self))
-        #
-        # dataMenu = QMenu()
-        # self.display_custom_formats_action = QAction(self.trlt('Display AequilibraE formats'), self.manager)
-        # self.display_custom_formats_action.triggered.connect(self.run_display_aequilibrae_formats)
-        # dataMenu.addAction(self.display_custom_formats_action)
-        #
-        # self.load_matrix_action = QAction(self.trlt('Import matrices'), self.manager)
-        # self.load_matrix_action.triggered.connect(self.run_load_matrices)
-        # dataMenu.addAction(self.load_matrix_action)
-        #
-        # self.load_database_action = QAction(self.trlt('Import dataset'), self.manager)
-        # self.load_database_action.triggered.connect(self.run_load_database)
-        # dataMenu.addAction(self.load_database_action)
-        #
-        # databutton = QToolButton()
-        # databutton.setText(self.trlt('Data'))
-        # databutton.setPopupMode(2)
-        # databutton.setMenu(dataMenu)
-        #
-        # self.toolbar.addWidget(databutton)
-        #
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
-        #
-        # distributionButton = QToolButton()
-        # distributionButton.setText(self.trlt('Trip Distribution'))
-        # distributionButton.clicked.connect(self.run_distribution_models)
-        # self.toolbar.addWidget(distributionButton)
-        #
+
+        self.add_menu_action('Trip Distribution', 'Trip Distribution', partial(run_distribution_models, self))
+
         # # # ########################################################################
         # # # ###################  PATH COMPUTATION SUB-MENU   #######################
         # pathMenu = QMenu()
@@ -467,11 +444,6 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    def run_load_matrices(self):
-        dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=False)
-        dlg2.show()
-        dlg2.exec_()
-
     def run_load_database(self):
         dlg2 = LoadDatasetDialog(self.iface, single_use=False)
         dlg2.show()
@@ -487,10 +459,6 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    def run_distribution_models(self):
-        dlg2 = DistributionModelsDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
 
     def run_shortest_path(self):
         if no_binary:
