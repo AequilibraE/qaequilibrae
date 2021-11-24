@@ -116,8 +116,7 @@ class AequilibraEMenu:
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
         self.add_menu_action('Data', 'Display project data', partial(run_show_project_data, self))
-        self.add_menu_action('Data', 'Display AequilibraE formats', partial(display_aequilibrae_formats, self))
-        self.add_menu_action('Data', 'Import matrices', partial(load_matrices, self))
+
 
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -210,6 +209,7 @@ class AequilibraEMenu:
 
         # # ########################################################################
         # # #################          Utils submenu         #########################
+        self.add_menu_action('Data', 'Import matrices', partial(load_matrices, self))
         self.add_menu_action('Utils', 'Display Matrices and datasets', partial(display_aequilibrae_formats, self))
 
         self.build_menu()

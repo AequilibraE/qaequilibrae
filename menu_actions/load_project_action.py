@@ -1,4 +1,4 @@
-from aequilibrae import Project
+from aequilibrae.project import Project
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QDockWidget, QAction, QVBoxLayout, QToolBar, QToolButton, QMenu
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QTableWidget
 from ..common_tools.auxiliary_functions import standard_path

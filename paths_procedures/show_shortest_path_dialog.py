@@ -49,16 +49,16 @@ from ..common_tools import LoadGraphLayerSettingDialog
 class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
     clickTool = PointTool(iface.mapCanvas())
 
-    def __init__(self, iface, project: Project, link_layer: QgsVectorLayer, node_layer: QgsVectorLayer) -> None:
+    def __init__(self, qgis_project) -> None:
         # QtWidgets.QDialog.__init__(self)
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
-        self.project = project
+        self.iface = qgis_project.iface
+        self.project = qgis_project.project # type: Project
         self.setupUi(self)
         self.field_types = {}
         self.centroids = None
-        self.node_layer = node_layer
-        self.line_layer = link_layer
+        self.node_layer = qgis_project.layers['nodes'][0]
+        self.line_layer = qgis_project.layers['links'][0]
         self.node_keys = {}
         self.node_fields = None
         self.index = None
@@ -89,7 +89,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             self.minimize_field = dlg2.minimize_field
 
             if not self.mode in self.project.network.graphs:
-                self.project.network.build_graphs()
+                self.project.network.build_graphs(modes=[self.mode])
 
             if dlg2.remove_chosen_links:
                 self.graph = self.project.network.graphs.pop(self.mode)
@@ -170,25 +170,22 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.to_but.setEnabled(True)
         if self.path_from.text().isdigit() and self.path_to.text().isdigit():
             self.res.reset()
-            path_computation(int(self.path_from.text()), int(self.path_to.text()), self.graph, self.res)
+            self.res.compute_path(int(self.path_from.text()), int(self.path_to.text()))
 
             if self.res.path is not None:
                 # If you want to do selections instead of new layers
                 if self.rdo_selection.isChecked():
                     self.create_path_with_selection()
-
                 # If you want to create new layers
                 else:
                     self.create_path_with_scratch_layer()
-
             else:
-                qgis.utils.iface.messageBar().pushMessage(
-                    "No path between " + self.path_from.text() + " and " + self.path_to.text(), "", level=3
-                )
+                msg = f"No path between {self.path_from.text()} and {self.path_to.text()}"
+                qgis.utils.iface.messageBar().pushMessage(msg, "", level=3)
 
     def create_path_with_selection(self):
         f = 'link_id'
-        t = " or ".join([f"{f}={k}" for k in self.res.path])
+        t = " or ".join([f"{f}={int(k)}" for k in self.res.path])
         self.line_layer.selectByExpression(t)
 
     def create_path_with_scratch_layer(self):
