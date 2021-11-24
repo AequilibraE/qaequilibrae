@@ -26,7 +26,7 @@ from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_p
 from .menu_actions import run_distribution_models
 from .common_tools import ParameterDialog, LogDialog
 
-from .paths_procedures import run_shortest_path
+from .paths_procedures import run_shortest_path, run_dist_matrix
 from .common_tools import AboutDialog
 from .common_tools.auxiliary_functions import standard_path
 
@@ -128,14 +128,8 @@ class AequilibraEMenu:
         # pathMenu = QMenu()
         #
         self.add_menu_action('Paths and assignment', 'Shortest path', partial(run_shortest_path, self))
-        # self.shortest_path_action = QAction(self.trlt(''), self.manager)
-        # self.shortest_path_action.triggered.connect(self.run_shortest_path)
-        # pathMenu.addAction(self.shortest_path_action)
-        #
-        # self.dist_matrix_action = QAction(self.trlt('Impedance matrix'), self.manager)
-        # self.dist_matrix_action.triggered.connect(self.run_dist_matrix)
-        # pathMenu.addAction(self.dist_matrix_action)
-        #
+        self.add_menu_action('Paths and assignment', 'Impedance matrix', partial(run_dist_matrix, self))
+
         # self.traffic_assignment_action = QAction(self.trlt('Traffic Assignment'), self.manager)
         # self.traffic_assignment_action.triggered.connect(self.run_traffic_assig)
         # pathMenu.addAction(self.traffic_assignment_action)
@@ -407,17 +401,6 @@ class AequilibraEMenu:
         dlg2 = BinaryDownloaderDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
-
-    def run_dist_matrix(self):
-        if no_binary:
-            self.message_binary()
-        else:
-            if self.project is None:
-                self.show_message_no_project()
-            else:
-                dlg2 = ImpedanceMatrixDialog(self.iface, self.project, self.link_layer)
-                dlg2.show()
-                dlg2.exec_()
 
     def run_traffic_assig(self):
         if no_binary:

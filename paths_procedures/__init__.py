@@ -20,3 +20,4 @@
  """
 
 from .action_run_shortest_path import run_shortest_path
+from .action_skim_matrix import run_dist_matrix
