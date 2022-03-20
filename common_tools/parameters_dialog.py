@@ -1,10 +1,11 @@
-from qgis.core import *
-from qgis.PyQt.Qsci import QsciLexerYAML
-from qgis.PyQt.QtGui import *
-from qgis.PyQt import QtWidgets, uic
-
+import logging
 import os
+
 import yaml
+
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.Qsci import QsciLexerYAML
+from qgis.PyQt.QtGui import QFont
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_parameters.ui"))
 
@@ -30,6 +31,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         lexer.setDefaultFont(font)
         self.text_box.setLexer(lexer)
         self.text_box.setFolding(self.text_box.PlainFoldStyle)
+        self.logger = logging.getLogger("AequilibraEGUI")
 
         # Load the data
         self.load_original_data()
@@ -78,7 +80,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
                 if key not in dict2:
                     self.error = True
                     break
-                if type(dict1[key]) != type(dict2[key]):
+                if not isinstance(dict1[key], type(type(dict2[key]))):
                     self.error = True
                     break
                 if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
@@ -89,7 +91,8 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
                 if key not in dict1:
                     self.error = True
                     break
-        except:
+        except Exception as e:
+            self.logger.error(e.args)
             self.error = True
 
     def save_new_parameters(self):

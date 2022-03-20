@@ -1,52 +1,40 @@
 import glob
 import importlib.util as iutil
+import logging
 import os
+import subprocess
 import sys
 import tempfile
+import webbrowser
 from functools import partial
+from typing import Dict
+from warnings import warn
+
+from aequilibrae.project import Project
+from aequilibrae.project.database_connection import ENVIRON_VAR
 
 import qgis
-from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QListWidget, QListWidgetItem, QAbstractItemView, QAction, \
-    QVBoxLayout, QToolBar, QToolButton, QMenu, QPushButton, QTabWidget, QLabel, QCheckBox
-from qgis.core import QgsWkbTypes, QgsAnnotationManager, QgsProject, QgsGeometry, QgsRectangle, QgsTextAnnotation
-from qgis.gui import QgsMapTool, QgsRubberBand
-
-sys.dont_write_bytecode = True
-import subprocess
-import webbrowser
-
-from qgis.PyQt import QtWidgets
+from qgis.PyQt import Qt, QtCore
+from qgis.PyQt.QtWidgets import QVBoxLayout
+from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
-# This is how QtCore and QtGui imports change
-from qgis.PyQt.QtCore import *
-
-from qgis.PyQt.QtGui import *
-
-from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
-from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
-from .menu_actions import run_distribution_models
-from .common_tools import ParameterDialog, LogDialog
-
-from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
-from .common_tools import AboutDialog
-from .common_tools.auxiliary_functions import standard_path
-
+from qgis.core import QgsProject
 from .binary_downloader_class import BinaryDownloaderDialog
+from .common_tools import AboutDialog
+from .common_tools import ParameterDialog, LogDialog
 from .download_extra_packages_class import DownloadExtraPackages
-
 from .gis import CompareScenariosDialog
 from .gis import CreateBandwidthsDialog
 from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
-
-from .network import AddConnectorsDialog
-
 from .matrix_procedures import LoadDatasetDialog
-
+from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
+from .menu_actions import run_distribution_models
+from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
+from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from .public_transport_procedures import GtfsImportDialog
 
-from warnings import warn
-from aequilibrae.project.database_connection import ENVIRON_VAR
+# This is how QtCore and QtGui imports change
 
 no_binary = False
 try:
@@ -55,11 +43,8 @@ except ImportError as e:
     no_binary = True
     warn(f'AequilibraE binaries are not available {e.args}')
 
-from aequilibrae.project import Project
-
 if not no_binary:
     from .gis.desire_lines_dialog import DesireLinesDialog
-    from .project_procedures import CreatesTranspoNetDialog
 
 extra_packages = True
 # Checks if we can display OMX
@@ -80,6 +65,7 @@ class AequilibraEMenu:
 
     def __init__(self, iface):
         # Closes AequilibraE projects eventually opened in memory
+        self.logger = logging.getLogger('AequilibraEGUI')
         if ENVIRON_VAR in os.environ:
             del os.environ[ENVIRON_VAR]
         self.geo_layers_list = ['links', 'nodes', 'zones']
@@ -249,7 +235,7 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         self.tabContents = []
-        self.toolbar.setIconSize(QSize(16, 16))
+        self.toolbar.setIconSize(QtCore.QSize(16, 16))
 
         p1_vertical = QVBoxLayout()
         p1_vertical.setContentsMargins(0, 0, 0, 0)
@@ -327,7 +313,8 @@ class AequilibraEMenu:
         for f in glob.glob(p):
             try:
                 os.unlink(f)
-            except:
+            except Exception as e:
+                self.logger.error(e.args)
                 pass
 
     def run_close_project(self):

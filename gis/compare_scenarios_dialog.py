@@ -2,9 +2,12 @@ import os
 import sys
 from functools import partial
 
+from PyQt5.QtCore import Qt
+from qgis._core import QgsMapLayerProxyModel, QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
+
 import qgis
 from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis.core import *
+from qgis.core import QgsProject
 from ..common_tools.auxiliary_functions import get_parameter_chain
 from ..common_tools.auxiliary_functions import get_vector_layer_by_name
 

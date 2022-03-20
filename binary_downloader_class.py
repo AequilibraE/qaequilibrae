@@ -18,7 +18,6 @@ class BinaryDownloaderDialog(QtWidgets.QDialog, FORM_CLASS):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-        error = True
 
         self.local_path = os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/aequilibrae/paths"
 

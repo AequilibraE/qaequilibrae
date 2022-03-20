@@ -1,10 +1,10 @@
 import os
 import tempfile
-from qgis.core import *
-from qgis.PyQt.Qsci import QsciLexerYAML
-from qgis.PyQt.QtGui import *
-from qgis.PyQt import QtWidgets, uic
+
 from aequilibrae import Parameters
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.Qsci import QsciLexerYAML
+from qgis.PyQt.QtGui import QFont
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_parameters.ui"))
 
@@ -18,7 +18,7 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
         if not os.path.isdir(temp_folder):
             temp_folder = tempfile.gettempdir()
 
-        self.logfile = log_file = os.path.join(temp_folder, "aequilibrae.log")
+        self.logfile = os.path.join(temp_folder, "aequilibrae.log")
 
         self.iface = iface
         self.setupUi(self)

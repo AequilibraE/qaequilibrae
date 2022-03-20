@@ -1,38 +1,18 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       About dialog
- Purpose:    Dialog for showing the About window
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2018-06-29
- Updated:
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import *
-from qgis.PyQt import QtWidgets, uic
-import qgis
-from qgis.PyQt import QtGui
+import logging
+import os
 import webbrowser
+from os.path import dirname, abspath
+
 import yaml
 
-import os
-from os.path import dirname, abspath
+from qgis.PyQt import QtWidgets, uic
 from .auxiliary_functions import standard_path
 
 try:
     from aequilibrae.paths import release_name, release_version
-except:
+except Exception as e:
+    logger = logging.getLogger('AequilibraEGUI')
+    logger.error(e.args)
     release_name = "No Binaries available"
     release_version = "No Binaries available"
 

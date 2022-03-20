@@ -223,8 +223,8 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         try:
             self.model.load(file_name)
             self.update_model_parameters()
-        except:
-            qgis.utils.iface.messageBar().pushMessage("Error", "Could not load model", level=3)
+        except Exception as e:
+            qgis.utils.iface.messageBar().pushMessage("Error", f"Could not load model. {e.args}", level=3)
 
     def change_vector_field(self, cob_orig, cob_dest, dt):
         cob_dest.clear()

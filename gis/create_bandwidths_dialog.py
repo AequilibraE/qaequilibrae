@@ -340,20 +340,9 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 width = '(coalesce(scale_linear("' + field + '", 0, ' + str(max_value) + ", 0, " + band_size + "), 0))"
                 props["width_dd_expression"] = width
 
-                props["offset_dd_expression"] = (
-                        acc_offset
-                        + "+"
-                        + str(side)
-                        + ' * (coalesce(scale_linear("'
-                        + field
-                        + '", 0, '
-                        + str(max_value)
-                        + ", 0, "
-                        + band_size
-                        + "), 0)/2 + "
-                        + space_size
-                        + ")"
-                )
+                xpr = (acc_offset + "+" + str(side) + ' * (coalesce(scale_linear("' + field + '", 0, ' + str(
+                    max_value) + ", 0, " + band_size + "), 0)/2 + " + space_size + ")")
+                props["offset_dd_expression"] = xpr
                 props["line_style_expression"] = 'if (coalesce("' + field + '",0) = 0,' + "'no', 'solid')"
 
                 if isinstance(clr, dict):

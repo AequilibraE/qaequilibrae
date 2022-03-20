@@ -1,6 +1,6 @@
 import importlib.util as iutil
+import os
 import sqlite3
-import sys
 from os.path import join
 
 import pandas as pd
@@ -8,14 +8,10 @@ from aequilibrae.project.database_connection import database_connection
 from qgis._core import QgsProject, QgsVectorLayer, QgsDataSourceUri
 
 import qgis
-import os
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QAbstractItemView
 from .display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
-# from qgis.core import *
 from ..common_tools import PandasModel
-# from ..common_tools.auxiliary_functions import user_message, standard_path, tempPath, get_parameter_chain, only_str
-from ..common_tools.auxiliary_functions  import get_parameters_group, get_vector_layer_by_name, haversine, reporter
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_project_data.ui"))
 
