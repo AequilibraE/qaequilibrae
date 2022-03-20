@@ -1,5 +1,4 @@
-import QAbstractTableModel
-
+from PyQt5.QtCore import QAbstractTableModel
 from qgis.PyQt.QtCore import Qt
 
 

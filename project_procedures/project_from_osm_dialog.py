@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm_utils.place_getter import placegetter
 
-from common_tools import reporter
+from ..common_tools import reporter
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox
 from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit

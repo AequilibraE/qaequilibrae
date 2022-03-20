@@ -4,8 +4,8 @@ import sys
 from qgis._core import QgsProject
 
 import qgis
-from common_tools import standard_path, get_vector_layer_by_name
-from common_tools.global_parameters import line_types, point_types
+from ..common_tools import standard_path, get_vector_layer_by_name
+from ..common_tools.global_parameters import line_types, point_types
 from qgis.PyQt import QtWidgets, uic
 from .Network_preparation_procedure import NetworkPreparationProcedure
 from ..common_tools import ReportDialog

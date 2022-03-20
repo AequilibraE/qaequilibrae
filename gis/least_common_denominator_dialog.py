@@ -2,7 +2,7 @@ import os
 from functools import partial
 
 import qgis
-from common_tools.global_parameters import poly_types, multi_poly, point_types
+from ..common_tools.global_parameters import poly_types, multi_poly, point_types
 from qgis.PyQt import QtWidgets, uic
 from qgis.core import QgsProject
 from .least_common_denominator_procedure import LeastCommonDenominatorProcedure

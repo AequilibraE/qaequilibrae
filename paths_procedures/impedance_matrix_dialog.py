@@ -4,7 +4,7 @@ import os
 from aequilibrae.paths import Graph, SkimResults, NetworkSkimming
 
 import qgis
-from common_tools.global_parameters import integer_types, float_types
+from ..common_tools.global_parameters import integer_types, float_types
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView

@@ -2,7 +2,7 @@ import logging
 import os
 from functools import partial
 
-from common_tools import standard_path
+from ..common_tools import standard_path
 from qgis.PyQt import uic
 from qgis.PyQt.Qsci import QsciLexerPython
 from qgis.PyQt.QtGui import QFont

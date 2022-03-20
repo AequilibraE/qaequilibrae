@@ -10,7 +10,7 @@ from qgis._core import QgsLineSymbol
 
 import qgis
 from PyQt5 import Qt
-from common_tools import get_parameter_chain
+from ..common_tools import get_parameter_chain
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QPushButton, QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QToolButton, QHBoxLayout, QWidget, QDialog

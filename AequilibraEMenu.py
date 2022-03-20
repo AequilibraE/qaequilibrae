@@ -14,7 +14,8 @@ from aequilibrae.project import Project
 from aequilibrae.project.database_connection import ENVIRON_VAR
 
 import qgis
-from qgis.PyQt import Qt, QtCore
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QVBoxLayout
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
