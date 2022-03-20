@@ -1,19 +1,21 @@
-import qgis
-from functools import partial
-from qgis.core import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt import uic
-from PyQt5.QtGui import QColor
-import sys
-import os
 import copy
-
+import os
+import sys
+from functools import partial
 from random import randint
-from ..common_tools.auxiliary_functions import *
 
-from .set_color_ramps_dialog import LoadColorRampSelector
+from PyQt5.QtGui import QColor
+from qgis._core import QgsMapLayerProxyModel, QgsSimpleLineSymbolLayer, QgsExpressionContextUtils, QgsProject
+from qgis._core import QgsLineSymbol
+
+import qgis
+from PyQt5 import Qt
+from common_tools import get_parameter_chain
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QPushButton, QTableWidgetItem, QTableWidget
+from qgis.PyQt.QtWidgets import QToolButton, QHBoxLayout, QWidget, QDialog
 from .bandwidth_scale_dialog import BandwidthScaleDialog
+from .set_color_ramps_dialog import LoadColorRampSelector
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgscolorbutton"] = qgis.gui
@@ -132,9 +134,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
     def add_to_bands_list(self):
         if self.ab_FieldComboBox.currentIndex() >= 0 and self.ba_FieldComboBox.currentIndex() >= 0:
-            ab_band = self.layer.dataProvider().fieldNameIndex(self.ab_FieldComboBox.currentText())
-            ba_band = self.layer.dataProvider().fieldNameIndex(self.ba_FieldComboBox.currentText())
-
+            # ab_band = self.layer.dataProvider().fieldNameIndex(self.ab_FieldComboBox.currentText())
+            # ba_band = self.layer.dataProvider().fieldNameIndex(self.ba_FieldComboBox.currentText())
             self.bands_list.setRowCount(self.tot_bands + 1)
 
             # Field names
@@ -340,58 +341,35 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 props["width_dd_expression"] = width
 
                 props["offset_dd_expression"] = (
-                    acc_offset
-                    + "+"
-                    + str(side)
-                    + ' * (coalesce(scale_linear("'
-                    + field
-                    + '", 0, '
-                    + str(max_value)
-                    + ", 0, "
-                    + band_size
-                    + "), 0)/2 + "
-                    + space_size
-                    + ")"
+                        acc_offset
+                        + "+"
+                        + str(side)
+                        + ' * (coalesce(scale_linear("'
+                        + field
+                        + '", 0, '
+                        + str(max_value)
+                        + ", 0, "
+                        + band_size
+                        + "), 0)/2 + "
+                        + space_size
+                        + ")"
                 )
                 props["line_style_expression"] = 'if (coalesce("' + field + '",0) = 0,' + "'no', 'solid')"
 
                 if isinstance(clr, dict):
                     if direc == "ab":
-                        props["color_dd_expression"] = (
-                            "ramp_color('"
-                            + clr["color ab"]
-                            + "',scale_linear("
-                            + '"'
-                            + clr["ramp ab"]
-                            + '", '
-                            + str(clr["min ab"])
-                            + ", "
-                            + str(clr["max ab"])
-                            + ", 0, 1))"
-                        )
+                        xpr = ("ramp_color('" + clr["color ab"] + "',scale_linear(" + '"' + clr["ramp ab"]
+                               + '", ' + str(clr["min ab"]) + ", " + str(clr["max ab"]) + ", 0, 1))")
+                        props["color_dd_expression"] = xpr
+
                     else:
-                        props["color_dd_expression"] = (
-                            "ramp_color('"
-                            + clr["color ba"]
-                            + "',scale_linear("
-                            + '"'
-                            + clr["ramp ba"]
-                            + '", '
-                            + str(clr["min ba"])
-                            + ", "
-                            + str(clr["max ba"])
-                            + ", 0, 1))"
-                        )
+                        xpr = ("ramp_color('" + clr["color ba"] + "',scale_linear(" + '"' + clr[
+                            "ramp ba"] + '", ' + str(clr["min ba"]) + ", " + str(clr["max ba"]) + ", 0, 1))")
+                        props["color_dd_expression"] = xpr
                 else:
-                    props["line_color"] = (
-                        str(clr.getRgb()[0])
-                        + ","
-                        + str(clr.getRgb()[1])
-                        + ","
-                        + str(clr.getRgb()[2])
-                        + ","
-                        + str(clr.getRgb()[3])
-                    )
+                    xpr = (str(clr.getRgb()[0]) + "," + str(clr.getRgb()[1]) + "," + str(clr.getRgb()[2]) + "," + str(
+                        clr.getRgb()[3]))
+                    props["line_color"] = xpr
 
                 symbol_layer = QgsSimpleLineSymbolLayer.create(props)
                 self.layer.renderer().symbol().appendSymbolLayer(symbol_layer)

@@ -1,35 +1,6 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Adding centroid connectors procedure
- Purpose:    Executes centroid addition procedure in a separate thread
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-30
- Updated:    30/01/2020
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from typing import List
-from qgis.core import *
-from qgis.PyQt.QtCore import *
-from ..common_tools.auxiliary_functions import *
-from sqlite3 import Connection as sqlc
-import qgis
-import numpy as np
-from shapely.geometry import Point
 import shapely.wkb
+from shapely.geometry import Point
 
-from ..common_tools.global_parameters import *
 from ..common_tools import WorkerThread
 
 

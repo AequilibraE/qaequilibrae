@@ -1,42 +1,23 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Network preparation
- Purpose:    Prepares networks (extracting nodes A and B from links) on a separate thread
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2014-03-19
- Updated:    21/12/2016
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import *
-from qgis.PyQt.QtCore import *
+# from qgis.core import *
+# from qgis.PyQt.QtCore import *
 import numpy as np
-from ..common_tools.auxiliary_functions import *
+from qgis._core import QgsField, QgsFeatureRequest, QgsPointXY, QgsVectorLayer, QgsGeometry, QgsFeature, QgsSpatialIndex
+
+from qgis.PyQt.QtCore import QVariant
 from ..common_tools import WorkerThread
-from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import get_vector_layer_by_name
 
 
 class NetworkPreparationProcedure(WorkerThread):
     def __init__(
-        self,
-        parentThread,
-        line_layer,
-        new_line_layer,
-        node_layer=False,
-        node_ids=False,
-        new_node_layer=False,
-        node_start=0,
+            self,
+            parentThread,
+            line_layer,
+            new_line_layer,
+            node_layer=False,
+            node_ids=False,
+            new_node_layer=False,
+            node_start=0,
     ):
 
         WorkerThread.__init__(self, parentThread)
@@ -71,7 +52,7 @@ class NetworkPreparationProcedure(WorkerThread):
         add_fields = ["A_NODE", "B_NODE"]
         for f in add_fields:
             if f not in field_names:
-                res = new_line_layer.dataProvider().addAttributes([QgsField(f, QVariant.Int)])
+                _ = new_line_layer.dataProvider().addAttributes([QgsField(f, QVariant.Int)])
         new_line_layer.updateFields()
         self.ProgressValue.emit(2)
         # I f we have node IDs, we iterate over the ID field to make sure they are unique
@@ -137,9 +118,8 @@ class NetworkPreparationProcedure(WorkerThread):
         else:
             self.ProgressMaxValue.emit(feat_count)
             #  Create node layer
-            new_node_layer = QgsVectorLayer(
-                "Point?crs=epsg:" + str(epsg_code) + "&field=ID:integer", self.new_node_layer, "memory"
-            )
+            new_node_layer = QgsVectorLayer(f"Point?crs=epsg:{epsg_code}&field=ID:integer", self.new_node_layer,
+                                            "memory")
             DTYPE = [
                 ("LAT", np.float64),
                 ("LONG", np.float64),
@@ -150,13 +130,13 @@ class NetworkPreparationProcedure(WorkerThread):
 
             all_nodes = np.zeros(feat_count * 2, dtype=DTYPE)
 
-            l = 0
+            line = 0
             #  Let's read all links and the coordinates for their extremities
             for feat in new_line_layer.getFeatures():
                 P += 1
                 if P % 500 == 0:
                     self.ProgressValue.emit(int(P))
-                    self.ProgressText.emit("Links read: " + str(P) + "/" + str(feat_count))
+                    self.ProgressText.emit(f"Links read: {P}/{feat_count}")
 
                 link = list(feat.geometry().asPolyline())
                 if link:
@@ -165,16 +145,16 @@ class NetworkPreparationProcedure(WorkerThread):
                     node_a = (round(link[0][0], 10), round(link[0][1], 10))
                     node_b = (round(link[-1][0], 10), round(link[-1][1], 10))
 
-                    all_nodes[l][0] = node_a[0]
-                    all_nodes[l][1] = node_a[1]
-                    all_nodes[l][2] = link_id
-                    all_nodes[l][3] = 0
-                    l += 1
-                    all_nodes[l][0] = node_b[0]
-                    all_nodes[l][1] = node_b[1]
-                    all_nodes[l][2] = link_id
-                    all_nodes[l][3] = 1
-                    l += 1
+                    all_nodes[line][0] = node_a[0]
+                    all_nodes[line][1] = node_a[1]
+                    all_nodes[line][2] = link_id
+                    all_nodes[line][3] = 0
+                    line += 1
+                    all_nodes[line][0] = node_b[0]
+                    all_nodes[line][1] = node_b[1]
+                    all_nodes[line][2] = link_id
+                    all_nodes[line][3] = 1
+                    line += 1
 
             # Now we sort the nodes and assign IDs to them
             all_nodes = np.sort(all_nodes, order=["LAT", "LONG"])
@@ -185,7 +165,7 @@ class NetworkPreparationProcedure(WorkerThread):
             P = 0
 
             self.ProgressMaxValue.emit(feat_count * 2)
-            self.ProgressText.emit("Computing node IDs: " + str(0) + "/" + str(feat_count * 2))
+            self.ProgressText.emit(f"Computing node IDs: {0}/{feat_count * 2}")
             self.ProgressMaxValue.emit(feat_count * 2)
 
             for i in all_nodes:
@@ -201,10 +181,10 @@ class NetworkPreparationProcedure(WorkerThread):
 
                 if P % 2000 == 0:
                     self.ProgressValue.emit(int(P))
-                    self.ProgressText.emit("Computing node IDs: " + str(P) + "/" + str(feat_count * 2))
+                    self.ProgressText.emit(f"Computing node IDs: {P}/{feat_count * 2}")
 
             self.ProgressValue.emit(int(feat_count * 2))
-            self.ProgressText.emit("Computing node IDs: " + str(feat_count * 2) + "/" + str(feat_count * 2))
+            self.ProgressText.emit(f"Computing node IDs:  {feat_count * 2}/{feat_count * 2}")
 
             # And we write the node layer as well
             node_id0 = -1
@@ -225,24 +205,22 @@ class NetworkPreparationProcedure(WorkerThread):
 
                 if P % 500 == 0:
                     self.ProgressValue.emit(int(P))
-                    self.ProgressText.emit("Writing new node layer: " + str(P) + "/" + str(incremental_ids))
+                    self.ProgressText.emit(f"Writing new node layer: {P}/{incremental_ids}")
 
-            a = new_node_layer.dataProvider().addFeatures(cfeatures)
+            _ = new_node_layer.dataProvider().addFeatures(cfeatures)
             del cfeatures
             new_node_layer.commitChanges()
             self.ProgressValue.emit(int(incremental_ids))
-            self.ProgressText.emit("Writing new node layer: " + str(incremental_ids) + "/" + str(incremental_ids))
+            self.ProgressText.emit(f"Writing new node layer: {incremental_ids}/{incremental_ids}")
 
             # Now we write all the node _IDs back to the line layer
-            P = 0
-            self.ProgressText.emit("Writing node IDs to links: " + str(0) + "/" + str(feat_count * 2))
+            self.ProgressText.emit(f"Writing node IDs to links: {0}/{feat_count * 2}")
 
             self.ProgressMaxValue.emit(feat_count * 2)
             fid1 = new_line_layer.dataProvider().fieldNameIndex("A_NODE")
             fid2 = new_line_layer.dataProvider().fieldNameIndex("B_NODE")
 
-            for i in all_nodes:
-                P += 1
+            for P, i in enumerate(all_nodes):
                 lat, longit, link_id, position, node_id = i
 
                 if position == 0:
@@ -252,10 +230,10 @@ class NetworkPreparationProcedure(WorkerThread):
 
                 if P % 50 == 0:
                     self.ProgressValue.emit(int(P))
-                    self.ProgressText.emit("Writing node IDs to links: " + str(P) + "/" + str(feat_count * 2))
+                    self.ProgressText.emit(f"Writing node IDs to links: {P}/{feat_count * 2}")
 
             self.ProgressValue.emit(int(P))
-            self.ProgressText.emit("Writing node IDs to links: " + str(P) + "/" + str(feat_count * 2))
+            self.ProgressText.emit(f"Writing node IDs to links: {feat_count * 2}/{feat_count * 2}")
 
             new_line_layer.commitChanges()
             self.new_line_layer = new_line_layer

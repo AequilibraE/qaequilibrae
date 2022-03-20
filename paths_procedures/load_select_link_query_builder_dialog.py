@@ -1,38 +1,13 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Builds queries for select link analysis
- Purpose:    Helps in building queries
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-30
- Updated:    30/09/2016
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
 # Filtering largely adapted from http://stackoverflow.com/questions/34252413/how-to-create-a-filter-for-qtablewidget
+import os
 
-from qgis.core import *
-import qgis
-from qgis.PyQt.QtCore import *
-from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtWidgets import QPushButton
 import numpy as np
 
-import sys
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import QSortFilterProxyModel
+from qgis.PyQt.QtWidgets import QPushButton, QAbstractItemView, QTableWidgetItem
 from ..common_tools import LinkQueryModel
 
-# sys.modules['qgsmaplayercombobox'] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_link_query_builder.ui"))
 
 
@@ -52,14 +27,6 @@ class LoadSelectLinkQueryBuilderDialog(QtWidgets.QDialog, FORM_CLASS):
         self.query_name = None
         self.query_type = "or"
         self.links = None
-        dtype = [
-            ("link_id", np.int32),
-            ("a_node", np.int32),
-            ("b_node", np.int32),
-            ("direction", np.int8),
-            ("id", np.int32),
-            ("length", np.float64),
-        ]
 
         dt = [("link_id", np.int32), ("direction", "|S2")]
 
@@ -96,7 +63,6 @@ class LoadSelectLinkQueryBuilderDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_build_query.clicked.connect(self.save_query)
 
     def add_link_to_query(self):
-        indexes = self.graph_links_list.selectionModel().selectedRows()
         selection = self.graph_links_list.selectedIndexes()
         if selection:
             rows = sorted(index.row() for index in selection)

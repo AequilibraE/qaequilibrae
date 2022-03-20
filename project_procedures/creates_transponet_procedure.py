@@ -1,12 +1,9 @@
 from string import ascii_letters
-from shutil import copyfile
-from qgis.core import *
-from qgis.PyQt.QtCore import *
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
-from ..common_tools import WorkerThread
+
 from aequilibrae.project import Project
+
 from aequilibrae import logger
+from ..common_tools import WorkerThread
 
 
 class CreatesTranspoNetProcedure(WorkerThread):
@@ -31,7 +28,6 @@ class CreatesTranspoNetProcedure(WorkerThread):
         self.additional_fields_to_layers('links', self.link_layer, self.link_fields)
         self.additional_fields_to_layers('nodes', self.node_layer, self.node_fields)
 
-        conn = self.project.conn
         self.transfer_layer_features('links', self.link_layer, self.link_fields)
         self.renumber_nodes()
 
@@ -66,8 +62,9 @@ class CreatesTranspoNetProcedure(WorkerThread):
                 sql = "alter table " + table + " add column " + f + " " + field_type + "(" + str(field_length) + ")"
                 curr.execute(sql)
                 self.project.conn.commit()
-            except:
+            except Exception as e:
                 logger.error(sql)
+                logger.error(e.args)
                 self.report.append("field " + str(f) + " could not be added")
         curr.close()
         return string_fields
@@ -85,7 +82,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         curr.execute("COMMIT;")
         self.project.conn.commit()
 
-        self.emit_messages(message=f"Transferring nodes", value=0, max_val=self.node_layer.featureCount())
+        self.emit_messages(message="Transferring nodes", value=0, max_val=self.node_layer.featureCount())
 
         find_sql = """SELECT node_id
                         FROM nodes
@@ -101,7 +98,6 @@ class CreatesTranspoNetProcedure(WorkerThread):
         # update_link_b = "Update Links set b_node=? where b_node=?"
 
         crs = int(self.node_layer.crs().authid().split(":")[1])
-        data_to_add = []
         for j, f in enumerate(self.node_layer.getFeatures()):
             self.emit_messages(value=j + 1)
             attrs = [self.convert_data(f.attributes()[val]) if val > 0 else None for val in self.node_fields.values()]
@@ -109,8 +105,8 @@ class CreatesTranspoNetProcedure(WorkerThread):
             node_id = [x[0] for x in self.project.conn.execute(find_sql, [wkb, crs, wkb, crs])][0]
             if not node_id:
                 continue
-            new_node_id = f.attributes()[self.node_fields['node_id']]
             attrs.append(node_id)
+            # new_node_id = f.attributes()[self.node_fields['node_id']]
             # logger.info([update_link_b, [new_node_id, node_id]])
             # logger.info([update_link_a, [new_node_id, node_id]])
             logger.info([update_sql, attrs])
@@ -194,7 +190,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         self.project.conn.commit()
 
     def convert_data(self, value):
-        if type(value) == NULL:
+        if type(value) is None:
             return None
         else:
             return value

@@ -1,4 +1,4 @@
-from qgis.core import *
+from qgis.core import QgsWkbTypes
 
 point_types = [QgsWkbTypes.Point, QgsWkbTypes.Point25D]
 line_types = [QgsWkbTypes.LineString, QgsWkbTypes.LineString25D]

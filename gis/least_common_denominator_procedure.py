@@ -1,39 +1,10 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Least commmon denominator
- Purpose:    Computes least common denominator between two polygon layers in a separate thread
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-09-26
- Updated:    30/09/2016
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-# from PyQt4.QtCore import QVariant, SIGNAL
+from common_tools import get_vector_layer_by_name
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import (
-    QgsCoordinateTransform,
-    QgsSpatialIndex,
-    QgsFeature,
-    QgsGeometry,
-    QgsField,
-    QgsVectorLayer,
-    QgsProject,
-)
-import copy
-
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
-from ..common_tools.worker_thread import WorkerThread
+from qgis.core import QgsCoordinateReferenceSystem
+from qgis.core import QgsCoordinateTransform, QgsSpatialIndex, QgsFeature, QgsGeometry, QgsField, QgsVectorLayer
+from qgis.core import QgsProject
+from ..common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types, multi_point
+from aequilibrae.utils.worker_thread import WorkerThread
 
 
 class LeastCommonDenominatorProcedure(WorkerThread):
@@ -89,17 +60,17 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         # denominator of both layers
         epsg_code = int(self.to_layer.crs().authid().split(":")[1])
         if self.from_layer.wkbType() in self.poly_types and self.to_layer.wkbType() in self.poly_types:
-            lcd_layer = QgsVectorLayer("MultiPolygon?crs=epsg:" + str(epsg_code), "output", "memory")
+            lcd_layer = QgsVectorLayer(f"MultiPolygon?crs=epsg:{epsg_code}", "output", "memory")
             self.output_type = "Poly"
 
         elif (
-            self.from_layer.wkbType() in self.poly_types + self.line_types
-            and self.to_layer.wkbType() in self.poly_types + self.line_types
+                self.from_layer.wkbType() in self.poly_types + self.line_types
+                and self.to_layer.wkbType() in self.poly_types + self.line_types
         ):
-            lcd_layer = QgsVectorLayer("MultiLineString?crs=epsg:" + str(epsg_code), "output", "memory")
+            lcd_layer = QgsVectorLayer(f"MultiLineString?crs=epsg:{epsg_code}", "output", "memory")
             self.output_type = "Line"
         else:
-            lcd_layer = QgsVectorLayer("MultiPoint?crs=epsg:" + str(epsg_code), "output", "memory")
+            lcd_layer = QgsVectorLayer(f"MultiPoint?crs=epsg:{epsg_code}", "output", "memory")
             self.output_type = "Point"
 
         lcdpr = lcd_layer.dataProvider()
@@ -128,7 +99,6 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                     geom = geom.transform(self.transform)
                 geometry, statf = self.find_geometry(geom)
                 uncovered, statf = self.find_geometry(geom)
-                # uncovered = copy.deepcopy(geometry)
 
                 intersecting = self.index.intersects(geometry.boundingBox())
                 # Find all intersecting parts
@@ -168,9 +138,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         part_id += 1
 
             self.ProgressValue.emit(fc)
-            self.ProgressText.emit(
-                "Running Analysis (" + "{:,}".format(fc) + "/" + "{:,}".format(self.from_layer.featureCount()) + ")"
-            )
+            self.ProgressText.emit(f"Running Analysis ({fc:,}/{self.from_layer.featureCount():,}")
 
         # Find the features on TO that have no correspondence in FROM
         for f, feature in merged.items():
@@ -186,7 +154,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                 part_id += 1
 
         if features:
-            a = lcdpr.addFeatures(features)
+            _ = lcdpr.addFeatures(features)
         self.result = lcd_layer
 
         self.ProgressValue.emit(self.from_layer.dataProvider().featureCount())

@@ -3,8 +3,11 @@ from shutil import copyfile
 from qgis.core import *
 from qgis.PyQt.QtCore import *
 import shapely.wkb
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import user_message, standard_path, tempPath, get_parameter_chain, only_str
+from ..common_tools.auxiliary_functions  import get_parameters_group, get_vector_layer_by_name, haversine, reporter
+from ..common_tools.global_parameters import point_types, line_types, poly_types, multi_poly, multi_line, multi_point
+from ..common_tools.global_parameters import integer_types, float_types, string_types, numeric_types, directions_dictionary
+from ..common_tools.global_parameters import reserved_fields
 from ..common_tools import WorkerThread
 from aequilibrae import logger
 

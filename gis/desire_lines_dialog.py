@@ -1,49 +1,23 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Loads GUI for creating desire lines
- Purpose:    Creating desire and delaunay lines
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-01
- Updated:    2017-06-25
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import *
-from qgis.PyQt import QtWidgets, uic, QtCore
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
-from qgis.PyQt.QtCore import Qt
-import qgis
-import sys
+import logging
 import os
-import copy
 
-from ..common_tools.global_parameters import *
-from ..common_tools.auxiliary_functions import *
-
-from ..common_tools import NumpyModel
-from ..matrix_procedures import LoadMatrixDialog
-from ..common_tools import ReportDialog
-
+import qgis
+from qgis.PyQt import uic, QtCore
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
+from qgis.core import QgsProject
 from .desire_lines_procedure import DesireLinesProcedure
-
+from ..common_tools import ReportDialog
+from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
+from ..common_tools.global_parameters import poly_types, numeric_types, point_types
+from ..matrix_procedures import LoadMatrixDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_DesireLines.ui"))
 
 
-class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
+class DesireLinesDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
-        QtWidgets.QDialog.__init__(self)
+        QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.error = None
@@ -55,6 +29,7 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.zones = None
         self.columns = None
         self.matrix_hash = {}
+        self.logger = logging.getLogger('AequilibraEGUI')
 
         self.setMaximumSize(QtCore.QSize(383, 385))
         self.resize(383, 385)
@@ -157,8 +132,9 @@ class DesireLinesDialog(QtWidgets.QDialog, FORM_CLASS):
     def job_finished_from_thread(self):
         try:
             QgsProject.instance().addMapLayer(self.worker_thread.result_layer)
-        except:
+        except Exception as e:
             self.worker_thread.report.append("Could not load desire lines to map")
+            self.logger.error(f"Could not load desire lines to map. {e.args}")
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()

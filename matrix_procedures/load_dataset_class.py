@@ -1,30 +1,9 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Loads datasets into AequilibraE binary files
- Purpose:    Implements dataset creation
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-08-15 (Initially as vector loading)
- Updated:    2018-07-01
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtCore import QVariant
 import numpy as np
-from ..common_tools.worker_thread import WorkerThread
+from aequilibrae.utils.worker_thread import WorkerThread
 import struct
 from aequilibrae.matrix import AequilibraeData
-from ..common_tools.global_parameters import *
+from ..common_tools.global_parameters import float_types, string_types, integer_types
 
 
 class LoadDataset(WorkerThread):

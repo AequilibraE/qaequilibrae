@@ -1,34 +1,12 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Loads matrix from file/layer
- Purpose:    Implements matrix loading
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-30
- Updated:    2018-07-01
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
 import os
 import tempfile
 import uuid
-from scipy.sparse import coo_matrix
 
 import numpy as np
-from qgis.PyQt.QtCore import *
-
 from aequilibrae.matrix import AequilibraeMatrix
-from ..common_tools.worker_thread import WorkerThread
+from scipy.sparse import coo_matrix
+
+from aequilibrae.utils.worker_thread import WorkerThread
 
 
 class LoadMatrix(WorkerThread):
@@ -104,8 +82,8 @@ class LoadMatrix(WorkerThread):
                     self.report.append(
                         "Numpy array needs to be 2 dimensional. Matrix provided has " + str(len(mat.shape[:]))
                     )
-            except:
-                self.report.append("Could not load array")
+            except Exception as e:
+                self.report.append(f"Could not load array. {e.args}")
 
         self.ProgressText.emit("")
         self.finished_threaded_procedure.emit("LOADED-MATRIX")
@@ -184,11 +162,8 @@ class MatrixReblocking(WorkerThread):
             new_mat["flow"][new_mat["flow"] == 0] = np.inf
 
             # Uses SciPy Sparse matrices to build the compact one
-            self.matrix.matrix[mat_name][:, :] = (
-                coo_matrix((new_mat["flow"], (new_mat["from"], new_mat["to"])), shape=(compact_shape, compact_shape))
-                .toarray()
-                .astype(np.float64)
-            )
+            mat = coo_matrix((new_mat["flow"], (new_mat["from"], new_mat["to"])), shape=(compact_shape, compact_shape))
+            self.matrix.matrix[mat_name][:, :] = mat.toarray().astype(np.float64)
 
             # In order to differentiate the zeros from the NaNs in the future matrix
             self.matrix.matrix[mat_name][self.matrix.matrix[mat_name] == 0] = np.nan

@@ -1,20 +1,20 @@
-import qgis
-from qgis.core import *
-import sys
 import os
+import sys
+from functools import partial
 from os.path import isdir, join
-from qgis.PyQt.QtCore import *
+
+from PyQt5.QtCore import Qt
+from aequilibrae.project.network.network import Network
+
+import qgis
+from aequilibrae import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
-from functools import partial
-from ..common_tools.global_parameters import *
-from ..common_tools.get_output_file_name import GetOutputFileName
-from ..common_tools.all_layers_from_toc import all_layers_from_toc
-from ..common_tools.auxiliary_functions import *
-from ..common_tools import ReportDialog
 from .creates_transponet_procedure import CreatesTranspoNetProcedure
-from aequilibrae.project.network.network import Network
-from aequilibrae import Parameters
+from ..common_tools import ReportDialog
+from ..common_tools.all_layers_from_toc import all_layers_from_toc
+from ..common_tools.auxiliary_functions import get_vector_layer_by_name, standard_path
+from ..common_tools.global_parameters import point_types, line_types
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_transponet_construction.ui"))
@@ -223,8 +223,8 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                     chb1.setEnabled(False)
                 final_table.setCellWidget(counter, 1, self.centers_item(chb1))
                 counter += 1
-        except:
-            pass
+        except Exception as e:
+            self.logger.error(e.args)
 
     def centers_item(self, item):
         cell_widget = QtWidgets.QWidget()

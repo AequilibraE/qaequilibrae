@@ -1,32 +1,34 @@
+import logging
 import os
-from qgis.core import QgsVectorLayer
-from qgis.core import QgsProject
-from qgis.PyQt.QtCore import QObject, QVariant
-from qgis.PyQt import QtWidgets, uic
-from ..common_tools import ReportDialog
-import qgis
+
 import numpy as np
+
+import qgis
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 from .tsp_procedure import TSPProcedure
+from ..common_tools import ReportDialog
 
-from ..common_tools.global_parameters import *
-
+logger = logging.getLogger('AequilibraEGUI')
 no_binary = False
 try:
     from aequilibrae.paths import Graph, path_computation
     from aequilibrae.paths.results import PathResults
     from aequilibrae.project import Project
-except:
+except Exception as e:
+    logger.error(f'Importing AequilibraE failed. {e.args}')
     no_binary = True
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/tsp.ui"))
 
 
 class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, project: Project, link_layer, node_layer):
+    def __init__(self, iface, project, link_layer, node_layer):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-        self.project = project
+        self.project = project  # type: Project
         self.link_layer = link_layer
         self.node_layer = node_layer
         self.all_modes = {}
@@ -66,7 +68,6 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         return sorted(c)
 
     def run(self):
-        error = None
         md = self.all_modes[self.cob_mode.currentText()]
 
         self.project.network.build_graphs()
@@ -134,7 +135,6 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
             dlg2.show()
             dlg2.exec_()
 
-
     def create_path_with_selection(self, all_links):
         f = 'link_id'
         t = " or ".join([f"{f}={k}" for k in all_links])
@@ -171,7 +171,6 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         symbol = vl.renderer().symbol()
         symbol.setWidth(1.6)
         qgis.utils.iface.mapCanvas().refresh()
-
 
         # Create TSP stops
         crs = self.node_layer.dataProvider().crs().authid()
@@ -216,6 +215,5 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         symbol = QgsMarkerSymbol.createSimple({'name': 'star', 'color': 'red'})
         symbol.setSize(6)
         nl.renderer().setSymbol(symbol)
-
 
         qgis.utils.iface.mapCanvas().refresh()

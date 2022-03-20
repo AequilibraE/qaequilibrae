@@ -1,33 +1,7 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Auxiliary interface for setting ramp colors for bandwidth maps
- Purpose:    Load GUI and user interface for the color ramp setting tool
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
-from qgscolorbuttonv2 import QgsColorButtonV2
-from qgsfieldcombobox import QgsFieldComboBox
-from qgsmaplayercombobox import QgsMapLayerComboBox
-
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-12-07
- Updated:
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
 import qgis
 from functools import partial
-from qgis.core import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtWidgets import *
+from qgis.core import QgsStyle
+from qgis.PyQt.QtWidgets import QDialog
 from qgis.PyQt import uic
 import sys
 import os

@@ -1,55 +1,27 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Creating desire lines
- Purpose:    Implements procedure for Computing Desire lines based on a Delaunay Triangulation network on
-             a separate thread
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-01
- Updated:    2018-04-03
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-from qgis.core import *
-from qgis.PyQt import QtWidgets, uic, QtCore
-from qgis.PyQt.QtCore import *
-import qgis
-from qgis.core import *
 import itertools
-import numpy as np
-import struct
 import logging
-from ..common_tools.auxiliary_functions import *
-from aequilibrae.paths import Graph
-from aequilibrae.matrix import AequilibraeMatrix
-from aequilibrae.paths.results import AssignmentResults
+import struct
 from collections import OrderedDict
-import math
-from numpy.lib import recfunctions as rfn
 
+import numpy as np
+from aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.paths import Graph
+from aequilibrae.paths.results import AssignmentResults
+from numpy.lib import recfunctions as rfn
+from qgis._core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFeature
 from scipy.spatial import Delaunay
 
-error = False
-
-no_binary = False
-from aequilibrae.paths import allOrNothing
-
-#
-# try:
-#
-# except:
-#     no_binary = True
-
+from qgis.PyQt.QtCore import QVariant
 from ..common_tools import WorkerThread
+from ..common_tools.auxiliary_functions import get_vector_layer_by_name
+
+logger = logging.getLogger('AequilibraEGUI')
+try:
+    no_binary = False
+    from aequilibrae.paths import allOrNothing
+except Exception as e:
+    no_binary = True
+    logger.error(f"Desire lines procedure - {e.args}")
 
 
 class DesireLinesProcedure(WorkerThread):
@@ -67,8 +39,8 @@ class DesireLinesProcedure(WorkerThread):
         self.nodes_to_indices = {matrix.index[x]: x for x in range(matrix.zones)}
         self.python_version = (8 * struct.calcsize("P"))
 
-        if error:
-            self.error = 'Scipy and/or Numpy not installed'
+        if no_binary:
+            self.error = 'No AequilibraE binaries present'
             self.report.append(self.error)
         self.procedure = "ASSIGNMENT"
 
@@ -76,7 +48,6 @@ class DesireLinesProcedure(WorkerThread):
         if self.error is None:
             # In case we have only one class
             unnasigned = 0
-            classes = self.matrix.matrix_view.shape[2]
 
             layer = get_vector_layer_by_name(self.layer)
             idx = layer.dataProvider().fieldNameIndex(self.id_field)
@@ -155,10 +126,10 @@ class DesireLinesProcedure(WorkerThread):
                 arrays = arrays.reshape(arrays.shape[1], arrays.shape[2])
 
                 base_types = [(x, np.float64) for x in ['from', 'to']]
-                base_types = base_types + [(x + '_AB', np.float64) for x in field_names]
+                base_types = base_types + [(f'{x}_AB', np.float64) for x in field_names]
 
-                dtypes_ab = [(x, np.int64) for x in ['from', 'to']] + [(x + '_AB', float) for x in field_names]
-                dtypes_ba = [(x, np.int64) for x in ['to', 'from']] + [(x + '_BA', float) for x in field_names]
+                dtypes_ab = [(x, np.int64) for x in ['from', 'to']] + [(f'{x}_AB', float) for x in field_names]
+                dtypes_ba = [(x, np.int64) for x in ['to', 'from']] + [(f'{x}_BA', float) for x in field_names]
 
                 ab_mat = np.array(arrays[arrays[:, 0] > arrays[:, 1], :])
                 ba_mat = np.array(arrays[arrays[:, 0] < arrays[:, 1], :])

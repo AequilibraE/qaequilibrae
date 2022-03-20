@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>875</width>
+    <width>1013</width>
     <height>494</height>
    </rect>
   </property>
@@ -31,6 +31,18 @@
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label_13">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="enabled">
@@ -163,7 +175,7 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>480</width>
+           <width>620</width>
            <height>0</height>
           </size>
          </property>
@@ -180,11 +192,16 @@
           <number>0</number>
          </property>
          <property name="columnCount">
-          <number>4</number>
+          <number>6</number>
          </property>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>27</number>
          </attribute>
+         <column>
+          <property name="text">
+           <string>Class name</string>
+          </property>
+         </column>
          <column>
           <property name="text">
            <string>Mode</string>
@@ -193,6 +210,11 @@
          <column>
           <property name="text">
            <string>User classes</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Fixed cost</string>
           </property>
          </column>
          <column>
@@ -242,7 +264,56 @@
           <string/>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
+          <item row="5" column="0" colspan="2">
+           <widget class="QCheckBox" name="chb_chosen_links">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Remove selected links from the graph</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cob_mode_for_class">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="1">
+           <widget class="QLineEdit" name="ln_class_name"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Passenger Vehicle Equivalent</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QCheckBox" name="chb_check_centroids">
+            <property name="text">
+             <string>Block flows through centroids</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="pce_setter">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -259,6 +330,9 @@
             <property name="decimals">
              <number>4</number>
             </property>
+            <property name="minimum">
+             <double>0.010000000000000</double>
+            </property>
             <property name="maximum">
              <double>1000000.000000000000000</double>
             </property>
@@ -267,16 +341,6 @@
             </property>
             <property name="value">
              <double>1.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="cob_mode_for_class">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
             </property>
            </widget>
           </item>
@@ -289,12 +353,12 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>mode</string>
+             <string>Network Mode</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="label_14">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -302,25 +366,12 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Passenger Vehicle Equivalent</string>
+             <string>Assignment class name</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="QCheckBox" name="chb_chosen_links">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Remove selected links from the graph</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_12">
+          <item row="9" column="0">
+           <widget class="QLabel" name="lbl_vot">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -332,8 +383,27 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="pce_setter_2">
+          <item row="7" column="0">
+           <widget class="QCheckBox" name="chb_fixed_cost">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>199999</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Include fixed cost</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
+           <widget class="QDoubleSpinBox" name="vot_setter">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -357,6 +427,21 @@
             </property>
             <property name="value">
              <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QComboBox" name="cob_fixed_cost">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
             </property>
            </widget>
           </item>
@@ -409,7 +494,7 @@
           <item row="0" column="2">
            <spacer name="horizontalSpacer">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -434,7 +519,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Mode</string>
+             <string>Class</string>
             </property>
            </widget>
           </item>
@@ -455,7 +540,7 @@
            </widget>
           </item>
           <item row="0" column="4">
-           <widget class="QComboBox" name="cob_skim_mode">
+           <widget class="QComboBox" name="cob_skim_class">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -485,6 +570,9 @@
           </item>
           <item row="0" column="6">
            <widget class="QPushButton" name="but_add_skim">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -505,7 +593,7 @@
           <item row="0" column="5">
            <spacer name="horizontalSpacer_2">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -552,7 +640,7 @@
          </attribute>
          <column>
           <property name="text">
-           <string>Mode</string>
+           <string>Traffic class</string>
           </property>
           <property name="font">
            <font>
@@ -935,10 +1023,16 @@
           <string>Algorithm</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Relative Gap</string>
+          <item row="0" column="0" colspan="6">
+           <widget class="QComboBox" name="cb_choose_algorithm">
+            <property name="minimumSize">
+             <size>
+              <width>240</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maxVisibleItems">
+             <number>10</number>
             </property>
            </widget>
           </item>
@@ -955,23 +1049,17 @@
             </property>
            </spacer>
           </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Relative Gap</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="3">
            <widget class="QLabel" name="label_11">
             <property name="text">
              <string>Maximum Iterations</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="6">
-           <widget class="QComboBox" name="cb_choose_algorithm">
-            <property name="minimumSize">
-             <size>
-              <width>240</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maxVisibleItems">
-             <number>10</number>
             </property>
            </widget>
           </item>
@@ -992,16 +1080,6 @@
               <width>100</width>
               <height>16777215</height>
              </size>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="QCheckBox" name="chb_check_centroids">
-            <property name="text">
-             <string>Block flows through centroids</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -1041,52 +1119,6 @@
             </property>
             <property name="text">
              <string>Capacity</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_13">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Fixed Cost</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QComboBox" name="cob_fixed_cost">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QCheckBox" name="checkBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>60</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Use</string>
             </property>
            </widget>
           </item>
@@ -1158,7 +1190,7 @@
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QLineEdit" name="line_matrix">
+           <widget class="QLineEdit" name="output_scenario_name">
             <property name="text">
              <string/>
             </property>

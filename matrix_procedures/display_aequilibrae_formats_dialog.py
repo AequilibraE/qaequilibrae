@@ -1,36 +1,16 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Loads AequilibraE datasets for visualization
- Purpose:    Allows visual inspection of data
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2017-10-02
- Updated:
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-import sys
-import logging
-import numpy as np
 import importlib.util as iutil
-from qgis.core import *
-from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
-from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QTableWidget, QPushButton, QVBoxLayout
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QPushButton
+import logging
+import os
 
-from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
-
-from ..common_tools.auxiliary_functions import *
+import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix, AequilibraeData
+
+import qgis
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
+from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
+from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
+from ..common_tools.auxiliary_functions import standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 
@@ -48,6 +28,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.data_to_show = None
         self.error = None
+        self.logger = logging.getLogger('AequilibraEGUI')
 
         if len(file_path) > 0:
             self.data_path = file_path
@@ -90,8 +71,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.data_to_show.load(self.data_path)
                 self.list_cores = self.data_to_show.names
                 self.list_indices = self.data_to_show.index_names
-            except:
+            except Exception as e:
                 self.error = "Could not load dataset"
+                self.logger.error(e.args)
                 self.exit_with_error()
 
         elif self.data_type == "OMX":

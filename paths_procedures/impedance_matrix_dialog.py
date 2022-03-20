@@ -1,18 +1,15 @@
 import importlib.util as iutil
-from aequilibrae.matrix import matrix_export_types
+import os
+
 from aequilibrae.paths import Graph, SkimResults, NetworkSkimming
-from aequilibrae.project import Project
 
 import qgis
-from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
+from common_tools.global_parameters import integer_types, float_types
+from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QTableWidgetItem, QAbstractItemView
-from qgis.core import *
-from ..common_tools import GetOutputFileName
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
 from ..common_tools import ReportDialog
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_impedance_matrix.ui"))
 

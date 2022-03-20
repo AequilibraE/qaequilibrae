@@ -1,23 +1,17 @@
-from os.path import isdir, join
-import sys
 import logging
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QHBoxLayout, QWidget, QLineEdit, QCheckBox
-from qgis.PyQt.QtWidgets import QSpacerItem, QProgressBar, QLabel, QVBoxLayout, QSizePolicy, QCheckBox, QGroupBox
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog
-import numpy as np
+import os
+from os.path import isdir, join
 
-from ..common_tools.global_parameters import *
-from ..common_tools.auxiliary_functions import *
-from ..common_tools import ReportDialog, GetOutputFileName, standard_path
+from PyQt5.QtCore import Qt
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm_utils.place_getter import placegetter
-from aequilibrae import Parameters
 
-# from .osm_utils.osm_params import *
-# from .osm_downloader import OSMDownloader
+from common_tools import reporter
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox
+from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
+from qgis.PyQt.QtWidgets import QWidget, QFileDialog
+from ..common_tools import ReportDialog, standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
@@ -147,8 +141,8 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         elif val[0] == "text":
             self.progress_label.setText(val[1])
         elif val[0] == "finished_threaded_procedure":
-            l = self.qgis_project.project.network.count_links()
-            n = self.qgis_project.project.network.count_nodes()
-            self.report.append(reporter(f'{l:,} links generated'))
-            self.report.append(reporter(f'{n:,} nodes generated'))
+            lines = self.qgis_project.project.network.count_links()
+            nodes = self.qgis_project.project.network.count_nodes()
+            self.report.append(reporter(f'{lines:,} links generated'))
+            self.report.append(reporter(f'{nodes:,} nodes generated'))
             self.leave()

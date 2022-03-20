@@ -1,33 +1,9 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Compute GIS tags
- Purpose:    Implements computation of GIS tags on a separate thread
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2014-03-19
- Updated:    2018-12-28
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import *
-
-# from PyQt4.QtCore import *
-from qgis.PyQt.QtCore import *
 import numpy as np
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
-from ..common_tools.worker_thread import WorkerThread
-from ..common_tools.global_parameters import *
+
+from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
+from ..common_tools.auxiliary_functions import get_vector_layer_by_name
+from ..common_tools.global_parameters import multi_line, multi_point, line_types, point_types
+from aequilibrae.utils.worker_thread import WorkerThread
 
 
 class SimpleTAG(WorkerThread):
@@ -135,7 +111,7 @@ class SimpleTAG(WorkerThread):
         for i, feat in enumerate(self.to_layer.getFeatures()):
             self.ProgressValue.emit(i)
             if self.all_attr[feat.id()] is not None:
-                a = self.to_layer.dataProvider().changeAttributeValues({feat.id(): {fid: self.all_attr[feat.id()]}})
+                _ = self.to_layer.dataProvider().changeAttributeValues({feat.id(): {fid: self.all_attr[feat.id()]}})
 
         self.to_layer.commitChanges()
         self.to_layer.updateFields()
@@ -209,7 +185,3 @@ class SimpleTAG(WorkerThread):
                         else:
                             self.all_attr[feat.id()] = self.from_val[n]
                             break
-
-
-if __name__ == "__main__":
-    main()

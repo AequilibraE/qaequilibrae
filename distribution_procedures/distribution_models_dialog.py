@@ -1,26 +1,24 @@
 import importlib.util as iutil
-from qgis.core import *
-from qgis.PyQt import QtWidgets, uic, QtCore
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
-from qgis.PyQt.QtCore import Qt
-import qgis
-
+import os
 from collections import OrderedDict
 from functools import partial
+
 import numpy as np
-import os
-import yaml
-from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
-from ..common_tools.auxiliary_functions import *
-from ..common_tools import ReportDialog
-from ..common_tools import GetOutputFileName
 from aequilibrae.distribution import SyntheticGravityModel
 from aequilibrae.distribution.synthetic_gravity_model import valid_functions
 from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
+
+import qgis
 from aequilibrae import logger
-from .ipf_procedure import IpfProcedure
-from .calibrate_gravity_procedure import CalibrateGravityProcedure
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
 from .apply_gravity_procedure import ApplyGravityProcedure
+from .calibrate_gravity_procedure import CalibrateGravityProcedure
+from .ipf_procedure import IpfProcedure
+from ..common_tools import GetOutputFileName
+from ..common_tools import ReportDialog
+from ..common_tools.auxiliary_functions import standard_path
+from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_distribution.ui"))
 spec = iutil.find_spec("openmatrix")
@@ -201,7 +199,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if dataset_name is not None:
                 data_name = os.path.splitext(os.path.basename(dataset_name))[0]
                 data_name = self.find_non_conflicting_name(data_name, self.datasets)
-                self.datasets[data_name] = dataset = dlg2.dataset
+                self.datasets[data_name] = dlg2.dataset
                 self.add_to_table(self.datasets, self.table_datasets)
                 self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
                 self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)

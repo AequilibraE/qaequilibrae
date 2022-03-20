@@ -1,21 +1,15 @@
-import qgis
-from qgis.core import *
-import sys
 import os
-from os.path import isdir, join
+import sys
+
 import pandas as pd
-from qgis.PyQt.QtCore import *
+from PyQt5.QtCore import Qt
+
+import qgis
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QHBoxLayout
-from functools import partial
-from ..common_tools.global_parameters import *
-from ..common_tools.get_output_file_name import GetOutputFileName
-from ..common_tools.all_layers_from_toc import all_layers_from_toc
-from ..common_tools.auxiliary_functions import *
-from ..common_tools import ReportDialog
+from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
+from qgis.core import QgsMapLayerProxyModel
 from .add_zones_procedure import AddZonesProcedure
-from aequilibrae.project.network.network import Network
-from aequilibrae import Parameters
+from ..common_tools.auxiliary_functions import standard_path
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_add_zoning.ui"))

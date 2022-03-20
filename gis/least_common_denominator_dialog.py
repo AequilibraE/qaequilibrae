@@ -1,41 +1,12 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Least commmon denominator
- Purpose:    Loads GUI for computing least common denominator between two polygon layers
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-09-26
- Updated:    30/09/2016
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import QgsProject
-from qgis.PyQt.QtCore import QObject
-from qgis.PyQt import QtWidgets, uic
-import qgis
-import sys
 import os
-
-# For the GIS tools portion
-from .least_common_denominator_procedure import LeastCommonDenominatorProcedure
-
-from ..common_tools.global_parameters import *
-from ..common_tools.auxiliary_functions import get_vector_layer_by_name
-from ..common_tools.global_parameters import *
 from functools import partial
 
-#####################################################################################################
-###################################        SIMPLE TAG          ######################################
+import qgis
+from common_tools.global_parameters import poly_types, multi_poly, point_types
+from qgis.PyQt import QtWidgets, uic
+from qgis.core import QgsProject
+from .least_common_denominator_procedure import LeastCommonDenominatorProcedure
+from ..common_tools.auxiliary_functions import get_vector_layer_by_name
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_least_common_denominator.ui"))
 
@@ -107,10 +78,10 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         error = None
         if (
-            self.fromlayer.currentIndex() < 0
-            or self.fromfield.currentIndex() < 0
-            or self.tolayer.currentIndex() < 0
-            or self.tofield.currentIndex() < 0
+                self.fromlayer.currentIndex() < 0
+                or self.fromfield.currentIndex() < 0
+                or self.tolayer.currentIndex() < 0
+                or self.tofield.currentIndex() < 0
         ):
             error = "ComboBox with ilegal value"
 

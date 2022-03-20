@@ -1,42 +1,39 @@
 import importlib.util as iutil
+import logging
+import os
+import re
+import sys
+from tempfile import gettempdir
+
 import numpy as np
 import pandas as pd
-import sys
-import re
-from aequilibrae.matrix import AequilibraeMatrix
+from PyQt5.QtCore import Qt
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
-from aequilibrae.paths.vdf import VDF, all_vdf_functions
-from collections import OrderedDict
-from functools import partial
+from aequilibrae.paths.vdf import all_vdf_functions
 
 import qgis
 from aequilibrae import Parameters
-from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from qgis.core import *
-from .load_select_link_query_builder_dialog import LoadSelectLinkQueryBuilderDialog
-from ..common_tools import GetOutputFolderName, GetOutputFileName
-from ..common_tools import ReportDialog, only_str
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
-from ..matrix_procedures import LoadMatrixDialog
+from common_tools import standard_path
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 from ..common_tools import PandasModel
+from ..common_tools import ReportDialog
 
 no_binary = False
+logger = logging.getLogger('AequilibraEGUI')
 try:
     from aequilibrae.paths import Graph, AssignmentResults, allOrNothing
     from aequilibrae.project import Project
-except:
+except Exception as e:
+    logger.error(f'Importing AequilibraE failed. {e.args}')
     no_binary = True
 
 # Checks if we can display OMX
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None
 if has_omx:
-    import openmatrix as omx
+    pass
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_traffic_assignment.ui"))
@@ -72,6 +69,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_add_skim.clicked.connect(self.__add_skimming)
         self.but_add_class.clicked.connect(self.__create_traffic_class)
         self.cob_matrices.currentIndexChanged.connect(self.change_matrix_selected)
+        self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
+        self.chb_fixed_cost.toggled.connect(self.set_fixed_cost_use)
 
         self.do_assignment.clicked.connect(self.run)
         self.cancel_all.clicked.connect(self.exit_procedure)
@@ -125,24 +124,50 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.__change_vdf()
         self.change_matrix_selected()
+        self.change_class_name()
+        self.set_fixed_cost_use()
+
+    def set_fixed_cost_use(self):
+        for item in [self.cob_fixed_cost, self.lbl_vot, self.vot_setter]:
+            item.setEnabled(self.chb_fixed_cost.isChecked())
+
+        if self.chb_fixed_cost.isChecked():
+            dt = self.project.conn.execute("pragma table_info(modes)").fetchall()
+            if 'vot' in [x[1] for x in dt]:
+                sql = "select vot from modes where mode_id=?"
+                v = self.project.conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()
+                self.vot_setter.setValue(v[0])
+
+    def change_class_name(self):
+        nm = self.cob_mode_for_class.currentText()
+        self.ln_class_name.setText(nm[:-4])
+        self.set_fixed_cost_use()
+
+        dt = self.project.conn.execute("pragma table_info(modes)").fetchall()
+        if 'pce' in [x[1] for x in dt]:
+            sql = "select pce from modes where mode_id=?"
+            v = self.project.conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()
+            self.pce_setter.setValue(v[0])
 
     def change_matrix_selected(self):
         mat_name = self.cob_matrices.currentText()
+        self.but_add_class.setEnabled(False)
         if not mat_name:
             return
 
-        if ' (OMX not available)' in mat_name:
+        if ' (OMX not available)' in mat_name or ' (file missing)' in mat_name:
             df = pd.DataFrame([])
-            self.but_add_class.setEnabled(False)
         else:
+            print(mat_name)
             matrix = self.project.matrices.get_matrix(mat_name)
             cores = matrix.names
 
-            totals = [f'{np.nansum(matrix.matrix[x]):,.1f}' for x in cores]
+            totals = [f'{np.nansum(matrix.get_matrix(x)):,.1f}' for x in cores]
             df = pd.DataFrame({'matrix_core': cores, 'total': totals})
             self.but_add_class.setEnabled(True)
         matrices_model = PandasModel(df)
         self.tbl_core_list.setModel(matrices_model)
+        self.tbl_core_list.setSelectionBehavior(QAbstractItemView.SelectRows)
 
     def __populate_project_info(self):
         table = self.tbl_project_properties
@@ -159,8 +184,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         for x in curr.fetchall():
             modes.append(f'{x[0]} ({x[1]})')
             self.all_modes[f'{x[0]} ({x[1]})'] = x[1]
-            self.skims[f'{x[0]} ({x[1]})'] = []
-            self.traffic_classes[f'{x[0]} ({x[1]})'] = None
+            self.skims[x[1]] = []
 
         table.setItem(1, 0, QTableWidgetItem('Modes'))
         table.setItem(1, 1, QTableWidgetItem(', '.join(modes)))
@@ -177,6 +201,10 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             cob.addItems(flds)
 
         self.matrices = self.project.matrices.list()
+        for idx, rec in self.matrices.iterrows():
+            if not self.project.matrices.check_exists(rec['name']):
+                self.matrices.loc[idx, 'name'] += ' (file missing)'
+
         if not has_omx:
             filter = self.matrices.file_name.str.contains('.omx', flags=re.IGNORECASE, regex=True)
             self.matrices.loc[filter, 'name'] += ' (OMX not available)'
@@ -184,9 +212,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.cob_matrices.addItems(self.matrices['name'].tolist())
 
     def __edit_skimming_modes(self):
-        self.cob_skim_mode.clear()
-        for mode in self.current_modes:
-            self.cob_skim_mode.addItem(mode)
+        self.cob_skim_class.clear()
+        for class_name in set(self.traffic_classes.keys()):
+            self.cob_skim_class.addItem(class_name)
 
     def __change_vdf(self):
         table = self.tbl_vdf_parameters
@@ -211,32 +239,51 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             table.setCellWidget(i, 2, val_fld)
 
     def __create_traffic_class(self):
+        mat_name = self.cob_matrices.currentText()
+        if not mat_name:
+            return
+
+        class_name = self.ln_class_name.text()
+        if class_name in self.traffic_classes:
+            qgis.utils.iface.messageBar().pushMessage("Class name already used", '', level=2)
+
+        self.but_add_skim.setEnabled(True)
+
+        matrix = self.project.matrices.get_matrix(mat_name)
+
+        sel = self.tbl_core_list.selectionModel().selectedRows()
+        if not sel:
+            return
+        rows = [s.row() for s in sel if s.column() == 0]
+        user_classes = [matrix.names[i] for i in rows]
+        matrix.computational_view(user_classes)
+
         mode = self.cob_mode_for_class.currentText()
-        if len(mode) == 0:
-            return
-        table = self.table_matrix_list
-        user_classes = []
-        for i in range(table.rowCount()):
-            if table.cellWidget(i, 1).isChecked():
-                user_classes.append(only_str(table.item(i, 0).text()))
-        if len(user_classes) == 0:
-            return
+        mode_id = self.all_modes[mode]
+        if mode_id not in self.project.network.graphs:
+            self.project.network.build_graphs(modes=[mode_id])
 
-        self.matrix.computational_view(user_classes)
-
-        self.matrix.set_index(self.cob_matrix_indices.currentText())
-
-        graph = self.project.network.graphs[self.all_modes[mode]]
+        graph = self.project.network.graphs[mode_id]
 
         if self.chb_chosen_links.isChecked():
+            graph = self.project.network.graphs.pop(mode_id)
             idx = self.link_layer.dataProvider().fieldNameIndex('link_id')
             remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
             graph.exclude_links(remove)
 
+        graph.set_blocked_centroid_flows(self.chb_check_centroids.isChecked())
+        assigclass = TrafficClass(class_name, graph, matrix)
         pce = self.pce_setter.value()
-        assigclass = TrafficClass(graph, self.matrix)
         assigclass.set_pce(pce)
-        self.traffic_classes[mode] = assigclass
+
+        fcost = ''
+        if self.chb_fixed_cost.isChecked():
+            vot = self.vot_setter.value()
+            assigclass.set_vot(vot)
+            assigclass.set_fixed_cost(self.cob_fixed_cost.currentText())
+            fcost = f'{vot:,.4f}*{self.cob_fixed_cost.currentText()}'
+
+        self.traffic_classes[class_name] = assigclass
 
         num_classes = len([x for x in self.traffic_classes.values() if x is not None])
 
@@ -244,49 +291,37 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         table.setRowCount(num_classes)
 
         idx = num_classes - 1
-        mode_item = QTableWidgetItem(mode)
-        mode_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-        table.setItem(idx, 0, mode_item)
-
-        classes_item = QTableWidgetItem(str(len(user_classes)))
-        classes_item.setTextAlignment(Qt.AlignHCenter)
-        classes_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-        table.setItem(idx, 1, classes_item)
-
-        pce_item = QTableWidgetItem(str(round(pce, 4)))
-        pce_item.setTextAlignment(Qt.AlignHCenter)
-        pce_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-        table.setItem(idx, 2, pce_item)
+        for i, txt in enumerate([class_name, mode, str(len(user_classes)), fcost, str(round(pce, 4))]):
+            item = QTableWidgetItem(txt)
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            table.setItem(idx, i, item)
 
         but = QPushButton()
         but.setText('Remove')
         but.clicked.connect(self.__remove_class)
         but.setEnabled(False)
-        table.setCellWidget(idx, 3, but)
+        table.setCellWidget(idx, 5, but)
 
-        idx = self.cob_mode_for_class.currentIndex()
-        self.cob_mode_for_class.removeItem(idx)
         self.current_modes.append(mode)
         self.__edit_skimming_modes()
+        self.skims[class_name] = []
 
     def __add_skimming(self):
 
         field = self.cob_skims_available.currentText()
-        mode = self.cob_skim_mode.currentText()
-        if field in self.skims[mode]:
+        traffic_class = self.traffic_classes[self.cob_skim_class.currentText()]
+        name = traffic_class.__id__
+        if field in self.skims[name]:
             return
 
         table = self.skim_list_table
         idx = table.rowCount()
         table.setRowCount(idx + 1)
 
-        mode_item = QTableWidgetItem(mode)
-        mode_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-        table.setItem(idx, 0, mode_item)
-
-        classes_item = QTableWidgetItem(field)
-        classes_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-        table.setItem(idx, 1, classes_item)
+        for i, val in enumerate([self.cob_skim_class.currentText(), field]):
+            item = QTableWidgetItem(val)
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            table.setItem(idx, i, item)
 
         last_chb = QCheckBox()
         last_chb.setChecked(True)
@@ -296,7 +331,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         blended_chb.setChecked(True)
         table.setCellWidget(idx, 3, blended_chb)
 
-        self.skims[mode].append(field)
+        self.skims[name].append(field)
 
     def __remove_class(self):
         self.__edit_skimming_modes()
@@ -315,52 +350,55 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def run(self):
-        if self.check_data():
-            algorithm = self.cb_choose_algorithm.currentText()
-            self.miter = int(self.max_iter.text())
-            if algorithm != 'all-or-nothing':
-                for q in [self.progressbar1, self.progress_label1]:
-                    q.setVisible(True)
-                self.progressbar1.setRange(0, self.miter)
-
-            for q in [self.progressbar0, self.progress_label0]:
-                q.setVisible(True)
-                self.progressbar0.setRange(0, self.project.network.count_centroids())
-
-            if algorithm == 'all-or-nothing':
-                cls = [x for x in self.traffic_classes.values() if x is not None][0]
-                self.worker_thread = allOrNothing(cls.matrix, cls.graph, cls.results)
-            else:
-                self.assignment.set_classes([x for x in self.traffic_classes.values() if x is not None])
-                self.assignment.set_vdf(self.cob_vdf.currentText())
-                self.assignment.set_vdf_parameters(self.vdf_parameters)
-                self.assignment.set_capacity_field(self.cob_capacity.currentText())
-                self.assignment.set_time_field(self.cob_ffttime.currentText())
-                self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
-                self.assignment.max_iter = self.miter
-                self.assignment.rgap_target = float(self.rel_gap.text())
-                self.worker_thread = self.assignment.assignment
-            self.run_thread()
-        else:
+        if not self.check_data():
             qgis.utils.iface.messageBar().pushMessage("Input error", self.error, level=3)
 
+        algorithm = self.cb_choose_algorithm.currentText()
+        self.miter = int(self.max_iter.text())
+        if algorithm != 'all-or-nothing':
+            for q in [self.progressbar1, self.progress_label1]:
+                q.setVisible(True)
+            self.progressbar1.setRange(0, self.miter)
+
+        for q in [self.progressbar0, self.progress_label0]:
+            q.setVisible(True)
+            self.progressbar0.setRange(0, self.project.network.count_centroids())
+
+        self.assignment.set_classes(list(self.traffic_classes.values()))
+        self.assignment.set_vdf(self.cob_vdf.currentText())
+        self.assignment.set_vdf_parameters(self.vdf_parameters)
+        self.assignment.set_capacity_field(self.cob_capacity.currentText())
+        self.assignment.set_time_field(self.cob_ffttime.currentText())
+        self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
+        self.assignment.max_iter = self.miter
+        self.assignment.rgap_target = float(self.rel_gap.text())
+        self.worker_thread = self.assignment.assignment
+        self.run_thread()
+
     def check_data(self):
-        # TODO: AoN needs to be single class
         self.error = None
 
-        num_classes = len([x for x in self.traffic_classes.values() if x is not None])
+        num_classes = len(self.traffic_classes.values())
         if not num_classes:
             self.error = "No traffic classes to assign"
             return False
 
-        if self.output_path is None:
-            self.error = "Parameters for output missing"
+        self.scenario_name = self.output_scenario_name.text()
+        if not self.scenario_name:
+            self.error = "Missing scenario name"
             return False
 
-        self.temp_path = os.path.join(self.output_path, "temp")
-        if not os.path.exists(self.temp_path):
-            os.makedirs(self.temp_path)
-        return self.change_graph_settings()
+        if not self.scenario_name:
+            self.error = "Missing scenario name"
+            return False
+
+        sql = 'Select count(*) from results where table_name=?'
+        if sum(self.project.conn.execute(sql, [self.scenario_name]).fetchone()):
+            self.error = "Result table name already exists. Choose a new name"
+            return False
+
+        self.temp_path = gettempdir()
+        return self.set_assignment()
 
     def signal_handler(self, val):
         if val[0] == "zones finalized":
@@ -384,65 +422,10 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
     # Save link flows to disk
     def produce_all_outputs(self):
-        fn = os.path.join(self.output_path, "skims.aem")
-
-        fn_omx = os.path.join(self.output_path, "skims.omx")
-        if self.cb_choose_algorithm.currentText() == 'all-or-nothing':
-            cls = [x for x in self.traffic_classes.values() if x is not None][0]
-            cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.csv"), output="loads")
-            cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.aed"), output="loads")
-            if has_omx:
-                cls.results.skims.export(fn_omx)
-            else:
-                cls.results.skims.export(fn)
-            return
-
-        table = self.skim_list_table
-        skim_names = []
-        for i in range(table.rowCount()):
-            mode = self.all_modes[table.item(i, 0).text()]
-            field = table.item(i, 1).text()
-            last_iter = table.cellWidget(i, 2).isChecked()
-            blended = table.cellWidget(i, 3).isChecked()
-            if last_iter:
-                skim_names.append(f'{field}_{mode}_final')
-            if blended:
-                skim_names.append(f'{field}_{mode}_blended')
-
-        for cls in self.assignment.classes:
-            cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.csv"), output="loads")
-            cls.results.save_to_disk(os.path.join(self.output_path, f"link_flows_{cls.graph.mode}.aed"), output="loads")
-
-        # cls.results.skims.export(os.path.join(self.output_path, f'blended_skims_{cls.graph.mode}.aed'))
-        if skim_names:
-            args = {'file_name': fn,
-                    'zones': self.project.network.count_centroids(),
-                    'matrix_names': skim_names}
-            skims = AequilibraeMatrix()
-            skims.create_empty(**args)
-
-            for i in range(table.rowCount()):
-                mode_name = table.item(i, 0).text()
-                mode = self.all_modes[mode_name]
-                field = table.item(i, 1).text()
-                last_iter = table.cellWidget(i, 2).isChecked()
-                blended = table.cellWidget(i, 3).isChecked()
-
-                cls = self.traffic_classes[mode_name]
-
-                if last_iter:
-                    mat_name = f'{field}_{mode}_final'
-                    skims.matrix[mat_name][:, :] = cls._aon_results.skims.matrix[field][:, :]
-                if blended:
-                    mat_name = f'{field}_{mode}_blended'
-                    skims.matrix[mat_name][:, :] = cls.results.skims.matrix[field][:, :]
-
-            skims.index[:] = cls.matrix.index[:]
-            if has_omx:
-                skims.export(fn_omx)
-                skims.close()
-                del skims
-                os.unlink(fn)
+        self.assignment.save_results(self.scenario_name)
+        if self.skimming:
+            format = 'omx' if has_omx else 'aem'
+            self.assignment.save_skims(self.scenario_name, which_ones="all", format=format)
 
     # def click_button_inside_the_list(self, purpose):
     #     if purpose == "select link":
@@ -460,7 +443,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     #     elif purpose == "Link flow extraction":
     #         self.tot_link_flow_extract -= 1
 
-    def change_graph_settings(self):
+    def set_assignment(self):
         for k, v in self.skims.items():
             if not len(v):
                 continue
@@ -469,8 +452,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             graph.set_graph(self.cob_ffttime.currentText())
             graph.set_skimming(v)
             graph.set_blocked_centroid_flows(self.chb_check_centroids.isChecked())
-            matrix = c.matrix
-            self.traffic_classes[k] = TrafficClass(graph, matrix)
 
         table = self.tbl_vdf_parameters
         for i in range(table.rowCount()):
@@ -481,8 +462,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             else:
                 try:
                     val = float(val)
-                except:
+                except Exception as e:
                     self.error = 'VDF parameter is not numeric'
+                    self.logger = f'Tried to set a VDF parameter not numeric. {e.args}'
                     return False
             self.vdf_parameters[k] = val
 

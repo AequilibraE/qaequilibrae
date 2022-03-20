@@ -1,35 +1,14 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Network preparation
- Purpose:    Loads GUI for preparing networks (extracting nodes A and B from links)
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2014-03-19
- Updated:    21/12/2016
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import *
-import qgis
-from qgis.PyQt.QtCore import *
-from qgis.PyQt import QtWidgets, uic
-
+import os
 import sys
-from ..common_tools.global_parameters import *
-from ..common_tools.auxiliary_functions import *
-from ..common_tools import ReportDialog
 
+from qgis._core import QgsProject
+
+import qgis
+from common_tools import standard_path, get_vector_layer_by_name
+from common_tools.global_parameters import line_types, point_types
+from qgis.PyQt import QtWidgets, uic
 from .Network_preparation_procedure import NetworkPreparationProcedure
+from ..common_tools import ReportDialog
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 sys.modules["qgsfieldcombobox"] = qgis.gui
@@ -105,7 +84,7 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
             for i in for_using_existing_nodes:
                 i.setVisible(False)
 
-            self.cbb_node_layer.hideEvent
+            # self.cbb_node_layer.hideEvent()
             self.np_node_start.setEnabled(True)
 
     def job_finished_from_thread(self, success):

@@ -1,11 +1,7 @@
-from ortools.constraint_solver import routing_enums_pb2
-from ortools.constraint_solver import pywrapcp
-from os.path import join
 from aequilibrae.paths import NetworkSkimming, SkimResults
-
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
-from ..common_tools.worker_thread import WorkerThread
+from aequilibrae.utils.worker_thread import WorkerThread
+from ortools.constraint_solver import pywrapcp
+from ortools.constraint_solver import routing_enums_pb2
 
 
 class TSPProcedure(WorkerThread):

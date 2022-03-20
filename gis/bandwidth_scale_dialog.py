@@ -1,34 +1,9 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Accessory interface for the bandwidth map
- Purpose:    Set scale for bandwith map
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2017-7-24
- Updated:
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
 import copy
-import qgis
-from qgis.core import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtWidgets import *
+import os
+
 from qgis.PyQt import uic
-
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
-
+from qgis.PyQt.QtWidgets import QDialog, QSlider
+from ..common_tools.global_parameters import integer_types, float_types
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_bandwitdth_scale.ui"))
 

@@ -1,49 +1,30 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Shortest path computation
- Purpose:    Dialog for computing and displaying shortest paths based on clicks on the map
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-30
- Updated:    2020-02-08
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
+import logging
+import os
 import sys
 
-import qgis
-from qgis.core import QgsVectorLayer
 from aequilibrae.paths.results import PathResults
+from aequilibrae.project import Project
+from qgis._core import QgsProject, QgsVectorLayer, QgsSpatialIndex
+
+import qgis
 from qgis.PyQt import QtCore
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtWidgets import *
-from qgis.core import *
 from qgis.utils import iface
-from aequilibrae.project import Project
 from .point_tool import PointTool
-from ..common_tools.auxiliary_functions import *
+from ..common_tools.auxiliary_functions import standard_path
+from ..common_tools import LoadGraphLayerSettingDialog
 
 no_binary = False
+logger = logging.getLogger('AequilibraEGUI')
 try:
     from aequilibrae.paths import path_computation
-except:
+except Exception as e:
+    logger.error(f'Importing AequilibraE failed. {e.args}')
     no_binary = True
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_compute_path.ui"))
-
-from ..common_tools import LoadGraphLayerSettingDialog
 
 
 class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -53,7 +34,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         # QtWidgets.QDialog.__init__(self)
         QtWidgets.QDialog.__init__(self)
         self.iface = qgis_project.iface
-        self.project = qgis_project.project # type: Project
+        self.project = qgis_project.project  # type: Project
         self.setupUi(self)
         self.field_types = {}
         self.centroids = None
@@ -88,7 +69,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             self.mode = dlg2.mode
             self.minimize_field = dlg2.minimize_field
 
-            if not self.mode in self.project.network.graphs:
+            if self.mode not in self.project.network.graphs:
                 self.project.network.build_graphs(modes=[self.mode])
 
             if dlg2.remove_chosen_links:
@@ -163,8 +144,8 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             index_field = self.node_fields.index('node_id')
             node_actual_id = node_id[index_field]
             return node_actual_id
-        except:
-            pass
+        except Exception as e:
+            logger.error(e.args)
 
     def produces_path(self):
         self.to_but.setEnabled(True)
@@ -190,8 +171,8 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def create_path_with_scratch_layer(self):
         crs = self.line_layer.dataProvider().crs().authid()
-        vl = QgsVectorLayer("LineString?crs={}".format(crs), self.path_from.text() +
-                            " to " + self.path_to.text(), "memory")
+        vl = QgsVectorLayer("LineString?crs={}".format(crs), f'{self.path_from.text()} to {self.path_to.text()}',
+                            "memory")
         pr = vl.dataProvider()
 
         # add fields

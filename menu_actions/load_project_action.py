@@ -1,8 +1,10 @@
 from aequilibrae.project import Project
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QDockWidget, QAction, QVBoxLayout, QToolBar, QToolButton, QMenu
-from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QTableWidget
-from ..common_tools.auxiliary_functions import standard_path
+
+import qgis
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
+from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
+from ..common_tools.auxiliary_functions import standard_path
 
 
 def run_load_project(qgis_project):

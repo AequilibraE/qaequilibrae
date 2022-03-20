@@ -1,35 +1,9 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Main interface for adding centroid connectors
- Purpose:    Load GUI and user interface for the centroid addition procedure
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-30
- Updated:    2020-01-30
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
+import os
+import sys
 
 import qgis
-from qgis.core import *
-from qgis.PyQt.QtCore import *
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtWidgets import *
-
-from ..common_tools.auxiliary_functions import *
-import sys
-import os
-from ..common_tools.global_parameters import *
-
+from qgis.core import QgsMapLayerProxyModel
 from .adds_connectors_procedure import AddsConnectorsProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
@@ -85,7 +59,6 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         source = 'layer' if self.rdo_layer.isChecked() else source
 
         num_connectors = self.connectors.value()
-
 
         link_types = [item.text() for item in self.lst_link_types.selectedItems()]
         link_types = ''.join([self.link_types[lt] for lt in link_types])

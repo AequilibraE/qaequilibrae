@@ -1,12 +1,13 @@
+import glob
+import importlib.util as iutil
 import os
 import sys
 import tempfile
-import glob
-import importlib.util as iutil
 from functools import partial
+
+import qgis
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QListWidget, QListWidgetItem, QAbstractItemView, QAction, \
     QVBoxLayout, QToolBar, QToolButton, QMenu, QPushButton, QTabWidget, QLabel, QCheckBox
-import qgis
 from qgis.core import QgsWkbTypes, QgsAnnotationManager, QgsProject, QgsGeometry, QgsRectangle, QgsTextAnnotation
 from qgis.gui import QgsMapTool, QgsRubberBand
 
@@ -45,6 +46,7 @@ from .matrix_procedures import LoadDatasetDialog
 from .public_transport_procedures import GtfsImportDialog
 
 from warnings import warn
+from aequilibrae.project.database_connection import ENVIRON_VAR
 
 no_binary = False
 try:
@@ -77,6 +79,9 @@ if has_ortools:
 class AequilibraEMenu:
 
     def __init__(self, iface):
+        # Closes AequilibraE projects eventually opened in memory
+        if ENVIRON_VAR in os.environ:
+            del os.environ[ENVIRON_VAR]
         self.geo_layers_list = ['links', 'nodes', 'zones']
         self.translator = None
         self.iface = iface
@@ -116,7 +121,6 @@ class AequilibraEMenu:
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
         self.add_menu_action('Data', 'Display project data', partial(run_show_project_data, self))
-
 
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -220,17 +224,17 @@ class AequilibraEMenu:
         # helpButton.clicked.connect(self.run_help)
         # self.toolbar.addWidget(helpButton)
         #
-        # if no_binary:
-        #     binariesButton = QToolButton()
-        #     binariesButton.setText(self.trlt('Download binaries'))
-        #     binariesButton.clicked.connect(self.run_binary_download)
-        #     self.toolbar.addWidget(binariesButton)
-        #
-        # if not extra_packages:
-        #     xtrapkgButton = QToolButton()
-        #     xtrapkgButton.setText(self.trlt('Install extra packages'))
-        #     xtrapkgButton.clicked.connect(self.install_extra_packages)
-        #     self.toolbar.addWidget(xtrapkgButton)
+        if no_binary:
+            binariesButton = QToolButton()
+            binariesButton.setText(self.trlt('Download binaries'))
+            binariesButton.clicked.connect(self.run_binary_download)
+            self.toolbar.addWidget(binariesButton)
+
+        if not extra_packages:
+            xtrapkgButton = QToolButton()
+            xtrapkgButton.setText(self.trlt('Install extra packages'))
+            xtrapkgButton.clicked.connect(self.install_extra_packages)
+            self.toolbar.addWidget(xtrapkgButton)
 
         # ########################################################################
         # #################        PROJECT MANAGER       #########################
@@ -392,7 +396,6 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-
     def run_tsp(self):
         if self.project is None:
             self.show_message_no_project()
@@ -444,5 +447,3 @@ class AequilibraEMenu:
 
     def message_project_already_open(self):
         self.iface.messageBar().pushMessage("You need to close the project currently open first", level=2, duration=10)
-
-

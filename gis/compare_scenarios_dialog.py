@@ -1,32 +1,12 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Main interface for comparing assignment scenarios
- Purpose:    Load GUI and user interface for the scenario comparison procedure
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-12-01
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
+import os
+import sys
+from functools import partial
 
 import qgis
-from functools import partial
-from qgis.core import *
-from qgis.PyQt.QtCore import *
 from qgis.PyQt import QtGui, QtWidgets, uic
-import sys
-
-from ..common_tools.global_parameters import *
-from ..common_tools.auxiliary_functions import *
+from qgis.core import *
+from ..common_tools.auxiliary_functions import get_parameter_chain
+from ..common_tools.auxiliary_functions import get_vector_layer_by_name
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgsmaplayercombobox"] = qgis.gui
@@ -261,7 +241,3 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         str_color = str(some_color_btn.color().getRgb())
         str_color = str_color.replace("(", "")
         return "'" + str_color.replace(")", "") + "'"
-
-
-if __name__ == "__main__":
-    main()
