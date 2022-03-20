@@ -16,7 +16,7 @@ from aequilibrae.project.database_connection import ENVIRON_VAR
 import qgis
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtWidgets import QVBoxLayout
+from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
 from qgis.core import QgsProject
@@ -61,6 +61,12 @@ has_ortools = spec is not None
 if has_ortools:
     from .routing_procedures import TSPDialog
 
+if hasattr(Qt, 'AA_EnableHighDpiScaling'):
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+
+if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
 
 class AequilibraEMenu:
 
@@ -80,6 +86,7 @@ class AequilibraEMenu:
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
+        self.set_font(self.toolbar)
         self.toolbar.setOrientation(2)
 
         self.menuActions = {'Project': [],
@@ -268,9 +275,11 @@ class AequilibraEMenu:
                     self.toolbar.addWidget(action)
                 continue
             itemMenu = QMenu()
+            self.set_font(itemMenu)
             if isinstance(actions, dict):
                 for submenu, mini_actions in actions.items():
                     new_sub_menu = itemMenu.addMenu(submenu)
+                    self.set_font(new_sub_menu)
                     for mini_action in mini_actions:
                         new_sub_menu.addAction(mini_action)
             else:
@@ -435,3 +444,8 @@ class AequilibraEMenu:
 
     def message_project_already_open(self):
         self.iface.messageBar().pushMessage("You need to close the project currently open first", level=2, duration=10)
+
+    def set_font(self, obj):
+        f = obj.font()
+        f.setPointSize(11)
+        obj.setFont(f)

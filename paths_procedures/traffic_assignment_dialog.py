@@ -45,6 +45,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.setupUi(self)
+        self.skimming = False
         self.path = standard_path()
         self.output_path = None
         self.temp_path = None
@@ -146,8 +147,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         dt = self.project.conn.execute("pragma table_info(modes)").fetchall()
         if 'pce' in [x[1] for x in dt]:
             sql = "select pce from modes where mode_id=?"
-            v = self.project.conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()
-            self.pce_setter.setValue(v[0])
+            v = self.project.conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()[0]
+            if v is not None:
+                self.pce_setter.setValue(v)
 
     def change_matrix_selected(self):
         mat_name = self.cob_matrices.currentText()
@@ -219,7 +221,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def __change_vdf(self):
         table = self.tbl_vdf_parameters
         table.clearContents()
-        if self.cob_vdf.currentText().lower() == 'bpr':
+        if self.cob_vdf.currentText().lower() in ['bpr', 'bpr2', 'inrets', 'conical']:
             parameters = ['alpha', 'beta']
         else:
             return
@@ -281,7 +283,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             vot = self.vot_setter.value()
             assigclass.set_vot(vot)
             assigclass.set_fixed_cost(self.cob_fixed_cost.currentText())
-            fcost = f'{vot:,.4f}*{self.cob_fixed_cost.currentText()}'
+            fcost = f'{vot:,.5f}*{self.cob_fixed_cost.currentText()}'
 
         self.traffic_classes[class_name] = assigclass
 
@@ -289,6 +291,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         table = self.tbl_traffic_classes
         table.setRowCount(num_classes)
+        self.project.matrices.reload()
 
         idx = num_classes - 1
         for i, txt in enumerate([class_name, mode, str(len(user_classes)), fcost, str(round(pce, 4))]):
@@ -332,6 +335,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         table.setCellWidget(idx, 3, blended_chb)
 
         self.skims[name].append(field)
+        self.skimming = True
 
     def __remove_class(self):
         self.__edit_skimming_modes()
@@ -398,7 +402,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             return False
 
         self.temp_path = gettempdir()
-        return self.set_assignment()
+        tries_setup = self.set_assignment()
+        return tries_setup
 
     def signal_handler(self, val):
         if val[0] == "zones finalized":
@@ -444,14 +449,13 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     #         self.tot_link_flow_extract -= 1
 
     def set_assignment(self):
-        for k, v in self.skims.items():
-            if not len(v):
-                continue
-            c = self.traffic_classes[k]  # type: TrafficClass
-            graph = c.graph
-            graph.set_graph(self.cob_ffttime.currentText())
-            graph.set_skimming(v)
-            graph.set_blocked_centroid_flows(self.chb_check_centroids.isChecked())
+        for k, cls in self.traffic_classes.items():
+            if self.skims[k]:
+                dt = cls.graph.block_centroid_flows
+                logger.debug(f'Set skims {self.skims[k]} for {k}')
+                cls.graph.set_graph(self.cob_ffttime.currentText())
+                cls.graph.set_skimming(self.skims[k])
+                cls.graph.set_blocked_centroid_flows(dt)
 
         table = self.tbl_vdf_parameters
         for i in range(table.rowCount()):
@@ -464,12 +468,10 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     val = float(val)
                 except Exception as e:
                     self.error = 'VDF parameter is not numeric'
-                    self.logger = f'Tried to set a VDF parameter not numeric. {e.args}'
+                    logger.error(f'Tried to set a VDF parameter not numeric. {e.args}')
                     return False
             self.vdf_parameters[k] = val
 
-        for k, v in self.vdf_parameters.items():
-            print(k, v)
         return True
 
     def exit_procedure(self):
