@@ -30,7 +30,7 @@ from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 from .matrix_procedures import LoadDatasetDialog
 from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
-from .menu_actions import run_distribution_models, run_tsp
+from .menu_actions import run_distribution_models, run_tsp, run_change_parameters
 from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
 from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from .public_transport_procedures import GtfsImportDialog
@@ -97,7 +97,8 @@ class AequilibraEMenu:
                             'Routing': [],
                             'Public Transport': [],
                             'GIS': [],
-                            'Utils': []}
+                            'Utils': [],
+                            'AequilibraE': []}
 
         # # #######################   PROJECT SUB-MENU   ############################
         self.add_menu_action('Project', 'Open Project', partial(run_load_project, self))
@@ -185,42 +186,21 @@ class AequilibraEMenu:
         self.add_menu_action('Data', 'Import matrices', partial(load_matrices, self))
         self.add_menu_action('Utils', 'Display Matrices and datasets', partial(display_aequilibrae_formats, self))
 
-        self.build_menu()
+
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
-        #
-        # parametersButton = QToolButton()
-        # parametersButton.setText(self.trlt('Parameters'))
-        # parametersButton.clicked.connect(self.run_change_parameters)
-        # self.toolbar.addWidget(parametersButton)
-        #
-        # aboutButton = QToolButton()
-        # aboutButton.setText(self.trlt('About'))
-        # aboutButton.clicked.connect(self.run_about)
-        # self.toolbar.addWidget(aboutButton)
-        #
-        # logButton = QToolButton()
-        # logButton.setText(self.trlt('logfile'))
-        # logButton.clicked.connect(self.run_log)
-        # self.toolbar.addWidget(logButton)
-        #
-        # helpButton = QToolButton()
-        # helpButton.setText(self.trlt('Help'))
-        # helpButton.clicked.connect(self.run_help)
-        # self.toolbar.addWidget(helpButton)
-        #
+        # self.add_menu_action('AequilibraE', 'Parameters', partial(run_change_parameters, self))
+        self.add_menu_action('AequilibraE', 'About', self.run_about)
+        # self.add_menu_action('AequilibraE', 'logfile', self.run_log)
+        self.add_menu_action('AequilibraE', 'Help', self.run_help)
+
         if no_binary:
-            binariesButton = QToolButton()
-            binariesButton.setText(self.trlt('Download binaries'))
-            binariesButton.clicked.connect(self.run_binary_download)
-            self.toolbar.addWidget(binariesButton)
+            self.add_menu_action('AequilibraE', 'Download binaries', self.run_binary_download)
 
         if not extra_packages:
-            xtrapkgButton = QToolButton()
-            xtrapkgButton.setText(self.trlt('Install extra packages'))
-            xtrapkgButton.clicked.connect(self.install_extra_packages)
-            self.toolbar.addWidget(xtrapkgButton)
+            self.add_menu_action('AequilibraE', 'Install extra packages', self.install_extra_packages)
 
+        self.build_menu()
         # ########################################################################
         # #################        PROJECT MANAGER       #########################
 
@@ -261,7 +241,7 @@ class AequilibraEMenu:
 
     def build_menu(self):
         for menu, actions in self.menuActions.items():
-            if menu == 'Polaris':
+            if menu == 'AequilibraE':
                 for action in actions:
                     self.toolbar.addWidget(action)
                 continue
@@ -358,11 +338,6 @@ class AequilibraEMenu:
         uri.setDataSource('', layer_name, 'geometry')
         layer = QgsVectorLayer(uri.uri(), layer_name, 'spatialite')
         return layer
-
-    def run_change_parameters(self):
-        dlg2 = ParameterDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
 
     def run_about(self):
         dlg2 = AboutDialog(self.iface)

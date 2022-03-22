@@ -1,8 +1,10 @@
 import logging
 import os
+from os.path import join, isfile
 
 import yaml
 
+from aequilibrae import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML
 from qgis.PyQt.QtGui import QFont
@@ -11,15 +13,17 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, parent=None):
+    def __init__(self, qgis_project, parent=None):
         super(ParameterDialog, self).__init__(parent)
         # QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
 
-        self.path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/aequilibrae/"
-        self.default_values = None
-        self.parameter_values = None
+        self.p = Parameters()
+        self.path = self.p.file
+
+        self.default_values = self.p._default
+        self.parameter_values = self.p.parameters
         self.current_data = None
         self.error = False
         # Configures the text editor
@@ -35,7 +39,6 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Load the data
         self.load_original_data()
-        self.load_defaults()
 
         # Connect all buttons
         self.but_validate.clicked.connect(self.validate_data)
@@ -45,15 +48,13 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
 
     # Load the current parameters onto the GUI
     def load_original_data(self):
-        with open(self.path + "parameters.yml", "r") as yml:
-            self.parameter_values = yaml.safe_load(yml)
         pretty_data = yaml.dump(self.parameter_values, default_flow_style=False)
         self.text_box.setText(str(pretty_data))
 
     # Read defaults to memory
     def load_defaults(self):
         with open(self.path + "parameter_default.yml", "r") as yml:
-            self.default_values = yaml.safe_load(yml)
+            self.default_values = self.p._default
 
     def validate_data(self):
         self.error = False
