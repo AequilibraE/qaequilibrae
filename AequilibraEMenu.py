@@ -30,7 +30,7 @@ from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 from .matrix_procedures import LoadDatasetDialog
 from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
-from .menu_actions import run_distribution_models
+from .menu_actions import run_distribution_models, run_tsp
 from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
 from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from .public_transport_procedures import GtfsImportDialog
@@ -123,7 +123,6 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         # # # ###################  PATH COMPUTATION SUB-MENU   #######################
-        # pathMenu = QMenu()
         #
         self.add_menu_action('Paths and assignment', 'Shortest path', partial(run_shortest_path, self))
         self.add_menu_action('Paths and assignment', 'Impedance matrix', partial(run_dist_matrix, self))
@@ -131,19 +130,11 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         # # # #######################   ROUTING SUB-MENU   ###########################
-        # if has_ortools:
-        #     routingMenu = QMenu()
-        #     self.tsp_action = QAction(self.trlt('Travelling Salesman Problem'), self.manager)
-        #     self.tsp_action.triggered.connect(self.run_tsp)
-        #     routingMenu.addAction(self.tsp_action)
-        #
-        #     routingButton = QToolButton()
-        #     routingButton.setText(self.trlt('Routing'))
-        #     routingButton.setPopupMode(2)
-        #     routingButton.setMenu(routingMenu)
-        #
-        #     self.toolbar.addWidget(routingButton)
-        #
+        if has_ortools:
+            self.add_menu_action('Routing', 'Travelling Salesman Problem', partial(run_tsp, self))
+        else:
+            _ = self.menuActions.pop('Routing')
+
         # # # ########################################################################
         # # # #######################   TRANSIT SUB-MENU   ###########################
         # transitMenu = QMenu()
@@ -392,14 +383,6 @@ class AequilibraEMenu:
         dlg2 = BinaryDownloaderDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
-
-    def run_tsp(self):
-        if self.project is None:
-            self.show_message_no_project()
-        else:
-            dlg2 = TSPDialog(self.iface, self.project, self.link_layer, self.node_layer)
-            dlg2.show()
-            dlg2.exec_()
 
     def run_import_gtfs(self):
         dlg2 = GtfsImportDialog(self.iface)

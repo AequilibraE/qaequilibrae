@@ -24,13 +24,19 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ts
 
 
 class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, project, link_layer, node_layer):
+    def __init__(self, qgisproject):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgisproject.iface
         self.setupUi(self)
-        self.project = project  # type: Project
-        self.link_layer = link_layer
-        self.node_layer = node_layer
+        self.project = qgisproject.project  # type: Project
+        self._PQgis = qgisproject
+
+        self.link_layer = self._PQgis.layers['links'][0]
+        self.node_layer = self._PQgis.layers['nodes'][0]
+
+        QgsProject.instance().addMapLayer(self.link_layer)
+        QgsProject.instance().addMapLayer(self.node_layer)
+
         self.all_modes = {}
         self.worker_thread: TSPProcedure = None
         self.but_run.clicked.connect(self.run)
@@ -70,19 +76,19 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         md = self.all_modes[self.cob_mode.currentText()]
 
-        self.project.network.build_graphs()
+        self.project.network.build_graphs(modes=[md])
         self.graph = self.project.network.graphs[md]
 
         if self.rdo_selected.isChecked():
             centroids = self.selected_nodes()
             if len(centroids) < 3:
-                qgis.utils.iface.messageBar().pushMessage("You need at least three selected nodes. ", '', level=3)
+                qgis.utils.iface.messageBar().pushMessage("You need at least three nodes to route. ", '', level=3)
                 return
             centroids = np.array(centroids).astype(np.int64)
             self.graph.prepare_graph(centroids=centroids)
         else:
             if self.project.network.count_centroids() < 3:
-                qgis.utils.iface.messageBar().pushMessage("You need at least three centroids. ", '', level=3)
+                qgis.utils.iface.messageBar().pushMessage("You need at least three centroids to route. ", '', level=3)
                 return
 
         self.graph.set_graph(self.cob_minimize.currentText())  # let's say we want to minimize time
@@ -95,26 +101,13 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         self.run_thread()
 
     def run_thread(self):
-        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
-        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
-        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
-
-        self.worker_thread.finished_threaded_procedure.connect(self.finished)
+        self.worker_thread.finished.connect(self.finished)
         self.worker_thread.start()
         self.exec_()
 
-    def progress_range_from_thread(self, value):
-        self.progressbar.setRange(0, value)
-
-    def progress_text_from_thread(self, value):
-        self.progress_label.setText(value)
-
-    def progress_value_from_thread(self, value):
-        self.progressbar.setValue(value)
-
-    def finished(self, procedure):
+    def finished(self):
         ns = self.worker_thread.node_sequence
-
+        print(ns)
         if len(ns) < 2:
             return
 
