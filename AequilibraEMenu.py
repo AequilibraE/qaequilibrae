@@ -24,12 +24,11 @@ from .binary_downloader_class import BinaryDownloaderDialog
 from .common_tools import AboutDialog
 from .download_extra_packages_class import DownloadExtraPackages
 from .gis import CompareScenariosDialog
-from .gis import CreateBandwidthsDialog
 from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 from .matrix_procedures import LoadDatasetDialog
-from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
-from .menu_actions import run_distribution_models, run_tsp, run_change_parameters, show_log
+from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices, show_log
+from .menu_actions import run_distribution_models, run_tsp, run_change_parameters, run_stacked_bandwidths
 from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
 from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from .public_transport_procedures import GtfsImportDialog
@@ -160,21 +159,12 @@ class AequilibraEMenu:
         # self.dlines_action = QAction(self.trlt('Desire Lines'), self.manager)
         # self.dlines_action.triggered.connect(self.run_dlines)
         # gisMenu.addAction(self.dlines_action)
-        #
-        # self.bandwidth_action = QAction(self.trlt('Stacked Bandwidth'), self.manager)
-        # self.bandwidth_action.triggered.connect(self.run_bandwidth)
-        # gisMenu.addAction(self.bandwidth_action)
-        #
+
+        self.add_menu_action('GIS', 'Stacked Bandwidth', partial(run_stacked_bandwidths, self))
+
         # self.scenario_comparison_action = QAction(self.trlt('Scenario Comparison'), self.manager)
         # self.scenario_comparison_action.triggered.connect(self.run_scenario_comparison)
         # gisMenu.addAction(self.scenario_comparison_action)
-        #
-        # gisButton = QToolButton()
-        # gisButton.setText(self.trlt('GIS'))
-        # gisButton.setPopupMode(2)
-        # gisButton.setMenu(gisMenu)
-        #
-        # self.toolbar.addWidget(gisButton)
 
         # # ########################################################################
         # # #################          Utils submenu         #########################
@@ -369,11 +359,6 @@ class AequilibraEMenu:
             dlg2 = DesireLinesDialog(self.iface)
             dlg2.show()
             dlg2.exec_()
-
-    def run_bandwidth(self):
-        dlg2 = CreateBandwidthsDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
 
     def run_scenario_comparison(self):
         dlg2 = CompareScenariosDialog(self.iface)

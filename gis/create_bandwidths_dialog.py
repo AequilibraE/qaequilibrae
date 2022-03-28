@@ -1,21 +1,19 @@
-import copy
 import os
 import sys
 from functools import partial
 from random import randint
 
 from PyQt5.QtGui import QColor
-from qgis._core import QgsMapLayerProxyModel, QgsSimpleLineSymbolLayer, QgsExpressionContextUtils, QgsProject
 from qgis._core import QgsLineSymbol
+from qgis._core import QgsMapLayerProxyModel, QgsSimpleLineSymbolLayer, QgsExpressionContextUtils, QgsProject
 
 import qgis
-from PyQt5 import Qt
-from ..common_tools import get_parameter_chain
 from qgis.PyQt import uic
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QPushButton, QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QToolButton, QHBoxLayout, QWidget, QDialog
-from .bandwidth_scale_dialog import BandwidthScaleDialog
 from .set_color_ramps_dialog import LoadColorRampSelector
+from ..common_tools import get_parameter_chain
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgscolorbutton"] = qgis.gui
@@ -24,21 +22,19 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class CreateBandwidthsDialog(QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgis_project):
         QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
 
         self.tot_bands = 0
-        self.default_scale = {"width": 10, "spacing": 0.1, "max_flow": -1}
 
-        self.scale = copy.deepcopy(self.default_scale)
+        self.scale = {"width": 10, "spacing": 0.001, "max_flow": -1}
 
         self.band_size = 10.0
         self.space_size = 0.01
         self.layer = None
         self.ramps = None
-        self.expert_mode = False
         self.drive_side = get_parameter_chain(["system", "driving side"])
 
         # layers and fields        # For adding skims
@@ -65,15 +61,11 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
         self.rdo_color.toggled.connect(self.color_origins)
 
-        self.rdo_scale_auto.toggled.connect(self.set_new_scale)
-        # self.rdo_scale_custom.toggled.connect(self.set_new_scale)
-
         self.rdo_ramp.toggled.connect(self.color_origins)
         self.but_run.clicked.connect(self.add_bands_to_map)
         self.but_run.setEnabled(False)
 
         self.but_load_ramp.clicked.connect(self.load_ramp_action)
-        self.but_set_scale.clicked.connect(self.load_scale_setter)
 
         self.add_fields_to_cboxes()
         self.random_rgb()
@@ -85,12 +77,6 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.but_load_ramp.setVisible(self.rdo_ramp.isChecked())
         self.txt_ramp.setVisible(self.rdo_ramp.isChecked())
         self.but_load_ramp.setEnabled(self.rdo_ramp.isChecked())
-
-    def set_new_scale(self):
-        if self.rdo_scale_custom.isChecked():
-            self.load_scale_setter()
-        else:
-            self.scale = copy.deepcopy(self.default_scale)
 
     def choose_a_field(self, modified):
         i, j = "AB", "BA"
@@ -254,29 +240,9 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 self.ramps = dlg2.results
                 self.txt_ramp.setText(str(self.ramps))
 
-    def load_scale_setter(self):
-        if self.layer is not None:
-            self.ramps = None
-            dlg2 = BandwidthScaleDialog(self.iface, self.layer, self.scale, self.default_scale)
-            dlg2.show()
-            dlg2.exec_()
-            self.scale = dlg2.scale
-
-        self.rdo_scale_custom.blockSignals(True)
-        self.rdo_scale_auto.blockSignals(True)
-        if self.scale == self.default_scale:
-            self.rdo_scale_auto.setChecked(True)
-        else:
-            self.rdo_scale_custom.setChecked(True)
-        self.rdo_scale_auto.blockSignals(False)
-        self.rdo_scale_custom.blockSignals(False)
-
     def add_bands_to_map(self):
-        self.expert_mode = self.chk_expert_mode.isChecked()
         for item in [
-            self.gbox_scale,
             self.but_run,
-            self.but_set_scale,
             self.mMapLayerComboBox,
             self.but_add_band,
             self.rdo_color,
@@ -322,15 +288,15 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             bands_ba.append((self.bands_list.item(i, 1).text(), ba, cl, "ba"))
 
         if max_value < 0:
+            values = [x for x in values if x is not None] + [0]
             max_value = max(values)
 
-        if self.expert_mode:
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_max_value", max_value)
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_spacer", float(space_size))
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_width", band_size)
-            max_value = "@aeq_band_max_value"
-            space_size = "@aeq_band_spacer"
-            band_size = "@aeq_band_width"
+        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_max_value", max_value)
+        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_spacer", float(space_size))
+        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_width", band_size)
+        max_value = "@aeq_band_max_value"
+        space_size = "@aeq_band_spacer"
+        band_size = "@aeq_band_width"
 
         for s in [bands_ab, bands_ba]:
             acc_offset = "0"

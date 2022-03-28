@@ -3,6 +3,7 @@ from .action_add_zoning import run_add_zones
 from .action_display_aeq_formats import display_aequilibrae_formats
 from .action_distribution import run_distribution_models
 from .action_edit_parameters import run_change_parameters
+from .action_gis_stacked_bandwidths import run_stacked_bandwidths
 from .action_import_matrices import load_matrices
 from .action_prepare_network import prepare_network
 from .action_run_tsp import run_tsp

@@ -2,10 +2,10 @@ import importlib.util as iutil
 import os
 
 import numpy as np
-import qgis
 from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
 
 import aequilibrae
+import qgis
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem
