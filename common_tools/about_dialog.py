@@ -1,6 +1,5 @@
 import logging
 import os
-import webbrowser
 from os.path import dirname, abspath
 
 import yaml
@@ -26,11 +25,9 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.path = standard_path()
 
-        self.but_mailing.clicked.connect(self.go_to_mailing_list)
         self.but_close.clicked.connect(self.exit_procedure)
 
         repository = "https://github.com/AequilibraE/AequilibraE-GUI"
-        self.wiki = "https://github.com/aequilibrae/aequilibrae/wiki"
 
         d = dirname(dirname(abspath(__file__)))
         with open(os.path.join(d, "meta.yaml"), "r") as yml:
@@ -49,7 +46,7 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
         self.all_items.append(["AequilibraE Version number", release_version])
         self.all_items.append(["GUI version", b])
         self.all_items.append(["GUI Repository", repository])
-        self.all_items.append(["Minimum QGIS", "3.0"])
+        self.all_items.append(["Minimum QGIS", "3.14"])
         self.all_items.append(["Developers", par["developers"]])
         self.all_items.append(["Sponsors", par["sponsors"]])
 
@@ -72,10 +69,6 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
 
             row_count += 1
         self.about_table.setVerticalHeaderLabels(titles)
-
-    def go_to_mailing_list(self):
-        webbrowser.open(self.wiki, new=2)
-        self.exit_procedure()
 
     def exit_procedure(self):
         self.close()
