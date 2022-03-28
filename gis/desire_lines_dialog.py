@@ -1,7 +1,10 @@
 import logging
 import os
 
+import pandas as pd
+
 import qgis
+
 from qgis.PyQt import uic, QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
@@ -10,15 +13,15 @@ from .desire_lines_procedure import DesireLinesProcedure
 from ..common_tools import ReportDialog
 from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
 from ..common_tools.global_parameters import poly_types, numeric_types, point_types
-from ..matrix_procedures import LoadMatrixDialog
+from ..matrix_procedures import list_matrices
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_DesireLines.ui"))
 
 
 class DesireLinesDialog(QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgis_project):
         QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
         self.error = None
         self.validtypes = numeric_types
@@ -29,17 +32,16 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.zones = None
         self.columns = None
         self.matrix_hash = {}
+        self.qgis_project = qgis_project
+        if qgis_project.project is None:
+            self.proj_matrices = pd.DataFrame([])
+        else:
+            self.proj_matrices = list_matrices(self.qgis_project.project.matrices.fldr)
         self.logger = logging.getLogger('AequilibraEGUI')
 
-        self.setMaximumSize(QtCore.QSize(383, 385))
-        self.resize(383, 385)
-
-        # FIRST, we connect slot signals
-        # For changing the input matrix_procedures
-        self.but_load_new_matrix.clicked.connect(self.find_matrices)
+        self.resize(389, 385)
 
         self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
-
         self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
 
         # Create desire lines
@@ -56,30 +58,51 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                     self.progress_label.setVisible(False)
                     self.progressbar.setVisible(False)
 
+        self.list_matrices()
+        self.set_show_matrices()
+
+    def list_matrices(self):
+        for idx, rec in self.proj_matrices.iterrows():
+            if len(rec.WARNINGS) == 0:
+                self.cob_matrices.addItem(rec['name'])
+        for key in self.qgis_project.matrices.keys():
+            self.cob_matrices.addItem(key)
+
+    def set_matrix(self):
+        if self.cob_matrices.currentIndex() < 0:
+            self.matrix = None
+            return
+
+        if self.cob_matrices.currentText() in self.qgis_project.matrices:
+            self.matrix = self.qgis_project.matrices[self.cob_matrices.currentText()]
+            return
+        self.matrix = self.qgis_project.project.matrices.get_matrix(self.cob_matrices.currentText())
+
     def set_show_matrices(self):
+        self.tbl_array_cores.setVisible(not self.chb_use_all_matrices.isChecked())
         self.tbl_array_cores.clear()
         if self.chb_use_all_matrices.isChecked():
-            self.resize(383, 385)
-            self.setMaximumSize(QtCore.QSize(383, 385))
-        else:
-            self.setMaximumSize(QtCore.QSize(710, 385))
-            self.resize(710, 385)
-            self.tbl_array_cores.setColumnWidth(0, 200)
-            self.tbl_array_cores.setColumnWidth(1, 80)
-            self.tbl_array_cores.setHorizontalHeaderLabels(["Matrix", "Use?"])
+            self.resize(389, 385)
+            return
 
-            if self.matrix is not None:
-                table = self.tbl_array_cores
-                table.setRowCount(self.matrix.cores)
-                for i, mat in enumerate(self.matrix.names):
-                    item1 = QTableWidgetItem(mat)
-                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                    table.setItem(i, 0, item1)
+        self.set_matrix()
+        self.resize(950, 385)
+        self.tbl_array_cores.setColumnWidth(0, 200)
+        self.tbl_array_cores.setColumnWidth(1, 80)
+        self.tbl_array_cores.setHorizontalHeaderLabels(["Matrix", "Use?"])
 
-                    chb1 = QCheckBox()
-                    chb1.setChecked(True)
-                    chb1.setEnabled(True)
-                    table.setCellWidget(i, 1, self.centers_item(chb1))
+        if self.matrix is not None:
+            table = self.tbl_array_cores
+            table.setRowCount(self.matrix.cores)
+            for i, mat in enumerate(self.matrix.names):
+                item1 = QTableWidgetItem(mat)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                table.setItem(i, 0, item1)
+
+                chb1 = QCheckBox()
+                chb1.setChecked(True)
+                chb1.setEnabled(True)
+                table.setCellWidget(i, 1, self.centers_item(chb1))
 
     def centers_item(self, item):
         cell_widget = QWidget()
@@ -91,7 +114,6 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         return cell_widget
 
     def run_thread(self):
-        self.worker_thread.assignment.connect(self.signal_handler)
         self.worker_thread.desire_lines.connect(self.signal_handler)
         self.worker_thread.start()
         self.exec_()
@@ -103,14 +125,6 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             for field in layer.dataProvider().fields().toList():
                 if field.type() in numeric_types:
                     self.zone_id_field.addItem(field.name())
-
-    def find_matrices(self):
-        dlg2 = LoadMatrixDialog(self.iface, sparse=True, multiple=True, single_use=True)
-        dlg2.show()
-        dlg2.exec_()
-        if dlg2.matrix is not None:
-            self.matrix = dlg2.matrix
-            self.set_show_matrices()
 
     def signal_handler(self, val):
         # Signals that will come from traffic assignment
@@ -142,6 +156,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def check_all_inputs(self):
+        self.set_matrix()
         if self.matrix is None:
             return False
 
@@ -174,8 +189,6 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
     def run(self):
         if self.check_all_inputs():
             # Sets the visual of the tool
-            self.lbl_funding1.setVisible(False)
-            self.lbl_funding2.setVisible(False)
             self.progress_label.setVisible(True)
             self.progressbar.setVisible(True)
             self.setMaximumSize(QtCore.QSize(383, 444))

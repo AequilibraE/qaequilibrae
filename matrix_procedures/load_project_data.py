@@ -11,6 +11,7 @@ import qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QAbstractItemView
 from .display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
+from .matrix_lister import list_matrices
 from ..common_tools import PandasModel
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_project_data.ui"))
@@ -27,6 +28,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.data_to_show = None
         self.error = None
+        self.qgs_proj = qgs_proj
         self.project = qgs_proj.project
 
         self.matrices: pd.DataFrame = None
@@ -55,26 +57,13 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
 
         file_name = self.matrices['file_name'][idx[0]]
 
-        dlg2 = DisplayAequilibraEFormatsDialog(self.iface, join(self.project.matrices.fldr, file_name))
+        dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj, join(self.project.matrices.fldr, file_name), proj=True)
         dlg2.show()
         dlg2.exec_()
 
     def load_matrices(self):
 
-        conn = database_connection()
-        df = pd.read_sql('select * from matrices', conn)
-        conn.close()
-
-        fldr = self.project.matrices.fldr
-        existing_files = os.listdir(fldr)
-
-        self.matrices = df.assign(WARNINGS='')
-        for idx, record in self.matrices.iterrows():
-            if record.file_name not in existing_files:
-                self.matrices.loc[idx, 'WARNINGS'] = 'File not found on disk'
-
-            elif record.file_name[-4:] == '.omx' and not has_omx:
-                self.matrices.loc[idx, 'WARNINGS'] = 'OMX not available for display'
+        self.matrices = list_matrices(self.project.matrices.fldr)
 
         self.matrices_model = PandasModel(self.matrices)
         self.list_matrices.setModel(self.matrices_model)

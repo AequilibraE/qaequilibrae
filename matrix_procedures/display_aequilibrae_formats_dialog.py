@@ -6,7 +6,7 @@ import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix, AequilibraeData
 
 import qgis
-from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
@@ -22,13 +22,16 @@ if has_omx:
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, file_path=''):
+    def __init__(self, qgis_project, file_path='', proj=False):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
+        self.iface = qgis_project.iface
         self.setupUi(self)
         self.data_to_show = None
         self.error = None
         self.logger = logging.getLogger('AequilibraEGUI')
+        self.qgis_project = qgis_project
+        self.from_proj = proj
 
         if len(file_path) > 0:
             self.data_path = file_path
@@ -66,7 +69,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.data_to_show = AequilibraeData()
             elif self.data_type == "AEM":
                 self.data_to_show = AequilibraeMatrix()
-
+                if not self.from_proj:
+                    self.qgis_project.matrices[self.data_path] = self.data_to_show
             try:
                 self.data_to_show.load(self.data_path)
                 self.list_cores = self.data_to_show.names
@@ -78,6 +82,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         elif self.data_type == "OMX":
             self.omx = omx.open_file(self.data_path, 'r')
+            if not self.from_proj:
+                self.qgis_project.matrices[self.data_path] = self.omx
             self.list_cores = self.omx.list_matrices()
             self.list_indices = self.omx.list_mappings()
             self.data_to_show = AequilibraeMatrix()
@@ -195,5 +201,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.close()
 
     def exit_procedure(self):
+        if not self.from_proj:
+            self.qgis_project.matrices.pop(self.data_path)
         self.show()
         self.close()

@@ -4,15 +4,16 @@ import struct
 from collections import OrderedDict
 
 import numpy as np
+import pandas as pd
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import AssignmentResults
 from numpy.lib import recfunctions as rfn
 from qgis._core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFeature
 from scipy.spatial import Delaunay
-
+from PyQt5.QtCore import pyqtSignal
 from qgis.PyQt.QtCore import QVariant
-from ..common_tools import WorkerThread
+from aequilibrae.utils.worker_thread import WorkerThread
 from ..common_tools.auxiliary_functions import get_vector_layer_by_name
 
 logger = logging.getLogger('AequilibraEGUI')
@@ -25,6 +26,8 @@ except Exception as e:
 
 
 class DesireLinesProcedure(WorkerThread):
+    desire_lines = pyqtSignal(object)
+
     def __init__(self, parentThread, layer: str, id_field: int, matrix: AequilibraeMatrix, matrix_hash: dict,
                  dl_type: str) -> None:
         WorkerThread.__init__(self, parentThread)
@@ -236,17 +239,23 @@ class DesireLinesProcedure(WorkerThread):
             desireline_link_id += 1
         self.desire_lines.emit(('text_dl', "Building graph"))
         network = np.asarray(data)
-        del data
-        # types for the network
+
+        net = pd.DataFrame({'link_id': network[:, 0],
+                            'a_node': network[:, 1],
+                            'b_node': network[:, 2],
+                            'distance_ab': network[:, 3],
+                            'distance_ba': network[:, 4],
+                            'direction': network[:, 5]})
         self.graph = Graph()
         itype = self.graph.default_types('int')
         ftype = self.graph.default_types('float')
         all_types = [itype, itype, itype, ftype, ftype, np.int8]
         all_titles = ['link_id', 'a_node', 'b_node', 'distance_ab', 'distance_ba', 'direction']
-        dt = [(t, d) for t, d in zip(all_titles, all_types)]
-        self.graph.network = np.zeros(network.shape[0], dtype=dt)
-        for k, t in enumerate(dt):
-            self.graph.network[t[0]] = network[:, k].astype(t[1])
+
+        for tb, nm in zip(all_types, all_titles):
+            net[nm] = net[nm].astype(tb)
+
+        self.graph.network = net
         del network
         self.graph.type_loaded = 'NETWORK'
         self.graph.status = 'OK'
