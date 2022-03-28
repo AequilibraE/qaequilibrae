@@ -14,3 +14,4 @@ from .action_show_project_data import run_show_project_data
 from .create_networks import run_create_transponet
 from .load_project_action import run_load_project
 from .project_from_osm_action import project_from_osm
+from .action_gis_lcd import run_lcd

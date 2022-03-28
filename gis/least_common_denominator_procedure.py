@@ -5,9 +5,15 @@ from qgis.core import QgsCoordinateTransform, QgsSpatialIndex, QgsFeature, QgsGe
 from qgis.core import QgsProject
 from ..common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types, multi_point
 from aequilibrae.utils.worker_thread import WorkerThread
+from qgis.PyQt.QtCore import pyqtSignal
 
 
 class LeastCommonDenominatorProcedure(WorkerThread):
+    ProgressValue = pyqtSignal(object)
+    ProgressMaxValue = pyqtSignal(object)
+    ProgressText = pyqtSignal(object)
+    finished_threaded_procedure = pyqtSignal(object)
+
     def __init__(self, parentThread, flayer, tlayer, ffield, tfield):
         WorkerThread.__init__(self, parentThread)
         self.flayer = flayer
