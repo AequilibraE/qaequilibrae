@@ -151,10 +151,6 @@ class AequilibraEMenu:
         # self.simple_tag_action = QAction(self.trlt('Simple tag'), self.manager)
         # self.simple_tag_action.triggered.connect(self.run_simple_tag)
         # gisMenu.addAction(self.simple_tag_action)
-        #
-        # self.lcd_action = QAction(self.trlt(''), self.manager)
-        # self.lcd_action.triggered.connect(self.run_lcd)
-        # gisMenu.addAction(self.lcd_action)
 
         self.add_menu_action('GIS', 'Desire Lines', partial(run_desire_lines, self))
         self.add_menu_action('GIS', 'Stacked Bandwidth', partial(run_stacked_bandwidths, self))
