@@ -23,14 +23,13 @@ from qgis.core import QgsProject
 from .binary_downloader_class import BinaryDownloaderDialog
 from .common_tools import AboutDialog
 from .download_extra_packages_class import DownloadExtraPackages
-from .gis import CompareScenariosDialog
 from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 from .matrix_procedures import LoadDatasetDialog
 from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices, show_log
+from .menu_actions import run_desire_lines, run_scenario_comparison
 from .menu_actions import run_distribution_models, run_tsp, run_change_parameters, run_stacked_bandwidths
 from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
-from .menu_actions import run_desire_lines
 from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from .public_transport_procedures import GtfsImportDialog
 
@@ -42,7 +41,7 @@ except ImportError as e:
     warn(f'AequilibraE binaries are not available {e.args}')
 
 if not no_binary:
-    from .gis.desire_lines_dialog import DesireLinesDialog
+    pass
 
 extra_packages = True
 # Checks if we can display OMX
@@ -160,10 +159,7 @@ class AequilibraEMenu:
 
         self.add_menu_action('GIS', 'Desire Lines', partial(run_desire_lines, self))
         self.add_menu_action('GIS', 'Stacked Bandwidth', partial(run_stacked_bandwidths, self))
-
-        # self.scenario_comparison_action = QAction(self.trlt('Scenario Comparison'), self.manager)
-        # self.scenario_comparison_action.triggered.connect(self.run_scenario_comparison)
-        # gisMenu.addAction(self.scenario_comparison_action)
+        self.add_menu_action('GIS', 'Scenario Comparison', partial(run_scenario_comparison, self))
 
         # # ########################################################################
         # # #################          Utils submenu         #########################
@@ -354,11 +350,6 @@ class AequilibraEMenu:
 
     def run_lcd(self):
         dlg2 = LeastCommonDenominatorDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-
-    def run_scenario_comparison(self):
-        dlg2 = CompareScenariosDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

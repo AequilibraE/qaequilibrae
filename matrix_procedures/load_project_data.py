@@ -1,17 +1,17 @@
 import importlib.util as iutil
 import os
-import sqlite3
 from os.path import join
 
 import pandas as pd
-from aequilibrae.project.database_connection import database_connection
 from qgis._core import QgsProject, QgsVectorLayer, QgsDataSourceUri
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QAbstractItemView
 from .display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
+from .load_result_table import load_result_table
 from .matrix_lister import list_matrices
+from .results_lister import list_results
 from ..common_tools import PandasModel
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_project_data.ui"))
@@ -74,17 +74,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         self.load_matrices()
 
     def load_results(self):
-        conn = database_connection()
-        df = pd.read_sql('select * from results', conn)
-        conn.close()
-
-        conn = sqlite3.connect(join(self.project.project_base_path, 'results_database.sqlite'))
-        tables = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
-        conn.close()
-        self.results = df.assign(WARNINGS='')
-        for idx, record in self.results.iterrows():
-            if record.table_name not in tables:
-                self.results.loc[idx, 'WARNINGS'] = 'Table not found in the results database'
+        self.results = list_results(self.project.project_base_path)
 
         self.results_model = PandasModel(self.results)
         self.list_results.setModel(self.results_model)
@@ -97,19 +87,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.results['WARNINGS'][idx[0]] != '':
             return
 
-        pth = join(self.project.project_base_path, 'results_database.sqlite')
-        conn = qgis.utils.spatialite_connect(pth)
-        conn.execute('PRAGMA temp_store = 0;')
-        conn.execute('SELECT InitSpatialMetaData();')
-        conn.commit()
-        conn.close()
-
-        uri = QgsDataSourceUri()
-        uri.setDatabase(pth)
-        uri.setDataSource('', table_name, None)
-        lyr = QgsVectorLayer(uri.uri(), table_name, 'spatialite')
-        QgsProject.instance().addMapLayer(lyr)
-        # layer_from_dataframe(df, table_name)
+        _ = load_result_table(self.project.project_base_path, table_name)
 
     def exit_with_error(self):
         qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
