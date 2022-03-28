@@ -53,8 +53,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
 
     # Read defaults to memory
     def load_defaults(self):
-        with open(self.path + "parameter_default.yml", "r") as yml:
-            self.default_values = self.p._default
+        self.default_values = self.p._default
 
     def validate_data(self):
         self.error = False

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>701</width>
+    <width>714</width>
     <height>487</height>
    </rect>
   </property>
@@ -16,6 +16,11 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="1">
     <widget class="QPushButton" name="but_save">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Save to disk</string>
      </property>
@@ -23,6 +28,11 @@
    </item>
    <item row="1" column="3">
     <widget class="QPushButton" name="but_defaults">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Reset to defaults</string>
      </property>
@@ -30,6 +40,11 @@
    </item>
    <item row="1" column="4">
     <widget class="QPushButton" name="but_close">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Cancel and close</string>
      </property>
@@ -37,6 +52,11 @@
    </item>
    <item row="1" column="0">
     <widget class="QPushButton" name="but_validate">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Validate</string>
      </property>
@@ -44,6 +64,11 @@
    </item>
    <item row="0" column="0" colspan="5">
     <widget class="QsciScintilla" name="text_box">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="toolTip">
       <string/>
      </property>

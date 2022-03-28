@@ -22,7 +22,6 @@ from qgis.core import QgsDataSourceUri, QgsVectorLayer
 from qgis.core import QgsProject
 from .binary_downloader_class import BinaryDownloaderDialog
 from .common_tools import AboutDialog
-from .common_tools import LogDialog
 from .download_extra_packages_class import DownloadExtraPackages
 from .gis import CompareScenariosDialog
 from .gis import CreateBandwidthsDialog
@@ -30,7 +29,7 @@ from .gis import LeastCommonDenominatorDialog
 from .gis import SimpleTagDialog
 from .matrix_procedures import LoadDatasetDialog
 from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
-from .menu_actions import run_distribution_models, run_tsp, run_change_parameters
+from .menu_actions import run_distribution_models, run_tsp, run_change_parameters, show_log
 from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
 from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from .public_transport_procedures import GtfsImportDialog
@@ -100,6 +99,7 @@ class AequilibraEMenu:
         self.add_menu_action('Project', 'Create Project from layers', partial(run_create_transponet, self))
         self.add_menu_action('Project', 'Add zoning data', partial(run_add_zones, self))
         self.add_menu_action('Project', 'Parameters', partial(run_change_parameters, self))
+        self.add_menu_action('Project', 'logfile', partial(show_log, self))
         self.add_menu_action('Project', 'Close project', self.run_close_project)
 
         # # # ########################################################################
@@ -185,7 +185,6 @@ class AequilibraEMenu:
         # # #################          LOOSE STUFF         #########################
 
         self.add_menu_action('AequilibraE', 'About', self.run_about)
-        # self.add_menu_action('AequilibraE', 'logfile', self.run_log)
         self.add_menu_action('AequilibraE', 'Help', self.run_help)
 
         if no_binary:
@@ -263,11 +262,6 @@ class AequilibraEMenu:
             subprocess.Popen(['open', url])
         else:
             webbrowser.open_new_tab(url)
-
-    def run_log(self):
-        dlg2 = LogDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
 
     def unload(self):
         del self.dock
