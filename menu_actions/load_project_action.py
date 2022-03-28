@@ -9,7 +9,8 @@ from ..common_tools.auxiliary_functions import standard_path
 
 def run_load_project(qgis_project):
     proj_path = QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
-
+    if proj_path is None or proj_path == '':
+        return
     # Cleans the project descriptor
     tab_count = 1
     for i in range(tab_count):

@@ -89,7 +89,7 @@ class AequilibraEMenu:
                             'Trip Distribution': [],
                             'Paths and assignment': [],
                             'Routing': [],
-                            'Public Transport': [],
+                            # 'Public Transport': [],
                             'GIS': [],
                             'Utils': [],
                             'AequilibraE': []}
@@ -281,6 +281,8 @@ class AequilibraEMenu:
         self.project.close()
         self.projectManager.clear()
         self.project = None
+        self.matrices.clear()
+        self.layers.clear()
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
@@ -298,6 +300,8 @@ class AequilibraEMenu:
         self.load_layer_by_name(lyr)
 
     def load_layer_by_name(self, layer_name: str):
+        if self.project is None:
+            return
         if layer_name.lower() not in self.layers:
             print('Layer was not found, which is weird')
             self.create_layer_by_name(layer_name)
@@ -310,6 +314,8 @@ class AequilibraEMenu:
         self.layers[layer_name.lower()] = [layer, layer.id()]
 
     def create_loose_layer(self, layer_name: str) -> QgsVectorLayer:
+        if self.project is None:
+            return
         uri = QgsDataSourceUri()
         uri.setDatabase(self.project.path_to_file)
         uri.setDataSource('', layer_name, 'geometry')
