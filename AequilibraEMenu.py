@@ -14,15 +14,15 @@ from aequilibrae.project import Project
 from aequilibrae.project.database_connection import ENVIRON_VAR
 
 import qgis
-from qgis.PyQt.QtCore import Qt
 from qgis.PyQt import QtCore
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
 from qgis.core import QgsProject
 from .binary_downloader_class import BinaryDownloaderDialog
 from .common_tools import AboutDialog
-from .common_tools import ParameterDialog, LogDialog
+from .common_tools import LogDialog
 from .download_extra_packages_class import DownloadExtraPackages
 from .gis import CompareScenariosDialog
 from .gis import CreateBandwidthsDialog
@@ -34,8 +34,6 @@ from .menu_actions import run_distribution_models, run_tsp, run_change_parameter
 from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
 from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from .public_transport_procedures import GtfsImportDialog
-
-# This is how QtCore and QtGui imports change
 
 no_binary = False
 try:
@@ -54,12 +52,8 @@ has_omx = spec is not None
 if not has_omx:
     extra_packages = False
 
-gtools = True
 spec = iutil.find_spec("openmatrix")
 has_ortools = spec is not None
-
-if has_ortools:
-    from .routing_procedures import TSPDialog
 
 if hasattr(Qt, 'AA_EnableHighDpiScaling'):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -105,6 +99,7 @@ class AequilibraEMenu:
         self.add_menu_action('Project', 'Create project from OSM', partial(project_from_osm, self))
         self.add_menu_action('Project', 'Create Project from layers', partial(run_create_transponet, self))
         self.add_menu_action('Project', 'Add zoning data', partial(run_add_zones, self))
+        self.add_menu_action('Project', 'Parameters', partial(run_change_parameters, self))
         self.add_menu_action('Project', 'Close project', self.run_close_project)
 
         # # # ########################################################################
@@ -186,10 +181,9 @@ class AequilibraEMenu:
         self.add_menu_action('Data', 'Import matrices', partial(load_matrices, self))
         self.add_menu_action('Utils', 'Display Matrices and datasets', partial(display_aequilibrae_formats, self))
 
-
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
-        # self.add_menu_action('AequilibraE', 'Parameters', partial(run_change_parameters, self))
+
         self.add_menu_action('AequilibraE', 'About', self.run_about)
         # self.add_menu_action('AequilibraE', 'logfile', self.run_log)
         self.add_menu_action('AequilibraE', 'Help', self.run_help)

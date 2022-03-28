@@ -81,7 +81,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
                 if key not in dict2:
                     self.error = True
                     break
-                if not isinstance(dict1[key], type(type(dict2[key]))):
+                if not isinstance(dict1[key], type(dict2[key])):
                     self.error = True
                     break
                 if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
@@ -99,7 +99,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
     def save_new_parameters(self):
         self.validate_data()
         if not self.error:
-            stream = open(self.path + "/parameters.yml", "w")
+            stream = open(self.path, "w")
             yaml.dump(self.current_data, stream, default_flow_style=False)
             stream.close()
             self.but_close.setText("Close")
