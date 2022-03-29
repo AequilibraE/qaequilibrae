@@ -10,9 +10,9 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
         self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
         self.geography_types = [None, None]

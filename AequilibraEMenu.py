@@ -23,10 +23,9 @@ from qgis.core import QgsProject
 from .binary_downloader_class import BinaryDownloaderDialog
 from .common_tools import AboutDialog
 from .download_extra_packages_class import DownloadExtraPackages
-from .gis import SimpleTagDialog
 from .matrix_procedures import LoadDatasetDialog
 from .menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices, show_log
-from .menu_actions import run_desire_lines, run_scenario_comparison, run_lcd
+from .menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag
 from .menu_actions import run_distribution_models, run_tsp, run_change_parameters, run_stacked_bandwidths
 from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
 from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
@@ -146,16 +145,11 @@ class AequilibraEMenu:
         #
         # # ########################################################################
         # # #################        GIS TOOLS SUB-MENU    #########################
-        #
-        # gisMenu = QMenu()
-        # self.simple_tag_action = QAction(self.trlt('Simple tag'), self.manager)
-        # self.simple_tag_action.triggered.connect(self.run_simple_tag)
-        # gisMenu.addAction(self.simple_tag_action)
-
         self.add_menu_action('GIS', 'Desire Lines', partial(run_desire_lines, self))
         self.add_menu_action('GIS', 'Stacked Bandwidth', partial(run_stacked_bandwidths, self))
         self.add_menu_action('GIS', 'Scenario Comparison', partial(run_scenario_comparison, self))
         self.add_menu_action('GIS', 'Lowest common denominator', partial(run_lcd, self))
+        self.add_menu_action('GIS', 'Simple tag', partial(run_tag, self))
 
         # # ########################################################################
         # # #################          Utils submenu         #########################
@@ -336,11 +330,6 @@ class AequilibraEMenu:
 
     def run_import_gtfs(self):
         dlg2 = GtfsImportDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-
-    def run_simple_tag(self):
-        dlg2 = SimpleTagDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

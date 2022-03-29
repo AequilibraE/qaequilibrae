@@ -4,9 +4,15 @@ from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordina
 from ..common_tools.auxiliary_functions import get_vector_layer_by_name
 from ..common_tools.global_parameters import multi_line, multi_point, line_types, point_types
 from aequilibrae.utils.worker_thread import WorkerThread
+from qgis.PyQt.QtCore import pyqtSignal
 
 
 class SimpleTAG(WorkerThread):
+    ProgressText = pyqtSignal(object)
+    ProgressValue = pyqtSignal(object)
+    ProgressMaxValue = pyqtSignal(object)
+    finished_threaded_procedure = pyqtSignal(object)
+
     def __init__(self, parentThread, flayer, tlayer, ffield, tfield, fmatch, tmatch, operation, geo_types):
         WorkerThread.__init__(self, parentThread)
         self.ffield = ffield

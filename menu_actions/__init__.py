@@ -4,7 +4,9 @@ from .action_display_aeq_formats import display_aequilibrae_formats
 from .action_distribution import run_distribution_models
 from .action_edit_parameters import run_change_parameters
 from .action_gis_desire_lines import run_desire_lines
+from .action_gis_lcd import run_lcd
 from .action_gis_scenario_comparison import run_scenario_comparison
+from .action_gis_simple_tag import run_tag
 from .action_gis_stacked_bandwidths import run_stacked_bandwidths
 from .action_import_matrices import load_matrices
 from .action_prepare_network import prepare_network
@@ -14,4 +16,3 @@ from .action_show_project_data import run_show_project_data
 from .create_networks import run_create_transponet
 from .load_project_action import run_load_project
 from .project_from_osm_action import project_from_osm
-from .action_gis_lcd import run_lcd
