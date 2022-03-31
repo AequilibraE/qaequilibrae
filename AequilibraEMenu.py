@@ -33,7 +33,7 @@ from .public_transport_procedures import GtfsImportDialog
 
 no_binary = False
 try:
-    from .aequilibrae.aequilibrae.paths import allOrNothing
+    from aequilibrae.paths.AoN import one_to_all
 except ImportError as e:
     no_binary = True
     warn(f'AequilibraE binaries are not available {e.args}')
