@@ -1,10 +1,10 @@
 import numpy as np
+from aequilibrae.utils.worker_thread import WorkerThread
 
+from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from ..common_tools.auxiliary_functions import get_vector_layer_by_name
 from ..common_tools.global_parameters import multi_line, multi_point, line_types, point_types
-from aequilibrae.utils.worker_thread import WorkerThread
-from qgis.PyQt.QtCore import pyqtSignal
 
 
 class SimpleTAG(WorkerThread):

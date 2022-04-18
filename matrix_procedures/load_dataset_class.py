@@ -4,9 +4,15 @@ from aequilibrae.utils.worker_thread import WorkerThread
 import struct
 from aequilibrae.matrix import AequilibraeData
 from ..common_tools.global_parameters import float_types, string_types, integer_types
+from qgis.PyQt.QtCore import pyqtSignal
 
 
 class LoadDataset(WorkerThread):
+    ProgressText = pyqtSignal(object)
+    ProgressValue = pyqtSignal(object)
+    ProgressMaxValue = pyqtSignal(object)
+    finished_threaded_procedure = pyqtSignal(object)
+
     def __init__(self, parent_thread, layer, index_field, fields, file_name):
         WorkerThread.__init__(self, parent_thread)
         self.layer = layer

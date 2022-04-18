@@ -4,12 +4,18 @@ import uuid
 
 import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.utils.worker_thread import WorkerThread
 from scipy.sparse import coo_matrix
 
-from aequilibrae.utils.worker_thread import WorkerThread
+from qgis.PyQt.QtCore import pyqtSignal
 
 
 class LoadMatrix(WorkerThread):
+    ProgressValue = pyqtSignal(object)
+    ProgressText = pyqtSignal(object)
+    ProgressMaxValue = pyqtSignal(object)
+    finished_threaded_procedure = pyqtSignal(object)
+
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
         self.matrix_type = kwargs.get("type")

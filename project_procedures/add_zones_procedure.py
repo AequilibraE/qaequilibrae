@@ -1,9 +1,14 @@
 import shapely.wkb
 
 from ..common_tools import WorkerThread
+from PyQt5.QtCore import pyqtSignal
 
 
 class AddZonesProcedure(WorkerThread):
+    ProgressValue = pyqtSignal(object)
+    ProgressText = pyqtSignal(object)
+    ProgressMaxValue = pyqtSignal(object)
+
     def __init__(self, parentThread, project, area_layer, select_only, add_centroids, field_correspondence):
         WorkerThread.__init__(self, parentThread)
         self.project = project

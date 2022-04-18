@@ -1,5 +1,6 @@
 from string import ascii_letters
 
+from PyQt5.QtCore import pyqtSignal
 from aequilibrae.project import Project
 
 from aequilibrae import logger
@@ -7,6 +8,11 @@ from ..common_tools import WorkerThread
 
 
 class CreatesTranspoNetProcedure(WorkerThread):
+    ProgressValue = pyqtSignal(object)
+    ProgressText = pyqtSignal(object)
+    ProgressMaxValue = pyqtSignal(object)
+    finished_threaded_procedure = pyqtSignal(object)
+
     def __init__(self, parentThread, proj_folder, node_layer, node_fields, link_layer, link_fields):
         WorkerThread.__init__(self, parentThread)
 

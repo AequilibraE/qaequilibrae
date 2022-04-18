@@ -2,9 +2,15 @@ import shapely.wkb
 from shapely.geometry import Point
 
 from ..common_tools import WorkerThread
+from PyQt5.QtCore import pyqtSignal
 
 
 class AddsConnectorsProcedure(WorkerThread):
+    ProgressValue = pyqtSignal(object)
+    ProgressText = pyqtSignal(object)
+    ProgressMaxValue = pyqtSignal(object)
+    finished_threaded_procedure = pyqtSignal(object)
+
     def __init__(self, parentThread, qgis_project, link_types, modes, num_connectors, source, radius=None, layer=None,
                  field=None):
         WorkerThread.__init__(self, parentThread)

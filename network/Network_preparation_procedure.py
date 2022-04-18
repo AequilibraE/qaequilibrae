@@ -1,6 +1,7 @@
 # from qgis.core import *
 # from qgis.PyQt.QtCore import *
 import numpy as np
+from PyQt5.QtCore import pyqtSignal
 from qgis._core import QgsField, QgsFeatureRequest, QgsPointXY, QgsVectorLayer, QgsGeometry, QgsFeature, QgsSpatialIndex
 
 from qgis.PyQt.QtCore import QVariant
@@ -9,6 +10,11 @@ from ..common_tools.auxiliary_functions import get_vector_layer_by_name
 
 
 class NetworkPreparationProcedure(WorkerThread):
+    ProgressValue = pyqtSignal(object)
+    ProgressText = pyqtSignal(object)
+    ProgressMaxValue = pyqtSignal(object)
+    finished_threaded_procedure = pyqtSignal(object)
+
     def __init__(
             self,
             parentThread,
