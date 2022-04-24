@@ -96,6 +96,10 @@ class LoadMatrix(WorkerThread):
 
 
 class MatrixReblocking(WorkerThread):
+    ProgressValue = pyqtSignal(object)
+    ProgressText = pyqtSignal(object)
+    ProgressMaxValue = pyqtSignal(object)
+    finished_threaded_procedure = pyqtSignal(object)
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
         self.matrix = AequilibraeMatrix()

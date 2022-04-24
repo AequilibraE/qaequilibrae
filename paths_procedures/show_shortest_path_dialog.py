@@ -53,7 +53,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.do_dist_matrix.setEnabled(False)
         self.from_but.setEnabled(False)
         self.to_but.setEnabled(False)
-        self.load_graph_from_file.clicked.connect(self.prepare_graph_and_network)
+        self.configure_graph.clicked.connect(self.prepare_graph_and_network)
         self.from_but.clicked.connect(self.search_for_point_from)
         self.to_but.clicked.connect(self.search_for_point_to)
         self.do_dist_matrix.clicked.connect(self.produces_path)
@@ -77,7 +77,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             else:
                 self.graph = self.project.network.graphs[self.mode]
             self.graph.set_graph(self.minimize_field)
-            self.graph.set_skimming(self.minimize_field)
+            self.graph.set_skimming([self.minimize_field])
             self.graph.set_blocked_centroid_flows(dlg2.block_connector)
 
             if dlg2.remove_chosen_links:
