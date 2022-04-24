@@ -134,7 +134,6 @@ class CreatesTranspoNetProcedure(WorkerThread):
         data_to_add = []
         sql = f"""INSERT INTO {table} ({field_titles} , geometry)
                   VALUES ({','.join(['?'] * len(layer_fields.keys()))},GeomFromWKB(?, ?))"""
-        # VALUES ({','.join(['?'] * len(layer_fields.keys()))},GeomFromText(?, ?))"""
 
         crs = int(layer.crs().authid().split(":")[1])
 

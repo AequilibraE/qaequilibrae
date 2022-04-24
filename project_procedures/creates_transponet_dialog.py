@@ -268,6 +268,13 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.project_destination.setText(self.proj_folder)
 
     def create_net(self):
+
+        ok, msg = self.check_data()
+
+        if not ok:
+            self.iface.messageBar().pushMessage("Error", msg, level=3, duration=10)
+            return
+
         self.proj_folder = self.project_destination.text()
         if isdir(self.proj_folder):
             counter = 1
@@ -284,6 +291,17 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progress_label.setVisible(True)
         self.worker_thread = CreatesTranspoNetProcedure(qgis.utils.iface.mainWindow(), *parameters)
         self.run_thread()
+
+    def check_data(self):
+        if self.link_layer:
+            if len(self.link_layer.crs().authid()) == 0:
+                return False, 'Link Layer has NO defined CRS'
+
+        if self.node_layer:
+            if len(self.node_layer.crs().authid()) == 0:
+                return False, 'Node Layer has NO defined CRS'
+
+        return True, ''
 
     def assembles_data(self):
         def compile_fields(layer, table):
