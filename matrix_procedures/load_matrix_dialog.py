@@ -9,7 +9,8 @@ import qgis
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem
-from .load_matrix_class import LoadMatrix, MatrixReblocking
+from .load_matrix_class import LoadMatrix
+from .mat_reblock import MatrixReblocking
 from ..common_tools.all_layers_from_toc import all_layers_from_toc
 from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
 from ..common_tools.get_output_file_name import GetOutputFileName
