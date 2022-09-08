@@ -22,7 +22,7 @@ class BinaryDownloaderDialog(QtWidgets.QDialog, FORM_CLASS):
 
         d = dirname(abspath(__file__))
         with open(os.path.join(d, "meta.yaml"), "r") as yml:
-            par = yaml.load(yml)
+            par = yaml.safe_load(yml)
         bin_path = par["binary source"]
         if isWindows():
             npv = np.__version__.split('.')[1]
