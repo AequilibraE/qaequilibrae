@@ -1,8 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
 from aequilibrae.paths import NetworkSkimming, SkimResults
 from aequilibrae.utils.worker_thread import WorkerThread
-from ortools.constraint_solver import pywrapcp
-from ortools.constraint_solver import routing_enums_pb2
 
 
 class TSPProcedure(WorkerThread):
@@ -19,6 +17,8 @@ class TSPProcedure(WorkerThread):
         self.node_sequence = []
 
     def doWork(self):
+        from ortools.constraint_solver import pywrapcp
+        from ortools.constraint_solver import routing_enums_pb2
         ns = NetworkSkimming(self.graph)
         ns.execute()
 
