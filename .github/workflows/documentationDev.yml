@@ -61,7 +61,7 @@ jobs:
           DEST_DIR: 'qgis/dev/'      # optional: defaults to entire repository
 
   unit_testing:
-#    needs: linting
+    needs: linting
     runs-on: ubuntu-latest
     container: qgis/qgis:release-3_22
     strategy:
@@ -69,7 +69,7 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          pip3 install -r requirements.txt
-          pip3 install -r docs/requirements-docs.txt
+          export QT_QPA_PLATFORM=offscreen
+          python3 -m pip install -r requirements.txt
+          python3 -m pip install -r docs/requirements-docs.txt
           ls
