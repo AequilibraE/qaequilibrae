@@ -1,14 +1,13 @@
-from ortools.constraint_solver import routing_enums_pb2
-from ortools.constraint_solver import pywrapcp
-from os.path import join
+from PyQt5.QtCore import pyqtSignal
 from aequilibrae.paths import NetworkSkimming, SkimResults
-
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
-from ..common_tools.worker_thread import WorkerThread
+from aequilibrae.utils.worker_thread import WorkerThread
+from ortools.constraint_solver import pywrapcp
+from ortools.constraint_solver import routing_enums_pb2
 
 
 class TSPProcedure(WorkerThread):
+    finished = pyqtSignal(object)
+
     def __init__(self, parentThread, graph, depot, vehicles):
         WorkerThread.__init__(self, parentThread)
         self.graph = graph
@@ -20,13 +19,10 @@ class TSPProcedure(WorkerThread):
         self.node_sequence = []
 
     def doWork(self):
-        res = SkimResults()
-        res.prepare(self.graph)
-
-        ns = NetworkSkimming(self.graph, res)
+        ns = NetworkSkimming(self.graph)
         ns.execute()
 
-        skm = res.skims
+        skm = ns.results.skims
         mat = (skm.get_matrix(skm.names[0]) * self.mult).astype(int)
         self.depot = list(skm.index).index(self.depot)
         # Create the routing index manager.
@@ -77,4 +73,4 @@ class TSPProcedure(WorkerThread):
             self.node_sequence.append(p)
             plan_output += f' {p}\n'
             self.report.append(plan_output)
-        self.finished_threaded_procedure.emit("TSP")
+        self.finished.emit("TSP")

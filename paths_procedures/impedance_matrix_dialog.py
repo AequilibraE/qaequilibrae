@@ -1,50 +1,30 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Creating impedance matrices
- Purpose:    Loads GUI to create impedance matrices
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2014-03-19
- Updated:    2020-02-08
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-from qgis.core import *
-import qgis
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QTableWidgetItem, QAbstractItemView
+import importlib.util as iutil
+import os
 
 from aequilibrae.paths import Graph, SkimResults, NetworkSkimming
-from aequilibrae.matrix import matrix_export_types
-from aequilibrae.project import Project
-from ..common_tools import GetOutputFileName
-from ..common_tools import ReportDialog
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
 
-# sys.modules['qgsmaplayercombobox'] = qgis.gui
+import qgis
+from ..common_tools.global_parameters import integer_types, float_types
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
+from ..common_tools import ReportDialog
+from ..common_tools.auxiliary_functions import standard_path
+
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_impedance_matrix.ui"))
+
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
 
 
 class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, project: Project, link_layer):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
 
-        self.project = project
-        self.link_layer = link_layer
+        self.project = qgis_project.project
+        self.link_layer = qgis_project.layers['links'][0]
         self.result = SkimResults()
         self.validtypes = integer_types + float_types
         self.tot_skims = 0
@@ -133,15 +113,13 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progressbar.setValue(0)
         self.progress_label.setText("")
 
-    def browse_outfile(self):
-        self.imped_results = None
-        new_name, extension = GetOutputFileName(
-            self, "AequilibraE impedance computation", matrix_export_types, ".aem", self.path
-        )
-        if new_name is not None:
-            self.imped_results = new_name
-            return True
-        return False
+    def check_name_exists(self):
+        txt = self.line_matrix.text()
+        if not len(txt):
+            return False
+        if self.project.conn.execute('Select count(*) from matrices where name=?', [txt]).fetchone()[0]:
+            return False
+        return True
 
     def run_thread(self):
         self.do_dist_matrix.setVisible(False)
@@ -160,13 +138,14 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def finished_threaded_procedure(self):
         self.report = self.worker_thread.report
-        self.result.skims.export(self.only_str(self.imped_results))
+        format = 'omx' if has_omx else 'aem'
+        self.worker_thread.save_to_project(self.only_str(self.mat_name), format=format)
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results
-        if not self.browse_outfile():
+        if not self.check_name_exists():
             return
-
+        self.mat_name = self.line_matrix.text()
         mode = self.all_modes[self.cb_modes.currentText()]
         self.project.network.build_graphs()
         self.graph = self.project.network.graphs[mode]

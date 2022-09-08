@@ -1,30 +1,23 @@
 import os
 import tempfile
-from qgis.core import *
-from qgis.PyQt.Qsci import QsciLexerYAML
-from qgis.PyQt.QtGui import *
-from qgis.PyQt import QtWidgets, uic
+from os.path import join
+
 from aequilibrae import Parameters
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.Qsci import QsciLexerYAML
+from qgis.PyQt.QtGui import QFont
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_parameters.ui"))
 
 
 class LogDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, parent=None):
+    def __init__(self, qgis_project, parent=None):
         super(LogDialog, self).__init__(parent)
-        p = Parameters().parameters
 
-        temp_folder = p["system"]["logging_directory"]
-        if not os.path.isdir(temp_folder):
-            temp_folder = tempfile.gettempdir()
+        self.logfile = join(qgis_project.project.project_base_path, 'aequilibrae.log')
 
-        self.logfile = log_file = os.path.join(temp_folder, "aequilibrae.log")
-
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
-
-        self.path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/aequilibrae/"
-        self.default_values = None
         self.parameter_values = None
         self.current_data = None
         self.error = False
@@ -44,9 +37,10 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
         # Connect all buttons
         self.but_validate.setVisible(False)
         self.but_defaults.setVisible(False)
-        self.but_save.setVisible(False)
+        self.but_save.setVisible(True)
         self.but_close.setText('Close')
         self.but_close.clicked.connect(self.exit_procedure)
+        self.but_save.clicked.connect(self.save_to_disk)
 
     # Load the current parameters onto the GUI
     def load_data(self):
@@ -55,6 +49,10 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
         with open(self.logfile, "r") as log:
             logdata = log.readlines()
         self.text_box.setText(''.join(logdata))
+
+    def save_to_disk(self):
+        with open(self.logfile, "w") as log:
+            log.writelines(self.text_box.text())
 
     def exit_procedure(self):
         self.close()

@@ -1,43 +1,18 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Compute GIS tags
- Purpose:    Loads GUI for computing GIS tags
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2014-03-19
- Updated:    2018-12-28
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import *
-from qgis.PyQt import QtWidgets, uic
-import qgis
-import sys
 import os
 
-# For the GIS tools portion
+import qgis
+from qgis.PyQt import QtWidgets, uic
 from .simple_tag_procedure import SimpleTAG
-
-from ..common_tools.global_parameters import *
 from ..common_tools.auxiliary_functions import get_vector_layer_by_name
+from ..common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types, multi_point
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_simple_tag.ui"))
 
 
 class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
         self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
         self.geography_types = [None, None]
@@ -221,13 +196,13 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         error = False
         if (
-            min(
-                self.fromlayer.currentIndex(),
-                self.fromfield.currentIndex(),
-                self.tolayer.currentIndex(),
-                self.tofield.currentIndex(),
-            )
-            < 0
+                min(
+                    self.fromlayer.currentIndex(),
+                    self.fromfield.currentIndex(),
+                    self.tolayer.currentIndex(),
+                    self.tofield.currentIndex(),
+                )
+                < 0
         ):
             error = True
 

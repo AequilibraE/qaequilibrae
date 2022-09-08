@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>612</width>
+    <width>696</width>
     <height>413</height>
    </rect>
   </property>
@@ -14,57 +14,7 @@
    <string>AequilibraE - Create project from layers</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0" rowspan="2">
-    <widget class="QProgressBar" name="progressbar">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="palette">
-      <palette>
-       <active>
-        <colorrole role="Highlight">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>0</red>
-           <green>170</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </active>
-       <inactive>
-        <colorrole role="Highlight">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>240</red>
-           <green>240</green>
-           <blue>240</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </inactive>
-       <disabled>
-        <colorrole role="Highlight">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>51</red>
-           <green>153</green>
-           <blue>255</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </disabled>
-      </palette>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-     <property name="textVisible">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="3">
+   <item row="0" column="0" colspan="5">
     <widget class="QTabWidget" name="tabs_list_widget">
      <property name="currentIndex">
       <number>0</number>
@@ -308,18 +258,124 @@
      </widget>
     </widget>
    </item>
-   <item row="1" column="2">
+   <item row="1" column="0">
+    <widget class="QPushButton" name="but_choose_folder">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Choose folder</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="project_destination">
+     <property name="minimumSize">
+      <size>
+       <width>250</width>
+       <height>30</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
     <widget class="QPushButton" name="but_create_network_file">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Create Project</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QLabel" name="progress_label">
+   <item row="5" column="0" rowspan="2" colspan="3">
+    <widget class="QProgressBar" name="progressbar">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="Highlight">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>170</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="Highlight">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>240</red>
+           <green>240</green>
+           <blue>240</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="Highlight">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>51</red>
+           <green>153</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
      <property name="font">
       <font>
-       <pointsize>9</pointsize>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="textVisible">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3" rowspan="2" colspan="2">
+    <widget class="QLabel" name="progress_label">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="text">

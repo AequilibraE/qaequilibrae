@@ -1,10 +1,17 @@
 developers:
   - Pedro Camargo
-  - Yu-Chu Huang
+  - Jan Zill
   - Jamie Cook
   - Andrew O'Brien
-  - Jan Zill
+  - Yu-Chu Huang
 sponsors:
   - IPEA (2015)
 
-binary source: http://www.aequilibrae.com/binaries/v.0.6.1/binaries.zip
+binary source:
+  MacOS: https://github.com/AequilibraE/aequilibrae/releases/download/V0.7.3/binaries.zip
+  Linux: https://github.com/AequilibraE/aequilibrae/releases/download/V0.7.3/binaries.zip
+  Windows:
+    np19: https://github.com/AequilibraE/aequilibrae/releases/download/V0.7.3/windows_binaries_1.19.zip
+    np20: https://github.com/AequilibraE/aequilibrae/releases/download/V0.7.3/windows_binaries_1.20.zip
+    np21: https://github.com/AequilibraE/aequilibrae/releases/download/V0.7.3/windows_binaries_1.21.zip
+    np22: https://github.com/AequilibraE/aequilibrae/releases/download/V0.7.3/windows_binaries_1.22.zip

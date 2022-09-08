@@ -1,43 +1,21 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Loads matrix from file/layer
- Purpose:    Loads GUI for loading matrix from different sources
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-30 (originally onto a single numpy array)
- Updated:    2019-04-09
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
 import importlib.util as iutil
-from qgis.core import *
+import os
+
+import numpy as np
+from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
+
+import aequilibrae
+import qgis
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
-import qgis
-from scipy.sparse import coo_matrix
-import logging
-import numpy as np
 from qgis.PyQt.QtWidgets import QTableWidgetItem
-
-import sys
-import os
+from .load_matrix_class import LoadMatrix
+from .mat_reblock import MatrixReblocking
 from ..common_tools.all_layers_from_toc import all_layers_from_toc
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
+from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
 from ..common_tools.get_output_file_name import GetOutputFileName
+from ..common_tools.global_parameters import float_types, integer_types
 from ..common_tools.report_dialog import ReportDialog
-from .load_matrix_class import LoadMatrix, MatrixReblocking
-from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
-import aequilibrae
 
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None
@@ -209,7 +187,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.matrix_count += 1
                 self.update_matrix_list()
 
-                if self.multiple == False:
+                if not self.multiple:
                     self.update_matrix_hashes()
 
             elif param == "REBLOCKED MATRICES":

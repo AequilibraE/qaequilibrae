@@ -1,36 +1,18 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Compute GIS tags
- Purpose:    Implements computation of GIS tags on a separate thread
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2014-03-19
- Updated:    2018-12-28
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import *
-
-# from PyQt4.QtCore import *
-from qgis.PyQt.QtCore import *
 import numpy as np
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
-from ..common_tools.worker_thread import WorkerThread
-from ..common_tools.global_parameters import *
+from aequilibrae.utils.worker_thread import WorkerThread
+
+from qgis.PyQt.QtCore import pyqtSignal
+from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
+from ..common_tools.auxiliary_functions import get_vector_layer_by_name
+from ..common_tools.global_parameters import multi_line, multi_point, line_types, point_types
 
 
 class SimpleTAG(WorkerThread):
+    ProgressText = pyqtSignal(object)
+    ProgressValue = pyqtSignal(object)
+    ProgressMaxValue = pyqtSignal(object)
+    finished_threaded_procedure = pyqtSignal(object)
+
     def __init__(self, parentThread, flayer, tlayer, ffield, tfield, fmatch, tmatch, operation, geo_types):
         WorkerThread.__init__(self, parentThread)
         self.ffield = ffield
@@ -135,7 +117,7 @@ class SimpleTAG(WorkerThread):
         for i, feat in enumerate(self.to_layer.getFeatures()):
             self.ProgressValue.emit(i)
             if self.all_attr[feat.id()] is not None:
-                a = self.to_layer.dataProvider().changeAttributeValues({feat.id(): {fid: self.all_attr[feat.id()]}})
+                _ = self.to_layer.dataProvider().changeAttributeValues({feat.id(): {fid: self.all_attr[feat.id()]}})
 
         self.to_layer.commitChanges()
         self.to_layer.updateFields()
@@ -145,71 +127,71 @@ class SimpleTAG(WorkerThread):
 
     def chooses_match(self, feat):
         geom = feat.geometry()
-        if geom is not None:
-            if self.transform is not None:
-                geom.transform(self.transform)
+        if geom is None:
+            return
 
-            if self.operation in ["ENCLOSED", "TOUCHING"]:
-                nearest = self.index_from.intersects(geom.boundingBox())
+        if self.transform is not None:
+            geom.transform(self.transform)
 
+        if self.operation in ["ENCLOSED", "TOUCHING"]:
+            self.enclosed_or_touching(feat, geom)
+        else:
+            self.other_predicates(feat, geom)
+
+    def other_predicates(self, feat, geom):
+        # The problem with the "nearest" search is that we cannot swear by it when we are using only spatial
+        # indexes. For this reason we will compute a fixed number of nearest neighbors and then get the
+        # distance for each one of them
+        pt = geom.centroid().asPoint()
+        s = self.sequence_of_searches[1]
+        nearest = self.index_from.nearestNeighbor(pt, s)
+        dists = np.zeros(len(nearest))
+        for k, n in enumerate(nearest):
+            dists[k] = self.from_features[n].geometry().distance(geom)
+        min_index = np.argsort(dists)
+        if feat.id() not in self.all_attr:
+            for k in range(len(nearest)):
+                n = nearest[min_index[k]]
                 if self.fmatch:
-                    nearest = [n for n in nearest if self.from_match[feat.id()] == self.to_match[n]]
-
-                if self.operation == "ENCLOSED":
-                    if self.geo_types[0] == "polygon":
-                        for n in nearest:
-                            if self.from_features[n].geometry().contains(geom):
-                                self.all_attr[feat.id()] = self.from_val[n]
-                                break
-                    # if we destination was the polygon
-                    else:
-                        for n in nearest:
-                            if geom.contains(self.from_features[n].geometry()):
-                                self.all_attr[feat.id()] = self.from_val[n]
-                                break
+                    if self.from_match[feat.id()] == self.to_match[n]:
+                        self.all_attr[feat.id()] = self.from_val[n]
+                        break
                 else:
-                    # we will compute the overlaps to make sure we are keeping the best match. e.g. Largest area or largest
-                    # length
-                    current_max = [None, -1]
-                    intersec = "length"
-                    if self.geo_types == ["polygon", "polygon"]:
-                        intersec = "area"
+                    self.all_attr[feat.id()] = self.from_val[n]
+                    break
 
-                    for n in nearest:
-                        intersection = self.from_features[n].geometry().intersection(geom)
-                        if intersection.geometry() is not None:
-                            if intersec == "length":
-                                aux = intersection.geometry().length()
-                            else:
-                                aux = intersection.geometry().area()
-                            if aux > current_max[1]:
-                                current_max = [self.from_val[n], aux]
-                    if current_max[0] is not None:
-                        self.all_attr[feat.id()] = current_max[0]
+    def enclosed_or_touching(self, feat, geom):
+        nearest = self.index_from.intersects(geom.boundingBox())
+        if self.fmatch:
+            nearest = [n for n in nearest if self.from_match[feat.id()] == self.to_match[n]]
+        if self.operation == "ENCLOSED":
+            if self.geo_types[0] == "polygon":
+                for n in nearest:
+                    if self.from_features[n].geometry().contains(geom):
+                        self.all_attr[feat.id()] = self.from_val[n]
+                        break
+            # if we destination was the polygon
             else:
-                # The problem with the "nearest" search is that we cannot swear by it when we are using only spatial
-                # indexes. For this reason we will compute a fixed number of nearest neighbors and then get the
-                # distance for each one of them
-                pt = geom.centroid().asPoint()
-                s = self.sequence_of_searches[1]
-                nearest = self.index_from.nearestNeighbor(pt, s)
-                dists = np.zeros(len(nearest))
+                for n in nearest:
+                    if geom.contains(self.from_features[n].geometry()):
+                        self.all_attr[feat.id()] = self.from_val[n]
+                        break
+        else:
+            # we will compute the overlaps to make sure we are keeping the best match. e.g. Largest area or largest
+            # length
+            current_max = [None, -1]
+            intersec = "length"
+            if self.geo_types == ["polygon", "polygon"]:
+                intersec = "area"
 
-                for k, n in enumerate(nearest):
-                    dists[k] = self.from_features[n].geometry().distance(geom)
-                min_index = np.argsort(dists)
-
-                if feat.id() not in self.all_attr:
-                    for k in range(len(nearest)):
-                        n = nearest[min_index[k]]
-                        if self.fmatch:
-                            if self.from_match[feat.id()] == self.to_match[n]:
-                                self.all_attr[feat.id()] = self.from_val[n]
-                                break
-                        else:
-                            self.all_attr[feat.id()] = self.from_val[n]
-                            break
-
-
-if __name__ == "__main__":
-    main()
+            for n in nearest:
+                intersection = self.from_features[n].geometry().intersection(geom)
+                if intersection.geometry() is not None:
+                    if intersec == "length":
+                        aux = intersection.geometry().length()
+                    else:
+                        aux = intersection.geometry().area()
+                    if aux > current_max[1]:
+                        current_max = [self.from_val[n], aux]
+            if current_max[0] is not None:
+                self.all_attr[feat.id()] = current_max[0]

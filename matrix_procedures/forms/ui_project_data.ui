@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>data_viewer</class>
+ <widget class="QDialog" name="data_viewer">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>687</width>
+    <height>429</height>
+   </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>5000</width>
+    <height>4000</height>
+   </size>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Project data</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../icon.png</normaloff>../icon.png</iconset>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QTabWidget" name="tabs">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab_mat">
+      <attribute name="title">
+       <string>Matrices</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="1" column="1">
+        <widget class="QPushButton" name="but_load_matrix">
+         <property name="toolTip">
+          <string>Displays matrix</string>
+         </property>
+         <property name="text">
+          <string>Load matrix</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QPushButton" name="but_update_matrices">
+         <property name="maximumSize">
+          <size>
+           <width>140</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Permanently updates the project table</string>
+         </property>
+         <property name="text">
+          <string>Update matrix table</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" colspan="2">
+        <widget class="QTableView" name="list_matrices"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_res">
+      <attribute name="title">
+       <string>Results</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0" colspan="3">
+        <widget class="QTableView" name="list_results">
+         <property name="toolTip">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="3">
+        <widget class="QPushButton" name="but_load_Results">
+         <property name="toolTip">
+          <string>It may take up to one minute to process for the first time a table is loaded from this database</string>
+         </property>
+         <property name="text">
+          <string>Load Result table as data layer</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

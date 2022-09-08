@@ -1,43 +1,18 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Loads graph from file
- Purpose:    Loads GUI for loading graphs from files and configuring them before computation
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-30
- Updated:    2020-02-08
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import *
-import qgis
-from qgis.PyQt import QtWidgets, uic, QtCore, QtGui
-from qgis.PyQt.QtGui import *
-
-import sys
+import logging
 import os
-from functools import partial
-from ..common_tools.auxiliary_functions import *
-from ..common_tools import GetOutputFileName
-from ..common_tools.global_parameters import *
+
 from aequilibrae.project import Project
 
+from qgis.PyQt import QtWidgets, uic, QtCore
+
+logger = logging.getLogger("AequilibraEGUI")
 try:
     from aequilibrae.paths import Graph
 
     no_binary = False
-except:
+except Exception as e:
     no_binary = True
+    logger.error(e.args)
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_load_network_info.ui"))
 

@@ -1,27 +1,8 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       NumPy Model
- Purpose:    Loads numpy to a GUI in an efficient fashion
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com1
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2014-03-19
- Updated:    2017-10-02
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
 import numpy as np
+
+import qgis
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import *
-import qgis
 
 Qt = QtCore.Qt
 

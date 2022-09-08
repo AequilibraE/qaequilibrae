@@ -1,40 +1,14 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       GTFS import
- Purpose:    Loads interface for converting GTFS to SQLite with Spatialite database
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:   Pedro Camargo
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2018-02-02
- Updated:
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
 import logging
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QHBoxLayout, QWidget, QLineEdit
-from qgis.PyQt.QtWidgets import QSpacerItem, QProgressBar, QLabel, QVBoxLayout, QSizePolicy, QCheckBox
-import sys
-from functools import partial
-import numpy as np
-from collections import OrderedDict
-
-from ..common_tools.global_parameters import *
-from ..common_tools.auxiliary_functions import *
-from ..common_tools import ReportDialog, GetOutputFileName, GetOutputFolderName
+import os
 
 from aequilibrae.transit.gtfs import create_gtfsdb
+
+import qgis
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QHBoxLayout, QWidget, QLineEdit
+from qgis.PyQt.QtWidgets import QSpacerItem, QProgressBar, QLabel, QVBoxLayout, QSizePolicy, QCheckBox
+from ..common_tools import ReportDialog, GetOutputFileName, GetOutputFolderName
+from ..common_tools.auxiliary_functions import standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 

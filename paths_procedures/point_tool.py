@@ -1,7 +1,7 @@
 # From http://gis.stackexchange.com/questions/45094/how-to-programatically-check-for-a-mouse-click-in-qgis
 # By Nathan Woodrow
 from qgis.gui import QgsMapTool
-from qgis.PyQt.QtCore import *
+from PyQt5.QtCore import pyqtSignal
 
 
 class PointTool(QgsMapTool):
@@ -15,13 +15,13 @@ class PointTool(QgsMapTool):
         x = event.pos().x()
         y = event.pos().y()
 
-        point = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
+        _ = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
 
     def canvasMoveEvent(self, event):
         x = event.pos().x()
         y = event.pos().y()
 
-        point = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
+        _ = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
 
     def canvasReleaseEvent(self, event):
         # Get the click

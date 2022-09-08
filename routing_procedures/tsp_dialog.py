@@ -1,34 +1,42 @@
+import logging
 import os
-from qgis.core import QgsVectorLayer
-from qgis.core import QgsProject
-from qgis.PyQt.QtCore import QObject, QVariant
-from qgis.PyQt import QtWidgets, uic
-from ..common_tools import ReportDialog
-import qgis
+
 import numpy as np
+
+import qgis
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 from .tsp_procedure import TSPProcedure
+from ..common_tools import ReportDialog
 
-from ..common_tools.global_parameters import *
-
+logger = logging.getLogger('AequilibraEGUI')
 no_binary = False
 try:
     from aequilibrae.paths import Graph, path_computation
     from aequilibrae.paths.results import PathResults
     from aequilibrae.project import Project
-except:
+except Exception as e:
+    logger.error(f'Importing AequilibraE failed. {e.args}')
     no_binary = True
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/tsp.ui"))
 
 
 class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, project: Project, link_layer, node_layer):
+    def __init__(self, qgisproject):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgisproject.iface
         self.setupUi(self)
-        self.project = project
-        self.link_layer = link_layer
-        self.node_layer = node_layer
+        self.project = qgisproject.project  # type: Project
+        self._PQgis = qgisproject
+
+        self.link_layer = self._PQgis.layers['links'][0]
+        self.node_layer = self._PQgis.layers['nodes'][0]
+
+        QgsProject.instance().addMapLayer(self.link_layer)
+        QgsProject.instance().addMapLayer(self.node_layer)
+
         self.all_modes = {}
         self.worker_thread: TSPProcedure = None
         self.but_run.clicked.connect(self.run)
@@ -66,22 +74,21 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         return sorted(c)
 
     def run(self):
-        error = None
         md = self.all_modes[self.cob_mode.currentText()]
 
-        self.project.network.build_graphs()
+        self.project.network.build_graphs(modes=[md])
         self.graph = self.project.network.graphs[md]
 
         if self.rdo_selected.isChecked():
             centroids = self.selected_nodes()
             if len(centroids) < 3:
-                qgis.utils.iface.messageBar().pushMessage("You need at least three selected nodes. ", '', level=3)
+                qgis.utils.iface.messageBar().pushMessage("You need at least three nodes to route. ", '', level=3)
                 return
             centroids = np.array(centroids).astype(np.int64)
             self.graph.prepare_graph(centroids=centroids)
         else:
             if self.project.network.count_centroids() < 3:
-                qgis.utils.iface.messageBar().pushMessage("You need at least three centroids. ", '', level=3)
+                qgis.utils.iface.messageBar().pushMessage("You need at least three centroids to route. ", '', level=3)
                 return
 
         self.graph.set_graph(self.cob_minimize.currentText())  # let's say we want to minimize time
@@ -94,26 +101,13 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         self.run_thread()
 
     def run_thread(self):
-        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
-        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
-        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
-
-        self.worker_thread.finished_threaded_procedure.connect(self.finished)
+        self.worker_thread.finished.connect(self.finished)
         self.worker_thread.start()
         self.exec_()
 
-    def progress_range_from_thread(self, value):
-        self.progressbar.setRange(0, value)
-
-    def progress_text_from_thread(self, value):
-        self.progress_label.setText(value)
-
-    def progress_value_from_thread(self, value):
-        self.progressbar.setValue(value)
-
-    def finished(self, procedure):
+    def finished(self):
         ns = self.worker_thread.node_sequence
-
+        print(ns)
         if len(ns) < 2:
             return
 
@@ -133,7 +127,6 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
             dlg2.exec_()
-
 
     def create_path_with_selection(self, all_links):
         f = 'link_id'
@@ -171,7 +164,6 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         symbol = vl.renderer().symbol()
         symbol.setWidth(1.6)
         qgis.utils.iface.mapCanvas().refresh()
-
 
         # Create TSP stops
         crs = self.node_layer.dataProvider().crs().authid()
@@ -216,6 +208,5 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         symbol = QgsMarkerSymbol.createSimple({'name': 'star', 'color': 'red'})
         symbol.setSize(6)
         nl.renderer().setSymbol(symbol)
-
 
         qgis.utils.iface.mapCanvas().refresh()

@@ -1,64 +1,45 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Shortest path computation
- Purpose:    Dialog for computing and displaying shortest paths based on clicks on the map
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-07-30
- Updated:    2020-02-08
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
+import logging
+import os
 import sys
 
-import qgis
-from qgis.core import QgsVectorLayer
 from aequilibrae.paths.results import PathResults
+from aequilibrae.project import Project
+from qgis._core import QgsProject, QgsVectorLayer, QgsSpatialIndex
+
+import qgis
 from qgis.PyQt import QtCore
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtWidgets import *
-from qgis.core import *
 from qgis.utils import iface
-from aequilibrae.project import Project
 from .point_tool import PointTool
-from ..common_tools.auxiliary_functions import *
+from ..common_tools.auxiliary_functions import standard_path
+from ..common_tools import LoadGraphLayerSettingDialog
 
 no_binary = False
+logger = logging.getLogger('AequilibraEGUI')
 try:
     from aequilibrae.paths import path_computation
-except:
+except Exception as e:
+    logger.error(f'Importing AequilibraE failed. {e.args}')
     no_binary = True
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_compute_path.ui"))
 
-from ..common_tools import LoadGraphLayerSettingDialog
-
 
 class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
     clickTool = PointTool(iface.mapCanvas())
 
-    def __init__(self, iface, project: Project, link_layer: QgsVectorLayer, node_layer: QgsVectorLayer) -> None:
+    def __init__(self, qgis_project) -> None:
         # QtWidgets.QDialog.__init__(self)
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
-        self.project = project
+        self.iface = qgis_project.iface
+        self.project = qgis_project.project  # type: Project
         self.setupUi(self)
         self.field_types = {}
         self.centroids = None
-        self.node_layer = node_layer
-        self.line_layer = link_layer
+        self.node_layer = qgis_project.layers['nodes'][0]
+        self.line_layer = qgis_project.layers['links'][0]
         self.node_keys = {}
         self.node_fields = None
         self.index = None
@@ -72,7 +53,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.do_dist_matrix.setEnabled(False)
         self.from_but.setEnabled(False)
         self.to_but.setEnabled(False)
-        self.load_graph_from_file.clicked.connect(self.prepare_graph_and_network)
+        self.configure_graph.clicked.connect(self.prepare_graph_and_network)
         self.from_but.clicked.connect(self.search_for_point_from)
         self.to_but.clicked.connect(self.search_for_point_to)
         self.do_dist_matrix.clicked.connect(self.produces_path)
@@ -88,15 +69,15 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             self.mode = dlg2.mode
             self.minimize_field = dlg2.minimize_field
 
-            if not self.mode in self.project.network.graphs:
-                self.project.network.build_graphs()
+            if self.mode not in self.project.network.graphs:
+                self.project.network.build_graphs(modes=[self.mode])
 
             if dlg2.remove_chosen_links:
                 self.graph = self.project.network.graphs.pop(self.mode)
             else:
                 self.graph = self.project.network.graphs[self.mode]
             self.graph.set_graph(self.minimize_field)
-            self.graph.set_skimming(self.minimize_field)
+            self.graph.set_skimming([self.minimize_field])
             self.graph.set_blocked_centroid_flows(dlg2.block_connector)
 
             if dlg2.remove_chosen_links:
@@ -163,38 +144,35 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             index_field = self.node_fields.index('node_id')
             node_actual_id = node_id[index_field]
             return node_actual_id
-        except:
-            pass
+        except Exception as e:
+            logger.error(e.args)
 
     def produces_path(self):
         self.to_but.setEnabled(True)
         if self.path_from.text().isdigit() and self.path_to.text().isdigit():
             self.res.reset()
-            path_computation(int(self.path_from.text()), int(self.path_to.text()), self.graph, self.res)
+            self.res.compute_path(int(self.path_from.text()), int(self.path_to.text()))
 
             if self.res.path is not None:
                 # If you want to do selections instead of new layers
                 if self.rdo_selection.isChecked():
                     self.create_path_with_selection()
-
                 # If you want to create new layers
                 else:
                     self.create_path_with_scratch_layer()
-
             else:
-                qgis.utils.iface.messageBar().pushMessage(
-                    "No path between " + self.path_from.text() + " and " + self.path_to.text(), "", level=3
-                )
+                msg = f"No path between {self.path_from.text()} and {self.path_to.text()}"
+                qgis.utils.iface.messageBar().pushMessage(msg, "", level=3)
 
     def create_path_with_selection(self):
         f = 'link_id'
-        t = " or ".join([f"{f}={k}" for k in self.res.path])
+        t = " or ".join([f"{f}={int(k)}" for k in self.res.path])
         self.line_layer.selectByExpression(t)
 
     def create_path_with_scratch_layer(self):
         crs = self.line_layer.dataProvider().crs().authid()
-        vl = QgsVectorLayer("LineString?crs={}".format(crs), self.path_from.text() +
-                            " to " + self.path_to.text(), "memory")
+        vl = QgsVectorLayer("LineString?crs={}".format(crs), f'{self.path_from.text()} to {self.path_to.text()}',
+                            "memory")
         pr = vl.dataProvider()
 
         # add fields

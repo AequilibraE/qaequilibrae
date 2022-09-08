@@ -1,36 +1,20 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
+import os
+import sqlite3
+import sys
+from functools import partial
+from os.path import join
 
- Name:       Main interface for comparing assignment scenarios
- Purpose:    Load GUI and user interface for the scenario comparison procedure
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-12-01
- Updated:
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
+from qgis._core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
 
 import qgis
-from functools import partial
-from qgis.core import *
-from qgis.PyQt.QtCore import *
 from qgis.PyQt import QtGui, QtWidgets, uic
-import sys
-import os
-
-from ..common_tools.global_parameters import *
-from ..common_tools.auxiliary_functions import *
-
-from random import randint
+from qgis.core import QgsExpression
+from qgis.core import QgsProject
+from qgis.core import QgsVectorLayerJoinInfo
+from ..common_tools.auxiliary_functions import get_parameter_chain
+from ..common_tools.table_field_lister import find_table_fields
+from ..matrix_procedures.load_result_table import load_result_table
+from ..matrix_procedures.results_lister import list_results
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgsmaplayercombobox"] = qgis.gui
@@ -38,32 +22,24 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.qgis_project = qgis_project
+        self.iface = qgis_project.iface
         self.setupUi(self)
-
+        self.conn = sqlite3.connect(join(qgis_project.project.project_base_path, 'results_database.sqlite'))
         self.positive_color.setColor(QtGui.QColor(0, 174, 116, 255))
         self.negative_color.setColor(QtGui.QColor(218, 0, 3, 255))
         self.common_flow_color.setColor(QtGui.QColor(0, 0, 0, 255))
         self.radio_diff.toggled.connect(self.show_color_composite)
         self.radio_compo.toggled.connect(self.show_color_composite)
 
+        self.results = list_results(self.qgis_project.project.project_base_path)
+
         self.band_size = 10.0
         self.space_size = 0.0
-        self.layer = None
-        self.expert_mode = False
+        self.link_layer = None
         self.drive_side = get_parameter_chain(["system", "driving side"])
-
-        # layers and fields        # For adding skims
-        self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.LineLayer)
-        self.mMapLayerComboBox.layerChanged.connect(self.add_fields_to_cboxes)
-
-        self.ab_FieldComboBoxBase.currentIndexChanged.connect(partial(self.choose_a_field, "base_AB"))
-        self.ba_FieldComboBoxBase.currentIndexChanged.connect(partial(self.choose_a_field, "base_BA"))
-
-        self.ab_FieldComboBoxAlt.currentIndexChanged.connect(partial(self.choose_a_field, "alt_AB"))
-        self.ba_FieldComboBoxAlt.currentIndexChanged.connect(partial(self.choose_a_field, "alt_BA"))
 
         # space slider
         self.slider_spacer.setMinimum(0)
@@ -72,6 +48,10 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.slider_spacer.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.slider_spacer.setTickInterval(10)
         self.slider_spacer.valueChanged.connect(self.spacevaluechange)
+        self.cob_base_scenario.currentIndexChanged.connect(
+            partial(self.choose_scenario, self.cob_base_scenario, self.cob_base_data))
+        self.cob_alternative_scenario.currentIndexChanged.connect(
+            partial(self.choose_scenario, self.cob_alternative_scenario, self.cob_alternative_data))
 
         # band slider
         self.slider_band_size.setMinimum(5)
@@ -80,12 +60,11 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.slider_band_size.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.slider_band_size.setTickInterval(5)
         self.slider_band_size.valueChanged.connect(self.sizevaluechange)
-
+        self.mode_frame.setVisible(False)
         self.but_run.clicked.connect(self.execute_comparison)
         self.add_fields_to_cboxes()
         self.sizevaluechange()
         self.spacevaluechange()
-        self.set_initial_value_if_available()
         self.show_color_composite()
         self.base_group_box.setToolTip("This is the reference case, to which the differences will refer to")
         self.alt_group_box.setToolTip("This is the alternative")
@@ -94,39 +73,6 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
     def show_color_composite(self):
         self.common_label.setVisible(self.radio_compo.isChecked())
         self.common_flow_color.setVisible(self.radio_compo.isChecked())
-
-    def choose_a_field(self, modified):
-        if modified[0:3] == "bas":
-            self.choose_field_indeed(modified, self.ab_FieldComboBoxBase, self.ba_FieldComboBoxBase)
-        else:
-            self.choose_field_indeed(modified, self.ab_FieldComboBoxAlt, self.ba_FieldComboBoxAlt)
-
-    def choose_field_indeed(self, modified, ab, ba):
-        i, j = "AB", "BA"
-        text = ab.currentText()
-        if i in text:
-            text = text.replace(i, j)
-            index = ba.findText(text, Qt.MatchFixedString)
-            if index >= 0:
-                ba.setCurrentIndex(index)
-        if modified == j:
-            text = ba.currentText()
-            if j in text:
-                text = text.replace(j, i)
-                index = ab.findText(text, Qt.MatchFixedString)
-                if index >= 0:
-                    ab.setCurrentIndex(index)
-
-    def set_initial_value_if_available(self):
-        all_items = [self.ab_FieldComboBoxBase.itemText(i) for i in range(self.ab_FieldComboBoxBase.count())]
-
-        for i in all_items:
-            if "AB" in i:
-                index = self.ab_FieldComboBoxBase.findText(i, Qt.MatchFixedString)
-                if index >= 0:
-                    self.ab_FieldComboBoxBase.setCurrentIndex(index)
-                    self.ab_FieldComboBoxAlt.setCurrentIndex(index)
-                break
 
     def spacevaluechange(self):
         self.space_size = self.slider_spacer.value() / 100.0
@@ -137,159 +83,142 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.lbl_width.setText("{:3,.2f}".format(self.band_size))
 
     def add_fields_to_cboxes(self):
-        self.layer = get_vector_layer_by_name(self.mMapLayerComboBox.currentText())
-        self.ab_FieldComboBoxBase.setLayer(self.layer)
-        self.ba_FieldComboBoxBase.setLayer(self.layer)
-        self.ab_FieldComboBoxAlt.setLayer(self.layer)
-        self.ba_FieldComboBoxAlt.setLayer(self.layer)
+        data = list(self.results[self.results.WARNINGS == ''].table_name)
+        for cob in [self.cob_base_scenario, self.cob_alternative_scenario]:
+            cob.clear()
+            cob.addItems(data)
+
+    def choose_scenario(self, cob_scenario, cob_fields):
+        cob_fields.clear()
+        if cob_scenario.currentIndex() < 0:
+            return
+        lst = find_table_fields(self.conn, cob_scenario.currentText())
+        flds = [x.replace('ab', '*') for x in lst if 'ab' in x and x.replace('ab', 'ba') in lst]
+        cob_fields.addItems(flds)
 
     def execute_comparison(self):
-        if self.check_inputs():
-            self.expert_mode = self.chk_expert_mode.isChecked()
-            self.but_run.setEnabled(False)
-            self.band_size = str(self.band_size)
-            self.space_size = str(self.space_size)
+        if not self.check_inputs():
+            return
 
-            if self.expert_mode:
-                QgsExpressionContextUtils.setProjectVariable(
-                    QgsProject.instance(), "aeq_band_spacer", float(self.space_size)
-                )
-                QgsExpressionContextUtils.setProjectVariable(
-                    QgsProject.instance(), "aeq_band_width", float(self.band_size)
-                )
-                self.space_size = "@aeq_band_spacer"
-                self.band_size = "@aeq_band_width"
+        self.but_run.setEnabled(False)
+        self.band_size = str(self.band_size)
+        self.space_size = str(self.space_size)
 
-            # define the side of the plotting based on the side of the road the system has defined
-            ab = -1
-            if self.drive_side == "right":
-                ab = 1
-            ba = -ab
+        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_spacer", float(self.space_size))
+        QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_width", float(self.band_size))
+        self.space_size = "@aeq_band_spacer"
+        self.band_size = "@aeq_band_width"
 
-            # fields
-            ab_base = self.ab_FieldComboBoxBase.currentText()
-            ba_base = self.ba_FieldComboBoxBase.currentText()
-            ab_alt = self.ab_FieldComboBoxAlt.currentText()
-            ba_alt = self.ba_FieldComboBoxAlt.currentText()
-            fields = [x.name() for x in self.layer.fields()]
+        # define the side of the plotting based on the side of the road the system has defined
+        ab = 1 if self.drive_side == "right" else -1
+        ba = -ab
 
-            idx_ab = fields.index(ab_base)
-            idx_ba = fields.index(ba_base)
-            idx2_ab = fields.index(ab_alt)
-            idx2_ba = fields.index(ba_alt)
+        # fields
+        [ab_base, ba_base], [ab_alt, ba_alt] = self.load_result_tables()
 
-            # Create new simple stype
-            symbol = QgsLineSymbol.createSimple({"name": "square", "color": "red"})
-            self.layer.renderer().setSymbol(symbol)
+        # Create new simple stype
+        symbol = QgsLineSymbol.createSimple({"name": "square", "color": "red"})
+        self.link_layer.renderer().setSymbol(symbol)
 
-            # Create the bandwidths for the comon flow, if requested
-            if self.radio_compo.isChecked():
-                values = []
-                values.append(self.layer.maximumValue(idx_ab))
-                values.append(self.layer.maximumValue(idx_ba))
-                values.append(self.layer.maximumValue(idx2_ab))
-                values.append(self.layer.maximumValue(idx2_ba))
-                max_value = max(values)
+        # Create the bandwidths for the common flow, if requested
+        if self.radio_compo.isChecked():
+            exp = QgsExpression(f'''max(maximum(coalesce("{ab_base}",0)),
+                                        maximum(coalesce("{ab_alt}",0)),
+                                        maximum(coalesce("{ba_base}",0)),
+                                        maximum(coalesce("{ba_alt}",0))) ''')
+            context = self.link_layer.createExpressionContext()
+            max_value = exp.evaluate(context).real
 
-                if self.expert_mode:
-                    QgsExpressionContextUtils.setProjectVariable(
-                        QgsProject.instance(), "aeq_band_max_value", float(max_value)
-                    )
-                    max_value = "@aeq_band_max_value"
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_max_value", float(max_value))
+            max_value = "@aeq_band_max_value"
 
-                # We create the styles for AB and BA directions and add to the fields
-                for abb, aba, di, t in ([ab_base, ab_alt, ab, "ab"], [ba_base, ba_alt, ba, "ba"]):
-                    width = (
-                        '(coalesce(scale_linear(min("'
-                        + abb
-                        + '","'
-                        + aba
-                        + '") , 0,'
-                        + str(max_value)
-                        + ", 0, "
-                        + self.band_size
-                        + "), 0))"
-                    )
-                    offset = str(di) + "*(" + width + "/2 + " + self.space_size + ")"
-                    line_pattern = 'if (max(("' + abb + '"+"' + aba + '"),0) = 0,' + "'no', 'solid')"
-                    symbol_layer = self.create_style(
-                        width, offset, self.text_color(self.common_flow_color), line_pattern
-                    )
-                    self.layer.renderer().symbol().appendSymbolLayer(symbol_layer)
-                    if t == "ab":
-                        ab_offset = str(di) + "*(" + width + " + " + self.space_size + ")"
-                    else:
-                        ba_offset = str(di) + "*(" + width + " + " + self.space_size + ")"
+            # We create the styles for AB and BA directions and add to the fields
+            text_color = self.text_color(self.common_flow_color)
+            for abb, aba, di, t in ([ab_base, ab_alt, ab, "ab"], [ba_base, ba_alt, ba, "ba"]):
+                width = f'(coalesce(scale_linear(min("{abb}","{aba}") , 0,{max_value},0,{self.band_size}), 0))'
+                offset = f"{di}*({width}/2 + {self.space_size})"
+                line_pattern = f'if (max(("{abb}"+"{aba}"),0) = 0,' + "'no', 'solid')"
+                symbol_layer = self.create_style(width, offset, text_color, line_pattern)
+                self.link_layer.renderer().symbol().appendSymbolLayer(symbol_layer)
+                ab_offset = offset if t == "ab" else None
+                ba_offset = offset if t != "ab" else None
 
-            # If we want a plot of the differences only
-            if self.radio_diff.isChecked():
-                # we compute the size of the differences
-                diffs = []
-                for feat in self.layer.getFeatures():
-                    diffs.append(abs(feat.attributes()[idx_ab] - feat.attributes()[idx2_ab]))
-                    diffs.append(abs(feat.attributes()[idx_ba] - feat.attributes()[idx2_ba]))
-                max_value = max(diffs)
-                ab_offset = "0"
-                ba_offset = "0"
+        # If we want a plot of the differences only
+        if self.radio_diff.isChecked():
+            exp = QgsExpression(f'''max(maximum(abs(coalesce("{ab_base}",0)-coalesce("{ab_alt}",0))),
+                                        maximum(abs(coalesce("{ba_base}",0)-coalesce("{ba_alt}",0)))) ''')
+            context = self.link_layer.createExpressionContext()
+            max_value = exp.evaluate(context).real
+            ab_offset = ba_offset = "0"
 
-                if self.expert_mode:
-                    QgsExpressionContextUtils.setProjectVariable(
-                        QgsProject.instance(), "aeq_band_max_value", float(max_value)
-                    )
-                    max_value = "@aeq_band_max_value"
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_max_value", float(max_value))
+            max_value = "@aeq_band_max_value"
 
-            # We now create the positive and negative bandwidths for each side of the link
-            styles = []
-            styles.append((ab_base, ab_alt, ab, ab_offset))
-            styles.append((ba_base, ba_alt, ba, ba_offset))
+        # We now create the positive and negative bandwidths for each side of the link
+        styles = []
+        styles.append((ab_base, ab_alt, ab, ab_offset))
+        styles.append((ba_base, ba_alt, ba, ba_offset))
 
-            for i in styles:
-                width = (
-                    '(coalesce(scale_linear(abs("'
-                    + i[0]
-                    + '"-"'
-                    + i[1]
-                    + '") , 0,'
-                    + str(max_value)
-                    + ", 0, "
-                    + self.band_size
-                    + "), 0))"
-                )
-                offset = i[3] + "+" + str(i[2]) + "*(" + width + "/2 + " + self.space_size + ")"
-                line_pattern = 'if (("' + i[0] + '"-"' + i[1] + '") = 0,' + "'no', 'solid')"
-                color = (
-                    'if (max(("'
-                    + i[0]
-                    + '"-"'
-                    + i[1]
-                    + '"),0) = 0,'
-                    + self.text_color(self.negative_color)
-                    + ", "
-                    + self.text_color(self.positive_color)
-                    + ")"
-                )
-                symbol_layer = self.create_style(width, offset, color, line_pattern)
-                self.layer.renderer().symbol().appendSymbolLayer(symbol_layer)
+        pos_color = self.text_color(self.positive_color)
+        neg_color = self.text_color(self.negative_color)
 
-            # Deletes the pre-existing style
-            self.layer.renderer().symbol().deleteSymbolLayer(0)
-            self.layer.triggerRepaint()
-            self.exit_procedure()
+        for i in styles:
+            width = f'(coalesce(scale_linear(abs("{i[0]}"-"{i[1]}") , 0,{max_value},0,{self.band_size}),0))'
+            offset = f"{i[3]}+{i[2]}*({width}/2 + {self.space_size})"
+            line_pattern = f'if (("{i[0]}"-"{i[1]}") = 0,' + "'no', 'solid')"
+            color = f'if(max(("{i[0]}"-"{i[1]}"),0) = 0,{neg_color},{pos_color})'
+            symbol_layer = self.create_style(width, offset, color, line_pattern)
+            self.link_layer.renderer().symbol().appendSymbolLayer(symbol_layer)
+
+        # Deletes the pre-existing style
+        self.link_layer.renderer().symbol().deleteSymbolLayer(0)
+        self.link_layer.triggerRepaint()
+        self.exit_procedure()
 
     def check_inputs(self):
-        if self.layer is None:
-            return False
-        if (
-            min(
-                self.ab_FieldComboBoxBase.currentIndex(),
-                self.ba_FieldComboBoxBase.currentIndex(),
-                self.ab_FieldComboBoxAlt.currentIndex(),
-                self.ba_FieldComboBoxAlt.currentIndex(),
-            )
-            < 0
-        ):
+        for combo in [self.cob_base_scenario, self.cob_alternative_scenario,
+                      self.cob_base_data, self.cob_alternative_data]:
+            if combo.currentIndex() < 0:
+                return False
+
+        v1 = self.cob_base_scenario.currentText()
+        v2 = self.cob_alternative_scenario.currentText()
+        v3 = self.cob_base_data.currentText()
+        v4 = self.cob_alternative_data.currentText()
+        if v1 == v2 and v3 == v4:
             return False
         return True
+
+    def load_result_tables(self):
+        self.link_layer = self.qgis_project.layers['links'][0]
+        QgsProject.instance().addMapLayer(self.link_layer)
+
+        v1 = self.cob_base_scenario.currentText()
+        v2 = self.cob_alternative_scenario.currentText()
+        v3 = self.cob_base_data.currentText()
+        v4 = self.cob_alternative_data.currentText()
+        self.base_lyr = load_result_table(self.qgis_project.project.project_base_path, v1)
+        data_to_join = [[self.base_lyr, 'base']]
+
+        txt = f'base_{v3}'
+        data_fields = [[txt.replace('*', 'ab'), txt.replace('*', 'ba')]]
+        txt = f'base_{v4}'
+        if v1 != v2:
+            self.alter_layer = load_result_table(self.qgis_project.project.project_base_path, v2)
+            data_to_join.append([self.alter_layer, 'alternative'])
+            txt = f'alternative_{v4}'
+        data_fields.append([txt.replace('*', 'ab'), txt.replace('*', 'ba')])
+
+        for lyr, nm in data_to_join:
+            lien = QgsVectorLayerJoinInfo()
+            lien.setJoinFieldName('link_id')
+            lien.setTargetFieldName('link_id')
+            lien.setJoinLayerId(lyr.id())
+            lien.setUsingMemoryCache(True)
+            lien.setJoinLayer(lyr)
+            lien.setPrefix(f'{nm}_')
+            self.link_layer.addJoin(lien)
+        return data_fields
 
     def create_style(self, width, offset, color, line_pattern):
         symbol_layer = QgsSimpleLineSymbolLayer.create({})
@@ -308,7 +237,3 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         str_color = str(some_color_btn.color().getRgb())
         str_color = str_color.replace("(", "")
         return "'" + str_color.replace(")", "") + "'"
-
-
-if __name__ == "__main__":
-    main()

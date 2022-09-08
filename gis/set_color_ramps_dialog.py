@@ -1,37 +1,11 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Auxiliary interface for setting ramp colors for bandwidth maps
- Purpose:    Load GUI and user interface for the color ramp setting tool
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
-from qgscolorbuttonv2 import QgsColorButtonV2
-from qgsfieldcombobox import QgsFieldComboBox
-from qgsmaplayercombobox import QgsMapLayerComboBox
-
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-12-07
- Updated:
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
+import os
+import sys
+from functools import partial
 
 import qgis
-from functools import partial
-from qgis.core import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtWidgets import *
 from qgis.PyQt import uic
-import sys
-import os
-
+from qgis.PyQt.QtWidgets import QDialog
+from qgis.core import QgsStyle
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_bandwidth_color_ramps.ui"))
@@ -96,9 +70,10 @@ class LoadColorRampSelector(QDialog, FORM_CLASS):
             max_box.setText(str(maxval))
 
         def find_max_min(field):
-            idx = self.layer.dataProvider().fieldNameIndex(field)
-            minval = round(self.layer.minimumValue(idx), 2)
-            maxval = round(self.layer.maximumValue(idx), 2)
+            idx = self.layer.fields().indexFromName(field)
+            minval, maxval = self.layer.minimumAndMaximumValue(idx)
+            minval = round(0 if minval is None else minval, 2)
+            maxval = round(0 if maxval is None else maxval, 2)
             return minval, maxval
 
         if direction == "BA":

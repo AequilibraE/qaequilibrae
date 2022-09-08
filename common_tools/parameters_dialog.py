@@ -1,24 +1,29 @@
-from qgis.core import *
-from qgis.PyQt.Qsci import QsciLexerYAML
-from qgis.PyQt.QtGui import *
-from qgis.PyQt import QtWidgets, uic
-
+import logging
 import os
+from os.path import join, isfile
+
 import yaml
+
+from aequilibrae import Parameters
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.Qsci import QsciLexerYAML
+from qgis.PyQt.QtGui import QFont
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_parameters.ui"))
 
 
 class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, parent=None):
+    def __init__(self, qgis_project, parent=None):
         super(ParameterDialog, self).__init__(parent)
         # QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
 
-        self.path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/aequilibrae/"
-        self.default_values = None
-        self.parameter_values = None
+        self.p = Parameters()
+        self.path = self.p.file
+
+        self.default_values = self.p._default
+        self.parameter_values = self.p.parameters
         self.current_data = None
         self.error = False
         # Configures the text editor
@@ -30,10 +35,10 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         lexer.setDefaultFont(font)
         self.text_box.setLexer(lexer)
         self.text_box.setFolding(self.text_box.PlainFoldStyle)
+        self.logger = logging.getLogger("AequilibraEGUI")
 
         # Load the data
         self.load_original_data()
-        self.load_defaults()
 
         # Connect all buttons
         self.but_validate.clicked.connect(self.validate_data)
@@ -43,15 +48,12 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
 
     # Load the current parameters onto the GUI
     def load_original_data(self):
-        with open(self.path + "parameters.yml", "r") as yml:
-            self.parameter_values = yaml.safe_load(yml)
         pretty_data = yaml.dump(self.parameter_values, default_flow_style=False)
         self.text_box.setText(str(pretty_data))
 
     # Read defaults to memory
     def load_defaults(self):
-        with open(self.path + "parameter_default.yml", "r") as yml:
-            self.default_values = yaml.safe_load(yml)
+        self.default_values = self.p._default
 
     def validate_data(self):
         self.error = False
@@ -78,7 +80,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
                 if key not in dict2:
                     self.error = True
                     break
-                if type(dict1[key]) != type(dict2[key]):
+                if not isinstance(dict1[key], type(dict2[key])):
                     self.error = True
                     break
                 if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
@@ -89,13 +91,14 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
                 if key not in dict1:
                     self.error = True
                     break
-        except:
+        except Exception as e:
+            self.logger.error(e.args)
             self.error = True
 
     def save_new_parameters(self):
         self.validate_data()
         if not self.error:
-            stream = open(self.path + "/parameters.yml", "w")
+            stream = open(self.path, "w")
             yaml.dump(self.current_data, stream, default_flow_style=False)
             stream.close()
             self.but_close.setText("Close")

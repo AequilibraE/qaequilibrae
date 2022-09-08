@@ -1,38 +1,17 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
+import os
+from functools import partial
 
- Name:       Loads Datasets from file/layer
- Purpose:    Loads GUI for loading datasets arrays from different sources
+import qgis
+from aequilibrae.matrix import AequilibraeData
 
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-08-15 (Initially as vector loading)
- Updated:    2017-10-05
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from qgis.core import *
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
-import qgis
 from qgis.PyQt.QtWidgets import QTableWidgetItem
-
-
-from functools import partial
-from ..common_tools.all_layers_from_toc import all_layers_from_toc
-from ..common_tools.auxiliary_functions import *
-from ..common_tools.global_parameters import *
-from ..common_tools.get_output_file_name import GetOutputFileName
-from aequilibrae.matrix import AequilibraeData
 from .load_dataset_class import LoadDataset
+from ..common_tools.all_layers_from_toc import all_layers_from_toc
+from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
+from ..common_tools.get_output_file_name import GetOutputFileName
+from ..common_tools.global_parameters import integer_types, float_types, point_types, poly_types
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_vector_loader.ui"))
 
@@ -127,7 +106,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
     def removes_fields(self):
         for i in self.table_fields_to_import.selectedRanges():
             old_fields = [
-                self.table_fields_to_import.item(row, 0).text() for row in xrange(i.topRow(), i.bottomRow() + 1)
+                self.table_fields_to_import.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)
             ]
 
             self.ignore_fields.extend(old_fields)
@@ -137,7 +116,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def append_to_list(self):
         for i in self.table_all_fields.selectedRanges():
-            new_fields = [self.table_all_fields.item(row, 0).text() for row in xrange(i.topRow(), i.bottomRow() + 1)]
+            new_fields = [self.table_all_fields.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
 
             self.selected_fields.extend(new_fields)
             self.ignore_fields = [x for x in self.ignore_fields if x not in new_fields]
@@ -193,8 +172,8 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         try:
             self.dataset = AequilibraeData()
             self.dataset.load(out_name)
-        except:
-            self.error = "Could not load file. It might be corrupted or might not be a valid AequilibraE file"
+        except Exception as e:
+            self.error = f"Could not load file. It might be corrupted or not a valid AequilibraE file. {e.args}"
         self.exit_procedure()
 
     def load_the_vector(self):

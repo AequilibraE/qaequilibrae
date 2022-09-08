@@ -1,36 +1,27 @@
-import sys
-from collections import OrderedDict
-from functools import partial
 import logging
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QHBoxLayout, QWidget, QLineEdit, QCheckBox
-from qgis.PyQt.QtWidgets import QSpacerItem, QProgressBar, QLabel, QVBoxLayout, QSizePolicy, QCheckBox, QGroupBox
-from qgis.PyQt.QtWidgets import QWidget
-import numpy as np
+import os
+from os.path import isdir, join
 
-from ..common_tools.global_parameters import *
-from ..common_tools.auxiliary_functions import *
-from ..common_tools import ReportDialog, GetOutputFileName, standard_path
+from PyQt5.QtCore import Qt
 from aequilibrae.project import Project
-from aequilibrae.project.network import OSMDownloader
-from aequilibrae.project.network.osm_builder import OSMBuilder
 from aequilibrae.project.network.osm_utils.place_getter import placegetter
-from aequilibrae.project.network.osm_utils.osm_params import max_query_area_size
-from aequilibrae import Parameters
 
-# from .osm_utils.osm_params import *
-# from .osm_downloader import OSMDownloader
+from ..common_tools import reporter
+from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox
+from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
+from qgis.PyQt.QtWidgets import QWidget, QFileDialog
+from ..common_tools import ReportDialog, standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
 
 class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
+        self.qgis_project = qgis_project
 
         self.path = standard_path()
         self.error = None
@@ -39,7 +30,6 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.running = False
         self.bbox = None
         self.json = []
-        self.project = None
         self.logger = logging.getLogger("aequilibrae")
 
         self._run_layout = QGridLayout()
@@ -68,7 +58,7 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Buttons and output
         self.but_choose_output = QPushButton()
-        self.but_choose_output.setText("Choose file output")
+        self.but_choose_output.setText("Choose folder output")
         self.but_choose_output.clicked.connect(self.choose_output)
 
         self.output_path = QLineEdit()
@@ -103,9 +93,15 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.resize(280, 250)
 
     def choose_output(self):
-        new_name, file_type = GetOutputFileName(self, '', ["SQLite database(*.sqlite)"], ".sqlite", self.path)
-        if new_name is not None:
-            self.output_path.setText(new_name)
+        new_name = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", standard_path())
+        if new_name is not None and len(new_name) > 0:
+
+            new_folder = 'new_project'
+            counter = 1
+            while isdir(join(new_name, new_folder)):
+                new_folder = f'new_project_{counter}'
+                counter += 1
+            self.output_path.setText(join(new_name, new_folder))
 
     def run(self):
         self.update_widget.setVisible(True)
@@ -120,66 +116,10 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
             bbox, r = placegetter(self.place.text())
             self.report.extend(r)
 
-        if bbox is None:
-            self.leave()
-            return
-
-        west, south, east, north = bbox[0], bbox[1], bbox[2], bbox[3]
-        self.report.append(reporter(
-            'Downloading network for bounding box ({} {}, {}, {})'.format(west, south, east, north)))
-
-        self.bbox = bbox
-        surveybox = QgsRectangle(QgsPointXY(west, south), QgsPointXY(east, north))
-        geom = QgsGeometry().fromRect(surveybox)
-        conv = QgsDistanceArea()
-        area = conv.convertAreaMeasurement(conv.measureArea(geom), QgsUnitTypes.AreaSquareMeters)
-        self.report.append(reporter('Area for which we will download a network: {:,} km.sq'.format(area / 1000000)))
-
-        if area <= max_query_area_size:
-            geometries = [[west, south, east, north]]
-        else:
-            parts = math.ceil(area / max_query_area_size)
-            horizontal = math.ceil(math.sqrt(parts))
-            vertical = math.ceil(parts / horizontal)
-            dx = east - west
-            dy = north - south
-            geometries = []
-            for i in range(horizontal):
-                xmin = west + i * dx
-                xmax = west + (i + 1) * dx
-                for j in range(vertical):
-                    ymin = south + j * dy
-                    ymax = south + (j + 1) * dy
-                    box = [xmin, ymin, xmax, ymax]
-                    geometries.append(box)
-
-        p = Parameters().parameters
-        modes = [list(k.keys())[0] for k in p['network']['modes']]
-
-        self.progress_label.setText('Downloading data')
-        self.downloader = OSMDownloader(geometries, modes)
-        self.run_download_thread()
-
-    def final_steps(self):
-        self.project = Project(self.output_path.text(), True)
-        self.project.network.create_empty_tables()
-        curr = self.project.conn.cursor()
-        curr.execute("""ALTER TABLE links ADD COLUMN osm_id integer""")
-        curr.execute("""ALTER TABLE nodes ADD COLUMN osm_id integer""")
-        self.project.conn.commit()
-        self.project.conn.close()
-        self.builder = OSMBuilder(self.downloader.json, self.project.source)
-        self.run_thread()
-
-    def run_download_thread(self):
-        self.downloader.downloading.connect(self.signal_downloader_handler)
-        self.downloader.start()
-        self.exec_()
-
-    def run_thread(self):
-        self.builder.building.connect(self.signal_handler)
-        self.builder.start()
-        self.exec_()
+        self.qgis_project.project = Project()
+        self.qgis_project.project.new(self.output_path.text())
+        self.qgis_project.project.network.netsignal.connect(self.signal_handler)
+        self.qgis_project.project.network.create_from_osm(west=bbox[0], south=bbox[1], east=bbox[2], north=bbox[3])
 
     def change_place_type(self):
         if self.choose_place.isChecked():
@@ -193,16 +133,6 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2.show()
         dlg2.exec_()
 
-    def signal_downloader_handler(self, val):
-        if val[0] == "Value":
-            self.progressbar.setValue(val[1])
-        elif val[0] == "maxValue":
-            self.progressbar.setRange(0, val[1])
-        elif val[0] == "text":
-            self.progress_label.setText(val[1])
-        elif val[0] == "FinishedDownloading":
-            self.final_steps()
-
     def signal_handler(self, val):
         if val[0] == "Value":
             self.progressbar.setValue(val[1])
@@ -211,12 +141,8 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         elif val[0] == "text":
             self.progress_label.setText(val[1])
         elif val[0] == "finished_threaded_procedure":
-            self.project = Project(self.output_path.text())
-            self.progress_label.setText('Adding spatial indices')
-            self.project.network.add_spatial_index()
-            self.project.network.add_triggers()
-            l = self.project.network.count_links()
-            n = self.project.network.count_nodes()
-            self.report.append(reporter(f'{l:,} links generated'))
-            self.report.append(reporter(f'{n:,} nodes generated'))
+            lines = self.qgis_project.project.network.count_links()
+            nodes = self.qgis_project.project.network.count_nodes()
+            self.report.append(reporter(f'{lines:,} links generated'))
+            self.report.append(reporter(f'{nodes:,} nodes generated'))
             self.leave()

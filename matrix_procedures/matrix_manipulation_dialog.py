@@ -1,37 +1,21 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Loads matrix utils interface
- Purpose:    Allows user to visually inspect, export and compute matrices
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2017-12-20
- Updated:
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
-from PyQt4 import QtGui, uic
-from PyQt4.QtGui import *
-from PyQt4.Qsci import QsciLexerPython
-
-from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
-from ..aequilibrae.aequilibrae.matrix import AequilibraeMatrix
-from ..common_tools.auxiliary_functions import *
+import logging
+import os
 from functools import partial
+
+from ..common_tools import standard_path
+from qgis.PyQt import uic
+from qgis.PyQt.Qsci import QsciLexerPython
+from qgis.PyQt.QtGui import QFont
+from qgis.PyQt.QtWidgets import QDialog
+from qgis.core import QGridLayout, QWidget, QTableView, QHBoxLayout, QCheckBox, QSpacerItem, QSizePolicy
+from qgis.core import QLabel, QSpinBox, QComboBox
+from ..aequilibrae.aequilibrae.matrix import AequilibraeMatrix
+from ..common_tools import NumpyModel, GetOutputFileName
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_viewer.ui"))
 
 
-class MatrixManipulationDialog(QtGui.QDialog, FORM_CLASS):
+class MatrixManipulationDialog(QDialog, FORM_CLASS):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
@@ -39,6 +23,7 @@ class MatrixManipulationDialog(QtGui.QDialog, FORM_CLASS):
         self.path = standard_path()
         self.error = None
         self.matrices = {}
+        self.logger = logging.getLogger("AequilibraEGUI")
 
         self.but_load.clicked.connect(self.find_new_matrix)
 
@@ -63,7 +48,7 @@ class MatrixManipulationDialog(QtGui.QDialog, FORM_CLASS):
         mat_name = self.find_non_conflicting_name(dataset.name, self.matrices)
         config["dataset"] = dataset
 
-        contents = QtGui.QWidget(self.matrix_tabs)
+        contents = QWidget(self.matrix_tabs)
         new_tab_layout = QGridLayout()
         new_table_view = QTableView()
         new_tab_layout.addWidget(new_table_view)
@@ -132,7 +117,8 @@ class MatrixManipulationDialog(QtGui.QDialog, FORM_CLASS):
             try:
                 dataset.load(data_path)
                 self.load_new_matrix(dataset)
-            except:
+            except Exception as e:
+                self.logger.error(e.args)
                 self.error = "Could not load matrix"
 
     def find_non_conflicting_name(self, data_name, dictio):
