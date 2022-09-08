@@ -27,7 +27,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.qgis_project = qgis_project
         self.iface = qgis_project.iface
         self.setupUi(self)
-        self.conn = sqlite3.connect(join(qgis_project.project.project_base_path, 'results_database.sqlite'))
+        self.conn = sqlite3.connect(join(qgis_project.project.project_base_path, "results_database.sqlite"))
         self.positive_color.setColor(QtGui.QColor(0, 174, 116, 255))
         self.negative_color.setColor(QtGui.QColor(218, 0, 3, 255))
         self.common_flow_color.setColor(QtGui.QColor(0, 0, 0, 255))
@@ -49,9 +49,11 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.slider_spacer.setTickInterval(10)
         self.slider_spacer.valueChanged.connect(self.spacevaluechange)
         self.cob_base_scenario.currentIndexChanged.connect(
-            partial(self.choose_scenario, self.cob_base_scenario, self.cob_base_data))
+            partial(self.choose_scenario, self.cob_base_scenario, self.cob_base_data)
+        )
         self.cob_alternative_scenario.currentIndexChanged.connect(
-            partial(self.choose_scenario, self.cob_alternative_scenario, self.cob_alternative_data))
+            partial(self.choose_scenario, self.cob_alternative_scenario, self.cob_alternative_data)
+        )
 
         # band slider
         self.slider_band_size.setMinimum(5)
@@ -83,7 +85,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.lbl_width.setText("{:3,.2f}".format(self.band_size))
 
     def add_fields_to_cboxes(self):
-        data = list(self.results[self.results.WARNINGS == ''].table_name)
+        data = list(self.results[self.results.WARNINGS == ""].table_name)
         for cob in [self.cob_base_scenario, self.cob_alternative_scenario]:
             cob.clear()
             cob.addItems(data)
@@ -93,7 +95,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         if cob_scenario.currentIndex() < 0:
             return
         lst = find_table_fields(self.conn, cob_scenario.currentText())
-        flds = [x.replace('ab', '*') for x in lst if 'ab' in x and x.replace('ab', 'ba') in lst]
+        flds = [x.replace("ab", "*") for x in lst if "ab" in x and x.replace("ab", "ba") in lst]
         cob_fields.addItems(flds)
 
     def execute_comparison(self):
@@ -122,10 +124,12 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Create the bandwidths for the common flow, if requested
         if self.radio_compo.isChecked():
-            exp = QgsExpression(f'''max(maximum(coalesce("{ab_base}",0)),
+            exp = QgsExpression(
+                f"""max(maximum(coalesce("{ab_base}",0)),
                                         maximum(coalesce("{ab_alt}",0)),
                                         maximum(coalesce("{ba_base}",0)),
-                                        maximum(coalesce("{ba_alt}",0))) ''')
+                                        maximum(coalesce("{ba_alt}",0))) """
+            )
             context = self.link_layer.createExpressionContext()
             max_value = exp.evaluate(context).real
 
@@ -145,8 +149,10 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # If we want a plot of the differences only
         if self.radio_diff.isChecked():
-            exp = QgsExpression(f'''max(maximum(abs(coalesce("{ab_base}",0)-coalesce("{ab_alt}",0))),
-                                        maximum(abs(coalesce("{ba_base}",0)-coalesce("{ba_alt}",0)))) ''')
+            exp = QgsExpression(
+                f"""max(maximum(abs(coalesce("{ab_base}",0)-coalesce("{ab_alt}",0))),
+                                        maximum(abs(coalesce("{ba_base}",0)-coalesce("{ba_alt}",0)))) """
+            )
             context = self.link_layer.createExpressionContext()
             max_value = exp.evaluate(context).real
             ab_offset = ba_offset = "0"
@@ -176,8 +182,12 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def check_inputs(self):
-        for combo in [self.cob_base_scenario, self.cob_alternative_scenario,
-                      self.cob_base_data, self.cob_alternative_data]:
+        for combo in [
+            self.cob_base_scenario,
+            self.cob_alternative_scenario,
+            self.cob_base_data,
+            self.cob_alternative_data,
+        ]:
             if combo.currentIndex() < 0:
                 return False
 
@@ -190,7 +200,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         return True
 
     def load_result_tables(self):
-        self.link_layer = self.qgis_project.layers['links'][0]
+        self.link_layer = self.qgis_project.layers["links"][0]
         QgsProject.instance().addMapLayer(self.link_layer)
 
         v1 = self.cob_base_scenario.currentText()
@@ -198,25 +208,25 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         v3 = self.cob_base_data.currentText()
         v4 = self.cob_alternative_data.currentText()
         self.base_lyr = load_result_table(self.qgis_project.project.project_base_path, v1)
-        data_to_join = [[self.base_lyr, 'base']]
+        data_to_join = [[self.base_lyr, "base"]]
 
-        txt = f'base_{v3}'
-        data_fields = [[txt.replace('*', 'ab'), txt.replace('*', 'ba')]]
-        txt = f'base_{v4}'
+        txt = f"base_{v3}"
+        data_fields = [[txt.replace("*", "ab"), txt.replace("*", "ba")]]
+        txt = f"base_{v4}"
         if v1 != v2:
             self.alter_layer = load_result_table(self.qgis_project.project.project_base_path, v2)
-            data_to_join.append([self.alter_layer, 'alternative'])
-            txt = f'alternative_{v4}'
-        data_fields.append([txt.replace('*', 'ab'), txt.replace('*', 'ba')])
+            data_to_join.append([self.alter_layer, "alternative"])
+            txt = f"alternative_{v4}"
+        data_fields.append([txt.replace("*", "ab"), txt.replace("*", "ba")])
 
         for lyr, nm in data_to_join:
             lien = QgsVectorLayerJoinInfo()
-            lien.setJoinFieldName('link_id')
-            lien.setTargetFieldName('link_id')
+            lien.setJoinFieldName("link_id")
+            lien.setTargetFieldName("link_id")
             lien.setJoinLayerId(lyr.id())
             lien.setUsingMemoryCache(True)
             lien.setJoinLayer(lyr)
-            lien.setPrefix(f'{nm}_')
+            lien.setPrefix(f"{nm}_")
             self.link_layer.addJoin(lien)
         return data_fields
 

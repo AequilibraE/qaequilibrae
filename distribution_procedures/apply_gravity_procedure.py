@@ -39,4 +39,4 @@ class ApplyGravityProcedure(WorkerThread):
             self.report = self.gravity.report
         except ValueError as e:
             self.error = e
-        self.finished_threaded_procedure.emit('apply_gravity')
+        self.finished_threaded_procedure.emit("apply_gravity")

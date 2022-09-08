@@ -3,6 +3,7 @@ def run_dist_matrix(qgis_project):
         qgis_project.message_binary()
     else:
         from .impedance_matrix_dialog import ImpedanceMatrixDialog
+
         if qgis_project.project is None:
             qgis_project.show_message_no_project()
         else:

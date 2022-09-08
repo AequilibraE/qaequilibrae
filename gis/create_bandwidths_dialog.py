@@ -306,24 +306,63 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 width = '(coalesce(scale_linear("' + field + '", 0, ' + str(max_value) + ", 0, " + band_size + "), 0))"
                 props["width_dd_expression"] = width
 
-                xpr = (acc_offset + "+" + str(side) + ' * (coalesce(scale_linear("' + field + '", 0, ' + str(
-                    max_value) + ", 0, " + band_size + "), 0)/2 + " + space_size + ")")
+                xpr = (
+                    acc_offset
+                    + "+"
+                    + str(side)
+                    + ' * (coalesce(scale_linear("'
+                    + field
+                    + '", 0, '
+                    + str(max_value)
+                    + ", 0, "
+                    + band_size
+                    + "), 0)/2 + "
+                    + space_size
+                    + ")"
+                )
                 props["offset_dd_expression"] = xpr
                 props["line_style_expression"] = 'if (coalesce("' + field + '",0) = 0,' + "'no', 'solid')"
 
                 if isinstance(clr, dict):
                     if direc == "ab":
-                        xpr = ("ramp_color('" + clr["color ab"] + "',scale_linear(" + '"' + clr["ramp ab"]
-                               + '", ' + str(clr["min ab"]) + ", " + str(clr["max ab"]) + ", 0, 1))")
+                        xpr = (
+                            "ramp_color('"
+                            + clr["color ab"]
+                            + "',scale_linear("
+                            + '"'
+                            + clr["ramp ab"]
+                            + '", '
+                            + str(clr["min ab"])
+                            + ", "
+                            + str(clr["max ab"])
+                            + ", 0, 1))"
+                        )
                         props["color_dd_expression"] = xpr
 
                     else:
-                        xpr = ("ramp_color('" + clr["color ba"] + "',scale_linear(" + '"' + clr[
-                            "ramp ba"] + '", ' + str(clr["min ba"]) + ", " + str(clr["max ba"]) + ", 0, 1))")
+                        xpr = (
+                            "ramp_color('"
+                            + clr["color ba"]
+                            + "',scale_linear("
+                            + '"'
+                            + clr["ramp ba"]
+                            + '", '
+                            + str(clr["min ba"])
+                            + ", "
+                            + str(clr["max ba"])
+                            + ", 0, 1))"
+                        )
                         props["color_dd_expression"] = xpr
                 else:
-                    xpr = (str(clr.getRgb()[0]) + "," + str(clr.getRgb()[1]) + "," + str(clr.getRgb()[2]) + "," + str(
-                        clr.getRgb()[3]))
+                    xpr = (
+                        str(clr.getRgb()[0])
+                        + ","
+                        + str(clr.getRgb()[1])
+                        + ","
+                        + str(clr.getRgb()[2])
+                        + ","
+                        + str(clr.getRgb()[3])
+                    )
                     props["line_color"] = xpr
 
                 symbol_layer = QgsSimpleLineSymbolLayer.create(props)

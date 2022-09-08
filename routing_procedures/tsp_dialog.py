@@ -10,14 +10,14 @@ from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 from .tsp_procedure import TSPProcedure
 from ..common_tools import ReportDialog
 
-logger = logging.getLogger('AequilibraEGUI')
+logger = logging.getLogger("AequilibraEGUI")
 no_binary = False
 try:
     from aequilibrae.paths import Graph, path_computation
     from aequilibrae.paths.results import PathResults
     from aequilibrae.project import Project
 except Exception as e:
-    logger.error(f'Importing AequilibraE failed. {e.args}')
+    logger.error(f"Importing AequilibraE failed. {e.args}")
     no_binary = True
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/tsp.ui"))
@@ -31,8 +31,8 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         self.project = qgisproject.project  # type: Project
         self._PQgis = qgisproject
 
-        self.link_layer = self._PQgis.layers['links'][0]
-        self.node_layer = self._PQgis.layers['nodes'][0]
+        self.link_layer = self._PQgis.layers["links"][0]
+        self.node_layer = self._PQgis.layers["nodes"][0]
 
         QgsProject.instance().addMapLayer(self.link_layer)
         QgsProject.instance().addMapLayer(self.node_layer)
@@ -53,7 +53,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
             centroids = self.selected_nodes()
         else:
             curr = self.project.network.conn.cursor()
-            curr.execute('select node_id from nodes where is_centroid=1;')
+            curr.execute("select node_id from nodes where is_centroid=1;")
             centroids = [i[0] for i in curr.fetchall()]
         for i in centroids:
             self.cob_start.addItem(str(i))
@@ -62,14 +62,14 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         curr = self.project.network.conn.cursor()
         curr.execute("""select mode_name, mode_id from modes""")
         for x in curr.fetchall():
-            self.cob_mode.addItem(f'{x[0]} ({x[1]})')
-            self.all_modes[f'{x[0]} ({x[1]})'] = x[1]
+            self.cob_mode.addItem(f"{x[0]} ({x[1]})")
+            self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         for f in self.project.network.skimmable_fields():
             self.cob_minimize.addItem(f)
 
     def selected_nodes(self) -> list:
-        idx = self.node_layer.dataProvider().fieldNameIndex('node_id')
+        idx = self.node_layer.dataProvider().fieldNameIndex("node_id")
         c = [int(feat.attributes()[idx]) for feat in self.node_layer.selectedFeatures()]
         return sorted(c)
 
@@ -82,13 +82,13 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.rdo_selected.isChecked():
             centroids = self.selected_nodes()
             if len(centroids) < 3:
-                qgis.utils.iface.messageBar().pushMessage("You need at least three nodes to route. ", '', level=3)
+                qgis.utils.iface.messageBar().pushMessage("You need at least three nodes to route. ", "", level=3)
                 return
             centroids = np.array(centroids).astype(np.int64)
             self.graph.prepare_graph(centroids=centroids)
         else:
             if self.project.network.count_centroids() < 3:
-                qgis.utils.iface.messageBar().pushMessage("You need at least three centroids to route. ", '', level=3)
+                qgis.utils.iface.messageBar().pushMessage("You need at least three centroids to route. ", "", level=3)
                 return
 
         self.graph.set_graph(self.cob_minimize.currentText())  # let's say we want to minimize time
@@ -129,21 +129,21 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
             dlg2.exec_()
 
     def create_path_with_selection(self, all_links):
-        f = 'link_id'
+        f = "link_id"
         t = " or ".join([f"{f}={k}" for k in all_links])
         self.link_layer.selectByExpression(t)
 
     def create_path_with_scratch_layer(self, path_links):
         # Create TSP route
         crs = self.link_layer.dataProvider().crs().authid()
-        vl = QgsVectorLayer(f"LineString?crs={crs}", 'TSP Solution', "memory")
+        vl = QgsVectorLayer(f"LineString?crs={crs}", "TSP Solution", "memory")
         pr = vl.dataProvider()
 
         # add fields
         pr.addAttributes(self.link_layer.dataProvider().fields())
         vl.updateFields()  # tell the vector layer to fetch changes from the provider
 
-        idx = self.link_layer.dataProvider().fieldNameIndex('link_id')
+        idx = self.link_layer.dataProvider().fieldNameIndex("link_id")
         self.link_features = {}
         for feat in self.link_layer.getFeatures():
             link_id = feat.attributes()[idx]
@@ -167,14 +167,14 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Create TSP stops
         crs = self.node_layer.dataProvider().crs().authid()
-        nl = QgsVectorLayer(f"Point?crs={crs}", 'TSP Stops', "memory")
+        nl = QgsVectorLayer(f"Point?crs={crs}", "TSP Stops", "memory")
         pn = nl.dataProvider()
 
         # add fields
         pn.addAttributes(self.node_layer.dataProvider().fields())
         nl.updateFields()  # tell the vector layer to fetch changes from the provider
 
-        idx = self.node_layer.dataProvider().fieldNameIndex('node_id')
+        idx = self.node_layer.dataProvider().fieldNameIndex("node_id")
         self.node_features = {}
         for feat in self.node_layer.getFeatures():
             node_id = feat.attributes()[idx]
@@ -192,9 +192,9 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         pn.addFeatures(stop_nodes)
 
         # Goes back and adds the order of visitation for each node
-        pn.addAttributes([QgsField('sequence', QVariant.Int)])
+        pn.addAttributes([QgsField("sequence", QVariant.Int)])
         nl.updateFields()
-        sdx = nl.dataProvider().fieldNameIndex('sequence')
+        sdx = nl.dataProvider().fieldNameIndex("sequence")
 
         nl.startEditing()
         for feat in nl.getFeatures():
@@ -205,7 +205,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # add layer to the map
         QgsProject.instance().addMapLayer(nl)
-        symbol = QgsMarkerSymbol.createSimple({'name': 'star', 'color': 'red'})
+        symbol = QgsMarkerSymbol.createSimple({"name": "star", "color": "red"})
         symbol.setSize(6)
         nl.renderer().setSymbol(symbol)
 

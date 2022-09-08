@@ -31,10 +31,10 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
         # Add the required extra fields to the link layer
         self.emit_messages(message="Adding extra network data fields to database", value=0, max_val=1)
-        self.additional_fields_to_layers('links', self.link_layer, self.link_fields)
-        self.additional_fields_to_layers('nodes', self.node_layer, self.node_fields)
+        self.additional_fields_to_layers("links", self.link_layer, self.link_fields)
+        self.additional_fields_to_layers("nodes", self.node_layer, self.node_fields)
 
-        self.transfer_layer_features('links', self.link_layer, self.link_fields)
+        self.transfer_layer_features("links", self.link_layer, self.link_fields)
         self.renumber_nodes()
 
         self.emit_messages(message="Creating layer triggers", value=0, max_val=1)
@@ -47,7 +47,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         fields = layer.dataProvider().fields()
         string_fields = []
 
-        curr.execute(f'PRAGMA table_info({table});')
+        curr.execute(f"PRAGMA table_info({table});")
         field_names = curr.fetchall()
         existing_fields = [f[1].lower() for f in field_names]
 
@@ -76,8 +76,8 @@ class CreatesTranspoNetProcedure(WorkerThread):
         return string_fields
 
     def renumber_nodes(self):
-        max_val = self.node_layer.maximumValue(self.node_fields['node_id'])
-        max_val += [x[0] for x in self.project.conn.execute('select max(node_id) from nodes')][0]
+        max_val = self.node_layer.maximumValue(self.node_fields["node_id"])
+        max_val += [x[0] for x in self.project.conn.execute("select max(node_id) from nodes")][0]
         logger.info(max_val)
 
         curr = self.project.conn.cursor()
@@ -98,7 +98,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
                           search_frame = GeomFromWKB(?, ?))"""
 
         flds = list(self.node_fields.keys())
-        setting = [f'{fld}=?' for fld in flds]
+        setting = [f"{fld}=?" for fld in flds]
         update_sql = f'Update nodes set {",".join(setting)} where node_id=?'
         # update_link_a = "Update Links set a_node=? where a_node=?"
         # update_link_b = "Update Links set b_node=? where b_node=?"
@@ -144,11 +144,11 @@ class CreatesTranspoNetProcedure(WorkerThread):
             attrs.extend([f.geometry().asWkb().data(), crs])
             data_to_add.append(attrs)
 
-            if table == 'links':
-                all_modes.update(list(f.attributes()[layer_fields['modes']]))
-                all_link_types.update([f.attributes()[layer_fields['link_type']]])
+            if table == "links":
+                all_modes.update(list(f.attributes()[layer_fields["modes"]]))
+                all_link_types.update([f.attributes()[layer_fields["link_type"]]])
 
-        if table == 'links':
+        if table == "links":
             # We check if all modes exist
             modes = self.project.network.modes
             current_modes = list(modes.all_modes().keys())
@@ -160,7 +160,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
                 new_mode.description = "Mode automatically added during project creation from layers"
                 modes.add(new_mode)
                 new_mode.save()
-                logger.info(f'{new_mode.description} --> ({md})')
+                logger.info(f"{new_mode.description} --> ({md})")
             self.project.conn.commit()
 
             # We check if all link types exist
@@ -183,7 +183,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
             try:
                 self.project.conn.execute(sql, data)
             except Exception as e:
-                logger.info(f'Failed inserting record {data[0]} for {table}')
+                logger.info(f"Failed inserting record {data[0]} for {table}")
                 logger.info(e.args)
                 logger.info([sql, data])
                 if data[0]:

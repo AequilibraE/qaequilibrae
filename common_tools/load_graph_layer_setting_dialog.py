@@ -24,10 +24,10 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
         self.iface = iface
         self.project = project
         self.setupUi(self)
-        self.minimize_field = ''
-        self.mode = ''
-        self.link_layer = ''
-        self.node_layer = ''
+        self.minimize_field = ""
+        self.mode = ""
+        self.link_layer = ""
+        self.node_layer = ""
         self.error = []
         self.all_modes = {}
 
@@ -35,8 +35,8 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
         curr.execute("""select mode_name, mode_id from modes""")
 
         for x in curr.fetchall():
-            self.cb_modes.addItem(f'{x[0]} ({x[1]})')
-            self.all_modes[f'{x[0]} ({x[1]})'] = x[1]
+            self.cb_modes.addItem(f"{x[0]} ({x[1]})")
+            self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         for field in self.project.network.skimmable_fields():
             self.cb_minimizing.addItem(field)

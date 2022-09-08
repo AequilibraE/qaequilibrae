@@ -196,13 +196,13 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         error = False
         if (
-                min(
-                    self.fromlayer.currentIndex(),
-                    self.fromfield.currentIndex(),
-                    self.tolayer.currentIndex(),
-                    self.tofield.currentIndex(),
-                )
-                < 0
+            min(
+                self.fromlayer.currentIndex(),
+                self.fromfield.currentIndex(),
+                self.tolayer.currentIndex(),
+                self.tofield.currentIndex(),
+            )
+            < 0
         ):
             error = True
 

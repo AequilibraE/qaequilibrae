@@ -4,7 +4,7 @@ from tempfile import gettempdir
 
 
 def starts_logging():
-    logger = logging.getLogger('AequilibraEGUI')
+    logger = logging.getLogger("AequilibraEGUI")
 
     log_file = os.path.join(gettempdir(), "aequilibrae_gui.log")
     if not os.path.isfile(log_file):
@@ -17,6 +17,6 @@ def starts_logging():
     if not len(logger.handlers):
         ch = logging.FileHandler(log_file)
         ch.setFormatter(formatter)
-        ch.name = 'AequilibraEGUI'
+        ch.name = "AequilibraEGUI"
         ch.setLevel(logging.DEBUG)
         logger.addHandler(ch)

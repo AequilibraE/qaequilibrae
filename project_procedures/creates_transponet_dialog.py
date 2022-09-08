@@ -258,10 +258,10 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.proj_folder = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", self.path)
         if self.proj_folder is None or len(self.proj_folder) == 0:
             return
-        new_folder = 'new_project'
+        new_folder = "new_project"
         counter = 1
         while isdir(join(self.proj_folder, new_folder)):
-            new_folder = f'new_project_{counter}'
+            new_folder = f"new_project_{counter}"
             counter += 1
 
         self.proj_folder = join(self.proj_folder, new_folder)
@@ -278,9 +278,9 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.proj_folder = self.project_destination.text()
         if isdir(self.proj_folder):
             counter = 1
-            while isdir(join(f'{self.proj_folder}{counter}')):
+            while isdir(join(f"{self.proj_folder}{counter}")):
                 counter += 1
-            self.proj_folder = f'{self.proj_folder}{counter}'
+            self.proj_folder = f"{self.proj_folder}{counter}"
 
         self.assembles_data()
 
@@ -295,13 +295,13 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def check_data(self):
         if self.link_layer:
             if len(self.link_layer.crs().authid()) == 0:
-                return False, 'Link Layer has NO defined CRS'
+                return False, "Link Layer has NO defined CRS"
 
         if self.node_layer:
             if len(self.node_layer.crs().authid()) == 0:
-                return False, 'Node Layer has NO defined CRS'
+                return False, "Node Layer has NO defined CRS"
 
-        return True, ''
+        return True, ""
 
     def assembles_data(self):
         def compile_fields(layer, table):

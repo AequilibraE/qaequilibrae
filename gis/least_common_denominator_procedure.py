@@ -70,8 +70,8 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             self.output_type = "Poly"
 
         elif (
-                self.from_layer.wkbType() in self.poly_types + self.line_types
-                and self.to_layer.wkbType() in self.poly_types + self.line_types
+            self.from_layer.wkbType() in self.poly_types + self.line_types
+            and self.to_layer.wkbType() in self.poly_types + self.line_types
         ):
             lcd_layer = QgsVectorLayer(f"MultiLineString?crs=epsg:{epsg_code}", "output", "memory")
             self.output_type = "Line"

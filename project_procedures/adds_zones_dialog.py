@@ -49,9 +49,14 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setFixedHeight(65)
         self.progress_box.setVisible(True)
         self.input_box.setVisible(False)
-        self.worker_thread = AddZonesProcedure(qgis.utils.iface.mainWindow(), self.project, layer,
-                                               self.chb_select.isChecked(), self.chb_add_centroids.isChecked(),
-                                               field_correspondence)
+        self.worker_thread = AddZonesProcedure(
+            qgis.utils.iface.mainWindow(),
+            self.project,
+            layer,
+            self.chb_select.isChecked(),
+            self.chb_add_centroids.isChecked(),
+            field_correspondence,
+        )
 
         self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
         self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
@@ -63,10 +68,10 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
     def changed_layer(self):
         if not self.project or not self.project.conn:
             return
-        ignore_fields = ['ogc_fid', 'geometry']
-        not_initializable = ['zone_id']
+        ignore_fields = ["ogc_fid", "geometry"]
+        not_initializable = ["zone_id"]
 
-        fields = pd.read_sql('PRAGMA table_info(zones)', self.project.conn).name.to_list()
+        fields = pd.read_sql("PRAGMA table_info(zones)", self.project.conn).name.to_list()
         fields = [x.lower() for x in fields if x not in ignore_fields]
 
         self.table_fields.clearContents()

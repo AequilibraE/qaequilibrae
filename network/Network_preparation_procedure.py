@@ -16,14 +16,14 @@ class NetworkPreparationProcedure(WorkerThread):
     finished_threaded_procedure = pyqtSignal(object)
 
     def __init__(
-            self,
-            parentThread,
-            line_layer,
-            new_line_layer,
-            node_layer=False,
-            node_ids=False,
-            new_node_layer=False,
-            node_start=0,
+        self,
+        parentThread,
+        line_layer,
+        new_line_layer,
+        node_layer=False,
+        node_ids=False,
+        new_node_layer=False,
+        node_start=0,
     ):
 
         WorkerThread.__init__(self, parentThread)
@@ -73,8 +73,9 @@ class NetworkPreparationProcedure(WorkerThread):
     def with_lines_only(self, feat_count, new_line_layer):
         self.ProgressMaxValue.emit(feat_count)
         #  Create node layer
-        new_node_layer = QgsVectorLayer(f"Point?crs=epsg:{self.epsg_code}&field=ID:integer", self.new_node_layer,
-                                        "memory")
+        new_node_layer = QgsVectorLayer(
+            f"Point?crs=epsg:{self.epsg_code}&field=ID:integer", self.new_node_layer, "memory"
+        )
         DTYPE = [
             ("LAT", np.float64),
             ("LONG", np.float64),

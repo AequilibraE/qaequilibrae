@@ -35,7 +35,7 @@ try:
     from aequilibrae.paths.AoN import one_to_all
 except ImportError as e:
     no_binary = True
-    warn(f'AequilibraE binaries are not available {e.args}')
+    warn(f"AequilibraE binaries are not available {e.args}")
 
 if not no_binary:
     pass
@@ -48,27 +48,26 @@ if not has_omx:
 
 has_ortools = iutil.find_spec("openmatrix") is not None
 
-if hasattr(Qt, 'AA_EnableHighDpiScaling'):
+if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
 
-if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
+if hasattr(Qt, "AA_UseHighDpiPixmaps"):
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
 
 class AequilibraEMenu:
-
     def __init__(self, iface):
         # Closes AequilibraE projects eventually opened in memory
-        self.logger = logging.getLogger('AequilibraEGUI')
+        self.logger = logging.getLogger("AequilibraEGUI")
         if ENVIRON_VAR in os.environ:
             del os.environ[ENVIRON_VAR]
-        self.geo_layers_list = ['links', 'nodes', 'zones']
+        self.geo_layers_list = ["links", "nodes", "zones"]
         self.translator = None
         self.iface = iface
         self.project = None  # type: Project
         self.matrices = {}
         self.layers = {}  # type: Dict[QgsVectorLayer]
-        self.dock = QDockWidget(self.trlt('AequilibraE'))
+        self.dock = QDockWidget(self.trlt("AequilibraE"))
         self.manager = QWidget()
         self.no_binary = no_binary
 
@@ -77,54 +76,56 @@ class AequilibraEMenu:
         self.set_font(self.toolbar)
         self.toolbar.setOrientation(2)
 
-        self.menuActions = {'Project': [],
-                            'Network Manipulation': [],
-                            'Data': [],
-                            'Trip Distribution': [],
-                            'Paths and assignment': [],
-                            'Routing': [],
-                            # 'Public Transport': [],
-                            'GIS': [],
-                            'Utils': [],
-                            'AequilibraE': []}
+        self.menuActions = {
+            "Project": [],
+            "Network Manipulation": [],
+            "Data": [],
+            "Trip Distribution": [],
+            "Paths and assignment": [],
+            "Routing": [],
+            # 'Public Transport': [],
+            "GIS": [],
+            "Utils": [],
+            "AequilibraE": [],
+        }
 
         # # #######################   PROJECT SUB-MENU   ############################
-        self.add_menu_action('Project', 'Open Project', partial(run_load_project, self))
-        self.add_menu_action('Project', 'Create project from OSM', partial(project_from_osm, self))
-        self.add_menu_action('Project', 'Create Project from layers', partial(run_create_transponet, self))
-        self.add_menu_action('Project', 'Add zoning data', partial(run_add_zones, self))
-        self.add_menu_action('Project', 'Parameters', partial(run_change_parameters, self))
-        self.add_menu_action('Project', 'logfile', partial(show_log, self))
-        self.add_menu_action('Project', 'Close project', self.run_close_project)
+        self.add_menu_action("Project", "Open Project", partial(run_load_project, self))
+        self.add_menu_action("Project", "Create project from OSM", partial(project_from_osm, self))
+        self.add_menu_action("Project", "Create Project from layers", partial(run_create_transponet, self))
+        self.add_menu_action("Project", "Add zoning data", partial(run_add_zones, self))
+        self.add_menu_action("Project", "Parameters", partial(run_change_parameters, self))
+        self.add_menu_action("Project", "logfile", partial(show_log, self))
+        self.add_menu_action("Project", "Close project", self.run_close_project)
 
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
 
-        self.add_menu_action('Network Manipulation', 'Network Preparation', partial(prepare_network, self))
-        self.add_menu_action('Network Manipulation', 'Add centroid connectors', partial(run_add_connectors, self))
+        self.add_menu_action("Network Manipulation", "Network Preparation", partial(prepare_network, self))
+        self.add_menu_action("Network Manipulation", "Add centroid connectors", partial(run_add_connectors, self))
 
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
-        self.add_menu_action('Data', 'Display project data', partial(run_show_project_data, self))
+        self.add_menu_action("Data", "Display project data", partial(run_show_project_data, self))
 
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
 
-        self.add_menu_action('Trip Distribution', 'Trip Distribution', partial(run_distribution_models, self))
+        self.add_menu_action("Trip Distribution", "Trip Distribution", partial(run_distribution_models, self))
 
         # # # ########################################################################
         # # # ###################  PATH COMPUTATION SUB-MENU   #######################
         #
-        self.add_menu_action('Paths and assignment', 'Shortest path', partial(run_shortest_path, self))
-        self.add_menu_action('Paths and assignment', 'Impedance matrix', partial(run_dist_matrix, self))
-        self.add_menu_action('Paths and assignment', 'Traffic Assignment', partial(run_traffic_assig, self))
+        self.add_menu_action("Paths and assignment", "Shortest path", partial(run_shortest_path, self))
+        self.add_menu_action("Paths and assignment", "Impedance matrix", partial(run_dist_matrix, self))
+        self.add_menu_action("Paths and assignment", "Traffic Assignment", partial(run_traffic_assig, self))
 
         # # # ########################################################################
         # # # #######################   ROUTING SUB-MENU   ###########################
         if has_ortools:
-            self.add_menu_action('Routing', 'Travelling Salesman Problem', partial(run_tsp, self))
+            self.add_menu_action("Routing", "Travelling Salesman Problem", partial(run_tsp, self))
         else:
-            _ = self.menuActions.pop('Routing')
+            _ = self.menuActions.pop("Routing")
 
         # # # ########################################################################
         # # # #######################   TRANSIT SUB-MENU   ###########################
@@ -142,35 +143,35 @@ class AequilibraEMenu:
         #
         # # ########################################################################
         # # #################        GIS TOOLS SUB-MENU    #########################
-        self.add_menu_action('GIS', 'Desire Lines', partial(run_desire_lines, self))
-        self.add_menu_action('GIS', 'Stacked Bandwidth', partial(run_stacked_bandwidths, self))
-        self.add_menu_action('GIS', 'Scenario Comparison', partial(run_scenario_comparison, self))
-        self.add_menu_action('GIS', 'Lowest common denominator', partial(run_lcd, self))
-        self.add_menu_action('GIS', 'Simple tag', partial(run_tag, self))
+        self.add_menu_action("GIS", "Desire Lines", partial(run_desire_lines, self))
+        self.add_menu_action("GIS", "Stacked Bandwidth", partial(run_stacked_bandwidths, self))
+        self.add_menu_action("GIS", "Scenario Comparison", partial(run_scenario_comparison, self))
+        self.add_menu_action("GIS", "Lowest common denominator", partial(run_lcd, self))
+        self.add_menu_action("GIS", "Simple tag", partial(run_tag, self))
 
         # # ########################################################################
         # # #################          Utils submenu         #########################
-        self.add_menu_action('Data', 'Import matrices', partial(load_matrices, self))
-        self.add_menu_action('Utils', 'Display Matrices and datasets', partial(display_aequilibrae_formats, self))
+        self.add_menu_action("Data", "Import matrices", partial(load_matrices, self))
+        self.add_menu_action("Utils", "Display Matrices and datasets", partial(display_aequilibrae_formats, self))
 
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
 
-        self.add_menu_action('AequilibraE', 'About', self.run_about)
-        self.add_menu_action('AequilibraE', 'Help', self.run_help)
+        self.add_menu_action("AequilibraE", "About", self.run_about)
+        self.add_menu_action("AequilibraE", "Help", self.run_help)
 
         if no_binary:
-            self.add_menu_action('AequilibraE', 'Download binaries', self.run_binary_download)
+            self.add_menu_action("AequilibraE", "Download binaries", self.run_binary_download)
 
         if not extra_packages:
-            self.add_menu_action('AequilibraE', 'Install extra packages', self.install_extra_packages)
+            self.add_menu_action("AequilibraE", "Install extra packages", self.install_extra_packages)
 
         self.build_menu()
         # ########################################################################
         # #################        PROJECT MANAGER       #########################
 
         self.showing = QCheckBox()
-        self.showing.setText('Show project info')
+        self.showing.setText("Show project info")
         self.showing.setChecked(True)
         self.toolbar.addWidget(self.showing)
 
@@ -192,7 +193,7 @@ class AequilibraEMenu:
         QgsProject.instance().layerRemoved.connect(self.layerRemoved)
 
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
-        if main_menu == 'AequilibraE':
+        if main_menu == "AequilibraE":
             action = QToolButton()
             action.setText(text)
             action.clicked.connect(function)
@@ -206,7 +207,7 @@ class AequilibraEMenu:
 
     def build_menu(self):
         for menu, actions in self.menuActions.items():
-            if menu == 'AequilibraE':
+            if menu == "AequilibraE":
                 for action in actions:
                     self.toolbar.addWidget(action)
                 continue
@@ -229,9 +230,9 @@ class AequilibraEMenu:
             self.toolbar.addWidget(itemButton)
 
     def run_help(self):
-        url = 'http://aequilibrae.com/qgis'
-        if sys.platform == 'darwin':  # in case of OS X
-            subprocess.Popen(['open', url])
+        url = "http://aequilibrae.com/qgis"
+        if sys.platform == "darwin":  # in case of OS X
+            subprocess.Popen(["open", url])
         else:
             webbrowser.open_new_tab(url)
 
@@ -286,7 +287,7 @@ class AequilibraEMenu:
         if self.project is None:
             return
         if layer_name.lower() not in self.layers:
-            print('Layer was not found, which is weird')
+            print("Layer was not found, which is weird")
             self.create_layer_by_name(layer_name)
         layer = self.layers[layer_name.lower()][0]
         QgsProject.instance().addMapLayer(layer)
@@ -301,8 +302,8 @@ class AequilibraEMenu:
             return
         uri = QgsDataSourceUri()
         uri.setDatabase(self.project.path_to_file)
-        uri.setDataSource('', layer_name, 'geometry')
-        layer = QgsVectorLayer(uri.uri(), layer_name, 'spatialite')
+        uri.setDataSource("", layer_name, "geometry")
+        layer = QgsVectorLayer(uri.uri(), layer_name, "spatialite")
         return layer
 
     def run_about(self):

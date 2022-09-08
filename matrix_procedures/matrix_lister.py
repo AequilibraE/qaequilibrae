@@ -10,16 +10,16 @@ has_omx = spec is not None
 
 def list_matrices(fldr) -> pd.DataFrame:
     conn = database_connection()
-    df = pd.read_sql('select * from matrices', conn)
+    df = pd.read_sql("select * from matrices", conn)
     conn.close()
 
     existing_files = os.listdir(fldr)
 
-    matrices = df.assign(WARNINGS='')
+    matrices = df.assign(WARNINGS="")
     for idx, record in matrices.iterrows():
         if record.file_name not in existing_files:
-            matrices.loc[idx, 'WARNINGS'] = 'File not found on disk'
+            matrices.loc[idx, "WARNINGS"] = "File not found on disk"
 
-        elif record.file_name[-4:] == '.omx' and not has_omx:
-            matrices.loc[idx, 'WARNINGS'] = 'OMX not available for display'
+        elif record.file_name[-4:] == ".omx" and not has_omx:
+            matrices.loc[idx, "WARNINGS"] = "OMX not available for display"
     return matrices

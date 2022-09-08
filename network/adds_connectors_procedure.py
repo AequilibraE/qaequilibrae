@@ -11,8 +11,9 @@ class AddsConnectorsProcedure(WorkerThread):
     ProgressMaxValue = pyqtSignal(object)
     finished_threaded_procedure = pyqtSignal(object)
 
-    def __init__(self, parentThread, qgis_project, link_types, modes, num_connectors, source, radius=None, layer=None,
-                 field=None):
+    def __init__(
+        self, parentThread, qgis_project, link_types, modes, num_connectors, source, radius=None, layer=None, field=None
+    ):
         WorkerThread.__init__(self, parentThread)
         self.qgis_project = qgis_project
         self.project = qgis_project.project
@@ -25,9 +26,9 @@ class AddsConnectorsProcedure(WorkerThread):
         self.field = field
 
     def doWork(self):
-        if self.source == 'zone':
+        if self.source == "zone":
             self.do_from_zones()
-        elif self.source == 'network':
+        elif self.source == "network":
             self.do_from_network()
         else:
             self.do_from_layer()
@@ -37,10 +38,10 @@ class AddsConnectorsProcedure(WorkerThread):
     def do_from_zones(self):
         zoning = self.project.zoning
         zoning.refresh_connection()
-        tot_zones = [x[0] for x in zoning.conn.execute('select count(*) from zones')][0]
+        tot_zones = [x[0] for x in zoning.conn.execute("select count(*) from zones")][0]
         self.ProgressMaxValue.emit(tot_zones)
 
-        zones = [x[0] for x in zoning.conn.execute('select zone_id from zones')]
+        zones = [x[0] for x in zoning.conn.execute("select zone_id from zones")]
         for counter, zone_id in enumerate(zones):
             zone = zoning.get(zone_id)
             zone.conn = zoning.conn
@@ -55,7 +56,7 @@ class AddsConnectorsProcedure(WorkerThread):
         nodes.refresh_connection()
         self.project.network.refresh_connection()
         self.ProgressMaxValue.emit(self.project.network.count_centroids())
-        centroids = [x[0] for x in nodes.conn.execute('select node_id from nodes where is_centroid=1')]
+        centroids = [x[0] for x in nodes.conn.execute("select node_id from nodes where is_centroid=1")]
         for counter, zone_id in enumerate(centroids):
             print(zone_id)
             node = nodes.get(zone_id)

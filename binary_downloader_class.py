@@ -25,7 +25,7 @@ class BinaryDownloaderDialog(QtWidgets.QDialog, FORM_CLASS):
             par = yaml.safe_load(yml)
         bin_path = par["binary source"]
         if isWindows():
-            npv = np.__version__.split('.')[1]
+            npv = np.__version__.split(".")[1]
             self.binary_path = bin_path["Windows"][f"np{npv}"]
         elif isMac():
             self.binary_path = bin_path["MacOS"]

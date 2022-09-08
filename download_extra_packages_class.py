@@ -12,25 +12,25 @@ class DownloadExtraPackages(QtWidgets.QDialog, FORM_CLASS):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-        with open(os.path.dirname(__file__) + "/extra_requirements.txt", 'r') as req:
+        with open(os.path.dirname(__file__) + "/extra_requirements.txt", "r") as req:
             self.packages = [line.rstrip() for line in req.readlines()]
 
-        self.lbl_list_of_packages.setText(', '.join(self.packages))
+        self.lbl_list_of_packages.setText(", ".join(self.packages))
         self.but_download.clicked.connect(self.download_package)
         self.setModal(True)
 
     def download_package(self):
         lines = []
         for pkg in self.packages:
-            command = 'python3 -m pip install {}'.format(pkg)
+            command = "python3 -m pip install {}".format(pkg)
             lines.append(command)
             with subprocess.Popen(
-                    command,
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stdin=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT,
-                    universal_newlines=True,
+                command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stdin=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
             ) as proc:
                 lines.extend(proc.stdout.readlines())
 

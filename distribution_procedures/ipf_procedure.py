@@ -21,4 +21,4 @@ class IpfProcedure(WorkerThread):
             self.output = self.ipf.output
         except ValueError as e:
             self.error = e
-        self.finished_threaded_procedure.emit('finishedIPF')
+        self.finished_threaded_procedure.emit("finishedIPF")

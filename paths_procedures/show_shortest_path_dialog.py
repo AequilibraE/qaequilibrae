@@ -15,11 +15,11 @@ from ..common_tools.auxiliary_functions import standard_path
 from ..common_tools import LoadGraphLayerSettingDialog
 
 no_binary = False
-logger = logging.getLogger('AequilibraEGUI')
+logger = logging.getLogger("AequilibraEGUI")
 try:
     from aequilibrae.paths import path_computation
 except Exception as e:
-    logger.error(f'Importing AequilibraE failed. {e.args}')
+    logger.error(f"Importing AequilibraE failed. {e.args}")
     no_binary = True
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
@@ -38,8 +38,8 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.field_types = {}
         self.centroids = None
-        self.node_layer = qgis_project.layers['nodes'][0]
-        self.line_layer = qgis_project.layers['links'][0]
+        self.node_layer = qgis_project.layers["nodes"][0]
+        self.line_layer = qgis_project.layers["links"][0]
         self.node_keys = {}
         self.node_fields = None
         self.index = None
@@ -59,7 +59,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.do_dist_matrix.clicked.connect(self.produces_path)
 
     def prepare_graph_and_network(self):
-        self.do_dist_matrix.setText('Loading data')
+        self.do_dist_matrix.setText("Loading data")
         self.from_but.setEnabled(False)
         self.to_but.setEnabled(False)
         dlg2 = LoadGraphLayerSettingDialog(self.iface, self.project)
@@ -81,7 +81,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             self.graph.set_blocked_centroid_flows(dlg2.block_connector)
 
             if dlg2.remove_chosen_links:
-                idx = self.line_layer.dataProvider().fieldNameIndex('link_id')
+                idx = self.line_layer.dataProvider().fieldNameIndex("link_id")
                 remove = [feat.attributes()[idx] for feat in self.line_layer.selectedFeatures()]
                 self.graph.exclude_links(remove)
 
@@ -93,13 +93,13 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.index.addFeature(feature)
                 self.node_keys[feature.id()] = feature.attributes()
 
-            idx = self.line_layer.dataProvider().fieldNameIndex('link_id')
+            idx = self.line_layer.dataProvider().fieldNameIndex("link_id")
             self.link_features = {}
             for feat in self.line_layer.getFeatures():
                 link_id = feat.attributes()[idx]
                 self.link_features[link_id] = feat
 
-            self.do_dist_matrix.setText('Display')
+            self.do_dist_matrix.setText("Display")
             self.do_dist_matrix.setEnabled(True)
             self.from_but.setEnabled(True)
             self.to_but.setEnabled(True)
@@ -141,7 +141,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
             self.clickTool = PointTool(self.iface.mapCanvas())
             node_id = self.node_keys[nearest[0]]
 
-            index_field = self.node_fields.index('node_id')
+            index_field = self.node_fields.index("node_id")
             node_actual_id = node_id[index_field]
             return node_actual_id
         except Exception as e:
@@ -165,14 +165,15 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                 qgis.utils.iface.messageBar().pushMessage(msg, "", level=3)
 
     def create_path_with_selection(self):
-        f = 'link_id'
+        f = "link_id"
         t = " or ".join([f"{f}={int(k)}" for k in self.res.path])
         self.line_layer.selectByExpression(t)
 
     def create_path_with_scratch_layer(self):
         crs = self.line_layer.dataProvider().crs().authid()
-        vl = QgsVectorLayer("LineString?crs={}".format(crs), f'{self.path_from.text()} to {self.path_to.text()}',
-                            "memory")
+        vl = QgsVectorLayer(
+            "LineString?crs={}".format(crs), f"{self.path_from.text()} to {self.path_to.text()}", "memory"
+        )
         pr = vl.dataProvider()
 
         # add fields

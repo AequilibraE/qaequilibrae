@@ -78,10 +78,10 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         error = None
         if (
-                self.fromlayer.currentIndex() < 0
-                or self.fromfield.currentIndex() < 0
-                or self.tolayer.currentIndex() < 0
-                or self.tofield.currentIndex() < 0
+            self.fromlayer.currentIndex() < 0
+            or self.fromfield.currentIndex() < 0
+            or self.tolayer.currentIndex() < 0
+            or self.tofield.currentIndex() < 0
         ):
             error = "ComboBox with ilegal value"
 

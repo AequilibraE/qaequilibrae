@@ -40,7 +40,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.job_queue = OrderedDict()
         self.model = SyntheticGravityModel()
         self.model.function = "GAMMA"
-        self.outfile = ''
+        self.outfile = ""
 
         self.matrices = OrderedDict()
         self.datasets = OrderedDict()
@@ -233,7 +233,8 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if dt == "data":
                 for f in self.datasets[d].fields:
                     if np.issubdtype(self.datasets[d].data[f].dtype, np.integer) or np.issubdtype(
-                            self.datasets[d].data[f].dtype, np.float):
+                        self.datasets[d].data[f].dtype, np.float
+                    ):
                         cob_dest.addItem(f)
             else:
                 for f in self.matrices[d].names:
@@ -277,7 +278,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         }
 
         if has_omx:
-            file_types['aem'] = ["Matrix", ['Open Matrix(*.omx)', "Aequilibrae matrix(*.aem)"], ".omx"]
+            file_types["aem"] = ["Matrix", ["Open Matrix(*.omx)", "Aequilibrae matrix(*.aem)"], ".omx"]
 
         ft = file_types[file_type]
         file_chosen, _ = GetOutputFileName(self, ft[0], ft[1], ft[2], self.path)
@@ -431,10 +432,10 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Procedure error: ", error.args[0], level=3)
         self.report.extend(self.worker_thread.report)
 
-        if success == 'calibrate':
+        if success == "calibrate":
             self.worker_thread.model.save(self.outfile)
 
-        if success in ['apply_gravity', 'finishedIPF']:
+        if success in ["apply_gravity", "finishedIPF"]:
             self.worker_thread.output.export(self.outfile)
         self.exit_procedure()
 

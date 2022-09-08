@@ -52,10 +52,10 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         idx = [x.row() for x in list(self.list_matrices.selectionModel().selectedRows())]
         if not idx:
             return
-        if self.matrices['WARNINGS'][idx[0]] != '':
+        if self.matrices["WARNINGS"][idx[0]] != "":
             return
 
-        file_name = self.matrices['file_name'][idx[0]]
+        file_name = self.matrices["file_name"][idx[0]]
 
         dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj, join(self.project.matrices.fldr, file_name), proj=True)
         dlg2.show()
@@ -83,8 +83,8 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         idx = [x.row() for x in list(self.list_results.selectionModel().selectedRows())]
         if not idx:
             return
-        table_name = self.results['table_name'][idx[0]]
-        if self.results['WARNINGS'][idx[0]] != '':
+        table_name = self.results["table_name"][idx[0]]
+        if self.results["WARNINGS"][idx[0]] != "":
             return
 
         _ = load_result_table(self.project.project_base_path, table_name)

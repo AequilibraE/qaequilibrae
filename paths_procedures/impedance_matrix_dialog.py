@@ -24,7 +24,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
 
         self.project = qgis_project.project
-        self.link_layer = qgis_project.layers['links'][0]
+        self.link_layer = qgis_project.layers["links"][0]
         self.result = SkimResults()
         self.validtypes = integer_types + float_types
         self.tot_skims = 0
@@ -60,8 +60,8 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         curr = self.project.network.conn.cursor()
         curr.execute("""select mode_name, mode_id from modes""")
         for x in curr.fetchall():
-            self.cb_modes.addItem(f'{x[0]} ({x[1]})')
-            self.all_modes[f'{x[0]} ({x[1]})'] = x[1]
+            self.cb_modes.addItem(f"{x[0]} ({x[1]})")
+            self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         self.skimmeable_fields = self.project.network.skimmable_fields()
         self.available_skims_table.setRowCount(len(self.skimmeable_fields))
@@ -117,7 +117,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         txt = self.line_matrix.text()
         if not len(txt):
             return False
-        if self.project.conn.execute('Select count(*) from matrices where name=?', [txt]).fetchone()[0]:
+        if self.project.conn.execute("Select count(*) from matrices where name=?", [txt]).fetchone()[0]:
             return False
         return True
 
@@ -138,7 +138,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def finished_threaded_procedure(self):
         self.report = self.worker_thread.report
-        format = 'omx' if has_omx else 'aem'
+        format = "omx" if has_omx else "aem"
         self.worker_thread.save_to_project(self.only_str(self.mat_name), format=format)
         self.exit_procedure()
 
@@ -158,7 +158,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
 
         if self.chb_chosen_links.isChecked():
-            idx = self.link_layer.dataProvider().fieldNameIndex('link_id')
+            idx = self.link_layer.dataProvider().fieldNameIndex("link_id")
             remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
             self.graph.exclude_links(remove)
 

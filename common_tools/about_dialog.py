@@ -10,7 +10,7 @@ from .auxiliary_functions import standard_path
 try:
     from aequilibrae.paths import release_name, release_version
 except Exception as e:
-    logger = logging.getLogger('AequilibraEGUI')
+    logger = logging.getLogger("AequilibraEGUI")
     logger.error(e.args)
     release_name = "No Binaries available"
     release_version = "No Binaries available"

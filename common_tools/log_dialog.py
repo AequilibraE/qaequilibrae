@@ -14,7 +14,7 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, parent=None):
         super(LogDialog, self).__init__(parent)
 
-        self.logfile = join(qgis_project.project.project_base_path, 'aequilibrae.log')
+        self.logfile = join(qgis_project.project.project_base_path, "aequilibrae.log")
 
         self.iface = qgis_project.iface
         self.setupUi(self)
@@ -38,7 +38,7 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_validate.setVisible(False)
         self.but_defaults.setVisible(False)
         self.but_save.setVisible(True)
-        self.but_close.setText('Close')
+        self.but_close.setText("Close")
         self.but_close.clicked.connect(self.exit_procedure)
         self.but_save.clicked.connect(self.save_to_disk)
 
@@ -48,7 +48,7 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
             return
         with open(self.logfile, "r") as log:
             logdata = log.readlines()
-        self.text_box.setText(''.join(logdata))
+        self.text_box.setText("".join(logdata))
 
     def save_to_disk(self):
         with open(self.logfile, "w") as log:

@@ -21,7 +21,7 @@ class AddZonesProcedure(WorkerThread):
         features = list(self.lyr.selectedFeatures()) if self.select_only else list(self.lyr.getFeatures())
         self.emit_messages(message="Importing zones", value=0, max_val=len(features))
 
-        idx_id = self.field_corresp['zone_id']
+        idx_id = self.field_corresp["zone_id"]
         zoning = self.project.zoning
         for i, feat in enumerate(features):
             zone = zoning.new(feat.attributes()[idx_id])

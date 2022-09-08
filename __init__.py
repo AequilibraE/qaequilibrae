@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "aequ
 
 def classFactory(iface):
     from .common_tools.start_logging import starts_logging
+
     starts_logging()
     from .AequilibraEMenu import AequilibraEMenu
 

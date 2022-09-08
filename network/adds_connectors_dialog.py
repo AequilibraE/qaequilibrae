@@ -55,24 +55,26 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.field_box.setLayer(self.layer_box.currentLayer())
 
     def run(self):
-        source = 'network' if self.rdo_network.isChecked() else 'zone'
-        source = 'layer' if self.rdo_layer.isChecked() else source
+        source = "network" if self.rdo_network.isChecked() else "zone"
+        source = "layer" if self.rdo_layer.isChecked() else source
 
         num_connectors = self.connectors.value()
 
         link_types = [item.text() for item in self.lst_link_types.selectedItems()]
-        link_types = ''.join([self.link_types[lt] for lt in link_types])
+        link_types = "".join([self.link_types[lt] for lt in link_types])
 
         modes = [item.text() for item in self.lst_modes.selectedItems()]
         modes = [self.modes[md] for md in modes]
 
-        parameters = {"qgis_project": self.qgis_project,
-                      "link_types": link_types,
-                      "modes": modes,
-                      "num_connectors": num_connectors,
-                      "source": source}
+        parameters = {
+            "qgis_project": self.qgis_project,
+            "link_types": link_types,
+            "modes": modes,
+            "num_connectors": num_connectors,
+            "source": source,
+        }
 
-        if source != 'zone':
+        if source != "zone":
             parameters["radius"] = self.sb_radius.value()
         if source == "layer":
             parameters["layer"] = self.layer_box.currentLayer()

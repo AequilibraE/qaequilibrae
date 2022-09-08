@@ -9,7 +9,7 @@ from ..common_tools.auxiliary_functions import standard_path
 
 def run_load_project(qgis_project):
     proj_path = QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
-    if proj_path is None or proj_path == '':
+    if proj_path is None or proj_path == "":
         return
     # Cleans the project descriptor
     tab_count = 1
@@ -23,14 +23,14 @@ def run_load_project(qgis_project):
         try:
             qgis_project.project.load(proj_path)
         except FileNotFoundError as e:
-            if e.args[0] == 'Model does not exist. Check your path and try again':
+            if e.args[0] == "Model does not exist. Check your path and try again":
                 qgis.utils.iface.messageBar().pushMessage("FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL", level=1)
                 return
             else:
                 raise e
 
     curr = qgis_project.project.conn.cursor()
-    curr.execute('select f_table_name from geometry_columns;')
+    curr.execute("select f_table_name from geometry_columns;")
     layers = [x[0] for x in curr.fetchall()]
 
     descrlayout = QVBoxLayout()
@@ -51,7 +51,7 @@ def run_load_project(qgis_project):
     descr.setLayout(descrlayout)
     qgis_project.tabContents = [(descr, "Geo layers")]
     qgis_project.projectManager.addTab(descr, "Geo layers")
-    qgis_project.project.conn.execute('PRAGMA temp_store = 0;')
+    qgis_project.project.conn.execute("PRAGMA temp_store = 0;")
 
     # Creates all layers and puts them in memory
     qgis_project.layers.clear()

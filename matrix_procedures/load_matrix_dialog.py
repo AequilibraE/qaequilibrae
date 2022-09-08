@@ -209,9 +209,9 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.worker_thread = None
         if self.radio_layer_matrix.isChecked():
             if (
-                    self.field_from.currentIndex() < 0
-                    or self.field_from.currentIndex() < 0
-                    or self.field_cells.currentIndex() < 0
+                self.field_from.currentIndex() < 0
+                or self.field_from.currentIndex() < 0
+                or self.field_cells.currentIndex() < 0
             ):
                 self.error = "Invalid field chosen"
 

@@ -22,14 +22,14 @@ if has_omx:
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgis_project, file_path='', proj=False):
+    def __init__(self, qgis_project, file_path="", proj=False):
         QtWidgets.QDialog.__init__(self)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
         self.iface = qgis_project.iface
         self.setupUi(self)
         self.data_to_show = None
         self.error = None
-        self.logger = logging.getLogger('AequilibraEGUI')
+        self.logger = logging.getLogger("AequilibraEGUI")
         self.qgis_project = qgis_project
         self.from_proj = proj
 
@@ -41,10 +41,10 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)"]
 
-        dflt = '.aem'
+        dflt = ".aem"
         if has_omx:
             formats.insert(0, "Open Matrix(*.omx)")
-            dflt = '.omx'
+            dflt = ".omx"
 
         self.data_path, self.data_type = GetOutputFileName(
             self,
@@ -62,7 +62,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.continue_with_data()
 
     def continue_with_data(self):
-        self.setWindowTitle(f'File path:  {self.data_path}')
+        self.setWindowTitle(f"File path:  {self.data_path}")
 
         if self.data_type in ["AED", "AEM"]:
             if self.data_type == "AED":
@@ -81,7 +81,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.exit_with_error()
 
         elif self.data_type == "OMX":
-            self.omx = omx.open_file(self.data_path, 'r')
+            self.omx = omx.open_file(self.data_path, "r")
             if not self.from_proj:
                 self.qgis_project.matrices[self.data_path] = self.omx
             self.list_cores = self.omx.list_matrices()
