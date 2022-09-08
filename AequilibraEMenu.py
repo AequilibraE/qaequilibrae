@@ -6,12 +6,11 @@ import subprocess
 import sys
 import tempfile
 import webbrowser
+from aequilibrae.project import Project
+from aequilibrae.project.database_connection import ENVIRON_VAR
 from functools import partial
 from typing import Dict
 from warnings import warn
-
-from aequilibrae.project import Project
-from aequilibrae.project.database_connection import ENVIRON_VAR
 
 import qgis
 from qgis.PyQt import QtCore
@@ -43,13 +42,11 @@ if not no_binary:
 
 extra_packages = True
 # Checks if we can display OMX
-spec = iutil.find_spec("openmatrix")
-has_omx = spec is not None
+has_omx = iutil.find_spec("openmatrix") is not None
 if not has_omx:
     extra_packages = False
 
-spec = iutil.find_spec("openmatrix")
-has_ortools = spec is not None
+has_ortools = iutil.find_spec("openmatrix") is not None
 
 if hasattr(Qt, 'AA_EnableHighDpiScaling'):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
