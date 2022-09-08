@@ -67,8 +67,8 @@ jobs:
     strategy:
       max-parallel: 4
     steps:
-      - name: Install dependencies
       - uses: actions/checkout@v1
+      - name: Install dependencies
         run: |
           export QT_QPA_PLATFORM=offscreen
           ls
