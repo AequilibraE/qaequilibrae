@@ -196,16 +196,9 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run(self):
         error = False
-        if (
-                min(
-                    self.fromlayer.currentIndex(),
-                    self.fromfield.currentIndex(),
-                    self.tolayer.currentIndex(),
-                    self.tofield.currentIndex(),
-                )
-                < 0
-        ):
-            error = True
+        for wdgt in [self.fromlayer, self.fromfield, self.tolayer, self.tofield]:
+            if wdgt.currentIndex() < 0:
+                error = True
 
         if self.needsmatching.isChecked():
             if self.matchingfrom.currentIndex() < 0 or self.matchingto.currentIndex() < 0:
@@ -246,5 +239,6 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", "  Try again", level=3)
 
-    def unload(self):
-        pass
+
+def unload(self):
+    pass
