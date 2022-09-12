@@ -73,3 +73,6 @@ jobs:
           export QT_QPA_PLATFORM=offscreen
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r docs/requirements-docs.txt
+
+      - name: Run tests
+        run: python3 -m pytest tests
