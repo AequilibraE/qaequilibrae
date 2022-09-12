@@ -1,10 +1,11 @@
 import os
 
 import qgis
+from modules.common_tools import get_vector_layer_by_name
+from modules.common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
+from modules.common_tools.global_parameters import multi_point
 from qgis.PyQt import QtWidgets, uic
 from .simple_tag_procedure import SimpleTAG
-from modules.common_tools import get_vector_layer_by_name
-from modules.common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types, multi_point
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_simple_tag.ui"))
 
@@ -196,13 +197,13 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         error = False
         if (
-            min(
-                self.fromlayer.currentIndex(),
-                self.fromfield.currentIndex(),
-                self.tolayer.currentIndex(),
-                self.tofield.currentIndex(),
-            )
-            < 0
+                min(
+                    self.fromlayer.currentIndex(),
+                    self.fromfield.currentIndex(),
+                    self.tolayer.currentIndex(),
+                    self.tofield.currentIndex(),
+                )
+                < 0
         ):
             error = True
 

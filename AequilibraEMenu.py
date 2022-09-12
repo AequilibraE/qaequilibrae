@@ -13,6 +13,14 @@ from typing import Dict
 from warnings import warn
 
 import qgis
+from modules.common_tools import AboutDialog
+from modules.matrix_procedures import LoadDatasetDialog
+from modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
+from modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag, run_add_connectors
+from modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, run_stacked_bandwidths
+from modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, show_log
+from modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
+from modules.public_transport_procedures import GtfsImportDialog
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
@@ -20,15 +28,7 @@ from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
 from qgis.core import QgsProject
 from .binary_downloader_class import BinaryDownloaderDialog
-from modules.common_tools import AboutDialog
 from .download_extra_packages_class import DownloadExtraPackages
-from modules.matrix_procedures import LoadDatasetDialog
-from modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices, show_log
-from modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag
-from modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, run_stacked_bandwidths
-from modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
-from modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
-from modules.public_transport_procedures import GtfsImportDialog
 
 no_binary = False
 try:

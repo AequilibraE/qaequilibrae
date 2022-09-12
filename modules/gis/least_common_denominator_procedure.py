@@ -1,11 +1,13 @@
+from aequilibrae.utils.worker_thread import WorkerThread
+
 from modules.common_tools import get_vector_layer_by_name
+from modules.common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
+from modules.common_tools.global_parameters import multi_point
 from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsCoordinateReferenceSystem
 from qgis.core import QgsCoordinateTransform, QgsSpatialIndex, QgsFeature, QgsGeometry, QgsField, QgsVectorLayer
 from qgis.core import QgsProject
-from modules.common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types, multi_point
-from aequilibrae.utils.worker_thread import WorkerThread
-from qgis.PyQt.QtCore import pyqtSignal
 
 
 class LeastCommonDenominatorProcedure(WorkerThread):
@@ -70,8 +72,8 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             self.output_type = "Poly"
 
         elif (
-            self.from_layer.wkbType() in self.poly_types + self.line_types
-            and self.to_layer.wkbType() in self.poly_types + self.line_types
+                self.from_layer.wkbType() in self.poly_types + self.line_types
+                and self.to_layer.wkbType() in self.poly_types + self.line_types
         ):
             lcd_layer = QgsVectorLayer(f"MultiLineString?crs=epsg:{epsg_code}", "output", "memory")
             self.output_type = "Line"
