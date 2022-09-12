@@ -39,7 +39,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
           pip install -r docs/requirements-docs.txt
 
       - name: Build documentation
@@ -71,7 +70,7 @@ jobs:
       - name: Install dependencies
         run: |
           export QT_QPA_PLATFORM=offscreen
-          python3 -m pip install -r requirements.txt
+          python3 -m pip install -r requirements-dev.txt
           python3 -m pip install -r docs/requirements-docs.txt
 
       - name: Run tests
