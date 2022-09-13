@@ -70,10 +70,8 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install -r requirements-dev.txt
-          python3 -m pip install -r docs/requirements-docs.txt
 
       - name: Run tests
         run: |
           export QT_QPA_PLATFORM=offscreen
-          ls
           python3 -m pytest tests

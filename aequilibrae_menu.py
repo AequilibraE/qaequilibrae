@@ -37,9 +37,6 @@ except ImportError as e:
     no_binary = True
     warn(f"AequilibraE binaries are not available {e.args}")
 
-if not no_binary:
-    pass
-
 extra_packages = True
 # Checks if we can display OMX
 has_omx = iutil.find_spec("openmatrix") is not None

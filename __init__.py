@@ -1,8 +1,8 @@
 # This portion of the script initializes the plugin, making it known to QGIS.
-import os
 import sys
+from os.path import abspath, join, dirname
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "aequilibrae")))
+sys.path.insert(0, abspath(join(dirname(__file__), "aequilibrae")))
 
 
 def classFactory(iface):
