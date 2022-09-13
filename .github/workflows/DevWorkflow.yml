@@ -4,26 +4,26 @@ on:  [pull_request]
 
 
 jobs:
-  linting:
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 black
-
-    - name: Lint with flake8
-      run: flake8
-
-    - name: Check code format with Black
-      run: black --check .
+#  linting:
+#    runs-on: ubuntu-latest
+#    strategy:
+#      max-parallel: 4
+#    steps:
+#    - uses: actions/checkout@v1
+#    - name: Set up Python 3.9
+#      uses: actions/setup-python@v1
+#      with:
+#        python-version: 3.9
+#    - name: Install dependencies
+#      run: |
+#        python -m pip install --upgrade pip
+#        pip install flake8 black
+#
+#    - name: Lint with flake8
+#      run: flake8
+#
+#    - name: Check code format with Black
+#      run: black --check .
 
 #  documentation:
 #    needs: linting
