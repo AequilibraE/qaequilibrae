@@ -6,7 +6,7 @@ from os.path import dirname, join
 from qgis.core import QgsCoordinateReferenceSystem
 from qgis.utils import iface
 from .utilities import get_qgis_app
-from .AequilibraEMenu import AequilibraEMenu
+from ..aequilibrae_menu import AequilibraEMenu
 
 
 class OpenMainDialogTest(unittest.TestCase):

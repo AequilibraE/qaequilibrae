@@ -9,6 +9,6 @@ def classFactory(iface):
     from modules.common_tools import starts_logging
 
     starts_logging()
-    from .AequilibraEMenu import AequilibraEMenu
+    from .aequilibrae_menu import AequilibraEMenu
 
     return AequilibraEMenu(iface)
