@@ -1,4 +1,4 @@
-from modules.project_procedures import CreatesTranspoNetDialog
+from ..project_procedures import CreatesTranspoNetDialog
 
 
 # run method that calls the network preparation section of the code

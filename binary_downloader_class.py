@@ -9,7 +9,7 @@ import yaml
 
 from qgis.PyQt import uic, QtWidgets
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__) + "/forms/", "ui_binary_downloader.ui"))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__) + "/modules/forms/", "ui_binary_downloader.ui"))
 
 
 class BinaryDownloaderDialog(QtWidgets.QDialog, FORM_CLASS):

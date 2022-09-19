@@ -11,10 +11,10 @@ from aequilibrae import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
 from .creates_transponet_procedure import CreatesTranspoNetProcedure
-from modules.common_tools import ReportDialog
-from modules.common_tools import all_layers_from_toc
-from modules.common_tools import get_vector_layer_by_name, standard_path
-from modules.common_tools.global_parameters import point_types, line_types
+from ..common_tools import ReportDialog
+from ..common_tools import all_layers_from_toc
+from ..common_tools import get_vector_layer_by_name, standard_path
+from ..common_tools.global_parameters import point_types, line_types
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_transponet_construction.ui"))

@@ -1,9 +1,9 @@
 import os
 
 import qgis
-from modules.common_tools import get_vector_layer_by_name
-from modules.common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
-from modules.common_tools.global_parameters import multi_point
+from ..common_tools import get_vector_layer_by_name
+from ..common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
+from ..common_tools.global_parameters import multi_point
 from qgis.PyQt import QtWidgets, uic
 from .simple_tag_procedure import SimpleTAG
 

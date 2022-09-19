@@ -1,4 +1,4 @@
-from modules.project_procedures import ProjectFromOSMDialog
+from ..project_procedures import ProjectFromOSMDialog
 
 
 def project_from_osm(qgis_project):

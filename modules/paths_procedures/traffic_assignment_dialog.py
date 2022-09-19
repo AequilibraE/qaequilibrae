@@ -14,11 +14,11 @@ from aequilibrae.paths.vdf import all_vdf_functions
 
 import qgis
 from aequilibrae import Parameters
-from modules.common_tools import standard_path
+from ..common_tools import standard_path
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
-from modules.common_tools import PandasModel
-from modules.common_tools import ReportDialog
+from ..common_tools import PandasModel
+from ..common_tools import ReportDialog
 
 no_binary = False
 logger = logging.getLogger("AequilibraEGUI")

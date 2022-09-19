@@ -1,4 +1,4 @@
-from modules.project_procedures import AddZonesDialog
+from ..project_procedures import AddZonesDialog
 
 
 def run_add_zones(qgis_project):

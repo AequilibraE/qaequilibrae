@@ -1,4 +1,4 @@
-from modules.network import AddConnectorsDialog
+from ..network import AddConnectorsDialog
 
 
 def run_add_connectors(qgis_project):

@@ -1,4 +1,4 @@
-from modules.gis import LeastCommonDenominatorDialog
+from ..gis import LeastCommonDenominatorDialog
 
 
 def run_lcd(qgis_project):

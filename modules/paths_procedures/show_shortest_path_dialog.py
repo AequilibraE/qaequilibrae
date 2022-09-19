@@ -11,8 +11,8 @@ from qgis.PyQt import QtCore
 from qgis.PyQt import QtWidgets, uic
 from qgis.utils import iface
 from .point_tool import PointTool
-from modules.common_tools import standard_path
-from modules.common_tools import LoadGraphLayerSettingDialog
+from ..common_tools import standard_path
+from ..common_tools import LoadGraphLayerSettingDialog
 
 no_binary = False
 logger = logging.getLogger("AequilibraEGUI")

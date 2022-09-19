@@ -14,7 +14,7 @@ from scipy.spatial import Delaunay
 from PyQt5.QtCore import pyqtSignal
 from qgis.PyQt.QtCore import QVariant
 from aequilibrae.utils.worker_thread import WorkerThread
-from modules.common_tools import get_vector_layer_by_name
+from ..common_tools import get_vector_layer_by_name
 
 logger = logging.getLogger("AequilibraEGUI")
 try:

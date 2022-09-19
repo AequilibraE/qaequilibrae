@@ -1,4 +1,4 @@
-from modules.gis import SimpleTagDialog
+from ..gis import SimpleTagDialog
 
 
 def run_tag(qgis_project):

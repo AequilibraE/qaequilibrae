@@ -1,4 +1,4 @@
-from modules.routing_procedures import TSPDialog
+from ..routing_procedures import TSPDialog
 
 
 def run_tsp(qgis_project):

@@ -13,3 +13,4 @@ from .about_dialog import AboutDialog
 from .all_layers_from_toc import all_layers_from_toc
 from .log_dialog import LogDialog
 from .data_layer_from_dataframe import layer_from_dataframe
+from .table_field_lister import find_table_fields

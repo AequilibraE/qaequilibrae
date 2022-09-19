@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 from aequilibrae.project import Project
 
 from aequilibrae import logger
-from modules.common_tools import WorkerThread
+from ..common_tools import WorkerThread
 
 
 class CreatesTranspoNetProcedure(WorkerThread):

@@ -1,4 +1,4 @@
-from modules.gis import CreateBandwidthsDialog
+from ..gis import CreateBandwidthsDialog
 
 
 def run_stacked_bandwidths(qgis_project):

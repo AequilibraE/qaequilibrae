@@ -9,7 +9,7 @@ from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
 from qgis.core import QgsMapLayerProxyModel
 from .add_zones_procedure import AddZonesProcedure
-from modules.common_tools import standard_path
+from ..common_tools import standard_path
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_add_zoning.ui"))

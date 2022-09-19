@@ -6,7 +6,7 @@ import numpy as np
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import QSortFilterProxyModel
 from qgis.PyQt.QtWidgets import QPushButton, QAbstractItemView, QTableWidgetItem
-from modules.common_tools import LinkQueryModel
+from ..common_tools import LinkQueryModel
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_link_query_builder.ui"))
 

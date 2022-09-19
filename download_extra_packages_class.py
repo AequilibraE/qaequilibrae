@@ -2,9 +2,9 @@ import os
 import subprocess
 
 from qgis.PyQt import uic, QtWidgets
-from modules.common_tools import ReportDialog
+from .modules.common_tools import ReportDialog
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__) + "/forms/", "ui_package_downloader.ui"))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__) + "/modules/forms/", "ui_package_downloader.ui"))
 
 
 class DownloadExtraPackages(QtWidgets.QDialog, FORM_CLASS):

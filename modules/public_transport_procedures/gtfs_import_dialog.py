@@ -7,8 +7,8 @@ import qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QHBoxLayout, QWidget, QLineEdit
 from qgis.PyQt.QtWidgets import QSpacerItem, QProgressBar, QLabel, QVBoxLayout, QSizePolicy, QCheckBox
-from modules.common_tools import ReportDialog, GetOutputFileName, GetOutputFolderName
-from modules.common_tools import standard_path
+from ..common_tools import ReportDialog, GetOutputFileName, GetOutputFolderName
+from ..common_tools import standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 

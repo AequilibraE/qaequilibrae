@@ -1,4 +1,4 @@
-from modules.network import NetworkPreparationDialog
+from ..network import NetworkPreparationDialog
 
 
 def prepare_network(qgis_project):

@@ -1,4 +1,4 @@
-from modules.gis.desire_lines_dialog import DesireLinesDialog
+from ..gis.desire_lines_dialog import DesireLinesDialog
 
 
 def run_desire_lines(qgis_project):

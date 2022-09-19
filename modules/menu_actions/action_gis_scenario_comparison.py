@@ -1,4 +1,4 @@
-from modules.gis import CompareScenariosDialog
+from ..gis import CompareScenariosDialog
 
 
 def run_scenario_comparison(qgis_project):

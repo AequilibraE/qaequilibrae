@@ -7,20 +7,19 @@ import sys
 import tempfile
 import webbrowser
 from aequilibrae.project import Project
-from aequilibrae.project.database_connection import ENVIRON_VAR
 from functools import partial
 from typing import Dict
 from warnings import warn
 
 import qgis
-from modules.common_tools import AboutDialog
-from modules.matrix_procedures import LoadDatasetDialog
-from modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
-from modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag, run_add_connectors
-from modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, run_stacked_bandwidths
-from modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, show_log
-from modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
-from modules.public_transport_procedures import GtfsImportDialog
+from .modules.common_tools import AboutDialog
+from .modules.matrix_procedures import LoadDatasetDialog
+from .modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
+from .modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag, run_add_connectors
+from .modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, run_stacked_bandwidths
+from .modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, show_log
+from .modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
+from .modules.public_transport_procedures import GtfsImportDialog
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
@@ -56,8 +55,6 @@ class AequilibraEMenu:
     def __init__(self, iface):
         # Closes AequilibraE projects eventually opened in memory
         self.logger = logging.getLogger("AequilibraEGUI")
-        if ENVIRON_VAR in os.environ:
-            del os.environ[ENVIRON_VAR]
         self.geo_layers_list = ["links", "nodes", "zones"]
         self.translator = None
         self.iface = iface

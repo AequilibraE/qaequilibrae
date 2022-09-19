@@ -8,7 +8,7 @@ from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 from .tsp_procedure import TSPProcedure
-from modules.common_tools import ReportDialog
+from ..common_tools import ReportDialog
 
 logger = logging.getLogger("AequilibraEGUI")
 no_binary = False

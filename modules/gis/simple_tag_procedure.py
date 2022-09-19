@@ -3,8 +3,8 @@ from aequilibrae.utils.worker_thread import WorkerThread
 
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
-from modules.common_tools import get_vector_layer_by_name
-from modules.common_tools.global_parameters import multi_line, multi_point, line_types, point_types
+from ..common_tools import get_vector_layer_by_name
+from ..common_tools.global_parameters import multi_line, multi_point, line_types, point_types
 
 
 class SimpleTAG(WorkerThread):

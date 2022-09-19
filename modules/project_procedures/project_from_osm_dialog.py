@@ -6,12 +6,12 @@ from PyQt5.QtCore import Qt
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm_utils.place_getter import placegetter
 
-from modules.common_tools import reporter
+from ..common_tools import reporter
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox
 from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
-from modules.common_tools import ReportDialog, standard_path
+from ..common_tools import ReportDialog, standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
