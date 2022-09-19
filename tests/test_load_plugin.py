@@ -1,12 +1,9 @@
-import sqlite3
 import unittest
-import uuid
-from os.path import dirname, join
 
-from qgis.core import QgsCoordinateReferenceSystem
 from qgis.utils import iface
-from .utilities import get_qgis_app
 
+from .utilities import get_qgis_app
+from ..aequilibrae_menu import AequilibraEMenu
 
 class OpenMainDialogTest(unittest.TestCase):
     """Test dialog works."""
@@ -17,7 +14,7 @@ class OpenMainDialogTest(unittest.TestCase):
 
     def test_if_dialog_opens(self):
         """Test we can click OK."""
-        from aequilibrae_menu import AequilibraEMenu
+
         self.dialog = AequilibraEMenu(iface)
 
 
