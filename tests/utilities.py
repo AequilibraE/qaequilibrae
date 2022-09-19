@@ -23,9 +23,7 @@ def get_qgis_app():
     If QGIS is already running the handle to that app will be returned.
     """
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
-    pth = abspath(join(dirname(dirname(__file__)), "aequilibrae"))
-    sys.path.insert(0, pth)
-    print(pth)
+    sys.path.insert(0, abspath(join(dirname(dirname(__file__)), "aequilibrae")))
     try:
         from qgis.PyQt import QtGui, QtCore
         from qgis.core import QgsApplication
