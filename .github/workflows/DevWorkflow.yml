@@ -72,6 +72,13 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install -r requirements-dev.txt
+          python3 -m pip install -r aequilibrae/requirements.txt
+
+      - name: build aequilibrae
+        run: |
+          cd aequilibrae/aequilibrae/paths
+          python setup_Assignment.py build_ext --inplace
+          cd ../../..
 
       - name: Run tests
         run: |
