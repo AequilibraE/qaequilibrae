@@ -71,13 +71,13 @@ jobs:
           submodules: recursive
       - name: Install dependencies
         run: |
-          python3 -m pip install -r requirements-dev.txt
           python3 -m pip install -r aequilibrae/requirements.txt
+          python3 -m pip install -r requirements-dev.txt
 
       - name: build aequilibrae
         run: |
           cd aequilibrae/aequilibrae/paths
-          python setup_Assignment.py build_ext --inplace
+          python3 setup_Assignment.py build_ext --inplace
           cd ../../..
 
       - name: Run tests
