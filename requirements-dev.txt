@@ -1,3 +1,6 @@
 pytest-qgis
 pandas
 shapely
+scipy
+openmatrix
+ortools
