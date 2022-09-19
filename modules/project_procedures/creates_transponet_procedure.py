@@ -3,8 +3,10 @@ from string import ascii_letters
 from PyQt5.QtCore import pyqtSignal
 from aequilibrae.project import Project
 
-from aequilibrae import logger
+from aequilibrae.context import get_logger
 from ..common_tools import WorkerThread
+
+logger = get_logger()
 
 
 class CreatesTranspoNetProcedure(WorkerThread):

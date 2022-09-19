@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt
 from aequilibrae.project.network.network import Network
 
 import qgis
-from aequilibrae import Parameters
+from aequilibrae.parameters import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
 from .creates_transponet_procedure import CreatesTranspoNetProcedure

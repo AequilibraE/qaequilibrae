@@ -13,7 +13,7 @@ from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
 
 import qgis
-from aequilibrae import Parameters
+from aequilibrae.parameters import Parameters
 from ..common_tools import standard_path
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView

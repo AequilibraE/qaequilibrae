@@ -9,7 +9,7 @@ from aequilibrae.distribution.synthetic_gravity_model import valid_functions
 from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
 
 import qgis
-from aequilibrae import logger
+from aequilibrae.context import get_logger
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
 from .apply_gravity_procedure import ApplyGravityProcedure
@@ -26,6 +26,8 @@ has_omx = spec is not None
 
 
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
+
+logger = get_logger()
 
 
 class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):

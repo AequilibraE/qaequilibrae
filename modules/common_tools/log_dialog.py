@@ -2,7 +2,7 @@ import os
 import tempfile
 from os.path import join
 
-from aequilibrae import Parameters
+from aequilibrae.parameters import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML
 from qgis.PyQt.QtGui import QFont
