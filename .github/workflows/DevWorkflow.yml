@@ -76,8 +76,4 @@ jobs:
       - name: Run tests
         run: |
           export QT_QPA_PLATFORM=offscreen
-          ls
-          cd aequilibrae
-          ls
-          cd ..
           python3 -m pytest tests

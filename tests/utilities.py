@@ -32,7 +32,7 @@ def get_qgis_app():
         return None, None, None, None
 
     global QGIS_APP  # pylint: disable=W0603
-    sys.path.insert(0, abspath(join(dirname(dirname(__file__)), "polarislib")))
+    sys.path.insert(0, abspath(join(dirname(dirname(__file__)), "aequilibrae")))
 
     if QGIS_APP is None:
         gui_flag = True  # All test will run qgis in gui mode
