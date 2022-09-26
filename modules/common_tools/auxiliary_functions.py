@@ -1,10 +1,12 @@
-import qgis
-from qgis.core import QgsProject
 import math
 import os
-import yaml
 import tempfile
+import yaml
+from os.path import dirname, isdir
 from time import localtime, strftime
+
+import qgis
+from qgis.core import QgsProject
 
 
 def user_message(message, level):
@@ -23,10 +25,8 @@ def standard_path():
 
 def tempPath():
     tmp_path = get_parameter_chain(["system", "temp directory"])
-    if os.path.isdir(tmp_path):
-        return tmp_path
-    else:
-        return tempfile.gettempdir()
+    tmp_path = tmp_path if isdir(tmp_path) else tempfile.gettempdir()
+    return tmp_path
 
 
 # Returns the parameter for a given hierarchy of groups in a dictionary of dictionaries (recovered from a yml)
@@ -45,7 +45,7 @@ def get_parameter_chain(chain):
 
 # Recovers a group of parameters (or the entire yml) as a dictionary of dictionaries
 def get_parameters_group(group=None):
-    path = os.path.dirname(os.path.dirname(__file__)) + "/aequilibrae/aequilibrae/"
+    path = dirname(dirname(dirname(__file__))) + "/aequilibrae/aequilibrae/"
     with open(path + "parameters.yml", "r") as yml:
         path = yaml.safe_load(yml)
     if group is None:
