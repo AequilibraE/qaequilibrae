@@ -141,7 +141,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
             for abb, aba, di, t in ([ab_base, ab_alt, ab, "ab"], [ba_base, ba_alt, ba, "ba"]):
                 width = f'(coalesce(scale_linear(min("{abb}","{aba}") , 0,{max_value},0,{self.band_size}), 0))'
                 offset = f"{di}*({width}/2 + {self.space_size})"
-                line_pattern = f'if (max(("{abb}"+"{aba}"),0) = 0,' + "'no', 'solid')"
+                line_pattern = f'if (max(coalesce("{abb}"+"{aba}", 0),0) = 0,' + "'no', 'solid')"
                 symbol_layer = self.create_style(width, offset, text_color, line_pattern)
                 self.link_layer.renderer().symbol().appendSymbolLayer(symbol_layer)
                 ab_offset = offset if t == "ab" else None
@@ -171,7 +171,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         for i in styles:
             width = f'(coalesce(scale_linear(abs("{i[0]}"-"{i[1]}") , 0,{max_value},0,{self.band_size}),0))'
             offset = f"{i[3]}+{i[2]}*({width}/2 + {self.space_size})"
-            line_pattern = f'if (("{i[0]}"-"{i[1]}") = 0,' + "'no', 'solid')"
+            line_pattern = f'if (coalesce("{i[0]}"-"{i[1]}", 0) = 0,' + "'no', 'solid')"
             color = f'if(max(("{i[0]}"-"{i[1]}"),0) = 0,{neg_color},{pos_color})'
             symbol_layer = self.create_style(width, offset, color, line_pattern)
             self.link_layer.renderer().symbol().appendSymbolLayer(symbol_layer)
