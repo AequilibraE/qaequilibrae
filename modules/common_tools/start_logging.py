@@ -6,7 +6,7 @@ from tempfile import gettempdir
 def starts_logging():
     logger = logging.getLogger("AequilibraEGUI")
 
-    log_file = os.path.join(gettempdir(), "aequilibrae_gui.log")
+    log_file = os.path.join(gettempdir(), "QAequilibraE.log")
     if not os.path.isfile(log_file):
         a = open(log_file, "w")
         a.close()

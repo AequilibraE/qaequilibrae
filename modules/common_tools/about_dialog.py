@@ -27,7 +27,7 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.but_close.clicked.connect(self.exit_procedure)
 
-        repository = "https://github.com/AequilibraE/AequilibraE-GUI"
+        repository = "https://github.com/AequilibraE/QAequilibraE"
 
         d = dirname(dirname(abspath(__file__)))
         with open(os.path.join(d, "meta.yaml"), "r") as yml:
