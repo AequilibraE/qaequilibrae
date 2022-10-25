@@ -1,42 +1,29 @@
 import importlib.util as iutil
 import logging
+import numpy as np
 import os
+import pandas as pd
 import re
 import sys
-from tempfile import gettempdir
-
-import numpy as np
-import pandas as pd
 from PyQt5.QtCore import Qt
+from aequilibrae.parameters import Parameters
+from aequilibrae.paths import Graph, AssignmentResults, allOrNothing
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
+from aequilibrae.project import Project
+from tempfile import gettempdir
 
 import qgis
-from aequilibrae.parameters import Parameters
-from ..common_tools import standard_path
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 from ..common_tools import PandasModel
 from ..common_tools import ReportDialog
-
-no_binary = False
-logger = logging.getLogger("AequilibraEGUI")
-try:
-    from aequilibrae.paths import Graph, AssignmentResults, allOrNothing
-    from aequilibrae.project import Project
-except Exception as e:
-    logger.error(f"Importing AequilibraE failed. {e.args}")
-    no_binary = True
-
-# Checks if we can display OMX
-spec = iutil.find_spec("openmatrix")
-has_omx = spec is not None
-if has_omx:
-    pass
+from ..common_tools import standard_path
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_traffic_assignment.ui"))
+logger = logging.getLogger("AequilibraEGUI")
 
 
 class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -207,9 +194,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             if not self.project.matrices.check_exists(rec["name"]):
                 self.matrices.loc[idx, "name"] += " (file missing)"
 
-        if not has_omx:
-            filter = self.matrices.file_name.str.contains(".omx", flags=re.IGNORECASE, regex=True)
-            self.matrices.loc[filter, "name"] += " (OMX not available)"
+        filter = self.matrices.file_name.str.contains(".omx", flags=re.IGNORECASE, regex=True)
+        self.matrices.loc[filter, "name"] += " (OMX not available)"
         self.cob_matrices.clear()
         self.cob_matrices.addItems(self.matrices["name"].tolist())
 
@@ -429,8 +415,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def produce_all_outputs(self):
         self.assignment.save_results(self.scenario_name)
         if self.skimming:
-            format = "omx" if has_omx else "aem"
-            self.assignment.save_skims(self.scenario_name, which_ones="all", format=format)
+            self.assignment.save_skims(self.scenario_name, which_ones="all", format="omx")
 
     # def click_button_inside_the_list(self, purpose):
     #     if purpose == "select link":

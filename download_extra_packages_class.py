@@ -1,28 +1,25 @@
+import importlib.util as iutil
 import os
 import subprocess
 
 from qgis.PyQt import uic, QtWidgets
-from QAequilibraE.modules.common_tools import ReportDialog
-
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__) + "/modules/forms/", "ui_package_downloader.ui"))
 
 
-class DownloadExtraPackages(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
-        QtWidgets.QDialog.__init__(self)
-        self.iface = iface
-        self.setupUi(self)
-        with open(os.path.dirname(__file__) + "/extra_requirements.txt", "r") as req:
+class download_all:
+    def __init__(self):
+        with open(os.path.dirname(__file__) + "/requirements.txt", "r") as req:
             self.packages = [line.rstrip() for line in req.readlines()]
 
-        self.lbl_list_of_packages.setText(", ".join(self.packages))
-        self.but_download.clicked.connect(self.download_package)
-        self.setModal(True)
+    def install(self):
+        #
+        # spec = iutil.find_spec("openmatrix")
+        # has_omx = spec is not None
+        # if has_omx:
+        #     pass
 
-    def download_package(self):
         lines = []
         for pkg in self.packages:
-            command = "python3 -m pip install {}".format(pkg)
+            command = "python3 -m pip install --user {}".format(pkg)
             lines.append(command)
             with subprocess.Popen(
                 command,
@@ -33,8 +30,3 @@ class DownloadExtraPackages(QtWidgets.QDialog, FORM_CLASS):
                 universal_newlines=True,
             ) as proc:
                 lines.extend(proc.stdout.readlines())
-
-        dlg2 = ReportDialog(self.iface, lines)
-        dlg2.show()
-        dlg2.exec_()
-        self.close()

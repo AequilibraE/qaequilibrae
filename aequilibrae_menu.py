@@ -14,10 +14,11 @@ from warnings import warn
 import qgis
 from QAequilibraE.modules.common_tools import AboutDialog
 from QAequilibraE.modules.matrix_procedures import LoadDatasetDialog
-from QAequilibraE.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data, load_matrices
-from QAequilibraE.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag, run_add_connectors
-from QAequilibraE.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, run_stacked_bandwidths
-from QAequilibraE.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, show_log
+from QAequilibraE.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths
+from QAequilibraE.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
+from QAequilibraE.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag
+from QAequilibraE.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network
+from QAequilibraE.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
 from QAequilibraE.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from QAequilibraE.modules.public_transport_procedures import GtfsImportDialog
 from qgis.PyQt import QtCore
@@ -26,23 +27,6 @@ from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
 from qgis.core import QgsProject
-from QAequilibraE.binary_downloader_class import BinaryDownloaderDialog
-from QAequilibraE.download_extra_packages_class import DownloadExtraPackages
-
-no_binary = False
-try:
-    from aequilibrae.paths.AoN import one_to_all
-except ImportError as e:
-    no_binary = True
-    warn(f"AequilibraE binaries are not available {e.args}")
-
-extra_packages = True
-# Checks if we can display OMX
-has_omx = iutil.find_spec("openmatrix") is not None
-if not has_omx:
-    extra_packages = False
-
-has_ortools = iutil.find_spec("openmatrix") is not None
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -63,7 +47,6 @@ class AequilibraEMenu:
         self.layers = {}  # type: Dict[QgsVectorLayer]
         self.dock = QDockWidget(self.trlt("AequilibraE"))
         self.manager = QWidget()
-        self.no_binary = no_binary
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -116,10 +99,7 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         # # # #######################   ROUTING SUB-MENU   ###########################
-        if has_ortools:
-            self.add_menu_action("Routing", "Travelling Salesman Problem", partial(run_tsp, self))
-        else:
-            _ = self.menuActions.pop("Routing")
+        self.add_menu_action("Routing", "Travelling Salesman Problem", partial(run_tsp, self))
 
         # # # ########################################################################
         # # # #######################   TRANSIT SUB-MENU   ###########################
@@ -153,12 +133,6 @@ class AequilibraEMenu:
 
         self.add_menu_action("AequilibraE", "About", self.run_about)
         self.add_menu_action("AequilibraE", "Help", self.run_help)
-
-        if no_binary:
-            self.add_menu_action("AequilibraE", "Download binaries", self.run_binary_download)
-
-        if not extra_packages:
-            self.add_menu_action("AequilibraE", "Install extra packages", self.install_extra_packages)
 
         self.build_menu()
         # ########################################################################
@@ -310,25 +284,10 @@ class AequilibraEMenu:
         dlg2.show()
         dlg2.exec_()
 
-    def install_extra_packages(self):
-        dlg2 = DownloadExtraPackages(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-
-    def run_binary_download(self):
-        dlg2 = BinaryDownloaderDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-
     def run_import_gtfs(self):
         dlg2 = GtfsImportDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
-
-    def message_binary(self):
-        qgis.utils.iface.messageBar().pushMessage(
-            "Binary Error: ", "Please download it from the repository using the downloader from the menu", level=3
-        )
 
     def show_message_no_project(self):
         self.iface.messageBar().pushMessage("Error", "You need to load a project first", level=3, duration=10)

@@ -1,18 +1,9 @@
 import logging
 import os
-
+from aequilibrae.paths import Graph
 from aequilibrae.project import Project
 
 from qgis.PyQt import QtWidgets, uic, QtCore
-
-logger = logging.getLogger("AequilibraEGUI")
-try:
-    from aequilibrae.paths import Graph
-
-    no_binary = False
-except Exception as e:
-    no_binary = True
-    logger.error(e.args)
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_load_network_info.ui"))
 

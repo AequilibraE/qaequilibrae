@@ -1,7 +1,7 @@
 import logging
 import os
 import sys
-
+from aequilibrae.paths import path_computation
 from aequilibrae.paths.results import PathResults
 from aequilibrae.project import Project
 from qgis._core import QgsProject, QgsVectorLayer, QgsSpatialIndex
@@ -11,16 +11,10 @@ from qgis.PyQt import QtCore
 from qgis.PyQt import QtWidgets, uic
 from qgis.utils import iface
 from .point_tool import PointTool
-from ..common_tools import standard_path
 from ..common_tools import LoadGraphLayerSettingDialog
+from ..common_tools import standard_path
 
-no_binary = False
 logger = logging.getLogger("AequilibraEGUI")
-try:
-    from aequilibrae.paths import path_computation
-except Exception as e:
-    logger.error(f"Importing AequilibraE failed. {e.args}")
-    no_binary = True
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
 
