@@ -11,14 +11,13 @@ class download_all:
             self.packages = [line.rstrip() for line in req.readlines()]
 
     def install(self):
-        #
-        # spec = iutil.find_spec("openmatrix")
-        # has_omx = spec is not None
-        # if has_omx:
-        #     pass
 
         lines = []
         for pkg in self.packages:
+            spec = iutil.find_spec(pkg)
+            if spec is not None:
+                continue
+
             command = "python3 -m pip install --user {}".format(pkg)
             lines.append(command)
             with subprocess.Popen(
