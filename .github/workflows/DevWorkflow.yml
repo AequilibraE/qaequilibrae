@@ -28,7 +28,8 @@ jobs:
   unittest_ltr:
 #    needs: linting
     runs-on: ubuntu-latest
-    container: qgis/qgis:release-3_22
+#    container: qgis/qgis:release-3_22
+    container: qgis/qgis:final-3_22_9
     strategy:
       max-parallel: 4
     steps:
