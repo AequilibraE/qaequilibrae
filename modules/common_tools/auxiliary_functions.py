@@ -7,6 +7,7 @@ from time import localtime, strftime
 
 import qgis
 from qgis.core import QgsProject
+from aequilibrae import Parameters
 
 
 def user_message(message, level):
@@ -45,9 +46,7 @@ def get_parameter_chain(chain):
 
 # Recovers a group of parameters (or the entire yml) as a dictionary of dictionaries
 def get_parameters_group(group=None):
-    path = dirname(dirname(dirname(__file__))) + "/aequilibrae/aequilibrae/"
-    with open(path + "parameters.yml", "r") as yml:
-        path = yaml.safe_load(yml)
+    path = Parameters().parameters
     if group is None:
         return path
     if group in path:
