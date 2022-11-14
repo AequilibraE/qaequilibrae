@@ -1,4 +1,3 @@
-aequilibrae
+aequilibrae==0.7.6
 openmatrix
 ortools
-pyarrow
