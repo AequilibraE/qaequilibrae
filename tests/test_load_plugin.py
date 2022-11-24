@@ -1,9 +1,9 @@
 import unittest
 
-from qgis.utils import iface
-
-from .utilities import get_qgis_app
 from aequilibrae_menu import AequilibraEMenu
+from qgis.utils import iface
+from .utilities import get_qgis_app
+
 
 class OpenMainDialogTest(unittest.TestCase):
     """Test dialog works."""

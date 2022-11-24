@@ -15,14 +15,7 @@ from PyQt5.QtCore import pyqtSignal
 from qgis.PyQt.QtCore import QVariant
 from aequilibrae.utils.worker_thread import WorkerThread
 from ..common_tools import get_vector_layer_by_name
-
-logger = logging.getLogger("AequilibraEGUI")
-try:
-    no_binary = False
-    from aequilibrae.paths import allOrNothing
-except Exception as e:
-    no_binary = True
-    logger.error(f"Desire lines procedure - {e.args}")
+from aequilibrae.paths import allOrNothing
 
 
 class DesireLinesProcedure(WorkerThread):
@@ -43,9 +36,6 @@ class DesireLinesProcedure(WorkerThread):
         self.nodes_to_indices = {matrix.index[x]: x for x in range(matrix.zones)}
         self.python_version = 8 * struct.calcsize("P")
 
-        if no_binary:
-            self.error = "No AequilibraE binaries present"
-            self.report.append(self.error)
         self.procedure = "ASSIGNMENT"
 
     def doWork(self):

@@ -1,7 +1,9 @@
 import logging
-import os
-
 import numpy as np
+import os
+from aequilibrae.paths import Graph, path_computation
+from aequilibrae.paths.results import PathResults
+from aequilibrae.project import Project
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
@@ -9,16 +11,6 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 from .tsp_procedure import TSPProcedure
 from ..common_tools import ReportDialog
-
-logger = logging.getLogger("AequilibraEGUI")
-no_binary = False
-try:
-    from aequilibrae.paths import Graph, path_computation
-    from aequilibrae.paths.results import PathResults
-    from aequilibrae.project import Project
-except Exception as e:
-    logger.error(f"Importing AequilibraE failed. {e.args}")
-    no_binary = True
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/tsp.ui"))
 

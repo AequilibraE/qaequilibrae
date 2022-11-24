@@ -4,65 +4,10 @@ on:  [pull_request]
 
 
 jobs:
-#  linting:
-#    runs-on: ubuntu-latest
-#    strategy:
-#      max-parallel: 4
-#    steps:
-#    - uses: actions/checkout@v3
-#    - name: Set up Python 3.9
-#      uses: actions/setup-python@v4
-#      with:
-#        python-version: 3.9
-#    - name: Install dependencies
-#      run: |
-#        python -m pip install --upgrade pip
-#        pip install flake8 black
-#
-#    - name: Lint with flake8
-#      run: flake8
-#
-#    - name: Check code format with Black
-#      run: black --check .
-
-#  documentation:
-#    needs: linting
-#    runs-on: ubuntu-latest
-#    strategy:
-#      max-parallel: 4
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: Set up Python 3.9
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: 3.9
-#      - name: Install dependencies
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install -r docs/requirements-docs.txt
-#
-#      - name: Build documentation
-#        run: |
-#          sphinx-apidoc -T -o docs/source/generated aequilibrae
-#          cd docs
-#          make html
-#
-#      - name: Upload to S3
-#        uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
-#        with:
-#          args: --acl public-read --follow-symlinks --delete
-#        env:
-#          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          AWS_REGION: 'us-east-1'   # optional: defaults to us-east-1
-#          SOURCE_DIR: 'docs/build/html/'      # optional: defaults to entire repository
-#          DEST_DIR: 'qgis/dev/'      # optional: defaults to entire repository
-
-  unit_testing:
+  unittest_latest:
 #    needs: linting
     runs-on: ubuntu-latest
-    container: qgis/qgis:release-3_22
+    container: qgis/qgis:latest
     strategy:
       max-parallel: 4
     steps:
@@ -71,14 +16,30 @@ jobs:
           submodules: recursive
       - name: Install dependencies
         run: |
-          python3 -m pip install -r aequilibrae/requirements.txt
+          python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-dev.txt
 
-      - name: build aequilibrae
+      - name: Run tests
         run: |
-          cd aequilibrae/aequilibrae/paths
-          python3 setup_Assignment.py build_ext --inplace
-          cd ../../..
+          export QT_QPA_PLATFORM=offscreen
+          pwd
+          python3 -m pytest tests
+
+  unittest_ltr:
+#    needs: linting
+    runs-on: ubuntu-latest
+    container: qgis/qgis:release-3_22
+#    container: qgis/qgis:final-3_22_9
+    strategy:
+      max-parallel: 4
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Install dependencies
+        run: |
+          python3 -m pip install -r requirements.txt
+          python3 -m pip install -r requirements-dev.txt
 
       - name: Run tests
         run: |
