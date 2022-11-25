@@ -1,0 +1,4 @@
+pytest-qgis
+pandas
+shapely
+scipy

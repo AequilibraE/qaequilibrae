@@ -1,13 +1,14 @@
 # This portion of the script initializes the plugin, making it known to QGIS.
-import os
 import sys
+from os.path import abspath, join, dirname
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "aequilibrae")))
+from .download_extra_packages_class import download_all
+
+da = download_all()
+da.install()
 
 
 def classFactory(iface):
-    from .common_tools.start_logging import starts_logging
-    starts_logging()
-    from .AequilibraEMenu import AequilibraEMenu
+    from .aequilibrae_menu import AequilibraEMenu
 
     return AequilibraEMenu(iface)
