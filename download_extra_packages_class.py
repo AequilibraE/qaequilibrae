@@ -8,7 +8,8 @@ from qgis.PyQt import uic, QtWidgets
 
 class download_all:
     def __init__(self):
-        with open(os.path.dirname(__file__) + "/requirements.txt", "r") as req:
+        pth = os.path.dirname(__file__)
+        with open(pth + "/requirements.txt", "r") as req:
             self.packages = [line.rstrip() for line in req.readlines()]
 
     def install(self):
@@ -19,7 +20,7 @@ class download_all:
             if spec is not None:
                 continue
 
-            command = f"{sys.executable} -m pip install --user {pkg}"
+            command = f"python -m pip install {pkg} -t {pth}"
             lines.append(command)
             with subprocess.Popen(
                     command,
