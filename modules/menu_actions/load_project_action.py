@@ -7,8 +7,17 @@ from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
 from ..common_tools.auxiliary_functions import standard_path
 
 
+# Split loading between Qt action and processing, for easier unit testing
 def run_load_project(qgis_project):
-    proj_path = QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
+    proj_path = _get_project_path()
+    return _run_load_project_from_path(qgis_project, proj_path)
+
+
+def _get_project_path():
+    return QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
+
+
+def _run_load_project_from_path(qgis_project, proj_path):
     if proj_path is None or proj_path == "":
         return
     # Cleans the project descriptor
@@ -21,7 +30,7 @@ def run_load_project(qgis_project):
         qgis_project.project = Project()
 
         try:
-            qgis_project.project.load(proj_path)
+            qgis_project.project.open(proj_path)
         except FileNotFoundError as e:
             if e.args[0] == "Model does not exist. Check your path and try again":
                 qgis.utils.iface.messageBar().pushMessage("FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL", level=1)
