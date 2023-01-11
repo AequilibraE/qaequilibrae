@@ -32,7 +32,7 @@ def test_load_project(ae_with_project):
 
 
 def test_add_zoning_data_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.project_procedures import AddZonesDialog
+    from qaequilibrae.modules.project_procedures import AddZonesDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, AddZonesDialog)
@@ -46,7 +46,7 @@ def test_add_zoning_data_menu(ae_with_project, qtbot):
 
 
 def test_parameters_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.common_tools import ParameterDialog
+    from qaequilibrae.modules.common_tools import ParameterDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, ParameterDialog)
@@ -60,7 +60,7 @@ def test_parameters_menu(ae_with_project, qtbot):
 
 
 def test_logfile_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.common_tools import LogDialog
+    from qaequilibrae.modules.common_tools import LogDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, LogDialog)
@@ -74,7 +74,7 @@ def test_logfile_menu(ae_with_project, qtbot):
 
 
 def test_network_preparation_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.network import NetworkPreparationDialog
+    from qaequilibrae.modules.network import NetworkPreparationDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, NetworkPreparationDialog)
@@ -86,7 +86,7 @@ def test_network_preparation_menu(ae_with_project, qtbot):
 
 
 def test_add_centroid_connectors_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.network import AddConnectorsDialog
+    from qaequilibrae.modules.network import AddConnectorsDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, AddConnectorsDialog)
@@ -100,7 +100,7 @@ def test_add_centroid_connectors_menu(ae_with_project, qtbot):
 
 
 def test_display_project_data_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.matrix_procedures import LoadProjectDataDialog
+    from qaequilibrae.modules.matrix_procedures import LoadProjectDataDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, LoadProjectDataDialog)
@@ -114,7 +114,7 @@ def test_display_project_data_menu(ae_with_project, qtbot):
 
 
 def test_import_matrices_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.matrix_procedures import LoadMatrixDialog
+    from qaequilibrae.modules.matrix_procedures import LoadMatrixDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, LoadMatrixDialog)
@@ -128,7 +128,7 @@ def test_import_matrices_menu(ae_with_project, qtbot):
 
 
 def test_trip_distribution_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.distribution_procedures import DistributionModelsDialog
+    from qaequilibrae.modules.distribution_procedures import DistributionModelsDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, DistributionModelsDialog)
@@ -142,7 +142,7 @@ def test_trip_distribution_menu(ae_with_project, qtbot):
 
 
 def test_shortest_path_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.paths_procedures.show_shortest_path_dialog import ShortestPathDialog
+    from qaequilibrae.modules.paths_procedures.show_shortest_path_dialog import ShortestPathDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, ShortestPathDialog)
@@ -156,7 +156,7 @@ def test_shortest_path_menu(ae_with_project, qtbot):
 
 
 def test_impedance_matrix_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.paths_procedures.impedance_matrix_dialog import ImpedanceMatrixDialog
+    from qaequilibrae.modules.paths_procedures.impedance_matrix_dialog import ImpedanceMatrixDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, ImpedanceMatrixDialog)
@@ -170,7 +170,7 @@ def test_impedance_matrix_menu(ae_with_project, qtbot):
 
 
 def test_traffic_assignment_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
+    from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, TrafficAssignmentDialog)
@@ -184,7 +184,7 @@ def test_traffic_assignment_menu(ae_with_project, qtbot):
 
 
 def test_travelling_salesman_problem_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.routing_procedures import TSPDialog
+    from qaequilibrae.modules.routing_procedures import TSPDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, TSPDialog)
@@ -198,7 +198,7 @@ def test_travelling_salesman_problem_menu(ae_with_project, qtbot):
 
 
 def test_gis_desire_lines_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.gis.desire_lines_dialog import DesireLinesDialog
+    from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, DesireLinesDialog)
@@ -212,7 +212,7 @@ def test_gis_desire_lines_menu(ae_with_project, qtbot):
 
 
 def test_gis_stacked_bandwidth_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.gis import CreateBandwidthsDialog
+    from qaequilibrae.modules.gis import CreateBandwidthsDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, CreateBandwidthsDialog)
@@ -226,7 +226,7 @@ def test_gis_stacked_bandwidth_menu(ae_with_project, qtbot):
 
 
 def test_gis_scenario_comparison_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.gis import CompareScenariosDialog
+    from qaequilibrae.modules.gis import CompareScenariosDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, CompareScenariosDialog)
@@ -240,7 +240,7 @@ def test_gis_scenario_comparison_menu(ae_with_project, qtbot):
 
 
 def test_gis_lowest_common_denominator_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.gis import LeastCommonDenominatorDialog
+    from qaequilibrae.modules.gis import LeastCommonDenominatorDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, LeastCommonDenominatorDialog)
@@ -254,7 +254,7 @@ def test_gis_lowest_common_denominator_menu(ae_with_project, qtbot):
 
 
 def test_gis_simple_tag_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.gis import SimpleTagDialog
+    from qaequilibrae.modules.gis import SimpleTagDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, SimpleTagDialog)
@@ -269,7 +269,7 @@ def test_gis_simple_tag_menu(ae_with_project, qtbot):
 
 @pytest.mark.skip(reason="find a way to capture and close the open QFileDialog")
 def test_utils_display_matrices_and_datasets_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.matrix_procedures import DisplayAequilibraEFormatsDialog
+    from qaequilibrae.modules.matrix_procedures import DisplayAequilibraEFormatsDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, DisplayAequilibraEFormatsDialog)
@@ -284,7 +284,7 @@ def test_utils_display_matrices_and_datasets_menu(ae_with_project, qtbot):
 
 @pytest.mark.skip(reason="This fails because of path issue, skipping meanwhile")
 def test_about_menu(ae_with_project, qtbot):
-    from QAequilibraE.modules.common_tools import AboutDialog
+    from qaequilibrae.modules.common_tools import AboutDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, AboutDialog)
