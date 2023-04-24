@@ -1,4 +1,5 @@
 pytest-qgis
+pytest-qt
 pandas
 shapely
 scipy

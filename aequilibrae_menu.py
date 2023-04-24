@@ -12,15 +12,15 @@ from typing import Dict
 from warnings import warn
 
 import qgis
-from QAequilibraE.modules.common_tools import AboutDialog
-from QAequilibraE.modules.matrix_procedures import LoadDatasetDialog
-from QAequilibraE.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths
-from QAequilibraE.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
-from QAequilibraE.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag
-from QAequilibraE.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network
-from QAequilibraE.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
-from QAequilibraE.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
-from QAequilibraE.modules.public_transport_procedures import GtfsImportDialog
+from qaequilibrae.modules.common_tools import AboutDialog
+from qaequilibrae.modules.matrix_procedures import LoadDatasetDialog
+from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths
+from qaequilibrae.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
+from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag
+from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network
+from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
+from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
+from qaequilibrae.modules.public_transport_procedures import GtfsImportDialog
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
