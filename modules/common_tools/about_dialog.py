@@ -29,7 +29,7 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
 
         repository = "https://github.com/AequilibraE/QAequilibraE"
 
-        d = dirname(dirname(abspath(__file__)))
+        d = dirname(dirname(dirname(abspath(__file__))))
         with open(os.path.join(d, "meta.yaml"), "r") as yml:
             par = yaml.load(yml)
 

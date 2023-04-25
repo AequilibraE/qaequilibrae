@@ -1,7 +1,7 @@
 import logging
 import os
 
-from aequilibrae.transit.gtfs import create_gtfsdb
+# from aequilibrae.transit.gtfs import create_gtfsdb
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
