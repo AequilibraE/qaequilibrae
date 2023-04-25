@@ -9,26 +9,23 @@ from qgis.PyQt import uic, QtWidgets
 class download_all:
     def __init__(self):
         pth = os.path.dirname(__file__)
-        with open(pth + "/requirements.txt", "r") as req:
-            self.packages = [line.rstrip() for line in req.readlines()]
+        self.file = join(pth, "requirements.txt")
         self.pth = join(pth, "packages")
 
     def install(self):
-        print(packages)
-        lines = []
-        for pkg in self.packages:
-            spec = iutil.find_spec(pkg)
-            if spec is not None:
-                continue
+        spec = iutil.find_spec("aequilibrae")
+        if spec is not None:
+            return
 
-            command = f"python -m pip install {pkg} -t {self.pth}"
-            lines.append(command)
-            with subprocess.Popen(
-                    command,
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stdin=subprocess.DEVNULL,
-                    stderr=subprocess.STDOUT,
-                    universal_newlines=True,
-            ) as proc:
-                lines.extend(proc.stdout.readlines())
+        lines = []
+        command = f"python -m pip install -r {self.file} -t {self.pth}"
+        lines.append(command)
+        with subprocess.Popen(
+                command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stdin=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+        ) as proc:
+            lines.extend(proc.stdout.readlines())
