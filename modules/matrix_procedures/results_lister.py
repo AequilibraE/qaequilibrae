@@ -8,7 +8,7 @@ from aequilibrae.project.database_connection import database_connection
 
 
 def list_results(project_base_path) -> pd.DataFrame:
-    conn = database_connection()
+    conn = database_connection(db_type="project_database")
     df = pd.read_sql("select * from results", conn)
     conn.close()
 

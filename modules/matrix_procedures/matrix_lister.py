@@ -9,7 +9,7 @@ has_omx = spec is not None
 
 
 def list_matrices(fldr) -> pd.DataFrame:
-    conn = database_connection()
+    conn = database_connection(db_type="project_database")
     df = pd.read_sql("select * from matrices", conn)
     conn.close()
 
