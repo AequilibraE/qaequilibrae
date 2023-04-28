@@ -6,27 +6,47 @@ import subprocess
 import sys
 import tempfile
 import webbrowser
-from aequilibrae.project import Project
 from functools import partial
 from typing import Dict
 from warnings import warn
 
 import qgis
-from qaequilibrae.modules.common_tools import AboutDialog
-from qaequilibrae.modules.matrix_procedures import LoadDatasetDialog
-from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths
-from qaequilibrae.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
-from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag
-from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network
-from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
-from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
-from qaequilibrae.modules.public_transport_procedures import GtfsImportDialog
+
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
 from qgis.core import QgsProject
+
+from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths
+from qaequilibrae.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
+from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag
+from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network
+from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
+from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
+try:
+    from aequilibrae.project import Project
+
+except:
+    from qgis.PyQt.QtWidgets import QMessageBox
+
+    if QMessageBox.question(None, "AequilibraE and other dependencies are not not installed",
+                            "Do you want us to install these missing python packages? \r\n"
+                            "QGIS will be non-responsive for a couple of minutes.",
+                            QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+        from .download_extra_packages_class import download_all
+
+        result = download_all().install()
+        if "ERROR" in "".join([str(x).upper() for x in result]):
+            QMessageBox.information(None, "Information", "We could not install the plugin dependencies. Please report "
+                                                         "the errors to the user group mailing list for support")
+        else:
+            QMessageBox.information(None, "Information", "You will probably need to restart QGIS to make it work")
+    else:
+        QMessageBox.information(None,
+                                "Information",
+                                "Without installing the packages, the plugin will be mostly non-functional")
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)

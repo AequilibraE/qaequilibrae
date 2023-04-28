@@ -1,7 +1,5 @@
-from ..network import AddConnectorsDialog
-
-
 def run_add_connectors(qgis_project):
+    from ..network import AddConnectorsDialog
     if qgis_project.project is None:
         qgis_project.iface.messageBar().pushMessage("Error", "You need to load a project first", level=3, duration=10)
         return

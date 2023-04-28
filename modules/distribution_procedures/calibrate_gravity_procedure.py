@@ -22,8 +22,6 @@
 from qgis.PyQt.QtCore import *
 
 from ..common_tools import WorkerThread
-from aequilibrae.distribution import GravityCalibration
-
 
 class CalibrateGravityProcedure(WorkerThread):
     def __init__(self, parentThread, **kwargs):

@@ -14,12 +14,8 @@ class download_all:
         self.pth = join(pth, "packages")
 
     def install(self):
-        sys.path.append(join(os.path.dirname(__file__), "packages"))
-        if iutil.find_spec("aequilibrae") is not None:
-            QgsMessageLog.logMessage("QAequilibraE are installed", level=Qgis.Critical)
-            return
         lines = []
-        command = f"python -m pip install -r {self.file} -t {self.pth}"
+        command = f"python -m pip install -r {self.file} -t {self.pth} --upgrade"
         print(command)
         lines.append(command)
         with subprocess.Popen(
@@ -34,3 +30,4 @@ class download_all:
 
         for line in lines:
             QgsMessageLog.logMessage(str(line), level=Qgis.Critical)
+        return lines
