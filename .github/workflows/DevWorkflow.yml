@@ -37,6 +37,7 @@ jobs:
         run: |
           rm -rf ./tests ./test ./docs .git .devcontainer .github
           mkdir -p /tmp/artifacts
+          ls ..
           zip -r /tmp/artifacts/QAequilibraE.zip ../qaequilibrae
 #          mkdir -p ./artifacts
 #          cp /tmp/artifacts/* ./artifacts
