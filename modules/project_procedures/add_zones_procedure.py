@@ -1,6 +1,6 @@
 import shapely.wkb
 
-from ..common_tools import WorkerThread
+from aequilibrae.utils.worker_thread import WorkerThread
 from PyQt5.QtCore import pyqtSignal
 
 

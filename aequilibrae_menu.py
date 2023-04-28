@@ -25,9 +25,9 @@ from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_com
 from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network
 from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
+
 try:
     from aequilibrae.project import Project
-
 except:
     from qgis.PyQt.QtWidgets import QMessageBox
 
@@ -39,8 +39,8 @@ except:
 
         result = download_all().install()
         if "ERROR" in "".join([str(x).upper() for x in result]):
-            QMessageBox.information(None, "Information", "We could not install the plugin dependencies. Please report "
-                                                         "the errors to the user group mailing list for support")
+            QMessageBox.information(None, "Information", "Errors may have happened during installation."
+                                                         "Please inspect the messages on your General Log message tab")
         else:
             QMessageBox.information(None, "Information", "You will probably need to restart QGIS to make it work")
     else:

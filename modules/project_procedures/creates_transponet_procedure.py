@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 from aequilibrae.project import Project
 
 from aequilibrae.context import get_logger
-from ..common_tools import WorkerThread
+from aequilibrae.utils.worker_thread import WorkerThread
 
 logger = get_logger()
 

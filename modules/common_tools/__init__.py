@@ -8,7 +8,6 @@ from .pandas_model import PandasModel
 from .database_model import DatabaseModel
 from .parameters_dialog import ParameterDialog
 from .report_dialog import ReportDialog
-
 from .about_dialog import AboutDialog
 from .all_layers_from_toc import all_layers_from_toc
 from .log_dialog import LogDialog
