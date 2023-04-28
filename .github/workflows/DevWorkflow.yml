@@ -36,14 +36,14 @@ jobs:
       - name: Build artifact
         run: |
           rm -rf ./tests ./test ./docs .git .devcontainer .github
-          mkdir -p /artifacts
-          zip -r /artifacts/QAequilibraE.zip ../qaequilibrae
-          mkdir -p ./artifacts
-          cp /artifacts/* ./artifacts
+          mkdir -p /tmp/artifacts
+          zip -r /tmp/artifacts/QAequilibraE.zip ../qaequilibrae
+#          mkdir -p ./artifacts
+#          cp /tmp/artifacts/* ./artifacts
 
       - name: Stores artifacts along with the workflow result
         uses: actions/upload-artifact@v3
         with:
           name: library
-          path: artifacts/*.zip
+          path: /tmp/artifacts/*.zip
           if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
