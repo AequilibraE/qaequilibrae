@@ -36,6 +36,7 @@ jobs:
       - name: Build artifact
         run: |
           rm -rf ./tests ./test ./docs .git .devcontainer .github
+          mkdir -p /artifacts
           zip -r /artifacts/QAequilibraE.zip ../qaequilibrae
           mkdir -p ./artifacts
           cp /artifacts/* ./artifacts
