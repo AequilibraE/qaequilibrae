@@ -1,11 +1,9 @@
-# from qgis.core import *
-# from qgis.PyQt.QtCore import *
 import numpy as np
 from PyQt5.QtCore import pyqtSignal
 from qgis._core import QgsField, QgsFeatureRequest, QgsPointXY, QgsVectorLayer, QgsGeometry, QgsFeature, QgsSpatialIndex
 
 from qgis.PyQt.QtCore import QVariant
-from ..common_tools import WorkerThread
+from aequilibrae.utils.worker_thread import WorkerThread
 from ..common_tools import get_vector_layer_by_name
 
 
@@ -16,14 +14,14 @@ class NetworkPreparationProcedure(WorkerThread):
     finished_threaded_procedure = pyqtSignal(object)
 
     def __init__(
-        self,
-        parentThread,
-        line_layer,
-        new_line_layer,
-        node_layer=False,
-        node_ids=False,
-        new_node_layer=False,
-        node_start=0,
+            self,
+            parentThread,
+            line_layer,
+            new_line_layer,
+            node_layer=False,
+            node_ids=False,
+            new_node_layer=False,
+            node_start=0,
     ):
 
         WorkerThread.__init__(self, parentThread)

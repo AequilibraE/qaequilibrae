@@ -4,6 +4,7 @@ import subprocess
 import sys
 from os.path import join
 from qgis.PyQt import uic, QtWidgets
+from qgis.core import QgsMessageLog, Qgis
 
 
 class download_all:
@@ -13,12 +14,9 @@ class download_all:
         self.pth = join(pth, "packages")
 
     def install(self):
-        spec = iutil.find_spec("aequilibrae")
-        if spec is not None:
-            return
-
         lines = []
-        command = f"python -m pip install -r {self.file} -t {self.pth}"
+        command = f"python -m pip install -r {self.file} -t {self.pth} --upgrade"
+        print(command)
         lines.append(command)
         with subprocess.Popen(
                 command,
@@ -29,3 +27,7 @@ class download_all:
                 universal_newlines=True,
         ) as proc:
             lines.extend(proc.stdout.readlines())
+
+        for line in lines:
+            QgsMessageLog.logMessage(str(line), level=Qgis.Critical)
+        return lines

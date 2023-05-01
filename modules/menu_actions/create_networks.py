@@ -1,8 +1,8 @@
-from ..project_procedures import CreatesTranspoNetDialog
 
 
 # run method that calls the network preparation section of the code
 def run_create_transponet(qgisproject):
+    from ..project_procedures import CreatesTranspoNetDialog
     if qgisproject.project is not None:
         qgisproject.message_project_already_open()
         return

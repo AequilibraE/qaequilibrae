@@ -1,7 +1,7 @@
 from PyQt5.QtCore import pyqtSignal
 from aequilibrae.distribution import Ipf
 
-from ..common_tools import WorkerThread
+from aequilibrae.utils.worker_thread import WorkerThread
 
 
 class IpfProcedure(WorkerThread):

@@ -1,26 +1,5 @@
-"""
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
-
- Name:       Applying Gravity model
- Purpose:    Applies synthetic gravity model
-
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
-
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
-
- Created:    2016-10-03
- Updated:    2018-12-27
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
-
 from qgis.PyQt.QtCore import *
-from ..common_tools import WorkerThread
+from aequilibrae.utils.worker_thread import WorkerThread
 from aequilibrae.distribution import GravityApplication
 
 

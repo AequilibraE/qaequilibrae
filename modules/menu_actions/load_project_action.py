@@ -1,10 +1,7 @@
-from aequilibrae.project import Project
-
 import qgis
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
-from ..common_tools.auxiliary_functions import standard_path
 
 
 # Split loading between Qt action and processing, for easier unit testing
@@ -14,10 +11,12 @@ def run_load_project(qgis_project):
 
 
 def _get_project_path():
+    from ..common_tools.auxiliary_functions import standard_path
     return QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
 
 
 def _run_load_project_from_path(qgis_project, proj_path):
+    from aequilibrae.project import Project
     if proj_path is None or proj_path == "":
         return
     # Cleans the project descriptor
