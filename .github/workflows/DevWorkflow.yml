@@ -39,14 +39,11 @@ jobs:
           rm -rf ./tests ./test ./docs .git .devcontainer .github
           mkdir -p /tmp/artifacts
           cd ..
-          ls
-#          zip -r /tmp/artifacts/QAequilibraE.zip ../qaequilibrae
-#          mkdir -p ./artifacts
-#          cp /tmp/artifacts/* ./artifacts
+          zip -r /tmp/artifacts/QAequilibraE.zip ./qaequilibrae
 
-#      - name: Stores artifacts along with the workflow result
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: library
-#          path: /tmp/artifacts/*.zip
-#          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
+      - name: Stores artifacts along with the workflow result
+        uses: actions/upload-artifact@v3
+        with:
+          name: library
+          path: /tmp/artifacts/*.zip
+          if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
