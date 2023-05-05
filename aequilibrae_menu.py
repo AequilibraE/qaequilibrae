@@ -27,6 +27,7 @@ from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 
 try:
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
     from aequilibrae.project import Project
 except:
     from qgis.PyQt.QtWidgets import QMessageBox
