@@ -1,3 +1,4 @@
-aequilibrae==0.9.0.dev1
+aequilibrae==0.9.1.dev0;python_version<="3.9"
+aequilibrae==0.9.1;python_version>"3.9"
 openmatrix
 ortools
