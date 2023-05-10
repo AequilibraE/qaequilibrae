@@ -7,7 +7,7 @@ AequilibraE Project
    :maxdepth: 2
 
 The AequilibraE project is one of the newest portions of the
-`aequilibrae API <www.aequilibrae.com/python>`_, and therefore not very mature.
+`AequilibraE API <http://www.aequilibrae.com/python/latest/>`_, and therefore not very mature.
 
 For a better overview of the AequilibraE project, please check the
 documentation listed above, as this page is dedicated to a practical implementation
@@ -15,13 +15,13 @@ documentation listed above, as this page is dedicated to a practical implementat
 Create project from OSM
 ~~~~~~~~~~~~~~~~~~~~~~~
 However, its first feature is the capability of importing networks directly from
-`Open Street Maps <www.openstreetmap.org>`_ into AequilibraE's efficient
+`Open Street Maps <https://www.openstreetmap.org/>`_ into AequilibraE's efficient
 TranspoNet format. This is also time to give a HUGE shout out to
 `Geoff Boeing <http://www.geoffboeing.com/>`_, creator of the widely used Python
-package `OSMNx <https://github.com/gboeing/osmnx>`_ . For several weeks I
+package `OSMNx <https://github.com/gboeing/osmnx>`_. For several weeks I
 worked with Geoff in refactoring the entire OSMNx code base so I could include
 it as a submodule or dependency for AequilibraE, but its deep integration with
-`GeoPandas <www.geopandas.org>`_ and all the packages it depends on (Pandas,
+`GeoPandas <https://geopandas.org/en/stable/index.html>`_ and all the packages it depends on (Pandas,
 Shapely, Fiona, RTree, etc.), means that we would have to rebuild OSMNx from the
 ground up in order to use it with AequilibraE within QGIS, since its Windows
 distribution does not include all those dependencies.
@@ -39,7 +39,7 @@ feature to life.
 Importing networks from OSM can be done by choosing an area for download,
 defined as the current map canvas on QGIS...
 
-.. image:: images/model_from_canvas_area.png
+.. image:: ../images/model_from_canvas_area.png
     :width: 999
     :align: center
     :alt: Download OSM networks for visible area
@@ -47,7 +47,7 @@ defined as the current map canvas on QGIS...
 
 ... or for a named place.
 
-.. image:: images/model_from_place.png
+.. image:: ../images/model_from_place.png
     :width: 1057
     :align: center
     :alt: Download OSM networks for named place
@@ -73,7 +73,8 @@ available do not have complete (or reliable) information. Manually editing the
 networks might be necessary, which is common practice in transport modelling .
 
 Before creating a project from the layer, you can understand how to prepare the
-layers for this task in the documentation page for :ref:`network_preparation`.
+layers for this task in the documentation page for 
+:ref:`preparing a network <network_preparation>`.
 
 After all field preparation is done, one can import those layers into an
 AequilibraE project using a dedicated tool in the **Project** menu in
@@ -82,7 +83,7 @@ AequilibraE.
 Accessing **AequilibraE > Project > Create Project from Layers**, the user is
 presented with the following screen.
 
-.. image:: images/project_from_layers.png
+.. image:: ../images/project_from_layers.png
     :width: 1425
     :align: center
     :alt: Create project from layers
@@ -111,8 +112,8 @@ Adding centroids
 
 Starting in version 0.6 of AequilibraE, centroid connectors can now only be
 added to
-`AequilibraE projects <http://www.aequilibrae.com/python/V.0.6.0/project.html>`_
-, and no longer generates new layers during the process.
+`AequilibraE projects <https://aequilibrae.com/python/latest/modeling_with_aequilibrae/project.html>`_,
+and no longer generates new layers during the process.
 
 Before we describe what this tool can do for you, however, let's just remember
 that there is a virtually unlimited number of things that can go awfully wrong
@@ -122,14 +123,14 @@ the results of this tool **CAREFULLY**.
 
 The **GUI** for this procedure is fairly straightforward, as shown below.
 
-.. image:: images/add_connectors_to_project.png
+.. image:: ../images/add_connectors_to_project.png
     :width: 827
     :align: center
     :alt: Adding connectors
 
 One would notice that nowhere in the **GUI** one can indicate which modes they
 want to see the network connected for or how to control how many connectors per
-mode will be created.  Although it could be implemented, such a solution would
+mode will be created. Although it could be implemented, such a solution would
 be convoluted and there is probably no good reason to do so.
 
 Instead, we have chosen to develop the procedure with the following criteria:
