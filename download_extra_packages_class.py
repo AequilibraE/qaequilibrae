@@ -16,7 +16,7 @@ class download_all:
 
     def install(self):
         lines = []
-        command = f'{self.find_python()} -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
+        command = f'"{self.find_python()}" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
         print(sys.executable)
         print(command)
         lines.append(command)
@@ -51,7 +51,7 @@ class download_all:
         elif sys.platform == "darwin":
             python_exe = sys_exe.parent / "bin" / "python3"
         elif sys.platform == "win32":
-            python_exe = sys_exe.parent / "python3"
+            python_exe = sys_exe.parent / "python3.exe"
 
         if not python_exe.exists():
             raise FileExistsError("Can't find a python executable to use")
