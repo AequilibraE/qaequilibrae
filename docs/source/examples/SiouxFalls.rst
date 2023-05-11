@@ -19,6 +19,7 @@ regional model, which has nearly 40,000 links and almost 1,800 zones.
 
 Got a bigger instance we could use as an example? Send it over!
 
+.. _siouxfalls-create-project:
 
 Creating a project
 -------------------
@@ -58,6 +59,8 @@ In the case of the nodes layer, only two fields are mandatory.
 
 After filling all fields, it is just a matter of saving it!
 
+.. _siouxfalls-open-project:
+
 Opening the project
 -------------------
 
@@ -68,6 +71,7 @@ Before we do anything else, we need to open the project.
     :align: center
     :alt: Opening the project
 
+.. _siouxfalls-individual-path-computation:
 
 Individual path computation
 ---------------------------
@@ -108,6 +112,8 @@ selected in the layer, but only one path can be shown at at time if you do so.
     :align: center
     :alt: paths_generated
 
+.. _siouxfalls-skimming:
+
 Skimming
 --------
 
@@ -147,6 +153,8 @@ the bottom left of the screen.
     :align: center
     :alt: viewing_matrix
 
+.. _siouxfalls-desire-lines:
+
 Desire Lines
 ------------
 One can also generate the desire lines and Delaunay lines for the demand matrix
@@ -179,7 +187,7 @@ or desire lines
     :alt: desire_lines_map
 
 
-.. _plotting_flows:
+.. _siouxfalls-plotting-flows:
 
 Plotting the flows
 ------------------
@@ -224,6 +232,7 @@ changing the project variables)
     :align: center
     :alt: bandwidth_maps
 
+.. _siouxfalls-traffic-assignment-and-skimming:
 
 Traffic assignment with skimming
 --------------------------------
@@ -321,7 +330,9 @@ Then we join it with the link layer by accessing the link layer's properties
     :align: center
     :alt: link_join
 
-Now we can revisit the instructions above for :ref:`plotting_flows`
+Now we can revisit the instructions above for :ref:`siouxfalls-plotting-flows`
+
+.. _siouxfalls-gravity-model-calibration:
 
 Gravity model calibration
 -------------------------
@@ -392,6 +403,8 @@ The resulting file is of type *.mod, but that is just a YAML (text file).
     :align: center
     :alt: calibrate_matrix_model_result
 
+.. _siouxfalls-forecast:
+
 Forecast
 --------
 
@@ -454,6 +467,8 @@ screen that will open) and press *Run jobs*.
 
 The result of this matrix can also be assigned, which is what we will generate
 the outputs being used in the scenario comparison.
+
+.. _siouxfalls-scenario-comparison:
 
 Scenario Comparison
 -------------------

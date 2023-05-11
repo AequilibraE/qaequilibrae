@@ -80,20 +80,6 @@ package.
          :text: Developing
          :classes: btn-block btn-secondary stretched-link
 
-.. _quicktour-video:
-
-Quick Tour
-----------
-AequilibraE 0.6 for QGIS has brought substantial changes to the previous graphical
-interface, which might cause some confusion to old users. For a brief overview
-of the new interface, we have prepared a little video tour.
-
-.. raw:: html
-
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/oZEcjiBRaok"
-     frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
-     picture-in-picture" allowfullscreen></iframe>
-
 Note to users
 -------------
 

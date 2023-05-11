@@ -16,7 +16,7 @@ For an example workflow, check the comprehensive example we prepared for
 Several portions of that work flow have also been reproduced in Python.
 
 Sample Data
-~~~~~~~~~~~
+-----------
 
 We have compiled two very distinct example datasets imported from the
 `TNTP instances <https://github.com/bstabler/TransportationNetworks/>`_.
@@ -33,14 +33,14 @@ AequilibraE project already imported, the demand matrix in both AEM and OMX
 formats and the best-known solutions for link flows.
 
 Video Tutorials
-~~~~~~~~~~~~~~~
+---------------
 
 Preparing tutorials using screen recording software is a LOT easier than writing
 comprehensive written documentation, so we have amassed a substantial collection
 of video tutorials hosted on YouTube.
 
 Tour of the new interface
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
@@ -49,7 +49,7 @@ Tour of the new interface
      picture-in-picture" allowfullscreen></iframe>
 
 Creating a project
-------------------
+~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
@@ -58,7 +58,7 @@ Creating a project
      picture-in-picture" allowfullscreen></iframe>
 
 Editing networks
-----------------
+~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
@@ -67,7 +67,7 @@ Editing networks
      picture-in-picture" allowfullscreen></iframe>
 
 Traffic Assignment
-------------------
+~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 

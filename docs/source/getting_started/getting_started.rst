@@ -96,6 +96,8 @@ AequilibraE menu, but it does require restarting QGIS
 
 Now it is just a matter of re-starting QGIS and starting to use AequilibraE.
 
+.. _importing-omx-matrices:
+
 For those who want to be able to use matrices in the OpenMatrix (*.omx) format,
 then you still need to install the openmatrix package.  If you are in Linux or
 Mac, then a simple
@@ -141,3 +143,19 @@ And it would report failure in case something has gone wrong.
 A more detailed discussion on how this process works has been presented in the
 form of a blog post on
 `XL-Optim <https://www.xl-optim.com/displaying-omx-matrix-in-qgis/>`_.
+
+.. _quicktour-video:
+
+Quick Tour
+----------
+
+After installing AequilibraE plug-in, you might enjoy this quick tour on QGIS interface.
+AequilibraE 0.6 for QGIS has brought substantial changes to the previous graphical
+interface, which might cause some confusion to old users. For a brief overview
+of the new interface, we have prepared a little video tour.
+
+.. raw:: html
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/oZEcjiBRaok"
+     frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
+     picture-in-picture" allowfullscreen></iframe>

@@ -58,9 +58,13 @@ Network articulation
 
 The association of *a_nodes* and *b_nodes* to a link layer is what can be named
 articulation of a network, and is one of the foundational tools in AequilibraE.
+Please **make sure that all your links are LineString geometries**, otherwise the articulation
+is not going to work. If all your links are MultiLineString geometries, you can save
+your data as a GeoPackage and enforce it to be LineString only.
 There are two distinct situations that need to be covered:
 
-**User has only the network links**
+User has only the network links
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is the case when one exports only links from a transportation package or
 downloads a link layer from Open Street Maps or a government open data portal
@@ -74,7 +78,8 @@ following:
 * Adds the fields *A_Node* and *B_Node* to the new link layer, and populate them
   with the *IDs* generated for the nodes layer
 
-**User has the network links and nodes but no database field linking them**
+User has the network links and nodes but no database field linking them
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In case one has both the complete sets of nodes and links and nodes for a
 certain network (commercial packages would allow you to export them separately),
@@ -130,12 +135,14 @@ for link direction with values in the set [-1, 0, 1], where:
 
 Distance
 --------
+
 The field for distance needs to be numeric, but its value is currently
 unimportant, as distance values will be overwritten with distance in meters by
 SpatiaLite. Other units will be possible in the future.
 
 Modes
 -----
+
 In AequilibraE, each mode is represented by a lower case letter. So imagine we
 will have several modes in our network, such as cars (c), trucks (t), bicycles
 (b) and walking (w). In that case, a link that allows all modes will have a

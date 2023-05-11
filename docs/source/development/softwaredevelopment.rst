@@ -12,10 +12,10 @@ Software Design and requirements
 The most important piece of AequilibraE's backend is, without a doubt, `NumPy <http://numpy.org>`__.
 
 Whenever vectorization is not possible through the use of NumPy functions, compiled code is developed in order to
-accelerate computation. All compiled code is written in `Cython <www.cython.org>`_.
+accelerate computation. All compiled code is written in `Cython <https://cython.org/>`_.
 
 AequilibraE also observes a strong requirement of only using libraries that are available in the Python installation
-used by `QGIS <www.qgis.org>`_ on Windows, as the most important use case of this library is as the computational
+used by `QGIS <https://qgis.org/en/site/>`_ on Windows, as the most important use case of this library is as the computational
 backend of the AequilibraE GUI for QGIS. This requirement can be relaxed, but it has to be analysed on a base-by-case
 basis and CANNOT break current workflow within QGIS.
 
@@ -104,7 +104,7 @@ Contributing to AequilibraE for QGIS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GitHub has a nice visual explanation on how collaboration is done `GitHub Flow
-<https://guides.github.com/introduction/flow>`_.  (For us,) The most important points there are:
+<https://guides.github.com/introduction/flow>`_. (For us,) The most important points there are:
 
 * The master branch contains the latest working/release version of AequilibraE
 * Work is done in an issue/feature branch (or a fork) and then pushed to a new brach
