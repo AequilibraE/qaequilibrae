@@ -95,7 +95,7 @@ there are two alternatives for support:
 2. Joining the `AequilibraE Google Group <https://groups.google.com/forum/#!forum/aequilibrae>`_
    and sending your question there.
 
-Before sending your questions to any platform, please check if your question wasn't answered before.
+**Before sending your questions to any platform, please check if your question wasn't answered before.**
 
 AequilibraE **does not have paid support** but if you are looking to hire its developers
 for specific projects or to **fund AequilibraE's** development,

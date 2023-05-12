@@ -12,32 +12,29 @@ documentation listed above, as this page is dedicated to a practical implementat
 Under the project tab, there are seven options to choose from and the following sections
 explore some of these actions.
 
-.. image:: ../images/tab-project.png
-    :align: center
-    :alt: tab project menu
-
 .. _siouxfalls-open-project:
 
 Open & Close project
 --------------------
 
 These options are pretty straightforward and are used either to open or close a
-project. 
+project. You just have to click **AequilibraE > Project > Open project** to open
+a project, and **AequilibraE > Project > Close project** to close it.
 
-The figure below shows how to open the project. The procedure for closing the project
-is also similar.
+Keep in mind that to open another project or to create a new one, you **must**
+close the currently open project, otherwise AequilibraE is going to return an
+error.
 
-.. image:: ../images/opening_project.png
-    :width: 560
+.. image:: ../images/tab-project.png
     :align: center
-    :alt: Opening the project
+    :alt: tab project menu
 
 .. _create-proj-from-osm:
 
 Create project from OSM
 -----------------------
 
-However, its first feature is the capability of importing networks directly from
+The first feature is the capability of importing networks directly from
 `Open Street Maps <https://www.openstreetmap.org/>`_ into AequilibraE's efficient
 TranspoNet format. This is also time to give a HUGE shout out to
 `Geoff Boeing <http://www.geoffboeing.com/>`_, creator of the widely used Python
@@ -142,7 +139,8 @@ It is possible to import to AequilibraE project your own zoning system in case
 you already have one. Currently, AequilibraE only supports one projection system,
 which is the EPSG:4326 (WGS84), so make sure your zone layer is in this projection.
 
-To add your zones to the active project, go to **AequilibraE > Project > Add zoning data**, select the zoning layer you want to add to the project, select weather you
+To add your zones to the active project, go to **AequilibraE > Project > Add zoning data**, 
+select the zoning layer you want to add to the project, select weather you
 want to migrate the data and the respective layer field in the zoning layer, and
 finally click on process.
 
@@ -161,7 +159,7 @@ reference documentation for this section can be found in its
 `documentation page <https://aequilibrae.com/python/latest/modeling_with_aequilibrae/parameter_file.html>`_.
 
 The QGIS plugin, however, has a nice interface to view and edit the parameters
-file, which can be accessed through **Aequilibrae > Parameters**. This
+file, which can be accessed through **Aequilibrae > Project > Parameters**. This
 interface, depicted below, allows one to edit and validate parameters before
 submitting them as the new parameter file for all AequilibraE procedures.
 

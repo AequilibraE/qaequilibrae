@@ -25,8 +25,18 @@ close this window (the TSP sequence can be found in the TSP stops layer).
     :align: center
     :alt: TSP procedure report
 
-And as we chose to display the result in a new layer, it would look like the figure below. Plase note that the TSP stops are labeled according their sequence.
+And as we chose to display the result in a new layer, it would look like the figure below. 
+Plase note that the TSP stops are labeled according their sequence.
 
 .. image:: ../images/tsp-solution.png
     :align: center
     :alt: TSP solution
+
+.. note::
+
+    TSP is a well-known optimization problem and it has already been implemented in several
+    different software and programming languages. However, the main problem related to
+    TSP is related to its size (hence its complexity). This means that as we increase the 
+    number of stops we want to travel to, the software will take much longer to provide you
+    with an answer, and in some cases, it might not even return an answer as the processing 
+    time explodes.

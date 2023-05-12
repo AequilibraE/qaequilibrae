@@ -47,8 +47,8 @@ selected in the layer, but only one path can be shown at at time if you do so.
 
 .. _siouxfalls-skimming:
 
-Impedance Matrix
-----------------
+Impedance Matrix (aka Skimming Matrix)
+--------------------------------------
 
 We can also skim the network to look into general connectivity of the network
 

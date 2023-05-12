@@ -1,14 +1,6 @@
 GIS Tools
 =========
 
-.. Simple TAG
-.. ----------
-.. pass
-
-.. Lowest Common denominator
-.. ----------------------------
-.. pass
-
 .. _siouxfalls-desire-lines:
 
 Desire Lines
@@ -140,3 +132,23 @@ And this is what it looks like
     :width: 778
     :align: center
     :alt: scenario_comparison_map
+
+Lowest Common denominator
+-------------------------
+
+When using AequilibraE, one of its premisses is that the zones do not overlay each
+other. Thus in case of overlaying geometries, we have to fix the geometries before
+using them in AequilibraE. 
+
+If we click **AequilibraE > GIS > Lowest common denominator** a new window opens and
+we can set the layers we want to overlay the geometries to fix them.
+
+
+
+
+Simple TAG
+----------
+
+**AequilibraE > GIS > Simple TAG** works as a spatial join tool in AequilibraE.
+One of its usages, for example, is to determine in which *zone_id* the network
+node is in.
