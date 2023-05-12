@@ -108,7 +108,12 @@ GitHub has a nice visual explanation on how collaboration is done `GitHub Flow
 
 * The master branch contains the latest working/release version of AequilibraE
 * Work is done in an issue/feature branch (or a fork) and then pushed to a new brach
-* The `test system <www.travis.org>`_ automatically runs unit tests
+* Automated testing is run using Github Actions. All tests must pass:
+
+  * Unit testing
+  * Build/packaging tests
+  * Documentation building test
+
 * If the tests pass, then a manual pull request can be approved to merge into master
 * The master branch is protected and therefore can only be written to after the code has been reviewed and approved
 * No individual has the privileges to push to the master branch

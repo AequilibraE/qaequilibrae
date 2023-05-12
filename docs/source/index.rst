@@ -40,15 +40,15 @@ package.
    **Using AequilibraE**
    ^^^^^^^^^^^^^^^^^
 
-   A series of examples on how to use AequilibraE, from building a model from scratch
+   A series of tutorials on how to use AequilibraE, from building a model from scratch
    to editing an existing, performing trip distribution or traffic assignment to analyzing
    results.
 
    +++++++++++++++++
 
-   .. link-button:: examples/readme
+   .. link-button:: examples/tutorials_and_sample_data
       :type: ref
-      :text: Examples
+      :text: Tutorials
       :classes: btn-block btn-secondary stretched-link
 
    ---
@@ -106,6 +106,6 @@ please e-mail the developers at contact@aequilibrae.com.
    :maxdepth: 2
 
    getting_started/getting_started
-   examples/readme
+   examples/tutorials_and_sample_data
    modeling_with_aequilibrae/readme
    development/readme

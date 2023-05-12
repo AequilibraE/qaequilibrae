@@ -10,10 +10,13 @@ It is not our intention here to provide a transportation modeling course, so the
 material listed below assumes that you are somewhat familiar with traditional
 transport modeling.
 
-For an example workflow, check the comprehensive example we prepared for
-:ref:`sioux_falls`.
+The sections in :ref:`modeling-init` present the functionality of AequilibraE's QGIS 
+plug-in uisng (mainly) the Sioux Falls example. Feel free to download the data and
+reproduce it in your own machine. 
 
-Several portions of that work flow have also been reproduced in Python.
+Several portions of that work flow have also been reproduced in Python, and
+you can check it in the library 
+`example's gallery <https://aequilibrae.com/python/latest/_auto_examples/index.html>`_.
 
 Sample Data
 -----------

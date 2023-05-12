@@ -16,11 +16,21 @@ explore some of these actions.
     :align: center
     :alt: tab project menu
 
+.. _siouxfalls-open-project:
+
 Open & Close project
 --------------------
 
 These options are pretty straightforward and are used either to open or close a
 project. 
+
+The figure below shows how to open the project. The procedure for closing the project
+is also similar.
+
+.. image:: ../images/opening_project.png
+    :width: 560
+    :align: center
+    :alt: Opening the project
 
 .. _create-proj-from-osm:
 
@@ -96,10 +106,27 @@ AequilibraE.
 Accessing **AequilibraE > Project > Create Project from Layers**, the user is
 presented with the following screen.
 
-.. image:: ../images/project_from_layers.png
-    :width: 1425
+.. image:: ../images/project_from_layers_links.png
+    :width: 614
     :align: center
-    :alt: Create project from layers
+    :alt: project_from_layers_links
+
+The first 7 fields for links are mandatory, and one needs to associate the
+corresponding layer fields to the network fields.
+
+The other fields that will be listed on the left side come from the parameters
+file (see the manual for that portion for more details), but the user can add
+more fields from the layer, as all of them are listed on the left side of the
+screen
+
+In the case of the nodes layer, only two fields are mandatory.
+
+.. image:: ../images/project_from_layers_nodes.png
+    :width: 614
+    :align: center
+    :alt: project_from_layers_nodes
+
+After filling all fields, it is just a matter of saving it!
 
 After running this tool a sqlite file (spatialite enabled) will be created and
 you can edit the network (create, move or delete links and nodes) and both
@@ -148,7 +175,7 @@ submitting them as the new parameter file for all AequilibraE procedures.
 Log file
 --------
 
-The log file contains information about what actions took place and when they happened.
+The log file contains information about which actions took place and when they happened.
 For example, after you :ref:`create a project from OSM  <create-proj-from-osm>`,
 if you access the log file, you are going to see something like the figure below,
 containing the sequence of steps followed to import the OSM network. If you wish to
