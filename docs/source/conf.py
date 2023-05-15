@@ -27,7 +27,7 @@ author = "Pedro Camargo"
 
 # The short X.Y.Z version
 
-a = open('../../metadata.txt', 'r')
+a = open("../../metadata.txt", "r")
 for line in a.readlines():
     if "version" in line.rstrip():
         version = line.rstrip()[8:]
@@ -51,7 +51,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.imgmath",
     "sphinx_autodoc_annotation",
-    "sphinx.ext.mathjax"
+    "sphinx.ext.mathjax",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
