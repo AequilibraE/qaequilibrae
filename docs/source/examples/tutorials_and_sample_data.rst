@@ -10,13 +10,16 @@ It is not our intention here to provide a transportation modeling course, so the
 material listed below assumes that you are somewhat familiar with traditional
 transport modeling.
 
-For an example workflow, check the comprehensive example we prepared for
-:ref:`sioux_falls`.
+The sections in :ref:`modeling-init` present the functionality of AequilibraE's QGIS 
+plug-in uisng (mainly) the Sioux Falls example. Feel free to download the data and
+reproduce it in your own machine. 
 
-Several portions of that work flow have also been reproduced in Python.
+Several portions of that work flow have also been reproduced in Python, and
+you can check it in the library 
+`example's gallery <https://aequilibrae.com/python/latest/_auto_examples/index.html>`_.
 
 Sample Data
-~~~~~~~~~~~
+-----------
 
 We have compiled two very distinct example datasets imported from the
 `TNTP instances <https://github.com/bstabler/TransportationNetworks/>`_.
@@ -33,14 +36,14 @@ AequilibraE project already imported, the demand matrix in both AEM and OMX
 formats and the best-known solutions for link flows.
 
 Video Tutorials
-~~~~~~~~~~~~~~~
+---------------
 
 Preparing tutorials using screen recording software is a LOT easier than writing
 comprehensive written documentation, so we have amassed a substantial collection
 of video tutorials hosted on YouTube.
 
 Tour of the new interface
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
@@ -49,7 +52,7 @@ Tour of the new interface
      picture-in-picture" allowfullscreen></iframe>
 
 Creating a project
-------------------
+~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
@@ -58,7 +61,7 @@ Creating a project
      picture-in-picture" allowfullscreen></iframe>
 
 Editing networks
-----------------
+~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
@@ -67,7 +70,7 @@ Editing networks
      picture-in-picture" allowfullscreen></iframe>
 
 Traffic Assignment
-------------------
+~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 

@@ -1,3 +1,5 @@
+.. _contributing_to_qaequilibrae:
+
 Contributing to AequilibraE for QGIS
 ====================================
 
@@ -7,25 +9,25 @@ the requirements for all pull-requests to be merged into master.
 Software Design and requirements
 --------------------------------
 
-The most important piece of AequilibraE's backend is, without a doubt, `numpy <http://numpy.org>`__.
+The most important piece of AequilibraE's backend is, without a doubt, `NumPy <http://numpy.org>`__.
 
 Whenever vectorization is not possible through the use of NumPy functions, compiled code is developed in order to
-accelerate computation. All compiled code is written in `Cython <www.cython.org>`_.
+accelerate computation. All compiled code is written in `Cython <https://cython.org/>`_.
 
 AequilibraE also observes a strong requirement of only using libraries that are available in the Python installation
-used by `QGIS <www.qgis.org>`_ on Windows, as the most important use case of this library is as the computational
+used by `QGIS <https://qgis.org/en/site/>`_ on Windows, as the most important use case of this library is as the computational
 backend of the AequilibraE GUI for QGIS. This requirement can be relaxed, but it has to be analysed on a base-by-case
 basis and CANNOT break current workflow within QGIS.
 
 We have not yet found an ideal source of recommendations for developing AequilibraE, but a good initial take can be
-found in `this article. <http://www.plosbiology.org/article/info%3Adoi%2F10.1371%2Fjournal.pbio.1001745>`__
+found in `this article. <http://www.plosbiology.org/article/info%3Adoi%2F10.1371%2Fjournal.pbio.1001745>`_
 
 Development Install
 -------------------
 
 As it goes with most Python packages, we recommend using a dedicated virtual environment to develop AequilibraE.
 
-AequilibraE is currently tested for Python 3.5, 3.6 and 3.7, but we recommend using Python 3.6 for development.
+AequilibraE is currently tested for Python 3.7, 3.8, 3.9 & 3.11, but we recommend using Python 3.9 or 3.10 for development.
 
 We also assume you are using `PyCharm <https://www.jetbrains.com/pycharm>`_, which is an awesome IDE for Python.
 
@@ -34,17 +36,18 @@ If you are using a different IDE, we would welcome if you could contribute with 
 Cloning the computational engine as submodule
 ---------------------------------------------
 
-git submodule update --init --recursive
+:: 
 
-git submodule update --recursive --remote
+  git submodule update --init --recursive
 
+  git submodule update --recursive --remote
 
 
 Non-Windows
 ~~~~~~~~~~~
 ::
 
-./ci.sh setup_dev
+  ./ci.sh setup_dev
 
 Windows
 ~~~~~~~
@@ -101,11 +104,16 @@ Contributing to AequilibraE for QGIS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GitHub has a nice visual explanation on how collaboration is done `GitHub Flow
-<https://guides.github.com/introduction/flow>`_.  (For us,) The most important points there are:
+<https://guides.github.com/introduction/flow>`_. (For us,) The most important points there are:
 
 * The master branch contains the latest working/release version of AequilibraE
 * Work is done in an issue/feature branch (or a fork) and then pushed to a new brach
-* The `test system <www.travis.org>`_ automatically runs unit tests
+* Automated testing is run using Github Actions. All tests must pass:
+
+  * Unit testing
+  * Build/packaging tests
+  * Documentation building test
+
 * If the tests pass, then a manual pull request can be approved to merge into master
 * The master branch is protected and therefore can only be written to after the code has been reviewed and approved
 * No individual has the privileges to push to the master branch
@@ -143,23 +151,22 @@ AequilibraE testing is done with three tools:
 
 To run the tests locally, you will need to figure out what to do...
 
-
-These same tests are run by Travis with each push to the repository.  These tests need to pass in order to somebody
+These same tests are run by Travis with each push to the repository. These tests need to pass in order to somebody
 manually review the code before merging it into master (or returning for corrections).
 
 In some cases, test targets need to be updated to match the new results produced by the code since these 
-are now the correct results.  In order to update the test targets, first determine which tests are 
-failing and then review the failing lines in the source files.  These are easy to identify since each 
-test ultimately comes down to one of Python's various types of `assert` statements.  Once you identify 
+are now the correct results. In order to update the test targets, first determine which tests are 
+failing and then review the failing lines in the source files. These are easy to identify since each 
+test ultimately comes down to one of Python's various types of `assert` statements. Once you identify 
 which `assert` is failing, you can work your way back through the code that creates the test targets in 
-order to update it.  After updating the test targets, re-run the tests to confirm the new code passes all 
+order to update it. After updating the test targets, re-run the tests to confirm the new code passes all 
 the tests.
 
 Documentation
 ~~~~~~~~~~~~~~
 
 All the AequilibraE documentation is (unfortunately) written in `reStructuredText
-<http://docutils.sourceforge.net/rst.html>`__  and built with `Sphinx <http://www.sphinx-doc.org/en/stable/>`__.
+<http://docutils.sourceforge.net/rst.html>`_ and built with `Sphinx <http://www.sphinx-doc.org/en/stable/>`_.
 Although Restructured Text is often unecessarily convoluted to write, Sphinx is capable of converting it to standard-
 looking html pages, while also bringing the docstring documentation along for the ride.
 
@@ -177,11 +184,11 @@ Releases
 ~~~~~~~~~
 
 AequilibraE releases are manually (and not often) uploaded to the `Python Package Index
-<https://pypi.python.org/pypi/aequilibrae>`__  (pypi).
+<https://pypi.python.org/pypi/aequilibrae>`_ (pypi).
 
 
 Finally
 ~~~~~~~~~
 
 A LOT of the structure around the documentation was borrowed (copied) from the excellent project `ActivitySim
-<https://activitysim.github.io/>`_
+<https://activitysim.github.io/>`_.
