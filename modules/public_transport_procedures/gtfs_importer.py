@@ -1,4 +1,5 @@
 from os.path import dirname, join
+from aequilibrae.transit import Transit
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
@@ -10,14 +11,14 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_importer.ui")
 
 
 class GTFSImporter(QDialog, FORM_CLASS):
-    def __init__(self, _PQgis):
+    def __init__(self, qgis_project):
         QDialog.__init__(self)
-        self.iface = _PQgis.iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
 
-        self._PQgis = _PQgis
+        self.qgis_project = qgis_project
         # self._p = _PQgis.network  # This is the Polaris network itself
-
+        self._p = Transit(qgis_project.project)
         self.progress_box.setVisible(False)
         self.progress_box.setEnabled(False)
         self.but_add.clicked.connect(self.add_gtfs_feed)
@@ -30,7 +31,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.items = [self.config_box, self.progress_box]
 
     def add_gtfs_feed(self, testing=False):
-        dlg2 = GTFSFeed(self._PQgis, testing)
+        dlg2 = GTFSFeed(self.qgis_project, testing)
         if not testing:
             dlg2.setWindowFlags(Qt.WindowStaysOnTopHint)
             dlg2.show()
@@ -56,8 +57,8 @@ class GTFSImporter(QDialog, FORM_CLASS):
             item.setEnabled(not item.isEnabled())
         self.setFixedHeight(176)
 
-        if self.rdo_purge.isChecked() or self.rdo_clear.isChecked():
-            self._p.transit.purge(self.rdo_purge.isChecked())
+        # if self.rdo_purge.isChecked() or self.rdo_clear.isChecked():
+        #     self._p.purge(self.rdo_purge.isChecked())
 
         for i, feed in enumerate(self.feeds):
             feed.signal.connect(self.signal_handler)

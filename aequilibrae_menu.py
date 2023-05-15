@@ -80,8 +80,8 @@ class AequilibraEMenu:
             "Data": [],
             "Trip Distribution": [],
             "Paths and assignment": [],
-            "Routing": [],
             "Public Transport": [],
+            "Routing": [],
             "GIS": [],
             "Utils": [],
             "AequilibraE": [],
@@ -89,12 +89,12 @@ class AequilibraEMenu:
 
         # # #######################   PROJECT SUB-MENU   ############################
         self.add_menu_action("Project", "Open Project", partial(run_load_project, self))
-        self.add_menu_action("Project", "Create project from OSM", partial(project_from_osm, self))
+        self.add_menu_action("Project", "Create Project from OSM", partial(project_from_osm, self))
         self.add_menu_action("Project", "Create Project from layers", partial(run_create_transponet, self))
         self.add_menu_action("Project", "Add zoning data", partial(run_add_zones, self))
         self.add_menu_action("Project", "Parameters", partial(run_change_parameters, self))
-        self.add_menu_action("Project", "logfile", partial(show_log, self))
-        self.add_menu_action("Project", "Close project", self.run_close_project)
+        self.add_menu_action("Project", "Log File", partial(show_log, self))
+        self.add_menu_action("Project", "Close Project", self.run_close_project)
 
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
