@@ -6,8 +6,6 @@ from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
 
-from ..common_tools import GetOutputFileName
-
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_feed.ui"))
 
 
@@ -36,6 +34,7 @@ class GTFSFeed(QDialog, FORM_CLASS):
                 self.close()
 
     def open_feed(self):
+        from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
         formats = ["GTFS Feed(*.zip)"]
         source_path_file, _ = GetOutputFileName(
             QDialog(),
