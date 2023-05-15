@@ -16,7 +16,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.setupUi(self)
 
         self._PQgis = _PQgis
-        self._p = _PQgis.network
+        # self._p = _PQgis.network  # This is the Polaris network itself
 
         self.progress_box.setVisible(False)
         self.progress_box.setEnabled(False)
