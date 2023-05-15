@@ -29,7 +29,7 @@ from .menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, ru
 from .menu_actions import run_distribution_models, run_tsp, run_change_parameters, run_stacked_bandwidths
 from .menu_actions import run_load_project, project_from_osm, run_create_transponet, prepare_network, run_add_connectors
 from .paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
-from .public_transport_procedures import GtfsImportDialog
+from .public_transport_procedures import GTFSImporter
 
 no_binary = False
 try:
@@ -86,7 +86,7 @@ class AequilibraEMenu:
                             'Trip Distribution': [],
                             'Paths and assignment': [],
                             'Routing': [],
-                            # 'Public Transport': [],
+                            'Public Transport': [],
                             'GIS': [],
                             'Utils': [],
                             'AequilibraE': []}
@@ -131,11 +131,10 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         # # # #######################   TRANSIT SUB-MENU   ###########################
-        # transitMenu = QMenu()
-        # self.gtfs_import_action = QAction(self.trlt('Convert GTFS to SpatiaLite'), self.manager)
-        # self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
-        # transitMenu.addAction(self.gtfs_import_action)
-        #
+        self.add_menu_action('Public Transport', 'Import GTFS', partial(run_traffic_assig, self))
+
+
+
         # transitButton = QToolButton()
         # transitButton.setText(self.trlt('Public Transport'))
         # transitButton.setPopupMode(2)
