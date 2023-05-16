@@ -12,19 +12,19 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_feed.ui"))
 
 
 class GTFSFeed(QDialog, FORM_CLASS):
-    def __init__(self, qgis_project, testing=False):
+    def __init__(self, qgis_project, pt_object, testing=False):
         QDialog.__init__(self)
         self.iface = qgis_project.iface
         self.setupUi(self)
         self.qgis_project = qgis_project
-        self._p = Transit(qgis_project.project)
+        self._p = pt_object
         # self.worker_thread = self._p.tools
         self.path = standard_path()
         self.feed = None
         self.but_add.clicked.connect(self.return_feed)
         self.but_new_row.clicked.connect(self.new_route_capacities)
         self.default_capacities = {}
-
+        self.service_day = None
         self.items = [self.but_add, self.service_calendar]
         self.but_add.setVisible(False)
         self.service_calendar.setVisible(False)
@@ -38,10 +38,11 @@ class GTFSFeed(QDialog, FORM_CLASS):
 
     def open_feed(self):
         from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
+
         formats = ["GTFS Feed(*.zip)"]
         source_path_file, _ = GetOutputFileName(
             QDialog(),
-            "Target GTFS feed",
+            "Target GTFS Feed",
             formats,
             ".zip",
             self.path,
@@ -79,7 +80,8 @@ class GTFSFeed(QDialog, FORM_CLASS):
 
         date = self.service_calendar.selectedDate().toString("yyyy-MM-dd")
         self.feed.set_date(date)
-        # self.feed.set_do_raw_shapes(self.chb_raw_shapes.isChecked())
+
+        self.service_day = date
 
         caps = {}
         for row in range(self.tbl_capacities.rowCount()):
