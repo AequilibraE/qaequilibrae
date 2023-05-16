@@ -1,4 +1,4 @@
-from os.path import dirname, join
+from os.path import dirname, join, isfile
 from aequilibrae.transit import Transit
 
 from qgis.PyQt import uic
@@ -26,6 +26,14 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.list_feeds.setColumnWidth(0, 230)
         self.feeds = []
         self.done = 1
+
+        if isfile(join(qgis_project.project.project_base_path, "public_transport.sqlite")):
+            self.rdo_clear.text = "Overwrite routes"
+            self.rdo_keep.text = "Add to existing routes"
+        else:
+            self.rdo_clear.text = "Crete new route system"
+            self.rdo_keep.setVisible(False)
+            self.rdo_clear.setChecked(True)
 
         self.setFixedHeight(380)
         self.items = [self.config_box, self.progress_box]
@@ -57,8 +65,12 @@ class GTFSImporter(QDialog, FORM_CLASS):
             item.setEnabled(not item.isEnabled())
         self.setFixedHeight(176)
 
-        # if self.rdo_purge.isChecked() or self.rdo_clear.isChecked():
-        #     self._p.purge(self.rdo_purge.isChecked())
+        if isfile(join(qgis_project.project.project_base_path, "public_transport.sqlite")):
+            if self.rdo_clear.isChecked():
+                # We must delete all existing routes here.
+                pass
+        else:
+            # MUST CREATE THE PT DATABASE NOW
 
         for i, feed in enumerate(self.feeds):
             feed.signal.connect(self.signal_handler)
