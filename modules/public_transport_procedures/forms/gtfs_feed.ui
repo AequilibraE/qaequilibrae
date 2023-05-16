@@ -221,74 +221,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_3">
-      <attribute name="title">
-       <string>Advanced settings</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_4">
-       <item row="2" column="0" rowspan="3">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string/>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QCheckBox" name="chb_raw_shapes">
-            <property name="text">
-             <string>Import raw shapes</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="1" rowspan="3">
-        <widget class="QGroupBox" name="map_matching_box">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="title">
-          <string/>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_5">
-          <item row="1" column="0">
-           <widget class="QListWidget" name="listWidget">
-            <property name="maximumSize">
-             <size>
-              <width>160</width>
-              <height>16777215</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Map-matching</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
   </layout>
@@ -301,8 +233,6 @@
   <tabstop>but_add</tabstop>
   <tabstop>tbl_capacities</tabstop>
   <tabstop>but_new_row</tabstop>
-  <tabstop>chb_raw_shapes</tabstop>
-  <tabstop>listWidget</tabstop>
  </tabstops>
  <resources/>
  <connections/>

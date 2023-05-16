@@ -59,7 +59,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Execute importer</string>
+         <string>Execute Importer</string>
         </property>
        </widget>
       </item>
@@ -172,7 +172,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Overwrite routes</string>
+         <string>Overwrite Routes</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -194,7 +194,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Add to existing routes</string>
+         <string>Add to Existing Routes</string>
         </property>
        </widget>
       </item>
