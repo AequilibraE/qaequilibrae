@@ -36,32 +36,16 @@ package.
       :classes: btn-block btn-secondary stretched-link
 
    ---
-   :fa:`folder`
-   **Using AequilibraE**
-   ^^^^^^^^^^^^^^^^^
-
-   A series of tutorials on how to use AequilibraE, from building a model from scratch
-   to editing an existing, performing trip distribution or traffic assignment to analyzing
-   results.
-
-   +++++++++++++++++
-
-   .. link-button:: examples/tutorials_and_sample_data
-      :type: ref
-      :text: Tutorials
-      :classes: btn-block btn-secondary stretched-link
-
-   ---
    :fa:`book`
-   **Modeling with AequilibraE**
-   ^^^^^^^^^^^^^^^^^^^^^^^^^
+   **Menus in detail**
+   ^^^^^^^^^^^^^^^^^^^
 
    An in-depth guide to modeling with AequilibraE, including the concepts that guide its
    development and user-experience.
 
    +++++++++++++++++
 
-   .. link-button:: modeling_with_aequilibrae/readme
+   .. link-button:: menus_in_detail/readme
          :type: ref
          :text: Modeling with AequilibraE
          :classes: btn-block btn-secondary stretched-link
@@ -97,6 +81,7 @@ there are two alternatives for support:
 
 **Before sending your questions to any platform, please check if your question wasn't answered before.**
 
+
 AequilibraE **does not have paid support** but if you are looking to hire its developers
 for specific projects or to **fund AequilibraE's** development,
 please e-mail the developers at contact@aequilibrae.com.
@@ -106,6 +91,6 @@ please e-mail the developers at contact@aequilibrae.com.
    :maxdepth: 2
 
    getting_started/getting_started
-   examples/tutorials_and_sample_data
-   modeling_with_aequilibrae/readme
+   menus_in_detail/readme
    development/readme
+..   examples/tutorials_and_sample_data
