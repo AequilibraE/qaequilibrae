@@ -30,7 +30,7 @@ jobs:
         make html
 
     - name: Upload documentation to dev
-      if: ${{ (github.event_name == 'pull_request') && (env.HAS_SECRETS == 'true') }}
+      if: ${{(env.HAS_SECRETS == 'true') }}
       uses: jakejarvis/s3-sync-action@7ed8b112447abb09f1da74f3466e4194fc7a6311
       with:
         args: --acl public-read --follow-symlinks --delete
