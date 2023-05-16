@@ -81,6 +81,7 @@ there are two alternatives for support:
 
 **Before sending your questions to any platform, please check if your question wasn't answered before.**
 
+
 AequilibraE **does not have paid support** but if you are looking to hire its developers
 for specific projects or to **fund AequilibraE's** development,
 please e-mail the developers at contact@aequilibrae.com.
