@@ -27,10 +27,11 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.done = 1
 
         if isfile(join(qgis_project.project.project_base_path, "public_transport.sqlite")):
-            self.rdo_clear.text = "Overwrite Routes"
-            self.rdo_keep.text = "Add to Existing Routes"
+            self.rdo_clear.setText("Overwrite Routes")
+            self.rdo_keep.setText("Add to Existing Routes")
         else:
-            self.rdo_clear.text = "Crete New Route System"
+            self.label_3.setText("Add Transit Table")
+            self.rdo_clear.setText("Crete New Route System")
             self.rdo_keep.setVisible(False)
             self.rdo_clear.setChecked(True)
         self.setFixedHeight(380)
@@ -65,30 +66,31 @@ class GTFSImporter(QDialog, FORM_CLASS):
             item.setEnabled(not item.isEnabled())
         self.setFixedHeight(176)
 
-        if isfile(join(self.qgis_project.project.project_base_path, "public_transport.sqlite")):
-            if self.rdo_clear.isChecked():
-                for table in [
-                    "agencies",
-                    "fare_attributes",
-                    "fare_rules",
-                    "fare_zones",
-                    "pattern_mapping",
-                    "route_links",
-                    "routes",
-                    "stop_connectors",
-                    "stops",
-                    "trips",
-                    "trips_schedule",
-                ]:
-                    self.pt_conn.execute(f"DELETE FROM {table};")
-                self.pt_conn.commit()
-
-        self.dlg2.feed.load_date(self.dlg2.service_day)
-        self.dlg2.feed.save_to_disk()
-
         for _, feed in enumerate(self.feeds):
             feed.signal.connect(self.signal_handler)
-            # feed.execute_import()
+
+            if isfile(join(self.qgis_project.project.project_base_path, "public_transport.sqlite")):
+                if self.rdo_clear.isChecked():
+                    for table in [
+                        "agencies",
+                        "fare_attributes",
+                        "fare_rules",
+                        "fare_zones",
+                        "pattern_mapping",
+                        "route_links",
+                        "routes",
+                        "stop_connectors",
+                        "stops",
+                        "trips",
+                        "trips_schedule",
+                    ]:
+                        self.pt_conn.execute(f"DELETE FROM {table};")
+                    self.pt_conn.commit()
+
+            self.dlg2.feed.load_date(self.dlg2.service_day)
+            self.dlg2.feed.set_allow_map_match(True)
+            self.dlg2.feed.map_match()
+            self.dlg2.feed.save_to_disk()
 
         self.close()
 

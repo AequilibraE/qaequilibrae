@@ -40,7 +40,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Resetting Transit tables</string>
+         <string>Resetting Transit Tables</string>
         </property>
        </widget>
       </item>
