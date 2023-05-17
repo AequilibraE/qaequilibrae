@@ -18,7 +18,6 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.setupUi(self)
 
         self.qgis_project = qgis_project
-        # self._p = _PQgis.network  # This is the Polaris network itself
         self.progress_box.setVisible(False)
         self.progress_box.setEnabled(False)
         self.but_add.clicked.connect(self.add_gtfs_feed)
@@ -68,9 +67,19 @@ class GTFSImporter(QDialog, FORM_CLASS):
 
         if isfile(join(self.qgis_project.project.project_base_path, "public_transport.sqlite")):
             if self.rdo_clear.isChecked():
-                for table in ["agencies", "fare_attributes", "fare_rules", "fare_zones",
-                              "pattern_mapping", "route_links", "routes", "stop_connectors",
-                              "stops", "trips", "trips_schedule"]:
+                for table in [
+                    "agencies",
+                    "fare_attributes",
+                    "fare_rules",
+                    "fare_zones",
+                    "pattern_mapping",
+                    "route_links",
+                    "routes",
+                    "stop_connectors",
+                    "stops",
+                    "trips",
+                    "trips_schedule",
+                ]:
                     self.pt_conn.execute(f"DELETE FROM {table};")
                 self.pt_conn.commit()
 
@@ -79,7 +88,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
 
         for _, feed in enumerate(self.feeds):
             feed.signal.connect(self.signal_handler)
-            feed.execute_import()
+            # feed.execute_import()
 
         self.close()
 
