@@ -43,7 +43,7 @@ def test_create_project_from_osm_menu(ae, qtbot):
         check_if_new_active_window_matches_class(qtbot, ProjectFromOSMDialog)
 
     action = ae.menuActions["Project"][1]
-    assert action.text() == "Create project from OSM", "Wrong text content"
+    assert action.text() == "Create Project from OSM", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
 

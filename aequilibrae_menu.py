@@ -90,7 +90,7 @@ class AequilibraEMenu:
         # # #######################   PROJECT SUB-MENU   ############################
         self.add_menu_action("Project", "Open Project", partial(run_load_project, self))
         self.add_menu_action("Project", "Create Project from OSM", partial(project_from_osm, self))
-        self.add_menu_action("Project", "Create project from OSM", partial(run_create_transponet, self))
+        self.add_menu_action("Project", "Create Project from layers", partial(run_create_transponet, self))
         self.add_menu_action("Project", "Add zoning data", partial(run_add_zones, self))
         self.add_menu_action("Project", "Parameters", partial(run_change_parameters, self))
         self.add_menu_action("Project", "logfile", partial(show_log, self))
