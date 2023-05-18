@@ -15,11 +15,11 @@ class download_all:
         self.pth = join(pth, "packages")
 
     def install(self):
-        lines = []
         command = f'"{self.find_python()}" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
-        print(sys.executable)
-        print(command)
-        lines.append(command)
+        QgsMessageLog.logMessage("About to run this command: ", level=Qgis.Info)
+        QgsMessageLog.logMessage("  => " + command, level=Qgis.Info)
+        
+        lines = []
         with subprocess.Popen(
             command,
             shell=True,
@@ -31,7 +31,7 @@ class download_all:
             lines.extend(proc.stdout.readlines())
 
         for line in lines:
-            QgsMessageLog.logMessage(str(line), level=Qgis.Critical)
+            QgsMessageLog.logMessage(str(line), level=Qgis.Info)
         return lines
 
     def find_python(self):
