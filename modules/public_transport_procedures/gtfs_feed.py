@@ -1,18 +1,17 @@
 from copy import deepcopy
 from os.path import dirname, join
-from aequilibrae.transit import Transit
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
-from ..common_tools.auxiliary_functions import standard_path
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_feed.ui"))
 
 
 class GTFSFeed(QDialog, FORM_CLASS):
     def __init__(self, qgis_project, pt_object, testing=False):
+        from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
         QDialog.__init__(self)
         self.iface = qgis_project.iface
         self.setupUi(self)
@@ -80,8 +79,6 @@ class GTFSFeed(QDialog, FORM_CLASS):
 
         date = self.service_calendar.selectedDate().toString("yyyy-MM-dd")
         self.feed.set_date(date)
-
-        self.service_day = date
 
         caps = {}
         for row in range(self.tbl_capacities.rowCount()):
