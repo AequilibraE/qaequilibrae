@@ -12,6 +12,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_feed.ui"))
 class GTFSFeed(QDialog, FORM_CLASS):
     def __init__(self, qgis_project, pt_object, testing=False):
         from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
+
         QDialog.__init__(self)
         self.iface = qgis_project.iface
         self.setupUi(self)

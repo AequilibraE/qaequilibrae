@@ -37,6 +37,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
 
     def add_gtfs_feed(self, testing=False):
         from aequilibrae.transit import Transit
+
         self._p = Transit(self.qgis_project.project)
         self.dlg2 = GTFSFeed(self.qgis_project, self._p, testing)
         if not testing:
