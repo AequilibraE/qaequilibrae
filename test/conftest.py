@@ -39,3 +39,24 @@ def timeoutDetector(qgis_iface) -> None:
     timer.start(3000)
     yield timer
     timer.stop()
+
+
+@pytest.fixture(scope="function")
+def pt_project(qgis_iface):
+    ae = AequilibraEMenu(qgis_iface)
+    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+
+    _run_load_project_from_path(ae, "test/data/coquimbo_project")
+    yield ae
+    ae.run_close_project()
+
+
+@pytest.fixture()
+def transit_object(pt_project):
+
+    from aequilibrae.transit import Transit
+
+    data = Transit(pt_project)
+
+    yield data
+    pt_project.close()
