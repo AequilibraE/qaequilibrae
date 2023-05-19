@@ -25,9 +25,10 @@ QGISDIR=.qgis2
 # Makefile for a PyQGIS plugin
 
 # translation
-SOURCES = AequilibraE.py ui_AequilibraE.py __init__.py AequilibraEdialog.py
-#TRANSLATIONS = i18n/AequilibraE_en.ts
-TRANSLATIONS =
+# SOURCES = AequilibraE.py ui_AequilibraE.py __init__.py AequilibraEdialog.py
+# TRANSLATIONS = i18n/AequilibraE_en.ts
+SOURCES = __init__.py aequilibrae_menu.py
+TRANSLATIONS = i18n/aequilibrae_pt_BR.ts
 
 # global
 
