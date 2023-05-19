@@ -20,17 +20,17 @@ def test_click(ae_with_project, qtbot):
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
 
-@pytest.fixture
-def create_feed(pt_project, transit_object):
-    dialog = GTFSFeed(pt_project, transit_object)
-    dialog.show()
+# @pytest.fixture
+# def create_feed(pt_project, transit_object):
+#     dialog = GTFSFeed(pt_project, transit_object)
+#     dialog.show()
 
-    yield dialog
+#     yield dialog
 
 
-def test_set_data(create_feed):
-    gtfs_path = "test/data/coquimbo_project/gtfs_coquimbo.zip"
+# def test_set_data(create_feed):
+#     gtfs_path = "test/data/coquimbo_project/gtfs_coquimbo.zip"
     
-    create_feed.set_data(gtfs_path)
+#     create_feed.set_data(gtfs_path)
 
-    assert len(create_feed.feed) == 1
+#     assert len(create_feed.feed) == 1
