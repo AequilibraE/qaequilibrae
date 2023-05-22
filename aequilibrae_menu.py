@@ -17,7 +17,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsSettings
 from qgis.PyQt.QtCore import QTranslator
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths
@@ -75,19 +75,16 @@ class AequilibraEMenu:
         self.set_font(self.toolbar)
         self.toolbar.setOrientation(2)
         
-        if QtCore.QSettings().value('locale/overrideFlag', type=bool):
-            locale = QtCore.QSettings().value('locale/userLocale')
-        else:
-            locale = QtCore.QLocale.system().name()
+        # locale: str = QgsSettings().value("qaequlibrae/locale/userLocale", QtCore.QLocale().name())[0:2]
+        # locale = QtCore.QLocale("locale/userLocale")
     
-        locale_path = os.path.join(
-        os.path.dirname(__file__),
-        'i18n',
-        'aequilibrae_{}.qm'.format(locale[0:2]))
+        # locale_path = os.path.join(os.path.dirname(__file__), 'i18n', 'aequilibrae_{}.qm'.format(locale[0:2]))
+        # locale_path = os.path.join(os.path.dirname(__file__), 'qaequilibrae/i18n', 'aequilibrae_{}.qm'.format(locale[:2]))
+        locale_path = os.path.join(os.path.dirname(__file__), 'qaequilibrae/i18n', 'aequilibrae_pt_BR.qm')
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
-            self.translator.load(locale_path)
+            self.translator.load(str(locale_path))
             QtCore.QCoreApplication.installTranslator(self.translator)
 
         self.menuActions = {
