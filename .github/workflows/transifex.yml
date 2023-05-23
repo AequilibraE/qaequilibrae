@@ -10,31 +10,33 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    strategy:
+      max-parallel: 4
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+  
+    - name: Install Qt lrelease
+      run: |
+        sudo apt-get update
+        sudo apt-get install qt5-make qttools5-dev-tools
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
+    - name: Install qgis-plugin-ci
+      run: |
+        pip install qgis-plugin-ci
 
-       - name: Install Qt lrelease
-         run: |
-          sudo apt-get update
-          sudo apt-get install qt5-make qttools5-dev-tools
+    - name: Pull from Transifex
+      run: |
+        qgis-plugin-ci pull-translation --compile ${{ secrets.TX_TOKEN }}
 
-      - name: Install qgis-plugin-ci
-        run: pip install qgis-plugin-ci
-
-      - name: Pull from Transifex
-        run: qgis-plugin-ci pull-translation --compile ${{ secrets.TX_TOKEN }}
-
-      # - name: Deploy plugin
-      #   run: >-
-      #     qgis-plugin-ci
-      #     release ${GITHUB_REF/refs\/tags\//}
-      #     --transifex-token ${{ secrets.TX_TOKEN }}
-      #     --github-token ${{ secrets.GITHUB_TOKEN }}
-      #     --osgeo-username ${{ secrets.OSGEO_USER }}
-      #     --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
+    # - name: Deploy plugin
+    #   run: >-
+    #     qgis-plugin-ci
+    #     release ${GITHUB_REF/refs\/tags\//}
+    #     --transifex-token ${{ secrets.TX_TOKEN }}
+    #     --github-token ${{ secrets.GITHUB_TOKEN }}
+    #     --osgeo-username ${{ secrets.OSGEO_USER }}
+    #     --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
