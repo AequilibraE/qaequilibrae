@@ -4,6 +4,7 @@ import qgis
 from ..common_tools import get_vector_layer_by_name
 from ..common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
 from ..common_tools.global_parameters import multi_point
+from ..common_tools.translator import tr
 from qgis.PyQt import QtWidgets, uic
 from .simple_tag_procedure import SimpleTAG
 
@@ -37,12 +38,16 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.tolayer.addItem(layer.name())
 
         self.enclosed.setToolTip(
-            "If source layer is a polygon, source needs to enclose target.  If only target is "
-            "a polygon, target needs to enclose source. First found record is used"
+            tr("If source layer is a polygon, source needs to enclose target.  If only target is "
+            "a polygon, target needs to enclose source. First found record is used")
         )
 
-        self.touching.setToolTip("Criteria to choose when there are multiple matches is largest area or length matched")
-        self.closest.setToolTip("Heuristic procedure that only computes the actual distance to the nearest neighbors")
+        self.touching.setToolTip(
+            tr("Criteria to choose when there are multiple matches is largest area or length matched")
+        )
+        self.closest.setToolTip(
+            tr("Heuristic procedure that only computes the actual distance to the nearest neighbors")
+        )
         self.works_field_matching()
 
     def reload_fields(self):
@@ -190,7 +195,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def finished_threaded_procedure(self, procedure):
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage(
-                "Input data not provided correctly", self.worker_thread.error, level=3
+                tr("Input data not provided correctly"), self.worker_thread.error, level=3
             )
         self.close()
 
@@ -237,7 +242,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly", "  Try again", level=3)
+            qgis.utils.iface.messageBar().pushMessage(tr("Input data not provided correctly"), tr("  Try again"), level=3)
 
 
 def unload(self):

@@ -11,6 +11,7 @@ from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerI
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
 from ..common_tools.auxiliary_functions import standard_path
+from ..common_tools.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 
@@ -48,14 +49,14 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.data_path, self.data_type = GetOutputFileName(
             self,
-            "AequilibraE custom formats",
+            tr("AequilibraE custom formats"),
             formats,
             dflt,
             standard_path(),
         )
 
         if self.data_type is None:
-            self.error = "Path provided is not a valid dataset"
+            self.error = tr("Path provided is not a valid dataset")
             self.exit_with_error()
         else:
             self.data_type = self.data_type.upper()
@@ -76,7 +77,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.list_cores = self.data_to_show.names
                 self.list_indices = self.data_to_show.index_names
             except Exception as e:
-                self.error = "Could not load dataset"
+                self.error = tr("Could not load dataset")
                 self.logger.error(e.args)
                 self.exit_with_error()
 
@@ -106,7 +107,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         # Thousand separator
         self.thousand_separator = QCheckBox()
         self.thousand_separator.setChecked(True)
-        self.thousand_separator.setText("Thousands separator")
+        self.thousand_separator.setText(tr("Thousands separator"))
         self.thousand_separator.toggled.connect(self.format_showing)
         self.show_layout.addWidget(self.thousand_separator)
 
@@ -115,7 +116,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Decimals
         txt = QLabel()
-        txt.setText("Decimal places")
+        txt.setText(tr("Decimal places"))
         self.show_layout.addWidget(txt)
         self.decimals = QSpinBox()
         self.decimals.valueChanged.connect(self.format_showing)
@@ -148,12 +149,12 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.change_matrix_cores()
 
         self.but_export = QPushButton()
-        self.but_export.setText("Export")
+        self.but_export.setText(tr("Export"))
         self.but_export.clicked.connect(self.export)
 
         self.but_close = QPushButton()
         self.but_close.clicked.connect(self.exit_procedure)
-        self.but_close.setText("Close")
+        self.but_close.setText(tr("Close"))
 
         self.but_layout = QHBoxLayout()
         self.but_layout.addWidget(self.but_export)

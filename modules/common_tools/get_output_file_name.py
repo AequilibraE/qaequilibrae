@@ -1,3 +1,4 @@
+from .translator import tr
 from qgis.PyQt.QtWidgets import QFileDialog
 import tempfile
 
@@ -24,7 +25,7 @@ def GetOutputFileName(clss, box_name, file_types, default_type, start_path):
     return new_name, extension
 
 
-def GetOutputFolderName(base_path=None, message="Select a folder:"):
+def GetOutputFolderName(base_path=None, message=tr("Select a folder:")):
     if base_path is None:
         base_path = tempfile.gettempdir()
     return QFileDialog.getExistingDirectory(None, message, base_path, QFileDialog.ShowDirsOnly)

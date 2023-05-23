@@ -7,6 +7,7 @@ from qgis.PyQt import QtWidgets, uic
 from qgis.core import QgsProject
 from .least_common_denominator_procedure import LeastCommonDenominatorProcedure
 from ..common_tools import get_vector_layer_by_name
+from ..common_tools.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_least_common_denominator.ui"))
 
@@ -71,7 +72,7 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
             QgsProject.instance().addMapLayer(self.worker_thread.result)
         else:
             qgis.utils.iface.messageBar().pushMessage(
-                "Input data not provided correctly", self.worker_thread.error, level=3
+                tr("Input data not provided correctly"), self.worker_thread.error, level=3
             )
         self.close()
 
@@ -83,7 +84,7 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
             or self.tolayer.currentIndex() < 0
             or self.tofield.currentIndex() < 0
         ):
-            error = "ComboBox with ilegal value"
+            error = tr("ComboBox with ilegal value")
 
         flayer = self.fromlayer.currentText()
         ffield = self.fromfield.currentText()
@@ -93,7 +94,7 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
         layer1 = get_vector_layer_by_name(self.fromlayer.currentText()).wkbType()
         layer2 = get_vector_layer_by_name(self.tolayer.currentText()).wkbType()
         if layer1 in point_types and layer2 in point_types:
-            error = "It is not sensible to have two point layers for this analysis"
+            error = tr("It is not sensible to have two point layers for this analysis")
 
         if error is None:
             self.worker_thread = LeastCommonDenominatorProcedure(
@@ -101,4 +102,4 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
             )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage("Input data not provided correctly. ", error, level=3)
+            qgis.utils.iface.messageBar().pushMessage(tr("Input data not provided correctly. "), error, level=3)

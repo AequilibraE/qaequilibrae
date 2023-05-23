@@ -16,6 +16,7 @@ from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_b
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.global_parameters import float_types, integer_types
 from ..common_tools.report_dialog import ReportDialog
+from ..common_tools.translator import tr
 
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None
@@ -213,7 +214,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 or self.field_from.currentIndex() < 0
                 or self.field_cells.currentIndex() < 0
             ):
-                self.error = "Invalid field chosen"
+                self.error = tr("Invalid field chosen")
 
             if self.error is None:
                 self.compressed.setVisible(False)
@@ -231,7 +232,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.radio_npy_matrix.isChecked():
             file_types = ["NumPY array(*.npy)"]
             default_type = ".npy"
-            box_name = "Matrix Loader"
+            box_name = tr("Matrix Loader")
             new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
             self.__current_name = os.path.split(new_name)[1].split(".")[0]
 
@@ -261,7 +262,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.run_thread()
 
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage(tr("Error:"), self.error, level=1)
 
     def update_matrix_list(self):
         if self.matrix_count > 0:

@@ -28,10 +28,12 @@ FORMS = ../modules/common_tools/forms/ui_about.ui \
         ../modules/paths_procedures/forms/ui_traffic_assignment.ui \
         ../modules/project_procedures/forms/ui_add_zoning.ui \
         ../modules/project_procedures/forms/ui_transponet_construction.ui \
-	  ../modules/routing_procedures/forms/tsp.ui
+	../modules/routing_procedures/forms/tsp.ui
 
 SOURCES = ../aequilibrae_menu.py \
+          ../modules/common_tools/get_output_file_name.py \
           ../modules/common_tools/parameters_dialog.py \
+          ../modules/common_tools/report_dialog.py \
           ../modules/distribution_procedures/distribution_models_dialog.py \
           ../modules/gis/compare_scenarios_dialog.py \
           ../modules/gis/desire_lines_dialog.py \
@@ -45,13 +47,18 @@ SOURCES = ../aequilibrae_menu.py \
           ../modules/matrix_procedures/load_dataset_dialog.py \
           ../modules/matrix_procedures/load_matrix_class.py \
           ../modules/matrix_procedures/load_matrix_dialog.py \
+          ../modules/matrix_procedures/load_project_data.py \
           ../modules/matrix_procedures/mat_reblock.py \
+          ../modules/matrix_procedures/matrix_lister.py \
+          ../modules/matrix_procedures/matrix_manipulation_dialog.py \
+          ../modules/matrix_procedures/results_lister.py \
           ../modules/menu_actions/action_add_connectors.py \
           ../modules/menu_actions/action_add_zoning.py \
           ../modules/menu_actions/action_gis_scenario_comparison.py \
           ../modules/menu_actions/action_show_log.py \
           ../modules/menu_actions/action_show_project_data.py \
           ../modules/menu_actions/load_project_action.py \
+          ../modules/network/network_preparation_dialog.py \
           ../modules/network/Network_preparation_procedure.py \
           ../modules/paths_procedures/impedance_matrix_dialog.py \
           ../modules/paths_procedures/show_shortest_path_dialog.py \

@@ -2,6 +2,7 @@ import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.utils.worker_thread import WorkerThread
 from scipy.sparse import coo_matrix
+from ..common_tools.translator import tr
 
 from qgis.PyQt.QtCore import pyqtSignal
 
@@ -29,7 +30,7 @@ class MatrixReblocking(WorkerThread):
             # Builds the hash
             self.ProgressMaxValue.emit(self.num_matrices)
             self.ProgressValue.emit(0)
-            self.ProgressText.emit("Building correspondence")
+            self.ProgressText.emit(tr("Building correspondence"))
 
             indices = None
             p = 0
@@ -63,7 +64,7 @@ class MatrixReblocking(WorkerThread):
 
         k = 0
         self.ProgressMaxValue.emit(self.num_matrices)
-        self.ProgressText.emit("Reblocking matrices")
+        self.ProgressText.emit(tr("Reblocking matrices"))
 
         new_mat = None
         for mat_name, mat in self.matrices.items():
@@ -80,7 +81,7 @@ class MatrixReblocking(WorkerThread):
 
             # In order to differentiate the zeros from the NaNs in the future matrix
             if new_mat is None:
-                raise ValueError("Could not create reblocked matrix.")
+                raise ValueError(tr("Could not create reblocked matrix."))
             new_mat["flow"][new_mat["flow"] == 0] = np.inf
 
             # Uses SciPy Sparse matrices to build the compact one
@@ -94,5 +95,5 @@ class MatrixReblocking(WorkerThread):
             del mat
             del new_mat
 
-        self.ProgressText.emit("Matrix Reblocking finalized")
-        self.finished_threaded_procedure.emit("REBLOCKED MATRICES")
+        self.ProgressText.emit(tr("Matrix Reblocking finalized"))
+        self.finished_threaded_procedure.emit(tr("REBLOCKED MATRICES"))

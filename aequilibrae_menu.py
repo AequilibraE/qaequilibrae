@@ -75,10 +75,13 @@ class AequilibraEMenu:
         self.set_font(self.toolbar)
         self.toolbar.setOrientation(2)
         
-        locale = QtCore.QLocale.system().name()
-        locale = locale if len(locale) == 5 else locale[:2]
+        if QtCore.QSettings().value("locale/overrideFlag", type=bool):
+            loc = QtCore.QSettings().value('locale/userLocale')
+        else:
+            loc = QtCore.QLocale.system().name()
+        loc = loc if len(loc) == 5 else loc[:2]
     
-        locale_path = os.path.join(os.path.dirname(__file__), 'i18n', 'aequilibrae_{}.qm'.format(locale))
+        locale_path = os.path.join(os.path.dirname(__file__), 'i18n', 'aequilibrae_{}.qm'.format(loc))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()

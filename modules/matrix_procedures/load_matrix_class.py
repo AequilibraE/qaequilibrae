@@ -6,6 +6,7 @@ import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.utils.worker_thread import WorkerThread
 from scipy.sparse import coo_matrix
+from ..common_tools.translator import tr
 
 from qgis.PyQt.QtCore import pyqtSignal
 
@@ -31,7 +32,7 @@ class LoadMatrix(WorkerThread):
 
     def doWork(self):
         if self.matrix_type == "layer":
-            self.ProgressText.emit("Loading from table")
+            self.ProgressText.emit(tr("Loading from table"))
             feat_count = self.layer.featureCount()
             self.ProgressMaxValue.emit(feat_count)
 
@@ -46,10 +47,10 @@ class LoadMatrix(WorkerThread):
                 matrix.append([a, b, c])
                 if P % 1000 == 0:
                     self.ProgressValue.emit(int(P))
-                    self.ProgressText.emit(("Loading matrix: " + "{:,}".format(P) + "/" + "{:,}".format(feat_count)))
+                    self.ProgressText.emit((tr("Loading matrix: ") + "{:,}".format(P) + "/" + "{:,}".format(feat_count)))
 
             self.ProgressValue.emit(0)
-            self.ProgressText.emit("Converting to a NumPy array")
+            self.ProgressText.emit(tr("Converting to a NumPy array"))
 
             matrix1 = np.array(matrix)  # transform the list of lists in NumPy array
             del matrix
@@ -68,7 +69,7 @@ class LoadMatrix(WorkerThread):
             del matrix1
 
         elif self.matrix_type == "numpy":
-            self.ProgressText.emit("Loading from NumPy")
+            self.ProgressText.emit(tr("Loading from NumPy"))
             try:
                 mat = np.load(self.numpy_file)
                 if len(mat.shape[:]) == 2:
@@ -86,10 +87,10 @@ class LoadMatrix(WorkerThread):
                     del mat
                 else:
                     self.report.append(
-                        "Numpy array needs to be 2 dimensional. Matrix provided has " + str(len(mat.shape[:]))
+                        tr("Numpy array needs to be 2 dimensional. Matrix provided has ") + str(len(mat.shape[:]))
                     )
             except Exception as e:
-                self.report.append(f"Could not load array. {e.args}")
+                self.report.append(tr(f"Could not load array. {e.args}"))
 
         self.ProgressText.emit("")
-        self.finished_threaded_procedure.emit("LOADED-MATRIX")
+        self.finished_threaded_procedure.emit(tr("LOADED-MATRIX"))

@@ -12,6 +12,7 @@ from ..common_tools.all_layers_from_toc import all_layers_from_toc
 from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.global_parameters import integer_types, float_types, point_types, poly_types
+from ..common_tools.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_vector_loader.ui"))
 
@@ -58,7 +59,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
             self.radio_aequilibrae.setEnabled(False)
             self.but_import_and_use.setEnabled(False)
             self.but_load.setEnabled(False)
-            self.but_save_and_use.setText("Import")
+            self.but_save_and_use.setText(tr("Import"))
 
         self.size_it_accordingly(partial(self.size_it_accordingly, False))
 
@@ -162,7 +163,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_save_and_use.setEnabled(True)
         self.chb_all_fields.setEnabled(True)
         if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error while loading vector:", self.worker_thread.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage(tr("Error while loading vector:"), self.worker_thread.error, level=1)
         else:
             self.dataset = self.worker_thread.output
         self.exit_procedure()
@@ -173,7 +174,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
             self.dataset = AequilibraeData()
             self.dataset.load(out_name)
         except Exception as e:
-            self.error = f"Could not load file. It might be corrupted or not a valid AequilibraE file. {e.args}"
+            self.error = tr(f"Could not load file. It might be corrupted or not a valid AequilibraE file. {e.args}")
         self.exit_procedure()
 
     def load_the_vector(self):
@@ -185,11 +186,11 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                 self, "AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed", self.path
             )
             if self.output_name is None:
-                self.error = "No name provided for the output file"
+                self.error = tr("No name provided for the output file")
 
         if self.radio_layer_matrix.isChecked() and self.error is None:
             if self.cob_data_layer.currentIndex() < 0 or self.cob_index_field.currentIndex() < 0:
-                self.error = "Invalid field chosen"
+                self.error = tr("Invalid field chosen")
 
             index_field = self.cob_index_field.currentText()
             if index_field in self.selected_fields:
@@ -207,10 +208,10 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.run_thread()
             else:
                 qgis.utils.iface.messageBar().pushMessage(
-                    "Error:", "One cannot load a dataset with indices only", level=1
+                    tr("Error:"), tr("One cannot load a dataset with indices only"), level=1
                 )
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage(tr("Error:"), self.error, level=1)
 
     def load_just_to_use(self):
         self.single_use = True

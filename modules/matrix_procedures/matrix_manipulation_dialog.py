@@ -11,6 +11,7 @@ from qgis.core import QGridLayout, QWidget, QTableView, QHBoxLayout, QCheckBox, 
 from qgis.core import QLabel, QSpinBox, QComboBox
 from aequilibrae.aequilibrae.matrix import AequilibraeMatrix
 from ..common_tools import NumpyModel, GetOutputFileName
+from ..common_tools.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_viewer.ui"))
 
@@ -60,7 +61,7 @@ class MatrixManipulationDialog(QDialog, FORM_CLASS):
         # Thousand separator
         separator = QCheckBox()
         separator.setChecked(True)
-        separator.setText("Thousands separator")
+        separator.setText(tr("Thousands separator"))
         separator.toggled.connect(partial(self.format_showing, mat_name))
         show_layout.addWidget(separator)
         config["separator"] = separator
@@ -70,7 +71,7 @@ class MatrixManipulationDialog(QDialog, FORM_CLASS):
 
         # Decimals
         txt = QLabel()
-        txt.setText("Decimal places")
+        txt.setText(tr("Decimal places"))
         show_layout.addWidget(txt)
         decimals = QSpinBox()
         decimals.valueChanged.connect(partial(self.format_showing, mat_name))
@@ -119,7 +120,7 @@ class MatrixManipulationDialog(QDialog, FORM_CLASS):
                 self.load_new_matrix(dataset)
             except Exception as e:
                 self.logger.error(e.args)
-                self.error = "Could not load matrix"
+                self.error = tr("Could not load matrix")
 
     def find_non_conflicting_name(self, data_name, dictio):
         if len(data_name) < 1:

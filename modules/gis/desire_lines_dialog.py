@@ -13,6 +13,7 @@ from .desire_lines_procedure import DesireLinesProcedure
 from ..common_tools import ReportDialog
 from ..common_tools import standard_path, get_vector_layer_by_name
 from ..common_tools.global_parameters import poly_types, numeric_types, point_types
+from ..common_tools.translator import tr
 from ..matrix_procedures import list_matrices
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_DesireLines.ui"))
@@ -148,7 +149,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             QgsProject.instance().addMapLayer(self.worker_thread.result_layer)
         except Exception as e:
             self.worker_thread.report.append("Could not load desire lines to map")
-            self.logger.error(f"Could not load desire lines to map. {e.args}")
+            self.logger.error(tr(f"Could not load desire lines to map. {e.args}"))
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
@@ -209,11 +210,11 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage(
-                "Inputs not loaded properly. You need the layer and at least one matrix_procedures core", "", level=3
+                tr("Inputs not loaded properly. You need the layer and at least one matrix_procedures core"), "", level=3
             )
 
     def throws_error(self, error_message):
-        error_message = ["*** ERROR ***", error_message]
+        error_message = [tr("*** ERROR ***"), error_message]
         dlg2 = ReportDialog(self.iface, error_message)
         dlg2.show()
         dlg2.exec_()

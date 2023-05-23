@@ -22,6 +22,7 @@
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic
 from .get_output_file_name import GetOutputFileName
+from .translator import tr
 import qgis
 
 import sys
@@ -46,7 +47,7 @@ class ReportDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def save_log(self):
         file_types = "Text files(*.txt)"
-        new_name, _ = GetOutputFileName(self, "Save procedure log", file_types, ".txt", self.path)
+        new_name, _ = GetOutputFileName(self, tr("Save procedure log"), file_types, ".txt", self.path)
         if new_name is not None:
             with open(new_name, "w") as outp:
                 for t in self.reporting:

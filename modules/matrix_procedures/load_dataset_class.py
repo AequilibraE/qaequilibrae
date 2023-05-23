@@ -4,6 +4,7 @@ from aequilibrae.utils.worker_thread import WorkerThread
 import struct
 from aequilibrae.matrix import AequilibraeData
 from ..common_tools.global_parameters import float_types, string_types, integer_types
+from ..common_tools.translator import tr
 from qgis.PyQt.QtCore import pyqtSignal
 
 
@@ -49,7 +50,7 @@ class LoadDataset(WorkerThread):
                     types.append("S" + str(field.length()))
                     empties.append("")
                 else:
-                    self.error = "Field {} does has a type not supported.".format(str(field.name()))
+                    self.error = tr("Field {} does has a type not supported.").format(str(field.name()))
                     break
                 fields.append(str(field.name()))
                 idxs.append(self.layer.dataProvider().fieldNameIndex(field.name()))
