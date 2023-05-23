@@ -4,7 +4,7 @@ project_slug: qaequilibrae
 transifex_coordinator: pedrocamargo
 transifex_organization: AequilibraE
 transifex_project: qaequilibrae
-transifex_resource: aequilibrae
+transifex_resource: aequilibrae.ts
 translation_language:
   - fr
   - pt-br
