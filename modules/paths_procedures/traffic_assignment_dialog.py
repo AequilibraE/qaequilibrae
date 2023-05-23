@@ -20,6 +20,7 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 from ..common_tools import PandasModel
 from ..common_tools import ReportDialog
 from ..common_tools import standard_path
+from ..common_tools.translator import tr
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_traffic_assignment.ui"))
@@ -233,7 +234,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         class_name = self.ln_class_name.text()
         if class_name in self.traffic_classes:
-            qgis.utils.iface.messageBar().pushMessage("Class name already used", "", level=2)
+            qgis.utils.iface.messageBar().pushMessage(tr("Class name already used"), "", level=2)
 
         self.but_add_skim.setEnabled(True)
 
@@ -286,7 +287,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             table.setItem(idx, i, item)
 
         but = QPushButton()
-        but.setText("Remove")
+        but.setText(tr("Remove"))
         but.clicked.connect(self.__remove_class)
         but.setEnabled(False)
         table.setCellWidget(idx, 5, but)
@@ -341,7 +342,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run(self):
         if not self.check_data():
-            qgis.utils.iface.messageBar().pushMessage("Input error", self.error, level=3)
+            qgis.utils.iface.messageBar().pushMessage(tr("Input error"), self.error, level=3)
 
         algorithm = self.cb_choose_algorithm.currentText()
         self.miter = int(self.max_iter.text())
@@ -370,21 +371,21 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         num_classes = len(self.traffic_classes.values())
         if not num_classes:
-            self.error = "No traffic classes to assign"
+            self.error = tr("No traffic classes to assign")
             return False
 
         self.scenario_name = self.output_scenario_name.text()
         if not self.scenario_name:
-            self.error = "Missing scenario name"
+            self.error = tr("Missing scenario name")
             return False
 
         if not self.scenario_name:
-            self.error = "Missing scenario name"
+            self.error = tr("Missing scenario name")
             return False
 
         sql = "Select count(*) from results where table_name=?"
         if sum(self.project.conn.execute(sql, [self.scenario_name]).fetchone()):
-            self.error = "Result table name already exists. Choose a new name"
+            self.error = tr("Result table name already exists. Choose a new name")
             return False
 
         self.temp_path = gettempdir()
@@ -452,8 +453,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 try:
                     val = float(val)
                 except Exception as e:
-                    self.error = "VDF parameter is not numeric"
-                    logger.error(f"Tried to set a VDF parameter not numeric. {e.args}")
+                    self.error = tr("VDF parameter is not numeric")
+                    logger.error(tr(f"Tried to set a VDF parameter not numeric. {e.args}"))
                     return False
             self.vdf_parameters[k] = val
 

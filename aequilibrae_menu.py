@@ -75,16 +75,14 @@ class AequilibraEMenu:
         self.set_font(self.toolbar)
         self.toolbar.setOrientation(2)
         
-        # locale: str = QgsSettings().value("qaequlibrae/locale/userLocale", QtCore.QLocale().name())[0:2]
-        # locale = QtCore.QLocale("locale/userLocale")
+        locale = QtCore.QLocale.system().name()
+        locale = locale if len(locale) == 5 else locale[:2]
     
-        # locale_path = os.path.join(os.path.dirname(__file__), 'i18n', 'aequilibrae_{}.qm'.format(locale[0:2]))
-        # locale_path = os.path.join(os.path.dirname(__file__), 'qaequilibrae/i18n', 'aequilibrae_{}.qm'.format(locale[:2]))
-        locale_path = os.path.join(os.path.dirname(__file__), 'qaequilibrae/i18n', 'aequilibrae_pt_BR.qm')
+        locale_path = os.path.join(os.path.dirname(__file__), 'i18n', 'aequilibrae_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
-            self.translator.load(str(locale_path))
+            self.translator.load(locale_path)
             QtCore.QCoreApplication.installTranslator(self.translator)
 
         self.menuActions = {
@@ -112,12 +110,12 @@ class AequilibraEMenu:
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
 
-        self.add_menu_action(("Network Manipulation"), self.tr("Network Preparation"), partial(prepare_network, self))
-        self.add_menu_action(("Network Manipulation"), self.tr("Add centroid connectors"), partial(run_add_connectors, self))
+        self.add_menu_action(self.tr("Network Manipulation"), self.tr("Network Preparation"), partial(prepare_network, self))
+        self.add_menu_action(self.tr("Network Manipulation"), self.tr("Add centroid connectors"), partial(run_add_connectors, self))
 
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
-        self.add_menu_action(("Data"), self.tr("Display project data"), partial(run_show_project_data, self))
+        self.add_menu_action(self.tr("Data"), self.tr("Display project data"), partial(run_show_project_data, self))
 
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -334,6 +332,6 @@ class AequilibraEMenu:
         f.setPointSize(11)
         obj.setFont(f)
 
-
     def tr(self, message):
-        return QtCore.QCoreApplication.translate("AequilibraE", message)
+        """Get string translation."""
+        return QtCore.QCoreApplication.translate(self.__class__.__name__, message)

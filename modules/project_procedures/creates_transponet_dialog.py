@@ -15,6 +15,8 @@ from ..common_tools import ReportDialog
 from ..common_tools import all_layers_from_toc
 from ..common_tools import get_vector_layer_by_name, standard_path
 from ..common_tools.global_parameters import point_types, line_types
+from ..common_tools.translator import tr
+
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_transponet_construction.ui"))
@@ -272,7 +274,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         ok, msg = self.check_data()
 
         if not ok:
-            self.iface.messageBar().pushMessage("Error", msg, level=3, duration=10)
+            self.iface.messageBar().pushMessage(tr("Error"), msg, level=3, duration=10)
             return
 
         self.proj_folder = self.project_destination.text()
@@ -295,11 +297,11 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def check_data(self):
         if self.link_layer:
             if len(self.link_layer.crs().authid()) == 0:
-                return False, "Link Layer has NO defined CRS"
+                return False, tr("Link Layer has NO defined CRS")
 
         if self.node_layer:
             if len(self.node_layer.crs().authid()) == 0:
-                return False, "Node Layer has NO defined CRS"
+                return False, tr("Node Layer has NO defined CRS")
 
         return True, ""
 

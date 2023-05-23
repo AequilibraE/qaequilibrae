@@ -1,9 +1,10 @@
 plugin_path: modules
 github_organization_slug: AequilibraE
 project_slug: qaequilibrae
-transifex_coordinator: Pedro Camargo
+transifex_coordinator: pedrocamargo
 transifex_organization: AequilibraE
 transifex_project: qaequilibrae
+transifex_resource: aequilibrae
 translation_language:
   - fr
   - pt-br

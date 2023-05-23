@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Set up Python 3.9
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
 
@@ -22,16 +22,16 @@ jobs:
           sudo apt-get install qt5-make qttools5-dev-tools
 
       - name: Install qgis-plugin-ci
-        run: pip3 install qgis-plugin-ci
+        run: pip install qgis-plugin-ci
 
       - name: Pull from Transifex
         run: qgis-plugin-ci pull-translation --compile ${{ secrets.TX_TOKEN }}
 
-      - name: Deploy plugin
-        run: >-
-          qgis-plugin-ci
-          release ${GITHUB_REF/refs\/tags\//}
-          --transifex-token ${{ secrets.TX_TOKEN }}
-          --github-token ${{ secrets.GITHUB_TOKEN }}
-          --osgeo-username ${{ secrets.OSGEO_USER }}
-          --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
+      # - name: Deploy plugin
+      #   run: >-
+      #     qgis-plugin-ci
+      #     release ${GITHUB_REF/refs\/tags\//}
+      #     --transifex-token ${{ secrets.TX_TOKEN }}
+      #     --github-token ${{ secrets.GITHUB_TOKEN }}
+      #     --osgeo-username ${{ secrets.OSGEO_USER }}
+      #     --osgeo-password ${{ secrets.OSGEO_PASSWORD }}

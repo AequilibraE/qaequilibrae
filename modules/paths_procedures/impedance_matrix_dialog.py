@@ -10,6 +10,8 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
 from ..common_tools import ReportDialog
 from ..common_tools import standard_path
+from ..common_tools.translator import tr
+
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_impedance_matrix.ui"))
 
@@ -174,7 +176,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         try:
             self.run_thread()
         except ValueError as error:
-            qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
+            qgis.utils.iface.messageBar().pushMessage(tr("Input error"), error.message, level=3)
 
     @staticmethod
     def only_str(str_input):
@@ -185,13 +187,13 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
     def check_inputs(self):
         self.error = None
         if self.rdo_all_nodes.isChecked() and self.block_paths.isChecked():
-            self.error = "It is not possible to trace paths between all nodes while blocking flows through centroids"
+            self.error = tr("It is not possible to trace paths between all nodes while blocking flows through centroids")
 
         if self.graph is None:
-            self.error = "No graph loaded"
+            self.error = tr("No graph loaded")
 
         if len(self.skim_fields) < 1:
-            self.error = "No skim fields provided"
+            self.error = tr("No skim fields provided")
 
     def exit_procedure(self):
         self.close()

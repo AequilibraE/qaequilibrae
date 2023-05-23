@@ -12,6 +12,7 @@ from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox
 from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
 from ..common_tools import ReportDialog, standard_path
+from ..common_tools.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
@@ -36,12 +37,12 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Area to import network for
         self.choose_place = QRadioButton()
-        self.choose_place.setText("Place name")
+        self.choose_place.setText(tr("Place name"))
         self.choose_place.toggled.connect(self.change_place_type)
         self.choose_place.setChecked(False)
 
         self.choose_canvas = QRadioButton()
-        self.choose_canvas.setText("Current map canvas area")
+        self.choose_canvas.setText(tr("Current map canvas area"))
         self.choose_canvas.setChecked(True)
 
         self.place = QLineEdit()
@@ -58,13 +59,13 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Buttons and output
         self.but_choose_output = QPushButton()
-        self.but_choose_output.setText("Choose folder output")
+        self.but_choose_output.setText(tr("Choose folder output"))
         self.but_choose_output.clicked.connect(self.choose_output)
 
         self.output_path = QLineEdit()
 
         self.but_run = QPushButton()
-        self.but_run.setText("Import network and create project")
+        self.but_run.setText(tr("Import network and create project"))
         self.but_run.clicked.connect(self.run)
 
         self.buttons_frame = QVBoxLayout()
@@ -107,12 +108,12 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.update_widget.setVisible(True)
         self.resize(280, 300)
         if self.choose_canvas.isChecked():
-            self.report.append(reporter("Chose to download network for canvas area"))
+            self.report.append(reporter(tr("Chose to download network for canvas area")))
             e = self.iface.mapCanvas().extent()
             bbox = [e.xMinimum(), e.yMinimum(), e.xMaximum(), e.yMaximum()]
         else:
-            self.progress_label.setText("Establishing area for download")
-            self.report.append(reporter("Chose to download network for place"))
+            self.progress_label.setText(tr("Establishing area for download"))
+            self.report.append(reporter(tr("Chose to download network for place")))
             bbox, r = placegetter(self.place.text())
             self.report.extend(r)
 
