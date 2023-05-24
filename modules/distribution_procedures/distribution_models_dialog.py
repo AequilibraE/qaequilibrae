@@ -18,7 +18,7 @@ from .ipf_procedure import IpfProcedure
 from ..common_tools import GetOutputFileName
 from ..common_tools import ReportDialog
 from ..common_tools.auxiliary_functions import standard_path
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_distribution.ui"))

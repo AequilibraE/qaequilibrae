@@ -5,7 +5,7 @@ from qgis._core import QgsField, QgsFeatureRequest, QgsPointXY, QgsVectorLayer, 
 from qgis.PyQt.QtCore import QVariant
 from aequilibrae.utils.worker_thread import WorkerThread
 from ..common_tools import get_vector_layer_by_name
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 
 class NetworkPreparationProcedure(WorkerThread):

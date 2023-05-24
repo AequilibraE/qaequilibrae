@@ -5,7 +5,7 @@ from aequilibrae.project import Project
 
 from aequilibrae.context import get_logger
 from aequilibrae.utils.worker_thread import WorkerThread
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 logger = get_logger()
 

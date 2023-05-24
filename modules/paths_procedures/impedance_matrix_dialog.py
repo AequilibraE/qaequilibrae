@@ -10,7 +10,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
 from ..common_tools import ReportDialog
 from ..common_tools import standard_path
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_impedance_matrix.ui"))

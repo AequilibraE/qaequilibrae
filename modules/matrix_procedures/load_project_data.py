@@ -13,7 +13,7 @@ from .load_result_table import load_result_table
 from .matrix_lister import list_matrices
 from .results_lister import list_results
 from ..common_tools import PandasModel
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_project_data.ui"))
 

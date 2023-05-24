@@ -13,7 +13,7 @@ from .desire_lines_procedure import DesireLinesProcedure
 from ..common_tools import ReportDialog
 from ..common_tools import standard_path, get_vector_layer_by_name
 from ..common_tools.global_parameters import poly_types, numeric_types, point_types
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 from ..matrix_procedures import list_matrices
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_DesireLines.ui"))

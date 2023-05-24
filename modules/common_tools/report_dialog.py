@@ -22,7 +22,7 @@
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic
 from .get_output_file_name import GetOutputFileName
-from .translator import tr
+from ...translation.translator import tr
 import qgis
 
 import sys

@@ -5,7 +5,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from ..common_tools import get_vector_layer_by_name
 from ..common_tools.global_parameters import multi_line, multi_point, line_types, point_types
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 
 class SimpleTAG(WorkerThread):

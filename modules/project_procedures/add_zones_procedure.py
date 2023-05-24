@@ -2,7 +2,7 @@ import shapely.wkb
 
 from aequilibrae.utils.worker_thread import WorkerThread
 from PyQt5.QtCore import pyqtSignal
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 
 class AddZonesProcedure(WorkerThread):

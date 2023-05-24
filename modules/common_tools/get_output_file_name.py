@@ -1,4 +1,4 @@
-from .translator import tr
+from ...translation.translator import tr
 from qgis.PyQt.QtWidgets import QFileDialog
 import tempfile
 

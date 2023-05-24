@@ -2,7 +2,7 @@ import qgis
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 
 # Split loading between Qt action and processing, for easier unit testing

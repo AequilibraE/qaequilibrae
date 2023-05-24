@@ -3,7 +3,7 @@ import os
 
 import pandas as pd
 from aequilibrae.project.database_connection import database_connection
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None

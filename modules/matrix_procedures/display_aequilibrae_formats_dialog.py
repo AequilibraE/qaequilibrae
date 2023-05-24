@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerI
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
 from ..common_tools.auxiliary_functions import standard_path
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 

@@ -20,7 +20,7 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 from ..common_tools import PandasModel
 from ..common_tools import ReportDialog
 from ..common_tools import standard_path
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_traffic_assignment.ui"))

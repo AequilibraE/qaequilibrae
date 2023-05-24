@@ -15,7 +15,7 @@ from ..common_tools import ReportDialog
 from ..common_tools import all_layers_from_toc
 from ..common_tools import get_vector_layer_by_name, standard_path
 from ..common_tools.global_parameters import point_types, line_types
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui

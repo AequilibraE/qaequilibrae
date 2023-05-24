@@ -16,7 +16,7 @@ from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_b
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.global_parameters import float_types, integer_types
 from ..common_tools.report_dialog import ReportDialog
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None

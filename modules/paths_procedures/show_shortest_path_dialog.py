@@ -13,7 +13,7 @@ from qgis.utils import iface
 from .point_tool import PointTool
 from ..common_tools import LoadGraphLayerSettingDialog
 from ..common_tools import standard_path
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 logger = logging.getLogger("AequilibraEGUI")
 

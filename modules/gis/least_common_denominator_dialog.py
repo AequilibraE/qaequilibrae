@@ -7,7 +7,7 @@ from qgis.PyQt import QtWidgets, uic
 from qgis.core import QgsProject
 from .least_common_denominator_procedure import LeastCommonDenominatorProcedure
 from ..common_tools import get_vector_layer_by_name
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_least_common_denominator.ui"))
 

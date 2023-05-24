@@ -12,7 +12,7 @@ from ..common_tools.all_layers_from_toc import all_layers_from_toc
 from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.global_parameters import integer_types, float_types, point_types, poly_types
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_vector_loader.ui"))
 

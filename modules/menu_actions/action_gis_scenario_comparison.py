@@ -1,4 +1,4 @@
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 
 def run_scenario_comparison(qgis_project):

@@ -1,4 +1,4 @@
-from ..common_tools.translator import tr
+from ...translation.translator import tr
 
 
 def run_show_project_data(qgis_project):
