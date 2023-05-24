@@ -58,6 +58,6 @@ aequilibrae/paths/build/*
 
 # End of https://www.gitignore.io/api/jetbrains
 # qgis-plugin-ci
-qequilibrae.zip
-qaequilibrae.*.zip
+# qequilibrae.zip
+# qaequilibrae.*.zip
 
