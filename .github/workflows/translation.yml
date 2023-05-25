@@ -33,13 +33,13 @@ jobs:
       run: |
         lupdate -no-obsolete qaequilibrae/i18n/qaequilibrae.pro
 
-    # - name: Push to Transifex
-    #   run: |
-    #     qgis-plugin-ci push-translation ${{ secrets.TX_TOKEN }}
-  
     - name: Pull from Transifex
       run: |
         qgis-plugin-ci pull-translation --compile ${{ secrets.TX_TOKEN }}
+
+    - name: Push to Transifex
+      run: |
+        qgis-plugin-ci push-translation ${{ secrets.TX_TOKEN }}
 
     - name: build the package
       run: |
