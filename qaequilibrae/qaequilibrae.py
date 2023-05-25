@@ -81,7 +81,7 @@ class AequilibraEMenu:
             loc = QtCore.QLocale.system().name()
         loc = loc if len(loc) == 5 else loc[:2]
     
-        locale_path = os.path.join(os.path.dirname(__file__), 'i18n', 'aequilibrae_{}.qm'.format(loc))
+        locale_path = os.path.join(os.path.dirname(__file__), 'i18n', 'qaequilibrae_{}.qm'.format(loc))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()

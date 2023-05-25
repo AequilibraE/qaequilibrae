@@ -15,7 +15,7 @@ def ae_with_project(qgis_iface) -> AequilibraEMenu:
     ae = AequilibraEMenu(qgis_iface)
     from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-    _run_load_project_from_path(ae, "qaequilibrae/test/data/SiouxFalls_project")
+    _run_load_project_from_path(ae, "test/data/SiouxFalls_project")
     yield ae
     ae.run_close_project()
 

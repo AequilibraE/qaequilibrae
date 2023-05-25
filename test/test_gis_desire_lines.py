@@ -7,7 +7,7 @@ from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
 
 
 def load_layers():
-    path_to_gpkg = "qaequilibrae/test/data/SiouxFalls_project/SiouxFalls.gpkg"
+    path_to_gpkg = "test/data/SiouxFalls_project/SiouxFalls.gpkg"
     # append the layername part
     gpkg_links_layer = path_to_gpkg + "|layername=links"
     gpkg_nodes_layer = path_to_gpkg + "|layername=nodes"
