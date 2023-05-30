@@ -74,7 +74,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="397"/>
         <source>Production vector is missing</source>
-        <translation type="unfinished"/>
+        <translation>Falta o vetor de produção</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="400"/>
