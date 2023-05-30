@@ -802,7 +802,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="111"/>
         <source>Close project</source>
-        <translation type="unfinished"/>
+        <translation>Fechar Projeto</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="116"/>
