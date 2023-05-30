@@ -757,7 +757,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="133"/>
         <source>Paths and assignment</source>
-        <translation type="unfinished"/>
+        <translation>Caminhos e Alocações</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="137"/>
