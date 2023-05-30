@@ -44,7 +44,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="137"/>
         <source>AequilibraE - Calibrate gravity model</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Calibrar Modelo Gravitacional</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="138"/>
