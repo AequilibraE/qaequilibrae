@@ -42,13 +42,16 @@ jobs:
     #   run: |
     #     qgis-plugin-ci pull-translation --compile ${{ secrets.TX_TOKEN }}
 
+    - name: Folder
+      run: pwd
+
     - name: Compile translations
       run:  |
-        lrelease /home/runner/work/qaequilibrae/qaequilibrae/i18n/*.ts
+        lrelease ${{ env.PROJECT_FOLDER}}/qaequilibrae/i18n/*.ts
 
     - name: build the package
       run: |
-        qgis-plugin-ci package ${{env.PLUGIN_VERSION}} -c
+        qgis-plugin-ci package ${{ env.PLUGIN_VERSION }} -c
 
     - name: Download artifact
       uses: actions/upload-artifact@v3
