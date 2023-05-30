@@ -782,12 +782,12 @@
     <message>
         <location filename="../qaequilibrae.py" line="107"/>
         <source>Create Project from layers</source>
-        <translation type="unfinished"/>
+        <translation>Criar Projeto a partir de Camada</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="108"/>
         <source>Add zoning data</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar Info de Zonas</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="109"/>
