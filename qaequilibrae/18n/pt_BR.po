@@ -49,7 +49,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="138"/>
         <source>Observed matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matriz Observada</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="164"/>
