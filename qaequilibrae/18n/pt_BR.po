@@ -99,12 +99,12 @@
     <message>
         <location filename="../modules/gis/compare_scenarios_dialog.py" line="73"/>
         <source>This is the alternative</source>
-        <translation type="unfinished"/>
+        <translation>Esta é a alternativa</translation>
     </message>
     <message>
         <location filename="../modules/gis/compare_scenarios_dialog.py" line="74"/>
         <source>It will be BASE minus ALTERNATIVE</source>
-        <translation type="unfinished"/>
+        <translation>Será BASE menos ALTERNATIVA</translation>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_dialog.py" line="152"/>
