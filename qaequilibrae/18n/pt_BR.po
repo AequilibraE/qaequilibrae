@@ -89,7 +89,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="408"/>
         <source>Impedance matrix is missing</source>
-        <translation type="unfinished"/>
+        <translation>Falta a matriz de impedância</translation>
     </message>
     <message>
         <location filename="../modules/gis/compare_scenarios_dialog.py" line="72"/>
