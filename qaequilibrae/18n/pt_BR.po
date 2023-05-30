@@ -54,7 +54,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="164"/>
         <source>Function</source>
-        <translation type="unfinished"/>
+        <translation>Função</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="230"/>
