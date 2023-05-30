@@ -46,11 +46,17 @@ jobs:
       run:  |
         lrelease ${{ env.PROJECT_FOLDER}}/i18n/qaequilibrae_*.ts
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: Build translations
-        path: ${{ env.PROJECT_FOLDER }}/i18n/*.qm
-        if-no-files-found: error
+    # - uses: actions/upload-artifact@v3
+    #   with:
+    #     name: Build translations
+    #     path: ${{ env.PROJECT_FOLDER }}/i18n/*.qm
+    #     if-no-files-found: error
+
+    - name: Amend gitignore to include compiled translations and add it to tracked files
+      run: |
+        sed -i "s|^*.qm.*| |" .gitignore
+
+        git add ${{ env.PROJECT_FOLDER }}/
 
     - name: Build the package
       run: |
