@@ -344,12 +344,12 @@
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_class.py" line="53"/>
         <source>Field {} does has a type not supported.</source>
-        <translation type="unfinished"/>
+        <translation>O campo {} tem um tipo não suportado.</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="62"/>
         <source>Import</source>
-        <translation type="unfinished"/>
+        <translation>Importar</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="166"/>
