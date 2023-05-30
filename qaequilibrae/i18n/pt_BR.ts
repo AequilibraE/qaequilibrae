@@ -354,7 +354,7 @@
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="166"/>
         <source>Error while loading vector:</source>
-        <translation type="unfinished"/>
+        <translation>Erro ao carregar o vetor</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="177"/>
