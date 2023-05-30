@@ -44,7 +44,7 @@ jobs:
 
     - name: Compile translations
       run:  |
-        lrelease ${{ env.PROJECT_FOLDER }}/i18n/*.ts
+        lrelease /home/runner/work/qaequilibrae/qaequilibrae/i18n/*.ts
 
     - name: build the package
       run: |
