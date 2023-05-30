@@ -792,7 +792,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="109"/>
         <source>Parameters</source>
-        <translation type="unfinished"/>
+        <translation>Parâmetros</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="110"/>
