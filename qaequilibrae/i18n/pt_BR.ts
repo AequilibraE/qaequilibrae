@@ -767,7 +767,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="164"/>
         <source>Utils</source>
-        <translation type="unfinished"/>
+        <translation>Ferramentas</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="105"/>
