@@ -772,12 +772,12 @@
     <message>
         <location filename="../qaequilibrae.py" line="105"/>
         <source>Open Project</source>
-        <translation type="unfinished"/>
+        <translation>Abrir Projeto</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="106"/>
         <source>Create project from OSM</source>
-        <translation type="unfinished"/>
+        <translation>Criar Projeto a partir do OSM</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="107"/>
