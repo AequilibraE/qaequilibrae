@@ -797,7 +797,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="110"/>
         <source>logfile</source>
-        <translation type="unfinished"/>
+        <translation>Arquivo de Registro</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="111"/>
