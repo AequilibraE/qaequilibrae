@@ -26,7 +26,7 @@ jobs:
     - name: Install packages
       run: |
         sudo apt-get update
-        sudo apt-get install qt5-qmake qttools5-dev-tools
+        sudo apt install qttools5-dev-tools
         python -m pip install --upgrade pip
         python -m pip install -r requirements/packaging.txt
 
@@ -42,12 +42,9 @@ jobs:
     #   run: |
     #     qgis-plugin-ci pull-translation --compile ${{ secrets.TX_TOKEN }}
 
-    - name: Folder
-      run: pwd
-
     - name: Compile translations
       run:  |
-        lrelease ${{ env.PROJECT_FOLDER}}/qaequilibrae/i18n/*.ts
+        lrelease ${{ env.PROJECT_FOLDER}}/i18n/*.ts
 
     - name: build the package
       run: |
