@@ -319,12 +319,12 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="59"/>
         <source>Path provided is not a valid dataset</source>
-        <translation type="unfinished"/>
+        <translation>O caminho indicado não é um conjunto de dados válido</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="80"/>
         <source>Could not load dataset</source>
-        <translation type="unfinished"/>
+        <translation>Não foi pos´sivel carregar o conjunto de dados</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/matrix_manipulation_dialog.py" line="64"/>
