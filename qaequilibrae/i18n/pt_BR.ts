@@ -339,7 +339,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="152"/>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>Exportar</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_class.py" line="53"/>
