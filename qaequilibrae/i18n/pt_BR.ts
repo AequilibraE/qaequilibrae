@@ -324,7 +324,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="80"/>
         <source>Could not load dataset</source>
-        <translation>Não foi pos´sivel carregar o conjunto de dados</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/matrix_manipulation_dialog.py" line="64"/>
