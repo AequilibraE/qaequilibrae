@@ -359,7 +359,7 @@
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="177"/>
         <source>Could not load file. It might be corrupted or not a valid AequilibraE file. {e.args}</source>
-        <translation type="unfinished"/>
+        <translation>Não foi possível carregar o arquivo. É possível que esteja corrompido ou que não seja um arquivo AequilibraE válido. {e.args}</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="189"/>
