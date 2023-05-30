@@ -369,12 +369,12 @@
     <message>
         <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="217"/>
         <source>Invalid field chosen</source>
-        <translation type="unfinished"/>
+        <translation>Escolha de campo inválida</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/load_project_data.py" line="94"/>
         <source>Error:</source>
-        <translation type="unfinished"/>
+        <translation>Erro:</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="210"/>
