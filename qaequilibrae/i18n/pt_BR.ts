@@ -752,7 +752,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="126"/>
         <source>Trip Distribution</source>
-        <translation type="unfinished"/>
+        <translation>Distribuição de Viagens</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="133"/>
