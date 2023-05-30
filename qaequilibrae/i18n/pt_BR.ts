@@ -757,12 +757,12 @@
     <message>
         <location filename="../qaequilibrae.py" line="133"/>
         <source>Paths and assignment</source>
-        <translation>Caminhos e Alocações</translation>
+        <translation>Rotas e Alocações</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="137"/>
         <source>Routing</source>
-        <translation type="unfinished"/>
+        <translation>Roteirização</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="164"/>
