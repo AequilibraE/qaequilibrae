@@ -109,7 +109,7 @@
     <message>
         <location filename="../modules/gis/desire_lines_dialog.py" line="152"/>
         <source>Could not load desire lines to map. {e.args}</source>
-        <translation type="unfinished"/>
+        <translation>Não foi possível carregar linhas de desejo ao mapa. {e.args}</translation>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_dialog.py" line="212"/>
