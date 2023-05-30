@@ -34,7 +34,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="127"/>
         <source>Seed matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matriz Inicial</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="131"/>
