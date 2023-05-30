@@ -94,7 +94,7 @@
     <message>
         <location filename="../modules/gis/compare_scenarios_dialog.py" line="72"/>
         <source>This is the reference case, to which the differences will refer to</source>
-        <translation type="unfinished"/>
+        <translation>Este é o modelo de referência ao qual todas as diferenças se relacionam</translation>
     </message>
     <message>
         <location filename="../modules/gis/compare_scenarios_dialog.py" line="73"/>
