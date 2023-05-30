@@ -314,7 +314,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="50"/>
         <source>AequilibraE custom formats</source>
-        <translation type="unfinished"/>
+        <translation>Formatos personalizados do AequilibraE</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="59"/>
