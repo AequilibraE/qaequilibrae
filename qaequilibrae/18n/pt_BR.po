@@ -84,7 +84,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="404"/>
         <source>Observed (seed) matrix is missing</source>
-        <translation type="unfinished"/>
+        <translation>Falta a matriz observada (inicial)</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="408"/>
