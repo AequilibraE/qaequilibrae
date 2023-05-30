@@ -64,7 +64,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="435"/>
         <source>Procedure error: </source>
-        <translation type="unfinished"/>
+        <translation>Erro no procedimento:</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="378"/>
