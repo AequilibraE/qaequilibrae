@@ -29,17 +29,21 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install -r requirements/packaging.txt
 
-    - name: Create translatable file
-      run: |
-        lupdate -no-obsolete qaequilibrae/i18n/qaequilibrae.pro
+    # - name: Create translatable file
+    #   run: |
+    #     lupdate -no-obsolete qaequilibrae/i18n/qaequilibrae.pro
 
-    - name: Push to Transifex
-      run: |
-        qgis-plugin-ci push-translation ${{ secrets.TX_TOKEN }}
+    # - name: Push to Transifex
+    #   run: |
+    #     qgis-plugin-ci push-translation ${{ secrets.TX_TOKEN }}
   
-    - name: Pull from Transifex
-      run: |
-        qgis-plugin-ci pull-translation --compile ${{ secrets.TX_TOKEN }}
+    # - name: Pull from Transifex
+    #   run: |
+    #     qgis-plugin-ci pull-translation --compile ${{ secrets.TX_TOKEN }}
+
+    - name: Translate files
+      run:  |
+        lrelease qaequilibrae/i18n/*.ts
 
     - name: build the package
       run: |
