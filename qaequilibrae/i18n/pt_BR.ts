@@ -742,12 +742,12 @@
     <message>
         <location filename="../qaequilibrae.py" line="117"/>
         <source>Network Manipulation</source>
-        <translation type="unfinished"/>
+        <translation>Manipulação de Rede</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="163"/>
         <source>Data</source>
-        <translation type="unfinished"/>
+        <translation>Dados</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="126"/>
