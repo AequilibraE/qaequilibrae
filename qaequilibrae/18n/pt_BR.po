@@ -39,7 +39,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="131"/>
         <source>AequilibraE - Apply gravity model</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Aplicar Modelo Gravitacional</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="137"/>
