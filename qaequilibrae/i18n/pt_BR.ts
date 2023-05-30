@@ -324,17 +324,17 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="80"/>
         <source>Could not load dataset</source>
-        <translation type="unfinished"/>
+        <translation>Não foi pos´sivel carregar o conjunto de dados</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/matrix_manipulation_dialog.py" line="64"/>
         <source>Thousands separator</source>
-        <translation type="unfinished"/>
+        <translation>Separador de milhares</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/matrix_manipulation_dialog.py" line="74"/>
         <source>Decimal places</source>
-        <translation type="unfinished"/>
+        <translation>Casas decimais</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="152"/>
