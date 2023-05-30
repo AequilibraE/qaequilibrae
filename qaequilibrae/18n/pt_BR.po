@@ -79,7 +79,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="400"/>
         <source>Attraction vector is missing</source>
-        <translation type="unfinished"/>
+        <translation>Falta o vetor de atração</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="404"/>
