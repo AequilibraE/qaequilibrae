@@ -364,7 +364,7 @@
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="189"/>
         <source>No name provided for the output file</source>
-        <translation type="unfinished"/>
+        <translation>O nome do arquivo não foi fornecido.</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="217"/>
