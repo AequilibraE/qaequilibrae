@@ -30,7 +30,7 @@ FORMS = ../modules/common_tools/forms/ui_about.ui \
         ../modules/project_procedures/forms/ui_transponet_construction.ui \
 	../modules/routing_procedures/forms/tsp.ui
 
-SOURCES = ../aequilibrae_menu.py \
+SOURCES = ../qaequilibrae.py \
           ../modules/common_tools/get_output_file_name.py \
           ../modules/common_tools/parameters_dialog.py \
           ../modules/common_tools/report_dialog.py \
