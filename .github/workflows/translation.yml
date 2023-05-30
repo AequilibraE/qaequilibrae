@@ -1,7 +1,7 @@
 name: translate & pack
 
 env:
-  PLUGIN_VERSION: 0.9.0.2
+  PLUGIN_VERSION: 0.9.0.1
   PROJECT_FOLDER: "qaequilibrae"
 
 on:
@@ -44,9 +44,15 @@ jobs:
 
     - name: Compile translations
       run:  |
-        lrelease ${{ env.PROJECT_FOLDER}}/i18n/*.ts
+        lrelease ${{ env.PROJECT_FOLDER}}/i18n/qaequilibrae_*.ts
 
-    - name: build the package
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Build translations
+        path: ${{ env.PROJECT_FOLDER }}/i18n/*.qm
+        if-no-files-found: error
+
+    - name: Build the package
       run: |
         qgis-plugin-ci package ${{ env.PLUGIN_VERSION }} -c
 
