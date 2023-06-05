@@ -30,16 +30,13 @@ jobs:
         python -m pip install -r requirements/packaging.txt
     
     - name: Create pro file
-      run: |
-        python qaequilibrae/i18n/create_pro_file.py
+      run: python qaequilibrae/i18n/create_pro_file.py
 
     - name: Create translatable file
-      run: |
-        pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
+      run: pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
 
     - name: Compile translations
-      run:  |
-        lrelease ${{ env.PROJECT_FOLDER}}/i18n/qaequilibrae_*.ts
+      run: lrelease ${{ env.PROJECT_FOLDER}}/i18n/qaequilibrae_*.ts
 
     - name: Amend gitignore to include compiled translations and add it to tracked files
       run: |
@@ -52,8 +49,7 @@ jobs:
       run: PLUGIN_VERSION=$(python qaequilibrae/i18n/get_version.py)
   
     - name: Build the package
-      run: |
-        qgis-plugin-ci package $PLUGIN_VERSION -c
+      run: qgis-plugin-ci package ${{ vars.PLUGIN_VERSION }} -c
 
     - name: Download artifact
       uses: actions/upload-artifact@v3
