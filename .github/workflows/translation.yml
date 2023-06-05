@@ -1,6 +1,7 @@
 name: translate & pack
 
 env:
+  PLUGIN_VERSION: $(python qaequilibrae/i18n/get_version.py)
   PROJECT_FOLDER: "qaequilibrae"
 
 on:
@@ -45,11 +46,9 @@ jobs:
 
         git add ${{ env.PROJECT_FOLDER }}/
 
-    - name: Get plugin version
-      run: PLUGIN_VERSION=$(python qaequilibrae/i18n/get_version.py)
   
     - name: Build the package
-      run: qgis-plugin-ci package ${{ vars.PLUGIN_VERSION }} -c
+      run: qgis-plugin-ci package ${{ env.PLUGIN_VERSION }} -c
 
     - name: Download artifact
       uses: actions/upload-artifact@v3
