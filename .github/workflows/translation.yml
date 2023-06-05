@@ -1,7 +1,6 @@
 name: translate & pack
 
 env:
-  PLUGIN_VERSION: 0.9.0.1
   PROJECT_FOLDER: "qaequilibrae"
 
 on:
@@ -29,38 +28,32 @@ jobs:
         sudo apt install qttools5-dev-tools
         python -m pip install --upgrade pip
         python -m pip install -r requirements/packaging.txt
+    
+    - name: Create pro file
+      run: |
+        python qaequilibrae/i18n/create_pro_file.py
 
-    # - name: Create translatable file
-    #   run: |
-    #     lupdate -no-obsolete qaequilibrae/i18n/qaequilibrae.pro
-
-    # - name: Push to Transifex
-    #   run: |
-    #     qgis-plugin-ci push-translation ${{ secrets.TX_TOKEN }}
-  
-    # - name: Pull from Transifex
-    #   run: |
-    #     qgis-plugin-ci pull-translation --compile ${{ secrets.TX_TOKEN }}
+    - name: Create translatable file
+      run: |
+        lupdate -no-obsolete qaequilibrae/i18n/qaequilibrae.pro
 
     - name: Compile translations
       run:  |
         lrelease ${{ env.PROJECT_FOLDER}}/i18n/qaequilibrae_*.ts
 
-    # - uses: actions/upload-artifact@v3
-    #   with:
-    #     name: Build translations
-    #     path: ${{ env.PROJECT_FOLDER }}/i18n/*.qm
-    #     if-no-files-found: error
-
     - name: Amend gitignore to include compiled translations and add it to tracked files
       run: |
         sed -i "s|^*.qm.*| |" .gitignore
+        sed -i "s|^*.ts.*| |" .gitignore
 
         git add ${{ env.PROJECT_FOLDER }}/
 
+    - name: Get plugin version
+      run: PLUGIN_VERSION=$(python qaequilibrae/i18n/get_version.py)
+  
     - name: Build the package
       run: |
-        qgis-plugin-ci package ${{ env.PLUGIN_VERSION }} -c
+        qgis-plugin-ci package $PLUGIN_VERSION -c
 
     - name: Download artifact
       uses: actions/upload-artifact@v3
@@ -74,7 +67,6 @@ jobs:
     #   run: >-
     #     qgis-plugin-ci
     #     release ${GITHUB_REF/refs\/tags\//}
-    #     --transifex-token ${{ secrets.TX_TOKEN }}
     #     --github-token ${{ secrets.GITHUB_TOKEN }}
     #     --osgeo-username ${{ secrets.QGIS_PLUGIN_REPO_USER }}
     #     --osgeo-password ${{ secrets.QGIS_PLUGIN_REPO_PASSWORD }}
