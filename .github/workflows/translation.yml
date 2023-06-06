@@ -42,7 +42,8 @@ jobs:
     - name: Check if there are changes in the file
       id: check_changes
       run: |
-        if [[ -n $(git diff --name-only) ]]; then
+        if [[ -n $(git diff --name-only) ]]; 
+        then
           echo "{changed}={true}" >> $GITHUB_OUTPUT
         else
           echo "{changed}={false}" >> $GITHUB_OUTPUT
