@@ -1,5 +1,6 @@
 import os
 import pytest
+from unittest import mock
 from uuid import uuid4
 from PyQt5.QtCore import Qt
 from qaequilibrae.modules.public_transport_procedures.gtfs_feed import GTFSFeed
@@ -35,14 +36,16 @@ def test_click_add_importer(pt_project, qtbot):
 def create_path(tmp_path):
     return os.path.join(tmp_path, uuid4().hex)
 
-@pytest.fixture
-def _pt_object(pt_project):
-    from aequilibrae.transit import Transit
 
-    @mock.patch('test.Transit.project_base_path', create_path)
-    data = Transit(pt_project)
+def pt_object(create_path):
+    from aequilibrae.transit import Transit
+    from aequilibrae.project import Project
+    prj = Project()
+    prj.new(create_path)
+    data = Transit(prj)
 
     yield data
+    prj.close()
 
 
 def test_click_feed(pt_project, _pt_object, qtbot):
