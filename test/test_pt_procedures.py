@@ -33,15 +33,24 @@ def test_click_add_importer(pt_project, qtbot):
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
 
-# def test_click_feed(ae_with_project, transit_object, qtbot):
-#     dialog = GTFSFeed(ae_with_project, transit_object)
-#     dialog.show()
+@pytest.fixture
+def _pt_object(pt_project):
+    from aequilibrae.transit import Transit
 
-#     assert dialog.label_2.text() == "Service date"
-#     assert dialog.label_3.text() == "Agency*"
-#     assert dialog.label_4.text() == "Description*"
+    data = Transit(pt_project)
 
-#     with qtbot.capture_exceptions() as exceptions:
-#         qtbot.mouseClick(dialog.but_add, Qt.LeftButton)
+    yield data
 
-#     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
+
+def test_click_feed(pt_project, _pt_object, qtbot):
+    dialog = GTFSFeed(pt_project, _pt_object)
+    dialog.show()
+
+    assert dialog.label_2.text() == "Service date"
+    assert dialog.label_3.text() == "Agency*"
+    assert dialog.label_4.text() == "Description*"
+
+    with qtbot.capture_exceptions() as exceptions:
+        qtbot.mouseClick(dialog.but_add, Qt.LeftButton)
+
+    assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
