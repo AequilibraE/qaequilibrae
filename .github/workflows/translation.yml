@@ -1,7 +1,7 @@
 name: translate & pack
 
 env:
-  PLUGIN_VERSION: $(python get_version.py)
+  PLUGIN_VERSION: $(python qaequilibrae/get_version.py)
   PROJECT_FOLDER: "qaequilibrae"
 
 on:
@@ -42,7 +42,7 @@ jobs:
     - name: Check if there are changes in the file
       id: check_changes
       run: |
-        if [[ -n $(git diff --name-only HEAD^ HEAD qaequilibrae/i18n/qaequilibrae.ts) ]]; then
+        if [[ -n $(git diff --name-only HEAD^ qaequilibrae/i18n/qaequilibrae.ts) ]]; then
           echo "{changed}={true}" >> $GITHUB_OUTPUT
         else
           echo "{changed}={true}" >> $GITHUB_OUTPUT
