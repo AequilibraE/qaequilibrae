@@ -1,8 +1,7 @@
 import os
 import pytest
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QApplication
-from qgis.core import QgsProject, Qgis, QgsVectorLayer
+from uuid import uuid4
+from PyQt5.QtCore import Qt
 from qaequilibrae.modules.public_transport_procedures.gtfs_feed import GTFSFeed
 from qaequilibrae.modules.public_transport_procedures.gtfs_importer import GTFSImporter
 
@@ -32,11 +31,15 @@ def test_click_add_importer(pt_project, qtbot):
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
+@pytest.fixture
+def create_path(tmp_path):
+    return os.path.join(tmp_path, uuid4().hex)
 
 @pytest.fixture
 def _pt_object(pt_project):
     from aequilibrae.transit import Transit
 
+    @mock.patch('test.Transit.project_base_path', create_path)
     data = Transit(pt_project)
 
     yield data
