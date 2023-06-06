@@ -32,21 +32,13 @@ def test_click_add_importer(pt_project, qtbot):
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
-@pytest.fixture
-def create_path(tmp_path):
-    return os.path.join(tmp_path, uuid4().hex)
-
 
 @pytest.fixture
-def pt_object(create_path):
+def pt_object(ae_with_project):
     from aequilibrae.transit import Transit
-    from aequilibrae.project import Project
-    prj = Project()
-    prj.new(create_path)
-    data = Transit(prj)
+    data = Transit(ae_with_project)
 
     yield data
-    prj.close()
 
 
 def test_click_feed(pt_project, pt_object, qtbot):
