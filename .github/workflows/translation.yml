@@ -37,12 +37,13 @@ jobs:
       run: |
         cd qaequilibrae/i18n
         pylupdate5 qaequilibrae.pro
+        ls -l
         cd ../..
     
     - name: Check if there are changes in the file
       id: check_changes
       run: |
-        if [[ -n $(git diff --name-only) ]]; 
+        if [[ -n $(git diff --name-only qaequilibrae/i18n/qaequilibrae.ts) ]]; 
         then
           echo "{changed}={true}" >> $GITHUB_OUTPUT
         else
