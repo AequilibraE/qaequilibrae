@@ -42,7 +42,7 @@ def timeoutDetector(qgis_iface) -> None:
 
 
 @pytest.fixture(scope="function")
-def pt_project(qgis_iface):
+def pt_project(qgis_iface) -> AequilibraEMenu:
     ae = AequilibraEMenu(qgis_iface)
     from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
