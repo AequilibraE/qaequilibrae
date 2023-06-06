@@ -1,5 +1,6 @@
 import os
 import pytest
+from unittest import mock
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject, Qgis, QgsVectorLayer
@@ -20,6 +21,7 @@ def test_click_importer(ae_with_project, qtbot):
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
 
+# @mock.patch("tradesman.data_retrieval.osm_tags.import_osm_data.generic_tag")
 def test_click_feed(transit_object, pt_project, qtbot):
     dialog = GTFSFeed(transit_object, pt_project)
     dialog.show()
@@ -32,19 +34,3 @@ def test_click_feed(transit_object, pt_project, qtbot):
         qtbot.mouseClick(dialog.but_add, Qt.LeftButton)
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
-
-
-# @pytest.fixture
-# def create_feed(pt_project, transit_object):
-#     dialog = GTFSFeed(pt_project, transit_object)
-#     dialog.show()
-
-#     yield dialog
-
-
-# def test_set_data(create_feed):
-#     gtfs_path = "test/data/coquimbo_project/gtfs_coquimbo.zip"
-    
-#     create_feed.set_data(gtfs_path)
-
-#     assert len(create_feed.feed) == 1

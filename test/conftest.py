@@ -51,7 +51,7 @@ def pt_project(qgis_iface):
     ae.run_close_project()
 
 
-@pytest.fixture()
+@pytest.fixture(scope="function")
 def transit_object(pt_project):
 
     from aequilibrae.transit import Transit
