@@ -34,15 +34,18 @@ jobs:
       run: python qaequilibrae/i18n/create_pro_file.py
 
     - name: Create translatable file
-      run: pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
+      run: |
+        cd qaequilibrae/i18n
+        pylupdate5 qaequilibrae.pro
+        cd ../..
     
     - name: Check if there are changes in the file
       id: check_changes
       run: |
         if [[ -n $(git diff --name-only HEAD^ HEAD qaequilibrae/i18n/qaequilibrae.ts) ]]; then
-          echo "::set-output name=changed::true"
+          echo "{changed}={true}" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=changed::false"
+          echo "{changed}={true}" >> $GITHUB_OUTPUT
         fi
 
     - name: Update 
