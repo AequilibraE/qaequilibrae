@@ -1,7 +1,7 @@
 name: translate & pack
 
 env:
-  PLUGIN_VERSION: $(python qaequilibrae/i18n/get_version.py)
+  PLUGIN_VERSION: $(python get_version.py)
   PROJECT_FOLDER: "qaequilibrae"
 
 on:
@@ -35,6 +35,18 @@ jobs:
 
     - name: Create translatable file
       run: pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
+    
+    - name: Update translatable file
+      run: |
+        git add ${{ env.PROJECT_FOLDER }}/i18n/qaequilibrae.ts
+        git commit -m "Update translatable file"
+    
+    - name: Push changes to TS file
+      uses: ad-m/github-push-action@master
+      with:
+        branch: B77 #ignore if your branch is master
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        force: true
 
     - name: Compile translations
       run: lrelease ${{ env.PROJECT_FOLDER}}/i18n/qaequilibrae_*.ts
@@ -42,10 +54,7 @@ jobs:
     - name: Amend gitignore to include compiled translations and add it to tracked files
       run: |
         sed -i "s|^*.qm.*| |" .gitignore
-        sed -i "s|^*.ts.*| |" .gitignore
-
         git add ${{ env.PROJECT_FOLDER }}/
-
   
     - name: Build the package
       run: qgis-plugin-ci package ${{ env.PLUGIN_VERSION }} -c
