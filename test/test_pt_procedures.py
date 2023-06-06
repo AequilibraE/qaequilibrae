@@ -37,6 +37,7 @@ def create_path(tmp_path):
     return os.path.join(tmp_path, uuid4().hex)
 
 
+@pytest.fixture
 def pt_object(create_path):
     from aequilibrae.transit import Transit
     from aequilibrae.project import Project
@@ -48,8 +49,8 @@ def pt_object(create_path):
     prj.close()
 
 
-def test_click_feed(pt_project, _pt_object, qtbot):
-    dialog = GTFSFeed(pt_project, _pt_object)
+def test_click_feed(pt_project, pt_object, qtbot):
+    dialog = GTFSFeed(pt_project, pt_object)
     dialog.show()
 
     assert dialog.label_2.text() == "Service date"
