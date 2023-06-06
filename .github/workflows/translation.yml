@@ -50,7 +50,7 @@ jobs:
         fi
 
     - name: Update 
-      if: steps.check_changes.outputs.changed == 'true'
+      # if: steps.check_changes.outputs.changed == 'true'
       run: |
         git checkout ${{ github.ref }}
         git add qaequilibrae/i18n/qaequilibrae.ts
