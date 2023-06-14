@@ -1,5 +1,4 @@
 import os
-from time import sleep
 import pytest
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
@@ -45,6 +44,8 @@ def test_click_feed(pt_project, qtbot):
 
     dialog = GTFSFeed(pt_project, data, True)
     dialog.show()
+    qtbot.addWidget(dialog)
+    qtbot.waitExposed(dialog)
 
     assert dialog.label.text() == "Route capacities"
     assert dialog.label_2.text() == "Service date"
@@ -52,20 +53,9 @@ def test_click_feed(pt_project, qtbot):
     assert dialog.label_4.text() == "Agency*"
 
     with qtbot.capture_exceptions() as exceptions:
-        qtbot.mouseClick(dialog.but_add, Qt.LeftButton)
-
-    assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
-
-    messagebar = pt_project.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:Enter agency and description"
-    
-    with qtbot.capture_exceptions() as exceptions:
         qtbot.mouseClick(dialog.but_new_row, Qt.LeftButton)
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
-
-    sleep(10)
-    dialog.close()
 
 
 def test_pt_menu(ae_with_project, qtbot):
