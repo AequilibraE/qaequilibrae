@@ -40,9 +40,9 @@ jobs:
         pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
 
     - name: Check if there are modifications in the translatable files
-      id: check_changes
       run: |
         git fetch --no-tags --depth=1 origin ${{ env.CURRENT_BRANCH }}
+        files_created=$(git ls-files --others --exclude-standard)
         files_changed=$(git diff --name-only)
 
         if echo "${files_changed}" | grep --quiet "qaequilibrae/i18n/qaequilibrae.ts"; then
@@ -53,7 +53,16 @@ jobs:
           git add .
           git commit -a -m "Adds translatable files"
           git push origin HEAD:refs/heads/${{ env.CURRENT_BRANCH }}
-          
+        
+        elif echo "${files_created}" | grep --quiet "qaequilibrae/i18n/qaequilibrae.ts"; then
+          echo ".ts file was created!"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          git add .
+          git commit -a -m "Adds translatable files"
+          git push origin HEAD:refs/heads/${{ env.CURRENT_BRANCH }}
+
         else
           echo ".ts file wasn't modified."
         fi
