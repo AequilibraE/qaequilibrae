@@ -68,12 +68,17 @@ jobs:
         fi
 
     - name: Compile translations if they exist
-      run: lrelease ${{ env.PROJECT_FOLDER}}/i18n/qaequilibrae_*.ts
-
-    - name: Amend gitignore to include compiled translations and add it to tracked files
       run: |
-        sed -i "s|^*.qm.*| |" .gitignore
-        git add ${{ env.PROJECT_FOLDER }}/
+        cd qaequilibrae/i18n
+        translatable_files=$(ls | grep "qaequilibrae_.*\.ts$")
+        cd ../..
+        if echo "$translatable_files" | grep "qaequilibrae_"; then
+          lrelease ${{ env.PROJECT_FOLDER }}/i18n/qaequilibrae_*.ts
+          sed -i "s|^*.qm.*| |" .gitignore
+          git add ${{ env.PROJECT_FOLDER }}/
+        else
+          echo "No translatable files found"
+        fi
   
     - name: Build the package
       run: qgis-plugin-ci package ${{ env.PLUGIN_VERSION }} -c
