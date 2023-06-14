@@ -42,14 +42,18 @@ def test_click_feed(pt_project, qtbot):
     dialog = GTFSFeed(pt_project, data, True)
     dialog.show()
 
-    assert QApplication.activeWindow() is not None
-
+    assert dialog.label.text() == "Route capacities"
     assert dialog.label_2.text() == "Service date"
     assert dialog.label_3.text() == "Agency*"
     assert dialog.label_4.text() == "Description*"
 
     with qtbot.capture_exceptions() as exceptions:
         qtbot.mouseClick(dialog.but_add, Qt.LeftButton)
+
+    assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
+
+    with qtbot.capture_exceptions() as exceptions:
+        qtbot.mouseClick(dialog.but_new_row, Qt.LeftButton)
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
