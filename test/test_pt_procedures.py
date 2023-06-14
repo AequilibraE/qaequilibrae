@@ -1,4 +1,5 @@
 import os
+from time import sleep
 import pytest
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
@@ -63,6 +64,7 @@ def test_click_feed(pt_project, qtbot):
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
+    sleep(10)
     dialog.close()
 
 
