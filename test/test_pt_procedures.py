@@ -7,6 +7,7 @@ from qaequilibrae.modules.public_transport_procedures.gtfs_feed import GTFSFeed
 from qaequilibrae.modules.public_transport_procedures.gtfs_importer import GTFSImporter
 
 
+@pytest.mark.run(after='test_help_menu')
 def test_click_new_importer(ae_with_project, qtbot):
     dialog = GTFSImporter(ae_with_project)
     dialog.show()
@@ -20,6 +21,7 @@ def test_click_new_importer(ae_with_project, qtbot):
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
 
+@pytest.mark.run(after='test_help_menu')
 def test_click_add_importer(pt_project, qtbot):
     dialog = GTFSImporter(pt_project)
     dialog.show()
@@ -33,6 +35,7 @@ def test_click_add_importer(pt_project, qtbot):
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
 
+@pytest.mark.run(after='test_help_menu')
 def test_click_feed(pt_project, qtbot):
     from aequilibrae.transit import Transit
     
@@ -50,6 +53,9 @@ def test_click_feed(pt_project, qtbot):
         qtbot.mouseClick(dialog.but_add, Qt.LeftButton)
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
+
+    messagebar = pt_project.iface.messageBar()
+    assert messagebar.messages == "Error:Enter agency and description"
 
     with qtbot.capture_exceptions() as exceptions:
         qtbot.mouseClick(dialog.but_new_row, Qt.LeftButton)
