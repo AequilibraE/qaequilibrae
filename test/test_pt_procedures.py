@@ -34,11 +34,16 @@ def test_click_add_importer(pt_project, qtbot):
 
 
 # @pytest.mark.skip(reason="PT object is not working properly within the test")
-def test_click_feed(ae_with_project, qtbot):
+def test_click_feed(tmp_path, qtbot):
     from aequilibrae.transit import Transit
-    data = Transit(ae_with_project)
+    from aequilibrae.utils.create_example import create_example
 
-    dialog = GTFSFeed(ae_with_project, data, True)
+    path = tmp_path / "test_prj"
+    
+    project = create_example(path, "coquimbo")
+    data = Transit(project)
+
+    dialog = GTFSFeed(project, data, True)
     dialog.show()
 
     assert QApplication.activeWindow() is not None
