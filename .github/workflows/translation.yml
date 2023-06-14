@@ -3,6 +3,7 @@ name: translate & pack
 env:
   PLUGIN_VERSION: $(python qaequilibrae/get_version.py)
   PROJECT_FOLDER: "qaequilibrae"
+  CURRENT_BRANCH: $(git branch --show-current)
 
 on:
   push:
@@ -18,6 +19,9 @@ jobs:
       max-parallel: 4
     steps:
     - uses: actions/checkout@v3
+      with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
     - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
@@ -30,35 +34,31 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install -r requirements/packaging.txt
     
-    - name: Create pro file
-      run: python qaequilibrae/i18n/create_pro_file.py
-
-    - name: Create translatable file
+    - name: Create translatable files
       run: |
-        cd qaequilibrae/i18n
-        pylupdate5 qaequilibrae.pro
-        ls -l
-        cd ../..
-    
-    - name: Check if there are changes in the file
+        python qaequilibrae/i18n/create_pro_file.py
+        pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
+
+    - name: Check if there are modifications in the translatable files
       id: check_changes
       run: |
-        if [[ -n $(git diff --name-only qaequilibrae/i18n/qaequilibrae.ts) ]]; 
-        then
-          echo "{changed}={true}" >> $GITHUB_OUTPUT
+        git fetch --no-tags --depth=1 origin ${{ env.CURRENT_BRANCH }}
+        files_changed=$(git diff --name-only)
+
+        if echo "${files_changed}" | grep --quiet "qaequilibrae/i18n/qaequilibrae.ts"; then
+          echo ".ts file was modified!"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          git add .
+          git commit -a -m "Adds translatable files"
+          git push origin HEAD:refs/heads/${{ env.CURRENT_BRANCH }}
+          
         else
-          echo "{changed}={false}" >> $GITHUB_OUTPUT
+          echo ".ts file wasn't modified."
         fi
 
-    - name: Update 
-      if: steps.check_changes.outputs.changed == 'true'
-      run: |
-        git checkout ${{ github.ref }}
-        git add qaequilibrae/i18n/qaequilibrae.ts
-        git commit -m "Updates translatable file"
-        git push origin ${{ github.ref }}
-
-    - name: Compile translations
+    - name: Compile translations if they exist
       run: lrelease ${{ env.PROJECT_FOLDER}}/i18n/qaequilibrae_*.ts
 
     - name: Amend gitignore to include compiled translations and add it to tracked files
@@ -74,7 +74,7 @@ jobs:
       with:
         name: qaequilibrae
         path: /home/runner/work/qaequilibrae/qaequilibrae/*.zip
-        if-no-files-found: error
+        if-no-files-found: warn
   
     # - name: Deploy plugin
     #   if: ${{ (github.event_name == 'release')}}
