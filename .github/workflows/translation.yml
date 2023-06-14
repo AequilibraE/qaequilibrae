@@ -70,9 +70,10 @@ jobs:
     - name: Compile translations if they exist
       run: |
         cd qaequilibrae/i18n
-        translatable_files=$(ls | grep "qaequilibrae_.*\.ts$")
+        translatable_files=$(ls)
         cd ../..
-        if echo "$translatable_files" | grep "qaequilibrae_"; then
+        if echo "$translatable_files" | grep "qaequilibrae_.*\.ts"; then
+          echo "Translatable files found"
           lrelease ${{ env.PROJECT_FOLDER }}/i18n/qaequilibrae_*.ts
           sed -i "s|^*.qm.*| |" .gitignore
           git add ${{ env.PROJECT_FOLDER }}/
