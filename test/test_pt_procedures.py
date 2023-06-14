@@ -7,6 +7,7 @@ from qaequilibrae.modules.public_transport_procedures.gtfs_feed import GTFSFeed
 from qaequilibrae.modules.public_transport_procedures.gtfs_importer import GTFSImporter
 
 
+@pytest.mark.run(order=3)
 def test_click_new_importer(ae_with_project, qtbot):
     dialog = GTFSImporter(ae_with_project)
     dialog.show()
@@ -18,8 +19,10 @@ def test_click_new_importer(ae_with_project, qtbot):
         qtbot.mouseClick(dialog.but_execute, Qt.LeftButton)
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
+    
+    dialog.close()
 
-
+@pytest.mark.run(order=2)
 def test_click_add_importer(pt_project, qtbot):
     dialog = GTFSImporter(pt_project)
     dialog.show()
@@ -32,8 +35,9 @@ def test_click_add_importer(pt_project, qtbot):
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
+    dialog.close()
 
-# @pytest.mark.skip(reason="Problem with test")
+@pytest.mark.run(order=4)
 def test_click_feed(ae_with_project, qtbot):
     from aequilibrae.transit import Transit
     
@@ -53,8 +57,15 @@ def test_click_feed(ae_with_project, qtbot):
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
     messagebar = ae_with_project.iface.messageBar()
-    assert messagebar.messages[3] == "Error:Enter agency and description"
+    assert messagebar.messages[3][0] == "Error:Enter agency and description"
 
+    messagebar.closeEvent()
+
+    with qtbot.capture_exceptions() as exceptions:
+        qtbot.mouseClick(dialog.but_add, Qt.LeftButton)
+
+    assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
+    
     with qtbot.capture_exceptions() as exceptions:
         qtbot.mouseClick(dialog.but_new_row, Qt.LeftButton)
 
@@ -63,6 +74,7 @@ def test_click_feed(ae_with_project, qtbot):
     dialog.close()
 
 
+@pytest.mark.run(order=1)
 def test_pt_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.public_transport_procedures.gtfs_importer import GTFSImporter
     from test.test_qaequilibrae_menu_with_project import check_if_new_active_window_matches_class
