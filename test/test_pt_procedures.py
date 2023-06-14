@@ -33,13 +33,13 @@ def test_click_add_importer(pt_project, qtbot):
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
 
-@pytest.mark.skip(reasson="Problem with test")
-def test_click_feed(pt_project, qtbot):
+# @pytest.mark.skip(reason="Problem with test")
+def test_click_feed(ae_with_project, qtbot):
     from aequilibrae.transit import Transit
     
-    data = Transit(pt_project.project)
+    data = Transit(ae_with_project.project)
 
-    dialog = GTFSFeed(pt_project, data, True)
+    dialog = GTFSFeed(ae_with_project, data, True)
     dialog.show()
 
     assert dialog.label.text() == "Route capacities"
@@ -52,7 +52,7 @@ def test_click_feed(pt_project, qtbot):
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
-    messagebar = pt_project.iface.messageBar()
+    messagebar = ae_with_project.iface.messageBar()
     assert messagebar.messages[3] == "Error:Enter agency and description"
 
     with qtbot.capture_exceptions() as exceptions:
@@ -71,7 +71,7 @@ def test_pt_menu(ae_with_project, qtbot):
         check_if_new_active_window_matches_class(qtbot, GTFSImporter)
 
     action = ae_with_project.menuActions["Public Transport"][0]
-    assert action.text() == "Public Transport", "Wrong text content"
+    assert action.text() == "Import GTFS", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
