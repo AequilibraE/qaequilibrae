@@ -33,7 +33,6 @@ def test_click_add_importer(pt_project, qtbot):
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
 
-# @pytest.mark.skip(reason="PT object is not working properly within the test")
 def test_click_feed(pt_project, qtbot):
     from aequilibrae.transit import Transit
     
@@ -44,8 +43,8 @@ def test_click_feed(pt_project, qtbot):
 
     assert dialog.label.text() == "Route capacities"
     assert dialog.label_2.text() == "Service date"
-    assert dialog.label_3.text() == "Agency*"
-    assert dialog.label_4.text() == "Description*"
+    assert dialog.label_3.text() == "Description*"
+    assert dialog.label_4.text() == "Agency*"
 
     with qtbot.capture_exceptions() as exceptions:
         qtbot.mouseClick(dialog.but_add, Qt.LeftButton)
