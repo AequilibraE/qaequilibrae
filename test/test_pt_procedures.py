@@ -1,8 +1,8 @@
 import os
 import pytest
-from unittest import mock
-from uuid import uuid4
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import QApplication
+from qgis.core import QgsProject, Qgis, QgsVectorLayer
 from qaequilibrae.modules.public_transport_procedures.gtfs_feed import GTFSFeed
 from qaequilibrae.modules.public_transport_procedures.gtfs_importer import GTFSImporter
 
@@ -33,17 +33,15 @@ def test_click_add_importer(pt_project, qtbot):
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
 
 
-@pytest.fixture
-def pt_object(ae_with_project):
+# @pytest.mark.skip(reason="PT object is not working properly within the test")
+def test_click_feed(ae_with_project, qtbot):
     from aequilibrae.transit import Transit
     data = Transit(ae_with_project)
 
-    yield data
-
-@pytest.mark.skip(reason="PT object is not working properly within the test")
-def test_click_feed(pt_project, pt_object, qtbot):
-    dialog = GTFSFeed(pt_project, pt_object)
+    dialog = GTFSFeed(ae_with_project, data, True)
     dialog.show()
+
+    assert QApplication.activeWindow() is not None
 
     assert dialog.label_2.text() == "Service date"
     assert dialog.label_3.text() == "Agency*"
@@ -53,3 +51,5 @@ def test_click_feed(pt_project, pt_object, qtbot):
         qtbot.mouseClick(dialog.but_add, Qt.LeftButton)
 
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
+
+    dialog.close()
