@@ -1,4 +1,4 @@
-import os
+from os.path import isfile, join
 import pytest
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
@@ -71,3 +71,26 @@ def test_pt_menu(ae_with_project, qtbot):
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+
+
+def test_add_new_feed(ae_with_project, qtbot):
+    from aequilibrae.transit import Transit
+    from aequilibrae.project.database_connection import database_connection
+
+    data = Transit(ae_with_project.project)
+    feed = GTFSFeed(ae_with_project, data, True)
+
+    gtfs_file = "test/data/coquimbo_project/gtfs_coquimbo.zip"
+    feed.set_data(gtfs_file)
+
+    importer = GTFSImporter(ae_with_project)
+    importer.set_feed(feed.feed)
+    importer.execute_importer()
+    
+    if isfile(join(ae_with_project.project.project_base_path, "public_transport.sqlite")):
+        pt_conn = database_connection("transit")
+        
+        assert pt_conn.execute("SELECT * FROM agencies WHERE agency_id IS NOT NULL;").fetchone()[0] > 0
+
+def test_add_other_feed():
+    pass
