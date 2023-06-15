@@ -42,7 +42,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.cells = None
         self.matrix_count = 0
         self.matrices = {}
-        self.matrix = None
+        self.matrix = AequilibraeMatrix()
         self.error = None
         self.__current_name = None
         self.logger = aequilibrae.logger
@@ -228,35 +228,6 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                     qgis.utils.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
                 )
 
-        if self.radio_npy_matrix.isChecked():
-            file_types = ["NumPY array(*.npy)"]
-            default_type = ".npy"
-            box_name = "Matrix Loader"
-            new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
-            self.__current_name = os.path.split(new_name)[1].split(".")[0]
-
-            self.worker_thread = LoadMatrix(qgis.utils.iface.mainWindow(), type="numpy", file_path=new_name)
-
-        if self.radio_aeq_matrix.isChecked():
-            file_types = ["AequilibraE Matrix(*.aem)"]
-            default_type = ".aem"
-            box_name = "AequilibraE Matrix"
-            new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
-            if new_name is not None:
-                self.matrix = AequilibraeMatrix()
-                self.matrix.load(new_name)
-                self.exit_procedure()
-
-        if self.radio_omx_matrix.isChecked():
-            file_types = ["AequilibraE Matrix(*.omx)"]
-            default_type = ".omx"
-            box_name = "Open Matrix"
-            new_name, type = GetOutputFileName(self, box_name, file_types, default_type, self.path)
-            if new_name is not None:
-                self.matrix = AequilibraeMatrix()
-                self.matrix.load(new_name)
-                self.exit_procedure()
-
         if self.worker_thread is not None:
             self.run_thread()
 
@@ -330,6 +301,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
             )
         self.run_thread()
+        self.worker_thread.matrix.export(self.output_name)
 
     def exit_procedure(self):
         self.close()
