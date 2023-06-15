@@ -86,9 +86,6 @@ def test_add_new_feed(ae_with_project):
     feed.feed.gtfs_data.agency.agency = "agency name 1"
     feed.feed.gtfs_data.agency.description = "add description 1"
 
-    assert feed.feed.gtfs_data.agency.agency == "agency name 1"
-    assert feed.feed.gtfs_data.agency.description == "add description 1"
-
     importer = GTFSImporter(ae_with_project)
     importer.set_feed(feed.feed)
     importer.execute_importer()
@@ -102,7 +99,7 @@ def test_add_new_feed(ae_with_project):
 
 def test_add_other_feed(pt_project):
     from aequilibrae.transit import Transit
-    from packages.aequilibrae.project.database_connection import database_connection
+    from aequilibrae.project.database_connection import database_connection
 
     data = Transit(pt_project.project)
     feed = GTFSFeed(pt_project, data, True)
@@ -112,25 +109,11 @@ def test_add_other_feed(pt_project):
     
     feed.feed.gtfs_data.agency.agency = "agency name 1"
     feed.feed.gtfs_data.agency.description = "add description 1"
-
-    if isfile(join(pt_project.project.project_base_path, "public_transport.sqlite")):
-        pt_conn = database_connection("transit")
-        for table in [
-            "agencies",
-            "fare_attributes",
-            "fare_rules",
-            "fare_zones",
-            "pattern_mapping",
-            "route_links",
-            "routes",
-            "stop_connectors",
-            "stops",
-            "trips",
-            "trips_schedule",
-        ]:
-            pt_conn.execute(f"DELETE FROM {table};")
-        pt_conn.commit()
     
     importer = GTFSImporter(pt_project)
     importer.set_feed(feed.feed)
     importer.execute_importer()
+
+    pt_conn = database_connection("transit")
+
+    assert pt_conn.execute("SELECT COUNT(agency_id) FROM agencies").fetchone()[0] > 0
