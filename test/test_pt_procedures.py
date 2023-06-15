@@ -12,7 +12,7 @@ def test_click_new_importer(ae_with_project, qtbot):
     dialog.show()
 
     assert dialog.label_3.text() == "Add Transit Table"
-    assert dialog.rdo_clear.text() == "Crete New Route System"
+    assert dialog.rdo_clear.text() == "Create New Route System"
 
     with qtbot.capture_exceptions() as exceptions:
         qtbot.mouseClick(dialog.but_execute, Qt.LeftButton)

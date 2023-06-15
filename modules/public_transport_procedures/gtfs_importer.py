@@ -29,7 +29,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
             self.rdo_keep.setText("Add to Existing Routes")
         else:
             self.label_3.setText("Add Transit Table")
-            self.rdo_clear.setText("Crete New Route System")
+            self.rdo_clear.setText("Create New Route System")
             self.rdo_keep.setVisible(False)
             self.rdo_clear.setChecked(True)
         self.setFixedHeight(380)
