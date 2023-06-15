@@ -89,8 +89,6 @@ def test_add_new_feed(pt_project):
     importer = GTFSImporter(pt_project)
     importer.set_feed(feed.feed)
     importer.execute_importer()
-    
-    pt_project.close()
 
     if isfile(db_path):
         pt_conn = sqlite3.connect(db_path)
