@@ -11,8 +11,8 @@ def test_click_new_importer(ae_with_project, qtbot):
     dialog = GTFSImporter(ae_with_project)
     dialog.show()
 
-    assert dialog.label_3.text() == "Add Transit Table"
-    assert dialog.rdo_clear.text() == "Create New Route System"
+    assert dialog.label_3.text() == "Add transit table"
+    assert dialog.rdo_clear.text() == "Create new route system"
 
     with qtbot.capture_exceptions() as exceptions:
         qtbot.mouseClick(dialog.but_execute, Qt.LeftButton)
