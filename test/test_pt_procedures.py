@@ -99,7 +99,7 @@ def test_add_new_feed(ae_with_project):
 
 def test_add_other_feed(pt_project):
     from aequilibrae.transit import Transit
-    from aequilibrae.project.database_connection import database_connection
+    import sqlite3
 
     data = Transit(pt_project.project)
     feed = GTFSFeed(pt_project, data, True)
@@ -114,6 +114,6 @@ def test_add_other_feed(pt_project):
     importer.set_feed(feed.feed)
     importer.execute_importer()
 
-    pt_conn = database_connection("transit")
+    pt_conn = sqlite3.connect("test/data/coquimbo_project/public_transport.sqlite")
 
     assert pt_conn.execute("SELECT COUNT(agency_id) FROM agencies").fetchone()[0] > 0
