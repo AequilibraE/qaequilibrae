@@ -85,6 +85,7 @@ def test_add_new_feed(ae_with_project):
     
     feed.feed.gtfs_data.agency.agency = "agency name 1"
     feed.feed.gtfs_data.agency.description = "add description 1"
+    feed.feed.gtfs_data.agency.feed_date = "2016-09-16"
 
     importer = GTFSImporter(ae_with_project)
     importer.set_feed(feed.feed)
@@ -109,11 +110,12 @@ def test_add_other_feed(pt_project):
     
     feed.feed.gtfs_data.agency.agency = "agency name 1"
     feed.feed.gtfs_data.agency.description = "add description 1"
+    feed.feed.gtfs_data.agency.feed_date = "2016-09-16"
     
     importer = GTFSImporter(pt_project)
     importer.set_feed(feed.feed)
     importer.execute_importer()
 
-    pt_conn = sqlite3.connect("test/data/coquimbo_project/public_transport.sqlite")
+    pt_conn = sqlite3.connect("data/coquimbo_project/public_transport.sqlite")
 
     assert pt_conn.execute("SELECT COUNT(agency_id) FROM agencies").fetchone()[0] > 0
