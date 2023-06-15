@@ -73,26 +73,30 @@ def test_pt_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-def test_add_new_feed(ae_with_project, qtbot):
+def test_add_new_feed(pt_project):
     from aequilibrae.transit import Transit
-    from aequilibrae.project.database_connection import database_connection
+    import sqlite3
 
-    data = Transit(ae_with_project.project)
-    feed = GTFSFeed(ae_with_project, data, True)
+    db_path = join(pt_project.project.project_base_path, "public_transport.sqlite")
+    assert isfile(db_path) is True  # check if PT database exists
+
+    data = Transit(pt_project.project)
+    feed = GTFSFeed(pt_project, data, True)
 
     gtfs_file = "test/data/coquimbo_project/gtfs_coquimbo.zip"
     feed.set_data(gtfs_file)
 
-    importer = GTFSImporter(ae_with_project)
+    importer = GTFSImporter(pt_project)
     importer.set_feed(feed.feed)
     importer.execute_importer()
     
-    db_path = join(ae_with_project.project.project_base_path, "public_transport.sqlite")
+    pt_project.close()
+
     if isfile(db_path):
-        pt_conn = database_connection("transit", db_path)
+        pt_conn = sqlite3.connect(db_path)
         
-        # assert pt_conn.execute("SELECT * FROM agencies WHERE agency_id IS NOT NULL;").fetchone()[0] > 0
-        assert pt_conn is not None
+        assert pt_conn.execute("SELECT agency_id FROM agencies WHERE agency_id IS NOT NULL").fetchone()[0] == 1
+        # assert pt_conn is not None
 
 def test_add_other_feed():
     pass
