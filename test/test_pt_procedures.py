@@ -93,7 +93,6 @@ def test_add_new_feed(ae_with_project):
     importer.execute_importer()
 
 
-@pytest.mark.skip(reason="Test is not working")
 def test_add_other_feed(pt_project):
     from aequilibrae.transit import Transit
     import sqlite3
