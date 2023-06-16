@@ -8,7 +8,8 @@ import aequilibrae
 import qgis
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QAction
+from qgis.PyQt.QtGui import QIcon
 from .load_matrix_class import LoadMatrix
 from .mat_reblock import MatrixReblocking
 from ..common_tools.all_layers_from_toc import all_layers_from_toc
@@ -230,6 +231,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if self.worker_thread is not None:
             self.run_thread()
+            self.worker_thread.doWork()
 
         if self.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
@@ -301,7 +303,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
             )
         self.run_thread()
-        self.worker_thread.matrix.export(self.output_name)
+        self.worker_thread.doWork()
 
     def exit_procedure(self):
         self.close()
