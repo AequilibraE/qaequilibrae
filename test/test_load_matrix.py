@@ -8,16 +8,16 @@ from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrix
 
 def load_layers():
     # Add an Open Layer table
-    path_to_gpkg = "test/data/SiouxFalls_project/SiouxFalls.gpkg"
+    path_to_gpkg = "test/data/results_database.gpkg"
     # append the layername part
-    gpkg_links_layer = path_to_gpkg + "|layername=links"
+    gpkg_links_layer = path_to_gpkg + "|layername=aon"
 
-    linkslayer = QgsVectorLayer(gpkg_links_layer, "Links layer", "ogr")
+    datalayer = QgsVectorLayer(gpkg_links_layer, "Matrix layer", "ogr")
 
-    if not linkslayer.isValid():
-        print("Links layer failed to load!")
+    if not datalayer.isValid():
+        print("Matrix layer failed to load!")
     else:
-        QgsProject.instance().addMapLayer(linkslayer)
+        QgsProject.instance().addMapLayer(datalayer)
 
 
 def test_mat_menu(ae_with_project, qtbot):
@@ -43,6 +43,6 @@ def test_mat_load(ae_with_project, qtbot):
     assert dialog.radio_layer_matrix.text() == "Open layer"
 
     qtbot.mouseClick(dialog.radio_layer_matrix, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_load, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_permanent_save, Qt.LeftButton)
     dialog.close()
-    # qtbot.mouseClick(dialog.but_load, Qt.LeftButton)
-    # qtbot.mouseClick(dialog.but_permanent_save, Qt.LeftButton)
