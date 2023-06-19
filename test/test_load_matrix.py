@@ -6,6 +6,20 @@ from qgis.core import QgsProject, Qgis, QgsVectorLayer
 from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
 
 
+def load_layers():
+    # Add an Open Layer table
+    path_to_gpkg = "test/data/SiouxFalls_project/SiouxFalls.gpkg"
+    # append the layername part
+    gpkg_links_layer = path_to_gpkg + "|layername=links"
+
+    linkslayer = QgsVectorLayer(gpkg_links_layer, "Links layer", "ogr")
+
+    if not linkslayer.isValid():
+        print("Links layer failed to load!")
+    else:
+        QgsProject.instance().addMapLayer(linkslayer)
+
+
 def test_mat_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
     from test.test_qaequilibrae_menu_with_project import check_if_new_active_window_matches_class
@@ -22,14 +36,13 @@ def test_mat_menu(ae_with_project, qtbot):
 
 
 def test_mat_load(ae_with_project, qtbot):
+    load_layers()
     dialog = LoadMatrixDialog(ae_with_project)
     dialog.show()
 
     assert dialog.radio_layer_matrix.text() == "Open layer"
 
-
     qtbot.mouseClick(dialog.radio_layer_matrix, Qt.LeftButton)
+    dialog.close()
     # qtbot.mouseClick(dialog.but_load, Qt.LeftButton)
     # qtbot.mouseClick(dialog.but_permanent_save, Qt.LeftButton)
-    # qtbot.stop()
-    qtbot._close_widget()
