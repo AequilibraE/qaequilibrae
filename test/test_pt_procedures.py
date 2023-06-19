@@ -93,7 +93,7 @@ def test_add_new_feed(ae_with_project):
     importer.execute_importer()
 
 
-def test_add_other_feed(pt_project):
+def test_add_other_feed(pt_project, qtbot):
     from aequilibrae.transit import Transit
     import sqlite3
 
@@ -109,7 +109,9 @@ def test_add_other_feed(pt_project):
     
     importer = GTFSImporter(pt_project)
     importer.set_feed(feed.feed)
+    importer.show()
     # importer.execute_importer()
+    qtbot.mouseClick(importer.but_execute, Qt.LeftButton)
 
     db_path = join(pt_project.project.project_base_path, "public_transport.sqlite")
     # Check if PT database was created
@@ -117,5 +119,5 @@ def test_add_other_feed(pt_project):
 
     assert feed.feed is not None
 
-    feed.feed.set_allow_map_match(True)
-    feed.feed.doWork()
+    # feed.feed.set_allow_map_match(True)
+    # feed.feed.doWork()
