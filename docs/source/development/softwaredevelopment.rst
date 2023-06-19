@@ -100,6 +100,27 @@ Imports
 
     import numpy as np
 
+Translatable Strings
+~~~~~~~~~~~~~~~~~~~~
+
+In case you are adding and/or changing any piece of AequilibraE's code that   translatable strings,
+which are those strings we see in the widget windows, please make sure to indicate they are translatable by
+import the `tr` function, that will guarantee you that the string will be compiled into our
+future translations.
+
+::
+
+    from qaequilibrae.i18n.translator import tr
+
+    # Indicates that the message "You need at least three centroids to route. " will be
+    # set for translation.
+    qgis.utils.iface.messageBar().pushMessage(tr("You need at least three centroids to route. "), "", level=3)
+
+As for June 2023, AequilibraE's translations are all hosted in Transifex. Currently, we have ongoing translations in
+Brazilian Portuguese, French, and German. If you want to contribute to AequilibraE by translating the plugin,
+please let us know in our `AequilibraE Google Group <https://groups.google.com/forum/#!forum/aequilibrae>`_,
+so we can add your language into our translation pool!
+
 Contributing to AequilibraE for QGIS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -107,7 +128,7 @@ GitHub has a nice visual explanation on how collaboration is done `GitHub Flow
 <https://guides.github.com/introduction/flow>`_. (For us,) The most important points there are:
 
 * The master branch contains the latest working/release version of AequilibraE
-* Work is done in an issue/feature branch (or a fork) and then pushed to a new brach
+* Work is done in an issue/feature branch (or a fork) and then pushed to a new branch
 * Automated testing is run using Github Actions. All tests must pass:
 
   * Unit testing
@@ -167,7 +188,7 @@ Documentation
 
 All the AequilibraE documentation is (unfortunately) written in `reStructuredText
 <http://docutils.sourceforge.net/rst.html>`_ and built with `Sphinx <http://www.sphinx-doc.org/en/stable/>`_.
-Although Restructured Text is often unecessarily convoluted to write, Sphinx is capable of converting it to standard-
+Although Restructured Text is often unnecessarily convoluted to write, Sphinx is capable of converting it to standard-
 looking html pages, while also bringing the docstring documentation along for the ride.
 
 To build the documentation, first make sure the required packages are installed::
