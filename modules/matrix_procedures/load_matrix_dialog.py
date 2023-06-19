@@ -48,9 +48,6 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.__current_name = None
         self.logger = aequilibrae.logger
         self.radio_layer_matrix.clicked.connect(self.change_matrix_type)
-        self.radio_npy_matrix.clicked.connect(self.change_matrix_type)
-        self.radio_aeq_matrix.clicked.connect(self.change_matrix_type)
-        self.radio_omx_matrix.clicked.connect(self.change_matrix_type)
 
         # For changing the network layer
         self.matrix_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
@@ -71,30 +68,20 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 if layer.wkbType() == 100:
                     self.matrix_layer.addItem(layer.name())
 
-        self.radio_omx_matrix.setEnabled(has_omx)
-
         self.resizing()
 
     def resizing(self):
-        if self.radio_aeq_matrix.isChecked() or self.radio_omx_matrix.isChecked():
-            self.group_combo.setVisible(False)
-            self.group_list.setVisible(False)
-            self.group_buttons.setVisible(False)
-            self.setMaximumSize(127, 176)
-            self.resize(127, 176)
-            self.but_permanent_save.setVisible(False)
-        else:
-            self.group_combo.setVisible(True)
-            self.group_list.setVisible(True)
-            self.group_buttons.setVisible(True)
-            self.matrix_list_view.setColumnWidth(0, 180)
-            self.matrix_list_view.setColumnWidth(1, 100)
-            self.matrix_list_view.setColumnWidth(2, 125)
-            self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
-            self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
-            self.setMaximumSize(QtCore.QSize(100000, 100000))
-            self.resize(542, 427)
-            self.but_permanent_save.setVisible(True)
+        self.group_combo.setVisible(True)
+        self.group_list.setVisible(True)
+        self.group_buttons.setVisible(True)
+        self.matrix_list_view.setColumnWidth(0, 180)
+        self.matrix_list_view.setColumnWidth(1, 100)
+        self.matrix_list_view.setColumnWidth(2, 125)
+        self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
+        self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
+        self.setMaximumSize(QtCore.QSize(100000, 100000))
+        self.resize(542, 427)
+        self.but_permanent_save.setVisible(True)
 
         self.but_save_for_single_use.setEnabled(False)
         self.but_permanent_save.setEnabled(False)
@@ -122,12 +109,6 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             for member in all_members:
                 member.setVisible(True)
             self.load_fields_to_combo_boxes()
-
-        # if self.radio_omx_matrix.isChecked():
-        #     self.lbl_matrix.setText("Matrix core")
-        #     self.lbl_from.setText("Indices")
-        #     for member in members:
-        #         member.setVisible(True)
 
         self.resizing()
 
