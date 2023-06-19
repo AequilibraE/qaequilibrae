@@ -1,8 +1,5 @@
-import os
-import pytest
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QApplication
-from qgis.core import QgsProject, Qgis, QgsVectorLayer
+from qgis.core import QgsProject, QgsVectorLayer
 from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
 
 
