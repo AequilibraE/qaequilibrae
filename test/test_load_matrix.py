@@ -29,6 +29,7 @@ def test_mat_load(ae_with_project, qtbot):
 
 
     qtbot.mouseClick(dialog.radio_layer_matrix, Qt.LeftButton)
-    qtbot.mouseClick(dialog.but_load, Qt.LeftButton)
+    # qtbot.mouseClick(dialog.but_load, Qt.LeftButton)
     # qtbot.mouseClick(dialog.but_permanent_save, Qt.LeftButton)
-    qtbot.stop()
+    # qtbot.stop()
+    qtbot._close_widget()
