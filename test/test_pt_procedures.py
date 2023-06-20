@@ -119,4 +119,4 @@ def test_add_other_feed(pt_project):
     importer.execute_importer()
 
     size_after = os.stat(db_path)
-    assert size_after > size_before
+    assert size_after.st_size > size_before.st_size
