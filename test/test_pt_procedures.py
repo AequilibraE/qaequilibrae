@@ -72,34 +72,34 @@ def test_pt_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-@pytest.mark.skip(reason="Test is not working")
-def test_add_new_feed(ae_with_project, qtbot):
+def test_add_new_feed(pt_no_feed, qtbot):
     from aequilibrae.transit import Transit
     import sqlite3
 
-    data = Transit(ae_with_project.project)
-    feed = GTFSFeed(ae_with_project, data, True)
+    data = Transit(pt_no_feed.project)
+    feed = GTFSFeed(pt_no_feed, data, True)
 
     gtfs_file = "test/data/coquimbo_project/gtfs_coquimbo.zip"
     feed.set_data(gtfs_file)
-    
-    feed.feed.gtfs_data.agency.agency = "agency name 1"
-    feed.feed.gtfs_data.agency.description = "add description 1"
-    feed.feed.gtfs_data.agency.feed_date = "2016-09-16"
+    feed.led_agency.setText("New agency")
+    feed.led_description.setText("Adds new agency description")
+    feed.return_feed()
 
-    importer = GTFSImporter(ae_with_project)
+    importer = GTFSImporter(pt_no_feed)
     importer.set_feed(feed.feed)
-    importer.show()
-    qtbot.mouseClick(importer.but_execute, Qt.LeftButton)
+    importer.rdo_keep.setChecked(True)
+    importer.execute_importer()
 
-    db_path = os.path.join(ae_with_project.project.project_base_path, "public_transport.sqlite")
-    # Check if PT database was created
-    assert os.path.isfile(db_path) is True
+    db_path = os.path.join(pt_no_feed.project.project_base_path, "public_transport.sqlite")
+    conn = sqlite3.connect(db_path)
+    var = conn.execute("select count(agency_id) from agencies").fetchone()[0]
 
-    assert feed.feed is not None
+    assert var == 1
 
-def test_add_other_feed(pt_project):
+@pytest.mark.parametrize("is_checked", [False, True])
+def test_add_other_feed(pt_project, is_checked):
     from aequilibrae.transit import Transit
+    import sqlite3
 
     data = Transit(pt_project.project)
     feed = GTFSFeed(pt_project, data, True)
@@ -108,15 +108,21 @@ def test_add_other_feed(pt_project):
     feed.set_data(gtfs_file)
     feed.led_agency.setText("New agency")
     feed.led_description.setText("Adds new agency description")
+    feed.return_feed()
     
     db_path = os.path.join(pt_project.project.project_base_path, "public_transport.sqlite")
     size_before =  os.stat(db_path)
-    assert os.path.isfile(db_path) is True # Check if PT database exists
 
     importer = GTFSImporter(pt_project)
+    importer.rdo_clear.setChecked(is_checked)
     importer.set_feed(feed.feed)
-    importer.rdo_keep.setChecked(True)
     importer.execute_importer()
 
     size_after = os.stat(db_path)
-    assert size_after.st_size > size_before.st_size
+    conn = sqlite3.connect(db_path)
+    var = conn.execute("select count(agency_id) from agencies").fetchone()[0]
+
+    if is_checked:
+        assert var == 2
+    else:
+        assert var == 1
