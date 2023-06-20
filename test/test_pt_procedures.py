@@ -1,5 +1,4 @@
-from os import remove
-from os.path import isfile, join
+import os
 import pytest
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
@@ -93,9 +92,9 @@ def test_add_new_feed(ae_with_project, qtbot):
     importer.show()
     qtbot.mouseClick(importer.but_execute, Qt.LeftButton)
 
-    db_path = join(ae_with_project.project.project_base_path, "public_transport.sqlite")
+    db_path = os.path.join(ae_with_project.project.project_base_path, "public_transport.sqlite")
     # Check if PT database was created
-    assert isfile(db_path) is True
+    assert os.path.isfile(db_path) is True
 
     assert feed.feed is not None
 
@@ -110,15 +109,14 @@ def test_add_other_feed(pt_project):
     feed.led_agency.setText("New agency")
     feed.led_description.setText("Adds new agency description")
     
+    db_path = os.path.join(pt_project.project.project_base_path, "public_transport.sqlite")
+    size_before =  os.stat(db_path)
+    assert os.path.isfile(db_path) is True # Check if PT database exists
+
     importer = GTFSImporter(pt_project)
     importer.set_feed(feed.feed)
+    importer.rdo_keep.setChecked(True)
     importer.execute_importer()
 
-    db_path = join(pt_project.project.project_base_path, "public_transport.sqlite")
-    # Check if PT database was created
-    assert isfile(db_path) is True
-
-    assert feed.feed is not None
-
-    # feed.feed.set_allow_map_match(True)
-    # feed.feed.doWork()
+    size_after = os.stat(db_path)
+    assert size_after > size_before
