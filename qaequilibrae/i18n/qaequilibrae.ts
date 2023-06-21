@@ -45,7 +45,7 @@ QGIS will be non-responsive for a couple of minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="164"/>
+        <location filename="../qaequilibrae.py" line="154"/>
         <source>Data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -65,7 +65,7 @@ QGIS will be non-responsive for a couple of minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="165"/>
+        <location filename="../qaequilibrae.py" line="155"/>
         <source>Utils</source>
         <translation type="unfinished"></translation>
     </message>
@@ -140,52 +140,52 @@ QGIS will be non-responsive for a couple of minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="156"/>
+        <location filename="../qaequilibrae.py" line="146"/>
         <source>Desire Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="157"/>
+        <location filename="../qaequilibrae.py" line="147"/>
         <source>Stacked Bandwidth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="158"/>
+        <location filename="../qaequilibrae.py" line="148"/>
         <source>Scenario Comparison</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="159"/>
+        <location filename="../qaequilibrae.py" line="149"/>
         <source>Lowest common denominator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="160"/>
+        <location filename="../qaequilibrae.py" line="150"/>
         <source>Simple tag</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="164"/>
+        <location filename="../qaequilibrae.py" line="154"/>
         <source>Import matrices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="165"/>
+        <location filename="../qaequilibrae.py" line="155"/>
         <source>Display Matrices and datasets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="170"/>
+        <location filename="../qaequilibrae.py" line="160"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="171"/>
+        <location filename="../qaequilibrae.py" line="161"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="178"/>
+        <location filename="../qaequilibrae.py" line="168"/>
         <source>Show project info</source>
         <translation type="unfinished"></translation>
     </message>
@@ -195,7 +195,7 @@ QGIS will be non-responsive for a couple of minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="332"/>
+        <location filename="../qaequilibrae.py" line="322"/>
         <source>You need to close the project currently open first</source>
         <translation type="unfinished"></translation>
     </message>
@@ -922,6 +922,41 @@ QGIS will be non-responsive for a couple of minutes.</source>
     <message>
         <location filename="../modules/matrix_procedures/mat_reblock.py" line="99"/>
         <source>REBLOCKED MATRICES</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="142"/>
+        <source>Public Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="142"/>
+        <source>Import GTFS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/gtfs_feed.py" line="80"/>
+        <source>Enter agency and description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="29"/>
+        <source>Overwrite Routes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="30"/>
+        <source>Add to Existing Routes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="32"/>
+        <source>Add Transit Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="33"/>
+        <source>Crete New Route System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

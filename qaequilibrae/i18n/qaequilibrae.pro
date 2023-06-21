@@ -37,6 +37,8 @@ SOURCES = ../qaequilibrae.py \
  ../modules/project_procedures/add_zones_procedure.py \
  ../modules/project_procedures/creates_transponet_dialog.py \
  ../modules/project_procedures/project_from_osm_dialog.py \
+ ../modules/public_transport_procedures/gtfs_feed.py \
+ ../modules/public_transport_procedures/gtfs_importer.py \
  ../modules/menu_actions/action_add_zoning.py \
  ../modules/menu_actions/action_add_connectors.py \
  ../modules/menu_actions/load_project_action.py \
