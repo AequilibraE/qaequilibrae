@@ -47,7 +47,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = None
         self.__current_name = None
         self.logger = aequilibrae.logger
-        self.radio_layer_matrix.clicked.connect(self.change_matrix_type)
+        self.change_matrix_type()
 
         # For changing the network layer
         self.matrix_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
@@ -103,12 +103,11 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         for member in all_members:
             member.setVisible(False)
 
-        if self.radio_layer_matrix.isChecked():
-            self.lbl_matrix.setText("Matrix")
-            self.lbl_from.setText("From")
-            for member in all_members:
-                member.setVisible(True)
-            self.load_fields_to_combo_boxes()
+        self.lbl_matrix.setText("Matrix")
+        self.lbl_from.setText("From")
+        for member in all_members:
+            member.setVisible(True)
+        self.load_fields_to_combo_boxes()
 
         self.resizing()
 
@@ -189,26 +188,25 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
     def load_the_matrix(self):
         self.error = None
         self.worker_thread = None
-        if self.radio_layer_matrix.isChecked():
-            if (
-                self.field_from.currentIndex() < 0
-                or self.field_from.currentIndex() < 0
-                or self.field_cells.currentIndex() < 0
-            ):
-                self.error = "Invalid field chosen"
+        if (
+            self.field_from.currentIndex() < 0
+            or self.field_from.currentIndex() < 0
+            or self.field_cells.currentIndex() < 0
+        ):
+            self.error = "Invalid field chosen"
 
-            if self.error is None:
-                self.compressed.setVisible(False)
-                self.progress_label.setVisible(True)
-                self.__current_name = self.__create_appropriate_name(self.field_cells.currentText().lower())
-                idx1 = self.layer.dataProvider().fieldNameIndex(self.field_from.currentText())
-                idx2 = self.layer.dataProvider().fieldNameIndex(self.field_to.currentText())
-                idx3 = self.layer.dataProvider().fieldNameIndex(self.field_cells.currentText())
-                idx = [idx1, idx2, idx3]
+        if self.error is None:
+            self.compressed.setVisible(False)
+            self.progress_label.setVisible(True)
+            self.__current_name = self.__create_appropriate_name(self.field_cells.currentText().lower())
+            idx1 = self.layer.dataProvider().fieldNameIndex(self.field_from.currentText())
+            idx2 = self.layer.dataProvider().fieldNameIndex(self.field_to.currentText())
+            idx3 = self.layer.dataProvider().fieldNameIndex(self.field_cells.currentText())
+            idx = [idx1, idx2, idx3]
 
-                self.worker_thread = LoadMatrix(
-                    qgis.utils.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
-                )
+            self.worker_thread = LoadMatrix(
+                qgis.utils.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
+            )
 
         if self.worker_thread is not None:
             self.run_thread()
