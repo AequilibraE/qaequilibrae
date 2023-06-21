@@ -1331,6 +1331,116 @@ QGIS will be non-responsive for a couple of minutes.</source>
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="22"/>
+        <source>GTFS Feed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="40"/>
+        <source>Add to importer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="57"/>
+        <source>Basic settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="70"/>
+        <source>Description*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="107"/>
+        <source>Service date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="145"/>
+        <source>Agency*</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="172"/>
+        <source>Route capacities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="186"/>
+        <source>Route Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="191"/>
+        <source>Seated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="196"/>
+        <source>Design</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="201"/>
+        <source>Total</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="215"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add row&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="218"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="19"/>
+        <source>GTFS Importer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="43"/>
+        <source>Resetting Transit Tables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="62"/>
+        <source>Execute Importer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="107"/>
+        <source>Add Feed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="121"/>
+        <source>Feeds to import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="153"/>
+        <source>Rebuild active transport networks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="175"/>
+        <source>Overwrite Routes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="197"/>
+        <source>Add to Existing Routes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="272"/>
+        <source>Running</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Impedance_Matrix</name>
@@ -1840,51 +1950,6 @@ QGIS will be non-responsive for a couple of minutes.</source>
 </context>
 <context>
     <name>data_viewer</name>
-    <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_gtfs_viewer.ui" line="34"/>
-        <source>AequilibraE  -  GTFS viewer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_gtfs_viewer.ui" line="54"/>
-        <source>Filter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_gtfs_viewer.ui" line="68"/>
-        <source>Filter routes by</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_gtfs_viewer.ui" line="80"/>
-        <source>Stops</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_gtfs_viewer.ui" line="93"/>
-        <source>Routes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_gtfs_viewer.ui" line="109"/>
-        <source>Date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_gtfs_viewer.ui" line="157"/>
-        <source>Load GTFS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_gtfs_viewer.ui" line="204"/>
-        <source>Update layer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_gtfs_viewer.ui" line="266"/>
-        <source>...</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../modules/common_tools/forms/ui_empty.ui" line="34"/>
         <source>AequilibraE</source>

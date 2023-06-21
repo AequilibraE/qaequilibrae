@@ -1,6 +1,7 @@
 FORMS = ../modules/project_procedures/forms/ui_transponet_construction.ui \
  ../modules/project_procedures/forms/ui_add_zoning.ui \
- ../modules/public_transport_procedures/forms/ui_gtfs_viewer.ui \
+ ../modules/public_transport_procedures/forms/gtfs_feed.ui \
+ ../modules/public_transport_procedures/forms/gtfs_importer.ui \
  ../modules/forms/ui_nodes_to_areas.ui \
  ../modules/forms/ui_MatrixViewer.ui \
  ../modules/forms/ui_SegmentingLines.ui \
