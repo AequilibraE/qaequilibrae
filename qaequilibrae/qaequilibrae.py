@@ -96,7 +96,7 @@ class AequilibraEMenu:
             tr("Trip Distribution"): [],
             tr("Paths and assignment"): [],
             tr("Routing"): [],
-            # tr("Public Transport"): [],
+            tr("Public Transport"): [],
             "GIS": [],
             tr("Utils"): [],
             "AequilibraE": [],
@@ -139,18 +139,8 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         # # # #######################   TRANSIT SUB-MENU   ###########################
-        # transitMenu = QMenu()
-        # self.gtfs_import_action = QAction(trlt('Convert GTFS to SpatiaLite'), self.manager)
-        # self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
-        # transitMenu.addAction(self.gtfs_import_action)
-        #
-        # transitButton = QToolButton()
-        # transitButton.setText(trlt('Public Transport'))
-        # transitButton.setPopupMode(2)
-        # transitButton.setMenu(transitMenu)
-        #
-        # self.toolbar.addWidget(transitButton)
-        #
+        self.add_menu_action(tr('Public Transport'), tr('Import GTFS'), partial(run_import_gtfs, self))
+
         # # ########################################################################
         # # #################        GIS TOOLS SUB-MENU    #########################
         self.add_menu_action("GIS", tr("Desire Lines"), partial(run_desire_lines, self))
