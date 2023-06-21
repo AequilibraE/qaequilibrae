@@ -20,9 +20,9 @@ from qgis.core import QgsDataSourceUri, QgsVectorLayer
 from qgis.core import QgsProject, QgsSettings
 from qgis.PyQt.QtCore import QTranslator
 
-from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths
+from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
-from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag
+from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_import_gtfs
 from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network
 from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
