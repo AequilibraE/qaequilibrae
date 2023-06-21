@@ -103,9 +103,9 @@ Imports
 Translatable Strings
 ~~~~~~~~~~~~~~~~~~~~
 
-In case you are adding and/or changing any piece of AequilibraE's code that   translatable strings,
+In case you are adding and/or changing any piece of AequilibraE's code with translatable strings,
 which are those strings we see in the widget windows, please make sure to indicate they are translatable by
-import the `tr` function, that will guarantee you that the string will be compiled into our
+importing the `tr` function. This shall guarantee you that the string will be compiled into our
 future translations.
 
 ::
@@ -116,10 +116,11 @@ future translations.
     # set for translation.
     qgis.utils.iface.messageBar().pushMessage(tr("You need at least three centroids to route. "), "", level=3)
 
-As for June 2023, AequilibraE's translations are all hosted in Transifex. Currently, we have ongoing translations in
-Brazilian Portuguese, French, and German. If you want to contribute to AequilibraE by translating the plugin,
-please let us know in our `AequilibraE Google Group <https://groups.google.com/forum/#!forum/aequilibrae>`_,
-so we can add your language into our translation pool!
+As for June 2023, AequilibraE's translations are all hosted in Transifex. Currently, we are targeting translations
+in Brazilian Portuguese, Chinese, French, German, Italian, and Spanish. If you want to contribute to AequilibraE 
+by translating the plugin to other languages, please let us know in our 
+`AequilibraE Google Group <https://groups.google.com/forum/#!forum/aequilibrae>`_,
+so we can add your language to our translation pool!
 
 Contributing to AequilibraE for QGIS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
