@@ -32,14 +32,14 @@ def test_mat_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-def test_matrix_import(ae_with_project, qtbot):
+def test_mat_load(ae_with_project, qtbot):
     load_layers()
     dialog = LoadMatrixDialog(ae_with_project)
     dialog.show()
 
-    with qtbot.capture_exceptions() as exceptions:
-        qtbot.mouseClick(dialog.but_load, Qt.LeftButton)
-        qtbot.mouseClick(dialog.but_permanent_save, Qt.LeftButton)
-    
-    assert len(exceptions) == 0
+    assert dialog.radio_layer_matrix.text() == "Open layer"
+
+    qtbot.mouseClick(dialog.radio_layer_matrix, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_load, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_permanent_save, Qt.LeftButton)
     dialog.close()
