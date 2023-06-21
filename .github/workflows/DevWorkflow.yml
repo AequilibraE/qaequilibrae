@@ -23,6 +23,7 @@ jobs:
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-dev.txt
           python3 -m pip install numpy --upgrade
+          python3 -m pip install git+https://github.com/AequilibraE/aequilibrae@develop
 
       - name: Run tests
         run: |
