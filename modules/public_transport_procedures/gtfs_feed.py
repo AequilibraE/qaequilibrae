@@ -30,6 +30,7 @@ class GTFSFeed(QDialog, FORM_CLASS):
         self.service_calendar.setVisible(False)
         self.setFixedHeight(1)
         self.testing = testing
+        self.date = None
         if not testing:
             self.open_feed()
 
@@ -78,7 +79,7 @@ class GTFSFeed(QDialog, FORM_CLASS):
         if not self.testing:
             date = self.service_calendar.selectedDate().toString("yyyy-MM-dd")
         else:
-            date = "2016-06-17"
+            date = self.date
         self.feed.set_date(date)
 
         caps = {}
