@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerI
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
 from ..common_tools import DatabaseModel, NumpyModel, GetOutputFileName
 from ..common_tools.auxiliary_functions import standard_path
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 
@@ -63,7 +63,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.continue_with_data()
 
     def continue_with_data(self):
-        self.setWindowTitle(f"File path:  {self.data_path}")
+        self.setWindowTitle(tr("File path:").format(self.data_path))
 
         if self.data_type in ["AED", "AEM"]:
             if self.data_type == "AED":
@@ -192,7 +192,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def export(self):
         new_name, file_type = GetOutputFileName(
-            self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.data_path
+            self, self.data_type, [tr("Comma-separated file(*.csv)")], ".csv", self.data_path
         )
         if new_name is not None:
             self.data_to_show.export(new_name)

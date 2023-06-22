@@ -15,7 +15,7 @@ from ..common_tools import ReportDialog
 from ..common_tools import all_layers_from_toc
 from ..common_tools import get_vector_layer_by_name, standard_path
 from ..common_tools.global_parameters import point_types, line_types
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
@@ -274,7 +274,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         ok, msg = self.check_data()
 
         if not ok:
-            self.iface.messageBar().pushMessage(tr("Error"), msg, level=3, duration=10)
+            self.iface.messageBar().pushMessage("Error", msg, level=3, duration=10)
             return
 
         self.proj_folder = self.project_destination.text()

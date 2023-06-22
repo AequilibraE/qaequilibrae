@@ -12,7 +12,7 @@ from ..common_tools.all_layers_from_toc import all_layers_from_toc
 from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
 from ..common_tools.get_output_file_name import GetOutputFileName
 from ..common_tools.global_parameters import integer_types, float_types, point_types, poly_types
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_vector_loader.ui"))
 
@@ -208,10 +208,10 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.run_thread()
             else:
                 qgis.utils.iface.messageBar().pushMessage(
-                    tr("Error:"), tr("One cannot load a dataset with indices only"), level=1
+                    "Error:", tr("One cannot load a dataset with indices only"), level=1
                 )
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage(tr("Error:"), self.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
 
     def load_just_to_use(self):
         self.single_use = True

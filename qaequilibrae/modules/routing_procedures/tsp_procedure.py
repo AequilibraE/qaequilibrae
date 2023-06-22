@@ -2,6 +2,8 @@ from PyQt5.QtCore import pyqtSignal
 from aequilibrae.paths import NetworkSkimming, SkimResults
 from aequilibrae.utils.worker_thread import WorkerThread
 
+from qaequilibrae.i18n.translator import tr
+
 
 class TSPProcedure(WorkerThread):
     finished = pyqtSignal(object)
@@ -54,12 +56,12 @@ class TSPProcedure(WorkerThread):
 
         # Print solution on console.
         if not solution:
-            self.error = "Solution not found"
+            self.error = tr("Solution not found")
             self.report.append(self.error)
         else:
-            self.report.append(f"Objective function value: {solution.ObjectiveValue() / self.mult}")
+            self.report.append(tr("Objective function value: {}").format(solution.ObjectiveValue() / self.mult))
             index = routing.Start(0)
-            plan_output = "Route:\n"
+            plan_output = tr("Route:\n")
             route_distance = 0
 
             while not routing.IsEnd(index):

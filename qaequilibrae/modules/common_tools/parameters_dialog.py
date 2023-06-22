@@ -8,7 +8,7 @@ from aequilibrae.parameters import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML
 from qgis.PyQt.QtGui import QFont
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_parameters.ui"))
 
@@ -67,7 +67,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.error:
             self.but_save.setEnabled(False)
             self.iface.messageBar().pushMessage(
-                tr("Error"), tr("Parameter structure was compromised. Please reset " "to defaults"), level=3, duration=10
+                "Error", tr("Parameter structure was compromised. Please reset to defaults"), level=3, duration=10
             )
             # qgis.utils.iface.messageBar().pushMessage("Error", "Parameter structure was compromised. Please reset "
             #                                                    "to defaults", level=3, duration=10)

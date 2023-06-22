@@ -42,13 +42,13 @@ except:
 
         result = download_all().install()
         if "ERROR" in "".join([str(x).upper() for x in result]):
-            QMessageBox.information(None, tr("Information"), tr("Errors may have happened during installation."
+            QMessageBox.information(None, "Information", tr("Errors may have happened during installation."
                                                          "Please inspect the messages on your General Log message tab"))
         else:
-            QMessageBox.information(None, tr("Information"), tr("You will probably need to restart QGIS to make it work"))
+            QMessageBox.information(None, "Information", tr("You will probably need to restart QGIS to make it work"))
     else:
         QMessageBox.information(None,
-                                tr("Information"),
+                                "Information",
                                 tr("Without installing the packages, the plugin will be mostly non-functional"))
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):

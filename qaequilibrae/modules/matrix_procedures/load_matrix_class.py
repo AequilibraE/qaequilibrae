@@ -6,7 +6,7 @@ import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.utils.worker_thread import WorkerThread
 from scipy.sparse import coo_matrix
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 
 from qgis.PyQt.QtCore import pyqtSignal
 
@@ -90,7 +90,7 @@ class LoadMatrix(WorkerThread):
                         tr("Numpy array needs to be 2 dimensional. Matrix provided has ") + str(len(mat.shape[:]))
                     )
             except Exception as e:
-                self.report.append(tr(f"Could not load array. {e.args}"))
+                self.report.append(tr("Could not load array. {}").format(e.args))
 
         self.ProgressText.emit("")
         self.finished_threaded_procedure.emit(tr("LOADED-MATRIX"))

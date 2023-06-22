@@ -20,7 +20,7 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 from ..common_tools import PandasModel
 from ..common_tools import ReportDialog
 from ..common_tools import standard_path
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_traffic_assignment.ui"))
@@ -438,7 +438,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         for k, cls in self.traffic_classes.items():
             if self.skims[k]:
                 dt = cls.graph.block_centroid_flows
-                logger.debug(f"Set skims {self.skims[k]} for {k}")
+                logger.debug(tr("Set skims {} for {}").format(self.skims[k], k))
                 cls.graph.set_graph(self.cob_ffttime.currentText())
                 cls.graph.set_skimming(self.skims[k])
                 cls.graph.set_blocked_centroid_flows(dt)
@@ -454,7 +454,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     val = float(val)
                 except Exception as e:
                     self.error = tr("VDF parameter is not numeric")
-                    logger.error(tr(f"Tried to set a VDF parameter not numeric. {e.args}"))
+                    logger.error(tr("Tried to set a VDF parameter not numeric. {}").format(e.args))
                     return False
             self.vdf_parameters[k] = val
 

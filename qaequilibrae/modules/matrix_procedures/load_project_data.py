@@ -13,7 +13,6 @@ from .load_result_table import load_result_table
 from .matrix_lister import list_matrices
 from .results_lister import list_results
 from ..common_tools import PandasModel
-from ...i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_project_data.ui"))
 
@@ -91,7 +90,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         _ = load_result_table(self.project.project_base_path, table_name)
 
     def exit_with_error(self):
-        qgis.utils.iface.messageBar().pushMessage(tr("Error:"), self.error, level=1)
+        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
         self.close()
 
     def exit_procedure(self):

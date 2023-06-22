@@ -15,7 +15,7 @@ from PyQt5.QtCore import pyqtSignal
 from qgis.PyQt.QtCore import QVariant
 from aequilibrae.utils.worker_thread import WorkerThread
 from ..common_tools import get_vector_layer_by_name
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 from aequilibrae.paths import allOrNothing
 
 

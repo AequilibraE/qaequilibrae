@@ -6,6 +6,7 @@ import yaml
 
 from qgis.PyQt import QtWidgets, uic
 from .auxiliary_functions import standard_path
+from qaequilibrae.i18n.translator import tr
 
 try:
     from aequilibrae.paths import release_name, release_version
@@ -42,13 +43,13 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
                     break
 
         self.all_items = []
-        self.all_items.append(["AequilibraE Version name", release_name])
-        self.all_items.append(["AequilibraE Version number", release_version])
-        self.all_items.append(["GUI version", b])
-        self.all_items.append(["GUI Repository", repository])
-        self.all_items.append(["Minimum QGIS", "3.14"])
-        self.all_items.append(["Developers", par["developers"]])
-        self.all_items.append(["Sponsors", par["sponsors"]])
+        self.all_items.append([tr("AequilibraE Version name"), release_name])
+        self.all_items.append([tr("AequilibraE Version number"), release_version])
+        self.all_items.append([tr("GUI version"), b])
+        self.all_items.append([tr("GUI Repository"), repository])
+        self.all_items.append([tr("Minimum QGIS"), "3.14"])
+        self.all_items.append([tr("Developers"), par["developers"]])
+        self.all_items.append([tr("Sponsors"), par["sponsors"]])
 
         self.assemble()
 

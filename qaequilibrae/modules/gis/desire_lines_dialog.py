@@ -13,7 +13,7 @@ from .desire_lines_procedure import DesireLinesProcedure
 from ..common_tools import ReportDialog
 from ..common_tools import standard_path, get_vector_layer_by_name
 from ..common_tools.global_parameters import poly_types, numeric_types, point_types
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 from ..matrix_procedures import list_matrices
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_DesireLines.ui"))
@@ -148,8 +148,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         try:
             QgsProject.instance().addMapLayer(self.worker_thread.result_layer)
         except Exception as e:
-            self.worker_thread.report.append("Could not load desire lines to map")
-            self.logger.error(tr(f"Could not load desire lines to map. {e.args}"))
+            self.worker_thread.report.append(tr("Could not load desire lines to map"))
+            self.logger.error(tr("Could not load desire lines to map. {}").format(e.args))
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()

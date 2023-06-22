@@ -13,7 +13,7 @@ from qgis.core import QgsProject
 from qgis.core import QgsVectorLayerJoinInfo
 from ..common_tools import get_parameter_chain
 from ..common_tools import find_table_fields
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 from ..matrix_procedures.load_result_table import load_result_table
 from ..matrix_procedures import list_results
 

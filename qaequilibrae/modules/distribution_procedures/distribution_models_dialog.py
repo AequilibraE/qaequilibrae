@@ -18,7 +18,7 @@ from .ipf_procedure import IpfProcedure
 from ..common_tools import GetOutputFileName
 from ..common_tools import ReportDialog
 from ..common_tools.auxiliary_functions import standard_path
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_distribution.ui"))
@@ -227,7 +227,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.model.load(file_name)
             self.update_model_parameters()
         except Exception as e:
-            qgis.utils.iface.messageBar().pushMessage(tr("Error"), tr(f"Could not load model. {e.args}"), level=3)
+            qgis.utils.iface.messageBar().pushMessage("Error", tr("Could not load model. {}").format(e.args), level=3)
 
     def change_vector_field(self, cob_orig, cob_dest, dt):
         cob_dest.clear()

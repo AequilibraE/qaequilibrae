@@ -11,7 +11,7 @@ from qgis.core import QGridLayout, QWidget, QTableView, QHBoxLayout, QCheckBox, 
 from qgis.core import QLabel, QSpinBox, QComboBox
 from aequilibrae.aequilibrae.matrix import AequilibraeMatrix
 from ..common_tools import NumpyModel, GetOutputFileName
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_viewer.ui"))
 
@@ -165,7 +165,7 @@ class MatrixManipulationDialog(QDialog, FORM_CLASS):
 
     def export(self):
         new_name, file_type = GetOutputFileName(
-            self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.path
+            self, self.data_type, [tr("Comma-separated file(*.csv)")], ".csv", self.path
         )
         if new_name is not None:
             self.data_to_show.export(new_name)

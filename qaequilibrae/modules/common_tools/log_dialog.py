@@ -7,6 +7,8 @@ from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML
 from qgis.PyQt.QtGui import QFont
 
+from qaequilibrae.i18n.translator import tr
+
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_parameters.ui"))
 
 
@@ -38,7 +40,7 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_validate.setVisible(False)
         self.but_defaults.setVisible(False)
         self.but_save.setVisible(True)
-        self.but_close.setText("Close")
+        self.but_close.setText(tr("Close"))
         self.but_close.clicked.connect(self.exit_procedure)
         self.but_save.clicked.connect(self.save_to_disk)
 

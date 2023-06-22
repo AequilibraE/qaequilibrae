@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
 
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_feed.ui"))
 

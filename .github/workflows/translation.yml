@@ -50,7 +50,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
 
-          git add .
+          git add qaequilibrae/i18n/qaequilibrae.ts
           git commit -a -m "Adds translatable files"
           git push origin HEAD:refs/heads/${{ env.CURRENT_BRANCH }}
         
@@ -59,7 +59,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
 
-          git add .
+          git add qaequilibrae/i18n/qaequilibrae.ts
           git commit -a -m "Adds translatable files"
           git push origin HEAD:refs/heads/${{ env.CURRENT_BRANCH }}
 

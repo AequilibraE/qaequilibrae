@@ -5,7 +5,7 @@ from aequilibrae.project import Project
 
 from aequilibrae.context import get_logger
 from aequilibrae.utils.worker_thread import WorkerThread
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 
 logger = get_logger()
 
@@ -74,7 +74,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
             except Exception as e:
                 logger.error(sql)
                 logger.error(e.args)
-                self.report.append("field " + str(f) + " could not be added")
+                self.report.append(tr("field {} could not be added").format(str(f)))
         curr.close()
         return string_fields
 
@@ -91,7 +91,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         curr.execute("COMMIT;")
         self.project.conn.commit()
 
-        self.emit_messages(message="Transferring nodes", value=0, max_val=self.node_layer.featureCount())
+        self.emit_messages(message=tr("Transferring nodes"), value=0, max_val=self.node_layer.featureCount())
 
         find_sql = """SELECT node_id
                         FROM nodes
@@ -129,7 +129,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
     def transfer_layer_features(self, table, layer, layer_fields):
 
-        self.emit_messages(message=f"Transferring {table}", value=0, max_val=layer.featureCount())
+        self.emit_messages(message=tr("Transferring {}").format(table), value=0, max_val=layer.featureCount())
 
         field_titles = ",".join(layer_fields.keys())
         all_modes = set()
@@ -186,13 +186,13 @@ class CreatesTranspoNetProcedure(WorkerThread):
             try:
                 self.project.conn.execute(sql, data)
             except Exception as e:
-                logger.info(f"Failed inserting record {data[0]} for {table}")
+                logger.info(tr("Failed inserting record {} for {}").format(data[0], table))
                 logger.info(e.args)
                 logger.info([sql, data])
                 if data[0]:
-                    msg = tr(f"feature with id {data[0]} could not be added to layer {table}")
+                    msg = tr("feature with id {} could not be added to layer {}").format(data[0], table)
                 else:
-                    msg = tr(f"feature with no node id present. It could not be added to layer {table}")
+                    msg = tr("feature with no node id present. It could not be added to layer {}").format(table)
                 self.report.append(msg)
 
         self.project.conn.commit()

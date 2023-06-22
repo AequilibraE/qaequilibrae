@@ -4,7 +4,7 @@ from aequilibrae.utils.worker_thread import WorkerThread
 import struct
 from aequilibrae.matrix import AequilibraeData
 from ..common_tools.global_parameters import float_types, string_types, integer_types
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 from qgis.PyQt.QtCore import pyqtSignal
 
 
@@ -74,4 +74,4 @@ class LoadDataset(WorkerThread):
                 self.ProgressValue.emit(p)
 
             self.ProgressValue.emit(feat_count)
-        self.finished_threaded_procedure.emit("Done")
+        self.finished_threaded_procedure.emit(tr("Done"))

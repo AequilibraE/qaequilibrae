@@ -13,7 +13,7 @@ from qgis.utils import iface
 from .point_tool import PointTool
 from ..common_tools import LoadGraphLayerSettingDialog
 from ..common_tools import standard_path
-from ...i18n.translator import tr
+from qaequilibrae.i18n.translator import tr
 
 logger = logging.getLogger("AequilibraEGUI")
 
@@ -156,7 +156,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                 else:
                     self.create_path_with_scratch_layer()
             else:
-                msg = tr(f"No path between {self.path_from.text()} and {self.path_to.text()}")
+                msg = tr("No path between {} and {}").format(self.path_from.text(), self.path_to.text())
                 qgis.utils.iface.messageBar().pushMessage(msg, "", level=3)
 
     def create_path_with_selection(self):
