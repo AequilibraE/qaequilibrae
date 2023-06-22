@@ -29,8 +29,8 @@ class GTFSImporter(QDialog, FORM_CLASS):
             self.rdo_clear.setText(tr("Overwrite Routes"))
             self.rdo_keep.setText(tr("Add to Existing Routes"))
         else:
-            self.label_3.setText(tr("Add Transit Table"))
-            self.rdo_clear.setText(tr("Crete New Route System"))
+            self.label_3.setText(tr("Add transit table"))
+            self.rdo_clear.setText(tr("Create new route system"))
             self.rdo_keep.setVisible(False)
             self.rdo_clear.setChecked(True)
         self.setFixedHeight(380)

@@ -32,7 +32,7 @@ jobs:
         sudo apt-get update
         sudo apt install qttools5-dev-tools
         python -m pip install --upgrade pip
-        python -m pip install -r requirements/packaging.txt
+        python -m pip install -r ci/packaging.txt
     
     - name: Create translatable files
       run: |
