@@ -31,12 +31,10 @@ class GTFSFeed(QDialog, FORM_CLASS):
         self.but_add.setVisible(False)
         self.service_calendar.setVisible(False)
         self.setFixedHeight(1)
-        if testing:
-            self.close()
-        else:
+        self.testing = testing
+        self.date = None
+        if not testing:
             self.open_feed()
-            if self.feed is None:
-                self.close()
 
     def open_feed(self):
         from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
@@ -80,7 +78,10 @@ class GTFSFeed(QDialog, FORM_CLASS):
             self.iface.messageBar().pushMessage("Error", tr("Enter agency and description"), level=3, duration=10)
             return
 
-        date = self.service_calendar.selectedDate().toString("yyyy-MM-dd")
+        if not self.testing:
+            date = self.service_calendar.selectedDate().toString("yyyy-MM-dd")
+        else:
+            date = self.date
         self.feed.set_date(date)
 
         caps = {}
