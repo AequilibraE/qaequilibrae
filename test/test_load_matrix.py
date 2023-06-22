@@ -1,17 +1,39 @@
-from PyQt5.QtCore import Qt, QTimer
-from qgis.core import QgsProject, QgsVectorLayer
+from unittest import mock
+from PyQt5.QtCore import Qt, QTimer, QVariant
+from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature, QgsApplication
 from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
 
 
 def load_layers():
-    path_to_gpkg = 'file:test/data/SiouxFalls_project/aon.csv?delimiter=,'
-    datalayer = QgsVectorLayer(path_to_gpkg, "open_layer", "delimitedtext")
+    import csv
+    path_to_csv = 'test/data/SiouxFalls_project/SiouxFalls_od.csv'
+    datalayer = QgsVectorLayer('None?delimiter=,', "open_layer", 'memory')
+
+    fields = [
+        QgsField('O', QVariant.Int),
+        QgsField('D', QVariant.Int),
+        QgsField('Ton', QVariant.Double),
+    ]
+    datalayer.dataProvider().addAttributes(fields)
+    datalayer.updateFields()
+
+    with open(
+        path_to_csv, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            origin = int(row['O'])
+            destination = int(row['D'])
+            tons = float(row["Ton"])
+
+            feature = QgsFeature()
+            feature.setAttributes([origin, destination, tons])
+
+            datalayer.dataProvider().addFeature(feature)
 
     if not datalayer.isValid():
         print("Open layer failed to load!")
     else:
         QgsProject.instance().addMapLayer(datalayer)
-
 
 def test_matrix_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
@@ -29,10 +51,19 @@ def test_matrix_menu(ae_with_project, qtbot):
 
 
 def test_save_matrix(ae_with_project, qtbot):
+    file_name = "test/data/SiouxFalls_project/test_matrix.aem"
     load_layers()
     dialog = LoadMatrixDialog(ae_with_project)
-    dialog.show()
+    dialog.output_name = file_name
+    dialog.field_from.setCurrentIndex(0)
+    dialog.field_to.setCurrentIndex(1)
+    dialog.field_cells.setCurrentIndex(2)
+    dialog.prepare_final_matrix()
 
-    qtbot.mouseClick(dialog.but_load, Qt.LeftButton)
-    qtbot.mouseClick(dialog.but_permanent_save, Qt.LeftButton)
+    from aequilibrae.matrix import AequilibraeMatrix
+    mat = AequilibraeMatrix()
+    mat.load(file_name)
+    
+    assert mat.matrices.size == 0
+
     dialog.close()
