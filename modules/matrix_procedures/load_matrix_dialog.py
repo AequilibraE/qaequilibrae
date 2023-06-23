@@ -12,11 +12,11 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QAction
 from qgis.PyQt.QtGui import QIcon
 from .load_matrix_class import LoadMatrix
 from .mat_reblock import MatrixReblocking
-from ..common_tools.all_layers_from_toc import all_layers_from_toc
-from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
-from ..common_tools.get_output_file_name import GetOutputFileName
-from ..common_tools.global_parameters import float_types, integer_types
-from ..common_tools.report_dialog import ReportDialog
+from modules.common_tools.all_layers_from_toc import all_layers_from_toc
+from modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
+from modules.common_tools.get_output_file_name import GetOutputFileName
+from modules.common_tools.global_parameters import float_types, integer_types
+from modules.common_tools.report_dialog import ReportDialog
 
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None
@@ -28,7 +28,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 # TODO: Allow user to import multiple matrices from CSV at once (like an export from TransCad or FAF data)
 # TODO: Add a remove button to the list of matrices to be loaded. Remove double-click
 class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, **kwargs):
+    def __init__(self, iface, testing=False, **kwargs):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
@@ -47,7 +47,8 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = None
         self.__current_name = None
         self.logger = aequilibrae.logger
-        self.change_matrix_type()
+        self.testing = testing
+        self.load_layer_to_project()
 
         # For changing the network layer
         self.matrix_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
@@ -68,24 +69,6 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 if layer.wkbType() == 100:
                     self.matrix_layer.addItem(layer.name())
 
-        self.resizing()
-
-    def resizing(self):
-        self.group_combo.setVisible(True)
-        self.group_list.setVisible(True)
-        self.group_buttons.setVisible(True)
-        self.matrix_list_view.setColumnWidth(0, 180)
-        self.matrix_list_view.setColumnWidth(1, 100)
-        self.matrix_list_view.setColumnWidth(2, 125)
-        self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
-        self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
-        self.setMaximumSize(QtCore.QSize(100000, 100000))
-        self.resize(542, 427)
-        self.but_permanent_save.setVisible(True)
-
-        self.but_save_for_single_use.setEnabled(False)
-        self.but_permanent_save.setEnabled(False)
-
     def slot_double_clicked(self, mi):
         row = mi.row()
         if row > -1:
@@ -94,7 +77,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.matrices.pop(mat_to_remove, None)
             self.update_matrix_list()
 
-    def change_matrix_type(self):
+    def load_layer_to_project(self):
         self.but_load.setEnabled(True)
         members = [self.lbl_matrix, self.lbl_from, self.matrix_layer, self.field_from]
         all_members = members + [self.lbl_to, self.lbl_flow, self.field_to, self.field_cells]
@@ -108,8 +91,6 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         for member in all_members:
             member.setVisible(True)
         self.load_fields_to_combo_boxes()
-
-        self.resizing()
 
     def load_fields_to_combo_boxes(self):
         self.but_load.setEnabled(False)
@@ -149,7 +130,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def finished_threaded_procedure(self, param):
         self.but_load.setEnabled(True)
-        if self.worker_thread.report:
+        if self.worker_thread.report and not self.testing:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
             dlg2.exec_()
