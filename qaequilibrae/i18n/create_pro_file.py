@@ -22,8 +22,8 @@ for path, subdirs, files in os.walk("qaequilibrae/modules"):
                 if s.find(b'i18n.translator import tr') != -1:
                     sources.append(os.path.join(path, name))
 
-forms = [f.replace("""\\""", "/").replace("qaequilibrae", "..") for f in forms]
-sources = [s.replace("""\\""", "/").replace("qaequilibrae", "..") for s in sources]
+forms = [f.replace("""\\""", "/") for f in forms]
+sources = [s.replace("""\\""", "/") for s in sources]
 
 with open("qaequilibrae/i18n/qaequilibrae.pro", mode="w") as pro_file:
     pro_file.write(f"FORMS = {forms[0]} \\")
@@ -33,7 +33,7 @@ with open("qaequilibrae/i18n/qaequilibrae.pro", mode="w") as pro_file:
 
     pro_file.write("\n")
 
-    pro_file.write(f"\nSOURCES = ../qaequilibrae.py \\")
+    pro_file.write(f"\nSOURCES = qaequilibrae/qaequilibrae.py \\")
     for s in sources[:-1]:
         pro_file.write(f"\n {s} \\")
     pro_file.write(f"\n {sources[-1]}")

@@ -1,7 +1,7 @@
 
 
 def run_traffic_assig(qgis_project):
-    from .traffic_assignment_dialog import TrafficAssignmentDialog
+    from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
     if qgis_project.project is None:
         qgis_project.show_message_no_project()
         return

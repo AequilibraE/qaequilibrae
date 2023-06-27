@@ -12,7 +12,7 @@ def run_load_project(qgis_project):
 
 
 def _get_project_path():
-    from ..common_tools.auxiliary_functions import standard_path
+    from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
     return QFileDialog.getExistingDirectory(QWidget(), tr("AequilibraE Project folder"), standard_path())
 
 

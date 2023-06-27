@@ -12,14 +12,14 @@ import qgis
 from aequilibrae.context import get_logger
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
-from .apply_gravity_procedure import ApplyGravityProcedure
-from .calibrate_gravity_procedure import CalibrateGravityProcedure
-from .ipf_procedure import IpfProcedure
-from ..common_tools import GetOutputFileName
-from ..common_tools import ReportDialog
-from ..common_tools.auxiliary_functions import standard_path
+from qaequilibrae.modules.distribution_procedures.apply_gravity_procedure import ApplyGravityProcedure
+from qaequilibrae.modules.distribution_procedures.calibrate_gravity_procedure import CalibrateGravityProcedure
+from qaequilibrae.modules.distribution_procedures.ipf_procedure import IpfProcedure
+from qaequilibrae.modules.common_tools import GetOutputFileName
+from qaequilibrae.modules.common_tools import ReportDialog
+from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
 from qaequilibrae.i18n.translator import tr
-from ..matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
+from qaequilibrae.modules.matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_distribution.ui"))
 spec = iutil.find_spec("openmatrix")

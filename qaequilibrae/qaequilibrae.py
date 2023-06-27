@@ -38,7 +38,7 @@ except:
                             tr("Do you want us to install these missing python packages? \r\n"
                             "QGIS will be non-responsive for a couple of minutes."),
                             QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
-        from .download_extra_packages_class import download_all
+        from qaequilibrae.download_extra_packages_class import download_all
 
         result = download_all().install()
         if "ERROR" in "".join([str(x).upper() for x in result]):

@@ -17,9 +17,9 @@ from tempfile import gettempdir
 import qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
-from ..common_tools import PandasModel
-from ..common_tools import ReportDialog
-from ..common_tools import standard_path
+from qaequilibrae.modules.common_tools import PandasModel
+from qaequilibrae.modules.common_tools import ReportDialog
+from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.i18n.translator import tr
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui

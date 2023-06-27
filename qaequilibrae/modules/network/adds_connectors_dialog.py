@@ -4,7 +4,7 @@ import sys
 import qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.core import QgsMapLayerProxyModel
-from .adds_connectors_procedure import AddsConnectorsProcedure
+from qaequilibrae.modules.network.adds_connectors_procedure import AddsConnectorsProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 sys.modules["qgsfieldcombobox"] = qgis.gui

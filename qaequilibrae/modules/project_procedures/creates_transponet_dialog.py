@@ -10,11 +10,11 @@ import qgis
 from aequilibrae.parameters import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
-from .creates_transponet_procedure import CreatesTranspoNetProcedure
-from ..common_tools import ReportDialog
-from ..common_tools import all_layers_from_toc
-from ..common_tools import get_vector_layer_by_name, standard_path
-from ..common_tools.global_parameters import point_types, line_types
+from qaequilibrae.modules.project_procedures.creates_transponet_procedure import CreatesTranspoNetProcedure
+from qaequilibrae.modules.common_tools import ReportDialog
+from qaequilibrae.modules.common_tools import all_layers_from_toc
+from qaequilibrae.modules.common_tools import get_vector_layer_by_name, standard_path
+from qaequilibrae.modules.common_tools.global_parameters import point_types, line_types
 from qaequilibrae.i18n.translator import tr
 
 

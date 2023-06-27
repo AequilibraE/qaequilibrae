@@ -2,15 +2,15 @@ import logging
 import os
 from functools import partial
 
-from ..common_tools import standard_path
+from qaequilibrae.modules.common_tools import standard_path
 from qgis.PyQt import uic
 from qgis.PyQt.Qsci import QsciLexerPython
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QGridLayout, QWidget, QTableView, QHBoxLayout, QCheckBox, QSpacerItem, QSizePolicy
 from qgis.core import QLabel, QSpinBox, QComboBox
-from aequilibrae.aequilibrae.matrix import AequilibraeMatrix
-from ..common_tools import NumpyModel, GetOutputFileName
+from aequilibrae.matrix import AequilibraeMatrix
+from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
 from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_viewer.ui"))

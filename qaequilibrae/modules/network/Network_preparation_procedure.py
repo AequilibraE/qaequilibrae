@@ -4,7 +4,7 @@ from qgis._core import QgsField, QgsFeatureRequest, QgsPointXY, QgsVectorLayer, 
 
 from qgis.PyQt.QtCore import QVariant
 from aequilibrae.utils.worker_thread import WorkerThread
-from ..common_tools import get_vector_layer_by_name
+from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from qaequilibrae.i18n.translator import tr
 
 

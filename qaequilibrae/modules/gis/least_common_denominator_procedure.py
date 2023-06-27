@@ -1,8 +1,8 @@
 from aequilibrae.utils.worker_thread import WorkerThread
 
-from ..common_tools import get_vector_layer_by_name
-from ..common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
-from ..common_tools.global_parameters import multi_point
+from qaequilibrae.modules.common_tools import get_vector_layer_by_name
+from qaequilibrae.modules.common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
+from qaequilibrae.modules.common_tools.global_parameters import multi_point
 from qaequilibrae.i18n.translator import tr
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtCore import pyqtSignal

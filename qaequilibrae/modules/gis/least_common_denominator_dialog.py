@@ -2,11 +2,11 @@ import os
 from functools import partial
 
 import qgis
-from ..common_tools.global_parameters import poly_types, multi_poly, point_types
+from qaequilibrae.modules.common_tools.global_parameters import poly_types, multi_poly, point_types
 from qgis.PyQt import QtWidgets, uic
 from qgis.core import QgsProject
 from .least_common_denominator_procedure import LeastCommonDenominatorProcedure
-from ..common_tools import get_vector_layer_by_name
+from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_least_common_denominator.ui"))

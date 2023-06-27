@@ -13,7 +13,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QPushButton, QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QToolButton, QHBoxLayout, QWidget, QDialog
 from .set_color_ramps_dialog import LoadColorRampSelector
-from ..common_tools import get_parameter_chain
+from qaequilibrae.modules.common_tools import get_parameter_chain
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgscolorbutton"] = qgis.gui

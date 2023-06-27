@@ -7,11 +7,11 @@ from aequilibrae.matrix import AequilibraeData
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem
-from .load_dataset_class import LoadDataset
-from ..common_tools.all_layers_from_toc import all_layers_from_toc
-from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
-from ..common_tools.get_output_file_name import GetOutputFileName
-from ..common_tools.global_parameters import integer_types, float_types, point_types, poly_types
+from qaequilibrae.modules.matrix_procedures.load_dataset_class import LoadDataset
+from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_from_toc
+from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
+from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
+from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types, point_types, poly_types
 from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_vector_loader.ui"))

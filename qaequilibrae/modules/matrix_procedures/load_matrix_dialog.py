@@ -9,13 +9,13 @@ import qgis
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem
-from .load_matrix_class import LoadMatrix
-from .mat_reblock import MatrixReblocking
-from ..common_tools.all_layers_from_toc import all_layers_from_toc
-from ..common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
-from ..common_tools.get_output_file_name import GetOutputFileName
-from ..common_tools.global_parameters import float_types, integer_types
-from ..common_tools.report_dialog import ReportDialog
+from qaequilibrae.modules.matrix_procedures.load_matrix_class import LoadMatrix
+from qaequilibrae.modules.matrix_procedures.mat_reblock import MatrixReblocking
+from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_from_toc
+from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
+from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
+from qaequilibrae.modules.common_tools.global_parameters import float_types, integer_types
+from qaequilibrae.modules.common_tools.report_dialog import ReportDialog
 from qaequilibrae.i18n.translator import tr
 
 spec = iutil.find_spec("openmatrix")

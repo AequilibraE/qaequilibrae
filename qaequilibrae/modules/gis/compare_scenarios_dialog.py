@@ -11,11 +11,11 @@ from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.core import QgsExpression
 from qgis.core import QgsProject
 from qgis.core import QgsVectorLayerJoinInfo
-from ..common_tools import get_parameter_chain
-from ..common_tools import find_table_fields
+from qaequilibrae.modules.common_tools import get_parameter_chain
+from qaequilibrae.modules.common_tools import find_table_fields
 from qaequilibrae.i18n.translator import tr
-from ..matrix_procedures.load_result_table import load_result_table
-from ..matrix_procedures import list_results
+from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
+from qaequilibrae.modules.matrix_procedures import list_results
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgsmaplayercombobox"] = qgis.gui
