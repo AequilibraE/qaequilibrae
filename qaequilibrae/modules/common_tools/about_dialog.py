@@ -5,7 +5,7 @@ from os.path import dirname, abspath
 import yaml
 
 from qgis.PyQt import QtWidgets, uic
-from .auxiliary_functions import standard_path
+from auxiliary_functions import standard_path
 from qaequilibrae.i18n.translator import tr
 
 try:
