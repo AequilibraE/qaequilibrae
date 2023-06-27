@@ -116,7 +116,8 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.but_load.setEnabled(False)
         self.worker_thread.start()
-        self.exec_()
+        if not self.testing:
+            self.exec_()
 
     # VAL and VALUE have the following structure: (bar/text ID, value)
     def progress_range_from_thread(self, val):
@@ -189,9 +190,9 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 qgis.utils.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
             )
 
-        if self.worker_thread is not None:
+        if self.worker_thread is not None and not self.testing:
             self.run_thread()
-            self.worker_thread.doWork()
+        self.worker_thread.doWork()
 
         if self.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
@@ -262,7 +263,8 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.worker_thread = MatrixReblocking(
                 qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
             )
-        self.run_thread()
+        if not self.testing:
+            self.run_thread()
         self.worker_thread.doWork()
 
     def exit_procedure(self):

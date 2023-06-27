@@ -53,17 +53,20 @@ def test_matrix_menu(ae_with_project, qtbot):
 def test_save_matrix(ae_with_project, qtbot):
     file_name = "test/data/SiouxFalls_project/test_matrix.aem"
     load_layers()
-    dialog = LoadMatrixDialog(ae_with_project)
+    dialog = LoadMatrixDialog(ae_with_project, testing=True)
+    dialog.sparse = True
     dialog.output_name = file_name
     dialog.field_from.setCurrentIndex(0)
     dialog.field_to.setCurrentIndex(1)
     dialog.field_cells.setCurrentIndex(2)
+    qtbot.mouseClick(dialog.but_load, Qt.LeftButton)
+    dialog.finished_threaded_procedure("LOADED-MATRIX")
     dialog.prepare_final_matrix()
 
     from aequilibrae.matrix import AequilibraeMatrix
     mat = AequilibraeMatrix()
     mat.load(file_name)
     
-    assert mat.matrices.size == 0
+    assert mat.matrix["ton"].shape == (24,24)
 
     dialog.close()
