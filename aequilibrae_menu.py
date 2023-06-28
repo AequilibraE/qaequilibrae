@@ -19,9 +19,9 @@ from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
 from qgis.core import QgsProject
 
-from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths
+from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
-from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_tag
+from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_import_gtfs
 from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network
 from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
@@ -80,8 +80,8 @@ class AequilibraEMenu:
             "Data": [],
             "Trip Distribution": [],
             "Paths and assignment": [],
+            "Public Transport": [],
             "Routing": [],
-            # 'Public Transport': [],
             "GIS": [],
             "Utils": [],
             "AequilibraE": [],
@@ -89,12 +89,12 @@ class AequilibraEMenu:
 
         # # #######################   PROJECT SUB-MENU   ############################
         self.add_menu_action("Project", "Open Project", partial(run_load_project, self))
-        self.add_menu_action("Project", "Create project from OSM", partial(project_from_osm, self))
+        self.add_menu_action("Project", "Create Project from OSM", partial(project_from_osm, self))
         self.add_menu_action("Project", "Create Project from layers", partial(run_create_transponet, self))
         self.add_menu_action("Project", "Add zoning data", partial(run_add_zones, self))
         self.add_menu_action("Project", "Parameters", partial(run_change_parameters, self))
         self.add_menu_action("Project", "logfile", partial(show_log, self))
-        self.add_menu_action("Project", "Close project", self.run_close_project)
+        self.add_menu_action("Project", "Close Project", self.run_close_project)
 
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
@@ -124,18 +124,8 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         # # # #######################   TRANSIT SUB-MENU   ###########################
-        # transitMenu = QMenu()
-        # self.gtfs_import_action = QAction(self.trlt('Convert GTFS to SpatiaLite'), self.manager)
-        # self.gtfs_import_action.triggered.connect(self.run_import_gtfs)
-        # transitMenu.addAction(self.gtfs_import_action)
-        #
-        # transitButton = QToolButton()
-        # transitButton.setText(self.trlt('Public Transport'))
-        # transitButton.setPopupMode(2)
-        # transitButton.setMenu(transitMenu)
-        #
-        # self.toolbar.addWidget(transitButton)
-        #
+        self.add_menu_action('Public Transport', 'Import GTFS', partial(run_import_gtfs, self))
+
         # # ########################################################################
         # # #################        GIS TOOLS SUB-MENU    #########################
         self.add_menu_action("GIS", "Desire Lines", partial(run_desire_lines, self))
