@@ -57,7 +57,8 @@ class MatrixReblocking(WorkerThread):
 
         names = [str(n) for n in self.matrices.keys()]
         self.matrix.create_empty(
-            file_name=self.file_name, zones=compact_shape, matrix_names=names, data_type=np.float64
+            file_name=self.file_name, zones=compact_shape, matrix_names=names, data_type=np.float64,
+            memory_only=False
         )
 
         self.matrix.index[:] = indices[:]

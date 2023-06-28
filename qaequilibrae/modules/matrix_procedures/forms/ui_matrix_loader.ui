@@ -31,7 +31,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>AequilibraE  -  Matrix loader</string>
+   <string>AequilibraE  -  Matrix importer</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -139,64 +139,6 @@
         </property>
         <property name="maxVisibleItems">
          <number>10</number>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>120</width>
-       <height>131</height>
-      </size>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="radio_aeq_matrix">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>AequilibraE</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QRadioButton" name="radio_layer_matrix">
-        <property name="text">
-         <string>Open layer</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QRadioButton" name="radio_npy_matrix">
-        <property name="text">
-         <string>Numpy</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QRadioButton" name="radio_omx_matrix">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>OMX</string>
         </property>
        </widget>
       </item>
@@ -511,10 +453,6 @@
     </widget>
    </item>
   </layout>
-  <zorder>groupBox</zorder>
-  <zorder>group_combo</zorder>
-  <zorder>group_list</zorder>
-  <zorder>groupBox_2</zorder>
  </widget>
  <resources/>
  <connections/>
