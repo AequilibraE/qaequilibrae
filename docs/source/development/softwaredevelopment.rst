@@ -100,6 +100,35 @@ Imports
 
     import numpy as np
 
+Translatable Strings
+~~~~~~~~~~~~~~~~~~~~
+
+In case you are adding and/or changing any piece of QAequilibraE's code with translatable strings,
+which are those strings we see in the widget windows, please make sure to indicate they are translatable by
+importing the `tr` function. This shall guarantee you that the string will be compiled into our
+future translations.
+
+::
+
+    from qaequilibrae.i18n.translator import tr
+
+    # Indicates that the message "You need at least three centroids to route. " will be
+    # set for translation.
+    qgis.utils.iface.messageBar().pushMessage(tr("You need at least three centroids to route. "), "", level=3)
+
+    # In case you have to insert any text into a string, the best way is to use string format
+    self.error = tr("ID {} is non unique in your selected field").format(str(i_d))
+
+As for June 2023, QAequilibraE's translations are all hosted in 
+`Transifex <https://explore.transifex.com/aequilibrae/qaequilibrae/>`_. Currently, we are targeting translations
+in Brazilian Portuguese, Chinese, French, German, Italian, and Spanish. If you want to contribute to QAequilibraE 
+by translating the plugin to other languages, please let us know in our 
+`AequilibraE Google Group <https://groups.google.com/forum/#!forum/aequilibrae>`_,
+so we can add your language to our translation pool!
+
+In the :ref:`plugin-translation`page, you can find more information on creating you account and
+start translating QAequilibraE.
+
 Contributing to AequilibraE for QGIS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -107,7 +136,7 @@ GitHub has a nice visual explanation on how collaboration is done `GitHub Flow
 <https://guides.github.com/introduction/flow>`_. (For us,) The most important points there are:
 
 * The master branch contains the latest working/release version of AequilibraE
-* Work is done in an issue/feature branch (or a fork) and then pushed to a new brach
+* Work is done in an issue/feature branch (or a fork) and then pushed to a new branch
 * Automated testing is run using Github Actions. All tests must pass:
 
   * Unit testing
@@ -167,7 +196,7 @@ Documentation
 
 All the AequilibraE documentation is (unfortunately) written in `reStructuredText
 <http://docutils.sourceforge.net/rst.html>`_ and built with `Sphinx <http://www.sphinx-doc.org/en/stable/>`_.
-Although Restructured Text is often unecessarily convoluted to write, Sphinx is capable of converting it to standard-
+Although Restructured Text is often unnecessarily convoluted to write, Sphinx is capable of converting it to standard-
 looking html pages, while also bringing the docstring documentation along for the ride.
 
 To build the documentation, first make sure the required packages are installed::

@@ -2,7 +2,7 @@ import pytest
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject, Qgis
-from aequilibrae_menu import AequilibraEMenu
+from qaequilibrae.qaequilibrae import AequilibraEMenu
 
 
 def wait_for_active_window(qtbot):
@@ -43,7 +43,7 @@ def test_create_project_from_osm_menu(ae, qtbot):
         check_if_new_active_window_matches_class(qtbot, ProjectFromOSMDialog)
 
     action = ae.menuActions["Project"][1]
-    assert action.text() == "Create Project from OSM", "Wrong text content"
+    assert action.text() == "Create project from OSM", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
 

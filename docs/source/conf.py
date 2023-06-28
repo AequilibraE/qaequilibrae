@@ -27,7 +27,7 @@ author = "Pedro Camargo"
 
 # The short X.Y.Z version
 
-a = open("../../metadata.txt", "r")
+a = open("../../qaequilibrae/metadata.txt", "r")
 for line in a.readlines():
     if "version" in line.rstrip():
         version = line.rstrip()[8:]

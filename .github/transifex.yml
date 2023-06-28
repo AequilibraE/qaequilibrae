@@ -1,0 +1,15 @@
+filters:
+  - filter_type: file
+    file_format: QT
+    source_language: en
+    source_file: qaequilibrae/i18n/qaequilibrae.ts
+    translation_files_expression: 'qaequilibrae/i18n/qaequilibrae_<lang>.ts'
+settings:
+  language_mapping:
+    fr: fr_FR
+    pt: pt_BR
+    en: en_US
+    de: de
+    it: it
+    es: es
+    zh: zh_CN
