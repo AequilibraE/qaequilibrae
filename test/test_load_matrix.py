@@ -1,5 +1,6 @@
 from unittest import mock
 from PyQt5.QtCore import Qt, QTimer, QVariant
+import numpy as np
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature, QgsApplication
 from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
 
@@ -68,5 +69,7 @@ def test_save_matrix(ae_with_project, qtbot):
     mat.load(file_name)
     
     assert mat.matrix["ton"].shape == (24,24)
+    assert np.sum(np.nan_to_num(mat.matrix["ton"])[:,:]) == 360600
+    assert (mat.index == np.arange(1, 25)).all()
 
     dialog.close()
