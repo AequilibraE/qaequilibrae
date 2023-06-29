@@ -7,8 +7,9 @@ env:
 
 on:
   push:
-    branches:
+    branches-ignore:
       - develop
+      - main
   pull_request:
   release:
 
