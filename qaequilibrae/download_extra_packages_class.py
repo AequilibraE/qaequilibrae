@@ -1,3 +1,4 @@
+import numpy as np
 import importlib.util as iutil
 import os
 from pathlib import Path
@@ -15,6 +16,9 @@ class download_all:
         self.pth = join(pth, "packages")
 
     def install(self):
+        if int(np.__version__.split(".")[1]) < 22:
+            self.adapt_aeq_version()
+
         lines = []
         command = f'"{self.find_python()}" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
         print(sys.executable)
@@ -57,3 +61,13 @@ class download_all:
             raise FileExistsError("Can't find a python executable to use")
 
         return python_exe
+
+    def adapt_aeq_version(self):
+        with open(self.file, "r") as fl:
+            cts = [c.rstrip() for c in fl.readlines()]
+
+        with open(self.file, "w") as fl:
+            for c in cts:
+                if "aequilibrae" in c:
+                    c = c + ".dev0"
+                fl.write(f"{c}\n")
