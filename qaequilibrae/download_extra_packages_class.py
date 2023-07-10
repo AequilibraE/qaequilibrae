@@ -1,10 +1,12 @@
-import numpy as np
 import importlib.util as iutil
+import numpy as np
 import os
-from pathlib import Path
+import shutil
 import subprocess
 import sys
-from os.path import join
+from os.path import join, isfile
+from pathlib import Path
+from pathlib import Path
 from qgis.PyQt import uic, QtWidgets
 from qgis.core import QgsMessageLog, Qgis
 
@@ -12,12 +14,12 @@ from qgis.core import QgsMessageLog, Qgis
 class download_all:
     def __init__(self):
         pth = os.path.dirname(__file__)
-        self.file = join(pth, "requirements.txt")
+        self._file = join(pth, "requirements.txt")
+        self.file = join(pth, "requirements_to_do.txt")
         self.pth = join(pth, "packages")
 
     def install(self):
-        if int(np.__version__.split(".")[1]) < 22:
-            self.adapt_aeq_version()
+        self.adapt_aeq_version()
 
         lines = []
         command = f'"{self.find_python()}" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
@@ -25,12 +27,12 @@ class download_all:
         print(command)
         lines.append(command)
         with subprocess.Popen(
-            command,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stdin=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
+                command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stdin=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
         ) as proc:
             lines.extend(proc.stdout.readlines())
 
@@ -49,7 +51,7 @@ class download_all:
             # If that didn't work, it also has a valid sys.executable (unlike other platforms)
             python_exe = sys_exe
 
-        # On mac/windows sys.exeuctable returns '/Applications/QGIS.app/Contents/MacOS/QGIS' or
+        # On mac/windows sys.executable returns '/Applications/QGIS.app/Contents/MacOS/QGIS' or
         # 'C:\\Program Files\\QGIS 3.30.0\\bin\\qgis-bin.exe' respectively so we need to explore in that area
         # of the filesystem
         elif sys.platform == "darwin":
@@ -63,7 +65,12 @@ class download_all:
         return python_exe
 
     def adapt_aeq_version(self):
-        with open(self.file, "r") as fl:
+        if int(np.__version__.split(".")[1]) >= 22:
+            Path(self.file).unlink(missing_ok=True)
+            shutil.copyfile(self._file, self.file)
+            return
+
+        with open(self._file, "r") as fl:
             cts = [c.rstrip() for c in fl.readlines()]
 
         with open(self.file, "w") as fl:
