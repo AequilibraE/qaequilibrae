@@ -13,6 +13,7 @@ from qgis._core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFea
 from scipy.spatial import Delaunay
 from PyQt5.QtCore import pyqtSignal
 from qgis.PyQt.QtCore import QVariant
+from qgis.core import QgsCoordinateReferenceSystem
 from aequilibrae.utils.worker_thread import WorkerThread
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from qaequilibrae.i18n.translator import tr
@@ -51,7 +52,9 @@ class DesireLinesProcedure(WorkerThread):
         self.desire_lines.emit((tr("finished_desire_lines_procedure"), 0))
 
     def get_basic_data(self):
+        crs = QgsCoordinateReferenceSystem('EPSG:4326')
         layer = get_vector_layer_by_name(self.layer)
+        layer.setCrs(crs)
         idx = layer.dataProvider().fieldNameIndex(self.id_field)
         feature_count = layer.featureCount()
         self.desire_lines.emit(("job_size_dl", feature_count))
