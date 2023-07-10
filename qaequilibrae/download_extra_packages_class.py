@@ -4,7 +4,7 @@ import os
 import shutil
 import subprocess
 import sys
-from os.path import join, isfile
+from os.path import join, isfile, isdir
 from pathlib import Path
 from pathlib import Path
 from qgis.PyQt import uic, QtWidgets
@@ -27,17 +27,18 @@ class download_all:
         print(command)
         lines.append(command)
         with subprocess.Popen(
-                command,
-                shell=True,
-                stdout=subprocess.PIPE,
-                stdin=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT,
-                universal_newlines=True,
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stdin=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
         ) as proc:
             lines.extend(proc.stdout.readlines())
 
         for line in lines:
             QgsMessageLog.logMessage(str(line), level=Qgis.Critical)
+        self.clean_packages()
         return lines
 
     def find_python(self):
@@ -61,7 +62,6 @@ class download_all:
 
         if not python_exe.exists():
             raise FileExistsError("Can't find a python executable to use")
-
         return python_exe
 
     def adapt_aeq_version(self):
@@ -78,3 +78,11 @@ class download_all:
                 if "aequilibrae" in c:
                     c = c + ".dev0"
                 fl.write(f"{c}\n")
+
+    def clean_packages(self):
+        pkgs = ["numpy", "scipy", "pandas"]
+        for fldr in list(os.walk(self.pth))[0][1]:
+            for pkg in pkgs:
+                if pkg.lower() in fldr.lower():
+                    if isdir(join(self.pth, fldr)):
+                        shutil.rmtree(join(self.pth, fldr))
