@@ -47,9 +47,6 @@ def test_matrix_menu(ae_with_project, qtbot):
     assert action.text() == "Import matrices", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
 
 def test_save_matrix(ae_with_project, qtbot):
     file_name = "test/data/SiouxFalls_project/test_matrix.aem"

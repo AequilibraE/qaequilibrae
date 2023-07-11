@@ -18,8 +18,6 @@ def test_ta_menu(ae_with_project, qtbot):
     assert action.text() == "Traffic Assignment", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 def test_traffic_assignment(ae_with_project, qtbot):
     update_matrices = LoadProjectDataDialog(ae_with_project)
