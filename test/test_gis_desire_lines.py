@@ -2,7 +2,7 @@ import os
 import pytest
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
-from qgis.core import QgsProject, Qgis, QgsVectorLayer
+from qgis.core import QgsProject, Qgis, QgsVectorLayer, QgsCoordinateReferenceSystem
 from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
 
 
@@ -24,6 +24,10 @@ def load_layers():
         print("Nodes layer failed to load!")
     else:
         QgsProject.instance().addMapLayer(nodeslayer)
+        var = QgsProject.instance().mapLayersByName("Nodes layer")
+        if not var[0].crs().isValid():
+            crs = QgsCoordinateReferenceSystem("EPSG:4326")
+            var[0].setCrs(crs)
 
 
 def test_click_create_without_layers(ae_with_project, qtbot):
