@@ -28,10 +28,11 @@ logger = logging.getLogger("AequilibraEGUI")
 
 
 class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgis_project):
+    def __init__(self, qgis_project, testing=False):
         QtWidgets.QDialog.__init__(self)
         self.iface = qgis_project.iface
         self.project = qgis_project.project
+        self.testing = testing
         self.setupUi(self)
         self.skimming = False
         self.path = standard_path()
@@ -241,11 +242,14 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         matrix = self.project.matrices.get_matrix(mat_name)
 
         sel = self.tbl_core_list.selectionModel().selectedRows()
-        if not sel:
+        if not sel and not self.testing:
             return
         rows = [s.row() for s in sel if s.column() == 0]
         user_classes = [matrix.names[i] for i in rows]
-        matrix.computational_view(user_classes)
+        if self.testing:
+            matrix.computational_view(["matrix"])
+        else:
+            matrix.computational_view(user_classes)
 
         mode = self.cob_mode_for_class.currentText()
         mode_id = self.all_modes[mode]
@@ -297,7 +301,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.skims[class_name] = []
 
     def __add_skimming(self):
-
         field = self.cob_skims_available.currentText()
         traffic_class = self.traffic_classes[self.cob_skim_class.currentText()]
         name = traffic_class.__id__
@@ -363,6 +366,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
         self.assignment.max_iter = self.miter
         self.assignment.rgap_target = float(self.rel_gap.text())
+        self.assignment.log_specification()
         self.worker_thread = self.assignment.assignment
         self.run_thread()
 
@@ -375,10 +379,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             return False
 
         self.scenario_name = self.output_scenario_name.text()
-        if not self.scenario_name:
-            self.error = tr("Missing scenario name")
-            return False
-
         if not self.scenario_name:
             self.error = tr("Missing scenario name")
             return False
@@ -457,7 +457,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     logger.error(tr("Tried to set a VDF parameter not numeric. {}").format(e.args))
                     return False
             self.vdf_parameters[k] = val
-
+        if self.testing:
+            self.vdf_parameters = {"alpha": 0.15, "beta": 4.0}
         return True
 
     def exit_procedure(self):
