@@ -1,3 +1,5 @@
+import numpy as np
+from aequilibrae.matrix import AequilibraeMatrix
 from pathlib import Path
 from os.path import isfile
 import sqlite3
@@ -19,7 +21,7 @@ def test_ta_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
 
-def test_traffic_assignment(ae_with_project, qtbot):
+def test_single_class_traffic_assignment(ae_with_project, qtbot):
     update_matrices = LoadProjectDataDialog(ae_with_project)
     update_matrices.update_matrix_table()
 
@@ -32,6 +34,10 @@ def test_traffic_assignment(ae_with_project, qtbot):
 
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
     
+    dialog.cob_skims_available.setCurrentText("free_flow_time")
+    dialog.cob_skims_available.setCurrentText("car")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+
     dialog.cob_vdf.setCurrentText("BPR")
     dialog.cob_capacity.setCurrentText("capacity")
     dialog.cob_ffttime.setCurrentText("free_flow_time")
@@ -47,6 +53,14 @@ def test_traffic_assignment(ae_with_project, qtbot):
     con = sqlite3.connect(results)
     assert con.execute(f"SELECT SUM(PCE_tot) FROM {test_name}").fetchone()[0] > 881_000
 
+    skims = pth / ("matrices/" + test_name + "_car.aem")
+    assert isfile(skims)
+
+    mtx = AequilibraeMatrix()
+    mtx.load(skims)
+    assert np.sum(np.nan_to_num(mtx.matrix["free_flow_time_final"])) > 0
+    assert np.sum(np.nan_to_num(mtx.matrix["free_flow_time_blended"])) > 0
+
     num_cores = dialog.assignment.cores
     log_ = pth / "aequilibrae.log"
     assert isfile(log_)
@@ -61,3 +75,6 @@ def test_traffic_assignment(ae_with_project, qtbot):
     assert """'Number of centroids': 24, 'Matrix cores': ['matrix'], 'Matrix totals': {'matrix': 360600.0}}"}}""" in file_text
     assert "INFO ; Traffic Assignment specification" in file_text
     assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 30, 'Target RGAP': 0.001}}".format(num_cores)
+
+def test_multiclass_traffic_assignment(ae_with_project, qtbot):
+    pass
