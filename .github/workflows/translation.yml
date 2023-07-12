@@ -6,10 +6,6 @@ env:
   CURRENT_BRANCH: $(git branch --show-current)
 
 on:
-  push:
-    branches-ignore:
-      - develop
-      - main
   pull_request:
     branches-ignore:
       - develop
