@@ -363,9 +363,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.assignment.set_vdf_parameters(self.vdf_parameters)
         self.assignment.set_capacity_field(self.cob_capacity.currentText())
         self.assignment.set_time_field(self.cob_ffttime.currentText())
-        self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
         self.assignment.max_iter = self.miter
         self.assignment.rgap_target = float(self.rel_gap.text())
+        self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
         self.assignment.log_specification()
         self.worker_thread = self.assignment.assignment
         self.run_thread()

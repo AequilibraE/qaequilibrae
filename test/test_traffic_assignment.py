@@ -26,7 +26,6 @@ def test_traffic_assignment(ae_with_project, qtbot):
     dialog = TrafficAssignmentDialog(ae_with_project, testing=True)
 
     test_name = f"TestTrafficAssignment_{uuid4().hex[:6]}"
-    print(test_name)
     dialog.chb_check_centroids.setChecked(False)
     dialog.output_scenario_name.setText(test_name)
     dialog.cob_matrices.setCurrentText("b'none'")
@@ -61,4 +60,4 @@ def test_traffic_assignment(ae_with_project, qtbot):
     assert """INFO ; {'car': {'Graph': "{'Mode': 'c', 'Block through centroids': False, 'Number of centroids': 24, 'Links': 76, 'Nodes': 24}",""" in file_text
     assert """'Number of centroids': 24, 'Matrix cores': ['matrix'], 'Matrix totals': {'matrix': 360600.0}}"}}""" in file_text
     assert "INFO ; Traffic Assignment specification" in file_text
-    assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 250, 'Target RGAP': 0.0001}}".format(num_cores)
+    assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 30, 'Target RGAP': 0.001}}".format(num_cores)
