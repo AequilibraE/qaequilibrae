@@ -1,4 +1,4 @@
-name: translate & pack
+name: translate & package
 
 env:
   PLUGIN_VERSION: $(python qaequilibrae/get_version.py)
@@ -6,10 +6,10 @@ env:
   CURRENT_BRANCH: $(git branch --show-current)
 
 on:
-  pull_request:
-    branches-ignore:
+  push:
+    branches:
       - develop
-      - main
+  pull_request:
   release:
 
 jobs:
@@ -35,12 +35,13 @@ jobs:
         python -m pip install -r ci/packaging.txt
     
     - name: Create translatable files
+      if: ${{(github.ref == 'refs/heads/develop') && (github.event_name == 'push')}}
       run: |
         python qaequilibrae/i18n/create_pro_file.py
         pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
 
     - name: Check if there are modifications in the translatable files
-      if: ${{ (github.event_name != 'release')}}
+      if: ${{(github.ref == 'refs/heads/develop') && (github.event_name == 'push')}}
       run: |
         git fetch --no-tags --depth=1 origin ${{ env.CURRENT_BRANCH }}
         files_created=$(git ls-files --others --exclude-standard)
@@ -69,7 +70,6 @@ jobs:
         fi
 
     - name: Compile translations if they exist
-      if: ${{ (github.event_name != 'release')}}
       run: |
         cd qaequilibrae/i18n
         translatable_files=$(ls)
