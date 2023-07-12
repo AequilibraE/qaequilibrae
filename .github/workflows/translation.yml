@@ -11,6 +11,9 @@ on:
       - develop
       - main
   pull_request:
+    branches-ignore:
+      - develop
+      - main
   release:
 
 jobs:
@@ -41,6 +44,7 @@ jobs:
         pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
 
     - name: Check if there are modifications in the translatable files
+      if: ${{ (github.event_name != 'release')}}
       run: |
         git fetch --no-tags --depth=1 origin ${{ env.CURRENT_BRANCH }}
         files_created=$(git ls-files --others --exclude-standard)
@@ -69,6 +73,7 @@ jobs:
         fi
 
     - name: Compile translations if they exist
+      if: ${{ (github.event_name != 'release')}}
       run: |
         cd qaequilibrae/i18n
         translatable_files=$(ls)
