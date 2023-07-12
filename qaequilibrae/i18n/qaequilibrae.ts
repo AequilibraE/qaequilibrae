@@ -195,7 +195,7 @@ QGIS will be non-responsive for a couple of minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/menu_actions/action_add_connectors.py" line="7"/>
+        <location filename="../modules/menu_actions/action_show_log.py" line="7"/>
         <source>You need to load a project first</source>
         <translation type="unfinished"></translation>
     </message>
@@ -506,7 +506,7 @@ QGIS will be non-responsive for a couple of minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/common_tools/log_dialog.py" line="43"/>
+        <location filename="../modules/common_tools/parameters_dialog.py" line="105"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3065,7 +3065,7 @@ QGIS will be non-responsive for a couple of minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
         <source>Layer field</source>
         <translation type="unfinished"></translation>
     </message>
