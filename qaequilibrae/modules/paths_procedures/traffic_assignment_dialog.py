@@ -28,11 +28,10 @@ logger = logging.getLogger("AequilibraEGUI")
 
 
 class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgis_project, testing=False):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
         self.iface = qgis_project.iface
         self.project = qgis_project.project
-        self.testing = testing
         self.setupUi(self)
         self.skimming = False
         self.path = standard_path()
@@ -242,14 +241,11 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         matrix = self.project.matrices.get_matrix(mat_name)
 
         sel = self.tbl_core_list.selectionModel().selectedRows()
-        if not sel and not self.testing:
+        if not sel:
             return
         rows = [s.row() for s in sel if s.column() == 0]
         user_classes = [matrix.names[i] for i in rows]
-        if self.testing:
-            matrix.computational_view(["matrix"])
-        else:
-            matrix.computational_view(user_classes)
+        matrix.computational_view(user_classes)
 
         mode = self.cob_mode_for_class.currentText()
         mode_id = self.all_modes[mode]
@@ -457,8 +453,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     logger.error(tr("Tried to set a VDF parameter not numeric. {}").format(e.args))
                     return False
             self.vdf_parameters[k] = val
-        if self.testing:
-            self.vdf_parameters = {"alpha": 0.15, "beta": 4.0}
         return True
 
     def exit_procedure(self):
