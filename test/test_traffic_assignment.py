@@ -97,51 +97,52 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     dialog.output_scenario_name.setText(test_name)
     dialog.cob_matrices.setCurrentText("b''")
 
-    dialog.ln_class_name.setText("car")
+    # Traffic class - Car
     dialog.tbl_core_list.selectRow(0)
-    dialog.cob_mode_for_class.setCurrentText("car")
-    dialog.chb_check_centroids.setChecked(False)
+    dialog.cob_mode_for_class.setCurrentIndex(0)
+    dialog.ln_class_name.setText("car")
     dialog.pce_setter.setValue(1.0)
+    dialog.chb_check_centroids.setChecked(False)
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds car skims
-    dialog.cob_skims_available.setCurrentText("free_flow_time")
-    dialog.cob_skim_class.setCurrentText("car")
+    dialog.cob_skims_available.setCurrentIndex(4)
+    dialog.cob_skim_class.setCurrentIndex(0)
     qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    dialog.cob_skims_available.setCurrentText("distance")
-    dialog.cob_skim_class.setCurrentText("car")
+    dialog.cob_skims_available.setCurrentIndex(8)
+    dialog.cob_skim_class.setCurrentIndex(0)
     qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
-    dialog.ln_class_name.setText("trucks")
-    dialog.cob_mode_for_class.setCurrentIndex(4)
-    dialog.cob_mode_for_class.setCurrentText("Trucks")
+    # Traffic Class Trucks
     dialog.tbl_core_list.selectRow(2)
-    dialog.chb_check_centroids.setChecked(False)
+    dialog.cob_mode_for_class.setCurrentIndex(4)
+    dialog.ln_class_name.setText("Trucks")
     dialog.pce_setter.setValue(2.5)
+    dialog.chb_check_centroids.setChecked(False)
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds truck skims
-    dialog.cob_skims_available.setCurrentText("free_flow_time")
-    dialog.cob_skim_class.setCurrentText("truck")
+    dialog.cob_skims_available.setCurrentIndex(4)
+    dialog.cob_skim_class.setCurrentIndex(1)
     qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    dialog.cob_skims_available.setCurrentText("distance")
-    dialog.cob_skim_class.setCurrentText("truck")
+    dialog.cob_skims_available.setCurrentIndex(8)
+    dialog.cob_skim_class.setCurrentIndex(1)
     qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
-    dialog.ln_class_name.setText("motorcycle")
+    # Traffic Class Motorcycle
+    dialog.tbl_core_list.selectRow(1)
     dialog.cob_mode_for_class.setCurrentIndex(3)
     dialog.cob_mode_for_class.setCurrentText("Motorcycle")
-    dialog.tbl_core_list.selectRow(1)
-    dialog.chb_check_centroids.setChecked(False)
     dialog.pce_setter.setValue(0.2)
+    dialog.chb_check_centroids.setChecked(False)
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds motorcycle skims
-    dialog.cob_skims_available.setCurrentText("free_flow_time")
-    dialog.cob_skim_class.setCurrentText("motorcycle")
+    dialog.cob_skims_available.setCurrentIndex(4)
+    dialog.cob_skim_class.setCurrentIndex(2)
     qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    dialog.cob_skims_available.setCurrentText("distance")
-    dialog.cob_skim_class.setCurrentText("motorcycle")
+    dialog.cob_skims_available.setCurrentIndex(8)
+    dialog.cob_skim_class.setCurrentIndex(2)
     qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
     dialog.skims["car"] = ["free_flow_time", "distance"]
