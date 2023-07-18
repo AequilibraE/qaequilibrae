@@ -29,7 +29,7 @@ def test_single_class_traffic_assignment(ae_with_project, qtbot):
     dialog = TrafficAssignmentDialog(ae_with_project)
 
     test_name = f"TestTrafficAssignment_SC_{uuid4().hex[:6]}"
-    dialog.cob_matrices.setCurrentText("b'none'")
+    dialog.cob_matrices.setCurrentText("demand")
     dialog.ln_class_name.setText("car")
     dialog.cob_mode_for_class.setCurrentText("car (c)")
 
@@ -89,14 +89,13 @@ def test_single_class_traffic_assignment(ae_with_project, qtbot):
 
 def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     update_matrices = LoadProjectDataDialog(ae_with_project)
-    update_matrices.update_matrix_table()
 
     dialog = TrafficAssignmentDialog(ae_with_project)
     dialog.testing = True
 
     test_name = f"TestTrafficAssignment_MC_{uuid4().hex[:6]}"
     dialog.output_scenario_name.setText(test_name)
-    dialog.cob_matrices.setCurrentText("b''")
+    dialog.cob_matrices.setCurrentText("demand_mc")
 
     # Traffic class - Car
     dialog.tbl_core_list.selectRow(0)
