@@ -105,12 +105,12 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds car skims
-    # dialog.cob_skims_available.setCurrentIndex(4)
-    # dialog.cob_skim_class.setCurrentIndex(0)
-    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    # dialog.cob_skims_available.setCurrentIndex(8)
-    # dialog.cob_skim_class.setCurrentIndex(0)
-    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    dialog.cob_skims_available.setCurrentText("free_flow_time")
+    dialog.cob_skim_class.setCurrentText("car")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    dialog.cob_skims_available.setCurrentText("distance")
+    dialog.cob_skim_class.setCurrentText("car")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
     # Traffic Class Trucks
     dialog.tbl_core_list.selectRow(2)
@@ -121,12 +121,12 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds truck skims
-    # dialog.cob_skims_available.setCurrentIndex(4)
-    # dialog.cob_skim_class.setCurrentIndex(1)
-    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    # dialog.cob_skims_available.setCurrentIndex(8)
-    # dialog.cob_skim_class.setCurrentIndex(1)
-    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    dialog.cob_skims_available.setCurrentText("free_flow_time")
+    dialog.cob_skim_class.setCurrentText("Trucks")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    dialog.cob_skims_available.setCurrentText("distance")
+    dialog.cob_skim_class.setCurrentText("Trucks")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
     # Traffic Class Motorcycle
     dialog.tbl_core_list.selectRow(1)
@@ -137,16 +137,12 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds motorcycle skims
-    # dialog.cob_skims_available.setCurrentIndex(4)
-    # dialog.cob_skim_class.setCurrentIndex(2)
-    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    # dialog.cob_skims_available.setCurrentIndex(8)
-    # dialog.cob_skim_class.setCurrentIndex(2)
-    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    #
-    # dialog.skims["car"] = ["free_flow_time", "distance"]
-    # dialog.skims["Trucks"] = ["free_flow_time", "distance"]
-    # dialog.skims["Motorcycle"] = ["free_flow_time", "distance"]
+    dialog.cob_skims_available.setCurrentText("free_flow_time")
+    dialog.cob_skim_class.setCurrentText("Motorcycle")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    dialog.cob_skims_available.setCurrentText("distance")
+    dialog.cob_skim_class.setCurrentText("Motorcycle")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
     # Assignment setup
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
