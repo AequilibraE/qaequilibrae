@@ -28,15 +28,14 @@ def test_single_class_traffic_assignment(ae_with_project, qtbot):
     dialog = TrafficAssignmentDialog(ae_with_project)
 
     test_name = f"TestTrafficAssignment_SC_{uuid4().hex[:6]}"
-    dialog.cob_matrices.setCurrentText("demand")
-    dialog.ln_class_name.setText("car")
-    dialog.cob_mode_for_class.setCurrentText("car (c)")
+    dialog.output_scenario_name.setText(test_name)
+    dialog.cob_matrices.setCurrentText("demand.aem")
 
     dialog.tbl_core_list.selectRow(0)
-
-    dialog.cob_skim_class.setCurrentText("car")
+    dialog.cob_mode_for_class.setCurrentIndex(0)
+    dialog.ln_class_name.setText("car")
+    dialog.pce_setter.setValue(1.0)
     dialog.chb_check_centroids.setChecked(False)
-    dialog.output_scenario_name.setText(test_name)
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Skimming
