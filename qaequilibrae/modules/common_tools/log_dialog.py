@@ -54,11 +54,12 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def save_to_disk(self):
         options = QtWidgets.QFileDialog.Options()
-        options |= QtWidgets.QFileDialog.DontUseNativeDialog
-        file_path, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save logfile", "", "lofgile (*.log)", options=options)
+        file_path, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Save logfile", "", "logfile (*.log)", options=options)
         if file_path:
             with open(file_path, "w") as log:
                 log.writelines(self.text_box.text())
+
+        self.exit_procedure()
 
     def exit_procedure(self):
         self.close()
