@@ -53,10 +53,11 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.rgap = "Undefined"
         self.iter = 0
         self.miter = 1000
+        self.testing = False
 
         # Signals for the matrix_procedures tab
         self.but_add_skim.clicked.connect(self.__add_skimming)
-        self.but_add_class.clicked.connect(self.__create_traffic_class)
+        self.but_add_class.clicked.connect(self._create_traffic_class)
         self.cob_matrices.currentIndexChanged.connect(self.change_matrix_selected)
         self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
         self.chb_fixed_cost.toggled.connect(self.set_fixed_cost_use)
@@ -227,9 +228,11 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 val_fld.addItem(x)
             table.setCellWidget(i, 2, val_fld)
 
-    def __create_traffic_class(self):
+    def _create_traffic_class(self):
         mat_name = self.cob_matrices.currentText()
         if not mat_name:
+            if self.testing:
+                raise AttributeError("Matrix not set")
             return
 
         class_name = self.ln_class_name.text()
@@ -242,6 +245,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         sel = self.tbl_core_list.selectionModel().selectedRows()
         if not sel:
+            if self.testing:
+                raise AttributeError("Matrix cores not chosen")
             return
         rows = [s.row() for s in sel if s.column() == 0]
         user_classes = [matrix.names[i] for i in rows]
@@ -297,11 +302,12 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.skims[class_name] = []
 
     def __add_skimming(self):
-
         field = self.cob_skims_available.currentText()
         traffic_class = self.traffic_classes[self.cob_skim_class.currentText()]
         name = traffic_class.__id__
         if field in self.skims[name]:
+            if self.testing:
+                raise AttributeError("No skims set")
             return
 
         table = self.skim_list_table
@@ -342,7 +348,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run(self):
         if not self.check_data():
-            qgis.utils.iface.messageBar().pushMessage(tr("Input error"), self.error, level=3)
+            if self.testing:
+                raise Exception(self.error)
+            qgis.utils.iface.messageBar().pushMessage(tr("Input error"), self.error, level=3, duration=10)
 
         algorithm = self.cb_choose_algorithm.currentText()
         self.miter = int(self.max_iter.text())
@@ -360,9 +368,10 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.assignment.set_vdf_parameters(self.vdf_parameters)
         self.assignment.set_capacity_field(self.cob_capacity.currentText())
         self.assignment.set_time_field(self.cob_ffttime.currentText())
-        self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
         self.assignment.max_iter = self.miter
         self.assignment.rgap_target = float(self.rel_gap.text())
+        self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
+        self.assignment.log_specification()
         self.worker_thread = self.assignment.assignment
         self.run_thread()
 
@@ -375,10 +384,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             return False
 
         self.scenario_name = self.output_scenario_name.text()
-        if not self.scenario_name:
-            self.error = tr("Missing scenario name")
-            return False
-
         if not self.scenario_name:
             self.error = tr("Missing scenario name")
             return False
@@ -457,7 +462,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     logger.error(tr("Tried to set a VDF parameter not numeric. {}").format(e.args))
                     return False
             self.vdf_parameters[k] = val
-
         return True
 
     def exit_procedure(self):
