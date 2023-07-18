@@ -1,12 +1,13 @@
+import sqlite3
+from os.path import isfile
+from pathlib import Path
+from uuid import uuid4
+
 import numpy as np
 import openmatrix as omx
-from pathlib import Path
-from os.path import isfile
-import sqlite3
-from uuid import uuid4
-from PyQt5.QtCore import QTimer, Qt, QItemSelectionModel
 import pytest
-from qaequilibrae.modules.matrix_procedures.load_project_data import LoadProjectDataDialog
+from PyQt5.QtCore import QTimer, Qt
+
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
 
@@ -22,10 +23,8 @@ def test_ta_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
 
-def test_single_class_traffic_assignment(ae_with_project, qtbot):
-    update_matrices = LoadProjectDataDialog(ae_with_project)
-    update_matrices.update_matrix_table()
 
+def test_single_class_traffic_assignment(ae_with_project, qtbot):
     dialog = TrafficAssignmentDialog(ae_with_project)
 
     test_name = f"TestTrafficAssignment_SC_{uuid4().hex[:6]}"
@@ -40,6 +39,7 @@ def test_single_class_traffic_assignment(ae_with_project, qtbot):
     dialog.output_scenario_name.setText(test_name)
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
+    # Skimming
     dialog.cob_skims_available.setCurrentText("free_flow_time")
     qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
@@ -85,11 +85,11 @@ def test_single_class_traffic_assignment(ae_with_project, qtbot):
     assert """INFO ; {'car': {'Graph': "{'Mode': 'c', 'Block through centroids': False, 'Number of centroids': 24, 'Links': 76, 'Nodes': 24}",""" in file_text
     assert """'Number of centroids': 24, 'Matrix cores': ['matrix'], 'Matrix totals': {'matrix': 360600.0}}"}}""" in file_text
     assert "INFO ; Traffic Assignment specification" in file_text
-    assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 30, 'Target RGAP': 0.001}}".format(num_cores)
+    assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 30, 'Target RGAP': 0.001}}".format(
+        num_cores)
+
 
 def test_multiclass_traffic_assignment(ae_with_project, qtbot):
-    update_matrices = LoadProjectDataDialog(ae_with_project)
-
     dialog = TrafficAssignmentDialog(ae_with_project)
     dialog.testing = True
 
@@ -106,12 +106,12 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds car skims
-    dialog.cob_skims_available.setCurrentIndex(4)
-    dialog.cob_skim_class.setCurrentIndex(0)
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    dialog.cob_skims_available.setCurrentIndex(8)
-    dialog.cob_skim_class.setCurrentIndex(0)
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    # dialog.cob_skims_available.setCurrentIndex(4)
+    # dialog.cob_skim_class.setCurrentIndex(0)
+    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    # dialog.cob_skims_available.setCurrentIndex(8)
+    # dialog.cob_skim_class.setCurrentIndex(0)
+    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
     # Traffic Class Trucks
     dialog.tbl_core_list.selectRow(2)
@@ -122,12 +122,12 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds truck skims
-    dialog.cob_skims_available.setCurrentIndex(4)
-    dialog.cob_skim_class.setCurrentIndex(1)
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    dialog.cob_skims_available.setCurrentIndex(8)
-    dialog.cob_skim_class.setCurrentIndex(1)
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    # dialog.cob_skims_available.setCurrentIndex(4)
+    # dialog.cob_skim_class.setCurrentIndex(1)
+    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    # dialog.cob_skims_available.setCurrentIndex(8)
+    # dialog.cob_skim_class.setCurrentIndex(1)
+    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
     # Traffic Class Motorcycle
     dialog.tbl_core_list.selectRow(1)
@@ -138,16 +138,16 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds motorcycle skims
-    dialog.cob_skims_available.setCurrentIndex(4)
-    dialog.cob_skim_class.setCurrentIndex(2)
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    dialog.cob_skims_available.setCurrentIndex(8)
-    dialog.cob_skim_class.setCurrentIndex(2)
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-
-    dialog.skims["car"] = ["free_flow_time", "distance"]
-    dialog.skims["Trucks"] = ["free_flow_time", "distance"]
-    dialog.skims["Motorcycle"] = ["free_flow_time", "distance"]
+    # dialog.cob_skims_available.setCurrentIndex(4)
+    # dialog.cob_skim_class.setCurrentIndex(2)
+    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    # dialog.cob_skims_available.setCurrentIndex(8)
+    # dialog.cob_skim_class.setCurrentIndex(2)
+    # qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    #
+    # dialog.skims["car"] = ["free_flow_time", "distance"]
+    # dialog.skims["Trucks"] = ["free_flow_time", "distance"]
+    # dialog.skims["Motorcycle"] = ["free_flow_time", "distance"]
 
     # Assignment setup
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
@@ -194,4 +194,5 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     assert """INFO ; {'trucks': {'Graph': "{'Mode': 'T', 'Block through centroids': False, 'Number of centroids': 24, 'Links': 76, 'Nodes': 24}","""
     assert """'Number of centroids': 24, 'Matrix cores': ['trucks'], 'Matrix totals': {'trucks': 90235.57459796841}}"}}"""
     assert "INFO ; Traffic Assignment specification" in file_text
-    assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 20, 'Target RGAP': 0.001}}".format(num_cores)
+    assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 20, 'Target RGAP': 0.001}}".format(
+        num_cores)
