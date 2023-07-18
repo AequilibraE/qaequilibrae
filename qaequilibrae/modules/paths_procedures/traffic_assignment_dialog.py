@@ -53,10 +53,11 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.rgap = "Undefined"
         self.iter = 0
         self.miter = 1000
+        self.testing = False
 
         # Signals for the matrix_procedures tab
         self.but_add_skim.clicked.connect(self.__add_skimming)
-        self.but_add_class.clicked.connect(self.__create_traffic_class)
+        self.but_add_class.clicked.connect(self._create_traffic_class)
         self.cob_matrices.currentIndexChanged.connect(self.change_matrix_selected)
         self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
         self.chb_fixed_cost.toggled.connect(self.set_fixed_cost_use)
@@ -227,9 +228,11 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 val_fld.addItem(x)
             table.setCellWidget(i, 2, val_fld)
 
-    def __create_traffic_class(self):
+    def _create_traffic_class(self):
         mat_name = self.cob_matrices.currentText()
         if not mat_name:
+            if self.testing:
+                raise AttributeError("Matrix not set")
             return
 
         class_name = self.ln_class_name.text()
@@ -242,6 +245,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         sel = self.tbl_core_list.selectionModel().selectedRows()
         if not sel:
+            if self.testing:
+                raise AttributeError("Matrix cores not chosen")
             return
         rows = [s.row() for s in sel if s.column() == 0]
         user_classes = [matrix.names[i] for i in rows]
@@ -301,6 +306,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         traffic_class = self.traffic_classes[self.cob_skim_class.currentText()]
         name = traffic_class.__id__
         if field in self.skims[name]:
+            if self.testing:
+                raise AttributeError("No skims set")
             return
 
         table = self.skim_list_table

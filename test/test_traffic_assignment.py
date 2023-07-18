@@ -92,6 +92,7 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     update_matrices.update_matrix_table()
 
     dialog = TrafficAssignmentDialog(ae_with_project)
+    dialog.testing = True
 
     test_name = f"TestTrafficAssignment_MC_{uuid4().hex[:6]}"
     dialog.output_scenario_name.setText(test_name)
