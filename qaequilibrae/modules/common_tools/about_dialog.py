@@ -32,7 +32,7 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
 
         d = dirname(dirname(dirname(abspath(__file__))))
         with open(os.path.join(d, "meta.yaml"), "r") as yml:
-            par = yaml.load(yml)
+            par = yaml.safe_load(yml)
 
         my_file = os.path.join(d, "metadata.txt")
         b = "?"

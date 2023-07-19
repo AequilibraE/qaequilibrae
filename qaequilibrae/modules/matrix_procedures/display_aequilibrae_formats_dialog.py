@@ -148,16 +148,16 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self._layout.addItem(self.mat_layout)
             self.change_matrix_cores()
 
-        self.but_export = QPushButton()
-        self.but_export.setText(tr("Export"))
-        self.but_export.clicked.connect(self.export)
+        # self.but_export = QPushButton()
+        # self.but_export.setText(tr("Export"))
+        # self.but_export.clicked.connect(self.export)
 
         self.but_close = QPushButton()
         self.but_close.clicked.connect(self.exit_procedure)
         self.but_close.setText(tr("Close"))
 
         self.but_layout = QHBoxLayout()
-        self.but_layout.addWidget(self.but_export)
+        # self.but_layout.addWidget(self.but_export)
         self.but_layout.addWidget(self.but_close)
 
         self._layout.addItem(self.but_layout)
