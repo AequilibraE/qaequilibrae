@@ -23,7 +23,7 @@ from qgis.PyQt.QtCore import QTranslator
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_import_gtfs
-from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network
+from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network, run_about
 from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from qaequilibrae.i18n.translator import tr
@@ -157,7 +157,7 @@ class AequilibraEMenu:
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
 
-        self.add_menu_action("AequilibraE", tr("About"), self.run_about)
+        self.add_menu_action("AequilibraE", tr("About"), partial(run_about, self))
         self.add_menu_action("AequilibraE", tr("Help"), self.run_help)
 
         self.build_menu()
@@ -300,18 +300,8 @@ class AequilibraEMenu:
         layer = QgsVectorLayer(uri.uri(), layer_name, "spatialite")
         return layer
 
-    def run_about(self):
-        dlg2 = AboutDialog(self.iface)
-        dlg2.show()
-        dlg2.exec_()
-
     def run_load_database(self):
         dlg2 = LoadDatasetDialog(self.iface, single_use=False)
-        dlg2.show()
-        dlg2.exec_()
-
-    def run_import_gtfs(self):
-        dlg2 = GtfsImportDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 
