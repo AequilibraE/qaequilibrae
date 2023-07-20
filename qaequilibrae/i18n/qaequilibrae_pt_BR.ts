@@ -206,7 +206,7 @@ O QGIS não vai responder por alguns minutos.</translation>
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="78"/>
         <source>You need at least three nodes to route. </source>
-        <translation type="unfinished"/>
+        <translation>É preciso ao menos três nós para criar uma rota</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="84"/>
