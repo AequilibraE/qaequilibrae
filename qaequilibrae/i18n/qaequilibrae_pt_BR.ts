@@ -191,12 +191,12 @@ O QGIS não vai responder por alguns minutos.</translation>
     <message>
         <location filename="../qaequilibrae.py" line="168"/>
         <source>Show project info</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar informações do projeto</translation>
     </message>
     <message>
         <location filename="../modules/menu_actions/action_show_log.py" line="7"/>
         <source>You need to load a project first</source>
-        <translation type="unfinished"/>
+        <translation>Você precisa carregar um projeto primeiro</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="322"/>
