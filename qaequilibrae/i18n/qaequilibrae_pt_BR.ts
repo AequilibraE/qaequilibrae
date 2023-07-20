@@ -176,17 +176,17 @@ O QGIS não vai responder por alguns minutos.</translation>
     <message>
         <location filename="../qaequilibrae.py" line="155"/>
         <source>Display Matrices and datasets</source>
-        <translation type="unfinished"/>
+        <translation>Mostrar matrizes e bancos de dados</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="160"/>
         <source>About</source>
-        <translation type="unfinished"/>
+        <translation>Sobre</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="161"/>
         <source>Help</source>
-        <translation type="unfinished"/>
+        <translation>Ajuda</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="168"/>
