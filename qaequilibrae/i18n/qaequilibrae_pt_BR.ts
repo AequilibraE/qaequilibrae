@@ -201,7 +201,7 @@ O QGIS não vai responder por alguns minutos.</translation>
     <message>
         <location filename="../qaequilibrae.py" line="322"/>
         <source>You need to close the project currently open first</source>
-        <translation type="unfinished"/>
+        <translation>Você precisa fechar o projeto atual primeiro</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="78"/>
