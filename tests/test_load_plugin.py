@@ -1,6 +1,6 @@
 import unittest
 
-from aequilibrae_menu import AequilibraEMenu
+from qaequilibrae.qaequilibrae import AequilibraEMenu
 from qgis.utils import iface
 from .utilities import get_qgis_app
 

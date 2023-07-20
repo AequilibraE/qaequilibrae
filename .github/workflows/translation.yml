@@ -1,0 +1,103 @@
+name: translate & package
+
+env:
+  PLUGIN_VERSION: $(python qaequilibrae/get_version.py)
+  PROJECT_FOLDER: "qaequilibrae"
+  CURRENT_BRANCH: $(git branch --show-current)
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+  release:
+
+jobs:
+  translation:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+  
+    - name: Install packages
+      run: |
+        sudo apt-get update
+        sudo apt install qttools5-dev-tools
+        python -m pip install --upgrade pip
+        python -m pip install -r ci/packaging.txt
+    
+    - name: Create translatable files
+      if: ${{(github.ref == 'refs/heads/develop') && (github.event_name == 'push')}}
+      run: |
+        python qaequilibrae/i18n/create_pro_file.py
+        pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
+
+    - name: Check if there are modifications in the translatable files
+      if: ${{(github.ref == 'refs/heads/develop') && (github.event_name == 'push')}}
+      run: |
+        git fetch --no-tags --depth=1 origin ${{ env.CURRENT_BRANCH }}
+        files_created=$(git ls-files --others --exclude-standard)
+        files_changed=$(git diff --name-only)
+
+        if echo "${files_changed}" | grep --quiet "qaequilibrae/i18n/qaequilibrae.ts"; then
+          echo ".ts file was modified!"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          git add qaequilibrae/i18n/qaequilibrae.ts
+          git commit -a -m "Adds translatable files"
+          git push origin HEAD:refs/heads/${{ env.CURRENT_BRANCH }}
+        
+        elif echo "${files_created}" | grep --quiet "qaequilibrae/i18n/qaequilibrae.ts"; then
+          echo ".ts file was created!"
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          git add qaequilibrae/i18n/qaequilibrae.ts
+          git commit -a -m "Adds translatable files"
+          git push origin HEAD:refs/heads/${{ env.CURRENT_BRANCH }}
+
+        else
+          echo ".ts file wasn't modified."
+        fi
+
+    - name: Compile translations if they exist
+      run: |
+        cd qaequilibrae/i18n
+        translatable_files=$(ls)
+        cd ../..
+        if echo "$translatable_files" | grep "qaequilibrae_.*\.ts"; then
+          echo "Translatable files found"
+          lrelease ${{ env.PROJECT_FOLDER }}/i18n/qaequilibrae_*.ts
+          sed -i "s|^*.qm.*| |" .gitignore
+          git add ${{ env.PROJECT_FOLDER }}/
+        else
+          echo "No translatable files found"
+        fi
+  
+    - name: Build the package
+      run: qgis-plugin-ci package ${{ env.PLUGIN_VERSION }} -c
+
+    - name: Download artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: qaequilibrae
+        path: /home/runner/work/qaequilibrae/qaequilibrae/*.zip
+        if-no-files-found: warn
+  
+    # - name: Deploy plugin
+    #   if: ${{ (github.event_name == 'release')}}
+    #   run: >-
+    #     qgis-plugin-ci
+    #     release ${GITHUB_REF/refs\/tags\//}
+    #     --github-token ${{ secrets.GITHUB_TOKEN }}
+    #     --osgeo-username ${{ secrets.QGIS_PLUGIN_REPO_USER }}
+    #     --osgeo-password ${{ secrets.QGIS_PLUGIN_REPO_PASSWORD }}

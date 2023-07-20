@@ -2,7 +2,7 @@ import pytest
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject, Qgis
-from aequilibrae_menu import AequilibraEMenu
+from qaequilibrae.qaequilibrae import AequilibraEMenu
 
 
 def wait_for_active_window(qtbot):

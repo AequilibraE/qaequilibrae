@@ -1,7 +1,7 @@
 import pytest
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
-from aequilibrae_menu import AequilibraEMenu
+from qaequilibrae.qaequilibrae import AequilibraEMenu
 from qaequilibrae.modules.common_tools import ReportDialog
 
 
@@ -39,3 +39,23 @@ def timeoutDetector(qgis_iface) -> None:
     timer.start(3000)
     yield timer
     timer.stop()
+
+
+@pytest.fixture(scope="function")
+def pt_project(qgis_iface) -> AequilibraEMenu:
+    ae = AequilibraEMenu(qgis_iface)
+    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+
+    _run_load_project_from_path(ae, "test/data/coquimbo_project")
+    yield ae
+    ae.run_close_project()
+
+
+@pytest.fixture(scope="function")
+def pt_no_feed(qgis_iface) -> AequilibraEMenu:
+    ae = AequilibraEMenu(qgis_iface)
+    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+
+    _run_load_project_from_path(ae, "test/data/no_pt_feed")
+    yield ae
+    ae.run_close_project()
