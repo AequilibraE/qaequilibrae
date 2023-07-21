@@ -998,7 +998,7 @@ O QGIS não vai responder por alguns minutos.</translation>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="441"/>
         <source>Set skims {} for {}</source>
-        <translation type="unfinished"/>
+        <translation>Escolha matriz de custos {} para {}</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="456"/>
