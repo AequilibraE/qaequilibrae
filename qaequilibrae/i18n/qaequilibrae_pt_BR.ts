@@ -1084,7 +1084,7 @@ O QGIS não vai responder por alguns minutos.</translation>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="114"/>
         <source>Matrix core</source>
-        <translation type="unfinished"/>
+        <translation>Camada da matriz</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="119"/>
