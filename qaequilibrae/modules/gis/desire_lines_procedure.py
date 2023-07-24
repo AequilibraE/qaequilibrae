@@ -15,7 +15,7 @@ from PyQt5.QtCore import pyqtSignal
 from qgis.PyQt.QtCore import QVariant
 from aequilibrae.utils.worker_thread import WorkerThread
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
-from qaequilibrae.i18n.translator import tr
+# from qaequilibrae.i18n.translator import tr
 from aequilibrae.paths import allOrNothing
 
 
@@ -48,7 +48,7 @@ class DesireLinesProcedure(WorkerThread):
             elif self.dl_type == "DelaunayLines":
                 self.do_delaunay_lines()
 
-        self.desire_lines.emit((tr("finished_desire_lines_procedure"), 0))
+        self.desire_lines.emit(("finished_desire_lines_procedure", 0))
 
     def get_basic_data(self):
         layer = get_vector_layer_by_name(self.layer)
@@ -63,7 +63,7 @@ class DesireLinesProcedure(WorkerThread):
                 centroid_id = feat.attributes()[idx]
                 all_centroids[centroid_id] = point
             self.desire_lines.emit(("jobs_done_dl", P))
-            self.desire_lines.emit(("text_dl", tr("Loading Layer Features: ") + str(P) + "/" + str(feature_count)))
+            self.desire_lines.emit(("text_dl", self.tr("Loading Layer Features: ") + str(P) + "/" + str(feature_count)))
         # Creating resulting layer
         EPSG_code = int(layer.crs().authid().split(":")[1])
         desireline_layer = QgsVectorLayer("LineString?crs=epsg:" + str(EPSG_code), self.dl_type, "memory")
@@ -86,14 +86,14 @@ class DesireLinesProcedure(WorkerThread):
         coord_index = np.zeros((max_zone, 2))
         coord_index[coords[:, 0].astype(np.int64), 0] = coords[:, 1]
         coord_index[coords[:, 0].astype(np.int64), 1] = coords[:, 2]
-        self.desire_lines.emit(("text_dl", tr("Manipulating matrix indices")))
+        self.desire_lines.emit(("text_dl", self.tr("Manipulating matrix indices")))
         zones = self.matrix.index[:].shape[0]
         a = np.array(self.matrix.index[:], np.int64)
         ij, ji = np.meshgrid(a, a, sparse=False, indexing="ij")
         ij = ij.flatten()
         ji = ji.flatten()
         arrays = [ij, ji]
-        self.desire_lines.emit(("text_dl", tr("Collecting all matrices")))
+        self.desire_lines.emit(("text_dl", self.tr("Collecting all matrices")))
         self.desire_lines.emit(("job_size_dl", len(self.matrix.view_names)))
         total_mat = np.zeros((zones, zones), np.float64)
         for i, mat in enumerate(self.matrix.view_names):
@@ -102,7 +102,7 @@ class DesireLinesProcedure(WorkerThread):
             arrays.append(m.flatten())
             self.desire_lines.emit(("jobs_done_dl", i + 1))
         # Eliminates the cells for which we don't have geography
-        self.desire_lines.emit(("text_dl", tr("Filtering zones with no geography available")))
+        self.desire_lines.emit(("text_dl", self.tr("Filtering zones with no geography available")))
         zones_with_no_geography = [x for x in self.matrix.index[:] if x not in all_centroids]
         if zones_with_no_geography:
             self.desire_lines.emit(("job_size_dl", len(zones_with_no_geography)))
@@ -110,11 +110,11 @@ class DesireLinesProcedure(WorkerThread):
             i = self.matrix.matrix_hash[z]
             t = np.nansum(total_mat[i, :]) + np.nansum(total_mat[:, i])
             unnasigned += t
-            self.report.append(tr("Zone {} does not have a corresponding centroid/zone. Total flow {}").format(z, t))
+            self.report.append(self.tr("Zone {} does not have a corresponding centroid/zone. Total flow {}").format(z, t))
             total_mat[i, :] = 0
             total_mat[:, i] = 0
             self.desire_lines.emit(("jobs_done_dl", k + 1))
-        self.desire_lines.emit(("text_dl", tr("Filtering down to OD pairs with flows")))
+        self.desire_lines.emit(("text_dl", self.tr("Filtering down to OD pairs with flows")))
         field_names = [x for x in self.matrix.view_names]
         nonzero = np.nonzero(total_mat.flatten())
         arrays = np.vstack(arrays).transpose()
@@ -135,7 +135,7 @@ class DesireLinesProcedure(WorkerThread):
         defaults1 = {x + "_AB": 0.0 for x in field_names}
         defaults = {x + "_BA": 0.0 for x in field_names}
         defaults = {**defaults, **defaults1}
-        self.desire_lines.emit(("text_dl", tr("Concatenating AB & BA flows")))
+        self.desire_lines.emit(("text_dl", self.tr("Concatenating AB & BA flows")))
         flows = rfn.join_by(
             ["from", "to"], flows_ab, flows_ba, jointype="outer", defaults=defaults, usemask=True, asrecarray=True
         )
@@ -144,7 +144,7 @@ class DesireLinesProcedure(WorkerThread):
             base_dl_fields.extend([QgsField(f, QVariant.Double)])
         dlpr.addAttributes(base_dl_fields)
         desireline_layer.updateFields()
-        self.desire_lines.emit(("text_dl", tr("Creating Desire Lines")))
+        self.desire_lines.emit(("text_dl", self.tr("Creating Desire Lines")))
         self.desire_lines.emit(("job_size_dl", flows.shape[0]))
         all_features = []
         for i, rec in enumerate(flows):
@@ -163,12 +163,12 @@ class DesireLinesProcedure(WorkerThread):
             all_features.append(feature)
             self.desire_lines.emit(("jobs_done_dl", i))
         if unnasigned > 0:
-            self.report.append(tr("Total non assigned flows (not counting intrazonals):") + str(unnasigned))
+            self.report.append(self.tr("Total non assigned flows (not counting intrazonals):") + str(unnasigned))
         if flows.shape[0] > 1:
             a = dlpr.addFeatures(all_features)
             self.result_layer = desireline_layer
         else:
-            self.report.append(tr("Nothing to show"))
+            self.report.append(self.tr("Nothing to show"))
 
     def do_delaunay_lines(self):
         all_centroids, base_dl_fields, desireline_layer, dlpr = self.get_basic_data()
@@ -182,7 +182,7 @@ class DesireLinesProcedure(WorkerThread):
             )
         dlpr.addAttributes(base_dl_fields)
         desireline_layer.updateFields()
-        self.desire_lines.emit(("text_dl", tr("Building Delaunay dataset")))
+        self.desire_lines.emit(("text_dl", self.tr("Building Delaunay dataset")))
         points = []
         node_id_in_delaunay_results = {}
         i = 0
@@ -192,10 +192,10 @@ class DesireLinesProcedure(WorkerThread):
             points.append(v)
             node_id_in_delaunay_results[i] = k
             i += 1
-        self.desire_lines.emit(("text_dl", tr("Computing Delaunay Triangles")))
+        self.desire_lines.emit(("text_dl", self.tr("Computing Delaunay Triangles")))
         tri = Delaunay(np.array(points))
         # We process all the triangles to only get each edge once
-        self.desire_lines.emit(("text_dl", tr("Building Delaunay Network: Collecting Edges")))
+        self.desire_lines.emit(("text_dl", self.tr("Building Delaunay Network: Collecting Edges")))
         edges = []
         if self.python_version == 32:
             all_edges = tri.vertices
@@ -207,10 +207,10 @@ class DesireLinesProcedure(WorkerThread):
             links = list(itertools.combinations(triangle, 2))
             for i in links:
                 edges.append([min(i[0], i[1]), max(i[0], i[1])])
-        self.desire_lines.emit(("text_dl", tr("Building Delaunay Network: Getting unique edges")))
+        self.desire_lines.emit(("text_dl", self.tr("Building Delaunay Network: Getting unique edges")))
         edges = OrderedDict((str(x), x) for x in edges).values()
         # Writing Delaunay layer
-        self.desire_lines.emit(("text_dl", tr("Building Delaunay Network: Assembling Layer")))
+        self.desire_lines.emit(("text_dl", self.tr("Building Delaunay Network: Assembling Layer")))
         desireline_link_id = 1
         data = []
         dl_ids_on_links = {}
@@ -234,7 +234,7 @@ class DesireLinesProcedure(WorkerThread):
             data.append(line)
             dl_ids_on_links[desireline_link_id] = [a_node, b_node, 0, dist]
             desireline_link_id += 1
-        self.desire_lines.emit(("text_dl", tr("Building graph")))
+        self.desire_lines.emit(("text_dl", self.tr("Building graph")))
         network = np.asarray(data)
 
         net = pd.DataFrame(
@@ -266,14 +266,14 @@ class DesireLinesProcedure(WorkerThread):
         self.graph.set_blocked_centroid_flows(False)
         self.results = AssignmentResults()
         self.results.prepare(self.graph, self.matrix)
-        self.desire_lines.emit(("text_dl", tr("Assigning demand")))
+        self.desire_lines.emit(("text_dl", self.tr("Assigning demand")))
         self.desire_lines.emit(("job_size_dl", self.matrix.index.shape[0]))
         assigner = allOrNothing(self.matrix, self.graph, self.results)
         assigner.execute()
         self.report = assigner.report
         print(self.results.link_loads)
-        self.desire_lines.emit(("text_dl", tr("Collecting results")))
-        self.desire_lines.emit(("text_dl", tr("Building resulting layer")))
+        self.desire_lines.emit(("text_dl", self.tr("Collecting results")))
+        self.desire_lines.emit(("text_dl", self.tr("Building resulting layer")))
         features = []
         max_edges = len(edges)
         self.desire_lines.emit(("job_size_dl", max_edges))
