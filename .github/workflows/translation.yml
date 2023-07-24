@@ -77,15 +77,16 @@ jobs:
         files_changed=$(git diff --name-only)
       
         if echo "${files_changed}" | grep --quiet "qaequilibrae/i18n/qaequilibrae.ts"; then
-          echo file=$("new_file")
+          echo file="new_file"
         elif echo "${files_created}" | grep --quiet "qaequilibrae/i18n/qaequilibrae.ts"; then
-          echo file=$("new_file")
+          echo file="new_file"
         else
-          echo file=$("no_file")
+          echo file="no_file"
         fi
+        echo "file=$file" > $GITHUB_ENV
     
     - name: Create PR
-      if: ${{file == "new_file"}}
+      if: ${{ env.file == "new_file" }}
       uses: peter-evans/create-pull-request@v5
       with:
         commit-message: update .ts file
