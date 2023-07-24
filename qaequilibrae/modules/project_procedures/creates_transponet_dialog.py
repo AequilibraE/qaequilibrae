@@ -15,7 +15,6 @@ from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import all_layers_from_toc
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name, standard_path
 from qaequilibrae.modules.common_tools.global_parameters import point_types, line_types
-# from qaequilibrae.i18n.translator import tr
 
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui

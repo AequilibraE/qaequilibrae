@@ -11,7 +11,6 @@ from qgis.core import QGridLayout, QWidget, QTableView, QHBoxLayout, QCheckBox, 
 from qgis.core import QLabel, QSpinBox, QComboBox
 from aequilibrae.matrix import AequilibraeMatrix
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
-# from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_viewer.ui"))
 

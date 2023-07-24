@@ -2,8 +2,6 @@ from PyQt5.QtCore import pyqtSignal
 from aequilibrae.paths import NetworkSkimming, SkimResults
 from aequilibrae.utils.worker_thread import WorkerThread
 
-# from qaequilibrae.i18n.translator import tr
-
 
 class TSPProcedure(WorkerThread):
     finished = pyqtSignal(object)
