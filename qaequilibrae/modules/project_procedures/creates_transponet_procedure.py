@@ -5,7 +5,7 @@ from aequilibrae.project import Project
 
 from aequilibrae.context import get_logger
 from aequilibrae.utils.worker_thread import WorkerThread
-from qaequilibrae.i18n.translator import tr
+# from qaequilibrae.i18n.translator import tr
 
 logger = get_logger()
 
@@ -28,20 +28,20 @@ class CreatesTranspoNetProcedure(WorkerThread):
         self.project: Project
 
     def doWork(self):
-        self.emit_messages(message=tr("Initializing project"), value=0, max_val=1)
+        self.emit_messages(message=self.tr("Initializing project"), value=0, max_val=1)
         self.project = Project()
         self.project.new(self.proj_folder)
 
         # Add the required extra fields to the link layer
-        self.emit_messages(message=tr("Adding extra network data fields to database"), value=0, max_val=1)
+        self.emit_messages(message=self.tr("Adding extra network data fields to database"), value=0, max_val=1)
         self.additional_fields_to_layers("links", self.link_layer, self.link_fields)
         self.additional_fields_to_layers("nodes", self.node_layer, self.node_fields)
 
         self.transfer_layer_features("links", self.link_layer, self.link_fields)
         self.renumber_nodes()
 
-        self.emit_messages(message=tr("Creating layer triggers"), value=0, max_val=1)
-        self.emit_messages(message=tr("Spatial indices"), value=0, max_val=1)
+        self.emit_messages(message=self.tr("Creating layer triggers"), value=0, max_val=1)
+        self.emit_messages(message=self.tr("Spatial indices"), value=0, max_val=1)
         self.ProgressText.emit("DONE")
 
     # Adds the non-standard fields to a layer
@@ -74,7 +74,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
             except Exception as e:
                 logger.error(sql)
                 logger.error(e.args)
-                self.report.append(tr("field {} could not be added").format(str(f)))
+                self.report.append(self.tr("field {} could not be added").format(str(f)))
         curr.close()
         return string_fields
 
@@ -91,7 +91,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         curr.execute("COMMIT;")
         self.project.conn.commit()
 
-        self.emit_messages(message=tr("Transferring nodes"), value=0, max_val=self.node_layer.featureCount())
+        self.emit_messages(message=self.tr("Transferring nodes"), value=0, max_val=self.node_layer.featureCount())
 
         find_sql = """SELECT node_id
                         FROM nodes
@@ -129,7 +129,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
     def transfer_layer_features(self, table, layer, layer_fields):
 
-        self.emit_messages(message=tr("Transferring {}").format(table), value=0, max_val=layer.featureCount())
+        self.emit_messages(message=self.tr("Transferring {}").format(table), value=0, max_val=layer.featureCount())
 
         field_titles = ",".join(layer_fields.keys())
         all_modes = set()
@@ -160,7 +160,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
             for md in all_modes:
                 new_mode = modes.new(md)
                 new_mode.mode_name = md
-                new_mode.description = tr("Mode automatically added during project creation from layers")
+                new_mode.description = self.tr("Mode automatically added during project creation from layers")
                 modes.add(new_mode)
                 new_mode.save()
                 logger.info(f"{new_mode.description} --> ({md})")
@@ -177,7 +177,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
                 new_link_type = link_types.new(letters[0])
                 letters = letters[1:]
                 new_link_type.link_type = lt
-                new_link_type.description = tr("Link_type automatically added during project creation from layers")
+                new_link_type.description = self.tr("Link_type automatically added during project creation from layers")
                 new_link_type.save()
                 logger.info(new_link_type.description + f" --> ({new_link_type.link_type})")
             self.project.conn.commit()
@@ -186,13 +186,13 @@ class CreatesTranspoNetProcedure(WorkerThread):
             try:
                 self.project.conn.execute(sql, data)
             except Exception as e:
-                logger.info(tr("Failed inserting record {} for {}").format(data[0], table))
+                logger.info(self.tr("Failed inserting record {} for {}").format(data[0], table))
                 logger.info(e.args)
                 logger.info([sql, data])
                 if data[0]:
-                    msg = tr("feature with id {} could not be added to layer {}").format(data[0], table)
+                    msg = self.tr("feature with id {} could not be added to layer {}").format(data[0], table)
                 else:
-                    msg = tr("feature with no node id present. It could not be added to layer {}").format(table)
+                    msg = self.tr("feature with no node id present. It could not be added to layer {}").format(table)
                 self.report.append(msg)
 
         self.project.conn.commit()

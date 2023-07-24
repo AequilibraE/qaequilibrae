@@ -3,7 +3,7 @@ from aequilibrae.utils.worker_thread import WorkerThread
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
 from qaequilibrae.modules.common_tools.global_parameters import multi_point
-from qaequilibrae.i18n.translator import tr
+# from qaequilibrae.i18n.translator import tr
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsCoordinateReferenceSystem
@@ -52,7 +52,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
         # We create an spatial self.index to hold all the features of the layer that will receive the data
         # And a dictionary that will hold all the features IDs found to intersect with each feature in the spatial index
         self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
-        self.ProgressText.emit(tr("Building Spatial Index"))
+        self.ProgressText.emit(self.tr("Building Spatial Index"))
         self.ProgressValue.emit(0)
         allfeatures = {}
         merged = {}
@@ -63,7 +63,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
             self.index.insertFeature(feature)
             self.ProgressValue.emit(i)
 
-        self.ProgressText.emit(tr("Duplicating Layers"))
+        self.ProgressText.emit(self.tr("Duplicating Layers"))
         self.all_attr = {}
         # We create the memory layer that will have the analysis result, which is the lowest common
         # denominator of both layers
@@ -96,7 +96,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
 
         # PROGRESS BAR
         self.ProgressMaxValue.emit(self.from_layer.dataProvider().featureCount())
-        self.ProgressText.emit(tr("Running Analysis"))
+        self.ProgressText.emit(self.tr("Running Analysis"))
         self.ProgressValue.emit(0)
         part_id = 1
         features = []
@@ -147,7 +147,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         part_id += 1
 
             self.ProgressValue.emit(fc)
-            self.ProgressText.emit(tr(f"Running Analysis ({fc:,}/{self.from_layer.featureCount():,}"))
+            self.ProgressText.emit(f"Running Analysis ({fc:,}/{self.from_layer.featureCount():,})")
 
         # Find the features on TO that have no correspondence in FROM
         for f, feature in merged.items():

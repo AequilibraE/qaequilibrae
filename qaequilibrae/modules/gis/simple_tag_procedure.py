@@ -5,7 +5,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import multi_line, multi_point, line_types, point_types
-from qaequilibrae.i18n.translator import tr
+# from qaequilibrae.i18n.translator import tr
 
 
 class SimpleTAG(WorkerThread):
@@ -53,7 +53,7 @@ class SimpleTAG(WorkerThread):
         self.from_features = {}
 
     def doWork(self):
-        self.ProgressText.emit(tr("Initializing. Sit tight"))
+        self.ProgressText.emit(self.tr("Initializing. Sit tight"))
         self.ProgressValue.emit(0)
 
         EPSG1 = QgsCoordinateReferenceSystem(int(self.from_layer.crs().authid().split(":")[1]))
@@ -75,7 +75,7 @@ class SimpleTAG(WorkerThread):
             self.to_match = {feature.id(): feature.attributes()[idq2] for (feature) in self.to_layer.getFeatures()}
 
         # We create an spatial self.index to hold all the features of the layer that will receive the data
-        self.ProgressText.emit(tr("Spatial index for target layer"))
+        self.ProgressText.emit(self.tr("Spatial index for target layer"))
         self.ProgressValue.emit(0)
         allfeatures = {}
         for i, feature in enumerate(self.to_layer.getFeatures()):
@@ -90,7 +90,7 @@ class SimpleTAG(WorkerThread):
 
         # Dictionary with the FROM values
         self.ProgressMaxValue.emit(self.from_layer.dataProvider().featureCount())
-        self.ProgressText.emit(tr("Spatial index for source layer"))
+        self.ProgressText.emit(self.tr("Spatial index for source layer"))
         self.from_val = {}
         for i, feature in enumerate(self.from_layer.getFeatures()):
             self.index_from.addFeature(feature)
@@ -102,7 +102,7 @@ class SimpleTAG(WorkerThread):
         self.ProgressValue.emit(0)
 
         self.from_count = len(self.from_val.keys())  # Number of features in the source layer
-        self.ProgressText.emit(tr("Performing spatial matching"))
+        self.ProgressText.emit(self.tr("Performing spatial matching"))
         self.ProgressValue.emit(0)
         self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
         # Now we will have the code for all the possible configurations of input layer and output layer
@@ -114,7 +114,7 @@ class SimpleTAG(WorkerThread):
                 self.all_attr[feat.id()] = None
 
         self.ProgressValue.emit(0)
-        self.ProgressText.emit(tr("Writing data to target layer"))
+        self.ProgressText.emit(self.tr("Writing data to target layer"))
         for i, feat in enumerate(self.to_layer.getFeatures()):
             self.ProgressValue.emit(i)
             if self.all_attr[feat.id()] is not None:
@@ -124,7 +124,7 @@ class SimpleTAG(WorkerThread):
         self.to_layer.updateFields()
 
         self.ProgressValue.emit(self.to_layer.dataProvider().featureCount())
-        self.finished_threaded_procedure.emit(tr("procedure"))
+        self.finished_threaded_procedure.emit(self.tr("procedure"))
 
     def chooses_match(self, feat):
         geom = feat.geometry()

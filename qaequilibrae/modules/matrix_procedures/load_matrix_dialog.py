@@ -16,7 +16,7 @@ from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path,
 from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
 from qaequilibrae.modules.common_tools.global_parameters import float_types, integer_types
 from qaequilibrae.modules.common_tools.report_dialog import ReportDialog
-from qaequilibrae.i18n.translator import tr
+# from qaequilibrae.i18n.translator import tr
 
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None
@@ -175,7 +175,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             or self.field_from.currentIndex() < 0
             or self.field_cells.currentIndex() < 0
         ):
-            self.error = tr("Invalid field chosen")
+            self.error = self.tr("Invalid field chosen")
 
         if self.error is None:
             self.compressed.setVisible(False)
@@ -195,7 +195,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.worker_thread.doWork()
 
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage(tr("Error:"), self.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Error:"), self.error, level=1)
 
     def update_matrix_list(self):
         if self.matrix_count > 0:

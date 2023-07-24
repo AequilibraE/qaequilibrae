@@ -5,7 +5,7 @@ from os.path import join
 
 import pandas as pd
 from aequilibrae.project.database_connection import database_connection
-from qaequilibrae.i18n.translator import tr
+# from qaequilibrae.i18n.translator import tr
 
 
 def list_results(project_base_path) -> pd.DataFrame:
@@ -19,5 +19,5 @@ def list_results(project_base_path) -> pd.DataFrame:
     results = df.assign(WARNINGS="")
     for idx, record in results.iterrows():
         if record.table_name not in tables:
-            results.loc[idx, "WARNINGS"] = tr("Table not found in the results database")
+            results.loc[idx, "WARNINGS"] = "Table not found in the results database"
     return results

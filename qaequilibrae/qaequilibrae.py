@@ -26,7 +26,6 @@ from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_com
 from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network, run_about
 from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
-from qaequilibrae.i18n.translator import tr
 
 try:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
@@ -34,22 +33,22 @@ try:
 except:
     from qgis.PyQt.QtWidgets import QMessageBox
 
-    if QMessageBox.question(None, tr("AequilibraE and other dependencies are not not installed"),
-                            tr("Do you want us to install these missing python packages? \r\n"
-                            "QGIS will be non-responsive for a couple of minutes."),
+    if QMessageBox.question(None, "AequilibraE and other dependencies are not not installed",
+                            "Do you want us to install these missing python packages? \r\n"
+                            "QGIS will be non-responsive for a couple of minutes.",
                             QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
         from qaequilibrae.download_extra_packages_class import download_all
 
         result = download_all().install()
         if "ERROR" in "".join([str(x).upper() for x in result]):
-            QMessageBox.information(None, "Information", tr("Errors may have happened during installation."
-                                                         "Please inspect the messages on your General Log message tab"))
+            QMessageBox.information(None, "Information", "Errors may have happened during installation."
+                                                         "Please inspect the messages on your General Log message tab")
         else:
-            QMessageBox.information(None, "Information", tr("You will probably need to restart QGIS to make it work"))
+            QMessageBox.information(None, "Information", "You will probably need to restart QGIS to make it work")
     else:
         QMessageBox.information(None,
                                 "Information",
-                                tr("Without installing the packages, the plugin will be mostly non-functional"))
+                                "Without installing the packages, the plugin will be mostly non-functional")
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -82,7 +81,7 @@ class AequilibraEMenu:
             loc = QtCore.QLocale.system().name()
         loc = loc if len(loc) == 5 else loc[:2]
     
-        locale_path = os.path.join(os.path.dirname(__file__), 'i18n', 'qaequilibrae_{}.qm'.format(loc))
+        locale_path = '{}/i18n/qaequilibrae_{}.qm'.format(os.path.dirname(__file__), loc)
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -90,82 +89,82 @@ class AequilibraEMenu:
             QtCore.QCoreApplication.installTranslator(self.translator)
 
         self.menuActions = {
-            tr("Project"): [],
-            tr("Network Manipulation"): [],
-            tr("Data"): [],
-            tr("Trip Distribution"): [],
-            tr("Paths and assignment"): [],
-            tr("Routing"): [],
-            tr("Public Transport"): [],
+            self.tr("Project"): [],
+            self.tr("Network Manipulation"): [],
+            self.tr("Data"): [],
+            self.tr("Trip Distribution"): [],
+            self.tr("Paths and assignment"): [],
+            self.tr("Routing"): [],
+            self.tr("Public Transport"): [],
             "GIS": [],
-            tr("Utils"): [],
+            self.tr("Utils"): [],
             "AequilibraE": [],
         }
 
         # # #######################   PROJECT SUB-MENU   ############################
-        self.add_menu_action(tr("Project"), tr("Open Project"), partial(run_load_project, self))
-        self.add_menu_action(tr("Project"), tr("Create project from OSM"), partial(project_from_osm, self))
-        self.add_menu_action(tr("Project"), tr("Create Project from layers"), partial(run_create_transponet, self))
-        self.add_menu_action(tr("Project"), tr("Add zoning data"), partial(run_add_zones, self))
-        self.add_menu_action(tr("Project"), tr("Parameters"), partial(run_change_parameters, self))
-        self.add_menu_action(tr("Project"), tr("logfile"), partial(show_log, self))
-        self.add_menu_action(tr("Project"), tr("Close project"), self.run_close_project)
+        self.add_menu_action("Project", self.tr("Open Project"), partial(run_load_project, self))
+        self.add_menu_action("Project", self.tr("Create project from OSM"), partial(project_from_osm, self))
+        self.add_menu_action("Project", self.tr("Create Project from layers"), partial(run_create_transponet, self))
+        self.add_menu_action("Project", self.tr("Add zoning data"), partial(run_add_zones, self))
+        self.add_menu_action("Project", self.tr("Parameters"), partial(run_change_parameters, self))
+        self.add_menu_action("Project", self.tr("logfile"), partial(show_log, self))
+        self.add_menu_action("Project", self.tr("Close project"), self.run_close_project)
 
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
 
-        self.add_menu_action(tr("Network Manipulation"), tr("Network Preparation"), partial(prepare_network, self))
-        self.add_menu_action(tr("Network Manipulation"), tr("Add centroid connectors"), partial(run_add_connectors, self))
+        self.add_menu_action("Network Manipulation", self.tr("Network Preparation"), partial(prepare_network, self))
+        self.add_menu_action("Network Manipulation", self.tr("Add centroid connectors"), partial(run_add_connectors, self))
 
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
-        self.add_menu_action(tr("Data"), tr("Display project data"), partial(run_show_project_data, self))
+        self.add_menu_action("Data", self.tr("Display project data"), partial(run_show_project_data, self))
 
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
 
-        self.add_menu_action(tr("Trip Distribution"), tr("Trip Distribution"), partial(run_distribution_models, self))
+        self.add_menu_action("Trip Distribution", self.tr("Trip Distribution"), partial(run_distribution_models, self))
 
         # # # ########################################################################
         # # # ###################  PATH COMPUTATION SUB-MENU   #######################
         #
-        self.add_menu_action(tr("Paths and assignment"), tr("Shortest path"), partial(run_shortest_path, self))
-        self.add_menu_action(tr("Paths and assignment"), tr("Impedance matrix"), partial(run_dist_matrix, self))
-        self.add_menu_action(tr("Paths and assignment"), tr("Traffic Assignment"), partial(run_traffic_assig, self))
+        self.add_menu_action("Paths and assignment", self.tr("Shortest path"), partial(run_shortest_path, self))
+        self.add_menu_action("Paths and assignment", self.tr("Impedance matrix"), partial(run_dist_matrix, self))
+        self.add_menu_action("Paths and assignment", self.tr("Traffic Assignment"), partial(run_traffic_assig, self))
 
         # # # ########################################################################
         # # # #######################   ROUTING SUB-MENU   ###########################
-        self.add_menu_action(tr("Routing"), tr("Travelling Salesman Problem"), partial(run_tsp, self))
+        self.add_menu_action("Routing", self.tr("Travelling Salesman Problem"), partial(run_tsp, self))
 
         # # # ########################################################################
         # # # #######################   TRANSIT SUB-MENU   ###########################
-        self.add_menu_action(tr('Public Transport'), tr('Import GTFS'), partial(run_import_gtfs, self))
+        self.add_menu_action('Public Transport', self.tr('Import GTFS'), partial(run_import_gtfs, self))
 
         # # ########################################################################
         # # #################        GIS TOOLS SUB-MENU    #########################
-        self.add_menu_action("GIS", tr("Desire Lines"), partial(run_desire_lines, self))
-        self.add_menu_action("GIS", tr("Stacked Bandwidth"), partial(run_stacked_bandwidths, self))
-        self.add_menu_action("GIS", tr("Scenario Comparison"), partial(run_scenario_comparison, self))
-        self.add_menu_action("GIS", tr("Lowest common denominator"), partial(run_lcd, self))
-        self.add_menu_action("GIS", tr("Simple tag"), partial(run_tag, self))
+        self.add_menu_action("GIS", self.tr("Desire Lines"), partial(run_desire_lines, self))
+        self.add_menu_action("GIS", self.tr("Stacked Bandwidth"), partial(run_stacked_bandwidths, self))
+        self.add_menu_action("GIS", self.tr("Scenario Comparison"), partial(run_scenario_comparison, self))
+        self.add_menu_action("GIS", self.tr("Lowest common denominator"), partial(run_lcd, self))
+        self.add_menu_action("GIS", self.tr("Simple tag"), partial(run_tag, self))
 
         # # ########################################################################
         # # #################          Utils submenu         #########################
-        self.add_menu_action(tr("Data"), tr("Import matrices"), partial(load_matrices, self))
-        self.add_menu_action(tr("Utils"), tr("Display Matrices and datasets"), partial(display_aequilibrae_formats, self))
+        self.add_menu_action("Data", self.tr("Import matrices"), partial(load_matrices, self))
+        self.add_menu_action("Utils", self.tr("Display Matrices and datasets"), partial(display_aequilibrae_formats, self))
 
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
 
-        self.add_menu_action("AequilibraE", tr("About"), partial(run_about, self))
-        self.add_menu_action("AequilibraE", tr("Help"), self.run_help)
+        self.add_menu_action("AequilibraE", self.tr("About"), partial(run_about, self))
+        self.add_menu_action("AequilibraE", self.tr("Help"), self.run_help)
 
         self.build_menu()
         # ########################################################################
         # #################        PROJECT MANAGER       #########################
 
         self.showing = QCheckBox()
-        self.showing.setText(tr("Show project info"))
+        self.showing.setText(self.tr("Show project info"))
         self.showing.setChecked(True)
         self.toolbar.addWidget(self.showing)
 
@@ -306,12 +305,15 @@ class AequilibraEMenu:
         dlg2.exec_()
 
     def show_message_no_project(self):
-        self.iface.messageBar().pushMessage("Error", tr("You need to load a project first"), level=3, duration=10)
+        self.iface.messageBar().pushMessage("Error", self.tr("You need to load a project first"), level=3, duration=10)
 
     def message_project_already_open(self):
-        self.iface.messageBar().pushMessage(tr("You need to close the project currently open first"), level=2, duration=10)
+        self.iface.messageBar().pushMessage(self.tr("You need to close the project currently open first"), level=2, duration=10)
 
     def set_font(self, obj):
         f = obj.font()
         f.setPointSize(11)
         obj.setFont(f)
+
+    def tr(self, text):
+        return QtCore.QCoreApplication.translate("aequilibrae", text)

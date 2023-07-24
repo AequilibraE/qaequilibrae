@@ -15,7 +15,7 @@ from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import all_layers_from_toc
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name, standard_path
 from qaequilibrae.modules.common_tools.global_parameters import point_types, line_types
-from qaequilibrae.i18n.translator import tr
+# from qaequilibrae.i18n.translator import tr
 
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
@@ -297,11 +297,11 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def check_data(self):
         if self.link_layer:
             if len(self.link_layer.crs().authid()) == 0:
-                return False, tr("Link Layer has NO defined CRS")
+                return False, self.tr("Link Layer has NO defined CRS")
 
         if self.node_layer:
             if len(self.node_layer.crs().authid()) == 0:
-                return False, tr("Node Layer has NO defined CRS")
+                return False, self.tr("Node Layer has NO defined CRS")
 
         return True, ""
 
