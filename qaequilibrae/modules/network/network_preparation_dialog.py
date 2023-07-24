@@ -9,7 +9,6 @@ from qaequilibrae.modules.common_tools.global_parameters import line_types, poin
 from qgis.PyQt import QtWidgets, uic
 from qaequilibrae.modules.network.Network_preparation_procedure import NetworkPreparationProcedure
 from qaequilibrae.modules.common_tools import ReportDialog
-# from qaequilibrae.i18n.translator import tr
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 sys.modules["qgsfieldcombobox"] = qgis.gui

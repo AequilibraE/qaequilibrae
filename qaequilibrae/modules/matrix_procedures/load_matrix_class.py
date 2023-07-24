@@ -6,7 +6,6 @@ import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.utils.worker_thread import WorkerThread
 from scipy.sparse import coo_matrix
-# from qaequilibrae.i18n.translator import tr
 
 from qgis.PyQt.QtCore import pyqtSignal
 

@@ -13,7 +13,6 @@ from qgis.utils import iface
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
 from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog
 from qaequilibrae.modules.common_tools import standard_path
-# from qaequilibrae.i18n.translator import tr
 
 logger = logging.getLogger("AequilibraEGUI")
 

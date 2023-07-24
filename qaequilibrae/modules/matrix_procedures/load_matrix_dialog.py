@@ -16,7 +16,6 @@ from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path,
 from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
 from qaequilibrae.modules.common_tools.global_parameters import float_types, integer_types
 from qaequilibrae.modules.common_tools.report_dialog import ReportDialog
-# from qaequilibrae.i18n.translator import tr
 
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None
@@ -86,8 +85,8 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         for member in all_members:
             member.setVisible(False)
 
-        self.lbl_matrix.setText("Matrix")
-        self.lbl_from.setText("From")
+        self.lbl_matrix.setText(self.tr("Matrix"))
+        self.lbl_from.setText(self.tr("From"))
         for member in all_members:
             member.setVisible(True)
         self.load_fields_to_combo_boxes()

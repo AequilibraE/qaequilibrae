@@ -4,7 +4,6 @@ import qgis
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
 from qaequilibrae.modules.common_tools.global_parameters import multi_point
-# from qaequilibrae.i18n.translator import tr
 from qgis.PyQt import QtWidgets, uic
 from .simple_tag_procedure import SimpleTAG
 
@@ -38,8 +37,8 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.tolayer.addItem(layer.name())
 
         self.enclosed.setToolTip(
-            self.tr("If source layer is a polygon, source needs to enclose target.  If only target is "
-            "a polygon, target needs to enclose source. First found record is used")
+            self.tr("""If source layer is a polygon, source needs to enclose target.  If only target is \n
+                    a polygon, target needs to enclose source. First found record is used""")
         )
 
         self.touching.setToolTip(

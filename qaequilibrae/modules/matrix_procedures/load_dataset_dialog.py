@@ -12,7 +12,6 @@ from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_fro
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
 from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types, point_types, poly_types
-# from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_vector_loader.ui"))
 
@@ -174,7 +173,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
             self.dataset = AequilibraeData()
             self.dataset.load(out_name)
         except Exception as e:
-            self.error = self.tr(f"Could not load file. It might be corrupted or not a valid AequilibraE file. {e.args}")
+            self.error = self.tr("Could not load file. It might be corrupted or not a valid AequilibraE file. {}".format(e.args))
         self.exit_procedure()
 
     def load_the_vector(self):

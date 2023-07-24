@@ -19,7 +19,7 @@ for path, subdirs, files in os.walk("qaequilibrae/modules"):
         else:
             with open(os.path.join(path, name), 'rb', 0) as file, \
                     mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
-                if s.find(b'i18n.translator import tr') != -1:
+                if s.find(b'self.tr') != -1:
                     sources.append(os.path.join(path, name))
 
 forms = [f.replace("""\\""", "/").replace("qaequilibrae", "..") for f in forms]

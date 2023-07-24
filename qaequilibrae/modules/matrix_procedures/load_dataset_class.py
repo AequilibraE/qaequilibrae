@@ -4,7 +4,6 @@ from aequilibrae.utils.worker_thread import WorkerThread
 import struct
 from aequilibrae.matrix import AequilibraeData
 from qaequilibrae.modules.common_tools.global_parameters import float_types, string_types, integer_types
-# from qaequilibrae.i18n.translator import tr
 from qgis.PyQt.QtCore import pyqtSignal
 
 
