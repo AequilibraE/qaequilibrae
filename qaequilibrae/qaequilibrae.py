@@ -13,7 +13,7 @@ from warnings import warn
 import qgis
 
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
@@ -102,43 +102,43 @@ class AequilibraEMenu:
         }
 
         # # #######################   PROJECT SUB-MENU   ############################
-        self.add_menu_action("Project", self.tr("Open Project"), partial(run_load_project, self))
-        self.add_menu_action("Project", self.tr("Create project from OSM"), partial(project_from_osm, self))
-        self.add_menu_action("Project", self.tr("Create Project from layers"), partial(run_create_transponet, self))
-        self.add_menu_action("Project", self.tr("Add zoning data"), partial(run_add_zones, self))
-        self.add_menu_action("Project", self.tr("Parameters"), partial(run_change_parameters, self))
-        self.add_menu_action("Project", self.tr("logfile"), partial(show_log, self))
-        self.add_menu_action("Project", self.tr("Close project"), self.run_close_project)
+        self.add_menu_action(self.tr("Project"), self.tr("Open Project"), partial(run_load_project, self))
+        self.add_menu_action(self.tr("Project"), self.tr("Create project from OSM"), partial(project_from_osm, self))
+        self.add_menu_action(self.tr("Project"), self.tr("Create Project from layers"), partial(run_create_transponet, self))
+        self.add_menu_action(self.tr("Project"), self.tr("Add zoning data"), partial(run_add_zones, self))
+        self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
+        self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
+        self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
 
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
 
-        self.add_menu_action("Network Manipulation", self.tr("Network Preparation"), partial(prepare_network, self))
-        self.add_menu_action("Network Manipulation", self.tr("Add centroid connectors"), partial(run_add_connectors, self))
+        self.add_menu_action(self.tr("Network Manipulation"), self.tr("Network Preparation"), partial(prepare_network, self))
+        self.add_menu_action(self.tr("Network Manipulation"), self.tr("Add centroid connectors"), partial(run_add_connectors, self))
 
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
-        self.add_menu_action("Data", self.tr("Display project data"), partial(run_show_project_data, self))
+        self.add_menu_action(self.tr("Data"), self.tr("Display project data"), partial(run_show_project_data, self))
 
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
 
-        self.add_menu_action("Trip Distribution", self.tr("Trip Distribution"), partial(run_distribution_models, self))
+        self.add_menu_action(self.tr("Trip Distribution"), self.tr("Trip Distribution"), partial(run_distribution_models, self))
 
         # # # ########################################################################
         # # # ###################  PATH COMPUTATION SUB-MENU   #######################
         #
-        self.add_menu_action("Paths and assignment", self.tr("Shortest path"), partial(run_shortest_path, self))
-        self.add_menu_action("Paths and assignment", self.tr("Impedance matrix"), partial(run_dist_matrix, self))
-        self.add_menu_action("Paths and assignment", self.tr("Traffic Assignment"), partial(run_traffic_assig, self))
+        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Shortest path"), partial(run_shortest_path, self))
+        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Impedance matrix"), partial(run_dist_matrix, self))
+        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Traffic Assignment"), partial(run_traffic_assig, self))
 
         # # # ########################################################################
         # # # #######################   ROUTING SUB-MENU   ###########################
-        self.add_menu_action("Routing", self.tr("Travelling Salesman Problem"), partial(run_tsp, self))
+        self.add_menu_action(self.tr("Routing"), self.tr("Travelling Salesman Problem"), partial(run_tsp, self))
 
         # # # ########################################################################
         # # # #######################   TRANSIT SUB-MENU   ###########################
-        self.add_menu_action('Public Transport', self.tr('Import GTFS'), partial(run_import_gtfs, self))
+        self.add_menu_action(self.tr('Public Transport'), self.tr('Import GTFS'), partial(run_import_gtfs, self))
 
         # # ########################################################################
         # # #################        GIS TOOLS SUB-MENU    #########################
@@ -150,8 +150,8 @@ class AequilibraEMenu:
 
         # # ########################################################################
         # # #################          Utils submenu         #########################
-        self.add_menu_action("Data", self.tr("Import matrices"), partial(load_matrices, self))
-        self.add_menu_action("Utils", self.tr("Display Matrices and datasets"), partial(display_aequilibrae_formats, self))
+        self.add_menu_action(self.tr("Data"), self.tr("Import matrices"), partial(load_matrices, self))
+        self.add_menu_action(self.tr("Utils"), self.tr("Display Matrices and datasets"), partial(display_aequilibrae_formats, self))
 
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
@@ -316,4 +316,4 @@ class AequilibraEMenu:
         obj.setFont(f)
 
     def tr(self, text):
-        return QtCore.QCoreApplication.translate("aequilibrae", text)
+        return QCoreApplication.translate("AequilibraEMenu", text)
