@@ -1,6 +1,6 @@
-from qgis.PyQt import QtCore
+from qgis.PyQt.QtCore import QCoreApplication
 
 
-def tr(message):
+def tr(text):
     """Get string translation."""
-    return QtCore.QCoreApplication.translate("qaequilibrae", message)
+    return QCoreApplication.translate("AequilibraE", text)
