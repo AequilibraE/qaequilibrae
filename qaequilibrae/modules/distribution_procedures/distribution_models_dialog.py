@@ -18,7 +18,7 @@ from qaequilibrae.modules.distribution_procedures.ipf_procedure import IpfProced
 from qaequilibrae.modules.common_tools import GetOutputFileName
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
-from qaequilibrae.i18n.translator import tr
+# from qaequilibrae.i18n.translator import tr
 from qaequilibrae.modules.matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_distribution.ui"))
@@ -123,19 +123,19 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         to_remove = []
         if self.rdo_ipf.isChecked():
             self.job = "ipf"
-            self.setWindowTitle(tr("AequilibraE - Iterative Proportional Fitting"))
-            self.model_tabs.setTabText(4, tr("Seed matrix"))
+            self.setWindowTitle(self.tr("AequilibraE - Iterative Proportional Fitting"))
+            self.model_tabs.setTabText(4, self.tr("Seed matrix"))
             to_remove = [6, 5, 3]
 
         if self.rdo_apply_gravity.isChecked():
-            self.setWindowTitle(tr("AequilibraE - Apply gravity model"))
+            self.setWindowTitle(self.tr("AequilibraE - Apply gravity model"))
             self.job = "apply"
             to_remove = [6, 4]
 
         if self.rdo_calibrate_gravity.isChecked():
             self.job = "calibrate"
-            self.setWindowTitle(tr("AequilibraE - Calibrate gravity model"))
-            self.model_tabs.setTabText(4, tr("Observed matrix"))
+            self.setWindowTitle(self.tr("AequilibraE - Calibrate gravity model"))
+            self.model_tabs.setTabText(4, self.tr("Observed matrix"))
             to_remove = [5, 2, 0]
             self.rdo_gamma.setEnabled(False)
             self.rdo_friction.setEnabled(False)
@@ -161,7 +161,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.user_chosen_model.currentIndexChanged.connect(self.change_model_by_user)
 
         self.table_model.setRowCount(2)
-        self.table_model.setItem(0, 0, QTableWidgetItem(tr("Function")))
+        self.table_model.setItem(0, 0, QTableWidgetItem(self.tr("Function")))
 
         self.table_model.setCellWidget(0, 1, self.user_chosen_model)
 
@@ -227,7 +227,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.model.load(file_name)
             self.update_model_parameters()
         except Exception as e:
-            qgis.utils.iface.messageBar().pushMessage("Error", tr("Could not load model. {}").format(e.args), level=3)
+            qgis.utils.iface.messageBar().pushMessage("Error", self.tr("Could not load model. {}").format(e.args), level=3)
 
     def change_vector_field(self, cob_orig, cob_dest, dt):
         cob_dest.clear()
@@ -363,7 +363,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 return
             self.add_job_to_list(worker_thread, out_name)
         else:
-            qgis.utils.iface.messageBar().pushMessage(tr("Procedure error: "), self.error, level=3)
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), self.error, level=3)
 
     def add_job_to_list(self, job, out_name):
         self.job_queue[out_name] = job
@@ -375,7 +375,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             data_name = os.path.splitext(os.path.basename(j))[0]
             self.table_jobs.setItem(i, 0, QTableWidgetItem(str(i + 1)))
             self.table_jobs.setItem(i, 1, QTableWidgetItem(data_name))
-            self.table_jobs.setItem(i, 2, QTableWidgetItem(tr("Queued")))
+            self.table_jobs.setItem(i, 2, QTableWidgetItem(self.tr("Queued")))
 
     def run(self):
         self.progressbar.setVisible(True)
@@ -394,18 +394,18 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         # Check for missing info
         if self.job != "calibrate":
             if self.cob_prod_field.currentIndex() < 0:
-                self.error = tr("Production vector is missing")
+                self.error = self.tr("Production vector is missing")
 
             if self.cob_atra_field.currentIndex() < 0:
-                self.error = tr("Attraction vector is missing")
+                self.error = self.tr("Attraction vector is missing")
 
         if self.job != "apply":
             if self.cob_seed_field.currentIndex() < 0:
-                self.error = tr("Observed (seed) matrix is missing")
+                self.error = self.tr("Observed (seed) matrix is missing")
 
         if self.job != "ipf":
             if self.cob_imped_field.currentIndex() < 0:
-                self.error = tr("Impedance matrix is missing")
+                self.error = self.tr("Impedance matrix is missing")
 
         if self.error is not None:
             return False
@@ -432,7 +432,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def job_finished_from_thread(self, success):
         error = self.worker_thread.error
         if error is not None:
-            qgis.utils.iface.messageBar().pushMessage(tr("Procedure error: "), error.args[0], level=3)
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), error.args[0], level=3)
         self.report.extend(self.worker_thread.report)
 
         if success == "calibrate":

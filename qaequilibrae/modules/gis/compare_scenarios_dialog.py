@@ -13,7 +13,7 @@ from qgis.core import QgsProject
 from qgis.core import QgsVectorLayerJoinInfo
 from qaequilibrae.modules.common_tools import get_parameter_chain
 from qaequilibrae.modules.common_tools import find_table_fields
-from qaequilibrae.i18n.translator import tr
+# from qaequilibrae.i18n.translator import tr
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
 from qaequilibrae.modules.matrix_procedures import list_results
 
@@ -69,9 +69,9 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.sizevaluechange()
         self.spacevaluechange()
         self.show_color_composite()
-        self.base_group_box.setToolTip(tr("This is the reference case, to which the differences will refer to"))
-        self.alt_group_box.setToolTip(tr("This is the alternative"))
-        self.color_group_box.setToolTip(tr("It will be BASE minus ALTERNATIVE"))
+        self.base_group_box.setToolTip(self.tr("This is the reference case, to which the differences will refer to"))
+        self.alt_group_box.setToolTip(self.tr("This is the alternative"))
+        self.color_group_box.setToolTip(self.tr("It will be BASE minus ALTERNATIVE"))
 
     def show_color_composite(self):
         self.common_label.setVisible(self.radio_compo.isChecked())

@@ -5,7 +5,7 @@ from qgis._core import QgsField, QgsFeatureRequest, QgsPointXY, QgsVectorLayer, 
 from qgis.PyQt.QtCore import QVariant
 from aequilibrae.utils.worker_thread import WorkerThread
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
-from qaequilibrae.i18n.translator import tr
+# from qaequilibrae.i18n.translator import tr
 
 
 class NetworkPreparationProcedure(WorkerThread):
@@ -45,7 +45,7 @@ class NetworkPreparationProcedure(WorkerThread):
 
         self.ProgressMaxValue.emit(3)
         self.ProgressValue.emit(0)
-        self.ProgressText.emit(tr("Duplicating line layer"))
+        self.ProgressText.emit(self.tr("Duplicating line layer"))
 
         # We create the new line layer and load it in memory
         self.epsg_code = int(layer.crs().authid().split(":")[1])
@@ -67,7 +67,7 @@ class NetworkPreparationProcedure(WorkerThread):
         else:
             self.with_lines_only(feat_count, new_line_layer)
 
-        self.ProgressText.emit(tr("DONE"))
+        self.ProgressText.emit("DONE")
 
     def with_lines_only(self, feat_count, new_line_layer):
         self.ProgressMaxValue.emit(feat_count)
@@ -88,7 +88,7 @@ class NetworkPreparationProcedure(WorkerThread):
         for p, feat in enumerate(new_line_layer.getFeatures()):
             if p % 500 == 0:
                 self.ProgressValue.emit(int(p))
-                self.ProgressText.emit(tr("Links read: {}").format(p/feat_count))
+                self.ProgressText.emit(self.tr("Links read: {}").format(p/feat_count))
 
             link = list(feat.geometry().asPolyline())
             if link:
@@ -114,7 +114,7 @@ class NetworkPreparationProcedure(WorkerThread):
         incremental_ids = self.node_start - 1
         p = 0
         self.ProgressMaxValue.emit(feat_count * 2)
-        self.ProgressText.emit(tr("Computing node IDs: {}").format(0/(feat_count * 2)))
+        self.ProgressText.emit(self.tr("Computing node IDs: {}").format(0/(feat_count * 2)))
         self.ProgressMaxValue.emit(feat_count * 2)
         for i in all_nodes:
             p += 1
@@ -129,9 +129,9 @@ class NetworkPreparationProcedure(WorkerThread):
 
             if p % 2000 == 0:
                 self.ProgressValue.emit(int(p))
-                self.ProgressText.emit(tr("Computing node IDs: {}").format(p/(feat_count * 2)))
+                self.ProgressText.emit(self.tr("Computing node IDs: {}").format(p/(feat_count * 2)))
         self.ProgressValue.emit(int(feat_count * 2))
-        self.ProgressText.emit(tr("Computing node IDs: {}").format((feat_count * 2)/(feat_count * 2)))
+        self.ProgressText.emit(self.tr("Computing node IDs: {}").format((feat_count * 2)/(feat_count * 2)))
         # And we write the node layer as well
         node_id0 = -1
         p = 0
@@ -150,14 +150,14 @@ class NetworkPreparationProcedure(WorkerThread):
 
             if p % 500 == 0:
                 self.ProgressValue.emit(int(p))
-                self.ProgressText.emit(tr("Writing new node layer: {}").format(p/incremental_ids))
+                self.ProgressText.emit(self.tr("Writing new node layer: {}").format(p/incremental_ids))
         _ = new_node_layer.dataProvider().addFeatures(cfeatures)
         del cfeatures
         new_node_layer.commitChanges()
         self.ProgressValue.emit(int(incremental_ids))
-        self.ProgressText.emit(tr("Writing new node layer: {}").fromat({incremental_ids}/{incremental_ids}))
+        self.ProgressText.emit(self.tr("Writing new node layer: {}").fromat({incremental_ids}/{incremental_ids}))
         # Now we write all the node _IDs back to the line layer
-        self.ProgressText.emit(tr("Writing node IDs to links: {}").format(0/(feat_count * 2)))
+        self.ProgressText.emit(self.tr("Writing node IDs to links: {}").format(0/(feat_count * 2)))
         self.ProgressMaxValue.emit(feat_count * 2)
         fid1 = new_line_layer.dataProvider().fieldNameIndex("A_NODE")
         fid2 = new_line_layer.dataProvider().fieldNameIndex("B_NODE")
@@ -171,9 +171,9 @@ class NetworkPreparationProcedure(WorkerThread):
 
             if p % 50 == 0:
                 self.ProgressValue.emit(int(p))
-                self.ProgressText.emit(tr("Writing node IDs to links: {}").format(p/(feat_count * 2)))
+                self.ProgressText.emit(self.tr("Writing node IDs to links: {}").format(p/(feat_count * 2)))
         self.ProgressValue.emit(int(p))
-        self.ProgressText.emit(tr("Writing node IDs to links: {}").format((feat_count * 2)/(feat_count * 2)))
+        self.ProgressText.emit(self.tr("Writing node IDs to links: {}").format((feat_count * 2)/(feat_count * 2)))
         new_line_layer.commitChanges()
         self.new_line_layer = new_line_layer
         self.new_node_layer = new_node_layer
@@ -186,15 +186,15 @@ class NetworkPreparationProcedure(WorkerThread):
         self.ProgressMaxValue.emit(nodes.featureCount())
         self.ProgressValue.emit(0)
         for P, feat in enumerate(nodes.getFeatures()):
-            self.ProgressText.emit(tr("Checking node layer: {}/{}").format(str(P), str(nodes.featureCount())))
+            self.ProgressText.emit(self.tr("Checking node layer: {}/{}").format(str(P), str(nodes.featureCount())))
             self.ProgressValue.emit(P)
             index.insertFeature(feat)
             i_d = feat.attributes()[idx]
             if i_d in ids:
-                self.error = tr("ID {} is non unique in your selected field").format(str(i_d))
+                self.error = self.tr("ID {} is non unique in your selected field").format(str(i_d))
                 self.report.append(self.error)
             if i_d < 0:
-                self.error = tr("Negative node ID in your selected field")
+                self.error = self.tr("Negative node ID in your selected field")
                 self.report.append(self.error)
                 break
             ids.append(i_d)
@@ -204,7 +204,7 @@ class NetworkPreparationProcedure(WorkerThread):
             for feat in new_line_layer.getFeatures():
                 P += 1
                 self.ProgressValue.emit(int(P))
-                self.ProgressText.emit(tr("Processing links: {}/{}").format(str(P), str(feat_count)))
+                self.ProgressText.emit(self.tr("Processing links: {}/{}").format(str(P), str(feat_count)))
 
                 # We search for matches for all AB nodes
                 ab_nodes = [("A_NODE", 0), ("B_NODE", -1)]
@@ -225,7 +225,7 @@ class NetworkPreparationProcedure(WorkerThread):
                         new_line_layer.dataProvider().changeAttributeValues({feat.id(): {fid: int(ids)}})
 
                     else:  # If not, we throw an error
-                        self.error = tr("CORRESPONDING NODE NOTE FOUND. Link: {}").format(str(feat.attributes()))
+                        self.error = self.tr("CORRESPONDING NODE NOTE FOUND. Link: {}").format(str(feat.attributes()))
                         self.report.append(self.error)
                         break
                 if self.error is not None:
