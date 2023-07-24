@@ -39,6 +39,7 @@ jobs:
       run: |
         python qaequilibrae/i18n/create_pro_file.py
         pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
+        rm qaequilibrae/i18n/qaequilibrae.pro
 
     # - name: Check if there are modifications in the translatable files
     #   if: ${{(github.ref == 'refs/heads/develop') && (github.event_name == 'push')}}
@@ -77,16 +78,15 @@ jobs:
         files_changed=$(git diff --name-only)
       
         if echo "${files_changed}" | grep --quiet "qaequilibrae/i18n/qaequilibrae.ts"; then
-          echo file="new_file"
+          echo "new_file=$IS_FILE" >> $GITHUB_ENV
         elif echo "${files_created}" | grep --quiet "qaequilibrae/i18n/qaequilibrae.ts"; then
-          echo file="new_file"
+          echo "new_file=$IS_FILE" >> $GITHUB_ENV
         else
-          echo file="no_file"
+          echo "no_file=$IS_FILE" >> $GITHUB_ENV
         fi
-        echo "file=$file" > $GITHUB_ENV
     
     - name: Create PR
-      if: ${{ env.file == "new_file" }}
+      if: ${{ env.IS_FILE == "new_file" }}
       uses: peter-evans/create-pull-request@v5
       with:
         commit-message: update .ts file
