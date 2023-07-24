@@ -5,7 +5,6 @@ from os.path import join
 
 import pandas as pd
 from aequilibrae.project.database_connection import database_connection
-# from qaequilibrae.i18n.translator import tr
 
 
 def list_results(project_base_path) -> pd.DataFrame:

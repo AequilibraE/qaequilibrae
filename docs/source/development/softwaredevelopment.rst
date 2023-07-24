@@ -104,25 +104,23 @@ Translatable Strings
 ~~~~~~~~~~~~~~~~~~~~
 
 In case you are adding and/or changing any piece of QAequilibraE's code with translatable strings,
-which are those strings we see in the widget windows, please make sure to indicate they are translatable by
-importing the `tr` function. This shall guarantee you that the string will be compiled into our
-future translations.
+which are those strings we see in the widget windows, please make sure to locate the strings by
+using the `tr` function. This shall guarantee you that the string will be compiled into our
+future translations. So far, only classes with `self` allow the location of strings.
 
 ::
 
-    from qaequilibrae.i18n.translator import tr
-
     # Indicates that the message "You need at least three centroids to route. " will be
     # set for translation.
-    qgis.utils.iface.messageBar().pushMessage(tr("You need at least three centroids to route. "), "", level=3)
+    qgis.utils.iface.messageBar().pushMessage(self.tr("You need at least three centroids to route. "), "", level=3)
 
     # In case you have to insert any text into a string, the best way is to use string format
-    self.error = tr("ID {} is non unique in your selected field").format(str(i_d))
+    self.error = self.tr("ID {} is non unique in your selected field").format(str(i_d))
 
 As for June 2023, QAequilibraE's translations are all hosted in 
 `Transifex <https://explore.transifex.com/aequilibrae/qaequilibrae/>`_. Currently, we are targeting translations
 in Brazilian Portuguese, Chinese, French, German, Italian, and Spanish. If you want to contribute to QAequilibraE 
-by translating the plugin to other languages, please let us know in our 
+by translating the plugin to other languages or reviewing the existing translations, please let us know in our 
 `AequilibraE Google Group <https://groups.google.com/forum/#!forum/aequilibrae>`_,
 so we can add your language to our translation pool!
 

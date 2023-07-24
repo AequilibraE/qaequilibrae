@@ -2,7 +2,6 @@ import qgis
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
-# from qaequilibrae.i18n.translator import tr
 
 
 # Split loading between Qt action and processing, for easier unit testing

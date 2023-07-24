@@ -11,7 +11,6 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 from qaequilibrae.modules.routing_procedures.tsp_procedure import TSPProcedure
 from qaequilibrae.modules.common_tools import ReportDialog
-# from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/tsp.ui"))
 

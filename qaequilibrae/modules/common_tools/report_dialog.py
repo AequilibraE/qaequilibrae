@@ -22,7 +22,6 @@
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic
 from .get_output_file_name import GetOutputFileName
-# from qaequilibrae.i18n.translator import tr
 import qgis
 
 import sys

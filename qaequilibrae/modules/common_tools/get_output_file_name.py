@@ -1,4 +1,3 @@
-# from qaequilibrae.i18n.translator import tr
 from qgis.PyQt.QtWidgets import QFileDialog
 import tempfile
 

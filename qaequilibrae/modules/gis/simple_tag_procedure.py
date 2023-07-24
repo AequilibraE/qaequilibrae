@@ -5,7 +5,6 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import multi_line, multi_point, line_types, point_types
-# from qaequilibrae.i18n.translator import tr
 
 
 class SimpleTAG(WorkerThread):
