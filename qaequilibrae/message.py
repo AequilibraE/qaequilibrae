@@ -24,4 +24,4 @@ class messages:
         return self.tr("Without installing the packages, the plugin will be mostly non-functional")
 
     def tr(self, text):
-        return QCoreApplication.translate("AequilibraEMenu", text)
+        return QCoreApplication.translate("messages", text)
