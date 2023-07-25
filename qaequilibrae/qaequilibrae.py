@@ -23,9 +23,11 @@ from qgis.PyQt.QtCore import QTranslator
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_import_gtfs
-from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network, run_about
+from qaequilibrae.modules.menu_actions import run_distribution_models, run_tsp, run_change_parameters, prepare_network, \
+    run_about
 from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
+from qaequilibrae.message import messages
 
 try:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
@@ -33,22 +35,16 @@ try:
 except:
     from qgis.PyQt.QtWidgets import QMessageBox
 
-    if QMessageBox.question(None, "AequilibraE and other dependencies are not not installed",
-                            "Do you want us to install these missing python packages? \r\n"
-                            "QGIS will be non-responsive for a couple of minutes.",
-                            QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+    if QMessageBox.question(None, messages.first_message, QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
         from qaequilibrae.download_extra_packages_class import download_all
 
         result = download_all().install()
         if "ERROR" in "".join([str(x).upper() for x in result]):
-            QMessageBox.information(None, "Information", "Errors may have happened during installation."
-                                                         "Please inspect the messages on your General Log message tab")
+            QMessageBox.information(None, "Information", messages.second_message)
         else:
-            QMessageBox.information(None, "Information", "You will probably need to restart QGIS to make it work")
+            QMessageBox.information(None, "Information", messages.third_message)
     else:
-        QMessageBox.information(None,
-                                "Information",
-                                "Without installing the packages, the plugin will be mostly non-functional")
+        QMessageBox.information(None, "Information", messages.fourth_message)
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -74,13 +70,13 @@ class AequilibraEMenu:
         self.toolbar = QToolBar()
         self.set_font(self.toolbar)
         self.toolbar.setOrientation(2)
-        
+
         if QtCore.QSettings().value("locale/overrideFlag", type=bool):
             loc = QtCore.QSettings().value('locale/userLocale')
         else:
             loc = QtCore.QLocale.system().name()
         loc = loc if len(loc) == 5 else loc[:2]
-    
+
         locale_path = '{}/i18n/qaequilibrae_{}.qm'.format(os.path.dirname(__file__), loc)
 
         if os.path.exists(locale_path):
@@ -104,7 +100,8 @@ class AequilibraEMenu:
         # # #######################   PROJECT SUB-MENU   ############################
         self.add_menu_action(self.tr("Project"), self.tr("Open Project"), partial(run_load_project, self))
         self.add_menu_action(self.tr("Project"), self.tr("Create project from OSM"), partial(project_from_osm, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Create Project from layers"), partial(run_create_transponet, self))
+        self.add_menu_action(self.tr("Project"), self.tr("Create Project from layers"),
+                             partial(run_create_transponet, self))
         self.add_menu_action(self.tr("Project"), self.tr("Add zoning data"), partial(run_add_zones, self))
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
@@ -113,8 +110,10 @@ class AequilibraEMenu:
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
 
-        self.add_menu_action(self.tr("Network Manipulation"), self.tr("Network Preparation"), partial(prepare_network, self))
-        self.add_menu_action(self.tr("Network Manipulation"), self.tr("Add centroid connectors"), partial(run_add_connectors, self))
+        self.add_menu_action(self.tr("Network Manipulation"), self.tr("Network Preparation"),
+                             partial(prepare_network, self))
+        self.add_menu_action(self.tr("Network Manipulation"), self.tr("Add centroid connectors"),
+                             partial(run_add_connectors, self))
 
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
@@ -123,14 +122,18 @@ class AequilibraEMenu:
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
 
-        self.add_menu_action(self.tr("Trip Distribution"), self.tr("Trip Distribution"), partial(run_distribution_models, self))
+        self.add_menu_action(self.tr("Trip Distribution"), self.tr("Trip Distribution"),
+                             partial(run_distribution_models, self))
 
         # # # ########################################################################
         # # # ###################  PATH COMPUTATION SUB-MENU   #######################
         #
-        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Shortest path"), partial(run_shortest_path, self))
-        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Impedance matrix"), partial(run_dist_matrix, self))
-        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Traffic Assignment"), partial(run_traffic_assig, self))
+        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Shortest path"),
+                             partial(run_shortest_path, self))
+        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Impedance matrix"),
+                             partial(run_dist_matrix, self))
+        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Traffic Assignment"),
+                             partial(run_traffic_assig, self))
 
         # # # ########################################################################
         # # # #######################   ROUTING SUB-MENU   ###########################
@@ -151,7 +154,8 @@ class AequilibraEMenu:
         # # ########################################################################
         # # #################          Utils submenu         #########################
         self.add_menu_action(self.tr("Data"), self.tr("Import matrices"), partial(load_matrices, self))
-        self.add_menu_action(self.tr("Utils"), self.tr("Display Matrices and datasets"), partial(display_aequilibrae_formats, self))
+        self.add_menu_action(self.tr("Utils"), self.tr("Display Matrices and datasets"),
+                             partial(display_aequilibrae_formats, self))
 
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
@@ -308,7 +312,8 @@ class AequilibraEMenu:
         self.iface.messageBar().pushMessage("Error", self.tr("You need to load a project first"), level=3, duration=10)
 
     def message_project_already_open(self):
-        self.iface.messageBar().pushMessage(self.tr("You need to close the project currently open first"), level=2, duration=10)
+        self.iface.messageBar().pushMessage(self.tr("You need to close the project currently open first"), level=2,
+                                            duration=10)
 
     def set_font(self, obj):
         f = obj.font()
