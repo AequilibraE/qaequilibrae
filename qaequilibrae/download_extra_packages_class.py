@@ -22,7 +22,7 @@ class download_all:
         self.adapt_aeq_version()
 
         lines = []
-        command = f'"python" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
+        command = f'"{self.find_python()}" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
         print(sys.executable)
         print(command)
         lines.append(command)
