@@ -59,9 +59,17 @@ class download_all:
             python_exe = sys_exe.parent / "bin" / "python3"
         elif sys.platform == "win32":
             python_exe = sys_exe.parent / "python3.exe"
+            if python_exe.exists():
+                return python_exe    
+            # Conda sys_exe is ~/.conda/envs/<envname>/Library/bin/qgis.exe,
+            # python is at ~/.conda/envs/<envname>/python.exe
+            conda_candidate = (sys_exe.parent.parent.parent / "python.exe")
+            if conda_candidate.exists():
+                return conda_candidate
+
 
         if not python_exe.exists():
-            raise FileExistsError("Can't find a python executable to use")
+            raise FileNotFoundError(f"Can't find a python executable to use")
         return python_exe
 
     def adapt_aeq_version(self):
