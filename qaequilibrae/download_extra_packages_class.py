@@ -22,7 +22,7 @@ class download_all:
         self.adapt_aeq_version()
 
         lines = []
-        command = f'"{self.find_python()}" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
+        command = f'"python" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
         print(sys.executable)
         print(command)
         lines.append(command)
@@ -69,7 +69,7 @@ class download_all:
 
 
         if not python_exe.exists():
-            raise FileNotFoundError(f"Can't find a python executable to use")
+            raise FileExistsError("Can't find a python executable to use")
         return python_exe
 
     def adapt_aeq_version(self):
