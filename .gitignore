@@ -55,6 +55,11 @@ aequilibrae/paths/basic_path_finding.html
 aequilibrae/paths/parameters.html
 aequilibrae/paths/build/*
 
+qaequilibrae/requirements_to_do.txt
+
+__pycache__/
+
+
 
 # End of https://www.gitignore.io/api/jetbrains
 # qgis-plugin-ci
