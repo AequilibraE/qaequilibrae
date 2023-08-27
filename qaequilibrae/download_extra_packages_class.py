@@ -58,7 +58,7 @@ class download_all:
         elif sys.platform == "darwin":
             python_exe = sys_exe.parent / "bin" / "python3"
         elif sys.platform == "win32":
-            python_exe = sys_exe.parent / "python3.exe"
+            python_exe = Path(sys.base_prefix) / "python.exe"
 
         if not python_exe.exists():
             raise FileExistsError("Can't find a python executable to use")
