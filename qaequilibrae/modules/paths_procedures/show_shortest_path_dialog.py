@@ -13,7 +13,6 @@ from qgis.utils import iface
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
 from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog
 from qaequilibrae.modules.common_tools import standard_path
-from qaequilibrae.i18n.translator import tr
 
 logger = logging.getLogger("AequilibraEGUI")
 
@@ -54,7 +53,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.do_dist_matrix.clicked.connect(self.produces_path)
 
     def prepare_graph_and_network(self):
-        self.do_dist_matrix.setText(tr("Loading data"))
+        self.do_dist_matrix.setText(self.tr("Loading data"))
         self.from_but.setEnabled(False)
         self.to_but.setEnabled(False)
         dlg2 = LoadGraphLayerSettingDialog(self.iface, self.project)
@@ -94,7 +93,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                 link_id = feat.attributes()[idx]
                 self.link_features[link_id] = feat
 
-            self.do_dist_matrix.setText(tr("Display"))
+            self.do_dist_matrix.setText(self.tr("Display"))
             self.do_dist_matrix.setEnabled(True)
             self.from_but.setEnabled(True)
             self.to_but.setEnabled(True)
@@ -156,7 +155,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                 else:
                     self.create_path_with_scratch_layer()
             else:
-                msg = tr("No path between {} and {}").format(self.path_from.text(), self.path_to.text())
+                msg = self.tr("No path between {} and {}").format(self.path_from.text(), self.path_to.text())
                 qgis.utils.iface.messageBar().pushMessage(msg, "", level=3)
 
     def create_path_with_selection(self):

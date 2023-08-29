@@ -4,7 +4,6 @@ from aequilibrae.utils.worker_thread import WorkerThread
 import struct
 from aequilibrae.matrix import AequilibraeData
 from qaequilibrae.modules.common_tools.global_parameters import float_types, string_types, integer_types
-from qaequilibrae.i18n.translator import tr
 from qgis.PyQt.QtCore import pyqtSignal
 
 
@@ -50,7 +49,7 @@ class LoadDataset(WorkerThread):
                     types.append("S" + str(field.length()))
                     empties.append("")
                 else:
-                    self.error = tr("Field {} does has a type not supported.").format(str(field.name()))
+                    self.error = self.tr("Field {} does has a type not supported.").format(str(field.name()))
                     break
                 fields.append(str(field.name()))
                 idxs.append(self.layer.dataProvider().fieldNameIndex(field.name()))
@@ -74,4 +73,4 @@ class LoadDataset(WorkerThread):
                 self.ProgressValue.emit(p)
 
             self.ProgressValue.emit(feat_count)
-        self.finished_threaded_procedure.emit(tr("Done"))
+        self.finished_threaded_procedure.emit(self.tr("Done"))

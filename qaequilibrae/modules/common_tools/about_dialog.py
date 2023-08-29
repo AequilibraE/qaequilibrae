@@ -6,7 +6,6 @@ import yaml
 
 from qgis.PyQt import QtWidgets, uic
 from .auxiliary_functions import standard_path
-from qaequilibrae.i18n.translator import tr
 
 try:
     from aequilibrae.paths import release_name, release_version
@@ -43,13 +42,13 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
                     break
 
         self.all_items = []
-        self.all_items.append([tr("AequilibraE Version name"), release_name])
-        self.all_items.append([tr("AequilibraE Version number"), release_version])
-        self.all_items.append([tr("GUI version"), b])
-        self.all_items.append([tr("GUI Repository"), repository])
-        self.all_items.append([tr("Minimum QGIS"), "3.14"])
-        self.all_items.append([tr("Developers"), par["developers"]])
-        self.all_items.append([tr("Sponsors"), par["sponsors"]])
+        self.all_items.append([self.tr("AequilibraE Version name"), release_name])
+        self.all_items.append([self.tr("AequilibraE Version number"), release_version])
+        self.all_items.append([self.tr("GUI version"), b])
+        self.all_items.append([self.tr("GUI Repository"), repository])
+        self.all_items.append([self.tr("Minimum QGIS"), "3.14"])
+        self.all_items.append([self.tr("Developers"), par["developers"]])
+        self.all_items.append([self.tr("Sponsors"), par["sponsors"]])
 
         self.assemble()
 
@@ -66,7 +65,7 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.about_table.setCellWidget(row_count, 0, lv)
                 self.about_table.setRowHeight(row_count, len(t) * self.about_table.rowHeight(row_count))
             else:
-                self.about_table.setItem(row_count, 0, QtWidgets.QTableWidgetItem(str(t)))
+                self.about_table.setItem(row_count, 0, QtWidgets.QTableWidgetItem(self.tr(t)))
 
             row_count += 1
         self.about_table.setVerticalHeaderLabels(titles)

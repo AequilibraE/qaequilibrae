@@ -4,7 +4,6 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
 
-from qaequilibrae.i18n.translator import tr
 from qaequilibrae.modules.public_transport_procedures.gtfs_feed import GTFSFeed
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_importer.ui"))
@@ -26,11 +25,11 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.done = 1
 
         if isfile(join(qgis_project.project.project_base_path, "public_transport.sqlite")):
-            self.rdo_clear.setText(tr("Overwrite Routes"))
-            self.rdo_keep.setText(tr("Add to Existing Routes"))
+            self.rdo_clear.setText(self.tr("Overwrite Routes"))
+            self.rdo_keep.setText(self.tr("Add to Existing Routes"))
         else:
-            self.label_3.setText(tr("Add transit table"))
-            self.rdo_clear.setText(tr("Create new route system"))
+            self.label_3.setText(self.tr("Add transit table"))
+            self.rdo_clear.setText(self.tr("Create new route system"))
             self.rdo_keep.setVisible(False)
             self.rdo_clear.setChecked(True)
         self.setFixedHeight(380)

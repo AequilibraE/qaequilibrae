@@ -2,7 +2,6 @@ import shapely.wkb
 
 from aequilibrae.utils.worker_thread import WorkerThread
 from PyQt5.QtCore import pyqtSignal
-from qaequilibrae.i18n.translator import tr
 
 
 class AddZonesProcedure(WorkerThread):
@@ -20,7 +19,7 @@ class AddZonesProcedure(WorkerThread):
 
     def doWork(self):
         features = list(self.lyr.selectedFeatures()) if self.select_only else list(self.lyr.getFeatures())
-        self.emit_messages(message=tr("Importing zones"), value=0, max_val=len(features))
+        self.emit_messages(message=self.tr("Importing zones"), value=0, max_val=len(features))
 
         idx_id = self.field_corresp["zone_id"]
         zoning = self.project.zoning
