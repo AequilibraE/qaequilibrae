@@ -1,6 +1,7 @@
+from aequilibrae.distribution import GravityCalibration
+from aequilibrae.utils.worker_thread import WorkerThread
 from qgis.PyQt.QtCore import *
 
-from aequilibrae.utils.worker_thread import WorkerThread
 
 class CalibrateGravityProcedure(WorkerThread):
     def __init__(self, parentThread, **kwargs):
@@ -11,10 +12,7 @@ class CalibrateGravityProcedure(WorkerThread):
         self.model = None
 
     def doWork(self):
-        try:
-            self.gravity.calibrate()
-            self.report = self.gravity.report
-            self.model = self.gravity.model
-        except ValueError as e:
-            self.error = e
-        self.finished_threaded_procedure.emit("calibrate")
+        self.gravity.calibrate()
+        self.report = self.gravity.report
+        self.model = self.gravity.model
+        self.jobFinished.emit("calibrate")
