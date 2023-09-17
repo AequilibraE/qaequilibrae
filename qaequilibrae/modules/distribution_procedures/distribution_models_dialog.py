@@ -11,7 +11,6 @@ from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
 
 from qgis.PyQt.QtWidgets import QAbstractItemView
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
-from qaequilibrae.modules.matrix_procedures.results_lister import list_results
 from qaequilibrae.modules.common_tools import PandasModel
 import qgis
 from aequilibrae.context import get_logger
@@ -23,7 +22,7 @@ from qaequilibrae.modules.distribution_procedures.ipf_procedure import IpfProced
 from qaequilibrae.modules.common_tools import GetOutputFileName
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
-from qaequilibrae.modules.matrix_procedures import LoadMatrixDialog, LoadDatasetDialog, DisplayAequilibraEFormatsDialog
+from qaequilibrae.modules.matrix_procedures import LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_distribution.ui"))
 spec = iutil.find_spec("openmatrix")
@@ -81,7 +80,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.but_run.clicked.connect(self.run)
         self.but_queue.clicked.connect(self.add_job_to_queue)
-        self.but_cancel.clicked.connect(self.exit_procedure)
+        self.but_cancel.clicked.connect(self.close)
         self.table_datasets.doubleClicked.connect(self.data_double_clicked)
 
         self.table_jobs.setColumnWidth(0, 50)
@@ -232,7 +231,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if dt == "data":
                 for f in self.datasets[d].fields:
                     if np.issubdtype(self.datasets[d].data[f].dtype, np.integer) or np.issubdtype(
-                        self.datasets[d].data[f].dtype, np.float
+                        self.datasets[d].data[f].dtype, np.float64
                     ):
                         cob_dest.addItem(f)
             else:
@@ -284,12 +283,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         ft = file_types[file_type]
         file_chosen, _ = GetOutputFileName(self, ft[0], ft[1], ft[2], self.path)
         return file_chosen
-
-    def get_matrix(self, matrix_name):
-
-
-
-        return
 
     def add_job_to_queue(self):
         worker_thread = None
