@@ -3249,7 +3249,7 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="275"/>
         <source>Choose folder</source>
-        <translation type="unfinished"/>
+        <translation>Choix du dossier d&apos;enregistrement</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="303"/>
