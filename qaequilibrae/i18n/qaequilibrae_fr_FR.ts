@@ -3229,7 +3229,7 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="189"/>
         <source>Field</source>
-        <translation type="unfinished"/>
+        <translation>Champ</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="194"/>
