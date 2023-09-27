@@ -3318,7 +3318,7 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="411"/>
         <source>Data layer</source>
-        <translation type="unfinished"/>
+        <translation>Couche des données</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="424"/>
