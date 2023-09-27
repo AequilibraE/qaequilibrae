@@ -3322,7 +3322,7 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="424"/>
         <source>Keep these fields only</source>
-        <translation type="unfinished"/>
+        <translation>Conserver uniquement ces champs</translation>
     </message>
 </context>
 </TS>
