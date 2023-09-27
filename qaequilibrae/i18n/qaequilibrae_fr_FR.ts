@@ -3298,12 +3298,12 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="267"/>
         <source>Save and Use</source>
-        <translation>Enregistrer et utiliser</translation>
+        <translation>Enregistrer et sélectionner</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="296"/>
         <source>Field</source>
-        <translation type="unfinished"/>
+        <translation>Champ</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="329"/>
