@@ -3292,7 +3292,7 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="214"/>
         <source>All fields</source>
-        <translation type="unfinished"/>
+        <translation>Tous les champs</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="267"/>
