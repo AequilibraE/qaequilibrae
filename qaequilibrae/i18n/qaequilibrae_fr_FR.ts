@@ -3283,7 +3283,7 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="182"/>
         <source>AequilibraE data</source>
-        <translation>Donnée AequilibraE</translation>
+        <translation>Format AequilibraE</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="198"/>
