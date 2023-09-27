@@ -3308,12 +3308,12 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="329"/>
         <source>...</source>
-        <translation type="unfinished"/>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="385"/>
         <source>Load</source>
-        <translation type="unfinished"/>
+        <translation>Charger</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="411"/>
