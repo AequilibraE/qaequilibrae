@@ -3267,7 +3267,7 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="28"/>
         <source>AequilibraE  -  Vector loader</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE  -  Import de vecteur</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="84"/>
