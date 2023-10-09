@@ -54,7 +54,7 @@ class DatabaseModel(QtCore.QAbstractTableModel):
                 if np.issubdtype(t, np.integer):
                     self.types.append(0)
                     self.empties.append(np.iinfo(t).min)
-                elif np.issubdtype(t, np.float64):
+                elif np.issubdtype(t, np.floating):
                     self.types.append(1)
                     self.empties.append(np.nan)
                 else:
