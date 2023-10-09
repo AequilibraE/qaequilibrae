@@ -17,8 +17,10 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
-from qgis.core import QgsProject, QgsSettings
+from qgis.core import QgsProject, QgsSettings, QgsApplication
 from qgis.PyQt.QtCore import QTranslator
+
+from .modules.processing_provider.provider import Provider
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
@@ -61,6 +63,7 @@ class AequilibraEMenu:
         # translator = None
         self.iface = iface
         self.project = None  # type: Project
+        self.provider = None #processing provider for QGIS
         self.matrices = {}
         self.layers = {}  # type: Dict[QgsVectorLayer]
         self.dock = QDockWidget(self.trlt("AequilibraE"))
@@ -235,6 +238,9 @@ class AequilibraEMenu:
 
     def unload(self):
         del self.dock
+        if  self.provider in QgsApplication.processingRegistry().providers():
+            QgsApplication.processingRegistry().removeProvider(self.provider)
+        pass
 
     def trlt(self, message):
         # In the near future, we will use this function to automatically translate the AequilibraE menu
@@ -243,6 +249,8 @@ class AequilibraEMenu:
         return message
 
     def initGui(self):
+        self.provider = Provider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
         pass
 
     def removes_temporary_files(self):

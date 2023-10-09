@@ -1,0 +1,87 @@
+__author__ = 'Arthur Evrard'
+
+from qgis.core import QgsProcessing
+from qgis.core import QgsProcessingAlgorithm
+from qgis.core import QgsProcessingMultiStepFeedback
+from qgis.core import QgsProcessingParameterFile
+from qgis.core import QgsProcessingContext
+import processing
+import importlib.util as iutil
+
+import numpy as np
+import os
+
+# Checks if we can display OMX
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
+
+class omx2csv(QgsProcessingAlgorithm):
+
+    def initAlgorithm(self, config=None):
+        self.addParameter(QgsProcessingParameterFile('omxFile', 'OMX file to convert (.omx)', behavior=QgsProcessingParameterFile.File, fileFilter='OMX (*.omx)', defaultValue=None))
+        self.addParameter(QgsProcessingParameterFile('destFolder', 'Export matrices to', behavior=QgsProcessingParameterFile.Folder, fileFilter='Tous les fichiers (*.*)', defaultValue=None))
+
+    def processAlgorithm(self, parameters, context, model_feedback):
+        results = {}
+        outputs = {}
+        
+        pathSource=parameters['omxFile']
+        pathDest=parameters['destFolder']
+        
+        if has_omx:
+            import openmatrix as omx
+            matrix=omx.open_file(pathSource)
+            feedback = QgsProcessingMultiStepFeedback(len(matrix), model_feedback)
+            
+            feedback.setCurrentStep(0)
+            feedback.pushInfo('')
+            feedback.pushInfo('Dimensions of matrices to process: ')
+            feedback.pushInfo(str(matrix.shape()))
+            
+            feedback.pushInfo('')
+            feedback.pushInfo('Attributes in omx file: ')
+            feedback.pushInfo(str(matrix.list_all_attributes()))
+            
+            folder=os.path.join(pathDest,os.path.splitext(os.path.basename(pathSource))[0])
+            if not os.path.exists(folder):
+               os.makedirs(folder)
+
+            for m in range(len(matrix)):
+                n=matrix.list_matrices()[m]
+                current=np.array(matrix[n])
+                feedback.pushInfo('')
+                feedback.pushInfo('Total stored in the "'+str(n)+'"matrix : ')
+                feedback.pushInfo(str(int(round(current.sum(),0))))
+                np.savetxt(f"{folder}/{n}.csv", current, delimiter=";")
+                
+                feedback.setCurrentStep(m)
+                if feedback.isCanceled():
+                    return {}
+
+            matrix.close()
+        
+        else:
+            sys.exit('Openmatrix library not found')
+        
+        return results
+
+    def name(self):
+        return 'Convert OMX to CSV'
+
+    def displayName(self):
+        return 'Convert OMX to CSV'
+
+    def group(self):
+        return 'Matrix'
+
+    def groupId(self):
+        return 'Matrix'
+        
+    def shortHelpString(self):
+        return """
+        Export the matrices contained in an .omx file to a set of .csv files
+        You need to install openmatrix library to use this function
+        """
+
+    def createInstance(self):
+        return omx2csv()
