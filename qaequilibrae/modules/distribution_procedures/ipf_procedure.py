@@ -5,7 +5,6 @@ from aequilibrae.utils.worker_thread import WorkerThread
 
 
 class IpfProcedure(WorkerThread):
-    finished_threaded_procedure = pyqtSignal(object)
 
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
@@ -21,4 +20,4 @@ class IpfProcedure(WorkerThread):
             self.output = self.ipf.output
         except ValueError as e:
             self.error = e
-        self.finished_threaded_procedure.emit("finishedIPF")
+        self.jobFinished.emit("finishedIPF")

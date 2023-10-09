@@ -125,15 +125,11 @@ def test_import_matrices_menu(ae, qtbot):
 
 
 def test_trip_distribution_menu(ae, qtbot):
-    from qaequilibrae.modules.distribution_procedures import DistributionModelsDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, DistributionModelsDialog)
-
     action = ae.menuActions["Trip Distribution"][0]
     assert action.text() == "Trip Distribution", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
     action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
 def test_shortest_path_menu(ae, qtbot):
