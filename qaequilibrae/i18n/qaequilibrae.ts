@@ -589,7 +589,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="370"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="316"/>
         <source>Load</source>
         <translation type="unfinished"></translation>
     </message>
@@ -599,142 +599,127 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="110"/>
-        <source>Matrix name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="115"/>
-        <source># of cores</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="123"/>
-        <source>Matrices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="167"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="113"/>
         <source>Vectors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="189"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="135"/>
         <source>Attraction</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="232"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="178"/>
         <source>Production</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="238"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="184"/>
         <source>Impedance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="342"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="288"/>
         <source>Core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="329"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="275"/>
         <source>Matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="301"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="247"/>
         <source>Seed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="428"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="374"/>
         <source>Model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="391"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="337"/>
         <source>Parameter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="396"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="342"/>
         <source>Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="434"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="380"/>
         <source>Negative Exponential</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="444"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="390"/>
         <source>Inverse Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="451"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="397"/>
         <source>Gamma Function</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="458"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="404"/>
         <source>Friction Factors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="466"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="412"/>
         <source>jobs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="480"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="429"/>
         <source>Job</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="485"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="434"/>
         <source>Output name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="490"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="439"/>
         <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="498"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="418"/>
         <source>Treat empties as zeros</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="515"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="451"/>
         <source>Iterative Proportional Fitting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="522"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="458"/>
         <source>Apply Gravity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="529"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="465"/>
         <source>Calibrate Gravity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="536"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="472"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="543"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="479"/>
         <source>Queue jobs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="553"/>
+        <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="489"/>
         <source>Run jobs</source>
         <translation type="unfinished"></translation>
     </message>
@@ -820,67 +805,67 @@
 <context>
     <name>DistributionModelsDialog</name>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="125"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="135"/>
         <source>AequilibraE - Iterative Proportional Fitting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="126"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="136"/>
         <source>Seed matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="130"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="140"/>
         <source>AequilibraE - Apply gravity model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="136"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="146"/>
         <source>AequilibraE - Calibrate gravity model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="137"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="147"/>
         <source>Observed matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="163"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="173"/>
         <source>Function</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="229"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="225"/>
         <source>Could not load model. {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="434"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="423"/>
         <source>Procedure error: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="377"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="379"/>
         <source>Queued</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="396"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="397"/>
         <source>Production vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="399"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="400"/>
         <source>Attraction vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="403"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="404"/>
         <source>Observed (seed) matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="407"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="408"/>
         <source>Impedance matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
