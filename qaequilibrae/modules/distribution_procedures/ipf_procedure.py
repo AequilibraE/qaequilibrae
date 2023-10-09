@@ -5,7 +5,6 @@ from aequilibrae.utils.worker_thread import WorkerThread
 
 
 class IpfProcedure(WorkerThread):
-    # finished_threaded_procedure = pyqtSignal(object)
 
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
