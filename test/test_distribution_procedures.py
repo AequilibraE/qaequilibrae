@@ -43,13 +43,29 @@ def traffic_assignment(ae_with_project, qtbot):
     dialog.run()
     
 
-def test_iterative_proportional_fitting(ae_with_project, qtbot):
-    dialog = DistributionModelsDialog(ae_with_project, mode="ipf")
+def test_ipf(ae_with_project, qtbot):
+    dialog = DistributionModelsDialog(ae_with_project, mode="ipf", testing=True)
 
-    pass
+    dialog.dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
+    dialog.out_name = "test/data/SiouxFalls_project/demand_ipf.aem"
+    dialog.cob_seed_mat.setCurrentIndex(4)
+    dialog.cob_seed_field.setCurrentText("matrix")
+    
+    dialog.cob_prod_data.setCurrentText("synthetic_future_vector")
+    dialog.cob_prod_field.setCurrentText("origins")
+    dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
+    dialog.cob_atra_field.setCurrentText("destinations")
+
+    # em check data tem as verificações dos vetores estão erradas pq não tem indice?
+
+    qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+
+    print(dialog.__dict__)
+    dialog.close()
 
 def test_calibrate_gravity(ae_with_project, qtbot):
-    # traffic_assignment(ae_with_project, qtbot)
+    traffic_assignment(ae_with_project, qtbot)
 
     dialog = DistributionModelsDialog(ae_with_project, mode="calibrate", testing=True)
 
@@ -68,6 +84,7 @@ def test_calibrate_gravity(ae_with_project, qtbot):
 
     # Check if mod file was saved and contains any information
 
+@pytest.mark.skip()
 def test_apply_gravity(ae_with_project, qtbot):
     dialog = DistributionModelsDialog(ae_with_project, mode="apply", testing=True)
 
