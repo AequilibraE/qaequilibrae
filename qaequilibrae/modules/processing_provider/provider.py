@@ -7,11 +7,15 @@ import os
 ProviderPath = os.path.dirname(__file__)
 
 from .omx2csv import omx2csv
+from .ProjectFromLayer import ProjectFromLayer
+from .RenumberFromCentroids import RenumberFromCentroids
 
 class Provider(QgsProcessingProvider):
 
     def loadAlgorithms(self):
-        self.addAlgorithm(omx2csv() )
+        self.addAlgorithm(omx2csv())
+        self.addAlgorithm(ProjectFromLayer())
+        self.addAlgorithm(RenumberFromCentroids())
         # add additional algorithms here
         # self.addAlgorithm(MyOtherAlgorithm())
 

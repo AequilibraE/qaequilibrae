@@ -41,6 +41,8 @@ class omx2csv(QgsProcessingAlgorithm):
             feedback.pushInfo('')
             feedback.pushInfo('Attributes in omx file: ')
             feedback.pushInfo(str(matrix.list_all_attributes()))
+            Destination=np.array([list(matrix.mapping('main_index'))])
+            Origin=np.transpose(np.array([[np.NaN]+list(matrix.mapping('main_index'))]))
             
             folder=os.path.join(pathDest,os.path.splitext(os.path.basename(pathSource))[0])
             if not os.path.exists(folder):
@@ -52,7 +54,7 @@ class omx2csv(QgsProcessingAlgorithm):
                 feedback.pushInfo('')
                 feedback.pushInfo('Total stored in the "'+str(n)+'"matrix : ')
                 feedback.pushInfo(str(int(round(current.sum(),0))))
-                np.savetxt(f"{folder}/{n}.csv", current, delimiter=";")
+                np.savetxt(f"{folder}/{n}.csv", np.c_[Origin, np.r_[Destination, current]], fmt='%.16g', delimiter=";")
                 
                 feedback.setCurrentStep(m)
                 if feedback.isCanceled():
@@ -72,10 +74,10 @@ class omx2csv(QgsProcessingAlgorithm):
         return 'Convert OMX to CSV'
 
     def group(self):
-        return 'Matrix'
+        return '2_Matrix'
 
     def groupId(self):
-        return 'Matrix'
+        return '2_Matrix'
         
     def shortHelpString(self):
         return """
