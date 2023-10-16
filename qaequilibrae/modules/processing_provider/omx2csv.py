@@ -1,19 +1,16 @@
 __author__ = 'Arthur Evrard'
 
-from qgis.core import QgsProcessing
+import importlib.util as iutil
+import os
+import sys
+
+import numpy as np
 from qgis.core import QgsProcessingAlgorithm
 from qgis.core import QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile
-from qgis.core import QgsProcessingContext
-import processing
-import importlib.util as iutil
-
-import numpy as np
-import os
 
 # Checks if we can display OMX
-spec = iutil.find_spec("openmatrix")
-has_omx = spec is not None
+has_omx = iutil.find_spec("openmatrix") is not None
 
 class omx2csv(QgsProcessingAlgorithm):
 
@@ -28,43 +25,40 @@ class omx2csv(QgsProcessingAlgorithm):
         pathSource=parameters['omxFile']
         pathDest=parameters['destFolder']
         
-        if has_omx:
-            import openmatrix as omx
-            matrix=omx.open_file(pathSource)
-            feedback = QgsProcessingMultiStepFeedback(len(matrix), model_feedback)
-            
-            feedback.setCurrentStep(0)
-            feedback.pushInfo('')
-            feedback.pushInfo('Dimensions of matrices to process: ')
-            feedback.pushInfo(str(matrix.shape()))
-            
-            feedback.pushInfo('')
-            feedback.pushInfo('Attributes in omx file: ')
-            feedback.pushInfo(str(matrix.list_all_attributes()))
-            Destination=np.array([list(matrix.mapping('main_index'))])
-            Origin=np.transpose(np.array([[np.NaN]+list(matrix.mapping('main_index'))]))
-            
-            folder=os.path.join(pathDest,os.path.splitext(os.path.basename(pathSource))[0])
-            if not os.path.exists(folder):
-               os.makedirs(folder)
-
-            for m in range(len(matrix)):
-                n=matrix.list_matrices()[m]
-                current=np.array(matrix[n])
-                feedback.pushInfo('')
-                feedback.pushInfo('Total stored in the "'+str(n)+'"matrix : ')
-                feedback.pushInfo(str(int(round(current.sum(),0))))
-                np.savetxt(f"{folder}/{n}.csv", np.c_[Origin, np.r_[Destination, current]], fmt='%.16g', delimiter=";")
-                
-                feedback.setCurrentStep(m)
-                if feedback.isCanceled():
-                    return {}
-
-            matrix.close()
-        
-        else:
+        if not has_omx:
             sys.exit('Openmatrix library not found')
-        
+        import openmatrix as omx
+        matrix=omx.open_file(pathSource)
+        feedback = QgsProcessingMultiStepFeedback(len(matrix), model_feedback)
+
+        feedback.setCurrentStep(0)
+        feedback.pushInfo('')
+        feedback.pushInfo('Dimensions of matrices to process: ')
+        feedback.pushInfo(str(matrix.shape()))
+
+        feedback.pushInfo('')
+        feedback.pushInfo('Attributes in omx file: ')
+        feedback.pushInfo(str(matrix.list_all_attributes()))
+        Destination=np.array([list(matrix.mapping('main_index'))])
+        Origin=np.transpose(np.array([[np.NaN]+list(matrix.mapping('main_index'))]))
+
+        folder=os.path.join(pathDest,os.path.splitext(os.path.basename(pathSource))[0])
+        if not os.path.exists(folder):
+           os.makedirs(folder)
+
+        for m in range(len(matrix)):
+            n=matrix.list_matrices()[m]
+            current=np.array(matrix[n])
+            feedback.pushInfo('')
+            feedback.pushInfo('Total stored in the "'+str(n)+'"matrix : ')
+            feedback.pushInfo(str(int(round(current.sum(),0))))
+            np.savetxt(f"{folder}/{n}.csv", np.c_[Origin, np.r_[Destination, current]], fmt='%.16g', delimiter=";")
+
+            feedback.setCurrentStep(m)
+            if feedback.isCanceled():
+                return {}
+
+        matrix.close()
         return results
 
     def name(self):
