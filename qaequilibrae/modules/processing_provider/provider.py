@@ -6,6 +6,7 @@ import os
 
 ProviderPath = os.path.dirname(__file__)
 
+from .MatrixFromLayer import MatrixFromLayer
 from .exportMatrix import exportMatrix
 from .ProjectFromLayer import ProjectFromLayer
 from .RenumberFromCentroids import RenumberFromCentroids
@@ -13,6 +14,7 @@ from .RenumberFromCentroids import RenumberFromCentroids
 class Provider(QgsProcessingProvider):
 
     def loadAlgorithms(self):
+        self.addAlgorithm(MatrixFromLayer())
         self.addAlgorithm(exportMatrix())
         self.addAlgorithm(ProjectFromLayer())
         self.addAlgorithm(RenumberFromCentroids())
