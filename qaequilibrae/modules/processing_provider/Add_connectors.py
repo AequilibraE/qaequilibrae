@@ -1,0 +1,74 @@
+from qgis.core import QgsProcessing
+from qgis.core import QgsProcessingAlgorithm
+from qgis.core import QgsProcessingMultiStepFeedback
+from qgis.core import QgsProcessingParameterFile
+from qgis.core import QgsProcessingParameterNumber
+from qgis.core import QgsProcessingParameterString
+import processing
+
+from qaequilibrae.i18n.translator import tr
+
+import importlib.util as iutil
+import pandas as pd
+
+class AddConnectors(QgsProcessingAlgorithm):
+
+    def initAlgorithm(self, config=None):
+        self.addParameter(QgsProcessingParameterNumber('nb_conn', tr('Desired number of connectors'), type=QgsProcessingParameterNumber.Integer, minValue=1, maxValue=10, defaultValue=1))
+        self.addParameter(QgsProcessingParameterString('mode', tr('Mode to connect (only one at a time)'), multiLine=False, defaultValue='c'))
+        self.addParameter(QgsProcessingParameterFile('PrjtPath', tr('AequilibraE project'), behavior=QgsProcessingParameterFile.Folder, defaultValue='D:/'))
+
+    def processAlgorithm(self, parameters, context, model_feedback):
+        feedback = QgsProcessingMultiStepFeedback(2, model_feedback)
+        results = {}
+        outputs = {}
+        
+        # Checks if we have access to aequilibrae library
+        has_aeq = iutil.find_spec("aequilibrae") is not None
+        if not has_aeq:
+            sys.exit(tr('AequilibraE library not found'))
+
+        from aequilibrae import Project
+        feedback.pushInfo(tr('Connecting to aequilibrae project'))
+        project = Project()
+        project.open(parameters['PrjtPath'])
+        
+        all_nodes= project.network.nodes
+        nodes_table= all_nodes.data
+        
+        feedback.pushInfo(' ')
+        feedback.setCurrentStep(1)
+        
+        # Adding connectors
+        nb_conn=parameters['nb_conn']
+        mode=parameters['mode']
+        feedback.pushInfo(tr(f'Adding {nb_conn} connectors when none exists for mode "{mode}"'))
+        for idx, node in nodes_table.query("is_centroid == 1").iterrows():
+            curr=all_nodes.get(node.node_id)
+            curr.connect_mode(curr.geometry.buffer(0.01), mode_id=mode, connectors=nb_conn)
+        feedback.pushInfo(' ')
+        feedback.setCurrentStep(2)
+        
+        project.close()
+        output_file=parameters['PrjtPath']
+        return {'Output': output_file}
+
+    def name(self):
+        return tr('Add connectors')
+
+    def displayName(self):
+        return tr('Add connectors')
+
+    def group(self):
+        return tr('1_Network')
+
+    def groupId(self):
+        return tr('1_Network')
+
+    def shortHelpString(self):
+        return tr("""
+        Go through all the centroids and add connectors only if none exists for the chosen mode
+        """)
+
+    def createInstance(self):
+        return AddConnectors()

@@ -10,6 +10,8 @@ from .MatrixFromLayer import MatrixFromLayer
 from .exportMatrix import exportMatrix
 from .ProjectFromLayer import ProjectFromLayer
 from .RenumberFromCentroids import RenumberFromCentroids
+from .Add_connectors import AddConnectors
+from .AssignFromYaml import TrafficAssignYAML
 
 class Provider(QgsProcessingProvider):
 
@@ -18,6 +20,8 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(exportMatrix())
         self.addAlgorithm(ProjectFromLayer())
         self.addAlgorithm(RenumberFromCentroids())
+        self.addAlgorithm(AddConnectors())
+        self.addAlgorithm(TrafficAssignYAML())
         # add additional algorithms here
         # self.addAlgorithm(MyOtherAlgorithm())
 
