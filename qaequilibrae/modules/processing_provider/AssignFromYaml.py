@@ -1,12 +1,13 @@
 __author__ = 'Arthur Evrard'
 
-import importlib.util as iutil
-import sys
-
-from qaequilibrae.i18n.translator import tr
 from qgis.core import QgsProcessingAlgorithm
 from qgis.core import QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile
+
+from qaequilibrae.i18n.translator import tr
+
+import importlib.util as iutil
+import sys
 
 class TrafficAssignYAML(QgsProcessingAlgorithm):
 

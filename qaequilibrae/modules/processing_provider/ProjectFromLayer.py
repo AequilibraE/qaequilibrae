@@ -1,12 +1,10 @@
-from qgis.core import QgsProcessing
-from qgis.core import QgsProcessingAlgorithm
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
-from qgis.core import QgsProcessingMultiStepFeedback
-from qgis.core import QgsProcessingParameterVectorLayer
-from qgis.core import QgsProcessingParameterField
-from qgis.core import QgsProcessingParameterFile
-from qgis.core import QgsProcessingParameterString
-import processing
+__author__ = 'Arthur Evrard'
+
+from qgis.core import QgsProject, QgsFeature, QgsVectorLayer, QgsDataSourceUri
+from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterFile, QgsProcessingParameterString
+from qgis.PyQt.QtCore import QVariant
 
 from qaequilibrae.i18n.translator import tr
 
@@ -42,21 +40,41 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         project = Project()
         PrjtPath= join(parameters['destFolder'],parameters['prject_name'])
         project.new(PrjtPath)
+        
+        # Adding source_id field early to have all fields available in links table
+        links = project.network.links
+        link_data = links.fields
+        link_data.add("source_id", "link_id from the data source")
+        links.refresh_fields()
+        uri = QgsDataSourceUri()
+        uri.setDatabase(join(PrjtPath,'project_database.sqlite'))
+        uri.setDataSource('', 'links', 'geometry')
+        links_layer=QgsVectorLayer(uri.uri(), 'links_layer', 'spatialite')
+        feedback.pushInfo(' ')
         feedback.setCurrentStep(1)
         
         feedback.pushInfo(tr('Importing link layer from QGIS'))
         layer_crs = self.parameterAsVectorLayer(parameters, 'links', context).crs()
         aeq_crs = QgsCoordinateReferenceSystem("EPSG:4326")
         
-        #Import QGIS layer as a panda dataframe
+        #Import QGIS layer as a panda dataframe and storing features for future copy
         layer = self.parameterAsVectorLayer(parameters, 'links', context)
-        columns = [f.name() for f in layer.fields()] + ['geometry']
-        columns_types = [f.typeName() for f in layer.fields()] #
+        columns = [parameters['modes'], parameters['link_type']]
         row_list = []
+        featureList = []      
         for f in layer.getFeatures():
             geom=f.geometry()
             geom.transform(QgsCoordinateTransform(layer_crs, aeq_crs, QgsProject.instance()))
-            row_list.append(dict(zip(columns, f.attributes() + [geom.asWkt()])))
+            nf=QgsFeature(links_layer.fields())
+            nf.setGeometry(geom)
+            nf['ogc_fid']=f[parameters['link_id']]
+            nf['link_id']=f[parameters['link_id']]
+            nf['source_id']=f[parameters['link_id']]
+            nf['direction']=f[parameters['direction']]
+            nf['link_type']=f[parameters['link_type']]
+            nf['modes']=f[parameters['modes']]
+            featureList.append(nf)
+            row_list.append([f[parameters['modes']], f[parameters['link_type']]])
         df = pd.DataFrame(row_list, columns=columns)
         feedback.pushInfo(' ')
         feedback.setCurrentStep(2)
@@ -90,24 +108,17 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         
         feedback.pushInfo(tr('Adding links'))
         
-        #adding links
-        links = project.network.links
-        link_data = links.fields
-        link_data.add("source_id", "link_id from the data source")
-        links.refresh_fields()
-        for idx, record in df.iterrows():
-            new_link = links.new()
-            new_link.source_id = record[parameters['link_id']]
-            new_link.direction = record[parameters['direction']]
-            new_link.modes = record[parameters['modes']]
-            new_link.link_type = record[parameters['link_type']]
-            new_link.geometry = load_wkt(record['geometry'])
-            new_link.save()
+        #Adding links all at once
+        links_layer.startEditing()
+        links_layer.dataProvider().addFeatures(featureList)        
+        links_layer.commitChanges()       
+        
         feedback.pushInfo(' ')
         feedback.setCurrentStep(4)
                 
         feedback.pushInfo(tr('Closing aequilibrae project'))
         project.close()
+        del row_list, df, featureList, uri, links_layer
         
         output_file=PrjtPath
         return {'Output': output_file}

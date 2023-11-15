@@ -1,12 +1,8 @@
-from qgis.core import QgsProcessing
-from qgis.core import QgsProcessingAlgorithm
+__author__ = 'Arthur Evrard'
+
+from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
-from qgis.core import QgsProcessingMultiStepFeedback
-from qgis.core import QgsProcessingParameterVectorLayer
-from qgis.core import QgsProcessingParameterField
-from qgis.core import QgsProcessingParameterFile
-from qgis.core import QgsProcessingParameterString
-import processing
+from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterFile, QgsProcessingParameterString
 
 from qaequilibrae.i18n.translator import tr
 
@@ -104,6 +100,8 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
         feedback.pushInfo(' ')
         
         project.close()
+        del row_list, df
+        
         output_file=parameters['PrjtPath']
         return {'Output': output_file}
 

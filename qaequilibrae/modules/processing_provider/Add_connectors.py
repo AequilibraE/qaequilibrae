@@ -1,10 +1,7 @@
-from qgis.core import QgsProcessing
-from qgis.core import QgsProcessingAlgorithm
-from qgis.core import QgsProcessingMultiStepFeedback
-from qgis.core import QgsProcessingParameterFile
-from qgis.core import QgsProcessingParameterNumber
-from qgis.core import QgsProcessingParameterString
-import processing
+__author__ = 'Arthur Evrard'
+
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
+from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterNumber, QgsProcessingParameterString
 
 from qaequilibrae.i18n.translator import tr
 

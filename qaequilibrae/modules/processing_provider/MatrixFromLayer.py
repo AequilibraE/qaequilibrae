@@ -1,16 +1,11 @@
-from qgis.core import QgsProcessing
-from qgis.core import QgsProcessingAlgorithm
+__author__ = 'Arthur Evrard'
+
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
-from qgis.core import QgsProcessingMultiStepFeedback
-from qgis.core import QgsProcessingParameterVectorLayer
-from qgis.core import QgsProcessingParameterField
-from qgis.core import QgsProcessingParameterMapLayer
-from qgis.core import QgsProcessingParameterFile
-from qgis.core import QgsProcessingParameterString
-from qgis.core import QgsProcessingParameterDefinition
-import processing
+from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterMapLayer, QgsProcessingParameterFile, QgsProcessingParameterString, QgsProcessingParameterDefinition
 
 from qaequilibrae.i18n.translator import tr
+
 import importlib.util as iutil
 import os
 import numpy as np
@@ -110,6 +105,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         output=mat.name+", "+mat.description+" ("+filename+")"
         mat.save()
         mat.close()
+        del matrix
         
         feedback.pushInfo(' ')
         feedback.setCurrentStep(3)

@@ -1,15 +1,14 @@
 __author__ = 'Arthur Evrard'
 
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
+from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterEnum
+
+from qaequilibrae.i18n.translator import tr
+
 import importlib.util as iutil
 import os, tempfile
 from pathlib import Path
 import sys
-
-from qaequilibrae.i18n.translator import tr
-from qgis.core import QgsProcessingAlgorithm
-from qgis.core import QgsProcessingMultiStepFeedback
-from qgis.core import QgsProcessingParameterFile
-from qgis.core import QgsProcessingParameterEnum
 
 class exportMatrix(QgsProcessingAlgorithm):
 
