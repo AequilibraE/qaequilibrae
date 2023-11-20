@@ -1,19 +1,19 @@
 __author__ = 'Arthur Evrard'
 
+import importlib.util as iutil
+import pandas as pd
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterNumber, QgsProcessingParameterString
 
-from qaequilibrae.i18n.translator import tr
+from .translatableAlgo import TranslatableAlgorithm
 
-import importlib.util as iutil
-import pandas as pd
 
-class AddConnectors(QgsProcessingAlgorithm):
+class AddConnectors(TranslatableAlgorithm):
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterNumber('nb_conn', tr('Desired number of connectors'), type=QgsProcessingParameterNumber.Integer, minValue=1, maxValue=10, defaultValue=1))
-        self.addParameter(QgsProcessingParameterString('mode', tr('Mode to connect (only one at a time)'), multiLine=False, defaultValue='c'))
-        self.addParameter(QgsProcessingParameterFile('PrjtPath', tr('AequilibraE project'), behavior=QgsProcessingParameterFile.Folder, defaultValue='D:/'))
+        self.addParameter(QgsProcessingParameterNumber('nb_conn', self.tr('Desired number of connectors'), type=QgsProcessingParameterNumber.Integer, minValue=1, maxValue=10, defaultValue=1))
+        self.addParameter(QgsProcessingParameterString('mode', self.tr('Mode to connect (only one at a time)'), multiLine=False, defaultValue='c'))
+        self.addParameter(QgsProcessingParameterFile('PrjtPath', self.tr('AequilibraE project'), behavior=QgsProcessingParameterFile.Folder, defaultValue='D:/'))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(2, model_feedback)
@@ -51,21 +51,19 @@ class AddConnectors(QgsProcessingAlgorithm):
         return {'Output': output_file}
 
     def name(self):
-        return tr('Add connectors')
+        return self.tr('Add connectors')
 
     def displayName(self):
-        return tr('Add connectors')
+        return self.tr('Add connectors')
 
     def group(self):
-        return tr('1_Network')
+        return self.tr('1_Network')
 
     def groupId(self):
-        return tr('1_Network')
+        return self.tr('1_Network')
 
     def shortHelpString(self):
-        return tr("""
-        Go through all the centroids and add connectors only if none exists for the chosen mode
-        """)
+        return self.tr("Go through all the centroids and add connectors only if none exists for the chosen mode")
 
     def createInstance(self):
-        return AddConnectors()
+        return AddConnectors(self.tr)

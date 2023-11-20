@@ -1,18 +1,17 @@
 __author__ = 'Arthur Evrard'
 
-from qgis.core import QgsProcessingAlgorithm
+import importlib.util as iutil
+import sys
 from qgis.core import QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile
 
-from qaequilibrae.i18n.translator import tr
+from .translatableAlgo import TranslatableAlgorithm
 
-import importlib.util as iutil
-import sys
 
-class TrafficAssignYAML(QgsProcessingAlgorithm):
+class TrafficAssignYAML(TranslatableAlgorithm):
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFile('confFile', tr('Configuration file (.yaml)'), behavior=QgsProcessingParameterFile.File, fileFilter=tr('Assignment configuration file (*.yaml)'), defaultValue=None))
+        self.addParameter(QgsProcessingParameterFile('confFile', self.tr('Configuration file (.yaml)'), behavior=QgsProcessingParameterFile.File, fileFilter=self.tr('Assignment configuration file (*.yaml)'), defaultValue=None))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(5, model_feedback)
@@ -118,19 +117,19 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         return {'Output': 'Traffic assignment successfully completed'}
 
     def name(self):
-        return tr('Traffic assignment from a config file')
+        return self.tr('Traffic assignment from a config file')
 
     def displayName(self):
-        return tr('Traffic assignment from a config file')
+        return self.tr('Traffic assignment from a config file')
 
     def group(self):
-        return tr('3_Assignment')
+        return self.tr('3_Assignment')
 
     def groupId(self):
-        return tr('3_Assignment')
+        return self.tr('3_Assignment')
         
     def shortHelpString(self):
-        return tr("""
+        return self.tr("""
         Run a traffic assignment using a yaml configuration file. Example of valide configuration file:
         ""
         Project: D:/AequilibraE/Project/
@@ -167,4 +166,4 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         """)
 
     def createInstance(self):
-        return TrafficAssignYAML()
+        return TrafficAssignYAML(self.tr)

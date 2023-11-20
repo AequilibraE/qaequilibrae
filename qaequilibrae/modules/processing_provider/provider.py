@@ -6,22 +6,26 @@ import os
 
 ProviderPath = os.path.dirname(__file__)
 
-from .MatrixFromLayer import MatrixFromLayer
-from .exportMatrix import exportMatrix
-from .ProjectFromLayer import ProjectFromLayer
-from .RenumberFromCentroids import RenumberFromCentroids
-from .Add_connectors import AddConnectors
-from .AssignFromYaml import TrafficAssignYAML
 
 class Provider(QgsProcessingProvider):
+    def __init__(self, translator):
+        super(QgsProcessingProvider, self).__init__()
+        self.tr = translator
 
     def loadAlgorithms(self):
-        self.addAlgorithm(MatrixFromLayer())
-        self.addAlgorithm(exportMatrix())
-        self.addAlgorithm(ProjectFromLayer())
-        self.addAlgorithm(RenumberFromCentroids())
-        self.addAlgorithm(AddConnectors())
-        self.addAlgorithm(TrafficAssignYAML())
+        from .MatrixFromLayer import MatrixFromLayer
+        from .exportMatrix import exportMatrix
+        from .ProjectFromLayer import ProjectFromLayer
+        from .RenumberFromCentroids import RenumberFromCentroids
+        from .Add_connectors import AddConnectors
+        from .AssignFromYaml import TrafficAssignYAML
+
+        self.addAlgorithm(MatrixFromLayer(self.tr))
+        self.addAlgorithm(exportMatrix(self.tr))
+        self.addAlgorithm(ProjectFromLayer(self.tr))
+        self.addAlgorithm(RenumberFromCentroids(self.tr))
+        self.addAlgorithm(AddConnectors(self.tr))
+        self.addAlgorithm(TrafficAssignYAML(self.tr))
         # add additional algorithms here
         # self.addAlgorithm(MyOtherAlgorithm())
 

@@ -37,16 +37,16 @@ try:
 except:
     from qgis.PyQt.QtWidgets import QMessageBox
 
-    if QMessageBox.question(None, messages.first_message, QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+    if QMessageBox.question(None, "", messages().first_message, QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
         from qaequilibrae.download_extra_packages_class import download_all
 
         result = download_all().install()
         if "ERROR" in "".join([str(x).upper() for x in result]):
-            QMessageBox.information(None, "Information", messages.second_message)
+            QMessageBox.information(None, "Information", messages().second_message)
         else:
-            QMessageBox.information(None, "Information", messages.third_message)
+            QMessageBox.information(None, "Information", messages().third_message)
     else:
-        QMessageBox.information(None, "Information", messages.fourth_message)
+        QMessageBox.information(None, "Information", messages().fourth_message)
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -249,7 +249,7 @@ class AequilibraEMenu:
         return message
 
     def initGui(self):
-        self.provider = Provider()
+        self.provider = Provider(self.tr)
         QgsApplication.processingRegistry().addProvider(self.provider)
         pass
 

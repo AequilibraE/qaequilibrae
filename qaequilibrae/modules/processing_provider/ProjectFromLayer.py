@@ -1,29 +1,30 @@
 __author__ = 'Arthur Evrard'
 
-from qgis.core import QgsProject, QgsFeature, QgsVectorLayer, QgsDataSourceUri
-from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
-from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterFile, QgsProcessingParameterString
-from qgis.PyQt.QtCore import QVariant
-
-from qaequilibrae.i18n.translator import tr
-
 import importlib.util as iutil
-from string import ascii_lowercase
-from os.path import join
-from shapely.wkt import loads as load_wkt
 import pandas as pd
+from os.path import join
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback
+from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterFile, \
+    QgsProcessingParameterString
+from qgis.core import QgsProject, QgsFeature, QgsVectorLayer, QgsDataSourceUri
+from shapely.wkt import loads as load_wkt
+from string import ascii_lowercase
 
-class ProjectFromLayer(QgsProcessingAlgorithm):
+from .translatableAlgo import TranslatableAlgorithm
+
+
+class ProjectFromLayer(TranslatableAlgorithm):
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterVectorLayer('links', tr('Links'), types=[QgsProcessing.TypeVectorLine], defaultValue=None))
-        self.addParameter(QgsProcessingParameterField('link_id', tr('Link_ID'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='links', allowMultiple=False, defaultValue='link_id'))
-        self.addParameter(QgsProcessingParameterField('link_type', tr('Link_type'), type=QgsProcessingParameterField.String, parentLayerParameterName='links', allowMultiple=False, defaultValue='link_type'))
-        self.addParameter(QgsProcessingParameterField('direction', tr('Direction'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='links', allowMultiple=False, defaultValue='direction'))
-        self.addParameter(QgsProcessingParameterField('modes', tr('Modes'), type=QgsProcessingParameterField.String, parentLayerParameterName='links', allowMultiple=False, defaultValue='modes'))
-        self.addParameter(QgsProcessingParameterFile('destFolder', tr('Folder to create the project in'), behavior=QgsProcessingParameterFile.Folder, defaultValue='D:/'))
-        self.addParameter(QgsProcessingParameterString('prject_name', tr('Project name'), multiLine=False, defaultValue='New_Project'))
+        self.addParameter(QgsProcessingParameterVectorLayer('links', self.tr('Links'), types=[QgsProcessing.TypeVectorLine], defaultValue=None))
+        self.addParameter(QgsProcessingParameterField('link_id', self.tr('Link_ID'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='links', allowMultiple=False, defaultValue='link_id'))
+        self.addParameter(QgsProcessingParameterField('link_type', self.tr('Link_type'), type=QgsProcessingParameterField.String, parentLayerParameterName='links', allowMultiple=False, defaultValue='link_type'))
+        self.addParameter(QgsProcessingParameterField('direction', self.tr('Direction'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='links', allowMultiple=False, defaultValue='direction'))
+        self.addParameter(QgsProcessingParameterField('modes', self.tr('Modes'), type=QgsProcessingParameterField.String, parentLayerParameterName='links', allowMultiple=False, defaultValue='modes'))
+        self.addParameter(QgsProcessingParameterFile('destFolder', self.tr('Folder to create the project in'), behavior=QgsProcessingParameterFile.Folder, defaultValue='D:/'))
+        self.addParameter(QgsProcessingParameterString('prject_name', self.tr('Project name'), multiLine=False, defaultValue='New_Project'))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(5, model_feedback)
@@ -124,21 +125,21 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         return {'Output': output_file}
 
     def name(self):
-        return tr('Create project from link layer')
+        return self.tr('Create project from link layer')
 
     def displayName(self):
-        return tr('Create project from link layer')
+        return self.tr('Create project from link layer')
 
     def group(self):
-        return tr('0_Project')
+        return self.tr('0_Project')
 
     def groupId(self):
-        return tr('0_Project')
+        return self.tr('0_Project')
 
     def shortHelpString(self):
-        return tr("""
+        return self.tr("""
         Create an AequilibraE project from a given link layer
         """)
 
     def createInstance(self):
-        return ProjectFromLayer()
+        return ProjectFromLayer(self.tr)

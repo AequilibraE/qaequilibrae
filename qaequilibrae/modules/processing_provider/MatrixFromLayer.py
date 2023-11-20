@@ -3,8 +3,7 @@ __author__ = 'Arthur Evrard'
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterMapLayer, QgsProcessingParameterFile, QgsProcessingParameterString, QgsProcessingParameterDefinition
-
-from qaequilibrae.i18n.translator import tr
+from .translatableAlgo import TranslatableAlgorithm
 
 import importlib.util as iutil
 import os
@@ -12,18 +11,18 @@ import numpy as np
 import pandas as pd
 from scipy.sparse import coo_matrix
 
-class MatrixFromLayer(QgsProcessingAlgorithm):
+class MatrixFromLayer(TranslatableAlgorithm):
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterMapLayer('matrix_layer', tr('Layer containing a matrix in list format')))
-        self.addParameter(QgsProcessingParameterField('origin', tr('Origin field'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='matrix_layer', allowMultiple=False, defaultValue='origin'))
-        self.addParameter(QgsProcessingParameterField('destination', tr('Destination field'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='matrix_layer', allowMultiple=False, defaultValue='destination'))
-        self.addParameter(QgsProcessingParameterField('value', tr('Value field'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='matrix_layer', allowMultiple=False, defaultValue='value'))
-        self.addParameter(QgsProcessingParameterString('FileName', tr('Name your output file'), multiLine=False, defaultValue=''))
-        self.addParameter(QgsProcessingParameterFile('OutputFold', tr('Output folder'), behavior=QgsProcessingParameterFile.Folder, fileFilter='Tous les fichiers (*.*)', defaultValue='D:/'))
-        advparams = [QgsProcessingParameterString('MatrixName', tr('Name of your matrix'), optional=True, multiLine=False, defaultValue=''),
-                    QgsProcessingParameterString('MatrixDescription', tr('Something usefull to describe your matrix'), optional=True, multiLine=False, defaultValue=''),
-                    QgsProcessingParameterString('CoreName', tr('Name for the core of your matrix'), multiLine=False, defaultValue='Value')
+        self.addParameter(QgsProcessingParameterMapLayer('matrix_layer', self.tr('Layer containing a matrix in list format')))
+        self.addParameter(QgsProcessingParameterField('origin', self.tr('Origin field'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='matrix_layer', allowMultiple=False, defaultValue='origin'))
+        self.addParameter(QgsProcessingParameterField('destination', self.tr('Destination field'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='matrix_layer', allowMultiple=False, defaultValue='destination'))
+        self.addParameter(QgsProcessingParameterField('value', self.tr('Value field'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='matrix_layer', allowMultiple=False, defaultValue='value'))
+        self.addParameter(QgsProcessingParameterString('FileName', self.tr('Name your output file'), multiLine=False, defaultValue=''))
+        self.addParameter(QgsProcessingParameterFile('OutputFold', self.tr('Output folder'), behavior=QgsProcessingParameterFile.Folder, fileFilter='Tous les fichiers (*.*)', defaultValue='D:/'))
+        advparams = [QgsProcessingParameterString('MatrixName', self.tr('Name of your matrix'), optional=True, multiLine=False, defaultValue=''),
+                    QgsProcessingParameterString('MatrixDescription', self.tr('Something usefull to describe your matrix'), optional=True, multiLine=False, defaultValue=''),
+                    QgsProcessingParameterString('CoreName', self.tr('Name for the core of your matrix'), multiLine=False, defaultValue='Value')
                     ]
         for param in advparams:
             param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
@@ -113,19 +112,19 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         return {'Output': output}
 
     def name(self):
-        return tr('Create a .aem matrix file from a layer')
+        return self.tr('Create a .aem matrix file from a layer')
 
     def displayName(self):
-        return tr('Create a .aem matrix file from a layer')
+        return self.tr('Create a .aem matrix file from a layer')
 
     def group(self):
-        return tr('2_Matrix')
+        return self.tr('2_Matrix')
 
     def groupId(self):
-        return tr('2_Matrix')
+        return self.tr('2_Matrix')
 
     def shortHelpString(self):
-        return tr("""
+        return self.tr("""
         Save a layer as a .aem file :
         - the original matrix stored in the layer needs to be in list format
         - Origin and destination fields need to be integers
@@ -133,4 +132,4 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         """)
 
     def createInstance(self):
-        return MatrixFromLayer()
+        return MatrixFromLayer(self.tr)

@@ -1,22 +1,23 @@
 __author__ = 'Arthur Evrard'
 
-from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
-from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterFile, QgsProcessingParameterString
-
-from qaequilibrae.i18n.translator import tr
-
 import importlib.util as iutil
-from os.path import join
-from shapely.wkt import loads as load_wkt
 import pandas as pd
+from os.path import join
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
+from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback
+from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterFile, \
+    QgsProcessingParameterString
+from shapely.wkt import loads as load_wkt
 
-class RenumberFromCentroids(QgsProcessingAlgorithm):
+from .translatableAlgo import TranslatableAlgorithm
+
+
+class RenumberFromCentroids(TranslatableAlgorithm):
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterVectorLayer('nodes', tr('Centroids'), types=[QgsProcessing.TypeVectorPoint], defaultValue='nodes'))
-        self.addParameter(QgsProcessingParameterField('node_id', tr('Zone id'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='nodes', allowMultiple=False, defaultValue='node_id'))
-        self.addParameter(QgsProcessingParameterFile('PrjtPath', tr('AequilibraE project'), behavior=QgsProcessingParameterFile.Folder, defaultValue='D:/'))
+        self.addParameter(QgsProcessingParameterVectorLayer('nodes', self.tr('Centroids'), types=[QgsProcessing.TypeVectorPoint], defaultValue='nodes'))
+        self.addParameter(QgsProcessingParameterField('node_id', self.tr('Zone id'), type=QgsProcessingParameterField.Numeric, parentLayerParameterName='nodes', allowMultiple=False, defaultValue='node_id'))
+        self.addParameter(QgsProcessingParameterFile('PrjtPath', self.tr('AequilibraE project'), behavior=QgsProcessingParameterFile.Folder, defaultValue='D:/'))
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(3, model_feedback)
@@ -106,22 +107,22 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
         return {'Output': output_file}
 
     def name(self):
-        return tr('Create/renumber nodes from a centroid layer')
+        return self.tr('Create/renumber nodes from a centroid layer')
 
     def displayName(self):
-        return tr('Create/renumber nodes from a centroid layer')
+        return self.tr('Create/renumber nodes from a centroid layer')
 
     def group(self):
-        return tr('1_Network')
+        return self.tr('1_Network')
 
     def groupId(self):
-        return tr('1_Network')
+        return self.tr('1_Network')
 
     def shortHelpString(self):
-        return tr("""
+        return self.tr("""
         Import or create nodes to match an AequilibraE project with a GIS layer of centroids
         Warning : you may have to change existing node_id (ex. using QGIS field calculator) to ensure that changed node IDs (coming from zone id) are not already used.
         """)
 
     def createInstance(self):
-        return RenumberFromCentroids()
+        return RenumberFromCentroids(self.tr)
