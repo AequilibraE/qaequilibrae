@@ -2,6 +2,7 @@ __author__ = 'Arthur Evrard'
 
 import importlib.util as iutil
 import pandas as pd
+import sys
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterNumber, QgsProcessingParameterString
 

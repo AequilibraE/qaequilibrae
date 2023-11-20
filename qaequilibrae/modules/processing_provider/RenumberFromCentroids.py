@@ -2,6 +2,7 @@ __author__ = 'Arthur Evrard'
 
 import importlib.util as iutil
 import pandas as pd
+import sys
 from os.path import join
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback

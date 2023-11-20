@@ -2,6 +2,7 @@ __author__ = 'Arthur Evrard'
 
 import importlib.util as iutil
 import pandas as pd
+import sys
 from os.path import join
 from qgis.PyQt.QtCore import QVariant
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform

@@ -4,9 +4,8 @@ from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterEnum
 from .translatableAlgo import TranslatableAlgorithm
 import importlib.util as iutil
-import os, tempfile
+import os, tempfile, sys
 from pathlib import Path
-import sys
 
 class exportMatrix(TranslatableAlgorithm):
 

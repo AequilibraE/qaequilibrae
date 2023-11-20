@@ -6,7 +6,7 @@ from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterF
 from .translatableAlgo import TranslatableAlgorithm
 
 import importlib.util as iutil
-import os
+import os, sys
 import numpy as np
 import pandas as pd
 from scipy.sparse import coo_matrix
