@@ -3,8 +3,6 @@ from os.path import isfile
 from os import remove
 from pathlib import Path
 
-# from uuid import uuid4
-
 import numpy as np
 import openmatrix as omx
 import pytest
@@ -14,7 +12,7 @@ from qaequilibrae.modules.distribution_procedures.distribution_models_dialog imp
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
 
-def run_traffic_assignment(ae_with_project, qtbot, ext):
+def run_traffic_assignment(ae_with_project, qtbot, ext):    
     dialog = TrafficAssignmentDialog(ae_with_project)
 
     assignment_result = f"TrafficAssignment_DP_{ext}"
@@ -42,19 +40,22 @@ def run_traffic_assignment(ae_with_project, qtbot, ext):
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
     dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
 
-    # dialog.vdf_parameters = {"alpha": 0.15, "beta": 4.0}
-    # print(dialog.vdf_parameters)
     dialog.run()
-
+    
 
 def test_ipf(ae_with_project, qtbot):
     dialog = DistributionModelsDialog(ae_with_project, mode="ipf", testing=True)
 
-    dialog.dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
+    # dialog.dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed" # not currently loaded
     dialog.out_name = "test/data/SiouxFalls_project/demand_ipf.aem"
-    dialog.cob_seed_mat.setCurrentIndex(4)
-    dialog.cob_seed_field.setCurrentText("matrix")
+    dialog.dlg2.dataset.file_path = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
+    dialog.load_datasets()
 
+    temp = list(dialog.matrices["name"])
+    demand_idx = temp.index("omx")
+    dialog.cob_seed_mat.setCurrentIndex(demand_idx)
+    dialog.cob_seed_field.setCurrentText("matrix")
+    
     dialog.cob_prod_data.setCurrentText("synthetic_future_vector")
     dialog.cob_prod_field.setCurrentText("origins")
     dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
@@ -65,18 +66,14 @@ def test_ipf(ae_with_project, qtbot):
     qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
     qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
-    print(dialog.__dict__)
     dialog.close()
 
+    assert isfile(dialog.out_name)
 
-@pytest.mark.parametrize(
-    ("is_negative", "is_power", "file1", "file2", "ext"),
-    [
-        (True, False, "mod_negative_exponential", "", "A"),
-        (False, True, "", "mod_inverse_power", "B"),
-        (True, True, "mod_negative_exponential", "mod_inverse_power", "C"),
-    ],
-)
+@pytest.mark.parametrize(("is_negative", "is_power", "file1", "file2", "ext"), 
+    [(True, False, "mod_negative_exponential", "", "A"),
+    (False, True, "", "mod_inverse_power", "B"),
+    (True, True, "mod_negative_exponential", "mod_inverse_power", "C")])
 def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1, file2, ext):
     run_traffic_assignment(ae_with_project, qtbot, ext)
 
@@ -109,19 +106,20 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
         dialog.rdo_power.setChecked(True)
 
         qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
-
+    
     qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
     dialog.close()
 
     if is_negative:
+
         assert isfile(f1)
 
         file_text = ""
         with open(f1, "r", encoding="utf-8") as file:
             for line in file.readlines():
                 file_text += line
-
+        
         assert "alpha: null" in file_text
         assert "function: EXPO" in file_text
 
@@ -132,10 +130,9 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
         with open(f2, "r", encoding="utf-8") as file:
             for line in file.readlines():
                 file_text += line
-
+        
         assert "beta: null" in file_text
         assert "function: POWER" in file_text
-
 
 @pytest.mark.skip()
 def test_apply_gravity(ae_with_project, qtbot):

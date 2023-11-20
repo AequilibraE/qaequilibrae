@@ -211,10 +211,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def load_datasets(self):
         print("load_datasets")
-        if not self.testing:
-            self.dlg2 = LoadDatasetDialog(self.iface)
-            self.dlg2.show()
-            self.dlg2.exec_()
+        self.dlg2 = LoadDatasetDialog(self.iface)
+        self.dlg2.show()
+        self.dlg2.exec_()
         if isinstance(self.dlg2.dataset, AequilibraeData):
             self.dataset_name = self.dlg2.dataset.file_path
             if self.dataset_name is not None:
