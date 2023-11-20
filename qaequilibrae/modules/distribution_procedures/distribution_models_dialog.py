@@ -107,7 +107,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.testing = testing
 
     def load_matrices(self):
-        print("load_matrices")
         self.matrices = list_matrices(self.project.matrices.fldr)
 
         self.matrices_model = PandasModel(self.matrices)
@@ -117,7 +116,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
 
     def data_double_clicked(self, mi):
-        print("data_double_clicked")
         row = mi.row()
         if row > -1:
             obj_to_view = self.table_datasets.item(row, 0).text()
@@ -126,7 +124,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             dlg2.exec_()
 
     def configure_inputs(self):
-        print("configure_inputs")
         self.but_run.setVisible(True)
         self.but_queue.setVisible(True)
         self.but_cancel.setVisible(True)
@@ -162,12 +159,10 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.rdo_calibrate_gravity.setEnabled(False)
 
     def change_model_by_user(self):
-        print("change_model_by_user")
         self.model.function = self.user_chosen_model.currentText()
         self.update_model_parameters()
 
     def update_model_parameters(self):
-        print("update_model_parameters")
         self.user_chosen_model = QComboBox()
         for f in valid_functions:
             self.user_chosen_model.addItem(f)
@@ -210,22 +205,20 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.table_model.setCellWidget(i - 1, 1, item)
 
     def load_datasets(self):
-        print("load_datasets")
-        self.dlg2 = LoadDatasetDialog(self.iface)
-        self.dlg2.show()
-        self.dlg2.exec_()
-        if isinstance(self.dlg2.dataset, AequilibraeData):
-            self.dataset_name = self.dlg2.dataset.file_path
-            if self.dataset_name is not None:
-                data_name = os.path.splitext(os.path.basename(self.dataset_name))[0]
+        dlg2 = LoadDatasetDialog(self.iface)
+        dlg2.show()
+        dlg2.exec_()
+        if isinstance(dlg2.dataset, AequilibraeData):
+            dataset_name = dlg2.dataset.file_path
+            if dataset_name is not None:
+                data_name = os.path.splitext(os.path.basename(dataset_name))[0]
                 data_name = self.find_non_conflicting_name(data_name, self.datasets)
-                self.datasets[data_name] = self.dlg2.dataset
+                self.datasets[data_name] = dlg2.dataset
                 self.add_to_table(self.datasets, self.table_datasets)
                 self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
                 self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
 
     def load_model(self):
-        print("load_model")
         file_name = self.browse_outfile("mod")
         try:
             self.model.load(file_name)
@@ -234,7 +227,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage("Error", self.tr("Could not load model. {}").format(e.args), level=3)
 
     def change_vector_field(self, cob_orig, cob_dest, dt):
-        print("change_vector_field")
         cob_dest.clear()
         d = str(cob_orig.currentText())
         if len(d) > 0:
@@ -251,13 +243,11 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 cob_dest.addItems(mat.names)
 
     def load_comboboxes(self, list_to_load, data_cob):
-        print("load_comboboxes")
         data_cob.clear()
         for d in list_to_load:
             data_cob.addItem(d)
 
     def find_non_conflicting_name(self, data_name, dictio):
-        print("find_non_conflicting_name")
         if data_name in dictio:
             i = 1
             new_data_name = data_name + "_" + str(i)
@@ -268,7 +258,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         return data_name
 
     def add_to_table(self, dictio, table):
-        print("add_to_table")
         table.setColumnWidth(0, 235)
         table.setColumnWidth(1, 80)
         table.clearContents()
@@ -283,7 +272,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 table.setItem(i, 1, QTableWidgetItem(str(dictio[data_name].cores)))
 
     def browse_outfile(self, file_type):
-        print("browse_outfile")
         file_types = {
             "aed": ["AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed"],
             "mod": ["Model file", ["Model file(*.mod)"], ".mod"],
@@ -298,31 +286,26 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         return file_chosen
 
     def add_job_to_queue(self):
-        print("add_job_to_queue")
         worker_thread = None
         if self.check_data():
             if self.job != "ipf":
-                print("not ipf")
                 imped_name = self.matrices.at[self.cob_imped_mat.currentIndex(), "file_name"]
                 imped_matrix = AequilibraeMatrix()
                 imped_matrix.load(join(self.project.matrices.fldr, imped_name))
                 imped_matrix.computational_view([self.cob_imped_field.currentText()])
 
             if self.job != "apply":
-                print("not apply")
                 seed_name = self.matrices.at[self.cob_seed_mat.currentIndex(), "file_name"]
                 seed_matrix = AequilibraeMatrix()
                 seed_matrix.load(join(self.project.matrices.fldr, seed_name))
                 seed_matrix.computational_view([self.cob_seed_field.currentText()])
 
             if self.job != "calibrate":
-                print("not calibrate")
                 prod_vec = self.datasets[self.cob_prod_data.currentText()]
                 prod_field = self.cob_prod_field.currentText()
                 atra_vec = self.datasets[self.cob_atra_data.currentText()]
                 atra_field = self.cob_atra_field.currentText()
 
-            print(self.job)
             if self.job == "ipf":
                 if not self.testing:
                     self.out_name = self.browse_outfile("aem")
@@ -388,7 +371,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), self.error, level=3)
 
     def add_job_to_list(self, job, out_name):
-        print("add_job_to_list")
         self.job_queue[out_name] = job
 
         self.table_jobs.clearContents()
@@ -401,7 +383,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.table_jobs.setItem(i, 2, QTableWidgetItem(self.tr("Queued")))
 
     def run(self):
-        print("run")
         self.chb_empty_as_zero.setVisible(False)
         try:
             for out_name in self.job_queue.keys():
@@ -412,7 +393,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             logger.error(e.args)
 
     def check_data(self):
-        print("check_data")
         self.error = None
 
         # Check for missing info
@@ -438,13 +418,11 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             return True
 
     def run_thread(self):
-        print("run_thread")
         self.worker_thread.jobFinished.connect(self.job_finished_from_thread)
         self.worker_thread.doWork()
         self.show()
 
     def job_finished_from_thread(self, success):
-        print("job_finished_from_thread")
         error = self.worker_thread.error
         if error is not None:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), error.args[0], level=3)
@@ -458,7 +436,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def exit_procedure(self):
-        print("exit_procedure")
         if self.report is not None and not self.testing:
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()

@@ -87,9 +87,9 @@ def test_ipf(ae_with_project, qtbot):
 
 
 @pytest.mark.parametrize(("is_negative", "is_power", "file1", "file2", "ext"), 
-    [(True, False, "mod_negative_exponential", "", "X"),
-    (False, True, "", "mod_inverse_power", "Y"),
-    (True, True, "mod_negative_exponential", "mod_inverse_power", "Z")])
+    [(True, False, "mod_negative_exponential", "", "A"),
+    (False, True, "", "mod_inverse_power", "B"),
+    (True, True, "mod_negative_exponential", "mod_inverse_power", "C")])
 def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1, file2, ext):
     run_traffic_assignment(ae_with_project, qtbot, ext)
 
@@ -150,8 +150,6 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
         assert "beta: null" in file_text
         assert "function: POWER" in file_text
 
-@pytest.mark.skip()
-# @pytest.mark.parametrize(("ext"), [()])
 def test_apply_gravity(ae_with_project, qtbot):
 
     dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
@@ -162,14 +160,12 @@ def test_apply_gravity(ae_with_project, qtbot):
 
     dialog = DistributionModelsDialog(ae_with_project, mode="apply", testing=True)
 
-    # Load vector data
     dialog.datasets[data_name] = dataset
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_prod_data)
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_atra_data)
 
-    ext = "I"
     temp = list(dialog.matrices["name"])
-    imped_idx = temp.index(f"TrafficAssignment_DP_{ext}_car")
+    imped_idx = temp.index(f"TrafficAssignment_DP_X_car")
     dialog.cob_imped_mat.setCurrentIndex(imped_idx)
     dialog.cob_imped_field.setCurrentText("free_flow_time_final")
     
@@ -178,12 +174,15 @@ def test_apply_gravity(ae_with_project, qtbot):
     dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
     dialog.cob_atra_field.setCurrentText("destinations")
 
-    dialog.out_name = "test/data/SiouxFalls_project/demand_ipf.aem"
-    dialog.path = "test/data/SiouxFalls_project/"
-    dialog.cob_imped_mat.setCurrentIndex(5)
-    dialog.cob_imped_field.setCurrentText("free_flow_time_final")
+    dialog.model.load(f"test/data/SiouxFalls_project/mod_negative_exponential_X.mod")
+    dialog.update_model_parameters()
+
+    file_path = f"test/data/SiouxFalls_project/matrices/ADJ-TrafficAssignment_DP_X.omx"
+    dialog.out_name = file_path
 
     qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
     qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
     dialog.close()
+
+    assert isfile(file_path)
