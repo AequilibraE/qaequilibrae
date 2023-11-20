@@ -7,7 +7,7 @@ import numpy as np
 import openmatrix as omx
 import pytest
 from PyQt5.QtCore import QTimer, Qt
-from aequilibrae.matrix import AequilibraeData
+from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
 
 from qaequilibrae.modules.distribution_procedures.distribution_models_dialog import DistributionModelsDialog
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
@@ -54,8 +54,9 @@ def test_ipf(ae_with_project, qtbot):
 
     dialog = DistributionModelsDialog(ae_with_project, mode="ipf", testing=True)
 
-    # dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed" # not currently loaded
-    dialog.out_name = "test/data/SiouxFalls_project/demand_ipf.aem"
+    file_path = "test/data/SiouxFalls_project/demand_ipf.aem"
+    dialog.out_name = file_path
+    dialog.outfile = file_path
     dialog.datasets[data_name] = dataset
 
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_prod_data)
@@ -76,12 +77,19 @@ def test_ipf(ae_with_project, qtbot):
 
     dialog.close()
 
-    assert isfile(dialog.out_name)
+    assert isfile(file_path)
+
+    mat = AequilibraeMatrix()
+    mat.load(file_path)
+
+    assert mat.matrix["matrix"].shape == (24, 24)
+    assert np.sum(np.nan_to_num(mat.matrix["matrix"])[:, :]) > 360600
+
 
 @pytest.mark.parametrize(("is_negative", "is_power", "file1", "file2", "ext"), 
-    [(True, False, "mod_negative_exponential", "", "A"),
-    (False, True, "", "mod_inverse_power", "B"),
-    (True, True, "mod_negative_exponential", "mod_inverse_power", "C")])
+    [(True, False, "mod_negative_exponential", "", "X"),
+    (False, True, "", "mod_inverse_power", "Y"),
+    (True, True, "mod_negative_exponential", "mod_inverse_power", "Z")])
 def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1, file2, ext):
     run_traffic_assignment(ae_with_project, qtbot, ext)
 
@@ -169,7 +177,6 @@ def test_apply_gravity(ae_with_project, qtbot):
     dialog.cob_prod_field.setCurrentText("origins")
     dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
     dialog.cob_atra_field.setCurrentText("destinations")
-
 
     dialog.out_name = "test/data/SiouxFalls_project/demand_ipf.aem"
     dialog.path = "test/data/SiouxFalls_project/"
