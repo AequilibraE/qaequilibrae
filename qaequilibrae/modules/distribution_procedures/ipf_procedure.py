@@ -14,10 +14,7 @@ class IpfProcedure(WorkerThread):
         self.report = []
 
     def doWork(self):
-        try:
-            self.ipf.fit()
-            self.report = self.ipf.report
-            self.output = self.ipf.output
-        except ValueError as e:
-            self.error = e
+        self.ipf.fit()
+        self.report = self.ipf.report
+        self.output = self.ipf.output
         self.jobFinished.emit("finishedIPF")
