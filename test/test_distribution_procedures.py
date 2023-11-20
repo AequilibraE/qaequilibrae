@@ -1,5 +1,5 @@
 import sqlite3
-from os.path import isfile
+from os.path import isfile, splitext, basename
 from os import remove
 from pathlib import Path
 
@@ -7,6 +7,7 @@ import numpy as np
 import openmatrix as omx
 import pytest
 from PyQt5.QtCore import QTimer, Qt
+from aequilibrae.matrix import AequilibraeData
 
 from qaequilibrae.modules.distribution_procedures.distribution_models_dialog import DistributionModelsDialog
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
@@ -44,15 +45,24 @@ def run_traffic_assignment(ae_with_project, qtbot, ext):
     
 
 def test_ipf(ae_with_project, qtbot):
+    
+    dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
+    dataset = AequilibraeData()
+    dataset.load(dataset_name)
+
+    data_name = splitext(basename(dataset_name))[0]
+
     dialog = DistributionModelsDialog(ae_with_project, mode="ipf", testing=True)
 
-    # dialog.dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed" # not currently loaded
+    # dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed" # not currently loaded
     dialog.out_name = "test/data/SiouxFalls_project/demand_ipf.aem"
-    dialog.dlg2.dataset.file_path = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
-    dialog.load_datasets()
+    dialog.datasets[data_name] = dataset
+
+    dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_prod_data)
+    dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_atra_data)
 
     temp = list(dialog.matrices["name"])
-    demand_idx = temp.index("omx")
+    demand_idx = temp.index("demand.aem")
     dialog.cob_seed_mat.setCurrentIndex(demand_idx)
     dialog.cob_seed_field.setCurrentText("matrix")
     
@@ -60,8 +70,6 @@ def test_ipf(ae_with_project, qtbot):
     dialog.cob_prod_field.setCurrentText("origins")
     dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
     dialog.cob_atra_field.setCurrentText("destinations")
-
-    # em check data tem as verificações dos vetores estão erradas pq não tem indice?
 
     qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
     qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
@@ -135,9 +143,35 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
         assert "function: POWER" in file_text
 
 @pytest.mark.skip()
+# @pytest.mark.parametrize(("ext"), [()])
 def test_apply_gravity(ae_with_project, qtbot):
+
+    dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
+    dataset = AequilibraeData()
+    dataset.load(dataset_name)
+
+    data_name = splitext(basename(dataset_name))[0]
+
     dialog = DistributionModelsDialog(ae_with_project, mode="apply", testing=True)
 
+    # Load vector data
+    dialog.datasets[data_name] = dataset
+    dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_prod_data)
+    dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_atra_data)
+
+    ext = "I"
+    temp = list(dialog.matrices["name"])
+    imped_idx = temp.index(f"TrafficAssignment_DP_{ext}_car")
+    dialog.cob_imped_mat.setCurrentIndex(imped_idx)
+    dialog.cob_imped_field.setCurrentText("free_flow_time_final")
+    
+    dialog.cob_prod_data.setCurrentText("synthetic_future_vector")
+    dialog.cob_prod_field.setCurrentText("origins")
+    dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
+    dialog.cob_atra_field.setCurrentText("destinations")
+
+
+    dialog.out_name = "test/data/SiouxFalls_project/demand_ipf.aem"
     dialog.path = "test/data/SiouxFalls_project/"
     dialog.cob_imped_mat.setCurrentIndex(5)
     dialog.cob_imped_field.setCurrentText("free_flow_time_final")
