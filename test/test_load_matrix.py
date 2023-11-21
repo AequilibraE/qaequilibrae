@@ -7,23 +7,23 @@ from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrix
 
 def load_layers():
     import csv
-    path_to_csv = 'test/data/SiouxFalls_project/SiouxFalls_od.csv'
-    datalayer = QgsVectorLayer('None?delimiter=,', "open_layer", 'memory')
+
+    path_to_csv = "test/data/SiouxFalls_project/SiouxFalls_od.csv"
+    datalayer = QgsVectorLayer("None?delimiter=,", "open_layer", "memory")
 
     fields = [
-        QgsField('O', QVariant.Int),
-        QgsField('D', QVariant.Int),
-        QgsField('Ton', QVariant.Double),
+        QgsField("O", QVariant.Int),
+        QgsField("D", QVariant.Int),
+        QgsField("Ton", QVariant.Double),
     ]
     datalayer.dataProvider().addAttributes(fields)
     datalayer.updateFields()
 
-    with open(
-        path_to_csv, 'r') as file:
+    with open(path_to_csv, "r") as file:
         reader = csv.DictReader(file)
         for row in reader:
-            origin = int(row['O'])
-            destination = int(row['D'])
+            origin = int(row["O"])
+            destination = int(row["D"])
             tons = float(row["Ton"])
 
             feature = QgsFeature()
@@ -36,6 +36,7 @@ def load_layers():
     else:
         QgsProject.instance().addMapLayer(datalayer)
 
+
 def test_matrix_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
     from test.test_qaequilibrae_menu_with_project import check_if_new_active_window_matches_class
@@ -47,6 +48,7 @@ def test_matrix_menu(ae_with_project, qtbot):
     assert action.text() == "Import matrices", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
+
 
 def test_save_matrix(ae_with_project, qtbot):
     file_name = "test/data/SiouxFalls_project/test_matrix.aem"
@@ -62,11 +64,12 @@ def test_save_matrix(ae_with_project, qtbot):
     dialog.prepare_final_matrix()
 
     from aequilibrae.matrix import AequilibraeMatrix
+
     mat = AequilibraeMatrix()
     mat.load(file_name)
-    
-    assert mat.matrix["ton"].shape == (24,24)
-    assert np.sum(np.nan_to_num(mat.matrix["ton"])[:,:]) == 360600
+
+    assert mat.matrix["ton"].shape == (24, 24)
+    assert np.sum(np.nan_to_num(mat.matrix["ton"])[:, :]) == 360600
     assert (mat.index == np.arange(1, 25)).all()
 
     dialog.close()

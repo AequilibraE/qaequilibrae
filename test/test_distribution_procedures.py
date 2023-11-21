@@ -13,7 +13,7 @@ from qaequilibrae.modules.distribution_procedures.distribution_models_dialog imp
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
 
-def run_traffic_assignment(ae_with_project, qtbot, ext):    
+def run_traffic_assignment(ae_with_project, qtbot, ext):
     dialog = TrafficAssignmentDialog(ae_with_project)
 
     assignment_result = f"TrafficAssignment_DP_{ext}"
@@ -42,10 +42,9 @@ def run_traffic_assignment(ae_with_project, qtbot, ext):
     dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
 
     dialog.run()
-    
+
 
 def test_ipf(ae_with_project, qtbot):
-    
     dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
     dataset = AequilibraeData()
     dataset.load(dataset_name)
@@ -66,7 +65,7 @@ def test_ipf(ae_with_project, qtbot):
     demand_idx = temp.index("demand.aem")
     dialog.cob_seed_mat.setCurrentIndex(demand_idx)
     dialog.cob_seed_field.setCurrentText("matrix")
-    
+
     dialog.cob_prod_data.setCurrentText("synthetic_future_vector")
     dialog.cob_prod_field.setCurrentText("origins")
     dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
@@ -86,10 +85,14 @@ def test_ipf(ae_with_project, qtbot):
     assert np.sum(np.nan_to_num(mat.matrix["matrix"])[:, :]) > 360600
 
 
-@pytest.mark.parametrize(("is_negative", "is_power", "file1", "file2", "ext"), 
-    [(True, False, "mod_negative_exponential", "", "A"),
-    (False, True, "", "mod_inverse_power", "B"),
-    (True, True, "mod_negative_exponential", "mod_inverse_power", "C")])
+@pytest.mark.parametrize(
+    ("is_negative", "is_power", "file1", "file2", "ext"),
+    [
+        (True, False, "mod_negative_exponential", "", "A"),
+        (False, True, "", "mod_inverse_power", "B"),
+        (True, True, "mod_negative_exponential", "mod_inverse_power", "C"),
+    ],
+)
 def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1, file2, ext):
     run_traffic_assignment(ae_with_project, qtbot, ext)
 
@@ -122,20 +125,19 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
         dialog.rdo_power.setChecked(True)
 
         qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
-    
+
     qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
     dialog.close()
 
     if is_negative:
-
         assert isfile(f1)
 
         file_text = ""
         with open(f1, "r", encoding="utf-8") as file:
             for line in file.readlines():
                 file_text += line
-        
+
         assert "alpha: null" in file_text
         assert "function: EXPO" in file_text
 
@@ -146,12 +148,12 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
         with open(f2, "r", encoding="utf-8") as file:
             for line in file.readlines():
                 file_text += line
-        
+
         assert "beta: null" in file_text
         assert "function: POWER" in file_text
 
-def test_apply_gravity(ae_with_project, qtbot):
 
+def test_apply_gravity(ae_with_project, qtbot):
     dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
     dataset = AequilibraeData()
     dataset.load(dataset_name)
@@ -168,7 +170,7 @@ def test_apply_gravity(ae_with_project, qtbot):
     imped_idx = temp.index(f"TrafficAssignment_DP_X_car")
     dialog.cob_imped_mat.setCurrentIndex(imped_idx)
     dialog.cob_imped_field.setCurrentText("free_flow_time_final")
-    
+
     dialog.cob_prod_data.setCurrentText("synthetic_future_vector")
     dialog.cob_prod_field.setCurrentText("origins")
     dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
