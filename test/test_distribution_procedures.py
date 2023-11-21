@@ -1,12 +1,8 @@
-import sqlite3
 from os.path import isfile, splitext, basename
-from os import remove
-from pathlib import Path
 
 import numpy as np
-import openmatrix as omx
 import pytest
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import Qt
 from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
 
 from qaequilibrae.modules.distribution_procedures.distribution_models_dialog import DistributionModelsDialog
@@ -167,7 +163,7 @@ def test_apply_gravity(ae_with_project, qtbot):
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_atra_data)
 
     temp = list(dialog.matrices["name"])
-    imped_idx = temp.index(f"TrafficAssignment_DP_X_car")
+    imped_idx = temp.index(f"trafficassignment_dp_x_car_omx")
     dialog.cob_imped_mat.setCurrentIndex(imped_idx)
     dialog.cob_imped_field.setCurrentText("free_flow_time_final")
 
