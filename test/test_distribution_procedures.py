@@ -1,6 +1,7 @@
 from os.path import isfile, splitext, basename
 
 import numpy as np
+import openmatrix as omx
 import pytest
 from PyQt5.QtCore import Qt
 from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
@@ -149,7 +150,11 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
         assert "function: POWER" in file_text
 
 
-def test_apply_gravity(ae_with_project, qtbot):
+@pytest.mark.parametrize(
+    ("is_negative", "is_power", "is_gamma", "ext"),
+    [(True, False, False, "X"), (False, True, False, "Y"), (False, False, True, "Z")],
+)
+def test_apply_gravity(ae_with_project, qtbot, is_negative, is_power, is_gamma, ext):
     dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
     dataset = AequilibraeData()
     dataset.load(dataset_name)
@@ -172,10 +177,18 @@ def test_apply_gravity(ae_with_project, qtbot):
     dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
     dialog.cob_atra_field.setCurrentText("destinations")
 
-    dialog.model.load(f"test/data/SiouxFalls_project/mod_negative_exponential_X.mod")
-    dialog.update_model_parameters()
+    if is_negative:
+        dialog.model.load(f"test/data/SiouxFalls_project/mod_negative_exponential_X.mod")
+        dialog.update_model_parameters()
+    elif is_power:
+        dialog.model.function = "POWER"
+        dialog.model.alpha = 0.02718039228535631
+        dialog.update_model_parameters()
+    elif is_gamma:
+        dialog.model.alpha = 0.02718039228535631
+        dialog.model.beta = 0.020709580776383137
 
-    file_path = f"test/data/SiouxFalls_project/matrices/ADJ-TrafficAssignment_DP_X.omx"
+    file_path = f"test/data/SiouxFalls_project/matrices/ADJ-TrafficAssignment_DP_{ext}.omx"
     dialog.out_name = file_path
 
     qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
@@ -184,3 +197,8 @@ def test_apply_gravity(ae_with_project, qtbot):
     dialog.close()
 
     assert isfile(file_path)
+
+    mtx = omx.open_file(file_path)
+    mtx = mtx["gravity"][:]
+    assert mtx.shape == (24, 24)  # matrix shape
+    assert mtx.sum() > 0  # matrix is not null
