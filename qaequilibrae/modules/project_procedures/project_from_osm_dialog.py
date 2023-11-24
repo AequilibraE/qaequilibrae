@@ -1,6 +1,7 @@
 import logging
 import os
 from os.path import isdir, join
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 
 from PyQt5.QtCore import Qt
 from aequilibrae.project import Project
@@ -109,6 +110,10 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.choose_canvas.isChecked():
             self.report.append(reporter(self.tr("Chose to download network for canvas area")))
             e = self.iface.mapCanvas().extent()
+            src_SCR=self.iface.mapCanvas().mapSettings().destinationCrs()
+            osm_SCR=QgsCoordinateReferenceSystem("EPSG:4326")
+            transform = QgsCoordinateTransform(src_SCR, osm_SCR, QgsProject.instance())
+            e = transform.transformBoundingBox(e)
             bbox = [e.xMinimum(), e.yMinimum(), e.xMaximum(), e.yMaximum()]
         else:
             self.progress_label.setText(self.tr("Establishing area for download"))

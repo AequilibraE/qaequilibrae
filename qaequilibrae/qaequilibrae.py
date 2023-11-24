@@ -17,8 +17,10 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
-from qgis.core import QgsProject, QgsSettings
+from qgis.core import QgsProject, QgsSettings, QgsApplication
 from qgis.PyQt.QtCore import QTranslator
+
+from .modules.processing_provider.provider import Provider
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
@@ -35,16 +37,16 @@ try:
 except:
     from qgis.PyQt.QtWidgets import QMessageBox
 
-    if QMessageBox.question(None, messages.first_message, QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
+    if QMessageBox.question(None, "", messages().first_message, QMessageBox.Ok | QMessageBox.Cancel) == QMessageBox.Ok:
         from qaequilibrae.download_extra_packages_class import download_all
 
         result = download_all().install()
         if "ERROR" in "".join([str(x).upper() for x in result]):
-            QMessageBox.information(None, "Information", messages.second_message)
+            QMessageBox.information(None, "Information", messages().second_message)
         else:
-            QMessageBox.information(None, "Information", messages.third_message)
+            QMessageBox.information(None, "Information", messages().third_message)
     else:
-        QMessageBox.information(None, "Information", messages.fourth_message)
+        QMessageBox.information(None, "Information", messages().fourth_message)
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -61,6 +63,7 @@ class AequilibraEMenu:
         # translator = None
         self.iface = iface
         self.project = None  # type: Project
+        self.provider = None #processing provider for QGIS
         self.matrices = {}
         self.layers = {}  # type: Dict[QgsVectorLayer]
         self.dock = QDockWidget(self.trlt("AequilibraE"))
@@ -75,7 +78,7 @@ class AequilibraEMenu:
             loc = QtCore.QSettings().value('locale/userLocale')
         else:
             loc = QtCore.QLocale.system().name()
-        loc = loc if len(loc) == 5 else loc[:2]
+        loc = loc[0:2]
 
         locale_path = '{}/i18n/qaequilibrae_{}.qm'.format(os.path.dirname(__file__), loc)
 
@@ -235,6 +238,9 @@ class AequilibraEMenu:
 
     def unload(self):
         del self.dock
+        if  self.provider in QgsApplication.processingRegistry().providers():
+            QgsApplication.processingRegistry().removeProvider(self.provider)
+        pass
 
     def trlt(self, message):
         # In the near future, we will use this function to automatically translate the AequilibraE menu
@@ -243,6 +249,8 @@ class AequilibraEMenu:
         return message
 
     def initGui(self):
+        self.provider = Provider(self.tr)
+        QgsApplication.processingRegistry().addProvider(self.provider)
         pass
 
     def removes_temporary_files(self):
