@@ -1,5 +1,3 @@
-__author__ = 'Arthur Evrard'
-
 import importlib.util as iutil
 import sys
 from qgis.core import QgsProcessingMultiStepFeedback
@@ -15,14 +13,11 @@ class TrafficAssignYAML(TranslatableAlgorithm):
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(5, model_feedback)
-        results = {}
-        outputs = {}
         
         # Checks if we have access to aequilibrae library
-        has_aeq = iutil.find_spec("aequilibrae") is not None
-        
-        if not has_aeq:
+        if iutil.find_spec("aequilibrae") is None:
             sys.exit(tr('AequilibraE library not found'))
+        
         from aequilibrae.paths import TrafficAssignment, TrafficClass
         from aequilibrae.project import Project
         from aequilibrae.matrix import AequilibraeMatrix

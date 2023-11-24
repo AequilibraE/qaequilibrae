@@ -1,3 +1,0 @@
-aequilibrae==0.9.4
-openmatrix
-ortools

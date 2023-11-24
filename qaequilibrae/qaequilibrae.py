@@ -78,7 +78,7 @@ class AequilibraEMenu:
             loc = QtCore.QSettings().value('locale/userLocale')
         else:
             loc = QtCore.QLocale.system().name()
-        loc = loc if len(loc) == 5 else loc[:2]
+        loc = loc[0:2]
 
         locale_path = '{}/i18n/qaequilibrae_{}.qm'.format(os.path.dirname(__file__), loc)
 

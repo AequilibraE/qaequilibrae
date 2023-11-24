@@ -1,5 +1,3 @@
-__author__ = 'Arthur Evrard'
-
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterMapLayer, QgsProcessingParameterFile, QgsProcessingParameterString, QgsProcessingParameterDefinition
@@ -30,14 +28,11 @@ class MatrixFromLayer(TranslatableAlgorithm):
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(3, model_feedback)
-        results = {}
-        outputs = {}
         
         # Checks if we have access to aequilibrae library
-        has_aeq = iutil.find_spec("aequilibrae") is not None
-        
-        if not has_aeq:
+        if iutil.find_spec("aequilibrae") is None:
             sys.exit(tr('AequilibraE library not found'))
+        
         from aequilibrae.matrix import AequilibraeMatrix
         
         origin=parameters['origin']

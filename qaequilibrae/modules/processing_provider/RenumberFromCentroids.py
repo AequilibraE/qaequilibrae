@@ -1,13 +1,12 @@
-__author__ = 'Arthur Evrard'
-
-import importlib.util as iutil
-import pandas as pd
-import sys
 from os.path import join
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterFile, \
     QgsProcessingParameterString
+
+import importlib.util as iutil
+import pandas as pd
+import sys
 from shapely.wkt import loads as load_wkt
 
 from .translatableAlgo import TranslatableAlgorithm
@@ -22,15 +21,13 @@ class RenumberFromCentroids(TranslatableAlgorithm):
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(3, model_feedback)
-        results = {}
-        outputs = {}
         
         # Checks if we have access to aequilibrae library
-        has_aeq = iutil.find_spec("aequilibrae") is not None
-        if not has_aeq:
+        if iutil.find_spec("aequilibrae") is None:
             sys.exit(tr('AequilibraE library not found'))
-
+        
         from aequilibrae import Project
+        
         feedback.pushInfo(tr('Connecting to aequilibrae project'))
         project = Project()
         project.open(parameters['PrjtPath'])

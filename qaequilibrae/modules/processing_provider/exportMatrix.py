@@ -1,5 +1,3 @@
-__author__ = 'Arthur Evrard'
-
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterEnum
 from .translatableAlgo import TranslatableAlgorithm
@@ -15,18 +13,15 @@ class exportMatrix(TranslatableAlgorithm):
         self.addParameter(QgsProcessingParameterEnum('outputformat', self.tr('Format to use for export'), options=['.csv','.omx','.aem'], defaultValue='.csv'))
 
     def processAlgorithm(self, parameters, context, model_feedback):
-        results = {}
-        outputs = {}
 
         pathSource=parameters['srcFile']
         fileformat=['.csv','.omx','.aem']
         pathDest=os.path.join(parameters['destFolder'], Path(pathSource).stem+fileformat[parameters['outputformat']])
 
         # Checks if we have access to aequilibrae library
-        has_aeq = iutil.find_spec("aequilibrae") is not None
-
-        if not has_aeq:
-            sys.exit(self.tr('AequilibraE library not found'))
+        if iutil.find_spec("aequilibrae") is None:
+            sys.exit(tr('AequilibraE library not found'))
+        
         from aequilibrae.matrix import AequilibraeMatrix
 
         if pathSource[-3:]=='omx':

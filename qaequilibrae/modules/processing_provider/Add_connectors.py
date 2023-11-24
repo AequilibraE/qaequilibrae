@@ -1,5 +1,3 @@
-__author__ = 'Arthur Evrard'
-
 import importlib.util as iutil
 import pandas as pd
 import sys
@@ -18,13 +16,11 @@ class AddConnectors(TranslatableAlgorithm):
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(2, model_feedback)
-        results = {}
-        outputs = {}
         
         # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(tr('AequilibraE library not found'))
-
+        
         from aequilibrae import Project
         feedback.pushInfo(tr('Connecting to aequilibrae project'))
         project = Project()
