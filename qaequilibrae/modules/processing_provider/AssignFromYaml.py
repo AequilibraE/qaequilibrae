@@ -45,7 +45,7 @@ class TrafficAssignYAML(TranslatableAlgorithm):
 
         # Creating traffic classes
         traffic_classes=[]
-        feedback.pushInfo(str(len(params["Traffic_classes"]))+tr(' traffic classes have been find in config file :'))
+        feedback.pushInfo(str(len(params["Traffic_classes"]))+tr(' traffic classes have been found in config file :'))
         for classes in params["Traffic_classes"]:
             for traffic in classes:
 
@@ -60,8 +60,7 @@ class TrafficAssignYAML(TranslatableAlgorithm):
                 graph.set_blocked_centroid_flows(False)
 
                 if "skims" in classes[traffic] and classes[traffic]["skims"] is not None:
-                    skims=[]
-                    for sk in classes[traffic]["skims"].split(","): skims.append(sk.strip())
+                    skims=[sk.strip() for sk in classes[traffic]["skims"].split(",")]
                     graph.set_skimming(skims)
 
                 # Setting class

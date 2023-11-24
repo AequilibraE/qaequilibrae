@@ -86,12 +86,10 @@ class MatrixFromLayer(TranslatableAlgorithm):
         mat.name=matrix_name
         mat.description=matrix_description
 
-        kwargs = {'file_name': filename,
-                  'zones': num_zones,
-                  'matrix_names': core_name,
-                  'memory_only': False}
-
-        mat.create_empty(**kwargs)
+        mat.create_empty(file_name = filename,
+                         zones = num_zones,
+                         matrix_names = core_name,
+                         memory_only = False)
         mat.index[:] = all_zones[:]
 
         m = coo_matrix((agg_matrix[value], (agg_matrix['from'], agg_matrix['to'])), shape=(num_zones, num_zones)).toarray().astype(np.float64)

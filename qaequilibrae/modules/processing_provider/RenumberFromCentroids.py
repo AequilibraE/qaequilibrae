@@ -45,11 +45,11 @@ class RenumberFromCentroids(TranslatableAlgorithm):
         layer = self.parameterAsVectorLayer(parameters, 'nodes', context)
         columns = [f.name() for f in layer.fields()] + ['geometry']
         columns_types = [f.typeName() for f in layer.fields()] #
-        row_list = []
-        for f in layer.getFeatures():
+        def fn(f):
             geom=f.geometry()
             geom.transform(QgsCoordinateTransform(layer_crs, aeq_crs, QgsProject.instance()))
-            row_list.append(dict(zip(columns, f.attributes() + [geom.asWkt()])))
+            return dict(zip(columns, f.attributes() + [geom.asWkt()]))
+        row_list = [fn(f) for f in layer.getFeatures()]
         df = pd.DataFrame(row_list, columns=columns)
         feedback.pushInfo(' ')
         feedback.setCurrentStep(2)

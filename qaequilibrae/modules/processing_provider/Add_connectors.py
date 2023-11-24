@@ -22,8 +22,7 @@ class AddConnectors(TranslatableAlgorithm):
         outputs = {}
         
         # Checks if we have access to aequilibrae library
-        has_aeq = iutil.find_spec("aequilibrae") is not None
-        if not has_aeq:
+        if iutil.find_spec("aequilibrae") is None:
             sys.exit(tr('AequilibraE library not found'))
 
         from aequilibrae import Project
