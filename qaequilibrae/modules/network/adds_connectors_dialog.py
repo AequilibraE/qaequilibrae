@@ -1,5 +1,6 @@
 import os
 import sys
+import threading
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
@@ -13,6 +14,8 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "./forms/
 
 class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
+        print("AddConnectorsDialog")
+        print(threading.enumerate())
         QtWidgets.QDialog.__init__(self)
         self.iface = qgis_project.iface
         self.setupUi(self)
@@ -46,15 +49,18 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_process.clicked.connect(self.run)
 
     def centroid_source(self):
+        print("centroid_source")
         self.layer_box.setEnabled(self.rdo_layer.isChecked())
         self.field_box.setEnabled(self.rdo_layer.isChecked())
         self.field_box.setVisible(not self.rdo_zone.isChecked())
         self.lbl_radius.setVisible(not self.rdo_zone.isChecked())
 
     def set_fields(self):
+        print("set_fields")
         self.field_box.setLayer(self.layer_box.currentLayer())
 
     def run(self):
+        print("run")
         source = "network" if self.rdo_network.isChecked() else "zone"
         source = "layer" if self.rdo_layer.isChecked() else source
 
@@ -83,23 +89,28 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.run_thread()
 
     def run_thread(self):
+        print("run_thread")
         self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
         self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
         self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
         self.worker_thread.jobFinished.connect(self.job_finished_from_thread)
-        self.worker_thread.start()
+        self.worker_thread.doWork()
         self.show()
 
     def progress_range_from_thread(self, val):
+        print("progress_range_from_thread")
         self.progressbar.setRange(0, val)
 
     def progress_value_from_thread(self, value):
+        print("progress_value_from_thread")
         self.progressbar.setValue(value)
 
     def progress_text_from_thread(self, value):
+        print("progress_text_from_thread")
         self.progress_label.setText(value)
 
     def job_finished_from_thread(self, success):
+        print("job_finished_from_thread")
         self.but_process.setEnabled(True)
         self.project.network.refresh_connection()
         self.project.network.links.refresh_connection()
@@ -108,4 +119,5 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def exit_procedure(self):
+        print("exit_procedure")
         self.close()
