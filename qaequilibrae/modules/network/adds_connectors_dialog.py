@@ -13,7 +13,6 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "./forms/
 
 class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
-        print(threading.enumerate())
         QtWidgets.QDialog.__init__(self)
         self.iface = qgis_project.iface
         self.setupUi(self)
