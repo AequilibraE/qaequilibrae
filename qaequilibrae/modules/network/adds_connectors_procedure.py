@@ -67,7 +67,7 @@ class AddsConnectorsProcedure(WorkerThread):
 
     def do_from_layer(self):
         fields = self.layer.fields()
-        idx = fields.indexOf(self.field.name())
+        idx = fields.indexOf(self.field)
         features = list(self.layer.getFeatures())
         self.ProgressMaxValue.emit(len(features))
 
