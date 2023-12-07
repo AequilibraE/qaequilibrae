@@ -14,6 +14,7 @@ def commit_deletion(connection):
     connection.execute("delete from nodes where is_centroid=1")
     connection.commit()
 
+
 def test_add_connectors_from_zones(pt_project):
     dialog = AddConnectorsDialog(pt_project)
     dialog.rdo_zone.setChecked(True)
@@ -35,14 +36,15 @@ def test_add_connectors_from_zones(pt_project):
     assert node_count == 11
     assert link_count == 11
 
-    # conn.execute("delete from links where name like 'centroid%'")
-    # conn.execute("delete from nodes where is_centroid=1")
-    # conn.commit()
-
     commit_deletion(conn)
 
+
 @pytest.mark.parametrize(
-    ("node_id", "radius", "point"), [(1000, 500, Point(-29.9170, -71.3183)), (1001, 5555, Point(-29.9176, -71.3657))]
+    ("node_id", "radius", "point"),
+    [
+        (1000, 500,Point(-29.9170, -71.3183)),
+        (1001, 5555, Point(-71.3346, -29.9176)),
+    ],
 )
 def test_add_connectors_from_network(pt_project, node_id, radius, point):
     dialog = AddConnectorsDialog(pt_project)
@@ -54,8 +56,8 @@ def test_add_connectors_from_network(pt_project, node_id, radius, point):
     nd.geometry = point
     nd.save()
 
-    dialog.lst_link_types.setCurrentRow(1)
-    dialog.lst_modes.setCurrentRow(3)
+    dialog.lst_modes.setCurrentRow(1)
+    dialog.lst_link_types.setCurrentRow(11)
 
     dialog.sb_radius.setValue(radius)
 
@@ -71,14 +73,14 @@ def test_add_connectors_from_network(pt_project, node_id, radius, point):
     if radius == 500:
         assert node_count == 1
         assert link_count == 0
-        commit_deletion(conn)
     else:
         assert node_count == 1
         assert link_count == 1
-        commit_deletion(conn)
 
-@pytest.mark.skip("Test is crashing")
-def test_add_connectors_from_layer(ae_with_project):
+    commit_deletion(conn)
+
+
+def test_add_connectors_from_layer(pt_project):
     nodes_layer = QgsVectorLayer("Point?crs=epsg:4326", "Centroids", "memory")
     if not nodes_layer.isValid():
         print("Nodes layer failed to load!")
@@ -91,9 +93,9 @@ def test_add_connectors_from_layer(ae_with_project):
 
         nodes_layer.updateFields()
         points = [
-            QgsPointXY(-96.7433, 43.5839),
-            QgsPointXY(-96.7689, 43.5176),
-            QgsPointXY(12.4606599, 41.9093632),
+            QgsPointXY(-71.3509, -29.9393),
+            QgsPointXY(-71.3182, -29.9619),
+            QgsPointXY(12.4606, 41.9093),
         ]
 
         zone_ids = [97, 98, 99]
@@ -109,24 +111,22 @@ def test_add_connectors_from_layer(ae_with_project):
 
         QgsProject.instance().addMapLayer(nodes_layer)
 
-    dialog = AddConnectorsDialog(ae_with_project)
+    dialog = AddConnectorsDialog(pt_project)
     dialog.rdo_layer.setChecked(True)
 
-    dialog.lst_link_types.setCurrentRow(1)
-    dialog.lst_modes.setCurrentRow(3)
+    dialog.lst_modes.setCurrentRow(1)
+    dialog.lst_link_types.setCurrentRow(11)
 
     dialog.run()
 
-    db_path = os.path.join(ae_with_project.project.project_base_path, "project_database.sqlite")
+    db_path = os.path.join(pt_project.project.project_base_path, "project_database.sqlite")
     conn = sqlite3.connect(db_path)
-    var = conn.execute("select count(node_id) from nodes where modes is null").fetchone()[0]
-    assert var == 5
-
+    node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
     # Due to the radius, not all nodes are connected to the network
-    var = conn.execute("select count(name) from links where name is not null").fetchone()[0]
-    assert var == 2  # check the validity of this assertion!
+    link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
 
+    assert node_count == 3
+    assert link_count == 2
+
+    commit_deletion(conn)
     QgsProject.instance().removeMapLayer(nodes_layer.id())
-
-    conn.execute("delete from links where name like 'centroid%'")
-    conn.commit()
