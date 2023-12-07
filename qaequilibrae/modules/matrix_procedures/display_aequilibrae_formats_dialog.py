@@ -10,7 +10,7 @@ from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
 from qaequilibrae.modules.common_tools import DatabaseModel, NumpyModel, GetOutputFileName
-from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
+from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, tempPath
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 
@@ -92,8 +92,13 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.data_type == "AEM":
             self.data_to_show.computational_view([self.data_to_show.names[0]])
         elif self.data_type == "OMX":
+            matrix_index = np.array(list(self.omx.mapping(self.list_indices[0]).keys()))
+            self.data_to_show.create_empty(file_name=os.path.join(tempPath(), "matrix.aem"),
+                                           zones=matrix_index.shape[0],
+                                           matrix_names=[self.list_cores[0]]) 
             self.data_to_show.matrix_view = np.array(self.omx[self.list_cores[0]])
-            self.data_to_show.index = np.array(list(self.omx.mapping(self.list_indices[0]).keys()))
+            self.data_to_show.index = matrix_index
+            self.data_to_show.matrix[self.list_cores[0]] = self.data_to_show.matrix_view[:, :]
 
         # Elements that will be used during the displaying
         self._layout = QVBoxLayout()
@@ -147,16 +152,16 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self._layout.addItem(self.mat_layout)
             self.change_matrix_cores()
 
-        # self.but_export = QPushButton()
-        # self.but_export.setText(self.tr("Export"))
-        # self.but_export.clicked.connect(self.export)
+        self.but_export = QPushButton()
+        self.but_export.setText(self.tr("Export"))
+        self.but_export.clicked.connect(self.export)
 
         self.but_close = QPushButton()
         self.but_close.clicked.connect(self.exit_procedure)
         self.but_close.setText(self.tr("Close"))
 
         self.but_layout = QHBoxLayout()
-        # self.but_layout.addWidget(self.but_export)
+        self.but_layout.addWidget(self.but_export)
         self.but_layout.addWidget(self.but_close)
 
         self._layout.addItem(self.but_layout)
@@ -185,8 +190,13 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.data_to_show.set_index(idx)
             self.format_showing()
         elif self.data_type == "OMX":
+            matrix_index = np.array(list(self.omx.mapping(idx).keys()))
+            self.data_to_show.create_empty(file_name=os.path.join(tempPath(), "matrix.aem"),
+                                           zones=matrix_index.shape[0],
+                                           matrix_names=[core])
             self.data_to_show.matrix_view = np.array(self.omx[core])
-            self.data_to_show.index = np.array(list(self.omx.mapping(idx).keys()))
+            self.data_to_show.index = matrix_index
+            self.data_to_show.matrix[core] = self.data_to_show.matrix_view[:, :]
             self.format_showing()
 
     def export(self):
