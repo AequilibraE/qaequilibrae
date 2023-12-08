@@ -57,6 +57,9 @@ class LoadDataset(WorkerThread):
         index_idx = self.layer.dataProvider().fieldNameIndex(self.index_field)
         datafile_spec["field_names"] = fields
         datafile_spec["data_types"] = types
+
+        if self.output_name is None:
+            self.output_name = self.output.random_name()
         datafile_spec["file_path"] = self.output_name
 
         if self.error is None:

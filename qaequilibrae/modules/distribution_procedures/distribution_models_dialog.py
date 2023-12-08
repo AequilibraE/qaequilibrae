@@ -207,14 +207,16 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2.show()
         dlg2.exec_()
         if isinstance(dlg2.dataset, AequilibraeData):
-            dataset_name = dlg2.dataset.file_path
-            if dataset_name is not None:
-                data_name = os.path.splitext(os.path.basename(dataset_name))[0]
-                data_name = self.find_non_conflicting_name(data_name, self.datasets)
-                self.datasets[data_name] = dlg2.dataset
-                self.add_to_table(self.datasets, self.table_datasets)
-                self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
-                self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
+            if dlg2.dataset.file_path is not None:
+                dataset_name = dlg2.dataset.file_path
+            else:
+                dataset_name = None
+            data_name = os.path.splitext(os.path.basename(dataset_name))[0]
+            data_name = self.find_non_conflicting_name(data_name, self.datasets)
+            self.datasets[data_name] = dlg2.dataset
+            self.add_to_table(self.datasets, self.table_datasets)
+            self.load_comboboxes(self.datasets.keys(), self.cob_prod_data)
+            self.load_comboboxes(self.datasets.keys(), self.cob_atra_data)
 
     def load_model(self):
         file_name = self.browse_outfile("mod")
