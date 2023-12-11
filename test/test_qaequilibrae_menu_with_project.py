@@ -282,7 +282,6 @@ def test_utils_display_matrices_and_datasets_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-@pytest.mark.skip(reason="This fails because of path issue, skipping meanwhile")
 def test_about_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.common_tools import AboutDialog
 

@@ -226,7 +226,6 @@ def test_utils_display_matrices_and_datasets_menu(ae, qtbot):
     assert action.text() == "Display Matrices and datasets", "Wrong text content"
 
 
-@pytest.mark.skip(reason="This fails because of path issue, skipping meanwhile")
 def test_about_menu(ae, qtbot):
     from qaequilibrae.modules.common_tools import AboutDialog
 
@@ -243,3 +242,11 @@ def test_help_menu(ae, qtbot):
     """TODO: find a way to capture the opening of webpage"""
     button = ae.menuActions["AequilibraE"][1]
     assert button.text() == "Help", "Wrong text content"
+
+
+def test_gtfs_importer(ae, qtbot):
+    action = ae.menuActions["Public Transport"][0]
+    assert action.text() == "Import GTFS", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
