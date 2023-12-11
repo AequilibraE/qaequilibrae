@@ -2349,7 +2349,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="59"/>
+        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="1058"/>
         <source>Load matrix</source>
         <translation type="unfinished"></translation>
     </message>
