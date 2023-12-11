@@ -87,7 +87,7 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
         self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
         self.worker_thread.jobFinished.connect(self.job_finished_from_thread)
-        self.worker_thread.doWork()
+        self.worker_thread.start()
         self.show()
 
     def progress_range_from_thread(self, val):
