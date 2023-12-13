@@ -1,3 +1,5 @@
+import numpy as np
+
 from PyQt5.QtCore import pyqtSignal
 from aequilibrae.paths import NetworkSkimming, SkimResults
 from aequilibrae.utils.worker_thread import WorkerThread
@@ -24,7 +26,8 @@ class TSPProcedure(WorkerThread):
         ns.execute()
 
         skm = ns.results.skims
-        mat = (skm.get_matrix(skm.names[0]) * self.mult).astype(int)
+        with np.errstate(invalid="ignore"):
+            mat = (skm.get_matrix(skm.names[0]) * self.mult).astype(int)
         self.depot = list(skm.index).index(self.depot)
         # Create the routing index manager.
         manager = pywrapcp.RoutingIndexManager(mat.shape[0], self.vehicles, self.depot)
