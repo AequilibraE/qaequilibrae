@@ -76,13 +76,17 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.rdo_selected.isChecked():
             centroids = self.selected_nodes()
             if len(centroids) < 3:
-                qgis.utils.iface.messageBar().pushMessage(self.tr("You need at least three nodes to route. "), "", level=3)
+                qgis.utils.iface.messageBar().pushMessage(
+                    self.tr("You need at least three nodes to route. "), "", level=3
+                )
                 return
             centroids = np.array(centroids).astype(np.int64)
             self.graph.prepare_graph(centroids=centroids)
         else:
             if self.project.network.count_centroids() < 3:
-                qgis.utils.iface.messageBar().pushMessage(self.tr("You need at least three centroids to route. "), "", level=3)
+                qgis.utils.iface.messageBar().pushMessage(
+                    self.tr("You need at least three centroids to route. "), "", level=3
+                )
                 return
 
         self.graph.set_graph(self.cob_minimize.currentText())  # let's say we want to minimize time

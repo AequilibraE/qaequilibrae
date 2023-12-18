@@ -12,11 +12,13 @@ def run_load_project(qgis_project):
 
 def _get_project_path():
     from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
+
     return QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
 
 
 def _run_load_project_from_path(qgis_project, proj_path):
     from aequilibrae.project import Project
+
     if proj_path is None or proj_path == "":
         return
     # Cleans the project descriptor

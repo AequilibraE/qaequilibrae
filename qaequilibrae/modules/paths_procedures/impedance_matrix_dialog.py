@@ -188,7 +188,9 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
     def check_inputs(self):
         self.error = None
         if self.rdo_all_nodes.isChecked() and self.block_paths.isChecked():
-            self.error = self.tr("It is not possible to trace paths between all nodes while blocking flows through centroids")
+            self.error = self.tr(
+                "It is not possible to trace paths between all nodes while blocking flows through centroids"
+            )
 
         if self.graph is None:
             self.error = self.tr("No graph loaded")

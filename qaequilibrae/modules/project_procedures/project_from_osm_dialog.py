@@ -95,7 +95,6 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
     def choose_output(self):
         new_name = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", standard_path())
         if new_name is not None and len(new_name) > 0:
-
             new_folder = "new_project"
             counter = 1
             while isdir(join(new_name, new_folder)):

@@ -60,7 +60,6 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2.exec_()
 
     def load_matrices(self):
-
         self.matrices = list_matrices(self.project.matrices.fldr)
 
         self.matrices_model = PandasModel(self.matrices)

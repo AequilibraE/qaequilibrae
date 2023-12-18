@@ -69,7 +69,6 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def changed_layer(self):
         with commit_and_close(database_connection("network")) as conn:
-
             if not self.project or not conn:
                 return
             ignore_fields = ["ogc_fid", "geometry"]

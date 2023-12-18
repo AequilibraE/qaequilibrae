@@ -4,7 +4,6 @@ from aequilibrae.utils.worker_thread import WorkerThread
 
 
 class IpfProcedure(WorkerThread):
-
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
         self.ipf = Ipf(**kwargs)

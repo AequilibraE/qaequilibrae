@@ -39,7 +39,7 @@ class AddsConnectorsProcedure(WorkerThread):
 
     def do_from_zones(self):
         zoning = self.project.zoning
-        
+
         with commit_and_close(database_connection("network")) as conn:
             tot_zones = [x[0] for x in conn.execute("select count(*) from zones")][0]
             self.ProgressMaxValue.emit(tot_zones)
@@ -58,7 +58,7 @@ class AddsConnectorsProcedure(WorkerThread):
         nodes = self.project.network.nodes
         nodes.refresh()
         self.ProgressMaxValue.emit(self.project.network.count_centroids())
-        
+
         with commit_and_close(database_connection("network")) as conn:
             centroids = [x[0] for x in conn.execute("select node_id from nodes where is_centroid=1")]
         for counter, zone_id in enumerate(centroids):
