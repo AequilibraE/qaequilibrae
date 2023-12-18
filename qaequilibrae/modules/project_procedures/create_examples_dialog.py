@@ -94,3 +94,4 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run(self):
         create_example(self.output_path.text(), self.place)
+        self.close()
