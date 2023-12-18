@@ -1320,7 +1320,7 @@
     <message>
         <location filename="../modules/matrix_procedures/load_matrix_class.py" line="95"/>
         <source>LOADED-MATRIX</source>
-        <translation type="unfinished"/>
+        <translation>MATRIZ-CARREGADA</translation>
     </message>
 </context>
 <context>
