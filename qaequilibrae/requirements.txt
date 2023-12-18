@@ -1,3 +1,4 @@
 aequilibrae==0.9.3
 openmatrix
 ortools
+tables==3.8.0
