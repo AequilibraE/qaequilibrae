@@ -5,7 +5,7 @@ class messages:
 
     @property
     def first_box_name(self):
-        return self.tr("AequilibraE and other dependencies are not not installed")
+        return self.tr("AequilibraE and other dependencies are not installed")
 
     @property
     def first_message(self):
