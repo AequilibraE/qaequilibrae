@@ -1,8 +1,6 @@
 import math
-import os
 import tempfile
-import yaml
-from os.path import dirname, isdir
+from os.path import isdir
 from time import localtime, strftime
 
 import qgis
