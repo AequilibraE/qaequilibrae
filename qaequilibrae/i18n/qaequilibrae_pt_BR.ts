@@ -352,7 +352,7 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="192"/>
         <source>feature with id {} could not be added to layer {}</source>
-        <translation type="unfinished"/>
+        <translation>recurso com id {} não pode ser adicionado à camada {}</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="194"/>
@@ -453,7 +453,7 @@
     <message>
         <location filename="../modules/gis/desire_lines_dialog.py" line="211"/>
         <source>Inputs not loaded properly. You need the layer and at least one matrix_procedures core</source>
-        <translation type="unfinished"/>
+        <translation>Dados de entrada não foram carregados adequadamente. É preciso uma camada e ao menos um núcleo em matrix_procedure</translation>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_dialog.py" line="216"/>
