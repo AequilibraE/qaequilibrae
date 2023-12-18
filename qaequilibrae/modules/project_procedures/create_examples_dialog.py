@@ -75,7 +75,6 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setLayout(self._run_layout)
         self.resize(280, 250)
 
-    
     def choose_output(self):
         if self.select_sfalls.isChecked():
             self.place = "sioux_falls"
@@ -83,7 +82,7 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
             self.place = "nauru"
         else:
             self.place = "coquimbo"
-    
+
         new_name = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", standard_path())
         if new_name is not None and len(new_name) > 0:
             new_folder = f"example_{self.place}"
@@ -93,7 +92,5 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
                 counter += 1
             self.output_path.setText(join(new_name, new_folder))
 
-
     def run(self):
-
         create_example(self.output_path.text(), self.place)
