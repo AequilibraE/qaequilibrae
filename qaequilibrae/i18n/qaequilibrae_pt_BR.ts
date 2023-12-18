@@ -347,7 +347,7 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="188"/>
         <source>Failed inserting record {} for {}</source>
-        <translation type="unfinished"/>
+        <translation>Falha na inserção de {} por {}</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="192"/>
