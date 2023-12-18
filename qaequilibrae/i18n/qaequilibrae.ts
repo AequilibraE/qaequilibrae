@@ -787,18 +787,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="109"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="108"/>
         <source>Thousands separator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="118"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="117"/>
         <source>Decimal places</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="156"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="155"/>
         <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="150"/>
+        <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
