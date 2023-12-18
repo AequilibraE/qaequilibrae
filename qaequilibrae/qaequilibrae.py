@@ -28,7 +28,7 @@ from qaequilibrae.modules.menu_actions import (
     prepare_network,
     run_about,
 )
-from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
+from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log, create_example
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from qaequilibrae.message import messages
 
@@ -171,6 +171,7 @@ class AequilibraEMenu:
         self.add_menu_action(
             self.tr("Utils"), self.tr("Display Matrices and datasets"), partial(display_aequilibrae_formats, self)
         )
+        self.add_menu_action(self.tr("Utils"), self.tr("Create example"), partial(create_example, self))
 
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
