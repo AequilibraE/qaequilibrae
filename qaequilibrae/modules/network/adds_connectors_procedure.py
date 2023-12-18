@@ -48,7 +48,6 @@ class AddsConnectorsProcedure(WorkerThread):
 
         for counter, zone_id in enumerate(zones):
             zone = zoning.get(zone_id)
-            zone.conn = zoning.conn
             zone.add_centroid(None)
             for mode_id in self.modes:
                 zone.connect_mode(mode_id=mode_id, link_types=self.link_types, connectors=self.num_connectors)
@@ -62,7 +61,6 @@ class AddsConnectorsProcedure(WorkerThread):
         with commit_and_close(database_connection("network")) as conn:
             centroids = [x[0] for x in conn.execute("select node_id from nodes where is_centroid=1")]
         for counter, zone_id in enumerate(centroids):
-            print(zone_id)
             node = nodes.get(zone_id)
             geo = self.polygon_from_radius(node.geometry)
             for mode_id in self.modes:
