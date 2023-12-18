@@ -10,7 +10,7 @@ from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
 from qaequilibrae.modules.common_tools import DatabaseModel, NumpyModel, GetOutputFileName
-from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, tempPath
+from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 
