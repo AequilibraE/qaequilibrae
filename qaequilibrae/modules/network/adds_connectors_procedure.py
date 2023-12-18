@@ -1,6 +1,8 @@
 import shapely.wkb
 from shapely.geometry import Point
 
+from aequilibrae.project.database_connection import database_connection
+from aequilibrae.utils.db_utils import commit_and_close
 from aequilibrae.utils.worker_thread import WorkerThread
 from PyQt5.QtCore import pyqtSignal
 
@@ -37,11 +39,13 @@ class AddsConnectorsProcedure(WorkerThread):
 
     def do_from_zones(self):
         zoning = self.project.zoning
-        zoning.refresh_connection()
-        tot_zones = [x[0] for x in zoning.conn.execute("select count(*) from zones")][0]
-        self.ProgressMaxValue.emit(tot_zones)
+        
+        with commit_and_close(database_connection("network")) as conn:
+            tot_zones = [x[0] for x in conn.execute("select count(*) from zones")][0]
+            self.ProgressMaxValue.emit(tot_zones)
 
-        zones = [x[0] for x in zoning.conn.execute("select zone_id from zones")]
+            zones = [x[0] for x in conn.execute("select zone_id from zones")]
+
         for counter, zone_id in enumerate(zones):
             zone = zoning.get(zone_id)
             zone.conn = zoning.conn
@@ -53,10 +57,10 @@ class AddsConnectorsProcedure(WorkerThread):
     def do_from_network(self):
         nodes = self.project.network.nodes
         nodes.refresh()
-        nodes.refresh_connection()
-        self.project.network.refresh_connection()
         self.ProgressMaxValue.emit(self.project.network.count_centroids())
-        centroids = [x[0] for x in nodes.conn.execute("select node_id from nodes where is_centroid=1")]
+        
+        with commit_and_close(database_connection("network")) as conn:
+            centroids = [x[0] for x in conn.execute("select node_id from nodes where is_centroid=1")]
         for counter, zone_id in enumerate(centroids):
             print(zone_id)
             node = nodes.get(zone_id)
@@ -67,12 +71,12 @@ class AddsConnectorsProcedure(WorkerThread):
 
     def do_from_layer(self):
         fields = self.layer.fields()
-        idx = fields.indexOf(self.field.name())
+        idx = fields.indexOf(self.field)
         features = list(self.layer.getFeatures())
         self.ProgressMaxValue.emit(len(features))
 
         nodes = self.project.network.nodes
-        nodes.refresh_connection()
+        nodes.refresh()
         for counter, feat in enumerate(features):
             zone_id = feat.attributes()[idx]
             node = nodes.new_centroid(zone_id)
