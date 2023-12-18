@@ -1,9 +1,11 @@
-import logging
 import numpy as np
 import os
-from aequilibrae.paths import Graph, path_computation
+from aequilibrae.paths import path_computation
 from aequilibrae.paths.results import PathResults
 from aequilibrae.project import Project
+from aequilibrae.project.database_connection import database_connection
+from aequilibrae.utils.db_utils import read_and_close
+
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
@@ -44,18 +46,18 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.rdo_selected.isChecked():
             centroids = self.selected_nodes()
         else:
-            curr = self.project.network.conn.cursor()
-            curr.execute("select node_id from nodes where is_centroid=1;")
-            centroids = [i[0] for i in curr.fetchall()]
+            with read_and_close(database_connection("network")) as conn:
+                res = conn.execute("select node_id from nodes where is_centroid=1;")
+                centroids = [i[0] for i in res.fetchall()]
         for i in centroids:
             self.cob_start.addItem(str(i))
 
     def populate(self):
-        curr = self.project.network.conn.cursor()
-        curr.execute("""select mode_name, mode_id from modes""")
-        for x in curr.fetchall():
-            self.cob_mode.addItem(f"{x[0]} ({x[1]})")
-            self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
+        with read_and_close(database_connection("network")) as conn:
+            res = conn.execute("""select mode_name, mode_id from modes""")
+            for x in res.fetchall():
+                self.cob_mode.addItem(f"{x[0]} ({x[1]})")
+                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         for f in self.project.network.skimmable_fields():
             self.cob_minimize.addItem(f)
