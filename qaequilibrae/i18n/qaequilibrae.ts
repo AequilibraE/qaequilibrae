@@ -805,67 +805,67 @@
 <context>
     <name>DistributionModelsDialog</name>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="135"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="137"/>
         <source>AequilibraE - Iterative Proportional Fitting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="136"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="138"/>
         <source>Seed matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="140"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="142"/>
         <source>AequilibraE - Apply gravity model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="146"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="148"/>
         <source>AequilibraE - Calibrate gravity model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="147"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="149"/>
         <source>Observed matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="173"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="175"/>
         <source>Function</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="225"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="227"/>
         <source>Could not load model. {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="423"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="428"/>
         <source>Procedure error: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="379"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="383"/>
         <source>Queued</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="397"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="401"/>
         <source>Production vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="400"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="404"/>
         <source>Attraction vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="404"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="408"/>
         <source>Observed (seed) matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="408"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="412"/>
         <source>Impedance matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2349,7 +2349,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="1058"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="59"/>
         <source>Load matrix</source>
         <translation type="unfinished"></translation>
     </message>
