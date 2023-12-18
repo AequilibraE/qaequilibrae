@@ -302,7 +302,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def __add_skimming(self):
         field = self.cob_skims_available.currentText()
         traffic_class = self.traffic_classes[self.cob_skim_class.currentText()]
-        name = traffic_class.__id__
+        name = traffic_class._id
         if field in self.skims[name]:
             if self.testing:
                 raise AttributeError("No skims set")
