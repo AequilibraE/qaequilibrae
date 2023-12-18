@@ -22,9 +22,7 @@
 from qgis.core import *
 from qgis.PyQt import QtWidgets, uic
 from .get_output_file_name import GetOutputFileName
-import qgis
 
-import sys
 import os
 from .auxiliary_functions import standard_path
 

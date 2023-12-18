@@ -1,4 +1,4 @@
-from qgis.PyQt.QtCore import Qt, QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication
 
 
 class messages:

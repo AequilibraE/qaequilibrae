@@ -1,5 +1,4 @@
 import glob
-import importlib.util as iutil
 import logging
 import os
 import subprocess
@@ -8,7 +7,6 @@ import tempfile
 import webbrowser
 from functools import partial
 from typing import Dict
-from warnings import warn
 
 import qgis
 
@@ -17,7 +15,7 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
-from qgis.core import QgsProject, QgsSettings
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QTranslator
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag

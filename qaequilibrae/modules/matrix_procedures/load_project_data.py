@@ -1,9 +1,7 @@
 import importlib.util as iutil
 import os
 from os.path import join
-
 import pandas as pd
-from qgis._core import QgsProject, QgsVectorLayer, QgsDataSourceUri
 
 import qgis
 from qgis.PyQt import QtWidgets, uic

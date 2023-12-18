@@ -1,7 +1,6 @@
 import numpy as np
 
-import qgis
-from qgis.PyQt import QtWidgets, uic, QtCore
+from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import *
 
 Qt = QtCore.Qt

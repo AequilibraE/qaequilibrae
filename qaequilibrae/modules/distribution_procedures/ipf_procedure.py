@@ -1,4 +1,3 @@
-from PyQt5.QtCore import pyqtSignal
 from aequilibrae.distribution import Ipf
 
 from aequilibrae.utils.worker_thread import WorkerThread
