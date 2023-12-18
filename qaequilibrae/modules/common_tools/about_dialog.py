@@ -37,6 +37,9 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
         b = "?"
         with open(my_file, "r") as a:
             for line in a.readlines():
+                if line[:18] == "qgisMinimumVersion":
+                    min_qgis = line[19:]
+                    continue
                 if line[:7] == "version":
                     b = line[8:]
                     break
@@ -46,7 +49,7 @@ class AboutDialog(QtWidgets.QDialog, FORM_CLASS):
         self.all_items.append([self.tr("AequilibraE Version number"), release_version])
         self.all_items.append([self.tr("GUI version"), b])
         self.all_items.append([self.tr("GUI Repository"), repository])
-        self.all_items.append([self.tr("Minimum QGIS"), "3.14"])
+        self.all_items.append([self.tr("Minimum QGIS"), min_qgis])
         self.all_items.append([self.tr("Developers"), par["developers"]])
         self.all_items.append([self.tr("Sponsors"), par["sponsors"]])
 
