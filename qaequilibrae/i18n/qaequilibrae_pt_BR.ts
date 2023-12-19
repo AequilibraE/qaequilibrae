@@ -1976,7 +1976,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="97"/>
         <source>Base scenario</source>
-        <translation>Cenário base</translation>
+        <translation>Cenário Base</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="152"/>
