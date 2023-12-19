@@ -3115,7 +3115,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="57"/>
         <source>From network</source>
-        <translation>da rede</translation>
+        <translation>Rede</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="67"/>
