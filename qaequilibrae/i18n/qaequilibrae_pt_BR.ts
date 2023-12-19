@@ -3120,7 +3120,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="67"/>
         <source>Zone centers</source>
-        <translation>centro da zona</translation>
+        <translation>Centroide</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="74"/>
