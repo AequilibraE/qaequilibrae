@@ -2937,7 +2937,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="468"/>
         <source>Skimming</source>
-        <translation>Determinando custos</translation>
+        <translation>Custos</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="522"/>
