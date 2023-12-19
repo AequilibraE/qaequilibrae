@@ -2011,7 +2011,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="293"/>
         <source>Maximum band width</source>
-        <translation>Maior espessura de faixa</translation>
+        <translation>Espessura de faixa</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="337"/>
