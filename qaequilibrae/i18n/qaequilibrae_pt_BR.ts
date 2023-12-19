@@ -1923,7 +1923,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="110"/>
         <source>Add band</source>
-        <translation>Adicionar camada</translation>
+        <translation>Adicionar</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="128"/>
