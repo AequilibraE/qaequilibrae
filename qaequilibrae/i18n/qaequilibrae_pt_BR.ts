@@ -105,7 +105,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="115"/>
         <source>Add zoning data</source>
-        <translation>Adicionar Info de Zonas</translation>
+        <translation>Adicionar Zonas</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="116"/>
