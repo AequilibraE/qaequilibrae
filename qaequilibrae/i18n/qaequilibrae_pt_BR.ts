@@ -2448,7 +2448,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="122"/>
         <source>Data field</source>
-        <translation>Campo com dados</translation>
+        <translation>Campo</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="135"/>
