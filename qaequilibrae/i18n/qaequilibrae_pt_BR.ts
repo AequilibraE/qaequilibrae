@@ -2917,7 +2917,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="369"/>
         <source>Assignment class name</source>
-        <translation>Nome da classe de alocação</translation>
+        <translation>Nome da classe</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="382"/>
