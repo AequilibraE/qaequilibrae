@@ -3200,7 +3200,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="216"/>
         <source>Zoning layer</source>
-        <translation>Camada de zoneamento</translation>
+        <translation>Camada</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="14"/>
