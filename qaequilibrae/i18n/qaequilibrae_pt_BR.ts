@@ -115,7 +115,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="117"/>
         <source>logfile</source>
-        <translation>Arquivo de Registro</translation>
+        <translation>Registro de Operações</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="118"/>
