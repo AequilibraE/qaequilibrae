@@ -1893,7 +1893,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="20"/>
         <source>AequilibraE - Stacked Bandwidth and color ramps</source>
-        <translation>AequilibraE - Linhas empilhadas e gradientes de cor</translation>
+        <translation>AequilibraE - Mapa de volume e gradientes de cor</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="37"/>
