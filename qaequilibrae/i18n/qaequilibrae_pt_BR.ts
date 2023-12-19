@@ -3105,7 +3105,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
         <source>AequilibraE - Add zoning layer to project</source>
-        <translation>AequilibraE - Adicionando camadas do zoneamento ao projeto</translation>
+        <translation>AequilibraE - Adicionando zonas ao projeto</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="25"/>
