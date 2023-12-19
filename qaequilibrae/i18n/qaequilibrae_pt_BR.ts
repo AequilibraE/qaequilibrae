@@ -2872,7 +2872,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="212"/>
         <source>User classes</source>
-        <translation>Classes do usuário</translation>
+        <translation># de classes</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="217"/>
