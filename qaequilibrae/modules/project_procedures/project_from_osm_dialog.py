@@ -53,7 +53,7 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.source_type_frame.addWidget(self.choose_canvas)
         self.source_type_frame.addWidget(self.place)
 
-        self.source_type_widget = QGroupBox("Target")
+        self.source_type_widget = QGroupBox(self.tr("Target"))
         self.source_type_widget.setLayout(self.source_type_frame)
 
         # Buttons and output
