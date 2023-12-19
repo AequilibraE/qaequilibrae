@@ -669,7 +669,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="412"/>
         <source>jobs</source>
-        <translation>trabalhos</translation>
+        <translation>Tarefas</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="429"/>
