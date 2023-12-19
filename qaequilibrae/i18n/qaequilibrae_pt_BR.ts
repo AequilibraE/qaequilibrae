@@ -1731,7 +1731,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="162"/>
         <source>Node layer name</source>
-        <translation>Nome da camada de nós</translation>
+        <translation>Nome da camada</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="183"/>
@@ -1751,7 +1751,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="267"/>
         <source>Line layer name</source>
-        <translation>Nome do layer de links</translation>
+        <translation>Nome da camada</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="288"/>
