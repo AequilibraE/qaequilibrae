@@ -105,7 +105,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="115"/>
         <source>Add zoning data</source>
-        <translation>Adicionar Info de Zonas</translation>
+        <translation>Adicionar Zonas</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="116"/>
@@ -115,7 +115,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="117"/>
         <source>logfile</source>
-        <translation>Arquivo de Registro</translation>
+        <translation>Registro de Operações</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="118"/>
@@ -253,7 +253,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_bandwidth_color_ramps.ui" line="230"/>
         <source>Color ramp</source>
-        <translation>Gradiente de coloração</translation>
+        <translation>Cores</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidth_color_ramps.ui" line="243"/>
@@ -574,7 +574,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="46"/>
         <source>Dataset name</source>
-        <translation>Nome do banco de dados</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="51"/>
@@ -619,7 +619,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="288"/>
         <source>Core</source>
-        <translation>Núcleos</translation>
+        <translation>Camada</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="275"/>
@@ -669,12 +669,12 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="412"/>
         <source>jobs</source>
-        <translation>trabalhos</translation>
+        <translation>Tarefas</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="429"/>
         <source>Job</source>
-        <translation>trabalho</translation>
+        <translation>Tarefa</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="434"/>
@@ -714,12 +714,12 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="479"/>
         <source>Queue jobs</source>
-        <translation>Enfileirar trabalhos</translation>
+        <translation>Enfileirar tarefas</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="489"/>
         <source>Run jobs</source>
-        <translation>Executar trabalhos</translation>
+        <translation>Executar tarefas</translation>
     </message>
     <message>
         <location filename="../modules/common_tools/forms/ui_about.ui" line="14"/>
@@ -1731,7 +1731,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="162"/>
         <source>Node layer name</source>
-        <translation>Nome da camada de nós</translation>
+        <translation>Nome da camada</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="183"/>
@@ -1751,7 +1751,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="267"/>
         <source>Line layer name</source>
-        <translation>Nome do layer de links</translation>
+        <translation>Nome da camada</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="288"/>
@@ -1893,7 +1893,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="20"/>
         <source>AequilibraE - Stacked Bandwidth and color ramps</source>
-        <translation>AequilibraE - Linhas empilhadas e gradientes de cor</translation>
+        <translation>AequilibraE - Mapa de volumes e gradientes de cor</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="37"/>
@@ -1923,7 +1923,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="110"/>
         <source>Add band</source>
-        <translation>Adicionar camada</translation>
+        <translation>Adicionar</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="128"/>
@@ -1933,7 +1933,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="146"/>
         <source>Color ramp</source>
-        <translation>Gradiente de coloração</translation>
+        <translation>Gradiente</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="181"/>
@@ -1976,7 +1976,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="97"/>
         <source>Base scenario</source>
-        <translation>Cenário base</translation>
+        <translation>Cenário Base</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="152"/>
@@ -2011,7 +2011,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="293"/>
         <source>Maximum band width</source>
-        <translation>Maior espessura de faixa</translation>
+        <translation>Espessura de faixa</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="337"/>
@@ -2448,7 +2448,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="122"/>
         <source>Data field</source>
-        <translation>Campo com dados</translation>
+        <translation>Campo</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="135"/>
@@ -2754,7 +2754,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/gis/forms/ui_simple_tag.ui" line="122"/>
         <source>Data field</source>
-        <translation>Campo com dados</translation>
+        <translation>Campo</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_simple_tag.ui" line="135"/>
@@ -2872,7 +2872,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="212"/>
         <source>User classes</source>
-        <translation>Classes do usuário</translation>
+        <translation># de classes</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="217"/>
@@ -2887,7 +2887,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="227"/>
         <source>remove</source>
-        <translation>remover</translation>
+        <translation>Remover</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="241"/>
@@ -2917,7 +2917,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="369"/>
         <source>Assignment class name</source>
-        <translation>Nome da classe de alocação</translation>
+        <translation>Nome da classe</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="382"/>
@@ -2932,12 +2932,12 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="460"/>
         <source>Add Traffic class to assignment</source>
-        <translation>Adicionar classe de tráfego para alocação</translation>
+        <translation>Adicionar classe de tráfego</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="468"/>
         <source>Skimming</source>
-        <translation>Determinando custos</translation>
+        <translation>Custos</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="522"/>
@@ -2977,7 +2977,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="693"/>
         <source>Critical analysis</source>
-        <translation>Análise crítica</translation>
+        <translation>Criticalidade</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="708"/>
@@ -3105,7 +3105,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
         <source>AequilibraE - Add zoning layer to project</source>
-        <translation>AequilibraE - Adicionando camadas do zoneamento ao projeto</translation>
+        <translation>AequilibraE - Adicionando zonas ao projeto</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="25"/>
@@ -3115,12 +3115,12 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="57"/>
         <source>From network</source>
-        <translation>da rede</translation>
+        <translation>Rede</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="67"/>
         <source>Zone centers</source>
-        <translation>centro da zona</translation>
+        <translation>Centroide</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="74"/>
@@ -3185,7 +3185,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="173"/>
         <source>Zoning field</source>
-        <translation>Campo com zonas</translation>
+        <translation>Campo</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
@@ -3200,7 +3200,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="216"/>
         <source>Zoning layer</source>
-        <translation>Camada de zoneamento</translation>
+        <translation>Camada</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="14"/>
