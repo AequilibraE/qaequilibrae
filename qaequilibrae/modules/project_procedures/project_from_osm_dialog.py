@@ -140,8 +140,8 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         elif val[0] == "text":
             self.progress_label.setText(val[1])
         elif val[0] == "finished_threaded_procedure":
-            lines = self.qgis_project.project.network.count_links()
-            nodes = self.qgis_project.project.network.count_nodes()
-            self.report.append(reporter(f"{lines:,} links generated"))
-            self.report.append(reporter(f"{nodes:,} nodes generated"))
+            # lines = self.qgis_project.project.network.count_links()
+            # nodes = self.qgis_project.project.network.count_nodes()
+            # self.report.append(reporter(f"{lines:,} links generated"))
+            # self.report.append(reporter(f"{nodes:,} nodes generated"))
             self.leave()
