@@ -674,7 +674,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="429"/>
         <source>Job</source>
-        <translation>trabalho</translation>
+        <translation>Tarefa</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="434"/>
