@@ -714,12 +714,12 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="479"/>
         <source>Queue jobs</source>
-        <translation>Enfileirar trabalhos</translation>
+        <translation>Enfileirar tarefas</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="489"/>
         <source>Run jobs</source>
-        <translation>Executar trabalhos</translation>
+        <translation>Executar tarefas</translation>
     </message>
     <message>
         <location filename="../modules/common_tools/forms/ui_about.ui" line="14"/>
