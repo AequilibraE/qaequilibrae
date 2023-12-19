@@ -3185,7 +3185,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="173"/>
         <source>Zoning field</source>
-        <translation>Campo com zonas</translation>
+        <translation>Campo</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
