@@ -253,7 +253,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_bandwidth_color_ramps.ui" line="230"/>
         <source>Color ramp</source>
-        <translation>Gradiente de coloração</translation>
+        <translation>Cores</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidth_color_ramps.ui" line="243"/>
