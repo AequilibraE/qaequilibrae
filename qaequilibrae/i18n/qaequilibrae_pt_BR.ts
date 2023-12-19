@@ -2887,7 +2887,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="227"/>
         <source>remove</source>
-        <translation>remover</translation>
+        <translation>Remover</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="241"/>
