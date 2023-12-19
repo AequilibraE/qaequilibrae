@@ -325,11 +325,6 @@ class AequilibraEMenu:
         layer = QgsVectorLayer(uri.uri(), layer_name, "spatialite")
         return layer
 
-    def run_load_database(self):
-        dlg2 = LoadDatasetDialog(self.iface, single_use=False)
-        dlg2.show()
-        dlg2.exec_()
-
     def show_message_no_project(self):
         self.iface.messageBar().pushMessage("Error", self.tr("You need to load a project first"), level=3, duration=10)
 

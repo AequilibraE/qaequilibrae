@@ -46,7 +46,7 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Buttons and output
         self.but_choose_output = QPushButton()
-        self.but_choose_output.setText(self.tr("Choose folder output"))
+        self.but_choose_output.setText(self.tr("Choose output folder"))
         self.but_choose_output.clicked.connect(self.choose_output)
 
         self.output_path = QLineEdit()
