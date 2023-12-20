@@ -1,7 +1,6 @@
-from unittest import mock
 from PyQt5.QtCore import Qt, QTimer, QVariant
 import numpy as np
-from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature, QgsApplication
+from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
 from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
 
 
