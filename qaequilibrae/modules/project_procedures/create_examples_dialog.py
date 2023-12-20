@@ -2,12 +2,10 @@ import os
 from os.path import isdir, join
 from pathlib import Path
 
-from PyQt5.QtCore import Qt
 from aequilibrae.utils.create_example import create_example
 
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtWidgets import QVBoxLayout, QGroupBox
-from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
+from qgis.PyQt.QtWidgets import QGridLayout, QPushButton, QLineEdit, QComboBox, QLabel, QVBoxLayout
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
 from qaequilibrae.modules.common_tools import standard_path
 
@@ -18,7 +16,8 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
         pth = Path(__file__).parent.parent.parent / "packages" / "aequilibrae" / "reference_files"
-        print([str(x.stem) for x in pth.glob("*.zip")])
+        models = [str(x.stem) for x in pth.glob("*.zip")]
+        print(models)
 
         self.iface = qgis_project.iface
         self.setupUi(self)
@@ -26,29 +25,11 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self._run_layout = QGridLayout()
 
-        # Area to import network for
-        self.select_sfalls = QRadioButton()
-        self.select_sfalls.setText("Sioux Falls")
-        self.select_sfalls.setChecked(True)
+        lbl = QLabel("Available models:")
 
-        self.select_nauru = QRadioButton()
-        self.select_nauru.setText("Nauru")
-        self.select_nauru.setChecked(False)
+        self.cb_models = QComboBox()
+        self.cb_models.addItems(models)
 
-        self.select_coquimbo = QRadioButton()
-        self.select_coquimbo.setText("Coquimbo")
-        self.select_coquimbo.setChecked(False)
-
-        self.source_type_frame = QVBoxLayout()
-        self.source_type_frame.setAlignment(Qt.AlignLeft)
-        self.source_type_frame.addWidget(self.select_sfalls)
-        self.source_type_frame.addWidget(self.select_nauru)
-        self.source_type_frame.addWidget(self.select_coquimbo)
-
-        self.source_type_widget = QGroupBox("Available models")
-        self.source_type_widget.setLayout(self.source_type_frame)
-
-        # Buttons and output
         self.but_choose_output = QPushButton()
         self.but_choose_output.setText(self.tr("Choose output folder"))
         self.but_choose_output.clicked.connect(self.choose_output)
@@ -72,20 +53,16 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
         self.update_widget.setLayout(self.update_frame)
         self.update_widget.setVisible(False)
 
-        self._run_layout.addWidget(self.source_type_widget)
+        self._run_layout.addWidget(lbl)
+        self._run_layout.addWidget(self.cb_models)
         self._run_layout.addWidget(self.buttons_widget)
         self._run_layout.addWidget(self.update_widget)
 
         self.setLayout(self._run_layout)
-        self.resize(280, 250)
+        self.resize(250, 170)
 
     def choose_output(self):
-        if self.select_sfalls.isChecked():
-            self.place = "sioux_falls"
-        elif self.select_nauru.isChecked():
-            self.place = "nauru"
-        else:
-            self.place = "coquimbo"
+        self.place = self.cb_models.currentText()
 
         new_name = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", standard_path())
         if new_name is not None and len(new_name) > 0:
