@@ -1,5 +1,6 @@
 import os
 from os.path import isdir, join
+from pathlib import Path
 
 from PyQt5.QtCore import Qt
 from aequilibrae.utils.create_example import create_example
@@ -16,6 +17,9 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../commo
 class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
+        pth = Path(__file__).parent.parent.parent / "packages" / "aequilibrae" / "reference_files"
+        print(list(pth.glob("*.zip")))
+
         self.iface = qgis_project.iface
         self.setupUi(self)
         self.qgis_project = qgis_project
