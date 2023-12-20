@@ -38,5 +38,4 @@ Plase note that the TSP stops are labeled according their sequence.
     different software and programming languages. However, the main problem related to
     TSP is related to its size (hence its complexity). This means that as we increase the 
     number of stops we want to travel to, the software will take much longer to provide you
-    with an answer, and in some cases, it might not even return an answer as the processing 
-    time explodes.
+    with an answer, and in some cases, it might not even return an answer due to its complexity.

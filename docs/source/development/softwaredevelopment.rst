@@ -124,7 +124,7 @@ by translating the plugin to other languages or reviewing the existing translati
 `AequilibraE Google Group <https://groups.google.com/forum/#!forum/aequilibrae>`_,
 so we can add your language to our translation pool!
 
-In the :ref:`plugin-translation`page, you can find more information on creating you account and
+In the :ref:`plugin translation <plugin_translation>` page, you can find more information on creating you account and
 start translating QAequilibraE.
 
 Contributing to AequilibraE for QGIS
