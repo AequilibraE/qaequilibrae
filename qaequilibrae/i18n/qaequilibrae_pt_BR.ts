@@ -2405,7 +2405,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="75"/>
         <source>Update matrix table</source>
-        <translation>Atualizar a tabela de matrizes</translation>
+        <translation>Atualizar tabela</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="86"/>
