@@ -158,3 +158,12 @@ places and move them to more appropriate positions.
 One might need to convert the zoning system to a SingleParts layer before
 following the instructions above, which can be done following the description
 provided in :ref:`multipart to singlepart <multipart_to_singlepart>`.
+
+Video tutorial
+--------------
+
+.. raw:: html
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/lAxY7E9g1Q8"
+     frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
+     picture-in-picture" allowfullscreen></iframe>

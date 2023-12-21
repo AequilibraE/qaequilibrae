@@ -13,16 +13,17 @@ main functionalities.
     :alt: aeq menu
 
 Most screenshots in this section are related to Sioux Falls, a standard example
-in transportation network algorithm studies. Now, you can :ref:`easily create <create_example>`
-your own Sioux Falls project. 
+in transportation network algorithm studies. 
 
-Here we present an image-based example on a realistic modelling workflow
-for the beginner modeler out there. All the data used here can be downloaded
-at the :ref:`tutorial_sample_data` page.
+In the following sections, we present an image-based example on a realistic modelling workflow
+for the beginner modeler out there. You can easily create a Sioux Falls model using our
+:ref:`create example <create_example>` tool. The remaining of the data used
+in the examples can be downloaded `here <https://www.aequilibrae.com/data/SiouxFalls.7z>`_.
 
 As to not upset those who think that Sioux Falls is not a realistic example (you
-would be right to think so), the example data is also available for the Chicago
-regional model, which has nearly 40,000 links and almost 1,800 zones.
+would be right to think so), the example data is also available for the `Chicago
+regional model <https://www.aequilibrae.com/data/Chicago.7z>`_,
+which has nearly 40,000 links and almost 1,800 zones.
 
 Got a bigger instance we could use as an example? Send it over!
 

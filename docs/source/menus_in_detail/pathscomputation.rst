@@ -171,3 +171,12 @@ fields to join, and press ok.
     :alt: link_join
 
 Now we can revisit the instructions above for :ref:`siouxfalls-stacked-bandwidth`
+
+Video tutorial
+~~~~~~~~~~~~~~
+
+.. raw:: html
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/DRY4QpdX3qQ"
+     frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
+     picture-in-picture" allowfullscreen></iframe>

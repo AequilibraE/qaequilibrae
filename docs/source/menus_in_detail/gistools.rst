@@ -6,43 +6,37 @@ GIS Tools
 Desire Lines
 ------------
 
-AequilibraE is now capable of doing two types of desire lines.
-
-If you are new to AequilibraE and are trying use this tool for the first time, we recommend you first take a look at
-the section on :ref:`importing matrices into AequilibraE format <importing_matrices>`. In our experience, that is where most
-people find themselves stranded.
-
-.. image:: ../images/gis_desire_lines.png
-    :width: 800
-    :align: center
-    :alt: Desire Lines menu
-
-One can also generate the desire lines and Delaunay lines for the demand matrix
-provided.
+AequilibraE is capable of doing two types of desire lines. 
 
 .. image:: ../images/desire_lines_menu.png
-    :width: 448
+    :width: 350
     :align: center
     :alt: desire_lines_menu
 
+It is possible to use a zone or a node layer, and one can also generate the desire 
+lines and Delaunay lines for the demand matrix provided.
+
+.. image:: ../images/desire_lines_gui.png
+    :width: 800
+    :align: center
+    :alt: Desire Lines GUI
+
 After selecting a matrix, the user can choose to un-check the *use all matrices*
 box and select which matrices they want to use (the list of matrices will only
-show if the option is un-checked).
-
-Make sure to select a *zone/node layer* and *node id* that is compatible with
-your matrix.
+show if the option is un-checked). Just make sure to select a *zone/node layer* 
+and *node id* that is compatible with your matrix.
 
 The user also needs to choose if they want Delaunay lines
 
 .. image:: ../images/delaunay_results.png
-    :width: 797
+    :width: 750
     :align: center
     :alt: delaunay_results
 
 or desire lines
 
 .. image:: ../images/desire_lines_map.png
-    :width: 749
+    :width: 750
     :align: center
     :alt: desire_lines_map
 
@@ -55,9 +49,12 @@ The tool for plotting link flows you just saw above can be found under the GIS
 menu.
 
 .. image:: ../images/select_stacked_bandwidth.png
-    :width: 520
+    :width: 350
     :align: center
     :alt: select_stacked_bandwidth
+
+You can select a link layer, including Delaunay Lines or desire lines. It is also possible
+to choose between solid or gradient colors.
 
 .. image:: ../images/add_band.png
     :width: 760
@@ -69,8 +66,7 @@ menu.
     :align: center
     :alt: create_bands
 
-If you have selected the *Expert mode* in the previous screen, you can also
-control the overall look of these bands (thickness and separation between AB and
+You can also control the overall look of these bands (thickness and separation between AB and
 BA flows) in the project properties.
 
 .. image:: ../images/project_properties.png
@@ -105,7 +101,7 @@ understand.
 The scenario comparison tool is under the GIS menu
 
 .. image:: ../images/scenario_comparison_menu.png
-    :width: 438
+    :width: 350
     :align: center
     :alt: scenario_comparison_menu
 
@@ -142,8 +138,6 @@ using them in AequilibraE.
 
 If we click **AequilibraE > GIS > Lowest common denominator** a new window opens and
 we can set the layers we want to overlay the geometries to fix them.
-
-
 
 
 Simple TAG
