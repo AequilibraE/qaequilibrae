@@ -18,3 +18,4 @@ from .load_project_action import run_load_project
 from .project_from_osm_action import project_from_osm
 from .action_pt_import_gtfs import run_import_gtfs
 from .action_display_about import run_about
+from .action_create_example import create_example

@@ -1,5 +1,4 @@
 import glob
-import importlib.util as iutil
 import logging
 import os
 import subprocess
@@ -8,7 +7,6 @@ import tempfile
 import webbrowser
 from functools import partial
 from typing import Dict
-from warnings import warn
 
 import qgis
 
@@ -17,7 +15,7 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
-from qgis.core import QgsProject, QgsSettings
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QTranslator
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
@@ -30,7 +28,13 @@ from qaequilibrae.modules.menu_actions import (
     prepare_network,
     run_about,
 )
-from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet, show_log
+from qaequilibrae.modules.menu_actions import (
+    run_load_project,
+    project_from_osm,
+    run_create_transponet,
+    show_log,
+    create_example,
+)
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from qaequilibrae.message import messages
 
@@ -173,6 +177,7 @@ class AequilibraEMenu:
         self.add_menu_action(
             self.tr("Utils"), self.tr("Display Matrices and datasets"), partial(display_aequilibrae_formats, self)
         )
+        self.add_menu_action(self.tr("Utils"), self.tr("Create example"), partial(create_example, self))
 
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
@@ -319,11 +324,6 @@ class AequilibraEMenu:
         uri.setDataSource("", layer_name, "geometry")
         layer = QgsVectorLayer(uri.uri(), layer_name, "spatialite")
         return layer
-
-    def run_load_database(self):
-        dlg2 = LoadDatasetDialog(self.iface, single_use=False)
-        dlg2.show()
-        dlg2.exec_()
 
     def show_message_no_project(self):
         self.iface.messageBar().pushMessage("Error", self.tr("You need to load a project first"), level=3, duration=10)

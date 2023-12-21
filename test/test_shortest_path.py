@@ -1,8 +1,6 @@
-import os
-import pytest
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
-from qgis.core import QgsProject, Qgis, QgsVectorLayer
+from qgis.core import QgsProject, QgsVectorLayer
 from qaequilibrae.modules.paths_procedures.show_shortest_path_dialog import ShortestPathDialog
 
 

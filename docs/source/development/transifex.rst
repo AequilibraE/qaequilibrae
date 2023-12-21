@@ -1,6 +1,6 @@
-.. _plugin-translation:
+.. _plugin_translation:
 
-Plug-in translation
+Plugin translation
 ===================
 
 In this section, we briefly explain how you can get your Transifex account and how to start 

@@ -1,8 +1,7 @@
-from qgis.PyQt.QtCore import Qt, QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication
 
 
 class messages:
-
     @property
     def first_box_name(self):
         return self.tr("AequilibraE and other dependencies are not installed")

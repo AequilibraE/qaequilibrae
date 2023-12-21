@@ -114,7 +114,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.cob_imped_mat.addItems(self.matrices["name"].tolist())
         self.cob_seed_mat.addItems(self.matrices["name"].tolist())
 
-
     def data_double_clicked(self, mi):
         row = mi.row()
         if row > -1:
@@ -224,7 +223,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.model.load(file_name)
             self.update_model_parameters()
         except Exception as e:
-            qgis.utils.iface.messageBar().pushMessage("Error", self.tr("Could not load model. {}").format(e.args), level=3)
+            qgis.utils.iface.messageBar().pushMessage(
+                "Error", self.tr("Could not load model. {}").format(e.args), level=3
+            )
 
     def change_vector_field(self, cob_orig, cob_dest, dt):
         cob_dest.clear()

@@ -46,7 +46,9 @@ class LoadMatrix(WorkerThread):
                 matrix.append([a, b, c])
                 if P % 1000 == 0:
                     self.ProgressValue.emit(int(P))
-                    self.ProgressText.emit((self.tr("Loading matrix: ") + "{:,}".format(P) + "/" + "{:,}".format(feat_count)))
+                    self.ProgressText.emit(
+                        (self.tr("Loading matrix: ") + "{:,}".format(P) + "/" + "{:,}".format(feat_count))
+                    )
 
             self.ProgressValue.emit(0)
             self.ProgressText.emit(self.tr("Converting to a NumPy array"))

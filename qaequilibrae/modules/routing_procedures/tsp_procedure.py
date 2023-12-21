@@ -1,5 +1,5 @@
 from PyQt5.QtCore import pyqtSignal
-from aequilibrae.paths import NetworkSkimming, SkimResults
+from aequilibrae.paths import NetworkSkimming
 from aequilibrae.utils.worker_thread import WorkerThread
 
 

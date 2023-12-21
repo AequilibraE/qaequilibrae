@@ -9,7 +9,7 @@ Desire Lines
 AequilibraE is now capable of doing two types of desire lines.
 
 If you are new to AequilibraE and are trying use this tool for the first time, we recommend you first take a look at
-the section on :ref:`importing matrices into AequilibraE format <importing-omx-matrices>`. In our experience, that is where most
+the section on :ref:`importing matrices into AequilibraE format <importing_matrices>`. In our experience, that is where most
 people find themselves stranded.
 
 .. image:: ../images/gis_desire_lines.png

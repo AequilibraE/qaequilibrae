@@ -1,9 +1,7 @@
 import importlib.util as iutil
 import os
 from os.path import join
-
 import pandas as pd
-from qgis._core import QgsProject, QgsVectorLayer, QgsDataSourceUri
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
@@ -62,7 +60,6 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2.exec_()
 
     def load_matrices(self):
-
         self.matrices = list_matrices(self.project.matrices.fldr)
 
         self.matrices_model = PandasModel(self.matrices)

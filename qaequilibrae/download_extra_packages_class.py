@@ -1,13 +1,11 @@
-import importlib.util as iutil
 import os
 import shutil
 import subprocess
 import sys
-from os.path import join, isfile, isdir
+from os.path import join, isdir
 from pathlib import Path
 
 import numpy as np
-from qgis.PyQt import uic, QtWidgets
 from qgis.core import QgsMessageLog, Qgis
 
 
