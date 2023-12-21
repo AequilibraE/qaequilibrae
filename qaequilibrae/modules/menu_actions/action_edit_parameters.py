@@ -1,5 +1,6 @@
 def run_change_parameters(qgis_project):
     from qaequilibrae.modules.common_tools import ParameterDialog
+
     if qgis_project.project is None:
         qgis_project.show_message_no_project()
         return

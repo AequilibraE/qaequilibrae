@@ -1,4 +1,3 @@
-import importlib.util as iutil
 import logging
 import numpy as np
 import os
@@ -7,11 +6,11 @@ import re
 import sys
 from PyQt5.QtCore import Qt
 from aequilibrae.parameters import Parameters
-from aequilibrae.paths import Graph, AssignmentResults, allOrNothing
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
-from aequilibrae.project import Project
+from aequilibrae.project.database_connection import database_connection
+from aequilibrae.utils.db_utils import read_and_close
 from tempfile import gettempdir
 
 import qgis
@@ -167,14 +166,14 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         table.setItem(0, 0, QTableWidgetItem("Project path"))
         table.setItem(0, 1, QTableWidgetItem(self.project.path_to_file))
 
-        curr = self.project.network.conn.cursor()
-        curr.execute("""select mode_name, mode_id from modes""")
+        with read_and_close(database_connection("network")) as conn:
+            res = conn.execute("""select mode_name, mode_id from modes""")
 
-        modes = []
-        for x in curr.fetchall():
-            modes.append(f"{x[0]} ({x[1]})")
-            self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
-            self.skims[x[1]] = []
+            modes = []
+            for x in res.fetchall():
+                modes.append(f"{x[0]} ({x[1]})")
+                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
+                self.skims[x[1]] = []
 
         table.setItem(1, 0, QTableWidgetItem("Modes"))
         table.setItem(1, 1, QTableWidgetItem(", ".join(modes)))
@@ -303,7 +302,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def __add_skimming(self):
         field = self.cob_skims_available.currentText()
         traffic_class = self.traffic_classes[self.cob_skim_class.currentText()]
-        name = traffic_class.__id__
+        name = traffic_class._id
         if field in self.skims[name]:
             if self.testing:
                 raise AttributeError("No skims set")

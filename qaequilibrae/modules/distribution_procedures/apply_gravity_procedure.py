@@ -12,10 +12,7 @@ class ApplyGravityProcedure(WorkerThread):
         self.report = []
 
     def doWork(self):
-        try:
-            self.gravity.apply()
-            self.output = self.gravity.output
-            self.report = self.gravity.report
-        except ValueError as e:
-            self.error = e
+        self.gravity.apply()
+        self.output = self.gravity.output
+        self.report = self.gravity.report
         self.jobFinished.emit("apply_gravity")

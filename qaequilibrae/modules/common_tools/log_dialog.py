@@ -1,8 +1,6 @@
 import os
-import tempfile
 from os.path import join
 
-from aequilibrae.parameters import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML
 from qgis.PyQt.QtGui import QFont
@@ -53,7 +51,9 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def save_to_disk(self):
         options = QtWidgets.QFileDialog.Options()
-        file_path, _ = QtWidgets.QFileDialog.getSaveFileName(self, self.tr("Save logfile"), "", "logfile (*.log)", options=options)
+        file_path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, self.tr("Save logfile"), "", "logfile (*.log)", options=options
+        )
         if file_path:
             with open(file_path, "w") as log:
                 log.writelines(self.text_box.text())

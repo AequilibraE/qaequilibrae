@@ -109,7 +109,9 @@ class DesireLinesProcedure(WorkerThread):
             i = self.matrix.matrix_hash[z]
             t = np.nansum(total_mat[i, :]) + np.nansum(total_mat[:, i])
             unnasigned += t
-            self.report.append(self.tr("Zone {} does not have a corresponding centroid/zone. Total flow {}").format(z, t))
+            self.report.append(
+                self.tr("Zone {} does not have a corresponding centroid/zone. Total flow {}").format(z, t)
+            )
             total_mat[i, :] = 0
             total_mat[:, i] = 0
             self.desire_lines.emit(("jobs_done_dl", k + 1))

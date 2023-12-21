@@ -88,7 +88,6 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
             self.np_node_start.setEnabled(True)
 
     def job_finished_from_thread(self, success):
-
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Node layer error: "), self.worker_thread.error, level=3)
         else:

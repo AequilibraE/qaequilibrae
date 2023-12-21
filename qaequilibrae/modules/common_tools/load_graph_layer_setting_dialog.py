@@ -1,7 +1,7 @@
-import logging
 import os
-from aequilibrae.paths import Graph
 from aequilibrae.project import Project
+from aequilibrae.project.database_connection import database_connection
+from aequilibrae.utils.db_utils import read_and_close
 
 from qgis.PyQt import QtWidgets, uic, QtCore
 
@@ -22,12 +22,12 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = []
         self.all_modes = {}
 
-        curr = self.project.network.conn.cursor()
-        curr.execute("""select mode_name, mode_id from modes""")
+        with read_and_close(database_connection("network")) as conn:
+            res = conn.execute("""select mode_name, mode_id from modes""")
 
-        for x in curr.fetchall():
-            self.cb_modes.addItem(f"{x[0]} ({x[1]})")
-            self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
+            for x in res.fetchall():
+                self.cb_modes.addItem(f"{x[0]} ({x[1]})")
+                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         for field in self.project.network.skimmable_fields():
             self.cb_minimizing.addItem(field)
