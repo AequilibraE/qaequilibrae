@@ -75,14 +75,14 @@ when we edit networks with automated procedures, and we highly recommend that
 you **BACKUP YOUR DATA** prior to running this procedure and that you inspect
 the results of this tool **CAREFULLY**.
 
-The **GUI** for this procedure is fairly straightforward, as shown below.
+The *GUI* for this procedure is fairly straightforward, as shown below.
 
 .. image:: ../images/add_connectors_to_project.png
     :width: 827
     :align: center
     :alt: Adding connectors
 
-One would notice that nowhere in the **GUI** one can indicate which modes they
+One would notice that nowhere in the *GUI* one can indicate which modes they
 want to see the network connected for or how to control how many connectors per
 mode will be created. Although it could be implemented, such a solution would
 be convoluted and there is probably no good reason to do so.
@@ -94,7 +94,7 @@ Instead, we have chosen to develop the procedure with the following criteria:
   each and every mode will have that number of connectors. If a particular mode
   is only available rather far from the centroid, it is likely that a single
   connector to that mode will be created for that centroid
-* When considering the maximum length of connectors, the **GUI** returns to the
+* When considering the maximum length of connectors, the *GUI* returns to the
   user the list of centroids/modes that could not be connected.
 
 Notice that in order to add centroids and their connectors to the network,

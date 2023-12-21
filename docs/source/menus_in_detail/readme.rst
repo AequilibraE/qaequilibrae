@@ -13,7 +13,8 @@ main functionalities.
     :alt: aeq menu
 
 Most screenshots in this section are related to Sioux Falls, a standard example
-in transportation network algorithm studies.
+in transportation network algorithm studies. Now, you can :ref:`easily create <create_example>`
+your own Sioux Falls project. 
 
 Here we present an image-based example on a realistic modelling workflow
 for the beginner modeler out there. All the data used here can be downloaded
@@ -36,5 +37,6 @@ Got a bigger instance we could use as an example? Send it over!
    tripdistribution
    pathscomputation
    routing
+   public_transport
    gistools
    utils

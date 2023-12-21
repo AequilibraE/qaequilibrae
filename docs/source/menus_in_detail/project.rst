@@ -3,13 +3,12 @@
 AequilibraE Project
 ===================
 
-The AequilibraE project is one of the newest portions of the
-`AequilibraE API <http://www.aequilibrae.com/python/latest/>`_, and therefore not very mature.
+This page is dedicated to a practical implementation of the AequilibraE project. In case you
+are interested in better understanding its structure, plase visit its 
+`documentation <https://www.aequilibrae.com/python/latest/modeling_with_aequilibrae/project.html>`_
+webpage.
 
-For a better overview of the AequilibraE project, please check the
-documentation listed above, as this page is dedicated to a practical implementation
-
-Under the project tab, there are seven options to choose from and the following sections
+Under the project tab, there are some options to choose from and the following sections
 explore some of these actions.
 
 .. _siouxfalls-open-project:

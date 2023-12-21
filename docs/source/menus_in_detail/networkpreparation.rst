@@ -41,9 +41,8 @@ to create the project.
     :align: center
     :alt: Creating Link IDs
 
-**LET'S STRESS THIS !!!!!!**
-
 .. warning::
+  **LET'S STRESS THIS !!!!!!**
 
   **AequilibraE can deal with an arbitrary set of IDs for links and nodes**, but
   we vectorize a lot of operations for faster performance, which means that you
@@ -150,7 +149,7 @@ modes field equal to **ctbw** (the order of modes is irrelevant), while a link
 that allows bikes and pedestrians would have a modes string equal to **bw**.
 
 The list of modes that will exist in the model, however, comes from the
-parameter list built into AequilibraE under the section *Network*-->*modes*.
+parameter list built into AequilibraE under the section *Network* --> *modes*.
 
 To find out how to access the parameters file see documentation on the
 :ref:`global parameters file <parameters_file>`.

@@ -27,6 +27,8 @@ window, you can also save the current matrix in \*.csv format.
     :align: center
     :alt: utils display matrices
 
+.. _create_example:
+
 Create example
 --------------
 
