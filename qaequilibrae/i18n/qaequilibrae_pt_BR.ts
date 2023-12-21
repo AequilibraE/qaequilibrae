@@ -1610,7 +1610,7 @@
     <message>
         <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="56"/>
         <source>Target</source>
-        <translation type="unfinished"/>
+        <translation>Objetivo</translation>
     </message>
 </context>
 <context>
