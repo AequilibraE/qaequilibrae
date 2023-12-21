@@ -294,7 +294,7 @@
     <message>
         <location filename="../modules/project_procedures/create_examples_dialog.py" line="34"/>
         <source>Choose output folder</source>
-        <translation>Escolher pasta de destino</translation>
+        <translation>Escolha a pasta de saída</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/create_examples_dialog.py" line="40"/>
