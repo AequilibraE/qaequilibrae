@@ -127,7 +127,6 @@ class CreatesTranspoNetProcedure(WorkerThread):
         self.project.conn.commit()
 
     def transfer_layer_features(self, table, layer, layer_fields):
-
         self.emit_messages(message=self.tr("Transferring {}").format(table), value=0, max_val=layer.featureCount())
 
         field_titles = ",".join(layer_fields.keys())

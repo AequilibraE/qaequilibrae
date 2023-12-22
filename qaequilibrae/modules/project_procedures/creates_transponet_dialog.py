@@ -269,7 +269,6 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.project_destination.setText(self.proj_folder)
 
     def create_net(self):
-
         ok, msg = self.check_data()
 
         if not ok:

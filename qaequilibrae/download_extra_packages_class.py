@@ -1,13 +1,11 @@
-import importlib.util as iutil
 import os
 import shutil
 import subprocess
 import sys
-from os.path import join, isfile, isdir
+from os.path import join, isdir
 from pathlib import Path
 
 import numpy as np
-from qgis.PyQt import uic, QtWidgets
 from qgis.core import QgsMessageLog, Qgis
 
 
@@ -21,10 +19,22 @@ class download_all:
     def install(self):
         self.adapt_aeq_version()
 
-        lines = []
         command = f'"{self.find_python()}" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
-        print(sys.executable)
         print(command)
+        lines = self.execute(command)
+        
+        if "because the ssl module is not available" in "".join(lines).lower() and sys.platform == "win32":
+            command = f'python -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
+            print(command)
+            lines = self.execute(command)
+
+        for line in lines:
+            QgsMessageLog.logMessage(str(line), level=Qgis.Critical)
+        self.clean_packages()
+        return lines
+
+    def execute(self, command):
+        lines = []
         lines.append(command)
         with subprocess.Popen(
             command,
@@ -35,12 +45,8 @@ class download_all:
             universal_newlines=True,
         ) as proc:
             lines.extend(proc.stdout.readlines())
-
-        for line in lines:
-            QgsMessageLog.logMessage(str(line), level=Qgis.Critical)
-        self.clean_packages()
         return lines
-
+        
     def find_python(self):
         sys_exe = Path(sys.executable)
         if sys.platform == "linux" or sys.platform == "linux2":
@@ -58,10 +64,11 @@ class download_all:
         elif sys.platform == "darwin":
             python_exe = sys_exe.parent / "bin" / "python3"
         elif sys.platform == "win32":
-            python_exe = Path(sys.base_prefix) / "python.exe"
+            python_exe = Path(sys.base_prefix) / "python3.exe"
 
         if not python_exe.exists():
             raise FileExistsError("Can't find a python executable to use")
+        print(python_exe)
         return python_exe
 
     def adapt_aeq_version(self):

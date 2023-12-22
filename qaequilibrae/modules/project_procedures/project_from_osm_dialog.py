@@ -53,7 +53,7 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.source_type_frame.addWidget(self.choose_canvas)
         self.source_type_frame.addWidget(self.place)
 
-        self.source_type_widget = QGroupBox("Target")
+        self.source_type_widget = QGroupBox(self.tr("Target"))
         self.source_type_widget.setLayout(self.source_type_frame)
 
         # Buttons and output
@@ -95,7 +95,6 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
     def choose_output(self):
         new_name = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", standard_path())
         if new_name is not None and len(new_name) > 0:
-
             new_folder = "new_project"
             counter = 1
             while isdir(join(new_name, new_folder)):
@@ -141,8 +140,8 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         elif val[0] == "text":
             self.progress_label.setText(val[1])
         elif val[0] == "finished_threaded_procedure":
-            lines = self.qgis_project.project.network.count_links()
-            nodes = self.qgis_project.project.network.count_nodes()
-            self.report.append(reporter(f"{lines:,} links generated"))
-            self.report.append(reporter(f"{nodes:,} nodes generated"))
+            # lines = self.qgis_project.project.network.count_links()
+            # nodes = self.qgis_project.project.network.count_nodes()
+            # self.report.append(reporter(f"{lines:,} links generated"))
+            # self.report.append(reporter(f"{nodes:,} nodes generated"))
             self.leave()

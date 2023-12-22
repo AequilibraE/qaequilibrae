@@ -1,5 +1,6 @@
 def run_tsp(qgis_project):
     from qaequilibrae.modules.routing_procedures import TSPDialog
+
     if qgis_project.project is None:
         qgis_project.show_message_no_project()
         return

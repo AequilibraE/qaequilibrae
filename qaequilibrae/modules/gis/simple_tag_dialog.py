@@ -2,7 +2,13 @@ import os
 
 import qgis
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
-from qaequilibrae.modules.common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
+from qaequilibrae.modules.common_tools.global_parameters import (
+    multi_line,
+    multi_poly,
+    line_types,
+    point_types,
+    poly_types,
+)
 from qaequilibrae.modules.common_tools.global_parameters import multi_point
 from qgis.PyQt import QtWidgets, uic
 from .simple_tag_procedure import SimpleTAG
@@ -37,8 +43,10 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.tolayer.addItem(layer.name())
 
         self.enclosed.setToolTip(
-            self.tr("""If source layer is a polygon, source needs to enclose target.  If only target is \n
-                    a polygon, target needs to enclose source. First found record is used""")
+            self.tr(
+                """If source layer is a polygon, source needs to enclose target.  If only target is \n
+                    a polygon, target needs to enclose source. First found record is used"""
+            )
         )
 
         self.touching.setToolTip(
@@ -130,7 +138,6 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             self.geography_types[1] = "point"
 
     def works_field_matching(self):
-
         self.matchingfrom.clear()
         self.matchingto.clear()
 
@@ -241,7 +248,9 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input data not provided correctly"), self.tr("  Try again"), level=3)
+            qgis.utils.iface.messageBar().pushMessage(
+                self.tr("Input data not provided correctly"), self.tr("  Try again"), level=3
+            )
 
 
 def unload(self):

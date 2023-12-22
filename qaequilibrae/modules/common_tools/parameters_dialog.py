@@ -1,7 +1,5 @@
 import logging
 import os
-from os.path import join, isfile
-
 import yaml
 
 from aequilibrae.parameters import Parameters

@@ -57,14 +57,7 @@ The steps for installing AequilibraE are the same as for any QGIS plugin
 
 After installing the plugin, you will be faced with the question of whether you
 want to download its dependencies, which are required for using most of the
-features.
-
-.. image:: ../images/no_binaries_error.png
-    :width: 1099
-    :align: center
-    :alt: no_binaries_error
-
-The problem is that many of AequilibraE's algorithms rely on compiled
+features. The problem is that many of AequilibraE's algorithms rely on compiled
 extensions, but it is against the QGIS's community guidelines to upload binaries
 to the repository.
 
@@ -81,7 +74,8 @@ showing the image below.
     :align: center
     :alt: Seventh step
 
-.. _quicktour-video:
+.. _quicktour_video:
+
 Quick Tour
 ----------
 

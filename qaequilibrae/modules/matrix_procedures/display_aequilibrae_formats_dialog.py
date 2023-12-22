@@ -92,8 +92,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.data_type == "AEM":
             self.data_to_show.computational_view([self.data_to_show.names[0]])
         elif self.data_type == "OMX":
-            self.data_to_show.matrix_view = np.array(self.omx[self.list_cores[0]])
-            self.data_to_show.index = np.array(list(self.omx.mapping(self.list_indices[0]).keys()))
+            self.add_matrix_parameters(self.list_indices[0], self.list_cores[0])
 
         # Elements that will be used during the displaying
         self._layout = QVBoxLayout()
@@ -147,16 +146,16 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self._layout.addItem(self.mat_layout)
             self.change_matrix_cores()
 
-        # self.but_export = QPushButton()
-        # self.but_export.setText(self.tr("Export"))
-        # self.but_export.clicked.connect(self.export)
+        self.but_export = QPushButton()
+        self.but_export.setText(self.tr("Export"))
+        self.but_export.clicked.connect(self.export)
 
         self.but_close = QPushButton()
         self.but_close.clicked.connect(self.exit_procedure)
         self.but_close.setText(self.tr("Close"))
 
         self.but_layout = QHBoxLayout()
-        # self.but_layout.addWidget(self.but_export)
+        self.but_layout.addWidget(self.but_export)
         self.but_layout.addWidget(self.but_close)
 
         self._layout.addItem(self.but_layout)
@@ -185,8 +184,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.data_to_show.set_index(idx)
             self.format_showing()
         elif self.data_type == "OMX":
-            self.data_to_show.matrix_view = np.array(self.omx[core])
-            self.data_to_show.index = np.array(list(self.omx.mapping(idx).keys()))
+            self.add_matrix_parameters(idx, core)
             self.format_showing()
 
     def export(self):
@@ -205,3 +203,14 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.qgis_project.matrices.pop(self.data_path)
         self.show()
         self.close()
+
+    def add_matrix_parameters(self, idx, field):
+        matrix_name = self.data_to_show.random_name()
+        matrix_index = np.array(list(self.omx.mapping(idx).keys()))
+
+        args = {"zones": matrix_index.shape[0], "matrix_names": [field], "file_name": matrix_name, "memory_only": True}
+
+        self.data_to_show.create_empty(**args)
+        self.data_to_show.matrix_view = np.array(self.omx[field])
+        self.data_to_show.index = np.array(list(self.omx.mapping(idx).keys()))
+        self.data_to_show.matrix[field] = self.data_to_show.matrix_view[:, :]

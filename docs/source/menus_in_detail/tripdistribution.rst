@@ -79,7 +79,7 @@ Inspect the procedure output
     :align: center
     :alt: calibrate_matrix_inspect_report
 
-The resulting file is of type *.mod, but that is just a YAML (text file).
+The resulting file is of type \*.mod, but that is just a YAML (text file).
 
 .. image:: ../images/calibrate_matrix_model_result.png
     :width: 704

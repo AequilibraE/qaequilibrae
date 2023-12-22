@@ -10,4 +10,4 @@ sphinx-gallery
 sphinx-panels
 sphinx_theme
 sphinx-copybutton
-pydata-sphinx-theme
+pydata-sphinx-theme==0.13.3
