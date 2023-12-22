@@ -40,17 +40,20 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         self.populate_node_source()
 
         self.close_window = False
+        self.test_dowork = False
 
     def populate_node_source(self):
         self.cob_start.clear()
         if self.rdo_selected.isChecked():
             centroids = self.selected_nodes()
+            print("centroids: ", centroids)
         else:
             curr = self.project.network.conn.cursor()
             curr.execute("select node_id from nodes where is_centroid=1;")
             centroids = [i[0] for i in curr.fetchall()]
         for i in centroids:
             self.cob_start.addItem(str(i))
+        print("start", self.cob_start)
 
     def populate(self):
         curr = self.project.network.conn.cursor()
@@ -100,7 +103,10 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run_thread(self):
         self.worker_thread.finished.connect(self.finished)
-        self.worker_thread.start()
+        if not self.test_dowork:
+            self.worker_thread.start()
+        else:
+            self.worker_thread.doWork()
         self.exec_()
 
     def finished(self):
