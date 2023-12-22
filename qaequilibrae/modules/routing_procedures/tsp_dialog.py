@@ -42,20 +42,17 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         self.populate_node_source()
 
         self.close_window = False
-        self.test_dowork = False
 
     def populate_node_source(self):
         self.cob_start.clear()
         if self.rdo_selected.isChecked():
             centroids = self.selected_nodes()
-            print("centroids: ", centroids)
         else:
             with read_and_close(database_connection("network")) as conn:
                 res = conn.execute("select node_id from nodes where is_centroid=1;")
                 centroids = [i[0] for i in res.fetchall()]
         for i in centroids:
             self.cob_start.addItem(str(i))
-        print("start", self.cob_start)
 
     def populate(self):
         with read_and_close(database_connection("network")) as conn:
@@ -80,6 +77,9 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if self.rdo_selected.isChecked():
             centroids = self.selected_nodes()
+            if self.close_window:
+                for i in centroids:
+                    self.cob_start.addItem(str(i))
             if len(centroids) < 3:
                 qgis.utils.iface.messageBar().pushMessage(
                     "", self.tr("You need at least three nodes to route. "), level=3, duration=10
@@ -91,6 +91,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.project.network.count_centroids() < 3:
                 qgis.utils.iface.messageBar().pushMessage(
                     "", self.tr("You need at least three centroids to route. "), level=3, duration=10
+                )
                 return
 
         self.graph.set_graph(self.cob_minimize.currentText())  # let's say we want to minimize time
@@ -104,10 +105,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run_thread(self):
         self.worker_thread.finished.connect(self.finished)
-        if not self.test_dowork:
-            self.worker_thread.start()
-        else:
-            self.worker_thread.doWork()
+        self.worker_thread.start()
         self.exec_()
 
     def finished(self):

@@ -5,7 +5,6 @@ from PyQt5.QtCore import Qt
 from qgis.core import QgsProject
 
 
-@pytest.mark.skip("Working - ignore now")
 @pytest.mark.parametrize("in_selection", [False, True])
 def test_create_from_centroids(ae_with_project, in_selection):
     dialog = TSPDialog(ae_with_project)
@@ -40,9 +39,7 @@ def test_create_from_nodes(pt_project, in_selection):
 
     dialog.rdo_selected.setChecked(True)
     dialog.rdo_new_layer.setChecked(in_selection)
-    # dialog.node_layer.selectedFeatures = node_selection
     dialog.close_window = True
-    dialog.test_dowork = True
     dialog.cob_minimize.setCurrentText("distance")
     dialog.cob_start.setCurrentText("74034")
 
@@ -55,12 +52,11 @@ def test_create_from_nodes(pt_project, in_selection):
         assert "TSP Solution" in names
         assert "TSP Stops" in names
     else:       
-        assert len(dialog.worker_thread.node_sequence) == 6
+        assert len(dialog.worker_thread.node_sequence) == 4
 
     nodes.removeSelection()
     pt_project.run_close_project()
 
-@pytest.mark.skip("Working - ignore now")
 def test_nodes_error(pt_no_feed):
     nodes = pt_no_feed.layers["nodes"][0]
     node_selection = [74034, 74035]
@@ -81,7 +77,6 @@ def test_nodes_error(pt_no_feed):
     nodes.removeSelection()
     pt_no_feed.run_close_project()
 
-@pytest.mark.skip("Working - ignore now")
 def test_centroid_error(pt_no_feed):
     dialog = TSPDialog(pt_no_feed)
 
