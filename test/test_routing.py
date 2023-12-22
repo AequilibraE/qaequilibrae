@@ -23,7 +23,9 @@ def test_create_from_centroids(ae_with_project):
 
     QgsProject.instance().clear()
 
+    ae_with_project.run_close_project()
 
+@pytest.mark.skip("Not implemented")
 def test_create_from_nodes():
     pass
 
@@ -39,6 +41,7 @@ def test_centroid_error(pt_project):
     messagebar = pt_project.iface.messageBar()
     assert messagebar.messages[3][0] == ":You need at least three centroids to route. ", "Level 3 error message is missing"
 
+    pt_project.run_close_project()
 
 def test_nodes_error(ae_with_project):
     dialog = TSPDialog(ae_with_project)
@@ -58,3 +61,5 @@ def test_nodes_error(ae_with_project):
     messagebar = ae_with_project.iface.messageBar()
     assert messagebar.messages[3][0] == ":You need at least three nodes to route. ", "Level 3 error message is missing"
 
+
+    ae_with_project.run_close_project()
