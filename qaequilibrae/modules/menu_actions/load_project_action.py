@@ -1,3 +1,4 @@
+from os.path import exists, join
 import qgis
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
@@ -42,6 +43,17 @@ def _run_load_project_from_path(qgis_project, proj_path):
     curr = qgis_project.project.conn.cursor()
     curr.execute("select f_table_name from geometry_columns;")
     layers = [x[0] for x in curr.fetchall()]
+
+    # Add transit_tables to layers
+    pt_database = join(proj_path, "public_transport.sqlite")
+    if exists(pt_database):
+        new_conn = qgis.utils.spatialite_connect(pt_database)
+
+    other_layers = [
+        "transit_" + x[0] for x in new_conn.execute("select f_table_name from geometry_columns;").fetchall()
+    ]
+
+    layers += other_layers
 
     descrlayout = QVBoxLayout()
     qgis_project.geo_layers_table = QTableWidget()
