@@ -13,9 +13,8 @@ from qgis.core import QgsTextBufferSettings, QgsVectorLayerSimpleLabeling, QgsPi
 
 from qaequilibrae.modules.common_tools import layer_from_dataframe, PandasModel
 from qaequilibrae.modules.gis import color_ramp_shades
-from qaequilibrae.modules.public_transport_procedures.transit_demand_metrics import DemandMetrics
+# from qaequilibrae.modules.public_transport_procedures.transit_demand_metrics import DemandMetrics
 from qaequilibrae.modules.public_transport_procedures.transit_supply_metrics import SupplyMetrics
-from .update_pt_layers import update_layers
 from aequilibrae.utils.db_utils import read_and_close
 from aequilibrae.transit.constants import WALK_AGENCY_ID as WID
 
@@ -45,10 +44,10 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.has_raw = "transit_raw_shapes" in self.qgis_project.layers
         self.chb_raw_shapes.setEnabled(self.has_raw)
 
-        self.sm = SupplyMetrics()
-        self.dm = DemandMetrics()
-        self.sm_alt: SupplyMetrics = None
-        self.dm_alt: DemandMetrics = None
+        # self.sm = SupplyMetrics()
+        # self.dm = DemandMetrics()
+        # self.sm_alt: SupplyMetrics = None
+        # self.dm_alt: DemandMetrics = None
         self._testing = False
         self.gtfs_types = {
             0: "Light rail",
@@ -66,19 +65,19 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         # update_layers(self.project.project_base_path, self.qgis_project)
 
         fldr = join(dirname(dirname(__file__)), "style_loader")
-        self.stops_layer = self.qgis_project.layers["stops"][0]
+        self.stops_layer = self.qgis_project.layers["transit_stops"][0]
         self.stops_layer.loadNamedStyle(join(fldr, "stops.qml"), True)
 
         self.zones_layer = self.qgis_project.layers["zones"][0]
         self.zones_layer.loadNamedStyle(join(fldr, "zones.qml"), True)
 
-        self.trips_layer = self.qgis_project.layers["trips"][0]
-        self.trips_layer.loadNamedStyle(join(fldr, "trips.qml"), True)
+        # self.trips_layer = self.qgis_project.layers["trips"][0]
+        # self.trips_layer.loadNamedStyle(join(fldr, "trips.qml"), True)
 
-        self.routes_layer = self.qgis_project.layers["routes"][0]
+        self.routes_layer = self.qgis_project.layers["transit_routes"][0]
         self.routes_layer.loadNamedStyle(join(fldr, "routes.qml"), True)
 
-        for layer in [self.zones_layer, self.routes_layer, self.trips_layer, self.stops_layer]:
+        for layer in [self.zones_layer, self.routes_layer, self.stops_layer]:
             QgsProject.instance().addMapLayer(layer)
 
         self.chb_raw_shapes.setEnabled(self.has_raw)
@@ -88,7 +87,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
             QgsProject.instance().addMapLayer(self.raw_shapes_layer)
             self.raw_shapes_layer.setSubsetString('"pattern_id"=-999999')
 
-        agency_sql = f"Select agency_id, agency from Transit_Agencies where agency_id != {WID}"
+        agency_sql = f"Select agency_id, agency from agencies where agency_id != {WID}"
         sql = """SELECT pattern_id, coalesce(ST_X(ST_StartPoint(geo))-ST_X(ST_EndPoint(geo)),0) dx,
                         coalesce(ST_Y(ST_StartPoint(geo))-ST_Y(ST_EndPoint(geo)),0) dy
                   FROM pattern_mapping"""
@@ -571,7 +570,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         else:
             self.mapped_zones = False
             fldr = join(dirname(dirname(__file__)), "style_loader", "styles")
-            self.zones_layer.loadNamedStyle(join(fldr, "zone_background.qml"), True)
+            self.zones_layer.loadNamedStyle(join(fldr, "zones.qml"), True)
             self.zones_layer.triggerRepaint()
 
         self.allows_colors_zones()
