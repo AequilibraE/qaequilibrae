@@ -23,29 +23,25 @@ class SupplyMetrics:
         rt_sql = """Select route_id, pattern_id, route, agency_id, route_type, 
                     seated_capacity s_capacity, total_capacity t_capacity from routes"""
 
-        patt_sql = """Select pattern_id, route_id, seated_capacity s_capacity,
-                      total_capacity t_capacity from Transit_Patterns"""
+        # Aqui
+        patt_sql = """Select route_id, pattern_id, route, agency_id, route_type, 
+                    seated_capacity s_capacity, total_capacity t_capacity from routes"""
 
         stop_sql = f"""Select stop_id, stop, name stop_name, agency_id, route_type from stops
                        where agency_id != {WID}"""
 
-        stop_pat_sql = """Select pattern_id, from_node stop_id from Transit_Links
+        stop_pat_sql = """Select pattern_id, from_node stop_id from route_links
                           UNION ALL
-                          Select pattern_id, to_node stop_id from Transit_Links """
+                          Select pattern_id, to_node stop_id from route_links """
 
-        trip_sql = """select trip_id, pattern_id, seated_capacity s_capacity,
-                      total_capacity t_capacity from Transit_Trips"""
+        trip_sql = """select trip_id, pattern_id from trips"""
 
-        pattern_links_sql = """select pattern_id, from_node stop_id from Transit_Links
-                               UNION ALL
-                               select pattern_id, to_node stop_id from Transit_Links"""
+        trp_sch_sql = """Select trip_id, seq stop_order, arrival/60 arrival, departure/60 departure
+                         from trips_schedule"""
 
-        trp_sch_sql = """Select trip_id, "index" stop_order, arrival/60 arrival, departure/60 departure
-                         from Transit_Trips_Schedule"""
-
-        trp_pat_lnk_sql = """select tpl.*, tl.from_node, tl.to_node  from Transit_Links tl
-                                 inner join Transit_Pattern_Links tpl
-                                    on tl.transit_link=tpl.transit_link"""
+        trp_pat_lnk_sql = """select tpl.*, tl.from_node, tl.to_node  from route_links tl
+                             inner join Transit_Pattern_Links tpl
+                             on tl.transit_link=tpl.transit_link"""
 
         with read_and_close(supply_file) as conn:
             self.__raw_routes = pd.read_sql(rt_sql, conn).fillna(0)
@@ -56,7 +52,6 @@ class SupplyMetrics:
             self.__raw_stop_pattern = self.__raw_stop_pattern.merge(self.__raw_stops, on="stop_id", how="left")
             self.__raw_stop_pattern.fillna(0, inplace=True)
 
-            self.__pattern_stops = pd.read_sql(pattern_links_sql, conn).drop_duplicates()
             self.__raw_trips = pd.read_sql(trip_sql, conn).fillna(0)
             self.__trip_schedule = pd.read_sql(trp_sch_sql, conn)
 
