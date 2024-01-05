@@ -3,10 +3,6 @@ from math import ceil
 from os.path import dirname, join
 
 import pandas as pd
-import qgis
-from polarislib.analyze.transit_demand_metrics import DemandMetrics
-from polarislib.analyze.transit_supply_metrics import SupplyMetrics
-from polarislib.network.constants import WALK_AGENCY_ID as WID
 from qgis.PyQt import uic, QtGui
 from qgis.PyQt.QtCore import QSizeF
 from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView
@@ -15,24 +11,27 @@ from qgis.core import QgsProject, QgsStyle, QgsVectorLayerJoinInfo, QgsGraduated
 from qgis.core import QgsSymbol, QgsLinearlyInterpolatedDiagramRenderer, QgsPalLayerSettings, QgsTextFormat
 from qgis.core import QgsTextBufferSettings, QgsVectorLayerSimpleLabeling, QgsPieDiagram
 
-from polarislib.utils.database.db_utils import read_and_close
-from ..common_tools import GetOutputFileName
-from ..common_tools import layer_from_dataframe, PandasModel
-from ..common_tools.mapping import color_ramp_shades
-from pathlib import Path
+from qaequilibrae.modules.common_tools import layer_from_dataframe, PandasModel
+from qaequilibrae.modules.gis import color_ramp_shades
+from qaequilibrae.modules.public_transport_procedures.transit_demand_metrics import DemandMetrics
+from qaequilibrae.modules.public_transport_procedures.transit_supply_metrics import SupplyMetrics
+from .update_pt_layers import update_layers
+from aequilibrae.utils.db_utils import read_and_close
+from aequilibrae.transit.constants import WALK_AGENCY_ID as WID
+
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/transit_navigator.ui"))
 
 
 class TransitNavigatorDialog(QDialog, FORM_CLASS):
-    def __init__(self, _PQgis):
+    def __init__(self, qgis_project):
         QDialog.__init__(self)
         self.setupUi(self)
-        self.iface = _PQgis.iface
+        self.iface = qgis_project.iface
         self.feed = None
-        self._PQgis = _PQgis
-        self.polaris_project = _PQgis.polaris_project
-        self._p = self.polaris_project.network
+        self.qgis_project = qgis_project
+        self.project = qgis_project.project
+        self._p = self.project.network
         self.mapped_stops = False
         self.mapped_lines = False
         self.mapped_zones = False
@@ -43,11 +42,11 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.stop_target_metric = ""
         self.zone_target_metric = ""
         self.filtered = {}
-        self.has_raw = "transit_raw_shapes" in self._PQgis.layers
+        self.has_raw = "transit_raw_shapes" in self.qgis_project.layers
         self.chb_raw_shapes.setEnabled(self.has_raw)
 
-        self.sm = _PQgis.polaris_project.analyze.transit().supply_metrics()
-        self.dm = _PQgis.polaris_project.analyze.transit().demand_metrics()
+        self.sm = SupplyMetrics()
+        self.dm = DemandMetrics()
         self.sm_alt: SupplyMetrics = None
         self.dm_alt: DemandMetrics = None
         self._testing = False
@@ -64,25 +63,27 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
             12: "Monorail",
         }
 
-        fldr = join(dirname(dirname(__file__)), "style_loader", "styles")
-        self.stops_layer = self._PQgis.layers["transit_stops"][0]
-        self.stops_layer.loadNamedStyle(join(fldr, "transit_stops.qml"), True)
+        # update_layers(self.project.project_base_path, self.qgis_project)
 
-        self.zones_layer = self._PQgis.layers["zone"][0]
-        self.zones_layer.loadNamedStyle(join(fldr, "zone_background.qml"), True)
+        fldr = join(dirname(dirname(__file__)), "style_loader")
+        self.stops_layer = self.qgis_project.layers["stops"][0]
+        self.stops_layer.loadNamedStyle(join(fldr, "stops.qml"), True)
 
-        self.patterns_layer = self._PQgis.layers["transit_patterns"][0]
-        self.patterns_layer.loadNamedStyle(join(fldr, "transit_pattern_directional.qml"), True)
+        self.zones_layer = self.qgis_project.layers["zones"][0]
+        self.zones_layer.loadNamedStyle(join(fldr, "zones.qml"), True)
 
-        self.routes_layer = self._PQgis.layers["transit_routes"][0]
-        self.routes_layer.loadNamedStyle(join(fldr, "transit_routes.qml"), True)
+        self.trips_layer = self.qgis_project.layers["trips"][0]
+        self.trips_layer.loadNamedStyle(join(fldr, "trips.qml"), True)
 
-        for layer in [self.zones_layer, self.routes_layer, self.patterns_layer, self.stops_layer]:
+        self.routes_layer = self.qgis_project.layers["routes"][0]
+        self.routes_layer.loadNamedStyle(join(fldr, "routes.qml"), True)
+
+        for layer in [self.zones_layer, self.routes_layer, self.trips_layer, self.stops_layer]:
             QgsProject.instance().addMapLayer(layer)
 
         self.chb_raw_shapes.setEnabled(self.has_raw)
         if self.has_raw:
-            self.raw_shapes_layer = self._PQgis.layers["transit_raw_shapes"][0]
+            self.raw_shapes_layer = self.qgis_project.layers["transit_raw_shapes"][0]
             self.raw_shapes_layer.loadNamedStyle(join(fldr, "transit_raw_shapes.qml"), True)
             QgsProject.instance().addMapLayer(self.raw_shapes_layer)
             self.raw_shapes_layer.setSubsetString('"pattern_id"=-999999')
@@ -90,7 +91,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         agency_sql = f"Select agency_id, agency from Transit_Agencies where agency_id != {WID}"
         sql = """SELECT pattern_id, coalesce(ST_X(ST_StartPoint(geo))-ST_X(ST_EndPoint(geo)),0) dx,
                         coalesce(ST_Y(ST_StartPoint(geo))-ST_Y(ST_EndPoint(geo)),0) dy
-                  FROM Transit_Patterns"""
+                  FROM pattern_mapping"""
         with read_and_close(str(self._p.path_to_file), spatial=True) as conn:
             self.all_agencies = {ag: ag_id for ag_id, ag in conn.execute(agency_sql)}
             patt_df = pd.read_sql(sql, conn)
@@ -133,7 +134,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.ln_route_id.textChanged.connect(partial(self.search_route, "route_id"))
         self.ln_route.textChanged.connect(partial(self.search_route, "route"))
 
-        self.ln_pattern_id.textChanged.connect(self.search_pattern)
+        self.ln_pattern_id.textChanged.connect(self.search_trips)
 
         self.ln_stop_id.textChanged.connect(partial(self.search_stop, "stop_id"))
         self.ln_stop.textChanged.connect(partial(self.search_stop, "stop"))
@@ -143,9 +144,9 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.cob_type.currentIndexChanged.connect(self.filter_direction)
 
         # Databases for comparison
-        self.but_additional_supply.clicked.connect(partial(self.load_new_file, "supply"))
-        self.but_additional_demand.clicked.connect(partial(self.load_new_file, "demand"))
-        self.but_additional_demand.setEnabled(self.polaris_project.demand_file is not None)
+        # self.but_additional_supply.clicked.connect(partial(self.load_new_file, "supply"))
+        # self.but_additional_demand.clicked.connect(partial(self.load_new_file, "demand"))
+        # self.but_additional_demand.setEnabled(self.project.demand_file is not None)
 
         # Direction filtering
         self.rdo_all_directions.toggled.connect(self.filter_direction)
@@ -192,36 +193,36 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.selected_from_time = None
         self.selected_to_time = None
 
-    def load_new_file(self, file_type):
-        formats = ["Polaris Network(*.sqlite)"] if file_type == "supply" else ["Polaris Demand(*.sqlite)"]
+    # def load_new_file(self, file_type):
+    #     formats = ["Polaris Network(*.sqlite)"] if file_type == "supply" else ["Polaris Demand(*.sqlite)"]
 
-        path, dtype = GetOutputFileName(
-            QDialog(),
-            f"Polaris {file_type}",
-            formats,
-            ".sqlite",
-            self._PQgis.path,
-        )
-        self._add_loaded_file(path, file_type)
+    #     path, dtype = GetOutputFileName(
+    #         QDialog(),
+    #         f"Polaris {file_type}",
+    #         formats,
+    #         ".sqlite",
+    #         self.qgis_project.path,
+    #     )
+    #     self._add_loaded_file(path, file_type)
 
-    def _add_loaded_file(self, path, file_type):
-        if file_type == "supply":
-            if path is None or path == self.polaris_project.supply_file:
-                path = ""
-                self.additional_supply = None
-            else:
-                self.additional_supply = path
-                self.sm_alt = SupplyMetrics(Path(path))
-            self.lbl_additional_supply.setText(path)
-        else:
-            if path is None or path == self.polaris_project.demand_file:
-                path = ""
-                self.additional_demand = None
-            else:
-                supply = self.polaris_project.supply_file if self.additional_supply is None else self.additional_supply
-                self.additional_demand = path
-                self.dm_alt = DemandMetrics(supply, Path(path))
-            self.lbl_additional_demand.setText(path)
+    # def _add_loaded_file(self, path, file_type):
+    #     if file_type == "supply":
+    #         if path is None or path == self.project.supply_file:
+    #             path = ""
+    #             self.additional_supply = None
+    #         else:
+    #             self.additional_supply = path
+    #             self.sm_alt = SupplyMetrics(Path(path))
+    #         self.lbl_additional_supply.setText(path)
+    #     else:
+    #         if path is None or path == self.project.demand_file:
+    #             path = ""
+    #             self.additional_demand = None
+    #         else:
+    #             supply = self.project.supply_file if self.additional_supply is None else self.additional_supply
+    #             self.additional_demand = path
+    #             self.dm_alt = DemandMetrics(supply, Path(path))
+    #         self.lbl_additional_demand.setText(path)
 
     def show_label_stops(self):
         self.build_label(
@@ -282,12 +283,12 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         filtered = self.stop_pattern[self.stop_pattern.pattern_id.isin(self.patterns.pattern_id)]
         self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
 
-        self.populate_patterns()
+        self.populate_trips()
         self.populate_routes()
         self.populate_stops()
         self.redo_map()
 
-    def search_pattern(self):
+    def search_trips(self):
         pat = str(self.ln_pattern_id.text())
         self.patterns = self.patterns[self.patterns.pattern_id.astype(str).str.contains(pat)]
         pattern_ids = list(self.patterns.pattern_id.values)
@@ -297,7 +298,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
         filtered = self.stop_pattern[self.stop_pattern.pattern_id.isin(pattern_ids)]
         self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
-        self.populate_patterns()
+        self.populate_trips()
         self.populate_routes()
         self.populate_stops()
         self.redo_map()
@@ -310,7 +311,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.patterns = self.all_patterns[self.all_patterns.pattern_id.isin(filtered.pattern_id)]
         self.routes = self.all_routes[self.all_routes.route_id.isin(self.patterns.route_id)]
         self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
-        self.populate_patterns()
+        self.populate_trips()
         self.populate_routes()
         self.populate_stops()
         self.redo_map()
@@ -360,10 +361,10 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.patterns = self.all_patterns.copy(True)
         self.stops = self.all_stops.copy(True)
         self.populate_routes()
-        self.populate_patterns()
+        self.populate_trips()
         self.populate_stops()
         self.routes_layer.setSubsetString("")
-        self.patterns_layer.setSubsetString("")
+        self.trips_layer.setSubsetString("")
         self.stops_layer.setSubsetString("")
 
     def allow_filter_by_agency(self):
@@ -412,14 +413,14 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         filtered = self.stop_pattern[self.stop_pattern.pattern_id.isin(self.patterns.pattern_id)]
         self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
 
-        self.populate_patterns()
+        self.populate_trips()
         self.populate_stops()
         self.redo_map()
         self.routes_layer.setSubsetString(f'"route_id" = {route_id}')
         self.iface.mapCanvas().setExtent(self.routes_layer.extent())
         self.iface.mapCanvas().refresh()
 
-    def select_pattern(self):
+    def select_trip(self):
         idx = [x.row() for x in list(self.list_patterns.selectionModel().selectedRows())][0]
 
         route_id = self.patterns.route_id.values[idx]
@@ -436,7 +437,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.populate_routes()
         self.populate_stops()
         self.redo_map()
-        self.patterns_layer.setSubsetString(f'"pattern_id" = {pattern_id}')
+        self.trips_layer.setSubsetString(f'"pattern_id" = {pattern_id}')
         if self.chb_raw_shapes.isChecked():
             self.raw_shapes_layer.setSubsetString(f'"pattern_id" = {pattern_id}')
 
@@ -448,7 +449,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         filtered = self.stop_pattern[self.stop_pattern.stop_id == stop_id]
         self.patterns = self.all_patterns[self.all_patterns.pattern_id.isin(filtered.pattern_id)]
         self.routes = self.all_routes[self.all_routes.route_id.isin(self.patterns.route_id)]
-        self.populate_patterns()
+        self.populate_trips()
         self.populate_routes()
         self.redo_map()
         self.stops_layer.setSubsetString(f'"stop_id" = {stop_id}')
@@ -459,11 +460,11 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.list_routes.setVerticalHeader(None)
         self.list_routes.selectionModel().selectionChanged.connect(self.select_route)
 
-    def populate_patterns(self):
+    def populate_trips(self):
         self.patterns_model = PandasModel(self.patterns[["pattern_id"]])
         self.list_patterns.setModel(self.patterns_model)
         self.list_patterns.setVerticalHeader(None)
-        self.list_patterns.selectionModel().selectionChanged.connect(self.select_pattern)
+        self.list_patterns.selectionModel().selectionChanged.connect(self.select_trip)
 
     def populate_stops(self):
         fields = ["stop_id", "stop", "stop_name"]
@@ -487,11 +488,11 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         if self.patterns.shape[0] > 0:
             patt = tuple(self.patterns.pattern_id.tolist())
             fltr = f'"pattern_id" IN {str(patt)}' if len(patt) > 1 else f'"pattern_id" = {patt[0]}'
-            self.patterns_layer.setSubsetString(fltr)
+            self.trips_layer.setSubsetString(fltr)
             if self.chb_raw_shapes.isChecked():
                 self.raw_shapes_layer.setSubsetString(fltr)
         else:
-            self.patterns_layer.setSubsetString('"pattern_id"=-999999')
+            self.trips_layer.setSubsetString('"pattern_id"=-999999')
 
         if self.routes.shape[0] > 0:
             rt = tuple(self.routes.route_id.tolist())
@@ -507,10 +508,10 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         if self.mapped_zones:
             self.map_zones()
 
-        for lyr in [self.stops_layer, self.patterns_layer, self.routes_layer, self.zones_layer]:
+        for lyr in [self.stops_layer, self.trips_layer, self.routes_layer, self.zones_layer]:
             lyr.triggerRepaint()
         ext = self.routes_layer.extent()
-        ext.combineExtentWith(self.patterns_layer.extent())
+        ext.combineExtentWith(self.trips_layer.extent())
         ext.combineExtentWith(self.stops_layer.extent())
         self.iface.mapCanvas().setExtent(ext)
         self.iface.mapCanvas().refresh()
@@ -538,7 +539,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         else:
             self.mapped_stops = False
             fldr = join(dirname(dirname(__file__)), "style_loader", "styles")
-            self.stops_layer.loadNamedStyle(join(fldr, "transit_stops.qml"), True)
+            self.stops_layer.loadNamedStyle(join(fldr, "stops.qml"), True)
             self.stops_layer.triggerRepaint()
         self.allows_colors_stops()
         self.iface.mapCanvas().refresh()
@@ -766,9 +767,9 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         else:
             self.mapped_lines = False
             fldr = join(dirname(dirname(__file__)), "style_loader", "styles")
-            self.patterns_layer.loadNamedStyle(join(fldr, "transit_pattern_directional.qml"), True)
-            self.routes_layer.loadNamedStyle(join(fldr, "transit_routes.qml"), True)
-            self.patterns_layer.triggerRepaint()
+            self.trips_layer.loadNamedStyle(join(fldr, "trips.qml"), True)
+            self.routes_layer.loadNamedStyle(join(fldr, "routes.qml"), True)
+            self.trips_layer.triggerRepaint()
             self.routes_layer.triggerRepaint()
         self.allows_colors_line()
         self.iface.mapCanvas().refresh()
@@ -782,7 +783,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         if self.line_metric_layer is not None:
             QgsProject.instance().removeMapLayers([self.line_metric_layer.id()])
 
-            for lyr in [self.routes_layer, self.patterns_layer]:
+            for lyr in [self.routes_layer, self.trips_layer]:
                 rem = [lien.joinLayerId() for lien in lyr.vectorJoins()]
                 for lien_id in rem:
                     lyr.removeJoin(lien_id)
@@ -832,7 +833,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
                         df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
                 df = df[[fld] + self.dm.list_route_metrics()]
 
-        lyr = self.routes_layer if element == "Routes" else self.patterns_layer
+        lyr = self.routes_layer if element == "Routes" else self.trips_layer
 
         self.line_metric_layer = layer_from_dataframe(df, f"{element}_metrics")
 
