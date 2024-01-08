@@ -16,7 +16,7 @@ class SupplyMetrics:
     whenever *from_time* is not provided and the end of simulation when
     *to_time* is not provided"""
 
-    def __init__(self):
+    def __init__(self, path: None):
         """
         :param supply_file: Path to the supply file we want to compute metrics for
         """
@@ -24,12 +24,7 @@ class SupplyMetrics:
         rt_sql = """Select route_id, route, pattern_id, agency_id, route_type, 
                     seated_capacity s_capacity, total_capacity t_capacity from routes"""
 
-        # Aqui
-        # patt_sql = """Select route_id, pattern_id, route, agency_id, route_type, 
-        #             seated_capacity s_capacity, total_capacity t_capacity from routes"""
-
-        stop_sql = f"""Select stop_id, stop, name stop_name, agency_id, route_type from stops
-                       where agency_id != {WID}"""
+        stop_sql = f"""Select stop_id, stop, name stop_name, agency_id, route_type from stops"""
 
         stop_pat_sql = """Select pattern_id, from_stop stop_id from route_links
                           UNION ALL
@@ -40,12 +35,11 @@ class SupplyMetrics:
         trp_sch_sql = """Select trip_id, seq stop_order, arrival/60 arrival, departure/60 departure
                          from trips_schedule"""
 
-        # TODO: RI
         trp_pat_lnk_sql = """select pattern_id, seq stop_order, from_stop, to_stop from route_links"""
 
-        with read_and_close(database_connection("transit")) as conn:
+        connection = database_connection("transit") if path == None else path
+        with read_and_close(connection) as conn:
             self.__raw_routes = pd.read_sql(rt_sql, conn).fillna(0)
-            # self.__raw_patterns = pd.read_sql(patt_sql, conn).fillna(0)
             self.__raw_stops = pd.read_sql(stop_sql, conn)
 
             self.__raw_stop_pattern = pd.read_sql(stop_pat_sql, conn).drop_duplicates()
@@ -56,19 +50,15 @@ class SupplyMetrics:
             self.__trip_schedule = pd.read_sql(trp_sch_sql, conn)
 
             self.__route_links = pd.read_sql(trp_pat_lnk_sql, conn)
-            # cols = ["pattern_id", "stop_order", "transit_link", "from_node", "to_node"]
-            # self.__pattern_links.columns = cols  # type: ignore # Pandas recommended behaviour that results in error
 
         self.__distribute_time_stamps()
         self.__compute_stop_order()
         self.__correct_capacities()
 
         self.__stops = self.__raw_stops.copy(True)
-        # self.__trips = self.__raw_trips.copy(True)
         self._stop_pattern = self.__raw_stop_pattern.copy(True)
 
         self.__routes = self.__compute_route_metrics(self.__raw_trips, self.__raw_routes)
-        # self.__patterns = self.__compute_pattern_metrics(self.__raw_trips, self.__raw_patterns)
         self.__stops = self.__compute_stop_metrics(self.__routes, self.__raw_stops)
 
     def stop_metrics(
@@ -100,40 +90,9 @@ class SupplyMetrics:
 
         trips = self.__filter_trips(from_minute, to_minute, routes, patterns, stops)
 
-        pats = self.__compute_route_metrics(trips, self.__routes)
+        pats = self.__compute_route_metrics(trips, self.__raw_routes)
         stop_metrics = self.__compute_stop_metrics(pats, self.__raw_stops)
         return stop_metrics if stops is None else stop_metrics[stop_metrics.stop_id.isin(stops)]
-
-    # def pattern_metrics(
-    #     self,
-    #     from_minute: Optional[int] = None,
-    #     to_minute: Optional[int] = None,
-    #     patterns: Optional[List[int]] = None,
-    #     routes: Optional[List[int]] = None,
-    #     stops: Optional[List[int]] = None,
-    # ) -> pd.DataFrame:
-    #     """Returns a dataframe with all supported supply metrics for Patterns
-    #     Capacities correspond to the sum of the capacities of all vehicles
-    #     for all trips for each pattern
-
-    #     :param from_minute: (`Optional`) Start of time window to compute metrics for
-    #     :param to_minute: (`Optional`) End of time window to compute metrics for
-    #     :param patterns: (`Optional`) List of patterns to consider
-    #     :param routes: (`Optional`) List of routes to consider
-    #     :param stops: (`Optional`) List of stops to consider
-
-    #     :return: pattern_metrics (`pd.DataFrame`)
-
-    #     """
-    #     if all(x is None for x in [from_minute, to_minute, routes, patterns, stops]):
-    #         return self.__routes.copy(True)
-
-    #     # Set the time for the interval we want
-    #     from_minute, to_minute = self.__time_interval(from_minute, to_minute)
-
-    #     trips = self.__filter_trips(from_minute, to_minute, routes, patterns, stops)
-    #     patt_metric = self.__compute_pattern_metrics(trips, self.__raw_routes)
-    #     return patt_metric if patterns is None else patt_metric[patt_metric.pattern_id.isin(patterns)]
 
     def route_metrics(
         self,
@@ -174,16 +133,6 @@ class SupplyMetrics:
         :return: Lists of metrics available for stops
         """
         return ["routes", "patterns", "trips", "seated_capacity", "total_capacity"]
-
-    # @staticmethod
-    # def list_pattern_metrics():
-    #     """Helper method to identify metrics available for transit patterns.
-    #        Capacities correspond to the sum of the capacities of all vehicles
-    #        for all trips for each pattern
-
-    #     :return: Lists of metrics available for patterns
-    #     """
-    #     return ["trips", "seated_capacity", "total_capacity"]
 
     @staticmethod
     def list_route_metrics():
@@ -257,15 +206,6 @@ class SupplyMetrics:
         self.__raw_routes = self.__raw_routes.merge(patts, on="pattern_id", how="left")
         self.__raw_routes.fillna(0, inplace=True)
 
-        rts = (
-            self.__raw_routes.groupby(["route_id"])
-            .agg(first_departure=("first_departure", "min"), last_arrival=("last_arrival", "max"))
-            .reset_index()
-        )
-
-        self.__raw_routes = self.__raw_routes.merge(rts, on="route_id", how="left")
-        self.__raw_routes.fillna(0, inplace=True)
-
     def __compute_stop_order(self):
         aux = self.__route_links.groupby("pattern_id").max()[["stop_order"]].reset_index()
         aux = aux.merge(self.__route_links, on=["pattern_id", "stop_order"], how="left")
@@ -294,25 +234,10 @@ class SupplyMetrics:
         trps.reset_index(inplace=True)
 
         routes = routes.merge(trps, on="route_id", how="left")
-        routes.drop(columns=["route_type", "s_capacity", "t_capacity"], inplace=True)
+        routes.drop(columns=["s_capacity", "t_capacity"], inplace=True)
         routes.fillna(0, inplace=True)
+        routes = routes.drop_duplicates().reset_index(drop=True)
         return routes
-
-    # def __compute_pattern_metrics(self, trips: pd.DataFrame, patterns: pd.DataFrame) -> pd.DataFrame:
-    #     trps = trips.assign(trip_count=1)
-    #     trps = trps.groupby(["pattern_id"]).sum()[["trip_count", "s_capacity", "t_capacity"]]
-
-    #     trps.columns = [
-    #         "trips",
-    #         "seated_capacity",
-    #         "total_capacity",
-    #     ]  # type: ignore # Recommended Pandas behaviour that should not trigger typing
-    #     trps.reset_index(inplace=True)
-
-    #     patterns = patterns.merge(trps, on="pattern_id", how="left")
-    #     patterns.drop(columns=["s_capacity", "t_capacity"], inplace=True)
-    #     patterns.fillna(0, inplace=True)
-    #     return patterns
 
     def __compute_stop_metrics(self, patterns: pd.DataFrame, stops: pd.DataFrame) -> pd.DataFrame:
         smetric = self.__raw_stop_pattern.merge(patterns, on="pattern_id", how="right")
