@@ -15,7 +15,7 @@ def layer_from_dataframe(df: pd.DataFrame, layer_name: str) -> QgsVectorLayer:
 
     field_names = list(df.dtypes.index)
     types = [qgs_type(df.dtypes[fname]) for fname in field_names]
-    attributes = [QgsField(fname, dtype) for fname, dtype in zip(field_names, types)]
+    attributes = [QgsField(name=fname, type=dtype) for fname, dtype in zip(field_names, types)]
     pr.addAttributes(attributes)
     vl.updateFields()  # tell the vector layer to fetch changes from the provider
 
@@ -23,7 +23,7 @@ def layer_from_dataframe(df: pd.DataFrame, layer_name: str) -> QgsVectorLayer:
     features = []
     for _, record in df.iterrows():
         fet = QgsFeature()
-        fet.setAttributes(record.to_list())
+        fet.setAttributes([record.to_list()])
         features.append(fet)
     pr.addFeatures(features)
     QgsProject.instance().addMapLayer(vl)

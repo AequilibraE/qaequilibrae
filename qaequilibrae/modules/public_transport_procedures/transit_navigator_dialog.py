@@ -42,10 +42,8 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.stop_target_metric = ""
         self.zone_target_metric = ""
         self.filtered = {}
-        self.has_raw = "transit_raw_shapes" in self.qgis_project.layers
-        self.chb_raw_shapes.setEnabled(self.has_raw)
 
-        self.sm = SupplyMetrics()
+        self.sm = SupplyMetrics(None)
         # self.dm = DemandMetrics()
         self.sm_alt: SupplyMetrics = None
         # self.dm_alt: DemandMetrics = None
@@ -76,33 +74,26 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         for layer in [self.zones_layer, self.routes_layer, self.stops_layer]:
             QgsProject.instance().addMapLayer(layer)
 
-        self.chb_raw_shapes.setEnabled(self.has_raw)
-        if self.has_raw:
-            self.raw_shapes_layer = self.qgis_project.layers["transit_raw_shapes"][0]
-            self.raw_shapes_layer.loadNamedStyle(join(fldr, "transit_raw_shapes.qml"), True)
-            QgsProject.instance().addMapLayer(self.raw_shapes_layer)
-            self.raw_shapes_layer.setSubsetString('"pattern_id"=-999999')
-
         agency_sql = f"Select agency_id, agency from agencies"
-        sql = """SELECT pattern_id, coalesce(ST_X(ST_StartPoint(geometry))-ST_X(ST_EndPoint(geometry)),0) dx,
+        sql = """SELECT route_id, pattern_id, coalesce(ST_X(ST_StartPoint(geometry))-ST_X(ST_EndPoint(geometry)),0) dx,
                         coalesce(ST_Y(ST_StartPoint(geometry))-ST_Y(ST_EndPoint(geometry)),0) dy
-                  FROM pattern_mapping"""
+                 FROM routes"""
         with read_and_close(database_connection("transit")) as conn:
             self.all_agencies = {ag: ag_id for ag_id, ag in conn.execute(agency_sql)}
-            patt_df = pd.read_sql(sql, conn)
+            route_df = pd.read_sql(sql, conn)
 
-        patt_df = patt_df.assign(direction=pd.NA)
-        patt_df.loc[(patt_df.dy.abs() >= patt_df.dx.abs()) & (patt_df.dy < 0), "direction"] = "N"
-        patt_df.loc[(patt_df.dy.abs() >= patt_df.dx.abs()) & (patt_df.dy > 0), "direction"] = "S"
-        patt_df.loc[(patt_df.dy.abs() < patt_df.dx.abs()) & (patt_df.dx > 0), "direction"] = "W"
-        patt_df.loc[(patt_df.dy.abs() < patt_df.dx.abs()) & (patt_df.dx < 0), "direction"] = "E"
-        self.pattern_directions = patt_df[["pattern_id", "direction"]]
-        if max(patt_df.dx.max(), patt_df.dy.max()) == 0:
+        route_df = route_df.assign(direction=pd.NA)
+        route_df.loc[(route_df.dy.abs() >= route_df.dx.abs()) & (route_df.dy < 0), "direction"] = "N"
+        route_df.loc[(route_df.dy.abs() >= route_df.dx.abs()) & (route_df.dy > 0), "direction"] = "S"
+        route_df.loc[(route_df.dy.abs() < route_df.dx.abs()) & (route_df.dx > 0), "direction"] = "W"
+        route_df.loc[(route_df.dy.abs() < route_df.dx.abs()) & (route_df.dx < 0), "direction"] = "E"
+        self.route_directions = route_df[["route_id", "pattern_id", "direction"]]
+        if max(route_df.dx.max(), route_df.dy.max()) == 0:
             self.rdo_ab_direction.setEnabled(False)
             self.rdo_ba_direction.setEnabled(False)
 
         self.all_routes = pd.DataFrame([])
-        self.all_patterns = pd.DataFrame([])
+        self.route_patterns = pd.DataFrame([])
         self.all_stops = pd.DataFrame([])
         self.stop_pattern = pd.DataFrame([])
         self.reset_data_global()
@@ -129,8 +120,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.ln_route_id.textChanged.connect(partial(self.search_route, "route_id"))
         self.ln_route.textChanged.connect(partial(self.search_route, "route"))
 
-        self.ln_pattern_id.textChanged.connect(self.search_trips)
-
         self.ln_stop_id.textChanged.connect(partial(self.search_stop, "stop_id"))
         self.ln_stop.textChanged.connect(partial(self.search_stop, "stop"))
         self.ln_stop_name.textChanged.connect(partial(self.search_stop, "stop_name"))
@@ -139,9 +128,9 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.cob_type.currentIndexChanged.connect(self.filter_direction)
 
         # Databases for comparison
-        self.but_additional_supply.clicked.connect(partial(self.load_new_file, "supply"))
-        self.but_additional_demand.clicked.connect(partial(self.load_new_file, "demand"))
-        self.but_additional_demand.setEnabled(self.project.demand_file is not None)
+        # self.but_additional_supply.clicked.connect(partial(self.load_new_file, "supply"))
+        # self.but_additional_demand.clicked.connect(partial(self.load_new_file, "demand"))
+        # self.but_additional_demand.setEnabled(self.project.demand_file is not None)
 
         # Direction filtering
         self.rdo_all_directions.toggled.connect(self.filter_direction)
@@ -275,25 +264,9 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.routes = self.routes[self.routes[field].astype(str).str.contains(rt, case=False)]
         self.patterns = self.patterns[self.patterns.route_id.isin(self.routes.route_id)]
 
-        filtered = self.stop_pattern[self.stop_pattern.pattern_id.isin(self.patterns.pattern_id)]
+        filtered = self.stop_pattern[self.stop_pattern.route_id.isin(self.patterns.route_id)]
         self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
 
-        self.populate_trips()
-        self.populate_routes()
-        self.populate_stops()
-        self.redo_map()
-
-    def search_trips(self):
-        pat = str(self.ln_pattern_id.text())
-        self.patterns = self.patterns[self.patterns.pattern_id.astype(str).str.contains(pat)]
-        pattern_ids = list(self.patterns.pattern_id.values)
-        route_ids = list(self.patterns.route_id.values)
-
-        self.routes = self.all_routes[self.all_routes.route_id.isin(route_ids)]
-
-        filtered = self.stop_pattern[self.stop_pattern.pattern_id.isin(pattern_ids)]
-        self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
-        self.populate_trips()
         self.populate_routes()
         self.populate_stops()
         self.redo_map()
@@ -303,10 +276,9 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         stop = str(self.ln_stop_name.text()) if field == "stop_name" else stop
 
         filtered = self.stop_pattern[self.stop_pattern[field].astype(str).str.contains(stop, case=False)]
-        self.patterns = self.all_patterns[self.all_patterns.pattern_id.isin(filtered.pattern_id)]
+        self.patterns = self.route_patterns[self.route_patterns.route_id.isin(filtered.route_id)]
         self.routes = self.all_routes[self.all_routes.route_id.isin(self.patterns.route_id)]
         self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
-        self.populate_trips()
         self.populate_routes()
         self.populate_stops()
         self.redo_map()
@@ -318,20 +290,19 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
     def reset_data_global(self):
         self.all_routes = self.sm.route_metrics()
-        self.all_patterns = self.all_routes.merge(self.pattern_directions, on="pattern_id", how="left")
-        self.all_patterns.drop_duplicates(subset="pattern_id", inplace=True)
+        self.route_patterns = self.all_routes.merge(self.route_directions, on="route_id", how="left")
+        # self.route_patterns.drop_duplicates(subset="route_id", inplace=True)
 
         self.all_stops = self.sm.stop_metrics()
         self.stop_pattern = self.sm._stop_pattern.copy(True)
 
         # If empty, we just throw in some arbitrary direction
-        self.all_patterns.loc[self.all_patterns.direction.isna(), "direction"] = "S"
+        self.route_patterns.loc[self.route_patterns.direction.isna(), "direction"] = "S"
 
         self.reset()
 
     def reset(self):
         self.filtered.clear()
-        self.ln_pattern_id.clear()
         self.reset_lists()
 
         if self.mapped_stops:
@@ -343,21 +314,21 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
     def filter_direction(self):
         self.reset_data_global()
         if self.rdo_ab_direction.isChecked():
-            self.all_patterns = self.all_patterns[self.all_patterns.direction.isin(["S", "W"])]
+            self.route_patterns = self.route_patterns[self.route_patterns.direction.isin(["S", "N"])]
         elif self.rdo_ba_direction.isChecked():
-            self.all_patterns = self.all_patterns[self.all_patterns.direction.isin(["N", "E"])]
+            self.route_patterns = self.route_patterns[self.route_patterns.direction.isin(["W", "E"])]
 
-        self.all_routes = self.all_routes[self.all_routes.route_id.isin(self.all_patterns.route_id)]
-        filtered = self.stop_pattern[self.stop_pattern.pattern_id.isin(self.all_patterns.pattern_id)]
+        self.all_routes = self.all_routes[self.all_routes.route_id.isin(self.route_patterns.route_id)]
+        filtered = self.stop_pattern[self.stop_pattern.route_id.isin(self.route_patterns.route_id)]
         self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
+        print(self.stops.shape)
         self.global_filters_only()
 
     def reset_lists(self):
         self.routes = self.all_routes.copy(True)
-        self.patterns = self.all_patterns.copy(True)
+        self.patterns = self.route_patterns.copy(True)
         self.stops = self.all_stops.copy(True)
         self.populate_routes()
-        self.populate_trips()
         self.populate_stops()
         self.routes_layer.setSubsetString("")
         self.stops_layer.setSubsetString("")
@@ -375,14 +346,14 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
             agency_id = self.all_agencies[self.cob_agency.currentText()]
 
             self.all_routes = self.all_routes[self.all_routes.agency_id == agency_id]
-            self.all_patterns = self.all_patterns[self.all_patterns.route_id.isin(self.all_routes.route_id)]
+            self.route_patterns = self.route_patterns[self.route_patterns.route_id.isin(self.all_routes.route_id)]
             self.all_stops = self.all_stops[self.all_stops.agency_id == agency_id]
             self.stop_pattern = self.stop_pattern[self.stop_pattern.agency_id == agency_id]
         if self.chb_type.isChecked():
             gtfs_tp = self.gtfs_types[self.cob_type.currentText()]
 
             self.all_routes = self.all_routes[self.all_routes.route_type == gtfs_tp]
-            self.all_patterns = self.all_patterns[self.all_patterns.route_id.isin(self.all_routes.route_id)]
+            self.route_patterns = self.route_patterns[self.route_patterns.route_id.isin(self.all_routes.route_id)]
             self.all_stops = self.all_stops[self.all_stops.route_type == gtfs_tp]
             self.stop_pattern = self.stop_pattern[self.stop_pattern.route_type == gtfs_tp]
         self.reset()
@@ -403,38 +374,16 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         route_id = self.routes.route_id.values[idx]
         self.filtered = {"routes": [route_id]}
 
-        self.patterns = self.all_patterns[self.all_patterns.route_id == route_id]
+        self.patterns = self.route_patterns[self.route_patterns.route_id == route_id]
 
-        filtered = self.stop_pattern[self.stop_pattern.pattern_id.isin(self.patterns.pattern_id)]
+        filtered = self.stop_pattern[self.stop_pattern.route_id.isin(self.patterns.route_id)]
         self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
 
-        self.populate_trips()
         self.populate_stops()
         self.redo_map()
         self.routes_layer.setSubsetString(f'"route_id" = {route_id}')
         self.iface.mapCanvas().setExtent(self.routes_layer.extent())
         self.iface.mapCanvas().refresh()
-
-    def select_trip(self):
-        idx = [x.row() for x in list(self.list_patterns.selectionModel().selectedRows())][0]
-
-        route_id = self.patterns.route_id.values[idx]
-        self.routes = self.all_routes[self.all_routes.route_id == route_id]
-
-        pattern_id = self.patterns.pattern_id.values[idx]
-        self.filtered = {"patterns": [pattern_id]}
-        filtered = self.stop_pattern[self.stop_pattern.pattern_id == pattern_id]
-        self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
-        self.stops = self.stops.merge(
-            self.stop_pattern[self.stop_pattern.pattern_id == pattern_id][["stop_id", "stop_order"]], on="stop_id"
-        )
-        self.stops.sort_values("stop_order", inplace=True)
-        self.populate_routes()
-        self.populate_stops()
-        self.redo_map()
-        self.routes_layer.setSubsetString(f'"pattern_id" = {pattern_id}')
-        if self.chb_raw_shapes.isChecked():
-            self.raw_shapes_layer.setSubsetString(f'"pattern_id" = {pattern_id}')
 
     def select_stop(self):
         idx = [x.row() for x in list(self.list_stops.selectionModel().selectedRows())][0]
@@ -442,9 +391,8 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         stop_id = self.stops.stop_id.values[idx]
         self.filtered = {"stops": [stop_id]}
         filtered = self.stop_pattern[self.stop_pattern.stop_id == stop_id]
-        self.patterns = self.all_patterns[self.all_patterns.pattern_id.isin(filtered.pattern_id)]
+        self.patterns = self.route_patterns[self.route_patterns.route_id.isin(filtered.route_id)]
         self.routes = self.all_routes[self.all_routes.route_id.isin(self.patterns.route_id)]
-        self.populate_trips()
         self.populate_routes()
         self.redo_map()
         self.stops_layer.setSubsetString(f'"stop_id" = {stop_id}')
@@ -455,12 +403,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.list_routes.setVerticalHeader(None)
         self.list_routes.selectionModel().selectionChanged.connect(self.select_route)
 
-    def populate_trips(self):
-        self.patterns_model = PandasModel(self.patterns[["pattern_id"]])
-        self.list_patterns.setModel(self.patterns_model)
-        self.list_patterns.setVerticalHeader(None)
-        self.list_patterns.selectionModel().selectionChanged.connect(self.select_trip)
-
     def populate_stops(self):
         fields = ["stop_id", "stop", "stop_name"]
         fields += ["stop_order"] if "stop_order" in self.stops else []
@@ -470,22 +412,13 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.list_stops.selectionModel().selectionChanged.connect(self.select_stop)
 
     def redo_map(self):
-        if self.has_raw:
-            self.raw_shapes_layer.setSubsetString('"pattern_id"=-999999')
-
+        print(self.stops.shape)
         if self.stops.shape[0] > 0:
             stops = tuple(self.stops.stop_id.tolist())
             fltr = f'"stop_id" IN {str(stops)}' if len(stops) > 1 else f'"stop_id" = {stops[0]}'
             self.stops_layer.setSubsetString(fltr)
         else:
             self.stops_layer.setSubsetString('"stop_id"=-999999')
-
-        if self.patterns.shape[0] > 0:
-            patt = tuple(self.patterns.pattern_id.tolist())
-            fltr = f'"pattern_id" IN {str(patt)}' if len(patt) > 1 else f'"pattern_id" = {patt[0]}'
-            self.routes_layer.setSubsetString(fltr)
-            if self.chb_raw_shapes.isChecked():
-                self.raw_shapes_layer.setSubsetString(fltr)
 
         if self.routes.shape[0] > 0:
             rt = tuple(self.routes.route_id.tolist())
@@ -593,18 +526,18 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         to_time = minutes_to if self.chb_time.isChecked() else None
 
         stops = self.filtered.get("stops", self.stops.stop_id.tolist())
-        patterns = self.filtered.get("patterns", self.patterns.pattern_id.tolist())
         routes = self.filtered.get("routes", self.routes.route_id.tolist())
 
         self.stop_target_metric = self.cob_stops_map_info.currentText()
         sample = self.sb_sample.value() / 100
         if self.stop_target_metric in self.sm.list_stop_metrics():
             df = self.sm.stop_metrics(
-                from_minute=from_time, to_minute=to_time, routes=routes, patterns=patterns, stops=stops
+                from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
             )
             if self.additional_supply is not None:
+                print("In loop")
                 df2 = self.sm_alt.stop_metrics(
-                    from_minute=from_time, to_minute=to_time, routes=routes, patterns=patterns, stops=stops
+                    from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
                 )
                 df = df.merge(df2, on="stop_id", suffixes=("", "_alt"))
                 for metric in self.sm.list_stop_metrics():
@@ -615,13 +548,13 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
                 df = df[["stop_id"] + self.sm.list_stop_metrics()]
         # else:
         #     df = self.dm.stop_metrics(
-        #         from_minute=from_time, to_minute=to_time, routes=routes, patterns=patterns, stops=stops
+        #         from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
         #     )
         #     df.loc[:, self.dm.list_stop_metrics()] /= sample
 
         #     if self.additional_demand is not None:
         #         df2 = self.dm_alt.stop_metrics(
-        #             from_minute=from_time, to_minute=to_time, routes=routes, patterns=patterns, stops=stops
+        #             from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
         #         )
         #         df2.loc[:, self.dm_alt.list_stop_metrics()] /= sample
         #         df = df.merge(df2, on="stop_id", suffixes=("", "_alt"))
@@ -632,7 +565,13 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         #                 df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
         #         df = df[["stop_id"] + self.dm.list_stop_metrics()]
 
-        self.stop_metric_layer = layer_from_dataframe(df, "stop_metrics")
+        # print(df.shape)
+        # print(df.head(3).transpose())
+        df.reset_index(drop=True, inplace=True)
+        df = df[["stop_id", "trips", "routes"]]
+        print(df.dtypes)
+        # self.stop_metric_layer = layer_from_dataframe(df, "stop_metrics")
+        layer_from_dataframe(df, "stop_metrics")
 
         # lien = QgsVectorLayerJoinInfo()
         # lien.setJoinFieldName("stop_id")
@@ -661,20 +600,19 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         to_time = minutes_to if self.chb_time.isChecked() else None
 
         stops = self.filtered.get("stops", self.stops.stop_id.tolist())
-        patterns = self.filtered.get("patterns", self.patterns.pattern_id.tolist())
         routes = self.filtered.get("routes", self.routes.route_id.tolist())
 
         self.zone_target_metric = self.cob_zones_map_info.currentText()
         sample = self.sb_sample.value() / 100
 
         # df = self.dm.zone_metrics(
-        #     from_minute=from_time, to_minute=to_time, routes=routes, patterns=patterns, stops=stops
+        #     from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
         # )
         # df.loc[:, self.dm.list_zone_metrics()] /= sample
 
         # if self.additional_demand is not None:
         #     df2 = self.dm_alt.zone_metrics(
-        #         from_minute=from_time, to_minute=to_time, routes=routes, patterns=patterns, stops=stops
+        #         from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
         #     )
         #     df2.loc[:, self.dm_alt.list_zone_metrics()] /= sample
         #     df = df.merge(df2, on="zone", suffixes=("", "_alt"))
@@ -744,13 +682,12 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
             self.but_map_routes,
             self.lbl_scl_line,
         ]:
-            # item.setVisible(self.rdo_map_routes.isChecked())
             item.setEnabled(self.rdo_map_routes.isChecked())
 
         for cob in [self.cob_routes_map_type, self.cob_routes_map_info, self.cob_routes_color, self.cob_routes_element]:
             cob.clear()
         if self.rdo_map_routes.isChecked():
-            self.cob_routes_element.addItems(["Routes", "Patterns"])
+            self.cob_routes_element.addItems(["Routes"])
             self.cob_routes_map_type.addItems(["Color", "Thickness"])
             self.cob_routes_map_info.addItems(self.sm.list_route_metrics())
             # if self.dm.tables:
@@ -786,25 +723,24 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         to_time = minutes_to if self.chb_time.isChecked() else None
 
         stops = self.filtered.get("stops", self.stops.stop_id.tolist())
-        patterns = self.filtered.get("patterns", self.patterns.pattern_id.tolist())
         routes = self.filtered.get("routes", self.routes.route_id.tolist())
         self.line_target_metric = self.cob_routes_map_info.currentText()
 
-        par = {"from_minute": from_time, "to_minute": to_time, "routes": routes, "patterns": patterns, "stops": stops}
-        fld = "route_id" if element == "Routes" else "pattern_id"
+        par = {"from_minute": from_time, "to_minute": to_time, "routes": routes, "stops": stops}
 
         if self.line_target_metric in self.sm.list_route_metrics():
             df = self.sm.route_metrics(**par)
 
             if self.additional_supply is not None:
+                print("In loop")
                 df2 = self.sm_alt.route_metrics(**par)
-                df = df.merge(df2, on=fld, suffixes=("", "_alt"))
+                df = df.merge(df2, on="route_id", suffixes=("", "_alt"))
                 for metric in self.sm.list_route_metrics():
                     if self.rdo_absollute_diff.isChecked():
                         df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
                     else:
                         df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
-                df = df[[fld] + self.sm.list_route_metrics()]
+                df = df[["route_id"] + self.sm.list_route_metrics()]
 
         # else:
         #     _ = par.pop("stops")
@@ -823,20 +759,20 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         #                 df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
         #         df = df[[fld] + self.dm.list_route_metrics()]
 
-        lyr = self.routes_layer
-
+        print(df.columns)
+        print(df.head())
         self.line_metric_layer = layer_from_dataframe(df, f"{element}_metrics")
 
         lien = QgsVectorLayerJoinInfo()
-        lien.setJoinFieldName(fld)
-        lien.setTargetFieldName(fld)
+        lien.setJoinFieldName("route_id")
+        lien.setTargetFieldName("route_id")
         lien.setJoinLayerId(self.line_metric_layer.id())
         lien.setUsingMemoryCache(True)
         lien.setJoinLayer(self.line_metric_layer)
         lien.setPrefix("metrics_")
-        lyr.addJoin(lien)
+        self.routes_layer.addJoin(lien)
 
-        self.line_map_layer = lyr
+        self.line_map_layer = self.routes_layer
         self.draw_line_styles()
         self.but_map_routes.setEnabled(True)
         self.show_label_lines()

@@ -3,8 +3,6 @@ from typing import List
 
 import pandas as pd
 
-from polarislib.runs.scenario_compression import ScenarioCompression
-from aequilibrae.transit.constants import WALK_AGENCY_ID as WID
 from aequilibrae.utils.db_utils import read_sql, read_and_close, commit_and_close
 
 
@@ -16,7 +14,7 @@ class DemandMetrics:
     whenever *from_time* is not provided and the end of simulation when
     *to_time* is not provided"""
 
-    def __init__(self, supply_file: Path, demand_file: Path):
+    def __init__(self, supply_file: Path = None, demand_file: Path = None):
         """
         :param demand_file: Path to the demand file we want to compute metrics for
         :param supply_file: Path to the supply file corresponding to the demand file we will compute metrics for
@@ -25,7 +23,7 @@ class DemandMetrics:
         self.__base_table = None
         self.__trip_load = None
         self.__zone_data = None
-        self.__demand_file = ScenarioCompression.maybe_extract(demand_file)
+        self.__demand_file = demand_file
         self.__supply_file = supply_file
 
         self.tables: List[str] = []
@@ -152,7 +150,8 @@ class DemandMetrics:
                     self.__stop_data = pd.read_sql("Select * from qgs_stop_to_stop_matrix", conn)
                     return
 
-            transit_stops = read_sql("select stop_id, zone from Transit_Stops", self.__supply_file)
+            with read_and_close(self.__supply_file) as supply_conn:
+                transit_stops = read_sql("select stop_id, zone from stops", supply_conn)
 
             self.__get_base_table()
             gpb = self.__base_table.groupby("object_id")
@@ -240,7 +239,7 @@ class DemandMetrics:
 
             self.__list_tables()
 
-    def __line_metrics(self, metric, from_minute, to_minute, agency_id, patterns, routes):
+    def __line_metrics(self, metric, from_minute, to_minute, agency_id, routes):
         self.compute_line_loads()
         base_data = self.__trip_load
         if not all([from_minute is None, to_minute is None]):
@@ -252,15 +251,12 @@ class DemandMetrics:
         if agency_id is not None:
             base_data = base_data[base_data.agency_id == agency_id]
 
-        if patterns is not None:
-            base_data = base_data[base_data.pattern_id.isin(patterns)]
-
         if routes is not None:
             base_data = base_data[base_data.route_id.isin(routes)]
 
-        boards = base_data[["agency_id", "route_id", "pattern_id", "trip_id", "from_time"]].assign(action=1)
+        boards = base_data[["agency_id", "route_id", "trip_id", "from_time"]].assign(action=1)
         boards.rename(columns={"from_time": "instant"}, inplace=True)
-        alights = base_data[["agency_id", "route_id", "pattern_id", "trip_id", "to_time"]].assign(action=-1)
+        alights = base_data[["agency_id", "route_id", "trip_id", "to_time"]].assign(action=-1)
         alights.rename(columns={"to_time": "instant"}, inplace=True)
         loads = pd.concat([boards, alights])
 
@@ -276,7 +272,7 @@ class DemandMetrics:
         busiest_trip = busiest_trip.groupby([metric]).max()[["most_crowded_trip"]]
 
         most_boardings = (
-            base_data[["trip_id", "pattern_id", "route_id", "from_time"]].groupby(["trip_id", metric]).count()
+            base_data[["trip_id", "route_id", "from_time"]].groupby(["trip_id", metric]).count()
         )
         most_boardings = most_boardings.reset_index().groupby(metric).max()[["from_time"]]
         most_boardings.columns = ["most_boardings_trip"]
@@ -293,14 +289,13 @@ class DemandMetrics:
         agency_id=None,
         aggregation="stop_id",
         stops=None,
-        patterns=None,
         routes=None,
     ):
         self.compute_stop_to_stop_matrix()
         base_data = self.__stop_data.assign(pax_count=1)
         if self.__boardings.shape[0] == 0:
             gpb = base_data.groupby(
-                ["from_stop", "from_minute", "from_agency_id", "from_zone", "from_pattern_id", "from_route_id"]
+                ["from_stop", "from_minute", "from_agency_id", "from_zone", "from_route_id"]
             )
             self.__boardings = gpb.sum()[["pax_hour", "pax_km", "pax_count"]].reset_index()
             self.__boardings.rename(
@@ -309,13 +304,12 @@ class DemandMetrics:
                     "from_stop": "stop_id",
                     "from_minute": "boarding_minute",
                     "from_zone": "zone",
-                    "from_pattern_id": "pattern_id",
                     "from_route_id": "route_id",
                 },
                 inplace=True,
             )
 
-            gpb = base_data.groupby(["to_stop", "to_minute", "to_agency_id", "to_zone", "to_pattern_id", "to_route_id"])
+            gpb = base_data.groupby(["to_stop", "to_minute", "to_agency_id", "to_zone", "to_route_id"])
             self.__alightings = gpb.sum()[["pax_hour", "pax_km", "pax_count"]].reset_index()
             self.__alightings.rename(
                 columns={
@@ -323,7 +317,6 @@ class DemandMetrics:
                     "to_stop": "stop_id",
                     "to_minute": "alighting_minute",
                     "to_zone": "zone",
-                    "to_pattern_id": "pattern_id",
                     "to_route_id": "route_id",
                 },
                 inplace=True,
@@ -340,10 +333,6 @@ class DemandMetrics:
         if stops is not None:
             board = board.loc[board.stop_id.isin(stops)]
             alight = alight.loc[alight.stop_id.isin(stops)]
-
-        if patterns is not None:
-            board = board.loc[board.pattern_id.isin(patterns)]
-            alight = alight.loc[alight.pattern_id.isin(patterns)]
 
         if routes is not None:
             board = board.loc[board.route_id.isin(routes)]
@@ -363,8 +352,9 @@ class DemandMetrics:
     def __get_zonal_data(self):
         if self.__zone_data is not None:
             return
-        self.__zone_data = read_sql(
-            "Select zone, pop_persons popu, employment_total empl from Zone", self.__supply_file, index_col="zone"
+        with read_and_close(self.__supply_file) as conn:
+            self.__zone_data = read_sql(
+            "Select zone, pop_persons popu, employment_total empl from zones", conn, index_col="zone"
         )
 
     def __get_base_table(self):
@@ -378,17 +368,18 @@ class DemandMetrics:
                             INNER JOIN transit_pattern_links tpl ON tl.transit_link=tpl.transit_link
                             INNER JOIN routes tr ON tp.route_id=tr.route_id"""
 
-        trans_links = read_sql(qry, self.__supply_file)
+        with read_and_close(self.__supply_file) as conn:
+            trans_links = read_sql(qry, conn)
 
-        qry = """select object_id, value_transit_vehicle_trip trip_id, "index" trip_idx, value_link transit_link,
-                        value_Act_Arrival_time vaat, value_Act_Duration vadt
-                        from Path_Multimodal_links where value_transit_vehicle_trip > 0"""
+        # qry = """select object_id, value_transit_vehicle_trip trip_id, "index" trip_idx, value_link transit_link,
+        #                 value_Act_Arrival_time vaat, value_Act_Duration vadt
+        #                 from Path_Multimodal_links where value_transit_vehicle_trip > 0"""
 
-        df = read_sql(qry, self.__demand_file)
-        df = df.assign(from_time=(df.vaat / 60).astype(int), to_time=((0.5 + df.vaat + df.vadt) / 60).astype(int))
+        # df = read_sql(qry, self.__demand_file)
+        # df = df.assign(from_time=(df.vaat / 60).astype(int), to_time=((0.5 + df.vaat + df.vadt) / 60).astype(int))
 
-        self.__base_table = df.merge(trans_links, on="transit_link")
-        self.__base_table.sort_values(by=["object_id", "vaat"], inplace=True)
+        # self.__base_table = df.merge(trans_links, on="transit_link")
+        # self.__base_table.sort_values(by=["object_id", "vaat"], inplace=True)
 
     def __list_tables(self):
         if self.__demand_file is None:

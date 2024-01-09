@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>690</width>
-    <height>820</height>
+    <width>767</width>
+    <height>889</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -51,8 +51,8 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="2">
-       <widget class="QLineEdit" name="ln_stop_id">
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="ln_stop">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -75,8 +75,53 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QLineEdit" name="ln_stop">
+      <item row="1" column="2" colspan="3">
+       <widget class="QTableView" name="list_stops">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>230</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLineEdit" name="ln_route_id">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>500</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="statusTip">
+         <string extracomment="route_id"/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLineEdit" name="ln_stop_id">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -126,30 +171,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLineEdit" name="ln_route_id">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>500</width>
-          <height>40</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="statusTip">
-         <string extracomment="route_id"/>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="4">
        <widget class="QLineEdit" name="ln_stop_name">
         <property name="sizePolicy">
@@ -171,27 +192,6 @@
         </property>
         <property name="statusTip">
          <string extracomment="stop_id"/>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" colspan="3">
-       <widget class="QTableView" name="list_stops">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>230</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
         </property>
        </widget>
       </item>
@@ -595,7 +595,7 @@
          </font>
         </property>
         <property name="text">
-         <string>South/West patterns</string>
+         <string>South/North patterns</string>
         </property>
        </widget>
       </item>
@@ -821,7 +821,7 @@
          </font>
         </property>
         <property name="text">
-         <string>North/East Patterns</string>
+         <string>West/East Patterns</string>
         </property>
        </widget>
       </item>
@@ -1200,7 +1200,7 @@
       </font>
      </property>
      <property name="title">
-      <string>Supply Mapping routes and patterns</string>
+      <string>Supply Mapping Routes</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
       <item row="1" column="5">

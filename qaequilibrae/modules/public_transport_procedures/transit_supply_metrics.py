@@ -44,12 +44,17 @@ class SupplyMetrics:
 
             self.__raw_stop_pattern = pd.read_sql(stop_pat_sql, conn).drop_duplicates()
             self.__raw_stop_pattern = self.__raw_stop_pattern.merge(self.__raw_stops, on="stop_id", how="left")
+            self.__raw_stop_pattern = self.__raw_stop_pattern.merge(self.__raw_routes[["pattern_id", "route_id"]],
+                                                                    on="pattern_id")
             self.__raw_stop_pattern.fillna(0, inplace=True)
 
             self.__raw_trips = pd.read_sql(trip_sql, conn).fillna(0)
+            self.__raw_trips = self.__raw_trips.merge(self.__raw_routes[["pattern_id", "route_id"]], on="pattern_id")
             self.__trip_schedule = pd.read_sql(trp_sch_sql, conn)
 
             self.__route_links = pd.read_sql(trp_pat_lnk_sql, conn)
+            self.__route_links = self.__route_links.merge(self.__raw_routes[["pattern_id", "route_id"]], 
+                                                          on="pattern_id")
 
         self.__distribute_time_stamps()
         self.__compute_stop_order()
@@ -132,7 +137,7 @@ class SupplyMetrics:
 
         :return: Lists of metrics available for stops
         """
-        return ["routes", "patterns", "trips", "seated_capacity", "total_capacity"]
+        return ["routes", "trips", "seated_capacity", "total_capacity"]
 
     @staticmethod
     def list_route_metrics():
@@ -198,31 +203,31 @@ class SupplyMetrics:
         self.__raw_trips.fillna(0, inplace=True)
 
         patts = (
-            self.__raw_trips.groupby(["pattern_id"])
+            self.__raw_trips.groupby(["route_id"])
             .agg(first_departure=("begin_trip", "min"), last_arrival=("end_trip", "max"))
             .reset_index()
         )
 
-        self.__raw_routes = self.__raw_routes.merge(patts, on="pattern_id", how="left")
+        self.__raw_routes = self.__raw_routes.merge(patts, on="route_id", how="left")
         self.__raw_routes.fillna(0, inplace=True)
 
     def __compute_stop_order(self):
         aux = self.__route_links.groupby("pattern_id").max()[["stop_order"]].reset_index()
         aux = aux.merge(self.__route_links, on=["pattern_id", "stop_order"], how="left")
-        aux = aux[["pattern_id", "stop_order", "to_stop"]]
+        aux = aux[["route_id", "pattern_id", "stop_order", "to_stop"]]
         aux.loc[:, "stop_order"] += 1
-        aux.columns = ["pattern_id", "stop_order", "stop_id"]
+        aux.columns = ["route_id", "pattern_id", "stop_order", "stop_id"]
 
-        stop_order = self.__route_links[["pattern_id", "stop_order", "from_stop"]]
-        stop_order.columns = ["pattern_id", "stop_order", "stop_id"]
+        stop_order = self.__route_links[["route_id", "pattern_id", "stop_order", "from_stop"]]
+        stop_order.columns = ["route_id", "pattern_id", "stop_order", "stop_id"]
         stop_order = pd.concat([stop_order, aux])
 
-        self.__raw_stop_pattern = self.__raw_stop_pattern.merge(stop_order, on=["pattern_id", "stop_id"], how="left")
+        self.__raw_stop_pattern = self.__raw_stop_pattern.merge(stop_order, 
+                                                                on=["route_id", "pattern_id", "stop_id"], how="left")
         self.__raw_stop_pattern.fillna(0, inplace=True)
 
     def __compute_route_metrics(self, trips: pd.DataFrame, routes: pd.DataFrame) -> pd.DataFrame:
         trps = trips.assign(trip_count=1)
-        trps = trps.merge(self.__raw_routes[["pattern_id", "route_id"]], on="pattern_id")
 
         trps = trps.groupby(["route_id"]).agg(
             trips=("trip_count", "sum"),
@@ -234,20 +239,19 @@ class SupplyMetrics:
         trps.reset_index(inplace=True)
 
         routes = routes.merge(trps, on="route_id", how="left")
-        routes.drop(columns=["s_capacity", "t_capacity"], inplace=True)
+        routes.drop(columns=["pattern_id", "s_capacity", "t_capacity"], inplace=True)
         routes.fillna(0, inplace=True)
         routes = routes.drop_duplicates().reset_index(drop=True)
         return routes
 
     def __compute_stop_metrics(self, patterns: pd.DataFrame, stops: pd.DataFrame) -> pd.DataFrame:
-        smetric = self.__raw_stop_pattern.merge(patterns, on="pattern_id", how="right")
+        smetric = self.__raw_stop_pattern.merge(patterns, on="route_id", how="right")
         smetric = (
             smetric.groupby("stop_id")
             .agg(
                 trips=("trips", "sum"),
                 seated_capacity=("seated_capacity", "sum"),
                 total_capacity=("total_capacity", "sum"),
-                patterns=("pattern_id", "nunique"),
                 routes=("route_id", "nunique"),
             )
             .reset_index()
