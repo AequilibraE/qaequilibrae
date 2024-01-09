@@ -1,6 +1,6 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
 <qgis styleCategories="Symbology" version="3.16.3-Hannover">
-  <renderer-v2 enableorderby="0" type="categorizedSymbol" symbollevels="0" forceraster="0" attr="type">
+  <renderer-v2 enableorderby="0" type="categorizedSymbol" symbollevels="0" forceraster="0" attr="route_type">
     <categories>
       <category label="Tram/Light Rail" render="true" symbol="0" value="0"/>
       <category label="Metro" render="true" symbol="1" value="1"/>
