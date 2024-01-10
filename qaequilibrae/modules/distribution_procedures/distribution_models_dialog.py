@@ -35,7 +35,7 @@ logger = get_logger()
 
 
 class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgs_proj, mode=None):
+    def __init__(self, qgs_proj, mode=None, testing=False):
         QtWidgets.QDialog.__init__(self)
         self.iface = qgs_proj.iface
         self.setupUi(self)
@@ -104,7 +104,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.user_chosen_model = None
         self.update_model_parameters()
 
-        self.testing = False
+        self.testing = testing
 
     def load_matrices(self):
         self.matrices = list_matrices(self.project.matrices.fldr)

@@ -192,7 +192,6 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.error = self.tr("No name provided for the output file")
 
         if self.radio_layer_matrix.isChecked() and self.error is None:
-            self.output_name = self.layer.name()
             if self.cob_data_layer.currentIndex() < 0 or self.cob_index_field.currentIndex() < 0:
                 self.error = self.tr("Invalid field chosen")
 

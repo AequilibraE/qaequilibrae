@@ -1,6 +1,5 @@
 from qgis.PyQt.QtCore import QVariant
 import numpy as np
-from uuid import uuid4
 from aequilibrae.utils.worker_thread import WorkerThread
 import struct
 from aequilibrae.matrix import AequilibraeData
@@ -58,11 +57,6 @@ class LoadDataset(WorkerThread):
         index_idx = self.layer.dataProvider().fieldNameIndex(self.index_field)
         datafile_spec["field_names"] = fields
         datafile_spec["data_types"] = types
-
-        if self.output_name is None:
-            self.output_name = self.output.random_name()
-        else:
-            self.output_name += f"_{uuid4().hex[:10]}"
         datafile_spec["file_path"] = self.output_name
 
         if self.error is None:
