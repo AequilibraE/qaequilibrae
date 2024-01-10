@@ -15,7 +15,7 @@ main functionalities.
 Most screenshots in this section are related to Sioux Falls, a standard example
 in transportation network algorithm studies. 
 
-In the following sections, we present an image-based example on a realistic modelling workflow
+In the following sections, we present an illustrated example of a realistic modeling workflow
 for the beginner modeler out there. You can easily create a Sioux Falls model using our
 :ref:`create example <create_example>` tool. The remaining of the data used
 in the examples can be downloaded `here <https://www.aequilibrae.com/data/SiouxFalls.7z>`_.

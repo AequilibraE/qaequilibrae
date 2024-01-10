@@ -44,7 +44,7 @@ imported in your project folder.
     :align: center
     :alt: gtfs loaded
 
-Case you want to add or rewrite information on your public transport database, you can click on
+In case you want to add or rewrite information on your public transport database, you can click on
 **AequilibraE > Public Transport > Import GTFS**. You will notice a difference in the clickable buttons at
 the bottom of the page, and it is now possible to *Overwrite routes* or *Add to Existing Routes*.
 For any of these options, you follow the same steps previously presented to add feed data and load it into the

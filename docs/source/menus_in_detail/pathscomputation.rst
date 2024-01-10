@@ -108,8 +108,8 @@ The Traffic Assignment procedure tab looks like this!
 
 In the *Traffic Classes* tab you will create the traffic classes used in the project.
 First, select one of the available matrices (in \*.AEM format), and the matrix core
-that will be used for computation. For Sioux Falls example, we don't want to block
-flow through centroids, but this might not always be the case. When you finish, just
+that will be used for computation. For the Sioux Falls example, we don't want to block
+flow through centroids, but this is only necessary because regular nodes of the network are centroids. When you finish, just
 press the *Add Traffic class to assignment*.
 
 .. image:: ../images/traffic_open_matrix.png
@@ -150,7 +150,7 @@ block flows through centroids for the reason discussed above.
     :align: center
     :alt: Setup assignment
 
-The result of the traffic allocation we just performed is stored in the results.sqlite
+The result of the traffic assignment we just performed is stored in the results.sqlite
 database within the project folder. It can be easily accessed and loaded by clicking
 **Data -> Display project data**, and a project data window will open. Just click on the
 *Results* tab, select the desired result, and click in the *Load Result table as data layer*

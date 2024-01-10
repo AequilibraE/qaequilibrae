@@ -74,8 +74,7 @@ After the job is completed, a new window showing its procedure report will open.
     :alt: ipf_7
 
 .. note::
-    Although IPF aim is to balance the production/attraction vectors, the total sum of production 
-    and attraction must be the same, otherwise IPF cannot be run.
+Production and Attraction vectors must be balanced before running IPF. 
 
 Synthetic Gravity Models
 ------------------------
