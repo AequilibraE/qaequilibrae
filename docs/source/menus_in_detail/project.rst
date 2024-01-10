@@ -4,7 +4,7 @@ AequilibraE Project
 ===================
 
 This page is dedicated to a practical implementation of the AequilibraE project. In case you
-are interested in better understanding its structure, plase visit its 
+are interested in better understanding its structure, please visit its 
 `documentation <https://www.aequilibrae.com/python/latest/modeling_with_aequilibrae/project.html>`_
 webpage.
 

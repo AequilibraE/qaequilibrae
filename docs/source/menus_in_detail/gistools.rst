@@ -22,7 +22,7 @@ lines and Delaunay lines for the demand matrix provided.
     :alt: Desire Lines GUI
 
 After selecting a matrix, the user can choose to un-check the *use all matrices*
-box and select which matrices they want to use (the list of matrices will only
+box and select which matrix layers/cores they want to use (the list of matrices will only
 show if the option is un-checked). Just make sure to select a *zone/node layer* 
 and *node id* that is compatible with your matrix.
 

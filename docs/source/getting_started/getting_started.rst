@@ -40,7 +40,7 @@ Go to the Plugins panel and click on **Manage and Install Plugins**.
 
 After installing the plugin, you will be faced with the question of whether you
 want to download its dependencies, which are required for using most of the
-features. The problem is that many of AequilibraE's algorithms rely on compiled
+features. This is necessary because AequilibraE's algorithms rely on compiled
 extensions, but it is against the QGIS's community guidelines to upload binaries
 to the repository.
 
