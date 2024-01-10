@@ -82,8 +82,6 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
             parameters["layer"] = self.layer_box.currentLayer()
             parameters["field"] = self.field_box.currentField()
         self.worker_thread = AddsConnectorsProcedure(qgis.utils.iface.mainWindow(), **parameters)
-        if self._testing:
-            self.worker_thread._testing = True
         self.run_thread()
 
     def run_thread(self):

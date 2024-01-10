@@ -15,6 +15,8 @@ def test_add_connectors_from_zones(pt_no_feed):
     dialog = AddConnectorsDialog(pt_no_feed)
     dialog.rdo_zone.setChecked(True)
     dialog._testing = True
+    dialog.link_types = "rtSp"
+    dialog.modes = ["c"]
 
     zoning = dialog.project.zoning
     assert len(zoning.all_zones())
