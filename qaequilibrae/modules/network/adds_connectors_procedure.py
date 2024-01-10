@@ -26,6 +26,7 @@ class AddsConnectorsProcedure(WorkerThread):
         self.source = source
         self.layer = layer
         self.field = field
+        self._testing = False
 
     def doWork(self):
         if self.source == "zone":
@@ -39,6 +40,9 @@ class AddsConnectorsProcedure(WorkerThread):
 
     def do_from_zones(self):
         zoning = self.project.zoning
+        if self._testing:
+            self.link_types = "rtSp"
+            self.modes = ["c"]
 
         with commit_and_close(database_connection("network")) as conn:
             tot_zones = [x[0] for x in conn.execute("select count(*) from zones")][0]
