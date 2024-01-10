@@ -3,7 +3,8 @@ from os.path import isfile, splitext, basename
 import numpy as np
 import openmatrix as omx
 import pytest
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QVariant
+from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
 from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
 
 from qaequilibrae.modules.distribution_procedures.distribution_models_dialog import DistributionModelsDialog
@@ -41,19 +42,85 @@ def run_traffic_assignment(ae_with_project, qtbot, ext):
     dialog.run()
 
 
-def test_ipf(ae_with_project, qtbot):
-    dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
-    dataset = AequilibraeData()
-    dataset.load(dataset_name)
+def load_external_vector():
+    import csv
 
-    data_name = splitext(basename(dataset_name))[0]
+    path_to_csv = "test/data/SiouxFalls_project/synthetic_future_vector.csv"
+    datalayer = QgsVectorLayer("None?delimiter=,", "synthetic_future_vector", "memory")
 
-    dialog = DistributionModelsDialog(ae_with_project, mode="ipf", testing=True)
+    fields = [
+        QgsField("index", QVariant.Int),
+        QgsField("origins", QVariant.Double),
+        QgsField("destinations", QVariant.Double),
+    ]
+    datalayer.dataProvider().addAttributes(fields)
+    datalayer.updateFields()
 
-    file_path = "test/data/SiouxFalls_project/demand_ipf.aem"
-    dialog.out_name = file_path
-    dialog.outfile = file_path
-    dialog.datasets[data_name] = dataset
+    with open(path_to_csv, "r") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            origin = float(row["origins"])
+            destination = float(row["destinations"])
+            index = int(row["index"])
+
+            feature = QgsFeature()
+            feature.setAttributes([index, origin, destination])
+
+            datalayer.dataProvider().addFeature(feature)
+
+    if not datalayer.isValid():
+        print("Open layer failed to load!")
+    else:
+        QgsProject.instance().addMapLayer(datalayer)
+
+
+@pytest.mark.parametrize(("is_dataset", "is_layer"), [(True, False), (False, True)])
+def test_ipf(ae_with_project, qtbot, is_dataset, is_layer):
+    dialog = DistributionModelsDialog(ae_with_project, mode="ipf")
+    dialog.testing = True
+
+    if is_dataset:
+        dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
+        dataset = AequilibraeData()
+        dataset.load(dataset_name)
+
+        data_name = splitext(basename(dataset_name))[0]
+
+        file_path = "test/data/SiouxFalls_project/demand_ipf_D.aem"
+        dialog.out_name = file_path
+        dialog.outfile = file_path
+        dialog.datasets[data_name] = dataset
+
+    if is_layer:
+        load_external_vector()
+        layer = QgsProject.instance().mapLayersByName("synthetic_future_vector")[0]
+        dialog.iface.setActiveLayer(layer)
+        idx = []
+        origin = []
+        destination = []
+        for feat in layer.getFeatures():
+            f = feat.attributes()
+            idx.append(f[0])
+            origin.append(f[1])
+            destination.append(f[2])
+        args = {
+            "entries": 24,
+            "field_names": ["origins", "destinations"],
+            "data_types": [np.float64, np.float64],
+            "file_path": "synthetic_future_vector_CSV.aed",
+        }
+
+        dataset = AequilibraeData()
+        dataset.create_empty(**args)
+
+        dataset.origins[:] = origin[:]
+        dataset.destinations[:] = destination[:]
+        dataset.index[:] = idx[:]
+
+        file_path = "test/data/SiouxFalls_project/demand_ipf_L.aem"
+        dialog.out_name = file_path
+        dialog.outfile = file_path
+        dialog.datasets["synthetic_future_vector_CSV"] = dataset
 
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_prod_data)
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_atra_data)
@@ -63,9 +130,7 @@ def test_ipf(ae_with_project, qtbot):
     dialog.cob_seed_mat.setCurrentIndex(demand_idx)
     dialog.cob_seed_field.setCurrentText("matrix")
 
-    dialog.cob_prod_data.setCurrentText("synthetic_future_vector")
     dialog.cob_prod_field.setCurrentText("origins")
-    dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
     dialog.cob_atra_field.setCurrentText("destinations")
 
     qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
@@ -93,7 +158,8 @@ def test_ipf(ae_with_project, qtbot):
 def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1, file2, ext):
     run_traffic_assignment(ae_with_project, qtbot, ext)
 
-    dialog = DistributionModelsDialog(ae_with_project, mode="calibrate", testing=True)
+    dialog = DistributionModelsDialog(ae_with_project, mode="calibrate")
+    dialog.testing = True
 
     dialog.path = "test/data/SiouxFalls_project/"
 
@@ -161,7 +227,8 @@ def test_apply_gravity(ae_with_project, qtbot, is_negative, is_power, is_gamma, 
 
     data_name = splitext(basename(dataset_name))[0]
 
-    dialog = DistributionModelsDialog(ae_with_project, mode="apply", testing=True)
+    dialog = DistributionModelsDialog(ae_with_project, mode="apply")
+    dialog.testing = True
 
     dialog.datasets[data_name] = dataset
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_prod_data)
