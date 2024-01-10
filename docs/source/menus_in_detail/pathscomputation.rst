@@ -38,7 +38,7 @@ deselect this option, but use this carefully.
 If we select that paths need to be in a separate layer, then every time you
 compute a path, a new layer with a copy of the links in that path will be
 created and formatted in a noticeable way. You can also select to have links
-selected in the layer, but only one path can be shown at at time if you do so.
+selected in the layer, but only one path can be shown at time if you do so.
 
 .. image:: ../images/paths_generated.png
     :width: 1696
@@ -78,7 +78,7 @@ With the results computed (AEM or OMX), one can display them on the screen.
 
 On the matrix display screen, one can control how many decimal places are shown
 and whether decimal separators are shown. One can also browse through all the
-skims in this file by selecting the skim of choice in the drop down menu in
+skims in this file by selecting the skim of choice in the drop-down menu in
 the bottom left of the screen.
 
 .. image:: ../images/viewing_matrix.png
@@ -109,8 +109,8 @@ The Traffic Assignment procedure tab looks like this!
 In the *Traffic Classes* tab you will create the traffic classes used in the project.
 First, select one of the available matrices (in \*.AEM format), and the matrix core
 that will be used for computation. For the Sioux Falls example, we don't want to block
-flow through centroids, but this is only necessary because regular nodes of the network are centroids. When you finish, just
-press the *Add Traffic class to assignment*.
+flow through centroids, but this is only necessary because regular nodes of the network are centroids. 
+When you finish, just press the *Add Traffic class to assignment* button.
 
 .. image:: ../images/traffic_open_matrix.png
     :width: 877

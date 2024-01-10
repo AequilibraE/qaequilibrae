@@ -11,7 +11,7 @@ Preparing a network
 
 Preparing a link network to be imported into an AequilibraE project consists of
 ensuring that all fields necessary for network import exist and are properly
-filled. These fields are :
+filled. These fields are:
 
 * **link_id**
 * **a_node**
@@ -28,7 +28,7 @@ Link ID
 
 The link ID field is necessarily a field with unique values, but it would
 ideally also be filled with small integers (e.g. a network with 100,000 links
-does not need to have IDs in the order of 1,000,000,000,000,000), as this saves
+does not need to have IDs in the order of 1,000,000,000,000,000), as this save
 memory and computational time during some of the computations.
 
 To create such field, one can use QGIS' field calculator as shown below. Please
@@ -73,7 +73,7 @@ following:
 * Duplicates the pre-existing network in order to edit it without risk of data
   corruption
 * Creates nodes at the extremities of all links in the network (no duplicate
-  nodes at the same lat/long)
+  nodes at the same latitude/longitude)
 * Adds the fields *A_Node* and *B_Node* to the new link layer, and populate them
   with the *IDs* generated for the nodes layer
 
@@ -142,7 +142,7 @@ SpatiaLite. Other units will be possible in the future.
 Modes
 -----
 
-In AequilibraE, each mode is represented by a lower case letter. So imagine we
+In AequilibraE, each mode is represented by a lower-case letter. So imagine we
 will have several modes in our network, such as cars (c), trucks (t), bicycles
 (b) and walking (w). In that case, a link that allows all modes will have a
 modes field equal to **ctbw** (the order of modes is irrelevant), while a link

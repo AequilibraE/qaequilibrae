@@ -5,7 +5,7 @@ On the trip distribution tab, the user can perform Iterative Proportional Fittin
 with their available matrices and vectors, as well as calibrate and apply a Synthetic Gravity
 Model.
 
-In this page each option under the **Aequilibrae > Trip Distribution > Trip Distribution** is
+In this page each option under the **AequilibraE > Trip Distribution > Trip Distribution** is
 presented in one of the subsections below.
 
 .. image:: ../images/tripdistribution-menu.png
@@ -74,7 +74,8 @@ After the job is completed, a new window showing its procedure report will open.
     :alt: ipf_7
 
 .. note::
-Production and Attraction vectors must be balanced before running IPF. 
+
+    Production and Attraction vectors **must** be balanced before running IPF. 
 
 Synthetic Gravity Models
 ------------------------

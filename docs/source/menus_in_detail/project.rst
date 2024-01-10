@@ -144,7 +144,7 @@ want to migrate the data and the respective layer field in the zoning layer, and
 finally click on process.
 
 .. image:: ../images/add-zone-layer.png
-    :width: 704
+    :width: 450
     :align: center
     :alt: adding zone layer
 
@@ -158,7 +158,7 @@ reference documentation for this section can be found in its
 `documentation page <https://aequilibrae.com/python/latest/modeling_with_aequilibrae/parameter_file.html>`_.
 
 The QGIS plugin, however, has a nice interface to view and edit the parameters
-file, which can be accessed through **Aequilibrae > Project > Parameters**. This
+file, which can be accessed through **AequilibraE > Project > Parameters**. This
 interface, depicted below, allows one to edit and validate parameters before
 submitting them as the new parameter file for all AequilibraE procedures.
 

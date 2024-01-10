@@ -144,7 +144,7 @@ centroids and number them appropriately, as discussed in
 :ref:`adding centroids <adding_centroids>`.
 
 QGIS has straightforward tools to extract centroids from areas, which can be
-accessed through the menu  **Vector > Geometry Tools > Centroids**, as shown below
+accessed through the menu **Vector > Geometry Tools > Centroids**, as shown below
 
 .. image:: ../images/network_edit_centroids_menu.png
     :width: 800

@@ -11,7 +11,7 @@ a look at the documentation provided by `Google <https://developers.google.com/t
 Import GTFS
 -----------
 
-To import a GTFS feed, click **Aequilibrae > Public transport > Import GTFS**. A new window with the importer
+To import a GTFS feed, click **AequilibraE > Public transport > Import GTFS**. A new window with the importer
 will open. If it is the first time you are creating a GTFS feed for your project, it may take a little while
 to create the public transport database in the project folder. In the GTFS importer window, you can click on
 *Add Feed* and point to the location in your machine where the GTFS data is.

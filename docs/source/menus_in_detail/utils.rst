@@ -33,7 +33,7 @@ Create example
 --------------
 
 AequilibraE has three different example sets one can use as learning tool, and they were all
-made available within the QGIS ecossystem.
+made available within the QGIS ecosystem.
 
 Within **AequilibraE > Utils > Create example**, select one of the available models, the desired
 location of the output folder, and just press *Create*. The window will close automatically
