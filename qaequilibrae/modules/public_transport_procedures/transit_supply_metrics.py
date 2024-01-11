@@ -4,7 +4,6 @@ from typing import List, Optional
 import pandas as pd
 import numpy as np
 
-from aequilibrae.transit.constants import WALK_AGENCY_ID as WID
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
 
