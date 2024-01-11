@@ -13,7 +13,7 @@ from qgis.core import QgsSymbol, QgsLinearlyInterpolatedDiagramRenderer, QgsPalL
 from qgis.core import QgsTextBufferSettings, QgsVectorLayerSimpleLabeling, QgsPieDiagram
 
 from qaequilibrae.modules.common_tools import layer_from_dataframe, PandasModel, GetOutputFileName
-from qaequilibrae.modules.gis import color_ramp_shades
+from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
 from qaequilibrae.modules.public_transport_procedures.transit_demand_metrics import DemandMetrics
 from qaequilibrae.modules.public_transport_procedures.transit_supply_metrics import SupplyMetrics
 from aequilibrae.project.database_connection import database_connection
@@ -636,8 +636,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
         val = self.sld_stop_scale.value() / 2
         color_ramp_name = "Blues" if method != "Color" else self.cob_stops_color.currentText()
-        for x in [fld, max_metric, method, self.stops_layer, val, color_ramp_name]:
-            print(str(x), type(x))
         self.map_ranges(fld, max_metric, method, self.stops_layer, val, color_ramp_name)
         self.but_map_stops.setEnabled(True)
 
