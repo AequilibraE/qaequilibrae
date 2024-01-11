@@ -44,9 +44,9 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.filtered = {}
 
         self.sm = SupplyMetrics(None)
-        # self.dm = DemandMetrics()
+        self.dm = DemandMetrics()
         self.sm_alt: SupplyMetrics = None
-        # self.dm_alt: DemandMetrics = None
+        self.dm_alt: DemandMetrics = None
         self._testing = False
         self.gtfs_types = {
             0: "Light rail",
@@ -128,8 +128,8 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.cob_type.currentIndexChanged.connect(self.filter_direction)
 
         # Databases for comparison
-        # self.but_additional_supply.clicked.connect(partial(self.load_new_file, "supply"))
-        # self.but_additional_demand.clicked.connect(partial(self.load_new_file, "demand"))
+        self.but_additional_supply.clicked.connect(partial(self.load_new_file, "supply"))
+        self.but_additional_demand.clicked.connect(partial(self.load_new_file, "demand"))
         # self.but_additional_demand.setEnabled(self.project.demand_file is not None)
 
         # Direction filtering
@@ -177,36 +177,36 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.selected_from_time = None
         self.selected_to_time = None
 
-    # def load_new_file(self, file_type):
-    #     formats = ["Transit Network(*.sqlite)"] if file_type == "supply" else ["Transit Demand(*.sqlite)"]
+    def load_new_file(self, file_type):
+        formats = ["Transit Network(*.sqlite)"] if file_type == "supply" else ["Transit Demand(*.sqlite)"]
 
-    #     path, _ = GetOutputFileName(
-    #         QDialog(),
-    #         f"Transit {file_type}",
-    #         formats,
-    #         ".sqlite",
-    #         self.qgis_project.path,
-    #     )
-    #     self._add_loaded_file(path, file_type)
+        path, _ = GetOutputFileName(
+            QDialog(),
+            f"Transit {file_type}",
+            formats,
+            ".sqlite",
+            self.project.project_base_path,
+        )
+        self._add_loaded_file(path, file_type)
 
-    # def _add_loaded_file(self, path, file_type):
-    #     if file_type == "supply":
-    #         if path is None:
-    #             path = ""
-    #             self.additional_supply = None
-    #         else:
-    #             self.additional_supply = path
-    #             self.sm_alt = SupplyMetrics(Path(path))
-    #         self.lbl_additional_supply.setText(path)
-    #     else:
-    #         if path is None:
-    #             path = ""
-    #             self.additional_demand = None
-    #         else:
-    #             supply = "" if self.additional_supply is None else self.additional_supply
-    #             self.additional_demand = path
-    #             self.dm_alt = DemandMetrics(supply, Path(path))
-    #         self.lbl_additional_demand.setText(path)
+    def _add_loaded_file(self, path, file_type):
+        if file_type == "supply":
+            if path is None:
+                path = ""
+                self.additional_supply = None
+            else:
+                self.additional_supply = path
+                self.sm_alt = SupplyMetrics(Path(path))
+            self.lbl_additional_supply.setText(path)
+        else:
+            if path is None:
+                path = ""
+                self.additional_demand = None
+            else:
+                supply = "" if self.additional_supply is None else self.additional_supply
+                self.additional_demand = path
+                self.dm_alt = DemandMetrics(supply, Path(path))
+            self.lbl_additional_demand.setText(path)
 
     def show_label_stops(self):
         self.build_label(
@@ -314,14 +314,13 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
     def filter_direction(self):
         self.reset_data_global()
         if self.rdo_ab_direction.isChecked():
-            self.route_patterns = self.route_patterns[self.route_patterns.direction.isin(["S", "N"])]
+            self.route_patterns = self.route_patterns[self.route_patterns.direction.isin(["S", "W"])]
         elif self.rdo_ba_direction.isChecked():
-            self.route_patterns = self.route_patterns[self.route_patterns.direction.isin(["W", "E"])]
+            self.route_patterns = self.route_patterns[self.route_patterns.direction.isin(["N", "E"])]
 
         self.all_routes = self.all_routes[self.all_routes.route_id.isin(self.route_patterns.route_id)]
         filtered = self.stop_pattern[self.stop_pattern.route_id.isin(self.route_patterns.route_id)]
         self.stops = self.all_stops[self.all_stops.stop_id.isin(filtered.stop_id)]
-        print(self.stops.shape)
         self.global_filters_only()
 
     def reset_lists(self):
@@ -412,7 +411,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.list_stops.selectionModel().selectionChanged.connect(self.select_stop)
 
     def redo_map(self):
-        print(self.stops.shape)
         if self.stops.shape[0] > 0:
             stops = tuple(self.stops.stop_id.tolist())
             fltr = f'"stop_id" IN {str(stops)}' if len(stops) > 1 else f'"stop_id" = {stops[0]}'
@@ -529,13 +527,12 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         routes = self.filtered.get("routes", self.routes.route_id.tolist())
 
         self.stop_target_metric = self.cob_stops_map_info.currentText()
-        sample = self.sb_sample.value() / 100
+        # sample = self.sb_sample.value() / 100
         if self.stop_target_metric in self.sm.list_stop_metrics():
             df = self.sm.stop_metrics(
                 from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
             )
             if self.additional_supply is not None:
-                print("In loop")
                 df2 = self.sm_alt.stop_metrics(
                     from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
                 )
@@ -565,25 +562,19 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         #                 df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
         #         df = df[["stop_id"] + self.dm.list_stop_metrics()]
 
-        # print(df.shape)
-        # print(df.head(3).transpose())
-        df.reset_index(drop=True, inplace=True)
-        df = df[["stop_id", "trips", "routes"]]
-        print(df.dtypes)
-        # self.stop_metric_layer = layer_from_dataframe(df, "stop_metrics")
-        layer_from_dataframe(df, "stop_metrics")
+        self.stop_metric_layer = layer_from_dataframe(df, "stop_metrics")
 
-        # lien = QgsVectorLayerJoinInfo()
-        # lien.setJoinFieldName("stop_id")
-        # lien.setTargetFieldName("stop_id")
-        # lien.setJoinLayerId(self.stop_metric_layer.id())
-        # lien.setUsingMemoryCache(True)
-        # lien.setJoinLayer(self.stop_metric_layer)
-        # lien.setPrefix("metrics_")
-        # self.stops_layer.addJoin(lien)
-        # self.draw_stop_styles()
-        # self.but_map_stops.setEnabled(True)
-        # self.show_label_stops()
+        lien = QgsVectorLayerJoinInfo()
+        lien.setJoinFieldName("stop_id")
+        lien.setTargetFieldName("stop_id")
+        lien.setJoinLayerId(self.stop_metric_layer.id())
+        lien.setUsingMemoryCache(True)
+        lien.setJoinLayer(self.stop_metric_layer)
+        lien.setPrefix("metrics_")
+        self.stops_layer.addJoin(lien)
+        self.draw_stop_styles()
+        self.but_map_stops.setEnabled(True)
+        self.show_label_stops()
 
     def map_zones(self):
         self.mapped_zones = True
@@ -645,6 +636,8 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
         val = self.sld_stop_scale.value() / 2
         color_ramp_name = "Blues" if method != "Color" else self.cob_stops_color.currentText()
+        for x in [fld, max_metric, method, self.stops_layer, val, color_ramp_name]:
+            print(str(x), type(x))
         self.map_ranges(fld, max_metric, method, self.stops_layer, val, color_ramp_name)
         self.but_map_stops.setEnabled(True)
 
@@ -732,7 +725,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
             df = self.sm.route_metrics(**par)
 
             if self.additional_supply is not None:
-                print("In loop")
                 df2 = self.sm_alt.route_metrics(**par)
                 df = df.merge(df2, on="route_id", suffixes=("", "_alt"))
                 for metric in self.sm.list_route_metrics():
@@ -759,8 +751,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         #                 df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
         #         df = df[[fld] + self.dm.list_route_metrics()]
 
-        print(df.columns)
-        print(df.head())
         self.line_metric_layer = layer_from_dataframe(df, f"{element}_metrics")
 
         lien = QgsVectorLayerJoinInfo()
