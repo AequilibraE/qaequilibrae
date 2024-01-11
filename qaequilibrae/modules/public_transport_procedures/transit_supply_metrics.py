@@ -2,6 +2,7 @@ from os import PathLike
 from typing import List, Optional
 
 import pandas as pd
+import numpy as np
 
 from aequilibrae.transit.constants import WALK_AGENCY_ID as WID
 from aequilibrae.project.database_connection import database_connection
@@ -41,11 +42,13 @@ class SupplyMetrics:
         with read_and_close(connection) as conn:
             self.__raw_routes = pd.read_sql(rt_sql, conn).fillna(0)
             self.__raw_stops = pd.read_sql(stop_sql, conn)
+            self.__raw_stops["stop_id"] = self.__raw_stops["stop_id"].astype(np.int64)
 
             self.__raw_stop_pattern = pd.read_sql(stop_pat_sql, conn).drop_duplicates()
             self.__raw_stop_pattern = self.__raw_stop_pattern.merge(self.__raw_stops, on="stop_id", how="left")
-            self.__raw_stop_pattern = self.__raw_stop_pattern.merge(self.__raw_routes[["pattern_id", "route_id"]],
-                                                                    on="pattern_id")
+            self.__raw_stop_pattern = self.__raw_stop_pattern.merge(
+                self.__raw_routes[["pattern_id", "route_id"]], on="pattern_id"
+            )
             self.__raw_stop_pattern.fillna(0, inplace=True)
 
             self.__raw_trips = pd.read_sql(trip_sql, conn).fillna(0)
@@ -53,8 +56,9 @@ class SupplyMetrics:
             self.__trip_schedule = pd.read_sql(trp_sch_sql, conn)
 
             self.__route_links = pd.read_sql(trp_pat_lnk_sql, conn)
-            self.__route_links = self.__route_links.merge(self.__raw_routes[["pattern_id", "route_id"]], 
-                                                          on="pattern_id")
+            self.__route_links = self.__route_links.merge(
+                self.__raw_routes[["pattern_id", "route_id"]], on="pattern_id"
+            )
 
         self.__distribute_time_stamps()
         self.__compute_stop_order()
@@ -222,8 +226,9 @@ class SupplyMetrics:
         stop_order.columns = ["route_id", "pattern_id", "stop_order", "stop_id"]
         stop_order = pd.concat([stop_order, aux])
 
-        self.__raw_stop_pattern = self.__raw_stop_pattern.merge(stop_order, 
-                                                                on=["route_id", "pattern_id", "stop_id"], how="left")
+        self.__raw_stop_pattern = self.__raw_stop_pattern.merge(
+            stop_order, on=["route_id", "pattern_id", "stop_id"], how="left"
+        )
         self.__raw_stop_pattern.fillna(0, inplace=True)
 
     def __compute_route_metrics(self, trips: pd.DataFrame, routes: pd.DataFrame) -> pd.DataFrame:

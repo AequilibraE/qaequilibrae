@@ -49,11 +49,11 @@ def _run_load_project_from_path(qgis_project, proj_path):
     if exists(pt_database):
         new_conn = qgis.utils.spatialite_connect(pt_database)
 
-    other_layers = [
-        "transit_" + x[0] for x in new_conn.execute("select f_table_name from geometry_columns;").fetchall()
-    ]
+        other_layers = [
+            "transit_" + x[0] for x in new_conn.execute("select f_table_name from geometry_columns;").fetchall()
+        ]
 
-    layers += other_layers
+        layers += other_layers
 
     descrlayout = QVBoxLayout()
     qgis_project.geo_layers_table = QTableWidget()

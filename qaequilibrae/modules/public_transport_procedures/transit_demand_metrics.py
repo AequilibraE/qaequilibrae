@@ -155,11 +155,11 @@ class DemandMetrics:
 
             self.__get_base_table()
             gpb = self.__base_table.groupby("object_id")
-            frt = gpb.first()[["from_node", "from_time", "agency_id", "pattern_id", "route_id"]]
-            frt.columns = ["from_stop", "from_minute", "from_agency_id", "from_pattern_id", "from_route_id"]
+            frt = gpb.first()[["from_node", "from_time", "agency_id", "route_id"]]
+            frt.columns = ["from_stop", "from_minute", "from_agency_id", "from_route_id"]
 
-            lst = gpb.last()[["to_node", "to_time", "agency_id", "pattern_id", "route_id"]]
-            lst.columns = ["to_stop", "to_minute", "to_agency_id", "to_pattern_id", "to_route_id"]
+            lst = gpb.last()[["to_node", "to_time", "agency_id", "route_id"]]
+            lst.columns = ["to_stop", "to_minute", "to_agency_id", "to_route_id"]
 
             sm = gpb.sum()[["vadt", "distance"]]
             sm.columns = ["pax_hour", "pax_km"]
@@ -192,22 +192,6 @@ class DemandMetrics:
         :return: Statistics DataFrame
         """
         return self.__line_metrics("route_id", from_minute, to_minute, agency_id, patterns, routes)
-
-    def pattern_metrics(
-        self, from_minute=None, to_minute=None, agency_id=None, patterns=None, routes=None
-    ) -> pd.DataFrame:
-        """Computes several metrics for transit patterns, indexed by pattern_id. Allows constraining
-            the analysis to a given time interval, set of routes, set of patterns and/or Transit Agency.
-            *It does NOT allow for filtering by stops*
-
-        :param from_minute: Start of the interval for computation. Zero if not provided
-        :param to_minute: End of the interval for computation. Maximum time from the dataset if not provided
-        :param agency_id: The ID of the agency we want to filter for
-        :param patterns: List of pattern_id to consider in the computation
-        :param routes: List of route_id to consider in the computation
-        :return: Statistics DataFrame
-        """
-        return self.__line_metrics("pattern_id", from_minute, to_minute, agency_id, patterns, routes)
 
     def compute_line_loads(self, overwrite=False):
         """Builds tables on demand database with the summary statistics for line loads.
@@ -271,13 +255,11 @@ class DemandMetrics:
         busiest_trip = busiest_trip.assign(most_crowded_trip=busiest_trip.groupby("trip_id")["action"].cumsum())
         busiest_trip = busiest_trip.groupby([metric]).max()[["most_crowded_trip"]]
 
-        most_boardings = (
-            base_data[["trip_id", "route_id", "from_time"]].groupby(["trip_id", metric]).count()
-        )
+        most_boardings = base_data[["trip_id", "route_id", "from_time"]].groupby(["trip_id", metric]).count()
         most_boardings = most_boardings.reset_index().groupby(metric).max()[["from_time"]]
         most_boardings.columns = ["most_boardings_trip"]
 
-        boards = base_data[["route_id", "pattern_id"]].groupby(metric).count()
+        boards = base_data[["route_id"]].groupby(metric).count()
         boards.columns = ["total_boardings"]
 
         return route_loads.join(boards).join(busiest_trip).join(most_boardings).reset_index()
@@ -294,9 +276,7 @@ class DemandMetrics:
         self.compute_stop_to_stop_matrix()
         base_data = self.__stop_data.assign(pax_count=1)
         if self.__boardings.shape[0] == 0:
-            gpb = base_data.groupby(
-                ["from_stop", "from_minute", "from_agency_id", "from_zone", "from_route_id"]
-            )
+            gpb = base_data.groupby(["from_stop", "from_minute", "from_agency_id", "from_zone", "from_route_id"])
             self.__boardings = gpb.sum()[["pax_hour", "pax_km", "pax_count"]].reset_index()
             self.__boardings.rename(
                 columns={
@@ -354,19 +334,17 @@ class DemandMetrics:
             return
         with read_and_close(self.__supply_file) as conn:
             self.__zone_data = read_sql(
-            "Select zone, pop_persons popu, employment_total empl from zones", conn, index_col="zone"
-        )
+                "Select zone, pop_persons popu, employment_total empl from zones", conn, index_col="zone"
+            )
 
     def __get_base_table(self):
         if self.__base_table is not None:
             return
 
-        qry = """SELECT tl.transit_link, tl.from_node, tl.to_node, "index" "order",  tl.pattern_id, tp.route_id,
-                        tr.agency_id, tl.length distance
-                            FROM links tl
-                            INNER JOIN transit_patterns tp ON tl.pattern_id=tp.pattern_id
-                            INNER JOIN transit_pattern_links tpl ON tl.transit_link=tpl.transit_link
-                            INNER JOIN routes tr ON tp.route_id=tr.route_id"""
+        qry = """SELECT tl.transit_link, tl.from_stop, tl.to_stop, "index" "order",  tl.pattern_id, 
+                        tr.agency_id, tl.distance, tr.route_id
+                 FROM route_links tl
+                 INNER JOIN routes tr ON tl.pattern_id=tr.pattern_id"""
 
         with read_and_close(self.__supply_file) as conn:
             trans_links = read_sql(qry, conn)
