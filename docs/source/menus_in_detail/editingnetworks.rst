@@ -78,7 +78,7 @@ the results of this tool **CAREFULLY**.
 The *GUI* for this procedure is fairly straightforward, as shown below.
 
 .. image:: ../images/add_connectors_to_project.png
-    :width: 827
+    :width: 600
     :align: center
     :alt: Adding connectors
 

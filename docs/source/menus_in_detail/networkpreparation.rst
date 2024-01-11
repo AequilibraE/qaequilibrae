@@ -93,10 +93,8 @@ following:
 * Adds the fields *A_Node* and *B_Node* to the new link layer, and populate them
   with the *IDs* chosen among the fields from the nodes layer
 
-**GUI**
-
-The tool can be accessed in the AequilibraE menu *AequilibraE > Network
-Manipulation > Network Preparation*, and it looks like this:
+The *GUI* for this process can be accessed in the AequilibraE menu **AequilibraE > Network
+Manipulation > Network Preparation**, and it looks like this:
 
 .. image:: ../images/network_edit_network_preparation.png
     :width: 774

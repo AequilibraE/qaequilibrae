@@ -21,7 +21,7 @@ to see if the network is connected and if paths make sense.
 Before computing a path, we go to the configuration screen
 
 .. image:: ../images/configure_path_computation.png
-    :width: 257
+    :width: 250
     :align: center
     :alt: configure_path_computation
 
@@ -31,7 +31,7 @@ case. For zones with a single connector per zone it is slightly faster to also
 deselect this option, but use this carefully.
 
 .. image:: ../images/path_computation_configuration.png
-    :width: 282
+    :width: 250
     :align: center
     :alt: path_computation_configuration
 
@@ -107,7 +107,7 @@ The Traffic Assignment procedure tab looks like this!
     :alt: Project overview
 
 In the *Traffic Classes* tab you will create the traffic classes used in the project.
-First, select one of the available matrices (in \*.AEM format), and the matrix core
+First, select one of the available matrices (in \*.AEM or \*.OMX format), and the matrix core
 that will be used for computation. For the Sioux Falls example, we don't want to block
 flow through centroids, but this is only necessary because regular nodes of the network are centroids. 
 When you finish, just press the *Add Traffic class to assignment* button.
