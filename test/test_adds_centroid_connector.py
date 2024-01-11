@@ -14,10 +14,11 @@ from qaequilibrae.modules.network.adds_connectors_dialog import AddConnectorsDia
 def test_add_connectors_from_zones(pt_no_feed):
     dialog = AddConnectorsDialog(pt_no_feed)
     dialog.rdo_zone.setChecked(True)
-    dialog._testing = True
-    dialog.link_types = "rtSp"
-    dialog.modes = ["c"]
 
+    dialog.lst_modes.setCurrentRow(1)
+    dialog.lst_link_types.setCurrentRow(11)
+
+    # Assert zones exist in the project
     zoning = dialog.project.zoning
     assert len(zoning.all_zones())
 

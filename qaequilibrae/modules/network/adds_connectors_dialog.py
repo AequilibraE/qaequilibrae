@@ -45,8 +45,6 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.but_process.clicked.connect(self.run)
 
-        self._testing = False
-
     def centroid_source(self):
         self.layer_box.setEnabled(self.rdo_layer.isChecked())
         self.field_box.setEnabled(self.rdo_layer.isChecked())
