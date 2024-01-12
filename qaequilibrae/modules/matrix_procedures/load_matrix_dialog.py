@@ -47,7 +47,6 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.__current_name = None
         self.logger = aequilibrae.logger
         self._testing = False
-        self.load_layer_to_project()
 
         # For changing the network layer
         self.matrix_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
@@ -68,6 +67,24 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 if layer.wkbType() == 100:
                     self.matrix_layer.addItem(layer.name())
 
+        self.resizing()
+
+    def resizing(self):
+        self.group_combo.setVisible(True)
+        self.group_list.setVisible(True)
+        self.group_buttons.setVisible(True)
+        self.matrix_list_view.setColumnWidth(0, 180)
+        self.matrix_list_view.setColumnWidth(1, 100)
+        self.matrix_list_view.setColumnWidth(2, 125)
+        self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
+        self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
+        self.setMaximumSize(QtCore.QSize(100000, 100000))
+        self.resize(542, 427)
+        self.but_permanent_save.setVisible(True)
+
+        self.but_save_for_single_use.setEnabled(False)
+        self.but_permanent_save.setEnabled(False)
+
     def slot_double_clicked(self, mi):
         row = mi.row()
         if row > -1:
@@ -75,21 +92,6 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             mat_to_remove = self.matrix_list_view.item(row, 0).text()
             self.matrices.pop(mat_to_remove, None)
             self.update_matrix_list()
-
-    def load_layer_to_project(self):
-        self.but_load.setEnabled(True)
-        members = [self.lbl_matrix, self.lbl_from, self.matrix_layer, self.field_from]
-        all_members = members + [self.lbl_to, self.lbl_flow, self.field_to, self.field_cells]
-
-        # Covers the Numpy option (minimizes the code length this way)
-        for member in all_members:
-            member.setVisible(False)
-
-        self.lbl_matrix.setText(self.tr("Matrix"))
-        self.lbl_from.setText(self.tr("From"))
-        for member in all_members:
-            member.setVisible(True)
-        self.load_fields_to_combo_boxes()
 
     def load_fields_to_combo_boxes(self):
         self.but_load.setEnabled(False)
@@ -191,7 +193,6 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if self.worker_thread is not None and not self._testing:
             self.run_thread()
-        self.worker_thread.doWork()
 
         if self.error is not None:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Error:"), self.error, level=1)
@@ -262,9 +263,8 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.worker_thread = MatrixReblocking(
                 qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
             )
-        if not self._testing:
-            self.run_thread()
-        self.worker_thread.doWork()
+            if not self._testing:
+                self.run_thread()
 
     def exit_procedure(self):
         self.close()
