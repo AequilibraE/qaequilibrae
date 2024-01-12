@@ -27,7 +27,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 # TODO: Allow user to import multiple matrices from CSV at once (like an export from TransCad or FAF data)
 # TODO: Add a remove button to the list of matrices to be loaded. Remove double-click
 class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, testing=False, **kwargs):
+    def __init__(self, iface, **kwargs):
         QtWidgets.QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
@@ -46,7 +46,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = None
         self.__current_name = None
         self.logger = aequilibrae.logger
-        self.testing = testing
+        self._testing = False
         self.load_layer_to_project()
 
         # For changing the network layer
@@ -115,7 +115,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.but_load.setEnabled(False)
         self.worker_thread.start()
-        if not self.testing:
+        if not self._testing:
             self.exec_()
 
     # VAL and VALUE have the following structure: (bar/text ID, value)
@@ -130,7 +130,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def finished_threaded_procedure(self, param):
         self.but_load.setEnabled(True)
-        if self.worker_thread.report and not self.testing:
+        if self.worker_thread.report and not self._testing:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
             dlg2.exec_()
@@ -189,7 +189,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                 qgis.utils.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
             )
 
-        if self.worker_thread is not None and not self.testing:
+        if self.worker_thread is not None and not self._testing:
             self.run_thread()
         self.worker_thread.doWork()
 
@@ -262,7 +262,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.worker_thread = MatrixReblocking(
                 qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
             )
-        if not self.testing:
+        if not self._testing:
             self.run_thread()
         self.worker_thread.doWork()
 

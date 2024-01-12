@@ -51,9 +51,10 @@ def test_matrix_menu(ae_with_project, qtbot):
 
 
 def test_save_matrix(ae_with_project, qtbot):
-    file_name = "test/data/SiouxFalls_project/test_matrix.aem"
+    file_name = "test/data/SiouxFalls_project/matrices/test_matrix.aem"
     load_layers()
-    dialog = LoadMatrixDialog(ae_with_project, testing=True)
+    dialog = LoadMatrixDialog(ae_with_project)
+    dialog._testing = True
     dialog.sparse = True
     dialog.output_name = file_name
     dialog.field_from.setCurrentIndex(0)
