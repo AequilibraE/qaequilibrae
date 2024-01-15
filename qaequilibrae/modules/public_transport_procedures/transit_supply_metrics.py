@@ -41,9 +41,9 @@ class SupplyMetrics:
         with read_and_close(connection) as conn:
             self.__raw_routes = pd.read_sql(rt_sql, conn).fillna(0)
             self.__raw_stops = pd.read_sql(stop_sql, conn)
-            self.__raw_stops["stop_id"] = self.__raw_stops["stop_id"].astype(np.int64)
 
             self.__raw_stop_pattern = pd.read_sql(stop_pat_sql, conn).drop_duplicates()
+            self.__raw_stop_pattern["stop_id"] = self.__raw_stop_pattern["stop_id"].astype(str)
             self.__raw_stop_pattern = self.__raw_stop_pattern.merge(self.__raw_stops, on="stop_id", how="left")
             self.__raw_stop_pattern = self.__raw_stop_pattern.merge(
                 self.__raw_routes[["pattern_id", "route_id"]], on="pattern_id"
@@ -58,6 +58,8 @@ class SupplyMetrics:
             self.__route_links = self.__route_links.merge(
                 self.__raw_routes[["pattern_id", "route_id"]], on="pattern_id"
             )
+            self.__route_links["from_stop"] = self.__route_links["from_stop"].astype(str)
+            self.__route_links["to_stop"] = self.__route_links["to_stop"].astype(str)
 
         self.__distribute_time_stamps()
         self.__compute_stop_order()
