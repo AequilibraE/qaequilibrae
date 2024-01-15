@@ -21,46 +21,51 @@ class SupplyMetrics:
         :param supply_file: Path to the supply file we want to compute metrics for
         """
 
-        rt_sql = """Select route_id, route, pattern_id, agency_id, route_type, 
+        rt_sql = """Select cast(route_id as text) route_id, route, 
+                    cast(pattern_id as text) pattern_id, agency_id, route_type, 
                     seated_capacity s_capacity, total_capacity t_capacity from routes"""
 
-        stop_sql = f"""Select stop_id, stop, name stop_name, agency_id, route_type from stops"""
+        stop_sql = f"""Select cast(stop_id as text) stop_id, stop, name stop_name, agency_id, route_type from stops"""
 
-        stop_pat_sql = """Select pattern_id, from_stop stop_id from route_links
+        stop_pat_sql = """Select cast(pattern_id as text) pattern_id, cast(from_stop as text) stop_id from route_links
                           UNION ALL
-                          Select pattern_id, to_stop stop_id from route_links """
+                          Select cast(pattern_id as text) pattern_id, cast(to_stop as text) stop_id from route_links """
 
-        trip_sql = """select trip_id, pattern_id from trips"""
+        trip_sql = """select cast(trip_id as text) trip_id, cast(pattern_id as text) pattern_id from trips"""
 
-        trp_sch_sql = """Select trip_id, seq stop_order, arrival/60 arrival, departure/60 departure
+        trp_sch_sql = """Select cast(trip_id as text) trip_id, seq stop_order, arrival/60 arrival, departure/60 departure
                          from trips_schedule"""
 
-        trp_pat_lnk_sql = """select pattern_id, seq stop_order, from_stop, to_stop from route_links"""
+        trp_pat_lnk_sql = """select cast(pattern_id as text) pattern_id, seq stop_order, 
+                                    cast(from_stop as text) from_stop, cast(to_stop as text) to_stop from route_links"""
 
         connection = database_connection("transit") if path == None else path
         with read_and_close(connection) as conn:
             self.__raw_routes = pd.read_sql(rt_sql, conn).fillna(0)
             self.__raw_stops = pd.read_sql(stop_sql, conn)
+            print(self.__raw_routes.dtypes)
+            print(self.__raw_stops.dtypes)
 
             self.__raw_stop_pattern = pd.read_sql(stop_pat_sql, conn).drop_duplicates()
-            self.__raw_stop_pattern["stop_id"] = self.__raw_stop_pattern["stop_id"].astype(str)
             self.__raw_stop_pattern = self.__raw_stop_pattern.merge(self.__raw_stops, on="stop_id", how="left")
             self.__raw_stop_pattern = self.__raw_stop_pattern.merge(
                 self.__raw_routes[["pattern_id", "route_id"]], on="pattern_id"
             )
             self.__raw_stop_pattern.fillna(0, inplace=True)
+            print("__raw_stop_pattern")
+            print(self.__raw_stop_pattern.dtypes)
 
             self.__raw_trips = pd.read_sql(trip_sql, conn).fillna(0)
             self.__raw_trips = self.__raw_trips.merge(self.__raw_routes[["pattern_id", "route_id"]], on="pattern_id")
             self.__trip_schedule = pd.read_sql(trp_sch_sql, conn)
+            print(self.__raw_trips.dtypes)
+            print(self.__trip_schedule.dtypes)
 
             self.__route_links = pd.read_sql(trp_pat_lnk_sql, conn)
             self.__route_links = self.__route_links.merge(
                 self.__raw_routes[["pattern_id", "route_id"]], on="pattern_id"
             )
-            self.__route_links["from_stop"] = self.__route_links["from_stop"].astype(str)
-            self.__route_links["to_stop"] = self.__route_links["to_stop"].astype(str)
-
+            print(self.__route_links.dtypes)
         self.__distribute_time_stamps()
         self.__compute_stop_order()
         self.__correct_capacities()
@@ -69,7 +74,9 @@ class SupplyMetrics:
         self._stop_pattern = self.__raw_stop_pattern.copy(True)
 
         self.__routes = self.__compute_route_metrics(self.__raw_trips, self.__raw_routes)
+        print(self.__routes.dtypes)
         self.__stops = self.__compute_stop_metrics(self.__routes, self.__raw_stops)
+        print(self.__stops.dtypes)
 
     def stop_metrics(
         self,
@@ -160,6 +167,7 @@ class SupplyMetrics:
         return from_minute, to_minute
 
     def __filter_trips(self, from_minute, to_minute, routes, patterns, stops) -> pd.DataFrame:
+        print(" __filter_trips")
         trips = self.__raw_trips
         if None not in [from_minute, to_minute]:
             crit1 = (from_minute < trips.begin_trip) & (trips.begin_trip < to_minute)
@@ -185,6 +193,7 @@ class SupplyMetrics:
 
     def __correct_capacities(self):
         """Brings capacities from patterns down to patterns and then trips when those are not available"""
+        print(" __correct_capacities")
         for field in ["s_capacity", "t_capacity"]:
             route_cap = self.__raw_routes[["route_id", field]]
             route_cap.columns = ["route_id", "route_cap"]
@@ -198,6 +207,7 @@ class SupplyMetrics:
             self.__raw_trips.fillna(0, inplace=True)
 
     def __distribute_time_stamps(self):
+        print(" __distribute_time_stamps")
         # Distribute mins and max time stamps for all elements
         trps = (
             self.__trip_schedule.groupby(["trip_id"])
@@ -217,22 +227,28 @@ class SupplyMetrics:
         self.__raw_routes.fillna(0, inplace=True)
 
     def __compute_stop_order(self):
+        print(" __compute_stop_order")
         aux = self.__route_links.groupby("pattern_id").max()[["stop_order"]].reset_index()
         aux = aux.merge(self.__route_links, on=["pattern_id", "stop_order"], how="left")
         aux = aux[["route_id", "pattern_id", "stop_order", "to_stop"]]
         aux.loc[:, "stop_order"] += 1
         aux.columns = ["route_id", "pattern_id", "stop_order", "stop_id"]
 
+        print(aux.dtypes)
+        print(1)
         stop_order = self.__route_links[["route_id", "pattern_id", "stop_order", "from_stop"]]
         stop_order.columns = ["route_id", "pattern_id", "stop_order", "stop_id"]
         stop_order = pd.concat([stop_order, aux])
 
+        print(stop_order.dtypes)
+        print(2)
         self.__raw_stop_pattern = self.__raw_stop_pattern.merge(
             stop_order, on=["route_id", "pattern_id", "stop_id"], how="left"
         )
         self.__raw_stop_pattern.fillna(0, inplace=True)
 
     def __compute_route_metrics(self, trips: pd.DataFrame, routes: pd.DataFrame) -> pd.DataFrame:
+        print(" __compute_route_metrics")
         trps = trips.assign(trip_count=1)
 
         trps = trps.groupby(["route_id"]).agg(
@@ -251,6 +267,7 @@ class SupplyMetrics:
         return routes
 
     def __compute_stop_metrics(self, patterns: pd.DataFrame, stops: pd.DataFrame) -> pd.DataFrame:
+        print(" __compute_stop_metrics")
         smetric = self.__raw_stop_pattern.merge(patterns, on="route_id", how="right")
         smetric = (
             smetric.groupby("stop_id")
