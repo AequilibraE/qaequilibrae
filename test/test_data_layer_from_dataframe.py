@@ -14,10 +14,6 @@ def test_layer_from_dataframe(qgis_iface):
 
     assert layer.isValid()
 
-    # for f in layer.getFeatures():
-    #     for attr in f.attributes():
-    #         print(attr)
-
     counter = 0
     for f in layer.getFeatures():
         counter += 1

@@ -62,13 +62,13 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         }
 
         fldr = join(dirname(dirname(__file__)), "style_loader")
-        self.stops_layer = self.qgis_project.layers["transit_stops"][0]
+        self.stops_layer = qgis_project.layers["transit_stops"][0]
         self.stops_layer.loadNamedStyle(join(fldr, "stops.qml"), True)
 
-        self.zones_layer = self.qgis_project.layers["zones"][0]
+        self.zones_layer = qgis_project.layers["zones"][0]
         self.zones_layer.loadNamedStyle(join(fldr, "zones.qml"), True)
 
-        self.routes_layer = self.qgis_project.layers["transit_routes"][0]
+        self.routes_layer = qgis_project.layers["transit_routes"][0]
         self.routes_layer.loadNamedStyle(join(fldr, "routes.qml"), True)
 
         for layer in [self.zones_layer, self.routes_layer, self.stops_layer]:
@@ -538,7 +538,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
                 )
                 df = df.merge(df2, on="stop_id", suffixes=("", "_alt"))
                 for metric in self.sm.list_stop_metrics():
-                    if self.rdo_absollute_diff.isChecked():
+                    if self.rdo_absolute_diff.isChecked():
                         df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
                     else:
                         df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
@@ -556,7 +556,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         #         df2.loc[:, self.dm_alt.list_stop_metrics()] /= sample
         #         df = df.merge(df2, on="stop_id", suffixes=("", "_alt"))
         #         for metric in self.dm.list_stop_metrics():
-        #             if self.rdo_absollute_diff.isChecked():
+        #             if self.rdo_absolute_diff.isChecked():
         #                 df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
         #             else:
         #                 df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
