@@ -1,5 +1,4 @@
 import pandas as pd
-from qgis.core import QgsProject
 
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
 
