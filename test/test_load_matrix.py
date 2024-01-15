@@ -49,20 +49,22 @@ def test_matrix_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
 
-
-def test_save_matrix(ae_with_project, qtbot):
+# TODO: test removing the matrices
+def test_save_matrix(ae_with_project):
     file_name = "test/data/SiouxFalls_project/matrices/test_matrix.aem"
     load_layers()
     dialog = LoadMatrixDialog(ae_with_project)
     dialog._testing = True
     dialog.sparse = True
     dialog.output_name = file_name
-    dialog.field_from.setCurrentIndex(0)
-    dialog.field_to.setCurrentIndex(1)
-    dialog.field_cells.setCurrentIndex(2)
-    qtbot.mouseClick(dialog.but_load, Qt.LeftButton)
+    dialog.field_from.setCurrentText("O")
+    dialog.field_to.setCurrentText("D")
+    dialog.field_cells.setCurrentText("Ton")
+    dialog.load_the_matrix()
+    dialog.worker_thread.doWork()
     dialog.finished_threaded_procedure("LOADED-MATRIX")
     dialog.prepare_final_matrix()
+    dialog.worker_thread.doWork()
 
     from aequilibrae.matrix import AequilibraeMatrix
 
