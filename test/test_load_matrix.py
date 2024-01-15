@@ -49,6 +49,7 @@ def test_matrix_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
 
+
 # TODO: test removing the matrices
 def test_save_matrix(ae_with_project):
     file_name = "test/data/SiouxFalls_project/matrices/test_matrix.aem"
