@@ -113,7 +113,6 @@ def all_items(cob):
     return [cob.itemText(i) for i in range(cob.count())]
 
 
-@pytest.mark.skip(reason="Not working")
 def test_map_stops(dialog):
     # Simplest mapping
     for map_type in all_items(dialog.cob_stops_map_type):
@@ -130,7 +129,6 @@ def test_map_stops(dialog):
             dialog.but_map_stops.click()
 
 
-@pytest.mark.skip(reason="Not working")
 def test_map_lines(dialog):
     # Simplest mapping
     for metric in all_items(dialog.cob_routes_map_info):
