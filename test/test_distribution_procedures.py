@@ -11,7 +11,6 @@ from qaequilibrae.modules.distribution_procedures.distribution_models_dialog imp
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
 
-@pytest.fixture
 def run_traffic_assignment(ae_with_project, qtbot, ext):
     dialog = TrafficAssignmentDialog(ae_with_project)
 
