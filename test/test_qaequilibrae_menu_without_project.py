@@ -250,3 +250,8 @@ def test_gtfs_importer(ae, qtbot):
     action.trigger()
     messagebar = ae.iface.messageBar()
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
+def test_create_example(ae):
+    action = ae.menuActions["Utils"][1]
+    assert action.text() == "Create example", "Wrong text content"
