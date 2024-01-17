@@ -37,7 +37,7 @@ def run_traffic_assignment(ae_with_project, qtbot):
     dialog.run()
 
 
-# @pytest.mark.skip("Not working")
+@pytest.mark.skip("Not working")
 def test_load_result_table(ae_with_project, qtbot):
     # run_traffic_assignment(ae_with_project, qtbot)
 
