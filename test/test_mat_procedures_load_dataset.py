@@ -1,5 +1,5 @@
 import pytest
-from aequilibrae.matrix import AequilibraeData
+import numpy as np
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
 
@@ -44,7 +44,6 @@ def test_load_dialog(ae_with_project, method):
     dialog._testing = True
 
     if method == "aequilibrae data":
-        print("AED")
         dialog.radio_aequilibrae.setChecked(True)
         dialog.load_fields_to_combo_boxes()
         dialog.cob_data_layer.setCurrentText("synthetic_future_vector")
@@ -52,10 +51,11 @@ def test_load_dialog(ae_with_project, method):
         dialog.out_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
         dialog.load_from_aequilibrae_format()
 
-        print(dialog.dataset.data)
+        assert dialog.selected_fields == ["index", "origins", "destinations"]
+        assert dialog.worker_thread is None
+        arr = dialog.dataset.data.tolist()
 
     else:
-        print("Open layer")
         dialog.radio_layer_matrix.setChecked(True)
         dialog.load_fields_to_combo_boxes()
         dialog.cob_data_layer.setCurrentText("synthetic_future_vector")
@@ -64,6 +64,9 @@ def test_load_dialog(ae_with_project, method):
         dialog.worker_thread.doWork()
         dialog.output_name = "test/data/SiouxFalls_project/synthetic_future_vector_TEST.aed"
 
-        # print(dialog.__dict__)
-        # print(dialog.worker_thread.output.data)
-        # TODO: assertions
+        assert dialog.selected_fields == ["origins", "destinations"]
+        assert dialog.dataset is None
+        arr = dialog.worker_thread.output.data.tolist()
+
+    assert len(arr) == 24
+    assert np.sum(arr, axis=0)[1] == np.sum(arr, axis=0)[2] > 0
