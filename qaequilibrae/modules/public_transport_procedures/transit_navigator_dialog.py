@@ -14,7 +14,6 @@ from qgis.core import QgsTextBufferSettings, QgsVectorLayerSimpleLabeling, QgsPi
 
 from qaequilibrae.modules.common_tools import layer_from_dataframe, PandasModel, GetOutputFileName
 from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
-from qaequilibrae.modules.public_transport_procedures.transit_demand_metrics import DemandMetrics
 from qaequilibrae.modules.public_transport_procedures.transit_supply_metrics import SupplyMetrics
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
@@ -44,9 +43,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.filtered = {}
 
         self.sm = SupplyMetrics(None)
-        self.dm = DemandMetrics()
         self.sm_alt: SupplyMetrics = None
-        self.dm_alt: DemandMetrics = None
         self._testing = False
         self.gtfs_types = {
             0: "Light rail",
@@ -97,6 +94,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.route_patterns = pd.DataFrame([])
         self.all_stops = pd.DataFrame([])
         self.stop_pattern = pd.DataFrame([])
+        self.zones = pd.DataFrame([])
         self.reset_data_global()
         self.cob_agency.addItems(list(self.all_agencies.keys()))
 
@@ -130,8 +128,9 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
         # Databases for comparison
         self.but_additional_supply.clicked.connect(partial(self.load_new_file, "supply"))
-        self.but_additional_demand.clicked.connect(partial(self.load_new_file, "demand"))
-        # self.but_additional_demand.setEnabled(self.project.demand_file is not None)
+
+        self.but_additional_demand.setVisible(False)
+        self.lbl_additional_demand.setVisible(False)
 
         # Direction filtering
         self.rdo_all_directions.toggled.connect(self.filter_direction)
@@ -179,7 +178,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.selected_to_time = None
 
     def load_new_file(self, file_type):
-        formats = ["Transit Network(*.sqlite)"] if file_type == "supply" else ["Transit Demand(*.sqlite)"]
+        formats = ["Transit Network (*.sqlite)"] if file_type == "supply" else ["Transit Demand (*.sqlite)"]
 
         path, _ = GetOutputFileName(
             QDialog(),
@@ -199,15 +198,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
                 self.additional_supply = path
                 self.sm_alt = SupplyMetrics(Path(path))
             self.lbl_additional_supply.setText(path)
-        else:
-            if path is None:
-                path = ""
-                self.additional_demand = None
-            else:
-                supply = "" if self.additional_supply is None else self.additional_supply
-                self.additional_demand = path
-                self.dm_alt = DemandMetrics(supply, Path(path))
-            self.lbl_additional_demand.setText(path)
 
     def show_label_stops(self):
         self.build_label(
@@ -292,13 +282,14 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
     def reset_data_global(self):
         self.all_routes = self.sm.route_metrics()
         self.route_patterns = self.all_routes.merge(self.route_directions, on="route_id", how="left")
-        # self.route_patterns.drop_duplicates(subset="route_id", inplace=True)
 
         self.all_stops = self.sm.stop_metrics()
         self.stop_pattern = self.sm._stop_pattern.copy(True)
 
         # If empty, we just throw in some arbitrary direction
         self.route_patterns.loc[self.route_patterns.direction.isna(), "direction"] = "S"
+
+        self.zones = self.sm.zone_metrics()
 
         self.reset()
 
@@ -457,8 +448,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         if self.rdo_map_stops.isChecked():
             self.cob_stops_map_type.addItems(["Color", "Thickness"])
             self.cob_stops_map_info.addItems(self.sm.list_stop_metrics())
-            # if self.dm.tables:
-            #     self.cob_stops_map_info.addItems(self.dm.list_stop_metrics())
             self.cob_stops_color.addItems(list(default_style.colorRampNames()))
         else:
             self.mapped_stops = False
@@ -483,14 +472,9 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         for cob in [self.cob_zones_map_type, self.cob_zones_map_info, self.cob_zones_color]:
             cob.clear()
 
-        # if not self.dm.tables:
-        #     self.but_map_zones.setEnabled(False)
-        #     return
-
         if self.rdo_map_zones.isChecked():
             self.cob_zones_map_type.addItems(["Color", "Pie chart", "Stacked bars"])
-            # if self.dm.tables:
-            #     self.cob_zones_map_info.addItems(self.dm.list_zone_metrics())
+            self.cob_zones_map_info.addItems(self.sm.list_zone_metrics())
             self.cob_zones_color.addItems(list(default_style.colorRampNames()))
         else:
             self.mapped_zones = False
@@ -528,7 +512,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         routes = self.filtered.get("routes", self.routes.route_id.tolist())
 
         self.stop_target_metric = self.cob_stops_map_info.currentText()
-        # sample = self.sb_sample.value() / 100
         if self.stop_target_metric in self.sm.list_stop_metrics():
             df = self.sm.stop_metrics(from_minute=from_time, to_minute=to_time, routes=routes, stops=stops)
             if self.additional_supply is not None:
@@ -540,24 +523,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
                     else:
                         df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
                 df = df[["stop_id"] + self.sm.list_stop_metrics()]
-        # else:
-        #     df = self.dm.stop_metrics(
-        #         from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
-        #     )
-        #     df.loc[:, self.dm.list_stop_metrics()] /= sample
-
-        #     if self.additional_demand is not None:
-        #         df2 = self.dm_alt.stop_metrics(
-        #             from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
-        #         )
-        #         df2.loc[:, self.dm_alt.list_stop_metrics()] /= sample
-        #         df = df.merge(df2, on="stop_id", suffixes=("", "_alt"))
-        #         for metric in self.dm.list_stop_metrics():
-        #             if self.rdo_absolute_diff.isChecked():
-        #                 df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
-        #             else:
-        #                 df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
-        #         df = df[["stop_id"] + self.dm.list_stop_metrics()]
 
         self.stop_metric_layer = layer_from_dataframe(df, "stop_metrics")
 
@@ -593,25 +558,21 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.zone_target_metric = self.cob_zones_map_info.currentText()
         sample = self.sb_sample.value() / 100
 
-        # df = self.dm.zone_metrics(
-        #     from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
-        # )
-        # df.loc[:, self.dm.list_zone_metrics()] /= sample
+        df = self.sm.zone_metrics(from_minute=from_time, to_minute=to_time, routes=routes, stops=stops)
+        df.loc[:, self.sm.list_zone_metrics()] /= sample
 
-        # if self.additional_demand is not None:
-        #     df2 = self.dm_alt.zone_metrics(
-        #         from_minute=from_time, to_minute=to_time, routes=routes, stops=stops
-        #     )
-        #     df2.loc[:, self.dm_alt.list_zone_metrics()] /= sample
-        #     df = df.merge(df2, on="zone", suffixes=("", "_alt"))
-        #     for metric in self.dm.list_zone_metrics():
-        #         if self.rdo_absollute_diff.isChecked():
-        #             df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
-        #         else:
-        #             df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
-        #     df = df.reset_index()[["zone"] + self.dm.list_zone_metrics()]
+        if self.additional_demand is not None:
+            df2 = self.sm_alt.zone_metrics(from_minute=from_time, to_minute=to_time, routes=routes, stops=stops)
+            df2.loc[:, self.sm_alt.list_zone_metrics()] /= sample
+            df = df.merge(df2, on="zone", suffixes=("", "_alt"))
+            for metric in self.sm.list_zone_metrics():
+                if self.rdo_absolute_diff.isChecked():
+                    df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
+                else:
+                    df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
+            df = df.reset_index()[["zone"] + self.sm.list_zone_metrics()]
 
-        # self.zone_metric_layer = layer_from_dataframe(df, "zone_metrics")
+        self.zone_metric_layer = layer_from_dataframe(df, "zone_metrics")
 
         lien = QgsVectorLayerJoinInfo()
         lien.setJoinFieldName("zone")
@@ -678,8 +639,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
             self.cob_routes_element.addItems(["Routes"])
             self.cob_routes_map_type.addItems(["Color", "Thickness"])
             self.cob_routes_map_info.addItems(self.sm.list_route_metrics())
-            # if self.dm.tables:
-            #     self.cob_routes_map_info.addItems(self.dm.list_route_metrics())
             self.cob_routes_color.addItems(list(default_style.colorRampNames()))
         else:
             self.mapped_lines = False
@@ -715,36 +674,20 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.line_target_metric = self.cob_routes_map_info.currentText()
 
         par = {"from_minute": from_time, "to_minute": to_time, "routes": routes, "stops": stops}
+        fld = "route_id"
 
         if self.line_target_metric in self.sm.list_route_metrics():
             df = self.sm.route_metrics(**par)
 
             if self.additional_supply is not None:
                 df2 = self.sm_alt.route_metrics(**par)
-                df = df.merge(df2, on="route_id", suffixes=("", "_alt"))
+                df = df.merge(df2, on=fld, suffixes=("", "_alt"))
                 for metric in self.sm.list_route_metrics():
-                    if self.rdo_absollute_diff.isChecked():
+                    if self.rdo_absolute_diff.isChecked():
                         df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
                     else:
                         df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
-                df = df[["route_id"] + self.sm.list_route_metrics()]
-
-        # else:
-        #     _ = par.pop("stops")
-        #     df = self.dm.route_metrics(**par)
-        #     sample = self.sb_sample.value() / 100
-        #     df.loc[:, self.dm.list_route_metrics()] /= sample
-
-        #     if self.additional_demand is not None:
-        #         df2 = self.dm_alt.route_metrics(**par)
-        #         df2.loc[:, self.dm_alt.list_route_metrics()] /= sample
-        #         df = df.merge(df2, on=fld, suffixes=("", "_alt"))
-        #         for metric in self.dm.list_route_metrics():
-        #             if self.rdo_absollute_diff.isChecked():
-        #                 df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
-        #             else:
-        #                 df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
-        #         df = df[[fld] + self.dm.list_route_metrics()]
+                df = df[[fld] + self.sm.list_route_metrics()]
 
         self.line_metric_layer = layer_from_dataframe(df, f"{element}_metrics")
 

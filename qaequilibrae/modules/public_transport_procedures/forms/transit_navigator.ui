@@ -1844,7 +1844,7 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QRadioButton" name="rdo_absollute_diff">
+       <widget class="QRadioButton" name="rdo_absolute_diff">
         <property name="font">
          <font>
           <pointsize>10</pointsize>
@@ -1858,18 +1858,6 @@
         </property>
         <property name="checked">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QRadioButton" name="rdo_rel_diff">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Relative differences</string>
         </property>
        </widget>
       </item>
