@@ -104,7 +104,6 @@ def test_enable_stop_mapping(dialog):
     dialog.cob_zones_map_type.setCurrentIndex(1)
 
 
-@pytest.mark.skip(reason="Not working")
 def test_drap_maps(dialog):
     dialog.but_map_zones.click()
 
@@ -114,14 +113,6 @@ def all_items(cob):
 
 
 def test_map_stops(dialog):
-    # Simplest mapping
-    for map_type in all_items(dialog.cob_stops_map_type):
-        dialog.cob_stops_map_type.setCurrentText(map_type)
-        for metric in all_items(dialog.cob_stops_map_info):
-            dialog.cob_stops_map_info.setCurrentText(metric)
-            dialog.but_map_stops.click()
-
-    # With alternatives loaded
     for map_type in all_items(dialog.cob_stops_map_type):
         dialog.cob_stops_map_type.setCurrentText(map_type)
         for metric in all_items(dialog.cob_stops_map_info):
@@ -130,12 +121,6 @@ def test_map_stops(dialog):
 
 
 def test_map_lines(dialog):
-    # Simplest mapping
-    for metric in all_items(dialog.cob_routes_map_info):
-        dialog.cob_routes_map_info.setCurrentText(metric)
-        dialog.but_map_routes.click()
-
-    # Mapping with alternative
     for metric in all_items(dialog.cob_routes_map_info):
         dialog.cob_routes_map_info.setCurrentText(metric)
         dialog.but_map_routes.click()
@@ -143,12 +128,6 @@ def test_map_lines(dialog):
 
 @pytest.mark.skip(reason="Not working")
 def test_map_zones(dialog):
-    # Simplest mapping
-    for map_type in all_items(dialog.cob_zones_map_type):
-        dialog.cob_zones_map_type.setCurrentText(map_type)
-        dialog.but_map_zones.click()
-
-    # Complete mapping
     for map_type in all_items(dialog.cob_zones_map_type):
         dialog.cob_zones_map_type.setCurrentText(map_type)
         dialog.but_map_zones.click()

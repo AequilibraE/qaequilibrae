@@ -1,8 +1,6 @@
-from os import PathLike
 from typing import List, Optional
 
 import pandas as pd
-import numpy as np
 
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
@@ -150,9 +148,7 @@ class SupplyMetrics:
         trips = self.__filter_trips(from_minute, to_minute, routes, stops)
 
         route_metrics = self.__compute_route_metrics(trips, self.__raw_routes)
-        print(route_metrics.head().transpose())
         zone_metrics = self.__compute_zones_metrics(route_metrics)
-        print(zone_metrics.head().transpose())
         return zone_metrics
 
     @staticmethod

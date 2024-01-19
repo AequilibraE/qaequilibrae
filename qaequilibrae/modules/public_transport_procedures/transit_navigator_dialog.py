@@ -575,8 +575,8 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.zone_metric_layer = layer_from_dataframe(df, "zone_metrics")
 
         lien = QgsVectorLayerJoinInfo()
-        lien.setJoinFieldName("zone")
-        lien.setTargetFieldName("zone")
+        lien.setJoinFieldName("zone_id")
+        lien.setTargetFieldName("zone_id")
         lien.setJoinLayerId(self.zone_metric_layer.id())
         lien.setUsingMemoryCache(True)
         lien.setJoinLayer(self.zone_metric_layer)
@@ -693,7 +693,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
         lien = QgsVectorLayerJoinInfo()
         lien.setJoinFieldName("route_id")
-        lien.setTargetFieldName("route_id")
+        lien.setTargetFieldName("v_route_id")
         lien.setJoinLayerId(self.line_metric_layer.id())
         lien.setUsingMemoryCache(True)
         lien.setJoinLayer(self.line_metric_layer)

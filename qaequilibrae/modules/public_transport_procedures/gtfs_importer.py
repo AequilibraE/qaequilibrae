@@ -1,4 +1,6 @@
 from os.path import dirname, join, isfile
+from aequilibrae.project.database_connection import database_connection
+from aequilibrae.utils.db_utils import commit_and_close
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
@@ -60,8 +62,6 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.list_feeds.setItem(self.list_feeds.rowCount() - 1, 0, feed_txt)
 
     def execute_importer(self):
-        from aequilibrae.project.database_connection import database_connection
-
         for item in self.items:
             item.setVisible(not item.isVisible())
             item.setEnabled(not item.isEnabled())
@@ -91,6 +91,13 @@ class GTFSImporter(QDialog, FORM_CLASS):
 
             feed.set_allow_map_match(True)
             feed.doWork()
+
+            with commit_and_close(database_connection("transit")) as conn:
+                list = [col for col in conn.execute("PRAGMA table_info(routes)").fetchall()]
+                print(list)
+                if "v_route_id" not in list:
+                    conn.execute("alter TABLE routes add v_route_id text")
+                conn.execute("update routes set v_route_id=cast(route_id as text) where v_route_id is null")
 
         self.close()
 
