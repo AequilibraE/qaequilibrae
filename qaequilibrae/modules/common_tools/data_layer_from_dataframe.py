@@ -30,9 +30,6 @@ def layer_from_dataframe(df: pd.DataFrame, layer_name: str) -> QgsVectorLayer:
     print("is_valid: ", pr.isValid())
     print("has_errors: ", pr.hasErrors())
     print("error: ", pr.error().messageList())
-    print("fields: ", [f.name() for f in pr.fields()])
-    print("dtypes: ", [f.typeName() for f in pr.fields()])
-    print("num_features: ", pr.featureCount())
 
     QgsProject.instance().addMapLayer(vl)
 
