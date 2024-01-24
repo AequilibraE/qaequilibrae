@@ -1262,12 +1262,12 @@
 <context>
     <name>LoadDataset</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="52"/>
+        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="53"/>
         <source>Field {} does has a type not supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="76"/>
+        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="82"/>
         <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1295,12 +1295,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="196"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="197"/>
         <source>Invalid field chosen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="213"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="214"/>
         <source>One cannot load a dataset with indices only</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1346,17 +1346,7 @@
 <context>
     <name>LoadMatrixDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="88"/>
-        <source>Matrix</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="89"/>
-        <source>From</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="177"/>
+        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="178"/>
         <source>Invalid field chosen</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1795,12 +1785,12 @@
 <context>
     <name>TSPDialog</name>
     <message>
-        <location filename="../modules/routing_procedures/tsp_dialog.py" line="79"/>
+        <location filename="../modules/routing_procedures/tsp_dialog.py" line="84"/>
         <source>You need at least three nodes to route. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/routing_procedures/tsp_dialog.py" line="87"/>
+        <location filename="../modules/routing_procedures/tsp_dialog.py" line="92"/>
         <source>You need at least three centroids to route. </source>
         <translation type="unfinished"></translation>
     </message>
