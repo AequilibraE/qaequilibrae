@@ -19,14 +19,14 @@ After creating your account, direct yourself to `team's page
 access to the project. Approving your request might take a couple of days, so don't worry.
 
 .. image:: ../images/tx_project_1.png
-    :width: 479
+    :width: 1250
     :align: center
     :alt: ask-to-join-tx-project
 
 You'll be redirected to this page to enter your translation languages of preference.
 
 .. image:: ../images/tx_project_2.png
-    :width: 479
+    :width: 1250
     :align: center
     :alt: select-tx-pref-languages
 
@@ -34,7 +34,7 @@ As soon as you have your request approved, you can log in once more in Transifex
 translating.
 
 .. image:: ../images/tx_project_3.png
-    :width: 479
+    :width: 1250
     :align: center
     :alt: tx-waiting-for-approval
 
@@ -46,7 +46,7 @@ Your project screen should look like the one in the figure below. In this exampl
 we only have Brazilian Portuguese and French as translation options. 
 
 .. image:: ../images/tx_project_4.png
-    :width: 479
+    :width: 1250
     :align: center
     :alt: tx-project-page
 
@@ -55,7 +55,7 @@ right side of each translatable idiom and click on the **Translate** button. You
 to a new page.
 
 .. image:: ../images/tx_project_6.png
-    :width: 479
+    :width: 1250
     :align: center
     :alt: tx-project-page
 
