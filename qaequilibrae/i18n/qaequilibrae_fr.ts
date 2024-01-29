@@ -225,7 +225,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="180"/>
         <source>Create example</source>
-        <translation type="unfinished"/>
+        <translation>Créer un example</translation>
     </message>
 </context>
 <context>
@@ -299,7 +299,7 @@
     <message>
         <location filename="../modules/project_procedures/create_examples_dialog.py" line="40"/>
         <source>Create</source>
-        <translation type="unfinished"/>
+        <translation>Créer</translation>
     </message>
 </context>
 <context>
