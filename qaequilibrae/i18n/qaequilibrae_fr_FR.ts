@@ -225,7 +225,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="180"/>
         <source>Create example</source>
-        <translation type="unfinished"/>
+        <translation>Créer un example</translation>
     </message>
 </context>
 <context>
@@ -299,7 +299,7 @@
     <message>
         <location filename="../modules/project_procedures/create_examples_dialog.py" line="40"/>
         <source>Create</source>
-        <translation type="unfinished"/>
+        <translation>Créer</translation>
     </message>
 </context>
 <context>
@@ -820,7 +820,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="150"/>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>Exporter</translation>
     </message>
 </context>
 <context>
@@ -1600,7 +1600,7 @@
     <message>
         <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="56"/>
         <source>Target</source>
-        <translation type="unfinished"/>
+        <translation>Cible</translation>
     </message>
 </context>
 <context>
