@@ -75,14 +75,14 @@ when we edit networks with automated procedures, and we highly recommend that
 you **BACKUP YOUR DATA** prior to running this procedure and that you inspect
 the results of this tool **CAREFULLY**.
 
-The **GUI** for this procedure is fairly straightforward, as shown below.
+The *GUI* for this procedure is fairly straightforward, as shown below.
 
 .. image:: ../images/add_connectors_to_project.png
-    :width: 827
+    :width: 600
     :align: center
     :alt: Adding connectors
 
-One would notice that nowhere in the **GUI** one can indicate which modes they
+One would notice that nowhere in the *GUI* one can indicate which modes they
 want to see the network connected for or how to control how many connectors per
 mode will be created. Although it could be implemented, such a solution would
 be convoluted and there is probably no good reason to do so.
@@ -94,7 +94,7 @@ Instead, we have chosen to develop the procedure with the following criteria:
   each and every mode will have that number of connectors. If a particular mode
   is only available rather far from the centroid, it is likely that a single
   connector to that mode will be created for that centroid
-* When considering the maximum length of connectors, the **GUI** returns to the
+* When considering the maximum length of connectors, the *GUI* returns to the
   user the list of centroids/modes that could not be connected.
 
 Notice that in order to add centroids and their connectors to the network,
@@ -144,7 +144,7 @@ centroids and number them appropriately, as discussed in
 :ref:`adding centroids <adding_centroids>`.
 
 QGIS has straightforward tools to extract centroids from areas, which can be
-accessed through the menu  **Vector > Geometry Tools > Centroids**, as shown below
+accessed through the menu **Vector > Geometry Tools > Centroids**, as shown below
 
 .. image:: ../images/network_edit_centroids_menu.png
     :width: 800
@@ -158,3 +158,12 @@ places and move them to more appropriate positions.
 One might need to convert the zoning system to a SingleParts layer before
 following the instructions above, which can be done following the description
 provided in :ref:`multipart to singlepart <multipart_to_singlepart>`.
+
+Video tutorial
+--------------
+
+.. raw:: html
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/lAxY7E9g1Q8"
+     frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
+     picture-in-picture" allowfullscreen></iframe>

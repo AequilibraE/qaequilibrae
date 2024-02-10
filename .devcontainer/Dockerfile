@@ -1,4 +1,4 @@
-FROM qgis/qgis:release-3_28
+FROM qgis/qgis:release-3_32
 
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt update -y && apt install -y pandoc zip

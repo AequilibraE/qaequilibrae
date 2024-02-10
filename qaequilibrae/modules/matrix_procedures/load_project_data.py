@@ -2,6 +2,8 @@ import importlib.util as iutil
 import os
 from os.path import join
 import pandas as pd
+from aequilibrae.utils.db_utils import commit_and_close
+from aequilibrae.project.database_connection import database_connection
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
@@ -68,6 +70,9 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
     def update_matrix_table(self):
         matrices = self.project.matrices
         matrices.update_database()
+        with commit_and_close(database_connection("network")) as conn:
+            qry = """UPDATE matrices SET name = substr(file_name, 1, length(file_name)-4) WHERE name like "b''%";"""
+            conn.execute(qry)
         self.load_matrices()
 
     def load_results(self):
