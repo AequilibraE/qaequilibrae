@@ -340,42 +340,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="76"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="73"/>
         <source>field {} could not be added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="93"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="88"/>
         <source>Transferring nodes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="130"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="115"/>
         <source>Transferring {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="161"/>
-        <source>Mode automatically added during project creation from layers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="178"/>
-        <source>Link_type automatically added during project creation from layers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="187"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="144"/>
         <source>Failed inserting record {} for {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="191"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="148"/>
         <source>feature with id {} could not be added to layer {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="193"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="150"/>
         <source>feature with no node id present. It could not be added to layer {}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3200,7 +3190,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
         <source>Layer field</source>
         <translation type="unfinished"></translation>
     </message>
