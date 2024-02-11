@@ -338,42 +338,32 @@
         <translation>Índice geográfico</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="76"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="73"/>
         <source>field {} could not be added</source>
         <translation>campo {} não pode ser adicionado</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="93"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="88"/>
         <source>Transferring nodes</source>
         <translation>Transferência de nós</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="130"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="115"/>
         <source>Transferring {}</source>
         <translation>Transferindo {}</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="161"/>
-        <source>Mode automatically added during project creation from layers</source>
-        <translation>Modo adicionado automáticamente durante a criação do projeto a partir de camadas</translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="178"/>
-        <source>Link_type automatically added during project creation from layers</source>
-        <translation>link_type adicionado automaticamente durante a criação do projeto a partir de camadas</translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="187"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="144"/>
         <source>Failed inserting record {} for {}</source>
         <translation>Falha na inserção de {} por {}</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="191"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="148"/>
         <source>feature with id {} could not be added to layer {}</source>
         <translation>recurso com id {} não pode ser adicionado à camada {}</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="193"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="150"/>
         <source>feature with no node id present. It could not be added to layer {}</source>
         <translation>recurso sem node id presente. Não pode ser adicionado à camada {}</translation>
     </message>
@@ -3201,7 +3191,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
         <source>Layer field</source>
         <translation>Campo da camada</translation>
     </message>
