@@ -40,6 +40,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         # layers and fields        # For adding skims
         self.mMapLayerComboBox.layerChanged.connect(self.add_fields_to_cboxes)
         self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.LineLayer)
+        self.mMapLayerComboBox.setLayer(self.iface.activeLayer())
 
         self.ab_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, "AB"))
         self.ba_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, "BA"))
@@ -182,11 +183,11 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
         # if we clicked the "remove button"
         if column == 0 and row < self.tot_bands - 1:
-            low_cl = self.bands_list.item(row + 1, 2).backgroundColor()
+            low_cl = self.bands_list.item(row + 1, 2).background()
             low_ab = self.bands_list.item(row + 1, 0).text()
             low_ba = self.bands_list.item(row + 1, 1).text()
 
-            top_cl = self.bands_list.item(row, 2).backgroundColor()
+            top_cl = self.bands_list.item(row, 2).background()
             top_ab = self.bands_list.item(row, 0).text()
             top_ba = self.bands_list.item(row, 1).text()
 
@@ -199,11 +200,11 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             self.bands_list.item(row + 1, 2).setBackground(top_cl)
 
         elif column == 1 and row > 0:
-            low_cl = self.bands_list.item(row, 2).backgroundColor()
+            low_cl = self.bands_list.item(row, 2).background()
             low_ab = self.bands_list.item(row, 0).text()
             low_ba = self.bands_list.item(row, 1).text()
 
-            top_cl = self.bands_list.item(row - 1, 2).backgroundColor()
+            top_cl = self.bands_list.item(row - 1, 2).background()
             top_ab = self.bands_list.item(row - 1, 0).text()
             top_ba = self.bands_list.item(row - 1, 1).text()
 
@@ -279,7 +280,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 # we also build a list of bands to construct
                 # The function "(2 * j -1) * ba"  maps the index j {1,2} and the direction to the side of the
                 # link the band needs to be. Try it out. it works!!
-                # bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).backgroundColor()))
+                # bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).background()))
             if len(self.bands_list.item(i, 2).text()) == 0:
                 cl = self.bands_list.item(i, 2).background().color()
             else:
