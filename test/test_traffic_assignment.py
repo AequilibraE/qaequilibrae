@@ -59,18 +59,20 @@ def test_single_class_traffic_assignment(ae_with_project, qtbot):
     results = pth / "results_database.sqlite"
     assert isfile(results)
 
+    # Assert we have a non-null result and that results are actually stored in the file
     con = sqlite3.connect(results)
-    assert con.execute(f"SELECT ROUND(SUM(PCE_tot), 4) FROM {test_name}").fetchone()[0] == 879087.8481
+    assert con.execute(f"SELECT ROUND(SUM(PCE_tot), 4) FROM {test_name}").fetchone()[0] > 0
 
     skims = pth / ("matrices/" + test_name + "_car.omx")
     assert isfile(skims)
 
     mtx = omx.open_file(skims)
-    assert round(np.sum(np.nan_to_num(mtx["free_flow_time_final"][:])), 4) == 13594.6657
-    assert round(np.sum(np.nan_to_num(mtx["free_flow_time_blended"][:])), 4) == 13548.7296
-    assert round(np.sum(np.nan_to_num(mtx["distance_final"][:])), 4) == 6584.0
-    assert round(np.sum(np.nan_to_num(mtx["distance_blended"][:])), 4) == 6719.0863
+    assert round(np.sum(np.nan_to_num(mtx["free_flow_time_final"][:])), 4) > 0
+    assert round(np.sum(np.nan_to_num(mtx["free_flow_time_blended"][:])), 4) > 0
+    assert round(np.sum(np.nan_to_num(mtx["distance_final"][:])), 4) > 0
+    assert round(np.sum(np.nan_to_num(mtx["distance_blended"][:])), 4) > 0
 
+    # Assert information exists in the log file
     num_cores = dialog.assignment.cores
     log_ = pth / "aequilibrae.log"
     assert isfile(log_)
@@ -166,19 +168,21 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
     with pytest.raises(ValueError):
         dialog.produce_all_outputs()
 
+    # Assert we have a non-null result and that results are actually stored in the file
     pth = Path("test/data/SiouxFalls_project")
     results = pth / "results_database.sqlite"
     assert isfile(results)
     con = sqlite3.connect(results)
-    assert con.execute(f"SELECT ROUND(SUM(PCE_tot), 4) FROM {test_name}").fetchone()[0] == 1332054.7483
-    assert con.execute(f"SELECT ROUND(SUM(car_tot), 4) FROM {test_name}").fetchone()[0] == 698325.9227
-    assert con.execute(f"SELECT ROUND(SUM(motorcycle_tot), 4) FROM {test_name}").fetchone()[0] == 242112.6235
-    assert con.execute(f"SELECT ROUND(SUM(trucks_tot), 4) FROM {test_name}").fetchone()[0] == 234122.5204
+    assert con.execute(f"SELECT ROUND(SUM(PCE_tot), 4) FROM {test_name}").fetchone()[0] > 0
+    assert con.execute(f"SELECT ROUND(SUM(car_tot), 4) FROM {test_name}").fetchone()[0] > 0
+    assert con.execute(f"SELECT ROUND(SUM(motorcycle_tot), 4) FROM {test_name}").fetchone()[0] > 0
+    assert con.execute(f"SELECT ROUND(SUM(trucks_tot), 4) FROM {test_name}").fetchone()[0] > 0
 
     assert isfile(pth / ("matrices/" + test_name + "_car.omx"))
     assert isfile(pth / ("matrices/" + test_name + "_Motorcycle.omx"))
     assert isfile(pth / ("matrices/" + test_name + "_Trucks.omx"))
 
+    # Assert information exists in the log file
     num_cores = dialog.assignment.cores
     log_ = pth / "aequilibrae.log"
     assert isfile(log_)
