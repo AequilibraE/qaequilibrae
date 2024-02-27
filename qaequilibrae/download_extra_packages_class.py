@@ -23,10 +23,12 @@ class download_all:
         with open(self.file, "r") as fl:
             lines = fl.readlines()
 
+        reps = []
         for line in lines:
-            self.install_package(line.strip())
+            reps.extend(self.install_package(line.strip()))
 
         self.clean_packages()
+        return reps
 
     def install_package(self, package):
         install_command = f'-m pip install {package} -t "{self.pth}"'
@@ -38,17 +40,16 @@ class download_all:
         
         if not self.no_ssl:
             reps = self.execute(command)
-            print(reps)
 
         if self.no_ssl or ("because the ssl module is not available" in "".join(reps).lower() and sys.platform == "win32"):
             command = f"python {install_command}"
             print(command)
             reps = self.execute(command)
-            print(reps)
             self.no_ssl = True
 
         for line in reps:
             QgsMessageLog.logMessage(str(line))
+        return reps
 
     def execute(self, command):
         lines = []

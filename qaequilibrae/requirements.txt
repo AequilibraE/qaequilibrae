@@ -3,3 +3,4 @@ tables==3.8.0
 openmatrix
 rtree
 ortools
+pyarrow
