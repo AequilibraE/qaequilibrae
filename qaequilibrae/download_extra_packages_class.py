@@ -16,6 +16,7 @@ class download_all:
         # self._file = join(pth, "requirements.txt")
         # self.file = join(pth, "requirements_to_do.txt")
         self.pth = join(pth, "packages")
+        self.no_ssl = False
 
     def install(self):
         # self.adapt_aeq_version()
@@ -28,18 +29,23 @@ class download_all:
         self.clean_packages()
 
     def install_package(self, package):
-        install_command = f"""-m pip install {package} -t '{self.pth}'"""
+        install_command = f'-m pip install {package} -t "{self.pth}"'
         if "aequilibrae" in package.lower():
             install_command += " --no-deps"
 
         command = f'"{self.find_python()}" {install_command}'
         print(command)
-        reps = self.execute(command)
+        
+        if not self.no_ssl:
+            reps = self.execute(command)
+            print(reps)
 
-        if "because the ssl module is not available" in "".join(reps).lower() and sys.platform == "win32":
+        if self.no_ssl or ("because the ssl module is not available" in "".join(reps).lower() and sys.platform == "win32"):
             command = f"python {install_command}"
             print(command)
             reps = self.execute(command)
+            print(reps)
+            self.no_ssl = True
 
         for line in reps:
             QgsMessageLog.logMessage(str(line))
