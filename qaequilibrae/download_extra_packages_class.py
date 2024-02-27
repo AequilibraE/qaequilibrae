@@ -12,26 +12,37 @@ from qgis.core import QgsMessageLog, Qgis
 class download_all:
     def __init__(self):
         pth = os.path.dirname(__file__)
-        self._file = join(pth, "requirements.txt")
-        self.file = join(pth, "requirements_to_do.txt")
+        self.file = join(pth, "requirements.txt")
+        # self._file = join(pth, "requirements.txt")
+        # self.file = join(pth, "requirements_to_do.txt")
         self.pth = join(pth, "packages")
 
     def install(self):
-        self.adapt_aeq_version()
-
-        command = f'"{self.find_python()}" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
-        print(command)
-        lines = self.execute(command)
-        
-        if "because the ssl module is not available" in "".join(lines).lower() and sys.platform == "win32":
-            command = f'python -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
-            print(command)
-            lines = self.execute(command)
+        # self.adapt_aeq_version()
+        with open(self.file, "r") as fl:
+            lines = fl.readlines()
 
         for line in lines:
-            QgsMessageLog.logMessage(str(line), level=Qgis.Critical)
+            self.install_package(line.strip())
+
         self.clean_packages()
-        return lines
+
+    def install_package(self, package):
+        install_command = """-m pip install {package} -t '{self.pth}'"""
+        if "aequilibrae" in package.lower():
+            install_command += " --no-deps"
+
+        command = f'"{self.find_python()}" {install_command}'
+        print(command)
+        reps = self.execute(command)
+
+        if "because the ssl module is not available" in "".join(reps).lower() and sys.platform == "win32":
+            command = f"python {install_command}"
+            print(command)
+            reps = self.execute(command)
+
+        for line in reps:
+            QgsMessageLog.logMessage(str(line))
 
     def execute(self, command):
         lines = []
@@ -46,7 +57,7 @@ class download_all:
         ) as proc:
             lines.extend(proc.stdout.readlines())
         return lines
-        
+
     def find_python(self):
         sys_exe = Path(sys.executable)
         if sys.platform == "linux" or sys.platform == "linux2":
