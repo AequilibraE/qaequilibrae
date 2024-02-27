@@ -28,7 +28,7 @@ class download_all:
         self.clean_packages()
 
     def install_package(self, package):
-        install_command = """-m pip install {package} -t '{self.pth}'"""
+        install_command = f"""-m pip install {package} -t '{self.pth}'"""
         if "aequilibrae" in package.lower():
             install_command += " --no-deps"
 
