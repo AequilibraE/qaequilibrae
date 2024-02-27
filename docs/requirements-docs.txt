@@ -1,13 +1,10 @@
 scipy
 pyqt5
-enum34>=1.1.6
-Sphinx>=1.7.5
-sphinx-rtd-theme>=0.3.1
+enum34
+Sphinx
 sphinxcontrib-apidoc
 sphinx_autodoc_annotation
 sphinx-git
-sphinx-gallery
 sphinx-panels
-sphinx_theme
-sphinx-copybutton
-pydata-sphinx-theme==0.13.3
+pydata-sphinx-theme
+sphinx-subfigure

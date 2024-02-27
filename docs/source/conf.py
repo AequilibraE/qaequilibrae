@@ -52,6 +52,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx_git",
     "sphinx_panels",
+    "sphinx_subfigure"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
