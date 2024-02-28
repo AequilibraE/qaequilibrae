@@ -32,7 +32,7 @@ class download_all:
 
     def install_package(self, package):
         install_command = f'-m pip install {package} -t "{self.pth}"'
-        if "aequilibrae" in package.lower():
+        if "aequilibrae" in package.lower() or "openmatrix" in package.lower():
             install_command += " --no-deps"
 
         command = f'"{self.find_python()}" {install_command}'
