@@ -113,8 +113,3 @@ class download_all:
                 if pkg.lower() in fldr.lower():
                     if isdir(join(self.pth, fldr)):
                         shutil.rmtree(join(self.pth, fldr))
-
-
-if __name__ == "__main__":
-    installer = download_all()
-    installer.install()
