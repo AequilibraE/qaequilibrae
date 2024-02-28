@@ -21,7 +21,6 @@ jobs:
       - name: Install dependencies
         run: |
           python3 qaequilibrae/download_extra_packages_class.py
-#          python3 -m pip install -r qaequilibrae/requirements.txt
           python3 -m pip install -r ci/requirements-dev.txt
           python3 -m pip install numpy --upgrade
 
