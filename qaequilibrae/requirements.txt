@@ -3,4 +3,4 @@ tables==3.8.0
 openmatrix
 rtree
 ortools
-pyarrow<15.0.0
+pyarrow<13.0.0
