@@ -10,7 +10,10 @@ from qgis.core import QgsMessageLog, Qgis
 
 
 class download_all:
-    must_remove = ["numpy", "scipy", "pandas", "cpuinfo"]
+    must_remove = ["numpy", "scipy", "pandas", "charset_normalizer", "click_plugins", "click", "certifi",
+                   "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
+                   "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
+                   "importlib_metadata", "pyaml", "urllib3", "packaging"]
     def __init__(self):
         pth = os.path.dirname(__file__)
         self.file = join(pth, "requirements.txt")
@@ -33,7 +36,7 @@ class download_all:
 
     def install_package(self, package):
         install_command = f'-m pip install {package} -t "{self.pth}"'
-        if  "openmatrix" in package.lower():
+        if  "openmatrix" in package.lower() or "aequilibrae" in package.lower():
             install_command += " --no-deps"
 
         command = f'"{self.find_python()}" {install_command}'
