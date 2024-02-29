@@ -37,11 +37,13 @@ class download_all:
 
         command = f'"{self.find_python()}" {install_command}'
         print(command)
-        
+
         if not self.no_ssl:
             reps = self.execute(command)
 
-        if self.no_ssl or ("because the ssl module is not available" in "".join(reps).lower() and sys.platform == "win32"):
+        if self.no_ssl or (
+            "because the ssl module is not available" in "".join(reps).lower() and sys.platform == "win32"
+        ):
             command = f"python {install_command}"
             print(command)
             reps = self.execute(command)
