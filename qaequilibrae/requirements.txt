@@ -1,2 +1,3 @@
 aequilibrae==1.0.1
 ortools
+pyarrow

@@ -10,6 +10,7 @@ from qgis.core import QgsMessageLog, Qgis
 
 
 class download_all:
+    must_remove = ["numpy", "scipy", "pandas", "cpuinfo"]
     def __init__(self):
         pth = os.path.dirname(__file__)
         self.file = join(pth, "requirements.txt")
@@ -107,9 +108,9 @@ class download_all:
                 fl.write(f"{c}\n")
 
     def clean_packages(self):
-        pkgs = ["numpy", "scipy", "pandas", "cpuinfo"]
+
         for fldr in list(os.walk(self.pth))[0][1]:
-            for pkg in pkgs:
+            for pkg in self.must_remove:
                 if pkg.lower() in fldr.lower():
                     if isdir(join(self.pth, fldr)):
                         shutil.rmtree(join(self.pth, fldr))
