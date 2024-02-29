@@ -1,6 +1,2 @@
 aequilibrae==1.0.1
-tables==3.8.0
-openmatrix
-rtree
 ortools
-pyarrow<13.0.0

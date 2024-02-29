@@ -32,7 +32,7 @@ class download_all:
 
     def install_package(self, package):
         install_command = f'-m pip install {package} -t "{self.pth}"'
-        if "aequilibrae" in package.lower() or "openmatrix" in package.lower():
+        if  "openmatrix" in package.lower():
             install_command += " --no-deps"
 
         command = f'"{self.find_python()}" {install_command}'
@@ -105,7 +105,7 @@ class download_all:
                 fl.write(f"{c}\n")
 
     def clean_packages(self):
-        pkgs = ["numpy", "scipy", "pandas"]
+        pkgs = ["numpy", "scipy", "pandas", "cpuinfo"]
         for fldr in list(os.walk(self.pth))[0][1]:
             for pkg in pkgs:
                 if pkg.lower() in fldr.lower():
