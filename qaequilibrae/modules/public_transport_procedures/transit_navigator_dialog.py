@@ -1,7 +1,6 @@
 from functools import partial
 from math import ceil
 from os.path import dirname, join
-from pathlib import Path
 
 import pandas as pd
 from qgis.PyQt import uic, QtGui
@@ -12,7 +11,7 @@ from qgis.core import QgsProject, QgsStyle, QgsVectorLayerJoinInfo, QgsGraduated
 from qgis.core import QgsSymbol, QgsLinearlyInterpolatedDiagramRenderer, QgsPalLayerSettings, QgsTextFormat
 from qgis.core import QgsTextBufferSettings, QgsVectorLayerSimpleLabeling, QgsPieDiagram
 
-from qaequilibrae.modules.common_tools import layer_from_dataframe, PandasModel, GetOutputFileName
+from qaequilibrae.modules.common_tools import layer_from_dataframe, PandasModel
 from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
 from qaequilibrae.modules.public_transport_procedures.transit_supply_metrics import SupplyMetrics
 from aequilibrae.project.database_connection import database_connection
@@ -34,8 +33,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.mapped_stops = False
         self.mapped_lines = False
         self.mapped_zones = False
-        self.additional_demand = None
-        self.additional_supply = None
         self.line_target_metric = ""
         self.line_map_layer = ""
         self.stop_target_metric = ""
@@ -126,12 +123,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.cob_agency.currentIndexChanged.connect(self.filter_direction)
         self.cob_type.currentIndexChanged.connect(self.filter_direction)
 
-        # Databases for comparison
-        self.but_additional_supply.clicked.connect(partial(self.load_new_file, "supply"))
-
-        self.but_additional_demand.setVisible(False)
-        self.lbl_additional_demand.setVisible(False)
-
         # Direction filtering
         self.rdo_all_directions.toggled.connect(self.filter_direction)
         self.rdo_ab_direction.toggled.connect(self.filter_direction)
@@ -169,35 +160,12 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.glob_stop_map.setCollapsed(True)
         self.glob_route_map.setCollapsed(True)
         self.glob_zone_map.setCollapsed(True)
-        self.glob_scenario_comparison.setCollapsed(True)
 
         self.selected_stops = None
         self.selected_patterns = None
         self.selected_routes = None
         self.selected_from_time = None
         self.selected_to_time = None
-
-    def load_new_file(self, file_type):
-        formats = ["Transit Network (*.sqlite)"] if file_type == "supply" else ["Transit Demand (*.sqlite)"]
-
-        path, _ = GetOutputFileName(
-            QDialog(),
-            f"Transit {file_type}",
-            formats,
-            ".sqlite",
-            self.project.project_base_path,
-        )
-        self._add_loaded_file(path, file_type)
-
-    def _add_loaded_file(self, path, file_type):
-        if file_type == "supply":
-            if path is None:
-                path = ""
-                self.additional_supply = None
-            else:
-                self.additional_supply = path
-                self.sm_alt = SupplyMetrics(Path(path))
-            self.lbl_additional_supply.setText(path)
 
     def show_label_stops(self):
         self.build_label(
@@ -514,15 +482,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.stop_target_metric = self.cob_stops_map_info.currentText()
         if self.stop_target_metric in self.sm.list_stop_metrics():
             df = self.sm.stop_metrics(from_minute=from_time, to_minute=to_time, routes=routes, stops=stops)
-            if self.additional_supply is not None:
-                df2 = self.sm_alt.stop_metrics(from_minute=from_time, to_minute=to_time, routes=routes, stops=stops)
-                df = df.merge(df2, on="stop_id", suffixes=("", "_alt"))
-                for metric in self.sm.list_stop_metrics():
-                    if self.rdo_absolute_diff.isChecked():
-                        df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
-                    else:
-                        df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
-                df = df[["stop_id"] + self.sm.list_stop_metrics()]
 
         self.stop_metric_layer = layer_from_dataframe(df, "stop_metrics")
 
@@ -560,17 +519,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
         df = self.sm.zone_metrics(from_minute=from_time, to_minute=to_time, routes=routes, stops=stops)
         df.loc[:, self.sm.list_zone_metrics()] /= sample
-
-        if self.additional_demand is not None:
-            df2 = self.sm_alt.zone_metrics(from_minute=from_time, to_minute=to_time, routes=routes, stops=stops)
-            df2.loc[:, self.sm_alt.list_zone_metrics()] /= sample
-            df = df.merge(df2, on="zone", suffixes=("", "_alt"))
-            for metric in self.sm.list_zone_metrics():
-                if self.rdo_absolute_diff.isChecked():
-                    df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
-                else:
-                    df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
-            df = df.reset_index()[["zone"] + self.sm.list_zone_metrics()]
 
         self.zone_metric_layer = layer_from_dataframe(df, "zone_metrics")
 
@@ -674,20 +622,9 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.line_target_metric = self.cob_routes_map_info.currentText()
 
         par = {"from_minute": from_time, "to_minute": to_time, "routes": routes, "stops": stops}
-        fld = "route_id"
 
         if self.line_target_metric in self.sm.list_route_metrics():
             df = self.sm.route_metrics(**par)
-
-            if self.additional_supply is not None:
-                df2 = self.sm_alt.route_metrics(**par)
-                df = df.merge(df2, on=fld, suffixes=("", "_alt"))
-                for metric in self.sm.list_route_metrics():
-                    if self.rdo_absolute_diff.isChecked():
-                        df.loc[:, metric] -= df.loc[:, f"{metric}_alt"]
-                    else:
-                        df.loc[:, metric] = 1 - (df.loc[:, f"{metric}_alt"] / df.loc[:, metric])
-                df = df[[fld] + self.sm.list_route_metrics()]
 
         self.line_metric_layer = layer_from_dataframe(df, f"{element}_metrics")
 
@@ -780,4 +717,3 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         layer.setRenderer(renderer)
         layer.triggerRepaint()
         self.iface.mapCanvas().setExtent(layer.extent())
-        self.iface.mapCanvas().refresh()
