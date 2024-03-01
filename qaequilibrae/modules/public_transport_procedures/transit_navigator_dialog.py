@@ -693,7 +693,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
         lien = QgsVectorLayerJoinInfo()
         lien.setJoinFieldName("route_id")
-        lien.setTargetFieldName("v_route_id")
+        lien.setTargetFieldName("route_id")
         lien.setJoinLayerId(self.line_metric_layer.id())
         lien.setUsingMemoryCache(True)
         lien.setJoinLayer(self.line_metric_layer)
