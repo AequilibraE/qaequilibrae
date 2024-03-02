@@ -1555,42 +1555,42 @@
 <context>
     <name>ProjectFromOSMDialog</name>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="39"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="40"/>
         <source>Place name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="44"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="45"/>
         <source>Current map canvas area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="61"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="62"/>
         <source>Choose folder output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="67"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="68"/>
         <source>Import network and create project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="109"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="110"/>
         <source>Chose to download network for canvas area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="113"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="115"/>
         <source>Establishing area for download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="114"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="116"/>
         <source>Chose to download network for place</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="56"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="57"/>
         <source>Target</source>
         <translation type="unfinished"></translation>
     </message>
