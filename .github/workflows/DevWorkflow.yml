@@ -25,7 +25,7 @@ jobs:
           python3 -m pip install numpy --upgrade
 
       - name: Run tests
-        run: |.
+        run: |
           export QT_QPA_PLATFORM=offscreen
           pwd
           python3 -m pytest test -v --tb=short --cov=qaequilibrae
