@@ -3,15 +3,16 @@ import os
 from os.path import isdir, join
 
 from PyQt5.QtCore import Qt
+from shapely.geometry import box
 from aequilibrae.project import Project
-from aequilibrae.project.network.osm_utils.place_getter import placegetter
+from aequilibrae.project.network.osm.place_getter import placegetter
 
-from qaequilibrae.modules.common_tools import reporter
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox
 from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
-from qaequilibrae.modules.common_tools import ReportDialog, standard_path
+from qgis.core import QgsProject, QgsCoordinateReferenceSystem
+from qaequilibrae.modules.common_tools import reporter, ReportDialog, standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
@@ -107,6 +108,7 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.resize(280, 300)
         if self.choose_canvas.isChecked():
             self.report.append(reporter(self.tr("Chose to download network for canvas area")))
+            QgsProject.instance().setCrs(QgsCoordinateReferenceSystem.fromEpsgId(4326))
             e = self.iface.mapCanvas().extent()
             bbox = [e.xMinimum(), e.yMinimum(), e.xMaximum(), e.yMaximum()]
         else:
@@ -118,7 +120,9 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.qgis_project.project = Project()
         self.qgis_project.project.new(self.output_path.text())
         self.qgis_project.project.network.netsignal.connect(self.signal_handler)
-        self.qgis_project.project.network.create_from_osm(west=bbox[0], south=bbox[1], east=bbox[2], north=bbox[3])
+
+        
+        self.qgis_project.project.network.create_from_osm(box(*bbox))
 
     def change_place_type(self):
         if self.choose_place.isChecked():

@@ -10,28 +10,52 @@ from qgis.core import QgsMessageLog, Qgis
 
 
 class download_all:
+    must_remove = ["numpy", "scipy", "pandas", "charset_normalizer", "click_plugins", "click", "certifi",
+                   "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
+                   "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
+                   "importlib_metadata", "pyaml", "urllib3", "packaging"]
     def __init__(self):
         pth = os.path.dirname(__file__)
-        self._file = join(pth, "requirements.txt")
-        self.file = join(pth, "requirements_to_do.txt")
+        self.file = join(pth, "requirements.txt")
+        # self._file = join(pth, "requirements.txt")
+        # self.file = join(pth, "requirements_to_do.txt")
         self.pth = join(pth, "packages")
+        self.no_ssl = False
 
     def install(self):
-        self.adapt_aeq_version()
+        # self.adapt_aeq_version()
+        with open(self.file, "r") as fl:
+            lines = fl.readlines()
 
-        command = f'"{self.find_python()}" -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
-        print(command)
-        lines = self.execute(command)
-        
-        if "because the ssl module is not available" in "".join(lines).lower() and sys.platform == "win32":
-            command = f'python -m pip install -r "{self.file}" -t "{self.pth}" --upgrade'
-            print(command)
-            lines = self.execute(command)
-
+        reps = []
         for line in lines:
-            QgsMessageLog.logMessage(str(line), level=Qgis.Critical)
+            reps.extend(self.install_package(line.strip()))
+
         self.clean_packages()
-        return lines
+        return reps
+
+    def install_package(self, package):
+        install_command = f'-m pip install {package} -t "{self.pth}"'
+        if  "openmatrix" in package.lower() or "aequilibrae" in package.lower():
+            install_command += " --no-deps"
+
+        command = f'"{self.find_python()}" {install_command}'
+        print(command)
+
+        if not self.no_ssl:
+            reps = self.execute(command)
+
+        if self.no_ssl or (
+            "because the ssl module is not available" in "".join(reps).lower() and sys.platform == "win32"
+        ):
+            command = f"python {install_command}"
+            print(command)
+            reps = self.execute(command)
+            self.no_ssl = True
+
+        for line in reps:
+            QgsMessageLog.logMessage(str(line))
+        return reps
 
     def execute(self, command):
         lines = []
@@ -46,7 +70,7 @@ class download_all:
         ) as proc:
             lines.extend(proc.stdout.readlines())
         return lines
-        
+
     def find_python(self):
         sys_exe = Path(sys.executable)
         if sys.platform == "linux" or sys.platform == "linux2":
@@ -87,9 +111,9 @@ class download_all:
                 fl.write(f"{c}\n")
 
     def clean_packages(self):
-        pkgs = ["numpy", "scipy", "pandas"]
+
         for fldr in list(os.walk(self.pth))[0][1]:
-            for pkg in pkgs:
+            for pkg in self.must_remove:
                 if pkg.lower() in fldr.lower():
                     if isdir(join(self.pth, fldr)):
                         shutil.rmtree(join(self.pth, fldr))
