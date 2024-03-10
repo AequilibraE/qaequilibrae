@@ -295,6 +295,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 # link the band needs to be. Try it out. it works!!
                 # bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).backgroundColor()))
             if len(self.bands_list.item(i, 2).text()) == 0:
+                color_ramp_style = False
                 cl = self.bands_list.item(i, 2).background().color()
             else:
                 color_ramp_style = True
