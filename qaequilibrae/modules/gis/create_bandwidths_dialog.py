@@ -276,7 +276,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         # Create new simple stype
         symbol = QgsLineSymbol.createSimple({"name": "square", "color": "red"})
         self.layer.setRenderer(QgsSingleSymbolRenderer(symbol))
-        bands = [] # TODO consolidate new bands with old bands list
+        bands = [] # TODO consolidate new bands with old bands list?
         bands_ab = []
         bands_ba = []
         # go through all the fields that will be used to find the maximum value. This will be used
@@ -304,13 +304,11 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             text_ba = self.bands_list.item(i, 1).text()
             bands_ab.append((text_ab, ab, cl, "ab"))
             bands_ba.append((text_ba, ba, cl, "ba"))
-            print(text_ba, text_ab)
             if text_ab.upper().endswith("_AB") and text_ba.upper().endswith("_BA"):
                 # remove directed suffix
                 label = text_ab[:-3]
             else:
                 label = f"{text_ab} - {text_ba}"
-            print(label)
             bands.append(BandAttributes(label, cl, color_ramp_style, (text_ab, text_ba), ("ab", "ba")))
             
 
@@ -398,7 +396,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 acc_offset = acc_offset + " + " + str(side) + "*(" + width + "+" + space_size_aeq_var + ")"
 
         self.build_width_legend(self.layer.name(), max_layer_value=max_value, max_band_value=band_size)
-        self.build_color_legend(self.layer.name())
+        self.build_color_legend(self.layer.name(), bands=bands)
 
         self.layer.renderer().symbol().deleteSymbolLayer(0)
         self.layer.triggerRepaint()
