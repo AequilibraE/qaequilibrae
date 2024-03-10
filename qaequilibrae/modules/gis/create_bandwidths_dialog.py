@@ -7,7 +7,15 @@ from typing import Tuple, Literal, Dict, Union
 
 from PyQt5.QtGui import QColor
 from qgis._core import QgsLineSymbol, QgsVectorLayer, QgsSymbol
-from qgis._core import QgsMapLayerProxyModel, QgsSimpleLineSymbolLayer, QgsExpressionContextUtils, QgsProject, QgsSingleSymbolRenderer, QgsRuleBasedRenderer, QgsStyle
+from qgis._core import (
+    QgsMapLayerProxyModel,
+    QgsSimpleLineSymbolLayer,
+    QgsExpressionContextUtils,
+    QgsProject,
+    QgsSingleSymbolRenderer,
+    QgsRuleBasedRenderer,
+    QgsStyle,
+)
 
 import qgis
 from qgis.PyQt import uic
@@ -26,11 +34,12 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 @dataclass
 class BandAttributes:
     """Record type to hold stack bandwidth styling data."""
-    label:str
-    color:Union[QColor,  Dict]
-    color_ramp_style:bool
+
+    label: str
+    color: Union[QColor, Dict]
+    color_ramp_style: bool
     # direction specific fields
-    fieldnames:Tuple[str, str]
+    fieldnames: Tuple[str, str]
     direction: Tuple[Literal["ab", "ba"], Literal["ab", "ba"]]
 
 
@@ -264,7 +273,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         ]:
             item.setEnabled(False)
 
-        band_size = self.scale["width"] # TODO will changing this break something, seems like it should be a float/int
+        band_size = self.scale["width"]  # TODO will changing this break something, seems like it should be a float/int
         space_size = self.scale["spacing"]
         max_value = self.scale["max_flow"]
         # define the side of the plotting based on the side of the road the system has defined
@@ -276,7 +285,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         # Create new simple stype
         symbol = QgsLineSymbol.createSimple({"name": "square", "color": "red"})
         self.layer.setRenderer(QgsSingleSymbolRenderer(symbol))
-        bands = [] # TODO consolidate new bands with old bands list?
+        bands = []  # TODO consolidate new bands with old bands list?
         bands_ab = []
         bands_ba = []
         # go through all the fields that will be used to find the maximum value. This will be used
@@ -293,14 +302,14 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 # we also build a list of bands to construct
                 # The function "(2 * j -1) * ba"  maps the index j {1,2} and the direction to the side of the
                 # link the band needs to be. Try it out. it works!!
-                # bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).backgroundColor()))
+                # bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).background()))
             if len(self.bands_list.item(i, 2).text()) == 0:
                 color_ramp_style = False
                 cl = self.bands_list.item(i, 2).background().color()
             else:
                 color_ramp_style = True
                 cl = eval(self.bands_list.item(i, 2).text())
-            text_ab =self.bands_list.item(i, 0).text()
+            text_ab = self.bands_list.item(i, 0).text()
             text_ba = self.bands_list.item(i, 1).text()
             bands_ab.append((text_ab, ab, cl, "ab"))
             bands_ba.append((text_ba, ba, cl, "ba"))
@@ -310,7 +319,6 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             else:
                 label = f"{text_ab} - {text_ba}"
             bands.append(BandAttributes(label, cl, color_ramp_style, (text_ab, text_ba), ("ab", "ba")))
-            
 
         if max_value < 0:
             values = [x for x in values if x is not None] + [0]
@@ -328,7 +336,15 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             for field, side, clr, direc in s:
                 symbol_layer = QgsSimpleLineSymbolLayer.create({})
                 props = symbol_layer.properties()
-                width = '(coalesce(scale_linear("' + field + '", 0, ' + max_value_aeq_var + ", 0, " + band_size_aeq_var + "), 0))"
+                width = (
+                    '(coalesce(scale_linear("'
+                    + field
+                    + '", 0, '
+                    + max_value_aeq_var
+                    + ", 0, "
+                    + band_size_aeq_var
+                    + "), 0))"
+                )
                 props["width_dd_expression"] = width
 
                 xpr = (
@@ -406,21 +422,20 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.close()
 
     @classmethod
-    def delete_existing_layers_with_same_name(cls, layer_name:str)->None:
-        layers_with_name =QgsProject.instance().mapLayersByName(layer_name)
-        if len(layers_with_name) >0:
+    def delete_existing_layers_with_same_name(cls, layer_name: str) -> None:
+        layers_with_name = QgsProject.instance().mapLayersByName(layer_name)
+        if len(layers_with_name) > 0:
             # delete existing layers with this name (i.e. previous legends)
             # TODO small chance this deletes user data, should this be behind a default ticked checkbox?
             for layer in layers_with_name:
                 QgsProject.instance().removeMapLayer(layer.id())
 
-
     @classmethod
-    def build_width_legend(cls, layer_name:str, max_layer_value:float, max_band_value:float)->None:
+    def build_width_legend(cls, layer_name: str, max_layer_value: float, max_band_value: float) -> None:
         """Generate legend entry for stacked bandwidth line thickness."""
         width_legend_name = f"{layer_name} (Width)"
         cls.delete_existing_layers_with_same_name(width_legend_name)
-        
+
         width_layer = QgsVectorLayer("LineString?crs=4326", width_legend_name, "memory")
         symbol = QgsSymbol.defaultSymbol(width_layer.geometryType())
         symbol.setWidth(0.001)
@@ -431,16 +446,16 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             pct = interval / num_legend_steps
             rule = renderer.rootRule().children()[0].clone()
             ub = cls.format_legend_number(pct * max_layer_value, max_layer_value)
-            
+
             if interval > 0:
-                pct_prev = (interval-1) / num_legend_steps
+                pct_prev = (interval - 1) / num_legend_steps
                 lb = cls.format_legend_number(pct_prev * max_layer_value + 1, max_layer_value)
                 label = f"{lb} - {ub}"
             else:
                 label = ub
-            
+
             rule.setLabel(label)
-            rule.symbol().setWidth(pct * max_band_value) # scale width by @aeq_band_width
+            rule.symbol().setWidth(pct * max_band_value)  # scale width by @aeq_band_width
             renderer.rootRule().appendChild(rule)
 
         # remove first child (dummy entry we have been cloning)
@@ -451,36 +466,44 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         width_layer.triggerRepaint()
 
     @classmethod
-    def build_color_legend(cls, layer_name:str, bands:list[BandAttributes])->None:
+    def build_color_legend(cls, layer_name: str, bands: list[BandAttributes]) -> None:
         """Generate legend layer for stacked bandwidths colored categories."""
         color_legend_name = f"{layer_name} (Color)"
         cls.delete_existing_layers_with_same_name(color_legend_name)
-            
+
         color_layer = QgsVectorLayer("LineString?crs=4326", color_legend_name, "memory")
 
-        renderer = QgsRuleBasedRenderer(QgsLineSymbol.createSimple({'width':2}))
+        renderer = QgsRuleBasedRenderer(QgsLineSymbol.createSimple({"width": 2}))
         root_rule = renderer.rootRule()
         rule_to_clone = root_rule.children()[0]
         for band in bands:
             if band.color_ramp_style:
                 ref_style = QgsStyle().defaultStyle()
-                
-                # Same colormap both directions
-                if (band.color['max ba'] == band.color['max ab']) and (band.color['color ba'] ==band.color['color ab']):
-                    color_ramp = ref_style.colorRamp(band.color['color ba'])
-                    band_max_value = band.color['max ba']
-                    cls.populate_graduated_rule_rendered(root_rule, rule_to_clone, band.label, color_ramp, band_max_value)
-                    
-                else: # split AB BA colormap
-                    color_ramp = ref_style.colorRamp(band.color['color ba'])
-                    band_max_value = band.color['max ba']
-                    band_label = f"{band.label} BA"
-                    cls.populate_graduated_rule_rendered(root_rule, rule_to_clone, band_label, color_ramp, band_max_value)
 
-                    color_ramp = ref_style.colorRamp(band.color['color ab'])
-                    band_max_value = band.color['max ab']
+                # Same colormap both directions
+                if (band.color["max ba"] == band.color["max ab"]) and (
+                    band.color["color ba"] == band.color["color ab"]
+                ):
+                    color_ramp = ref_style.colorRamp(band.color["color ba"])
+                    band_max_value = band.color["max ba"]
+                    cls.populate_graduated_rule_rendered(
+                        root_rule, rule_to_clone, band.label, color_ramp, band_max_value
+                    )
+
+                else:  # split AB BA colormap
+                    color_ramp = ref_style.colorRamp(band.color["color ba"])
+                    band_max_value = band.color["max ba"]
+                    band_label = f"{band.label} BA"
+                    cls.populate_graduated_rule_rendered(
+                        root_rule, rule_to_clone, band_label, color_ramp, band_max_value
+                    )
+
+                    color_ramp = ref_style.colorRamp(band.color["color ab"])
+                    band_max_value = band.color["max ab"]
                     band_label = f"{band.label} AB"
-                    cls.populate_graduated_rule_rendered(root_rule, rule_to_clone, band_label, color_ramp, band_max_value)
+                    cls.populate_graduated_rule_rendered(
+                        root_rule, rule_to_clone, band_label, color_ramp, band_max_value
+                    )
 
             else:
                 rule = rule_to_clone.clone()
@@ -495,11 +518,19 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         color_layer.triggerRepaint()
 
     @staticmethod
-    def format_legend_number(value:float, max_value:float)->str:
+    def format_legend_number(value: float, max_value: float) -> str:
         return f"{(value):,.2f}" if max_value < 100 else f"{int(value):,}"
-    
+
     @classmethod
-    def populate_graduated_rule_rendered(cls, parent_rule: QgsRuleBasedRenderer.Rule, rule_to_clone: QgsRuleBasedRenderer.Rule, band_label:str, color_ramp, max_val:float, num_legend_steps:int=5):
+    def populate_graduated_rule_rendered(
+        cls,
+        parent_rule: QgsRuleBasedRenderer.Rule,
+        rule_to_clone: QgsRuleBasedRenderer.Rule,
+        band_label: str,
+        color_ramp,
+        max_val: float,
+        num_legend_steps: int = 5,
+    ):
         """Populate a new rule tier inside parent_rule displaying color ramp value ranges."""
         band_parent_rule = rule_to_clone.clone()
         band_parent_rule.setLabel(band_label)
@@ -508,14 +539,14 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             pct = interval / num_legend_steps
             rule = rule_to_clone.clone()
             ub = cls.format_legend_number(pct * max_val, max_val)
-            
+
             if interval > 0:
-                pct_prev = (interval-1) / num_legend_steps
-                lb = cls.format_legend_number(pct_prev * max_val +1, max_val)
+                pct_prev = (interval - 1) / num_legend_steps
+                lb = cls.format_legend_number(pct_prev * max_val + 1, max_val)
                 label = f"{lb} - {ub}"
             else:
                 label = ub
-            
+
             rule.setLabel(label)
             rule.symbol().setColor(color_ramp.color(pct))
             band_parent_rule.appendChild(rule)
