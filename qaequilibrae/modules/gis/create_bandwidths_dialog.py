@@ -408,17 +408,21 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.close()
 
     @classmethod
-    def build_width_legend(cls, layer_name:str, max_layer_value:float, max_band_value:float):
-        # Bandwidth thickness legend
-        width_legend_name = f"{layer_name} (Width)"
-        layers_with_name =QgsProject.instance().mapLayersByName(width_legend_name)
+    def delete_existing_layers_with_same_name(cls, layer_name:str)->None:
+        layers_with_name =QgsProject.instance().mapLayersByName(layer_name)
         if len(layers_with_name) >0:
             # delete existing layers with this name (i.e. previous legends)
             # TODO small chance this deletes user data, should this be behind a default ticked checkbox?
             for layer in layers_with_name:
                 QgsProject.instance().removeMapLayer(layer.id())
 
-        # setup band width legend layer    
+
+    @classmethod
+    def build_width_legend(cls, layer_name:str, max_layer_value:float, max_band_value:float)->None:
+        """Generate legend entry for stacked bandwidth line thickness."""
+        width_legend_name = f"{layer_name} (Width)"
+        cls.delete_existing_layers_with_same_name(width_legend_name)
+        
         width_layer = QgsVectorLayer("LineString?crs=4326", width_legend_name, "memory")
         symbol = QgsSymbol.defaultSymbol(width_layer.geometryType())
         symbol.setWidth(0.001)
@@ -443,20 +447,16 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
         # remove first child (dummy entry we have been cloning)
         renderer.rootRule().removeChildAt(0)
+
         width_layer.setRenderer(renderer)
         QgsProject.instance().addMapLayer(width_layer)
         width_layer.triggerRepaint()
 
     @classmethod
-    def build_color_legend(cls, layer_name:str, bands:list[BandAttributes]):
-        # generate legend layer for stacked bandwidths
+    def build_color_legend(cls, layer_name:str, bands:list[BandAttributes])->None:
+        """Generate legend layer for stacked bandwidths colored categories."""
         color_legend_name = f"{layer_name} (Color)"
-        layers_with_name =QgsProject.instance().mapLayersByName(color_legend_name)
-        if len(layers_with_name) >0:
-            # delete existing layers with this name (i.e. previous legends)
-            # TODO small chance this deletes user data, should this be behind a default ticked checkbox?
-            for layer in layers_with_name:
-                QgsProject.instance().removeMapLayer(layer.id())
+        cls.delete_existing_layers_with_same_name(color_legend_name)
             
         color_layer = QgsVectorLayer("LineString?crs=4326", color_legend_name, "memory")
 
