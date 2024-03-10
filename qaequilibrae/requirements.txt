@@ -1,3 +1,8 @@
-aequilibrae==0.9.3
-openmatrix
+aequilibrae==1.0.1
 ortools
+cython
+numexpr
+py-cpuinfo
+tables==3.8.0
+openmatrix
+fastparquet

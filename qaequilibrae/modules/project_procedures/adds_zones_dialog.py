@@ -2,6 +2,8 @@ import os
 import sys
 
 import pandas as pd
+from aequilibrae.project.database_connection import database_connection
+from aequilibrae.utils.db_utils import commit_and_close
 from PyQt5.QtCore import Qt
 
 import qgis
@@ -66,34 +68,35 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.show()
 
     def changed_layer(self):
-        if not self.project or not self.project.conn:
-            return
-        ignore_fields = ["ogc_fid", "geometry"]
-        not_initializable = ["zone_id"]
+        with commit_and_close(database_connection("network")) as conn:
+            if not self.project or not conn:
+                return
+            ignore_fields = ["ogc_fid", "geometry"]
+            not_initializable = ["zone_id"]
 
-        fields = pd.read_sql("PRAGMA table_info(zones)", self.project.conn).name.to_list()
-        fields = [x.lower() for x in fields if x not in ignore_fields]
+            fields = pd.read_sql("PRAGMA table_info(zones)", conn).name.to_list()
+            fields = [x.lower() for x in fields if x not in ignore_fields]
 
-        self.table_fields.clearContents()
-        self.table_fields.setRowCount(len(fields))
+            self.table_fields.clearContents()
+            self.table_fields.setRowCount(len(fields))
 
-        layer_fields = self.cob_lyr.currentLayer().fields() if self.cob_lyr.currentLayer() else []
+            layer_fields = self.cob_lyr.currentLayer().fields() if self.cob_lyr.currentLayer() else []
 
-        for counter, field in enumerate(fields):
-            item1 = QtWidgets.QTableWidgetItem(field)
-            item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            self.table_fields.setItem(counter, 1, item1)
+            for counter, field in enumerate(fields):
+                item1 = QtWidgets.QTableWidgetItem(field)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.table_fields.setItem(counter, 1, item1)
 
-            chb1 = QtWidgets.QCheckBox()
-            chb1.setChecked(True)
-            if field in not_initializable:
-                chb1.setEnabled(False)
-            self.table_fields.setCellWidget(counter, 0, self.centers_item(chb1))
+                chb1 = QtWidgets.QCheckBox()
+                chb1.setChecked(True)
+                if field in not_initializable:
+                    chb1.setEnabled(False)
+                self.table_fields.setCellWidget(counter, 0, self.centers_item(chb1))
 
-            cbb = QtWidgets.QComboBox()
-            for i in layer_fields:
-                cbb.addItem(i.name())
-            self.table_fields.setCellWidget(counter, 2, self.centers_item(cbb))
+                cbb = QtWidgets.QComboBox()
+                for i in layer_fields:
+                    cbb.addItem(i.name())
+                self.table_fields.setCellWidget(counter, 2, self.centers_item(cbb))
 
     def centers_item(self, item):
         cell_widget = QWidget()
@@ -115,3 +118,6 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def job_finished_from_thread(self, success):
         self.exit_procedure()
+
+    def exit_procedure(self):
+        self.close()

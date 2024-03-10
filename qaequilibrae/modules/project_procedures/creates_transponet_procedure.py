@@ -1,10 +1,10 @@
-from string import ascii_letters
-
 from PyQt5.QtCore import pyqtSignal
-from aequilibrae.project import Project
-
 from aequilibrae.context import get_logger
+from aequilibrae.project import Project
+from aequilibrae.project.database_connection import database_connection
+from aequilibrae.utils.db_utils import commit_and_close
 from aequilibrae.utils.worker_thread import WorkerThread
+from string import ascii_letters
 
 logger = get_logger()
 
@@ -45,89 +45,73 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
     # Adds the non-standard fields to a layer
     def additional_fields_to_layers(self, table, layer, layer_fields):
-        curr = self.project.conn.cursor()
-        fields = layer.dataProvider().fields()
-        string_fields = []
+        with commit_and_close(database_connection("network")) as conn:
 
-        curr.execute(f"PRAGMA table_info({table});")
-        field_names = curr.fetchall()
-        existing_fields = [f[1].lower() for f in field_names]
+            fields = layer.dataProvider().fields()
+            string_fields = []
 
-        for f in set(layer_fields.keys()):
-            if f.lower() in existing_fields:
-                continue
-            field = fields[layer_fields[f]]
-            field_length = field.length()
-            if not field.isNumeric():
-                field_type = "char"
-                string_fields.append(f)
-            else:
-                if "Int" in field.typeName():
-                    field_type = "INTEGER"
+            field_names = conn.execute(f"PRAGMA table_info({table});").fetchall()
+            existing_fields = [f[1].lower() for f in field_names]
+
+            for f in set(layer_fields.keys()):
+                if f.lower() in existing_fields:
+                    continue
+                field = fields[layer_fields[f]]
+                field_length = field.length()
+                if not field.isNumeric():
+                    field_type = "char"
+                    string_fields.append(f)
                 else:
-                    field_type = "REAL"
-            try:
-                sql = "alter table " + table + " add column " + f + " " + field_type + "(" + str(field_length) + ")"
-                curr.execute(sql)
-                self.project.conn.commit()
-            except Exception as e:
-                logger.error(sql)
-                logger.error(e.args)
-                self.report.append(self.tr("field {} could not be added").format(str(f)))
-        curr.close()
+                    field_type = "INTEGER" if "Int" in field.typeName() else "REAL"
+                try:
+                    sql = "alter table " + table + " add column " + f + " " + field_type + "(" + str(field_length) + ")"
+                    conn.execute(sql)
+                    self.project.conn.commit()
+                except Exception as e:
+                    logger.error(sql)
+                    logger.error(e.args)
+                    self.report.append(self.tr("field {} could not be added").format(str(f)))
+
         return string_fields
 
     def renumber_nodes(self):
         max_val = self.node_layer.maximumValue(self.node_fields["node_id"])
-        max_val += [x[0] for x in self.project.conn.execute("select max(node_id) from nodes")][0]
-        logger.info(max_val)
+        with commit_and_close(database_connection("network")) as conn:
+            num_nodes = conn.execute("select max(node_id) from nodes").fetchone()[0]
+            max_val += num_nodes
+            logger.info(max_val)
 
-        curr = self.project.conn.cursor()
-        # self.node_fields
-        curr.execute("BEGIN;")
-        curr.execute("Update Nodes set node_id=node_id+?", [max_val])
-        # curr.execute("Update Links set a_node=a_node+?, b_node=b_node+?", [max_val, max_val])
-        curr.execute("COMMIT;")
-        self.project.conn.commit()
+            conn.execute("BEGIN;")
+            conn.execute("Update Nodes set node_id=node_id+?", [max_val])
+            conn.execute("COMMIT;")
 
-        self.emit_messages(message=self.tr("Transferring nodes"), value=0, max_val=self.node_layer.featureCount())
+            self.emit_messages(message=self.tr("Transferring nodes"), value=0, max_val=self.node_layer.featureCount())
 
-        find_sql = """SELECT node_id
-                        FROM nodes
-                        WHERE geometry = GeomFromWKB(?, ?) AND
-                        ROWID IN (
-                          SELECT ROWID FROM SpatialIndex WHERE f_table_name = 'nodes' AND
-                          search_frame = GeomFromWKB(?, ?))"""
+            find_sql = """SELECT node_id
+                            FROM nodes
+                            WHERE geometry = GeomFromWKB(?, ?) AND
+                            ROWID IN (
+                            SELECT ROWID FROM SpatialIndex WHERE f_table_name = 'nodes' AND
+                            search_frame = GeomFromWKB(?, ?))"""
 
-        flds = list(self.node_fields.keys())
-        setting = [f"{fld}=?" for fld in flds]
-        update_sql = f'Update nodes set {",".join(setting)} where node_id=?'
-        # update_link_a = "Update Links set a_node=? where a_node=?"
-        # update_link_b = "Update Links set b_node=? where b_node=?"
+            flds = list(self.node_fields.keys())
+            setting = [f"{fld}=?" for fld in flds]
+            update_sql = f'Update nodes set {",".join(setting)} where node_id=?'
 
-        crs = int(self.node_layer.crs().authid().split(":")[1])
-        for j, f in enumerate(self.node_layer.getFeatures()):
-            self.emit_messages(value=j + 1)
-            attrs = [self.convert_data(f.attributes()[val]) if val > 0 else None for val in self.node_fields.values()]
-            wkb = f.geometry().asWkb().data()
-            node_id = [x[0] for x in self.project.conn.execute(find_sql, [wkb, crs, wkb, crs])][0]
-            if not node_id:
-                continue
-            attrs.append(node_id)
-            # new_node_id = f.attributes()[self.node_fields['node_id']]
-            # logger.info([update_link_b, [new_node_id, node_id]])
-            # logger.info([update_link_a, [new_node_id, node_id]])
-            logger.info([update_sql, attrs])
-            curr = self.project.conn.cursor()
-            # curr.execute("BEGIN;")
-            # curr.execute(update_sql, attrs)
-            # curr.execute(update_link_a, [new_node_id, node_id])
-            # curr.execute(update_link_b, [new_node_id, node_id])
-            # curr.execute("COMMIT;")
-        self.project.conn.commit()
+            crs = int(self.node_layer.crs().authid().split(":")[1])
+            for j, f in enumerate(self.node_layer.getFeatures()):
+                self.emit_messages(value=j + 1)
+                attrs = [self.convert_data(f.attributes()[val]) if val >= 0 else None for val in
+                         self.node_fields.values()]
+                wkb = f.geometry().asWkb().data()
+                node_id = conn.execute(find_sql, [wkb, crs, wkb, crs]).fetchall()
+                if not node_id:
+                    continue
+                attrs.append(node_id)
+                logger.info([update_sql, attrs])
+            conn.commit()
 
     def transfer_layer_features(self, table, layer, layer_fields):
-
         self.emit_messages(message=self.tr("Transferring {}").format(table), value=0, max_val=layer.featureCount())
 
         field_titles = ",".join(layer_fields.keys())
@@ -141,8 +125,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
         for j, f in enumerate(layer.getFeatures()):
             self.emit_messages(value=j + 1)
-            attrs = [self.convert_data(f.attributes()[val]) if val > 0 else "NULL" for val in layer_fields.values()]
-            # attrs.extend([f.geometry().asWkt().upper(), crs])
+            attrs = [self.convert_data(f.attributes()[val]) if val >= 0 else None for val in layer_fields.values()]
             attrs.extend([f.geometry().asWkb().data(), crs])
             data_to_add.append(attrs)
 
@@ -150,57 +133,54 @@ class CreatesTranspoNetProcedure(WorkerThread):
                 all_modes.update(list(f.attributes()[layer_fields["modes"]]))
                 all_link_types.update([f.attributes()[layer_fields["link_type"]]])
 
-        if table == "links":
-            # We check if all modes exist
-            modes = self.project.network.modes
-            current_modes = list(modes.all_modes().keys())
-            letters = [x for x in list(ascii_letters) if x not in current_modes]
-            all_modes = [x for x in all_modes if x not in current_modes]
-            for md in all_modes:
-                new_mode = modes.new(md)
-                new_mode.mode_name = md
-                new_mode.description = self.tr("Mode automatically added during project creation from layers")
-                modes.add(new_mode)
-                new_mode.save()
-                logger.info(f"{new_mode.description} --> ({md})")
-            self.project.conn.commit()
+        with commit_and_close(database_connection("network")) as conn:
+            if table == "links":
+                self.__add_linktypes_and_modes(all_link_types, all_modes, conn)
 
-            # We check if all link types exist
-            link_types = self.project.network.link_types
-            current_lt = [lt.link_type for lt in link_types.all_types().values()]
-            letters = [x for x in list(ascii_letters) if x not in link_types.all_types().keys()]
+            for data in data_to_add:
+                try:
+                    conn.execute(sql, data)
+                except Exception as e:
+                    logger.info(self.tr("Failed inserting record {} for {}").format(data[0], table))
+                    logger.info(e.args)
+                    logger.info([sql, data])
+                    if data[0]:
+                        msg = self.tr("feature with id {} could not be added to layer {}").format(data[0], table)
+                    else:
+                        msg = self.tr("feature with no node id present. It could not be added to layer {}").format(
+                            table)
+                    self.report.append(msg)
 
-            all_link_types = [lt for lt in all_link_types if lt not in current_lt]
-            logger.info(all_link_types)
-            for lt in all_link_types:
-                new_link_type = link_types.new(letters[0])
-                letters = letters[1:]
-                new_link_type.link_type = lt
-                new_link_type.description = self.tr("Link_type automatically added during project creation from layers")
-                new_link_type.save()
-                logger.info(new_link_type.description + f" --> ({new_link_type.link_type})")
-            self.project.conn.commit()
-
-        for data in data_to_add:
-            try:
-                self.project.conn.execute(sql, data)
-            except Exception as e:
-                logger.info(self.tr("Failed inserting record {} for {}").format(data[0], table))
-                logger.info(e.args)
-                logger.info([sql, data])
-                if data[0]:
-                    msg = self.tr("feature with id {} could not be added to layer {}").format(data[0], table)
-                else:
-                    msg = self.tr("feature with no node id present. It could not be added to layer {}").format(table)
-                self.report.append(msg)
-
-        self.project.conn.commit()
+    def __add_linktypes_and_modes(self, all_link_types, all_modes, conn):
+        # We check if all modes exist
+        modes = self.project.network.modes
+        current_modes = list(modes.all_modes().keys())
+        all_modes = [x for x in all_modes if x not in current_modes]
+        for md in all_modes:
+            new_mode = modes.new(md)
+            new_mode.mode_name = md
+            new_mode.description = "Mode automatically added during project creation from layers"
+            modes.add(new_mode)
+            new_mode.save()
+            logger.info(f"{new_mode.description} --> ({md})")
+        conn.commit()
+        # We check if all link types exist
+        link_types = self.project.network.link_types
+        current_lt = [lt.link_type for lt in link_types.all_types().values()]
+        letters = [x for x in list(ascii_letters) if x not in link_types.all_types().keys()]
+        all_link_types = [lt for lt in all_link_types if lt not in current_lt]
+        logger.info(all_link_types)
+        for lt in all_link_types:
+            new_link_type = link_types.new(letters[0])
+            letters = letters[1:]
+            new_link_type.link_type = lt
+            new_link_type.description = "Link_type automatically added during project creation from layers"
+            new_link_type.save()
+            logger.info(new_link_type.description + f" --> ({new_link_type.link_type})")
+        conn.commit()
 
     def convert_data(self, value):
-        if type(value) is None:
-            return None
-        else:
-            return value
+        return None if type(value) is None else value
 
     def emit_messages(self, message="", value=-1, max_val=-1):
         if len(message) > 0:

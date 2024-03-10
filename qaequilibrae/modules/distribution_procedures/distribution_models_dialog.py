@@ -104,6 +104,8 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.user_chosen_model = None
         self.update_model_parameters()
 
+        self.testing = False
+
     def load_matrices(self):
         self.matrices = list_matrices(self.project.matrices.fldr)
 
@@ -111,7 +113,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.list_matrices.setModel(self.matrices_model)
         self.cob_imped_mat.addItems(self.matrices["name"].tolist())
         self.cob_seed_mat.addItems(self.matrices["name"].tolist())
-
 
     def data_double_clicked(self, mi):
         row = mi.row()
@@ -222,7 +223,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.model.load(file_name)
             self.update_model_parameters()
         except Exception as e:
-            qgis.utils.iface.messageBar().pushMessage("Error", self.tr("Could not load model. {}").format(e.args), level=3)
+            qgis.utils.iface.messageBar().pushMessage(
+                "Error", self.tr("Could not load model. {}").format(e.args), level=3
+            )
 
     def change_vector_field(self, cob_orig, cob_dest, dt):
         cob_dest.clear()
@@ -270,7 +273,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 table.setItem(i, 1, QTableWidgetItem(str(dictio[data_name].cores)))
 
     def browse_outfile(self, file_type):
-
         file_types = {
             "aed": ["AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed"],
             "mod": ["Model file", ["Model file(*.mod)"], ".mod"],
@@ -306,8 +308,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 atra_field = self.cob_atra_field.currentText()
 
             if self.job == "ipf":
-                out_name = self.browse_outfile("aem")
-                if out_name is not None:
+                if not self.testing:
+                    self.out_name = self.browse_outfile("aem")
+                if self.out_name is not None:
                     args = {
                         "matrix": seed_matrix,
                         "rows": prod_vec,
@@ -319,8 +322,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                     worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), **args)
 
             if self.job == "apply":
-                out_name = self.browse_outfile("aem")
-                if out_name is not None:
+                if not self.testing:
+                    self.out_name = self.browse_outfile("aem")
+                if self.out_name is not None:
                     for i in range(1, self.table_model.rowCount()):
                         if str(self.table_model.item(i, 0).text()) == "Alpha":
                             self.model.alpha = float(self.table_model.cellWidget(i, 1).value())
@@ -334,14 +338,15 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                         "model": self.model,
                         "columns": atra_vec,
                         "column_field": atra_field,
-                        "output": out_name,
+                        "output": self.out_name,
                         "nan_as_zero": self.chb_empty_as_zero.isChecked(),
                     }
                     worker_thread = ApplyGravityProcedure(qgis.utils.iface.mainWindow(), **args)
 
             if self.job == "calibrate":
-                out_name = self.browse_outfile("mod")
-                if out_name is not None:
+                if not self.testing:
+                    self.out_name = self.browse_outfile("mod")
+                if self.out_name is not None:
                     if self.rdo_expo.isChecked():
                         func_name = "EXPO"
                     if self.rdo_power.isChecked():
@@ -362,7 +367,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.chb_empty_as_zero.setEnabled(False)
             if worker_thread is None:
                 return
-            self.add_job_to_list(worker_thread, out_name)
+            self.add_job_to_list(worker_thread, self.out_name)
         else:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), self.error, level=3)
 
@@ -407,6 +412,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.cob_imped_field.currentIndex() < 0:
                 self.error = self.tr("Impedance matrix is missing")
 
+        print(self.error)
         if self.error is not None:
             return False
         else:
@@ -431,7 +437,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def exit_procedure(self):
-        if self.report is not None:
+        if self.report is not None and not self.testing:
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
             dlg2.exec_()

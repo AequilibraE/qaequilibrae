@@ -35,7 +35,6 @@ class AddZonesProcedure(WorkerThread):
                 zone.add_centroid(None)
             self.emit_messages(value=i + 1)
         self.jobFinished.emit("DONE")
-        self.close()
 
     def emit_messages(self, message="", value=-1, max_val=-1):
         if len(message) > 0:

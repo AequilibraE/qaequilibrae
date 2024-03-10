@@ -1,7 +1,6 @@
 import logging
 import os
 import sys
-from aequilibrae.paths import path_computation
 from aequilibrae.paths.results import PathResults
 from aequilibrae.project import Project
 from qgis._core import QgsProject, QgsVectorLayer, QgsSpatialIndex

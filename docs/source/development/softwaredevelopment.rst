@@ -31,7 +31,7 @@ AequilibraE is currently tested for Python 3.7, 3.8, 3.9 & 3.11, but we recommen
 
 We also assume you are using `PyCharm <https://www.jetbrains.com/pycharm>`_, which is an awesome IDE for Python.
 
-If you are using a different IDE, we would welcome if you could contribute with insctruction to set that up.
+If you are using a different IDE, we would welcome if you could contribute with instructions to set that up.
 
 Cloning the computational engine as submodule
 ---------------------------------------------
@@ -124,7 +124,7 @@ by translating the plugin to other languages or reviewing the existing translati
 `AequilibraE Google Group <https://groups.google.com/forum/#!forum/aequilibrae>`_,
 so we can add your language to our translation pool!
 
-In the :ref:`plugin-translation`page, you can find more information on creating you account and
+In the :ref:`plugin translation <plugin_translation>` page, you can find more information on creating your account and
 start translating QAequilibraE.
 
 Contributing to AequilibraE for QGIS
@@ -148,7 +148,7 @@ GitHub has a nice visual explanation on how collaboration is done `GitHub Flow
 Release versions
 ~~~~~~~~~~~~~~~~~
 
-AequilibraE uses the the de-facto Python standard for `versioning
+AequilibraE uses the de-facto Python standard for `versioning
 <http://the-hitchhikers-guide-to-packaging.readthedocs.io/en/latest/specification.html>`_
 
 ::

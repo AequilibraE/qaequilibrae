@@ -101,10 +101,8 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def job_finished_from_thread(self, success):
         self.but_process.setEnabled(True)
-        self.project.network.refresh_connection()
-        self.project.network.links.refresh_connection()
-        self.project.network.nodes.refresh_connection()
-        self.project.zoning.refresh_connection()
+        self.project.network.links.refresh()
+        self.project.network.nodes.refresh()
         self.exit_procedure()
 
     def exit_procedure(self):

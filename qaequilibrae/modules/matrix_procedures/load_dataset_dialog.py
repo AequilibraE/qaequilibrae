@@ -162,7 +162,9 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_save_and_use.setEnabled(True)
         self.chb_all_fields.setEnabled(True)
         if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Error while loading vector:"), self.worker_thread.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage(
+                self.tr("Error while loading vector:"), self.worker_thread.error, level=1
+            )
         else:
             self.dataset = self.worker_thread.output
         self.exit_procedure()
@@ -173,7 +175,9 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
             self.dataset = AequilibraeData()
             self.dataset.load(out_name)
         except Exception as e:
-            self.error = self.tr("Could not load file. It might be corrupted or not a valid AequilibraE file. {}".format(e.args))
+            self.error = self.tr(
+                "Could not load file. It might be corrupted or not a valid AequilibraE file. {}".format(e.args)
+            )
         self.exit_procedure()
 
     def load_the_vector(self):
@@ -188,6 +192,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.error = self.tr("No name provided for the output file")
 
         if self.radio_layer_matrix.isChecked() and self.error is None:
+            self.output_name = self.layer.name()
             if self.cob_data_layer.currentIndex() < 0 or self.cob_index_field.currentIndex() < 0:
                 self.error = self.tr("Invalid field chosen")
 

@@ -3,13 +3,12 @@
 AequilibraE Project
 ===================
 
-The AequilibraE project is one of the newest portions of the
-`AequilibraE API <http://www.aequilibrae.com/python/latest/>`_, and therefore not very mature.
+This page is dedicated to a practical implementation of the AequilibraE project. In case you
+are interested in better understanding its structure, please visit its 
+`documentation <https://www.aequilibrae.com/python/latest/modeling_with_aequilibrae/project.html>`_
+webpage.
 
-For a better overview of the AequilibraE project, please check the
-documentation listed above, as this page is dedicated to a practical implementation
-
-Under the project tab, there are seven options to choose from and the following sections
+Under the project tab, there are some options to choose from and the following sections
 explore some of these actions.
 
 .. _siouxfalls-open-project:
@@ -145,7 +144,7 @@ want to migrate the data and the respective layer field in the zoning layer, and
 finally click on process.
 
 .. image:: ../images/add-zone-layer.png
-    :width: 704
+    :width: 450
     :align: center
     :alt: adding zone layer
 
@@ -159,7 +158,7 @@ reference documentation for this section can be found in its
 `documentation page <https://aequilibrae.com/python/latest/modeling_with_aequilibrae/parameter_file.html>`_.
 
 The QGIS plugin, however, has a nice interface to view and edit the parameters
-file, which can be accessed through **Aequilibrae > Project > Parameters**. This
+file, which can be accessed through **AequilibraE > Project > Parameters**. This
 interface, depicted below, allows one to edit and validate parameters before
 submitting them as the new parameter file for all AequilibraE procedures.
 

@@ -10,16 +10,17 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        container: [ 'qgis/qgis:latest', 'qgis/qgis:release-3_28']
+        container: [ 'qgis/qgis:latest', 'qgis/qgis:release-3_32']
     container:
       image: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Install dependencies
         run: |
+          python3 -c "from qaequilibrae.download_extra_packages_class import download_all; download_all().install()"
           python3 -m pip install -r qaequilibrae/requirements.txt
           python3 -m pip install -r ci/requirements-dev.txt
           python3 -m pip install numpy --upgrade
@@ -28,4 +29,4 @@ jobs:
         run: |
           export QT_QPA_PLATFORM=offscreen
           pwd
-          python3 -m pytest test -v --tb=short
+          python3 -m pytest test -v --tb=short --cov=qaequilibrae

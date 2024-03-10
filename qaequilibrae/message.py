@@ -1,13 +1,16 @@
-from qgis.PyQt.QtCore import Qt, QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication
 
 
 class messages:
     @property
+    def first_box_name(self):
+        return self.tr("AequilibraE and other dependencies are not installed")
+
+    @property
     def first_message(self):
-        a = self.tr("AequilibraE and other dependencies are not not installed")
-        b = self.tr("Do you want us to install these missing python packages?")
-        c = self.tr("QGIS will be non-responsive for a couple of minutes.")
-        return f"{a} {b}\r\n{c}"
+        a = self.tr("Do you want us to install these missing python packages?")
+        b = self.tr("QGIS will be non-responsive for a couple of minutes.")
+        return f"{a}\r\n{b}"
 
     @property
     def second_message(self):

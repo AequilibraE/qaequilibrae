@@ -7,7 +7,7 @@ In this section we describe how you can install AequilibraE's QGIS plug-in.
 
 .. note::
 
-    The recommendations on this page are as current as of May 2023.
+    The recommendations on this page are as current as of December 2023.
 
 Installation
 ------------
@@ -20,68 +20,53 @@ download it using the instructions below.
 Step--by-step installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The steps for installing AequilibraE are the same as for any QGIS plugin
+The steps for installing AequilibraE are the same as for any QGIS plugin.
+Go to the Plugins panel and click on **Manage and Install Plugins**.
 
 .. image:: ../images/install_1.png
     :width: 1181
     :align: center
     :alt: First step
 
-
 .. image:: ../images/install_2.png
     :width: 1035
     :align: center
     :alt: Second step
 
-
 .. image:: ../images/install_3.png
-    :width: 1062
+    :width: 1226
     :align: center
     :alt: Third step
 
-.. note::
-   We recommend selecting experimental plugins ONLY if you absolutely require
-   the latest features. Otherwise keep it with the latest stable one.
-   The old plugin (aequilibrae) has been deprecated and may eventually stop working
-   altogether.
+After installing the plugin, you will be faced with the question of whether you
+want to download its dependencies, which are required for using most of the
+features. This is necessary because AequilibraE's algorithms rely on compiled
+extensions, but it is against the QGIS's community guidelines to upload binaries
+to the repository.
 
 .. image:: ../images/install_4.png
-    :width: 1234
+    :width: 400
     :align: center
     :alt: Fourth step
 
+If you select to download the packages, QGIS will freeze for a few seconds before
+showing the image below.
+
 .. image:: ../images/install_5.png
-    :width: 1226
+    :width: 380
     :align: center
     :alt: Fifth step
 
-After installing the plugin, you will be faced with the question of whether you
-want to download its dependencies, which are required for using most of the
-features.
-
-.. image:: ../images/no_binaries_error.png
-    :width: 1099
-    :align: center
-    :alt: no_binaries_error
-
-The problem is that many of AequilibraE's algorithms rely on compiled
-extensions, but it is against the QGIS's community guidelines to upload binaries
-to the repository.
+Otherwise, a message warning about installation problems will be shown, and your
+plugin will be non-functional.
 
 .. image:: ../images/install_6.png
     :width: 492
     :align: center
     :alt: Sixth step
 
-If you select to download the packages, QGIS will freeze for a few seconds before
-showing the image below.
+.. _quicktour_video:
 
-.. image:: ../images/install_7.png
-    :width: 675
-    :align: center
-    :alt: Seventh step
-
-.. _quicktour-video:
 Quick Tour
 ----------
 

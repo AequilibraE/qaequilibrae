@@ -293,9 +293,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
                 # we also build a list of bands to construct
                 # The function "(2 * j -1) * ba"  maps the index j {1,2} and the direction to the side of the
                 # link the band needs to be. Try it out. it works!!
-                # bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).background()))
-            if len(self.bands_list.item(i, 2).text()) == 0: # block color
-                color_ramp_style = False
+                # bands.append((field, (2 * j -1) * ba, self.bands_list.item(i, 2).backgroundColor()))
+            if len(self.bands_list.item(i, 2).text()) == 0:
                 cl = self.bands_list.item(i, 2).background().color()
             else:
                 color_ramp_style = True

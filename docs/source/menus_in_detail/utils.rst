@@ -1,6 +1,12 @@
 Utils
 =====
 
+On the Utils tab, the user can either display matrices and datasets in OMX or AequilibraE's native
+format or create an example project to learn how to use QAequilibraE.
+
+Display matrices and datasets
+-----------------------------
+
 Within **AequilibraE > Utils > Display matrices and datasets** one can load and
 open matrices and datasets in the following extensions \*.omx, \*.aem, and \*.aed.
 
@@ -20,3 +26,19 @@ window, you can also save the current matrix in \*.csv format.
 .. image:: ../images/utils-load-matrix.png
     :align: center
     :alt: utils display matrices
+
+.. _create_example:
+
+Create example
+--------------
+
+AequilibraE has three different example sets one can use as learning tool, and they were all
+made available within the QGIS ecosystem.
+
+Within **AequilibraE > Utils > Create example**, select one of the available models, the desired
+location of the output folder, and just press *Create*. The window will close automatically
+and you can open the project folder in the Project tab.
+
+.. image:: ../images/utils-create_example.png
+    :align: center
+    :alt: utils create example

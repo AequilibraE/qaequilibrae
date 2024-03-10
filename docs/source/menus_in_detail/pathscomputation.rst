@@ -21,7 +21,7 @@ to see if the network is connected and if paths make sense.
 Before computing a path, we go to the configuration screen
 
 .. image:: ../images/configure_path_computation.png
-    :width: 257
+    :width: 250
     :align: center
     :alt: configure_path_computation
 
@@ -31,14 +31,14 @@ case. For zones with a single connector per zone it is slightly faster to also
 deselect this option, but use this carefully.
 
 .. image:: ../images/path_computation_configuration.png
-    :width: 282
+    :width: 250
     :align: center
     :alt: path_computation_configuration
 
 If we select that paths need to be in a separate layer, then every time you
 compute a path, a new layer with a copy of the links in that path will be
 created and formatted in a noticeable way. You can also select to have links
-selected in the layer, but only one path can be shown at at time if you do so.
+selected in the layer, but only one path can be shown at time if you do so.
 
 .. image:: ../images/paths_generated.png
     :width: 1696
@@ -53,7 +53,7 @@ Impedance Matrix (aka Skimming Matrix)
 We can also skim the network to look into general connectivity of the network
 
 .. image:: ../images/skimming_menu.png
-    :width: 507
+    :width: 350
     :align: center
     :alt: skimming_menu
 
@@ -72,13 +72,13 @@ paths.
 With the results computed (AEM or OMX), one can display them on the screen.
 
 .. image:: ../images/display_data.png
-    :width: 485
+    :width: 350
     :align: center
     :alt: display_data
 
 On the matrix display screen, one can control how many decimal places are shown
 and whether decimal separators are shown. One can also browse through all the
-skims in this file by selecting the skim of choice in the drop down menu in
+skims in this file by selecting the skim of choice in the drop-down menu in
 the bottom left of the screen.
 
 .. image:: ../images/viewing_matrix.png
@@ -92,38 +92,30 @@ Traffic assignment
 ------------------
 
 Having verified that the network seems to be in order, one can proceed to
-perform traffic assignment, since we have a demand matrix:
+perform traffic assignment, since we have a demand matrix.
 
 .. image:: ../images/traffic_assignment.png
-    :width: 877
+    :width: 350
     :align: center
     :alt: Calling assignment
+
+The Traffic Assignment procedure tab looks like this!
 
 .. image:: ../images/project_overview.png
     :width: 877
     :align: center
     :alt: Project overview
 
+In the *Traffic Classes* tab you will create the traffic classes used in the project.
+First, select one of the available matrices (in \*.AEM or \*.OMX format), and the matrix core
+that will be used for computation. For the Sioux Falls example, we don't want to block
+flow through centroids, but this is only necessary because regular nodes of the network are centroids. 
+When you finish, just press the *Add Traffic class to assignment* button.
+
 .. image:: ../images/traffic_open_matrix.png
     :width: 877
     :align: center
     :alt: Calling assignment
-
-Matrices are provided in both OMX and AEM formats, so you are not required to
-install openmatrix.
-
-.. image:: ../images/choose_matrix.png
-    :width: 1314
-    :align: center
-    :alt: Choose matrix
-
-For this example, we only add one traffic class for mode **c** (car)
-
-.. image:: ../images/add_traffic_class.png
-    :width: 877
-    :align: center
-    :alt: Add traffic class
-
 
 To select skims, we need to choose which fields/modes we will skim
 
@@ -158,26 +150,20 @@ block flows through centroids for the reason discussed above.
     :align: center
     :alt: Setup assignment
 
-
-In order to plot the flows as shown above, first we need to add the link flows
-CSV to the QGIS workspace
+The result of the traffic assignment we just performed is stored in the results.sqlite
+database within the project folder. It can be easily accessed and loaded by clicking
+**Data -> Display project data**, and a project data window will open. Just click on the
+*Results* tab, select the desired result, and click in the *Load Result table as data layer*
+button at the bottom.
 
 .. image:: ../images/add_layer.png
-    :width: 173
+    :width: 887
     :align: center
     :alt: add_layer
 
-.. image:: ../images/add_link_flows_to_map.png
-    :width: 83
-    :align: center
-    :alt: add_link_flows_to_map
-
-Then we join it with the link layer by accessing the link layer's properties
-
-.. image:: ../images/layer_properties.png
-    :width: 523
-    :align: center
-    :alt: layer_properties
+Now we can plot the flows we just obtained. You can select the *links* layer and 
+right-click it to open the layer properties window. Go to *Joins*, select the
+fields to join, and press ok.
 
 .. image:: ../images/link_join.png
     :width: 1449
@@ -185,3 +171,12 @@ Then we join it with the link layer by accessing the link layer's properties
     :alt: link_join
 
 Now we can revisit the instructions above for :ref:`siouxfalls-stacked-bandwidth`
+
+Video tutorial
+~~~~~~~~~~~~~~
+
+.. raw:: html
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/DRY4QpdX3qQ"
+     frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
+     picture-in-picture" allowfullscreen></iframe>

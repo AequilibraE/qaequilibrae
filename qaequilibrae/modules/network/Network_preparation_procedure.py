@@ -14,16 +14,15 @@ class NetworkPreparationProcedure(WorkerThread):
     finished_threaded_procedure = pyqtSignal(object)
 
     def __init__(
-            self,
-            parentThread,
-            line_layer,
-            new_line_layer,
-            node_layer=False,
-            node_ids=False,
-            new_node_layer=False,
-            node_start=0,
+        self,
+        parentThread,
+        line_layer,
+        new_line_layer,
+        node_layer=False,
+        node_ids=False,
+        new_node_layer=False,
+        node_start=0,
     ):
-
         WorkerThread.__init__(self, parentThread)
         self.line_layer = line_layer
         self.node_layer = node_layer
@@ -87,7 +86,7 @@ class NetworkPreparationProcedure(WorkerThread):
         for p, feat in enumerate(new_line_layer.getFeatures()):
             if p % 500 == 0:
                 self.ProgressValue.emit(int(p))
-                self.ProgressText.emit(self.tr("Links read: {}").format(p/feat_count))
+                self.ProgressText.emit(self.tr("Links read: {}").format(p / feat_count))
 
             link = list(feat.geometry().asPolyline())
             if link:
@@ -113,7 +112,7 @@ class NetworkPreparationProcedure(WorkerThread):
         incremental_ids = self.node_start - 1
         p = 0
         self.ProgressMaxValue.emit(feat_count * 2)
-        self.ProgressText.emit(self.tr("Computing node IDs: {}").format(0/(feat_count * 2)))
+        self.ProgressText.emit(self.tr("Computing node IDs: {}").format(0 / (feat_count * 2)))
         self.ProgressMaxValue.emit(feat_count * 2)
         for i in all_nodes:
             p += 1
@@ -128,9 +127,9 @@ class NetworkPreparationProcedure(WorkerThread):
 
             if p % 2000 == 0:
                 self.ProgressValue.emit(int(p))
-                self.ProgressText.emit(self.tr("Computing node IDs: {}").format(p/(feat_count * 2)))
+                self.ProgressText.emit(self.tr("Computing node IDs: {}").format(p / (feat_count * 2)))
         self.ProgressValue.emit(int(feat_count * 2))
-        self.ProgressText.emit(self.tr("Computing node IDs: {}").format((feat_count * 2)/(feat_count * 2)))
+        self.ProgressText.emit(self.tr("Computing node IDs: {}").format((feat_count * 2) / (feat_count * 2)))
         # And we write the node layer as well
         node_id0 = -1
         p = 0
@@ -149,14 +148,14 @@ class NetworkPreparationProcedure(WorkerThread):
 
             if p % 500 == 0:
                 self.ProgressValue.emit(int(p))
-                self.ProgressText.emit(self.tr("Writing new node layer: {}").format(p/incremental_ids))
+                self.ProgressText.emit(self.tr("Writing new node layer: {}").format(p / incremental_ids))
         _ = new_node_layer.dataProvider().addFeatures(cfeatures)
         del cfeatures
         new_node_layer.commitChanges()
         self.ProgressValue.emit(int(incremental_ids))
-        self.ProgressText.emit(self.tr("Writing new node layer: {}").fromat({incremental_ids}/{incremental_ids}))
+        self.ProgressText.emit(self.tr("Writing new node layer: {}").fromat({incremental_ids} / {incremental_ids}))
         # Now we write all the node _IDs back to the line layer
-        self.ProgressText.emit(self.tr("Writing node IDs to links: {}").format(0/(feat_count * 2)))
+        self.ProgressText.emit(self.tr("Writing node IDs to links: {}").format(0 / (feat_count * 2)))
         self.ProgressMaxValue.emit(feat_count * 2)
         fid1 = new_line_layer.dataProvider().fieldNameIndex("A_NODE")
         fid2 = new_line_layer.dataProvider().fieldNameIndex("B_NODE")
@@ -170,9 +169,9 @@ class NetworkPreparationProcedure(WorkerThread):
 
             if p % 50 == 0:
                 self.ProgressValue.emit(int(p))
-                self.ProgressText.emit(self.tr("Writing node IDs to links: {}").format(p/(feat_count * 2)))
+                self.ProgressText.emit(self.tr("Writing node IDs to links: {}").format(p / (feat_count * 2)))
         self.ProgressValue.emit(int(p))
-        self.ProgressText.emit(self.tr("Writing node IDs to links: {}").format((feat_count * 2)/(feat_count * 2)))
+        self.ProgressText.emit(self.tr("Writing node IDs to links: {}").format((feat_count * 2) / (feat_count * 2)))
         new_line_layer.commitChanges()
         self.new_line_layer = new_line_layer
         self.new_node_layer = new_node_layer
