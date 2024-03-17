@@ -233,14 +233,14 @@ class NetworkPreparationProcedure(WorkerThread):
                 self.new_line_layer = new_line_layer
 
 
-def duplicate_layer(self, original_layer, layer_type, layer_name):
-    self.epsg_code = int(original_layer.crs().authid().split(":")[1])
-    feats = [feat for feat in original_layer.getFeatures()]
-    duplicate_layer = QgsVectorLayer(layer_type + "?crs=epsg:" + str(self.epsg_code), layer_name, "memory")
-    new_layer_data = duplicate_layer.dataProvider()
-    attr = original_layer.dataProvider().fields().toList()
-    new_layer_data.addAttributes(attr)
-    duplicate_layer.updateFields()
-    new_layer_data.addFeatures(feats)
-    del feats
-    return duplicate_layer
+    def duplicate_layer(self, original_layer, layer_type, layer_name):
+        self.epsg_code = int(original_layer.crs().authid().split(":")[1])
+        feats = [feat for feat in original_layer.getFeatures()]
+        duplicate_layer = QgsVectorLayer(layer_type + "?crs=epsg:" + str(self.epsg_code), layer_name, "memory")
+        new_layer_data = duplicate_layer.dataProvider()
+        attr = original_layer.dataProvider().fields().toList()
+        new_layer_data.addAttributes(attr)
+        duplicate_layer.updateFields()
+        new_layer_data.addFeatures(feats)
+        del feats
+        return duplicate_layer
