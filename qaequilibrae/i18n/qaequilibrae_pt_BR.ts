@@ -338,42 +338,32 @@
         <translation>Índice geográfico</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="76"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="73"/>
         <source>field {} could not be added</source>
         <translation>campo {} não pode ser adicionado</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="93"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="88"/>
         <source>Transferring nodes</source>
         <translation>Transferência de nós</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="130"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="115"/>
         <source>Transferring {}</source>
         <translation>Transferindo {}</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="161"/>
-        <source>Mode automatically added during project creation from layers</source>
-        <translation>Modo adicionado automáticamente durante a criação do projeto a partir de camadas</translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="178"/>
-        <source>Link_type automatically added during project creation from layers</source>
-        <translation>link_type adicionado automaticamente durante a criação do projeto a partir de camadas</translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="187"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="144"/>
         <source>Failed inserting record {} for {}</source>
         <translation>Falha na inserção de {} por {}</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="191"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="148"/>
         <source>feature with id {} could not be added to layer {}</source>
         <translation>recurso com id {} não pode ser adicionado à camada {}</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="193"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="150"/>
         <source>feature with no node id present. It could not be added to layer {}</source>
         <translation>recurso sem node id presente. Não pode ser adicionado à camada {}</translation>
     </message>
@@ -1260,12 +1250,12 @@
 <context>
     <name>LoadDataset</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="52"/>
+        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="53"/>
         <source>Field {} does has a type not supported.</source>
         <translation>O campo {} possui um tipo de dado que não é suportado.</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="76"/>
+        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="82"/>
         <source>Done</source>
         <translation>Pronto</translation>
     </message>
@@ -1293,12 +1283,12 @@
         <translation>O nome do arquivo de saída não foi fornecido.</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="196"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="197"/>
         <source>Invalid field chosen</source>
         <translation>Escolha de campo inválida</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="213"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="214"/>
         <source>One cannot load a dataset with indices only</source>
         <translation>Não é possível carregar o banco de dados apenas com índices</translation>
     </message>
@@ -1344,17 +1334,7 @@
 <context>
     <name>LoadMatrixDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="88"/>
-        <source>Matrix</source>
-        <translation>Matriz</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="89"/>
-        <source>From</source>
-        <translation>De</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="177"/>
+        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="178"/>
         <source>Invalid field chosen</source>
         <translation>Escolha de campo inválida</translation>
     </message>
@@ -1795,12 +1775,12 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
 <context>
     <name>TSPDialog</name>
     <message>
-        <location filename="../modules/routing_procedures/tsp_dialog.py" line="79"/>
+        <location filename="../modules/routing_procedures/tsp_dialog.py" line="84"/>
         <source>You need at least three nodes to route. </source>
         <translation>São necessários ao menos três nós para criar uma rota.</translation>
     </message>
     <message>
-        <location filename="../modules/routing_procedures/tsp_dialog.py" line="87"/>
+        <location filename="../modules/routing_procedures/tsp_dialog.py" line="92"/>
         <source>You need at least three centroids to route. </source>
         <translation>São necessários ao menos três centroides para criar uma rota.</translation>
     </message>
@@ -3211,7 +3191,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
         <source>Layer field</source>
         <translation>Campo da camada</translation>
     </message>

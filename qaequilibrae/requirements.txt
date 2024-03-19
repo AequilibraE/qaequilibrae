@@ -1,4 +1,8 @@
-aequilibrae==1.0.0
+aequilibrae==1.0.1
+ortools
+cython
+numexpr
+py-cpuinfo
 tables==3.8.0
 openmatrix
-ortools
+fastparquet

@@ -225,7 +225,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="180"/>
         <source>Create example</source>
-        <translation type="unfinished"/>
+        <translation>Créer un example</translation>
     </message>
 </context>
 <context>
@@ -299,7 +299,7 @@
     <message>
         <location filename="../modules/project_procedures/create_examples_dialog.py" line="40"/>
         <source>Create</source>
-        <translation type="unfinished"/>
+        <translation>Créer</translation>
     </message>
 </context>
 <context>
@@ -338,42 +338,32 @@
         <translation>Indices spatiaux</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="76"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="73"/>
         <source>field {} could not be added</source>
         <translation>Le champ {} n&apos;a pas pu être ajouté</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="93"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="88"/>
         <source>Transferring nodes</source>
         <translation>Transfert des nœuds</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="130"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="115"/>
         <source>Transferring {}</source>
         <translation>Transfert {}</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="161"/>
-        <source>Mode automatically added during project creation from layers</source>
-        <translation>Mode ajouté automatiquement lors de la création du projet à partir des couches</translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="178"/>
-        <source>Link_type automatically added during project creation from layers</source>
-        <translation>link_type ajouté automatiquement lors de la création du projet à partir de couches</translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="187"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="144"/>
         <source>Failed inserting record {} for {}</source>
         <translation>Echec de l&apos;enregistrement {} pour {}</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="191"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="148"/>
         <source>feature with id {} could not be added to layer {}</source>
         <translation>L&apos;élément avec l&apos;id {} n&apos;a pas pu être ajouté à la couche {}</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="193"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="150"/>
         <source>feature with no node id present. It could not be added to layer {}</source>
         <translation>Elément trouvé sans identifiant de nœud. Il n&apos;a pas pu être ajouté à la couche {}</translation>
     </message>
@@ -820,7 +810,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="150"/>
         <source>Export</source>
-        <translation type="unfinished"/>
+        <translation>Exporter</translation>
     </message>
 </context>
 <context>
@@ -1260,12 +1250,12 @@
 <context>
     <name>LoadDataset</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="52"/>
+        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="53"/>
         <source>Field {} does has a type not supported.</source>
         <translation>Le champ {} est d&apos;un type non supporté.</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="76"/>
+        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="82"/>
         <source>Done</source>
         <translation>Terminé</translation>
     </message>
@@ -1293,12 +1283,12 @@
         <translation>Aucun nom renseigné pour le fichier de sortie</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="196"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="197"/>
         <source>Invalid field chosen</source>
         <translation>Champ choisi invalide</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="213"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="214"/>
         <source>One cannot load a dataset with indices only</source>
         <translation>Impossible de charger un jeu de données contenant uniquement des indices</translation>
     </message>
@@ -1344,17 +1334,7 @@
 <context>
     <name>LoadMatrixDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="88"/>
-        <source>Matrix</source>
-        <translation>Matrice</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="89"/>
-        <source>From</source>
-        <translation>Origine</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="177"/>
+        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="178"/>
         <source>Invalid field chosen</source>
         <translation>Champ sélectionné invalide</translation>
     </message>
@@ -1610,7 +1590,7 @@
     <message>
         <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="56"/>
         <source>Target</source>
-        <translation type="unfinished"/>
+        <translation>Cible</translation>
     </message>
 </context>
 <context>
@@ -1795,12 +1775,12 @@
 <context>
     <name>TSPDialog</name>
     <message>
-        <location filename="../modules/routing_procedures/tsp_dialog.py" line="79"/>
+        <location filename="../modules/routing_procedures/tsp_dialog.py" line="84"/>
         <source>You need at least three nodes to route. </source>
         <translation>Il faut au moins trois nœuds pour établir un itinéraire.</translation>
     </message>
     <message>
-        <location filename="../modules/routing_procedures/tsp_dialog.py" line="87"/>
+        <location filename="../modules/routing_procedures/tsp_dialog.py" line="92"/>
         <source>You need at least three centroids to route. </source>
         <translation>Il faut au moins trois centroïdes pour établir un itinéraire.</translation>
     </message>
@@ -3210,7 +3190,7 @@
         <translation>Champ de zonage</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
         <source>Layer field</source>
         <translation>Champ de la couche</translation>
     </message>

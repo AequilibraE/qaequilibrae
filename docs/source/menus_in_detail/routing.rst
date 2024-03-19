@@ -3,7 +3,7 @@ Routing
 
 AequilibraE's routing allows the user to run a Travelling Salesman Problem (TSP),
 using a selected set of nodes or the centroids of a network. Its usage is 
-straightforward. Just click **Aequilibrae > Routing > Travelling Salesman Problem**
+straightforward. Just click **AequilibraE > Routing > Travelling Salesman Problem**
 and the prompt box will open up. For Sioux Falls, for example, we would select the
 centroids of the network, and minimize the distance travelled by car. It is also
 possible to choose the start node of our TSP (we'll let node_id 1 to be the starting
@@ -26,7 +26,7 @@ close this window (the TSP sequence can be found in the TSP stops layer).
     :alt: TSP procedure report
 
 And as we chose to display the result in a new layer, it would look like the figure below. 
-Plase note that the TSP stops are labeled according their sequence.
+Please note that the TSP stops are labeled according their sequence.
 
 .. image:: ../images/tsp-solution.png
     :align: center
@@ -38,4 +38,4 @@ Plase note that the TSP stops are labeled according their sequence.
     different software and programming languages. However, the main problem related to
     TSP is related to its size (hence its complexity). This means that as we increase the 
     number of stops we want to travel to, the software will take much longer to provide you
-    with an answer, and in some cases, it might not even return an answer due to its complexity.
+    with an answer, and in some cases, it might also crash.

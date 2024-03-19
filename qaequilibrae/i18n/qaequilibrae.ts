@@ -340,42 +340,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="76"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="73"/>
         <source>field {} could not be added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="93"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="88"/>
         <source>Transferring nodes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="130"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="115"/>
         <source>Transferring {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="161"/>
-        <source>Mode automatically added during project creation from layers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="178"/>
-        <source>Link_type automatically added during project creation from layers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="187"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="144"/>
         <source>Failed inserting record {} for {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="191"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="148"/>
         <source>feature with id {} could not be added to layer {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="193"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="150"/>
         <source>feature with no node id present. It could not be added to layer {}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1262,12 +1252,12 @@
 <context>
     <name>LoadDataset</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="52"/>
+        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="53"/>
         <source>Field {} does has a type not supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="76"/>
+        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="82"/>
         <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1295,12 +1285,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="196"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="197"/>
         <source>Invalid field chosen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="213"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="214"/>
         <source>One cannot load a dataset with indices only</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1346,17 +1336,7 @@
 <context>
     <name>LoadMatrixDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="88"/>
-        <source>Matrix</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="89"/>
-        <source>From</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="177"/>
+        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="178"/>
         <source>Invalid field chosen</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1575,42 +1555,42 @@
 <context>
     <name>ProjectFromOSMDialog</name>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="39"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="40"/>
         <source>Place name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="44"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="45"/>
         <source>Current map canvas area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="61"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="62"/>
         <source>Choose folder output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="67"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="68"/>
         <source>Import network and create project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="109"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="110"/>
         <source>Chose to download network for canvas area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="113"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="115"/>
         <source>Establishing area for download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="114"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="116"/>
         <source>Chose to download network for place</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="56"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="57"/>
         <source>Target</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1795,12 +1775,12 @@
 <context>
     <name>TSPDialog</name>
     <message>
-        <location filename="../modules/routing_procedures/tsp_dialog.py" line="79"/>
+        <location filename="../modules/routing_procedures/tsp_dialog.py" line="84"/>
         <source>You need at least three nodes to route. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/routing_procedures/tsp_dialog.py" line="87"/>
+        <location filename="../modules/routing_procedures/tsp_dialog.py" line="92"/>
         <source>You need at least three centroids to route. </source>
         <translation type="unfinished"></translation>
     </message>
@@ -3125,7 +3105,7 @@
 <context>
     <name>ui_transponet_construction</name>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="19"/>
         <source>AequilibraE - Add zoning layer to project</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3145,7 +3125,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="74"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
         <source>Layer</source>
         <translation type="unfinished"></translation>
     </message>
