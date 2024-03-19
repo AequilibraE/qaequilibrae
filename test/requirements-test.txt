@@ -1,0 +1,15 @@
+numpy==1.24.1
+geopandas==0.13.2
+pandas==2.0.2
+pyaml==23.5.9
+pyproj==3.6.0
+requests==2.31.0
+rtree==1.0.1
+scipy==1.10.1
+shapely==2.0.1
+absl-py
+protobuf
+blosc2
+packaging==23.1
+cramjam==2.8.1
+fsspec==2024.2.0
