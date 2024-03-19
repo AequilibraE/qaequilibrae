@@ -7,6 +7,7 @@ from qaequilibrae.modules.matrix_procedures.load_result_table import load_result
 
 def run_traffic_assignment(ae_with_project, qtbot):
     from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
+
     dialog = TrafficAssignmentDialog(ae_with_project)
 
     assignment_result = f"TrafficAssignment_DP_LRT"

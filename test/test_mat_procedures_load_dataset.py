@@ -37,6 +37,7 @@ def load_external_vector():
     else:
         QgsProject.instance().addMapLayer(datalayer)
 
+
 @pytest.mark.parametrize("method", ["aequilibrae data", "open layer"])
 def test_load_dialog(ae_with_project, method):
     load_external_vector()

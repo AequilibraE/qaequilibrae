@@ -19,4 +19,3 @@ def test_create_example(ae, place_name):
     assert isdir(folder)
 
     rmtree(folder)
-

@@ -9,8 +9,7 @@ from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog i
 @pytest.mark.parametrize("file_name", ["matrices/demand.aem", "matrices/SiouxFalls.omx"])
 def test_display_formats_without_project(ae, file_name):
     print("\n", file_name)
-    dialog = DisplayAequilibraEFormatsDialog(ae, 
-                                             file_path=f"test/data/SiouxFalls_project/{file_name}")
+    dialog = DisplayAequilibraEFormatsDialog(ae, file_path=f"test/data/SiouxFalls_project/{file_name}")
     dialog._testing = True
 
     dialog.exit_procedure()
@@ -23,9 +22,9 @@ def test_display_formats_without_project(ae, file_name):
 
 @pytest.mark.parametrize("file_name", ["demand.aem", "SiouxFalls.omx"])
 def test_display_formats_with_project(ae_with_project, file_name):
-    dialog = DisplayAequilibraEFormatsDialog(ae_with_project, 
-                                             join(ae_with_project.project.matrices.fldr, file_name), 
-                                             proj=True)
+    dialog = DisplayAequilibraEFormatsDialog(
+        ae_with_project, join(ae_with_project.project.matrices.fldr, file_name), proj=True
+    )
 
     dialog.exit_procedure()
 
