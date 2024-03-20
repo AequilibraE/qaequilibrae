@@ -1,5 +1,5 @@
-from os.path import isfile, splitext, basename
-
+from os.path import isfile, splitext, basename, join
+from shutil import copy
 import numpy as np
 import openmatrix as omx
 import pytest
@@ -42,10 +42,12 @@ def run_traffic_assignment(ae_with_project, qtbot, ext):
     dialog.run()
 
 
-def load_external_vector():
+def load_external_vector(folder_path):
     import csv
 
-    path_to_csv = "test/data/SiouxFalls_project/synthetic_future_vector.csv"
+    path_to_csv = join(folder_path, "synthetic_future_vector.csv")
+    copy("test/data/SiouxFalls_project/synthetic_future_vector.csv", path_to_csv)
+
     datalayer = QgsVectorLayer("None?delimiter=,", "synthetic_future_vector", "memory")
 
     fields = [
@@ -72,27 +74,29 @@ def load_external_vector():
         print("Open layer failed to load!")
     else:
         QgsProject.instance().addMapLayer(datalayer)
+    
+    return folder_path
 
 
 @pytest.mark.parametrize(("is_dataset", "is_layer"), [(True, False), (False, True)])
-def test_ipf(ae_with_project, qtbot, is_dataset, is_layer):
+def test_ipf(ae_with_project, qtbot, is_dataset, is_layer, folder_path):
     dialog = DistributionModelsDialog(ae_with_project, mode="ipf")
     dialog.testing = True
 
     if is_dataset:
-        dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
+        dataset_name = f"{folder_path}/synthetic_future_vector.aed"
         dataset = AequilibraeData()
         dataset.load(dataset_name)
 
         data_name = splitext(basename(dataset_name))[0]
 
-        file_path = "test/data/SiouxFalls_project/demand_ipf_D.aem"
+        file_path = f"{folder_path}/demand_ipf_D.aem"
         dialog.out_name = file_path
         dialog.outfile = file_path
         dialog.datasets[data_name] = dataset
 
     if is_layer:
-        load_external_vector()
+        pth = load_external_vector(folder_path)
         layer = QgsProject.instance().mapLayersByName("synthetic_future_vector")[0]
         dialog.iface.setActiveLayer(layer)
         idx = []
@@ -107,7 +111,7 @@ def test_ipf(ae_with_project, qtbot, is_dataset, is_layer):
             "entries": 24,
             "field_names": ["origins", "destinations"],
             "data_types": [np.float64, np.float64],
-            "file_path": "synthetic_future_vector_CSV.aed",
+            "file_path": f"{pth}/synthetic_future_vector_CSV.aed",
         }
 
         dataset = AequilibraeData()
@@ -117,7 +121,7 @@ def test_ipf(ae_with_project, qtbot, is_dataset, is_layer):
         dataset.destinations[:] = destination[:]
         dataset.index[:] = idx[:]
 
-        file_path = "test/data/SiouxFalls_project/demand_ipf_L.aem"
+        file_path = f"{pth}/demand_ipf_L.aem"
         dialog.out_name = file_path
         dialog.outfile = file_path
         dialog.datasets["synthetic_future_vector_CSV"] = dataset
@@ -155,13 +159,13 @@ def test_ipf(ae_with_project, qtbot, is_dataset, is_layer):
         (True, True, "mod_negative_exponential", "mod_inverse_power", "C"),
     ],
 )
-def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1, file2, ext):
+def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1, file2, ext, folder_path):
     run_traffic_assignment(ae_with_project, qtbot, ext)
 
     dialog = DistributionModelsDialog(ae_with_project, mode="calibrate")
     dialog.testing = True
 
-    dialog.path = "test/data/SiouxFalls_project/"
+    dialog.path = folder_path
 
     temp = list(dialog.matrices["name"])
     imped_idx = temp.index(f"TrafficAssignment_DP_{ext}_car")
@@ -172,7 +176,7 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
     dialog.cob_seed_field.setCurrentText("matrix")
 
     if is_negative:
-        f1 = f"test/data/SiouxFalls_project/{file1}_{ext}.mod"
+        f1 = f"{folder_path}/{file1}_{ext}.mod"
 
         dialog.out_name = f1
 
@@ -181,7 +185,7 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
         qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
 
     if is_power:
-        f2 = f"test/data/SiouxFalls_project/{file2}_{ext}.mod"
+        f2 = f"{folder_path}/{file2}_{ext}.mod"
 
         dialog.out_name = f2
 
@@ -220,8 +224,11 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
     ("is_negative", "is_power", "is_gamma", "ext"),
     [(True, False, False, "X"), (False, True, False, "Y"), (False, False, True, "Z")],
 )
-def test_apply_gravity(ae_with_project, qtbot, is_negative, is_power, is_gamma, ext):
-    dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
+def test_apply_gravity(ae_with_project, qtbot, is_negative, is_power, is_gamma, ext, folder_path):
+
+    dataset_name = join(folder_path, "synthetic_future_vector.aed")
+    copy("test/data/SiouxFalls_project/synthetic_future_vector.aed", dataset_name)
+
     dataset = AequilibraeData()
     dataset.load(dataset_name)
 
@@ -245,7 +252,9 @@ def test_apply_gravity(ae_with_project, qtbot, is_negative, is_power, is_gamma, 
     dialog.cob_atra_field.setCurrentText("destinations")
 
     if is_negative:
-        dialog.model.load(f"test/data/SiouxFalls_project/mod_negative_exponential_X.mod")
+        model_file = join(folder_path, "mod_negative_exponential_X.mod")
+        copy("test/data/SiouxFalls_project/mod_negative_exponential_X.mod", model_file)
+        dialog.model.load(model_file)
         dialog.update_model_parameters()
     elif is_power:
         dialog.model.function = "POWER"
@@ -255,7 +264,7 @@ def test_apply_gravity(ae_with_project, qtbot, is_negative, is_power, is_gamma, 
         dialog.model.alpha = 0.02718039228535631
         dialog.model.beta = 0.020709580776383137
 
-    file_path = f"test/data/SiouxFalls_project/matrices/ADJ-TrafficAssignment_DP_{ext}.omx"
+    file_path = f"{folder_path}/matrices/ADJ-TrafficAssignment_DP_{ext}.omx"
     dialog.out_name = file_path
 
     qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
