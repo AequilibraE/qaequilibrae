@@ -19,7 +19,7 @@ class SupplyMetrics:
         :param supply_file: Path to the supply file we want to compute metrics for
         """
 
-        rt_sql = """Select cast(route_id as text) route_id, route, 
+        rt_sql = """Select route_id, route, 
                     cast(pattern_id as text) pattern_id, agency_id, route_type, 
                     seated_capacity s_capacity, total_capacity t_capacity from routes"""
 
@@ -43,6 +43,7 @@ class SupplyMetrics:
         connection = database_connection("transit") if path == None else path
         with read_and_close(connection) as conn:
             self.__raw_routes = pd.read_sql(rt_sql, conn).fillna(0)
+
             self.__raw_stops = pd.read_sql(stop_sql, conn)
 
             self.__raw_stop_pattern = pd.read_sql(stop_pat_sql, conn).drop_duplicates()
@@ -54,6 +55,7 @@ class SupplyMetrics:
 
             self.__raw_trips = pd.read_sql(trip_sql, conn).fillna(0)
             self.__raw_trips = self.__raw_trips.merge(self.__raw_routes[["pattern_id", "route_id"]], on="pattern_id")
+
             self.__trip_schedule = pd.read_sql(trp_sch_sql, conn)
 
             self.__route_links = pd.read_sql(trp_pat_lnk_sql, conn)
@@ -70,6 +72,7 @@ class SupplyMetrics:
 
         self.__routes = self.__compute_route_metrics(self.__raw_trips, self.__raw_routes)
         self.__stops = self.__compute_stop_metrics(self.__routes, self.__raw_stops)
+
         self.__zones = self.__compute_zones_metrics(self.__routes)
 
     def stop_metrics(
@@ -85,7 +88,6 @@ class SupplyMetrics:
 
             :param from_minute: (`Optional`) Start of time window to compute metrics for
             :param to_minute: (`Optional`) End of time window to compute metrics for
-            :param patterns: (`Optional`) List of patterns to consider
             :param routes: (`Optional`) List of routes to consider
             :param stops: (`Optional`) List of stops to consider
 
@@ -117,7 +119,6 @@ class SupplyMetrics:
 
         :param from_minute: (`Optional`) Start of time window to compute metrics for
         :param to_minute: (`Optional`) End of time window to compute metrics for
-        :param patterns: (`Optional`) List of patterns to consider
         :param routes: (`Optional`) List of routes to consider
         :param stops: (`Optional`) List of stops to consider
 
