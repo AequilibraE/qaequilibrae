@@ -1,4 +1,5 @@
 from os.path import dirname, join, isfile
+from aequilibrae.utils.db_utils import commit_and_close
 from aequilibrae.project.database_connection import database_connection
 
 from qgis.PyQt import uic
@@ -70,8 +71,8 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.setFixedHeight(176)
 
         if self.rdo_clear.isChecked() and self.is_pt_database:
-            self.pt_conn = database_connection("transit")
-            for table in [
+            with commit_and_close(database_connection("transit")) as conn:
+                for table in [
                 "agencies",
                 "fare_attributes",
                 "fare_rules",
@@ -84,8 +85,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
                 "trips",
                 "trips_schedule",
             ]:
-                self.pt_conn.execute(f"DELETE FROM {table};")
-            self.pt_conn.commit()
+                    conn.execute(f"DELETE FROM {table};")
 
         for _, feed in enumerate(self.feeds):
             feed.signal.connect(self.signal_handler)
