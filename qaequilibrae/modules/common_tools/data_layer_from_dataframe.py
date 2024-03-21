@@ -27,10 +27,6 @@ def layer_from_dataframe(df: pd.DataFrame, layer_name: str) -> QgsVectorLayer:
         features.append(fet)
     pr.addFeatures(features)
 
-    print("is_valid: ", pr.isValid())
-    print("has_errors: ", pr.hasErrors())
-    print("error: ", pr.error().messageList())
-
     QgsProject.instance().addMapLayer(vl)
 
     # returns the layer handle

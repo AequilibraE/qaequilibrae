@@ -270,7 +270,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.all_routes = self.sm.route_metrics()
         self.all_patterns = self.sm.pattern_metrics()
         self.all_patterns = self.all_patterns.merge(self.pattern_directions, on="pattern_id", how="left")
-        print(self.all_patterns.head())
         self.all_stops = self.sm.stop_metrics()
         self.stop_pattern = self.sm._stop_pattern.copy(True)
 
@@ -598,22 +597,26 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
     def draw_stop_styles(self):
         fld = f"metrics_{self.stop_target_metric}"
         idx = self.stops_layer.fields().indexFromName(fld)
+        min_metric = self.stops_layer.minimumValue(idx)
         max_metric = self.stops_layer.maximumValue(idx)
         method = self.cob_stops_map_type.currentText()
 
         val = self.sld_stop_scale.value() / 2
         color_ramp_name = "Blues" if method != "Color" else self.cob_stops_color.currentText()
-        self.map_ranges(fld, max_metric, method, self.stops_layer, val, color_ramp_name)
+        num_intervals = max_metric - min_metric
+        self.map_ranges(fld, num_intervals, max_metric, method, self.stops_layer, val, color_ramp_name)
         self.but_map_stops.setEnabled(True)
 
     def draw_zone_styles(self):
         fld = f"metrics_{self.zone_target_metric}"
         idx = self.zones_layer.fields().indexFromName(fld)
+        min_metric = self.zones_layer.minimumValue(idx)
         max_metric = self.zones_layer.maximumValue(idx)
 
         val = self.sld_zone_scale.value()
         color_ramp_name = self.cob_zones_color.currentText()
-        self.map_ranges(fld, max_metric, "Color", self.zones_layer, val / 2, color_ramp_name)
+        num_intervals = max_metric - min_metric
+        self.map_ranges(fld, num_intervals, max_metric, "Color", self.zones_layer, val / 2, color_ramp_name)
 
         self.but_map_zones.setEnabled(True)
 
@@ -707,21 +710,24 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
     def draw_line_styles(self):
         fld = f"metrics_{self.line_target_metric}"
         idx = self.line_map_layer.fields().indexFromName(fld)
+        min_metric = self.line_map_layer.minimumValue(idx)
         max_metric = self.line_map_layer.maximumValue(idx)
         method = self.cob_routes_map_type.currentText()
 
         val = self.sld_route_scale.value() / 2
         color_ramp_name = "Blues" if method != "Color" else self.cob_routes_color.currentText()
-        self.map_ranges(fld, max_metric, method, self.line_map_layer, val, color_ramp_name)
+        num_intervals = max_metric - min_metric
+        self.map_ranges(fld, num_intervals, max_metric, method, self.line_map_layer, val, color_ramp_name)
 
-    def map_ranges(self, fld, max_metric, method, layer, val, color_ramp_name):
-        intervals = 5
+    def map_ranges(self, fld, num_intervals, max_metric, method, layer, val, color_ramp_name):
+        intervals = num_intervals if num_intervals < 5 else 5
+        intervals = num_intervals if num_intervals > 1 else 1
         max_metric = intervals if max_metric is None else max_metric
         values = [ceil(i * (max_metric / intervals)) for i in range(1, intervals + 1)]
         values = [0, 0.000001] + values
         color_ramp = color_ramp_shades(color_ramp_name, intervals)
         ranges = []
-        for i in range(intervals):
+        for i in range(intervals + 1):
             myColour = QtGui.QColor("#1e00ff") if method != "Color" else color_ramp[i]
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
             symbol.setColor(myColour)

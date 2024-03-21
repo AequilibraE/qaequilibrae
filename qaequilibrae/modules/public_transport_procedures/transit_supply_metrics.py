@@ -27,14 +27,15 @@ class SupplyMetrics:
 
         stop_pat_sql = """Select pattern_id, cast(from_stop as text) stop_id from route_links
                         UNION ALL
-                        Select pattern_id, cast(to_stop as text) stop_id from route_links """
+                        Select pattern_id, cast(to_stop as text) stop_id from route_links"""
 
         trip_sql = """select trip_id, pattern_id from trips"""
 
         trp_sch_sql = """Select trip_id, seq stop_order, arrival/60 arrival, departure/60 departure
                         from trips_schedule"""
 
-        trp_pat_lnk_sql = """select pattern_id, seq stop_order, from_stop, to_stop from route_links"""
+        trp_pat_lnk_sql = """select pattern_id, seq stop_order, cast(from_stop as text) from_stop, 
+                             cast(to_stop as text) to_stop from route_links"""
 
         connection = database_connection("transit") if path == None else path
         with read_and_close(connection) as conn:
@@ -316,7 +317,6 @@ class SupplyMetrics:
         stop_order = self.__pattern_links[["pattern_id", "stop_order", "from_node"]]
         stop_order.columns = ["pattern_id", "stop_order", "stop_id"]
         stop_order = pd.concat([stop_order, aux])
-        stop_order["stop_id"] = stop_order["stop_id"].astype(str)
 
         self.__raw_stop_pattern = self.__raw_stop_pattern.merge(stop_order, on=["pattern_id", "stop_id"], how="left")
         self.__raw_stop_pattern.fillna(0, inplace=True)
