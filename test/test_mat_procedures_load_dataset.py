@@ -38,18 +38,20 @@ def load_external_vector():
         QgsProject.instance().addMapLayer(datalayer)
 
 
+# TODO: test with aequilibrae data is creating files in the wrong folder
 @pytest.mark.parametrize("method", ["aequilibrae data", "open layer"])
-def test_load_dialog(ae_with_project, method):
+def test_load_dialog(ae_with_project, method, folder_path):
     load_external_vector()
     dialog = LoadDatasetDialog(ae_with_project)
     dialog._testing = True
+    dialog.path = folder_path
 
     if method == "aequilibrae data":
         dialog.radio_aequilibrae.setChecked(True)
         dialog.load_fields_to_combo_boxes()
         dialog.cob_data_layer.setCurrentText("synthetic_future_vector")
 
-        dialog.out_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
+        dialog.out_name = f"{folder_path}/synthetic_future_vector.aed"
         dialog.load_from_aequilibrae_format()
 
         assert dialog.selected_fields == ["index", "origins", "destinations"]
@@ -61,9 +63,9 @@ def test_load_dialog(ae_with_project, method):
         dialog.load_fields_to_combo_boxes()
         dialog.cob_data_layer.setCurrentText("synthetic_future_vector")
 
+        dialog.output_name = f"{folder_path}/synthetic_future_vector_TEST.aed"
         dialog.load_the_vector()
         dialog.worker_thread.doWork()
-        dialog.output_name = "test/data/SiouxFalls_project/synthetic_future_vector_TEST.aed"
 
         assert dialog.selected_fields == ["origins", "destinations"]
         assert dialog.dataset is None

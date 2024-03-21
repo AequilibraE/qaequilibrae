@@ -24,7 +24,7 @@ def test_ta_menu(ae_with_project, qtbot):
     action.trigger()
 
 
-def test_single_class_traffic_assignment(ae_with_project, qtbot):
+def test_single_class(ae_with_project, qtbot):
     dialog = TrafficAssignmentDialog(ae_with_project)
 
     test_name = f"TestTrafficAssignment_SC_{uuid4().hex[:6]}"
@@ -55,7 +55,7 @@ def test_single_class_traffic_assignment(ae_with_project, qtbot):
 
     dialog.run()
 
-    pth = Path("test/data/SiouxFalls_project")
+    pth = Path(dialog.project.project_base_path)
     results = pth / "results_database.sqlite"
     assert isfile(results)
 
@@ -97,7 +97,7 @@ def test_single_class_traffic_assignment(ae_with_project, qtbot):
     )
 
 
-def test_multiclass_traffic_assignment(ae_with_project, qtbot):
+def test_multiclass(ae_with_project, qtbot):
     dialog = TrafficAssignmentDialog(ae_with_project)
     dialog.testing = True
 
@@ -169,7 +169,7 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
         dialog.produce_all_outputs()
 
     # Assert we have a non-null result and that results are actually stored in the file
-    pth = Path("test/data/SiouxFalls_project")
+    pth = Path(dialog.project.project_base_path)
     results = pth / "results_database.sqlite"
     assert isfile(results)
     con = sqlite3.connect(results)

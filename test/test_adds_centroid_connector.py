@@ -1,7 +1,7 @@
 import pytest
 from time import sleep
 from shapely.geometry import Point
-from aequilibrae.utils.db_utils import commit_and_close
+from aequilibrae.utils.db_utils import read_and_close
 from aequilibrae.project.database_connection import database_connection
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
 from qgis.core import QgsFeature, QgsPointXY, QgsGeometry
@@ -29,12 +29,9 @@ def test_add_connectors_from_zones(pt_no_feed):
     dialog.project.network.links.refresh()
     dialog.project.network.nodes.refresh()
 
-    with commit_and_close(database_connection("network")) as conn:
+    with read_and_close(database_connection("network")) as conn:
         node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
         link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
-
-        conn.execute("delete from links where name like 'centroid%'")
-        conn.execute("delete from nodes where is_centroid=1")
 
     assert node_count == 11
     assert link_count == 11
@@ -71,12 +68,9 @@ def test_add_connectors_from_network(pt_no_feed, node_id, radius, point):
     dialog.project.network.links.refresh()
     dialog.project.network.nodes.refresh()
 
-    with commit_and_close(database_connection("network")) as conn:
+    with read_and_close(database_connection("network")) as conn:
         node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
         link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
-
-        conn.execute("delete from links where name like 'centroid%'")
-        conn.execute("delete from nodes where is_centroid=1")
 
     if radius == 500:
         assert node_count == 1
@@ -130,12 +124,9 @@ def test_add_connectors_from_layer(pt_no_feed):
     dialog.project.network.links.refresh()
     dialog.project.network.nodes.refresh()
 
-    with commit_and_close(database_connection("network")) as conn:
+    with read_and_close(database_connection("network")) as conn:
         node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
         link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
-
-        conn.execute("delete from links where name like 'centroid%'")
-        conn.execute("delete from nodes where is_centroid=1")
 
     assert node_count == 3
     assert link_count == 2

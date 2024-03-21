@@ -15,7 +15,7 @@ def __add_polygon(x1, x2, y1, y2):
     )
 
 
-def test_add_zones(pt_project):
+def create_zoning_layer():
     squares = []
 
     x1 = -71.3671  # minx
@@ -44,8 +44,12 @@ def test_add_zones(pt_project):
 
     vl.updateExtents()
     QgsProject.instance().addMapLayer(vl)
+    return vl
 
-    #
+
+def test_add_zones(pt_project):
+    layer = create_zoning_layer()
+
     dialog = AddZonesDialog(pt_project)
     dialog.chb_add_centroids.setChecked(True)
 
@@ -56,8 +60,7 @@ def test_add_zones(pt_project):
 
     with commit_and_close(database_connection("network")) as conn:
         num_zones = conn.execute("select count(zone_id) from zones").fetchone()[0]
-        conn.execute("delete from zones")
 
     assert num_zones == 4
 
-    QgsProject.instance().removeMapLayer(vl)
+    QgsProject.instance().removeMapLayer(layer)

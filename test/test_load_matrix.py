@@ -1,7 +1,6 @@
-from unittest import mock
-from PyQt5.QtCore import Qt, QTimer, QVariant
+from PyQt5.QtCore import QTimer, QVariant
 import numpy as np
-from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature, QgsApplication
+from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
 from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
 
 
@@ -51,8 +50,8 @@ def test_matrix_menu(ae_with_project, qtbot):
 
 
 # TODO: test removing the matrices
-def test_save_matrix(ae_with_project):
-    file_name = "test/data/SiouxFalls_project/matrices/test_matrix.aem"
+def test_save_matrix(ae_with_project, folder_path):
+    file_name = f"{folder_path}/test_matrix.aem"
     load_layers()
     dialog = LoadMatrixDialog(ae_with_project)
     dialog._testing = True
