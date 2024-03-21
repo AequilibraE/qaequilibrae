@@ -73,18 +73,18 @@ class GTFSImporter(QDialog, FORM_CLASS):
         if self.rdo_clear.isChecked() and self.is_pt_database:
             with commit_and_close(database_connection("transit")) as conn:
                 for table in [
-                "agencies",
-                "fare_attributes",
-                "fare_rules",
-                "fare_zones",
-                "pattern_mapping",
-                "route_links",
-                "routes",
-                "stop_connectors",
-                "stops",
-                "trips",
-                "trips_schedule",
-            ]:
+                    "agencies",
+                    "fare_attributes",
+                    "fare_rules",
+                    "fare_zones",
+                    "pattern_mapping",
+                    "route_links",
+                    "routes",
+                    "stop_connectors",
+                    "stops",
+                    "trips",
+                    "trips_schedule",
+                ]:
                     conn.execute(f"DELETE FROM {table};")
 
         for _, feed in enumerate(self.feeds):
