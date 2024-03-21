@@ -603,8 +603,8 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
         val = self.sld_stop_scale.value() / 2
         color_ramp_name = "Blues" if method != "Color" else self.cob_stops_color.currentText()
-        num_intervals = max_metric - min_metric
-        self.map_ranges(fld, num_intervals, max_metric, method, self.stops_layer, val, color_ramp_name)
+        # num_intervals = max_metric - min_metric
+        self.map_ranges(fld, min_metric, max_metric, method, self.stops_layer, val, color_ramp_name)
         self.but_map_stops.setEnabled(True)
 
     def draw_zone_styles(self):
@@ -615,8 +615,8 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
         val = self.sld_zone_scale.value()
         color_ramp_name = self.cob_zones_color.currentText()
-        num_intervals = max_metric - min_metric
-        self.map_ranges(fld, num_intervals, max_metric, "Color", self.zones_layer, val / 2, color_ramp_name)
+        # num_intervals = max_metric - min_metric
+        self.map_ranges(fld, min_metric, max_metric, "Color", self.zones_layer, val / 2, color_ramp_name)
 
         self.but_map_zones.setEnabled(True)
 
@@ -716,12 +716,12 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
         val = self.sld_route_scale.value() / 2
         color_ramp_name = "Blues" if method != "Color" else self.cob_routes_color.currentText()
-        num_intervals = max_metric - min_metric
-        self.map_ranges(fld, num_intervals, max_metric, method, self.line_map_layer, val, color_ramp_name)
+        # num_intervals = max_metric - min_metric
+        self.map_ranges(fld, min_metric, max_metric, method, self.line_map_layer, val, color_ramp_name)
 
-    def map_ranges(self, fld, num_intervals, max_metric, method, layer, val, color_ramp_name):
-        intervals = num_intervals if num_intervals < 5 else 5
-        intervals = num_intervals if num_intervals > 1 else 1
+    def map_ranges(self, fld, min_metric, max_metric, method, layer, val, color_ramp_name):
+        intervals = 1 if min_metric is None else max_metric - min_metric
+        intervals = 1 if intervals < 2 else 5 if intervals >= 5 else max_metric - min_metric
         max_metric = intervals if max_metric is None else max_metric
         values = [ceil(i * (max_metric / intervals)) for i in range(1, intervals + 1)]
         values = [0, 0.000001] + values

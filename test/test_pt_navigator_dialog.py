@@ -100,9 +100,6 @@ def test_enable_stop_mapping(dialog):
     # Enable zone mapping
     dialog.rdo_map_zones.setChecked(True)
 
-    # Changes zone map type
-    dialog.cob_zones_map_type.setCurrentIndex(1)
-
 
 def test_drap_maps(dialog):
     dialog.but_map_zones.click()
