@@ -373,17 +373,17 @@ class SupplyMetrics:
         return stops.merge(smetric, on="stop_id")
 
     def __compute_zones_metrics(self, patterns: pd.DataFrame) -> pd.DataFrame:
-        
+
         zmetric = self.__raw_stop_pattern.merge(patterns, on="pattern_id", how="right")
         zmetric = (
             zmetric.groupby("zone_id")
             .agg(
-                routes=("route_id", "nunique"), 
+                routes=("route_id", "nunique"),
                 patterns=("pattern_id", "nunique"),
                 stops=("stop_id", "nunique"),
-                trips=("trips", "sum")
+                trips=("trips", "sum"),
             )
-        .reset_index()
+            .reset_index()
         )
 
         return zmetric
