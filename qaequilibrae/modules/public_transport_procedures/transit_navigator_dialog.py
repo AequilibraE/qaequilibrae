@@ -385,8 +385,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.populate_stops()
         self.redo_map()
         self.patterns_layer.setSubsetString(f'"pattern_id" = {pattern_id}')
-        if self.chb_raw_shapes.isChecked():
-            self.raw_shapes_layer.setSubsetString(f'"pattern_id" = {pattern_id}')
 
     def select_stop(self):
         idx = [x.row() for x in list(self.list_stops.selectionModel().selectedRows())][0]
@@ -433,8 +431,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
             patt = tuple(self.patterns.pattern_id.tolist())
             fltr = f'"pattern_id" IN {str(patt)}' if len(patt) > 1 else f'"pattern_id" = {patt[0]}'
             self.patterns_layer.setSubsetString(fltr)
-            if self.chb_raw_shapes.isChecked():
-                self.raw_shapes_layer.setSubsetString(fltr)
         else:
             self.patterns_layer.setSubsetString('"pattern_id"=-999999')
 
@@ -717,7 +713,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
 
     def map_ranges(self, fld, min_metric, max_metric, method, layer, val, color_ramp_name):
         if min_metric is None and max_metric is None:
-            intervals = 1
+            intervals = 0
         else:
             diff = max_metric - min_metric
             intervals = diff + 1 if diff < 4 else 5
