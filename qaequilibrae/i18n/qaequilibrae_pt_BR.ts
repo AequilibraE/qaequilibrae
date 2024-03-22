@@ -1359,21 +1359,6 @@
 </context>
 <context>
     <name>MatrixManipulationDialog</name>
-    <message>
-        <location filename="../modules/matrix_procedures/matrix_manipulation_dialog.py" line="63"/>
-        <source>Thousands separator</source>
-        <translation>Separador de milhares</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/matrix_manipulation_dialog.py" line="73"/>
-        <source>Decimal places</source>
-        <translation>Casas decimais</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/matrix_manipulation_dialog.py" line="122"/>
-        <source>Could not load matrix</source>
-        <translation>Não foi possível carregar a matriz</translation>
-    </message>
 </context>
 <context>
     <name>MatrixReblocking</name>
@@ -1553,42 +1538,42 @@
 <context>
     <name>ProjectFromOSMDialog</name>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="39"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="40"/>
         <source>Place name</source>
         <translation>Nome do local</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="44"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="45"/>
         <source>Current map canvas area</source>
         <translation>Área atual do mapa na tela</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="61"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="62"/>
         <source>Choose folder output</source>
         <translation>Escolha a pasta de saída</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="67"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="68"/>
         <source>Import network and create project</source>
         <translation>Importar rede e criar projeto</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="109"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="110"/>
         <source>Chose to download network for canvas area</source>
         <translation>Escolha para fazer o download da rede para a área do mapa na tela</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="113"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="115"/>
         <source>Establishing area for download</source>
         <translation>Estabelecendo área para download</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="114"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="116"/>
         <source>Chose to download network for place</source>
         <translation>Escolha para baixar rede para o local</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="56"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="57"/>
         <source>Target</source>
         <translation>Objetivo</translation>
     </message>
@@ -2118,246 +2103,6 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>AequilibraE</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="34"/>
-        <source>AequilibraE  -  Matrix utilities</source>
-        <translation>AequilibraE - Utilidades para Matrizes</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="56"/>
-        <source>Meta</source>
-        <translation>Meta</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="74"/>
-        <source>Matrix to edit</source>
-        <translation>Matriz para editar</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="88"/>
-        <source>Name</source>
-        <translation>Nome</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="93"/>
-        <source>Description</source>
-        <translation>Descrição</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="98"/>
-        <source>Value</source>
-        <translation>Valor</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="113"/>
-        <source>Cores</source>
-        <translation>Núcleos</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="128"/>
-        <source>Indices</source>
-        <translation>Índices</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="164"/>
-        <source>Update names and description</source>
-        <translation>Atualizar nomes e descrição</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="177"/>
-        <source>Math</source>
-        <translation>Matemática</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="426"/>
-        <source>Fill</source>
-        <translation>Preencher</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="432"/>
-        <source>Diagonal</source>
-        <translation>Diagonal</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="442"/>
-        <source>All cells</source>
-        <translation>Todas as células</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="455"/>
-        <source>Selected cells</source>
-        <translation>Células selecionadas</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="252"/>
-        <source>By</source>
-        <translation>Por</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="258"/>
-        <source>Filling</source>
-        <translation>Preenchendo</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="268"/>
-        <source>Clearing</source>
-        <translation>Limpando</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="278"/>
-        <source>Adding</source>
-        <translation>Adicionando</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="288"/>
-        <source>Subtracting</source>
-        <translation>Subtraindo</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="298"/>
-        <source>Multiplying</source>
-        <translation>Multiplicando</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="308"/>
-        <source>Dividing</source>
-        <translation>Dividindo</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="327"/>
-        <source>With</source>
-        <translation>Com</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="336"/>
-        <source>Fill matrix</source>
-        <translation>Preencher matriz</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="359"/>
-        <source>Results on</source>
-        <translation>Resultados em</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="378"/>
-        <source>Core</source>
-        <translation>Núcleos</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="474"/>
-        <source>Operator</source>
-        <translation>Operador</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="480"/>
-        <source>Cosine</source>
-        <translation>Cosseno</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="490"/>
-        <source>Sine</source>
-        <translation>Seno</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="500"/>
-        <source>Sqroot</source>
-        <translation>Raiz quadrada</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="510"/>
-        <source>Exponential</source>
-        <translation>Exponencial</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="520"/>
-        <source>Tangent</source>
-        <translation>Tangente</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="530"/>
-        <source>Inverse</source>
-        <translation>Inverso</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="540"/>
-        <source>Factorial</source>
-        <translation>Fatorial</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="550"/>
-        <source>Module</source>
-        <translation>Módulo</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="560"/>
-        <source>ln</source>
-        <translation>Em</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="570"/>
-        <source>Squared</source>
-        <translation>Quadrado</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="653"/>
-        <source>Apply operator</source>
-        <translation>Aplicar operador</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="609"/>
-        <source>Basic mode</source>
-        <translation>Modo básico</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="619"/>
-        <source>Advanced mode</source>
-        <translation>Modo avançado</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="666"/>
-        <source>Validated expression</source>
-        <translation>Expressão válida</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="730"/>
-        <source>matrix/cores</source>
-        <translation>matriz/núcleos</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="749"/>
-        <source>Operators</source>
-        <translation>Operadores</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="788"/>
-        <source>Functions</source>
-        <translation>Funções</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="823"/>
-        <source>Convert NULL to zero</source>
-        <translation>Converter NULL para zero</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="829"/>
-        <source>IO</source>
-        <translation>IO</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="857"/>
-        <source>Matrix to export</source>
-        <translation>Matriz a exportar</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="925"/>
-        <source>Cores to export</source>
-        <translation>Núcleos a exportar</translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="1000"/>
-        <source>Export</source>
-        <translation>Exportar</translation>
-    </message>
-    <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="59"/>
         <source>Load matrix</source>
         <translation>Carregar matriz</translation>
@@ -2471,56 +2216,6 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
 </context>
 <context>
     <name>link_query_builder</name>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="17"/>
-        <source>Critical link query builder</source>
-        <translation>Criação de consultas para links críticos</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="30"/>
-        <source>Link ID</source>
-        <translation>ID do link</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="35"/>
-        <source>Dir</source>
-        <translation>Diretório</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="40"/>
-        <source>Del</source>
-        <translation>Deletar</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="79"/>
-        <source>Query name</source>
-        <translation>Nome da consulta</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="95"/>
-        <source>Accept</source>
-        <translation>Aceitar</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="113"/>
-        <source>Filter link</source>
-        <translation>Filtro de links</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="131"/>
-        <source>And</source>
-        <translation>E</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="152"/>
-        <source>Or</source>
-        <translation>Ou</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="175"/>
-        <source>&gt;</source>
-        <translation>&gt;</translation>
-    </message>
 </context>
 <context>
     <name>load_network_info</name>
@@ -3106,7 +2801,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
 <context>
     <name>ui_transponet_construction</name>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="19"/>
         <source>AequilibraE - Add zoning layer to project</source>
         <translation>AequilibraE - Adicionando zonas ao projeto</translation>
     </message>
@@ -3126,7 +2821,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Centroide</translation>
     </message>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="74"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
         <source>Layer</source>
         <translation>Camada</translation>
     </message>
@@ -3191,7 +2886,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
         <source>Layer field</source>
         <translation>Campo da camada</translation>
     </message>
