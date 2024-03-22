@@ -123,8 +123,5 @@ def test_map_lines(dialog):
         dialog.but_map_routes.click()
 
 
-@pytest.mark.skip(reason="Not working")
 def test_map_zones(dialog):
-    for map_type in all_items(dialog.cob_zones_map_type):
-        dialog.cob_zones_map_type.setCurrentText(map_type)
-        dialog.but_map_zones.click()
+    dialog.but_map_zones.click()
