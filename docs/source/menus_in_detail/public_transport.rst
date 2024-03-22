@@ -2,7 +2,7 @@ Public Transport
 ================
 
 QAequilibraE is capable of importing a General Transit Feed Specification (GTFS) feed 
-into its public transport database. More details on the **public_transport.sqlite** are discussed on a nearly 
+into its public transport database. More details on the **public_transport.sqlite** are discussed on a 
 *per-table* basis in `AequilibraE's documentation <https://www.aequilibrae.com/python/latest/modeling_with_aequilibrae/transit_database/data_model/datamodel.html>`_, 
 and we recommend understanding the role of each table before 
 setting an AequilibraE model you intend to use. If you don't know much about GTFS, we strongly encourage you to take
@@ -60,14 +60,20 @@ Explore Transit
 
 Case you have already imported a GTFS feed into your project or you want to open a feed from an AequilibraE project 
 created with Python, you can click on **AequilibraE > Public Transport > Explore Transit** to visualize the Transit 
-routes. After the Transit Navigator dialog is open, you will notice that the layers *patterns*, *routes*, *stops* and
+routes. While opening the Transit Navigator, you will notice that the layers *patterns*, *routes*, *stops* and
 *zones* from the GTFS file are going to be displayed in your map canva, and appear in the layers list.
+
+.. image:: ../images/gtfs_7.png
+    :align: center
+    :alt: gtfs display layers
+
+The navigator window has five different tabs you can explore.
 
 .. image:: ../images/gtfs_6.png
     :align: center
     :alt: gtfs transit explorer
 
-The window has five different tabs you can explore. In the top, there are the three boxes one can select and
+In the top, there are the three boxes one can select and
 filter routes, patterns, and stops. You will notice that whenever an element is selected or filtered, this selection
 is automatically displayed in the map canva. After filtering data, if you want to restore the original layers,
 you can click on **Minor reset**, and your layers are restored.
@@ -79,4 +85,18 @@ tab is automatically displayed in the map canva. To restore the original layers,
 In the last three tabs, one can display useful information about stops, routes, patterns, and zones. For instance, you 
 can find out *how many routes stop at a specific stop location*, *what is the total capacity of a specific route*, 
 or *which zones have more stops or routes across them*. Within these tabs, it is possible to configure how one wants to 
-display the information, by selecting the object color, or thickness/size. 
+display the information, by selecting the object color, or thickness (size). It is also possible to display labels, by
+selecting the **Show labels** option. The figures below show the number of routes across the stops displaying the
+information with different symbol colors and sizes. Notice that in the layers list, the variable scale for number of
+routes is shown, as well as a data layer named *stops_metrics*, which contains the available metrics for the existing
+stops.
+
+.. image:: ../images/gtfs_8.png
+    :align: center
+    :alt: gtfs view by color
+
+|
+
+.. image:: ../images/gtfs_9.png
+    :align: center
+    :alt: gtfs view by thickness
