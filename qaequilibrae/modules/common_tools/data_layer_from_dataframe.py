@@ -4,7 +4,6 @@ from qgis.core import QgsVectorLayer, QgsField, QgsFeature, QgsProject
 
 
 def layer_from_dataframe(df: pd.DataFrame, layer_name: str) -> QgsVectorLayer:
-
     # create layer
     vl = QgsVectorLayer("none", layer_name, "memory")
     pr = vl.dataProvider()
@@ -22,8 +21,8 @@ def layer_from_dataframe(df: pd.DataFrame, layer_name: str) -> QgsVectorLayer:
     # Add records
     features = []
     for _, record in df.iterrows():
-        fet = QgsFeature()  
-        fet.setAttributes(record.tolist())
+        fet = QgsFeature()
+        fet.setAttributes(record.to_list())
         features.append(fet)
     pr.addFeatures(features)
 

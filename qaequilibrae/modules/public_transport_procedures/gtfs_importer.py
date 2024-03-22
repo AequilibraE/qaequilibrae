@@ -36,7 +36,6 @@ class GTFSImporter(QDialog, FORM_CLASS):
             self.rdo_clear.setText(self.tr("Create new route system"))
             self.rdo_keep.setVisible(False)
             self.rdo_clear.setChecked(True)
-
         self.setFixedHeight(380)
         self.items = [self.config_box, self.progress_box]
 
@@ -94,11 +93,6 @@ class GTFSImporter(QDialog, FORM_CLASS):
             feed.doWork()
 
         self.close()
-
-        for layer in ["transit_routes", "transit_stops"]:
-            self.qgis_project.create_layer_by_name(layer)
-
-        print(self.qgis_project.layers.keys())
 
     def signal_handler(self, val):
         if len(val) == 1:
