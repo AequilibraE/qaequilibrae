@@ -35,6 +35,7 @@ from qaequilibrae.modules.menu_actions import (
     show_log,
     create_example,
 )
+from qaequilibrae.modules.menu_actions import run_pt_explore
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from qaequilibrae.message import messages
 
@@ -162,6 +163,7 @@ class AequilibraEMenu:
         # # # ########################################################################
         # # # #######################   TRANSIT SUB-MENU   ###########################
         self.add_menu_action(self.tr("Public Transport"), self.tr("Import GTFS"), partial(run_import_gtfs, self))
+        self.add_menu_action(self.tr("Public Transport"), self.tr("Explore Transit"), partial(run_pt_explore, self))
 
         # # ########################################################################
         # # #################        GIS TOOLS SUB-MENU    #########################
@@ -320,8 +322,13 @@ class AequilibraEMenu:
         if self.project is None:
             return
         uri = QgsDataSourceUri()
-        uri.setDatabase(self.project.path_to_file)
-        uri.setDataSource("", layer_name, "geometry")
+        if not "transit_" in layer_name:
+            uri.setDatabase(self.project.path_to_file)
+            lname = layer_name
+        else:
+            uri.setDatabase(os.path.join(self.project.project_base_path, "public_transport.sqlite"))
+            lname = layer_name[8:]
+        uri.setDataSource("", lname, "geometry")
         layer = QgsVectorLayer(uri.uri(), layer_name, "spatialite")
         return layer
 
