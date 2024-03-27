@@ -48,7 +48,7 @@ def test_search_stop(dialog):
     dialog.ln_stop_id.setText("10000000028")
 
     assert dialog.stops.shape[0] == 1
-    assert dialog.routes.shape[0] == 1
+    assert dialog.routes.shape[0] == 2
 
     dialog.reset_global()
     assert dialog.stops.shape[0] > 10
@@ -62,17 +62,17 @@ def test_search_stop(dialog):
 
 
 def test_search_route(dialog):
-    assert dialog.routes.shape[0] == 1
+    assert dialog.routes.shape[0] == 2
 
     dialog.ln_route_id.setText("10001000000")
-    assert dialog.routes.shape[0] == 1
+    assert dialog.routes.shape[0] == 2
     assert dialog.stops.shape[0] == 78
 
     dialog.reset_global()
-    assert dialog.routes.shape[0] == 1
+    assert dialog.routes.shape[0] == 2
 
     dialog.ln_route.setText("101387")
-    assert dialog.routes.shape[0] == 1
+    assert dialog.routes.shape[0] == 2
     assert dialog.stops.shape[0] == 78
 
 
@@ -80,20 +80,20 @@ def test_filter_direction(dialog):
     dialog.chb_agency.setChecked(True)
     dialog.cob_agency.setCurrentText("Liserco")
 
-    assert dialog.all_routes.shape[0] == 1
+    assert dialog.all_routes.shape[0] == 2
 
     dialog.rdo_ab_direction.setChecked(True)
-    assert dialog.all_routes.shape[0] == 1
+    assert dialog.all_routes.shape[0] == 2
 
 
 def test_select_element(dialog):
     dialog.reset_global()
     dialog.list_routes.selectRow(0)
-    assert dialog.routes.shape[0] == 1
+    assert dialog.routes.shape[0] == 2
 
     dialog.reset_global()
     dialog.list_stops.selectRow(0)
-    assert dialog.routes.shape[0] == 1
+    assert dialog.routes.shape[0] == 2
 
 
 def test_enable_stop_mapping(dialog):

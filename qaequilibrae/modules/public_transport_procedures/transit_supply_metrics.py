@@ -354,7 +354,7 @@ class SupplyMetrics:
         patterns.drop(columns=["s_capacity", "t_capacity"], inplace=True)
         patterns.fillna(0, inplace=True)
         patterns = patterns.drop_duplicates().reset_index(drop=True)
-        return patterns
+        return patterns.astype("int64")
 
     def __compute_stop_metrics(self, patterns: pd.DataFrame, stops: pd.DataFrame) -> pd.DataFrame:
         smetric = self.__raw_stop_pattern.merge(patterns, on="pattern_id", how="right")
