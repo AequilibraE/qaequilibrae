@@ -1360,9 +1360,6 @@
     </message>
 </context>
 <context>
-    <name>MatrixManipulationDialog</name>
-</context>
-<context>
     <name>MatrixReblocking</name>
     <message>
         <location filename="../modules/matrix_procedures/mat_reblock.py" line="32"/>
@@ -2212,9 +2209,6 @@
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>link_query_builder</name>
 </context>
 <context>
     <name>load_network_info</name>
