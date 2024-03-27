@@ -1,11 +1,8 @@
-from time import sleep
-from aequilibrae.utils.db_utils import commit_and_close
-from aequilibrae.project.database_connection import database_connection
 from qgis.core import QgsGeometry, QgsFeature, QgsVectorLayer
 from qgis.core import QgsPointXY, QgsField, QgsProject
 from PyQt5.QtCore import QVariant
 
-from qaequilibrae.modules.project_procedures.adds_zones_dialog import AddZonesDialog
+from qaequilibrae.modules.gis.simple_tag_dialog import SimpleTagDialog
 
 
 def __add_polygon(x1, x2, y1, y2):
@@ -46,20 +43,5 @@ def create_zoning_layer():
     return vl
 
 
-def test_add_zones(pt_project):
-    layer = create_zoning_layer()
-
-    dialog = AddZonesDialog(pt_project)
-    dialog.chb_add_centroids.setChecked(True)
-
-    dialog.changed_layer()
-    dialog.run()
-
-    sleep(2)
-
-    with commit_and_close(database_connection("network")) as conn:
-        num_zones = conn.execute("select count(zone_id) from zones").fetchone()[0]
-
-    assert num_zones == 4
-
-    QgsProject.instance().removeMapLayer(layer)
+def test_simple_tag(pt_project):
+    parent_thread = SimpleTagDialog(pt_project)

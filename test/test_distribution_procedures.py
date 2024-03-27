@@ -74,7 +74,7 @@ def load_external_vector(folder_path):
         print("Open layer failed to load!")
     else:
         QgsProject.instance().addMapLayer(datalayer)
-    
+
     return folder_path
 
 

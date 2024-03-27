@@ -34,7 +34,7 @@ class TestInit(unittest.TestCase):
 
         required_metadata = ["name", "description", "version", "qgisMinimumVersion", "email", "author"]
 
-        file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, "metadata.txt"))
+        file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, "qaequilibrae/metadata.txt"))
         LOGGER.info(file_path)
         metadata = []
         parser = configparser.ConfigParser()

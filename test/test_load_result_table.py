@@ -1,5 +1,4 @@
 import pytest
-from time import sleep
 from PyQt5.QtCore import Qt
 
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table

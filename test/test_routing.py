@@ -1,7 +1,6 @@
 import pytest
 
 from qaequilibrae.modules.routing_procedures.tsp_dialog import TSPDialog
-from PyQt5.QtCore import Qt
 from qgis.core import QgsProject
 
 

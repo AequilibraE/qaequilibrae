@@ -6,7 +6,7 @@ from pathlib import Path
 from qaequilibrae.download_extra_packages_class import download_all
 
 
-@pytest.mark.skip("This test takes like... forever")
+@pytest.mark.skip("This test takes a long time to run")
 def test_file_creation():
     download_all().install()
     folder = Path("qaequilibrae/packages")
