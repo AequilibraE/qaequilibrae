@@ -1,5 +1,7 @@
 from os.path import dirname, join, isfile
 from aequilibrae.transit import Transit
+from aequilibrae.utils.db_utils import commit_and_close
+from aequilibrae.project.database_connection import database_connection
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
@@ -24,7 +26,9 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.feeds = []
         self.done = 1
 
-        if isfile(join(qgis_project.project.project_base_path, "public_transport.sqlite")):
+        self.is_pt_database = isfile(join(qgis_project.project.project_base_path, "public_transport.sqlite"))
+
+        if self.is_pt_database:
             self.rdo_clear.setText(self.tr("Overwrite Routes"))
             self.rdo_keep.setText(self.tr("Add to Existing Routes"))
         else:
@@ -57,16 +61,13 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.list_feeds.setItem(self.list_feeds.rowCount() - 1, 0, feed_txt)
 
     def execute_importer(self):
-        from aequilibrae.project.database_connection import database_connection
-
         for item in self.items:
             item.setVisible(not item.isVisible())
             item.setEnabled(not item.isEnabled())
         self.setFixedHeight(176)
 
-        if self.rdo_clear.isChecked():
-            if isfile(join(self.qgis_project.project.project_base_path, "public_transport.sqlite")):
-                self.pt_conn = database_connection("transit")
+        if self.rdo_clear.isChecked() and self.is_pt_database:
+            with commit_and_close(database_connection("transit")) as conn:
                 for table in [
                     "agencies",
                     "fare_attributes",
@@ -80,8 +81,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
                     "trips",
                     "trips_schedule",
                 ]:
-                    self.pt_conn.execute(f"DELETE FROM {table};")
-                self.pt_conn.commit()
+                    conn.execute(f"DELETE FROM {table};")
 
         for _, feed in enumerate(self.feeds):
             feed.signal.connect(self.signal_handler)

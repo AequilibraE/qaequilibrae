@@ -22,20 +22,21 @@ class download_all:
         self.pth = join(pth, "packages")
         self.no_ssl = False
 
-    def install(self):
+    def install(self, on_ci=False):
         # self.adapt_aeq_version()
         with open(self.file, "r") as fl:
             lines = fl.readlines()
 
         reps = []
         for line in lines:
-            reps.extend(self.install_package(line.strip()))
+            reps.extend(self.install_package(line.strip(), on_ci))
 
         self.clean_packages()
         return reps
 
-    def install_package(self, package):
-        install_command = f'-m pip install {package} -t "{self.pth}"'
+    def install_package(self, package, on_ci):
+        
+        install_command = f"-m pip install {package}" if on_ci else f'-m pip install {package} -t "{self.pth}"'
         if  "openmatrix" in package.lower() or "aequilibrae" in package.lower():
             install_command += " --no-deps"
 

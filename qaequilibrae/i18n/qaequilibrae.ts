@@ -50,183 +50,188 @@
 <context>
     <name>AequilibraEMenu</name>
     <message>
-        <location filename="../qaequilibrae.py" line="122"/>
+        <location filename="../qaequilibrae.py" line="123"/>
         <source>Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="130"/>
+        <location filename="../qaequilibrae.py" line="131"/>
         <source>Network Manipulation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="176"/>
+        <location filename="../qaequilibrae.py" line="178"/>
         <source>Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="141"/>
+        <location filename="../qaequilibrae.py" line="142"/>
         <source>Trip Distribution</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="154"/>
+        <location filename="../qaequilibrae.py" line="155"/>
         <source>Paths and assignment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="160"/>
+        <location filename="../qaequilibrae.py" line="161"/>
         <source>Routing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="164"/>
+        <location filename="../qaequilibrae.py" line="166"/>
         <source>Public Transport</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="180"/>
+        <location filename="../qaequilibrae.py" line="182"/>
         <source>Utils</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="114"/>
+        <location filename="../qaequilibrae.py" line="115"/>
         <source>Open Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="115"/>
+        <location filename="../qaequilibrae.py" line="116"/>
         <source>Create project from OSM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="116"/>
+        <location filename="../qaequilibrae.py" line="117"/>
         <source>Create Project from layers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="119"/>
+        <location filename="../qaequilibrae.py" line="120"/>
         <source>Add zoning data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="120"/>
+        <location filename="../qaequilibrae.py" line="121"/>
         <source>Parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="121"/>
+        <location filename="../qaequilibrae.py" line="122"/>
         <source>logfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="122"/>
+        <location filename="../qaequilibrae.py" line="123"/>
         <source>Close project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="127"/>
+        <location filename="../qaequilibrae.py" line="128"/>
         <source>Network Preparation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="130"/>
+        <location filename="../qaequilibrae.py" line="131"/>
         <source>Add centroid connectors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="136"/>
+        <location filename="../qaequilibrae.py" line="137"/>
         <source>Display project data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="148"/>
+        <location filename="../qaequilibrae.py" line="149"/>
         <source>Shortest path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="151"/>
+        <location filename="../qaequilibrae.py" line="152"/>
         <source>Impedance matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="154"/>
+        <location filename="../qaequilibrae.py" line="155"/>
         <source>Traffic Assignment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="160"/>
+        <location filename="../qaequilibrae.py" line="161"/>
         <source>Travelling Salesman Problem</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="164"/>
+        <location filename="../qaequilibrae.py" line="165"/>
         <source>Import GTFS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="168"/>
+        <location filename="../qaequilibrae.py" line="170"/>
         <source>Desire Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="169"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Stacked Bandwidth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="170"/>
+        <location filename="../qaequilibrae.py" line="172"/>
         <source>Scenario Comparison</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="171"/>
+        <location filename="../qaequilibrae.py" line="173"/>
         <source>Lowest common denominator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="172"/>
+        <location filename="../qaequilibrae.py" line="174"/>
         <source>Simple tag</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="176"/>
+        <location filename="../qaequilibrae.py" line="178"/>
         <source>Import matrices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="177"/>
+        <location filename="../qaequilibrae.py" line="179"/>
         <source>Display Matrices and datasets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="185"/>
+        <location filename="../qaequilibrae.py" line="187"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="186"/>
+        <location filename="../qaequilibrae.py" line="188"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="193"/>
+        <location filename="../qaequilibrae.py" line="195"/>
         <source>Show project info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="329"/>
+        <location filename="../qaequilibrae.py" line="336"/>
         <source>You need to load a project first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="332"/>
+        <location filename="../qaequilibrae.py" line="339"/>
         <source>You need to close the project currently open first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="180"/>
+        <location filename="../qaequilibrae.py" line="182"/>
         <source>Create example</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="166"/>
+        <source>Explore Transit</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1060,6 +1065,121 @@
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="25"/>
+        <source>Transit Navigator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="295"/>
+        <source>MINOR RESET</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="319"/>
+        <source>Global filtering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="348"/>
+        <source>Sample</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="375"/>
+        <source>North/East Patterns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="408"/>
+        <source>Route type from the GTFS. Standard values are 0 to 12</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="432"/>
+        <source>All directions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="462"/>
+        <source>%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="498"/>
+        <source>RESET</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="525"/>
+        <source>From</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="628"/>
+        <source>GTFS type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="691"/>
+        <source>Agency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="721"/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="778"/>
+        <source>Time Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="918"/>
+        <source>South/West patterns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="948"/>
+        <source>Supply Mapping Stops</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1686"/>
+        <source>No mapping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1593"/>
+        <source>Map!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1653"/>
+        <source>Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1746"/>
+        <source>Show labels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1617"/>
+        <source>Scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1232"/>
+        <source>Supply Mapping routes and patterns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1525"/>
+        <source>Zonal mapping</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GTFSFeed</name>
@@ -1077,22 +1197,22 @@
 <context>
     <name>GTFSImporter</name>
     <message>
-        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="28"/>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="32"/>
         <source>Overwrite Routes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="29"/>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="33"/>
         <source>Add to Existing Routes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="31"/>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="35"/>
         <source>Add transit table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="32"/>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="36"/>
         <source>Create new route system</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1356,24 +1476,6 @@
     <message>
         <location filename="../modules/common_tools/log_dialog.py" line="54"/>
         <source>Save logfile</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MatrixManipulationDialog</name>
-    <message>
-        <location filename="../modules/matrix_procedures/matrix_manipulation_dialog.py" line="63"/>
-        <source>Thousands separator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/matrix_manipulation_dialog.py" line="73"/>
-        <source>Decimal places</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/matrix_manipulation_dialog.py" line="122"/>
-        <source>Could not load matrix</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2117,246 +2219,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="34"/>
-        <source>AequilibraE  -  Matrix utilities</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="56"/>
-        <source>Meta</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="74"/>
-        <source>Matrix to edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="88"/>
-        <source>Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="93"/>
-        <source>Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="98"/>
-        <source>Value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="113"/>
-        <source>Cores</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="128"/>
-        <source>Indices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="164"/>
-        <source>Update names and description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="177"/>
-        <source>Math</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="426"/>
-        <source>Fill</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="432"/>
-        <source>Diagonal</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="442"/>
-        <source>All cells</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="455"/>
-        <source>Selected cells</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="252"/>
-        <source>By</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="258"/>
-        <source>Filling</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="268"/>
-        <source>Clearing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="278"/>
-        <source>Adding</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="288"/>
-        <source>Subtracting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="298"/>
-        <source>Multiplying</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="308"/>
-        <source>Dividing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="327"/>
-        <source>With</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="336"/>
-        <source>Fill matrix</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="359"/>
-        <source>Results on</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="378"/>
-        <source>Core</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="474"/>
-        <source>Operator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="480"/>
-        <source>Cosine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="490"/>
-        <source>Sine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="500"/>
-        <source>Sqroot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="510"/>
-        <source>Exponential</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="520"/>
-        <source>Tangent</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="530"/>
-        <source>Inverse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="540"/>
-        <source>Factorial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="550"/>
-        <source>Module</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="560"/>
-        <source>ln</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="570"/>
-        <source>Squared</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="653"/>
-        <source>Apply operator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="609"/>
-        <source>Basic mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="619"/>
-        <source>Advanced mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="666"/>
-        <source>Validated expression</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="730"/>
-        <source>matrix/cores</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="749"/>
-        <source>Operators</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="788"/>
-        <source>Functions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="823"/>
-        <source>Convert NULL to zero</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="829"/>
-        <source>IO</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="857"/>
-        <source>Matrix to export</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="925"/>
-        <source>Cores to export</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/forms/ui_matrix_viewer.ui" line="1000"/>
-        <source>Export</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="59"/>
         <source>Load matrix</source>
         <translation type="unfinished"></translation>
@@ -2465,59 +2327,6 @@
     <message>
         <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="162"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>link_query_builder</name>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="17"/>
-        <source>Critical link query builder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="30"/>
-        <source>Link ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="35"/>
-        <source>Dir</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="40"/>
-        <source>Del</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="79"/>
-        <source>Query name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="95"/>
-        <source>Accept</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="113"/>
-        <source>Filter link</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="131"/>
-        <source>And</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="152"/>
-        <source>Or</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_link_query_builder.ui" line="175"/>
-        <source>&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

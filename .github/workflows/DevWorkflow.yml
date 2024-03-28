@@ -20,10 +20,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -c "from qaequilibrae.download_extra_packages_class import download_all; download_all().install()"
-          python3 -m pip install -r qaequilibrae/requirements.txt
+          python3 -c "from qaequilibrae.download_extra_packages_class import download_all; download_all().install(True)"
+          python3 -m pip install -r test/requirements-test.txt
           python3 -m pip install -r ci/requirements-dev.txt
-          python3 -m pip install numpy --upgrade
 
       - name: Run tests
         run: |
