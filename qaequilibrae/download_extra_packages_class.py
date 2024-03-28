@@ -6,7 +6,7 @@ from os.path import join, isdir
 from pathlib import Path
 
 import numpy as np
-from qgis.core import QgsMessageLog, Qgis
+from qgis.core import QgsMessageLog
 
 
 class download_all:
@@ -17,8 +17,6 @@ class download_all:
     def __init__(self):
         pth = os.path.dirname(__file__)
         self.file = join(pth, "requirements.txt")
-        # self._file = join(pth, "requirements.txt")
-        # self.file = join(pth, "requirements_to_do.txt")
         self.pth = join(pth, "packages")
         self.no_ssl = False
 
@@ -35,9 +33,9 @@ class download_all:
         return reps
 
     def install_package(self, package, on_ci):
-        
+
         install_command = f"-m pip install {package}" if on_ci else f'-m pip install {package} -t "{self.pth}"'
-        if  "openmatrix" in package.lower() or "aequilibrae" in package.lower():
+        if "openmatrix" in package.lower() or "aequilibrae" in package.lower():
             install_command += " --no-deps"
 
         command = f'"{self.find_python()}" {install_command}'
@@ -118,3 +116,7 @@ class download_all:
                 if pkg.lower() in fldr.lower():
                     if isdir(join(self.pth, fldr)):
                         shutil.rmtree(join(self.pth, fldr))
+
+
+if __name__ == "__main__":
+    download_all().install(True)
