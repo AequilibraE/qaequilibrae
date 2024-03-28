@@ -1,9 +1,11 @@
 import pytest
 import numpy as np
+import qgis
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
 
 from qaequilibrae.modules.matrix_procedures.load_dataset_dialog import LoadDatasetDialog
+from qaequilibrae.modules.matrix_procedures.load_dataset_class import LoadDataset
 
 
 def load_external_vector():
@@ -39,11 +41,11 @@ def load_external_vector():
 
 
 # TODO: test with aequilibrae data is creating files in the wrong folder
+# @pytest.mark.skip("file modifications")
 @pytest.mark.parametrize("method", ["aequilibrae data", "open layer"])
 def test_load_dialog(ae_with_project, method, folder_path):
     load_external_vector()
     dialog = LoadDatasetDialog(ae_with_project)
-    dialog._testing = True
     dialog.path = folder_path
 
     if method == "aequilibrae data":
@@ -51,20 +53,29 @@ def test_load_dialog(ae_with_project, method, folder_path):
         dialog.load_fields_to_combo_boxes()
         dialog.cob_data_layer.setCurrentText("synthetic_future_vector")
 
-        dialog.out_name = f"{folder_path}/synthetic_future_vector.aed"
-        dialog.load_from_aequilibrae_format()
+        out_name = f"{folder_path}/synthetic_future_vector.aed"
+        dialog.load_with_file_name(out_name)
 
         assert dialog.selected_fields == ["index", "origins", "destinations"]
         assert dialog.worker_thread is None
-        arr = dialog.dataset.data.tolist()
+        arr = dialog.dataset.data.tolist()  
 
     else:
         dialog.radio_layer_matrix.setChecked(True)
         dialog.load_fields_to_combo_boxes()
         dialog.cob_data_layer.setCurrentText("synthetic_future_vector")
 
+        dialog.single_use = True
         dialog.output_name = f"{folder_path}/synthetic_future_vector_TEST.aed"
-        dialog.load_the_vector()
+        dialog.set_output_name()
+        dialog.selected_fields.remove("index")
+        dialog.worker_thread = LoadDataset(
+                    qgis.utils.iface.mainWindow(),
+                    layer=dialog.layer,
+                    index_field="index",
+                    fields=dialog.selected_fields,
+                    file_name=dialog.output_name,
+                )
         dialog.worker_thread.doWork()
 
         assert dialog.selected_fields == ["origins", "destinations"]

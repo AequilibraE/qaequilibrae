@@ -104,8 +104,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.user_chosen_model = None
         self.update_model_parameters()
 
-        self.testing = False
-
     def load_matrices(self):
         self.matrices = list_matrices(self.project.matrices.fldr)
 
@@ -308,8 +306,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 atra_field = self.cob_atra_field.currentText()
 
             if self.job == "ipf":
-                if not self.testing:
-                    self.out_name = self.browse_outfile("aem")
+                self.out_name = self.browse_outfile("aem")
                 if self.out_name is not None:
                     args = {
                         "matrix": seed_matrix,
@@ -322,8 +319,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                     worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), **args)
 
             if self.job == "apply":
-                if not self.testing:
-                    self.out_name = self.browse_outfile("aem")
+                self.out_name = self.browse_outfile("aem")
                 if self.out_name is not None:
                     for i in range(1, self.table_model.rowCount()):
                         if str(self.table_model.item(i, 0).text()) == "Alpha":
@@ -344,8 +340,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                     worker_thread = ApplyGravityProcedure(qgis.utils.iface.mainWindow(), **args)
 
             if self.job == "calibrate":
-                if not self.testing:
-                    self.out_name = self.browse_outfile("mod")
+                self.out_name = self.browse_outfile("mod")
                 if self.out_name is not None:
                     if self.rdo_expo.isChecked():
                         func_name = "EXPO"
@@ -437,7 +432,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def exit_procedure(self):
-        if self.report is not None and not self.testing:
+        if self.report is not None:
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
             dlg2.exec_()

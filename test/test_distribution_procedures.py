@@ -42,11 +42,10 @@ def run_traffic_assignment(ae_with_project, qtbot, ext):
     dialog.run()
 
 
-def load_external_vector(folder_path):
+def load_external_vector():
     import csv
 
-    path_to_csv = join(folder_path, "synthetic_future_vector.csv")
-    copy("test/data/SiouxFalls_project/synthetic_future_vector.csv", path_to_csv)
+    path_to_csv = "test/data/SiouxFalls_project/synthetic_future_vector.csv"
 
     datalayer = QgsVectorLayer("None?delimiter=,", "synthetic_future_vector", "memory")
 
@@ -75,28 +74,28 @@ def load_external_vector(folder_path):
     else:
         QgsProject.instance().addMapLayer(datalayer)
 
-    return folder_path
 
+@pytest.mark.parametrize("method", ("dataset", "open_layer"))
+def test_ipf(ae_with_project, folder_path, mocker, method):
 
-@pytest.mark.parametrize(("is_dataset", "is_layer"), [(True, False), (False, True)])
-def test_ipf(ae_with_project, qtbot, is_dataset, is_layer, folder_path):
+    file_path = f"{folder_path}/demand_ipf_D.aem"
+    mocker.patch(
+        "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog.browse_outfile",
+        return_value=file_path,
+    )
+
     dialog = DistributionModelsDialog(ae_with_project, mode="ipf")
-    dialog.testing = True
 
-    if is_dataset:
-        dataset_name = f"{folder_path}/synthetic_future_vector.aed"
+    if method == "dataset":
+        dataset_path = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
         dataset = AequilibraeData()
-        dataset.load(dataset_name)
+        dataset.load(dataset_path)
 
-        data_name = splitext(basename(dataset_name))[0]
+        data_name = splitext(basename(dataset_path))[0]
 
-        file_path = f"{folder_path}/demand_ipf_D.aem"
-        dialog.out_name = file_path
-        dialog.outfile = file_path
         dialog.datasets[data_name] = dataset
-
-    if is_layer:
-        pth = load_external_vector(folder_path)
+    else:
+        load_external_vector()
         layer = QgsProject.instance().mapLayersByName("synthetic_future_vector")[0]
         dialog.iface.setActiveLayer(layer)
         idx = []
@@ -111,7 +110,7 @@ def test_ipf(ae_with_project, qtbot, is_dataset, is_layer, folder_path):
             "entries": 24,
             "field_names": ["origins", "destinations"],
             "data_types": [np.float64, np.float64],
-            "file_path": f"{pth}/synthetic_future_vector_CSV.aed",
+            "file_path": f"{folder_path}/synthetic_future_vector_CSV.aed",
         }
 
         dataset = AequilibraeData()
@@ -121,10 +120,9 @@ def test_ipf(ae_with_project, qtbot, is_dataset, is_layer, folder_path):
         dataset.destinations[:] = destination[:]
         dataset.index[:] = idx[:]
 
-        file_path = f"{pth}/demand_ipf_L.aem"
-        dialog.out_name = file_path
-        dialog.outfile = file_path
         dialog.datasets["synthetic_future_vector_CSV"] = dataset
+
+    dialog.outfile = file_path
 
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_prod_data)
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_atra_data)
@@ -137,35 +135,31 @@ def test_ipf(ae_with_project, qtbot, is_dataset, is_layer, folder_path):
     dialog.cob_prod_field.setCurrentText("origins")
     dialog.cob_atra_field.setCurrentText("destinations")
 
-    qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    dialog.add_job_to_queue()
+    dialog.worker_thread = dialog.job_queue[dialog.outfile]
+    dialog.worker_thread.doWork()
 
-    dialog.close()
+    dialog.worker_thread.output.export(dialog.outfile)
 
     assert isfile(file_path)
 
     mat = AequilibraeMatrix()
     mat.load(file_path)
-
     assert mat.matrix["matrix"].shape == (24, 24)
     assert np.sum(np.nan_to_num(mat.matrix["matrix"])[:, :]) > 360600
 
 
-@pytest.mark.parametrize(
-    ("is_negative", "is_power", "file1", "file2", "ext"),
-    [
-        (True, False, "mod_negative_exponential", "", "A"),
-        (False, True, "", "mod_inverse_power", "B"),
-        (True, True, "mod_negative_exponential", "mod_inverse_power", "C"),
-    ],
-)
-def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1, file2, ext, folder_path):
+@pytest.mark.parametrize(("method", "ext"), [("negative_exponential", "A"), ("inverse_power", "B"), ("both", "C")])
+def test_calibrate_gravity(ae_with_project, qtbot, method, ext, folder_path, mocker):
     run_traffic_assignment(ae_with_project, qtbot, ext)
 
-    dialog = DistributionModelsDialog(ae_with_project, mode="calibrate")
-    dialog.testing = True
+    file_path = f"{folder_path}/mod_{method}_{ext}.mod"
+    mocker.patch(
+        "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog.browse_outfile",
+        return_value=file_path,
+    )
 
-    dialog.path = folder_path
+    dialog = DistributionModelsDialog(ae_with_project, mode="calibrate")
 
     temp = list(dialog.matrices["name"])
     imped_idx = temp.index(f"TrafficAssignment_DP_{ext}_car")
@@ -175,44 +169,35 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
     dialog.cob_seed_mat.setCurrentIndex(demand_idx)
     dialog.cob_seed_field.setCurrentText("matrix")
 
-    if is_negative:
-        f1 = f"{folder_path}/{file1}_{ext}.mod"
-
-        dialog.out_name = f1
-
+    if method == "negative_exponential":
         dialog.rdo_expo.setChecked(True)
-
-        qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
-
-    if is_power:
-        f2 = f"{folder_path}/{file2}_{ext}.mod"
-
-        dialog.out_name = f2
-
+    elif method == "inverse_power":
+        dialog.rdo_power.setChecked(True)
+    else:
+        dialog.rdo_expo.setChecked(True)
         dialog.rdo_power.setChecked(True)
 
-        qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
+    dialog.outfile = file_path
 
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    dialog.add_job_to_queue()
+    dialog.worker_thread = dialog.job_queue[dialog.outfile]
+    dialog.worker_thread.doWork()
+    dialog.worker_thread.model.save(dialog.outfile)
 
-    dialog.close()
+    assert isfile(file_path)
 
-    if is_negative:
-        assert isfile(f1)
-
+    if method in ["negative_exponential"]:
         file_text = ""
-        with open(f1, "r", encoding="utf-8") as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             for line in file.readlines():
                 file_text += line
 
         assert "alpha: null" in file_text
         assert "function: EXPO" in file_text
 
-    if is_power:
-        assert isfile(f2)
-
+    elif method in ["inverse_power", "both"]:
         file_text = ""
-        with open(f2, "r", encoding="utf-8") as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             for line in file.readlines():
                 file_text += line
 
@@ -220,14 +205,16 @@ def test_calibrate_gravity(ae_with_project, qtbot, is_negative, is_power, file1,
         assert "function: POWER" in file_text
 
 
-@pytest.mark.parametrize(
-    ("is_negative", "is_power", "is_gamma", "ext"),
-    [(True, False, False, "X"), (False, True, False, "Y"), (False, False, True, "Z")],
-)
-def test_apply_gravity(ae_with_project, qtbot, is_negative, is_power, is_gamma, ext, folder_path):
+@pytest.mark.parametrize(("method", "ext"), [("negative", "X"), ("power", "Y"), ("gamma", "Z")])
+def test_apply_gravity(ae_with_project, method, ext, folder_path, mocker):
 
-    dataset_name = join(folder_path, "synthetic_future_vector.aed")
-    copy("test/data/SiouxFalls_project/synthetic_future_vector.aed", dataset_name)
+    file_path = f"{folder_path}/matrices/ADJ-TrafficAssignment_DP_{ext}.omx"
+    mocker.patch(
+        "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog.browse_outfile",
+        return_value=file_path,
+    )
+
+    dataset_name = "test/data/SiouxFalls_project/synthetic_future_vector.aed"
 
     dataset = AequilibraeData()
     dataset.load(dataset_name)
@@ -235,7 +222,6 @@ def test_apply_gravity(ae_with_project, qtbot, is_negative, is_power, is_gamma, 
     data_name = splitext(basename(dataset_name))[0]
 
     dialog = DistributionModelsDialog(ae_with_project, mode="apply")
-    dialog.testing = True
 
     dialog.datasets[data_name] = dataset
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_prod_data)
@@ -251,26 +237,24 @@ def test_apply_gravity(ae_with_project, qtbot, is_negative, is_power, is_gamma, 
     dialog.cob_atra_data.setCurrentText("synthetic_future_vector")
     dialog.cob_atra_field.setCurrentText("destinations")
 
-    if is_negative:
-        model_file = join(folder_path, "mod_negative_exponential_X.mod")
-        copy("test/data/SiouxFalls_project/mod_negative_exponential_X.mod", model_file)
+    if method == "negative":
+        model_file = "test/data/SiouxFalls_project/mod_negative_exponential_X.mod"
         dialog.model.load(model_file)
         dialog.update_model_parameters()
-    elif is_power:
+    elif method == "power":
         dialog.model.function = "POWER"
         dialog.model.alpha = 0.02718039228535631
         dialog.update_model_parameters()
-    elif is_gamma:
+    else:
         dialog.model.alpha = 0.02718039228535631
         dialog.model.beta = 0.020709580776383137
 
-    file_path = f"{folder_path}/matrices/ADJ-TrafficAssignment_DP_{ext}.omx"
-    dialog.out_name = file_path
+    dialog.outfile = file_path
 
-    qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
-
-    dialog.close()
+    dialog.add_job_to_queue()
+    dialog.worker_thread = dialog.job_queue[dialog.outfile]
+    dialog.worker_thread.doWork()
+    dialog.worker_thread.output.export(dialog.outfile)
 
     assert isfile(file_path)
 
