@@ -1,5 +1,4 @@
-from os.path import isfile, splitext, basename, join
-from shutil import copy
+from os.path import isfile, splitext, basename
 import numpy as np
 import openmatrix as omx
 import pytest
