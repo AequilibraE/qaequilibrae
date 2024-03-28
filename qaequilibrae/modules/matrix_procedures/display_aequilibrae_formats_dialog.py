@@ -32,7 +32,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.logger = logging.getLogger("AequilibraEGUI")
         self.qgis_project = qgis_project
         self.from_proj = proj
-        self._testing = False
 
         if len(file_path) > 0:
             self.data_path = file_path
@@ -46,14 +45,13 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if has_omx:
             formats.insert(0, "Open Matrix(*.omx)")
             dflt = ".omx"
-        if not self._testing:
-            self.data_path, self.data_type = GetOutputFileName(
-                self,
-                self.tr("AequilibraE custom formats"),
-                formats,
-                dflt,
-                standard_path(),
-        )
+        self.data_path, self.data_type = GetOutputFileName(
+            self,
+            self.tr("AequilibraE custom formats"),
+            formats,
+            dflt,
+            standard_path(),
+    )
 
         if self.data_type is None:
             self.error = self.tr("Path provided is not a valid dataset")

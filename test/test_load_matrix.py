@@ -54,16 +54,16 @@ def test_save_matrix(ae_with_project, folder_path):
     file_name = f"{folder_path}/test_matrix.aem"
     load_layers()
     dialog = LoadMatrixDialog(ae_with_project)
-    dialog._testing = True
     dialog.sparse = True
     dialog.output_name = file_name
     dialog.field_from.setCurrentText("O")
     dialog.field_to.setCurrentText("D")
     dialog.field_cells.setCurrentText("Ton")
-    dialog.load_the_matrix()
+    dialog.has_errors()
     dialog.worker_thread.doWork()
+    dialog.worker_thread.report = None
     dialog.finished_threaded_procedure("LOADED-MATRIX")
-    dialog.prepare_final_matrix()
+    dialog.build_worker_thread()
     dialog.worker_thread.doWork()
 
     from aequilibrae.matrix import AequilibraeMatrix

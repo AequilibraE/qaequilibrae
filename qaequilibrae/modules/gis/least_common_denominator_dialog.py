@@ -16,7 +16,6 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
         QtWidgets.QDialog.__init__(self)
         self.iface = qgis_project.iface
         self.setupUi(self)
-        self._testing = False
 
         # The whole software is prepared to deal with all geometry types, but it has only been tested to work with
         # polygons, so I am turning the other layer types off
@@ -100,7 +99,6 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
             self.worker_thread = LeastCommonDenominatorProcedure(
                 qgis.utils.iface.mainWindow(), flayer, tlayer, ffield, tfield
             )
-            if not self._testing:
-                self.run_thread()
+            self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input data not provided correctly. "), error, level=3)
