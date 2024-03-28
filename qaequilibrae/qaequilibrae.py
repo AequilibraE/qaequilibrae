@@ -74,6 +74,7 @@ class AequilibraEMenu:
         self.geo_layers_list = ["links", "nodes", "zones"]
         # translator = None
         self.iface = iface
+        self.iface.projectRead.connect(self.active_project)
         self.project = None  # type: Project
         self.matrices = {}
         self.layers = {}  # type: Dict[QgsVectorLayer]
@@ -347,3 +348,9 @@ class AequilibraEMenu:
 
     def tr(self, text):
         return QCoreApplication.translate("AequilibraEMenu", text)
+
+    def active_project(self):
+        project = QgsProject.instance()
+        file_name = project.fileName()
+        name = f"file_name: {file_name.split('/')[-1]}"
+        return name
