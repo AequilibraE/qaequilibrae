@@ -10,7 +10,6 @@ from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog i
 def test_display_formats_without_project(ae, file_name):
     print("\n", file_name)
     dialog = DisplayAequilibraEFormatsDialog(ae, file_path=f"test/data/SiouxFalls_project/{file_name}")
-    dialog._testing = True
 
     dialog.exit_procedure()
 

@@ -6,7 +6,7 @@ from uuid import uuid4
 import numpy as np
 import openmatrix as omx
 import pytest
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import QTimer
 
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
@@ -99,7 +99,6 @@ def test_single_class(ae_with_project):
 
 def test_multiclass(ae_with_project):
     dialog = TrafficAssignmentDialog(ae_with_project)
-    dialog.testing = True
 
     test_name = f"TestTrafficAssignment_MC_{uuid4().hex[:6]}"
     dialog.output_scenario_name.setText(test_name)

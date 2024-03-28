@@ -339,8 +339,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run(self):
         if not self.check_data():
-            raise Exception(self.error)
-        qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=3, duration=10)
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=3, duration=10)
 
         algorithm = self.cb_choose_algorithm.currentText()
         self.miter = int(self.max_iter.text())

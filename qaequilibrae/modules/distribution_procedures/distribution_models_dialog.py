@@ -407,7 +407,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.cob_imped_field.currentIndex() < 0:
                 self.error = self.tr("Impedance matrix is missing")
 
-        print(self.error)
         if self.error is not None:
             return False
         else:
