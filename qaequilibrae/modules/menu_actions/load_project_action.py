@@ -1,8 +1,8 @@
+from os.path import exists, join
 import qgis
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
-
 
 # Split loading between Qt action and processing, for easier unit testing
 def run_load_project(qgis_project):
@@ -42,6 +42,11 @@ def _run_load_project_from_path(qgis_project, proj_path):
     curr = qgis_project.project.conn.cursor()
     curr.execute("select f_table_name from geometry_columns;")
     layers = [x[0] for x in curr.fetchall()]
+
+    # Add transit_tables to layers
+    pt_database = join(qgis_project.project.project_base_path, "public_transport.sqlite")
+    if exists(pt_database):
+        layers += ["transit_routes", "transit_stops", "transit_pattern_mapping"]
 
     descrlayout = QVBoxLayout()
     qgis_project.geo_layers_table = QTableWidget()
