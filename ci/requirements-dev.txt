@@ -1,3 +1,4 @@
 pytest-qgis
 pytest-qt
 pytest-cov
+pytest-mock
