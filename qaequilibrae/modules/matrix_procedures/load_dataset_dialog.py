@@ -33,6 +33,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.dataset = None
         self.ignore_fields = []
         self.single_use = single_use
+        self._testing = False
 
         self.radio_layer_matrix.clicked.connect(partial(self.size_it_accordingly, False))
         self.radio_aequilibrae.clicked.connect(partial(self.size_it_accordingly, False))
@@ -157,7 +158,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
     def progress_value_from_thread(self, val):
         self.progressbar.setValue(val)
 
-    def finished_threaded_procedure(self, param):
+    def finished_threaded_procedure(self):
         self.but_load.setEnabled(True)
         self.but_save_and_use.setEnabled(True)
         self.chb_all_fields.setEnabled(True)
@@ -170,10 +171,11 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def load_from_aequilibrae_format(self):
-        out_name, _ = GetOutputFileName(self, "AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed", self.path)
+        if not self._testing:
+            self.out_name, _ = GetOutputFileName(self, "AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed", self.path)
         try:
             self.dataset = AequilibraeData()
-            self.dataset.load(out_name)
+            self.dataset.load(self.out_name)
         except Exception as e:
             self.error = self.tr(
                 "Could not load file. It might be corrupted or not a valid AequilibraE file. {}".format(e.args)
@@ -209,7 +211,8 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                     file_name=self.output_name,
                 )
                 self.size_it_accordingly(True)
-                self.run_thread()
+                if not self._testing:
+                    self.run_thread()
             else:
                 qgis.utils.iface.messageBar().pushMessage(
                     "Error:", self.tr("One cannot load a dataset with indices only"), level=1

@@ -1,8 +1,5 @@
-import pytest
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication
-from qgis.core import QgsProject, Qgis
-from qaequilibrae.qaequilibrae import AequilibraEMenu
 
 
 def wait_for_active_window(qtbot):
@@ -250,3 +247,8 @@ def test_gtfs_importer(ae, qtbot):
     action.trigger()
     messagebar = ae.iface.messageBar()
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
+def test_create_example(ae):
+    action = ae.menuActions["Utils"][1]
+    assert action.text() == "Create example", "Wrong text content"

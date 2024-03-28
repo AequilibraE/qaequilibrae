@@ -1,9 +1,6 @@
-import os
-
 import pytest
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QApplication
-from qgis.core import QgsProject, Qgis, QgsVectorLayer, QgsCoordinateReferenceSystem
+from PyQt5.QtCore import Qt
+from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateReferenceSystem
 
 from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
 
