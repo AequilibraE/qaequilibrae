@@ -35,7 +35,7 @@ from qaequilibrae.modules.menu_actions import (
     show_log,
     create_example,
 )
-from qaequilibrae.modules.menu_actions import run_pt_explore
+from qaequilibrae.modules.menu_actions import run_pt_explore, save_as_qgis_project
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from qaequilibrae.message import messages
 
@@ -74,7 +74,6 @@ class AequilibraEMenu:
         self.geo_layers_list = ["links", "nodes", "zones"]
         # translator = None
         self.iface = iface
-        self.iface.projectRead.connect(self.active_project)
         self.project = None  # type: Project
         self.matrices = {}
         self.layers = {}  # type: Dict[QgsVectorLayer]
@@ -122,6 +121,7 @@ class AequilibraEMenu:
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
+        self.add_menu_action(self.tr("Project"), self.tr("Save as QGIS Project"), partial(save_as_qgis_project, self))
 
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
@@ -200,6 +200,7 @@ class AequilibraEMenu:
         self.projectManager = QTabWidget()
         self.toolbar.addWidget(self.projectManager)
 
+        self.iface.projectRead.connect(self.active_project)
         # # # ########################################################################
         self.tabContents = []
         self.toolbar.setIconSize(QtCore.QSize(16, 16))
@@ -289,6 +290,9 @@ class AequilibraEMenu:
         self.project = None
         self.matrices.clear()
         self.layers.clear()
+        if self.qgz_project:
+            self.qgz_project.write()
+            self.qgz_project.clear()
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
@@ -350,7 +354,13 @@ class AequilibraEMenu:
         return QCoreApplication.translate("AequilibraEMenu", text)
 
     def active_project(self):
-        project = QgsProject.instance()
-        file_name = project.fileName()
-        name = f"file_name: {file_name.split('/')[-1]}"
-        return name
+        from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+        self.qgz_project = QgsProject.instance()
+        self.prj_file = self.qgz_project.fileName()
+        for layer in self.qgz_project.mapLayers().values():
+            if layer.name() in self.geo_layers_list:
+                dbsource = layer.source().split("dbname='")[1].split(" table")[0]
+                dbsource_path = os.path.join(*dbsource.split("/")[:-1])
+                break
+        
+        _run_load_project_from_path(self, dbsource_path)
