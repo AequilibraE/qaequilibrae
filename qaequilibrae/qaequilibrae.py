@@ -121,7 +121,6 @@ class AequilibraEMenu:
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
-        self.add_menu_action(self.tr("Project"), self.tr("Save as QGIS Project"), partial(save_as_qgis_project, self))
 
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
@@ -136,6 +135,7 @@ class AequilibraEMenu:
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
         self.add_menu_action(self.tr("Data"), self.tr("Display project data"), partial(run_show_project_data, self))
+        self.add_menu_action(self.tr("Data"), self.tr("Import matrices"), partial(load_matrices, self))
 
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -176,11 +176,11 @@ class AequilibraEMenu:
 
         # # ########################################################################
         # # #################          Utils submenu         #########################
-        self.add_menu_action(self.tr("Data"), self.tr("Import matrices"), partial(load_matrices, self))
         self.add_menu_action(
             self.tr("Utils"), self.tr("Display Matrices and datasets"), partial(display_aequilibrae_formats, self)
         )
         self.add_menu_action(self.tr("Utils"), self.tr("Create example"), partial(create_example, self))
+        self.add_menu_action(self.tr("Utils"), self.tr("Save as QGIS Project"), partial(save_as_qgis_project, self))
 
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
@@ -290,9 +290,6 @@ class AequilibraEMenu:
         self.project = None
         self.matrices.clear()
         self.layers.clear()
-        if self.qgz_project:
-            self.qgz_project.write()
-            self.qgz_project.clear()
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
@@ -356,11 +353,18 @@ class AequilibraEMenu:
     def active_project(self):
         from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
         self.qgz_project = QgsProject.instance()
-        self.prj_file = self.qgz_project.fileName()
-        for layer in self.qgz_project.mapLayers().values():
-            if layer.name() in self.geo_layers_list:
-                dbsource = layer.source().split("dbname='")[1].split(" table")[0]
-                dbsource_path = os.path.join(*dbsource.split("/")[:-1])
-                break
+        layers = self.qgz_project.mapLayers().values()
+
+        file_path = {}
+        for layer in layers:
+            dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
+            dbpath = dbpath.split("|")[0].split(".sqlite")[0].split("/")
+            file_path[dbpath[-1]] = os.path.join(*dbpath[:-1])
         
-        _run_load_project_from_path(self, dbsource_path)
+        aeq_databases = ["project_database", "results_database", "public_transport", "qgis_layers"]
+
+        for key in file_path.keys():
+            if key in aeq_databases:
+                break
+
+        _run_load_project_from_path(self, file_path[key])
