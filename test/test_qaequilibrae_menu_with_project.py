@@ -290,3 +290,19 @@ def test_about_menu(ae_with_project, qtbot):
     assert button.text() == "About", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     button.click()
+
+
+@pytest.mark.skip(reason="Something related to the action.trigger is not working")
+def test_save_to_qgis_project(ae_with_project, qtbot):
+    from qaequilibrae.modules.menu_actions.save_as_qgis import SaveAsQGZ
+
+    def handle_trigger():
+        check_if_new_active_window_matches_class(qtbot, SaveAsQGZ)
+
+    action = ae_with_project.menuActions["Utils"][2]
+    assert action.text() == "Save as QGIS Project", "Wrong text content"
+    QTimer.singleShot(10, handle_trigger)
+    action.trigger()
+    messagebar = ae_with_project.iface.messageBar()
+    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+

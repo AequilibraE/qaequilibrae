@@ -26,7 +26,8 @@ class SaveAsQGZ(QtWidgets.QDialog, FORM_CLASS):
         self._run_layout = QGridLayout()
 
         self.output_path = QLineEdit()
-        self.choose_output()
+        file_name = self.choose_output()
+        self.output_path.setText(file_name)
 
         self.but_run = QPushButton()
         self.but_run.setText(self.tr("Save!"))
@@ -52,7 +53,7 @@ class SaveAsQGZ(QtWidgets.QDialog, FORM_CLASS):
 
     def choose_output(self):
         file_name, _ = GetOutputFileName(self, "File Path", ["QGIS Project(*.qgz)"], ".qgz", standard_path())
-        self.output_path.setText(file_name)
+        return file_name
         
     def save_project(self):
         self.qgz_project.write(self.output_path.text())

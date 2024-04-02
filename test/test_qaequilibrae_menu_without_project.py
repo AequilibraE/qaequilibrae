@@ -226,6 +226,14 @@ def test_utils_display_matrices_and_datasets_menu(ae, qtbot):
     assert action.text() == "Display Matrices and datasets", "Wrong text content"
 
 
+def test_save_to_qgis_project(ae):
+    action = ae.menuActions["Utils"][2]
+    assert action.text() == "Save as QGIS Project", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
 def test_about_menu(ae, qtbot):
     from qaequilibrae.modules.common_tools import AboutDialog
 
