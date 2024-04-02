@@ -200,7 +200,7 @@ class AequilibraEMenu:
         self.projectManager = QTabWidget()
         self.toolbar.addWidget(self.projectManager)
 
-        self.iface.projectRead.connect(self.active_project)
+        QgsProject.instance().readProject.connect(self.reload_project)
         # # # ########################################################################
         self.tabContents = []
         self.toolbar.setIconSize(QtCore.QSize(16, 16))
@@ -350,21 +350,22 @@ class AequilibraEMenu:
     def tr(self, text):
         return QCoreApplication.translate("AequilibraEMenu", text)
 
-    def active_project(self):
-        from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
-        self.qgz_project = QgsProject.instance()
-        layers = self.qgz_project.mapLayers().values()
-
-        file_path = {}
-        for layer in layers:
-            dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
-            dbpath = dbpath.split("|")[0].split(".sqlite")[0].split("/")
-            file_path[dbpath[-1]] = os.path.join(*dbpath[:-1])
+    def reload_project(self):
         
-        aeq_databases = ["project_database", "results_database", "public_transport", "qgis_layers"]
+        if len(QgsProject.instance().fileName()) > 0:    
+            from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+            layers = QgsProject.instance().mapLayers().values()
 
-        for key in file_path.keys():
-            if key in aeq_databases:
-                break
+            file_path = {}
+            for layer in layers:
+                dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
+                dbpath = dbpath.split("|")[0].split(".sqlite")[0].split("/")
+                file_path[dbpath[-1]] = os.path.join(*dbpath[:-1])
+            
+            aeq_databases = ["project_database", "results_database", "public_transport", "qgis_layers"]
 
-        _run_load_project_from_path(self, file_path[key])
+            for key in file_path.keys():
+                if key in aeq_databases:
+                    break
+
+            _run_load_project_from_path(self, file_path[key])
