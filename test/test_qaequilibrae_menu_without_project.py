@@ -33,6 +33,11 @@ def test_open_project_menu(ae, qtbot):
     # action.trigger()
 
 
+def test_create_example(ae):
+    action = ae.menuActions["Project"][1]
+    assert action.text() == "Create example", "Wrong text content"
+
+
 def test_parameters_menu(ae, qtbot):
     action = ae.menuActions["Project"][2]
     assert action.text() == "Parameters", "Wrong text content"

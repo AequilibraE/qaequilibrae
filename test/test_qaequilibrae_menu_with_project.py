@@ -28,6 +28,20 @@ def test_load_project(ae_with_project):
     assert ae_with_project.project is not None, "project should be loaded"
 
 
+def test_create_example(ae_with_project, qtbot):
+    from qaequilibrae.modules.project_procedures.create_examples_dialog import CreateExampleDialog
+
+    def handle_trigger():
+        check_if_new_active_window_matches_class(qtbot, CreateExampleDialog)
+
+    action = ae_with_project.menuActions["Project"][1]
+    assert action.text() == "Create example", "Wrong text content"
+    QTimer.singleShot(10, handle_trigger)
+    action.trigger()
+    messagebar = ae_with_project.iface.messageBar()
+    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+
+
 def test_parameters_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.common_tools import ParameterDialog
 
