@@ -118,13 +118,13 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         # # # ################# MODEL BUILDING SUB-MENU  #######################
-        self.add_menu_action(self.tr("Model Building"), self.tr("Create project from OSM"), partial(project_from_osm, self))
+        self.add_menu_action(
+            self.tr("Model Building"), self.tr("Create project from OSM"), partial(project_from_osm, self)
+        )
         self.add_menu_action(
             self.tr("Model Building"), self.tr("Create Project from layers"), partial(run_create_transponet, self)
         )
-        self.add_menu_action(
-            self.tr("Model Building"), self.tr("Network Preparation"), partial(prepare_network, self)
-        )
+        self.add_menu_action(self.tr("Model Building"), self.tr("Network Preparation"), partial(prepare_network, self))
         self.add_menu_action(
             self.tr("Model Building"), self.tr("Add centroid connectors"), partial(run_add_connectors, self)
         )
@@ -324,7 +324,7 @@ class AequilibraEMenu:
 
     def message_project_already_open(self):
         self.iface.messageBar().pushMessage(
-            self.tr("You need to close the project currently open first"), level=2, duration=10
+            "Error", self.tr("You need to close the project currently open first"), level=2, duration=10
         )
 
     def set_font(self, obj):

@@ -28,18 +28,14 @@ def test_load_project(ae_with_project):
     assert ae_with_project.project is not None, "project should be loaded"
 
 
-def test_create_example(ae_with_project, qtbot):
-    from qaequilibrae.modules.project_procedures.create_examples_dialog import CreateExampleDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, CreateExampleDialog)
-
+def test_create_example(ae_with_project):
     action = ae_with_project.menuActions["Project"][1]
     assert action.text() == "Create example", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert (
+        messagebar.messages[2][-1] == "Error:You need to close the project currently open first"
+    ), "Level 2 error message is missing"
 
 
 def test_parameters_menu(ae_with_project, qtbot):
@@ -297,7 +293,9 @@ def test_gtfs_explorer_no_gtfs(ae_with_project):
     assert action.text() == "Explore Transit", "Wrong text content"
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:You need to import a GTFS feed first", "Level 3 error message is missing"
+    assert (
+        messagebar.messages[3][-1] == "Error:You need to import a GTFS feed first"
+    ), "Level 3 error message is missing"
 
 
 def test_gtfs_explorer_with_gtfs(pt_project, qtbot):
@@ -311,4 +309,6 @@ def test_gtfs_explorer_with_gtfs(pt_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = pt_project.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:You need to import a GTFS feed first", "Level 3 error message is missing"
+    assert (
+        messagebar.messages[3][-1] == "Error:You need to import a GTFS feed first"
+    ), "Level 3 error message is missing"
