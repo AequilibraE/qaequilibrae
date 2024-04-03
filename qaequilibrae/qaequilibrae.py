@@ -19,14 +19,13 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QTranslator
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
-from qaequilibrae.modules.menu_actions import run_add_zones, display_aequilibrae_formats, run_show_project_data
+from qaequilibrae.modules.menu_actions import run_add_zones, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_import_gtfs
 from qaequilibrae.modules.menu_actions import (
     run_distribution_models,
     run_tsp,
     run_change_parameters,
     prepare_network,
-    run_about,
 )
 from qaequilibrae.modules.menu_actions import (
     run_load_project,
@@ -100,52 +99,50 @@ class AequilibraEMenu:
 
         self.menuActions = {
             self.tr("Project"): [],
-            self.tr("Network Manipulation"): [],
+            self.tr("Model Building"): [],
             self.tr("Data"): [],
             self.tr("Trip Distribution"): [],
             self.tr("Paths and assignment"): [],
             self.tr("Routing"): [],
             self.tr("Public Transport"): [],
             "GIS": [],
-            self.tr("Utils"): [],
             "AequilibraE": [],
         }
 
         # # #######################   PROJECT SUB-MENU   ############################
         self.add_menu_action(self.tr("Project"), self.tr("Open Project"), partial(run_load_project, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Create project from OSM"), partial(project_from_osm, self))
-        self.add_menu_action(
-            self.tr("Project"), self.tr("Create Project from layers"), partial(run_create_transponet, self)
-        )
-        self.add_menu_action(self.tr("Project"), self.tr("Add zoning data"), partial(run_add_zones, self))
+        self.add_menu_action(self.tr("Project"), self.tr("Create example"), partial(create_example, self))
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
 
         # # # ########################################################################
-        # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
-
+        # # # ################# MODEL BUILDING SUB-MENU  #######################
+        self.add_menu_action(self.tr("Model Building"), self.tr("Create project from OSM"), partial(project_from_osm, self))
         self.add_menu_action(
-            self.tr("Network Manipulation"), self.tr("Network Preparation"), partial(prepare_network, self)
+            self.tr("Model Building"), self.tr("Create Project from layers"), partial(run_create_transponet, self)
         )
         self.add_menu_action(
-            self.tr("Network Manipulation"), self.tr("Add centroid connectors"), partial(run_add_connectors, self)
+            self.tr("Model Building"), self.tr("Network Preparation"), partial(prepare_network, self)
         )
+        self.add_menu_action(
+            self.tr("Model Building"), self.tr("Add centroid connectors"), partial(run_add_connectors, self)
+        )
+        self.add_menu_action(self.tr("Model Building"), self.tr("Add zoning data"), partial(run_add_zones, self))
 
         # # # ########################################################################
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
-        self.add_menu_action(self.tr("Data"), self.tr("Display project data"), partial(run_show_project_data, self))
+        self.add_menu_action(self.tr("Data"), self.tr("Visualize data"), partial(run_show_project_data, self))
+        self.add_menu_action(self.tr("Data"), self.tr("Import matrices"), partial(load_matrices, self))
 
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
-
         self.add_menu_action(
             self.tr("Trip Distribution"), self.tr("Trip Distribution"), partial(run_distribution_models, self)
         )
 
         # # # ########################################################################
         # # # ###################  PATH COMPUTATION SUB-MENU   #######################
-        #
         self.add_menu_action(
             self.tr("Paths and assignment"), self.tr("Shortest path"), partial(run_shortest_path, self)
         )
@@ -174,17 +171,7 @@ class AequilibraEMenu:
         self.add_menu_action("GIS", self.tr("Simple tag"), partial(run_tag, self))
 
         # # ########################################################################
-        # # #################          Utils submenu         #########################
-        self.add_menu_action(self.tr("Data"), self.tr("Import matrices"), partial(load_matrices, self))
-        self.add_menu_action(
-            self.tr("Utils"), self.tr("Display Matrices and datasets"), partial(display_aequilibrae_formats, self)
-        )
-        self.add_menu_action(self.tr("Utils"), self.tr("Create example"), partial(create_example, self))
-
-        # # ########################################################################
         # # #################          LOOSE STUFF         #########################
-
-        self.add_menu_action("AequilibraE", self.tr("About"), partial(run_about, self))
         self.add_menu_action("AequilibraE", self.tr("Help"), self.run_help)
 
         self.build_menu()

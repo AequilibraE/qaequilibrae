@@ -36,13 +36,29 @@ def test_open_project_menu(ae, qtbot):
     # action.trigger()
 
 
+def test_parameters_menu(ae, qtbot):
+    action = ae.menuActions["Project"][2]
+    assert action.text() == "Parameters", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
+def test_logfile_menu(ae, qtbot):
+    action = ae.menuActions["Project"][3]
+    assert action.text() == "logfile", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
 def test_create_project_from_osm_menu(ae, qtbot):
     from qaequilibrae.modules.project_procedures import ProjectFromOSMDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, ProjectFromOSMDialog)
 
-    action = ae.menuActions["Project"][1]
+    action = ae.menuActions["Model Building"][0]
     assert action.text() == "Create project from OSM", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
@@ -54,34 +70,10 @@ def test_create_project_from_layers_menu(ae, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, CreatesTranspoNetDialog)
 
-    action = ae.menuActions["Project"][2]
+    action = ae.menuActions["Model Building"][1]
     assert action.text() == "Create Project from layers", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
-
-
-def test_add_zoning_data_menu(ae, qtbot):
-    action = ae.menuActions["Project"][3]
-    assert action.text() == "Add zoning data", "Wrong text content"
-    action.trigger()
-    messagebar = ae.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
-
-
-def test_parameters_menu(ae, qtbot):
-    action = ae.menuActions["Project"][4]
-    assert action.text() == "Parameters", "Wrong text content"
-    action.trigger()
-    messagebar = ae.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
-
-
-def test_logfile_menu(ae, qtbot):
-    action = ae.menuActions["Project"][5]
-    assert action.text() == "logfile", "Wrong text content"
-    action.trigger()
-    messagebar = ae.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
 def test_network_preparation_menu(ae, qtbot):
@@ -90,15 +82,23 @@ def test_network_preparation_menu(ae, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, NetworkPreparationDialog)
 
-    action = ae.menuActions["Network Manipulation"][0]
+    action = ae.menuActions["Model Building"][2]
     assert action.text() == "Network Preparation", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
 
 
 def test_add_centroid_connectors_menu(ae, qtbot):
-    action = ae.menuActions["Network Manipulation"][1]
+    action = ae.menuActions["Model Building"][3]
     assert action.text() == "Add centroid connectors", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
+def test_add_zoning_data_menu(ae, qtbot):
+    action = ae.menuActions["Model Building"][4]
+    assert action.text() == "Add zoning data", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
@@ -106,7 +106,7 @@ def test_add_centroid_connectors_menu(ae, qtbot):
 
 def test_display_project_data_menu(ae, qtbot):
     action = ae.menuActions["Data"][0]
-    assert action.text() == "Display project data", "Wrong text content"
+    assert action.text() == "Visualize data", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
@@ -220,27 +220,9 @@ def test_gis_simple_tag_menu(ae, qtbot):
     action.trigger()
 
 
-def test_utils_display_matrices_and_datasets_menu(ae, qtbot):
-    """TODO: find a way to capture and close the open QFileDialog"""
-    action = ae.menuActions["Utils"][0]
-    assert action.text() == "Display Matrices and datasets", "Wrong text content"
-
-
-def test_about_menu(ae, qtbot):
-    from qaequilibrae.modules.common_tools import AboutDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, AboutDialog)
-
-    button = ae.menuActions["AequilibraE"][0]
-    assert button.text() == "About", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    button.click()
-
-
 def test_help_menu(ae, qtbot):
     """TODO: find a way to capture the opening of webpage"""
-    button = ae.menuActions["AequilibraE"][1]
+    button = ae.menuActions["AequilibraE"][0]
     assert button.text() == "Help", "Wrong text content"
 
 

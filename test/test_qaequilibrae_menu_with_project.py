@@ -29,27 +29,13 @@ def test_load_project(ae_with_project):
     assert ae_with_project.project is not None, "project should be loaded"
 
 
-def test_add_zoning_data_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.project_procedures import AddZonesDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, AddZonesDialog)
-
-    action = ae_with_project.menuActions["Project"][3]
-    assert action.text() == "Add zoning data", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
-
 def test_parameters_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.common_tools import ParameterDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, ParameterDialog)
 
-    action = ae_with_project.menuActions["Project"][4]
+    action = ae_with_project.menuActions["Project"][2]
     assert action.text() == "Parameters", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
@@ -63,7 +49,7 @@ def test_logfile_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, LogDialog)
 
-    action = ae_with_project.menuActions["Project"][5]
+    action = ae_with_project.menuActions["Project"][3]
     assert action.text() == "logfile", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
@@ -77,7 +63,7 @@ def test_network_preparation_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, NetworkPreparationDialog)
 
-    action = ae_with_project.menuActions["Network Manipulation"][0]
+    action = ae_with_project.menuActions["Model Building"][2]
     assert action.text() == "Network Preparation", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
@@ -89,8 +75,22 @@ def test_add_centroid_connectors_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, AddConnectorsDialog)
 
-    action = ae_with_project.menuActions["Network Manipulation"][1]
+    action = ae_with_project.menuActions["Model Building"][3]
     assert action.text() == "Add centroid connectors", "Wrong text content"
+    QTimer.singleShot(10, handle_trigger)
+    action.trigger()
+    messagebar = ae_with_project.iface.messageBar()
+    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+
+
+def test_add_zoning_data_menu(ae_with_project, qtbot):
+    from qaequilibrae.modules.project_procedures import AddZonesDialog
+
+    def handle_trigger():
+        check_if_new_active_window_matches_class(qtbot, AddZonesDialog)
+
+    action = ae_with_project.menuActions["Model Building"][4]
+    assert action.text() == "Add zoning data", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
@@ -104,7 +104,7 @@ def test_display_project_data_menu(ae_with_project, qtbot):
         check_if_new_active_window_matches_class(qtbot, LoadProjectDataDialog)
 
     action = ae_with_project.menuActions["Data"][0]
-    assert action.text() == "Display project data", "Wrong text content"
+    assert action.text() == "Visualize data", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
@@ -263,30 +263,3 @@ def test_gis_simple_tag_menu(ae_with_project, qtbot):
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
-
-@pytest.mark.skip(reason="find a way to capture and close the open QFileDialog")
-def test_utils_display_matrices_and_datasets_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.matrix_procedures import DisplayAequilibraEFormatsDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, DisplayAequilibraEFormatsDialog)
-
-    action = ae_with_project.menuActions["Utils"][0]
-    assert action.text() == "Display Matrices and datasets", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
-
-def test_about_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.common_tools import AboutDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, AboutDialog)
-
-    button = ae_with_project.menuActions["AequilibraE"][0]
-    assert button.text() == "About", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    button.click()
