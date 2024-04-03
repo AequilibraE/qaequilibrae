@@ -54,14 +54,16 @@ class SaveAsQGZ(QtWidgets.QDialog, FORM_CLASS):
     def choose_output(self):
         file_name, _ = GetOutputFileName(self, "File Path", ["QGIS Project(*.qgz)"], ".qgz", standard_path())
         return file_name
-        
+
     def save_project(self):
         self.qgz_project.write(self.output_path.text())
         self.finished.emit("projectSaved")
 
     def __save_temporary_layers(self, layers):
         output_file_path = os.path.join(self.qgis_project.project.project_base_path, "qgis_layers.sqlite")
-        file_exists = True if os.path.isfile(output_file_path) else False
+        if os.path.isfile(output_file_path):
+            os.remove(output_file_path)
+        file_exists = False
 
         for layer in layers:
             if layer.isTemporary():
@@ -70,13 +72,13 @@ class SaveAsQGZ(QtWidgets.QDialog, FORM_CLASS):
                 if file_exists:
                     options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
                 options.layerName = layer.name()
-                
+
                 transform_context = QgsProject.instance().transformContext()
-                
+
                 error = QgsVectorFileWriter.writeAsVectorFormatV3(layer, output_file_path, transform_context, options)
 
                 if error[0] == QgsVectorFileWriter.NoError:
-                    layer.setDataSource(output_file_path + f'|layername={layer.name()}', layer.name(), 'ogr')
+                    layer.setDataSource(output_file_path + f"|layername={layer.name()}", layer.name(), "ogr")
 
                 file_exists = True
 
@@ -84,6 +86,6 @@ class SaveAsQGZ(QtWidgets.QDialog, FORM_CLASS):
         self.__save_temporary_layers(self.layers)
         self.save_project()
         self.exit_procedure()
-        
+
     def exit_procedure(self):
         self.close()
