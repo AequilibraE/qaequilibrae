@@ -93,4 +93,3 @@ please e-mail the developers at contact@aequilibrae.com.
    getting_started/getting_started
    menus_in_detail/readme
    development/readme
-..   examples/tutorials_and_sample_data

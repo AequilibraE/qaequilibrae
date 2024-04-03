@@ -1,3 +1,5 @@
+:orphan:
+
 .. _editing_networks:
 
 Editing networks
@@ -58,49 +60,6 @@ From the QGIS manual:
 
 So if you are editing zoning layers, I highly recommend you go to the
 `QGIS manual <https://www.qgis.org/en/docs/index.html>`_ and read about it!
-
-.. _adding_centroids:
-
-Adding centroids
-----------------
-
-Starting in version 0.6 of AequilibraE, centroid connectors can now only be
-added to
-`AequilibraE projects <https://aequilibrae.com/python/latest/modeling_with_aequilibrae/project.html>`_,
-and no longer generates new layers during the process.
-
-Before we describe what this tool can do for you, however, let's just remember
-that there is a virtually unlimited number of things that can go awfully wrong
-when we edit networks with automated procedures, and we highly recommend that
-you **BACKUP YOUR DATA** prior to running this procedure and that you inspect
-the results of this tool **CAREFULLY**.
-
-The *GUI* for this procedure is fairly straightforward, as shown below.
-
-.. image:: ../images/add_connectors_to_project.png
-    :width: 600
-    :align: center
-    :alt: Adding connectors
-
-One would notice that nowhere in the *GUI* one can indicate which modes they
-want to see the network connected for or how to control how many connectors per
-mode will be created. Although it could be implemented, such a solution would
-be convoluted and there is probably no good reason to do so.
-
-Instead, we have chosen to develop the procedure with the following criteria:
-
-* All modes will be connected to links where those modes are allowed.
-* When considering number of connectors per centroid, there is no guarantee that
-  each and every mode will have that number of connectors. If a particular mode
-  is only available rather far from the centroid, it is likely that a single
-  connector to that mode will be created for that centroid
-* When considering the maximum length of connectors, the *GUI* returns to the
-  user the list of centroids/modes that could not be connected.
-
-Notice that in order to add centroids and their connectors to the network,
-we need to create the set of centroids we want to add to the network in a
-separate layer and to have a field that contains unique centroid IDs. These IDs
-also cannot exist in the set of node IDs that are already part of the map.
 
 GIS tricks
 ----------
