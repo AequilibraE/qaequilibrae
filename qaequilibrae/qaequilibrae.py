@@ -79,7 +79,6 @@ class AequilibraEMenu:
         self.layers = {}  # type: Dict[QgsVectorLayer]
         self.dock = QDockWidget(self.trlt("AequilibraE"))
         self.manager = QWidget()
-        self.save_project = False
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -354,22 +353,25 @@ class AequilibraEMenu:
         return QCoreApplication.translate("AequilibraEMenu", text)
 
     def reload_project(self):
+        from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-        if len(QgsProject.instance().fileName()) > 0:
-            from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+        file_path = {}
+        for layer in QgsProject.instance().mapLayers().values():
+            dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
+            dbpath = dbpath.split("|")[0].split(".sqlite")[0].split("/")
+            pth = "".join(dbpath[:-1])
+            if len(pth) > 0:
+                file_path[dbpath[-1]] = pth
+            else:
+                return
 
-            file_path = {}
-            for layer in QgsProject.instance().mapLayers().values():
-                dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
-                dbpath = dbpath.split("|")[0].split(".sqlite")[0].split("/")
-                file_path[dbpath[-1]] = os.path.join(*dbpath[:-1])
-
-            _run_load_project_from_path(self, file_path["qgis_layers"])
+        _run_load_project_from_path(self, file_path["qgis_layers"])
 
     def avoid_saving(self):
 
-        for layer in QgsProject.instance().mapLayers().values():
-            if layer.name() in self.layers:
-                QgsProject.instance().removeMapLayer(layer)
-        qgis.utils.iface.mapCanvas().refresh()
-        QgsProject.instance().write()
+        if self.project is not None:    
+            for layer in QgsProject.instance().mapLayers().values():
+                if layer.name() in self.layers:
+                    QgsProject.instance().removeMapLayer(layer)
+            qgis.utils.iface.mapCanvas().refresh()
+            QgsProject.instance().write()

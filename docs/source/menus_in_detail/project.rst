@@ -184,6 +184,22 @@ using the **save to disk** button in the lower left corner of the log file box.
     :align: center
     :alt: proj logfile
 
+Save as QGIS Project
+--------------------
+
+Available since version 1.0.1, the **Project > Save as QGIS Project** allows the user to
+save temporary layers from its current work as a QGIS Project file (\*QGZ). After selecting this command, 
+the user will be required to point the location where the project file is going to be saved. Notice that
+when saving temporary layers into the QGIS Project, all AequilibraE's geometric layers in the layers tab
+are going to be removed. This is done to ensure that no further data manipulation to AequilibraE's layer
+occur without an open project.
+
+After this initial save, the user will notice that a **qgis_layers.sqlite** file is created in the project
+folder, and any modifications to the QGIS Project can be now saved using native QGIS shortcuts.
+
+Finally, whenever the QGIS Project file with an AequilibraE project is open, its project is automatically
+open. 
+
 Video tutorial
 --------------
 
