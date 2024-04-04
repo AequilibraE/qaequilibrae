@@ -5,6 +5,4 @@ def save_as_qgis_project(qgis_project):
         qgis_project.iface.messageBar().pushMessage("Error", "You need to load a project first", level=3, duration=10)
         return
 
-    dlg2 = SaveAsQGZ(qgis_project)
-    dlg2.show()
-    dlg2.exec_()
+    SaveAsQGZ(qgis_project)
