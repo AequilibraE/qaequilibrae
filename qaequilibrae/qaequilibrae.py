@@ -79,6 +79,7 @@ class AequilibraEMenu:
         self.layers = {}  # type: Dict[QgsVectorLayer]
         self.dock = QDockWidget(self.trlt("AequilibraE"))
         self.manager = QWidget()
+        self.save_project = False
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -121,6 +122,7 @@ class AequilibraEMenu:
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
+        self.add_menu_action(self.tr("Project"), self.tr("Save as QGIS Project"), partial(save_as_qgis_project, self))
 
         # # # ########################################################################
         # # # ################# NETWORK MANIPULATION SUB-MENU  #######################
@@ -180,7 +182,6 @@ class AequilibraEMenu:
             self.tr("Utils"), self.tr("Display Matrices and datasets"), partial(display_aequilibrae_formats, self)
         )
         self.add_menu_action(self.tr("Utils"), self.tr("Create example"), partial(create_example, self))
-        self.add_menu_action(self.tr("Utils"), self.tr("Save as QGIS Project"), partial(save_as_qgis_project, self))
 
         # # ########################################################################
         # # #################          LOOSE STUFF         #########################
@@ -201,6 +202,8 @@ class AequilibraEMenu:
         self.toolbar.addWidget(self.projectManager)
 
         QgsProject.instance().readProject.connect(self.reload_project)
+        QgsProject.instance().projectSaved.connect(self.avoid_saving)
+        QgsProject.instance().projectSaved.disconnect(self.avoid_saving)
         # # # ########################################################################
         self.tabContents = []
         self.toolbar.setIconSize(QtCore.QSize(16, 16))
@@ -351,21 +354,22 @@ class AequilibraEMenu:
         return QCoreApplication.translate("AequilibraEMenu", text)
 
     def reload_project(self):
-        
-        if len(QgsProject.instance().fileName()) > 0:    
+
+        if len(QgsProject.instance().fileName()) > 0:
             from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
-            layers = QgsProject.instance().mapLayers().values()
 
             file_path = {}
-            for layer in layers:
+            for layer in QgsProject.instance().mapLayers().values():
                 dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
                 dbpath = dbpath.split("|")[0].split(".sqlite")[0].split("/")
                 file_path[dbpath[-1]] = os.path.join(*dbpath[:-1])
-            
-            aeq_databases = ["project_database", "results_database", "public_transport", "qgis_layers"]
 
-            for key in file_path.keys():
-                if key in aeq_databases:
-                    break
+            _run_load_project_from_path(self, file_path["qgis_layers"])
 
-            _run_load_project_from_path(self, file_path[key])
+    def avoid_saving(self):
+
+        for layer in QgsProject.instance().mapLayers().values():
+            if layer.name() in self.layers:
+                QgsProject.instance().removeMapLayer(layer)
+        qgis.utils.iface.mapCanvas().refresh()
+        QgsProject.instance().write()

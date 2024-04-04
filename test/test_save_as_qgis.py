@@ -1,7 +1,7 @@
 import pytest
 from os.path import join, isfile
 
-from qaequilibrae.modules.menu_actions.save_as_qgis import SaveAsQGZ
+from qaequilibrae.modules.project_procedures.save_as_qgis import SaveAsQGZ
 
 
 @pytest.fixture(scope="function")
@@ -18,10 +18,10 @@ def run_tsp(ae_with_project):
     dialog.run()
 
 
-def test_save_as_qgis(ae_with_project, tmpdir, mocker, load_layers_from_csv, run_tsp):
+def test_save_as_qgis(ae_with_project, tmpdir, mocker, load_layers_from_csv):
 
     file_path = f"{tmpdir}/text.qgz"
-    function = "qaequilibrae.modules.menu_actions.save_as_qgis.SaveAsQGZ.choose_output"
+    function = "qaequilibrae.modules.project_procedures.save_as_qgis.SaveAsQGZ.choose_output"
     mocker.patch(function, return_value=file_path)
 
     dialog = SaveAsQGZ(ae_with_project)

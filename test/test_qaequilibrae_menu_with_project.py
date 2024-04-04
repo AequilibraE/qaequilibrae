@@ -71,6 +71,18 @@ def test_logfile_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
+def test_save_to_qgis_project(ae_with_project, tmpdir, mocker):
+    file_path = f"{tmpdir}/text.qgz"
+    function = "qaequilibrae.modules.project_procedures.save_as_qgis.SaveAsQGZ.choose_output"
+    mocker.patch(function, return_value=file_path)
+
+    action = ae_with_project.menuActions["Project"][7]
+    assert action.text() == "Save as QGIS Project", "Wrong text content"
+    action.trigger()
+    messagebar = ae_with_project.iface.messageBar()
+    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+
+
 def test_network_preparation_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.network import NetworkPreparationDialog
 
@@ -274,24 +286,6 @@ def test_utils_display_matrices_and_datasets_menu(ae_with_project, qtbot):
 
     action = ae_with_project.menuActions["Utils"][0]
     assert action.text() == "Display Matrices and datasets", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
-
-def test_save_to_qgis_project(ae_with_project, qtbot, tmpdir, mocker):
-    from qaequilibrae.modules.menu_actions.save_as_qgis import SaveAsQGZ
-
-    file_path = f"{tmpdir}/text.qgz"
-    function = "qaequilibrae.modules.menu_actions.save_as_qgis.SaveAsQGZ.choose_output"
-    mocker.patch(function, return_value=file_path)
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, SaveAsQGZ)
-
-    action = ae_with_project.menuActions["Utils"][2]
-    assert action.text() == "Save as QGIS Project", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
