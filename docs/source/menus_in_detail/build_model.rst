@@ -3,6 +3,15 @@
 Model building
 ==============
 
+On the Model building tab, it is possible to effectively build an AequilibraE model, and to do so,
+there are some options, such as creating project from Open Street Maps or using your existing layers.
+
+In this tab, you can also add centroids and zones to your project.
+
+.. image:: ../images/menu_model_building.png
+    :align: center
+    :alt: tab model building menu
+
 .. _create-proj-from-osm:
 
 Create project from OSM
@@ -67,14 +76,14 @@ available do not have complete (or reliable) information. Manually editing the
 networks might be necessary, which is common practice in transport modelling.
 
 Before creating a project from the layer, you can understand how to prepare the
-layers for this task on the documentation page for 
-:ref:`preparing a network <network_preparation>`.
+layers for this task on the page
+:ref:`Preparing a network <network_preparation_page>`.
 
 After all field preparation is done, one can import those layers into an
-AequilibraE project using a dedicated tool in the **Project** menu in
+AequilibraE project using a dedicated tool in the **Model building** menu in
 AequilibraE.
 
-Accessing **AequilibraE > Project > Create Project from Layers**, the user is
+Accessing **Model building > Create Project from Layers**, the user is
 presented with the following screen.
 
 .. image:: ../images/project_from_layers_links.png
@@ -109,8 +118,41 @@ consistent with each other.
 Network preparation
 -------------------
 
-The *GUI* for this process can be accessed in the AequilibraE menu **AequilibraE > Network
-Manipulation > Network Preparation**, and it looks like this:
+When preparing your project network, you might face there are two distinct situations:
+
+User has only the network links
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is the case when one exports only links from a transportation package or
+downloads a link layer from Open Street Maps or a government open data portal
+and want to use such network for path computation. This tool then does the
+following:
+
+* Duplicates the pre-existing network in order to edit it without risk of data
+  corruption
+* Creates nodes at the extremities of all links in the network (no duplicate
+  nodes at the same latitude/longitude)
+* Adds the fields *A_Node* and *B_Node* to the new link layer, and populate them
+  with the *IDs* generated for the nodes layer
+
+User has the network links and nodes but no database field linking them
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In case one has both the complete sets of nodes and links and nodes for a
+certain network (commercial packages would allow you to export them separately),
+you can use this tool to associate those links and nodes (if that information
+was not exported from the package). In that case, the steps would be the
+following:
+
+* Duplicates the pre-existing network in order to edit it without risk of data
+  corruption
+* Checks if the nodes provided cover both extremities of all links from the
+  layer provided. Node IDs are also checked for uniqueness
+* Adds the fields *A_Node* and *B_Node* to the new link layer, and populate them
+  with the *IDs* chosen among the fields from the nodes layer
+
+The *GUI* for this process can be accessed in the AequilibraE menu **Model
+Building > Network Preparation**, and it looks like this:
 
 .. image:: ../images/network_edit_network_preparation.png
     :width: 774
@@ -174,7 +216,7 @@ It is possible to import to AequilibraE project your own zoning system in case
 you already have one. Currently, AequilibraE only supports one projection system,
 which is the EPSG:4326 (WGS84), so make sure your zone layer is in this projection.
 
-To add your zones to the active project, go to **AequilibraE > Project > Add zoning data**, 
+To add your zones to the active project, go to **Model building > Add zoning data**, 
 select the zoning layer you want to add to the project, select weather you
 want to migrate the data and the respective layer field in the zoning layer, and
 finally click on process.

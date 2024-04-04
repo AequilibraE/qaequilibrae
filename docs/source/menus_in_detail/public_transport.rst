@@ -2,7 +2,13 @@ Public Transport
 ================
 
 QAequilibraE is capable of importing a General Transit Feed Specification (GTFS) feed 
-into its public transport database. More details on the **public_transport.sqlite** are discussed on a 
+into its public transport database. 
+
+.. image:: ../images/menu_public_transport.png
+    :align: center
+    :alt: tab public transport
+
+More details on the **public_transport.sqlite** are discussed on a 
 *per-table* basis in `AequilibraE's documentation <https://www.aequilibrae.com/python/latest/modeling_with_aequilibrae/transit_database/data_model/datamodel.html>`_, 
 and we recommend understanding the role of each table before 
 setting an AequilibraE model you intend to use. If you don't know much about GTFS, we strongly encourage you to take
@@ -11,7 +17,7 @@ a look at the documentation provided by `Google <https://developers.google.com/t
 Import GTFS
 -----------
 
-To import a GTFS feed, click **AequilibraE > Public transport > Import GTFS**. A new window with the importer
+To import a GTFS feed, click **Public transport > Import GTFS**. A new window with the importer
 will open. If it is the first time you are creating a GTFS feed for your project, it may take a little while
 to create the public transport database in the project folder. In the GTFS importer window, you can click on
 *Add Feed* and point to the location in your machine where the GTFS data is.
@@ -45,7 +51,7 @@ imported in your project folder.
     :alt: gtfs loaded
 
 In case you want to add or rewrite information on your public transport database, you can click on
-**AequilibraE > Public Transport > Import GTFS**. You will notice a difference in the clickable buttons at
+**Public Transport > Import GTFS**. You will notice a difference in the clickable buttons at
 the bottom of the page, and it is now possible to **Overwrite routes** or **Add to Existing Routes**.
 For any of these options, you follow the same steps previously presented to add feed data and load it into the
 project.
@@ -59,7 +65,7 @@ Explore Transit
 ---------------
 
 Case you have already imported a GTFS feed into your project or you want to open a feed from an AequilibraE project 
-created with Python, you can click on **AequilibraE > Public Transport > Explore Transit** to visualize the Transit 
+created with Python, you can click on **Public Transport > Explore Transit** to visualize the Transit 
 routes. While opening the Transit Navigator, you will notice that the layers *patterns*, *routes*, *stops* and
 *zones* from the GTFS file are going to be displayed in your map canva, and appear in the layers list.
 

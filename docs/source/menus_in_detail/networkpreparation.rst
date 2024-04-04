@@ -63,39 +63,6 @@ Please **make sure that all your links are LineString geometries**, otherwise th
 is not going to work. If all your links are MultiLineString geometries, you can save
 your data as a GeoPackage and enforce it to be LineString only.
 
-There are two distinct situations that need to be covered:
-
-User has only the network links
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This is the case when one exports only links from a transportation package or
-downloads a link layer from Open Street Maps or a government open data portal
-and want to use such network for path computation. This tool then does the
-following:
-
-* Duplicates the pre-existing network in order to edit it without risk of data
-  corruption
-* Creates nodes at the extremities of all links in the network (no duplicate
-  nodes at the same latitude/longitude)
-* Adds the fields *A_Node* and *B_Node* to the new link layer, and populate them
-  with the *IDs* generated for the nodes layer
-
-User has the network links and nodes but no database field linking them
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In case one has both the complete sets of nodes and links and nodes for a
-certain network (commercial packages would allow you to export them separately),
-you can use this tool to associate those links and nodes (if that information
-was not exported from the package). In that case, the steps would be the
-following:
-
-* Duplicates the pre-existing network in order to edit it without risk of data
-  corruption
-* Checks if the nodes provided cover both extremities of all links from the
-  layer provided. Node IDs are also checked for uniqueness
-* Adds the fields *A_Node* and *B_Node* to the new link layer, and populate them
-  with the *IDs* chosen among the fields from the nodes layer
-
 It is important to note that AequilibraE understands *a_node* as being the
 topologically first point of the line, and *b_node* the last. Topology in GIS
 involves a LOT of stuff, but you can look at an

@@ -11,22 +11,22 @@ webpage.
 Under the project tab, there are some options to choose from and the following sections
 explore some of these actions.
 
+.. image:: ../images/menu_project.png
+    :align: center
+    :alt: tab project menu
+
 .. _siouxfalls-open-project:
 
 Open & Close project
 --------------------
 
 These options are pretty straightforward and are used either to open or close a
-project. You just have to click **AequilibraE > Project > Open project** to open
-a project, and **AequilibraE > Project > Close project** to close it.
+project. You just have to click **Project > Open project** to open
+a project, and **Project > Close project** to close it.
 
 Keep in mind that to open another project or to create a new one, you **must**
 close the currently open project, otherwise AequilibraE is going to return an
 error.
-
-.. image:: ../images/tab-project.png
-    :align: center
-    :alt: tab project menu
 
 .. _create_example:
 
@@ -36,11 +36,11 @@ Create example
 AequilibraE has three different example sets one can use as learning tool, and they were all
 made available within the QGIS ecosystem.
 
-Within **AequilibraE > Project > Create example**, select one of the available models, the desired
+Within **Project > Create example**, select one of the available models, the desired
 location of the output folder, and just press *Create*. The window will close automatically
 and you can open the project folder in the Project tab.
 
-.. image:: ../images/utils-create_example.png
+.. image:: ../images/project_create_example.png
     :align: center
     :alt: utils create example
 
@@ -54,7 +54,7 @@ reference documentation for this section can be found in its
 `documentation page <https://aequilibrae.com/python/latest/modeling_with_aequilibrae/parameter_file.html>`_.
 
 The QGIS plugin, however, has a nice interface to view and edit the parameters
-file, which can be accessed through **AequilibraE > Project > Parameters**. This
+file, which can be accessed through **Project > Parameters**. This
 interface, depicted below, allows one to edit and validate parameters before
 submitting them as the new parameter file for all AequilibraE procedures.
 

@@ -5,13 +5,17 @@ On the trip distribution tab, the user can perform Iterative Proportional Fittin
 with their available matrices and vectors, as well as calibrate and apply a Synthetic Gravity
 Model.
 
-In this page each option under the **AequilibraE > Trip Distribution > Trip Distribution** is
+In this page each option under the **Trip Distribution > Trip Distribution** is
 presented in one of the subsections below.
 
-.. image:: ../images/tripdistribution-menu.png
-    :width: 241
+.. subfigure:: AB
     :align: center
-    :alt: trip_distribution_menu
+
+    .. image:: ../images/menu_trip_distribution.png
+        :alt: tab trip distribution
+
+    .. image:: ../images/tripdistribution-menu.png
+        :alt: trip distribution menu
 
 Iterative Proportional Fitting (IPF)
 ------------------------------------
