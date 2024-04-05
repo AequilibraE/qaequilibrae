@@ -25,6 +25,7 @@ def test_save_as_qgis(ae_with_project, tmpdir, mocker, load_layers_from_csv):
     mocker.patch(function, return_value=file_path)
 
     dialog = SaveAsQGZ(ae_with_project)
+    dialog.file_name = file_path
     dialog.run()
 
     assert isfile(join(dialog.qgis_project.project.project_base_path, "qgis_layers.sqlite"))
