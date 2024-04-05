@@ -1,5 +1,6 @@
 import pytest
 from os.path import join, isfile
+from os import remove
 
 from qaequilibrae.modules.project_procedures.save_as_qgis import SaveAsQGZ
 
@@ -18,15 +19,15 @@ def run_tsp(ae_with_project):
     dialog.run()
 
 
-def test_save_as_qgis(ae_with_project, tmpdir, mocker, load_layers_from_csv):
+def test_save_as_qgis(ae_with_project, tmpdir, mocker, load_layers_from_csv, run_tsp):
 
     file_path = f"{tmpdir}/text.qgz"
     function = "qaequilibrae.modules.project_procedures.save_as_qgis.SaveAsQGZ.choose_output"
     mocker.patch(function, return_value=file_path)
 
+    # TODO: remove statement when test setups are merged
+    remove("test/data/SiouxFalls_project/qgis_layers.sqlite")
     dialog = SaveAsQGZ(ae_with_project)
-    dialog.file_name = file_path
-    dialog.run()
 
     assert isfile(join(dialog.qgis_project.project.project_base_path, "qgis_layers.sqlite"))
 
