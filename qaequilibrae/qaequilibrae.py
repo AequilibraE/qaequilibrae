@@ -202,8 +202,7 @@ class AequilibraEMenu:
         self.toolbar.addWidget(self.projectManager)
 
         QgsProject.instance().readProject.connect(self.reload_project)
-        QgsProject.instance().projectSaved.connect(self.save_temporary_layers)
-        # QgsProject.instance().projectSaved.disconnect(self.save_temporary_layers)
+        # QgsProject.instance().projectSaved.connect(self.save_temporary_layers)
         # # # ########################################################################
         self.tabContents = []
         self.toolbar.setIconSize(QtCore.QSize(16, 16))
@@ -364,14 +363,13 @@ class AequilibraEMenu:
         _run_load_project_from_path(self, pth)
 
     def save_temporary_layers(self):
-        print("Trigger is accessed")
         from qaequilibrae.modules.project_procedures.save_as_qgis import SaveTempLayers
 
         for layer in QgsProject.instance().mapLayers().values():
-            print(layer.name())
-
-        SaveTempLayers(self.project.project_base_path, QgsProject.instance().mapLayers().values())
-        # QgsProject.instance().write()
+            if layer.isTemporary():
+                SaveTempLayers(self.project.project_base_path, QgsProject.instance())
+                break
+        qgis.utils.iface.mapCanvas().refresh()
 
     def remove_aequilibrae_layers(self):
         aequilibrae_databases = ["project_database", "public_transport", "results_database"]

@@ -14,9 +14,14 @@ class SaveAsQGZ(QtCore.QObject):
         super().__init__()
         self.qgis_project = qgis_project
         self.qgz_project = QgsProject.instance()
-        self.map_layers = self.qgz_project.mapLayers().values()
+        
+        self.prj_path = self.qgis_project.project.project_base_path
+        self.output_file_path = os.path.join(self.prj_path, "qgis_layers.sqlite")
+        self.file_exists = True if os.path.isfile(self.output_file_path) else False
 
-        self.file_name = self.choose_output()
+        if not self.file_exists:
+            self.file_name = self.choose_output()
+
         self.run()
 
     def choose_output(self):
@@ -26,38 +31,38 @@ class SaveAsQGZ(QtCore.QObject):
         return file_name
 
     def save_project(self):
-        prj_path = self.qgis_project.project.project_base_path
-        QgsExpressionContextUtils.setProjectVariable(self.qgz_project, 'aequilibrae_path', prj_path)
-        self.qgz_project.write(self.file_name)
+        if "aequilibrae_path" not in self.qgz_project.customVariables():
+            QgsExpressionContextUtils.setProjectVariable(self.qgz_project, 'aequilibrae_path', self.prj_path)
+            self.qgz_project.write(self.file_name)
+        else:
+            self.qgz_project.write()
         self.finished.emit("projectSaved")
 
     def run(self):
-        SaveTempLayers(self.qgis_project.project.project_base_path, self.map_layers)
+        SaveTempLayers(self.output_file_path, self.qgz_project, self.file_exists)
         self.save_project()
 
 
 class SaveTempLayers:
-    def __init__(self, path, layers):
-        self.save_temp_layers_to_db(path, layers)
+    def __init__(self, path, proj_instance, file_exists):
+        self.save_temp_layers_to_db(path, proj_instance, file_exists)
 
-    def save_temp_layers_to_db(self, path, layers):
-        output_file_path = os.path.join(path, "qgis_layers.sqlite")
-        file_exists = True if os.path.isfile(output_file_path) else False
-
-        for layer in layers:
+    def save_temp_layers_to_db(self, path, proj_instance, file_exists):
+        for layer in proj_instance.mapLayers().values():
             if layer.isTemporary():
-                print(layer.name())
+                layer_name = layer.name() + f"_{uuid4().hex}"
+                print("temp: ", layer.name())
                 options = QgsVectorFileWriter.SaveVectorOptions()
                 options.driverName = "SQLite"
+                options.layerName = layer_name
                 if file_exists:
                     options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-                options.layerName = layer.name()
 
                 transform_context = QgsProject.instance().transformContext()
 
-                error = QgsVectorFileWriter.writeAsVectorFormatV3(layer, output_file_path, transform_context, options)
+                error = QgsVectorFileWriter.writeAsVectorFormatV3(layer, path, transform_context, options)
 
                 if error[0] == QgsVectorFileWriter.NoError:
-                    layer.setDataSource(output_file_path + f"|layername={layer.name()}", layer.name(), "ogr")
+                    layer.setDataSource(path + f"|layername={layer_name}", layer.name(), "ogr")
 
                 file_exists = True
