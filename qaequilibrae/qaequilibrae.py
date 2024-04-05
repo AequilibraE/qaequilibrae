@@ -6,7 +6,7 @@ import sys
 import tempfile
 import webbrowser
 from functools import partial
-from typing import Dict
+from typing import Dict, Optional
 
 import qgis
 
@@ -15,7 +15,7 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsExpressionContextUtils, QgsVectorFileWriter, QgsMapLayer
 from qgis.PyQt.QtCore import QTranslator
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
@@ -79,6 +79,7 @@ class AequilibraEMenu:
         self.layers = {}  # type: Dict[QgsVectorLayer]
         self.dock = QDockWidget(self.trlt("AequilibraE"))
         self.manager = QWidget()
+        self.plugin_id = "qaequilibrae"
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -201,8 +202,8 @@ class AequilibraEMenu:
         self.toolbar.addWidget(self.projectManager)
 
         QgsProject.instance().readProject.connect(self.reload_project)
-        QgsProject.instance().projectSaved.connect(self.avoid_saving)
-        QgsProject.instance().projectSaved.disconnect(self.avoid_saving)
+        QgsProject.instance().projectSaved.connect(self.save_temporary_layers)
+        # QgsProject.instance().projectSaved.disconnect(self.save_temporary_layers)
         # # # ########################################################################
         self.tabContents = []
         self.toolbar.setIconSize(QtCore.QSize(16, 16))
@@ -292,6 +293,7 @@ class AequilibraEMenu:
         self.project = None
         self.matrices.clear()
         self.layers.clear()
+        self.remove_aequilibrae_layers()
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
@@ -353,25 +355,31 @@ class AequilibraEMenu:
         return QCoreApplication.translate("AequilibraEMenu", text)
 
     def reload_project(self):
+        pth = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('aequilibrae_path')
+        if not pth:
+            return
+        
         from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-        file_path = {}
+        _run_load_project_from_path(self, pth)
+
+    def save_temporary_layers(self):
+        print("Trigger is accessed")
+        from qaequilibrae.modules.project_procedures.save_as_qgis import SaveTempLayers
+
+        for layer in QgsProject.instance().mapLayers().values():
+            print(layer.name())
+
+        SaveTempLayers(self.project.project_base_path, QgsProject.instance().mapLayers().values())
+        # QgsProject.instance().write()
+
+    def remove_aequilibrae_layers(self):
+        aequilibrae_databases = ["project_database", "public_transport", "results_database"]
+
         for layer in QgsProject.instance().mapLayers().values():
             dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
-            dbpath = dbpath.split("|")[0].split(".sqlite")[0].split("/")
-            pth = "".join(dbpath[:-1])
-            if len(pth) > 0:
-                file_path[dbpath[-1]] = pth
-            else:
-                return
+            dbpath = dbpath.split("|")[0].split(".sqlite")[0].split("/")[-1].split("\\")[-1]
+            if dbpath in aequilibrae_databases:
+                QgsProject.instance().removeMapLayer(layer)
 
-        _run_load_project_from_path(self, file_path["qgis_layers"])
-
-    def avoid_saving(self):
-
-        if self.project is not None:    
-            for layer in QgsProject.instance().mapLayers().values():
-                if layer.name() in self.layers:
-                    QgsProject.instance().removeMapLayer(layer)
-            qgis.utils.iface.mapCanvas().refresh()
-            QgsProject.instance().write()
+        qgis.utils.iface.mapCanvas().refresh()
