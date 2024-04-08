@@ -232,7 +232,6 @@ class NetworkPreparationProcedure(WorkerThread):
                 new_line_layer.commitChanges()
                 self.new_line_layer = new_line_layer
 
-
     def duplicate_layer(self, original_layer, layer_type, layer_name):
         self.epsg_code = int(original_layer.crs().authid().split(":")[1])
         feats = [feat for feat in original_layer.getFeatures()]
