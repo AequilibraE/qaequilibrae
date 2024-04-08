@@ -1,7 +1,7 @@
 .. _modeling-init:
 
-Modeling with AequilibraE
-=========================
+Menus in Detail
+===============
 
 In this section you can find a deep dive into modeling with AequilibraE, as
 a start guide to a complete view into AequilibraE's data structure. Each and 
