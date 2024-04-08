@@ -5,7 +5,7 @@ from shutil import copytree
 
 from qgis.core import QgsProject, QgsVectorLayer
 from qaequilibrae.modules.network.network_preparation_dialog import NetworkPreparationDialog
-from qaequilibrae.modules.network.network_preparation_procedure import NetworkPreparationProcedure
+from qaequilibrae.modules.network.Network_preparation_procedure import NetworkPreparationProcedure
 
 
 def load_test_layer(path, file_name):

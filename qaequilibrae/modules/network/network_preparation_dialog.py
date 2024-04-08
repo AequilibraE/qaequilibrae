@@ -7,7 +7,7 @@ import qgis
 from qaequilibrae.modules.common_tools import standard_path, get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import line_types, point_types
 from qgis.PyQt import QtWidgets, uic
-from qaequilibrae.modules.network.network_preparation_procedure import NetworkPreparationProcedure
+from qaequilibrae.modules.network.Network_preparation_procedure import NetworkPreparationProcedure
 from qaequilibrae.modules.common_tools import ReportDialog
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
