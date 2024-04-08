@@ -26,7 +26,10 @@ def test_save_as_qgis(ae_with_project, tmpdir, mocker, load_layers_from_csv, run
     mocker.patch(function, return_value=file_path)
 
     # TODO: remove statement when test setups are merged
-    remove("test/data/SiouxFalls_project/qgis_layers.sqlite")
+    lyr_file = "test/data/SiouxFalls_project/qgis_layers.sqlite"
+    if isfile(lyr_file):
+        remove(lyr_file)
+
     dialog = SaveAsQGZ(ae_with_project)
 
     assert isfile(join(dialog.qgis_project.project.project_base_path, "qgis_layers.sqlite"))
