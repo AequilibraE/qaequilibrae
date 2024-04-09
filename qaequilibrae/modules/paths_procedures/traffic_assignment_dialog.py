@@ -1,3 +1,4 @@
+import importlib.util as iutil
 import logging
 import numpy as np
 import os
@@ -19,6 +20,9 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 from qaequilibrae.modules.common_tools import PandasModel
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import standard_path
+
+spec = iutil.find_spec("openmatrix")
+has_omx = spec is not None
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_traffic_assignment.ui"))
@@ -195,7 +199,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.matrices.loc[idx, "name"] += " (file missing)"
 
         filter = self.matrices.file_name.str.contains(".omx", flags=re.IGNORECASE, regex=True)
-        self.matrices.loc[filter, "name"] += " (OMX not available)"
+        if not has_omx:
+            self.matrices.loc[filter, "name"] += " (OMX not available)"
         self.cob_matrices.clear()
         self.cob_matrices.addItems(self.matrices["name"].tolist())
 
