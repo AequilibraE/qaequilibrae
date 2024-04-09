@@ -1,17 +1,16 @@
 from os.path import join
+from os import listdir
+from aequilibrae.utils.db_utils import commit_and_close
+from aequilibrae.utils.spatialite_utils import connect_spatialite
 
 from qgis._core import QgsProject, QgsVectorLayer, QgsDataSourceUri
-
-import qgis
 
 
 def load_result_table(project_base_path: str, table_name: str) -> QgsVectorLayer:
     pth = join(project_base_path, "results_database.sqlite")
-    conn = qgis.utils.spatialite_connect(pth)
-    conn.execute("PRAGMA temp_store = 0;")
-    conn.execute("SELECT InitSpatialMetaData();")
-    conn.commit()
-    conn.close()
+    with commit_and_close(connect_spatialite(pth)) as conn:
+        conn.execute("PRAGMA temp_store = 0;")
+        conn.execute("SELECT InitSpatialMetaData();")
 
     uri = QgsDataSourceUri()
     uri.setDatabase(pth)
