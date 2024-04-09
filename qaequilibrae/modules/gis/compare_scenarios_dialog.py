@@ -200,8 +200,13 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         return True
 
     def load_result_tables(self):
-        self.link_layer = self.qgis_project.layers["links"][0]
-        QgsProject.instance().addMapLayer(self.link_layer)
+        layer_names = [layer.name() for layer in QgsProject.instance().mapLayers().values()]
+
+        if "links" in layer_names:
+            self.link_layer = QgsProject.instance().mapLayersByName("links")[0]
+        else:
+            self.link_layer = self.qgis_project.layers["links"][0]
+            QgsProject.instance().addMapLayer(self.link_layer)
 
         v1 = self.cob_base_scenario.currentText()
         v2 = self.cob_alternative_scenario.currentText()

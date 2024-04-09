@@ -25,11 +25,19 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         self.project = qgisproject.project  # type: Project
         self._PQgis = qgisproject
 
-        self.link_layer = self._PQgis.layers["links"][0]
-        self.node_layer = self._PQgis.layers["nodes"][0]
+        layer_names = [layer.name() for layer in QgsProject.instance().mapLayers().values()]
 
-        QgsProject.instance().addMapLayer(self.link_layer)
-        QgsProject.instance().addMapLayer(self.node_layer)
+        if "links" in layer_names:
+            self.link_layer = QgsProject.instance().mapLayersByName("links")[0]
+        else:
+            self.link_layer = self._PQgis.layers["links"][0]
+            QgsProject.instance().addMapLayer(self.link_layer)
+
+        if "nodes" in layer_names:
+            self.node_layer = QgsProject.instance().mapLayersByName("nodes")[0]
+        else:
+            self.node_layer = self._PQgis.layers["nodes"][0]
+            QgsProject.instance().addMapLayer(self.node_layer)
 
         self.all_modes = {}
         self.worker_thread: TSPProcedure = None
