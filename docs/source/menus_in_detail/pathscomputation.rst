@@ -1,9 +1,13 @@
-Path computation
-================
+Paths and Assignment
+====================
 
 From version 0.6, AequilibraE plug-in does not require the user to create the graph to perform
 path computation as in previous versions. In this version, as you set up your own configurations,
 the software already computes the graph for you.
+
+.. image:: ../images/menu_paths_and_assignment.png
+    :align: center
+    :alt: tab paths and assignment
 
 .. _siouxfalls-individual-path-computation:
 
@@ -13,12 +17,7 @@ Shortest Path
 The first thing we can do with this project is to compute a few arbitrary paths
 to see if the network is connected and if paths make sense.
 
-.. image:: ../images/path_computation_menu.png
-    :width: 444
-    :align: center
-    :alt: path_computation_menu
-
-Before computing a path, we go to the configuration screen
+Before computing a path, we go to the configuration screen.
 
 .. image:: ../images/configure_path_computation.png
     :width: 250
@@ -50,12 +49,7 @@ selected in the layer, but only one path can be shown at time if you do so.
 Impedance Matrix (aka Skimming Matrix)
 --------------------------------------
 
-We can also skim the network to look into general connectivity of the network
-
-.. image:: ../images/skimming_menu.png
-    :width: 350
-    :align: center
-    :alt: skimming_menu
+We can also skim the network to look into general connectivity of the network.
 
 To perform skimming, we can select to compute a matrix from all nodes to all nodes,
 or from centroids to centroids, as well as to not allow flows through centroids.
@@ -69,22 +63,8 @@ paths.
     :align: center
     :alt: performing_skimming
 
-With the results computed (AEM or OMX), one can display them on the screen.
-
-.. image:: ../images/display_data.png
-    :width: 350
-    :align: center
-    :alt: display_data
-
-On the matrix display screen, one can control how many decimal places are shown
-and whether decimal separators are shown. One can also browse through all the
-skims in this file by selecting the skim of choice in the drop-down menu in
-the bottom left of the screen.
-
-.. image:: ../images/viewing_matrix.png
-    :width: 1146
-    :align: center
-    :alt: viewing_matrix
+With the results computed (AEM or OMX), one can display them on the screen, loading the 
+data using the :ref:`non-project data tab <fig_nonproject_data>` in **Data > Visualize data**. 
 
 .. _siouxfalls-traffic-assignment-and-skimming:
 
@@ -93,11 +73,6 @@ Traffic assignment
 
 Having verified that the network seems to be in order, one can proceed to
 perform traffic assignment, since we have a demand matrix.
-
-.. image:: ../images/traffic_assignment.png
-    :width: 350
-    :align: center
-    :alt: Calling assignment
 
 The Traffic Assignment procedure tab looks like this!
 
@@ -152,7 +127,7 @@ block flows through centroids for the reason discussed above.
 
 The result of the traffic assignment we just performed is stored in the results.sqlite
 database within the project folder. It can be easily accessed and loaded by clicking
-**Data -> Display project data**, and a project data window will open. Just click on the
+**Data > Visualize data**, and a project data window will open. Just click on the
 *Results* tab, select the desired result, and click in the *Load Result table as data layer*
 button at the bottom.
 

@@ -11,142 +11,38 @@ webpage.
 Under the project tab, there are some options to choose from and the following sections
 explore some of these actions.
 
+.. image:: ../images/menu_project.png
+    :align: center
+    :alt: tab project menu
+
 .. _siouxfalls-open-project:
 
 Open & Close project
 --------------------
 
 These options are pretty straightforward and are used either to open or close a
-project. You just have to click **AequilibraE > Project > Open project** to open
-a project, and **AequilibraE > Project > Close project** to close it.
+project. You just have to click **Project > Open project** to open
+a project, and **Project > Close project** to close it.
 
 Keep in mind that to open another project or to create a new one, you **must**
 close the currently open project, otherwise AequilibraE is going to return an
 error.
 
-.. image:: ../images/tab-project.png
+.. _create_example:
+
+Create example
+--------------
+
+AequilibraE has three different example sets one can use as learning tool, and they were all
+made available within the QGIS ecosystem.
+
+Within **Project > Create example**, select one of the available models, the desired
+location of the output folder, and just press *Create*. The window will close automatically
+and you can open the project folder in the Project tab.
+
+.. image:: ../images/project_create_example.png
     :align: center
-    :alt: tab project menu
-
-.. _create-proj-from-osm:
-
-Create project from OSM
------------------------
-
-The first feature is the capability of importing networks directly from
-`Open Street Maps <https://www.openstreetmap.org/>`_ into AequilibraE's efficient
-TranspoNet format. This is also time to give a HUGE shout out to
-`Geoff Boeing <http://www.geoffboeing.com/>`_, creator of the widely used Python
-package `OSMNx <https://github.com/gboeing/osmnx>`_. For several weeks I
-worked with Geoff in refactoring the entire OSMNx code base so I could include
-it as a submodule or dependency for AequilibraE, but its deep integration with
-`GeoPandas <https://geopandas.org/en/stable/index.html>`_ and all the packages it depends on (Pandas,
-Shapely, Fiona, RTree, etc.), means that we would have to rebuild OSMNx from the
-ground up in order to use it with AequilibraE within QGIS, since its Windows
-distribution does not include all those dependencies.
-
-For this reason, I have ported some of Geoff's code into AequilibraE
-(modifications were quite heavy, however), and was ultimately able to bring this
-feature to life.
-
-.. note::
-   Importing networks from OSM is a rather slow process, so we recommend that
-   you carefully choose the area you are downloading it for. We have also
-   inserted small pauses between successive downloads to not put too much
-   pressure on the OSM servers. So be patient!!
-
-Importing networks from OSM can be done by choosing an area for download,
-defined as the current map canvas on QGIS...
-
-.. image:: ../images/model_from_canvas_area.png
-    :width: 999
-    :align: center
-    :alt: Download OSM networks for visible area
-
-
-... or for a named place.
-
-.. image:: ../images/model_from_place.png
-    :width: 1057
-    :align: center
-    :alt: Download OSM networks for named place
-
-Project from layers
--------------------
-
-The AequilibraE project can also be bootstrapped from existing line and node
-layers obtained from any other source, as long as they contain the following
-required field for the conversion:
-
-* Link ID
-* a_node
-* b_node
-* Link direction
-* Length
-* Speed
-* Allowed modes
-* Link Type
-
-These requirements often create quite a bit of manual work, as most networks
-available do not have complete (or reliable) information. Manually editing the
-networks might be necessary, which is common practice in transport modelling.
-
-Before creating a project from the layer, you can understand how to prepare the
-layers for this task on the documentation page for 
-:ref:`preparing a network <network_preparation>`.
-
-After all field preparation is done, one can import those layers into an
-AequilibraE project using a dedicated tool in the **Project** menu in
-AequilibraE.
-
-Accessing **AequilibraE > Project > Create Project from Layers**, the user is
-presented with the following screen.
-
-.. image:: ../images/project_from_layers_links.png
-    :width: 614
-    :align: center
-    :alt: project_from_layers_links
-
-The first 7 fields for links are mandatory, and one needs to associate the
-corresponding layer fields to the network fields.
-
-The other fields that will be listed on the left side come from the parameters
-file (see the manual for that portion for more details), but the user can add
-more fields from the layer, as all of them are listed on the left side of the
-screen
-
-In the case of the nodes layer, only two fields are mandatory.
-
-.. image:: ../images/project_from_layers_nodes.png
-    :width: 614
-    :align: center
-    :alt: project_from_layers_nodes
-
-After filling all fields, it is just a matter of saving it!
-
-After running this tool a sqlite file (spatialite enabled) will be created and
-you can edit the network (create, move or delete links and nodes) and both
-layers (including node *ID* and *A_Node*/*B_Node* fields) will remain
-consistent with each other.
-
-.. _add-zoning-data:
-
-Add zoning data
----------------
-
-It is possible to import to AequilibraE project your own zoning system in case
-you already have one. Currently, AequilibraE only supports one projection system,
-which is the EPSG:4326 (WGS84), so make sure your zone layer is in this projection.
-
-To add your zones to the active project, go to **AequilibraE > Project > Add zoning data**, 
-select the zoning layer you want to add to the project, select weather you
-want to migrate the data and the respective layer field in the zoning layer, and
-finally click on process.
-
-.. image:: ../images/add-zone-layer.png
-    :width: 450
-    :align: center
-    :alt: adding zone layer
+    :alt: utils create example
 
 .. _parameters_file:
 
@@ -158,7 +54,7 @@ reference documentation for this section can be found in its
 `documentation page <https://aequilibrae.com/python/latest/modeling_with_aequilibrae/parameter_file.html>`_.
 
 The QGIS plugin, however, has a nice interface to view and edit the parameters
-file, which can be accessed through **AequilibraE > Project > Parameters**. This
+file, which can be accessed through **Project > Parameters**. This
 interface, depicted below, allows one to edit and validate parameters before
 submitting them as the new parameter file for all AequilibraE procedures.
 

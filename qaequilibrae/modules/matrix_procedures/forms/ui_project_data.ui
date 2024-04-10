@@ -43,7 +43,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_mat">
       <attribute name="title">
@@ -52,6 +52,12 @@
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="1" column="1">
         <widget class="QPushButton" name="but_load_matrix">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="toolTip">
           <string>Displays matrix</string>
          </property>
@@ -64,7 +70,7 @@
         <widget class="QPushButton" name="but_update_matrices">
          <property name="maximumSize">
           <size>
-           <width>140</width>
+           <width>200</width>
            <height>16777215</height>
           </size>
          </property>
@@ -86,13 +92,6 @@
        <string>Results</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="0" column="0" colspan="3">
-        <widget class="QTableView" name="list_results">
-         <property name="toolTip">
-          <string/>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0" colspan="3">
         <widget class="QPushButton" name="but_load_Results">
          <property name="toolTip">
@@ -103,7 +102,32 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="0" colspan="3">
+        <widget class="QTableView" name="list_results">
+         <property name="toolTip">
+          <string/>
+         </property>
+        </widget>
+       </item>
       </layout>
+     </widget>
+     <widget class="QWidget" name="tab_load_external">
+      <attribute name="title">
+       <string>Non-project Data</string>
+      </attribute>
+      <widget class="QPushButton" name="but_load_data">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>330</y>
+         <width>641</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Load Data</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </item>
