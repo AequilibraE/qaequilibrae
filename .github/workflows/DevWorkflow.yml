@@ -10,13 +10,11 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        container: [ 'qgis/qgis:latest', 'qgis/qgis:release-3_32']
+        container: [ 'qgis/qgis:latest', 'qgis/qgis:release-3_34']
     container:
       image: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: recursive
 
       - name: Install dependencies
         run: |
