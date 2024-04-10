@@ -46,12 +46,8 @@ release = "30/07/2018"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.coverage",
-    "sphinx.ext.imgmath",
-    "sphinx.ext.mathjax",
-    "sphinx_git",
     "sphinx_panels",
+    "sphinx_subfigure"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -96,7 +92,8 @@ html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "show_nav_level": 0,
     "github_url": "https://github.com/AequilibraE/qaequilibrae",
-    "navbar_end": ["theme-switcher"],
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
+    "navbar_persistent": ["search-button"],
 }
 
 # The name for this set of Sphinx documents.  If None, it defaults to

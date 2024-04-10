@@ -1,16 +1,12 @@
 .. _modeling-init:
 
-Modeling with AequilibraE
-=========================
+Menus in Detail
+===============
 
 In this section you can find a deep dive into modeling with AequilibraE, as
 a start guide to a complete view into AequilibraE's data structure. Each and 
 every one of the following sub-sections are related to one AequilibraE's
 main functionalities.
-
-.. image:: ../images/aequilibrae-main-menu.png
-    :align: center
-    :alt: aeq menu
 
 Most screenshots in this section are related to Sioux Falls, a standard example
 in transportation network algorithm studies. 
@@ -32,12 +28,10 @@ Got a bigger instance we could use as an example? Send it over!
    :maxdepth: 1
 
    project
-   networkpreparation
-   editingnetworks
+   build_model
    data
    tripdistribution
    pathscomputation
    routing
    public_transport
    gistools
-   utils

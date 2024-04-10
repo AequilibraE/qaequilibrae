@@ -47,6 +47,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_update_matrices.clicked.connect(self.update_matrix_table)
         self.but_load_Results.clicked.connect(self.load_result_table)
         self.but_load_matrix.clicked.connect(self.display_matrix)
+        self.but_load_data.clicked.connect(self.display_external_data)
 
     def display_matrix(self):
         idx = [x.row() for x in list(self.list_matrices.selectionModel().selectedRows())]
@@ -90,6 +91,11 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
             return
 
         _ = load_result_table(self.project.project_base_path, table_name)
+    
+    def display_external_data(self):
+        dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj)
+        dlg2.show()
+        dlg2.exec_()
 
     def exit_with_error(self):
         qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
