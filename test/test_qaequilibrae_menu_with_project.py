@@ -71,7 +71,7 @@ def test_save_to_qgis_project(ae_with_project, tmpdir, mocker):
     function = "qaequilibrae.modules.project_procedures.save_as_qgis.SaveAsQGZ.choose_output"
     mocker.patch(function, return_value=file_path)
 
-    action = ae_with_project.menuActions["Project"][7]
+    action = ae_with_project.menuActions["Project"][5]
     assert action.text() == "Save as QGIS Project", "Wrong text content"
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
