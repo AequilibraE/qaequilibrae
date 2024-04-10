@@ -6,7 +6,7 @@ import sys
 import tempfile
 import webbrowser
 from functools import partial
-from typing import Dict, Optional
+from typing import Dict
 
 import qgis
 
@@ -15,7 +15,7 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer
-from qgis.core import QgsProject, QgsExpressionContextUtils, QgsVectorFileWriter, QgsMapLayer
+from qgis.core import QgsProject, QgsExpressionContextUtils
 from qgis.PyQt.QtCore import QTranslator
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
@@ -136,7 +136,6 @@ class AequilibraEMenu:
         # # # ####################  DATA UTILITIES SUB-MENU  #########################
         self.add_menu_action(self.tr("Data"), self.tr("Visualize data"), partial(run_show_project_data, self))
         self.add_menu_action(self.tr("Data"), self.tr("Import matrices"), partial(load_matrices, self))
-        self.add_menu_action(self.tr("Data"), self.tr("Import matrices"), partial(load_matrices, self))
 
         # # # # ########################################################################
         # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -190,7 +189,6 @@ class AequilibraEMenu:
         self.toolbar.addWidget(self.projectManager)
 
         QgsProject.instance().readProject.connect(self.reload_project)
-        # QgsProject.instance().projectSaved.connect(self.save_temporary_layers)
         # # # ########################################################################
         self.tabContents = []
         self.toolbar.setIconSize(QtCore.QSize(16, 16))
@@ -275,12 +273,12 @@ class AequilibraEMenu:
     def run_close_project(self):
         if self.project is None:
             return
+        self.remove_aequilibrae_layers()
         self.project.close()
         self.projectManager.clear()
         self.project = None
         self.matrices.clear()
         self.layers.clear()
-        self.remove_aequilibrae_layers()
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
@@ -342,30 +340,35 @@ class AequilibraEMenu:
         return QCoreApplication.translate("AequilibraEMenu", text)
 
     def reload_project(self):
+        from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+
         pth = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('aequilibrae_path')
         if not pth:
             return
-        
-        from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
         _run_load_project_from_path(self, pth)
 
-    def save_temporary_layers(self):
-        from qaequilibrae.modules.project_procedures.save_as_qgis import SaveTempLayers
+        # Checks if the layers in the project have the same database path as the aequilibrae project layers.
+        # if so, we replace the path in self.layers
+        prj_layer_sources = [lyr.source() for lyr in QgsProject.instance().mapLayers().values()]
+        prj_layers = [lyr for lyr in QgsProject.instance().mapLayers().values()]
 
-        for layer in QgsProject.instance().mapLayers().values():
-            if layer.isTemporary():
-                SaveTempLayers(self.project.project_base_path, QgsProject.instance())
-                break
-        qgis.utils.iface.mapCanvas().refresh()
+        geo_source = [v[0].source().replace("\\\\", "/") for v in self.layers.values()]
+        geo_names = [v[0].name() for v in self.layers.values()]
+
+        for idx, lyr in enumerate(geo_source):
+            if lyr in prj_layer_sources:
+                lidx = prj_layer_sources.index(lyr)
+                self.layers[geo_names[idx]] = [prj_layers[lidx], prj_layers[lidx].id()]
 
     def remove_aequilibrae_layers(self):
         aequilibrae_databases = ["project_database", "public_transport", "results_database"]
 
         for layer in QgsProject.instance().mapLayers().values():
             dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
-            dbpath = dbpath.split("|")[0].split(".sqlite")[0].split("/")[-1].split("\\")[-1]
-            if dbpath in aequilibrae_databases:
+            dbpath = dbpath.split("|")[0].split(".sqlite")[0]
+            var = os.path.split(dbpath)
+            if var[0] == self.project.project_base_path and var[1] in aequilibrae_databases:
                 QgsProject.instance().removeMapLayer(layer)
 
         qgis.utils.iface.mapCanvas().refresh()

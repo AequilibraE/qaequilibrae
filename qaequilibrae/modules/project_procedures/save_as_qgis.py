@@ -19,6 +19,7 @@ class SaveAsQGZ(QtCore.QObject):
         self.prj_path = self.qgis_project.project.project_base_path
         self.output_file_path = os.path.join(self.prj_path, "qgis_layers.sqlite")
         self.file_exists = True if os.path.isfile(self.output_file_path) else False
+        self.file_name = False
 
         self.save_project()
 
@@ -32,10 +33,11 @@ class SaveAsQGZ(QtCore.QObject):
         if "aequilibrae_path" not in self.qgz_variables:
             self.file_name = self.choose_output()
             QgsExpressionContextUtils.setProjectVariable(self.qgz_project, 'aequilibrae_path', self.prj_path)
-            self.save_temp_layers_to_db()
+        
+        self.save_temp_layers_to_db()
+        if self.file_name:
             self.qgz_project.write(self.file_name)
         else:
-            self.save_temp_layers_to_db()
             self.qgz_project.write()
 
         self.finished.emit("projectSaved")
@@ -44,7 +46,6 @@ class SaveAsQGZ(QtCore.QObject):
         for layer in self.qgz_project.mapLayers().values():
             if layer.isTemporary():
                 layer_name = layer.name() + f"_{uuid4().hex}"
-                print("temp: ", layer.name())
                 options = QgsVectorFileWriter.SaveVectorOptions()
                 options.driverName = "SQLite"
                 options.layerName = layer_name

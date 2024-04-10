@@ -54,35 +54,20 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         }
 
         fldr = join(dirname(dirname(__file__)), "style_loader")
-        layer_names = [layer.name() for layer in QgsProject.instance().mapLayers().values()]
+        self.stops_layer = qgis_project.layers["transit_stops"][0]
+        self.stops_layer.loadNamedStyle(join(fldr, "stops.qml"), True)
 
-        if "transit_stops" in layer_names:
-            self.stops_layer = QgsProject.instance().mapLayersByName("transit_stops")[0]
-        else:
-            self.stops_layer = qgis_project.layers["transit_stops"][0]
-            self.stops_layer.loadNamedStyle(join(fldr, "stops.qml"), True)
+        self.zones_layer = qgis_project.layers["zones"][0]
+        self.zones_layer.loadNamedStyle(join(fldr, "zones.qml"), True)
 
-        if "zones" in layer_names:
-            self.zones_layer = QgsProject.instance().mapLayersByName("zones")[0]
-        else:
-            self.zones_layer = qgis_project.layers["zones"][0]
-            self.zones_layer.loadNamedStyle(join(fldr, "zones.qml"), True)
+        self.patterns_layer = qgis_project.layers["transit_pattern_mapping"][0]
+        self.patterns_layer.loadNamedStyle(join(fldr, "patterns.qml"), True)
 
-        if "transit_pattern_mapping" in layer_names:
-            self.patterns_layer = QgsProject.instance().mapLayersByName("transit_pattern_mapping")[0]
-        else:
-            self.patterns_layer = qgis_project.layers["transit_pattern_mapping"][0]
-            self.patterns_layer.loadNamedStyle(join(fldr, "patterns.qml"), True)
-
-        if "transit_routes" in layer_names:
-            self.routes_layer = QgsProject.instance().mapLayersByName("transit_routes")[0]
-        else:
-            self.routes_layer = qgis_project.layers["transit_routes"][0]
-            self.routes_layer.loadNamedStyle(join(fldr, "routes.qml"), True)
+        self.routes_layer = qgis_project.layers["transit_routes"][0]
+        self.routes_layer.loadNamedStyle(join(fldr, "routes.qml"), True)
 
         for layer in [self.zones_layer, self.patterns_layer, self.routes_layer, self.stops_layer]:
-            if layer.name() not in layer_names:
-                QgsProject.instance().addMapLayer(layer)
+            QgsProject.instance().addMapLayer(layer)
 
         agency_sql = f"Select agency_id, agency from agencies"
         sql = """SELECT pattern_id, 
