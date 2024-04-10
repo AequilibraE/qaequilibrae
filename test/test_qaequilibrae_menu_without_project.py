@@ -83,7 +83,7 @@ def test_parameters_menu(ae, qtbot):
     assert action.text() == "Parameters", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+    assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
 def test_logfile_menu(ae, qtbot):
@@ -91,7 +91,7 @@ def test_logfile_menu(ae, qtbot):
     assert action.text() == "logfile", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+    assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
 def test_save_to_qgis_project(ae):
@@ -99,7 +99,7 @@ def test_save_to_qgis_project(ae):
     assert action.text() == "Save as QGIS Project", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+    assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
 def test_network_preparation_menu(ae, qtbot):
