@@ -15,9 +15,7 @@ jobs:
       image: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
+        
       - name: Install dependencies
         run: |
           python3 -c "from qaequilibrae.download_extra_packages_class import download_all; download_all().install(True)"
@@ -26,6 +24,6 @@ jobs:
 
       - name: Run tests
         run: |
-          export QT_QPA_PLATFORM=offscreen
+          export QT_QPA_PLATFOR M=offscreen
           pwd
           python3 -m pytest test -v --tb=short --cov=qaequilibrae
