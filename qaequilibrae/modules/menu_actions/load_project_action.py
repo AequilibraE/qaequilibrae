@@ -39,6 +39,9 @@ def _run_load_project_from_path(qgis_project, proj_path):
             else:
                 raise e
 
+    update_project_layers(qgis_project)
+
+def update_project_layers(qgis_project):
     curr = qgis_project.project.conn.cursor()
     curr.execute("select f_table_name from geometry_columns;")
     layers = [x[0] for x in curr.fetchall()]
