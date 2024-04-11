@@ -7,6 +7,7 @@ import tempfile
 import webbrowser
 from functools import partial
 from typing import Dict
+from uuid import uuid4
 
 import qgis
 
@@ -14,8 +15,8 @@ from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
-from qgis.core import QgsDataSourceUri, QgsVectorLayer
-from qgis.core import QgsProject, QgsExpressionContextUtils
+from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QTranslator
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
@@ -78,7 +79,6 @@ class AequilibraEMenu:
         self.layers = {}  # type: Dict[QgsVectorLayer]
         self.dock = QDockWidget(self.trlt("AequilibraE"))
         self.manager = QWidget()
-        self.plugin_id = "qaequilibrae"
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -189,6 +189,8 @@ class AequilibraEMenu:
         self.toolbar.addWidget(self.projectManager)
 
         QgsProject.instance().readProject.connect(self.reload_project)
+        temp_saving = self.iface.mainWindow().findChild(QAction, "mActionSaveProject")
+        temp_saving.triggered.connect(self.save_in_project)
         # # # ########################################################################
         self.tabContents = []
         self.toolbar.setIconSize(QtCore.QSize(16, 16))
@@ -340,13 +342,16 @@ class AequilibraEMenu:
         return QCoreApplication.translate("AequilibraEMenu", text)
 
     def reload_project(self):
+        """Opens AequilibraE project when opening a QGIS project containing an AequilibraE model."""
         from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-        pth = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('aequilibrae_path')
-        if not pth:
+        # Checks if project contains an AequilibraE model
+        path = QgsProject.instance().customVariables()
+        if "aequilibrae_path" not in path:
             return
 
-        _run_load_project_from_path(self, pth)
+        # Opens project
+        _run_load_project_from_path(self, path["aequilibrae_path"])
 
         # Checks if the layers in the project have the same database path as the aequilibrae project layers.
         # if so, we replace the path in self.layers
@@ -362,6 +367,9 @@ class AequilibraEMenu:
                 self.layers[geo_names[idx]] = [prj_layers[lidx], prj_layers[lidx].id()]
 
     def remove_aequilibrae_layers(self):
+        """Removes layers connected to current aequilibrae project from active layers if the
+        active project is closed.
+        """
         aequilibrae_databases = ["project_database", "public_transport", "results_database"]
 
         for layer in QgsProject.instance().mapLayers().values():
@@ -372,3 +380,30 @@ class AequilibraEMenu:
                 QgsProject.instance().removeMapLayer(layer)
 
         qgis.utils.iface.mapCanvas().refresh()
+
+    def save_in_project(self):
+        """Saves temporary layers to the project using QGIS saving buttons. Works"""
+        path = QgsProject.instance().customVariables()
+        if "aequilibrae_path" not in path:
+            return
+        output_file_path = os.path.join(path["aequilibrae_path"], "qgis_layers.sqlite")
+        file_exists = True if os.path.isfile(output_file_path) else False
+        for layer in QgsProject.instance().mapLayers().values():
+            if layer.isTemporary():
+                layer_name = layer.name() + f"_{uuid4().hex}"
+                options = QgsVectorFileWriter.SaveVectorOptions()
+                options.driverName = "SQLite"
+                options.layerName = layer_name
+                if file_exists:
+                    options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+
+                transform_context = QgsProject.instance().transformContext()
+
+                error = QgsVectorFileWriter.writeAsVectorFormatV3(layer, output_file_path, transform_context, options)
+
+                if error[0] == QgsVectorFileWriter.NoError:
+                    layer.setDataSource(output_file_path + f"|layername={layer_name}", layer.name(), "ogr")
+
+                file_exists = True
+
+        QgsProject.instance().write()
