@@ -188,9 +188,6 @@ class AequilibraEMenu:
         self.projectManager = QTabWidget()
         self.toolbar.addWidget(self.projectManager)
 
-        QgsProject.instance().readProject.connect(self.reload_project)
-        temp_saving = self.iface.mainWindow().findChild(QAction, "mActionSaveProject")
-        temp_saving.triggered.connect(self.save_in_project)
         # # # ########################################################################
         self.tabContents = []
         self.toolbar.setIconSize(QtCore.QSize(16, 16))
@@ -204,6 +201,13 @@ class AequilibraEMenu:
         self.dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
         QgsProject.instance().layerRemoved.connect(self.layerRemoved)
+
+        # # # ########################################################################
+        # ##################        SAVING PROJECT CONFIGS       #####################
+        QgsProject.instance().readProject.connect(self.reload_project)
+        temp_saving = self.iface.mainWindow().findChild(QAction, "mActionSaveProject")
+        if temp_saving:
+            temp_saving.triggered.connect(self.save_in_project)
 
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
         if main_menu == "AequilibraE":
