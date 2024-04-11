@@ -39,7 +39,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.continue_with_data()
             return
 
-        self.get_file_name()
+        self.data_path, self.data_type = self.get_file_name()
 
         if self.data_type is None:
             self.error = self.tr("Path provided is not a valid dataset")
@@ -186,7 +186,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.data_to_show.export(new_name)
 
     def exit_with_error(self):
-        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1, duration=10)
         self.close()
 
     def exit_procedure(self):
@@ -214,10 +214,12 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             formats.insert(0, "Open Matrix(*.omx)")
             dflt = ".omx"
 
-        self.data_path, self.data_type = GetOutputFileName(
+        data_path, data_type = GetOutputFileName(
             self,
             self.tr("AequilibraE custom formats"),
             formats,
             dflt,
             standard_path(),
         )
+
+        return data_path, data_type
