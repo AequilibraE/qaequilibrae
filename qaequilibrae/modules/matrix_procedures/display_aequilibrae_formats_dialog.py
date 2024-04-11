@@ -178,10 +178,15 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.add_matrix_parameters(idx, core)
             self.format_showing()
 
-    def export(self):
-        new_name, file_type = GetOutputFileName(
+    def csv_file_path(self):
+        new_name, _ = GetOutputFileName(
             self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.data_path
         )
+        return new_name
+
+    def export(self):
+        new_name = self.csv_file_path()
+
         if new_name is not None:
             self.data_to_show.export(new_name)
 
