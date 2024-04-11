@@ -13,7 +13,10 @@ def test_display_data_no_path(ae, mocker):
     dialog.close()
 
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[1][-1] == "Error::Path provided is not a valid dataset", "Level 1 error message is missing"
+    assert (
+        messagebar.messages[1][-1] == "Error::Path provided is not a valid dataset"
+    ), "Level 1 error message is missing"
+
 
 @pytest.mark.parametrize("has_project", [True, False])
 @pytest.mark.parametrize("file_name", ("demand.aem", "SiouxFalls.omx"))
@@ -24,7 +27,7 @@ def test_display_data_with_path(tmpdir, ae_with_project, mocker, has_project, fi
     mocker.patch(file_func, return_value=(file_path, extension.upper()))
 
     out_func = "qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog.DisplayAequilibraEFormatsDialog.csv_file_path"
-    mocker.patch(out_func, return_value=f"{tmpdir}/{name}.csv",)
+    mocker.patch(out_func, return_value=f"{tmpdir}/{name}.csv")
 
     dialog = DisplayAequilibraEFormatsDialog(ae_with_project, file_path, has_project)
     dialog.export()
