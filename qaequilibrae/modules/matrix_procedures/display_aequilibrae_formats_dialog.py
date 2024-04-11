@@ -39,20 +39,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.continue_with_data()
             return
 
-        formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)"]
-
-        dflt = ".aem"
-        if has_omx:
-            formats.insert(0, "Open Matrix(*.omx)")
-            dflt = ".omx"
-
-        self.data_path, self.data_type = GetOutputFileName(
-            self,
-            self.tr("AequilibraE custom formats"),
-            formats,
-            dflt,
-            standard_path(),
-        )
+        self.get_file_name()
 
         if self.data_type is None:
             self.error = self.tr("Path provided is not a valid dataset")
@@ -60,6 +47,10 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             self.data_type = self.data_type.upper()
             self.continue_with_data()
+        
+        if self.error:
+            self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
+            self.but_load.clicked.connect(self.get_file_name)
 
     def continue_with_data(self):
         self.setWindowTitle(self.tr("File path:").format(self.data_path))
@@ -214,3 +205,19 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.data_to_show.matrix_view = np.array(self.omx[field])
         self.data_to_show.index = np.array(list(self.omx.mapping(idx).keys()))
         self.data_to_show.matrix[field] = self.data_to_show.matrix_view[:, :]
+
+    def get_file_name(self):
+        formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)"]
+
+        dflt = ".aem"
+        if has_omx:
+            formats.insert(0, "Open Matrix(*.omx)")
+            dflt = ".omx"
+
+        self.data_path, self.data_type = GetOutputFileName(
+            self,
+            self.tr("AequilibraE custom formats"),
+            formats,
+            dflt,
+            standard_path(),
+        )
