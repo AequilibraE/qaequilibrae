@@ -66,12 +66,12 @@ class LeastCommonDenominatorDialog(QtWidgets.QDialog, FORM_CLASS):
     def progress_value_from_thread(self, value):
         self.progressbar.setValue(value)
 
-    def finished_threaded_procedure(self, procedure):
+    def finished_threaded_procedure(self):
         if self.worker_thread.error is None:
             QgsProject.instance().addMapLayer(self.worker_thread.result)
         else:
             qgis.utils.iface.messageBar().pushMessage(
-                self.tr("Input data not provided correctly"), self.worker_thread.error, level=3
+                self.tr("Input data not provided correctly"), self.worker_thread.error, level=3, duration=10
             )
         self.close()
 

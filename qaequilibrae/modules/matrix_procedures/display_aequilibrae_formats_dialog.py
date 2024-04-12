@@ -45,14 +45,13 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if has_omx:
             formats.insert(0, "Open Matrix(*.omx)")
             dflt = ".omx"
-
         self.data_path, self.data_type = GetOutputFileName(
             self,
             self.tr("AequilibraE custom formats"),
             formats,
             dflt,
             standard_path(),
-        )
+    )
 
         if self.data_type is None:
             self.error = self.tr("Path provided is not a valid dataset")
@@ -188,14 +187,14 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.format_showing()
 
     def export(self):
-        new_name, file_type = GetOutputFileName(
+        new_name, _ = GetOutputFileName(
             self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.data_path
         )
         if new_name is not None:
             self.data_to_show.export(new_name)
 
     def exit_with_error(self):
-        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1, duration=10)
         self.close()
 
     def exit_procedure(self):
