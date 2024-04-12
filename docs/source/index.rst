@@ -36,8 +36,8 @@ package.
       :classes: btn-block btn-secondary stretched-link
 
    ---
-   :fa:`book`
-   **Menus in detail**
+   :fa:`bars`
+   **Menus in Detail**
    ^^^^^^^^^^^^^^^^^^^
 
    An in-depth guide to modeling with AequilibraE, including the concepts that guide its
@@ -47,12 +47,12 @@ package.
 
    .. link-button:: menus_in_detail/readme
          :type: ref
-         :text: Modeling with AequilibraE
+         :text: Menus in Detail
          :classes: btn-block btn-secondary stretched-link
 
    ---
-   ::fa:`lightbulb`
-   **Developing**
+   :fa:`code`
+   **Development Pathways**
    ^^^^^^^^^^^^
 
    Looking for something more than using the software? Check out the development info.
@@ -61,7 +61,7 @@ package.
 
    .. link-button:: development/readme
          :type: ref
-         :text: Developing
+         :text: Development Pathways
          :classes: btn-block btn-secondary stretched-link
 
 Note to users
@@ -93,4 +93,3 @@ please e-mail the developers at contact@aequilibrae.com.
    getting_started/getting_started
    menus_in_detail/readme
    development/readme
-..   examples/tutorials_and_sample_data
