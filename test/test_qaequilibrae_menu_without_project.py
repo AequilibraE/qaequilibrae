@@ -78,6 +78,30 @@ def test_create_project_from_layers_menu(ae, qtbot):
     action.trigger()
 
 
+def test_parameters_menu(ae, qtbot):
+    action = ae.menuActions["Project"][2]
+    assert action.text() == "Parameters", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
+def test_logfile_menu(ae, qtbot):
+    action = ae.menuActions["Project"][3]
+    assert action.text() == "logfile", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
+def test_save_to_qgis_project(ae):
+    action = ae.menuActions["Project"][5]
+    assert action.text() == "Save as QGIS Project", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
 def test_network_preparation_menu(ae, qtbot):
     from qaequilibrae.modules.network import NetworkPreparationDialog
 

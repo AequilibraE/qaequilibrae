@@ -7,6 +7,7 @@ import tempfile
 import webbrowser
 from functools import partial
 from typing import Dict
+from uuid import uuid4
 
 import qgis
 
@@ -14,7 +15,7 @@ from qgis.PyQt import QtCore
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
-from qgis.core import QgsDataSourceUri, QgsVectorLayer
+from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QTranslator
 
@@ -34,7 +35,7 @@ from qaequilibrae.modules.menu_actions import (
     show_log,
     create_example,
 )
-from qaequilibrae.modules.menu_actions import run_pt_explore
+from qaequilibrae.modules.menu_actions import run_pt_explore, save_as_qgis_project
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from qaequilibrae.message import messages
 
@@ -115,6 +116,7 @@ class AequilibraEMenu:
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
+        self.add_menu_action(self.tr("Project"), self.tr("Save as QGIS Project"), partial(save_as_qgis_project, self))
 
         # # # ########################################################################
         # # # ################# MODEL BUILDING SUB-MENU  #######################
@@ -200,6 +202,13 @@ class AequilibraEMenu:
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
         QgsProject.instance().layerRemoved.connect(self.layerRemoved)
 
+        # # # ########################################################################
+        # ##################        SAVING PROJECT CONFIGS       #####################
+        QgsProject.instance().readProject.connect(self.reload_project)
+        temp_saving = self.iface.mainWindow().findChild(QAction, "mActionSaveProject")
+        if temp_saving:
+            temp_saving.triggered.connect(self.save_in_project)
+
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
         if main_menu == "AequilibraE":
             action = QToolButton()
@@ -270,6 +279,7 @@ class AequilibraEMenu:
     def run_close_project(self):
         if self.project is None:
             return
+        self.remove_aequilibrae_layers()
         self.project.close()
         self.projectManager.clear()
         self.project = None
@@ -334,3 +344,70 @@ class AequilibraEMenu:
 
     def tr(self, text):
         return QCoreApplication.translate("AequilibraEMenu", text)
+
+    def reload_project(self):
+        """Opens AequilibraE project when opening a QGIS project containing an AequilibraE model."""
+        from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+
+        # Checks if project contains an AequilibraE model
+        path = QgsProject.instance().customVariables()
+        if "aequilibrae_path" not in path:
+            return
+
+        # Opens project
+        _run_load_project_from_path(self, path["aequilibrae_path"])
+
+        # Checks if the layers in the project have the same database path as the aequilibrae project layers.
+        # if so, we replace the path in self.layers
+        prj_layer_sources = [lyr.source() for lyr in QgsProject.instance().mapLayers().values()]
+        prj_layers = [lyr for lyr in QgsProject.instance().mapLayers().values()]
+
+        geo_source = [v[0].source().replace("\\\\", "/") for v in self.layers.values()]
+        geo_names = [v[0].name() for v in self.layers.values()]
+
+        for idx, lyr in enumerate(geo_source):
+            if lyr in prj_layer_sources:
+                lidx = prj_layer_sources.index(lyr)
+                self.layers[geo_names[idx]] = [prj_layers[lidx], prj_layers[lidx].id()]
+
+    def remove_aequilibrae_layers(self):
+        """Removes layers connected to current aequilibrae project from active layers if the
+        active project is closed.
+        """
+        aequilibrae_databases = ["project_database", "public_transport", "results_database"]
+
+        for layer in QgsProject.instance().mapLayers().values():
+            dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
+            dbpath = dbpath.split("|")[0].split(".sqlite")[0]
+            var = os.path.split(dbpath)
+            if var[0] == self.project.project_base_path and var[1] in aequilibrae_databases:
+                QgsProject.instance().removeMapLayer(layer)
+
+        qgis.utils.iface.mapCanvas().refresh()
+
+    def save_in_project(self):
+        """Saves temporary layers to the project using QGIS saving buttons. Works"""
+        path = QgsProject.instance().customVariables()
+        if "aequilibrae_path" not in path:
+            return
+        output_file_path = os.path.join(path["aequilibrae_path"], "qgis_layers.sqlite")
+        file_exists = True if os.path.isfile(output_file_path) else False
+        for layer in QgsProject.instance().mapLayers().values():
+            if layer.isTemporary():
+                layer_name = layer.name() + f"_{uuid4().hex}"
+                options = QgsVectorFileWriter.SaveVectorOptions()
+                options.driverName = "SQLite"
+                options.layerName = layer_name
+                if file_exists:
+                    options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+
+                transform_context = QgsProject.instance().transformContext()
+
+                error = QgsVectorFileWriter.writeAsVectorFormatV3(layer, output_file_path, transform_context, options)
+
+                if error[0] == QgsVectorFileWriter.NoError:
+                    layer.setDataSource(output_file_path + f"|layername={layer_name}", layer.name(), "ogr")
+
+                file_exists = True
+
+        QgsProject.instance().write()

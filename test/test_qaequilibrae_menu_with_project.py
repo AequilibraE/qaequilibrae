@@ -66,6 +66,18 @@ def test_logfile_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
+def test_save_to_qgis_project(ae_with_project, tmpdir, mocker):
+    file_path = f"{tmpdir}/text.qgz"
+    function = "qaequilibrae.modules.project_procedures.save_as_qgis.SaveAsQGZ.choose_output"
+    mocker.patch(function, return_value=file_path)
+
+    action = ae_with_project.menuActions["Project"][5]
+    assert action.text() == "Save as QGIS Project", "Wrong text content"
+    action.trigger()
+    messagebar = ae_with_project.iface.messageBar()
+    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+
+
 def test_network_preparation_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.network import NetworkPreparationDialog
 

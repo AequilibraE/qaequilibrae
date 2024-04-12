@@ -27,7 +27,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.link_layer = self._PQgis.layers["links"][0]
         self.node_layer = self._PQgis.layers["nodes"][0]
-
+        
         QgsProject.instance().addMapLayer(self.link_layer)
         QgsProject.instance().addMapLayer(self.node_layer)
 
