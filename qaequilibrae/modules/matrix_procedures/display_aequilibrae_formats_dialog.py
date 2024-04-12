@@ -1,7 +1,6 @@
-import importlib.util as iutil
 import logging
 import os
-
+import openmatrix as omx
 import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix, AequilibraeData
 
@@ -13,12 +12,6 @@ from qaequilibrae.modules.common_tools import DatabaseModel, NumpyModel, GetOutp
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
-
-# Checks if we can display OMX
-spec = iutil.find_spec("openmatrix")
-has_omx = spec is not None
-if has_omx:
-    import openmatrix as omx
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -59,13 +52,16 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.data_type == "AED":
                 self.data_to_show = AequilibraeData()
             elif self.data_type == "AEM":
-                self.data_to_show = AequilibraeMatrix()
-                if not self.from_proj:
-                    self.qgis_project.matrices[self.data_path] = self.data_to_show
+                self.data_to_show = AequilibraeMatrix() 
+            if not self.from_proj:
+                self.qgis_project.matrices[self.data_path] = self.data_to_show
             try:
                 self.data_to_show.load(self.data_path)
-                self.list_cores = self.data_to_show.names
-                self.list_indices = self.data_to_show.index_names
+                if self.data_type == "AED":
+                    self.list_cores = self.data_to_show.fields
+                elif self.data_type == "AEM":
+                    self.list_cores = self.data_to_show.names
+                    self.list_indices = self.data_to_show.index_names
             except Exception as e:
                 self.error = self.tr("Could not load dataset")
                 self.logger.error(e.args)
@@ -212,12 +208,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.data_to_show.matrix[field] = self.data_to_show.matrix_view[:, :]
 
     def get_file_name(self):
-        formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)"]
-
+        formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)", "OpenMatrix(*.omx)"]
         dflt = ".aem"
-        if has_omx:
-            formats.insert(0, "Open Matrix(*.omx)")
-            dflt = ".omx"
 
         data_path, data_type = GetOutputFileName(
             self,

@@ -1,4 +1,3 @@
-import importlib.util as iutil
 import os
 from os.path import join
 import pandas as pd
@@ -15,10 +14,6 @@ from qaequilibrae.modules.matrix_procedures.results_lister import list_results
 from qaequilibrae.modules.common_tools import PandasModel
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_project_data.ui"))
-
-# Checks if we can display OMX
-spec = iutil.find_spec("openmatrix")
-has_omx = spec is not None
 
 
 class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
