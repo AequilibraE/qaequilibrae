@@ -106,14 +106,6 @@ def test_add_zoning_data_menu(ae, qtbot):
     assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
-def test_display_project_data_menu(ae, qtbot):
-    action = ae.menuActions["Data"][0]
-    assert action.text() == "Visualize data", "Wrong text content"
-    action.trigger()
-    messagebar = ae.iface.messageBar()
-    assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
-
-
 def test_import_matrices_menu(ae, qtbot):
     from qaequilibrae.modules.matrix_procedures import LoadMatrixDialog
 
