@@ -1,17 +1,18 @@
 GIS Tools
 =========
 
+QAequilibraE has some tools to allow the user to visualize the data.
+
+.. image:: ../images/menu_gis.png
+    :align: center
+    :alt: tab gis menu
+
 .. _siouxfalls-desire-lines:
 
 Desire Lines
 ------------
 
-AequilibraE is capable of doing two types of desire lines. 
-
-.. image:: ../images/desire_lines_menu.png
-    :width: 350
-    :align: center
-    :alt: desire_lines_menu
+QAequilibraE is capable of doing two types of desire lines. 
 
 It is possible to use a zone or a node layer, and one can also generate the desire 
 lines and Delaunay lines for the demand matrix provided.
@@ -48,11 +49,6 @@ Stacked Bandwidth
 The tool for plotting link flows you just saw above can be found under the GIS
 menu.
 
-.. image:: ../images/select_stacked_bandwidth.png
-    :width: 350
-    :align: center
-    :alt: select_stacked_bandwidth
-
 You can select a link layer, including Delaunay Lines or desire lines. It is also possible
 to choose between solid or gradient colors.
 
@@ -60,6 +56,8 @@ to choose between solid or gradient colors.
     :width: 760
     :align: center
     :alt: add_band
+
+|
 
 .. image:: ../images/create_bands.png
     :width: 737
@@ -98,13 +96,6 @@ from the forecast we just did) to the links layer, one can compare scenarios.
 When joining the assignment results, make sure to name them in a way you will
 understand.
 
-The scenario comparison tool is under the GIS menu
-
-.. image:: ../images/scenario_comparison_menu.png
-    :width: 350
-    :align: center
-    :alt: scenario_comparison_menu
-
 The scenario configuration requires the user to set AB/BA flows for the two
 sets of link flows being compared, as well as the space between AB/BA flows,
 and band width.
@@ -136,13 +127,12 @@ When using AequilibraE, one of its premisses is that the zones do not overlay ea
 other. Thus in case of overlaying geometries, we have to fix the geometries before
 using them in AequilibraE. 
 
-If we click **AequilibraE > GIS > Lowest common denominator** a new window opens and
+If we click **GIS > Lowest common denominator** a new window opens and
 we can set the layers we want to overlay the geometries to fix them.
-
 
 Simple TAG
 ----------
 
-**AequilibraE > GIS > Simple TAG** works as a spatial join tool in AequilibraE.
+**GIS > Simple TAG** works as a spatial join tool in AequilibraE.
 One of its usages, for example, is to determine in which *zone_id* the network
 node is in.

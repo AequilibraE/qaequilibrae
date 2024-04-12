@@ -50,188 +50,173 @@
 <context>
     <name>AequilibraEMenu</name>
     <message>
-        <location filename="../qaequilibrae.py" line="123"/>
+        <location filename="../qaequilibrae.py" line="117"/>
         <source>Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="131"/>
-        <source>Network Manipulation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="178"/>
+        <location filename="../qaequilibrae.py" line="136"/>
         <source>Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="142"/>
+        <location filename="../qaequilibrae.py" line="140"/>
         <source>Trip Distribution</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="155"/>
+        <location filename="../qaequilibrae.py" line="152"/>
         <source>Paths and assignment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="161"/>
+        <location filename="../qaequilibrae.py" line="158"/>
         <source>Routing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="166"/>
+        <location filename="../qaequilibrae.py" line="163"/>
         <source>Public Transport</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="182"/>
-        <source>Utils</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="115"/>
+        <location filename="../qaequilibrae.py" line="113"/>
         <source>Open Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="116"/>
+        <location filename="../qaequilibrae.py" line="121"/>
         <source>Create project from OSM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="117"/>
+        <location filename="../qaequilibrae.py" line="124"/>
         <source>Create Project from layers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="120"/>
+        <location filename="../qaequilibrae.py" line="131"/>
         <source>Add zoning data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="121"/>
+        <location filename="../qaequilibrae.py" line="115"/>
         <source>Parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="122"/>
+        <location filename="../qaequilibrae.py" line="116"/>
         <source>logfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="123"/>
+        <location filename="../qaequilibrae.py" line="117"/>
         <source>Close project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="128"/>
+        <location filename="../qaequilibrae.py" line="127"/>
         <source>Network Preparation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="131"/>
+        <location filename="../qaequilibrae.py" line="128"/>
         <source>Add centroid connectors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="137"/>
-        <source>Display project data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="149"/>
+        <location filename="../qaequilibrae.py" line="146"/>
         <source>Shortest path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="152"/>
+        <location filename="../qaequilibrae.py" line="149"/>
         <source>Impedance matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="155"/>
+        <location filename="../qaequilibrae.py" line="152"/>
         <source>Traffic Assignment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="161"/>
+        <location filename="../qaequilibrae.py" line="158"/>
         <source>Travelling Salesman Problem</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="165"/>
+        <location filename="../qaequilibrae.py" line="162"/>
         <source>Import GTFS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="170"/>
+        <location filename="../qaequilibrae.py" line="167"/>
         <source>Desire Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="171"/>
+        <location filename="../qaequilibrae.py" line="168"/>
         <source>Stacked Bandwidth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="172"/>
+        <location filename="../qaequilibrae.py" line="169"/>
         <source>Scenario Comparison</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="173"/>
+        <location filename="../qaequilibrae.py" line="170"/>
         <source>Lowest common denominator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="174"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Simple tag</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="178"/>
+        <location filename="../qaequilibrae.py" line="136"/>
         <source>Import matrices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="179"/>
-        <source>Display Matrices and datasets</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="187"/>
-        <source>About</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="188"/>
+        <location filename="../qaequilibrae.py" line="175"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="195"/>
+        <location filename="../qaequilibrae.py" line="182"/>
         <source>Show project info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="336"/>
+        <location filename="../qaequilibrae.py" line="323"/>
         <source>You need to load a project first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="339"/>
+        <location filename="../qaequilibrae.py" line="326"/>
         <source>You need to close the project currently open first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="182"/>
+        <location filename="../qaequilibrae.py" line="114"/>
         <source>Create example</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="166"/>
+        <location filename="../qaequilibrae.py" line="163"/>
         <source>Explore Transit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="131"/>
+        <source>Model Building</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="135"/>
+        <source>Visualize data</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1597,22 +1582,22 @@
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="89"/>
-        <source>Links read: {}</source>
+        <source>Links read: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="132"/>
-        <source>Computing node IDs: {}</source>
+        <source>Computing node IDs: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="156"/>
-        <source>Writing new node layer: {}</source>
+        <source>Writing new node layer: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="174"/>
-        <source>Writing node IDs to links: {}</source>
+        <source>Writing node IDs to links: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2219,7 +2204,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="59"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="65"/>
         <source>Load matrix</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2234,32 +2219,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="56"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="62"/>
         <source>Displays matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="72"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="78"/>
         <source>Permanently updates the project table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="75"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="81"/>
         <source>Update matrix table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="86"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="92"/>
         <source>Results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="99"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="98"/>
         <source>It may take up to one minute to process for the first time a table is loaded from this database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="102"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="101"/>
         <source>Load Result table as data layer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2271,6 +2256,16 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_data_viewer.ui" line="84"/>
         <source>Load data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="116"/>
+        <source>Non-project Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="128"/>
+        <source>Load Data</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2914,7 +2909,7 @@
 <context>
     <name>ui_transponet_construction</name>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="19"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
         <source>AequilibraE - Add zoning layer to project</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2934,7 +2929,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="74"/>
         <source>Layer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2999,7 +2994,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
         <source>Layer field</source>
         <translation type="unfinished"></translation>
     </message>

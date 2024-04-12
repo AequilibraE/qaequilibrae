@@ -2,9 +2,13 @@ Routing
 =======
 
 AequilibraE's routing allows the user to run a Travelling Salesman Problem (TSP),
-using a selected set of nodes or the centroids of a network. Its usage is 
-straightforward. Just click **AequilibraE > Routing > Travelling Salesman Problem**
-and the prompt box will open up. For Sioux Falls, for example, we would select the
+using a selected set of nodes or the centroids of a network. 
+
+.. image:: ../images/menu_routing.png
+    :align: center
+    :alt: tab routing
+
+Its usage is straightforward. For Sioux Falls, for example, we would select the
 centroids of the network, and minimize the distance travelled by car. It is also
 possible to choose the start node of our TSP (we'll let node_id 1 to be the starting
 node, but it could be any available node), and indicate we want to see the result in

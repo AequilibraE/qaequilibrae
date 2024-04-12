@@ -11,4 +11,4 @@ is our current roadmap.
 
     softwaredevelopment
     contributors
-  
+    transifex
