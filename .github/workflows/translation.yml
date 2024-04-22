@@ -103,5 +103,5 @@ jobs:
       run: >-
         qgis-plugin-ci release ${ env.PLUGIN_VERSION }
         --github-token ${{ secrets.GITHUB_TOKEN }}
-        --osgeo-username ${{ secrets.OSGEO_USERNAME }}
-        --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
+        --osgeo-username ${{ secrets.QGIS_PLUGIN_REPO_USER }}
+        --osgeo-password ${{ secrets.QGIS_PLUGIN_REPO_PASSWORD }}
