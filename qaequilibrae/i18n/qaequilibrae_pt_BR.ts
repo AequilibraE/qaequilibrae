@@ -1136,17 +1136,17 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1686"/>
         <source>No mapping</source>
-        <translation type="unfinished"/>
+        <translation>Não criar mapa</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1593"/>
         <source>Map!</source>
-        <translation type="unfinished"/>
+        <translation>Criar!</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1653"/>
         <source>Map</source>
-        <translation type="unfinished"/>
+        <translation>Criar mapa</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1746"/>
