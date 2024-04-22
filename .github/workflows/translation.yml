@@ -101,8 +101,7 @@ jobs:
     - name: Deploy plugin
       if: ${{ (github.event_name == 'release')}}
       run: >-
-        qgis-plugin-ci release
+        qgis-plugin-ci release ${ env.PLUGIN_VERSION }
         --github-token ${{ secrets.GITHUB_TOKEN }}
         --osgeo-username ${{ secrets.OSGEO_USERNAME }}
         --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
-        release_version ${ env.PLUGIN_VERSION }
