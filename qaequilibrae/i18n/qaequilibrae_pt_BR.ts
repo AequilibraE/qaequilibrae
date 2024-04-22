@@ -1101,7 +1101,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="525"/>
         <source>From</source>
-        <translation>Origem</translation>
+        <translation>Início</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="628"/>
@@ -1116,7 +1116,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="721"/>
         <source>To</source>
-        <translation>Destino</translation>
+        <translation>Fim</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="778"/>
