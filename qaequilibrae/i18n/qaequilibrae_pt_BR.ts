@@ -48,22 +48,17 @@
 <context>
     <name>AequilibraEMenu</name>
     <message>
-        <location filename="../qaequilibrae.py" line="122"/>
+        <location filename="../qaequilibrae.py" line="119"/>
         <source>Project</source>
         <translation>Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="130"/>
-        <source>Network Manipulation</source>
-        <translation>Manipulação de Rede</translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="176"/>
+        <location filename="../qaequilibrae.py" line="138"/>
         <source>Data</source>
         <translation>Dados</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="141"/>
+        <location filename="../qaequilibrae.py" line="142"/>
         <source>Trip Distribution</source>
         <translation>Distribuição de Viagens</translation>
     </message>
@@ -78,14 +73,9 @@
         <translation>Roteirização</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="164"/>
+        <location filename="../qaequilibrae.py" line="165"/>
         <source>Public Transport</source>
         <translation>Transporte público</translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="180"/>
-        <source>Utils</source>
-        <translation>Ferramentas</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="114"/>
@@ -93,37 +83,37 @@
         <translation>Abrir Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="115"/>
+        <location filename="../qaequilibrae.py" line="123"/>
         <source>Create project from OSM</source>
         <translation>Criar Projeto a partir do OSM</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="116"/>
+        <location filename="../qaequilibrae.py" line="126"/>
         <source>Create Project from layers</source>
         <translation>Criar Projeto a partir de Camada</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="119"/>
+        <location filename="../qaequilibrae.py" line="133"/>
         <source>Add zoning data</source>
         <translation>Adicionar Zonas</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="120"/>
+        <location filename="../qaequilibrae.py" line="116"/>
         <source>Parameters</source>
         <translation>Parâmetros</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="121"/>
+        <location filename="../qaequilibrae.py" line="117"/>
         <source>logfile</source>
         <translation>Registro de Operações</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="122"/>
+        <location filename="../qaequilibrae.py" line="118"/>
         <source>Close project</source>
         <translation>Fechar Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="127"/>
+        <location filename="../qaequilibrae.py" line="129"/>
         <source>Network Preparation</source>
         <translation>Preparar Rede</translation>
     </message>
@@ -131,11 +121,6 @@
         <location filename="../qaequilibrae.py" line="130"/>
         <source>Add centroid connectors</source>
         <translation>Adicionar Conector no Centroide</translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="136"/>
-        <source>Display project data</source>
-        <translation>Mostrar dados do projeto</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="148"/>
@@ -163,69 +148,79 @@
         <translation>Importar GTFS</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="168"/>
+        <location filename="../qaequilibrae.py" line="169"/>
         <source>Desire Lines</source>
         <translation>Linhas de Desejo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="169"/>
+        <location filename="../qaequilibrae.py" line="170"/>
         <source>Stacked Bandwidth</source>
         <translation>Mapa de volumes</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="170"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Scenario Comparison</source>
         <translation>Comparação de Cenários</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="171"/>
+        <location filename="../qaequilibrae.py" line="172"/>
         <source>Lowest common denominator</source>
         <translation>Mínimo Denominador Comum</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="172"/>
+        <location filename="../qaequilibrae.py" line="173"/>
         <source>Simple tag</source>
         <translation>Etiqueta</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="176"/>
+        <location filename="../qaequilibrae.py" line="138"/>
         <source>Import matrices</source>
         <translation>Importar matrizes</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="177"/>
-        <source>Display Matrices and datasets</source>
-        <translation>Mostrar matrizes e bancos de dados</translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="185"/>
-        <source>About</source>
-        <translation>Sobre</translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="186"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="193"/>
+        <location filename="../qaequilibrae.py" line="184"/>
         <source>Show project info</source>
         <translation>Mostrar informações do projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="329"/>
+        <location filename="../qaequilibrae.py" line="333"/>
         <source>You need to load a project first</source>
         <translation>Você precisa carregar um projeto primeiro</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="332"/>
+        <location filename="../qaequilibrae.py" line="336"/>
         <source>You need to close the project currently open first</source>
         <translation>Você precisa fechar o projeto aberto primeiro</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="180"/>
+        <location filename="../qaequilibrae.py" line="115"/>
         <source>Create example</source>
         <translation>Criar exemplo</translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="165"/>
+        <source>Explore Transit</source>
+        <translation>Explorar Transporte Público</translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="133"/>
+        <source>Model Building</source>
+        <translation>Construção de Modelos</translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="137"/>
+        <source>Visualize data</source>
+        <translation>Visualizar Dados</translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="119"/>
+        <source>Save as QGIS Project</source>
+        <translation>Salvar como projeto do QGIS</translation>
     </message>
 </context>
 <context>
@@ -773,42 +768,42 @@
 <context>
     <name>DisplayAequilibraEFormatsDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="49"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="214"/>
         <source>AequilibraE custom formats</source>
         <translation>Formatos personalizados do AequilibraE</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="58"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="38"/>
         <source>Path provided is not a valid dataset</source>
         <translation>O caminho indicado não é um banco de dados válido</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="65"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="49"/>
         <source>File path:</source>
         <translation>Caminho para arquivo:</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="79"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="66"/>
         <source>Could not load dataset</source>
         <translation>Não foi possível carregar o banco de dados</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="108"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="95"/>
         <source>Thousands separator</source>
         <translation>Separador de milhares</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="117"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="104"/>
         <source>Decimal places</source>
         <translation>Casas decimais</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="155"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="142"/>
         <source>Close</source>
         <translation>Fechar</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="150"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="137"/>
         <source>Export</source>
         <translation>Exportar</translation>
     </message>
@@ -1058,6 +1053,121 @@
         <source>Run</source>
         <translation>Executar</translation>
     </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="25"/>
+        <source>Transit Navigator</source>
+        <translation>Navegador de Transporte Público</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="295"/>
+        <source>MINOR RESET</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="319"/>
+        <source>Global filtering</source>
+        <translation>Filtros globais</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="348"/>
+        <source>Sample</source>
+        <translation>Amostra</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="375"/>
+        <source>North/East Patterns</source>
+        <translation>Padrões Norte/Leste</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="408"/>
+        <source>Route type from the GTFS. Standard values are 0 to 12</source>
+        <translation>Tipos de rota do GTFS. Valores padrão entre 0 e 12</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="432"/>
+        <source>All directions</source>
+        <translation>Todas as direções</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="462"/>
+        <source>%</source>
+        <translation>%</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="498"/>
+        <source>RESET</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="525"/>
+        <source>From</source>
+        <translation>Origem</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="628"/>
+        <source>GTFS type</source>
+        <translation>Tipo GTFS</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="691"/>
+        <source>Agency</source>
+        <translation>Agência</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="721"/>
+        <source>To</source>
+        <translation>Destino</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="778"/>
+        <source>Time Window</source>
+        <translation>Janela de tempo</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="918"/>
+        <source>South/West patterns</source>
+        <translation>Padrões Sul/Oeste</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="948"/>
+        <source>Supply Mapping Stops</source>
+        <translation>Mapa de Paradas</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1686"/>
+        <source>No mapping</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1593"/>
+        <source>Map!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1653"/>
+        <source>Map</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1746"/>
+        <source>Show labels</source>
+        <translation>Mostrar rótulos</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1617"/>
+        <source>Scale</source>
+        <translation>Escala</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1232"/>
+        <source>Supply Mapping routes and patterns</source>
+        <translation>Mapa de Rotas e Padrões</translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1525"/>
+        <source>Zonal mapping</source>
+        <translation>Mapa de zonas</translation>
+    </message>
 </context>
 <context>
     <name>GTFSFeed</name>
@@ -1075,22 +1185,22 @@
 <context>
     <name>GTFSImporter</name>
     <message>
-        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="28"/>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="33"/>
         <source>Overwrite Routes</source>
         <translation>Sobrescrever rotas</translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="29"/>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="34"/>
         <source>Add to Existing Routes</source>
         <translation>Adicionar as rotas existentes</translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="31"/>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="36"/>
         <source>Add transit table</source>
         <translation>Adicionar tabela de transporte público</translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="32"/>
+        <location filename="../modules/public_transport_procedures/gtfs_importer.py" line="37"/>
         <source>Create new route system</source>
         <translation>Criar novo sistema de rotas</translation>
     </message>
@@ -1358,9 +1468,6 @@
     </message>
 </context>
 <context>
-    <name>MatrixManipulationDialog</name>
-</context>
-<context>
     <name>MatrixReblocking</name>
     <message>
         <location filename="../modules/matrix_procedures/mat_reblock.py" line="32"/>
@@ -1478,23 +1585,23 @@
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="89"/>
-        <source>Links read: {}</source>
-        <translation>Links lidos: {}</translation>
+        <source>Links read: {}/{}</source>
+        <translation>Links lidos: {}/{}</translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="132"/>
-        <source>Computing node IDs: {}</source>
-        <translation>Calculando a ID dos nós: {}</translation>
+        <source>Computing node IDs: {}/{}</source>
+        <translation>Calculando ID dos nós:{}/{}</translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="156"/>
-        <source>Writing new node layer: {}</source>
-        <translation>Escrevendo nova camada de nós: {}</translation>
+        <source>Writing new node layer: {}/{}</source>
+        <translation>Escrevendo nova camada de nós: {}/{}</translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="174"/>
-        <source>Writing node IDs to links: {}</source>
-        <translation>Escrevendo nos links as IDs dos nós: {}</translation>
+        <source>Writing node IDs to links: {}/{}</source>
+        <translation>Escrevendo ID dos nós nos links: {}/{}</translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="187"/>
@@ -1793,47 +1900,47 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="238"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="234"/>
         <source>Class name already used</source>
         <translation>O nome da classe já foi utilizado</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="293"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="289"/>
         <source>Remove</source>
         <translation>Remover</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="351"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="347"/>
         <source>Input error</source>
         <translation>Erro de entrada</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="381"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="377"/>
         <source>No traffic classes to assign</source>
         <translation>Não há classes de tráfego para alocar</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="386"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="382"/>
         <source>Missing scenario name</source>
         <translation>Está faltando o nome do cenário</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="391"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="387"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation>O nome para a tabela de resultados já existe. Escolha um novo nome.</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="444"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="440"/>
         <source>Set skims {} for {}</source>
         <translation>Escolha matriz de custos {} para {}</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="459"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="455"/>
         <source>VDF parameter is not numeric</source>
         <translation>Parâmetro VDF não é numérico</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="460"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="456"/>
         <source>Tried to set a VDF parameter not numeric. {}</source>
         <translation>Tentativa de configurar um parâmetro VDF não numérico. {}</translation>
     </message>
@@ -2103,7 +2210,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>AequilibraE</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="59"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="65"/>
         <source>Load matrix</source>
         <translation>Carregar matriz</translation>
     </message>
@@ -2118,32 +2225,32 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Matrizes</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="56"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="62"/>
         <source>Displays matrix</source>
         <translation>Mostrar matrizes</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="72"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="78"/>
         <source>Permanently updates the project table</source>
         <translation>Atualizar de maneira definitiva a tabela do projeto</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="75"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="81"/>
         <source>Update matrix table</source>
         <translation>Atualizar tabela</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="86"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="92"/>
         <source>Results</source>
         <translation>Resultados</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="99"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="98"/>
         <source>It may take up to one minute to process for the first time a table is loaded from this database</source>
         <translation>Pode levar até um minuto processar uma tabela que está sendo carregada a partir do banco de dados pela primeira vez</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="102"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="101"/>
         <source>Load Result table as data layer</source>
         <translation>Carregar a tabela de resultados como uma camada de dados</translation>
     </message>
@@ -2155,6 +2262,16 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_data_viewer.ui" line="84"/>
         <source>Load data</source>
+        <translation>Carregar dados</translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="116"/>
+        <source>Non-project Data</source>
+        <translation>Dados externos</translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="128"/>
+        <source>Load Data</source>
         <translation>Carregar dados</translation>
     </message>
 </context>
@@ -2213,9 +2330,6 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <source>OK</source>
         <translation>OK</translation>
     </message>
-</context>
-<context>
-    <name>link_query_builder</name>
 </context>
 <context>
     <name>load_network_info</name>
@@ -2801,7 +2915,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
 <context>
     <name>ui_transponet_construction</name>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="19"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
         <source>AequilibraE - Add zoning layer to project</source>
         <translation>AequilibraE - Adicionando zonas ao projeto</translation>
     </message>
@@ -2821,7 +2935,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Centroide</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="74"/>
         <source>Layer</source>
         <translation>Camada</translation>
     </message>
@@ -2886,7 +3000,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
         <source>Layer field</source>
         <translation>Campo da camada</translation>
     </message>
