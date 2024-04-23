@@ -1,4 +1,4 @@
-name: UploadTranslations
+name: translate & package
 
 env:
   PLUGIN_VERSION: $(python qaequilibrae/get_version.py)
