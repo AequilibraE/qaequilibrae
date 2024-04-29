@@ -116,7 +116,6 @@ class AequilibraEMenu:
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
-
         # # # ########################################################################
         # # # ################# MODEL BUILDING SUB-MENU  #######################
         self.add_menu_action(
@@ -387,12 +386,15 @@ class AequilibraEMenu:
 
     def save_in_project(self):
         """Saves temporary layers to the project using QGIS saving buttons."""
+        if not self.project:
+            return
+
         path = QgsProject.instance().customVariables()
 
         if "aequilibrae_path" not in path:
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 
-                                                         "aequilibrae_path", 
-                                                         self.project.project_base_path)
+            QgsExpressionContextUtils.setProjectVariable(
+                QgsProject.instance(), "aequilibrae_path", self.project.project_base_path
+            )
 
         output_file_path = os.path.join(self.project.project_base_path, "qgis_layers.sqlite")
 
