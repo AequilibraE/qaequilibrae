@@ -16,7 +16,7 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsExpressionContextUtils
 from qgis.PyQt.QtCore import QTranslator
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
@@ -35,7 +35,7 @@ from qaequilibrae.modules.menu_actions import (
     show_log,
     create_example,
 )
-from qaequilibrae.modules.menu_actions import run_pt_explore, save_as_qgis_project
+from qaequilibrae.modules.menu_actions import run_pt_explore
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from qaequilibrae.message import messages
 
@@ -116,7 +116,6 @@ class AequilibraEMenu:
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
-        self.add_menu_action(self.tr("Project"), self.tr("Save as QGIS Project"), partial(save_as_qgis_project, self))
 
         # # # ########################################################################
         # # # ################# MODEL BUILDING SUB-MENU  #######################
@@ -205,6 +204,7 @@ class AequilibraEMenu:
         # # # ########################################################################
         # ##################        SAVING PROJECT CONFIGS       #####################
         QgsProject.instance().readProject.connect(self.reload_project)
+
         temp_saving = self.iface.mainWindow().findChild(QAction, "mActionSaveProject")
         if temp_saving:
             temp_saving.triggered.connect(self.save_in_project)
@@ -386,12 +386,18 @@ class AequilibraEMenu:
         qgis.utils.iface.mapCanvas().refresh()
 
     def save_in_project(self):
-        """Saves temporary layers to the project using QGIS saving buttons. Works"""
+        """Saves temporary layers to the project using QGIS saving buttons."""
         path = QgsProject.instance().customVariables()
+
         if "aequilibrae_path" not in path:
-            return
-        output_file_path = os.path.join(path["aequilibrae_path"], "qgis_layers.sqlite")
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), 
+                                                         "aequilibrae_path", 
+                                                         self.project.project_base_path)
+
+        output_file_path = os.path.join(self.project.project_base_path, "qgis_layers.sqlite")
+
         file_exists = True if os.path.isfile(output_file_path) else False
+
         for layer in QgsProject.instance().mapLayers().values():
             if layer.isTemporary():
                 layer_name = layer.name() + f"_{uuid4().hex}"
