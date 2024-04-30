@@ -57,6 +57,25 @@ plugin will be non-functional.
     :align: center
     :alt: Fifth step
 
+Saving as QGIS Project
+----------------------
+
+Since version 1.0.1, our users can save their on-going projects directly through the QGIS saving menu! 
+This feature allows you to save both your AequilibraE project and temporary layers. The temporary layers
+are stored in **qgis_layer.sqlite**, a database automatically created to store these layers. All you have 
+to do is go to the Project panel and select **Save** or **Save as**, indicate where you want to store 
+your project file, and press save!
+
+.. image:: ../images/getting_started_6.png
+    :align: center
+    :alt: Saving file
+
+In the interest of data integrity, if you have open AequilibraE layers into your QGIS Project and close 
+the AequilibraE project, these layers are removed from your open QGIS project.
+
+When reopening the QGIS project containing an AequilibraE model, you will notice that the project 
+stored is automatically reopened by QAequilibraE.
+
 .. _quicktour_video:
 
 Quick Tour
