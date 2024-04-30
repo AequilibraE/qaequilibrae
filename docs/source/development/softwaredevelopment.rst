@@ -31,7 +31,7 @@ AequilibraE is currently tested for Python 3.7, 3.8, 3.9 & 3.11, but we recommen
 
 We also assume you are using `PyCharm <https://www.jetbrains.com/pycharm>`_, which is an awesome IDE for Python.
 
-If you are using a different IDE, we would welcome if you could contribute with insctruction to set that up.
+If you are using a different IDE, we would welcome if you could contribute with instructions to set that up.
 
 Cloning the computational engine as submodule
 ---------------------------------------------
@@ -104,29 +104,27 @@ Translatable Strings
 ~~~~~~~~~~~~~~~~~~~~
 
 In case you are adding and/or changing any piece of QAequilibraE's code with translatable strings,
-which are those strings we see in the widget windows, please make sure to indicate they are translatable by
-importing the `tr` function. This shall guarantee you that the string will be compiled into our
-future translations.
+which are those strings we see in the widget windows, please make sure to locate the strings by
+using the `tr` function. This shall guarantee you that the string will be compiled into our
+future translations. So far, only classes with `self` allow the location of strings.
 
 ::
 
-    from qaequilibrae.i18n.translator import tr
-
     # Indicates that the message "You need at least three centroids to route. " will be
     # set for translation.
-    qgis.utils.iface.messageBar().pushMessage(tr("You need at least three centroids to route. "), "", level=3)
+    qgis.utils.iface.messageBar().pushMessage(self.tr("You need at least three centroids to route. "), "", level=3)
 
     # In case you have to insert any text into a string, the best way is to use string format
-    self.error = tr("ID {} is non unique in your selected field").format(str(i_d))
+    self.error = self.tr("ID {} is non unique in your selected field").format(str(i_d))
 
 As for June 2023, QAequilibraE's translations are all hosted in 
 `Transifex <https://explore.transifex.com/aequilibrae/qaequilibrae/>`_. Currently, we are targeting translations
 in Brazilian Portuguese, Chinese, French, German, Italian, and Spanish. If you want to contribute to QAequilibraE 
-by translating the plugin to other languages, please let us know in our 
+by translating the plugin to other languages or reviewing the existing translations, please let us know in our 
 `AequilibraE Google Group <https://groups.google.com/forum/#!forum/aequilibrae>`_,
 so we can add your language to our translation pool!
 
-In the :ref:`plugin-translation`page, you can find more information on creating you account and
+In the :ref:`plugin translation <plugin_translation>` page, you can find more information on creating your account and
 start translating QAequilibraE.
 
 Contributing to AequilibraE for QGIS
@@ -150,7 +148,7 @@ GitHub has a nice visual explanation on how collaboration is done `GitHub Flow
 Release versions
 ~~~~~~~~~~~~~~~~~
 
-AequilibraE uses the the de-facto Python standard for `versioning
+AequilibraE uses the de-facto Python standard for `versioning
 <http://the-hitchhikers-guide-to-packaging.readthedocs.io/en/latest/specification.html>`_
 
 ::

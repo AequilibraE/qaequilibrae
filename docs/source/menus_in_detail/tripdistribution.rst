@@ -5,12 +5,81 @@ On the trip distribution tab, the user can perform Iterative Proportional Fittin
 with their available matrices and vectors, as well as calibrate and apply a Synthetic Gravity
 Model.
 
-In this page each option under the **Aequilibrae > Trip Distribution > Trip Distribution** is
+In this page each option under the **Trip Distribution > Trip Distribution** is
 presented in one of the subsections below.
+
+.. subfigure:: AB
+    :align: center
+
+    .. image:: ../images/menu_trip_distribution.png
+        :alt: tab trip distribution
+
+    .. image:: ../images/tripdistribution-menu.png
+        :alt: trip distribution menu
 
 Iterative Proportional Fitting (IPF)
 ------------------------------------
-.. pass
+It is possible to balance the production/attraction vectors using IPF. There are two different
+ways to load a vector's data: loading an \*.AED file or importing from an open layer. 
+
+We click on the Iterative Proportional Fitting option to open the menu.
+
+Loading the vector from an \*.AED file is straightforward. Just select the *AequilibraE Data* option
+in the menu, and click *Load*, pointing to the location of the vector in your machine.
+
+.. image:: ../images/tripdistribution-ipf-1.png
+    :width: 513
+    :align: center
+    :alt: ipf_1
+
+Otherwise, case you are loading from an open layer, just click *Import from layer*,
+point the available data layer, and the name of its index column. You can choose between *Use data*
+or *Save and use*. Case you choose to save, the vector will be saved in a temporary QGIS folder.
+
+.. image:: ../images/tripdistribution-ipf-2.png
+    :width: 513
+    :align: center
+    :alt: ipf_2
+
+After the vector is properly loaded, it will appear in the *Load datasets* tab.
+
+.. image:: ../images/tripdistribution-ipf-3.png
+    :width: 513
+    :align: center
+    :alt: ipf_3
+
+You can now select the production/attraction (origin/destination) vectors.
+
+.. image:: ../images/tripdistribution-ipf-4.png
+    :width: 513
+    :align: center
+    :alt: ipf_4
+
+And the impedance matrix to be used.
+
+.. image:: ../images/tripdistribution-ipf-5.png
+    :width: 513
+    :align: center
+    :alt: ipf_5
+
+To run the procedure, simply queue the job (and select the where the output file will be saved) 
+and press *Run jobs*.
+
+.. image:: ../images/tripdistribution-ipf-6.png
+    :width: 513
+    :align: center
+    :alt: ipf_6
+
+After the job is completed, a new window showing its procedure report will open.
+
+.. image:: ../images/tripdistribution-ipf-7.png
+    :width: 513
+    :align: center
+    :alt: ipf_7
+
+.. note::
+
+    Production and Attraction vectors **must** be balanced before running IPF. 
 
 Synthetic Gravity Models
 ------------------------
@@ -23,18 +92,7 @@ Now that we have the demand model and a fully converged skim, we can calibrate a
 synthetic gravity model.
 
 We click on Trip distribution in the AequilibraE menu and select the Calibrate
-Gravity model option
-
-
-.. image:: ../images/trip_distribution_menu.png
-    :width: 478
-    :align: center
-    :alt: trip_distribution_menu
-
-.. image:: ../images/select_calibrate_gravity.png
-    :width: 241
-    :align: center
-    :alt: select_calibrate_gravity
+Gravity model option.
 
 The first thing to do is to load all matrices we will need (skim and demand).
 
@@ -79,7 +137,7 @@ Inspect the procedure output
     :align: center
     :alt: calibrate_matrix_inspect_report
 
-The resulting file is of type *.mod, but that is just a YAML (text file).
+The resulting file is of type \*.mod, but that is just a YAML (text file).
 
 .. image:: ../images/calibrate_matrix_model_result.png
     :width: 704

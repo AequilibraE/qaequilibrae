@@ -2,6 +2,8 @@ import importlib.util as iutil
 import os
 
 from aequilibrae.paths import Graph, SkimResults, NetworkSkimming
+from aequilibrae.project.database_connection import database_connection
+from aequilibrae.utils.db_utils import read_and_close
 
 import qgis
 from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types
@@ -10,7 +12,6 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import standard_path
-from qaequilibrae.i18n.translator import tr
 
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_impedance_matrix.ui"))
@@ -59,11 +60,11 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.block_paths.setChecked(True)
         self.graph = None  # type: Graph
 
-        curr = self.project.network.conn.cursor()
-        curr.execute("""select mode_name, mode_id from modes""")
-        for x in curr.fetchall():
-            self.cb_modes.addItem(f"{x[0]} ({x[1]})")
-            self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
+        with read_and_close(database_connection("network")) as conn:
+            res = conn.execute("""select mode_name, mode_id from modes""")
+            for x in res.fetchall():
+                self.cb_modes.addItem(f"{x[0]} ({x[1]})")
+                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         self.skimmeable_fields = self.project.network.skimmable_fields()
         self.available_skims_table.setRowCount(len(self.skimmeable_fields))
@@ -187,13 +188,15 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
     def check_inputs(self):
         self.error = None
         if self.rdo_all_nodes.isChecked() and self.block_paths.isChecked():
-            self.error = tr("It is not possible to trace paths between all nodes while blocking flows through centroids")
+            self.error = self.tr(
+                "It is not possible to trace paths between all nodes while blocking flows through centroids"
+            )
 
         if self.graph is None:
-            self.error = tr("No graph loaded")
+            self.error = self.tr("No graph loaded")
 
         if len(self.skim_fields) < 1:
-            self.error = tr("No skim fields provided")
+            self.error = self.tr("No skim fields provided")
 
     def exit_procedure(self):
         self.close()

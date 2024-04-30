@@ -1,14 +1,11 @@
 import logging
 import os
-from os.path import join, isfile
-
 import yaml
 
 from aequilibrae.parameters import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML
 from qgis.PyQt.QtGui import QFont
-from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_parameters.ui"))
 
@@ -67,7 +64,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.error:
             self.but_save.setEnabled(False)
             self.iface.messageBar().pushMessage(
-                "Error", tr("Parameter structure was compromised. Please reset to defaults"), level=3, duration=10
+                "Error", self.tr("Parameter structure was compromised. Please reset to defaults"), level=3, duration=10
             )
             # qgis.utils.iface.messageBar().pushMessage("Error", "Parameter structure was compromised. Please reset "
             #                                                    "to defaults", level=3, duration=10)
@@ -102,7 +99,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
             stream = open(self.path, "w")
             yaml.dump(self.current_data, stream, default_flow_style=False)
             stream.close()
-            self.but_close.setText(tr("Close"))
+            self.but_close.setText(self.tr("Close"))
 
     def load_default_data(self):
         pretty_data = yaml.dump(self.default_values, default_flow_style=False)

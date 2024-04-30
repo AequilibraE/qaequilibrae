@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>511</width>
-    <height>330</height>
+    <height>334</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -103,62 +103,8 @@
        <string>Load matrices</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="0" column="2" rowspan="6">
-        <widget class="QTableWidget" name="table_matrices">
-         <column>
-          <property name="text">
-           <string>Matrix name</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string># of cores</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Matrices</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="1">
-        <spacer name="verticalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="3" column="1">
-        <widget class="QPushButton" name="but_load_mat">
-         <property name="text">
-          <string>Load</string>
-         </property>
-        </widget>
+       <item row="0" column="1">
+        <widget class="QTableView" name="list_matrices"/>
        </item>
       </layout>
      </widget>
@@ -466,10 +412,13 @@
        <string>jobs</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="2" column="0">
-        <widget class="QProgressBar" name="progressbar">
-         <property name="value">
-          <number>0</number>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="chb_empty_as_zero">
+         <property name="text">
+          <string>Treat empties as zeros</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -492,20 +441,7 @@
          </column>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="chb_empty_as_zero">
-         <property name="text">
-          <string>Treat empties as zeros</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
       </layout>
-      <zorder>progressbar</zorder>
-      <zorder>table_jobs</zorder>
-      <zorder>chb_empty_as_zero</zorder>
      </widget>
     </widget>
    </item>

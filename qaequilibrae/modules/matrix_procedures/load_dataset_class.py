@@ -1,10 +1,10 @@
 from qgis.PyQt.QtCore import QVariant
 import numpy as np
+from uuid import uuid4
 from aequilibrae.utils.worker_thread import WorkerThread
 import struct
 from aequilibrae.matrix import AequilibraeData
 from qaequilibrae.modules.common_tools.global_parameters import float_types, string_types, integer_types
-from qaequilibrae.i18n.translator import tr
 from qgis.PyQt.QtCore import pyqtSignal
 
 
@@ -50,7 +50,7 @@ class LoadDataset(WorkerThread):
                     types.append("S" + str(field.length()))
                     empties.append("")
                 else:
-                    self.error = tr("Field {} does has a type not supported.").format(str(field.name()))
+                    self.error = self.tr("Field {} does has a type not supported.").format(str(field.name()))
                     break
                 fields.append(str(field.name()))
                 idxs.append(self.layer.dataProvider().fieldNameIndex(field.name()))
@@ -58,6 +58,11 @@ class LoadDataset(WorkerThread):
         index_idx = self.layer.dataProvider().fieldNameIndex(self.index_field)
         datafile_spec["field_names"] = fields
         datafile_spec["data_types"] = types
+
+        if self.output_name is None:
+            self.output_name = self.output.random_name()
+        else:
+            self.output_name += f"_{uuid4().hex[:10]}"
         datafile_spec["file_path"] = self.output_name
 
         if self.error is None:
@@ -74,4 +79,4 @@ class LoadDataset(WorkerThread):
                 self.ProgressValue.emit(p)
 
             self.ProgressValue.emit(feat_count)
-        self.finished_threaded_procedure.emit(tr("Done"))
+        self.finished_threaded_procedure.emit(self.tr("Done"))

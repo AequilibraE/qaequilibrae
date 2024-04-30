@@ -2,9 +2,14 @@ import os
 
 import qgis
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
-from qaequilibrae.modules.common_tools.global_parameters import multi_line, multi_poly, line_types, point_types, poly_types
+from qaequilibrae.modules.common_tools.global_parameters import (
+    multi_line,
+    multi_poly,
+    line_types,
+    point_types,
+    poly_types,
+)
 from qaequilibrae.modules.common_tools.global_parameters import multi_point
-from qaequilibrae.i18n.translator import tr
 from qgis.PyQt import QtWidgets, uic
 from .simple_tag_procedure import SimpleTAG
 
@@ -38,15 +43,17 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.tolayer.addItem(layer.name())
 
         self.enclosed.setToolTip(
-            tr("If source layer is a polygon, source needs to enclose target.  If only target is "
-            "a polygon, target needs to enclose source. First found record is used")
+            self.tr(
+                """If source layer is a polygon, source needs to enclose target.  If only target is \n
+                    a polygon, target needs to enclose source. First found record is used"""
+            )
         )
 
         self.touching.setToolTip(
-            tr("Criteria to choose when there are multiple matches is largest area or length matched")
+            self.tr("Criteria to choose when there are multiple matches is largest area or length matched")
         )
         self.closest.setToolTip(
-            tr("Heuristic procedure that only computes the actual distance to the nearest neighbors")
+            self.tr("Heuristic procedure that only computes the actual distance to the nearest neighbors")
         )
         self.works_field_matching()
 
@@ -131,7 +138,6 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             self.geography_types[1] = "point"
 
     def works_field_matching(self):
-
         self.matchingfrom.clear()
         self.matchingto.clear()
 
@@ -195,7 +201,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def finished_threaded_procedure(self, procedure):
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage(
-                tr("Input data not provided correctly"), self.worker_thread.error, level=3
+                self.tr("Input data not provided correctly"), self.worker_thread.error, level=3
             )
         self.close()
 
@@ -242,7 +248,9 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage(tr("Input data not provided correctly"), tr("  Try again"), level=3)
+            qgis.utils.iface.messageBar().pushMessage(
+                self.tr("Input data not provided correctly"), self.tr("  Try again"), level=3
+            )
 
 
 def unload(self):

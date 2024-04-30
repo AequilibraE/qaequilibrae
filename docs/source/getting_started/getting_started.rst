@@ -7,7 +7,7 @@ In this section we describe how you can install AequilibraE's QGIS plug-in.
 
 .. note::
 
-    The recommendations on this page are as current as of May 2023.
+    The recommendations on this page are as current as of April 2024.
 
 Installation
 ------------
@@ -20,68 +20,45 @@ download it using the instructions below.
 Step--by-step installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The steps for installing AequilibraE are the same as for any QGIS plugin
+The steps for installing AequilibraE are the same as for any QGIS plugin.
+Go to the Plugins panel and click on **Manage and Install Plugins**.
 
-.. image:: ../images/install_1.png
-    :width: 1181
+.. image:: ../images/getting_started_1.png
     :align: center
     :alt: First step
 
+In the tab *All*, search for QAequilibraE.
 
-.. image:: ../images/install_2.png
-    :width: 1035
+.. image:: ../images/getting_started_2.png
     :align: center
     :alt: Second step
 
-
-.. image:: ../images/install_3.png
-    :width: 1062
-    :align: center
-    :alt: Third step
-
-.. note::
-   We recommend selecting experimental plugins ONLY if you absolutely require
-   the latest features. Otherwise keep it with the latest stable one.
-   The old plugin (aequilibrae) has been deprecated and may eventually stop working
-   altogether.
-
-.. image:: ../images/install_4.png
-    :width: 1234
-    :align: center
-    :alt: Fourth step
-
-.. image:: ../images/install_5.png
-    :width: 1226
-    :align: center
-    :alt: Fifth step
-
-After installing the plugin, you will be faced with the question of whether you
+After selecting the plug-in installation, you will be faced with the question of whether you
 want to download its dependencies, which are required for using most of the
-features.
-
-.. image:: ../images/no_binaries_error.png
-    :width: 1099
-    :align: center
-    :alt: no_binaries_error
-
-The problem is that many of AequilibraE's algorithms rely on compiled
+features. This is necessary because AequilibraE's algorithms rely on compiled
 extensions, but it is against the QGIS's community guidelines to upload binaries
 to the repository.
 
-.. image:: ../images/install_6.png
-    :width: 492
+.. image:: ../images/getting_started_3.png
     :align: center
-    :alt: Sixth step
+    :alt: Third step
 
 If you select to download the packages, QGIS will freeze for a few seconds before
 showing the image below.
 
-.. image:: ../images/install_7.png
-    :width: 675
+.. image:: ../images/getting_started_4.png
     :align: center
-    :alt: Seventh step
+    :alt: Fourth step
 
-.. _quicktour-video:
+Otherwise, a message warning about installation problems will be shown, and your
+plugin will be non-functional.
+
+.. image:: ../images/getting_started_5.png
+    :align: center
+    :alt: Fifth step
+
+.. _quicktour_video:
+
 Quick Tour
 ----------
 

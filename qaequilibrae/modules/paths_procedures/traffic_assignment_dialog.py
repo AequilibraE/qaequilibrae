@@ -1,17 +1,15 @@
-import importlib.util as iutil
 import logging
 import numpy as np
 import os
 import pandas as pd
-import re
 import sys
 from PyQt5.QtCore import Qt
 from aequilibrae.parameters import Parameters
-from aequilibrae.paths import Graph, AssignmentResults, allOrNothing
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
-from aequilibrae.project import Project
+from aequilibrae.project.database_connection import database_connection
+from aequilibrae.utils.db_utils import read_and_close
 from tempfile import gettempdir
 
 import qgis
@@ -20,7 +18,6 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 from qaequilibrae.modules.common_tools import PandasModel
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import standard_path
-from qaequilibrae.i18n.translator import tr
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_traffic_assignment.ui"))
@@ -146,10 +143,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         if not mat_name:
             return
 
-        if " (OMX not available)" in mat_name or " (file missing)" in mat_name:
+        if " (file missing)" in mat_name:
             df = pd.DataFrame([])
         else:
-            print(mat_name)
             matrix = self.project.matrices.get_matrix(mat_name)
             cores = matrix.names
 
@@ -168,14 +164,14 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         table.setItem(0, 0, QTableWidgetItem("Project path"))
         table.setItem(0, 1, QTableWidgetItem(self.project.path_to_file))
 
-        curr = self.project.network.conn.cursor()
-        curr.execute("""select mode_name, mode_id from modes""")
+        with read_and_close(database_connection("network")) as conn:
+            res = conn.execute("""select mode_name, mode_id from modes""")
 
-        modes = []
-        for x in curr.fetchall():
-            modes.append(f"{x[0]} ({x[1]})")
-            self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
-            self.skims[x[1]] = []
+            modes = []
+            for x in res.fetchall():
+                modes.append(f"{x[0]} ({x[1]})")
+                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
+                self.skims[x[1]] = []
 
         table.setItem(1, 0, QTableWidgetItem("Modes"))
         table.setItem(1, 1, QTableWidgetItem(", ".join(modes)))
@@ -196,8 +192,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             if not self.project.matrices.check_exists(rec["name"]):
                 self.matrices.loc[idx, "name"] += " (file missing)"
 
-        filter = self.matrices.file_name.str.contains(".omx", flags=re.IGNORECASE, regex=True)
-        self.matrices.loc[filter, "name"] += " (OMX not available)"
         self.cob_matrices.clear()
         self.cob_matrices.addItems(self.matrices["name"].tolist())
 
@@ -237,7 +231,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         class_name = self.ln_class_name.text()
         if class_name in self.traffic_classes:
-            qgis.utils.iface.messageBar().pushMessage(tr("Class name already used"), "", level=2)
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Class name already used"), "", level=2)
 
         self.but_add_skim.setEnabled(True)
 
@@ -292,7 +286,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             table.setItem(idx, i, item)
 
         but = QPushButton()
-        but.setText(tr("Remove"))
+        but.setText(self.tr("Remove"))
         but.clicked.connect(self.__remove_class)
         but.setEnabled(False)
         table.setCellWidget(idx, 5, but)
@@ -304,7 +298,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def __add_skimming(self):
         field = self.cob_skims_available.currentText()
         traffic_class = self.traffic_classes[self.cob_skim_class.currentText()]
-        name = traffic_class.__id__
+        name = traffic_class._id
         if field in self.skims[name]:
             if self.testing:
                 raise AttributeError("No skims set")
@@ -350,7 +344,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         if not self.check_data():
             if self.testing:
                 raise Exception(self.error)
-            qgis.utils.iface.messageBar().pushMessage(tr("Input error"), self.error, level=3, duration=10)
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=3, duration=10)
 
         algorithm = self.cb_choose_algorithm.currentText()
         self.miter = int(self.max_iter.text())
@@ -380,17 +374,17 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         num_classes = len(self.traffic_classes.values())
         if not num_classes:
-            self.error = tr("No traffic classes to assign")
+            self.error = self.tr("No traffic classes to assign")
             return False
 
         self.scenario_name = self.output_scenario_name.text()
         if not self.scenario_name:
-            self.error = tr("Missing scenario name")
+            self.error = self.tr("Missing scenario name")
             return False
 
         sql = "Select count(*) from results where table_name=?"
         if sum(self.project.conn.execute(sql, [self.scenario_name]).fetchone()):
-            self.error = tr("Result table name already exists. Choose a new name")
+            self.error = self.tr("Result table name already exists. Choose a new name")
             return False
 
         self.temp_path = gettempdir()
@@ -443,7 +437,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         for k, cls in self.traffic_classes.items():
             if self.skims[k]:
                 dt = cls.graph.block_centroid_flows
-                logger.debug(tr("Set skims {} for {}").format(self.skims[k], k))
+                logger.debug(self.tr("Set skims {} for {}").format(self.skims[k], k))
                 cls.graph.set_graph(self.cob_ffttime.currentText())
                 cls.graph.set_skimming(self.skims[k])
                 cls.graph.set_blocked_centroid_flows(dt)
@@ -458,8 +452,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 try:
                     val = float(val)
                 except Exception as e:
-                    self.error = tr("VDF parameter is not numeric")
-                    logger.error(tr("Tried to set a VDF parameter not numeric. {}").format(e.args))
+                    self.error = self.tr("VDF parameter is not numeric")
+                    logger.error(self.tr("Tried to set a VDF parameter not numeric. {}").format(e.args))
                     return False
             self.vdf_parameters[k] = val
         return True

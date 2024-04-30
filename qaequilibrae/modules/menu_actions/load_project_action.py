@@ -1,9 +1,8 @@
+from os.path import exists, join
 import qgis
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
-from qaequilibrae.i18n.translator import tr
-
 
 # Split loading between Qt action and processing, for easier unit testing
 def run_load_project(qgis_project):
@@ -13,11 +12,13 @@ def run_load_project(qgis_project):
 
 def _get_project_path():
     from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
-    return QFileDialog.getExistingDirectory(QWidget(), tr("AequilibraE Project folder"), standard_path())
+
+    return QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
 
 
 def _run_load_project_from_path(qgis_project, proj_path):
     from aequilibrae.project import Project
+
     if proj_path is None or proj_path == "":
         return
     # Cleans the project descriptor
@@ -33,14 +34,22 @@ def _run_load_project_from_path(qgis_project, proj_path):
             qgis_project.project.open(proj_path)
         except FileNotFoundError as e:
             if e.args[0] == "Model does not exist. Check your path and try again":
-                qgis.utils.iface.messageBar().pushMessage(tr("FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL"), level=1)
+                qgis.utils.iface.messageBar().pushMessage("FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL", level=1)
                 return
             else:
                 raise e
 
+    update_project_layers(qgis_project)
+
+def update_project_layers(qgis_project):
     curr = qgis_project.project.conn.cursor()
     curr.execute("select f_table_name from geometry_columns;")
     layers = [x[0] for x in curr.fetchall()]
+
+    # Add transit_tables to layers
+    pt_database = join(qgis_project.project.project_base_path, "public_transport.sqlite")
+    if exists(pt_database):
+        layers += ["transit_routes", "transit_stops", "transit_pattern_mapping"]
 
     descrlayout = QVBoxLayout()
     qgis_project.geo_layers_table = QTableWidget()

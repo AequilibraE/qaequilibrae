@@ -1,7 +1,6 @@
-import importlib.util as iutil
 import logging
 import os
-
+import openmatrix as omx
 import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix, AequilibraeData
 
@@ -11,15 +10,8 @@ from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerI
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
 from qaequilibrae.modules.common_tools import DatabaseModel, NumpyModel, GetOutputFileName
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
-from qaequilibrae.i18n.translator import tr
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
-
-# Checks if we can display OMX
-spec = iutil.find_spec("openmatrix")
-has_omx = spec is not None
-if has_omx:
-    import openmatrix as omx
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -40,44 +32,38 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.continue_with_data()
             return
 
-        formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)"]
-
-        dflt = ".aem"
-        if has_omx:
-            formats.insert(0, "Open Matrix(*.omx)")
-            dflt = ".omx"
-
-        self.data_path, self.data_type = GetOutputFileName(
-            self,
-            tr("AequilibraE custom formats"),
-            formats,
-            dflt,
-            standard_path(),
-        )
+        self.data_path, self.data_type = self.get_file_name()
 
         if self.data_type is None:
-            self.error = tr("Path provided is not a valid dataset")
+            self.error = self.tr("Path provided is not a valid dataset")
             self.exit_with_error()
         else:
             self.data_type = self.data_type.upper()
             self.continue_with_data()
+        
+        if self.error:
+            self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
+            self.but_load.clicked.connect(self.get_file_name)
 
     def continue_with_data(self):
-        self.setWindowTitle(tr("File path:").format(self.data_path))
+        self.setWindowTitle(self.tr("File path: {}").format(self.data_path))
 
         if self.data_type in ["AED", "AEM"]:
             if self.data_type == "AED":
                 self.data_to_show = AequilibraeData()
             elif self.data_type == "AEM":
-                self.data_to_show = AequilibraeMatrix()
-                if not self.from_proj:
-                    self.qgis_project.matrices[self.data_path] = self.data_to_show
+                self.data_to_show = AequilibraeMatrix() 
+            if not self.from_proj:
+                self.qgis_project.matrices[self.data_path] = self.data_to_show
             try:
                 self.data_to_show.load(self.data_path)
-                self.list_cores = self.data_to_show.names
-                self.list_indices = self.data_to_show.index_names
+                if self.data_type == "AED":
+                    self.list_cores = self.data_to_show.fields
+                elif self.data_type == "AEM":
+                    self.list_cores = self.data_to_show.names
+                    self.list_indices = self.data_to_show.index_names
             except Exception as e:
-                self.error = tr("Could not load dataset")
+                self.error = self.tr("Could not load dataset")
                 self.logger.error(e.args)
                 self.exit_with_error()
 
@@ -93,8 +79,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.data_type == "AEM":
             self.data_to_show.computational_view([self.data_to_show.names[0]])
         elif self.data_type == "OMX":
-            self.data_to_show.matrix_view = np.array(self.omx[self.list_cores[0]])
-            self.data_to_show.index = np.array(list(self.omx.mapping(self.list_indices[0]).keys()))
+            self.add_matrix_parameters(self.list_indices[0], self.list_cores[0])
 
         # Elements that will be used during the displaying
         self._layout = QVBoxLayout()
@@ -107,7 +92,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         # Thousand separator
         self.thousand_separator = QCheckBox()
         self.thousand_separator.setChecked(True)
-        self.thousand_separator.setText(tr("Thousands separator"))
+        self.thousand_separator.setText(self.tr("Thousands separator"))
         self.thousand_separator.toggled.connect(self.format_showing)
         self.show_layout.addWidget(self.thousand_separator)
 
@@ -116,7 +101,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Decimals
         txt = QLabel()
-        txt.setText(tr("Decimal places"))
+        txt.setText(self.tr("Decimal places"))
         self.show_layout.addWidget(txt)
         self.decimals = QSpinBox()
         self.decimals.valueChanged.connect(self.format_showing)
@@ -148,16 +133,16 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self._layout.addItem(self.mat_layout)
             self.change_matrix_cores()
 
-        # self.but_export = QPushButton()
-        # self.but_export.setText(tr("Export"))
-        # self.but_export.clicked.connect(self.export)
+        self.but_export = QPushButton()
+        self.but_export.setText(self.tr("Export"))
+        self.but_export.clicked.connect(self.export)
 
         self.but_close = QPushButton()
         self.but_close.clicked.connect(self.exit_procedure)
-        self.but_close.setText(tr("Close"))
+        self.but_close.setText(self.tr("Close"))
 
         self.but_layout = QHBoxLayout()
-        # self.but_layout.addWidget(self.but_export)
+        self.but_layout.addWidget(self.but_export)
         self.but_layout.addWidget(self.but_close)
 
         self._layout.addItem(self.but_layout)
@@ -186,19 +171,23 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.data_to_show.set_index(idx)
             self.format_showing()
         elif self.data_type == "OMX":
-            self.data_to_show.matrix_view = np.array(self.omx[core])
-            self.data_to_show.index = np.array(list(self.omx.mapping(idx).keys()))
+            self.add_matrix_parameters(idx, core)
             self.format_showing()
 
-    def export(self):
-        new_name, file_type = GetOutputFileName(
-            self, self.data_type, [tr("Comma-separated file(*.csv)")], ".csv", self.data_path
+    def csv_file_path(self):
+        new_name, _ = GetOutputFileName(
+            self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.data_path
         )
+        return new_name
+
+    def export(self):
+        new_name = self.csv_file_path()
+
         if new_name is not None:
             self.data_to_show.export(new_name)
 
     def exit_with_error(self):
-        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1, duration=10)
         self.close()
 
     def exit_procedure(self):
@@ -206,3 +195,28 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.qgis_project.matrices.pop(self.data_path)
         self.show()
         self.close()
+
+    def add_matrix_parameters(self, idx, field):
+        matrix_name = self.data_to_show.random_name()
+        matrix_index = np.array(list(self.omx.mapping(idx).keys()))
+
+        args = {"zones": matrix_index.shape[0], "matrix_names": [field], "file_name": matrix_name, "memory_only": True}
+
+        self.data_to_show.create_empty(**args)
+        self.data_to_show.matrix_view = np.array(self.omx[field])
+        self.data_to_show.index = np.array(list(self.omx.mapping(idx).keys()))
+        self.data_to_show.matrix[field] = self.data_to_show.matrix_view[:, :]
+
+    def get_file_name(self):
+        formats = ["Aequilibrae matrix(*.aem)", "Aequilibrae dataset(*.aed)", "OpenMatrix(*.omx)"]
+        dflt = ".aem"
+
+        data_path, data_type = GetOutputFileName(
+            self,
+            self.tr("AequilibraE custom formats"),
+            formats,
+            dflt,
+            standard_path(),
+        )
+
+        return data_path, data_type

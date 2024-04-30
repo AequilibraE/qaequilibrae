@@ -1,4 +1,6 @@
-.. _network_preparation:
+:orphan:
+
+.. _network_preparation_page:
 
 Preparing a network
 ===================
@@ -11,7 +13,7 @@ Preparing a network
 
 Preparing a link network to be imported into an AequilibraE project consists of
 ensuring that all fields necessary for network import exist and are properly
-filled. These fields are :
+filled. These fields are:
 
 * **link_id**
 * **a_node**
@@ -28,7 +30,7 @@ Link ID
 
 The link ID field is necessarily a field with unique values, but it would
 ideally also be filled with small integers (e.g. a network with 100,000 links
-does not need to have IDs in the order of 1,000,000,000,000,000), as this saves
+does not need to have IDs in the order of 1,000,000,000,000,000), as this save
 memory and computational time during some of the computations.
 
 To create such field, one can use QGIS' field calculator as shown below. Please
@@ -41,9 +43,8 @@ to create the project.
     :align: center
     :alt: Creating Link IDs
 
-**LET'S STRESS THIS !!!!!!**
-
 .. warning::
+  **LET'S STRESS THIS !!!!!!**
 
   **AequilibraE can deal with an arbitrary set of IDs for links and nodes**, but
   we vectorize a lot of operations for faster performance, which means that you
@@ -61,53 +62,6 @@ articulation of a network, and is one of the foundational tools in AequilibraE.
 Please **make sure that all your links are LineString geometries**, otherwise the articulation
 is not going to work. If all your links are MultiLineString geometries, you can save
 your data as a GeoPackage and enforce it to be LineString only.
-There are two distinct situations that need to be covered:
-
-User has only the network links
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This is the case when one exports only links from a transportation package or
-downloads a link layer from Open Street Maps or a government open data portal
-and want to use such network for path computation. This tool then does the
-following:
-
-* Duplicates the pre-existing network in order to edit it without risk of data
-  corruption
-* Creates nodes at the extremities of all links in the network (no duplicate
-  nodes at the same lat/long)
-* Adds the fields *A_Node* and *B_Node* to the new link layer, and populate them
-  with the *IDs* generated for the nodes layer
-
-User has the network links and nodes but no database field linking them
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In case one has both the complete sets of nodes and links and nodes for a
-certain network (commercial packages would allow you to export them separately),
-you can use this tool to associate those links and nodes (if that information
-was not exported from the package). In that case, the steps would be the
-following:
-
-* Duplicates the pre-existing network in order to edit it without risk of data
-  corruption
-* Checks if the nodes provided cover both extremities of all links from the
-  layer provided. Node IDs are also checked for uniqueness
-* Adds the fields *A_Node* and *B_Node* to the new link layer, and populate them
-  with the *IDs* chosen among the fields from the nodes layer
-
-**GUI**
-
-The tool can be accessed in the AequilibraE menu *AequilibraE > Network
-Manipulation > Network Preparation*, and it looks like this:
-
-.. image:: ../images/network_edit_network_preparation.png
-    :width: 774
-    :align: center
-    :alt: Network preparation
-
-In this case we chose to add nodes with IDs starting in 1,001, as we will
-reserve all nodes from 1 to 1,000 for centroids, external stations and other
-special uses (we are not planning to use all that range and that is not
-necessary, but the numbering gets quite neat that way).
 
 It is important to note that AequilibraE understands *a_node* as being the
 topologically first point of the line, and *b_node* the last. Topology in GIS
@@ -143,14 +97,14 @@ SpatiaLite. Other units will be possible in the future.
 Modes
 -----
 
-In AequilibraE, each mode is represented by a lower case letter. So imagine we
+In AequilibraE, each mode is represented by a lower-case letter. So imagine we
 will have several modes in our network, such as cars (c), trucks (t), bicycles
 (b) and walking (w). In that case, a link that allows all modes will have a
 modes field equal to **ctbw** (the order of modes is irrelevant), while a link
 that allows bikes and pedestrians would have a modes string equal to **bw**.
 
 The list of modes that will exist in the model, however, comes from the
-parameter list built into AequilibraE under the section *Network*-->*modes*.
+parameter list built into AequilibraE under the section *Network* --> *modes*.
 
 To find out how to access the parameters file see documentation on the
 :ref:`global parameters file <parameters_file>`.
