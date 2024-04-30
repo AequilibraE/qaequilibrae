@@ -46,7 +46,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.but_load.clicked.connect(self.get_file_name)
 
     def continue_with_data(self):
-        self.setWindowTitle(self.tr("File path:").format(self.data_path))
+        self.setWindowTitle(self.tr("File path: {}").format(self.data_path))
 
         if self.data_type in ["AED", "AEM"]:
             if self.data_type == "AED":
