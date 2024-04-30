@@ -70,10 +70,10 @@ your project file, and press save!
     :align: center
     :alt: Saving file
 
-For a matter of safety, if you have open AequilibraE layers into your QGIS Project and close the AequilibraE
-project, these layers are removed from your open QGIS project.
+In the interest of data integrity, if you have open AequilibraE layers into your QGIS Project and close 
+the AequilibraE project, these layers are removed from your open QGIS project.
 
-When reopening the QGIS project containing an AequilibraE model, you will notice that the AequilibraE project 
+When reopening the QGIS project containing an AequilibraE model, you will notice that the project 
 stored is automatically reopened by QAequilibraE.
 
 .. _quicktour_video:
