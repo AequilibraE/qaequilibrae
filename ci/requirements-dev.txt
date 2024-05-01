@@ -1,6 +1,4 @@
 pytest-qgis
 pytest-qt
 pytest-cov
-pandas
-shapely
-scipy
+pytest-mock

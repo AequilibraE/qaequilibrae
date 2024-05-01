@@ -1,0 +1,9 @@
+numpy==1.24.1
+geopandas
+pandas
+pyaml
+pyproj
+requests
+rtree
+scipy
+shapely

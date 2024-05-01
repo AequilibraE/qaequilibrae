@@ -1,6 +1,5 @@
 from .action_add_connectors import run_add_connectors
 from .action_add_zoning import run_add_zones
-from .action_display_aeq_formats import display_aequilibrae_formats
 from .action_distribution import run_distribution_models
 from .action_edit_parameters import run_change_parameters
 from .action_gis_desire_lines import run_desire_lines
@@ -17,5 +16,5 @@ from .create_networks import run_create_transponet
 from .load_project_action import run_load_project
 from .project_from_osm_action import project_from_osm
 from .action_pt_import_gtfs import run_import_gtfs
-from .action_display_about import run_about
 from .action_create_example import create_example
+from .action_pt_explore import run_pt_explore

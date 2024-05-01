@@ -1,0 +1,60 @@
+name: VersionRelease
+
+env:
+  PLUGIN_VERSION: $(python qaequilibrae/get_version.py)
+  PROJECT_FOLDER: "qaequilibrae"
+
+on: [release]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+    steps:
+    - uses: actions/checkout@v4
+      with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.9
+  
+    - name: Install packages
+      run: |
+        sudo apt-get update
+        sudo apt install qttools5-dev-tools
+        python -m pip install --upgrade pip
+        python -m pip install -r ci/packaging.txt
+    
+    - name: Compile translations if they exist
+      run: |
+        cd qaequilibrae/i18n
+        translatable_files=$(ls)
+        cd ../..
+        if echo "$translatable_files" | grep "qaequilibrae_.*\.ts"; then
+          echo "Translatable files found"
+          lrelease ${{ env.PROJECT_FOLDER }}/i18n/qaequilibrae_*.ts
+          sed -i "s|^*.qm.*| |" .gitignore
+          git add ${{ env.PROJECT_FOLDER }}/
+        else
+          echo "No translatable files found"
+        fi
+
+    - name: Build the package
+      run: qgis-plugin-ci package ${{ env.PLUGIN_VERSION }} -c
+
+    - name: Download artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qaequilibrae
+        path: /home/runner/work/qaequilibrae/qaequilibrae/*.zip
+        if-no-files-found: warn
+  
+    - name: Release plugin in QGIS
+      run: >-
+        qgis-plugin-ci release ${ env.PLUGIN_VERSION } -c
+        --github-token ${{ secrets.GITHUB_TOKEN }}
+        --osgeo-username ${{ secrets.QGIS_PLUGIN_REPO_USER }}
+        --osgeo-password ${{ secrets.QGIS_PLUGIN_REPO_PASSWORD }}
