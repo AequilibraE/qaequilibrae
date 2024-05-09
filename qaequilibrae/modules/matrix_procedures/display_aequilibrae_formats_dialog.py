@@ -133,6 +133,28 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self._layout.addItem(self.mat_layout)
             self.change_matrix_cores()
 
+            if self.qgis_project.supply_path:
+            self.mapping_layout = QHBoxLayout()
+
+            self.no_mapping = QRadioButton()
+            self.no_mapping.setText("No mapping")
+            self.no_mapping.toggled.connect(self.set_mapping)
+
+            self.by_row = QRadioButton()
+            self.by_row.setText("By origin")
+            self.by_row.toggled.connect(self.set_mapping)
+
+            self.by_col = QRadioButton()
+            self.by_col.setText("By destination")
+            self.by_col.toggled.connect(self.set_mapping)
+
+            self.no_mapping.setChecked(True)
+
+            self.mapping_layout.addWidget(self.no_mapping)
+            self.mapping_layout.addWidget(self.by_row)
+            self.mapping_layout.addWidget(self.by_col)
+            self._layout.addItem(self.mapping_layout)
+
         self.but_export = QPushButton()
         self.but_export.setText(self.tr("Export"))
         self.but_export.clicked.connect(self.export)
@@ -150,6 +172,130 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.resize(700, 500)
         self.setLayout(self._layout)
         self.format_showing()
+
+    def select_column(self):
+        self.selected_col = None
+        col_id = [col_idx.column() for col_idx in self.table.selectionModel().selectedColumns()]
+        if not col_id:
+            return
+        self.selected_col = col_id[0]
+        self.zones_layer.selectByExpression(f'"zone"={self.indices[col_id[0]]}', QgsVectorLayer.SetSelection)
+        self.iface.mapCanvas().refresh()
+
+        dt = np.array(self.data_to_show[:, col_id]).reshape(self.indices.shape[0])
+
+        self.map_dt(dt)
+
+    def select_row(self):
+        self.selected_row = None
+        row_id = [rowidx.row() for rowidx in self.table.selectionModel().selectedRows()]
+        if not row_id:
+            return
+        self.selected_row = row_id[0]
+        self.zones_layer.selectByExpression(f'"zone"={self.indices[row_id[0]]}', QgsVectorLayer.SetSelection)
+        dt = np.array(self.data_to_show[row_id[0], :]).reshape(self.indices.shape[0])
+        self.map_dt(dt)
+
+    def map_dt(self, dt):
+        self.remove_mapping_layer(False)
+        df = pd.DataFrame({"zone": self.indices, "data": dt}).dropna()
+        df = df[df["data"] < self.skims._infinite]
+        self.mapping_layer = layer_from_dataframe(df, "matrix_row")
+        self.make_join(self.zones_layer, "zone", self.mapping_layer)
+        self.draw_zone_styles()
+
+    def make_join(self, base_layer, join_field, metric_layer):
+        lien = QgsVectorLayerJoinInfo()
+        lien.setJoinFieldName(join_field)
+        lien.setTargetFieldName(join_field)
+        lien.setJoinLayerId(metric_layer.id())
+        lien.setUsingMemoryCache(True)
+        lien.setJoinLayer(metric_layer)
+        lien.setPrefix("metrics_")
+        base_layer.addJoin(lien)
+
+    def draw_zone_styles(self):
+        color_ramp_name = "Blues"  # if method != 'Color' else self.cob_zones_color.currentText()
+
+        self.map_ranges("metrics_data", self.zones_layer, color_ramp_name)
+
+    def map_ranges(self, fld, layer, color_ramp_name):
+        idx = self.zones_layer.fields().indexFromName("metrics_data")
+        max_metric = self.zones_layer.maximumValue(idx)
+
+        num_steps = 9
+        max_metric = num_steps if max_metric is None else max_metric
+        values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
+        values = [0, 0.000001] + values
+        color_ramp = color_ramp_shades(color_ramp_name, num_steps)
+        color_ramp[0] = QColor("#feffdf")
+        ranges = []
+        for i in range(num_steps + 1):
+            myColour = color_ramp[i]
+            symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+            symbol.setColor(myColour)
+            symbol.setOpacity(1)
+
+            if i == 0:
+                label = f"0/Null ({fld.replace('metrics_', '')})"
+            elif i == 1:
+                label = f"Up to {values[i + 1]:,.0f}"
+            else:
+                label = f"{values[i]:,.0f} to {values[i + 1]:,.0f}"
+
+            ranges.append(QgsRendererRange(values[i], values[i + 1], symbol, label))
+
+        sizes = [0, max_metric]
+        renderer = QgsGraduatedSymbolRenderer("", ranges)
+        renderer.setSymbolSizes(*sizes)
+        renderer.setClassAttribute(f"""coalesce("{fld}", 0)""")
+
+        classific_method = QgsApplication.classificationMethodRegistry().method("EqualInterval")
+        renderer.setClassificationMethod(classific_method)
+
+        layer.setRenderer(renderer)
+        layer.triggerRepaint()
+        self.iface.mapCanvas().setExtent(layer.extent())
+        self.iface.mapCanvas().refresh()
+
+    def set_mapping(self):
+        self.table.clearSelection()
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
+        if not self.qgis_project.supply_path:
+            return
+
+        self.remove_mapping_layer()
+        if self.no_mapping.isChecked():
+            return
+
+        if self.by_row.isChecked():
+            self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.selected_col = None
+            if self.selected_row:
+                self.table.blockSignals(True)
+                self.table.selectRow(self.selected_row)
+                self.table.blockSignals(False)
+                self.select_row()
+            self.table.selectionModel().selectionChanged.connect(self.select_row)
+        else:
+            self.table.setSelectionBehavior(QAbstractItemView.SelectColumns)
+            self.selected_row = None
+            if self.selected_col:
+                self.table.blockSignals(True)
+                self.table.selectColumn(self.selected_col)
+                self.table.blockSignals(False)
+                self.select_column()
+            self.table.selectionModel().selectionChanged.connect(self.select_column)
+
+    def remove_mapping_layer(self, clear_selection=True):
+        if self.mapping_layer is not None:
+            QgsProject.instance().removeMapLayers([self.mapping_layer.id()])
+        for lien in self.zones_layer.vectorJoins():
+            self.zones_layer.removeJoin(lien.joinLayerId())
+        self.mapping_layer = None
+        if clear_selection:
+            self.zones_layer.selectByExpression('"zone"-<1000', QgsVectorLayer.SetSelection)
+        self.zones_layer.triggerRepaint()
 
     def format_showing(self):
         if self.data_to_show is None:
