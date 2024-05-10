@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
-          python3 -c "from qaequilibrae.download_extra_packages_class import download_all; download_all().install(True)"
+          python3 ci/installation.py
           python3 -m pip install -r test/requirements-test.txt
           python3 -m pip install -r ci/requirements-dev.txt
 
