@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>342</width>
-    <height>54</height>
+    <width>151</width>
+    <height>41</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -21,7 +21,7 @@
   </property>
   <property name="font">
    <font>
-    <pointsize>11</pointsize>
+    <pointsize>9</pointsize>
    </font>
   </property>
   <property name="windowTitle">
@@ -34,13 +34,13 @@
   <property name="modal">
    <bool>false</bool>
   </property>
-  <widget class="QPushButton" name="but_load_traffic">
+  <widget class="QPushButton" name="but_load">
    <property name="geometry">
     <rect>
-     <x>36</x>
-     <y>15</y>
-     <width>132</width>
-     <height>26</height>
+     <x>10</x>
+     <y>10</y>
+     <width>131</width>
+     <height>23</height>
     </rect>
    </property>
    <property name="palette">
@@ -81,57 +81,7 @@
     </palette>
    </property>
    <property name="text">
-    <string>Load Highway skim</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="but_load_transit">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>15</y>
-     <width>123</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="palette">
-    <palette>
-     <active>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </active>
-     <inactive>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </inactive>
-     <disabled>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </disabled>
-    </palette>
-   </property>
-   <property name="text">
-    <string>Load Transit skim</string>
+    <string>Load data</string>
    </property>
   </widget>
  </widget>

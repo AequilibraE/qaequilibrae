@@ -36,9 +36,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.selected_col = None
         self.selected_row = None
 
-        if self.from_proj:
-            self.zones_layer = qgis_project.layers["zones"][0]  # Should be conditional if zones exist..
-            QgsProject.instance().addMapLayer(self.zones_layer)
+        self.__remove_temp_tables()
 
         if len(file_path) > 0:
             self.data_path = file_path
@@ -58,8 +56,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.error:
             self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
             self.but_load.clicked.connect(self.get_file_name)
-        
-        self.remove_mapping_layer()
 
     def continue_with_data(self):
         self.setWindowTitle(self.tr("File path: {}").format(self.data_path))
@@ -224,8 +220,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def map_dt(self, dt):
         self.remove_mapping_layer(False)
         df = pd.DataFrame({"zone_id": self.indices, "data": dt}).dropna()
-        # df = df[df["data"] < self.skims._infinite]
         self.mapping_layer = layer_from_dataframe(df, "matrix_row")
+        self.qgis_project.layers["matrix_row"] = [self.mapping_layer, self.mapping_layer.id()]
         self.make_join(self.zones_layer, "zone_id", self.mapping_layer)
         self.draw_zone_styles()
 
@@ -289,6 +285,10 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         if not self.from_proj:
             return
+
+        if self.from_proj:
+            self.zones_layer = self.qgis_project.layers["zones"][0]
+            QgsProject.instance().addMapLayer(self.zones_layer)
 
         self.remove_mapping_layer()
         if self.no_mapping.isChecked():
@@ -395,3 +395,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         )
 
         return data_path, data_type
+
+    def __remove_temp_tables(self):
+        for layer, values in self.qgis_project.layers.items():
+            if layer == "matrix_row":
+                QgsProject.instance().removeMapLayers([values[1]])
