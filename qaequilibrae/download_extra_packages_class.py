@@ -34,7 +34,8 @@ class download_all:
 
     def install_package(self, package, on_ci):
 
-        install_command = f"-m pip install {package}" if on_ci else f'-m pip install {package} -t "{self.pth}"'
+        # install_command = f"-m pip install {package}" if on_ci else f'-m pip install {package} -t "{self.pth}"'
+        install_command = f'-m pip install {package} -t "{self.pth}"'
         if "openmatrix" in package.lower() or "aequilibrae" in package.lower():
             install_command += " --no-deps"
 
