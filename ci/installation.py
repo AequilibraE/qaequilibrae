@@ -1,4 +1,7 @@
-from ..qaequilibrae.download_extra_packages_class import download_all
+import os
+
+print(set([x[0] for x in os.walk(".")]))
+from qaequilibrae.download_extra_packages_class import download_all
 
 
 download_all().install(True)
