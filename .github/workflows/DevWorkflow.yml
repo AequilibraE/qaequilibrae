@@ -10,8 +10,8 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        container: [ 'qgis/qgis:release-3_34']
-        # container: [ 'qgis/qgis:latest', 'qgis/qgis:release-3_34']
+        # container: [ 'qgis/qgis:release-3_34']
+        container: [ 'qgis/qgis:latest', 'qgis/qgis:release-3_34']
     container:
       image: ${{ matrix.container }}
     steps:
