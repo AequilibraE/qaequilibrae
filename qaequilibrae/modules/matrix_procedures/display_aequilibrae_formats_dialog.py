@@ -36,8 +36,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.selected_col = None
         self.selected_row = None
 
-        self.__remove_temp_tables()
-
         if len(file_path) > 0:
             self.data_path = file_path
             self.data_type = self.data_path[-3:].upper()
@@ -52,7 +50,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             self.data_type = self.data_type.upper()
             self.continue_with_data()
-        
+
         if self.error:
             self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
             self.but_load.clicked.connect(self.get_file_name)
@@ -64,7 +62,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.data_type == "AED":
                 self.data_to_show = AequilibraeData()
             elif self.data_type == "AEM":
-                self.data_to_show = AequilibraeMatrix() 
+                self.data_to_show = AequilibraeMatrix()
             if not self.from_proj:
                 self.qgis_project.matrices[self.data_path] = self.data_to_show
             try:
@@ -214,14 +212,13 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         core = self.mat_list.currentText()
         dt = np.array(self.data_to_show.matrix[core][row_id[0], :]).reshape(self.indices.shape[0])
-        
+
         self.map_dt(dt)
 
     def map_dt(self, dt):
         self.remove_mapping_layer(False)
         df = pd.DataFrame({"zone_id": self.indices, "data": dt}).dropna()
         self.mapping_layer = layer_from_dataframe(df, "matrix_row")
-        self.qgis_project.layers["matrix_row"] = [self.mapping_layer, self.mapping_layer.id()]
         self.make_join(self.zones_layer, "zone_id", self.mapping_layer)
         self.draw_zone_styles()
 
@@ -242,7 +239,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
-    
+
         idx = self.zones_layer.fields().indexFromName("metrics_data")
         max_metric = self.zones_layer.maximumValue(idx)
 
@@ -292,7 +289,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.remove_mapping_layer()
         if self.no_mapping.isChecked():
-            self.table.setSelectionMode(QAbstractItemView.SingleSelection)
             return
 
         if self.by_row.isChecked():
@@ -350,9 +346,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.indices = self.data_to_show.index.astype(np.int32)
 
     def csv_file_path(self):
-        new_name, _ = GetOutputFileName(
-            self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.data_path
-        )
+        new_name, _ = GetOutputFileName(self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.data_path)
         return new_name
 
     def export(self):
@@ -395,8 +389,3 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         )
 
         return data_path, data_type
-
-    def __remove_temp_tables(self):
-        for layer, values in self.qgis_project.layers.items():
-            if layer == "matrix_row":
-                QgsProject.instance().removeMapLayers([values[1]])
