@@ -29,7 +29,8 @@ class download_all:
         for line in lines:
             reps.extend(self.install_package(line.strip(), on_ci))
 
-        self.clean_packages()
+        if not on_ci:
+            self.clean_packages()
         return reps
 
     def install_package(self, package, on_ci):
