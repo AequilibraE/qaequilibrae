@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           chmod +x qaequilibrae/download_extra_packages_class.py
-          sudo qaequilibrae/download_extra_packages_class.py
+          python3 qaequilibrae/download_extra_packages_class.py
 
       - name: Run tests
         run: |
