@@ -3,6 +3,6 @@ ortools
 cython
 numexpr
 py-cpuinfo
-tables==3.8.0
+tables
 openmatrix
 fastparquet

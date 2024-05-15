@@ -20,25 +20,26 @@ class download_all:
         self.pth = join(pth, "packages")
         self.no_ssl = False
 
-    def install(self, on_ci=False):
+    def install(self, on_latest=False):
         # self.adapt_aeq_version()
         with open(self.file, "r") as fl:
             lines = fl.readlines()
 
         reps = []
         for line in lines:
-            reps.extend(self.install_package(line.strip(), on_ci))
+            reps.extend(self.install_package(line.strip(), on_latest))
 
-        if not on_ci:
-            self.clean_packages()
+        self.clean_packages()
         return reps
 
-    def install_package(self, package, on_ci):
+    def install_package(self, package, on_latest):
 
-        # install_command = f"-m pip install {package}" if on_ci else f'-m pip install {package} -t "{self.pth}"'
-        install_command = f'-m pip install {package} -t "{self.pth}"'
+        install_command = f"-m pip install {package}" if on_latest else f'-m pip install {package} -t "{self.pth}"'
+        # install_command = f'-m pip install {package} -t "{self.pth}"'
         if "openmatrix" in package.lower() or "aequilibrae" in package.lower():
             install_command += " --no-deps"
+        if on_latest:
+            install_command += " --break-system-packages"
 
         command = f'"{self.find_python()}" {install_command}'
         print(command)
@@ -121,4 +122,8 @@ class download_all:
 
 
 if __name__ == "__main__":
-    download_all().install(True)
+    on_latest = True
+    if sys.version_info < (3, 12):
+        on_latest = False
+
+    download_all().install(on_latest)
