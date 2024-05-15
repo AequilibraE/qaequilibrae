@@ -18,9 +18,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
-          python3 ci/installation.py
-          python3 -m pip install -r test/requirements-test.txt
-          python3 -m pip install -r ci/requirements-dev.txt
+          sudo python3 qaequilibrae/download_extra_packages_class.py
+          sudo python3 -m pip install -r test/requirements-test.txt
+          sudo python3 -m pip install -r ci/requirements-dev.txt
 
       - name: Run tests
         run: |
