@@ -18,9 +18,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
-          python3 qaequilibrae/download_extra_packages_class.py
-          python3 -m pip install -r test/requirements-test.txt
-          python3 -m pip install -r ci/requirements-dev.txt
+          chmod +x qaequilibrae/download_extra_packages_class.py
+          sudo qaequilibrae/download_extra_packages_class.py
 
       - name: Run tests
         run: |
