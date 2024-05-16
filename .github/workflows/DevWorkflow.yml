@@ -22,7 +22,7 @@ jobs:
           python3 -m pip install setuptools
           python3 -m pip install -r test/requirements-test.txt
           python3 -m pip install -r ci/requirements-dev.txt
-          python3 ./qaequilibrae/download_extra_packages_class.py
+          python3 ./ci/dependency_installation.py
 
       - name: Install dependencies for Latest
         if: ${{ (matrix.container == 'qgis/qgis:latest')}}
