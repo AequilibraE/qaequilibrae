@@ -46,9 +46,9 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
             self.but_load_Results.clicked.connect(self.load_result_table)
             self.but_load_matrix.clicked.connect(self.display_matrix)
         else:
-            QTabWidget.setTabVisible(self.tabs, 0, False)
-            QTabWidget.setTabVisible(self.tabs, 1, False)
-        
+            QTabWidget.removeTab(self.tabs, 0)
+            QTabWidget.removeTab(self.tabs, 0)
+
         self.but_load_data.clicked.connect(self.display_external_data)
 
     def display_matrix(self):
@@ -110,10 +110,10 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
             lien.setTargetFieldName("link_id")
             lien.setJoinLayerId(lyr.id())
             lien.setUsingMemoryCache(True)
-            lien.setJoinLayer(lyr)    
+            lien.setJoinLayer(lyr)
             lien.setPrefix(f"{table_name}_")
             self.link_layer.addJoin(lien)
-    
+
     def display_external_data(self):
         dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj)
         dlg2.show()
