@@ -9,7 +9,7 @@ import numpy as np
 from qgis.core import QgsMessageLog
 
 
-class download_all:
+class DownloadAll:
     must_remove = ["numpy", "scipy", "pandas", "charset_normalizer", "click_plugins", "click", "certifi",
                    "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
                    "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
@@ -20,23 +20,28 @@ class download_all:
         self.pth = join(pth, "packages")
         self.no_ssl = False
 
-    def install(self, on_ci=False):
+    def install(self, on_latest=False):
         # self.adapt_aeq_version()
         with open(self.file, "r") as fl:
             lines = fl.readlines()
 
         reps = []
         for line in lines:
-            reps.extend(self.install_package(line.strip(), on_ci))
+            reps.extend(self.install_package(line.strip(), on_latest))
 
         self.clean_packages()
         return reps
 
-    def install_package(self, package, on_ci):
+    def install_package(self, package, on_latest):
 
-        install_command = f"-m pip install {package}" if on_ci else f'-m pip install {package} -t "{self.pth}"'
+        install_command = f"-m pip install {package}" if on_latest else f'-m pip install {package} -t "{self.pth}"'
+        # install_command = f'-m pip install {package} -t "{self.pth}"'
         if "openmatrix" in package.lower() or "aequilibrae" in package.lower():
             install_command += " --no-deps"
+        if on_latest:
+            if "tables" in package:
+                install_command = install_command[:-7]
+            install_command += " --break-system-packages"
 
         command = f'"{self.find_python()}" {install_command}'
         print(command)
@@ -116,7 +121,3 @@ class download_all:
                 if pkg.lower() in fldr.lower():
                     if isdir(join(self.pth, fldr)):
                         shutil.rmtree(join(self.pth, fldr))
-
-
-if __name__ == "__main__":
-    download_all().install(True)

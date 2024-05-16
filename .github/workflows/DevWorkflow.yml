@@ -15,14 +15,21 @@ jobs:
       image: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies
+      - name: Install dependencies for Release
         run: |
-          python3 -c "from qaequilibrae.download_extra_packages_class import download_all; download_all().install(True)"
-          python3 -m pip install -r test/requirements-test.txt
-          python3 -m pip install -r ci/requirements-dev.txt
+          python3 -m venv /tmp/venv
+          # python3 -m pip install virtualenv --break-system-packages
+          # python3 -m virtualenv /tmp/venv
+          ls /tmp/venv/bin
+          chmod +x /tmp/venv/bin/activate
+          source /tmp/venv/bin/activate
+          python -m pip install setuptools
+          python -m pip install -r test/requirements-test.txt
+          python -m pip install -r ci/requirements-dev.txt
+          python ./qaequilibrae/download_extra_packages_class.py
 
       - name: Run tests
         run: |
           export QT_QPA_PLATFORM=offscreen
-          pwd
-          python3 -m pytest test -v --tb=short --cov=qaequilibrae
+          source /tmp/venv/bin/activate
+          python -m pytest test -v --tb=short --cov=qaequilibrae

@@ -50,9 +50,9 @@ except:
         QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
         == QMessageBox.Ok
     ):
-        from qaequilibrae.download_extra_packages_class import download_all
+        from qaequilibrae.download_extra_packages_class import DownloadAll
 
-        result = download_all().install()
+        result = DownloadAll().install()
         if "ERROR" in "".join([str(x).upper() for x in result]):
             QMessageBox.information(None, "Information", msg.second_message)
         else:
