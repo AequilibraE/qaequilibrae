@@ -9,7 +9,7 @@ import numpy as np
 from qgis.core import QgsMessageLog
 
 
-class download_all:
+class DownloadAll:
     must_remove = ["numpy", "scipy", "pandas", "charset_normalizer", "click_plugins", "click", "certifi",
                    "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
                    "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
@@ -121,11 +121,3 @@ class download_all:
                 if pkg.lower() in fldr.lower():
                     if isdir(join(self.pth, fldr)):
                         shutil.rmtree(join(self.pth, fldr))
-
-
-if __name__ == "__main__":
-    on_latest = True
-    if sys.version_info < (3, 12):
-        on_latest = False
-
-    download_all().install(on_latest)

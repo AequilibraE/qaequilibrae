@@ -30,7 +30,7 @@ jobs:
           python3 -m pip install setuptools --break-system-packages
           python3 -m pip install -r test/requirements-test.txt --break-system-packages
           python3 -m pip install -r ci/requirements-dev.txt --break-system-packages
-          python3 ./qaequilibrae/download_extra_packages_class.py
+          python3 ./ci/dependency_installation.py
 
       - name: Run tests
         run: |
