@@ -125,27 +125,20 @@ block flows through centroids for the reason discussed above.
     :align: center
     :alt: Setup assignment
 
+.. _usage-of-results-layer-join:
+
 The result of the traffic assignment we just performed is stored in the results.sqlite
 database within the project folder. It can be easily accessed and loaded by clicking
 **Data > Visualize data**, and a project data window will open. Just click on the
-*Results* tab, select the desired result, and click in the *Load Result table as data layer*
-button at the bottom.
+*Results* tab, select the desired result, let the *Join with layer* option checked,
+and click in the *Load Result table as data layer* button at the bottom. The result table
+layer will be automatically joined with the links layer.
 
-.. image:: ../images/add_layer.png
-    :width: 887
+.. image:: ../images/data_visualize_data_results-v2.png
     :align: center
     :alt: add_layer
 
-Now we can plot the flows we just obtained. You can select the *links* layer and 
-right-click it to open the layer properties window. Go to *Joins*, select the
-fields to join, and press ok.
-
-.. image:: ../images/link_join.png
-    :width: 1449
-    :align: center
-    :alt: link_join
-
-Now we can revisit the instructions above for :ref:`siouxfalls-stacked-bandwidth`
+Now we can revisit the instructions for :ref:`siouxfalls-stacked-bandwidth`
 
 Video tutorial
 ~~~~~~~~~~~~~~

@@ -20,7 +20,10 @@ opens. The tab *matrices* shows the matrices available for the current project (
     :alt: project data matrices
 
 As for the tab *results* it displays the results of procedures that took place, such as the
-creation of Delaunay Lines, and that are saved in a **results_database.sqlite**.
+creation of Delaunay Lines, and that are saved in a **results_database.sqlite**. If you left the option
+*Join with layer* checked, AequilibraE will automatically join the results table with the correspondent
+link layer. This can be helpful when 
+:ref:`visualizing assignment results <usage-of-results-layer-join>`, for example.
 
 .. image:: ../images/data_visualize_data_results.png
     :align: center
