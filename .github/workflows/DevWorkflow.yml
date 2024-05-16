@@ -20,7 +20,8 @@ jobs:
           python3 -m venv /tmp/venv
           # python3 -m pip install virtualenv --break-system-packages
           # python3 -m virtualenv /tmp/venv
-          ls /tmp/venv/bin/activate
+          ls /tmp/venv/bin
+          chmod +x /tmp/venv/bin/activate
           source /tmp/venv/bin/activate
           python -m pip install setuptools
           python -m pip install -r test/requirements-test.txt
