@@ -7,6 +7,7 @@ from aequilibrae.project.database_connection import database_connection
 import qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTabWidget
+from qgis.core import QgsProject, QgsVectorLayerJoinInfo
 from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
@@ -91,7 +92,27 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.results["WARNINGS"][idx[0]] != "":
             return
 
-        _ = load_result_table(self.project.project_base_path, table_name)
+        lyr = load_result_table(self.project.project_base_path, table_name)
+
+        if self.chb_join.isChecked():
+            procedure = self.results.loc[self.results["table_name"] == table_name]["procedure"].values[0]
+            if procedure == "transit assignment":
+                self.link_layer = self.qgs_proj.layers["transit_links"][0]
+            else:
+                self.link_layer = self.qgs_proj.layers["links"][0]
+            rem = [lien.joinLayerId() for lien in self.link_layer.vectorJoins()]
+            for lien_id in rem:
+                self.link_layer.removeJoin(lien_id)
+            QgsProject.instance().addMapLayer(self.link_layer)
+
+            lien = QgsVectorLayerJoinInfo()
+            lien.setJoinFieldName("link_id")
+            lien.setTargetFieldName("link_id")
+            lien.setJoinLayerId(lyr.id())
+            lien.setUsingMemoryCache(True)
+            lien.setJoinLayer(lyr)    
+            lien.setPrefix(f"{table_name}_")
+            self.link_layer.addJoin(lien)
     
     def display_external_data(self):
         dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj)
