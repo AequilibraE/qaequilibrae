@@ -17,7 +17,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies for Release
         run: |
-          python3 -m venv ./.venv
+          python3 -m pip install virtualenv --break-system-packages
+          python3 -m virtualenv ./.venv
           source ./.venv/bin/activate
           python -m pip install setuptools
           python -m pip install -r test/requirements-test.txt
@@ -27,4 +28,5 @@ jobs:
       - name: Run tests
         run: |
           export QT_QPA_PLATFORM=offscreen
+          source ./.venv/bin/activate
           python -m pytest test -v --tb=short --cov=qaequilibrae
