@@ -1,9 +1,17 @@
 import pytest
+from os.path import join
+from uuid import uuid4
+from shutil import copytree
 from PyQt5.QtCore import QTimer, QVariant
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
 from qaequilibrae.qaequilibrae import AequilibraEMenu
 from qaequilibrae.modules.common_tools import ReportDialog
+
+
+@pytest.fixture
+def folder_path(tmp_path):
+    return join(tmp_path, uuid4().hex)
 
 
 @pytest.fixture(scope="function")
@@ -12,11 +20,12 @@ def ae(qgis_iface) -> AequilibraEMenu:
 
 
 @pytest.fixture(scope="function")
-def ae_with_project(qgis_iface) -> AequilibraEMenu:
+def ae_with_project(qgis_iface, folder_path) -> AequilibraEMenu:
     ae = AequilibraEMenu(qgis_iface)
     from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-    _run_load_project_from_path(ae, "test/data/SiouxFalls_project")
+    copytree("test/data/SiouxFalls_project", folder_path)
+    _run_load_project_from_path(ae, folder_path)
     yield ae
     ae.run_close_project()
 
@@ -43,21 +52,23 @@ def timeoutDetector(qgis_iface) -> None:
 
 
 @pytest.fixture(scope="function")
-def pt_project(qgis_iface) -> AequilibraEMenu:
+def pt_project(qgis_iface, folder_path) -> AequilibraEMenu:
     ae = AequilibraEMenu(qgis_iface)
     from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-    _run_load_project_from_path(ae, "test/data/coquimbo_project")
+    copytree("test/data/coquimbo_project", folder_path)
+    _run_load_project_from_path(ae, folder_path)
     yield ae
     ae.run_close_project()
 
 
 @pytest.fixture(scope="function")
-def pt_no_feed(qgis_iface) -> AequilibraEMenu:
+def pt_no_feed(qgis_iface, folder_path) -> AequilibraEMenu:
     ae = AequilibraEMenu(qgis_iface)
     from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-    _run_load_project_from_path(ae, "test/data/no_pt_feed")
+    copytree("test/data/no_pt_feed", folder_path)
+    _run_load_project_from_path(ae, folder_path)
     yield ae
     ae.run_close_project()
 

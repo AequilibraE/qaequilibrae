@@ -55,7 +55,7 @@ def test_single_class_traffic_assignment(ae_with_project, qtbot):
 
     dialog.run()
 
-    pth = Path("test/data/SiouxFalls_project")
+    pth = Path(dialog.project.project_base_path)
     results = pth / "results_database.sqlite"
     assert isfile(results)
 
@@ -169,7 +169,7 @@ def test_multiclass_traffic_assignment(ae_with_project, qtbot):
         dialog.produce_all_outputs()
 
     # Assert we have a non-null result and that results are actually stored in the file
-    pth = Path("test/data/SiouxFalls_project")
+    pth = Path(dialog.project.project_base_path)
     results = pth / "results_database.sqlite"
     assert isfile(results)
     con = sqlite3.connect(results)
