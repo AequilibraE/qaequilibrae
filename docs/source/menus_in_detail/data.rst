@@ -40,8 +40,8 @@ AequilibraE the location of the file and its visualization is displayed.
 Check the figure below to see how the visualization window looks like! General configurations for data displaying
 such as the number of decimal places and the usage of thousand separator are available. In case your file has more 
 than one view, you can select the desired view using the dropdown buttons at the bottom of the page. In our figure,
-they are represented by the dropdowns containing *matrix* and *main_index*. To save your current matrix into \*.csv
-format, just click in the *export* button in the lower left corner of the window.
+they are represented by the dropdowns containing *distance_blended* and *main_index*. To save your current matrix 
+into \*.csv format, just click in the *export* button in the lower left corner of the window.
 
 .. image:: ../images/data-visualize-loaded-matrix.png
     :align: center
@@ -53,7 +53,7 @@ select *By origin*, then click on the desired row, and notice that is going to b
 (if it exists) is going to be loaded and the corresponding zones are going to receive a different color shade, according
 to the color palette selected in the dropdown menu.
 
-.. image:: ../images/data-matrix-view-row-v2.png
+.. image:: ../images/data-matrix-view-row.png
     :align: center
     :alt: data matrix view by origin
 
