@@ -18,7 +18,6 @@ def test_display_data_no_path(ae, mocker):
     assert messagebar.messages[1][-1] == error_message, "Level 1 error message is missing"
 
 
-# Have to test the exceptions
 @pytest.mark.parametrize("has_project", [True, False])
 @pytest.mark.parametrize("path", ("matrices/demand.aem", "matrices/SiouxFalls.omx", "synthetic_future_vector.aed"))
 def test_display_data_with_path(tmpdir, ae_with_project, mocker, has_project, path):
@@ -50,10 +49,10 @@ def test_display_data_with_path(tmpdir, ae_with_project, mocker, has_project, pa
     assert os.path.isfile(f"{tmpdir}/{name}.csv")
 
 
-# Ideally, we would test if the visualization is working
+# TODO: Ideally, we would test if the visualization is working
 @pytest.mark.parametrize("element", ["row", "column"])
 def test_select_elements(ae_with_project, mocker, element):
-    file_path = f"test/data/SiouxFalls_project/matrices/sfalls_skims.omx"
+    file_path = "test/data/SiouxFalls_project/matrices/sfalls_skims.omx"
     _, extension = file_path.split(".")
     file_func = "qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog.DisplayAequilibraEFormatsDialog.get_file_name"
     mocker.patch(file_func, return_value=(file_path, extension.upper()))
@@ -67,6 +66,8 @@ def test_select_elements(ae_with_project, mocker, element):
         dialog.by_col.setChecked(True)
         dialog.table.selectColumn(0)
 
+    dialog.exit_procedure()
+
     # For both columns and rows
     existing_layers = [vector.name() for vector in QgsProject.instance().mapLayers().values()]
     assert "matrix_row" in existing_layers
@@ -77,3 +78,7 @@ def test_select_elements(ae_with_project, mocker, element):
 
     metrics = [round(feat["metrics_data"], 0) for feat in layer.getFeatures()]
     assert metrics == [0.0, 6.0, 4.0]
+
+    QgsProject.instance().removeAllMapLayers()
+
+    dialog.omx.close()
