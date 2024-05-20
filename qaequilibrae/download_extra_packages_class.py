@@ -38,10 +38,10 @@ class DownloadAll:
         # install_command = f'-m pip install {package} -t "{self.pth}"'
         if "openmatrix" in package.lower() or "aequilibrae" in package.lower():
             install_command += " --no-deps"
-        if on_latest:
-            if "tables" in package:
-                install_command = install_command[:-7]
-            install_command += " --break-system-packages"
+        # if on_latest:
+        #     if "tables" in package:
+        #         install_command = install_command[:-7]
+            # install_command += " --break-system-packages"
 
         command = f'"{self.find_python()}" {install_command}'
         print(command)
