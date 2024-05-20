@@ -1,4 +1,4 @@
-FROM qgis/qgis:latest
+FROM qgis/qgis:release-3_34
 
 # Set environment variables for QGIS
 ENV QGIS_PREFIX_PATH=/usr
