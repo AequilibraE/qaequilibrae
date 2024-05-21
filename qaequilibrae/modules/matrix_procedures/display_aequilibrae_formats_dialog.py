@@ -2,13 +2,19 @@ import logging
 import os
 import openmatrix as omx
 import numpy as np
+import pandas as pd
+from math import ceil
 from aequilibrae.matrix import AequilibraeMatrix, AequilibraeData
 
 import qgis
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
+from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView
+from qgis._core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
+from qgis._core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
 from qaequilibrae.modules.common_tools import DatabaseModel, NumpyModel, GetOutputFileName
+from qaequilibrae.modules.common_tools import layer_from_dataframe
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
@@ -25,6 +31,10 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.logger = logging.getLogger("AequilibraEGUI")
         self.qgis_project = qgis_project
         self.from_proj = proj
+        self.indices = np.array(1)
+        self.mapping_layer = None
+        self.selected_col = None
+        self.selected_row = None
 
         if len(file_path) > 0:
             self.data_path = file_path
@@ -40,7 +50,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             self.data_type = self.data_type.upper()
             self.continue_with_data()
-        
+
         if self.error:
             self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
             self.but_load.clicked.connect(self.get_file_name)
@@ -52,7 +62,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.data_type == "AED":
                 self.data_to_show = AequilibraeData()
             elif self.data_type == "AEM":
-                self.data_to_show = AequilibraeMatrix() 
+                self.data_to_show = AequilibraeMatrix()
             if not self.from_proj:
                 self.qgis_project.matrices[self.data_path] = self.data_to_show
             try:
@@ -133,6 +143,33 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self._layout.addItem(self.mat_layout)
             self.change_matrix_cores()
 
+        if self.from_proj:
+            default_style = QgsStyle().defaultStyle()
+            self.mapping_layout = QHBoxLayout()
+
+            self.no_mapping = QRadioButton()
+            self.no_mapping.setText("No mapping")
+            self.no_mapping.toggled.connect(self.set_mapping)
+
+            self.by_row = QRadioButton()
+            self.by_row.setText("By origin")
+            self.by_row.toggled.connect(self.set_mapping)
+
+            self.by_col = QRadioButton()
+            self.by_col.setText("By destination")
+            self.by_col.toggled.connect(self.set_mapping)
+
+            self.cob_colors = QComboBox()
+            self.cob_colors.addItems(list(default_style.colorRampNames()))
+
+            self.no_mapping.setChecked(True)
+
+            self.mapping_layout.addWidget(self.no_mapping)
+            self.mapping_layout.addWidget(self.by_row)
+            self.mapping_layout.addWidget(self.by_col)
+            self.mapping_layout.addWidget(self.cob_colors)
+            self._layout.addItem(self.mapping_layout)
+
         self.but_export = QPushButton()
         self.but_export.setText(self.tr("Export"))
         self.but_export.clicked.connect(self.export)
@@ -150,6 +187,138 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.resize(700, 500)
         self.setLayout(self._layout)
         self.format_showing()
+
+    def select_column(self):
+        self.selected_col = None
+        col_id = [col_idx.column() for col_idx in self.table.selectionModel().selectedColumns()]
+        if not col_id:
+            return
+        self.selected_col = col_id[0]
+        self.zones_layer.selectByExpression(f'"zone_id"={self.indices[col_id[0]]}', QgsVectorLayer.SetSelection)
+        self.iface.mapCanvas().refresh()
+
+        core = self.mat_list.currentText()
+        dt = np.array(self.data_to_show.matrix[core][:, col_id]).reshape(self.indices.shape[0])
+
+        self.map_dt(dt)
+
+    def select_row(self):
+        self.selected_row = None
+        row_id = [rowidx.row() for rowidx in self.table.selectionModel().selectedRows()]
+        if not row_id:
+            return
+        self.selected_row = row_id[0]
+        self.zones_layer.selectByExpression(f'"zone_id"={self.indices[row_id[0]]}', QgsVectorLayer.SetSelection)
+
+        core = self.mat_list.currentText()
+        dt = np.array(self.data_to_show.matrix[core][row_id[0], :]).reshape(self.indices.shape[0])
+
+        self.map_dt(dt)
+
+    def map_dt(self, dt):
+        self.remove_mapping_layer(False)
+        df = pd.DataFrame({"zone_id": self.indices, "data": dt}).dropna()
+        self.mapping_layer = layer_from_dataframe(df, "matrix_row")
+        self.make_join(self.zones_layer, "zone_id", self.mapping_layer)
+        self.draw_zone_styles()
+
+    def make_join(self, base_layer, join_field, metric_layer):
+        lien = QgsVectorLayerJoinInfo()
+        lien.setJoinFieldName(join_field)
+        lien.setTargetFieldName(join_field)
+        lien.setJoinLayerId(metric_layer.id())
+        lien.setUsingMemoryCache(True)
+        lien.setJoinLayer(metric_layer)
+        lien.setPrefix("metrics_")
+        base_layer.addJoin(lien)
+
+    def draw_zone_styles(self):
+        color_ramp_name = self.cob_colors.currentText()
+
+        self.map_ranges("metrics_data", self.zones_layer, color_ramp_name)
+
+    def map_ranges(self, fld, layer, color_ramp_name):
+        from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
+
+        idx = self.zones_layer.fields().indexFromName("metrics_data")
+        max_metric = self.zones_layer.maximumValue(idx)
+
+        num_steps = 9
+        max_metric = num_steps if max_metric is None else max_metric
+        values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
+        values = [0, 0.000001] + values
+        color_ramp = color_ramp_shades(color_ramp_name, num_steps)
+        ranges = []
+        for i in range(num_steps + 1):
+            myColour = color_ramp[i]
+            symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+            symbol.setColor(myColour)
+            symbol.setOpacity(1)
+
+            if i == 0:
+                label = f"0/Null ({fld.replace('metrics_', '')})"
+            elif i == 1:
+                label = f"Up to {values[i + 1]:,.0f}"
+            else:
+                label = f"{values[i]:,.0f} to {values[i + 1]:,.0f}"
+
+            ranges.append(QgsRendererRange(values[i], values[i + 1], symbol, label))
+
+        sizes = [0, max_metric]
+        renderer = QgsGraduatedSymbolRenderer("", ranges)
+        renderer.setSymbolSizes(*sizes)
+        renderer.setClassAttribute(f"""coalesce("{fld}", 0)""")
+
+        classific_method = QgsApplication.classificationMethodRegistry().method("EqualInterval")
+        renderer.setClassificationMethod(classific_method)
+
+        layer.setRenderer(renderer)
+        layer.triggerRepaint()
+        self.iface.mapCanvas().setExtent(layer.extent())
+        self.iface.mapCanvas().refresh()
+
+    def set_mapping(self):
+        self.table.clearSelection()
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
+        if not self.from_proj:
+            return
+
+        if self.from_proj:
+            self.zones_layer = self.qgis_project.layers["zones"][0]
+            QgsProject.instance().addMapLayer(self.zones_layer)
+
+        self.remove_mapping_layer()
+        if self.no_mapping.isChecked():
+            return
+
+        if self.by_row.isChecked():
+            self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.selected_col = None
+            if self.selected_row:
+                self.table.blockSignals(True)
+                self.table.selectRow(self.selected_row)
+                self.table.blockSignals(False)
+                self.select_row()
+            self.table.selectionModel().selectionChanged.connect(self.select_row)
+        elif self.by_col.isChecked():
+            self.table.setSelectionBehavior(QAbstractItemView.SelectColumns)
+            self.selected_row = None
+            if self.selected_col:
+                self.table.blockSignals(True)
+                self.table.selectColumn(self.selected_col)
+                self.table.blockSignals(False)
+                self.select_column()
+            self.table.selectionModel().selectionChanged.connect(self.select_column)
+
+    def remove_mapping_layer(self, clear_selection=True):
+        if self.mapping_layer is not None:
+            QgsProject.instance().removeMapLayers([self.mapping_layer.id()])
+        for lien in self.zones_layer.vectorJoins():
+            self.zones_layer.removeJoin(lien.joinLayerId())
+        self.mapping_layer = None
+        if clear_selection:
+            self.zones_layer.selectByExpression('"zone_id"-<1000', QgsVectorLayer.SetSelection)
+        self.zones_layer.triggerRepaint()
 
     def format_showing(self):
         if self.data_to_show is None:
@@ -174,10 +343,10 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.add_matrix_parameters(idx, core)
             self.format_showing()
 
+        self.indices = self.data_to_show.index.astype(np.int32)
+
     def csv_file_path(self):
-        new_name, _ = GetOutputFileName(
-            self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.data_path
-        )
+        new_name, _ = GetOutputFileName(self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.data_path)
         return new_name
 
     def export(self):
