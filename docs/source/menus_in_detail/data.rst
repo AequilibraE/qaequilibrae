@@ -12,25 +12,24 @@ In the data tab the user can check and load the non-geographic data available in
 Visualize data
 --------------
 
-When clicking **Data > Visualize data**, a new window with three different tabs
-opens. The tab *matrices* shows the matrices available for the current project (see figure below).
+When clicking **Data > Visualize data**, a new window with three different tabs opens. The tab *matrices* shows 
+the matrices available for the current project (see figure below).
 
 .. image:: ../images/data_visualize_data_matrices.png
     :align: center
     :alt: project data matrices
 
-As for the tab *results* it displays the results of procedures that took place, such as the
-creation of Delaunay Lines, and that are saved in a **results_database.sqlite**. If you left the option
-*Join with layer* checked, AequilibraE will automatically join the results table with the correspondent
-link layer. This can be helpful when 
-:ref:`visualizing assignment results <usage-of-results-layer-join>`, for example.
+As for the tab *results* it displays the results of procedures that took place, such as the creation of Delaunay 
+Lines, and that are saved in a **results_database.sqlite**.
 
 .. image:: ../images/data_visualize_data_results.png
     :align: center
     :alt: project data results
 
-Finally, the tab *non-project data* allows you to open and visualize matrices and datasets in the following 
-extensions: \*.omx, \*.aem, and \*.aed.
+The tab *non-project data* allows you to open and visualize matrices and datasets in the following extensions: 
+\*.omx, \*.aem, and \*.aed. **This is the only tab available if no AequilibraE project is open**. Suppose you 
+want to check a skim matrix from a previous project. When clicking the **Load data** button, you can point 
+AequilibraE the location of the file and its visualization is displayed.
 
 .. _fig_nonproject_data:
 
@@ -38,21 +37,33 @@ extensions: \*.omx, \*.aem, and \*.aed.
     :align: center
     :alt: project data load non-project data
 
-Suppose you want to check a \*.aem matrix you have previously saved in your computer.
-When clicking the **Load data** button, you can point AequilibraE the location of the file and a new
-window opens.
-
-Check the figure below to see how the visualization window looks like.
-You can configure the number of decimal places to be displayed and if
-one wishes to use the thousand separator or not. In case your file has more than one view,
-you can select the desired view using the dropdown buttons at the bottom of the page.
-In our figure, they are represented by the dropdowns containing *matrix* and 
-*main_index*. Finally, if you click in the *export* button in the lower left corner of the 
-window, you can also save the current matrix in \*.csv format. 
+Check the figure below to see how the visualization window looks like! General configurations for data displaying
+such as the number of decimal places and the usage of thousand separator are available. In case your file has more 
+than one view, you can select the desired view using the dropdown buttons at the bottom of the page. In our figure,
+they are represented by the dropdowns containing *distance_blended* and *main_index*. To save your current matrix 
+into \*.csv format, just click in the *export* button in the lower left corner of the window.
 
 .. image:: ../images/data-visualize-loaded-matrix.png
     :align: center
     :alt: data visualize matrices
+
+Additionally, since version 1.0.2, we can visualize how the skim matrices look like in the map! Using the buttons
+*By origin* and *By destination*, it is possible to select the traffic zone by its origin or destination. If one
+select *By origin*, then click on the desired row, and notice that is going to be highlighted. The *zones* layer 
+(if it exists) is going to be loaded and the corresponding zones are going to receive a different color shade, according
+to the color palette selected in the dropdown menu.
+
+.. image:: ../images/data-matrix-view-row.png
+    :align: center
+    :alt: data matrix view by origin
+
+The step-by-step when selecting *By destination*, is identical to the one before. Select the desired column 
+(destination), notice that it will be highlighted, and the *zones* layer is going to present a color shade
+according to the color palette selected.
+
+.. image:: ../images/data-matrix-view-column.png
+    :align: center
+    :alt: data matrix view by destination
 
 .. _importing_matrices:
 
