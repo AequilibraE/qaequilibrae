@@ -49,7 +49,7 @@ def update_project_layers(qgis_project):
     # Add transit_tables to layers
     pt_database = join(qgis_project.project.project_base_path, "public_transport.sqlite")
     if exists(pt_database):
-        layers += ["transit_routes", "transit_stops", "transit_pattern_mapping"]
+        layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
 
     descrlayout = QVBoxLayout()
     qgis_project.geo_layers_table = QTableWidget()
