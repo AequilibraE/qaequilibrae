@@ -763,42 +763,42 @@
 <context>
     <name>DisplayAequilibraEFormatsDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="214"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="383"/>
         <source>AequilibraE custom formats</source>
         <translation>Formatos personalizados do AequilibraE</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="38"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="48"/>
         <source>Path provided is not a valid dataset</source>
         <translation>O caminho indicado não é um banco de dados válido</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="49"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="59"/>
         <source>File path: {}</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="66"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="76"/>
         <source>Could not load dataset</source>
         <translation>Não foi possível carregar o banco de dados</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="95"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="105"/>
         <source>Thousands separator</source>
         <translation>Separador de milhares</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="104"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="114"/>
         <source>Decimal places</source>
         <translation>Casas decimais</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="142"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="179"/>
         <source>Close</source>
         <translation>Fechar</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="137"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="174"/>
         <source>Export</source>
         <translation>Exportar</translation>
     </message>
@@ -2240,12 +2240,12 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Resultados</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="98"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="105"/>
         <source>It may take up to one minute to process for the first time a table is loaded from this database</source>
         <translation>Pode levar até um minuto processar uma tabela que está sendo carregada a partir do banco de dados pela primeira vez</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="101"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="108"/>
         <source>Load Result table as data layer</source>
         <translation>Carregar a tabela de resultados como uma camada de dados</translation>
     </message>
@@ -2260,14 +2260,19 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Carregar dados</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="116"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="126"/>
         <source>Non-project Data</source>
         <translation>Dados externos</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="128"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="138"/>
         <source>Load Data</source>
         <translation>Carregar dados</translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="115"/>
+        <source>Join with layer</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2910,7 +2915,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
 <context>
     <name>ui_transponet_construction</name>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="19"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
         <source>AequilibraE - Add zoning layer to project</source>
         <translation>AequilibraE - Adicionando zonas ao projeto</translation>
     </message>
@@ -2930,7 +2935,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Centroide</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="74"/>
         <source>Layer</source>
         <translation>Camada</translation>
     </message>
