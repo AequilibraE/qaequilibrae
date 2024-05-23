@@ -2267,7 +2267,7 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="138"/>
         <source>Load Data</source>
-        <translation type="unfinished"/>
+        <translation>Charger les données</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="115"/>
