@@ -39,9 +39,9 @@ class DownloadAll:
         if "openmatrix" in package.lower() or "aequilibrae" in package.lower():
             install_command += " --no-deps"
         if on_latest:
-            if "tables" in package:
-                install_command = install_command[:-7]
-            install_command += " --break-system-packages"
+        #     if "tables" in package:
+        #         install_command = install_command[:-7]
+            install_command += f' -t "/app/qgis_env/lib/python3.12/site-packages"'
 
         command = f'"{self.find_python()}" {install_command}'
         print(command)

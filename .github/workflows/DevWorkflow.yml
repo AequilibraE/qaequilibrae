@@ -10,27 +10,31 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        # container: [ 'qgis/qgis:release-3_34']
-        container: [ 'qgis/qgis:latest', 'qgis/qgis:release-3_34']
+        container: [ 'qgis/qgis:latest', 'qgis/qgis:3.34', 'qgis/qgis:3.36']
     container:
       image: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies for Release
-        if: ${{ (matrix.container == 'qgis/qgis:release-3_34')}}
+      - name: Install dependencies
         run: |
-          python3 -m pip install setuptools
-          python3 -m pip install -r test/requirements-test.txt
-          python3 -m pip install -r ci/requirements-dev.txt
-          python3 ./ci/dependency_installation.py
+          apt update && apt install -y python3-venv python3-pip
+          python3 -m venv --system-site-packages /app/qgis_env
+          /app/qgis_env/bin/pip install setuptools
 
-      - name: Install dependencies for Latest
-        if: ${{ (matrix.container == 'qgis/qgis:latest')}}
+      - name: Install QGIS and related dependencies
         run: |
-          python3 -m pip install setuptools --break-system-packages
-          python3 -m pip install -r test/requirements-test.txt --break-system-packages
-          python3 -m pip install -r ci/requirements-dev.txt --break-system-packages
-          python3 ./ci/dependency_installation.py
+          apt-get update
+          apt-get install -y qgis python3-qgis qgis-plugin-grass
+          ln -s /usr/local/bin/qgis-bin /app/qgis_env/bin/qgis
+
+      - name: Check QGIS installation
+        run: /app/qgis_env/bin/qgis --version
+
+      - name: Run your Python script or tests
+        run: |
+          pip install -r test/requirements-test.txt
+          pip install -r ci/requirements-dev.txt
+          python3 -c 'from qaequilibrae.download_extra_packages_class import DownloadAll; DownloadAll().install(True)'
 
       - name: Run tests
         run: |
