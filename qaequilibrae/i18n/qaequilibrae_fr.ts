@@ -1596,7 +1596,7 @@
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="174"/>
         <source>Writing node IDs to links: {}/{}</source>
-        <translation type="unfinished"/>
+        <translation>Ajout des ID de noeuds aux tronçons: {}/{}</translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="187"/>
