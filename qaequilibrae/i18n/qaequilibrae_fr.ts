@@ -2272,7 +2272,7 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="115"/>
         <source>Join with layer</source>
-        <translation type="unfinished"/>
+        <translation>Joindre la couche</translation>
     </message>
 </context>
 <context>
