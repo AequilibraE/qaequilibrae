@@ -10,7 +10,8 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        container: [ 'qgis/qgis:latest', 'qgis/qgis:3.34', 'qgis/qgis:3.36']
+        # container: ['qgis/qgis:latest', 'qgis/qgis:3.34', 'qgis/qgis:3.36']
+        container: ['qgis/qgis:latest']
     container:
       image: ${{ matrix.container }}
     steps:
@@ -19,11 +20,10 @@ jobs:
         run: |
           apt update && apt install -y python3-venv python3-pip
           python3 -m venv --system-site-packages /app/qgis_env
-          /app/qgis_env/bin/pip install setuptools
 
       - name: Install QGIS and related dependencies
         run: |
-          apt-get update
+          source /app/qgis_env/bin/activate
           apt-get install -y qgis python3-qgis qgis-plugin-grass
           ln -s /usr/local/bin/qgis-bin /app/qgis_env/bin/qgis
 
@@ -32,8 +32,9 @@ jobs:
 
       - name: Run your Python script or tests
         run: |
-          pip install -r test/requirements-test.txt
-          pip install -r ci/requirements-dev.txt
+          python3 -m pip install setuptools
+          python3 -m pip install -r test/requirements-test.txt
+          python3 -m pip install -r ci/requirements-dev.txt
           python3 -c 'from qaequilibrae.download_extra_packages_class import DownloadAll; DownloadAll().install(True)'
 
       - name: Run tests

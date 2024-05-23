@@ -44,7 +44,7 @@
 		"pip", "install", "-r", "test/requirements-test.txt",
 		"pip", "install", "-r", "ci/requirements-dev.txt",
 		"pip", "install", "-r", "ci/packaging.txt",
-		"pip", "install", "-r", "docs/requirements-docs.txt",
+		"pip", "install", "-r", "docs/requirements-docs.txt"
 	],
 	"postAttachCommand": "python3 -c 'from qaequilibrae.download_extra_packages_class import DownloadAll; DownloadAll().install(True)'"
 }
