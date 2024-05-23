@@ -1591,7 +1591,7 @@
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="156"/>
         <source>Writing new node layer: {}/{}</source>
-        <translation type="unfinished"/>
+        <translation>Ecriture de la nouvelle couche de noeuds: {}/{}</translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="174"/>
