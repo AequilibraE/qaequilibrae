@@ -16,8 +16,10 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
-from qgis.core import QgsProject, QgsExpressionContextUtils
+from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
 from qgis.PyQt.QtCore import QTranslator
+
+from .modules.processing_provider.provider import Provider
 
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, run_show_project_data
@@ -116,6 +118,7 @@ class AequilibraEMenu:
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
+
         # # # ########################################################################
         # # # ################# MODEL BUILDING SUB-MENU  #######################
         self.add_menu_action(
@@ -254,6 +257,8 @@ class AequilibraEMenu:
 
     def unload(self):
         del self.dock
+        if  self.provider in QgsApplication.processingRegistry().providers():
+            QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def trlt(self, message):
         # In the near future, we will use this function to automatically translate the AequilibraE menu
@@ -262,6 +267,8 @@ class AequilibraEMenu:
         return message
 
     def initGui(self):
+        self.provider = Provider(self.tr)
+        QgsApplication.processingRegistry().addProvider(self.provider)
         pass
 
     def removes_temporary_files(self):
