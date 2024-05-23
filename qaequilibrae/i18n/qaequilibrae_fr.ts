@@ -2262,7 +2262,7 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="126"/>
         <source>Non-project Data</source>
-        <translation type="unfinished"/>
+        <translation>Données &quot;hors-projet&quot;</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="138"/>
