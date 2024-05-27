@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>@default</name>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="92"/>
+        <source> zones found in input layer :</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AboutDialog</name>
     <message>
         <location filename="../modules/common_tools/about_dialog.py" line="50"/>
@@ -40,6 +48,54 @@
     </message>
 </context>
 <context>
+    <name>AddConnectors</name>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="13"/>
+        <source>Desired number of connectors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="14"/>
+        <source>Mode to connect (only one at a time)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="15"/>
+        <source>AequilibraE project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="22"/>
+        <source>AequilibraE library not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="25"/>
+        <source>Connecting to aequilibrae project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="38"/>
+        <source>Adding {nb_conn} connectors when none exists for mode &quot;{mode}&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="53"/>
+        <source>Add connectors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="59"/>
+        <source>1_Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="62"/>
+        <source>Go through all the centroids and add connectors only if none exists for the chosen mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AddZonesProcedure</name>
     <message>
         <location filename="../modules/project_procedures/add_zones_procedure.py" line="22"/>
@@ -50,172 +106,172 @@
 <context>
     <name>AequilibraEMenu</name>
     <message>
-        <location filename="../qaequilibrae.py" line="118"/>
+        <location filename="../qaequilibrae.py" line="120"/>
         <source>Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="136"/>
+        <location filename="../qaequilibrae.py" line="139"/>
         <source>Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="140"/>
+        <location filename="../qaequilibrae.py" line="143"/>
         <source>Trip Distribution</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="152"/>
+        <location filename="../qaequilibrae.py" line="155"/>
         <source>Paths and assignment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="158"/>
+        <location filename="../qaequilibrae.py" line="161"/>
         <source>Routing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="163"/>
+        <location filename="../qaequilibrae.py" line="166"/>
         <source>Public Transport</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="114"/>
+        <location filename="../qaequilibrae.py" line="116"/>
         <source>Open Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="121"/>
+        <location filename="../qaequilibrae.py" line="124"/>
         <source>Create project from OSM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="124"/>
+        <location filename="../qaequilibrae.py" line="127"/>
         <source>Create Project from layers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="131"/>
+        <location filename="../qaequilibrae.py" line="134"/>
         <source>Add zoning data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="116"/>
+        <location filename="../qaequilibrae.py" line="118"/>
         <source>Parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="117"/>
+        <location filename="../qaequilibrae.py" line="119"/>
         <source>logfile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="118"/>
+        <location filename="../qaequilibrae.py" line="120"/>
         <source>Close project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="127"/>
+        <location filename="../qaequilibrae.py" line="130"/>
         <source>Network Preparation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="128"/>
+        <location filename="../qaequilibrae.py" line="131"/>
         <source>Add centroid connectors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="146"/>
+        <location filename="../qaequilibrae.py" line="149"/>
         <source>Shortest path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="149"/>
+        <location filename="../qaequilibrae.py" line="152"/>
         <source>Impedance matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="152"/>
+        <location filename="../qaequilibrae.py" line="155"/>
         <source>Traffic Assignment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="158"/>
+        <location filename="../qaequilibrae.py" line="161"/>
         <source>Travelling Salesman Problem</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="162"/>
+        <location filename="../qaequilibrae.py" line="165"/>
         <source>Import GTFS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="167"/>
+        <location filename="../qaequilibrae.py" line="170"/>
         <source>Desire Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="168"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Stacked Bandwidth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="169"/>
+        <location filename="../qaequilibrae.py" line="172"/>
         <source>Scenario Comparison</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="170"/>
+        <location filename="../qaequilibrae.py" line="173"/>
         <source>Lowest common denominator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="171"/>
+        <location filename="../qaequilibrae.py" line="174"/>
         <source>Simple tag</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="136"/>
+        <location filename="../qaequilibrae.py" line="139"/>
         <source>Import matrices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="175"/>
+        <location filename="../qaequilibrae.py" line="178"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="182"/>
+        <location filename="../qaequilibrae.py" line="185"/>
         <source>Show project info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="332"/>
+        <location filename="../qaequilibrae.py" line="339"/>
         <source>You need to load a project first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="335"/>
+        <location filename="../qaequilibrae.py" line="342"/>
         <source>You need to close the project currently open first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="115"/>
+        <location filename="../qaequilibrae.py" line="117"/>
         <source>Create example</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="163"/>
+        <location filename="../qaequilibrae.py" line="166"/>
         <source>Explore Transit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="131"/>
+        <location filename="../qaequilibrae.py" line="134"/>
         <source>Model Building</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="135"/>
+        <location filename="../qaequilibrae.py" line="138"/>
         <source>Visualize data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1465,6 +1521,94 @@
     </message>
 </context>
 <context>
+    <name>MatrixFromLayer</name>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="15"/>
+        <source>Layer containing a matrix in list format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="16"/>
+        <source>Origin field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="17"/>
+        <source>Destination field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="18"/>
+        <source>Value field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="19"/>
+        <source>Name your output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="20"/>
+        <source>Output folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="21"/>
+        <source>Name of your matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="22"/>
+        <source>Something usefull to describe your matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="23"/>
+        <source>Name for the core of your matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="34"/>
+        <source>AequilibraE library not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="51"/>
+        <source>Importing the layer from QGIS :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="92"/>
+        <source>Matrix imported as a {num_zones}x{num_zones} matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="96"/>
+        <source>A final sweep after the work...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="111"/>
+        <source>Create a .aem matrix file from a layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="117"/>
+        <source>2_Matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/MatrixFromLayer.py" line="120"/>
+        <source>
+        Save a layer as a .aem file :
+        - the original matrix stored in the layer needs to be in list format
+        - Origin and destination fields need to be integers
+        - Value field can be integer or real
+        </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MatrixReblocking</name>
     <message>
         <location filename="../modules/matrix_procedures/mat_reblock.py" line="32"/>
@@ -1640,6 +1784,91 @@
     </message>
 </context>
 <context>
+    <name>ProjectFromLayer</name>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="21"/>
+        <source>Links</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="22"/>
+        <source>Link_ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="23"/>
+        <source>Link_type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="24"/>
+        <source>Direction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="25"/>
+        <source>Modes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="26"/>
+        <source>Folder to create the project in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="27"/>
+        <source>Project name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="34"/>
+        <source>AequilibraE library not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="38"/>
+        <source>Generating empty aequilibrae project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="55"/>
+        <source>Importing link layer from QGIS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="81"/>
+        <source>Getting parameters from link layer and setting up the AequilibraE project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="108"/>
+        <source>Adding links</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="118"/>
+        <source>Closing aequilibrae project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="129"/>
+        <source>Create project from link layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="135"/>
+        <source>0_Project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/ProjectFromLayer.py" line="138"/>
+        <source>
+        Create an AequilibraE project from a given link layer
+        </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ProjectFromOSMDialog</name>
     <message>
         <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="40"/>
@@ -1679,6 +1908,105 @@
     <message>
         <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="57"/>
         <source>Target</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Provider</name>
+    <message>
+        <location filename="../modules/processing_provider/provider.py" line="44"/>
+        <source>AequilibraE</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RenumberFromCentroids</name>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="18"/>
+        <source>Centroids</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="19"/>
+        <source>Zone id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="20"/>
+        <source>AequilibraE project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="27"/>
+        <source>AequilibraE library not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="31"/>
+        <source>Connecting to aequilibrae project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="37"/>
+        <source>Importing node layer from QGIS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="54"/>
+        <source>Looking for existing nodes from AequilibraE project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="63"/>
+        <source>Comparing nodes from input centroid layer:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="67"/>
+        <source>With existing nodes in AequilibraE project:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="91"/>
+        <source> Multiple nodes found for zone </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="91"/>
+        <source>, unable to decide which node to use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="94"/>
+        <source> zones found an existing matching node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="96"/>
+        <source> new nodes added for unmatched zones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="98"/>
+        <source> zones could not be processed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="111"/>
+        <source>Create/renumber nodes from a centroid layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="117"/>
+        <source>1_Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/RenumberFromCentroids.py" line="120"/>
+        <source>
+        Import or create nodes to match an AequilibraE project with a GIS layer of centroids
+        Warning : you may have to change existing node_id (ex. using QGIS field calculator) to ensure that changed node IDs (coming from zone id) are not already used.
+        </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1888,6 +2216,103 @@
         <location filename="../modules/routing_procedures/tsp_procedure.py" line="62"/>
         <source>Route:
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TrafficAssignYAML</name>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="12"/>
+        <source>Configuration file (.yaml)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="12"/>
+        <source>Assignment configuration file (*.yaml)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="19"/>
+        <source>AequilibraE library not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="26"/>
+        <source>Getting parameters from input yaml file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="33"/>
+        <source>Opening project and setting up traffic classes...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="43"/>
+        <source> traffic classes have been found in config file :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="79"/>
+        <source>Setting up assignment...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="96"/>
+        <source>Running traffic assignment...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="102"/>
+        <source>Assignment completed, saving outputs...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="117"/>
+        <source>Traffic assignment from a config file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="123"/>
+        <source>3_Assignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/AssignFromYaml.py" line="126"/>
+        <source>
+        Run a traffic assignment using a yaml configuration file. Example of valide configuration file:
+        
+        Project: D:/AequilibraE/Project/
+
+        Run_name: sce_from_yaml
+
+        Traffic_classes:
+            - car:
+                matrix_path: D:/AequilibraE/Project/matrices/demand.aem
+                matrix_core: car
+                network_mode: c
+                pce: 1
+                blocked_centroid_flows: True
+                skims: travel_time, distance
+            - truck:
+                matrix_path: D:/AequilibraE/Project/matrices/demand.aem
+                matrix_core: truck
+                network_mode: c
+                pce: 2
+                fixed_cost: toll
+                vot: 12
+                blocked_centroid_flows: True
+
+        Assignment:
+            algorithm: bfw
+            vdf: BPR2
+            alpha: 0.15
+            beta: power
+            capacity_field: capacity
+            time_field: travel_time
+            max_iter: 250
+            rgap: 0.00001
+        
+        </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2271,6 +2696,51 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="115"/>
         <source>Join with layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>exportMatrix</name>
+    <message>
+        <location filename="../modules/processing_provider/exportMatrix.py" line="11"/>
+        <source>Matrix file to convert (.omx or .aem)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/exportMatrix.py" line="11"/>
+        <source>AequilibraE matrix formats (*.omx *.aem)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/exportMatrix.py" line="12"/>
+        <source>Export matrices to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/exportMatrix.py" line="13"/>
+        <source>Format to use for export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/exportMatrix.py" line="23"/>
+        <source>AequilibraE library not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/exportMatrix.py" line="45"/>
+        <source>Export omx or aem matrix to csv, aem or omx</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/exportMatrix.py" line="51"/>
+        <source>2_Matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/exportMatrix.py" line="54"/>
+        <source>
+        Export an existing .omx or .aem matrix file into csv, aem or omx
+        </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
