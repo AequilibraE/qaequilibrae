@@ -1,9 +1,10 @@
 import importlib.util as iutil
 import sys
+
 from qgis.core import QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile
 
-from .translatable_algo import TranslatableAlgorithm
+from qaequilibrae.i18n.translate import TranslatableAlgorithm
 
 
 class TrafficAssignYAML(TranslatableAlgorithm):

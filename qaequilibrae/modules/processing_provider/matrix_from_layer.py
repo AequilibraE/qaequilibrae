@@ -1,13 +1,15 @@
-from qgis.core import QgsProcessingMultiStepFeedback, QgsProcessingParameterString, QgsProcessingParameterDefinition
-from qgis.core import QgsProcessingParameterField, QgsProcessingParameterMapLayer, QgsProcessingParameterFile
-from .translatable_algo import TranslatableAlgorithm
-
 import importlib.util as iutil
-import os, sys
+import sys
 import numpy as np
 import pandas as pd
+from os.path import join
 from scipy.sparse import coo_matrix
+
+from qgis.core import QgsProcessingMultiStepFeedback, QgsProcessingParameterString, QgsProcessingParameterDefinition
+from qgis.core import QgsProcessingParameterField, QgsProcessingParameterMapLayer, QgsProcessingParameterFile
+
 from qaequilibrae.modules.common_tools import standard_path
+from qaequilibrae.i18n.translate import TranslatableAlgorithm
 
 
 class MatrixFromLayer(TranslatableAlgorithm):
@@ -67,9 +69,7 @@ class MatrixFromLayer(TranslatableAlgorithm):
                 multiLine=False,
                 defaultValue="",
             ),
-            QgsProcessingParameterString(
-                "CoreName", self.tr("Matrix core"), multiLine=False, defaultValue="Value"
-            ),
+            QgsProcessingParameterString("CoreName", self.tr("Matrix core"), multiLine=False, defaultValue="Value"),
         ]
         for param in advparams:
             param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
@@ -94,7 +94,7 @@ class MatrixFromLayer(TranslatableAlgorithm):
 
         output_folder = parameters["OutputFold"]
         output_name = parameters["FileName"]
-        filename = os.path.join(output_folder, output_name + ".aem")
+        filename = join(output_folder, output_name + ".aem")
 
         # Import layer as a pandas df
         feedback.pushInfo(self.tr("Importing layer from QGIS:"))
@@ -171,7 +171,7 @@ class MatrixFromLayer(TranslatableAlgorithm):
 
     def createInstance(self):
         return MatrixFromLayer(self.tr)
-    
+
     def string_order(self, order):
         if order == 1:
             return self.tr("Save a layer as a *.aem file. Notice that: ")

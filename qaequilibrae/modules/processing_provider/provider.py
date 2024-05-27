@@ -1,10 +1,15 @@
 __author__ = "Arthur Evrard"
 
+from os.path import join
+import sys
+from pathlib import Path
+
 from qgis.core import QgsProcessingProvider
 from qgis.PyQt.QtGui import QIcon
-import os
 
-provider_path = os.path.dirname(__file__)[:-28]
+provider_path = Path(__file__).parent.parent.parent
+if str(provider_path) not in sys.path:
+    sys.path.append(str(provider_path))
 
 
 class Provider(QgsProcessingProvider):
@@ -15,7 +20,7 @@ class Provider(QgsProcessingProvider):
     def loadAlgorithms(self):
         from .matrix_from_layer import MatrixFromLayer
         from .export_matrix import exportMatrix
-        from .project_from_layers import ProjectFromLayer
+        from .project_from_layer import ProjectFromLayer
         from .renumber_from_centroids import RenumberFromCentroids
         from .Add_connectors import AddConnectors
         from .assign_from_yaml import TrafficAssignYAML
@@ -47,4 +52,4 @@ class Provider(QgsProcessingProvider):
         """Should return a QIcon which is used for your provider inside
         the Processing toolbox.
         """
-        return QIcon(os.path.join(provider_path, "icon.png"))
+        return QIcon(join(provider_path, "icon.png"))

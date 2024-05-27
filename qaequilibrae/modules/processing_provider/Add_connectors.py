@@ -1,10 +1,11 @@
 import importlib.util as iutil
 import sys
+
 from qgis.core import QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterNumber, QgsProcessingParameterString
-from qaequilibrae.modules.common_tools import standard_path
 
-from .translatable_algo import TranslatableAlgorithm
+from qaequilibrae.modules.common_tools import standard_path
+from qaequilibrae.i18n.translate import TranslatableAlgorithm
 
 
 class AddConnectors(TranslatableAlgorithm):

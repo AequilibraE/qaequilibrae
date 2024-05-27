@@ -1,21 +1,16 @@
-from os.path import join
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
-from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback
-from qgis.core import (
-    QgsProcessingParameterVectorLayer,
-    QgsProcessingParameterField,
-    QgsProcessingParameterFile,
-    QgsProcessingParameterString,
-)
-from qgis.core import QgsProject, QgsFeature, QgsVectorLayer, QgsDataSourceUri
-
 import importlib.util as iutil
 import pandas as pd
 import sys
+from os.path import join
 from string import ascii_lowercase
-from qaequilibrae.modules.common_tools import standard_path
 
-from .translatable_algo import TranslatableAlgorithm
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback, QgsProcessingParameterVectorLayer
+from qgis.core import QgsProcessingParameterField, QgsProcessingParameterFile, QgsProcessingParameterString
+from qgis.core import QgsProject, QgsFeature, QgsVectorLayer, QgsDataSourceUri
+
+from qaequilibrae.modules.common_tools import standard_path
+from qaequilibrae.i18n.translate import TranslatableAlgorithm
 
 
 class ProjectFromLayer(TranslatableAlgorithm):

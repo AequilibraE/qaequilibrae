@@ -1,8 +1,12 @@
-from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterEnum
-from .translatable_algo import TranslatableAlgorithm
 import importlib.util as iutil
-import os, tempfile, sys
+import tempfile
+import sys
 from pathlib import Path
+from os.path import join
+
+from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterEnum
+
+from qaequilibrae.i18n.translate import TranslatableAlgorithm
 
 
 class exportMatrix(TranslatableAlgorithm):
@@ -38,9 +42,7 @@ class exportMatrix(TranslatableAlgorithm):
 
         pathSource = parameters["srcFile"]
         fileformat = [".csv", ".omx", ".aem"]
-        pathDest = os.path.join(
-            parameters["destFolder"], Path(pathSource).stem + fileformat[parameters["outputformat"]]
-        )
+        pathDest = join(parameters["destFolder"], Path(pathSource).stem + fileformat[parameters["outputformat"]])
 
         # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:

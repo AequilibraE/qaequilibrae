@@ -1,14 +1,14 @@
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
-from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback
-from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterFile
-
 import importlib.util as iutil
 import pandas as pd
 import sys
 from shapely.wkt import loads as load_wkt
-from qaequilibrae.modules.common_tools import standard_path
 
-from .translatable_algo import TranslatableAlgorithm
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
+from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback
+from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterFile
+
+from qaequilibrae.modules.common_tools import standard_path
+from qaequilibrae.i18n.translate import TranslatableAlgorithm
 
 
 class RenumberFromCentroids(TranslatableAlgorithm):
