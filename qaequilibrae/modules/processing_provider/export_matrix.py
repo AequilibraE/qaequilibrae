@@ -1,6 +1,6 @@
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterEnum
-from .translatableAlgo import TranslatableAlgorithm
+from .translatable_algo import TranslatableAlgorithm
 import importlib.util as iutil
 import os, tempfile, sys
 from pathlib import Path

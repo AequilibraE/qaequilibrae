@@ -3,7 +3,7 @@ import sys
 from qgis.core import QgsProcessingMultiStepFeedback
 from qgis.core import QgsProcessingParameterFile
 
-from .translatableAlgo import TranslatableAlgorithm
+from .translatable_algo import TranslatableAlgorithm
 
 
 class TrafficAssignYAML(TranslatableAlgorithm):

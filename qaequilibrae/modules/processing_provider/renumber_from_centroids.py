@@ -9,7 +9,7 @@ import pandas as pd
 import sys
 from shapely.wkt import loads as load_wkt
 
-from .translatableAlgo import TranslatableAlgorithm
+from .translatable_algo import TranslatableAlgorithm
 
 
 class RenumberFromCentroids(TranslatableAlgorithm):

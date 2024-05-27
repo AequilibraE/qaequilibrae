@@ -12,7 +12,7 @@ import sys
 from shapely.wkt import loads as load_wkt
 from string import ascii_lowercase
 
-from .translatableAlgo import TranslatableAlgorithm
+from .translatable_algo import TranslatableAlgorithm
 
 
 class ProjectFromLayer(TranslatableAlgorithm):
