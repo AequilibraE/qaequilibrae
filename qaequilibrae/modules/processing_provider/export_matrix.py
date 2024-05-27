@@ -46,7 +46,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
 
         # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
-            sys.exit(self.tr("AequilibraE not found"))
+            sys.exit(self.tr("AequilibraE module not found"))
 
         from aequilibrae.matrix import AequilibraeMatrix
 

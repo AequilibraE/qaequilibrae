@@ -81,7 +81,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
 
         # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
-            sys.exit(self.tr("AequilibraE not found"))
+            sys.exit(self.tr("AequilibraE module not found"))
 
         from aequilibrae.matrix import AequilibraeMatrix
 
@@ -175,7 +175,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
 
     def string_order(self, order):
         if order == 1:
-            return self.tr("Save a layer as a *.aem file. Notice that: ")
+            return self.tr("Save a layer as a *.aem file. Notice that:")
         elif order == 2:
             return self.tr("- the original matrix stored in the layer needs to be in list format")
         elif order == 3:

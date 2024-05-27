@@ -80,11 +80,11 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
 
         # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
-            sys.exit(self.tr("AequilibraE not found"))
+            sys.exit(self.tr("AequilibraE module not found"))
 
         from aequilibrae import Project
 
-        feedback.pushInfo(self.tr("Generating empty aequilibrae project"))
+        feedback.pushInfo(self.tr("Creating AequilibraE project"))
         project = Project()
         PrjtPath = join(parameters["destFolder"], parameters["prject_name"])
         project.new(PrjtPath)
@@ -127,7 +127,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
-        feedback.pushInfo(self.tr("Getting parameters from link layer and setting up the AequilibraE project"))
+        feedback.pushInfo(self.tr("Getting parameters from link layer"))
 
         # Updating link types
         link_types = df[parameters["link_type"]].unique()
@@ -164,7 +164,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         feedback.pushInfo(" ")
         feedback.setCurrentStep(4)
 
-        feedback.pushInfo(self.tr("Closing aequilibrae project"))
+        feedback.pushInfo(self.tr("Closing project"))
         project.close()
         del row_list, df, featureList, uri, links_layer
 

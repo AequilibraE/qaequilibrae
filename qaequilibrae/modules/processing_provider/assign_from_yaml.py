@@ -24,7 +24,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
 
         # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
-            sys.exit(self.tr("AequilibraE not found"))
+            sys.exit(self.tr("AequilibraE module not found"))
 
         from aequilibrae.paths import TrafficAssignment, TrafficClass
         from aequilibrae.project import Project
@@ -136,16 +136,16 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         return self.tr("Paths and assignment")
 
     def shortHelpString(self):
-        return f"{self.string_order(1)}\n{self.string_order(2)}\n{self.string_order(3)}"
+        return f"{self.string_order(1)}\n {self.string_order(2)}\n {self.string_order(3)}"
 
     def createInstance(self):
         return TrafficAssignYAML()
 
     def string_order(self, order):
         if order == 1:
-            return self.tr("Run a traffic assignment using a YAML configuration file. ")
+            return self.tr("Run a traffic assignment using a YAML configuration file.")
         elif order == 2:
-            return self.tr("Example of valid configuration file: ")
+            return self.tr("Example of valid configuration file:")
         elif order == 3:
             return """
                     Project: D:/AequilibraE/Project/

@@ -43,7 +43,7 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
 
         # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
-            sys.exit(self.tr("AequilibraE not found"))
+            sys.exit(self.tr("AequilibraE module not found"))
 
         from aequilibrae import Project
 
@@ -114,11 +114,11 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
             elif len(matching.index) > 1:
                 fail += 1
                 feedback.pushInfo(
-                    self.tr(" Multiple nodes found for zone ")
-                    + str(zone[parameters["node_id"]])
-                    + self.tr(", unable to decide which node to use")
+                    self.tr("Multiple nodes found for zone {}. Unable to select node.").format(
+                        zone[parameters["node_id"]]
+                    )
                 )
-        feedback.pushInfo(self.tr("{} zones found in input layer: ").format(df.shape[0]))
+        feedback.pushInfo(self.tr("{} zones found in input layer.").format(df.shape[0]))
         if find > 0:
             feedback.pushInfo(self.tr("    {} zones found an existing matching node").format(find))
         if create > 0:
@@ -146,7 +146,7 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
         return self.tr("Model Building")
 
     def shortHelpString(self):
-        return f"{self.string_order(1)}\n{self.string_order(2)}{self.string_order(3)}"
+        return f"{self.string_order(1)}\n{self.string_order(2)} {self.string_order(3)}"
 
     def createInstance(self):
         return RenumberFromCentroids()
@@ -157,7 +157,7 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
         elif order == 2:
             return self.tr("WARNING: you may have to change existing node_id (ex. using QGIS field calculator)")
         elif order == 3:
-            return self.tr(" to ensure that changed node IDs (coming from Zone ID) are not already used.")
+            return self.tr("to ensure that changed node IDs (coming from Zone ID) are not already used.")
 
     def tr(self, message):
         return trlt("RenumberFromCentroids", message)
