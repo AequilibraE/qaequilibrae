@@ -13,7 +13,7 @@ from qaequilibrae.i18n.translate import trlt
 
 class RenumberFromCentroids(QgsProcessingAlgorithm):
 
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self):
         self.addParameter(
             QgsProcessingParameterVectorLayer(
                 "nodes", self.tr("Centroids"), types=[QgsProcessing.TypeVectorPoint], defaultValue="nodes"
@@ -47,20 +47,20 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
 
         from aequilibrae import Project
 
-        feedback.pushInfo(self.tr("Connecting to aequilibrae project"))
+        feedback.pushInfo(self.tr("Opening project"))
         project = Project()
         project.open(parameters["PrjtPath"])
         feedback.pushInfo(" ")
         feedback.setCurrentStep(1)
 
-        feedback.pushInfo(self.tr("Importing node layer from QGIS"))
+        feedback.pushInfo(self.tr("Importing node layer"))
         layer_crs = self.parameterAsVectorLayer(parameters, "nodes", context).crs()
         aeq_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 
         # Import QGIS layer as a panda dataframe
         layer = self.parameterAsVectorLayer(parameters, "nodes", context)
         columns = [f.name() for f in layer.fields()] + ["geometry"]
-        columns_types = [f.typeName() for f in layer.fields()]  #
+        # columns_types = [f.typeName() for f in layer.fields()]
 
         def fn(f):
             geom = f.geometry()
@@ -72,7 +72,7 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
-        feedback.pushInfo(self.tr("Looking for existing nodes from AequilibraE project"))
+        feedback.pushInfo(self.tr("Verifying nodes"))
         # Import QGIS layer as a panda dataframe
         all_nodes = project.network.nodes
         nodes_table = all_nodes.data
@@ -97,7 +97,7 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
         find = 0
         create = 0
         fail = 0
-        for idx, zone in df.iterrows():
+        for _, zone in df.iterrows():
             matching = nodes_table[(nodes_table.XY == zone.XY)]
             if len(matching.index) == 1:
                 find += 1
@@ -114,7 +114,7 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
             elif len(matching.index) > 1:
                 fail += 1
                 feedback.pushInfo(
-                    self.tr("Multiple nodes found for zone {}. Unable to select node.").format(
+                    self.tr("Multiple nodes found for Zone {}. Unable to select node.").format(
                         zone[parameters["node_id"]]
                     )
                 )

@@ -15,7 +15,7 @@ from qaequilibrae.i18n.translate import trlt
 
 class ProjectFromLayer(QgsProcessingAlgorithm):
 
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self):
         self.addParameter(
             QgsProcessingParameterVectorLayer(
                 "links", self.tr("Links"), types=[QgsProcessing.TypeVectorLine], defaultValue=None
@@ -84,7 +84,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
 
         from aequilibrae import Project
 
-        feedback.pushInfo(self.tr("Creating AequilibraE project"))
+        feedback.pushInfo(self.tr("Creating project"))
         project = Project()
         PrjtPath = join(parameters["destFolder"], parameters["prject_name"])
         project.new(PrjtPath)
@@ -101,7 +101,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         feedback.pushInfo(" ")
         feedback.setCurrentStep(1)
 
-        feedback.pushInfo(self.tr("Importing link layer from QGIS"))
+        feedback.pushInfo(self.tr("Importing link layer"))
         layer_crs = self.parameterAsVectorLayer(parameters, "links", context).crs()
         aeq_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 

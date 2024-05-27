@@ -8,7 +8,7 @@ from qaequilibrae.i18n.translate import trlt
 
 class TrafficAssignYAML(QgsProcessingAlgorithm):
 
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self):
         self.addParameter(
             QgsProcessingParameterFile(
                 "confFile",
@@ -19,7 +19,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
             )
         )
 
-    def processAlgorithm(self, parameters, context, model_feedback):
+    def processAlgorithm(self, parameters, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(5, model_feedback)
 
         # Checks if we have access to aequilibrae library
@@ -31,14 +31,14 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         from aequilibrae.matrix import AequilibraeMatrix
         import yaml
 
-        feedback.pushInfo(self.tr("Getting parameters from input YAML file..."))
+        feedback.pushInfo(self.tr("Getting parameters from YAML"))
         pathfile = parameters["confFile"]
         with open(pathfile, "r") as f:
             params = yaml.safe_load(f)
         feedback.pushInfo(" ")
         feedback.setCurrentStep(1)
 
-        feedback.pushInfo(self.tr("Opening project and setting up traffic classes..."))
+        feedback.pushInfo(self.tr("Opening project"))
         # Opening project
         project = Project()
         project.open(params["Project"])
@@ -49,7 +49,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         # Creating traffic classes
         traffic_classes = []
         num_classes = len(params["Traffic_classes"])
-        feedback.pushInfo(self.tr("{} traffic classes have been found in config file: ").format(num_classes))
+        feedback.pushInfo(self.tr("{} traffic classes found").format(num_classes))
 
         for classes in params["Traffic_classes"]:
             for traffic in classes:
@@ -89,7 +89,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         feedback.setCurrentStep(2)
 
         # Setting up assignment
-        feedback.pushInfo(self.tr("Setting up assignment..."))
+        feedback.pushInfo(self.tr("Setting up assignment"))
         feedback.pushInfo(str(params["Assignment"]))
         assig = TrafficAssignment()
         assig.set_classes(traffic_classes)
@@ -106,13 +106,13 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         feedback.setCurrentStep(3)
 
         # Running assignment
-        feedback.pushInfo(self.tr("Running traffic assignment..."))
+        feedback.pushInfo(self.tr("Running traffic assignment"))
         assig.execute()
         feedback.pushInfo(" ")
         feedback.setCurrentStep(4)
 
         # Saving outputs
-        feedback.pushInfo(self.tr("Assignment completed, saving outputs..."))
+        feedback.pushInfo(self.tr("Saving outputs"))
         feedback.pushInfo(str(assig.report()))
         assig.save_results(params["Run_name"])
         assig.save_skims(params["Run_name"], which_ones="all", format="omx")
