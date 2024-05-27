@@ -48,29 +48,29 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
             )
         )
         self.addParameter(
-            QgsProcessingParameterString("FileName", self.tr("File name"), multiLine=False, defaultValue="")
+            QgsProcessingParameterString("file_name", self.tr("File name"), multiLine=False, defaultValue="")
         )
         self.addParameter(
             QgsProcessingParameterFile(
-                "OutputFold",
+                "output_folder",
                 self.tr("Output folder"),
                 behavior=QgsProcessingParameterFile.Folder,
-                fileFilter="Tous les fichiers (*.*)",
+                fileFilter="All folders (*.*)",
                 defaultValue=standard_path(),
             )
         )
         advparams = [
             QgsProcessingParameterString(
-                "MatrixName", self.tr("Matrix name"), optional=True, multiLine=False, defaultValue=""
+                "matrix_name", self.tr("Matrix name"), optional=True, multiLine=False, defaultValue=""
             ),
             QgsProcessingParameterString(
-                "MatrixDescription",
+                "matrix_description",
                 self.tr("Matrix description"),
                 optional=True,
                 multiLine=False,
                 defaultValue="",
             ),
-            QgsProcessingParameterString("CoreName", self.tr("Matrix core"), multiLine=False, defaultValue="Value"),
+            QgsProcessingParameterString("matrix_core", self.tr("Matrix core"), multiLine=False, defaultValue="Value"),
         ]
         for param in advparams:
             param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
@@ -89,16 +89,16 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         destination = parameters["destination"]
         value = parameters["value"]
 
-        matrix_name = parameters["MatrixName"]
-        matrix_description = parameters["MatrixDescription"]
-        core_name = [parameters["CoreName"]]
+        matrix_name = parameters["matrix_name"]
+        matrix_description = parameters["matrix_description"]
+        core_name = [parameters["matrix_core"]]
 
-        output_folder = parameters["OutputFold"]
-        output_name = parameters["FileName"]
-        filename = join(output_folder, output_name + ".aem")
+        output_folder = parameters["output_folder"]
+        output_name = parameters["file_name"]
+        file_name = join(output_folder, f"{output_name}.aem")
 
         # Import layer as a pandas df
-        feedback.pushInfo(self.tr("Importing layer from QGIS:"))
+        feedback.pushInfo(self.tr("Importing layer"))
         layer = self.parameterAsVectorLayer(parameters, "matrix_layer", context)
         cols = [origin, destination, value]
         datagen = ([f[col] for col in cols] for f in layer.getFeatures())
@@ -131,7 +131,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         mat.name = matrix_name
         mat.description = matrix_description
 
-        mat.create_empty(file_name=filename, zones=num_zones, matrix_names=core_name, memory_only=False)
+        mat.create_empty(file_name=file_name, zones=num_zones, matrix_names=core_name, memory_only=False)
         mat.index[:] = all_zones[:]
 
         m = (
@@ -144,8 +144,6 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
-        feedback.pushInfo(self.tr("A final sweep after the work..."))
-        output = mat.name + ", " + mat.description + " (" + filename + ")"
         mat.save()
         mat.close()
         del matrix
@@ -153,7 +151,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         feedback.pushInfo(" ")
         feedback.setCurrentStep(3)
 
-        return {"Output": output}
+        return {"Output": f"{mat.name}, {mat.description} ({file_name})"}
 
     def name(self):
         return self.tr("Import matrices")

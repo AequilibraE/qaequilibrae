@@ -28,7 +28,7 @@ class AddConnectors(QgsProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterFile(
-                "PrjtPath",
+                "project_path",
                 self.tr("Project path"),
                 behavior=QgsProcessingParameterFile.Folder,
                 defaultValue=standard_path(),
@@ -46,7 +46,7 @@ class AddConnectors(QgsProcessingAlgorithm):
 
         feedback.pushInfo(self.tr("Connecting to AequilibraE project"))
         project = Project()
-        project.open(parameters["PrjtPath"])
+        project.open(parameters["project_path"])
 
         all_nodes = project.network.nodes
         nodes_table = all_nodes.data
@@ -65,8 +65,8 @@ class AddConnectors(QgsProcessingAlgorithm):
         feedback.setCurrentStep(2)
 
         project.close()
-        output_file = parameters["PrjtPath"]
-        return {"Output": output_file}
+
+        return {"Output": parameters["project_path"]}
 
     def name(self):
         return self.tr("Add centroid connectors")

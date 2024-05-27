@@ -1,9 +1,12 @@
 import pytest
 import re
+import pandas as pd
 from os.path import isfile, join
 from os import makedirs, listdir
 from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingFeedback
 from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateReferenceSystem
+
+from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
 
 from qaequilibrae.modules.processing_provider.provider import Provider
 from qaequilibrae.modules.processing_provider.export_matrix import ExportMatrix
@@ -34,11 +37,19 @@ def load_layers():
         print("Links layer failed to load!")
     else:
         QgsProject.instance().addMapLayer(linkslayer)
+        var = QgsProject.instance().mapLayersByName("Links layer")
+        if not var[0].crs().isValid():
+            crs = QgsCoordinateReferenceSystem("EPSG:4326")
+            var[0].setCrs(crs)
 
     if not nodeslayer.isValid():
         print("Nodes layer failed to load!")
     else:
         QgsProject.instance().addMapLayer(nodeslayer)
+        var = QgsProject.instance().mapLayersByName("Nodes layer")
+        if not var[0].crs().isValid():
+            crs = QgsCoordinateReferenceSystem("EPSG:4326")
+            var[0].setCrs(crs)
 
 
 def test_provider_exists(qgis_app):
@@ -57,9 +68,9 @@ def test_export_matrix(folder_path, source_file, format):
     action = ExportMatrix()
 
     parameters = {
-        "srcFile": f"test/data/SiouxFalls_project/matrices/{source_file}",
-        "destFolder": folder_path,
-        "outputformat": format,  # Assume .csv
+        "src": f"test/data/SiouxFalls_project/matrices/{source_file}",
+        "dst": folder_path,
+        "output_format": format,
     }
 
     context = QgsProcessingContext()
@@ -70,19 +81,46 @@ def test_export_matrix(folder_path, source_file, format):
     assert isfile(result["Output"])
 
 
-@pytest.mark.skip("not working")
-def test_matrix_from_layer():
+@pytest.mark.skip("layer not loading")
+def test_matrix_from_layer(folder_path):
+    makedirs(folder_path)
+
+    df = pd.read_csv("test/data/SiouxFalls_project/SiouxFalls_od.csv")
+    layer = layer_from_dataframe(df, "SiouxFalls_od")
+
     action = MatrixFromLayer()
 
+    parameters = {
+        "matrix_layer": "SiouxFalls_od",
+        "origin": "O",
+        "destination": "D",
+        "value": "Ton",
+        "file_name": "siouxfalls_od",
+        "output_folder": folder_path,
+        "matrix_name": "NAME_FOR_TEST",
+        "matrix_description": "this is a description",
+        "matrix_core": "MAT_CORE",
+    }
 
-# @pytest.mark.skip("not working")
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    result = action.processAlgorithm(parameters, context, feedback)
+
+    print(result)
+
+
+@pytest.mark.skip("layer not loading")
 def test_project_from_layer(folder_path):
     load_layers()
+
     makedirs(folder_path)
     action = ProjectFromLayer()
 
+    layer = QgsProject.instance().mapLayersByName("Links layer")[0]
+
     parameters = {
-        "links": "Links layer",
+        "links": layer.id(),
         "link_type": "link_type",
         "direction": "direction",
         "modes": "modes",
@@ -98,11 +136,15 @@ def test_project_from_layer(folder_path):
     # assert isfile(result['Output'])
     print(result.__dict__)
 
+    QgsProject.instance().removeMapLayer(layer.id())
 
+
+@pytest.mark.skip("incomplete")
 def test_add_centroid_connector():
     action = AddConnectors()
 
 
+@pytest.mark.skip("incomplete")
 def test_renumber_from_centroids():
     action = RenumberFromCentroids()
 

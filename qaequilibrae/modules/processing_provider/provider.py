@@ -13,8 +13,6 @@ if str(provider_path) not in sys.path:
 
 
 class Provider(QgsProcessingProvider):
-    def __init__(self):
-        super(QgsProcessingProvider, self).__init__()
 
     def loadAlgorithms(self):
         from .Add_connectors import AddConnectors

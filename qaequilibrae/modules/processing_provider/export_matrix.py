@@ -14,7 +14,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterFile(
-                "srcFile",
+                "src",
                 self.tr("Matrix"),
                 behavior=QgsProcessingParameterFile.File,
                 fileFilter="*.omx, *.aem",
@@ -23,7 +23,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterFile(
-                "destFolder",
+                "dst",
                 self.tr("Output folder"),
                 behavior=QgsProcessingParameterFile.Folder,
                 defaultValue=None,
@@ -31,7 +31,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterEnum(
-                "outputformat",
+                "output_format",
                 self.tr("File format"),
                 options=[".csv", ".omx", ".aem"],
                 defaultValue=".csv",
@@ -40,9 +40,10 @@ class ExportMatrix(QgsProcessingAlgorithm):
 
     def processAlgorithm(self, parameters, context, model_feedback):
 
-        pathSource = parameters["srcFile"]
-        fileformat = [".csv", ".omx", ".aem"]
-        pathDest = join(parameters["destFolder"], Path(pathSource).stem + fileformat[parameters["outputformat"]])
+        src_path = parameters["src"]
+        file_format = [".csv", ".omx", ".aem"]
+        format = file_format[parameters["output_format"]]
+        dst_path = join(parameters["dst"], f"{Path(src_path).stem}.{format}")
 
         # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
@@ -50,19 +51,19 @@ class ExportMatrix(QgsProcessingAlgorithm):
 
         from aequilibrae.matrix import AequilibraeMatrix
 
-        if pathSource[-3:] == "omx":
+        if src_path[-3:] == "omx":
             tmpmat = AequilibraeMatrix()
             tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".aem").name
-            tmpmat.create_from_omx(tmp, pathSource)
+            tmpmat.create_from_omx(tmp, src_path)
             tmpmat.export(tmp)
-            pathSource = tmp
+            src_path = tmp
             tmpmat.close()
         mat = AequilibraeMatrix()
-        mat.load(pathSource)
-        mat.export(pathDest)
+        mat.load(src_path)
+        mat.export(dst_path)
         mat.close()
 
-        return {"Output": pathDest}
+        return {"Output": dst_path}
 
     def name(self):
         return self.tr("Export matrices")

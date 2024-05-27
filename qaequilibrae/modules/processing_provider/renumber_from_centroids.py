@@ -31,7 +31,7 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterFile(
-                "PrjtPath",
+                "project_path",
                 self.tr("Output folder"),
                 behavior=QgsProcessingParameterFile.Folder,
                 defaultValue=standard_path(),
@@ -47,20 +47,20 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
 
         from aequilibrae import Project
 
-        feedback.pushInfo(self.tr("Connecting to aequilibrae project"))
+        feedback.pushInfo(self.tr("Opening project"))
         project = Project()
-        project.open(parameters["PrjtPath"])
+        project.open(parameters["project_path"])
         feedback.pushInfo(" ")
         feedback.setCurrentStep(1)
 
-        feedback.pushInfo(self.tr("Importing node layer from QGIS"))
+        feedback.pushInfo(self.tr("Importing node layer"))
         layer_crs = self.parameterAsVectorLayer(parameters, "nodes", context).crs()
         aeq_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 
         # Import QGIS layer as a panda dataframe
         layer = self.parameterAsVectorLayer(parameters, "nodes", context)
         columns = [f.name() for f in layer.fields()] + ["geometry"]
-        columns_types = [f.typeName() for f in layer.fields()]  #
+        # columns_types = [f.typeName() for f in layer.fields()]
 
         def fn(f):
             geom = f.geometry()
@@ -72,32 +72,32 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
-        feedback.pushInfo(self.tr("Looking for existing nodes from AequilibraE project"))
+        feedback.pushInfo(self.tr("Checking existing nodes"))
         # Import QGIS layer as a panda dataframe
         all_nodes = project.network.nodes
         nodes_table = all_nodes.data
 
-        def format_XY(geometry):
-            formated = (
-                str(round(float(str(geometry)[7:-1].split(" ")[0]), 8))
-                + "_"
-                + str(round(float(str(geometry)[7:-1].split(" ")[1]), 8))
-            )
-            return formated
+        # def format_XY(geometry):
+        #     formated = (
+        #         str(round(float(str(geometry)[7:-1].split(" ")[0]), 8))
+        #         + "_"
+        #         + str(round(float(str(geometry)[7:-1].split(" ")[1]), 8))
+        #     )
+        #     return formated
 
-        feedback.pushInfo(self.tr("Comparing nodes from input centroid layer:"))
-        # to be able to compare, rounding of coordinates to a sufficient degree of accuracy... 1mm
-        df["XY"] = df.apply(lambda row: format_XY(row.geometry), axis=1)
-        feedback.pushInfo(str(df.XY.head(5)))
-        feedback.pushInfo(self.tr("With existing nodes in AequilibraE project:"))
-        nodes_table["XY"] = nodes_table.apply(lambda row: format_XY(row.geometry), axis=1)
-        feedback.pushInfo(str(nodes_table.XY.head(5)))
-        feedback.pushInfo(" ")
+        # feedback.pushInfo(self.tr("Comparing nodes from input centroid layer:"))
+        # # to be able to compare, rounding of coordinates to a sufficient degree of accuracy... 1mm
+        # df["XY"] = df.apply(lambda row: format_XY(row.geometry), axis=1)
+        # feedback.pushInfo(str(df.XY.head(5)))
+        # feedback.pushInfo(self.tr("With existing nodes in AequilibraE project:"))
+        # nodes_table["XY"] = nodes_table.apply(lambda row: format_XY(row.geometry), axis=1)
+        # feedback.pushInfo(str(nodes_table.XY.head(5)))
+        # feedback.pushInfo(" ")
 
         find = 0
         create = 0
         fail = 0
-        for idx, zone in df.iterrows():
+        for _, zone in df.iterrows():
             matching = nodes_table[(nodes_table.XY == zone.XY)]
             if len(matching.index) == 1:
                 find += 1
@@ -120,18 +120,20 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
                 )
         feedback.pushInfo(self.tr("{} zones found in input layer.").format(df.shape[0]))
         if find > 0:
-            feedback.pushInfo(self.tr("    {} zones found an existing matching node").format(find))
+            txt = self.tr("{} zones found an existing matching node").format(find)
+            feedback.pushInfo("\t", txt)
         if create > 0:
-            feedback.pushInfo(self.tr("    {} new nodes added for unmatched zones").format(create))
+            txt = self.tr("{} new nodes added for unmatched zones").format(create)
+            feedback.pushInfo("\t", txt)
         if fail > 0:
-            feedback.pushInfo(self.tr("    {} zones could not be processed").format(fail))
+            txt = self.tr("{} zones could not be processed").format(fail)
+            feedback.pushInfo("\t", txt)
         feedback.pushInfo(" ")
 
         project.close()
         del row_list, df
 
-        output_file = parameters["PrjtPath"]
-        return {"Output": output_file}
+        return {"Output": parameters["project_path"]}
 
     def name(self):
         return self.tr("Nodes from centroid")

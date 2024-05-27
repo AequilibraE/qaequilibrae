@@ -63,7 +63,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterFile(
-                "destFolder",
+                "dst",
                 self.tr("Output folder"),
                 behavior=QgsProcessingParameterFile.Folder,
                 defaultValue=standard_path(),
@@ -71,11 +71,12 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterString(
-                "prject_name", self.tr("Project name"), multiLine=False, defaultValue="new_project"
+                "project_name", self.tr("Project name"), multiLine=False, defaultValue="new_project"
             )
         )
 
     def processAlgorithm(self, parameters, context, model_feedback):
+        print(parameters)
         feedback = QgsProcessingMultiStepFeedback(5, model_feedback)
 
         # Checks if we have access to aequilibrae library
@@ -84,10 +85,10 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
 
         from aequilibrae import Project
 
-        feedback.pushInfo(self.tr("Creating AequilibraE project"))
+        feedback.pushInfo(self.tr("Creating project"))
         project = Project()
-        PrjtPath = join(parameters["destFolder"], parameters["prject_name"])
-        project.new(PrjtPath)
+        prj_path = join(parameters["dst"], parameters["project_name"])
+        project.new(prj_path)
 
         # Adding source_id field early to have all fields available in links table
         links = project.network.links
@@ -95,13 +96,13 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         link_data.add("source_id", "link_id from the data source")
         links.refresh_fields()
         uri = QgsDataSourceUri()
-        uri.setDatabase(join(PrjtPath, "project_database.sqlite"))
+        uri.setDatabase(join(prj_path, "project_database.sqlite"))
         uri.setDataSource("", "links", "geometry")
         links_layer = QgsVectorLayer(uri.uri(), "links_layer", "spatialite")
         feedback.pushInfo(" ")
         feedback.setCurrentStep(1)
 
-        feedback.pushInfo(self.tr("Importing link layer from QGIS"))
+        feedback.pushInfo(self.tr("Importing link layer"))
         layer_crs = self.parameterAsVectorLayer(parameters, "links", context).crs()
         aeq_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 
@@ -127,7 +128,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
-        feedback.pushInfo(self.tr("Getting parameters from link layer"))
+        feedback.pushInfo(self.tr("Getting parameters from layer"))
 
         # Updating link types
         link_types = df[parameters["link_type"]].unique()
@@ -168,8 +169,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         project.close()
         del row_list, df, featureList, uri, links_layer
 
-        output_file = PrjtPath
-        return {"Output": output_file}
+        return {"Output": prj_path}
 
     def name(self):
         return self.tr("Create project from link layer")

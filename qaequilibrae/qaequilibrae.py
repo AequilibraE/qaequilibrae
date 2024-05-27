@@ -80,6 +80,7 @@ class AequilibraEMenu:
         self.layers = {}  # type: Dict[QgsVectorLayer]
         self.dock = QDockWidget("AequilibraE")
         self.manager = QWidget()
+        self.provider = None
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -254,20 +255,22 @@ class AequilibraEMenu:
         else:
             webbrowser.open_new_tab(url)
 
-    def unload(self):
-        del self.dock
-        if  self.provider in QgsApplication.processingRegistry().providers():
-            QgsApplication.processingRegistry().removeProvider(self.provider)
-
     # def trlt(self, message):
     #     # In the near future, we will use this function to automatically translate the AequilibraE menu
     #     # To any language we can get people to translate it to
     #     # return QCoreApplication.translate('AequilibraE', message)
     #     return message
 
-    def initGui(self):
+    def initProcessing(self):
         self.provider = Provider()
         QgsApplication.processingRegistry().addProvider(self.provider)
+    
+    def initGui(self):
+        self.initProcessing()
+
+    def unload(self):
+        if self.provider in QgsApplication.processingRegistry().providers():
+            QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def removes_temporary_files(self):
         # pass

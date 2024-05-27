@@ -31,14 +31,14 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         from aequilibrae.matrix import AequilibraeMatrix
         import yaml
 
-        feedback.pushInfo(self.tr("Getting parameters from input YAML file..."))
+        feedback.pushInfo(self.tr("Getting parameters from YAML"))
         pathfile = parameters["conf_file"]
         with open(pathfile, "r") as f:
             params = yaml.safe_load(f)
         feedback.pushInfo(" ")
         feedback.setCurrentStep(1)
 
-        feedback.pushInfo(self.tr("Opening project and setting up traffic classes..."))
+        feedback.pushInfo(self.tr("Opening project"))
         # Opening project
         project = Project()
         project.open(params["project"])
@@ -49,7 +49,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         # Creating traffic classes
         traffic_classes = []
         num_classes = len(params["traffic_classes"])
-        feedback.pushInfo(self.tr("{} traffic classes have been found in config file: ").format(num_classes))
+        feedback.pushInfo(self.tr("{} traffic classes have been found").format(num_classes))
 
         for classes in params["traffic_classes"]:
             for traffic in classes:
@@ -89,7 +89,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         feedback.setCurrentStep(2)
 
         # Setting up assignment
-        feedback.pushInfo(self.tr("Setting up assignment..."))
+        feedback.pushInfo(self.tr("Setting up assignment"))
         feedback.pushInfo(str(params["assignment"]))
         assig = TrafficAssignment()
         assig.set_classes(traffic_classes)
@@ -106,13 +106,13 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         feedback.setCurrentStep(3)
 
         # Running assignment
-        feedback.pushInfo(self.tr("Running traffic assignment..."))
+        feedback.pushInfo(self.tr("Running assignment"))
         assig.execute()
         feedback.pushInfo(" ")
         feedback.setCurrentStep(4)
 
         # Saving outputs
-        feedback.pushInfo(self.tr("Assignment completed, saving outputs..."))
+        feedback.pushInfo(self.tr("Saving outputs"))
         feedback.pushInfo(str(assig.report()))
         assig.save_results(params["result_name"])
         assig.save_skims(params["result_name"], which_ones="all", format="omx")
