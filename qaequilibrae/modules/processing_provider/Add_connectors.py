@@ -1,14 +1,14 @@
 import importlib.util as iutil
 import sys
 
-from qgis.core import QgsProcessingMultiStepFeedback
+from qgis.core import QgsProcessingMultiStepFeedback, QgsProcessingAlgorithm
 from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterNumber, QgsProcessingParameterString
 
 from qaequilibrae.modules.common_tools import standard_path
-from qaequilibrae.i18n.translate import TranslatableAlgorithm
+from qaequilibrae.i18n.translate import trlt
 
 
-class AddConnectors(TranslatableAlgorithm):
+class AddConnectors(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(
@@ -58,7 +58,7 @@ class AddConnectors(TranslatableAlgorithm):
         nb_conn = parameters["nb_conn"]
         mode = parameters["mode"]
         feedback.pushInfo(self.tr('Adding {} connectors when none exists for mode "{}"').format(nb_conn, mode))
-        for idx, node in nodes_table.query("is_centroid == 1").iterrows():
+        for _, node in nodes_table.query("is_centroid == 1").iterrows():
             curr = all_nodes.get(node.node_id)
             curr.connect_mode(curr.geometry.buffer(0.01), mode_id=mode, connectors=nb_conn)
         feedback.pushInfo(" ")
@@ -84,4 +84,7 @@ class AddConnectors(TranslatableAlgorithm):
         return self.tr("Go through all the centroids and add connectors only if none exists for the chosen mode")
 
     def createInstance(self):
-        return AddConnectors(self.tr)
+        return AddConnectors()
+
+    def tr(self, message):
+        return trlt("AddConnectors", message)

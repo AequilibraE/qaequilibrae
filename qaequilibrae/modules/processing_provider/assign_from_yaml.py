@@ -1,13 +1,12 @@
 import importlib.util as iutil
 import sys
 
-from qgis.core import QgsProcessingMultiStepFeedback
-from qgis.core import QgsProcessingParameterFile
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
 
-from qaequilibrae.i18n.translate import TranslatableAlgorithm
+from qaequilibrae.i18n.translate import trlt
 
 
-class TrafficAssignYAML(TranslatableAlgorithm):
+class TrafficAssignYAML(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(
@@ -140,7 +139,7 @@ class TrafficAssignYAML(TranslatableAlgorithm):
         return f"{self.string_order(1)}\n{self.string_order(2)}\n{self.string_order(3)}"
 
     def createInstance(self):
-        return TrafficAssignYAML(self.tr)
+        return TrafficAssignYAML()
 
     def string_order(self, order):
         if order == 1:
@@ -180,3 +179,6 @@ class TrafficAssignYAML(TranslatableAlgorithm):
                         max_iter: 250
                         rgap: 0.00001
             """
+
+    def tr(self, message):
+        return trlt("TrafficAssignYAML", message)

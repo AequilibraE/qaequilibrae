@@ -1,7 +1,6 @@
-from qgis.core import QgsProcessingAlgorithm
+from qgis.PyQt.QtCore import QCoreApplication
 
-
-class TranslatableAlgorithm(QgsProcessingAlgorithm):
-    def __init__(self, translator):
-        super(QgsProcessingAlgorithm, self).__init__()
-        self.tr = translator
+def trlt(context, message):
+    """
+    """
+    return QCoreApplication.translate(context, message)

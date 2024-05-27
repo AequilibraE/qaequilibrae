@@ -7,12 +7,13 @@ from scipy.sparse import coo_matrix
 
 from qgis.core import QgsProcessingMultiStepFeedback, QgsProcessingParameterString, QgsProcessingParameterDefinition
 from qgis.core import QgsProcessingParameterField, QgsProcessingParameterMapLayer, QgsProcessingParameterFile
+from qgis.core import QgsProcessingAlgorithm
 
 from qaequilibrae.modules.common_tools import standard_path
-from qaequilibrae.i18n.translate import TranslatableAlgorithm
+from qaequilibrae.i18n.translate import trlt
 
 
-class MatrixFromLayer(TranslatableAlgorithm):
+class MatrixFromLayer(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterMapLayer("matrix_layer", self.tr("Matrix Layer")))
@@ -170,7 +171,7 @@ class MatrixFromLayer(TranslatableAlgorithm):
         return f"{self.string_order(1)}\n{self.string_order(2)}\n{self.string_order(3)}\n{self.string_order(4)}"
 
     def createInstance(self):
-        return MatrixFromLayer(self.tr)
+        return MatrixFromLayer()
 
     def string_order(self, order):
         if order == 1:
@@ -181,3 +182,6 @@ class MatrixFromLayer(TranslatableAlgorithm):
             return self.tr("- origin and destination fields need to be integers")
         elif order == 4:
             return self.tr("- value field can be either integer or real")
+
+    def tr(self, message):
+        return trlt("MatrixFromLayer", message)

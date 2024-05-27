@@ -4,16 +4,16 @@ import sys
 from os.path import join
 from string import ascii_lowercase
 
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProcessingAlgorithm
 from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback, QgsProcessingParameterVectorLayer
 from qgis.core import QgsProcessingParameterField, QgsProcessingParameterFile, QgsProcessingParameterString
 from qgis.core import QgsProject, QgsFeature, QgsVectorLayer, QgsDataSourceUri
 
 from qaequilibrae.modules.common_tools import standard_path
-from qaequilibrae.i18n.translate import TranslatableAlgorithm
+from qaequilibrae.i18n.translate import trlt
 
 
-class ProjectFromLayer(TranslatableAlgorithm):
+class ProjectFromLayer(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(
@@ -187,4 +187,7 @@ class ProjectFromLayer(TranslatableAlgorithm):
         return self.tr("Create an AequilibraE project from a given link layer")
 
     def createInstance(self):
-        return ProjectFromLayer(self.tr)
+        return ProjectFromLayer()
+
+    def tr(self, message):
+        return trlt("ProjectFromLayer", message)

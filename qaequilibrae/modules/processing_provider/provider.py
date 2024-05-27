@@ -13,26 +13,23 @@ if str(provider_path) not in sys.path:
 
 
 class Provider(QgsProcessingProvider):
-    def __init__(self, translator):
+    def __init__(self):
         super(QgsProcessingProvider, self).__init__()
-        self.tr = translator
 
     def loadAlgorithms(self):
-        from .matrix_from_layer import MatrixFromLayer
-        from .export_matrix import exportMatrix
-        from .project_from_layer import ProjectFromLayer
-        from .renumber_from_centroids import RenumberFromCentroids
         from .Add_connectors import AddConnectors
         from .assign_from_yaml import TrafficAssignYAML
+        from .export_matrix import ExportMatrix
+        from .matrix_from_layer import MatrixFromLayer
+        from .project_from_layer import ProjectFromLayer
+        from .renumber_from_centroids import RenumberFromCentroids
 
-        self.addAlgorithm(MatrixFromLayer(self.tr))
-        self.addAlgorithm(exportMatrix(self.tr))
-        self.addAlgorithm(ProjectFromLayer(self.tr))
-        self.addAlgorithm(RenumberFromCentroids(self.tr))
-        self.addAlgorithm(AddConnectors(self.tr))
-        self.addAlgorithm(TrafficAssignYAML(self.tr))
-        # add additional algorithms here
-        # self.addAlgorithm(MyOtherAlgorithm())
+        self.addAlgorithm(MatrixFromLayer())
+        self.addAlgorithm(ExportMatrix())
+        self.addAlgorithm(ProjectFromLayer())
+        self.addAlgorithm(RenumberFromCentroids())
+        self.addAlgorithm(AddConnectors())
+        self.addAlgorithm(TrafficAssignYAML())
 
     def id(self):
         """The ID used for identifying the provider.

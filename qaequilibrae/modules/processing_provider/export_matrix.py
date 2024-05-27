@@ -4,12 +4,12 @@ import sys
 from pathlib import Path
 from os.path import join
 
-from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterEnum
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingParameterEnum
 
-from qaequilibrae.i18n.translate import TranslatableAlgorithm
+from qaequilibrae.i18n.translate import trlt
 
 
-class exportMatrix(TranslatableAlgorithm):
+class ExportMatrix(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(
@@ -80,4 +80,7 @@ class exportMatrix(TranslatableAlgorithm):
         return self.tr("Export an existing *.omx or *.aem matrix file into *.csv, *.aem or *.omx")
 
     def createInstance(self):
-        return exportMatrix(self.tr)
+        return ExportMatrix()
+
+    def tr(self, message):
+        return trlt("ExportMatrix", message)

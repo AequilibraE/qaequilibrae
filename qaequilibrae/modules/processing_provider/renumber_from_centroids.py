@@ -4,14 +4,14 @@ import sys
 from shapely.wkt import loads as load_wkt
 
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
-from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback
+from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback, QgsProcessingAlgorithm
 from qgis.core import QgsProcessingParameterVectorLayer, QgsProcessingParameterField, QgsProcessingParameterFile
 
 from qaequilibrae.modules.common_tools import standard_path
-from qaequilibrae.i18n.translate import TranslatableAlgorithm
+from qaequilibrae.i18n.translate import trlt
 
 
-class RenumberFromCentroids(TranslatableAlgorithm):
+class RenumberFromCentroids(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(
@@ -149,7 +149,7 @@ class RenumberFromCentroids(TranslatableAlgorithm):
         return f"{self.string_order(1)}\n{self.string_order(2)}{self.string_order(3)}"
 
     def createInstance(self):
-        return RenumberFromCentroids(self.tr)
+        return RenumberFromCentroids()
 
     def string_order(self, order):
         if order == 1:
@@ -158,3 +158,6 @@ class RenumberFromCentroids(TranslatableAlgorithm):
             return self.tr("WARNING: you may have to change existing node_id (ex. using QGIS field calculator)")
         elif order == 3:
             return self.tr(" to ensure that changed node IDs (coming from Zone ID) are not already used.")
+
+    def tr(self, message):
+        return trlt("RenumberFromCentroids", message)
