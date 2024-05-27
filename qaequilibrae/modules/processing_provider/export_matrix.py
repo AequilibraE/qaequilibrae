@@ -11,7 +11,7 @@ from qaequilibrae.i18n.translate import trlt
 
 class ExportMatrix(QgsProcessingAlgorithm):
 
-    def initAlgorithm(self):
+    def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterFile(
                 "srcFile",
@@ -38,7 +38,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
             )
         )
 
-    def processAlgorithm(self, parameters):
+    def processAlgorithm(self, parameters, context, model_feedback):
 
         pathSource = parameters["srcFile"]
         fileformat = [".csv", ".omx", ".aem"]

@@ -15,7 +15,7 @@ from qaequilibrae.i18n.translate import trlt
 
 class MatrixFromLayer(QgsProcessingAlgorithm):
 
-    def initAlgorithm(self):
+    def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterMapLayer("matrix_layer", self.tr("Matrix Layer")))
         self.addParameter(
             QgsProcessingParameterField(
@@ -98,7 +98,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         filename = join(output_folder, output_name + ".aem")
 
         # Import layer as a pandas df
-        feedback.pushInfo(self.tr("Importing layer"))
+        feedback.pushInfo(self.tr("Importing layer from QGIS:"))
         layer = self.parameterAsVectorLayer(parameters, "matrix_layer", context)
         cols = [origin, destination, value]
         datagen = ([f[col] for col in cols] for f in layer.getFeatures())
@@ -140,10 +140,12 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
             .astype(np.float64)
         )
         mat.matrix[core_name[0]][:, :] = m[:, :]
-        feedback.pushInfo(self.tr("{}x{} matrix imported").format(num_zones, num_zones))
+        feedback.pushInfo(self.tr("{}x{} matrix imported ").format(num_zones, num_zones))
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
+        feedback.pushInfo(self.tr("A final sweep after the work..."))
+        output = mat.name + ", " + mat.description + " (" + filename + ")"
         mat.save()
         mat.close()
         del matrix
@@ -151,7 +153,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         feedback.pushInfo(" ")
         feedback.setCurrentStep(3)
 
-        return {"Output": f"{mat.name}, {mat.description}, '{filename}'"}
+        return {"Output": output}
 
     def name(self):
         return self.tr("Import matrices")

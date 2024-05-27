@@ -10,7 +10,7 @@ from qaequilibrae.i18n.translate import trlt
 
 class AddConnectors(QgsProcessingAlgorithm):
 
-    def initAlgorithm(self):
+    def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterNumber(
                 "nb_conn",
@@ -35,7 +35,7 @@ class AddConnectors(QgsProcessingAlgorithm):
             )
         )
 
-    def processAlgorithm(self, parameters, model_feedback):
+    def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(2, model_feedback)
 
         # Checks if we have access to aequilibrae library
@@ -44,7 +44,7 @@ class AddConnectors(QgsProcessingAlgorithm):
 
         from aequilibrae import Project
 
-        feedback.pushInfo(self.tr("Opening project"))
+        feedback.pushInfo(self.tr("Connecting to AequilibraE project"))
         project = Project()
         project.open(parameters["PrjtPath"])
 
