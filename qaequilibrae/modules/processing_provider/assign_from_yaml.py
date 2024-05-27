@@ -11,7 +11,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterFile(
-                "confFile",
+                "conf_file",
                 self.tr("Configuration file (.yaml)"),
                 behavior=QgsProcessingParameterFile.File,
                 fileFilter="*.yaml",
@@ -32,7 +32,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         import yaml
 
         feedback.pushInfo(self.tr("Getting parameters from input YAML file..."))
-        pathfile = parameters["confFile"]
+        pathfile = parameters["conf_file"]
         with open(pathfile, "r") as f:
             params = yaml.safe_load(f)
         feedback.pushInfo(" ")
@@ -41,17 +41,17 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         feedback.pushInfo(self.tr("Opening project and setting up traffic classes..."))
         # Opening project
         project = Project()
-        project.open(params["Project"])
+        project.open(params["project"])
 
         # Creating graph
         project.network.build_graphs()
 
         # Creating traffic classes
         traffic_classes = []
-        num_classes = len(params["Traffic_classes"])
+        num_classes = len(params["traffic_classes"])
         feedback.pushInfo(self.tr("{} traffic classes have been found in config file: ").format(num_classes))
 
-        for classes in params["Traffic_classes"]:
+        for classes in params["traffic_classes"]:
             for traffic in classes:
 
                 # Getting matrix
@@ -61,7 +61,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
 
                 # Getting graph
                 graph = project.network.graphs[classes[traffic]["network_mode"]]
-                graph.set_graph("travel_time")
+                graph.set_graph(params["assignment"]["time_field"])
                 graph.set_blocked_centroid_flows(False)
 
                 if "skims" in classes[traffic] and classes[traffic]["skims"] is not None:
@@ -90,17 +90,17 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
 
         # Setting up assignment
         feedback.pushInfo(self.tr("Setting up assignment..."))
-        feedback.pushInfo(str(params["Assignment"]))
+        feedback.pushInfo(str(params["assignment"]))
         assig = TrafficAssignment()
         assig.set_classes(traffic_classes)
-        assig.set_vdf(params["Assignment"]["vdf"])
-        assig.set_vdf_parameters({"alpha": params["Assignment"]["alpha"], "beta": params["Assignment"]["beta"]})
-        assig.set_capacity_field(params["Assignment"]["capacity_field"])
-        assig.set_time_field(params["Assignment"]["time_field"])
+        assig.set_vdf(params["assignment"]["vdf"])
+        assig.set_vdf_parameters({"alpha": params["assignment"]["alpha"], "beta": params["assignment"]["beta"]})
+        assig.set_capacity_field(params["assignment"]["capacity_field"])
+        assig.set_time_field(params["assignment"]["time_field"])
 
-        assig.set_algorithm(params["Assignment"]["algorithm"])
-        assig.max_iter = params["Assignment"]["max_iter"]
-        assig.rgap_target = params["Assignment"]["rgap"]
+        assig.set_algorithm(params["assignment"]["algorithm"])
+        assig.max_iter = params["assignment"]["max_iter"]
+        assig.rgap_target = params["assignment"]["rgap"]
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(3)
@@ -114,8 +114,8 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         # Saving outputs
         feedback.pushInfo(self.tr("Assignment completed, saving outputs..."))
         feedback.pushInfo(str(assig.report()))
-        assig.save_results(params["Run_name"])
-        assig.save_skims(params["Run_name"], which_ones="all", format="omx")
+        assig.save_results(params["result_name"])
+        assig.save_skims(params["result_name"], which_ones="all", format="omx")
         feedback.pushInfo(" ")
         feedback.setCurrentStep(5)
 
@@ -150,9 +150,9 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
             return """
                     Project: D:/AequilibraE/Project/
 
-                    Run_name: sce_from_yaml
+                    result_name: sce_from_yaml
 
-                    Traffic_classes:
+                    traffic_classes:
                         - car:
                             matrix_path: D:/AequilibraE/Project/matrices/demand.aem
                             matrix_core: car
