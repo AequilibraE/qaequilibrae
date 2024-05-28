@@ -5,6 +5,7 @@ import numpy as np
 from os.path import isfile, join
 from os import makedirs
 from shutil import copyfile
+from shapely.geometry import Point
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.project import Project
 from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingFeedback
@@ -112,7 +113,7 @@ def test_matrix_from_layer(folder_path):
 
     _ = action.run(parameters, context, feedback)
 
-    assert isfile(join(folder_path, f"{parameters["file_name"]}.aem"))
+    assert isfile(join(folder_path, f"{parameters['file_name']}.aem"))
 
     mat = AequilibraeMatrix()
     mat.load(join(folder_path, f"{parameters["file_name"]}.aem"))
@@ -128,21 +129,21 @@ def test_matrix_from_layer(folder_path):
 def test_project_from_layer(folder_path):
     makedirs(folder_path)
     copyfile("test/data/SiouxFalls_project/SiouxFalls.gpkg", f"{folder_path}/SiouxFalls.gpkg")
-    
+
     load_layers(folder_path)
     action = ProjectFromLayer()
 
     linkslayer = QgsProject.instance().mapLayersByName("Links layer")[0]
 
     linkslayer.startEditing()
-    field = QgsField('ltype', QVariant.String)
+    field = QgsField("ltype", QVariant.String)
     linkslayer.addAttribute(field)
     linkslayer.updateFields()
-    
+
     for feature in linkslayer.getFeatures():
-        feature['ltype'] = 'road'
+        feature["ltype"] = "road"
         linkslayer.updateFeature(feature)
-    
+
     linkslayer.commitChanges()
 
     parameters = {
@@ -160,7 +161,7 @@ def test_project_from_layer(folder_path):
 
     result = action.run(parameters, context, feedback)
 
-    assert result[0]['Output'] == join(folder_path, parameters["project_name"])
+    assert result[0]["Output"] == join(folder_path, parameters["project_name"])
 
     QgsProject.instance().removeMapLayer(linkslayer.id())
 
@@ -171,14 +172,46 @@ def test_project_from_layer(folder_path):
     assert project.network.count_nodes() == 24
 
 
-@pytest.mark.skip("incomplete")
-def test_add_centroid_connector():
+def test_add_centroid_connector(pt_no_feed):
+    project = pt_no_feed.project
+    project_folder = project.project_base_path
+
+    nodes = project.network.nodes
+
+    cnt = nodes.new_centroid(100_000)
+    cnt.geometry = Point(-71.34, -29.95)
+    cnt.save()
+
     action = AddConnectors()
+
+    parameters = {"num_connectors": 3, "mode": "c", "project_path": project_folder}
+
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    result = action.processAlgorithm(parameters, context, feedback)
+
+    assert result["Output"] == project_folder
+
+    node_qry = "select count(node_id) from nodes where is_centroid=1"
+    node_count = project.conn.execute(node_qry).fetchone()[0]
+    assert node_count == 1
+
+    link_qry = "select count(name) from links where name like 'centroid connector%'"
+    link_count = project.conn.execute(link_qry).fetchone()[0]
+    assert link_count == 3
 
 
 @pytest.mark.skip("incomplete")
 def test_renumber_from_centroids():
     action = RenumberFromCentroids()
+
+    parameters = {}
+
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    result = action.processAlgorithm(parameters, context, feedback)
 
 
 def test_assign_from_yaml(ae_with_project):

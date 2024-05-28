@@ -13,7 +13,7 @@ class AddConnectors(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterNumber(
-                "nb_conn",
+                "num_connectors",
                 self.tr("Connectors per centroid"),
                 type=QgsProcessingParameterNumber.Integer,
                 minValue=1,
@@ -44,23 +44,26 @@ class AddConnectors(QgsProcessingAlgorithm):
 
         from aequilibrae import Project
 
-        feedback.pushInfo(self.tr("Connecting to AequilibraE project"))
+        feedback.pushInfo(self.tr("Opening project"))
         project = Project()
         project.open(parameters["project_path"])
 
-        all_nodes = project.network.nodes
-        nodes_table = all_nodes.data
+        nodes = project.network.nodes
+        centroids = nodes.data
+        centroids = centroids.loc[centroids["is_centroid"] == 1]
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(1)
 
         # Adding connectors
-        nb_conn = parameters["nb_conn"]
+        num_connectors = parameters["num_connectors"]
         mode = parameters["mode"]
-        feedback.pushInfo(self.tr('Adding {} connectors when none exists for mode "{}"').format(nb_conn, mode))
-        for _, node in nodes_table.query("is_centroid == 1").iterrows():
-            curr = all_nodes.get(node.node_id)
-            curr.connect_mode(curr.geometry.buffer(0.01), mode_id=mode, connectors=nb_conn)
+        feedback.pushInfo(self.tr('Adding {} connectors when none exists for mode "{}"').format(num_connectors, mode))
+
+        for _, node in centroids.iterrows():
+            cnt = nodes.get(node.node_id)
+            cnt.connect_mode(cnt.geometry.buffer(0.01), mode_id=mode, connectors=num_connectors)
+
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
