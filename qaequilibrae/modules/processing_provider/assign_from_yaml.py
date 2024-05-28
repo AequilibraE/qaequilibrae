@@ -48,8 +48,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
 
         # Creating traffic classes
         traffic_classes = []
-        num_classes = len(params["traffic_classes"])
-        feedback.pushInfo(self.tr("{} traffic classes have been found").format(num_classes))
+        feedback.pushInfo(self.tr("{} traffic classes have been found").format(len(params["traffic_classes"])))
 
         for classes in params["traffic_classes"]:
             for traffic in classes:
@@ -64,7 +63,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
                 graph.set_graph(params["assignment"]["time_field"])
                 graph.set_blocked_centroid_flows(False)
 
-                if "skims" in classes[traffic] and classes[traffic]["skims"] is not None:
+                if "skims" in classes[traffic] and classes[traffic]["skims"]:
                     skims = [sk.strip() for sk in classes[traffic]["skims"].split(",")]
                     graph.set_skimming(skims)
 
@@ -72,10 +71,8 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
                 assigclass = TrafficClass(name=traffic, graph=graph, matrix=demand)
                 assigclass.set_pce(classes[traffic]["pce"])
 
-                if "fixed_cost" in classes[traffic] and classes[traffic]["fixed_cost"] is not None:
-                    if "vot" in classes[traffic] and (
-                        type(classes[traffic]["vot"]) == int or type(classes[traffic]["vot"]) == float
-                    ):
+                if "fixed_cost" in classes[traffic] and classes[traffic]["fixed_cost"]:
+                    if isinstance(classes[traffic]["vot"], (int, float)):
                         assigclass.set_fixed_cost(classes[traffic]["fixed_cost"])
                         assigclass.set_vot(classes[traffic]["vot"])
                     else:
@@ -91,6 +88,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         # Setting up assignment
         feedback.pushInfo(self.tr("Setting up assignment"))
         feedback.pushInfo(str(params["assignment"]))
+
         assig = TrafficAssignment()
         assig.set_classes(traffic_classes)
         assig.set_vdf(params["assignment"]["vdf"])

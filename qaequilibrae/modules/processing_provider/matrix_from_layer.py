@@ -103,8 +103,6 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         cols = [origin, destination, value]
         datagen = ([f[col] for col in cols] for f in layer.getFeatures())
         matrix = pd.DataFrame.from_records(data=datagen, columns=cols)
-        feedback.pushInfo(str(matrix.head(5)))
-        feedback.pushInfo("...")
         feedback.pushInfo("")
         feedback.setCurrentStep(1)
 
@@ -166,7 +164,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         return self.tr("Data")
 
     def shortHelpString(self):
-        return f"{self.string_order(1)}\n{self.string_order(2)}\n{self.string_order(3)}\n{self.string_order(4)}"
+        return "\n".join([self.string_order(1), self.string_order(2), self.tring_order(3), self.string_order(4)])
 
     def createInstance(self):
         return MatrixFromLayer()

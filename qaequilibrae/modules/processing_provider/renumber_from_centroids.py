@@ -1,7 +1,7 @@
 import importlib.util as iutil
-import pandas as pd
+import geopandas as gpd
 import sys
-from shapely.wkt import loads as load_wkt
+from shapely.wkt import loads, dumps
 
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback, QgsProcessingAlgorithm
@@ -11,12 +11,12 @@ from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.i18n.translate import trlt
 
 
-class RenumberFromCentroids(QgsProcessingAlgorithm):
+class RenumberNodesFromCentroids(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterVectorLayer(
-                "nodes", self.tr("Centroids"), types=[QgsProcessing.TypeVectorPoint], defaultValue="nodes"
+                "nodes", self.tr("Centroids"), types=[QgsProcessing.TypeVectorPoint], defaultValue=None
             )
         )
         self.addParameter(
@@ -26,7 +26,7 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
                 type=QgsProcessingParameterField.Numeric,
                 parentLayerParameterName="nodes",
                 allowMultiple=False,
-                defaultValue="node_id",
+                defaultValue=None,
             )
         )
         self.addParameter(
@@ -48,70 +48,59 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
         from aequilibrae import Project
 
         feedback.pushInfo(self.tr("Opening project"))
+
         project = Project()
         project.open(parameters["project_path"])
+
         feedback.pushInfo(" ")
         feedback.setCurrentStep(1)
 
-        feedback.pushInfo(self.tr("Importing node layer"))
-        layer_crs = self.parameterAsVectorLayer(parameters, "nodes", context).crs()
+        feedback.pushInfo(self.tr("Importing nodes layer"))
         aeq_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 
         # Import QGIS layer as a panda dataframe
         layer = self.parameterAsVectorLayer(parameters, "nodes", context)
-        columns = [f.name() for f in layer.fields()] + ["geometry"]
-        # columns_types = [f.typeName() for f in layer.fields()]
+        columns = [f.name() for f in layer.fields()]
+        feature_list = []
+        geometries = []
+        for feat in layer.getFeatures():
+            feature_list.append(feat.attributes())
+            geom = feat.geometry()
+            geom.transform(QgsCoordinateTransform(layer.crs(), aeq_crs, QgsProject.instance()))
+            geometries.append(geom.asWkt().upper())
+        df = gpd.GeoDataFrame(feature_list, columns=columns, geometry=gpd.GeoSeries.from_wkt(geometries), crs=4326)
+        df["geometry"] = df["geometry"].apply(dumps, args=(True, 8))
 
-        def fn(f):
-            geom = f.geometry()
-            geom.transform(QgsCoordinateTransform(layer_crs, aeq_crs, QgsProject.instance()))
-            return dict(zip(columns, f.attributes() + [geom.asWkt()]))
-
-        row_list = [fn(f) for f in layer.getFeatures()]
-        df = pd.DataFrame(row_list, columns=columns)
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
         feedback.pushInfo(self.tr("Checking existing nodes"))
+
         # Import QGIS layer as a panda dataframe
-        all_nodes = project.network.nodes
-        nodes_table = all_nodes.data
+        nodes = project.network.nodes
+        nodes_data = gpd.GeoDataFrame(nodes.data, geometry=nodes.data["geometry"], crs=4326)
+        nodes_data["geometry"] = nodes_data["geometry"].apply(dumps, args=(True, 8))
 
-        # def format_XY(geometry):
-        #     formated = (
-        #         str(round(float(str(geometry)[7:-1].split(" ")[0]), 8))
-        #         + "_"
-        #         + str(round(float(str(geometry)[7:-1].split(" ")[1]), 8))
-        #     )
-        #     return formated
-
-        # feedback.pushInfo(self.tr("Comparing nodes from input centroid layer:"))
-        # # to be able to compare, rounding of coordinates to a sufficient degree of accuracy... 1mm
-        # df["XY"] = df.apply(lambda row: format_XY(row.geometry), axis=1)
-        # feedback.pushInfo(str(df.XY.head(5)))
-        # feedback.pushInfo(self.tr("With existing nodes in AequilibraE project:"))
-        # nodes_table["XY"] = nodes_table.apply(lambda row: format_XY(row.geometry), axis=1)
-        # feedback.pushInfo(str(nodes_table.XY.head(5)))
-        # feedback.pushInfo(" ")
+        feedback.pushInfo(" ")
 
         find = 0
         create = 0
         fail = 0
         for _, zone in df.iterrows():
-            matching = nodes_table[(nodes_table.XY == zone.XY)]
-            if len(matching.index) == 1:
+            matching = nodes_data.loc[nodes_data["geometry"] == zone["geometry"]]
+            if matching.shape[0] == 1:
                 find += 1
-                if int(zone[parameters["node_id"]]) != int(matching["node_id"].iloc[0]):
-                    updt = all_nodes.get(matching["node_id"].iloc[0])
-                    updt.is_centroid = 1
-                    updt.renumber(zone[parameters["node_id"]])
-                    updt.save()
-            elif len(matching.index) == 0:
+                if zone[parameters["node_id"]] != matching["node_id"].iloc[0]:
+                    update_node = nodes.get(matching["node_id"].iloc[0])
+                    update_node.is_centroid = 1
+                    update_node.renumber(zone[parameters["node_id"]])
+                    update_node.save()
+            elif matching.shape[0] == 0:
                 create += 1
-                new = all_nodes.new_centroid(zone[parameters["node_id"]])
-                new.geometry = load_wkt(zone["geometry"])
+                new = nodes.new_centroid(zone[parameters["node_id"]])
+                new.geometry = loads(zone["geom"])
                 new.save()
-            elif len(matching.index) > 1:
+            elif matching.shape[0] > 1:
                 fail += 1
                 feedback.pushInfo(
                     self.tr("Multiple nodes found for zone {}. Unable to select node.").format(
@@ -120,18 +109,15 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
                 )
         feedback.pushInfo(self.tr("{} zones found in input layer.").format(df.shape[0]))
         if find > 0:
-            txt = self.tr("{} zones found an existing matching node").format(find)
-            feedback.pushInfo("\t", txt)
+            feedback.pushInfo(self.tr("{} zones found an existing matching node").format(find))
         if create > 0:
-            txt = self.tr("{} new nodes added for unmatched zones").format(create)
-            feedback.pushInfo("\t", txt)
+            feedback.pushInfo(self.tr("{} new nodes added for unmatched zones").format(create))
         if fail > 0:
-            txt = self.tr("{} zones could not be processed").format(fail)
-            feedback.pushInfo("\t", txt)
+            feedback.pushInfo(self.tr("{} zones could not be processed").format(fail))
         feedback.pushInfo(" ")
 
         project.close()
-        del row_list, df
+        del df, nodes_data
 
         return {"Output": parameters["project_path"]}
 
@@ -151,15 +137,15 @@ class RenumberFromCentroids(QgsProcessingAlgorithm):
         return f"{self.string_order(1)}\n{self.string_order(2)} {self.string_order(3)}"
 
     def createInstance(self):
-        return RenumberFromCentroids()
+        return RenumberNodesFromCentroids()
 
     def string_order(self, order):
         if order == 1:
-            return self.tr("Import or create nodes to match an AequilibraE project with a GIS layer of centroids.")
+            return self.tr("Import or create nodes that match an AequilibraE project using a layer of centroids.")
         elif order == 2:
             return self.tr("WARNING: you may have to change existing node_id (ex. using QGIS field calculator)")
         elif order == 3:
             return self.tr("to ensure that changed node IDs (coming from Zone ID) are not already used.")
 
     def tr(self, message):
-        return trlt("RenumberFromCentroids", message)
+        return trlt("RenumberNodesFromCentroids", message)

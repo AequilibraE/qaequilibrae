@@ -2,6 +2,7 @@ import pytest
 import re
 import pandas as pd
 import numpy as np
+import sqlite3
 from os.path import isfile, join
 from os import makedirs
 from shutil import copyfile
@@ -21,7 +22,7 @@ from qaequilibrae.modules.processing_provider.matrix_from_layer import MatrixFro
 from qaequilibrae.modules.processing_provider.project_from_layer import ProjectFromLayer
 from qaequilibrae.modules.processing_provider.Add_connectors import AddConnectors
 from qaequilibrae.modules.processing_provider.assign_from_yaml import TrafficAssignYAML
-from qaequilibrae.modules.processing_provider.renumber_from_centroids import RenumberFromCentroids
+from qaequilibrae.modules.processing_provider.renumber_from_centroids import RenumberNodesFromCentroids
 
 
 def qgis_app():
@@ -116,7 +117,7 @@ def test_matrix_from_layer(folder_path):
     assert isfile(join(folder_path, f"{parameters['file_name']}.aem"))
 
     mat = AequilibraeMatrix()
-    mat.load(join(folder_path, f"{parameters["file_name"]}.aem"))
+    mat.load(join(folder_path, f"{parameters['file_name']}.aem"))
 
     info = mat.__dict__
     assert info["names"] == [parameters["matrix_core"]]
@@ -202,16 +203,38 @@ def test_add_centroid_connector(pt_no_feed):
     assert link_count == 3
 
 
-@pytest.mark.skip("incomplete")
-def test_renumber_from_centroids():
-    action = RenumberFromCentroids()
+def test_renumber_from_centroids(ae_with_project):
+    project = ae_with_project.project
+    project_folder = project.project_base_path
 
-    parameters = {}
+    copyfile("test/data/SiouxFalls_project/SiouxFalls.gpkg", f"{project_folder}/SiouxFalls.gpkg")
+
+    load_layers(project_folder)
+
+    nodeslayer = QgsProject.instance().mapLayersByName("Nodes layer")[0]
+
+    nodeslayer.startEditing()
+    for feat in nodeslayer.getFeatures():
+        value = feat["id"] + 1000
+        nodeslayer.changeAttributeValue(feat.id(), nodeslayer.fields().indexFromName("id"), value)
+
+    nodeslayer.commitChanges()
+
+    action = RenumberNodesFromCentroids()
+
+    parameters = {"nodes": nodeslayer, "node_id": "id", "project_path": project_folder}
 
     context = QgsProcessingContext()
     feedback = QgsProcessingFeedback()
 
-    result = action.processAlgorithm(parameters, context, feedback)
+    result = action.run(parameters, context, feedback)
+
+    assert result[0]["Output"] == project_folder
+
+    node_qry = "select node_id from nodes;"
+    node_count = project.conn.execute(node_qry).fetchall()
+    node_count = [n[0] for n in node_count]
+    assert node_count == list(range(1001, 1025))
 
 
 def test_assign_from_yaml(ae_with_project):
@@ -242,3 +265,10 @@ def test_assign_from_yaml(ae_with_project):
     assert result["Output"] == "Traffic assignment successfully completed"
 
     assert isfile(join(folder, "results_database.sqlite"))
+
+    conn = sqlite3.connect(join(folder, "results_database.sqlite"))
+    tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchone()[0]    
+    assert tables == "test_from_yaml"
+
+    row = conn.execute("SELECT * FROM test_from_yaml;").fetchone()
+    assert row

@@ -90,7 +90,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         project = Project()
         project.new(project_path)
 
-        feedback.pushInfo(self.tr("Importing link layer"))
+        feedback.pushInfo(self.tr("Importing links layer"))
         aeq_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 
         # Import QGIS layer as a panda dataframe and storing features for future copy
