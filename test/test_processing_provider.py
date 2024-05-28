@@ -3,7 +3,8 @@ import re
 import pandas as pd
 import numpy as np
 from os.path import isfile, join
-from os import makedirs, listdir
+from os import makedirs
+from shutil import copyfile
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.project import Project
 from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingFeedback
@@ -29,8 +30,8 @@ def qgis_app():
     qgs.exitQgis()
 
 
-def load_layers():
-    path_to_gpkg = "test/data/SiouxFalls_project/SiouxFalls.gpkg"
+def load_layers(folder):
+    path_to_gpkg = f"{folder}/SiouxFalls.gpkg"
 
     gpkg_links_layer = path_to_gpkg + "|layername=links"
     gpkg_nodes_layer = path_to_gpkg + "|layername=nodes"
@@ -125,9 +126,10 @@ def test_matrix_from_layer(folder_path):
 
 
 def test_project_from_layer(folder_path):
-    load_layers()
-
     makedirs(folder_path)
+    copyfile("test/data/SiouxFalls_project/SiouxFalls.gpkg", f"{folder_path}/SiouxFalls.gpkg")
+    
+    load_layers(folder_path)
     action = ProjectFromLayer()
 
     linkslayer = QgsProject.instance().mapLayersByName("Links layer")[0]
