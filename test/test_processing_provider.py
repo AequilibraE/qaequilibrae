@@ -1,10 +1,15 @@
 import pytest
 import re
 import pandas as pd
+import numpy as np
 from os.path import isfile, join
 from os import makedirs, listdir
+from aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.project import Project
 from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingFeedback
 from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateReferenceSystem
+from qgis.core import QgsField
+from PyQt5.QtCore import QVariant
 
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
 
@@ -81,7 +86,6 @@ def test_export_matrix(folder_path, source_file, format):
     assert isfile(result["Output"])
 
 
-@pytest.mark.skip("layer not loading")
 def test_matrix_from_layer(folder_path):
     makedirs(folder_path)
 
@@ -91,7 +95,7 @@ def test_matrix_from_layer(folder_path):
     action = MatrixFromLayer()
 
     parameters = {
-        "matrix_layer": "SiouxFalls_od",
+        "matrix_layer": layer,
         "origin": "O",
         "destination": "D",
         "value": "Ton",
@@ -105,38 +109,64 @@ def test_matrix_from_layer(folder_path):
     context = QgsProcessingContext()
     feedback = QgsProcessingFeedback()
 
-    result = action.processAlgorithm(parameters, context, feedback)
+    _ = action.run(parameters, context, feedback)
 
-    print(result)
+    assert isfile(join(folder_path, f"{parameters["file_name"]}.aem"))
+
+    mat = AequilibraeMatrix()
+    mat.load(join(folder_path, f"{parameters["file_name"]}.aem"))
+
+    info = mat.__dict__
+    assert info["names"] == [parameters["matrix_core"]]
+    assert parameters["matrix_name"].encode() in info["name"]
+    assert parameters["matrix_description"].encode() in info["description"]
+    assert info["zones"] == 24
+    assert np.sum(info["matrix"][parameters["matrix_core"]][:, :]) == 360600
 
 
-@pytest.mark.skip("layer not loading")
 def test_project_from_layer(folder_path):
     load_layers()
 
     makedirs(folder_path)
     action = ProjectFromLayer()
 
-    layer = QgsProject.instance().mapLayersByName("Links layer")[0]
+    linkslayer = QgsProject.instance().mapLayersByName("Links layer")[0]
+
+    linkslayer.startEditing()
+    field = QgsField('ltype', QVariant.String)
+    linkslayer.addAttribute(field)
+    linkslayer.updateFields()
+    
+    for feature in linkslayer.getFeatures():
+        feature['ltype'] = 'road'
+        linkslayer.updateFeature(feature)
+    
+    linkslayer.commitChanges()
 
     parameters = {
-        "links": layer.id(),
-        "link_type": "link_type",
+        "links": linkslayer,
+        "link_id": "link_id",
+        "link_type": "ltype",
         "direction": "direction",
         "modes": "modes",
-        "destFolder": folder_path,
+        "dst": folder_path,
         "project_name": "from_test",
     }
 
     context = QgsProcessingContext()
     feedback = QgsProcessingFeedback()
 
-    result = action.processAlgorithm(parameters, context, feedback)
+    result = action.run(parameters, context, feedback)
 
-    # assert isfile(result['Output'])
-    print(result.__dict__)
+    assert result[0]['Output'] == join(folder_path, parameters["project_name"])
 
-    QgsProject.instance().removeMapLayer(layer.id())
+    QgsProject.instance().removeMapLayer(linkslayer.id())
+
+    project = Project()
+    project.open(join(folder_path, parameters["project_name"]))
+
+    assert project.network.count_links() == 76
+    assert project.network.count_nodes() == 24
 
 
 @pytest.mark.skip("incomplete")

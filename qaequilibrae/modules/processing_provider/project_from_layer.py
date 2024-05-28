@@ -3,11 +3,12 @@ import pandas as pd
 import sys
 from os.path import join
 from string import ascii_lowercase
+from shapely.wkt import loads as load_wkt
 
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProcessingAlgorithm
 from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback, QgsProcessingParameterVectorLayer
 from qgis.core import QgsProcessingParameterField, QgsProcessingParameterFile, QgsProcessingParameterString
-from qgis.core import QgsProject, QgsFeature, QgsVectorLayer, QgsDataSourceUri
+from qgis.core import QgsProject
 
 from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.i18n.translate import trlt
@@ -76,7 +77,6 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, model_feedback):
-        print(parameters)
         feedback = QgsProcessingMultiStepFeedback(5, model_feedback)
 
         # Checks if we have access to aequilibrae library
@@ -86,47 +86,27 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         from aequilibrae import Project
 
         feedback.pushInfo(self.tr("Creating project"))
+        project_path = join(parameters["dst"], parameters["project_name"])
         project = Project()
-        prj_path = join(parameters["dst"], parameters["project_name"])
-        project.new(prj_path)
-
-        # Adding source_id field early to have all fields available in links table
-        links = project.network.links
-        link_data = links.fields
-        link_data.add("source_id", "link_id from the data source")
-        links.refresh_fields()
-        uri = QgsDataSourceUri()
-        uri.setDatabase(join(prj_path, "project_database.sqlite"))
-        uri.setDataSource("", "links", "geometry")
-        links_layer = QgsVectorLayer(uri.uri(), "links_layer", "spatialite")
-        feedback.pushInfo(" ")
-        feedback.setCurrentStep(1)
+        project.new(project_path)
 
         feedback.pushInfo(self.tr("Importing link layer"))
-        layer_crs = self.parameterAsVectorLayer(parameters, "links", context).crs()
         aeq_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 
         # Import QGIS layer as a panda dataframe and storing features for future copy
         layer = self.parameterAsVectorLayer(parameters, "links", context)
-        columns = [parameters["modes"], parameters["link_type"]]
-        row_list = []
-        featureList = []
-        for f in layer.getFeatures():
-            geom = f.geometry()
-            geom.transform(QgsCoordinateTransform(layer_crs, aeq_crs, QgsProject.instance()))
-            nf = QgsFeature(links_layer.fields())
-            nf.setGeometry(geom)
-            nf["ogc_fid"] = f[parameters["link_id"]]
-            nf["link_id"] = f[parameters["link_id"]]
-            nf["source_id"] = f[parameters["link_id"]]
-            nf["direction"] = f[parameters["direction"]]
-            nf["link_type"] = f[parameters["link_type"]]
-            nf["modes"] = f[parameters["modes"]]
-            featureList.append(nf)
-            row_list.append([f[parameters["modes"]], f[parameters["link_type"]]])
-        df = pd.DataFrame(row_list, columns=columns)
+        columns = [f.name() for f in layer.fields()]
+        feature_list = []
+        geometries = []
+        for feat in layer.getFeatures():
+            feature_list.append(feat.attributes())
+            geom = feat.geometry()
+            geom.transform(QgsCoordinateTransform(layer.crs(), aeq_crs, QgsProject.instance()))
+            geometries.append(geom.asWkt().upper())
+        df = pd.DataFrame(feature_list, columns=columns)
+        df["geom"] = geometries
         feedback.pushInfo(" ")
-        feedback.setCurrentStep(2)
+        feedback.setCurrentStep(1)
 
         feedback.pushInfo(self.tr("Getting parameters from layer"))
 
@@ -134,6 +114,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         link_types = df[parameters["link_type"]].unique()
         lt = project.network.link_types
         lt_dict = lt.all_types()
+
         existing_types = [ltype.link_type for ltype in lt_dict.values()]
         types_to_add = [ltype for ltype in link_types if ltype not in existing_types]
         for i, ltype in enumerate(types_to_add):
@@ -145,6 +126,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         md = project.network.modes
         md_dict = md.all_modes()
         existing_modes = {k: v.mode_name for k, v in md_dict.items()}
+
         all_modes = set("".join(df[parameters["modes"]].unique()))
         modes_to_add = [mode for mode in all_modes if mode not in existing_modes]
         for i, mode_id in enumerate(modes_to_add):
@@ -153,23 +135,33 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
             project.network.modes.add(new_mode)
             new_mode.save()
         feedback.pushInfo(" ")
-        feedback.setCurrentStep(3)
+        feedback.setCurrentStep(2)
 
         feedback.pushInfo(self.tr("Adding links"))
 
-        # Adding links all at once
-        links_layer.startEditing()
-        links_layer.dataProvider().addFeatures(featureList)
-        links_layer.commitChanges()
+        # Adding source_id field early to have all fields available in links table
+        links = project.network.links
+        link_data = links.fields
+        link_data.add("source_id", "link_id from the data source")
+        links.refresh_fields()
+
+        for _, record in df.iterrows():
+            new_link = links.new()
+            new_link.source_id = record[parameters["link_id"]]
+            new_link.direction = record[parameters["direction"]]
+            new_link.modes = record[parameters["modes"]]
+            new_link.link_type = record[parameters["link_type"]]
+            new_link.geometry = load_wkt(record.geom.upper())
+            new_link.save()
 
         feedback.pushInfo(" ")
-        feedback.setCurrentStep(4)
+        feedback.setCurrentStep(3)
 
         feedback.pushInfo(self.tr("Closing project"))
         project.close()
-        del row_list, df, featureList, uri, links_layer
+        del df, feature_list, geometries
 
-        return {"Output": prj_path}
+        return {"Output": project_path}
 
     def name(self):
         return self.tr("Create project from link layer")
