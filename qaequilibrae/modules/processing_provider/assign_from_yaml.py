@@ -134,7 +134,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         return self.tr("Paths and assignment")
 
     def shortHelpString(self):
-        return f"{self.string_order(1)}\n {self.string_order(2)}\n {self.string_order(3)}"
+        return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3)])
 
     def createInstance(self):
         return TrafficAssignYAML()
@@ -146,10 +146,8 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
             return self.tr("Example of valid configuration file:")
         elif order == 3:
             return """
-                    Project: D:/AequilibraE/Project/
-
+                    project: D:/AequilibraE/Project/
                     result_name: sce_from_yaml
-
                     traffic_classes:
                         - car:
                             matrix_path: D:/AequilibraE/Project/matrices/demand.aem
@@ -166,8 +164,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
                             fixed_cost: toll
                             vot: 12
                             blocked_centroid_flows: True
-
-                    Assignment:
+                    assignment:
                         algorithm: bfw
                         vdf: BPR2
                         alpha: 0.15

@@ -164,7 +164,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         return self.tr("Data")
 
     def shortHelpString(self):
-        return "\n".join([self.string_order(1), self.string_order(2), self.tring_order(3), self.string_order(4)])
+        return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3), self.string_order(4)])
 
     def createInstance(self):
         return MatrixFromLayer()

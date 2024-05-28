@@ -43,6 +43,8 @@ than one view, you can select the desired view using the dropdown buttons at the
 they are represented by the dropdowns containing *distance_blended* and *main_index*. To save your current matrix 
 into \*.csv format, just click in the *export* button in the lower left corner of the window.
 
+.. _fig_data_visualize_matrices:
+
 .. image:: ../images/data-visualize-loaded-matrix.png
     :align: center
     :alt: data visualize matrices

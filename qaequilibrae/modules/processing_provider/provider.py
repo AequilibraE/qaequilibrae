@@ -20,12 +20,12 @@ class Provider(QgsProcessingProvider):
         from .export_matrix import ExportMatrix
         from .matrix_from_layer import MatrixFromLayer
         from .project_from_layer import ProjectFromLayer
-        from .renumber_from_centroids import RenumberNodesFromCentroids
+        from .renumber_nodes_from_layer import RenumberNodesFromLayer
 
         self.addAlgorithm(MatrixFromLayer())
         self.addAlgorithm(ExportMatrix())
         self.addAlgorithm(ProjectFromLayer())
-        self.addAlgorithm(RenumberNodesFromCentroids())
+        self.addAlgorithm(RenumberNodesFromLayer())
         self.addAlgorithm(AddConnectors())
         self.addAlgorithm(TrafficAssignYAML())
 

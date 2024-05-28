@@ -11,7 +11,7 @@ from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.i18n.translate import trlt
 
 
-class RenumberNodesFromCentroids(QgsProcessingAlgorithm):
+class RenumberNodesFromLayer(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(
@@ -22,7 +22,7 @@ class RenumberNodesFromCentroids(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterField(
                 "node_id",
-                self.tr("Zone ID"),
+                self.tr("Node ID"),
                 type=QgsProcessingParameterField.Numeric,
                 parentLayerParameterName="nodes",
                 allowMultiple=False,
@@ -107,13 +107,13 @@ class RenumberNodesFromCentroids(QgsProcessingAlgorithm):
                         zone[parameters["node_id"]]
                     )
                 )
-        feedback.pushInfo(self.tr("{} zones found in input layer.").format(df.shape[0]))
+        feedback.pushInfo(self.tr("{} nodes found in input layer.").format(df.shape[0]))
         if find > 0:
-            feedback.pushInfo(self.tr("{} zones found an existing matching node").format(find))
+            feedback.pushInfo(self.tr("{} centroids found an existing matching node").format(find))
         if create > 0:
-            feedback.pushInfo(self.tr("{} new nodes added for unmatched zones").format(create))
+            feedback.pushInfo(self.tr("{} new nodes added for unmatched centroids").format(create))
         if fail > 0:
-            feedback.pushInfo(self.tr("{} zones could not be processed").format(fail))
+            feedback.pushInfo(self.tr("{} centroids could not be processed").format(fail))
         feedback.pushInfo(" ")
 
         project.close()
@@ -122,10 +122,10 @@ class RenumberNodesFromCentroids(QgsProcessingAlgorithm):
         return {"Output": parameters["project_path"]}
 
     def name(self):
-        return self.tr("Nodes from centroid")
+        return self.tr("Add/Renumber nodes from layer")
 
     def displayName(self):
-        return self.tr("Nodes from centroid")
+        return self.tr("Add/Renumber nodes from layer")
 
     def group(self):
         return self.tr("Model Building")
@@ -137,15 +137,15 @@ class RenumberNodesFromCentroids(QgsProcessingAlgorithm):
         return f"{self.string_order(1)}\n{self.string_order(2)} {self.string_order(3)}"
 
     def createInstance(self):
-        return RenumberNodesFromCentroids()
+        return RenumberNodesFromLayer()
 
     def string_order(self, order):
         if order == 1:
-            return self.tr("Import or create nodes that match an AequilibraE project using a layer of centroids.")
+            return self.tr("Add or renumber nodes in an AequilibraE project to match a layer of centroids.")
         elif order == 2:
             return self.tr("WARNING: you may have to change existing node_id (ex. using QGIS field calculator)")
         elif order == 3:
             return self.tr("to ensure that changed node IDs (coming from Zone ID) are not already used.")
 
     def tr(self, message):
-        return trlt("RenumberNodesFromCentroids", message)
+        return trlt("RenumberNodesFromLayer", message)

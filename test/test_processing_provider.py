@@ -22,7 +22,7 @@ from qaequilibrae.modules.processing_provider.matrix_from_layer import MatrixFro
 from qaequilibrae.modules.processing_provider.project_from_layer import ProjectFromLayer
 from qaequilibrae.modules.processing_provider.Add_connectors import AddConnectors
 from qaequilibrae.modules.processing_provider.assign_from_yaml import TrafficAssignYAML
-from qaequilibrae.modules.processing_provider.renumber_from_centroids import RenumberNodesFromCentroids
+from qaequilibrae.modules.processing_provider.renumber_nodes_from_layer import RenumberNodesFromLayer
 
 
 def qgis_app():
@@ -220,7 +220,7 @@ def test_renumber_from_centroids(ae_with_project):
 
     nodeslayer.commitChanges()
 
-    action = RenumberNodesFromCentroids()
+    action = RenumberNodesFromLayer()
 
     parameters = {"nodes": nodeslayer, "node_id": "id", "project_path": project_folder}
 
