@@ -2,9 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
-    <name>@default</name>
-</context>
-<context>
     <name>AboutDialog</name>
     <message>
         <location filename="../modules/common_tools/about_dialog.py" line="50"/>
@@ -1948,12 +1945,6 @@
     </message>
 </context>
 <context>
-    <name>Provider</name>
-</context>
-<context>
-    <name>RenumberFromCentroids</name>
-</context>
-<context>
     <name>RenumberNodesFromLayer</name>
     <message>
         <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="17"/>
@@ -2695,9 +2686,6 @@
         <source>Join with layer</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>exportMatrix</name>
 </context>
 <context>
     <name>gravity_parameters</name>
