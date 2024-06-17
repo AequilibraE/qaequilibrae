@@ -13,7 +13,7 @@ from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.i18n.translate import trlt
 
 
-class MatrixFromLayer(QgsProcessingAlgorithm):
+class AddMatrixFromLayer(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterMapLayer("matrix_layer", self.tr("Matrix Layer")))
@@ -48,33 +48,21 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
             )
         )
         self.addParameter(
-            QgsProcessingParameterString("file_name", self.tr("File name"), multiLine=False, defaultValue="")
-        )
-        self.addParameter(
             QgsProcessingParameterFile(
-                "output_folder",
-                self.tr("Output folder"),
-                behavior=QgsProcessingParameterFile.Folder,
-                fileFilter="All folders (*.*)",
-                defaultValue=standard_path(),
+                "matrix_file",
+                self.tr("Matrix file"),
+                behavior=QgsProcessingParameterFile.File,
+                fileFilter="*.aem",
+                defaultValue=None,
             )
-        )
-        advparams = [
+        
+        self.addParameter(
             QgsProcessingParameterString(
-                "matrix_name", self.tr("Matrix name"), optional=True, multiLine=False, defaultValue=""
-            ),
-            QgsProcessingParameterString(
-                "matrix_description",
-                self.tr("Matrix description"),
-                optional=True,
-                multiLine=False,
-                defaultValue="",
-            ),
-            QgsProcessingParameterString("matrix_core", self.tr("Matrix core"), multiLine=False, defaultValue="Value"),
+                "matrix_core",
+                self.tr("Matrix core"),
+                multiLine=False, 
+                defaultValue="Value"),
         ]
-        for param in advparams:
-            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
-            self.addParameter(param)
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(3, model_feedback)
@@ -89,13 +77,9 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         destination = parameters["destination"]
         value = parameters["value"]
 
-        matrix_name = parameters["matrix_name"]
-        matrix_description = parameters["matrix_description"]
-        core_name = [parameters["matrix_core"]]
+        core_name = parameters["matrix_core"]
 
-        output_folder = parameters["output_folder"]
-        output_name = parameters["file_name"]
-        file_name = join(output_folder, f"{output_name}.aem")
+        matrix_file = parameters["matrix_file"]
 
         # Import layer as a pandas df
         feedback.pushInfo(self.tr("Importing layer"))
@@ -126,25 +110,22 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
 
         # Creating the aequilibrae matrix file
         mat = AequilibraeMatrix()
-        mat.name = matrix_name
-        mat.description = matrix_description
-
-        mat.create_empty(file_name=file_name, zones=num_zones, matrix_names=core_name, memory_only=False)
-        mat.index[:] = all_zones[:]
+        mat.load(matrix_file)
 
         m = (
             coo_matrix((agg_matrix[value], (agg_matrix["from"], agg_matrix["to"])), shape=(num_zones, num_zones))
             .toarray()
             .astype(np.float64)
         )
-        mat.matrix[core_name[0]][:, :] = m[:, :]
+        mat.matrix[core_name][:, :] = m[:, :]
+        
         feedback.pushInfo(self.tr("{}x{} matrix imported ").format(num_zones, num_zones))
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
         mat.save()
         mat.close()
-        del matrix
+        del agg_matrix, matrix, m
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(3)
@@ -152,10 +133,10 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         return {"Output": f"{mat.name}, {mat.description} ({file_name})"}
 
     def name(self):
-        return self.tr("Import matrices")
+        return self.tr("Add a matrix from a layer to an existing aem file")
 
     def displayName(self):
-        return self.tr("Import matrices")
+        return self.tr("Add a matrix from a layer to an existing aem file")
 
     def group(self):
         return self.tr("02-Data")
@@ -167,17 +148,19 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3), self.string_order(4)])
 
     def createInstance(self):
-        return MatrixFromLayer()
+        return AddMatrixFromLayer()
 
     def string_order(self, order):
         if order == 1:
-            return self.tr("Save a layer as a *.aem file. Notice that:")
+            return self.tr("Save a layer to an existing *.aem file. Notice that:")
         elif order == 2:
             return self.tr("- the original matrix stored in the layer needs to be in list format")
         elif order == 3:
             return self.tr("- origin and destination fields need to be integers")
         elif order == 4:
             return self.tr("- value field can be either integer or real")
+        elif order == 5:
+            return self.tr("- if matrix_core is already existing, then it will be updated and previous data will be lost")
 
     def tr(self, message):
-        return trlt("MatrixFromLayer", message)
+        return trlt("AddMatrixFromLayer", message)

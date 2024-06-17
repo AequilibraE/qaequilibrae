@@ -18,11 +18,13 @@ class Provider(QgsProcessingProvider):
         from .Add_connectors import AddConnectors
         from .assign_from_yaml import TrafficAssignYAML
         from .export_matrix import ExportMatrix
-        from .matrix_from_layer import MatrixFromLayer
+        from .create_matrix_from_layer import CreateMatrixFromLayer
+        from .add_matrix_from_layer import AddMatrixFromLayer
         from .project_from_layer import ProjectFromLayer
         from .renumber_nodes_from_layer import RenumberNodesFromLayer
 
-        self.addAlgorithm(MatrixFromLayer())
+        self.addAlgorithm(CreateMatrixFromLayer())
+        self.addAlgorithm(AddMatrixFromLayer())
         self.addAlgorithm(ExportMatrix())
         self.addAlgorithm(ProjectFromLayer())
         self.addAlgorithm(RenumberNodesFromLayer())
