@@ -170,10 +170,10 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         return self.tr("Create project from link layer")
 
     def group(self):
-        return self.tr("Model Building")
+        return self.tr("01-Model Building")
 
     def groupId(self):
-        return self.tr("Model Building")
+        return self.tr("01-Model Building")
 
     def shortHelpString(self):
         return self.tr("Create an AequilibraE project from a given link layer")

@@ -158,10 +158,10 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         return self.tr("Import matrices")
 
     def group(self):
-        return self.tr("Data")
+        return self.tr("02-Data")
 
     def groupId(self):
-        return self.tr("Data")
+        return self.tr("02-Data")
 
     def shortHelpString(self):
         return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3), self.string_order(4)])

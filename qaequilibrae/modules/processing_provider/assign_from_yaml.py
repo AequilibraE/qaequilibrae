@@ -1,6 +1,8 @@
 import importlib.util as iutil
 import sys
 
+from datetime import datetime as dt
+
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
 
 from qaequilibrae.i18n.translate import trlt
@@ -112,7 +114,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         # Saving outputs
         feedback.pushInfo(self.tr("Saving outputs"))
         feedback.pushInfo(str(assig.report()))
-        assig.save_results(params["result_name"])
+        assig.save_results(params["result_name"]+dt.now().strftime('_%Y-%m-%d_%Hh%M'))
         assig.save_skims(params["result_name"], which_ones="all", format="omx")
         feedback.pushInfo(" ")
         feedback.setCurrentStep(5)
@@ -128,10 +130,10 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         return self.tr("Traffic assignment from file")
 
     def group(self):
-        return self.tr("Paths and assignment")
+        return self.tr("03-Paths and assignment")
 
     def groupId(self):
-        return self.tr("Paths and assignment")
+        return self.tr("03-Paths and assignment")
 
     def shortHelpString(self):
         return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3)])
