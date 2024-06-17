@@ -12,7 +12,6 @@ from qgis.core import QgsProcessingAlgorithm
 from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.i18n.translate import trlt
 
-
 class AddMatrixFromLayer(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
@@ -145,7 +144,7 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
         return self.tr("02-Data")
 
     def shortHelpString(self):
-        return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3), self.string_order(4)])
+        return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3), self.string_order(4), self.string_order(5)])
 
     def createInstance(self):
         return AddMatrixFromLayer()
