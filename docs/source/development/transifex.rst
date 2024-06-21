@@ -16,7 +16,8 @@ instructions. The process is straightforward and does not take a lot of time.
 
 After creating your account, direct yourself to `team's page 
 <https://explore.transifex.com/aequilibrae/qaequilibrae/>`_ and request your
-access to the project. Approving your request might take a couple of days, so don't worry.
+access to the project. Approving your request might take a couple of days (we are a small team of
+developers!), so don't worry.
 
 .. image:: ../images/tx_project_1.png
     :width: 1250
@@ -83,3 +84,19 @@ language, and you can start translating!
     :width: 479
     :align: center
     :alt: tx-request-a-language
+
+Translation tips!
+~~~~~~~~~~~~~~~~~
+
+Last but not least, here are some recommendations for translation, many of them borrowed / adapted from 
+`QGIS documentation <https://docs.qgis.org/3.34/en/docs/documentation_guidelines/do_translations.html#summary-rules-for-translation>`_.
+
+#. Be aware to use exactly the same (number of) special characters of the source text such as ``\```, ``\`\```, 
+   ``\*``, ``\*\*``, ``::``, ``{}``. These contribute to the cosmetics of the information provided.
+
+#. Do not begin nor end the text hold by special characters or tags with a space
+
+#. Do not end the translated strings with a new paragraph, otherwise the text will not be translated during the HTML
+   generation.
+
+#. Prefer using ``format`` over ``f``-strings.
