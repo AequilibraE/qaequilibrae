@@ -2,9 +2,7 @@ def show_log(qgis_project):
     from qaequilibrae.modules.common_tools import LogDialog
 
     if qgis_project.project is None:
-        qgis_project.iface.messageBar().pushMessage(
-            "Error", qgis_project.tr("You need to load a project first"), level=3, duration=10
-        )
+        qgis_project.show_message_no_project()
         return
     dlg2 = LogDialog(qgis_project)
     dlg2.show()

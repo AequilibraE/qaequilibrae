@@ -22,8 +22,6 @@ for path, subdirs, files in os.walk("qaequilibrae/modules"):
             ) as s:
                 if s.find(b"self.tr") != -1:
                     sources.append(os.path.join(path, name))
-                elif s.find(b"qgis_project.tr") != -1:
-                    sources.append(os.path.join(path, name))
 
 forms = [f.replace("""\\""", "/").replace("qaequilibrae", "..") for f in forms]
 sources = [s.replace("""\\""", "/").replace("qaequilibrae", "..") for s in sources]

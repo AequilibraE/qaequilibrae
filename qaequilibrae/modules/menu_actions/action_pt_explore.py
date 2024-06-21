@@ -3,15 +3,11 @@ def run_pt_explore(qgis_project):
     from os.path import exists, join
 
     if qgis_project.project is None:
-        qgis_project.iface.messageBar().pushMessage(
-            "Error", qgis_project.tr("You need to load a project first"), level=3, duration=10
-        )
+        qgis_project.show_message_no_project()
         return
 
     elif not exists(join(qgis_project.project.project_base_path, "public_transport.sqlite")):
-        qgis_project.iface.messageBar().pushMessage(
-            "Error", qgis_project.tr("You need to import a GTFS feed first"), level=3, duration=10
-        )
+        qgis_project.message_no_gtfs_feed()
         return
 
     dlg2 = TransitNavigatorDialog(qgis_project)
