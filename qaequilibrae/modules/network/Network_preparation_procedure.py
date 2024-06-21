@@ -189,10 +189,10 @@ class NetworkPreparationProcedure(WorkerThread):
             index.addFeature(feat)
             i_d = feat.attributes()[idx]
             if i_d in ids:
-                self.error = self.tr("ID {} is non unique in your selected field").format(str(i_d))
+                self.error = f"ID {str(i_d)} is non unique in your selected field"
                 self.report.append(self.error)
             if i_d < 0:
-                self.error = self.tr("Negative node ID in your selected field")
+                self.error = "Negative node ID in your selected field"
                 self.report.append(self.error)
                 break
             ids.append(i_d)
@@ -223,7 +223,7 @@ class NetworkPreparationProcedure(WorkerThread):
                         new_line_layer.dataProvider().changeAttributeValues({feat.id(): {fid: int(ids)}})
 
                     else:  # If not, we throw an error
-                        self.error = self.tr("CORRESPONDING NODE NOT FOUND. Link: {}").format(str(feat.attributes()))
+                        self.error = f"CORRESPONDING NODE NOT FOUND. Link: {str(feat.attributes())}"
                         self.report.append(self.error)
                         break
                 if self.error is not None:

@@ -101,8 +101,9 @@ class CreatesTranspoNetProcedure(WorkerThread):
             crs = int(self.node_layer.crs().authid().split(":")[1])
             for j, f in enumerate(self.node_layer.getFeatures()):
                 self.emit_messages(value=j + 1)
-                attrs = [self.convert_data(f.attributes()[val]) if val >= 0 else None for val in
-                         self.node_fields.values()]
+                attrs = [
+                    self.convert_data(f.attributes()[val]) if val >= 0 else None for val in self.node_fields.values()
+                ]
                 wkb = f.geometry().asWkb().data()
                 node_id = conn.execute(find_sql, [wkb, crs, wkb, crs]).fetchall()
                 if not node_id:

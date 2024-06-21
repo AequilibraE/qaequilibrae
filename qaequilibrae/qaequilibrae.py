@@ -264,7 +264,7 @@ class AequilibraEMenu:
     def initProcessing(self):
         self.provider = Provider()
         QgsApplication.processingRegistry().addProvider(self.provider)
-    
+
     def initGui(self):
         self.initProcessing()
 

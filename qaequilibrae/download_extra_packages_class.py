@@ -10,10 +10,39 @@ from qgis.core import QgsMessageLog
 
 
 class DownloadAll:
-    must_remove = ["numpy", "scipy", "pandas", "charset_normalizer", "click_plugins", "click", "certifi",
-                   "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
-                   "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
-                   "importlib_metadata", "pyaml", "urllib3", "packaging", "cpuinfo", "py-cpuinfo"]
+    must_remove = [
+        "numpy",
+        "scipy",
+        "pandas",
+        "charset_normalizer",
+        "click_plugins",
+        "click",
+        "certifi",
+        "cligj",
+        "colorama",
+        "fiona",
+        "pyproj",
+        "pytz",
+        "requests",
+        "rtree",
+        "setuptools",
+        "shapely",
+        "six",
+        "tzdata",
+        "zipp",
+        "attr",
+        "attrs",
+        "dateutil",
+        "python_dateutil",
+        "idna",
+        "importlib_metadata",
+        "pyaml",
+        "urllib3",
+        "packaging",
+        "cpuinfo",
+        "py-cpuinfo",
+    ]
+
     def __init__(self):
         pth = os.path.dirname(__file__)
         self.file = join(pth, "requirements.txt")
