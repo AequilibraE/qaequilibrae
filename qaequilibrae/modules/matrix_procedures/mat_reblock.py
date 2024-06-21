@@ -95,4 +95,4 @@ class MatrixReblocking(WorkerThread):
             del new_mat
 
         self.ProgressText.emit(self.tr("Matrix Reblocking finalized"))
-        self.finished_threaded_procedure.emit(self.tr("REBLOCKED MATRICES"))
+        self.finished_threaded_procedure.emit("REBLOCKED MATRICES")

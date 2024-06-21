@@ -109,9 +109,7 @@ class DesireLinesProcedure(WorkerThread):
             i = self.matrix.matrix_hash[z]
             t = np.nansum(total_mat[i, :]) + np.nansum(total_mat[:, i])
             unnasigned += t
-            self.report.append(
-                self.tr("Zone {} does not have a corresponding centroid/zone. Total flow {}").format(z, t)
-            )
+            self.report.append(f"Zone {z} does not have a corresponding centroid/zone. Total flow {t}")
             total_mat[i, :] = 0
             total_mat[:, i] = 0
             self.desire_lines.emit(("jobs_done_dl", k + 1))
@@ -164,12 +162,12 @@ class DesireLinesProcedure(WorkerThread):
             all_features.append(feature)
             self.desire_lines.emit(("jobs_done_dl", i))
         if unnasigned > 0:
-            self.report.append(self.tr("Total non assigned flows (not counting intrazonals):") + str(unnasigned))
+            self.report.append(f"Total non assigned flows (not counting intrazonals): {str(unnasigned)}")
         if flows.shape[0] > 1:
             a = dlpr.addFeatures(all_features)
             self.result_layer = desireline_layer
         else:
-            self.report.append(self.tr("Nothing to show"))
+            self.report.append("Nothing to show")
 
     def do_delaunay_lines(self):
         all_centroids, base_dl_fields, desireline_layer, dlpr = self.get_basic_data()

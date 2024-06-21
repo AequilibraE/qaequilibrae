@@ -212,10 +212,10 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.run_thread()
             else:
                 qgis.utils.iface.messageBar().pushMessage(
-                    "Error:", self.tr("One cannot load a dataset with indices only"), level=1
+                    "Error:", self.tr("One cannot load a dataset with indices only"), level=1, duration=10
                 )
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1, duration=10)
 
     def load_just_to_use(self):
         self.single_use = True

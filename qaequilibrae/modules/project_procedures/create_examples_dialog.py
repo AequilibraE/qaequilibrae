@@ -25,7 +25,7 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self._run_layout = QGridLayout()
 
-        lbl = QLabel("Available models:")
+        lbl = QLabel(self.tr("Available models:"))
 
         self.cb_models = QComboBox()
         self.cb_models.addItems(models)

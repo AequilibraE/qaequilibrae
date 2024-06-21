@@ -42,12 +42,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.fromlayer.addItem(layer.name())
                     self.tolayer.addItem(layer.name())
 
-        self.enclosed.setToolTip(
-            self.tr(
-                """If source layer is a polygon, source needs to enclose target.  If only target is \n
-                    a polygon, target needs to enclose source. First found record is used"""
-            )
-        )
+        self.enclosed.setToolTip("\n".join([self.string_order(1), self.string_order(2), self.string_order(3)]))
 
         self.touching.setToolTip(
             self.tr("Criteria to choose when there are multiple matches is largest area or length matched")
@@ -251,6 +246,14 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage(
                 self.tr("Input data not provided correctly"), self.tr("  Try again"), level=3
             )
+
+    def string_order(self, order):
+        if order == 1:
+            return self.tr("If source layer is a polygon, source needs to enclose target.")
+        elif order == 2:
+            return self.tr("If only target is a polygon, target needs to enclose source.")
+        elif order == 3:
+            return self.tr("First found record is used.")
 
 
 def unload(self):

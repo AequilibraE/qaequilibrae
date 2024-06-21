@@ -46,9 +46,7 @@ class LoadMatrix(WorkerThread):
                 matrix.append([a, b, c])
                 if P % 1000 == 0:
                     self.ProgressValue.emit(int(P))
-                    self.ProgressText.emit(
-                        (self.tr("Loading matrix: ") + "{:,}".format(P) + "/" + "{:,}".format(feat_count))
-                    )
+                    self.ProgressText.emit(self.tr("Loading matrix: {}/{}").format(P, feat_count))
 
             self.ProgressValue.emit(0)
             self.ProgressText.emit(self.tr("Converting to a NumPy array"))
@@ -88,10 +86,10 @@ class LoadMatrix(WorkerThread):
                     del mat
                 else:
                     self.report.append(
-                        self.tr("Numpy array needs to be 2 dimensional. Matrix provided has ") + str(len(mat.shape[:]))
+                        f"Numpy array needs to be 2 dimensional. Matrix provided has {str(len(mat.shape[:]))}"
                     )
             except Exception as e:
-                self.report.append(self.tr("Could not load array. {}").format(e.args))
+                self.report.append(f"Could not load array. {e.args}")
 
         self.ProgressText.emit("")
-        self.finished_threaded_procedure.emit(self.tr("LOADED-MATRIX"))
+        self.finished_threaded_procedure.emit("LOADED-MATRIX")

@@ -79,4 +79,4 @@ class LoadDataset(WorkerThread):
                 self.ProgressValue.emit(p)
 
             self.ProgressValue.emit(feat_count)
-        self.finished_threaded_procedure.emit(self.tr("Done"))
+        self.finished_threaded_procedure.emit("Done")

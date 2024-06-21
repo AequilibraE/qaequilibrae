@@ -123,7 +123,7 @@ class SimpleTAG(WorkerThread):
         self.to_layer.updateFields()
 
         self.ProgressValue.emit(self.to_layer.dataProvider().featureCount())
-        self.finished_threaded_procedure.emit(self.tr("procedure"))
+        self.finished_threaded_procedure.emit("procedure")
 
     def chooses_match(self, feat):
         geom = feat.geometry()

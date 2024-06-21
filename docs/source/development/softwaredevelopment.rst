@@ -20,7 +20,7 @@ backend of the AequilibraE GUI for QGIS. This requirement can be relaxed, but it
 basis and CANNOT break current workflow within QGIS.
 
 We have not yet found an ideal source of recommendations for developing AequilibraE, but a good initial take can be
-found in `this article. <http://www.plosbiology.org/article/info%3Adoi%2F10.1371%2Fjournal.pbio.1001745>`_
+found in `this article <http://www.plosbiology.org/article/info%3Adoi%2F10.1371%2Fjournal.pbio.1001745>`_.
 
 Development Install
 -------------------
@@ -103,10 +103,10 @@ Imports
 Translatable Strings
 ~~~~~~~~~~~~~~~~~~~~
 
-In case you are adding and/or changing any piece of QAequilibraE's code with translatable strings,
-which are those strings we see in the widget windows, please make sure to locate the strings by
-using the `tr` function. This shall guarantee you that the string will be compiled into our
-future translations. So far, only classes with `self` allow the location of strings.
+If you are adding or modifying any part of QAequilibraE's code that includes translatable strings, which are the
+strings displayed in the widget windows, please ensure you use the tr function to locate the strings. This will 
+guarantee that the strings are included in our future translations. Currently, only classes that use self support
+the localization of strings.
 
 ::
 
@@ -117,7 +117,26 @@ future translations. So far, only classes with `self` allow the location of stri
     # In case you have to insert any text into a string, the best way is to use string format
     self.error = self.tr("ID {} is non unique in your selected field").format(str(i_d))
 
-As for June 2023, QAequilibraE's translations are all hosted in 
+Strings in QAequilibraE Processing Provider can also be translated. To indicate the strings, import the translation
+function and configure it to return the context and the message.
+
+::
+  
+   from qaequilibrae.i18n.translate import trlt
+
+   class YourClassHere():
+      ...
+      # YourClassHere functions
+      ...
+      def processAlgorithm(self, parameters, context, model_feedback):
+        ...
+        feedback.pushInfo(self.tr("Running assignment"))  # indicates the translatable string
+        ...
+
+      def tr(self, message):
+        return trlt("TrafficAssignYAML", message)
+
+As for June 2024, QAequilibraE's translations are all hosted in 
 `Transifex <https://explore.transifex.com/aequilibrae/qaequilibrae/>`_. Currently, we are targeting translations
 in Brazilian Portuguese, Chinese, French, German, Italian, and Spanish. If you want to contribute to QAequilibraE 
 by translating the plugin to other languages or reviewing the existing translations, please let us know in our 
@@ -172,9 +191,9 @@ Testing
 
 AequilibraE testing is done with three tools:
 
-* `Flake8 <https://pypi.org/project/flake8/>`_, a tool to check Python code style
+* `flake8 <https://pypi.org/project/flake8/>`_, a tool to check Python code style
 * `pytest <http://pytest.org/latest/>`_, a Python testing tool
-* `coveralls <https://github.com/coagulant/coveralls-python>`_, a tool for measuring test code coverage
+* `pytest-cov <https://pytest-cov.readthedocs.io/en/latest/index.html>`_, a tool for measuring test code coverage
 
 To run the tests locally, you will need to figure out what to do...
 
@@ -184,8 +203,8 @@ manually review the code before merging it into master (or returning for correct
 In some cases, test targets need to be updated to match the new results produced by the code since these 
 are now the correct results. In order to update the test targets, first determine which tests are 
 failing and then review the failing lines in the source files. These are easy to identify since each 
-test ultimately comes down to one of Python's various types of `assert` statements. Once you identify 
-which `assert` is failing, you can work your way back through the code that creates the test targets in 
+test ultimately comes down to one of Python's various types of ``assert`` statements. Once you identify 
+which ``assert`` is failing, you can work your way back through the code that creates the test targets in 
 order to update it. After updating the test targets, re-run the tests to confirm the new code passes all 
 the tests.
 
@@ -194,16 +213,15 @@ Documentation
 
 All the AequilibraE documentation is (unfortunately) written in `reStructuredText
 <http://docutils.sourceforge.net/rst.html>`_ and built with `Sphinx <http://www.sphinx-doc.org/en/stable/>`_.
-Although Restructured Text is often unnecessarily convoluted to write, Sphinx is capable of converting it to standard-
-looking html pages, while also bringing the docstring documentation along for the ride.
+Although Restructured Text is often unnecessarily convoluted to write, Sphinx is capable of converting it to 
+standard-looking HTML pages, while also bringing the docstring documentation along for the ride.
 
 To build the documentation, first make sure the required packages are installed::
 
-    pip install sphinx  sphinx_rtd_theme
+    pip install sphinx pydata-sphinx-theme sphinx-gallery sphinx-design sphinx-panels sphinx-subfigure
 
-Next, build the documentation in html format with the following commands run from the ``root`` folder::
+Next, build the documentation in HTML format with the following commands run from the ``root`` folder::
 
-    sphinx-apidoc -T -o docs/source/generated aequilibrae
     cd docs
     make html
 

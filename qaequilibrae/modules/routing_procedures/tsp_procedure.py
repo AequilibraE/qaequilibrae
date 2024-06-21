@@ -54,12 +54,12 @@ class TSPProcedure(WorkerThread):
 
         # Print solution on console.
         if not solution:
-            self.error = self.tr("Solution not found")
+            self.error = "Solution not found"
             self.report.append(self.error)
         else:
-            self.report.append(self.tr("Objective function value: {}").format(solution.ObjectiveValue() / self.mult))
+            self.report.append("Objective function value: {}".format(solution.ObjectiveValue() / self.mult))
             index = routing.Start(0)
-            plan_output = self.tr("Route:\n")
+            plan_output = "Route:\n"
             route_distance = 0
 
             while not routing.IsEnd(index):

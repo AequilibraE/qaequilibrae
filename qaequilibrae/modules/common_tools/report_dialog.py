@@ -43,7 +43,7 @@ class ReportDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_close.clicked.connect(self.exit_procedure)
 
     def save_log(self):
-        file_types = self.tr("Text files(*.txt)")
+        file_types = "Text files(*.txt)"
         new_name, _ = GetOutputFileName(self, self.tr("Save procedure log"), file_types, ".txt", self.path)
         if new_name is not None:
             with open(new_name, "w") as outp:
