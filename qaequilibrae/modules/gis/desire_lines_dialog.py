@@ -148,7 +148,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             QgsProject.instance().addMapLayer(self.worker_thread.result_layer)
         except Exception as e:
             self.worker_thread.report.append(self.tr("Could not load desire lines to map"))
-            self.logger.error(self.tr("Could not load desire lines to map. {}").format(e.args))
+            self.logger.error(f"Could not load desire lines to map. {e.args}")
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()

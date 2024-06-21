@@ -223,7 +223,7 @@ class NetworkPreparationProcedure(WorkerThread):
                         new_line_layer.dataProvider().changeAttributeValues({feat.id(): {fid: int(ids)}})
 
                     else:  # If not, we throw an error
-                        self.error = self.tr("CORRESPONDING NODE NOTE FOUND. Link: {}").format(str(feat.attributes()))
+                        self.error = self.tr("CORRESPONDING NODE NOT FOUND. Link: {}").format(str(feat.attributes()))
                         self.report.append(self.error)
                         break
                 if self.error is not None:

@@ -70,7 +70,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
                 except Exception as e:
                     logger.error(sql)
                     logger.error(e.args)
-                    self.report.append(self.tr("field {} could not be added").format(str(f)))
+                    self.report.append(f"field {str(f)} could not be added")
 
         return string_fields
 
@@ -141,14 +141,13 @@ class CreatesTranspoNetProcedure(WorkerThread):
                 try:
                     conn.execute(sql, data)
                 except Exception as e:
-                    logger.info(self.tr("Failed inserting record {} for {}").format(data[0], table))
+                    logger.info(f"Failed inserting record {data[0]} for {table}")
                     logger.info(e.args)
                     logger.info([sql, data])
                     if data[0]:
-                        msg = self.tr("feature with id {} could not be added to layer {}").format(data[0], table)
+                        msg = f"feature with id {data[0]} could not be added to layer {table}"
                     else:
-                        msg = self.tr("feature with no node id present. It could not be added to layer {}").format(
-                            table)
+                        msg = f"feature with no node id present. It could not be added to layer {table}"
                     self.report.append(msg)
 
     def __add_linktypes_and_modes(self, all_link_types, all_modes, conn):

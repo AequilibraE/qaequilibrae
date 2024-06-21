@@ -148,15 +148,15 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.mapping_layout = QHBoxLayout()
 
             self.no_mapping = QRadioButton()
-            self.no_mapping.setText("No mapping")
+            self.no_mapping.setText(self.tr("No mapping"))
             self.no_mapping.toggled.connect(self.set_mapping)
 
             self.by_row = QRadioButton()
-            self.by_row.setText("By origin")
+            self.by_row.setText(self.tr("By origin"))
             self.by_row.toggled.connect(self.set_mapping)
 
             self.by_col = QRadioButton()
-            self.by_col.setText("By destination")
+            self.by_col.setText(self.tr("By destination"))
             self.by_col.toggled.connect(self.set_mapping)
 
             self.cob_colors = QComboBox()
