@@ -1,9 +1,11 @@
 import importlib.util as iutil
 import sys
+import textwrap
 
 from datetime import datetime as dt
 
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
+from qgis.core import QgsProcessingParameterDefinition, QgsProcessingParameterBoolean
 
 from qaequilibrae.i18n.translate import trlt
 
@@ -20,6 +22,18 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
                 defaultValue=None,
             )
         )
+        
+        advparams = [
+            QgsProcessingParameterBoolean(
+            "datetime_to_resultname", 
+            self.tr("Include current datetime to result name"), 
+            defaultValue=True
+            )
+        ]
+        
+        for param in advparams:
+            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            self.addParameter(param)
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(5, model_feedback)
@@ -114,8 +128,11 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         # Saving outputs
         feedback.pushInfo(self.tr("Saving outputs"))
         feedback.pushInfo(str(assig.report()))
-        assig.save_results(params["result_name"]+dt.now().strftime('_%Y-%m-%d_%Hh%M'))
-        assig.save_skims(params["result_name"], which_ones="all", format="omx")
+        if parameters["datetime_to_resultname"]:
+            assig.save_results(params["result_name"]+dt.now().strftime("_%Y-%m-%d_%Hh%M"))
+        else:
+            assig.save_results(params["result_name"])
+        assig.save_skims(params["result_name"], which_ones="all", format="aem")
         feedback.pushInfo(" ")
         feedback.setCurrentStep(5)
 
@@ -130,13 +147,13 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         return self.tr("Traffic assignment from file")
 
     def group(self):
-        return self.tr("03-Paths and assignment")
+        return ("03-"+self.tr("Paths and assignment"))
 
     def groupId(self):
-        return self.tr("03-Paths and assignment")
+        return ("03-"+self.tr("Paths and assignment"))
 
     def shortHelpString(self):
-        return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3)])
+        return textwrap.dedent("\n".join([self.string_order(1), self.string_order(2), self.string_order(3)]))
 
     def createInstance(self):
         return TrafficAssignYAML()
@@ -147,35 +164,35 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         elif order == 2:
             return self.tr("Example of valid configuration file:")
         elif order == 3:
-            return """
-                    project: D:/AequilibraE/Project/
-                    result_name: sce_from_yaml
-                    traffic_classes:
-                        - car:
-                            matrix_path: D:/AequilibraE/Project/matrices/demand.aem
-                            matrix_core: car
-                            network_mode: c
-                            pce: 1
-                            blocked_centroid_flows: True
-                            skims: travel_time, distance
-                        - truck:
-                            matrix_path: D:/AequilibraE/Project/matrices/demand.aem
-                            matrix_core: truck
-                            network_mode: c
-                            pce: 2
-                            fixed_cost: toll
-                            vot: 12
-                            blocked_centroid_flows: True
-                    assignment:
-                        algorithm: bfw
-                        vdf: BPR2
-                        alpha: 0.15
-                        beta: power
-                        capacity_field: capacity
-                        time_field: travel_time
-                        max_iter: 250
-                        rgap: 0.00001
-            """
+            return textwrap.dedent("""\
+                project: D:/AequilibraE/Project/
+                result_name: sce_from_yaml
+                traffic_classes:
+                    - car:
+                        matrix_path: D:/AequilibraE/Project/matrices/demand.aem
+                        matrix_core: car
+                        network_mode: c
+                        pce: 1
+                        blocked_centroid_flows: True
+                        skims: travel_time, distance
+                    - truck:
+                        matrix_path: D:/AequilibraE/Project/matrices/demand.aem
+                        matrix_core: truck
+                        network_mode: c
+                        pce: 2
+                        fixed_cost: toll
+                        vot: 12
+                        blocked_centroid_flows: True
+                assignment:
+                    algorithm: bfw
+                    vdf: BPR2
+                    alpha: 0.15
+                    beta: power
+                    capacity_field: capacity
+                    time_field: travel_time
+                    max_iter: 250
+                    rgap: 0.00001
+                """)
 
     def tr(self, message):
         return trlt("TrafficAssignYAML", message)

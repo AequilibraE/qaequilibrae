@@ -78,10 +78,10 @@ class AddConnectors(QgsProcessingAlgorithm):
         return self.tr("Add centroid connectors")
 
     def group(self):
-        return self.tr("01-Model Building")
+        return ("01-"+self.tr("Model Building"))
 
     def groupId(self):
-        return self.tr("01-Model Building")
+        return ("01-"+self.tr("Model Building"))
 
     def shortHelpString(self):
         return self.tr("Go through all the centroids and add connectors only if none exists for the chosen mode")

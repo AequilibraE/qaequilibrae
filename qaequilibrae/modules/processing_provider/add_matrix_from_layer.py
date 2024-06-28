@@ -49,19 +49,21 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFile(
                 "matrix_file",
-                self.tr("Matrix file"),
+                self.tr("Existing .aem file"),
                 behavior=QgsProcessingParameterFile.File,
                 fileFilter="*.aem",
                 defaultValue=None,
             )
+        )
         
         self.addParameter(
             QgsProcessingParameterString(
                 "matrix_core",
                 self.tr("Matrix core"),
                 multiLine=False, 
-                defaultValue="Value"),
-        ]
+                defaultValue="Value"
+            )
+        )
 
     def processAlgorithm(self, parameters, context, model_feedback):
         feedback = QgsProcessingMultiStepFeedback(3, model_feedback)
@@ -90,7 +92,7 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
         feedback.setCurrentStep(1)
 
         # Getting all zones
-        all_zones = np.array(sorted(list(set(list(matrix[origin].unique()) + list(matrix[destination].unique())))))
+        all_zones = np.unique(np.concatenate((matrices.Origine, matrices.Destination)))
         num_zones = all_zones.shape[0]
         idx = np.arange(num_zones)
 
@@ -132,16 +134,16 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
         return {"Output": f"{mat.name}, {mat.description} ({file_name})"}
 
     def name(self):
-        return self.tr("Add a matrix from a layer to an existing aem file")
+        return self.tr("Add matrix from layer to aem file")
 
     def displayName(self):
-        return self.tr("Add a matrix from a layer to an existing aem file")
+        return self.tr("Add matrix from layer to aem file")
 
     def group(self):
-        return self.tr("02-Data")
+        return ("02-"+self.tr("Data"))
 
     def groupId(self):
-        return self.tr("02-Data")
+        return ("02-"+self.tr("Data"))
 
     def shortHelpString(self):
         return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3), self.string_order(4), self.string_order(5)])
@@ -159,7 +161,7 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
         elif order == 4:
             return self.tr("- value field can be either integer or real")
         elif order == 5:
-            return self.tr("- if matrix_core is already existing, then it will be updated and previous data will be lost")
+            return self.tr("- if matrix_core already exists, it will be updated and previous data will be lost")
 
     def tr(self, message):
         return trlt("AddMatrixFromLayer", message)

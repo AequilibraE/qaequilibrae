@@ -107,7 +107,7 @@ class CreateMatrixFromLayer(QgsProcessingAlgorithm):
         feedback.setCurrentStep(1)
 
         # Getting all zones
-        all_zones = np.array(sorted(list(set(list(matrix[origin].unique()) + list(matrix[destination].unique())))))
+        all_zones = np.unique(np.concatenate((matrices.Origine, matrices.Destination)))
         num_zones = all_zones.shape[0]
         idx = np.arange(num_zones)
 
@@ -152,16 +152,16 @@ class CreateMatrixFromLayer(QgsProcessingAlgorithm):
         return {"Output": f"{mat.name}, {mat.description} ({file_name})"}
 
     def name(self):
-        return self.tr("Create an aequilibrae matrix file (.aem) from a layer")
+        return self.tr("Create aem matrix file from layer")
 
     def displayName(self):
-        return self.tr("Create an aequilibrae matrix file (.aem) from a layer")
+        return self.tr("Create aem matrix file from layer")
 
     def group(self):
-        return self.tr("02-Data")
+        return ("02-"+self.tr("Data"))
 
     def groupId(self):
-        return self.tr("02-Data")
+        return ("02-"+self.tr("Data"))
 
     def shortHelpString(self):
         return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3), self.string_order(4)])

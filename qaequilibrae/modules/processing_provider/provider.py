@@ -22,9 +22,11 @@ class Provider(QgsProcessingProvider):
         from .add_matrix_from_layer import AddMatrixFromLayer
         from .project_from_layer import ProjectFromLayer
         from .renumber_nodes_from_layer import RenumberNodesFromLayer
+        from .matrix_calculator import MatrixCalculator
 
         self.addAlgorithm(CreateMatrixFromLayer())
         self.addAlgorithm(AddMatrixFromLayer())
+        self.addAlgorithm(MatrixCalculator())
         self.addAlgorithm(ExportMatrix())
         self.addAlgorithm(ProjectFromLayer())
         self.addAlgorithm(RenumberNodesFromLayer())
