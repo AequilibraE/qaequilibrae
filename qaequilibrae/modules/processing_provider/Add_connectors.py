@@ -62,7 +62,7 @@ class AddConnectors(QgsProcessingAlgorithm):
 
         for _, node in centroids.iterrows():
             cnt = nodes.get(node.node_id)
-            cnt.connect_mode(cnt.geometry.buffer(0.01), mode_id=mode, connectors=num_connectors)
+            cnt.connect_mode(cnt.geometry.buffer(0.05), mode_id=mode, connectors=num_connectors)
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)

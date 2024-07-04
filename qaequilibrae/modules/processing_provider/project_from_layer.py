@@ -8,7 +8,7 @@ from shapely.wkt import loads as load_wkt
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProcessingAlgorithm
 from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback, QgsProcessingParameterVectorLayer
 from qgis.core import QgsProcessingParameterField, QgsProcessingParameterFile, QgsProcessingParameterString
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsFeature, QgsVectorLayer, QgsDataSourceUri
 
 from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.i18n.translate import trlt
@@ -93,18 +93,37 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         feedback.pushInfo(self.tr("Importing links layer"))
         aeq_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 
+        # Adding source_id field early to have all fields available in links table
+        links = project.network.links
+        link_data = links.fields
+        link_data.add("source_id", "link_id from the data source")
+        links.refresh_fields()
+        uri = QgsDataSourceUri()
+        uri.setDatabase(join(project_path,'project_database.sqlite'))
+        uri.setDataSource('', 'links', 'geometry')
+        links_layer=QgsVectorLayer(uri.uri(), 'links_layer', 'spatialite')
+
         # Import QGIS layer as a panda dataframe and storing features for future copy
         layer = self.parameterAsVectorLayer(parameters, "links", context)
-        columns = [f.name() for f in layer.fields()]
+        columns = [parameters['modes'], parameters['link_type']]
         feature_list = []
-        geometries = []
-        for feat in layer.getFeatures():
-            feature_list.append(feat.attributes())
-            geom = feat.geometry()
+        row_list = []
+        for f in layer.getFeatures():
+            geom=f.geometry()
             geom.transform(QgsCoordinateTransform(layer.crs(), aeq_crs, QgsProject.instance()))
-            geometries.append(geom.asWkt().upper())
-        df = pd.DataFrame(feature_list, columns=columns)
-        df["geom"] = geometries
+            nf=QgsFeature(links_layer.fields())
+            nf.setGeometry(geom)
+            nf['ogc_fid'] = f[parameters['link_id']]
+            nf['link_id'] = f[parameters['link_id']]
+            nf['a_node'] = 0
+            nf['b_node'] = 0
+            nf['source_id'] = f[parameters['link_id']]
+            nf['direction'] = f[parameters['direction']]
+            nf['link_type'] = f[parameters['link_type']]
+            nf['modes'] = f[parameters['modes']]
+            feature_list.append(nf)
+            row_list.append([f[parameters['modes']], f[parameters['link_type']]])
+        df = pd.DataFrame(row_list, columns=columns)
         feedback.pushInfo(" ")
         feedback.setCurrentStep(1)
 
@@ -134,32 +153,22 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
             new_mode.mode_name = f"Mode_from_original_data_{mode_id}"
             project.network.modes.add(new_mode)
             new_mode.save()
+        project.close()
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
         feedback.pushInfo(self.tr("Adding links"))
 
-        # Adding source_id field early to have all fields available in links table
-        links = project.network.links
-        link_data = links.fields
-        link_data.add("source_id", "link_id from the data source")
-        links.refresh_fields()
-
-        for _, record in df.iterrows():
-            new_link = links.new()
-            new_link.source_id = record[parameters["link_id"]]
-            new_link.direction = record[parameters["direction"]]
-            new_link.modes = record[parameters["modes"]]
-            new_link.link_type = record[parameters["link_type"]]
-            new_link.geometry = load_wkt(record.geom.upper())
-            new_link.save()
+        # Adding links all at once
+        links_layer.startEditing()
+        links_layer.addFeatures(feature_list)        
+        links_layer.commitChanges()
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(3)
 
         feedback.pushInfo(self.tr("Closing project"))
-        project.close()
-        del df, feature_list, geometries
+        del df, row_list, feature_list
 
         return {"Output": project_path}
 
