@@ -13,15 +13,14 @@ class DownloadAll:
     must_remove = ["numpy", "scipy", "pandas", "charset_normalizer", "click_plugins", "click", "certifi",
                    "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
                    "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
-                   "importlib_metadata", "pyaml", "urllib3", "packaging", "cpuinfo", "py-cpuinfo"]
+                   "importlib_metadata", "pyaml", "urllib3", "packaging"]
     def __init__(self):
         pth = os.path.dirname(__file__)
         self.file = join(pth, "requirements.txt")
         self.pth = join(pth, "packages")
         self.no_ssl = False
 
-    def install(self):
-        on_latest = sys.version_info >= (3, 12)
+    def install(self, on_latest=False):
         # self.adapt_aeq_version()
         with open(self.file, "r") as fl:
             lines = fl.readlines()
@@ -34,13 +33,14 @@ class DownloadAll:
         return reps
 
     def install_package(self, package, on_latest):
-        Path(self.pth).mkdir(parents=True, exist_ok=True)
 
-        install_command = f'-m pip install {package} -t "{self.pth}"'
+        install_command = f"-m pip install {package}" if on_latest else f'-m pip install {package} -t "{self.pth}"'
         # install_command = f'-m pip install {package} -t "{self.pth}"'
         if "openmatrix" in package.lower() or "aequilibrae" in package.lower():
             install_command += " --no-deps"
         if on_latest:
+            if "tables" in package:
+                install_command = install_command[:-7]
             install_command += " --break-system-packages"
 
         command = f'"{self.find_python()}" {install_command}'
