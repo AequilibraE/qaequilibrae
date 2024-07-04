@@ -19,8 +19,7 @@ from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
 from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
 from qgis.PyQt.QtCore import QTranslator
 
-from .modules.processing_provider.provider import Provider
-
+from qaequilibrae.modules.processing_provider.provider import Provider
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_import_gtfs
@@ -79,8 +78,9 @@ class AequilibraEMenu:
         self.project = None  # type: Project
         self.matrices = {}
         self.layers = {}  # type: Dict[QgsVectorLayer]
-        self.dock = QDockWidget(self.trlt("AequilibraE"))
+        self.dock = QDockWidget("AequilibraE")
         self.manager = QWidget()
+        self.provider = None
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -255,21 +255,22 @@ class AequilibraEMenu:
         else:
             webbrowser.open_new_tab(url)
 
-    def unload(self):
-        del self.dock
-        if  self.provider in QgsApplication.processingRegistry().providers():
-            QgsApplication.processingRegistry().removeProvider(self.provider)
+    # def trlt(self, message):
+    #     # In the near future, we will use this function to automatically translate the AequilibraE menu
+    #     # To any language we can get people to translate it to
+    #     # return QCoreApplication.translate('AequilibraE', message)
+    #     return message
 
-    def trlt(self, message):
-        # In the near future, we will use this function to automatically translate the AequilibraE menu
-        # To any language we can get people to translate it to
-        # return QCoreApplication.translate('AequilibraE', message)
-        return message
-
-    def initGui(self):
-        self.provider = Provider(self.tr)
+    def initProcessing(self):
+        self.provider = Provider()
         QgsApplication.processingRegistry().addProvider(self.provider)
-        pass
+    
+    def initGui(self):
+        self.initProcessing()
+
+    def unload(self):
+        if self.provider in QgsApplication.processingRegistry().providers():
+            QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def removes_temporary_files(self):
         # pass
