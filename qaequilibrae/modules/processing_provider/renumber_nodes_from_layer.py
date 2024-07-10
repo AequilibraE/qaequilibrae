@@ -98,7 +98,7 @@ class RenumberNodesFromLayer(QgsProcessingAlgorithm):
             elif matching.shape[0] == 0:
                 create += 1
                 new = nodes.new_centroid(zone[parameters["node_id"]])
-                new.geometry = loads(zone["geom"])
+                new.geometry = loads(zone["geometry"])
                 new.save()
             elif matching.shape[0] > 1:
                 fail += 1
