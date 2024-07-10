@@ -13,22 +13,12 @@ from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.i18n.translate import trlt
 
 
-class ProjectFromLayer(QgsProcessingAlgorithm):
+class AddLinksFromLayer(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterVectorLayer(
                 "links", self.tr("Links"), types=[QgsProcessing.TypeVectorLine], defaultValue=None
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterField(
-                "link_id",
-                self.tr("Link ID"),
-                type=QgsProcessingParameterField.Numeric,
-                parentLayerParameterName="links",
-                allowMultiple=False,
-                defaultValue="link_id",
             )
         )
         self.addParameter(
@@ -63,15 +53,10 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterFile(
-                "dst",
-                self.tr("Output folder"),
+                "project_path",
+                self.tr("Project path"),
                 behavior=QgsProcessingParameterFile.Folder,
                 defaultValue=standard_path(),
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterString(
-                "project_name", self.tr("Project name"), multiLine=False, defaultValue="new_project"
             )
         )
 
@@ -84,23 +69,23 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
 
         from aequilibrae import Project
 
-        feedback.pushInfo(self.tr("Creating project"))
-        project_path = join(parameters["dst"], parameters["project_name"])
-        project = Project()
-        project.new(project_path)
-
-        feedback.pushInfo(self.tr("Importing links layer"))
         aeq_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 
-        # Adding source_id field early to have all fields available in links table
-        links = project.network.links
-        link_data = links.fields
-        link_data.add("source_id", "link_id from the data source")
-        links.refresh_fields()
+        feedback.pushInfo(self.tr("Opening project"))
+        project_path=parameters["project_path"]
+        
+        # Import links layer
         uri = QgsDataSourceUri()
         uri.setDatabase(join(project_path,'project_database.sqlite'))
         uri.setDataSource('', 'links', 'geometry')
         links_layer=QgsVectorLayer(uri.uri(), 'links_layer', 'spatialite')
+        
+        # Get current max link_id
+        cols = ["link_id", "ogc_fid"]
+        datagen = ([f[col] for col in cols] for f in links_layer.getFeatures())
+        links_ids = pd.DataFrame.from_records(data=datagen, columns=cols)
+        ogc_id = links_ids['ogc_fid'].max() + 1
+        link_id = links_ids['link_id'].max() + 1
 
         # Import QGIS layer as a panda dataframe and storing features for future copy
         layer = self.parameterAsVectorLayer(parameters, "links", context)
@@ -112,14 +97,15 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
             geom.transform(QgsCoordinateTransform(layer.crs(), aeq_crs, QgsProject.instance()))
             nf=QgsFeature(links_layer.fields())
             nf.setGeometry(geom)
-            nf['ogc_fid'] = f[parameters['link_id']]
-            nf['link_id'] = f[parameters['link_id']]
+            nf['ogc_fid'] = int(ogc_id)
+            nf['link_id'] = int(link_id)
             nf['a_node'] = 0
             nf['b_node'] = 0
-            nf['source_id'] = f[parameters['link_id']]
             nf['direction'] = f[parameters['direction']]
             nf['link_type'] = f[parameters['link_type']]
             nf['modes'] = f[parameters['modes']]
+            ogc_id = ogc_id + 1
+            link_id = link_id + 1
             feature_list.append(nf)
             row_list.append([f[parameters['modes']], f[parameters['link_type']]])
         df = pd.DataFrame(row_list, columns=columns)
@@ -172,10 +158,10 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         return {"Output": project_path}
 
     def name(self):
-        return self.tr("Create project from link layer")
+        return self.tr("Add links from layer to project")
 
     def displayName(self):
-        return self.tr("Create project from link layer")
+        return self.tr("Add links from layer to project")
 
     def group(self):
         return ("01-"+self.tr("Model Building"))
@@ -184,10 +170,10 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
         return ("01-"+self.tr("Model Building"))
 
     def shortHelpString(self):
-        return self.tr("Create an AequilibraE project from a given link layer")
+        return self.tr("Take links from a layer and add them to an existing AequilibraE project")
 
     def createInstance(self):
-        return ProjectFromLayer()
+        return AddLinksFromLayer()
 
     def tr(self, message):
-        return trlt("ProjectFromLayer", message)
+        return trlt("AddLinksFromLayer", message)

@@ -21,6 +21,7 @@ class Provider(QgsProcessingProvider):
         from .create_matrix_from_layer import CreateMatrixFromLayer
         from .add_matrix_from_layer import AddMatrixFromLayer
         from .project_from_layer import ProjectFromLayer
+        from .add_links2project_from_layer import AddLinksFromLayer
         from .renumber_nodes_from_layer import RenumberNodesFromLayer
         from .matrix_calculator import MatrixCalculator
 
@@ -29,6 +30,7 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(MatrixCalculator())
         self.addAlgorithm(ExportMatrix())
         self.addAlgorithm(ProjectFromLayer())
+        self.addAlgorithm(AddLinksFromLayer)
         self.addAlgorithm(RenumberNodesFromLayer())
         self.addAlgorithm(AddConnectors())
         self.addAlgorithm(TrafficAssignYAML())
