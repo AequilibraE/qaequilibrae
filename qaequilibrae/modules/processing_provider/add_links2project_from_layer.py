@@ -18,7 +18,10 @@ class AddLinksFromLayer(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterVectorLayer(
-                "links", self.tr("Links"), types=[QgsProcessing.TypeVectorLine], defaultValue=None
+                "links",
+                self.tr("Links"),
+                types=[QgsProcessing.TypeVectorLine],
+                defaultValue=None
             )
         )
         self.addParameter(
