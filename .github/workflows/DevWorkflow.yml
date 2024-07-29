@@ -10,21 +10,13 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        # container: [ 'qgis/qgis:release-3_34']
         container: [ 'qgis/qgis:latest', 'qgis/qgis:3.34.7']
     container:
       image: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v4
-      # - name: Install dependencies for Release
-      #   if: ${{ (matrix.container == 'qgis/qgis:3.34.7')}}
-      #   run: |
-      #     python3 -m pip install setuptools
-      #     python3 -m pip install -r test/requirements-test.txt
-      #     python3 ./ci/dependency_installation.py
 
       - name: Install dependencies
-        # if: ${{ (matrix.container == 'qgis/qgis:latest')}}
         run: |
           python3 -m pip install setuptools --break-system-packages
           python3 -m pip install -r test/requirements-test.txt --break-system-packages
