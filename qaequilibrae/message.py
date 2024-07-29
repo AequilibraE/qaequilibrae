@@ -25,6 +25,12 @@ class messages:
     @property
     def fourth_message(self):
         return self.tr("Without installing the packages, the plugin will be mostly non-functional")
+    
+    @property
+    def messsage_five(self):
+        a = self.tr("QAequilibraE requires Python 3.12.")
+        b = self.tr("Please install an appropriate version to make it work")
+        return f"{a}\r\n{b}"
 
     def tr(self, text):
         return QCoreApplication.translate("messages", text)

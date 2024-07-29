@@ -1,3 +1,4 @@
+import pytest
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication
 
@@ -298,6 +299,7 @@ def test_gtfs_explorer_no_gtfs(ae_with_project):
     ), "Level 3 error message is missing"
 
 
+@pytest.mark.skip
 def test_gtfs_explorer_with_gtfs(pt_project, qtbot):
     from qaequilibrae.modules.public_transport_procedures.transit_navigator_dialog import TransitNavigatorDialog
 

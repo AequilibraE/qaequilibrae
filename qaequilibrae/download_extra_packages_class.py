@@ -13,7 +13,9 @@ class DownloadAll:
     must_remove = ["numpy", "scipy", "pandas", "charset_normalizer", "click_plugins", "click", "certifi",
                    "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
                    "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
-                   "importlib_metadata", "pyaml", "urllib3", "packaging", "cpuinfo", "py-cpuinfo"]
+                   "importlib_metadata", "pyaml", "urllib3", "packaging", "cpuinfo", "py-cpuinfo",
+                   "geopandas", "pyyaml"]
+
     def __init__(self):
         pth = os.path.dirname(__file__)
         self.file = join(pth, "requirements.txt")
@@ -21,14 +23,17 @@ class DownloadAll:
         self.no_ssl = False
 
     def install(self):
-        on_latest = sys.version_info >= (3, 12)
-        # self.adapt_aeq_version()
+        version = sys.version_info
+        on_latest = version >= (3,12)
         with open(self.file, "r") as fl:
             lines = fl.readlines()
 
         reps = []
         for line in lines:
             reps.extend(self.install_package(line.strip(), on_latest))
+
+        if version.micro > 3:
+            self.must_remove.append("pyogrio")
 
         self.clean_packages()
         return reps
@@ -37,8 +42,7 @@ class DownloadAll:
         Path(self.pth).mkdir(parents=True, exist_ok=True)
 
         install_command = f'-m pip install {package} -t "{self.pth}"'
-        # install_command = f'-m pip install {package} -t "{self.pth}"'
-        if "openmatrix" in package.lower() or "aequilibrae" in package.lower():
+        if "ortools" in package.lower():
             install_command += " --no-deps"
         if on_latest:
             install_command += " --break-system-packages"

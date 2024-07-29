@@ -1,9 +1,5 @@
-numpy<1.99
 aequilibrae==1.0.1
 ortools
-cython
-numexpr
-py-cpuinfo
-tables
-openmatrix
-fastparquet
+absl-py
+immutabledict
+protobuf
