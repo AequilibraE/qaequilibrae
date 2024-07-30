@@ -19,8 +19,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m pip install setuptools
-          python3 -m pip install -r test/requirements-test.txt
+          python3 -m pip install setuptools --break-system-packages
+          python3 -m pip install -r test/requirements-test.txt --break-system-packages
           python3 ./ci/dependency_installation.py
 
       - name: Run tests
