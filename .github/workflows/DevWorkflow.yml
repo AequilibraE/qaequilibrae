@@ -19,8 +19,8 @@ jobs:
       - name: Install dependencies
         run: |
             python3 -m venv venv
-            . venv/bin/activate
-            python3 -m pip install setuptools numpy==1.26.4
+            . app/qgis_env/bin/activate
+            python3 -m pip install setuptools
             python3 -m pip install -r test/requirements-test.txt
             python3 ./ci/dependency_installation.py
 
