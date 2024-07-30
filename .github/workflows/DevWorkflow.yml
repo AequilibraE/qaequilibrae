@@ -16,10 +16,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: |
-          docker build -t qaequilibrae .
+      - name: Print QGIS version
+        run: qgis --version
 
-      - name: Run tests
+      - name: Print Python version
+        run: python3 --version
+
+      - name: Install dependencies
         run: |
-          docker run -v $(pwd):/app -w /app qaequilibrae bash -c "source /app/qgis_env/bin/activate && pip install -r test/requirements-test.txt && python3 ci/dependency_installation.py && python3 -m pytest test -v --tb=short --cov=qaequilibrae"
+            ls -d */
+
+      #       python3 -m pip install setuptools
+      #       python3 -m pip install -r test/requirements-test.txt
+      #       python3 ./ci/dependency_installation.py
+
+      # - name: Run tests
+      #   run: |
+      #     export QT_QPA_PLATFORM=offscreen
+      #     pwd
+      #     python3 -m pytest test -v
