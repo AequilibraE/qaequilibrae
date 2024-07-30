@@ -25,6 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
             ls -d */
+            . ./src/app/qgis_env/bin/activate
 
       #       python3 -m pip install setuptools
       #       python3 -m pip install -r test/requirements-test.txt
