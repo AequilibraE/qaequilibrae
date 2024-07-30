@@ -2,6 +2,7 @@ name: DevelopmentTests
 
 on:  [pull_request]
 
+
 jobs:
   unittest:
 #    needs: linting
@@ -9,31 +10,20 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        # container: ['qgis/qgis:latest', 'qgis/qgis:3.34.7']
-        container: ['qgis/qgis:latest']
+        container: [ 'qgis/qgis:latest', 'qgis/qgis:3.34.7']
     container:
       image: ${{ matrix.container }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Print QGIS version
-        run: qgis --version
-
-      - name: Print Python version
-        run: python3 --version
-
       - name: Install dependencies
         run: |
-            cd ../../..
-            cd usr/local/bin
-            ls -d */
+          python3 -m pip install setuptools --break-system-packages
+          python3 -m pip install -r test/requirements-test.txt --break-system-packages
+          python3 ./ci/dependency_installation.py
 
-      #       python3 -m pip install setuptools
-      #       python3 -m pip install -r test/requirements-test.txt
-      #       python3 ./ci/dependency_installation.py
-
-      # - name: Run tests
-      #   run: |
-      #     export QT_QPA_PLATFORM=offscreen
-      #     pwd
-      #     python3 -m pytest test -v
+      - name: Run tests
+        run: |
+          export QT_QPA_PLATFORM=offscreen
+          pwd
+          python3 -m pytest test -v --tb=short --cov=qaequilibrae
