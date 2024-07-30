@@ -25,8 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
             cd ../../..
-            pwd
-            ls -d */
+            find . -maxdepth 3 -type d
 
       #       python3 -m pip install setuptools
       #       python3 -m pip install -r test/requirements-test.txt
