@@ -6,12 +6,11 @@ on:  [pull_request]
 jobs:
   unittest:
 #    needs: linting
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
       matrix:
         # container: [ 'qgis/qgis:latest', 'qgis/qgis:3.34.7']
-        container: ['qgis/qgis:latest']
         container: ['qgis/qgis:latest']
     container:
       image: ${{ matrix.container }}
@@ -20,7 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m pip install setuptools --break-system-packages
+          python3 -m pip install setuptools
           python3 -m pip install -r test/requirements-test.txt
           python3 ./ci/dependency_installation.py
 
