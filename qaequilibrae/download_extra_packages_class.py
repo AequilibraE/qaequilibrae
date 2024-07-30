@@ -14,7 +14,7 @@ class DownloadAll:
                    "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
                    "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
                    "importlib_metadata", "pyaml", "urllib3", "packaging", "cpuinfo", "py-cpuinfo",
-                   "geopandas", "pyyaml"]
+                   "geopandas", "pyyaml", "pyogrio"]
 
     def __init__(self):
         pth = os.path.dirname(__file__)
@@ -23,29 +23,23 @@ class DownloadAll:
         self.no_ssl = False
 
     def install(self):
-        version = sys.version_info
-        on_latest = version >= (3,12)
         with open(self.file, "r") as fl:
             lines = fl.readlines()
 
         reps = []
         for line in lines:
-            reps.extend(self.install_package(line.strip(), on_latest))
-
-        if version.micro > 3:
-            self.must_remove.append("pyogrio")
+            reps.extend(self.install_package(line.strip()))
 
         self.clean_packages()
         return reps
 
-    def install_package(self, package, on_latest):
+    def install_package(self, package):
         Path(self.pth).mkdir(parents=True, exist_ok=True)
 
         install_command = f'-m pip install {package} -t "{self.pth}"'
         if "ortools" in package.lower():
             install_command += " --no-deps"
-        if on_latest:
-            install_command += " --break-system-packages"
+        install_command += " --break-system-packages"
 
         command = f'"{self.find_python()}" {install_command}'
         print(command)

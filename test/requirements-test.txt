@@ -1,7 +1,4 @@
-pandas
-geopandas
 rtree
-shapely
 pytest-qgis
 pytest-qt
 pytest-cov

@@ -49,7 +49,9 @@ except:
     msg = messages()
     from qgis.PyQt.QtWidgets import QMessageBox
 
-    if version >= (3, 12):
+    if version < (3, 12) and sys.platform == "win32":
+        QMessageBox.information(None, "Warning", msg.messsage_five)
+    else:
         if (
             QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
             == QMessageBox.Ok
@@ -63,8 +65,6 @@ except:
                 QMessageBox.information(None, "Information", msg.third_message)
         else:
             QMessageBox.information(None, "Information", msg.fourth_message)
-    else:
-        QMessageBox.information(None, "Warning", msg.messsage_five)
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -269,7 +269,7 @@ class AequilibraEMenu:
     def initProcessing(self):
         self.provider = Provider()
         QgsApplication.processingRegistry().addProvider(self.provider)
-    
+
     def initGui(self):
         self.initProcessing()
 

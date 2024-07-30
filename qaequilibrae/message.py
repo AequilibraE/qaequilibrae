@@ -16,7 +16,7 @@ class messages:
     def second_message(self):
         a = self.tr("Errors may have happened during installation.")
         b = self.tr("Please inspect the messages on your General Log message tab")
-        return f"{a} {b}"
+        return f"{a}\r\n{b}"
 
     @property
     def third_message(self):
@@ -29,7 +29,7 @@ class messages:
     @property
     def messsage_five(self):
         a = self.tr("QAequilibraE requires Python 3.12.")
-        b = self.tr("Please install an appropriate version to make it work")
+        b = self.tr("Please install QGIS version 3.34.6+, 3.36.2+ or 3.38.0+ to make it work.")
         return f"{a}\r\n{b}"
 
     def tr(self, text):
