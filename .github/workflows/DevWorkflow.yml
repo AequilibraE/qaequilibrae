@@ -12,6 +12,7 @@ jobs:
       matrix:
         # container: [ 'qgis/qgis:latest', 'qgis/qgis:3.34.7']
         container: ['qgis/qgis:latest']
+        container: ['qgis/qgis:latest']
     container:
       image: ${{ matrix.container }}
     steps:
@@ -20,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install setuptools --break-system-packages
-          python3 -m pip install -r test/requirements-test.txt --break-system-packages
+          python3 -m pip install -r test/requirements-test.txt
           python3 ./ci/dependency_installation.py
 
       - name: Run tests

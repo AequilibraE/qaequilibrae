@@ -39,7 +39,7 @@ class DownloadAll:
         install_command = f'-m pip install {package} -t "{self.pth}"'
         if "ortools" in package.lower():
             install_command += " --no-deps"
-        install_command += " --break-system-packages"
+        # install_command += " --break-system-packages"
 
         command = f'"{self.find_python()}" {install_command}'
         print(command)
