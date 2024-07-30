@@ -18,8 +18,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m venv venv
-          source venv/bin/activate
+          source /env/qgis_env/bin/activate
           python3 -m pip install -r test/requirements-test.txt
 
       - name: Run tests
