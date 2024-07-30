@@ -24,7 +24,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-            cd ../..
+            cd ../../..
+            pwd
             ls -d */
 
       #       python3 -m pip install setuptools
