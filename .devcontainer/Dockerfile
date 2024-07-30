@@ -24,4 +24,4 @@ RUN . qgis_env/bin/activate && \
 RUN python3 -m pip install setuptools
 
 # Defines the default command to be executed when the container starts
-CMD ["bash", "-c", "source /app/qgis_env/bin/activate && qgis"]
+CMD ["bash", "-c", ". /app/qgis_env/bin/activate && qgis"]
