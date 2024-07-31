@@ -18,10 +18,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python3 -m pip install setuptools --break-system-packages
-          python3 -m pip install -r test/requirements-test.txt --break-system-packages
-          python3 -m pip install aequilibrae==1.0.1 absl-py immutabledict protobuf --break-system-packages
-          python3 -m pip install ortools --no-deps --break-system-packages
+          python3 -m venv tmp/venv_test
+          source /tmp/venv_test/bin/activate
+          python3 -m pip install setuptools
+          python3 -m pip install -r test/requirements-test.txt
+          python3 ./ci/dependency_installation.py
 
       - name: Run tests
         run: |
