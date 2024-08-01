@@ -5,7 +5,6 @@ import sys
 from os.path import join, isdir
 from pathlib import Path
 
-import numpy as np
 from qgis.core import QgsMessageLog
 
 
@@ -98,6 +97,7 @@ class DownloadAll:
         return python_exe
 
     def adapt_aeq_version(self):
+        import numpy as np
         if int(np.__version__.split(".")[1]) >= 22:
             Path(self.file).unlink(missing_ok=True)
             shutil.copyfile(self._file, self.file)
