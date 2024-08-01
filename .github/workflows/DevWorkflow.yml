@@ -19,10 +19,11 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m venv /tmp/venv_test --system-site-package
-          source /tmp/venv_test/bin/activate
+          . /tmp/venv_test/bin/activate
           python3 -m pip install setuptools
           python3 -m pip install -r test/requirements-test.txt
           python3 ./ci/dependency_installation.py
+          python3 -m pip list
 
       - name: Run tests
         run: |
