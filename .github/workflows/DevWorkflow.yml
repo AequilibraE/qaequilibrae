@@ -24,6 +24,8 @@ jobs:
           python3 -m pip install -r test/requirements-test.txt
           python3 ./ci/dependency_installation.py
           python3 -m pip list
+        env:
+          PYTHONPATH: ./qaequilibrae/packages:$PYTHONPATH
 
       - name: Run tests
         run: |
