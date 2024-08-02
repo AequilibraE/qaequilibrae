@@ -29,7 +29,6 @@ jobs:
       - name: Run tests
         run: |
           . /tmp/venv_test/bin/activate
-          python3 -m pip list
           export QT_QPA_PLATFORM=offscreen
           pwd
           python3 -m pytest test -v --tb=short --cov=qaequilibrae
