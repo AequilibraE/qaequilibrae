@@ -23,12 +23,11 @@ jobs:
           python3 -m pip install setuptools
           python3 -m pip install -r test/requirements-test.txt
           python3 ./ci/dependency_installation.py
-        env:
-          PYTHONPATH: $(pwd)/qaequilibrae/packages:$PYTHONPATH
+          echo "PYTHONPATH=$(pwd)/qaequilibrae/packages" >> $GITHUB_ENV
+          python3 -m pip list
 
       - name: Run tests
         run: |
           export QT_QPA_PLATFORM=offscreen
           pwd
-          python3 -m pip list
           python3 -m pytest test -v --tb=short --cov=qaequilibrae
