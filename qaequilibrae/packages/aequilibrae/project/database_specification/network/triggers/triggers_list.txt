@@ -1,4 +1,0 @@
-link_type_table_triggers
-modes_table_triggers
-network_triggers
-periods_triggers
