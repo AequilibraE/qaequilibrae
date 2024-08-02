@@ -1,0 +1,65 @@
+Metadata-Version: 2.1
+Name: ortools
+Version: 9.10.4067
+Summary: Google OR-Tools python libraries and modules
+Home-page: https://developers.google.com/optimization/
+Download-URL: https://github.com/google/or-tools/releases
+Author: Google LLC
+Author-email: or-tools@google.com
+License: Apache 2.0
+Keywords: operations research,constraint programming,linear programming,flow algorithms,python
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: Unix
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: POSIX :: BSD :: FreeBSD
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: C++
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Topic :: Office/Business :: Scheduling
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+Classifier: Topic :: Software Development
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >= 3.8
+License-File: LICENSE
+Requires-Dist: absl-py >=2.0.0
+Requires-Dist: numpy >=1.13.3
+Requires-Dist: pandas >=2.0.0
+Requires-Dist: protobuf >=5.26.1
+Requires-Dist: immutabledict >=3.0.0
+
+This project hosts operations research tools developed at Google and
+made available as open source under the Apache 2.0 License.
+
+OR-Tools includes solvers for:
+
+- Constraint Programming
+  - CP-SAT solver: A constraint programming solver that uses SAT (satisfiability)
+  methods.
+  - Original CP solver: A constraint programming solver.
+- Linear and Mixed-Integer Programming
+  - Glop: A linear optimizer to find the optimal value of a linear objective
+  function, given a set of linear inequalities as constraints.
+  - MPSolver, ModelBuilder: Wrappers around commercial and other open source
+  solvers, including mixed integer solvers: CBC, CLP, GLPK, Gurobi or SCIP.
+- Vehicle Routing
+  A specialized library for identifying best vehicle routes given constraints.
+- Graph Algorithms
+  Code for finding shortest paths in graphs, min-cost flows, max flows, and
+  linear sum assignments.
