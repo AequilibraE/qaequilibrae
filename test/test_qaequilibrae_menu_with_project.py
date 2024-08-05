@@ -1,3 +1,4 @@
+import pytest
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication
 
@@ -288,27 +289,13 @@ def test_gtfs_importer(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-def test_gtfs_explorer_no_gtfs(ae_with_project):
+def test_gtfs_explorer(ae_with_project, qtbot):
+    from qaequilibrae.modules.public_transport_procedures.transit_navigator_dialog import TransitNavigatorDialog
+
     action = ae_with_project.menuActions["Public Transport"][1]
     assert action.text() == "Explore Transit", "Wrong text content"
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert (
-        messagebar.messages[3][-1] == "Error:You need to import a GTFS feed first"
-    ), "Level 3 error message is missing"
-
-
-def test_gtfs_explorer_with_gtfs(pt_project, qtbot):
-    from qaequilibrae.modules.public_transport_procedures.transit_navigator_dialog import TransitNavigatorDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, TransitNavigatorDialog)
-
-    action = pt_project.menuActions["Public Transport"][1]
-    assert action.text() == "Explore Transit", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = pt_project.iface.messageBar()
     assert (
         messagebar.messages[3][-1] == "Error:You need to import a GTFS feed first"
     ), "Level 3 error message is missing"

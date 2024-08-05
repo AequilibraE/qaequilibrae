@@ -1,9 +1,6 @@
-numpy<1.99
 aequilibrae==1.0.1
+pyarrow==15.0.2
 ortools
-cython
-numexpr
-py-cpuinfo
-tables
-openmatrix
-fastparquet
+absl-py
+immutabledict
+protobuf

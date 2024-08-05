@@ -44,22 +44,27 @@ try:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
     from aequilibrae.project import Project
 except:
+    version = sys.version_info
+
     msg = messages()
     from qgis.PyQt.QtWidgets import QMessageBox
 
-    if (
-        QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
-        == QMessageBox.Ok
-    ):
-        from qaequilibrae.download_extra_packages_class import DownloadAll
-
-        result = DownloadAll().install()
-        if "ERROR" in "".join([str(x).upper() for x in result]):
-            QMessageBox.information(None, "Information", msg.second_message)
-        else:
-            QMessageBox.information(None, "Information", msg.third_message)
+    if version < (3, 12) and sys.platform == "win32":
+        QMessageBox.information(None, "Warning", msg.messsage_five)
     else:
-        QMessageBox.information(None, "Information", msg.fourth_message)
+        if (
+            QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
+            == QMessageBox.Ok
+        ):
+            from qaequilibrae.download_extra_packages_class import DownloadAll
+
+            result = DownloadAll().install()
+            if "ERROR" in "".join([str(x).upper() for x in result]):
+                QMessageBox.information(None, "Information", msg.second_message)
+            else:
+                QMessageBox.information(None, "Information", msg.third_message)
+        else:
+            QMessageBox.information(None, "Information", msg.fourth_message)
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -264,7 +269,7 @@ class AequilibraEMenu:
     def initProcessing(self):
         self.provider = Provider()
         QgsApplication.processingRegistry().addProvider(self.provider)
-    
+
     def initGui(self):
         self.initProcessing()
 
