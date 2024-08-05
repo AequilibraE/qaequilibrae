@@ -11,7 +11,7 @@ repository= https://github.com/AequilibraE/QAequilibraE
 tracker=https://github.com/aequilibrae/QAequilibraE/issues
 icon=icon.png
 hasProcessingProvider=yes
-experimental=True
+experimental=False
 homepage=https://www.aequilibrae.com/qgis
 
 
