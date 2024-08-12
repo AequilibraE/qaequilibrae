@@ -42,11 +42,15 @@ jobs:
       - name: Install QGIS on Chocolatey
         uses: crazy-max/ghaction-chocolatey@v3
         with:
-          args: install qgis-ltr
+          args: install qgis-ltr -y --version 3.34.6
+
+      - name: Verify QGIS installation
+        run: qgis --version
 
       - name: Plugin install
         shell: pwsh
         run: |
-          python-qgis-ltr.bat -m pip install qgis-plugin-manager
+          $env:PATH="C:\Program Files\QGIS 3.34.6\bin;$env:PATH"
+          $env:QGIS_PLUGIN_IN_CI=1
           python-qgis-ltr.bat -m pip list
-          python-qgis-ltr.bat -m qgis-plugin-manager search qaequilibrae
+          
