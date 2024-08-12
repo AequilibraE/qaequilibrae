@@ -52,5 +52,5 @@ jobs:
           python-qgis-ltr.bat -m pip install -r test/requirements-test.txt
           python-qgis-ltr.bat ci/dependency_installation.py
           python-qgis-ltr.bat -m pip list
-          python-qgis-ltr.bat -m pytest test/test_display_aequilibrae_formats.py
+          python-qgis-ltr.bat -m pytest test -v --tb=short --cov=qaequilibrae
           
