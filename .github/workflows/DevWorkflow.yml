@@ -4,7 +4,7 @@ on:  [pull_request]
 
 
 jobs:
-  unittest:
+  linux_test:
 #    needs: linting
     runs-on: ubuntu-latest
     strategy:
@@ -32,3 +32,23 @@ jobs:
           export QT_QPA_PLATFORM=offscreen
           pwd
           python3 -m pytest test -v --tb=short --cov=qaequilibrae
+
+  windows_test:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      
+      - name: Install QGIS on Chocolatey
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: choco install qgis-ltr
+
+      - name: Plugin install
+        shell: pwsh
+        run: |
+          python-qgis-ltr.bat -m pip install qgis-plugin-manager
+          python-qgis-ltr.bat -m pip list
+          python-qgis-ltr.bat -m qgis-plugin-manager search qaequilibrae
