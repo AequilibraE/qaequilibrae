@@ -20,6 +20,7 @@ class DownloadAll:
         self.file = join(pth, "requirements.txt")
         self.pth = join(pth, "packages")
         self.no_ssl = False
+        self.is_dev = True if "venv_dev" in sys.prefix else False
 
     def install(self):
         with open(self.file, "r") as fl:
@@ -34,6 +35,9 @@ class DownloadAll:
 
     def install_package(self, package):
         Path(self.pth).mkdir(parents=True, exist_ok=True)
+
+        if self.is_dev and "aequilibrae" in package:
+            package = "git+https://github.com/AequilibraE/aequilibrae.git@develop"
 
         install_command = f'-m pip install {package} -t "{self.pth}"'
         if "ortools" in package.lower():
