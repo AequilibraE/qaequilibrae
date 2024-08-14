@@ -2297,7 +2297,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/processing_provider/assign_from_yaml.py" line="144"/>
         <source>Run a traffic assignment using a YAML configuration file.</source>
-        <translation type="unfinished"/>
+        <translation>Executa a alocação de tráfego a partir de um arquivo de configuração YAML.</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/assign_from_yaml.py" line="146"/>
