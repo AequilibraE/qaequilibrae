@@ -38,6 +38,54 @@
     </message>
 </context>
 <context>
+    <name>AddConnectors</name>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="87"/>
+        <source>Go through all the centroids and add connectors only if none exists for the chosen mode</source>
+        <translation>Percorre todos os centroides e adiciona conectores somente se nenhum conector existir para o modo desejado.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="14"/>
+        <source>Connectors per centroid</source>
+        <translation>Conectores por centroide</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="24"/>
+        <source>Modes to connect (only one at a time)</source>
+        <translation>Modos para conectar (apenas um por vez)</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="29"/>
+        <source>Project path</source>
+        <translation>Pasta do projeto</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="43"/>
+        <source>AequilibraE module not found</source>
+        <translation>O módulo AequilibraE não foi encontrado.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="47"/>
+        <source>Opening project</source>
+        <translation>Abrindo projeto.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="61"/>
+        <source>Adding {} connectors when none exists for mode &quot;{}&quot;</source>
+        <translation>Adicionando {} conectores caso nenhum exista para o modo &quot;{}&quot;.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="78"/>
+        <source>Add centroid connectors</source>
+        <translation>Adicionar conectores ao centroide</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/Add_connectors.py" line="84"/>
+        <source>Model Building</source>
+        <translation>Construção de Modelos</translation>
+    </message>
+</context>
+<context>
     <name>AddZonesProcedure</name>
     <message>
         <location filename="../modules/project_procedures/add_zones_procedure.py" line="22"/>
@@ -48,172 +96,172 @@
 <context>
     <name>AequilibraEMenu</name>
     <message>
-        <location filename="../qaequilibrae.py" line="118"/>
+        <location filename="../qaequilibrae.py" line="125"/>
         <source>Project</source>
         <translation>Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="136"/>
+        <location filename="../qaequilibrae.py" line="144"/>
         <source>Data</source>
         <translation>Dados</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="140"/>
+        <location filename="../qaequilibrae.py" line="148"/>
         <source>Trip Distribution</source>
         <translation>Distribuição de Viagens</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="152"/>
+        <location filename="../qaequilibrae.py" line="160"/>
         <source>Paths and assignment</source>
         <translation>Rotas e Alocações</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="158"/>
+        <location filename="../qaequilibrae.py" line="166"/>
         <source>Routing</source>
         <translation>Roteirização</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="163"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Public Transport</source>
         <translation>Transporte público</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="114"/>
+        <location filename="../qaequilibrae.py" line="121"/>
         <source>Open Project</source>
         <translation>Abrir Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="121"/>
+        <location filename="../qaequilibrae.py" line="129"/>
         <source>Create project from OSM</source>
         <translation>Criar Projeto a partir do OSM</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="124"/>
+        <location filename="../qaequilibrae.py" line="132"/>
         <source>Create Project from layers</source>
         <translation>Criar Projeto a partir de Camada</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="131"/>
+        <location filename="../qaequilibrae.py" line="139"/>
         <source>Add zoning data</source>
         <translation>Adicionar Zonas</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="116"/>
+        <location filename="../qaequilibrae.py" line="123"/>
         <source>Parameters</source>
         <translation>Parâmetros</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="117"/>
+        <location filename="../qaequilibrae.py" line="124"/>
         <source>logfile</source>
         <translation>Registro de Operações</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="118"/>
+        <location filename="../qaequilibrae.py" line="125"/>
         <source>Close project</source>
         <translation>Fechar Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="127"/>
+        <location filename="../qaequilibrae.py" line="135"/>
         <source>Network Preparation</source>
         <translation>Preparar Rede</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="128"/>
+        <location filename="../qaequilibrae.py" line="136"/>
         <source>Add centroid connectors</source>
         <translation>Adicionar Conector no Centroide</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="146"/>
+        <location filename="../qaequilibrae.py" line="154"/>
         <source>Shortest path</source>
         <translation>Caminho mínimo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="149"/>
+        <location filename="../qaequilibrae.py" line="157"/>
         <source>Impedance matrix</source>
         <translation>Matriz de Impedância</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="152"/>
+        <location filename="../qaequilibrae.py" line="160"/>
         <source>Traffic Assignment</source>
         <translation>Alocação de Tráfego</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="158"/>
+        <location filename="../qaequilibrae.py" line="166"/>
         <source>Travelling Salesman Problem</source>
         <translation>Problema do Caixeiro Viajante</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="162"/>
+        <location filename="../qaequilibrae.py" line="170"/>
         <source>Import GTFS</source>
         <translation>Importar GTFS</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="167"/>
+        <location filename="../qaequilibrae.py" line="175"/>
         <source>Desire Lines</source>
         <translation>Linhas de Desejo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="168"/>
+        <location filename="../qaequilibrae.py" line="176"/>
         <source>Stacked Bandwidth</source>
         <translation>Mapa de volumes</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="169"/>
+        <location filename="../qaequilibrae.py" line="177"/>
         <source>Scenario Comparison</source>
         <translation>Comparação de Cenários</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="170"/>
+        <location filename="../qaequilibrae.py" line="178"/>
         <source>Lowest common denominator</source>
         <translation>Mínimo Denominador Comum</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="171"/>
+        <location filename="../qaequilibrae.py" line="179"/>
         <source>Simple tag</source>
         <translation>Etiqueta</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="136"/>
+        <location filename="../qaequilibrae.py" line="144"/>
         <source>Import matrices</source>
         <translation>Importar matrizes</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="175"/>
+        <location filename="../qaequilibrae.py" line="183"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="182"/>
+        <location filename="../qaequilibrae.py" line="190"/>
         <source>Show project info</source>
         <translation>Mostrar informações do projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="332"/>
+        <location filename="../qaequilibrae.py" line="345"/>
         <source>You need to load a project first</source>
         <translation>Você precisa carregar um projeto primeiro</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="335"/>
+        <location filename="../qaequilibrae.py" line="348"/>
         <source>You need to close the project currently open first</source>
         <translation>Você precisa fechar o projeto aberto primeiro</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="115"/>
+        <location filename="../qaequilibrae.py" line="122"/>
         <source>Create example</source>
         <translation>Criar exemplo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="163"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Explore Transit</source>
         <translation>Explorar Transporte Público</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="131"/>
+        <location filename="../qaequilibrae.py" line="139"/>
         <source>Model Building</source>
         <translation>Construção de Modelos</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="135"/>
+        <location filename="../qaequilibrae.py" line="143"/>
         <source>Visualize data</source>
         <translation>Visualizar Dados</translation>
     </message>
@@ -872,6 +920,44 @@
     </message>
 </context>
 <context>
+    <name>ExportMatrix</name>
+    <message>
+        <location filename="../modules/processing_provider/export_matrix.py" line="15"/>
+        <source>Matrix</source>
+        <translation>Matriz</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/export_matrix.py" line="24"/>
+        <source>Output folder</source>
+        <translation>Pasta de saída</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/export_matrix.py" line="32"/>
+        <source>File format</source>
+        <translation>Formato do arquivo</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/export_matrix.py" line="50"/>
+        <source>AequilibraE module not found</source>
+        <translation>O módulo AequilibraE não foi encontrado.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/export_matrix.py" line="72"/>
+        <source>Export matrices</source>
+        <translation>Exportar matrizes</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/export_matrix.py" line="78"/>
+        <source>Data</source>
+        <translation>Dados</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/export_matrix.py" line="81"/>
+        <source>Export an existing *.omx or *.aem matrix file into *.csv, *.aem or *.omx</source>
+        <translation>Exportar arquivo de matriz *.omx ou *.aem para *.csv, *.aem, ou *.omx</translation>
+    </message>
+</context>
+<context>
     <name>Form</name>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="22"/>
@@ -1463,6 +1549,99 @@
     </message>
 </context>
 <context>
+    <name>MatrixFromLayer</name>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="53"/>
+        <source>Output folder</source>
+        <translation>Pasta de saída</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="19"/>
+        <source>Matrix Layer</source>
+        <translation>Camada da matriz</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="20"/>
+        <source>Origin</source>
+        <translation>Origem</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="30"/>
+        <source>Destination</source>
+        <translation>Destino</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="40"/>
+        <source>Value</source>
+        <translation>Valor</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="50"/>
+        <source>File name</source>
+        <translation>Nome do arquivo</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="63"/>
+        <source>Matrix name</source>
+        <translation>Nome da matriz</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="66"/>
+        <source>Matrix description</source>
+        <translation>Descrição da matriz</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="73"/>
+        <source>Matrix core</source>
+        <translation>Núcleo da matriz</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="84"/>
+        <source>AequilibraE module not found</source>
+        <translation>O módulo AequilibraE não foi encontrado.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="101"/>
+        <source>Importing layer</source>
+        <translation>Importando camadas</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="141"/>
+        <source>{}x{} matrix imported </source>
+        <translation>Matriz {}x{} importada</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="158"/>
+        <source>Import matrices</source>
+        <translation>Importar matrizes</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="164"/>
+        <source>Data</source>
+        <translation>Dados</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="174"/>
+        <source>Save a layer as a *.aem file. Notice that:</source>
+        <translation>Salvar camada como um arquivo *.aem. Repare que:</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="176"/>
+        <source>- the original matrix stored in the layer needs to be in list format</source>
+        <translation>- a matriz originalmente armazenada na camada precisa estar no formato de lista</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="178"/>
+        <source>- origin and destination fields need to be integers</source>
+        <translation>- os campos que representam origem e destino devem possuir valores inteiros</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/matrix_from_layer.py" line="180"/>
+        <source>- value field can be either integer or real</source>
+        <translation>- o campo de valores pode assumir formato inteiro ou decimal</translation>
+    </message>
+</context>
+<context>
     <name>MatrixReblocking</name>
     <message>
         <location filename="../modules/matrix_procedures/mat_reblock.py" line="32"/>
@@ -1638,6 +1817,89 @@
     </message>
 </context>
 <context>
+    <name>ProjectFromLayer</name>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="20"/>
+        <source>Links</source>
+        <translation>Links</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="45"/>
+        <source>Direction</source>
+        <translation>Direção</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="55"/>
+        <source>Modes</source>
+        <translation>Modos</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="73"/>
+        <source>Project name</source>
+        <translation>Nome do projeto</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="140"/>
+        <source>Adding links</source>
+        <translation>Adicionando links</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="170"/>
+        <source>Create project from link layer</source>
+        <translation>Criando projeto a partir de camada de links</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="25"/>
+        <source>Link ID</source>
+        <translation>ID do link</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="35"/>
+        <source>Link type</source>
+        <translation>Tipo de link</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="65"/>
+        <source>Output folder</source>
+        <translation>Pasta de saída</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="84"/>
+        <source>AequilibraE module not found</source>
+        <translation>O módulo AequilibraE não foi encontrado.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="88"/>
+        <source>Creating project</source>
+        <translation>Criando projeto</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="93"/>
+        <source>Importing links layer</source>
+        <translation>Importando camadas de links</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="111"/>
+        <source>Getting parameters from layer</source>
+        <translation>Extraíndo parâmetros da camada</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="160"/>
+        <source>Closing project</source>
+        <translation>Fechando projeto</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="176"/>
+        <source>Model Building</source>
+        <translation>Construção de Modelos</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/project_from_layer.py" line="179"/>
+        <source>Create an AequilibraE project from a given link layer</source>
+        <translation>Criando projeto do AequilibraE a partir de uma camada de links</translation>
+    </message>
+</context>
+<context>
     <name>ProjectFromOSMDialog</name>
     <message>
         <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="40"/>
@@ -1678,6 +1940,94 @@
         <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="57"/>
         <source>Target</source>
         <translation>Objetivo</translation>
+    </message>
+</context>
+<context>
+    <name>RenumberNodesFromLayer</name>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="17"/>
+        <source>Centroids</source>
+        <translation>Centroides</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="22"/>
+        <source>Node ID</source>
+        <translation>ID do nó</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="32"/>
+        <source>Output folder</source>
+        <translation>Pasta de saída</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="46"/>
+        <source>AequilibraE module not found</source>
+        <translation>O módulo AequilibraE não foi encontrado.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="50"/>
+        <source>Opening project</source>
+        <translation>Abrindo projeto.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="58"/>
+        <source>Importing nodes layer</source>
+        <translation>Importando camada de nós</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="77"/>
+        <source>Checking existing nodes</source>
+        <translation>Verificando os nós existentes</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="105"/>
+        <source>Multiple nodes found for zone {}. Unable to select node.</source>
+        <translation>Múltiplos nós foram encontrados na zona {}. Não foi possível continuar com a seleção.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="110"/>
+        <source>{} nodes found in input layer.</source>
+        <translation>{} nós foram encontrados na camada de entrada.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="112"/>
+        <source>{} centroids found an existing matching node</source>
+        <translation>{} centroides encontraram um nó correspondente</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="114"/>
+        <source>{} new nodes added for unmatched centroids</source>
+        <translation>{} novos nós foram adicionados em correspondência aos centroides.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="116"/>
+        <source>{} centroids could not be processed</source>
+        <translation>{} centroides não foram processados</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="128"/>
+        <source>Add/Renumber nodes from layer</source>
+        <translation>Adicionar / Renumerar nós a partir de camada</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="134"/>
+        <source>Model Building</source>
+        <translation>Construção de Modelos</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="144"/>
+        <source>Add or renumber nodes in an AequilibraE project to match a layer of centroids.</source>
+        <translation>Adiciona ou renumera nós em um projeto do AequilibraE para que sejam correspondentes a uma camada de centroides.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="146"/>
+        <source>WARNING: you may have to change existing node_id (ex. using QGIS field calculator)</source>
+        <translation>AVISO: algumas mudanças podem ser necessárias no campo node_id (ex. utilizando a calculadora de campos do QGIS)</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="148"/>
+        <source>to ensure that changed node IDs (coming from Zone ID) are not already used.</source>
+        <translation>para garantir que as mudanças nos IDs dos nós (a partir de Zone ID) estejam disponíveis.</translation>
     </message>
 </context>
 <context>
@@ -1890,6 +2240,69 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
 </source>
         <translation>Rota:
 </translation>
+    </message>
+</context>
+<context>
+    <name>TrafficAssignYAML</name>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="12"/>
+        <source>Configuration file (.yaml)</source>
+        <translation>Arquivo de configuração (.yaml)</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="27"/>
+        <source>AequilibraE module not found</source>
+        <translation>O módulo AequilibraE não foi encontrado.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="34"/>
+        <source>Getting parameters from YAML</source>
+        <translation>Extraíndo parâmetros do YAML</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="41"/>
+        <source>Opening project</source>
+        <translation>Abrindo projeto.</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="51"/>
+        <source>{} traffic classes have been found</source>
+        <translation>{} classes de tráfego foram encontradas</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="89"/>
+        <source>Setting up assignment</source>
+        <translation>Configurando alocação</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="107"/>
+        <source>Running assignment</source>
+        <translation>Executando alocação</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="113"/>
+        <source>Saving outputs</source>
+        <translation>Salvando os resultados</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="128"/>
+        <source>Traffic assignment from file</source>
+        <translation>Alocação de tráfego a partir de um arquivo</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="134"/>
+        <source>Paths and assignment</source>
+        <translation>Rotas e Alocações</translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="144"/>
+        <source>Run a traffic assignment using a YAML configuration file.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/assign_from_yaml.py" line="146"/>
+        <source>Example of valid configuration file:</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2915,7 +3328,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
 <context>
     <name>ui_transponet_construction</name>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="19"/>
         <source>AequilibraE - Add zoning layer to project</source>
         <translation>AequilibraE - Adicionando zonas ao projeto</translation>
     </message>
@@ -2935,7 +3348,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Centroide</translation>
     </message>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="74"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
         <source>Layer</source>
         <translation>Camada</translation>
     </message>
@@ -3000,7 +3413,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
         <source>Layer field</source>
         <translation>Campo da camada</translation>
     </message>
