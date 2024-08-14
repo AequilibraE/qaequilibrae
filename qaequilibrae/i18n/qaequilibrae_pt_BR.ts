@@ -2302,7 +2302,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/processing_provider/assign_from_yaml.py" line="146"/>
         <source>Example of valid configuration file:</source>
-        <translation type="unfinished"/>
+        <translation>Exemplo de um arquivo de configuração válido:</translation>
     </message>
 </context>
 <context>
