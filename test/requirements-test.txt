@@ -1,9 +1,6 @@
-numpy
 geopandas
-pandas
-pyaml
-pyproj
-requests
 rtree
-scipy
-shapely
+pytest-qgis
+pytest-qt
+pytest-cov
+pytest-mock
