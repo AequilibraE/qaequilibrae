@@ -9,7 +9,7 @@ the requirements for all pull-requests to be merged into master.
 Software Design and requirements
 --------------------------------
 
-The most important piece of AequilibraE's backend is, without a doubt, `NumPy <http://numpy.org>`__.
+The most important piece of AequilibraE's backend is, without a doubt, `NumPy <http://numpy.org>`_.
 
 Whenever vectorization is not possible through the use of NumPy functions, compiled code is developed in order to
 accelerate computation. All compiled code is written in `Cython <https://cython.org/>`_.
@@ -27,7 +27,7 @@ Development Install
 
 As it goes with most Python packages, we recommend using a dedicated virtual environment to develop AequilibraE.
 
-AequilibraE is currently tested for Python 3.7, 3.8, 3.9 & 3.11, but we recommend using Python 3.9 or 3.10 for development.
+AequilibraE is currently tested for Python 3.9, 3.10, 3.11 & 3.12, but we recommend using Python 3.9 or 3.10 for development.
 
 We also assume you are using `PyCharm <https://www.jetbrains.com/pycharm>`_, which is an awesome IDE for Python.
 
@@ -103,10 +103,10 @@ Imports
 Translatable Strings
 ~~~~~~~~~~~~~~~~~~~~
 
-If you are adding or modifying any part of QAequilibraE's code that includes translatable strings, which are the
-strings displayed in the widget windows, please ensure you use the tr function to locate the strings. This will 
-guarantee that the strings are included in our future translations. Currently, only classes that use self support
-the localization of strings.
+If you are adding or modifying any piece of QAequilibraE's code that includes translatable strings, which are the
+strings displayed in the widget windows, please ensure you use the ``tr`` function to locate the strings. This will 
+guarantee that the strings are included in our future translations. Currently, only classes that have a ``self`` method 
+support the localization of strings.
 
 ::
 
@@ -143,7 +143,7 @@ by translating the plugin to other languages or reviewing the existing translati
 `AequilibraE Google Group <https://groups.google.com/forum/#!forum/aequilibrae>`_,
 so we can add your language to our translation pool!
 
-In the :ref:`plugin translation <plugin_translation>` page, you can find more information on creating your account and
+In the :ref:`plugin internationalization <plugin_i18n>` page, you can find more information on creating your account and
 start translating QAequilibraE.
 
 Contributing to AequilibraE for QGIS
@@ -197,8 +197,8 @@ AequilibraE testing is done with three tools:
 
 To run the tests locally, you will need to figure out what to do...
 
-These same tests are run by Travis with each push to the repository. These tests need to pass in order to somebody
-manually review the code before merging it into master (or returning for corrections).
+These same tests are run by GitHub Actions with each push to the repository. These tests need to pass in order to 
+somebody manually review the code before merging it into master (or returning for corrections).
 
 In some cases, test targets need to be updated to match the new results produced by the code since these 
 are now the correct results. In order to update the test targets, first determine which tests are 

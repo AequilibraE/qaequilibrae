@@ -1,10 +1,10 @@
-.. _plugin_translation:
+.. _plugin_i18n:
 
-Plugin translation
-===================
+Plugin internationalization (i18n)
+==================================
 
-In this section, we briefly explain how you can get your Transifex account and how to start 
-contributing to QAquilibraE translation.
+In this section, we briefly explain how you can set up your Transifex account and start contributing to QAquilibraE
+translation.
 
 Creating account
 ~~~~~~~~~~~~~~~~
@@ -63,7 +63,7 @@ Transifex will give you translation suggestions, that can match whatever you wan
 This can spare you some time.
 
 When you finish your work, direct yourself to the **Unreviewed** field, to check
-all strings you have translated. Here's your opportunity to look for typos or incorrect translations.
+all strings you have translated. Here's your opportunity to look out for typos or incorrect translations.
 
 For more information, we strongly encourage you to check Transifex official documentation in their
 website.
