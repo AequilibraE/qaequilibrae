@@ -2685,7 +2685,7 @@ um polígono, a camada de origem deve estar contida nela. O primeiro registro en
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="115"/>
         <source>Join with layer</source>
-        <translation type="unfinished"/>
+        <translation>Unir com camada</translation>
     </message>
 </context>
 <context>
