@@ -1,0 +1,37 @@
+name: Test AequilibraE dependency
+
+on:
+  repository_dispatch:
+    types: [custom-event]
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        container: ['qgis/qgis:latest', 'qgis/qgis:3.34.7']
+    container:
+      image: ${{ matrix.container }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          python3 -m venv /tmp/venv_dev --system-site-package
+          . /tmp/venv_dev/bin/activate
+          python3 -m pip install setuptools
+          python3 -m pip install git+https://github.com/AequilibraE/aequilibrae.git@develop
+          touch ./qaequilibrae/packages/aequilibrae_version.txt
+          python3 -m pip install -r test/requirements-test.txt
+          python3 ./ci/dependency_installation.py
+          export PYTHONPATH=$(pwd)/qaequilibrae/packages:$PYTHONPATH
+          echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: |
+          . /tmp/venv_dev/bin/activate
+          export QT_QPA_PLATFORM=offscreen
+          pwd
+          python3 -m pytest test -v --tb=short --cov=qaequilibrae
