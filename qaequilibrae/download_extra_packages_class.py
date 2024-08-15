@@ -16,30 +16,33 @@ class DownloadAll:
                    "geopandas", "pyyaml", "pyogrio"]
 
     def __init__(self):
-        pth = os.path.dirname(__file__)
-        self.file = join(pth, "requirements.txt")
-        self.pth = join(pth, "packages")
+        pth = Path(__file__).parent
+        self.dependency_files = [pth / "requirements.txt", pth / "aequilibrae_version.txt"]
+        self.target_folder = pth / "packages"
         self.no_ssl = False
-        self.is_dev = True if "venv_dev" in sys.prefix else False
 
     def install(self):
-        with open(self.file, "r") as fl:
-            lines = fl.readlines()
-
         reps = []
-        for line in lines:
-            reps.extend(self.install_package(line.strip()))
+        for file in self.dependency_files:
+            flag = self.target_folder / file.name
+            if flag.exists:
+                continue
+
+            with open(file, "r") as fl:
+                lines = fl.readlines()
+
+            for line in lines:
+                reps.extend(self.install_package(line.strip()))
+
+            with open(flag, "w") as fl:
+                fl.write("")
 
         self.clean_packages()
         return reps
-
     def install_package(self, package):
-        Path(self.pth).mkdir(parents=True, exist_ok=True)
+        Path(self.target_folder).mkdir(parents=True, exist_ok=True)
 
-        if self.is_dev and "aequilibrae" in package:
-            package = "git+https://github.com/AequilibraE/aequilibrae.git@develop"
-
-        install_command = f'-m pip install {package} -t "{self.pth}"'
+        install_command = f'-m pip install {package} -t "{self.target_folder}"'
         if "ortools" in package.lower():
             install_command += " --no-deps"
 
@@ -117,8 +120,8 @@ class DownloadAll:
 
     def clean_packages(self):
 
-        for fldr in list(os.walk(self.pth))[0][1]:
+        for fldr in list(os.walk(self.target_folder))[0][1]:
             for pkg in self.must_remove:
                 if pkg.lower() in fldr.lower():
-                    if isdir(join(self.pth, fldr)):
-                        shutil.rmtree(join(self.pth, fldr))
+                    if isdir(join(self.target_folder, fldr)):
+                        shutil.rmtree(join(self.target_folder, fldr))

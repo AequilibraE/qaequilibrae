@@ -40,10 +40,11 @@ from qaequilibrae.modules.menu_actions import run_pt_explore
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
 from qaequilibrae.message import messages
 
-try:
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
+
+if Path(os.path.join(os.path.dirname(__file__), "packages","requirements.txt")).exists():
     from aequilibrae.project import Project
-except:
+else:
     version = sys.version_info
 
     msg = messages()
