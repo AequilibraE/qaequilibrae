@@ -1,25 +1,24 @@
 import glob
 import logging
 import os
+import qgis
 import subprocess
 import sys
 import tempfile
 import webbrowser
 from functools import partial
-from typing import Dict
-from uuid import uuid4
-
-import qgis
-
+from pathlib import Path
 from qgis.PyQt import QtCore
+from qgis.PyQt.QtCore import QTranslator
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
 from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
-from qgis.PyQt.QtCore import QTranslator
+from typing import Dict
+from uuid import uuid4
 
-from qaequilibrae.modules.processing_provider.provider import Provider
+from qaequilibrae.message import messages
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_import_gtfs
@@ -38,7 +37,7 @@ from qaequilibrae.modules.menu_actions import (
 )
 from qaequilibrae.modules.menu_actions import run_pt_explore
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
-from qaequilibrae.message import messages
+from qaequilibrae.modules.processing_provider.provider import Provider
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
 
