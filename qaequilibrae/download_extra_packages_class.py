@@ -25,7 +25,7 @@ class DownloadAll:
         reps = []
         for file in self.dependency_files:
             flag = self.target_folder / file.name
-            if flag.exists:
+            if flag.exists():
                 continue
 
             with open(file, "r") as fl:
