@@ -2146,9 +2146,6 @@
     </message>
 </context>
 <context>
-    <name>TSPProcedure</name>
-</context>
-<context>
     <name>TrafficAssignYAML</name>
     <message>
         <location filename="../modules/processing_provider/assign_from_yaml.py" line="12"/>
