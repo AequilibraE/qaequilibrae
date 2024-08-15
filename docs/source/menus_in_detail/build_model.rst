@@ -83,6 +83,8 @@ After all field preparation is done, one can import those layers into an
 AequilibraE project using a dedicated tool in the **Model building** menu in
 AequilibraE.
 
+.. _project_from_layers:
+
 Accessing **Model building > Create Project from Layers**, the user is
 presented with the following screen.
 

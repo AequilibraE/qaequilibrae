@@ -349,6 +349,11 @@ class AequilibraEMenu:
             "Error", self.tr("You need to close the project currently open first"), level=2, duration=10
         )
 
+    def message_no_gtfs_feed(self):
+        self.iface.messageBar().pushMessage(
+            "Error", self.tr("You need to import a GTFS feed first"), level=3, duration=10
+        )
+
     def set_font(self, obj):
         f = obj.font()
         f.setPointSize(11)

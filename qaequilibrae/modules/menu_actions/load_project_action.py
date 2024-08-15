@@ -4,6 +4,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
 
+
 # Split loading between Qt action and processing, for easier unit testing
 def run_load_project(qgis_project):
     proj_path = _get_project_path()
@@ -40,6 +41,7 @@ def _run_load_project_from_path(qgis_project, proj_path):
                 raise e
 
     update_project_layers(qgis_project)
+
 
 def update_project_layers(qgis_project):
     curr = qgis_project.project.conn.cursor()

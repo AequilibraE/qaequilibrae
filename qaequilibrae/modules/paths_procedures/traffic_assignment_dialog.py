@@ -437,7 +437,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         for k, cls in self.traffic_classes.items():
             if self.skims[k]:
                 dt = cls.graph.block_centroid_flows
-                logger.debug(self.tr("Set skims {} for {}").format(self.skims[k], k))
+                logger.debug(f"Set skims {self.skims[k]} for {k}")
                 cls.graph.set_graph(self.cob_ffttime.currentText())
                 cls.graph.set_skimming(self.skims[k])
                 cls.graph.set_blocked_centroid_flows(dt)
@@ -453,7 +453,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     val = float(val)
                 except Exception as e:
                     self.error = self.tr("VDF parameter is not numeric")
-                    logger.error(self.tr("Tried to set a VDF parameter not numeric. {}").format(e.args))
+                    logger.error(f"Tried to set a VDF parameter not numeric. {e.args}")
                     return False
             self.vdf_parameters[k] = val
         return True
