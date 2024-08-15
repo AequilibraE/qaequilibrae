@@ -23,7 +23,7 @@ jobs:
           python3 -m pip install setuptools
           python3 -m pip install -r test/requirements-test.txt
           python3 ./ci/dependency_installation.py
-          export PYTHONPATH=$(pwd)/qaequilibrae/packages:$PYTHONPATH
+          export PYTHONPATH=$(pwd)/packages:$PYTHONPATH
           echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
 
       - name: Run tests
