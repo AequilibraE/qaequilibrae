@@ -3,12 +3,12 @@ import os
 from shutil import rmtree
 from pathlib import Path
 
-from qaequilibrae.download_extra_packages_class import download_all
+from qaequilibrae.download_extra_packages_class import DownloadAll
 
 
 @pytest.mark.skip("This test takes a long time to run")
 def test_file_creation():
-    download_all().install()
+    DownloadAll().install()
     folder = Path("qaequilibrae/packages")
 
     with open("qaequilibrae/requirements.txt", "r") as file:

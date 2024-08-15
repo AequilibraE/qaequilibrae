@@ -9,11 +9,41 @@ from qgis.core import QgsMessageLog
 
 
 class DownloadAll:
-    must_remove = ["numpy", "scipy", "pandas", "charset_normalizer", "click_plugins", "click", "certifi",
-                   "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
-                   "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
-                   "importlib_metadata", "pyaml", "urllib3", "packaging", "cpuinfo", "py-cpuinfo",
-                   "geopandas", "pyyaml", "pyogrio"]
+    must_remove = [
+        "numpy",
+        "scipy",
+        "pandas",
+        "charset_normalizer",
+        "click_plugins",
+        "click",
+        "certifi",
+        "cligj",
+        "colorama",
+        "fiona",
+        "pyproj",
+        "pytz",
+        "requests",
+        "rtree",
+        "setuptools",
+        "shapely",
+        "six",
+        "tzdata",
+        "zipp",
+        "attr",
+        "attrs",
+        "dateutil",
+        "python_dateutil",
+        "idna",
+        "importlib_metadata",
+        "pyaml",
+        "urllib3",
+        "packaging",
+        "cpuinfo",
+        "py-cpuinfo",
+        "geopandas",
+        "pyyaml",
+        "pyogrio",
+    ]
 
     def __init__(self):
         pth = Path(__file__).parent
@@ -39,6 +69,7 @@ class DownloadAll:
 
         self.clean_packages()
         return reps
+
     def install_package(self, package):
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
 
@@ -104,6 +135,7 @@ class DownloadAll:
 
     def adapt_aeq_version(self):
         import numpy as np
+
         if int(np.__version__.split(".")[1]) >= 22:
             Path(self.file).unlink(missing_ok=True)
             shutil.copyfile(self._file, self.file)

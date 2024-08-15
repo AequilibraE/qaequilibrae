@@ -267,7 +267,7 @@ def test_assign_from_yaml(ae_with_project):
     assert isfile(join(folder, "results_database.sqlite"))
 
     conn = sqlite3.connect(join(folder, "results_database.sqlite"))
-    tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchone()[0]    
+    tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchone()[0]
     assert tables == "test_from_yaml"
 
     row = conn.execute("SELECT * FROM test_from_yaml;").fetchone()

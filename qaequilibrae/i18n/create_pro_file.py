@@ -7,6 +7,7 @@ project_dir = Path(__file__).parent.parent
 if str(project_dir) not in sys.path:
     sys.path.append(str(project_dir))
 
+
 def create_file():
     forms = []
     sources = []
@@ -43,6 +44,7 @@ def create_file():
         pro_file.write("\n")
 
         pro_file.write(f"\nTRANSLATIONS = qaequilibrae.ts")
+
 
 if __name__ == "__main__":
     create_file()

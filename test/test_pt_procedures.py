@@ -42,7 +42,7 @@ def test_add_new_feed(pt_no_feed, mocker):
     feed.set_data(gtfs_file)
     feed.led_agency.setText("New agency")
     feed.led_description.setText("Adds new agency description")
-    feed.service_calendar.setSelectedDate(datetime(2016,4,16))
+    feed.service_calendar.setSelectedDate(datetime(2016, 4, 16))
     feed.return_feed()
 
     importer.set_feed(feed.feed)
@@ -58,7 +58,7 @@ def test_add_new_feed(pt_no_feed, mocker):
 
 @pytest.mark.parametrize(
     ("is_checked", "set_date", "set_agency"),
-    [(False, (2016,6,17), "New agency"), (True, (2016,8,21), "Other agency")],
+    [(False, (2016, 6, 17), "New agency"), (True, (2016, 8, 21), "Other agency")],
 )
 def test_add_other_feed(pt_project, set_agency, set_date, is_checked, mocker):
     mocker.patch(

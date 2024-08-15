@@ -172,7 +172,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
     def load_from_aequilibrae_format(self):
         out_name, _ = GetOutputFileName(self, "AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed", self.path)
         self.load_with_file_name(out_name)
-    
+
     def load_with_file_name(self, out_name):
         try:
             self.dataset = AequilibraeData()
@@ -222,7 +222,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
             )
             if self.output_name is None:
                 self.error = self.tr("No name provided for the output file")
-    
+
     def load_just_to_use(self):
         self.single_use = True
         self.load_the_vector()

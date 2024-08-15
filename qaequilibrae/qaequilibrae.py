@@ -41,7 +41,7 @@ from qaequilibrae.modules.processing_provider.provider import Provider
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
 
-if Path(os.path.join(os.path.dirname(__file__), "packages","requirements.txt")).exists():
+if Path(os.path.join(os.path.dirname(__file__), "packages", "requirements.txt")).exists():
     from aequilibrae.project import Project
 else:
     version = sys.version_info

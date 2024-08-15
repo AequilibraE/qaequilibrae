@@ -58,7 +58,7 @@ def test_load_dialog(ae_with_project, method, folder_path):
 
         assert dialog.selected_fields == ["index", "origins", "destinations"]
         assert dialog.worker_thread is None
-        arr = dialog.dataset.data.tolist()  
+        arr = dialog.dataset.data.tolist()
 
     else:
         dialog.radio_layer_matrix.setChecked(True)
@@ -70,12 +70,12 @@ def test_load_dialog(ae_with_project, method, folder_path):
         dialog.set_output_name()
         dialog.selected_fields.remove("index")
         dialog.worker_thread = LoadDataset(
-                    qgis.utils.iface.mainWindow(),
-                    layer=dialog.layer,
-                    index_field="index",
-                    fields=dialog.selected_fields,
-                    file_name=dialog.output_name,
-                )
+            qgis.utils.iface.mainWindow(),
+            layer=dialog.layer,
+            index_field="index",
+            fields=dialog.selected_fields,
+            file_name=dialog.output_name,
+        )
         dialog.worker_thread.doWork()
 
         assert dialog.selected_fields == ["origins", "destinations"]

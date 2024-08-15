@@ -25,7 +25,7 @@ class messages:
     @property
     def fourth_message(self):
         return self.tr("Without installing the packages, the plugin will be mostly non-functional")
-    
+
     @property
     def messsage_five(self):
         a = self.tr("QAequilibraE requires Python 3.12.")

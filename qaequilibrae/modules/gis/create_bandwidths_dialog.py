@@ -220,7 +220,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             self.bands_list.setItem(row + 1, 0, QTableWidgetItem(top_ab))
             self.bands_list.setItem(row + 1, 1, QTableWidgetItem(top_ba))
             self.bands_list.item(row + 1, 2).setBackground(top_cl)
-            
+
         # if we clicked the "up button"
         elif column == 1 and row > 0:
             low_cl = self.bands_list.item(row, 2).background()
