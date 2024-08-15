@@ -1,23 +1,24 @@
 import glob
 import logging
 import os
+import qgis
 import subprocess
 import sys
 import tempfile
 import webbrowser
 from functools import partial
-from typing import Dict
-
-import qgis
-
+from pathlib import Path
 from qgis.PyQt import QtCore
+from qgis.PyQt.QtCore import QTranslator
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox, QToolBar, QToolButton
-from qgis.core import QgsDataSourceUri, QgsVectorLayer
-from qgis.core import QgsProject
-from qgis.PyQt.QtCore import QTranslator
+from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
+from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
+from typing import Dict
+from uuid import uuid4
 
+from qaequilibrae.message import messages
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_import_gtfs
@@ -36,28 +37,34 @@ from qaequilibrae.modules.menu_actions import (
 )
 from qaequilibrae.modules.menu_actions import run_pt_explore
 from qaequilibrae.modules.paths_procedures import run_shortest_path, run_dist_matrix, run_traffic_assig
-from qaequilibrae.message import messages
+from qaequilibrae.modules.processing_provider.provider import Provider
 
-try:
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
+
+if Path(os.path.join(os.path.dirname(__file__), "packages","requirements.txt")).exists():
     from aequilibrae.project import Project
-except:
+else:
+    version = sys.version_info
+
     msg = messages()
     from qgis.PyQt.QtWidgets import QMessageBox
 
-    if (
-        QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
-        == QMessageBox.Ok
-    ):
-        from qaequilibrae.download_extra_packages_class import download_all
-
-        result = download_all().install()
-        if "ERROR" in "".join([str(x).upper() for x in result]):
-            QMessageBox.information(None, "Information", msg.second_message)
-        else:
-            QMessageBox.information(None, "Information", msg.third_message)
+    if version < (3, 12) and sys.platform == "win32":
+        QMessageBox.information(None, "Warning", msg.messsage_five)
     else:
-        QMessageBox.information(None, "Information", msg.fourth_message)
+        if (
+            QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
+            == QMessageBox.Ok
+        ):
+            from qaequilibrae.download_extra_packages_class import DownloadAll
+
+            result = DownloadAll().install()
+            if "ERROR" in "".join([str(x).upper() for x in result]):
+                QMessageBox.information(None, "Information", msg.second_message)
+            else:
+                QMessageBox.information(None, "Information", msg.third_message)
+        else:
+            QMessageBox.information(None, "Information", msg.fourth_message)
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
@@ -76,8 +83,9 @@ class AequilibraEMenu:
         self.project = None  # type: Project
         self.matrices = {}
         self.layers = {}  # type: Dict[QgsVectorLayer]
-        self.dock = QDockWidget(self.trlt("AequilibraE"))
+        self.dock = QDockWidget("AequilibraE")
         self.manager = QWidget()
+        self.provider = None
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -200,6 +208,14 @@ class AequilibraEMenu:
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
         QgsProject.instance().layerRemoved.connect(self.layerRemoved)
 
+        # # # ########################################################################
+        # ##################        SAVING PROJECT CONFIGS       #####################
+        QgsProject.instance().readProject.connect(self.reload_project)
+
+        temp_saving = self.iface.mainWindow().findChild(QAction, "mActionSaveProject")
+        if temp_saving:
+            temp_saving.triggered.connect(self.save_in_project)
+
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
         if main_menu == "AequilibraE":
             action = QToolButton()
@@ -244,17 +260,22 @@ class AequilibraEMenu:
         else:
             webbrowser.open_new_tab(url)
 
-    def unload(self):
-        del self.dock
+    # def trlt(self, message):
+    #     # In the near future, we will use this function to automatically translate the AequilibraE menu
+    #     # To any language we can get people to translate it to
+    #     # return QCoreApplication.translate('AequilibraE', message)
+    #     return message
 
-    def trlt(self, message):
-        # In the near future, we will use this function to automatically translate the AequilibraE menu
-        # To any language we can get people to translate it to
-        # return QCoreApplication.translate('AequilibraE', message)
-        return message
+    def initProcessing(self):
+        self.provider = Provider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
 
     def initGui(self):
-        pass
+        self.initProcessing()
+
+    def unload(self):
+        if self.provider in QgsApplication.processingRegistry().providers():
+            QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def removes_temporary_files(self):
         # pass
@@ -270,6 +291,7 @@ class AequilibraEMenu:
     def run_close_project(self):
         if self.project is None:
             return
+        self.remove_aequilibrae_layers()
         self.project.close()
         self.projectManager.clear()
         self.project = None
@@ -327,6 +349,11 @@ class AequilibraEMenu:
             "Error", self.tr("You need to close the project currently open first"), level=2, duration=10
         )
 
+    def message_no_gtfs_feed(self):
+        self.iface.messageBar().pushMessage(
+            "Error", self.tr("You need to import a GTFS feed first"), level=3, duration=10
+        )
+
     def set_font(self, obj):
         f = obj.font()
         f.setPointSize(11)
@@ -334,3 +361,79 @@ class AequilibraEMenu:
 
     def tr(self, text):
         return QCoreApplication.translate("AequilibraEMenu", text)
+
+    def reload_project(self):
+        """Opens AequilibraE project when opening a QGIS project containing an AequilibraE model."""
+        from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+
+        # Checks if project contains an AequilibraE model
+        path = QgsProject.instance().customVariables()
+        if "aequilibrae_path" not in path:
+            return
+
+        # Opens project
+        _run_load_project_from_path(self, path["aequilibrae_path"])
+
+        # Checks if the layers in the project have the same database path as the aequilibrae project layers.
+        # if so, we replace the path in self.layers
+        prj_layer_sources = [lyr.source() for lyr in QgsProject.instance().mapLayers().values()]
+        prj_layers = [lyr for lyr in QgsProject.instance().mapLayers().values()]
+
+        geo_source = [v[0].source().replace("\\\\", "/") for v in self.layers.values()]
+        geo_names = [v[0].name() for v in self.layers.values()]
+
+        for idx, lyr in enumerate(geo_source):
+            if lyr in prj_layer_sources:
+                lidx = prj_layer_sources.index(lyr)
+                self.layers[geo_names[idx]] = [prj_layers[lidx], prj_layers[lidx].id()]
+
+    def remove_aequilibrae_layers(self):
+        """Removes layers connected to current aequilibrae project from active layers if the
+        active project is closed.
+        """
+        aequilibrae_databases = ["project_database", "public_transport", "results_database"]
+
+        for layer in QgsProject.instance().mapLayers().values():
+            dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
+            dbpath = dbpath.split("|")[0].split(".sqlite")[0]
+            var = os.path.split(dbpath)
+            if var[0] == self.project.project_base_path and var[1] in aequilibrae_databases:
+                QgsProject.instance().removeMapLayer(layer)
+
+        qgis.utils.iface.mapCanvas().refresh()
+
+    def save_in_project(self):
+        """Saves temporary layers to the project using QGIS saving buttons."""
+        if not self.project:
+            return
+
+        path = QgsProject.instance().customVariables()
+
+        if "aequilibrae_path" not in path:
+            QgsExpressionContextUtils.setProjectVariable(
+                QgsProject.instance(), "aequilibrae_path", self.project.project_base_path
+            )
+
+        output_file_path = os.path.join(self.project.project_base_path, "qgis_layers.sqlite")
+
+        file_exists = True if os.path.isfile(output_file_path) else False
+
+        for layer in QgsProject.instance().mapLayers().values():
+            if layer.isTemporary():
+                layer_name = layer.name() + f"_{uuid4().hex}"
+                options = QgsVectorFileWriter.SaveVectorOptions()
+                options.driverName = "SQLite"
+                options.layerName = layer_name
+                if file_exists:
+                    options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+
+                transform_context = QgsProject.instance().transformContext()
+
+                error = QgsVectorFileWriter.writeAsVectorFormatV3(layer, output_file_path, transform_context, options)
+
+                if error[0] == QgsVectorFileWriter.NoError:
+                    layer.setDataSource(output_file_path + f"|layername={layer_name}", layer.name(), "ogr")
+
+                file_exists = True
+
+        QgsProject.instance().write()

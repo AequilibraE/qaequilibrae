@@ -152,7 +152,7 @@ class LeastCommonDenominatorProcedure(WorkerThread):
                         part_id += 1
 
             self.ProgressValue.emit(fc)
-            self.ProgressText.emit(f"Running Analysis ({fc:,}/{self.from_layer.featureCount():,})")
+            self.ProgressText.emit(self.tr("Running Analysis ({}/{})").format(fc, self.from_layer.featureCount()))
 
         # Find the features on TO that have no correspondence in FROM
         for f, feature in merged.items():

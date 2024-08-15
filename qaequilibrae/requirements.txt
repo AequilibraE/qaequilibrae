@@ -1,8 +1,5 @@
-aequilibrae==1.0.1
+pyarrow==15.0.2
 ortools
-cython
-numexpr
-py-cpuinfo
-tables==3.8.0
-openmatrix
-fastparquet
+absl-py
+immutabledict
+protobuf

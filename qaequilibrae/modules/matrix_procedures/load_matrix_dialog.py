@@ -173,7 +173,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.run_thread()
 
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Error:"), self.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
 
     def update_matrix_list(self):
         if self.matrix_count > 0:

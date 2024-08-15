@@ -2,7 +2,6 @@ import logging
 import numpy as np
 import os
 import pandas as pd
-import re
 import sys
 from PyQt5.QtCore import Qt
 from aequilibrae.parameters import Parameters
@@ -143,10 +142,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         if not mat_name:
             return
 
-        if " (OMX not available)" in mat_name or " (file missing)" in mat_name:
+        if " (file missing)" in mat_name:
             df = pd.DataFrame([])
         else:
-            print(mat_name)
             matrix = self.project.matrices.get_matrix(mat_name)
             cores = matrix.names
 
@@ -193,8 +191,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             if not self.project.matrices.check_exists(rec["name"]):
                 self.matrices.loc[idx, "name"] += " (file missing)"
 
-        filter = self.matrices.file_name.str.contains(".omx", flags=re.IGNORECASE, regex=True)
-        self.matrices.loc[filter, "name"] += " (OMX not available)"
         self.cob_matrices.clear()
         self.cob_matrices.addItems(self.matrices["name"].tolist())
 
@@ -432,7 +428,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         for k, cls in self.traffic_classes.items():
             if self.skims[k]:
                 dt = cls.graph.block_centroid_flows
-                logger.debug(self.tr("Set skims {} for {}").format(self.skims[k], k))
+                logger.debug(f"Set skims {self.skims[k]} for {k}")
                 cls.graph.set_graph(self.cob_ffttime.currentText())
                 cls.graph.set_skimming(self.skims[k])
                 cls.graph.set_blocked_centroid_flows(dt)
@@ -448,7 +444,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                     val = float(val)
                 except Exception as e:
                     self.error = self.tr("VDF parameter is not numeric")
-                    logger.error(self.tr("Tried to set a VDF parameter not numeric. {}").format(e.args))
+                    logger.error(f"Tried to set a VDF parameter not numeric. {e.args}")
                     return False
             self.vdf_parameters[k] = val
         return True

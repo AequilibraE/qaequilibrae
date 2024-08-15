@@ -7,6 +7,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
 
 from qaequilibrae.modules.public_transport_procedures.gtfs_feed import GTFSFeed
+from qaequilibrae.modules.menu_actions.load_project_action import update_project_layers
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_importer.ui"))
 
@@ -89,6 +90,9 @@ class GTFSImporter(QDialog, FORM_CLASS):
             feed.set_allow_map_match(True)
             feed.doWork()
 
+        self.qgis_project.projectManager.removeTab(0)
+        update_project_layers(self.qgis_project)
+
         self.close()
 
     def signal_handler(self, val):
@@ -98,7 +102,6 @@ class GTFSImporter(QDialog, FORM_CLASS):
         bar = self.progressBar if val[1] == "master" else self.progressBar2
         lbl = self.lbl_progress if val[1] == "master" else self.lbl_progress2
 
-        print(val)
         if val[0] == "start":
             lbl.setText(val[3])
             bar.setRange(0, val[2])

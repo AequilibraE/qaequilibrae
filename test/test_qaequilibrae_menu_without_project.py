@@ -78,6 +78,22 @@ def test_create_project_from_layers_menu(ae, qtbot):
     action.trigger()
 
 
+def test_parameters_menu(ae, qtbot):
+    action = ae.menuActions["Project"][2]
+    assert action.text() == "Parameters", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
+def test_logfile_menu(ae, qtbot):
+    action = ae.menuActions["Project"][3]
+    assert action.text() == "logfile", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
 def test_network_preparation_menu(ae, qtbot):
     from qaequilibrae.modules.network import NetworkPreparationDialog
 
@@ -101,14 +117,6 @@ def test_add_centroid_connectors_menu(ae, qtbot):
 def test_add_zoning_data_menu(ae, qtbot):
     action = ae.menuActions["Model Building"][4]
     assert action.text() == "Add zoning data", "Wrong text content"
-    action.trigger()
-    messagebar = ae.iface.messageBar()
-    assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
-
-
-def test_display_project_data_menu(ae, qtbot):
-    action = ae.menuActions["Data"][0]
-    assert action.text() == "Visualize data", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
     assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"

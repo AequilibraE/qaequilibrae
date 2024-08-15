@@ -43,7 +43,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_mat">
       <attribute name="title">
@@ -92,7 +92,14 @@
        <string>Results</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="1" column="0" colspan="3">
+       <item row="0" column="0" colspan="3">
+        <widget class="QTableView" name="list_results">
+         <property name="toolTip">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="3">
         <widget class="QPushButton" name="but_load_Results">
          <property name="toolTip">
           <string>It may take up to one minute to process for the first time a table is loaded from this database</string>
@@ -102,10 +109,13 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="3">
-        <widget class="QTableView" name="list_results">
-         <property name="toolTip">
-          <string/>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="chb_join">
+         <property name="text">
+          <string>Join with layer</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

@@ -5,37 +5,45 @@ import sys
 from os.path import join, isdir
 from pathlib import Path
 
-import numpy as np
 from qgis.core import QgsMessageLog
 
 
-class download_all:
+class DownloadAll:
     must_remove = ["numpy", "scipy", "pandas", "charset_normalizer", "click_plugins", "click", "certifi",
                    "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
                    "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
-                   "importlib_metadata", "pyaml", "urllib3", "packaging"]
+                   "importlib_metadata", "pyaml", "urllib3", "packaging", "cpuinfo", "py-cpuinfo",
+                   "geopandas", "pyyaml", "pyogrio"]
+
     def __init__(self):
-        pth = os.path.dirname(__file__)
-        self.file = join(pth, "requirements.txt")
-        self.pth = join(pth, "packages")
+        pth = Path(__file__).parent
+        self.dependency_files = [pth / "requirements.txt", pth / "aequilibrae_version.txt"]
+        self.target_folder = pth / "packages"
         self.no_ssl = False
 
-    def install(self, on_ci=False):
-        # self.adapt_aeq_version()
-        with open(self.file, "r") as fl:
-            lines = fl.readlines()
-
+    def install(self):
         reps = []
-        for line in lines:
-            reps.extend(self.install_package(line.strip(), on_ci))
+        for file in self.dependency_files:
+            flag = self.target_folder / file.name
+            if flag.exists():
+                continue
+
+            with open(file, "r") as fl:
+                lines = fl.readlines()
+
+            for line in lines:
+                reps.extend(self.install_package(line.strip()))
+
+            with open(flag, "w") as fl:
+                fl.write("")
 
         self.clean_packages()
         return reps
+    def install_package(self, package):
+        Path(self.target_folder).mkdir(parents=True, exist_ok=True)
 
-    def install_package(self, package, on_ci):
-
-        install_command = f"-m pip install {package}" if on_ci else f'-m pip install {package} -t "{self.pth}"'
-        if "openmatrix" in package.lower() or "aequilibrae" in package.lower():
+        install_command = f'-m pip install {package} -t "{self.target_folder}"'
+        if "ortools" in package.lower():
             install_command += " --no-deps"
 
         command = f'"{self.find_python()}" {install_command}'
@@ -95,6 +103,7 @@ class download_all:
         return python_exe
 
     def adapt_aeq_version(self):
+        import numpy as np
         if int(np.__version__.split(".")[1]) >= 22:
             Path(self.file).unlink(missing_ok=True)
             shutil.copyfile(self._file, self.file)
@@ -111,12 +120,8 @@ class download_all:
 
     def clean_packages(self):
 
-        for fldr in list(os.walk(self.pth))[0][1]:
+        for fldr in list(os.walk(self.target_folder))[0][1]:
             for pkg in self.must_remove:
                 if pkg.lower() in fldr.lower():
-                    if isdir(join(self.pth, fldr)):
-                        shutil.rmtree(join(self.pth, fldr))
-
-
-if __name__ == "__main__":
-    download_all().install(True)
+                    if isdir(join(self.target_folder, fldr)):
+                        shutil.rmtree(join(self.target_folder, fldr))
