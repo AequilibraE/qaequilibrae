@@ -18,7 +18,7 @@ class ptAssignYAML(QgsProcessingAlgorithm):
                 "conf_file",
                 self.tr("Configuration file (.yaml)"),
                 behavior=QgsProcessingParameterFile.File,
-                fileFilter="*.yaml",
+                fileFilter="",
                 defaultValue=None,
             )
         )

@@ -18,7 +18,7 @@ class ImportGTFS(QgsProcessingAlgorithm):
                 "gtfs_file",
                 self.tr("GTFS file (.zip)"),
                 behavior=QgsProcessingParameterFile.File,
-                fileFilter="*.zip",
+                fileFilter="",
                 defaultValue=None,
             )
         )
@@ -55,7 +55,7 @@ class ImportGTFS(QgsProcessingAlgorithm):
 
     def processAlgorithm(self, parameters, context, model_feedback):
         
-        if params["map_match"]:
+        if parameters["map_match"]:
             i=4
         else:
             i=3
@@ -73,20 +73,20 @@ class ImportGTFS(QgsProcessingAlgorithm):
         
         # Opening project
         project = Project()
-        project.open(params["project"])
+        project.open(parameters["project"])
         feedback.setCurrentStep(1)
         feedback.pushInfo(" ")
         
         # Importing GTFS
         feedback.pushInfo(self.tr("Importing GTFS"))
         data = Transit(project)
-        transit = data.new_gtfs_builder(agency=params["agency"], file_path=params["gtfs_file"])
-        transit.load_date(params["gtfs_date"])
+        transit = data.new_gtfs_builder(agency=parameters["agency"], file_path=parameters["gtfs_file"])
+        transit.load_date(parameters["gtfs_date"])
         feedback.setCurrentStep(2)
         feedback.pushInfo(" ")
         
         # Map matching if selected
-        if str(params["map_match"])=="True" :
+        if str(parameters["map_match"])=="True" :
             feedback.pushInfo(self.tr("Map matching of PT lines on available network, it may take a while..."))
             transit.set_allow_map_match(True)  
             transit.map_match()

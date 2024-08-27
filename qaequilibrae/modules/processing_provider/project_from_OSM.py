@@ -60,6 +60,7 @@ class ProjectFromOSM(QgsProcessingAlgorithm):
         feedback.setCurrentStep(2)
 
         feedback.pushInfo(self.tr("Closing project"))
+        project.close()
 
         return {"Output": project_path}
 
