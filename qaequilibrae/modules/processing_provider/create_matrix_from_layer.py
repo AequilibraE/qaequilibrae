@@ -107,7 +107,7 @@ class CreateMatrixFromLayer(QgsProcessingAlgorithm):
         feedback.setCurrentStep(1)
 
         # Getting all zones
-        all_zones = np.unique(np.concatenate((matrices.Origine, matrices.Destination)))
+        all_zones = np.array(sorted(list(set( list(matrix[origin].unique()) + list(matrix[destination].unique())))))
         num_zones = all_zones.shape[0]
         idx = np.arange(num_zones)
 

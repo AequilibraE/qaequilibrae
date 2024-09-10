@@ -17,7 +17,7 @@ class MatrixCalculator(QgsProcessingAlgorithm):
                 "conf_file",
                 self.tr("Matrix configuration file (.yaml)"),
                 behavior=QgsProcessingParameterFile.File,
-                fileFilter="*.yaml",
+                fileFilter="",
                 defaultValue=None
             )
         )
@@ -34,7 +34,7 @@ class MatrixCalculator(QgsProcessingAlgorithm):
                 "dest_path",
                 self.tr("Existing .aem file")+self.tr("(used to store computed matrix)"),
                 behavior=QgsProcessingParameterFile.File,
-                fileFilter="*.aem",
+                fileFilter="",
                 defaultValue=None
             )
         )
@@ -52,6 +52,7 @@ class MatrixCalculator(QgsProcessingAlgorithm):
                 "filtering_matrix",
                 self.tr("Filtering matrix"),
                 multiLine=False,
+                optional=True,
                 defaultValue=None
             )
         ]
@@ -67,8 +68,8 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
 
-        from aequilibrae.matrix import AequilibraeMatrix
-        import numpy as np
+        exec("from aequilibrae.matrix import AequilibraeMatrix", globals())
+        exec("import numpy as np", globals())
         import yaml
         
         start=dt.now()
@@ -77,13 +78,15 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         feedback.pushInfo(self.tr("Getting matrices from configuration file"))
         conf_file = parameters["conf_file"]
         dest_path = parameters["dest_path"]
-        dest_core = parameters["matrix_core"]
+        dest_core = [parameters["matrix_core"]]
+        request=parameters["request"]
         
         destination=AequilibraeMatrix()
         destination.load(dest_path)
-        d=len(destination.get_matrix(dest_core))
+        global d
+        d=len(destination.get_matrix(dest_core[0]))
 
-        feedback.pushInfo(self.tr("Matrix total before calculation: ")+"{:,.2f}".format(destination.get_matrix(dest_core).sum()).replace(",", " "))
+        feedback.pushInfo(self.tr("Matrix total before calculation: ")+"{:,.2f}".format(destination.get_matrix(dest_core[0]).sum()).replace(",", " "))
         feedback.pushInfo(self.tr("Expected dimensions of matrix based on destination file: ")+str(d)+"x"+str(d))
         feedback.pushInfo("")
         
@@ -93,29 +96,35 @@ class MatrixCalculator(QgsProcessingAlgorithm):
 
         for matrices in params["Matrices"]:
             for matrix in matrices:
-                exec(matrix + "= AequilibraeMatrix()")
-                exec(matrix + ".load('"+matrices[matrix]["matrix_path"]+"')")
-                exec(matrix + "="+matrix+ ".get_matrix('"+matrices[matrix]["matrix_core"]+"')")
+                exec(f"""
+{matrix} = AequilibraeMatrix()
+{matrix}.load("{matrices[matrix]["matrix_path"]}")
+{matrix}={matrix}.get_matrix("{matrices[matrix]["matrix_core"]}") 
+""",
+                globals()
+                )
 
                 m_list.append(matrix)
-                exec("dim=len("+matrix+")")
+                exec(f"dim=len({matrix})", globals())
+                feedback.pushInfo(str(matrix))
                 feedback.pushInfo(self.tr(f"Importation of {matrix}, matrix dimensions {dim}x{dim} and total is:"))
-                exec('print("{:,.2f}".format('+matrix+'.sum()).replace(",", " "))')
-                print()
+                exec('feedback.pushInfo("{:,.2f}".format('+matrix+'.sum()).replace(",", " "))')
                 assert d==dim, self.tr("Matrices must have the same dimensions as the desired result !")
+                feedback.pushInfo("")
 
         if "null_diag" in request: # If needed, prepare a matrix to set diagonal to 0
-            null_diag=np.ones((d, d), dtype=np.float64)
-            np.fill_diagonal(null_diag, 0)
+            exec("""
+null_diag=np.ones((d, d), dtype=np.float64)
+np.fill_diagonal(null_diag, 0)""",
+            globals(),
+            )
 
         if "zeros" in request: # If needed, prepare a matrix full of zero
-            zeros=np.zeros((d, d), dtype=np.float64)    
+            exec("zeros=np.zeros((d, d), dtype=np.float64)", globals())
         feedback.pushInfo(" ")
         feedback.setCurrentStep(1)
 
-        # Setting up request, Used grammar is close to R language, need to be translated for numpy
-        request=parameters["request"]
-        
+        # Setting up request, Used grammar is close to R language, need to be translated for numpy        
         request=request.replace("max(","np.maximum(")
         request=request.replace("min(","np.minimum(")
         request=request.replace("ln(","np.log(")
@@ -131,14 +140,15 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         # Compute request: if a filtering matrix is used, update only a part of the destination matrix
         filtering_matrix=parameters["filtering_matrix"]
         if len(filtering_matrix)>0:
-            exec("filtering_matrix=np.nan_to_num("+filtering_matrix+")")
+            global result
+            exec("filtering_matrix=np.nan_to_num("+filtering_matrix+")", globals())
             assert (np.any((filtering_matrix == 0.) | (filtering_matrix == 1.)))
-            keep=np.absolute(filtering_matrix-np.ones(d))*destination.get_matrix(dest_core)
-            exec("new=filtering_matrix*(" + request + ")")
+            keep=np.absolute(filtering_matrix-np.ones(d))*destination.get_matrix(dest_core[0])
+            exec("new=filtering_matrix*(" + request + ")", globals())
             result=keep+new
             del filtering_matrix
         else:
-            exec("result="+request)
+            exec("result="+request, globals())
         feedback.pushInfo(self.tr("Result (total: ")+f"{'{:,.2f}'.format(result.sum()).replace(',', ' ')}): ")
         feedback.pushInfo(str(result))
 
@@ -146,12 +156,12 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         feedback.setCurrentStep(3)
         
         # Updating destination matrix file
-        destination.matrix[dest_core][:,:] = result[:,:]
+        destination.matrix[dest_core[0]][:,:] = result[:,:]
         destination.save()
         destination.close()
         
         for m in m_list :
-            exec("del "+m)
+            exec("del "+m, globals())
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(4)

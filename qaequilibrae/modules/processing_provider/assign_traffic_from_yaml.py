@@ -67,10 +67,15 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         feedback.pushInfo(self.tr("{} traffic classes have been found").format(len(params["traffic_classes"])))
         select_links = "select_links" in params and params["select_links"]
         if select_links:
-            selection_dict={}
+            selection_dict = {}
             for selections in params["select_links"]:
-                for name, links_list in selections:
-                    exec(f'selection_dict[{name}]= {links_list}')
+                for name in selections:
+                    link_list = ''
+                    for text in selections[name]:
+                        link_list = link_list + ',' + text
+                    link_list = ('[' + link_list[1:] + ']')
+                    link_list=eval(link_list)
+                    selection_dict[name] = link_list
 
         for classes in params["traffic_classes"]:
             for traffic in classes:
@@ -142,11 +147,11 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
         feedback.pushInfo(self.tr("Saving outputs"))
         feedback.pushInfo(str(assig.report()))
         if str(parameters["datetime_to_resultname"])=="True":
-            assig.save_results(params["result_name"]+dt.now().strftime("_%Y-%m-%d_%Hh%M"))
-        else:
-            assig.save_results(params["result_name"])
+            params["result_name"]=(params["result_name"]+dt.now().strftime("_%Y-%m-%d_%Hh%M"))
+        assig.save_results(params["result_name"])
         assig.save_skims(params["result_name"], which_ones="all", format="aem")
         if select_links:
+            assig.procedure_id = assig.procedure_id+"_S"
             assig.save_select_link_results(params["result_name"])
         feedback.pushInfo(" ")
         feedback.setCurrentStep(5)

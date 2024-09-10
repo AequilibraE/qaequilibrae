@@ -23,7 +23,7 @@ class ptAssignYAML(QgsProcessingAlgorithm):
             )
         )
         
-        advparams = [
+        advparameters = [
             QgsProcessingParameterBoolean(
             "datetime_to_resultname", 
             self.tr("Include current datetime to result name"), 
@@ -31,7 +31,7 @@ class ptAssignYAML(QgsProcessingAlgorithm):
             )
         ]
         
-        for param in advparams:
+        for param in advparameters:
             param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
             self.addParameter(param)
 
@@ -42,7 +42,8 @@ class ptAssignYAML(QgsProcessingAlgorithm):
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
 
-        from aequilibrae.paths import TrafficAssignment, TrafficClass
+        from aequilibrae.paths import TransitAssignment, TransitClass
+        from aequilibrae.transit import Transit
         from aequilibrae.project import Project
         from aequilibrae.matrix import AequilibraeMatrix
         import yaml
@@ -65,17 +66,27 @@ class ptAssignYAML(QgsProcessingAlgorithm):
         
         # Connector matching
         project.network.build_graphs()
-        graph.create_line_geometry(method="connector project match", graph="w")
+        graph.create_line_geometry(method="connector project match", graph=params["assignment"]["access_mode"])
+        
+        if str(params["assignment"]["save_graph"])=="True":
+            data.save_graphs()
+        
+        transit_graph = graph.to_transit_graph()
 
         # Creating traffic classes
         transit_classes = []
         feedback.pushInfo(self.tr("{} traffic classes have been found").format(len(params["transit_classes"])))
         select_links = "select_links" in params and params["select_links"]
         if select_links:
-            selection_dict={}
+            selection_dict = {}
             for selections in params["select_links"]:
-                for name, links_list in selections:
-                    exec(f'selection_dict[{name}]= {links_list}')
+                for name in selections:
+                    link_list = ''
+                    for text in selections[name]:
+                        link_list = link_list + ',' + text
+                    link_list = ('[' + link_list[1:] + ']')
+                    link_list=eval(link_list)
+                    selection_dict[name] = link_list
         
         for classes in params["transit_classes"]:
             for transit in classes:
@@ -87,16 +98,15 @@ class ptAssignYAML(QgsProcessingAlgorithm):
 
                 # Getting graph
                 if str(classes[transit]["blocked_centroid_flows"])=="True":
-                    graph.set_blocked_centroid_flows(True)
+                    transit_graph.set_blocked_centroid_flows(True)
                 else:
-                    graph.set_blocked_centroid_flows(False)
+                    transit_graph.set_blocked_centroid_flows(False)
 
                 if "skims" in classes[transit] and classes[transit]["skims"]:
                     skims = [sk.strip() for sk in classes[transit]["skims"].split(",")]
-                    graph.set_skimming(skims)
+                    transit_graph.set_skimming(skims)
 
                 # Setting class
-                transit_graph = graph.to_transit_graph()
                 assigclass = TransitClass(name=transit, graph=transit_graph, matrix=demand, matrix_core= classes[transit]["matrix_core"])
 
                 # Adding class
@@ -128,12 +138,9 @@ class ptAssignYAML(QgsProcessingAlgorithm):
 
         # Saving outputs
         feedback.pushInfo(self.tr("Saving outputs"))
-        feedback.pushInfo(str(assig.report()))
         if str(parameters["datetime_to_resultname"])=="True":
-            assig.save_results(params["result_name"]+dt.now().strftime("_%Y-%m-%d_%Hh%M"))
-        else:
-            assig.save_results(params["result_name"])
-        assig.save_skims(params["result_name"], which_ones="all", format="aem")
+            params["result_name"]=(params["result_name"]+dt.now().strftime("_%Y-%m-%d_%Hh%M"))
+        assig.save_results(params["result_name"])
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(5)
@@ -177,15 +184,17 @@ class ptAssignYAML(QgsProcessingAlgorithm):
                         matrix_core: student_pt
                         blocked_centroid_flows: True
                         skims: travel_time, distance
-                    - truck:
+                    - worker:
                         matrix_path: D:/AequilibraE/Project/matrices/demand.aem
-                        matrix_core: truck_pt
+                        matrix_core: worker_pt
                         blocked_centroid_flows: True
                         
                 assignment:
+                    access_mode : w
+                    save_graph : True
                     time_field : trav_time
                     freq_field : freq
-                    algorithl: os
+                    algorithm: os
                 """)
 
     def tr(self, message):
