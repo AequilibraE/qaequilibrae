@@ -17,9 +17,8 @@ class Provider(QgsProcessingProvider):
     def loadAlgorithms(self):
         from .project_from_layer import ProjectFromLayer
         from .project_from_OSM import ProjectFromOSM
-        from .Add_connectors import AddConnectors
+        from .add_connectors import AddConnectors
         from .assign_traffic_from_yaml import TrafficAssignYAML
-        from .assign_pt_from_yaml import ptAssignYAML
         from .export_matrix import ExportMatrix
         from .create_matrix_from_layer import CreateMatrixFromLayer
         from .add_matrix_from_layer import AddMatrixFromLayer
@@ -27,6 +26,8 @@ class Provider(QgsProcessingProvider):
         from .renumber_nodes_from_layer import RenumberNodesFromLayer
         from .matrix_calculator import MatrixCalculator
         from .import_gtfs import ImportGTFS
+        from .create_pt_graph import create_pt_graph
+        from .assign_pt_from_yaml import ptAssignYAML
 
         self.addAlgorithm(ProjectFromOSM())
         self.addAlgorithm(ProjectFromLayer())
@@ -39,6 +40,7 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(AddConnectors())
         self.addAlgorithm(TrafficAssignYAML())
         self.addAlgorithm(ImportGTFS())
+        self.addAlgorithm(create_pt_graph())
         self.addAlgorithm(ptAssignYAML())
 
     def id(self):

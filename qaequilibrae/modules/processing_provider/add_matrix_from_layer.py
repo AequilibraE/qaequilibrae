@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import pandas as pd
 from os.path import join
+import os
 from scipy.sparse import coo_matrix
 
 from qgis.core import QgsProcessingMultiStepFeedback, QgsProcessingParameterString, QgsProcessingParameterDefinition
@@ -51,7 +52,7 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
                 "matrix_file",
                 self.tr("Existing .aem file"),
                 behavior=QgsProcessingParameterFile.File,
-                fileFilter="*.aem",
+                fileFilter="",
                 defaultValue=None,
             )
         )
@@ -78,7 +79,7 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
         destination = parameters["destination"]
         value = parameters["value"]
 
-        core_name = parameters["matrix_core"]
+        core_name = [parameters["matrix_core"]]
 
         matrix_file = parameters["matrix_file"]
 
@@ -92,7 +93,7 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
         feedback.setCurrentStep(1)
 
         # Getting all zones
-        all_zones = np.unique(np.concatenate((matrices.Origine, matrices.Destination)))
+        all_zones = np.array(sorted(list(set( list(matrix[origin].unique()) + list(matrix[destination].unique())))))
         num_zones = all_zones.shape[0]
         idx = np.arange(num_zones)
 
@@ -112,26 +113,51 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
         # Creating the aequilibrae matrix file
         mat = AequilibraeMatrix()
         mat.load(matrix_file)
-
+        
+        cores=mat.names
+        cores.append(core_name[0])
+        
+        output = AequilibraeMatrix()
+        output.create_empty(
+            file_name=matrix_file[-4]+"_temp.aem",
+            zones=mat.zones,
+            matrix_names=cores,
+            memory_only=False,
+        )
+        
         m = (
             coo_matrix((agg_matrix[value], (agg_matrix["from"], agg_matrix["to"])), shape=(num_zones, num_zones))
             .toarray()
             .astype(np.float64)
         )
-        mat.matrix[core_name][:, :] = m[:, :]
+        
+        output.index[:] = mat.index[:]
+        
+        for core in cores :
+            if core == core_name[0]:
+                output.matrix[core][:, :] = m[:, :]
+            else:
+                output.matrix[core][:, :] = mat.matrix[core][:, :]
+        output.setName(mat.name)
+        output.setDescription(mat.description.decode('utf-8'))
+        
         
         feedback.pushInfo(self.tr("{}x{} matrix imported ").format(num_zones, num_zones))
         feedback.pushInfo(" ")
         feedback.setCurrentStep(2)
 
-        mat.save()
+        output.save()
+        output.close()
         mat.close()
+        
+        os.remove(matrix_file)
+        os.rename(matrix_file[-4]+"_temp.aem", matrix_file)
         del agg_matrix, matrix, m
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(3)
 
-        return {"Output": f"{mat.name}, {mat.description} ({file_name})"}
+        return {"Output": f"{mat.name}, {mat.description} ({matrix_file})"}
 
     def name(self):
         return self.tr("Add matrix from layer to aem file")

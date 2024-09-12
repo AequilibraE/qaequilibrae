@@ -46,6 +46,8 @@ class ptAssignYAML(QgsProcessingAlgorithm):
         from aequilibrae.transit import Transit
         from aequilibrae.project import Project
         from aequilibrae.matrix import AequilibraeMatrix
+        from aequilibrae.project.database_connection import database_connection
+        from aequilibrae.transit.transit_graph_builder import TransitGraphBuilder
         import yaml
 
         feedback.pushInfo(self.tr("Getting parameters from YAML"))
@@ -61,15 +63,8 @@ class ptAssignYAML(QgsProcessingAlgorithm):
         project.open(params["project"])
         data = Transit(project)
 
-        # Creating graph
-        graph = data.create_graph()
-        
-        # Connector matching
-        project.network.build_graphs()
-        graph.create_line_geometry(method="connector project match", graph=params["assignment"]["access_mode"])
-        
-        if str(params["assignment"]["save_graph"])=="True":
-            data.save_graphs()
+        pt_con = database_connection("transit")
+        graph = TransitGraphBuilder.from_db(pt_con, int(params["assignment"]["period_id"]))
         
         transit_graph = graph.to_transit_graph()
 
@@ -118,20 +113,20 @@ class ptAssignYAML(QgsProcessingAlgorithm):
 
         # Setting up assignment
         feedback.pushInfo(self.tr("Setting up assignment"))
-        feedback.pushInfo(str(params["assignment"]))
 
         assig = TransitAssignment()
         assig.set_classes(transit_classes)
-        assig.set_frequency_field(params["assignment"]["freq_field"])
-        assig.set_time_field(params["assignment"]["time_field"])
+        assig.set_frequency_field("freq")
+        assig.set_time_field("trav_time")
 
-        assig.set_algorithm(params["assignment"]["algorithm"])
+        assig.set_algorithm("os")
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(3)
 
         # Running assignment
         feedback.pushInfo(self.tr("Running assignment"))
+        feedback.pushInfo(str(parameters["assignment"]))
         assig.execute()
         feedback.pushInfo(" ")
         feedback.setCurrentStep(4)
@@ -190,11 +185,7 @@ class ptAssignYAML(QgsProcessingAlgorithm):
                         blocked_centroid_flows: True
                         
                 assignment:
-                    access_mode : w
-                    save_graph : True
-                    time_field : trav_time
-                    freq_field : freq
-                    algorithm: os
+                    period_id: 1
                 """)
 
     def tr(self, message):
