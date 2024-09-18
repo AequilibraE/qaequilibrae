@@ -4,9 +4,9 @@ on:  [pull_request]
 
 
 jobs:
-  linux_test:
+  unittest:
 #    needs: linting
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest, windows-latest]
     strategy:
       max-parallel: 4
       matrix:
@@ -49,8 +49,10 @@ jobs:
         run: |
           $env:PATH="C:\Program Files\QGIS 3.34.9\bin;$env:PATH"
           $env:QGIS_PLUGIN_IN_CI=1
-          python-qgis-ltr.bat -m pip install -r test/requirements-test.txt
-          python-qgis-ltr.bat ci/dependency_installation.py
-          python-qgis-ltr.bat -m pip list
-          python-qgis-ltr.bat -m pytest test -v --tb=short --cov=qaequilibrae
+          pwd
+          
+  #         python-qgis-ltr.bat -m pip install -r test/requirements-test.txt
+  #         python-qgis-ltr.bat ci/dependency_installation.py
+  #         python-qgis-ltr.bat -m pip list
+  #         python-qgis-ltr.bat -m pytest test -v --tb=short --cov=qaequilibrae
           

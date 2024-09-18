@@ -61,6 +61,7 @@ __pycache__/
 
 # VS Code
 .vscode
+.venv
 
 # End of https://www.gitignore.io/api/jetbrains
 # qgis-plugin-ci
