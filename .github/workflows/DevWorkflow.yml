@@ -42,12 +42,12 @@ jobs:
       - name: Install QGIS on Chocolatey
         uses: crazy-max/ghaction-chocolatey@v3
         with:
-          args: install qgis-ltr --version=3.34.9
+          args: install qgis-ltr
 
       - name: Plugin install
         shell: pwsh
         run: |
-          $env:PATH="C:\Program Files\QGIS 3.34.9\bin;$env:PATH"
+          $env:PATH="C:\Program Files\QGIS 3.34.10\bin;$env:PATH"
           $env:QGIS_PLUGIN_IN_CI=1
           pwd
           
