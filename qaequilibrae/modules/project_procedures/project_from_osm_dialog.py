@@ -107,13 +107,13 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.update_widget.setVisible(True)
         self.resize(280, 300)
         if self.choose_canvas.isChecked():
-            self.report.append(reporter(self.tr("Chose to download network for canvas area")))
+            self.report.append(reporter("Chose to download network for canvas area"))
             QgsProject.instance().setCrs(QgsCoordinateReferenceSystem.fromEpsgId(4326))
             e = self.iface.mapCanvas().extent()
             bbox = [e.xMinimum(), e.yMinimum(), e.xMaximum(), e.yMaximum()]
         else:
             self.progress_label.setText(self.tr("Establishing area for download"))
-            self.report.append(reporter(self.tr("Chose to download network for place")))
+            self.report.append(reporter("Chose to download network for place"))
             bbox, r = placegetter(self.place.text())
             self.report.extend(r)
 
@@ -121,7 +121,6 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.qgis_project.project.new(self.output_path.text())
         self.qgis_project.project.network.netsignal.connect(self.signal_handler)
 
-        
         self.qgis_project.project.network.create_from_osm(box(*bbox))
 
     def change_place_type(self):

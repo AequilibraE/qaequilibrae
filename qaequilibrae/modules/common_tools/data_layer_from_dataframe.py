@@ -10,7 +10,9 @@ def layer_from_dataframe(df: pd.DataFrame, layer_name: str) -> QgsVectorLayer:
 
     # add fields
     def qgs_type(ftype):
-        return QVariant.Double if "float" in ftype.name else QVariant.LongLong if "int" in ftype.name else QVariant.String
+        return (
+            QVariant.Double if "float" in ftype.name else QVariant.LongLong if "int" in ftype.name else QVariant.String
+        )
 
     field_names = list(df.dtypes.index)
     types = [qgs_type(df.dtypes[fname]) for fname in field_names]

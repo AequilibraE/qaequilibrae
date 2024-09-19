@@ -267,6 +267,11 @@
         <source>Visualize data</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="353"/>
+        <source>You need to import a GTFS feed first</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BandwidthColorRamps</name>
@@ -341,6 +346,11 @@
         <source>Create</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../modules/project_procedures/create_examples_dialog.py" line="28"/>
+        <source>Available models:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CreatesTranspoNetDialog</name>
@@ -378,33 +388,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="73"/>
-        <source>field {} could not be added</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="88"/>
         <source>Transferring nodes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="115"/>
+        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="116"/>
         <source>Transferring {}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="144"/>
-        <source>Failed inserting record {} for {}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="148"/>
-        <source>feature with id {} could not be added to layer {}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="150"/>
-        <source>feature with no node id present. It could not be added to layer {}</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -489,23 +479,8 @@
 <context>
     <name>DesireLinesDialog</name>
     <message>
-        <location filename="../modules/gis/desire_lines_dialog.py" line="150"/>
-        <source>Could not load desire lines to map</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/desire_lines_dialog.py" line="151"/>
-        <source>Could not load desire lines to map. {}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../modules/gis/desire_lines_dialog.py" line="211"/>
         <source>Inputs not loaded properly. You need the layer and at least one matrix_procedures core</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/desire_lines_dialog.py" line="218"/>
-        <source>*** ERROR ***</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -532,77 +507,62 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="112"/>
-        <source>Zone {} does not have a corresponding centroid/zone. Total flow {}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="118"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="116"/>
         <source>Filtering down to OD pairs with flows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="139"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="137"/>
         <source>Concatenating AB &amp; BA flows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="148"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="146"/>
         <source>Creating Desire Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="167"/>
-        <source>Total non assigned flows (not counting intrazonals):</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="172"/>
-        <source>Nothing to show</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="186"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="184"/>
         <source>Building Delaunay dataset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="196"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="194"/>
         <source>Computing Delaunay Triangles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="199"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="197"/>
         <source>Building Delaunay Network: Collecting Edges</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="211"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="209"/>
         <source>Building Delaunay Network: Getting unique edges</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="214"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="212"/>
         <source>Building Delaunay Network: Assembling Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="238"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="236"/>
         <source>Building graph</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="270"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="268"/>
         <source>Assigning demand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="276"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="274"/>
         <source>Collecting results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="277"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="275"/>
         <source>Building resulting layer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -850,6 +810,21 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="174"/>
         <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="151"/>
+        <source>No mapping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="155"/>
+        <source>By origin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="159"/>
+        <source>By destination</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1439,17 +1414,17 @@
         <source>Running Analysis</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../modules/gis/least_common_denominator_procedure.py" line="155"/>
+        <source>Running Analysis ({}/{})</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LoadDataset</name>
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_class.py" line="53"/>
         <source>Field {} does has a type not supported.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="82"/>
-        <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1495,32 +1470,17 @@
     </message>
     <message>
         <location filename="../modules/matrix_procedures/load_matrix_class.py" line="49"/>
-        <source>Loading matrix: </source>
+        <source>Loading matrix: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_matrix_class.py" line="54"/>
+        <location filename="../modules/matrix_procedures/load_matrix_class.py" line="52"/>
         <source>Converting to a NumPy array</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_matrix_class.py" line="73"/>
+        <location filename="../modules/matrix_procedures/load_matrix_class.py" line="71"/>
         <source>Loading from NumPy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_class.py" line="90"/>
-        <source>Numpy array needs to be 2 dimensional. Matrix provided has </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_class.py" line="94"/>
-        <source>Could not load array. {}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_class.py" line="97"/>
-        <source>LOADED-MATRIX</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1529,11 +1489,6 @@
     <message>
         <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="178"/>
         <source>Invalid field chosen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="197"/>
-        <source>Error:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1665,11 +1620,6 @@
         <source>Matrix Reblocking finalized</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../modules/matrix_procedures/mat_reblock.py" line="98"/>
-        <source>REBLOCKED MATRICES</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>MatrixViewer</name>
@@ -1785,23 +1735,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="192"/>
-        <source>ID {} is non unique in your selected field</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="195"/>
-        <source>Negative node ID in your selected field</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="205"/>
         <source>Processing links: {}/{}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="226"/>
-        <source>CORRESPONDING NODE NOTE FOUND. Link: {}</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1924,18 +1859,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="110"/>
-        <source>Chose to download network for canvas area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="115"/>
         <source>Establishing area for download</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="116"/>
-        <source>Chose to download network for place</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2035,11 +1960,6 @@
 <context>
     <name>ReportDialog</name>
     <message>
-        <location filename="../modules/common_tools/report_dialog.py" line="46"/>
-        <source>Text files(*.txt)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../modules/common_tools/report_dialog.py" line="47"/>
         <source>Save procedure log</source>
         <translation type="unfinished"></translation>
@@ -2090,39 +2010,42 @@
         <source>Writing data to target layer</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../modules/gis/simple_tag_procedure.py" line="126"/>
-        <source>procedure</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>SimpleTagDialog</name>
     <message>
-        <location filename="../modules/gis/simple_tag_dialog.py" line="45"/>
-        <source>If source layer is a polygon, source needs to enclose target.  If only target is 
-
-                    a polygon, target needs to enclose source. First found record is used</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/simple_tag_dialog.py" line="52"/>
+        <location filename="../modules/gis/simple_tag_dialog.py" line="47"/>
         <source>Criteria to choose when there are multiple matches is largest area or length matched</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/simple_tag_dialog.py" line="55"/>
+        <location filename="../modules/gis/simple_tag_dialog.py" line="50"/>
         <source>Heuristic procedure that only computes the actual distance to the nearest neighbors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/simple_tag_dialog.py" line="251"/>
+        <location filename="../modules/gis/simple_tag_dialog.py" line="246"/>
         <source>Input data not provided correctly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/simple_tag_dialog.py" line="251"/>
+        <location filename="../modules/gis/simple_tag_dialog.py" line="246"/>
         <source>  Try again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/gis/simple_tag_dialog.py" line="252"/>
+        <source>If source layer is a polygon, source needs to enclose target.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/gis/simple_tag_dialog.py" line="254"/>
+        <source>If only target is a polygon, target needs to enclose source.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/gis/simple_tag_dialog.py" line="256"/>
+        <source>First found record is used.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2223,25 +2146,6 @@
     </message>
 </context>
 <context>
-    <name>TSPProcedure</name>
-    <message>
-        <location filename="../modules/routing_procedures/tsp_procedure.py" line="57"/>
-        <source>Solution not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/routing_procedures/tsp_procedure.py" line="60"/>
-        <source>Objective function value: {}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/routing_procedures/tsp_procedure.py" line="62"/>
-        <source>Route:
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>TrafficAssignYAML</name>
     <message>
         <location filename="../modules/processing_provider/assign_from_yaml.py" line="12"/>
@@ -2337,18 +2241,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="440"/>
-        <source>Set skims {} for {}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="455"/>
         <source>VDF parameter is not numeric</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="456"/>
-        <source>Tried to set a VDF parameter not numeric. {}</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
