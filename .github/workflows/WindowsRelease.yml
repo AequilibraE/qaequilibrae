@@ -15,7 +15,7 @@ jobs:
       - name: Install QGIS on Chocolatey
         uses: crazy-max/ghaction-chocolatey@v3
         with:
-          args: install qgis-ltr --version=3.34.2 y
+          args: install qgis-ltr --version=3.34.4 -y
 
       - name: Plugin install
         shell: pwsh
