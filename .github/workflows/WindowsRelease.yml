@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        qgis-version: [qgis-ltr-3.34.6, qgis-ltr, qgis]
+        version: [qgis-ltr --version=3.34.6, qgis-ltr, qgis]
 
     steps:
       - uses: actions/checkout@v3
@@ -18,7 +18,7 @@ jobs:
       - name: Install QGIS on Chocolatey
         uses: crazy-max/ghaction-chocolatey@v3
         with:
-          args: install ${{ matrix.qgis-version }} -y
+          args: install ${{ matrix.version }} -y
 
       - name: Plugin install
         shell: pwsh
