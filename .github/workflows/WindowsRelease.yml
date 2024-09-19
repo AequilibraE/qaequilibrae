@@ -21,14 +21,16 @@ jobs:
         shell: pwsh
         run: |
           pwd
-          Copy-Item "qaequilibrae" -Destination "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins" -Recurse
+          python --version
+          Copy-Item "qaequilibrae" -Destination "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins" -Recursive
           $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
           $env:QGIS_PLUGIN_IN_CI=1
           python-qgis-ltr.bat -m pip install -r test/requirements-test.txt
           python-qgis-ltr.bat -m pip list
+          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
           Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
-          python ci/dependency_installation.py
-          pwd
+          python start_download.py
+          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages"
         # python-qgis-ltr.bat -m pip list
         # python-qgis-ltr.bat -m pytest test -v --tb=short --cov=qaequilibrae
           
