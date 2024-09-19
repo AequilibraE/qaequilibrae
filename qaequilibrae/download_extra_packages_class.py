@@ -156,9 +156,3 @@ class DownloadAll:
                 if pkg.lower() in fldr.lower():
                     if isdir(join(self.pth, fldr)):
                         shutil.rmtree(join(self.pth, fldr))
-
-
-if __name__ == "__main__":
-    result = DownloadAll().install()
-    print("".join([str(x).upper() for x in result]))
-    print("Hello world")
