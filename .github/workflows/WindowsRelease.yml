@@ -23,10 +23,6 @@ jobs:
           Copy-Item "qaequilibrae" -Destination "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae" -Recurse
           $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
           $env:QGIS_PLUGIN_IN_CI=1
-          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
-          Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
-          python-qgis-ltr.bat qaequilibrae\start_download.py
+          Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
+          python-qgis-ltr.bat download_extra_packages_class.py
           Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages"
-        # python-qgis-ltr.bat -m pip list
-        # python-qgis-ltr.bat -m pytest test -v --tb=short --cov=qaequilibrae
-          
