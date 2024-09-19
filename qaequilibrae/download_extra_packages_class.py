@@ -161,5 +161,8 @@ class DownloadAll:
 
 if __name__ == "__main__":
     result = DownloadAll().install()
-    print("".join([str(x).upper() for x in result]))
-    print("Hello world")
+    output = ("".join([str(x).upper() for x in result]))
+    
+    assert "ERROR" not in output
+
+    print(output)
