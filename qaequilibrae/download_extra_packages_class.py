@@ -9,11 +9,41 @@ from qgis.core import QgsMessageLog
 
 
 class DownloadAll:
-    must_remove = ["numpy", "scipy", "pandas", "charset_normalizer", "click_plugins", "click", "certifi",
-                   "cligj", "colorama", "fiona", "pyproj", "pytz", "requests", "rtree", "setuptools",
-                   "shapely", "six", "tzdata", "zipp", "attr", "attrs", "dateutil", "python_dateutil", "idna",
-                   "importlib_metadata", "pyaml", "urllib3", "packaging", "cpuinfo", "py-cpuinfo",
-                   "geopandas", "pyyaml", "pyogrio"]
+    must_remove = [
+        "numpy",
+        "scipy",
+        "pandas",
+        "charset_normalizer",
+        "click_plugins",
+        "click",
+        "certifi",
+        "cligj",
+        "colorama",
+        "fiona",
+        "pyproj",
+        "pytz",
+        "requests",
+        "rtree",
+        "setuptools",
+        "shapely",
+        "six",
+        "tzdata",
+        "zipp",
+        "attr",
+        "attrs",
+        "dateutil",
+        "python_dateutil",
+        "idna",
+        "importlib_metadata",
+        "pyaml",
+        "urllib3",
+        "packaging",
+        "cpuinfo",
+        "py-cpuinfo",
+        "geopandas",
+        "pyyaml",
+        "pyogrio",
+    ]
 
     def __init__(self):
         pth = os.path.dirname(__file__)
@@ -97,6 +127,7 @@ class DownloadAll:
 
     def adapt_aeq_version(self):
         import numpy as np
+
         if int(np.__version__.split(".")[1]) >= 22:
             Path(self.file).unlink(missing_ok=True)
             shutil.copyfile(self._file, self.file)
@@ -118,3 +149,9 @@ class DownloadAll:
                 if pkg.lower() in fldr.lower():
                     if isdir(join(self.pth, fldr)):
                         shutil.rmtree(join(self.pth, fldr))
+
+
+if __name__ == "__main__":
+    result = DownloadAll().install()
+    print("".join([str(x).upper() for x in result]))
+    print("Hello world")
