@@ -69,6 +69,7 @@ class DownloadAll:
 
         self.clean_packages()
         return reps
+
     def install_package(self, package):
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
 
@@ -154,5 +155,5 @@ class DownloadAll:
         for fldr in list(os.walk(self.target_folder))[0][1]:
             for pkg in self.must_remove:
                 if pkg.lower() in fldr.lower():
-                    if isdir(join(self.pth, fldr)):
-                        shutil.rmtree(join(self.pth, fldr))
+                    if isdir(join(self.target_folder, fldr)):
+                        shutil.rmtree(join(self.target_folder, fldr))
