@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        version: [qgis-ltr --version=3.34.6, qgis-ltr, qgis]
+        version: [qgis-ltr --version=3.34.6, qgis-ltr, qgis --version=3.38.0]
 
     steps:
       - uses: actions/checkout@v3
