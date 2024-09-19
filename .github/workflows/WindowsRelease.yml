@@ -25,9 +25,9 @@ jobs:
           $env:QGIS_PLUGIN_IN_CI=1
           python-qgis-ltr.bat -m pip install -r test/requirements-test.txt
           python-qgis-ltr.bat -m pip list
-          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
-          Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
-          python-qgis-ltr.bat start_download.py
+          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
+          Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
+          python-qgis-ltr.bat qaequiilbrae\start_download.py
           Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages"
         # python-qgis-ltr.bat -m pip list
         # python-qgis-ltr.bat -m pytest test -v --tb=short --cov=qaequilibrae
