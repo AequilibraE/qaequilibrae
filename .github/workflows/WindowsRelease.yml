@@ -26,20 +26,19 @@ jobs:
           Copy-Item "qaequilibrae" -Destination "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae" -Recurse
           $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
           $env:QGIS_PLUGIN_IN_CI=1
+          Get-ChildItem -Path "$env:PATH"
           Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
 
-      - name: Install plugin
+      - name: Install plugin on LTR
         shell: pwsh
-        if: ${{ (matrix.version == 'qgis --version=3.38.0')}}
-        run: |
-          python-qgis.bat download_extra_packages_class.py
-          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages"
-
-# Consertar o if acima
-
-      - name: Install plugin
-        shell: pwsh
-        if: ${{ (matrix.version != 'qgis')}}
+        if: ${{ (matrix.version != 'qgis --version=3.38.0')}}
         run: |
           python-qgis-ltr.bat download_extra_packages_class.py
           Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages"
+
+        - name: Install plugin on Latest
+          shell: pwsh
+          if: ${{ (matrix.version == 'qgis --version=3.38.0')}}
+          run: |
+            python-qgis.bat download_extra_packages_class.py
+            Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages
