@@ -13,7 +13,7 @@ jobs:
         version: [qgis]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Install QGIS on Chocolatey
         uses: crazy-max/ghaction-chocolatey@v3
@@ -28,6 +28,7 @@ jobs:
           $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
           $env:QGIS_PLUGIN_IN_CI=1
           python-qgis.bat -m pip install -r test/requirements-test.txt
+          python-qgis.bat -m pip install -r ci/requirements_for_windows_test.txt
           Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
           python-qgis.bat download_extra_packages_class.py
           cd packages

@@ -1,0 +1,9 @@
+click-plugins
+click
+fiona
+six
+zipp
+attr
+python-dateutil
+importlib-metadata
+py-cpuinfo
