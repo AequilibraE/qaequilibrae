@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        version: [qgis-ltr --version=3.34.6, qgis-ltr, qgis --version=3.38.0]
+        version: [qgis]
 
     steps:
       - uses: actions/checkout@v3
@@ -20,26 +20,27 @@ jobs:
         with:
           args: install ${{ matrix.version }} -y
 
-      - name: Setup plugin
+      - name: Setup pytest
         shell: pwsh
         run: |
           Copy-Item "qaequilibrae" -Destination "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae" -Recurse
           $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
+          $env:PATH -split ';'
           $env:QGIS_PLUGIN_IN_CI=1
-          Get-ChildItem -Path "$env:PATH"
           Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
 
-      - name: Install plugin on LTR
-        shell: pwsh
-        if: ${{ (matrix.version != 'qgis --version=3.38.0')}}
-        run: |
-          python-qgis-ltr.bat download_extra_packages_class.py
+      # - name: Install plugin on LTR
+      #   shell: pwsh
+      #   if: ${{ (matrix.version != 'qgis --version=3.38.0')}}
+      #   run: |
+      #     python-qgis-ltr.bat download_extra_packages_class.py
           
       - name: Install plugin on Latest
         shell: pwsh
-        if: ${{ (matrix.version == 'qgis --version=3.38.0')}}
+        # if: ${{ (matrix.version == 'qgis --version=3.38.0')}}
         run: |
-          python-qgis.bat download_extra_packages_class.py
+          Get-ChildItem -Path "C:\Program Files\QGIS*\bin\*.bat"
+        # python-qgis.bat download_extra_packages_class.py
 
       - name: Run tests
         shell: pwsh
