@@ -1,9 +1,8 @@
-click-plugins
-click
-fiona
-six
-zipp
 attr
-python-dateutil
+click
+click-plugins
+cligj
+fiona
 importlib-metadata
 py-cpuinfo
+zipp
