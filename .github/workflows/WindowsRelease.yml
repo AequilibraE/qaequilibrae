@@ -26,12 +26,14 @@ jobs:
         run: |
           pwd
           Copy-Item "qaequilibrae" -Destination "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae" -Recurse
-          Copy-Item "test" -Destination "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\test" -Recurse
           $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
           $env:QGIS_PLUGIN_IN_CI=1
           python-qgis.bat -m pip install -r test/requirements-test.txt
           Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
           python-qgis.bat download_extra_packages_class.py
+          python-qgis.bat -m pip list
+          Set-Location "D:/a/qaequilibrae/qaequilibrae"
+          python-qgis.bat -m pip list
           python-qgis.bat -m pytest test -v
 
       # - name: Setup plugin on LTR
