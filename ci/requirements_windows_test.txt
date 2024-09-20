@@ -1,8 +1,0 @@
-attr
-click
-click-plugins
-cligj
-fiona
-importlib-metadata
-py-cpuinfo
-zipp
