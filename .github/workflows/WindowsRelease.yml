@@ -24,7 +24,7 @@ jobs:
         shell: pwsh
         run: |
           Copy-Item "qaequilibrae" -Destination "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae" -Recurse
-        # $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
+          $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
           $env:QGIS_PLUGIN_IN_CI=1
           Get-ChildItem -Path "C:\Program Files\QGIS*\bin\*.bat" -Name
 
@@ -32,9 +32,8 @@ jobs:
         shell: pwsh
         if: ${{ (matrix.version == 'qgis')}}
         run: |
-          $qgisPath = (Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName
-          $env:PATH = "$qgisPath\bin;$qgisPath\apps\Python*\Scripts;$env:PATH"
-          "$qgisPath\apps\Python*\python.exe" -m pip install -r test/requirements-test.txt
+          $env:PATH -split ";"
+          python3.exe -m pip install -r test/requirements-test.txt
       
       - name: Set Location
         shell: pwsh
@@ -50,7 +49,7 @@ jobs:
         shell: pwsh
         if: ${{ (matrix.version == 'qgis')}}
         run: |
-          "$qgisPath\apps\Python*\python.exe" download_extra_packages_class.py
+          python3.exe download_extra_packages_class.py
 
       - name: Run tests
         shell: pwsh
