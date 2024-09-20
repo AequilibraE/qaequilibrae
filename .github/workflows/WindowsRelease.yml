@@ -27,17 +27,10 @@ jobs:
           $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
           $env:QGIS_PLUGIN_IN_CI=1
           Get-ChildItem -Path "C:\Program Files\QGIS*\bin\*.bat" -Name
-
-      - name: Install pytest on Latest
-        shell: pwsh
-        if: ${{ (matrix.version == 'qgis')}}
-        run: |
           $env:PATH -split ";"
-          python3.exe -m pip install -r test/requirements-test.txt
-      
-      - name: Set Location
-        shell: pwsh
-        run: Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
+          python-qgis.bat -m pip install -r test/requirements-test.txt
+          Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
+          python-qgis.bat download_extra_packages_class.py
 
       # - name: Install plugin on LTR
       #   shell: pwsh
@@ -45,11 +38,11 @@ jobs:
       #   run: |
       #     python-qgis-ltr.bat download_extra_packages_class.py
           
-      - name: Install plugin on Latest
-        shell: pwsh
-        if: ${{ (matrix.version == 'qgis')}}
-        run: |
-          python3.exe download_extra_packages_class.py
+      # - name: Install plugin on Latest
+      #   shell: pwsh
+      #   if: ${{ (matrix.version == 'qgis')}}
+      #   run: |
+      #     python3.exe download_extra_packages_class.py
 
       - name: Run tests
         shell: pwsh
