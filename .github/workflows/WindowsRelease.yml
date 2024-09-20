@@ -34,11 +34,14 @@ jobs:
         if: ${{ (matrix.version != 'qgis --version=3.38.0')}}
         run: |
           python-qgis-ltr.bat download_extra_packages_class.py
-          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages"
+          
+      - name: Install plugin on Latest
+        shell: pwsh
+        if: ${{ (matrix.version == 'qgis --version=3.38.0')}}
+        run: |
+          python-qgis.bat download_extra_packages_class.py
 
-        - name: Install plugin on Latest
-          shell: pwsh
-          if: ${{ (matrix.version == 'qgis --version=3.38.0')}}
-          run: |
-            python-qgis.bat download_extra_packages_class.py
-            Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages
+      - name: Run tests
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages"
