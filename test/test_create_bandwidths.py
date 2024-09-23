@@ -77,18 +77,26 @@ def test_color_ramp(ae_with_project, dual_fields):
     # Create color ramps
     color_ramp = LoadColorRampSelector(dialog.iface, dialog.layer)
     color_ramp.chk_dual_fields.setChecked(dual_fields)
+    color_ramp.cbb_ab_color.setCurrentText("Blues")
 
     color_ramp.set_dual_fields()
 
     if dual_fields:
-        color_ramp.cbb_ab_color.setCurrentText("Blues")
         color_ramp.cbb_ab_field.setCurrentText("matrix_tot")
         color_ramp.txt_ab_min.setText("200.0")
         color_ramp.txt_ab_max.setText("46100.0")
         color_ramp.change_field("AB")
-        color_ramp.load_ramps()
     else:
-        print("hello world")
+        color_ramp.cbb_ba_color.setCurrentText("Reds")
+        color_ramp.cbb_ab_field.setCurrentText("matrix_ab")
+        color_ramp.txt_ab_min.setText("100.0")
+        color_ramp.txt_ab_max.setText("23000.0")
+        color_ramp.cbb_ba_field.setCurrentText("matrix_ba")
+        color_ramp.txt_ba_min.setText("100.0")
+        color_ramp.txt_ba_max.setText("23100.0")
+        color_ramp.change_field("BA")
+
+    color_ramp.load_ramps()
 
     dialog.ramps = color_ramp.results
     dialog.txt_ramp.setText(str(dialog.ramps))
