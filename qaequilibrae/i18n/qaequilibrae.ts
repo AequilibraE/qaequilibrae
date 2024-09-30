@@ -1370,12 +1370,6 @@
     </message>
 </context>
 <context>
-    <name>LeastCommonDenominatorDialog</name>
-</context>
-<context>
-    <name>LeastCommonDenominatorProcedure</name>
-</context>
-<context>
     <name>LoadDataset</name>
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_class.py" line="53"/>
@@ -2558,9 +2552,6 @@
         <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>least_common_denominator</name>
 </context>
 <context>
     <name>load_network_info</name>
