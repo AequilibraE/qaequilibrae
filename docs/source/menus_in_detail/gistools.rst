@@ -120,16 +120,6 @@ And this is what it looks like
     :align: center
     :alt: scenario_comparison_map
 
-Lowest Common denominator
--------------------------
-
-When using AequilibraE, one of its premisses is that the zones do not overlay each
-other. Thus in case of overlaying geometries, we have to fix the geometries before
-using them in AequilibraE. 
-
-If we click **GIS > Lowest common denominator** a new window opens and
-we can set the layers we want to overlay the geometries to fix them.
-
 Simple TAG
 ----------
 

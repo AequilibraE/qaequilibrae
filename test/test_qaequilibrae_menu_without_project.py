@@ -206,25 +206,13 @@ def test_gis_scenario_comparison_menu(ae, qtbot):
     assert messagebar.messages[3][-1] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
-def test_gis_lowest_common_denominator_menu(ae, qtbot):
-    from qaequilibrae.modules.gis import LeastCommonDenominatorDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, LeastCommonDenominatorDialog)
-
-    action = ae.menuActions["GIS"][3]
-    assert action.text() == "Lowest common denominator", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-
-
 def test_gis_simple_tag_menu(ae, qtbot):
     from qaequilibrae.modules.gis import SimpleTagDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, SimpleTagDialog)
 
-    action = ae.menuActions["GIS"][4]
+    action = ae.menuActions["GIS"][3]
     assert action.text() == "Simple tag", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
