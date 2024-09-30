@@ -5,7 +5,7 @@ from qaequilibrae.modules.gis.simple_tag_procedure import SimpleTAG
 
 
 @pytest.mark.skip
-def test_simple_tag(ae_with_project):
-    dialog = SimpleTagDialog(ae_with_project)
+def test_simple_tag(pt_project):
+    dialog = SimpleTagDialog(pt_project)
 
     print(dialog.__dict__)
