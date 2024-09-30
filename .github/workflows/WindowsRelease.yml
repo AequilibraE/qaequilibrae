@@ -1,0 +1,56 @@
+name: WindowsReleaseTest
+
+on:  
+  pull_request:
+  schedule:
+    - cron: '0 8 * * 1'
+
+jobs:
+  windows_test:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        version: [qgis-ltr --version=3.34.6, qgis-ltr, qgis]
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install QGIS on Chocolatey
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: install ${{ matrix.version }} -y
+
+      - name: Setup plugin on Latest
+        shell: pwsh
+        if: ${{ (matrix.version == 'qgis')}}
+        run: |
+          Copy-Item "qaequilibrae" -Destination "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae" -Recurse
+          $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
+          $env:QGIS_PLUGIN_IN_CI=1
+          python-qgis.bat -m pip list
+          python-qgis.bat -m pip install -r test/requirements-test.txt
+          Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
+          python-qgis.bat download_extra_packages_class.py
+        # cd packages
+        # python-qgis.bat -m pip list
+        # python-qgis.bat -m pytest D:\a\qaequilibrae\qaequilibrae\test -v
+
+      - name: Setup plugin on LTR
+        shell: pwsh
+        if: ${{ (matrix.version != 'qgis')}}
+        run: |
+          Copy-Item "qaequilibrae" -Destination "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae" -Recurse
+          $env:PATH=(Get-ChildItem -Path "C:\Program Files" -Directory QGIS*).FullName +"\bin;$env:PATH"
+          $env:QGIS_PLUGIN_IN_CI=1
+          python-qgis-ltr.bat -m pip list
+          python-qgis-ltr.bat -m pip install -r test/requirements-test.txt
+          Set-Location "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae"
+          python-qgis-ltr.bat download_extra_packages_class.py
+        # cd packages
+        # python-qgis-ltr.bat -m pip list
+        # python-qgis-ltr.bat -m pytest D:\a\qaequilibrae\qaequilibrae\test\ -v
+
+      - name: Check installation
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages" -Name
