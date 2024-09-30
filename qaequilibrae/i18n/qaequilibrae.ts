@@ -214,11 +214,6 @@
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="178"/>
-        <source>Lowest common denominator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../qaequilibrae.py" line="179"/>
         <source>Simple tag</source>
         <translation type="unfinished"></translation>
     </message>
@@ -228,22 +223,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="183"/>
+        <location filename="../qaequilibrae.py" line="182"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="190"/>
+        <location filename="../qaequilibrae.py" line="189"/>
         <source>Show project info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="345"/>
+        <location filename="../qaequilibrae.py" line="344"/>
         <source>You need to load a project first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="348"/>
+        <location filename="../qaequilibrae.py" line="347"/>
         <source>You need to close the project currently open first</source>
         <translation type="unfinished"></translation>
     </message>
@@ -268,7 +263,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="353"/>
+        <location filename="../qaequilibrae.py" line="352"/>
         <source>You need to import a GTFS feed first</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1376,49 +1371,9 @@
 </context>
 <context>
     <name>LeastCommonDenominatorDialog</name>
-    <message>
-        <location filename="../modules/gis/least_common_denominator_dialog.py" line="73"/>
-        <source>Input data not provided correctly</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/least_common_denominator_dialog.py" line="86"/>
-        <source>ComboBox with ilegal value</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/least_common_denominator_dialog.py" line="96"/>
-        <source>It is not sensible to have two point layers for this analysis</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/least_common_denominator_dialog.py" line="104"/>
-        <source>Input data not provided correctly. </source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>LeastCommonDenominatorProcedure</name>
-    <message>
-        <location filename="../modules/gis/least_common_denominator_procedure.py" line="60"/>
-        <source>Building Spatial Index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/least_common_denominator_procedure.py" line="71"/>
-        <source>Duplicating Layers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/least_common_denominator_procedure.py" line="104"/>
-        <source>Running Analysis</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/least_common_denominator_procedure.py" line="155"/>
-        <source>Running Analysis ({}/{})</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>LoadDataset</name>
@@ -2606,36 +2561,6 @@
 </context>
 <context>
     <name>least_common_denominator</name>
-    <message>
-        <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="19"/>
-        <source>AequilibraE  -  Least common denominator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="31"/>
-        <source>Layer 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="122"/>
-        <source>Data field</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="135"/>
-        <source>Layer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="90"/>
-        <source>Layer 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../modules/gis/forms/ui_least_common_denominator.ui" line="162"/>
-        <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>load_network_info</name>
@@ -3221,7 +3146,7 @@
 <context>
     <name>ui_transponet_construction</name>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="19"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
         <source>AequilibraE - Add zoning layer to project</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3241,7 +3166,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="74"/>
         <source>Layer</source>
         <translation type="unfinished"></translation>
     </message>
