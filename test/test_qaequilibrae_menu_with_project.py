@@ -247,27 +247,13 @@ def test_gis_scenario_comparison_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-def test_gis_lowest_common_denominator_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.gis import LeastCommonDenominatorDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, LeastCommonDenominatorDialog)
-
-    action = ae_with_project.menuActions["GIS"][3]
-    assert action.text() == "Lowest common denominator", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
-
 def test_gis_simple_tag_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.gis import SimpleTagDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, SimpleTagDialog)
 
-    action = ae_with_project.menuActions["GIS"][4]
+    action = ae_with_project.menuActions["GIS"][3]
     assert action.text() == "Simple tag", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()

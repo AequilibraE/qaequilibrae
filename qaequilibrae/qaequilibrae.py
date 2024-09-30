@@ -21,7 +21,7 @@ from uuid import uuid4
 from qaequilibrae.message import messages
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, run_show_project_data
-from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_lcd, run_import_gtfs
+from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs
 from qaequilibrae.modules.menu_actions import (
     run_distribution_models,
     run_tsp,
@@ -175,7 +175,6 @@ class AequilibraEMenu:
         self.add_menu_action("GIS", self.tr("Desire Lines"), partial(run_desire_lines, self))
         self.add_menu_action("GIS", self.tr("Stacked Bandwidth"), partial(run_stacked_bandwidths, self))
         self.add_menu_action("GIS", self.tr("Scenario Comparison"), partial(run_scenario_comparison, self))
-        self.add_menu_action("GIS", self.tr("Lowest common denominator"), partial(run_lcd, self))
         self.add_menu_action("GIS", self.tr("Simple tag"), partial(run_tag, self))
 
         # # ########################################################################
