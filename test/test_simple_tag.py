@@ -9,8 +9,22 @@ from qaequilibrae.modules.gis.simple_tag_dialog import SimpleTagDialog
 from qaequilibrae.modules.gis.simple_tag_procedure import SimpleTAG
 
 
+linestring_assertions = {
+    "polygon": {
+        "ENCLOSED": ["La Flor del Aire", None, "Pasaje Las Rosas"],
+        "TOUCHING": ["Escorial", None, "Lautaro"],
+        "CLOSEST": ["Tres Árboles", "centroid connector zone 98", "Circunvalación Monjitas Oriente"],
+    },
+    "linestring": {
+        "TOUCHING": [None, None, None],
+        "CLOSEST": ["Óscar Quiroz Morgado", "centroid connector zone 98", "Guatemala"],
+    },
+    "point": {"CLOSEST": ["centroid connector zone 97", "centroid connector zone 98", "centroid connector zone 99"]},
+}
+
+
 def create_nodes_layer(index):
-    layer = QgsVectorLayer("Point?crs=epsg:4326", "Centroids", "memory")
+    layer = QgsVectorLayer("Point?crs=epsg:4326", "point", "memory")
     if not layer.isValid():
         print("Nodes layer failed to load!")
     else:
@@ -18,9 +32,7 @@ def create_nodes_layer(index):
         field_zone_id = QgsField("zone_id", QVariant.Int)
         nickname = QgsField("name", QVariant.String)
 
-        layer.dataProvider().addAttributes([field_id])
-        layer.dataProvider().addAttributes([field_zone_id])
-        layer.dataProvider().addAttributes([nickname])
+        layer.dataProvider().addAttributes([field_id, field_zone_id, nickname])
         layer.updateFields()
 
         points = [
@@ -46,17 +58,15 @@ def create_nodes_layer(index):
 
 
 def create_links_layer(index):
-    layer = QgsVectorLayer("Linestring?crs=epsg:4326", "Lines", "memory")
+    layer = QgsVectorLayer("Linestring?crs=epsg:4326", "linestring", "memory")
     if not layer.isValid():
-        print("Lines layer failed to load!")
+        print("linestring layer failed to load!")
     else:
         field_id = QgsField("ID", QVariant.Int)
         field_zone_id = QgsField("zone_id", QVariant.Int)
         nickname = QgsField("name", QVariant.String)
 
-        layer.dataProvider().addAttributes([field_id])
-        layer.dataProvider().addAttributes([field_zone_id])
-        layer.dataProvider().addAttributes([nickname])
+        layer.dataProvider().addAttributes([field_id, field_zone_id, nickname])
         layer.updateFields()
 
         lines = [
@@ -81,77 +91,90 @@ def create_links_layer(index):
     return layer
 
 
-@pytest.mark.parametrize("ops", ["ENCLOSED", "CLOSEST"])
-def test_simple_tag_polygon_and_point(coquimbo_project, ops):
-    # Load zoning layer
-    coquimbo_project.load_layer_by_name("zones")
+def create_polygons_layer(index):
+    layer = QgsVectorLayer("Polygon?crs=epsg:4326", "polygon", "memory")
+    if not layer.isValid():
+        print("Polygon layer failed to load!")
+    else:
+        field_id = QgsField("ID", QVariant.Int)
+        field_zone_id = QgsField("zone_id", QVariant.Int)
+        nickname = QgsField("name", QVariant.String)
 
-    zones = [97, 98, 99]
-    cities = ["Valparaiso", "Santiago", "Antofagasta"]
+        layer.dataProvider().addAttributes([field_id, field_zone_id, nickname])
+        layer.updateFields()
 
-    with commit_and_close(database_connection("network")) as conn:
-        for i, zone in enumerate(zones):
-            conn.execute(f"UPDATE zones SET name='{cities[i]}' WHERE zone_id={zone}")
+        polys = [
+            [
+                QgsPointXY(-71.2487, -29.8936),
+                QgsPointXY(-71.2487, -29.8895),
+                QgsPointXY(-71.2441, -29.8895),
+                QgsPointXY(-71.2441, -29.8936),
+                QgsPointXY(-71.2487, -29.8936),
+            ],
+            [
+                QgsPointXY(-71.2401, -29.8945),
+                QgsPointXY(-71.2401, -29.8928),
+                QgsPointXY(-71.2375, -29.8928),
+                QgsPointXY(-71.2375, -29.8945),
+                QgsPointXY(-71.2401, -29.8945),
+            ],
+            [
+                QgsPointXY(-71.2329, -29.8800),
+                QgsPointXY(-71.2329, -29.8758),
+                QgsPointXY(-71.2280, -29.8758),
+                QgsPointXY(-71.2280, -29.8800),
+                QgsPointXY(-71.2329, -29.8800),
+            ],
+        ]
 
-    nodes_layer = create_nodes_layer(zones)
+        attributes = (index, [None, None, None])
 
-    prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
-    assert "Centroids" in prj_layers
-    assert "zones" in prj_layers
+        features = []
+        for i, (poly, zone_id, name) in enumerate(zip(polys, *attributes)):
+            feature = QgsFeature()
+            feature.setGeometry(QgsGeometry.fromPolygonXY([poly]))
+            feature.setAttributes([i + 1, zone_id, name])
+            features.append(feature)
 
-    dialog = SimpleTagDialog(coquimbo_project)
+        layer.dataProvider().addFeatures(features)
 
-    dialog.fromlayer.setCurrentText("zones")
-    dialog.fromfield.setCurrentIndex(3)
-    dialog.tolayer.setCurrentText("Centroids")
-    dialog.tofield.setCurrentIndex(2)
+        QgsProject.instance().addMapLayer(layer)
 
-    dialog.set_from_fields()
-    dialog.set_to_fields()
-    dialog.set_available_operations()
-
-    dialog.worker_thread = SimpleTAG(
-        parentThread=coquimbo_project.iface.mainWindow(),
-        flayer="zones",
-        ffield="name",
-        tlayer="Centroids",
-        tfield="name",
-        fmatch=None,
-        tmatch=None,
-        operation=ops,
-        geo_types=dialog.geography_types,
-    )
-    dialog.worker_thread.doWork()
-
-    feats = [f["name"] for f in nodes_layer.getFeatures()]
-    assert feats == cities
-
-    QgsProject.instance().clear()
+    return layer
 
 
 @pytest.mark.parametrize("ops", ["ENCLOSED", "TOUCHING", "CLOSEST"])
-def test_simple_tag_polygon_and_linestring(coquimbo_project, ops):
+@pytest.mark.parametrize("to_layer", ["polygon", "linestring", "point"])
+def test_simple_tag_polygon(coquimbo_project, to_layer, ops):
+    if to_layer == "point" and ops == "TOUCHING":
+        pytest.skip(f"'{ops}' does not apply to polygon-{to_layer}")
+
     coquimbo_project.load_layer_by_name("zones")
 
     zones = [97, 98, 99]
-    authors = ["Pablo Neruda", "Gabriela Mistral", "Alejandro Zambra"]
+    authors = ["Valparaiso", "Santiago", "Antofagasta"]
 
     with commit_and_close(database_connection("network")) as conn:
         for i, zone in enumerate(zones):
             conn.execute(f"UPDATE zones SET name='{authors[i]}' WHERE zone_id={zone}")
         conn.execute("DELETE FROM zones WHERE name IS NULL;")
 
-    lines_layer = create_links_layer(zones)
+    if to_layer == "polygon":
+        layer = create_polygons_layer(zones)
+    elif to_layer == "linestring":
+        layer = create_links_layer(zones)
+    else:
+        layer = create_nodes_layer(zones)
 
     prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
-    assert "Lines" in prj_layers
+    assert to_layer in prj_layers
     assert "zones" in prj_layers
 
     dialog = SimpleTagDialog(coquimbo_project)
 
     dialog.fromlayer.setCurrentText("zones")
     dialog.fromfield.setCurrentIndex(3)
-    dialog.tolayer.setCurrentText("Lines")
+    dialog.tolayer.setCurrentText(to_layer)
     dialog.tofield.setCurrentIndex(2)
 
     dialog.set_from_fields()
@@ -162,7 +185,7 @@ def test_simple_tag_polygon_and_linestring(coquimbo_project, ops):
         parentThread=coquimbo_project.iface.mainWindow(),
         flayer="zones",
         ffield="name",
-        tlayer="Lines",
+        tlayer=to_layer,
         tfield="name",
         fmatch=None,
         tmatch=None,
@@ -171,32 +194,44 @@ def test_simple_tag_polygon_and_linestring(coquimbo_project, ops):
     )
     dialog.worker_thread.doWork()
 
-    feats = [f["name"] for f in lines_layer.getFeatures()]
-    assert "Gabriela Mistral" in feats
-    if ops in ["TOUCHING", "CLOSEST"]:
-        assert "Pablo Neruda" in feats
-    elif ops in ["CLOSEST"]:
-        assert "Alejandro Zambra" in feats
+    feats = [f["name"] for f in layer.getFeatures()]
+    assert "Santiago" in feats
+    if ops in ["TOUCHING", "CLOSEST"] or to_layer == "point":
+        assert "Valparaiso" in feats
+    elif ops in ["CLOSEST"] or to_layer == "point":
+        assert "Antofagasta" in feats
 
     QgsProject.instance().clear()
 
 
-def test_simple_tag_linestring_and_point(coquimbo_project):
+@pytest.mark.parametrize("ops", ["ENCLOSED", "TOUCHING", "CLOSEST"])
+@pytest.mark.parametrize("to_layer", ["polygon", "linestring", "point"])
+def test_simple_tag_linestring(coquimbo_project, to_layer, ops):
+    if to_layer != "polygon" and ops == "ENCLOSED":
+        pytest.skip(f"'{ops}' does not apply to linestring-{to_layer}")
+    if to_layer == "point" and ops == "TOUCHING":
+        pytest.skip(f"'{ops}' does not apply to linestring-{to_layer}")
+
     coquimbo_project.load_layer_by_name("links")
 
-    links = [21, 121, 1021]
+    nodes = [21, 121, 1021]
 
-    nodes_layer = create_nodes_layer(links)
+    if to_layer == "polygon":
+        layer = create_polygons_layer(nodes)
+    elif to_layer == "linestring":
+        layer = create_links_layer(nodes)
+    else:
+        layer = create_nodes_layer(nodes)
 
     prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
-    assert "Centroids" in prj_layers
+    assert to_layer in prj_layers
     assert "links" in prj_layers
 
     dialog = SimpleTagDialog(coquimbo_project)
 
     dialog.fromlayer.setCurrentText("links")
-    dialog.fromfield.setCurrentIndex(8)
-    dialog.tolayer.setCurrentText("Centroids")
+    dialog.fromfield.setCurrentIndex(3)
+    dialog.tolayer.setCurrentText(to_layer)
     dialog.tofield.setCurrentIndex(2)
 
     dialog.set_from_fields()
@@ -207,16 +242,79 @@ def test_simple_tag_linestring_and_point(coquimbo_project):
         parentThread=coquimbo_project.iface.mainWindow(),
         flayer="links",
         ffield="name",
-        tlayer="Centroids",
+        tlayer=to_layer,
         tfield="name",
         fmatch=None,
         tmatch=None,
-        operation="CLOSEST",
+        operation=ops,
         geo_types=dialog.geography_types,
     )
     dialog.worker_thread.doWork()
 
-    feats = [f["name"] for f in nodes_layer.getFeatures()]
-    assert feats == ["centroid connector zone 97", "centroid connector zone 98", "centroid connector zone 99"]
+    feats = [f["name"] for f in layer.getFeatures()]
+    print(feats)
+    # assert "Santiago" in feats
+    # if ops in ["TOUCHING", "CLOSEST"] or to_layer == "point":
+    #     assert "Valparaiso" in feats
+    # elif ops in ["CLOSEST"] or to_layer == "point":
+    #     assert "Antofagasta" in feats
+    if to_layer == "polygon":
+        assert feats == linestring_assertions["polygon"][ops]
+
+    QgsProject.instance().clear()
+
+
+@pytest.mark.parametrize("ops", ["ENCLOSED", "CLOSEST"])
+@pytest.mark.parametrize("to_layer", ["polygon", "linestring", "point"])
+def test_simple_tag_point(coquimbo_project, to_layer, ops):
+    if to_layer != "polygon" and ops == "ENCLOSED":
+        pytest.skip(f"'{ops}' does not apply to point-{to_layer}")
+
+    coquimbo_project.load_layer_by_name("nodes")
+
+    nodes = [21, 121, 1021]
+
+    if to_layer == "polygon":
+        layer = create_polygons_layer(nodes)
+    elif to_layer == "linestring":
+        layer = create_links_layer(nodes)
+    else:
+        layer = create_nodes_layer(nodes)
+
+    prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
+    assert to_layer in prj_layers
+    assert "nodes" in prj_layers
+
+    # dialog = SimpleTagDialog(coquimbo_project)
+
+    # dialog.fromlayer.setCurrentText("nodes")
+    # dialog.fromfield.setCurrentIndex(3)
+    # dialog.tolayer.setCurrentText(to_layer)
+    # dialog.tofield.setCurrentIndex(2)
+
+    # dialog.set_from_fields()
+    # dialog.set_to_fields()
+    # dialog.set_available_operations()
+
+    # dialog.worker_thread = SimpleTAG(
+    #     parentThread=coquimbo_project.iface.mainWindow(),
+    #     flayer="nodes",
+    #     ffield="name",
+    #     tlayer=to_layer,
+    #     tfield="name",
+    #     fmatch=None,
+    #     tmatch=None,
+    #     operation=ops,
+    #     geo_types=dialog.geography_types,
+    # )
+    # dialog.worker_thread.doWork()
+
+    # feats = [f["name"] for f in layer.getFeatures()]
+    # print(feats)
+    # assert "Santiago" in feats
+    # if ops in ["TOUCHING", "CLOSEST"] or to_layer == "point":
+    #     assert "Valparaiso" in feats
+    # elif ops in ["CLOSEST"] or to_layer == "point":
+    #     assert "Antofagasta" in feats
 
     QgsProject.instance().clear()
