@@ -139,6 +139,7 @@ def test_simple_tag_polygon_and_linestring(coquimbo_project, ops):
     with commit_and_close(database_connection("network")) as conn:
         for i, zone in enumerate(zones):
             conn.execute(f"UPDATE zones SET name='{authors[i]}' WHERE zone_id={zone}")
+        conn.execute("DELETE FROM zones WHERE name IS NULL;")
 
     lines_layer = create_links_layer(zones)
 
@@ -174,9 +175,8 @@ def test_simple_tag_polygon_and_linestring(coquimbo_project, ops):
     assert "Gabriela Mistral" in feats
     if ops in ["TOUCHING", "CLOSEST"]:
         assert "Pablo Neruda" in feats
-    # elif in ["CLOSEST"]:
-    #     assert "Alejandro Zambra" in feats
-    print(feats)
+    elif ops in ["CLOSEST"]:
+        assert "Alejandro Zambra" in feats
 
     QgsProject.instance().clear()
 

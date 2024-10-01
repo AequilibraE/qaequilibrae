@@ -191,7 +191,7 @@ class SimpleTAG(WorkerThread):
                         aux = intersection.length()
                     else:
                         aux = intersection.area()
-                    if aux > current_max[1]:
+                    if aux > current_max[1] and aux > 0:
                         current_max = [self.from_val[n], aux]
             if current_max[0] is not None:
                 self.all_attr[feat.id()] = current_max[0]
