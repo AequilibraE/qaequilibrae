@@ -137,7 +137,7 @@ Notice that depending on the operation one want to perform, not all methods are
 available.
 
 .. image:: ../images/simple_tag.png
-    :width: 1142
+    :width: 473
     :align: center
     :alt: simple tag UI
 
