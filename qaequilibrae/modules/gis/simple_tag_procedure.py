@@ -186,11 +186,11 @@ class SimpleTAG(WorkerThread):
 
             for n in nearest:
                 intersection = self.from_features[n].geometry().intersection(geom)
-                if intersection.geometry() is not None:
+                if intersection is not None:
                     if intersec == "length":
-                        aux = intersection.geometry().length()
+                        aux = intersection.length()
                     else:
-                        aux = intersection.geometry().area()
+                        aux = intersection.area()
                     if aux > current_max[1]:
                         current_max = [self.from_val[n], aux]
             if current_max[0] is not None:

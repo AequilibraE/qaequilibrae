@@ -1,6 +1,3 @@
-import sqlite3
-from pathlib import Path
-from os.path import join
 import pytest
 from aequilibrae.utils.db_utils import commit_and_close
 from aequilibrae.project.database_connection import database_connection
@@ -38,6 +35,42 @@ def create_nodes_layer(index):
         for i, (point, zone_id, name) in enumerate(zip(points, *attributes)):
             feature = QgsFeature()
             feature.setGeometry(QgsGeometry.fromPointXY(point))
+            feature.setAttributes([i + 1, zone_id, name])
+            features.append(feature)
+
+        layer.dataProvider().addFeatures(features)
+
+        QgsProject.instance().addMapLayer(layer)
+
+    return layer
+
+
+def create_links_layer(index):
+    layer = QgsVectorLayer("Linestring?crs=epsg:4326", "Lines", "memory")
+    if not layer.isValid():
+        print("Lines layer failed to load!")
+    else:
+        field_id = QgsField("ID", QVariant.Int)
+        field_zone_id = QgsField("zone_id", QVariant.Int)
+        nickname = QgsField("name", QVariant.String)
+
+        layer.dataProvider().addAttributes([field_id])
+        layer.dataProvider().addAttributes([field_zone_id])
+        layer.dataProvider().addAttributes([nickname])
+        layer.updateFields()
+
+        lines = [
+            [QgsPointXY(-71.2517, -29.8880), QgsPointXY(-71.2498, -29.8944)],
+            [QgsPointXY(-71.2389, -29.8943), QgsPointXY(-71.2342, -29.8933)],
+            [QgsPointXY(-71.2397, -29.8836), QgsPointXY(-71.2341, -29.8805)],
+        ]
+
+        attributes = (index, [None, None, None])
+
+        features = []
+        for i, (line, zone_id, name) in enumerate(zip(lines, *attributes)):
+            feature = QgsFeature()
+            feature.setGeometry(QgsGeometry.fromPolylineXY(line))
             feature.setAttributes([i + 1, zone_id, name])
             features.append(feature)
 
@@ -96,23 +129,56 @@ def test_simple_tag_polygon_and_point(coquimbo_project, ops):
     QgsProject.instance().clear()
 
 
-@pytest.mark.skip("Not ready")
-def test_simple_tag_polygon_and_linestring(coquimbo_project):
-
+@pytest.mark.parametrize("ops", ["ENCLOSED", "TOUCHING", "CLOSEST"])
+def test_simple_tag_polygon_and_linestring(coquimbo_project, ops):
     coquimbo_project.load_layer_by_name("zones")
 
+    zones = [97, 98, 99]
     authors = ["Pablo Neruda", "Gabriela Mistral", "Alejandro Zambra"]
 
     with commit_and_close(database_connection("network")) as conn:
-        for i, zone in enumerate([97, 98, 99]):
+        for i, zone in enumerate(zones):
             conn.execute(f"UPDATE zones SET name='{authors[i]}' WHERE zone_id={zone}")
 
-    # links_layer =
+    lines_layer = create_links_layer(zones)
 
-    zones = join(coquimbo_project.project.project_base_path, "project_database.sqlite")
-    con = sqlite3.connect(zones)
+    prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
+    assert "Lines" in prj_layers
+    assert "zones" in prj_layers
 
-    print(con.execute("SELECT zone_id, name, population FROM zones WHERE zone_id IN (97, 98, 99)").fetchall())
+    dialog = SimpleTagDialog(coquimbo_project)
+
+    dialog.fromlayer.setCurrentText("zones")
+    dialog.fromfield.setCurrentIndex(3)
+    dialog.tolayer.setCurrentText("Lines")
+    dialog.tofield.setCurrentIndex(2)
+
+    dialog.set_from_fields()
+    dialog.set_to_fields()
+    dialog.set_available_operations()
+
+    dialog.worker_thread = SimpleTAG(
+        parentThread=coquimbo_project.iface.mainWindow(),
+        flayer="zones",
+        ffield="name",
+        tlayer="Lines",
+        tfield="name",
+        fmatch=None,
+        tmatch=None,
+        operation=ops,
+        geo_types=dialog.geography_types,
+    )
+    dialog.worker_thread.doWork()
+
+    feats = [f["name"] for f in lines_layer.getFeatures()]
+    assert "Gabriela Mistral" in feats
+    if ops in ["TOUCHING", "CLOSEST"]:
+        assert "Pablo Neruda" in feats
+    # elif in ["CLOSEST"]:
+    #     assert "Alejandro Zambra" in feats
+    print(feats)
+
+    QgsProject.instance().clear()
 
 
 def test_simple_tag_linestring_and_point(coquimbo_project):
