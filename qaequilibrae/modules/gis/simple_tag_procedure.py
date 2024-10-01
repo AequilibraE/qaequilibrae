@@ -55,8 +55,8 @@ class SimpleTAG(WorkerThread):
         self.ProgressText.emit(self.tr("Initializing. Sit tight"))
         self.ProgressValue.emit(0)
 
-        EPSG1 = QgsCoordinateReferenceSystem(int(self.from_layer.crs().authid().split(":")[1]))
-        EPSG2 = QgsCoordinateReferenceSystem(int(self.to_layer.crs().authid().split(":")[1]))
+        EPSG1 = QgsCoordinateReferenceSystem(f"EPSG:{int(self.from_layer.crs().authid().split(":")[1])}")
+        EPSG2 = QgsCoordinateReferenceSystem(f"EPSG:{int(self.to_layer.crs().authid().split(":")[1])}")
         if EPSG1 != EPSG2:
             self.transform = QgsCoordinateTransform(EPSG1, EPSG2, QgsProject.instance())
 
