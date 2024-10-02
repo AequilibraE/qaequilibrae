@@ -10,39 +10,25 @@ from qgis.core import QgsMessageLog
 
 class DownloadAll:
     must_remove = [
-        "numpy",
-        "scipy",
-        "pandas",
-        "charset_normalizer",
-        "click_plugins",
-        "click",
         "certifi",
-        "cligj",
-        "colorama",
-        "fiona",
+        "charset_normalizer",
+        "cpuinfo",
+        "geopandas",
+        "idna",
+        "numpy",
+        "packaging",
+        "pandas",
+        "py_cpuinfo",
+        "pyaml",
+        "pyogrio",
         "pyproj",
         "pytz",
-        "requests",
-        "rtree",
-        "setuptools",
-        "shapely",
-        "six",
-        "tzdata",
-        "zipp",
-        "attr",
-        "attrs",
-        "dateutil",
-        "python_dateutil",
-        "idna",
-        "importlib_metadata",
-        "pyaml",
-        "urllib3",
-        "packaging",
-        "cpuinfo",
-        "py-cpuinfo",
-        "geopandas",
         "pyyaml",
-        "pyogrio",
+        "requests",
+        "scipy",
+        "shapely",
+        "tzdata",
+        "urllib3",
     ]
 
     def __init__(self):
@@ -157,3 +143,12 @@ class DownloadAll:
                 if pkg.lower() in fldr.lower():
                     if isdir(join(self.target_folder, fldr)):
                         shutil.rmtree(join(self.target_folder, fldr))
+
+
+if __name__ == "__main__":
+    result = DownloadAll().install()
+    output = ("".join([str(x).upper() for x in result]))
+    
+    print(output)
+
+    assert "ERROR" not in output
