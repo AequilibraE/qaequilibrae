@@ -55,8 +55,8 @@ class SimpleTAG(WorkerThread):
         self.ProgressText.emit(self.tr("Initializing. Sit tight"))
         self.ProgressValue.emit(0)
 
-        EPSG1 = QgsCoordinateReferenceSystem(int(self.from_layer.crs().authid().split(":")[1]))
-        EPSG2 = QgsCoordinateReferenceSystem(int(self.to_layer.crs().authid().split(":")[1]))
+        EPSG1 = QgsCoordinateReferenceSystem(f"EPSG:{int(self.from_layer.crs().authid().split(":")[1])}")
+        EPSG2 = QgsCoordinateReferenceSystem(f"EPSG:{int(self.to_layer.crs().authid().split(":")[1])}")
         if EPSG1 != EPSG2:
             self.transform = QgsCoordinateTransform(EPSG1, EPSG2, QgsProject.instance())
 
@@ -186,12 +186,12 @@ class SimpleTAG(WorkerThread):
 
             for n in nearest:
                 intersection = self.from_features[n].geometry().intersection(geom)
-                if intersection.geometry() is not None:
+                if intersection is not None:
                     if intersec == "length":
-                        aux = intersection.geometry().length()
+                        aux = intersection.length()
                     else:
-                        aux = intersection.geometry().area()
-                    if aux > current_max[1]:
+                        aux = intersection.area()
+                    if aux > current_max[1] and aux > 0:
                         current_max = [self.from_val[n], aux]
             if current_max[0] is not None:
                 self.all_attr[feat.id()] = current_max[0]

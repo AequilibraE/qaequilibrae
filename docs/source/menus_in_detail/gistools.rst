@@ -120,19 +120,25 @@ And this is what it looks like
     :align: center
     :alt: scenario_comparison_map
 
-Lowest Common denominator
--------------------------
-
-When using AequilibraE, one of its premisses is that the zones do not overlay each
-other. Thus in case of overlaying geometries, we have to fix the geometries before
-using them in AequilibraE. 
-
-If we click **GIS > Lowest common denominator** a new window opens and
-we can set the layers we want to overlay the geometries to fix them.
-
-Simple TAG
+Simple tag
 ----------
 
-**GIS > Simple TAG** works as a spatial join tool in AequilibraE.
-One of its usages, for example, is to determine in which *zone_id* the network
-node is in.
+**GIS > Simple tag** works as a spatial join tool in AequilibraE that allows you
+to join useful information between layers.
+
+Suppose you have a nodes layer with a 'name' column only with ``NULL`` values,
+and a zoning layer with an analogous column 'name' but filled with actual names.
+We can join the information from the zoning layer into the nodes layer using 
+Simple tag.
+
+We start selecting the layer and the field from which we want to import the
+data, and then selecting the layer and the field we want to 'paste' the data.
+Notice that depending on the operation one want to perform, not all methods are
+available.
+
+.. image:: ../images/simple_tag.png
+    :align: center
+    :alt: simple tag UI
+
+Be aware that the existence of triggers in the project database might affect the
+performance of Simple tag.
