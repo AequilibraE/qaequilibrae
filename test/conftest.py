@@ -104,3 +104,22 @@ def load_layers_from_csv():
         print("Open layer failed to load!")
     else:
         QgsProject.instance().addMapLayer(datalayer)
+
+
+@pytest.fixture
+def create_example(folder_path):
+    from aequilibrae.utils.create_example import create_example
+
+    project = create_example(folder_path, "coquimbo")
+    project.close()
+    yield folder_path
+
+
+@pytest.fixture
+def coquimbo_project(qgis_iface, create_example) -> AequilibraEMenu:
+    ae = AequilibraEMenu(qgis_iface)
+    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+
+    _run_load_project_from_path(ae, create_example)
+    yield ae
+    ae.run_close_project()
