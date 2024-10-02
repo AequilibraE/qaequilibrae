@@ -22,6 +22,19 @@ linestring_assertions = {
     "point": {"CLOSEST": ["centroid connector zone 97", "centroid connector zone 98", "centroid connector zone 99"]},
 }
 
+point_assertions = {
+    "polygon": {
+        "ENCLOSED": ["rs", None, "lr"],
+        "CLOSEST": ["r", "uz", "rt"],
+    },
+    "linestring": {
+        "CLOSEST": ["rs", "z", "lr"],
+    },
+    "point": {"CLOSEST": ["z", "z", "z"]},
+}
+
+places = ["Valparaiso", "Santiago", "Antofagasta"]
+
 
 def create_nodes_layer(index):
     layer = QgsVectorLayer("Point?crs=epsg:4326", "point", "memory")
@@ -152,11 +165,10 @@ def test_simple_tag_polygon(coquimbo_project, to_layer, ops):
     coquimbo_project.load_layer_by_name("zones")
 
     zones = [97, 98, 99]
-    authors = ["Valparaiso", "Santiago", "Antofagasta"]
 
     with commit_and_close(database_connection("network")) as conn:
         for i, zone in enumerate(zones):
-            conn.execute(f"UPDATE zones SET name='{authors[i]}' WHERE zone_id={zone}")
+            conn.execute(f"UPDATE zones SET name='{places[i]}' WHERE zone_id={zone}")
         conn.execute("DELETE FROM zones WHERE name IS NULL;")
 
     if to_layer == "polygon":
@@ -252,14 +264,7 @@ def test_simple_tag_linestring(coquimbo_project, to_layer, ops):
     dialog.worker_thread.doWork()
 
     feats = [f["name"] for f in layer.getFeatures()]
-    print(feats)
-    # assert "Santiago" in feats
-    # if ops in ["TOUCHING", "CLOSEST"] or to_layer == "point":
-    #     assert "Valparaiso" in feats
-    # elif ops in ["CLOSEST"] or to_layer == "point":
-    #     assert "Antofagasta" in feats
-    if to_layer == "polygon":
-        assert feats == linestring_assertions["polygon"][ops]
+    assert feats == linestring_assertions[to_layer][ops]
 
     QgsProject.instance().clear()
 
@@ -270,9 +275,9 @@ def test_simple_tag_point(coquimbo_project, to_layer, ops):
     if to_layer != "polygon" and ops == "ENCLOSED":
         pytest.skip(f"'{ops}' does not apply to point-{to_layer}")
 
-    coquimbo_project.load_layer_by_name("nodes")
+    nodes = [21, 121, 12321]
 
-    nodes = [21, 121, 1021]
+    coquimbo_project.load_layer_by_name("nodes")
 
     if to_layer == "polygon":
         layer = create_polygons_layer(nodes)
@@ -285,36 +290,31 @@ def test_simple_tag_point(coquimbo_project, to_layer, ops):
     assert to_layer in prj_layers
     assert "nodes" in prj_layers
 
-    # dialog = SimpleTagDialog(coquimbo_project)
+    dialog = SimpleTagDialog(coquimbo_project)
 
-    # dialog.fromlayer.setCurrentText("nodes")
-    # dialog.fromfield.setCurrentIndex(3)
-    # dialog.tolayer.setCurrentText(to_layer)
-    # dialog.tofield.setCurrentIndex(2)
+    dialog.fromlayer.setCurrentText("nodes")
+    dialog.fromfield.setCurrentIndex(4)
+    dialog.tolayer.setCurrentText(to_layer)
+    dialog.tofield.setCurrentIndex(2)
 
-    # dialog.set_from_fields()
-    # dialog.set_to_fields()
-    # dialog.set_available_operations()
+    dialog.set_from_fields()
+    dialog.set_to_fields()
+    dialog.set_available_operations()
 
-    # dialog.worker_thread = SimpleTAG(
-    #     parentThread=coquimbo_project.iface.mainWindow(),
-    #     flayer="nodes",
-    #     ffield="name",
-    #     tlayer=to_layer,
-    #     tfield="name",
-    #     fmatch=None,
-    #     tmatch=None,
-    #     operation=ops,
-    #     geo_types=dialog.geography_types,
-    # )
-    # dialog.worker_thread.doWork()
+    dialog.worker_thread = SimpleTAG(
+        parentThread=coquimbo_project.iface.mainWindow(),
+        flayer="nodes",
+        ffield="link_types",
+        tlayer=to_layer,
+        tfield="name",
+        fmatch=None,
+        tmatch=None,
+        operation=ops,
+        geo_types=dialog.geography_types,
+    )
+    dialog.worker_thread.doWork()
 
-    # feats = [f["name"] for f in layer.getFeatures()]
-    # print(feats)
-    # assert "Santiago" in feats
-    # if ops in ["TOUCHING", "CLOSEST"] or to_layer == "point":
-    #     assert "Valparaiso" in feats
-    # elif ops in ["CLOSEST"] or to_layer == "point":
-    #     assert "Antofagasta" in feats
+    feats = [f["name"] for f in layer.getFeatures()]
+    assert feats == point_assertions[to_layer][ops]
 
     QgsProject.instance().clear()
