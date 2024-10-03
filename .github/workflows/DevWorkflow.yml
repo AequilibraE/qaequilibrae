@@ -31,4 +31,4 @@ jobs:
           . /tmp/venv_test/bin/activate
           export QT_QPA_PLATFORM=offscreen
           pwd
-          python3 -m pytest --cov-report term --cov-config=.coveragerc --cov=qaequilibrae test -v
+          python3 -m pytest --cov-config=.coveragerc --cov=qaequilibrae test
