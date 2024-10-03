@@ -33,7 +33,5 @@ def test_desirelines(ae_with_project, is_delaunay):
     assert line_layer in prj_layers
 
     layer = QgsProject.instance().mapLayersByName(line_layer)[0]
-    if is_delaunay:
-        assert layer.featureCount() == 62
-    else:
-        assert layer.featureCount() == 264
+    target = 62 if is_delaunay else 264
+    assert layer.featureCount() == target
