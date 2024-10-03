@@ -1,27 +1,6 @@
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication
-from qgis.core import QgsProject, QgsVectorLayer
 from qaequilibrae.modules.paths_procedures.show_shortest_path_dialog import ShortestPathDialog
-
-
-def load_layers():
-    path_to_gpkg = "test/data/SiouxFalls_project/SiouxFalls.gpkg"
-    # append the layername part
-    gpkg_links_layer = path_to_gpkg + "|layername=links"
-    gpkg_nodes_layer = path_to_gpkg + "|layername=nodes"
-
-    linkslayer = QgsVectorLayer(gpkg_links_layer, "Links layer", "ogr")
-    nodeslayer = QgsVectorLayer(gpkg_nodes_layer, "Nodes layer", "ogr")
-
-    if not linkslayer.isValid():
-        print("Links layer failed to load!")
-    else:
-        QgsProject.instance().addMapLayer(linkslayer)
-
-    if not nodeslayer.isValid():
-        print("Nodes layer failed to load!")
-    else:
-        QgsProject.instance().addMapLayer(nodeslayer)
 
 
 def wait_for_active_window(qtbot, previousClass):

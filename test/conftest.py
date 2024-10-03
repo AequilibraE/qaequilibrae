@@ -1,11 +1,12 @@
 import pytest
 from os.path import join
+from os import makedirs
 from uuid import uuid4
-from shutil import copytree
+from shutil import copytree, copyfile
 from PyQt5.QtCore import QTimer, QVariant, Qt
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
-from qgis.core import QgsPointXY, QgsGeometry
+from qgis.core import QgsPointXY, QgsGeometry, QgsCoordinateReferenceSystem
 from qaequilibrae.qaequilibrae import AequilibraEMenu
 from qaequilibrae.modules.common_tools import ReportDialog
 
@@ -163,37 +164,36 @@ def create_links_with_matrix():
 
 
 @pytest.fixture
-def run_aon(ae_with_project, qtbot):
-    from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
+def run_assignment(ae_with_project):
+    from aequilibrae.paths import TrafficAssignment, TrafficClass
 
-    dialog = TrafficAssignmentDialog(ae_with_project)
+    project = ae_with_project.project
+    project.network.build_graphs()
 
-    assignment_result = "aon"
-    dialog.output_scenario_name.setText(assignment_result)
-    dialog.cob_matrices.setCurrentText("demand.aem")
+    graph = project.network.graphs["c"]
+    graph.set_graph("free_flow_time")
+    graph.set_skimming(["free_flow_time", "distance"])
+    graph.set_blocked_centroid_flows(False)
 
-    dialog.tbl_core_list.selectRow(0)
-    dialog.cob_mode_for_class.setCurrentIndex(0)
-    dialog.ln_class_name.setText("car")
-    dialog.pce_setter.setValue(1.0)
-    dialog.chb_check_centroids.setChecked(False)
-    qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
+    demand = project.matrices.get_matrix("demand.aem")
+    demand.computational_view(["matrix"])
+    
+    assigclass = TrafficClass("car", graph, demand)
 
-    dialog.cob_skims_available.setCurrentText("free_flow_time")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    dialog.cob_skims_available.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    assig = TrafficAssignment()
 
-    dialog.cob_vdf.setCurrentText("BPR")
-    dialog.cob_capacity.setCurrentText("capacity")
-    dialog.cob_ffttime.setCurrentText("free_flow_time")
-    dialog.cb_choose_algorithm.setCurrentText("aon")
-    dialog.max_iter.setText("1")
-    dialog.rel_gap.setText("0.001")
-    dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
-    dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
+    assig.set_classes([assigclass])
+    assig.set_vdf("BPR")
+    assig.set_vdf_parameters({"alpha": "b", "beta": "power"})
+    assig.set_capacity_field("capacity")
+    assig.set_time_field("free_flow_time")
+    assig.set_algorithm("bfw")
+    assig.max_iter = 5
+    assig.rgap_target = 0.01
+    assig.execute()
 
-    dialog.run()
+    assig.save_results("assignment")
+    assig.save_skims("assignment", which_ones="all", format="omx")
 
     return ae_with_project
 
@@ -249,3 +249,65 @@ def create_polygons_layer(request):
         QgsProject.instance().addMapLayer(layer)
 
     return layer
+
+
+@pytest.fixture
+def load_sfalls_from_layer(folder_path):
+
+    path_to_gpkg = f"{folder_path}/SiouxFalls.gpkg"
+    copyfile("test/data/SiouxFalls_project/SiouxFalls.gpkg", path_to_gpkg)
+
+    # append the layername part
+    gpkg_links_layer = path_to_gpkg + "|layername=links"
+    gpkg_nodes_layer = path_to_gpkg + "|layername=nodes"
+
+    linkslayer = QgsVectorLayer(gpkg_links_layer, "Links layer", "ogr")
+    nodeslayer = QgsVectorLayer(gpkg_nodes_layer, "Nodes layer", "ogr")
+
+    if not linkslayer.isValid():
+        print("Links layer failed to load!")
+    else:
+        QgsProject.instance().addMapLayer(linkslayer)
+
+    if not nodeslayer.isValid():
+        print("Nodes layer failed to load!")
+    else:
+        QgsProject.instance().addMapLayer(nodeslayer)
+        var = QgsProject.instance().mapLayersByName("Nodes layer")
+        if not var[0].crs().isValid():
+            crs = QgsCoordinateReferenceSystem("EPSG:4326")
+            var[0].setCrs(crs)
+
+
+@pytest.fixture
+def load_synthetic_future_vector():
+    import csv
+
+    path_to_csv = "test/data/SiouxFalls_project/synthetic_future_vector.csv"
+
+    datalayer = QgsVectorLayer("None?delimiter=,", "synthetic_future_vector", "memory")
+
+    fields = [
+        QgsField("index", QVariant.Int),
+        QgsField("origins", QVariant.Double),
+        QgsField("destinations", QVariant.Double),
+    ]
+    datalayer.dataProvider().addAttributes(fields)
+    datalayer.updateFields()
+
+    with open(path_to_csv, "r") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            origin = float(row["origins"])
+            destination = float(row["destinations"])
+            index = int(row["index"])
+
+            feature = QgsFeature()
+            feature.setAttributes([index, origin, destination])
+
+            datalayer.dataProvider().addFeature(feature)
+
+    if not datalayer.isValid():
+        print("Open layer failed to load!")
+    else:
+        QgsProject.instance().addMapLayer(datalayer)

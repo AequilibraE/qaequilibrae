@@ -2,80 +2,14 @@ from os.path import isfile, splitext, basename
 import numpy as np
 import openmatrix as omx
 import pytest
-from PyQt5.QtCore import Qt, QVariant
-from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
+from qgis.core import QgsProject
 from aequilibrae.matrix import AequilibraeData, AequilibraeMatrix
 
 from qaequilibrae.modules.distribution_procedures.distribution_models_dialog import DistributionModelsDialog
-from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
-
-
-def run_traffic_assignment(ae_with_project, ext):
-    dialog = TrafficAssignmentDialog(ae_with_project)
-
-    assignment_result = f"TrafficAssignment_DP_{ext}"
-    dialog.output_scenario_name.setText(assignment_result)
-    dialog.cob_matrices.setCurrentText("demand.aem")
-
-    dialog.tbl_core_list.selectRow(0)
-    dialog.cob_mode_for_class.setCurrentIndex(0)
-    dialog.ln_class_name.setText("car")
-    dialog.pce_setter.setValue(1.0)
-    dialog.chb_check_centroids.setChecked(False)
-    dialog._create_traffic_class()
-
-    dialog.cob_skims_available.setCurrentText("free_flow_time")
-    dialog._add_skimming()
-    dialog.cob_skims_available.setCurrentText("distance")
-    dialog._add_skimming()
-
-    dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
-    dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
-    dialog.cob_vdf.setCurrentText("BPR")
-    dialog.cob_capacity.setCurrentText("capacity")
-    dialog.cob_ffttime.setCurrentText("free_flow_time")
-    dialog.cb_choose_algorithm.setCurrentText("bfw")
-    dialog.max_iter.setText("500")
-    dialog.rel_gap.setText("0.001")
-
-    dialog.run()
-
-
-def load_external_vector():
-    import csv
-
-    path_to_csv = "test/data/SiouxFalls_project/synthetic_future_vector.csv"
-
-    datalayer = QgsVectorLayer("None?delimiter=,", "synthetic_future_vector", "memory")
-
-    fields = [
-        QgsField("index", QVariant.Int),
-        QgsField("origins", QVariant.Double),
-        QgsField("destinations", QVariant.Double),
-    ]
-    datalayer.dataProvider().addAttributes(fields)
-    datalayer.updateFields()
-
-    with open(path_to_csv, "r") as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            origin = float(row["origins"])
-            destination = float(row["destinations"])
-            index = int(row["index"])
-
-            feature = QgsFeature()
-            feature.setAttributes([index, origin, destination])
-
-            datalayer.dataProvider().addFeature(feature)
-
-    if not datalayer.isValid():
-        print("Open layer failed to load!")
-    else:
-        QgsProject.instance().addMapLayer(datalayer)
 
 
 @pytest.mark.parametrize("method", ("dataset", "open_layer"))
-def test_ipf(ae_with_project, folder_path, mocker, method):
+def test_ipf(ae_with_project, folder_path, mocker, method, load_synthetic_future_vector):
 
     file_path = f"{folder_path}/demand_ipf_D.aem"
     mocker.patch(
@@ -94,7 +28,6 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
 
         dialog.datasets[data_name] = dataset
     else:
-        load_external_vector()
         layer = QgsProject.instance().mapLayersByName("synthetic_future_vector")[0]
         dialog.iface.setActiveLayer(layer)
         idx = []
@@ -148,32 +81,29 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
     assert np.sum(np.nan_to_num(mat.matrix["matrix"])[:, :]) > 360600
 
 
-@pytest.mark.parametrize(("method", "ext"), [("negative_exponential", "A"), ("inverse_power", "B"), ("both", "C")])
-def test_calibrate_gravity(ae_with_project, method, ext, folder_path, mocker):
-    run_traffic_assignment(ae_with_project, ext)
+@pytest.mark.parametrize("method", ["negative_exponential", "inverse_power", "both"])
+def test_calibrate_gravity(run_assignment, method, folder_path, mocker):
+    proj = run_assignment
 
-    file_path = f"{folder_path}/mod_{method}_{ext}.mod"
+    file_path = f"{folder_path}/mod_{method}.mod"
     mocker.patch(
         "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog.browse_outfile",
         return_value=file_path,
     )
 
-    dialog = DistributionModelsDialog(ae_with_project, mode="calibrate")
+    dialog = DistributionModelsDialog(proj, mode="calibrate")
 
     temp = list(dialog.matrices["name"])
-    imped_idx = temp.index(f"TrafficAssignment_DP_{ext}_car")
+    imped_idx = temp.index("assignment_car")
     demand_idx = temp.index("omx")
     dialog.cob_imped_mat.setCurrentIndex(imped_idx)
     dialog.cob_imped_field.setCurrentText("free_flow_time_final")
     dialog.cob_seed_mat.setCurrentIndex(demand_idx)
     dialog.cob_seed_field.setCurrentText("matrix")
 
-    if method == "negative_exponential":
+    if method in ["negative_exponential", "both"]:
         dialog.rdo_expo.setChecked(True)
-    elif method == "inverse_power":
-        dialog.rdo_power.setChecked(True)
-    else:
-        dialog.rdo_expo.setChecked(True)
+    elif method in ["inverse_power", "both"]:
         dialog.rdo_power.setChecked(True)
 
     dialog.outfile = file_path
@@ -185,7 +115,7 @@ def test_calibrate_gravity(ae_with_project, method, ext, folder_path, mocker):
 
     assert isfile(file_path)
 
-    if method in ["negative_exponential"]:
+    if method in ["negative_exponential", "both"]:
         file_text = ""
         with open(file_path, "r", encoding="utf-8") as file:
             for line in file.readlines():

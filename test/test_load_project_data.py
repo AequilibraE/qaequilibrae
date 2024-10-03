@@ -20,8 +20,8 @@ def test_no_project(ae, mocker, qtbot):
 
 
 @pytest.mark.parametrize("button_clicked", [True, False])
-def test_project(run_aon, mocker, qtbot, button_clicked):
-    proj = run_aon
+def test_project(run_assignment, mocker, qtbot, button_clicked):
+    proj = run_assignment
 
     function = "qaequilibrae.modules.matrix_procedures.load_project_data.DisplayAequilibraEFormatsDialog"
     mocker.patch(function)
@@ -32,26 +32,20 @@ def test_project(run_aon, mocker, qtbot, button_clicked):
     assert QTabWidget.tabText(dialog.tabs, 1) == "Results"
     assert QTabWidget.tabText(dialog.tabs, 2) == "Non-project Data"
 
-    # It should have different matrices in the folder to update.
-    proj_folder = dialog.project.project_base_path
-    copyfile(join(proj_folder, "matrices/sfalls_skims.omx"), join(proj_folder, "matrices/new_sfskim.omx"))
-
     qtbot.mouseClick(dialog.but_update_matrices, Qt.LeftButton)
-
-    assert "new_sfskim.omx" in dialog.matrices["file_name"].tolist()
+    
+    assert "assignment_car.omx" in dialog.matrices["file_name"].tolist()
 
     # Select matrix row to display
     dialog.list_matrices.selectRow(0)
     qtbot.mouseClick(dialog.but_load_matrix, Qt.LeftButton)
-
-    assert dialog.matrices["file_name"][0] == "sfalls_skims.omx"
 
     # Result selection
     dialog.list_results.selectRow(0)
     qtbot.mouseClick(dialog.but_load_Results, Qt.LeftButton)
 
     existing_layers = [vector.name() for vector in QgsProject.instance().mapLayers().values()]
-    assert "aon" in existing_layers
+    assert "assignment" in existing_layers
 
     # assert data from table was properly joined in links layer
     results_fields = [
@@ -75,6 +69,6 @@ def test_project(run_aon, mocker, qtbot, button_clicked):
         layer = QgsProject.instance().mapLayersByName("links")[0]
         field_names = [field.name() for field in layer.fields()]
         for r in results_fields:
-            assert "aon_" + r in field_names
+            assert "assignment_" + r in field_names
 
     dialog.close()
