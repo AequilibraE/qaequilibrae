@@ -1,9 +1,10 @@
 name: WindowsReleaseTest
 
 on:  
-  pull_request:
+  push:
+    branches: [develop]
   schedule:
-    - cron: '0 8 * * 1'
+    - cron: '0 8 * * *'
 
 jobs:
   windows_test:
