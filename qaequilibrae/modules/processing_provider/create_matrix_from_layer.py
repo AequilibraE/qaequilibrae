@@ -13,7 +13,7 @@ from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.i18n.translate import trlt
 
 
-class MatrixFromLayer(QgsProcessingAlgorithm):
+class CreateMatrixFromLayer(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterMapLayer("matrix_layer", self.tr("Matrix Layer")))
@@ -107,7 +107,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         feedback.setCurrentStep(1)
 
         # Getting all zones
-        all_zones = np.array(sorted(list(set(list(matrix[origin].unique()) + list(matrix[destination].unique())))))
+        all_zones = np.array(sorted(list(set( list(matrix[origin].unique()) + list(matrix[destination].unique())))))
         num_zones = all_zones.shape[0]
         idx = np.arange(num_zones)
 
@@ -144,7 +144,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
 
         mat.save()
         mat.close()
-        del matrix
+        del agg_matrix, matrix, m
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(3)
@@ -152,22 +152,22 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
         return {"Output": f"{mat.name}, {mat.description} ({file_name})"}
 
     def name(self):
-        return self.tr("Import matrices")
+        return self.tr("Create aem matrix file from layer")
 
     def displayName(self):
-        return self.tr("Import matrices")
+        return self.tr("Create aem matrix file from layer")
 
     def group(self):
-        return self.tr("Data")
+        return ("02-"+self.tr("Data"))
 
     def groupId(self):
-        return self.tr("Data")
+        return ("02-"+self.tr("Data"))
 
     def shortHelpString(self):
         return "\n".join([self.string_order(1), self.string_order(2), self.string_order(3), self.string_order(4)])
 
     def createInstance(self):
-        return MatrixFromLayer()
+        return CreateMatrixFromLayer()
 
     def string_order(self, order):
         if order == 1:
@@ -180,4 +180,4 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
             return self.tr("- value field can be either integer or real")
 
     def tr(self, message):
-        return trlt("MatrixFromLayer", message)
+        return trlt("CreateMatrixFromLayer", message)

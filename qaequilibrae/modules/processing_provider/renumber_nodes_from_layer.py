@@ -98,7 +98,7 @@ class RenumberNodesFromLayer(QgsProcessingAlgorithm):
             elif matching.shape[0] == 0:
                 create += 1
                 new = nodes.new_centroid(zone[parameters["node_id"]])
-                new.geometry = loads(zone["geom"])
+                new.geometry = loads(zone["geometry"])
                 new.save()
             elif matching.shape[0] > 1:
                 fail += 1
@@ -128,10 +128,10 @@ class RenumberNodesFromLayer(QgsProcessingAlgorithm):
         return self.tr("Add/Renumber nodes from layer")
 
     def group(self):
-        return self.tr("Model Building")
+        return ("01-"+self.tr("Model Building"))
 
     def groupId(self):
-        return self.tr("Model Building")
+        return ("01-"+self.tr("Model Building"))
 
     def shortHelpString(self):
         return f"{self.string_order(1)}\n{self.string_order(2)} {self.string_order(3)}"

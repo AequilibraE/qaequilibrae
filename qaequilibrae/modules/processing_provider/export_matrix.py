@@ -72,10 +72,10 @@ class ExportMatrix(QgsProcessingAlgorithm):
         return self.tr("Export matrices")
 
     def group(self):
-        return self.tr("Data")
+        return ("02-"+self.tr("Data"))
 
     def groupId(self):
-        return self.tr("Data")
+        return ("02-"+self.tr("Data"))
 
     def shortHelpString(self):
         return self.tr("Export an existing *.omx or *.aem matrix file into *.csv, *.aem or *.omx")

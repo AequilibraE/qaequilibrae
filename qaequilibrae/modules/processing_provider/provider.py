@@ -15,19 +15,33 @@ if str(provider_path) not in sys.path:
 class Provider(QgsProcessingProvider):
 
     def loadAlgorithms(self):
-        from .Add_connectors import AddConnectors
-        from .assign_from_yaml import TrafficAssignYAML
-        from .export_matrix import ExportMatrix
-        from .matrix_from_layer import MatrixFromLayer
         from .project_from_layer import ProjectFromLayer
+        from .project_from_OSM import ProjectFromOSM
+        from .add_connectors import AddConnectors
+        from .assign_traffic_from_yaml import TrafficAssignYAML
+        from .export_matrix import ExportMatrix
+        from .create_matrix_from_layer import CreateMatrixFromLayer
+        from .add_matrix_from_layer import AddMatrixFromLayer
+        from .add_links2project_from_layer import AddLinksFromLayer
         from .renumber_nodes_from_layer import RenumberNodesFromLayer
+        from .matrix_calculator import MatrixCalculator
+        from .import_gtfs import ImportGTFS
+        from .create_pt_graph import create_pt_graph
+        from .assign_pt_from_yaml import ptAssignYAML
 
-        self.addAlgorithm(MatrixFromLayer())
-        self.addAlgorithm(ExportMatrix())
+        self.addAlgorithm(ProjectFromOSM())
         self.addAlgorithm(ProjectFromLayer())
+        self.addAlgorithm(CreateMatrixFromLayer())
+        self.addAlgorithm(AddMatrixFromLayer())
+        self.addAlgorithm(MatrixCalculator())
+        self.addAlgorithm(ExportMatrix())
+        self.addAlgorithm(AddLinksFromLayer())
         self.addAlgorithm(RenumberNodesFromLayer())
         self.addAlgorithm(AddConnectors())
         self.addAlgorithm(TrafficAssignYAML())
+        self.addAlgorithm(ImportGTFS())
+        self.addAlgorithm(create_pt_graph())
+        self.addAlgorithm(ptAssignYAML())
 
     def id(self):
         """The ID used for identifying the provider.
