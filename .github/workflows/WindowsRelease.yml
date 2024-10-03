@@ -2,7 +2,7 @@ name: WindowsReleaseTest
 
 on:  
   push:
-    branches: [develop]
+    branches: ['*']
   schedule:
     - cron: '0 8 * * *'
 
