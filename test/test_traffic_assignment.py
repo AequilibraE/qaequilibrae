@@ -6,7 +6,7 @@ from uuid import uuid4
 import numpy as np
 import openmatrix as omx
 import pytest
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt
 
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
@@ -24,7 +24,7 @@ def test_ta_menu(ae_with_project, qtbot):
     action.trigger()
 
 
-def test_single_class(ae_with_project):
+def test_single_class(ae_with_project, qtbot):
     dialog = TrafficAssignmentDialog(ae_with_project)
 
     test_name = f"TestTrafficAssignment_SC_{uuid4().hex[:6]}"
@@ -36,13 +36,13 @@ def test_single_class(ae_with_project):
     dialog.ln_class_name.setText("car")
     dialog.pce_setter.setValue(1.0)
     dialog.chb_check_centroids.setChecked(False)
-    dialog._create_traffic_class()
+    qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Skimming
     dialog.cob_skims_available.setCurrentText("free_flow_time")
-    dialog._add_skimming()
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
-    dialog._add_skimming()
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
     dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
@@ -97,7 +97,7 @@ def test_single_class(ae_with_project):
     )
 
 
-def test_multiclass(ae_with_project):
+def test_multiclass(ae_with_project, qtbot):
     dialog = TrafficAssignmentDialog(ae_with_project)
 
     test_name = f"TestTrafficAssignment_MC_{uuid4().hex[:6]}"
@@ -110,15 +110,15 @@ def test_multiclass(ae_with_project):
     dialog.ln_class_name.setText("car")
     dialog.pce_setter.setValue(1.0)
     dialog.chb_check_centroids.setChecked(False)
-    dialog._create_traffic_class()
+    qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds car skims
     dialog.cob_skims_available.setCurrentText("free_flow_time")
     dialog.cob_skim_class.setCurrentText("car")
-    dialog._add_skimming()
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
     dialog.cob_skim_class.setCurrentText("car")
-    dialog._add_skimming()
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
     # Traffic Class Trucks
     dialog.tbl_core_list.selectRow(2)
@@ -126,15 +126,15 @@ def test_multiclass(ae_with_project):
     dialog.ln_class_name.setText("Trucks")
     dialog.pce_setter.setValue(2.5)
     dialog.chb_check_centroids.setChecked(False)
-    dialog._create_traffic_class()
+    qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds truck skims
     dialog.cob_skims_available.setCurrentText("free_flow_time")
     dialog.cob_skim_class.setCurrentText("Trucks")
-    dialog._add_skimming()
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
     dialog.cob_skim_class.setCurrentText("Trucks")
-    dialog._add_skimming()
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
     # Traffic Class Motorcycle
     dialog.tbl_core_list.selectRow(1)
@@ -142,15 +142,15 @@ def test_multiclass(ae_with_project):
     dialog.cob_mode_for_class.setCurrentText("Motorcycle")
     dialog.pce_setter.setValue(0.2)
     dialog.chb_check_centroids.setChecked(False)
-    dialog._create_traffic_class()
+    qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
 
     # Adds motorcycle skims
     dialog.cob_skims_available.setCurrentText("free_flow_time")
     dialog.cob_skim_class.setCurrentText("Motorcycle")
-    dialog._add_skimming()
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
     dialog.cob_skim_class.setCurrentText("Motorcycle")
-    dialog._add_skimming()
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
     # Assignment setup
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")

@@ -148,7 +148,6 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
     assert np.sum(np.nan_to_num(mat.matrix["matrix"])[:, :]) > 360600
 
 
-# @pytest.mark.skip("")
 @pytest.mark.parametrize(("method", "ext"), [("negative_exponential", "A"), ("inverse_power", "B"), ("both", "C")])
 def test_calibrate_gravity(ae_with_project, method, ext, folder_path, mocker):
     run_traffic_assignment(ae_with_project, ext)

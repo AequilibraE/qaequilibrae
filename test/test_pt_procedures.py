@@ -95,7 +95,5 @@ def test_add_other_feed(pt_project, set_agency, set_date, is_checked, mocker):
     conn = sqlite3.connect(db_path)
     var = conn.execute("select count(agency_id) from agencies").fetchone()[0]
 
-    if is_checked:
-        assert var == 1
-    else:
-        assert var == 2
+    target = 1 if is_checked else 2
+    assert var == target

@@ -7,42 +7,6 @@ from qgis.PyQt.QtWidgets import QTabWidget
 from qaequilibrae.modules.matrix_procedures.load_project_data import LoadProjectDataDialog
 
 
-@pytest.fixture
-def run_aon(ae_with_project, qtbot):
-    from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
-
-    dialog = TrafficAssignmentDialog(ae_with_project)
-
-    assignment_result = "aon"
-    dialog.output_scenario_name.setText(assignment_result)
-    dialog.cob_matrices.setCurrentText("demand.aem")
-
-    dialog.tbl_core_list.selectRow(0)
-    dialog.cob_mode_for_class.setCurrentIndex(0)
-    dialog.ln_class_name.setText("car")
-    dialog.pce_setter.setValue(1.0)
-    dialog.chb_check_centroids.setChecked(False)
-    qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
-
-    dialog.cob_skims_available.setCurrentText("free_flow_time")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-    dialog.cob_skims_available.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
-
-    dialog.cob_vdf.setCurrentText("BPR")
-    dialog.cob_capacity.setCurrentText("capacity")
-    dialog.cob_ffttime.setCurrentText("free_flow_time")
-    dialog.cb_choose_algorithm.setCurrentText("aon")
-    dialog.max_iter.setText("1")
-    dialog.rel_gap.setText("0.001")
-    dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
-    dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
-
-    dialog.run()
-
-    return ae_with_project
-
-
 def test_no_project(ae, mocker, qtbot):
     file_func = "qaequilibrae.modules.matrix_procedures.load_project_data.DisplayAequilibraEFormatsDialog"
     mocker.patch(file_func)
@@ -112,7 +76,5 @@ def test_project(run_aon, mocker, qtbot, button_clicked):
         field_names = [field.name() for field in layer.fields()]
         for r in results_fields:
             assert "aon_" + r in field_names
-
-    print(dialog.__dict__)
 
     dialog.close()

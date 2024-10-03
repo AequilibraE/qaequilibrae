@@ -2,11 +2,10 @@ import pytest
 from os.path import join
 from uuid import uuid4
 from shutil import copytree
-from PyQt5.QtCore import QTimer, QVariant
+from PyQt5.QtCore import QTimer, QVariant, Qt
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
 from qgis.core import QgsPointXY, QgsGeometry
-from qgis.PyQt.QtCore import QVariant
 from qaequilibrae.qaequilibrae import AequilibraEMenu
 from qaequilibrae.modules.common_tools import ReportDialog
 
@@ -161,3 +160,92 @@ def create_links_with_matrix():
         layer.dataProvider().addFeatures(features)
 
         QgsProject.instance().addMapLayer(layer)
+
+
+@pytest.fixture
+def run_aon(ae_with_project, qtbot):
+    from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
+
+    dialog = TrafficAssignmentDialog(ae_with_project)
+
+    assignment_result = "aon"
+    dialog.output_scenario_name.setText(assignment_result)
+    dialog.cob_matrices.setCurrentText("demand.aem")
+
+    dialog.tbl_core_list.selectRow(0)
+    dialog.cob_mode_for_class.setCurrentIndex(0)
+    dialog.ln_class_name.setText("car")
+    dialog.pce_setter.setValue(1.0)
+    dialog.chb_check_centroids.setChecked(False)
+    qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
+
+    dialog.cob_skims_available.setCurrentText("free_flow_time")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    dialog.cob_skims_available.setCurrentText("distance")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+
+    dialog.cob_vdf.setCurrentText("BPR")
+    dialog.cob_capacity.setCurrentText("capacity")
+    dialog.cob_ffttime.setCurrentText("free_flow_time")
+    dialog.cb_choose_algorithm.setCurrentText("aon")
+    dialog.max_iter.setText("1")
+    dialog.rel_gap.setText("0.001")
+    dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
+    dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
+
+    dialog.run()
+
+    return ae_with_project
+
+
+@pytest.fixture
+def create_polygons_layer(request):
+    layer = QgsVectorLayer("Polygon?crs=epsg:4326", "polygon", "memory")
+    if not layer.isValid():
+        print("Polygon layer failed to load!")
+    else:
+        field_id = QgsField("ID", QVariant.Int)
+        field_zone_id = QgsField("zone_id", QVariant.Int)
+        nickname = QgsField("name", QVariant.String)
+
+        layer.dataProvider().addAttributes([field_id, field_zone_id, nickname])
+        layer.updateFields()
+
+        polys = [
+            [
+                QgsPointXY(-71.2487, -29.8936),
+                QgsPointXY(-71.2487, -29.8895),
+                QgsPointXY(-71.2441, -29.8895),
+                QgsPointXY(-71.2441, -29.8936),
+                QgsPointXY(-71.2487, -29.8936),
+            ],
+            [
+                QgsPointXY(-71.2401, -29.8945),
+                QgsPointXY(-71.2401, -29.8928),
+                QgsPointXY(-71.2375, -29.8928),
+                QgsPointXY(-71.2375, -29.8945),
+                QgsPointXY(-71.2401, -29.8945),
+            ],
+            [
+                QgsPointXY(-71.2329, -29.8800),
+                QgsPointXY(-71.2329, -29.8758),
+                QgsPointXY(-71.2280, -29.8758),
+                QgsPointXY(-71.2280, -29.8800),
+                QgsPointXY(-71.2329, -29.8800),
+            ],
+        ]
+
+        attributes = (request.param, [None, None, None])
+
+        features = []
+        for i, (poly, zone_id, name) in enumerate(zip(polys, *attributes)):
+            feature = QgsFeature()
+            feature.setGeometry(QgsGeometry.fromPolygonXY([poly]))
+            feature.setAttributes([i + 1, zone_id, name])
+            features.append(feature)
+
+        layer.dataProvider().addFeatures(features)
+
+        QgsProject.instance().addMapLayer(layer)
+
+    return layer
