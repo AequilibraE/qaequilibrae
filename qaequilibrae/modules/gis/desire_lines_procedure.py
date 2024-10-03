@@ -270,7 +270,6 @@ class DesireLinesProcedure(WorkerThread):
         assigner = allOrNothing(self.matrix, self.graph, self.results)
         assigner.execute()
         self.report = assigner.report
-        # print(self.results.link_loads)
         self.desire_lines.emit(("text_dl", self.tr("Collecting results")))
         self.desire_lines.emit(("text_dl", self.tr("Building resulting layer")))
         features = []
