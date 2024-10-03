@@ -1,9 +1,8 @@
 import pytest
 from os.path import join
-from os import makedirs
 from uuid import uuid4
-from shutil import copytree, copyfile
-from PyQt5.QtCore import QTimer, QVariant, Qt
+from shutil import copytree
+from PyQt5.QtCore import QTimer, QVariant
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
 from qgis.core import QgsPointXY, QgsGeometry, QgsCoordinateReferenceSystem
@@ -177,7 +176,7 @@ def run_assignment(ae_with_project):
 
     demand = project.matrices.get_matrix("demand.aem")
     demand.computational_view(["matrix"])
-    
+
     assigclass = TrafficClass("car", graph, demand)
 
     assig = TrafficAssignment()
@@ -252,10 +251,10 @@ def create_polygons_layer(request):
 
 
 @pytest.fixture
-def load_sfalls_from_layer(folder_path):
+def load_sfalls_from_layer(folder_path, request):
 
-    path_to_gpkg = f"{folder_path}/SiouxFalls.gpkg"
-    copyfile("test/data/SiouxFalls_project/SiouxFalls.gpkg", path_to_gpkg)
+    p = "test/data/SiouxFalls_project" if request.param == None else folder_path
+    path_to_gpkg = f"{p}/SiouxFalls.gpkg"
 
     # append the layername part
     gpkg_links_layer = path_to_gpkg + "|layername=links"

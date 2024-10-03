@@ -99,8 +99,8 @@ def test_matrix_from_layer(folder_path):
     assert np.sum(info["matrix"][parameters["matrix_core"]][:, :]) == 360600
 
 
-@pytest.mark.skip
-def test_project_from_layer(folder_path):
+@pytest.mark.parametrize("load_sfalls_from_layer", [None], indirect=True)
+def test_project_from_layer(folder_path, load_sfalls_from_layer):
     makedirs(folder_path)
 
     action = ProjectFromLayer()
@@ -174,12 +174,10 @@ def test_add_centroid_connector(pt_no_feed):
     assert link_count == 3
 
 
+@pytest.mark.parametrize("load_sfalls_from_layer", ["tmp"], indirect=True)
 def test_renumber_from_centroids(ae_with_project, load_sfalls_from_layer):
     project = ae_with_project.project
     project_folder = project.project_base_path
-
-    prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
-    print(prj_layers)
 
     nodeslayer = QgsProject.instance().mapLayersByName("Nodes layer")[0]
 

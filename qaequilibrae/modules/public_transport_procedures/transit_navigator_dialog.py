@@ -39,7 +39,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.filtered = {}
 
         self.sm = SupplyMetrics(None)
-        # self._testing = False
         self.gtfs_types = {
             0: "Light rail",
             1: "Subway/Metro",

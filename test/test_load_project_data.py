@@ -33,7 +33,7 @@ def test_project(run_assignment, mocker, qtbot, button_clicked):
     assert QTabWidget.tabText(dialog.tabs, 2) == "Non-project Data"
 
     qtbot.mouseClick(dialog.but_update_matrices, Qt.LeftButton)
-    
+
     assert "assignment_car.omx" in dialog.matrices["file_name"].tolist()
 
     # Select matrix row to display

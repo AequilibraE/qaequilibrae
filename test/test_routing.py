@@ -31,7 +31,6 @@ def test_create_from_centroids(ae_with_project, in_selection):
 
 @pytest.mark.parametrize("in_selection", [False, True])
 def test_create_from_nodes(pt_project, in_selection):
-    print(pt_project.__dict__)
     nodes = pt_project.layers["nodes"][0]
     node_selection = [74034, 74035, 74101]
     nodes.select([f.id() for f in nodes.getFeatures() if f["node_id"] in node_selection])

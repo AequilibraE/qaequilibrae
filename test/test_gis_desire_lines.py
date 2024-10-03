@@ -14,6 +14,7 @@ def test_click_create_without_layers(ae_with_project, qtbot):
     assert len(exceptions) == 1
 
 
+@pytest.mark.parametrize("load_sfalls_from_layer", [None], indirect=True)
 def test_click_create_with_layers(ae_with_project, qtbot, timeoutDetector, load_sfalls_from_layer):
     dialog = DesireLinesDialog(ae_with_project)
     dialog.show()
@@ -29,6 +30,7 @@ def test_click_create_with_layers(ae_with_project, qtbot, timeoutDetector, load_
     # test that something cool happened on the map?
 
 
+@pytest.mark.parametrize("load_sfalls_from_layer", [None], indirect=True)
 def test_click_create_with_layers_desired_selected(ae_with_project, qtbot, timeoutDetector, load_sfalls_from_layer):
     dialog = DesireLinesDialog(ae_with_project)
     dialog.show()
@@ -43,6 +45,7 @@ def test_click_create_with_layers_desired_selected(ae_with_project, qtbot, timeo
     # test that something cool happened on the map?
 
 
+@pytest.mark.parametrize("load_sfalls_from_layer", [None], indirect=True)
 # Other than that, there isn't much error handling, so testing with wrong params triggers exceptions raising to the top
 # For example, one would expect something like this:
 @pytest.mark.skip(reason="Error handling implementation is required for this test")
