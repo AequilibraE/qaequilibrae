@@ -5,6 +5,8 @@ from shutil import copytree
 from PyQt5.QtCore import QTimer, QVariant
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
+from qgis.core import QgsPointXY, QgsGeometry
+from qgis.PyQt.QtCore import QVariant
 from qaequilibrae.qaequilibrae import AequilibraEMenu
 from qaequilibrae.modules.common_tools import ReportDialog
 
@@ -123,3 +125,39 @@ def coquimbo_project(qgis_iface, create_example) -> AequilibraEMenu:
     _run_load_project_from_path(ae, create_example)
     yield ae
     ae.run_close_project()
+
+
+@pytest.fixture
+def create_links_with_matrix():
+    layer = QgsVectorLayer("Linestring?crs=epsg:4326", "lines", "memory")
+    if not layer.isValid():
+        print("lines layer failed to load!")
+    else:
+        field_id = QgsField("link_id", QVariant.Int)
+        matrix_ab = QgsField("matrix_ab", QVariant.Int)
+        matrix_ba = QgsField("matrix_ba", QVariant.Int)
+        matrix_tot = QgsField("matrix_tot", QVariant.Int)
+
+        layer.dataProvider().addAttributes([field_id, matrix_ab, matrix_ba, matrix_tot])
+        layer.updateFields()
+
+        lines = [
+            [QgsPointXY(1, 0), QgsPointXY(1, 1)],
+            [QgsPointXY(1, 0), QgsPointXY(0, 0)],
+            [QgsPointXY(0, 0), QgsPointXY(0, 1)],
+            [QgsPointXY(0, 1), QgsPointXY(1, 1)],
+            [QgsPointXY(0, 0), QgsPointXY(1, 1)],
+        ]
+
+        attributes = ([1, 2, 3, 4, 5], [50, 42, 17, 32, 19], [50, 63, 18, 32, 11], [100, 105, 35, 64, 30])
+
+        features = []
+        for i, (line, fid, ab, ba, tot) in enumerate(zip(lines, *attributes)):
+            feature = QgsFeature()
+            feature.setGeometry(QgsGeometry.fromPolylineXY(line))
+            feature.setAttributes([fid, ab, ba, tot])
+            features.append(feature)
+
+        layer.dataProvider().addFeatures(features)
+
+        QgsProject.instance().addMapLayer(layer)

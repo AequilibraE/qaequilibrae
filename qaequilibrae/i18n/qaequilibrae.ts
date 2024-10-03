@@ -552,12 +552,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="274"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="273"/>
         <source>Collecting results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="275"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="274"/>
         <source>Building resulting layer</source>
         <translation type="unfinished"></translation>
     </message>
