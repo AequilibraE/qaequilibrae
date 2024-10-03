@@ -4,7 +4,7 @@ from shapely.geometry import Point
 from aequilibrae.utils.db_utils import read_and_close
 from aequilibrae.project.database_connection import database_connection
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
-from qgis.core import QgsFeature, QgsPointXY, QgsGeometry
+from qgis.core import QgsPointXY, QgsGeometry
 from qgis.PyQt.QtCore import QVariant
 
 from qaequilibrae.modules.network.adds_connectors_dialog import AddConnectorsDialog

@@ -5,13 +5,11 @@ import numpy as np
 import sqlite3
 from os.path import isfile, join
 from os import makedirs
-from shutil import copyfile
 from shapely.geometry import Point
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.project import Project
 from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingFeedback
-from qgis.core import QgsProject, QgsVectorLayer, QgsCoordinateReferenceSystem
-from qgis.core import QgsField
+from qgis.core import QgsProject, QgsField
 from PyQt5.QtCore import QVariant
 
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe

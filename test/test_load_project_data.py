@@ -1,9 +1,8 @@
 import pytest
-from os.path import join
-from shutil import copyfile
 from PyQt5.QtCore import Qt
 from qgis.core import QgsProject
 from qgis.PyQt.QtWidgets import QTabWidget
+
 from qaequilibrae.modules.matrix_procedures.load_project_data import LoadProjectDataDialog
 
 

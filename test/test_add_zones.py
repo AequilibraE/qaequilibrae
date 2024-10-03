@@ -1,7 +1,5 @@
 import pytest
 from time import sleep
-from aequilibrae.utils.db_utils import commit_and_close
-from aequilibrae.project.database_connection import database_connection
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.project_procedures.adds_zones_dialog import AddZonesDialog
@@ -18,9 +16,6 @@ def test_add_zones(pt_project, create_polygons_layer):
 
     sleep(2)
 
-    with commit_and_close(database_connection("network")) as conn:
-        num_zones = conn.execute("select count(zone_id) from zones").fetchone()[0]
-
-    assert num_zones == 3
+    assert len(pt_project.project.zoning.all_zones()) == 3
 
     QgsProject.instance().clear()

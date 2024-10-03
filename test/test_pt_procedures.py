@@ -4,6 +4,7 @@ import pytest
 from datetime import datetime
 from aequilibrae.transit import Transit
 from PyQt5.QtCore import QTimer
+
 from qaequilibrae.modules.public_transport_procedures.gtfs_feed import GTFSFeed
 from qaequilibrae.modules.public_transport_procedures.gtfs_importer import GTFSImporter
 

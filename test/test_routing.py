@@ -1,7 +1,7 @@
 import pytest
+from qgis.core import QgsProject
 
 from qaequilibrae.modules.routing_procedures.tsp_dialog import TSPDialog
-from qgis.core import QgsProject
 
 
 @pytest.mark.parametrize("in_selection", [False, True])
