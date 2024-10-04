@@ -1,35 +1,7 @@
-import os
-
 import pytest
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QApplication
-from qgis.core import QgsProject, Qgis, QgsVectorLayer, QgsCoordinateReferenceSystem
+from PyQt5.QtCore import Qt
 
 from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
-
-
-def load_layers():
-    path_to_gpkg = "test/data/SiouxFalls_project/SiouxFalls.gpkg"
-    # append the layername part
-    gpkg_links_layer = path_to_gpkg + "|layername=links"
-    gpkg_nodes_layer = path_to_gpkg + "|layername=nodes"
-
-    linkslayer = QgsVectorLayer(gpkg_links_layer, "Links layer", "ogr")
-    nodeslayer = QgsVectorLayer(gpkg_nodes_layer, "Nodes layer", "ogr")
-
-    if not linkslayer.isValid():
-        print("Links layer failed to load!")
-    else:
-        QgsProject.instance().addMapLayer(linkslayer)
-
-    if not nodeslayer.isValid():
-        print("Nodes layer failed to load!")
-    else:
-        QgsProject.instance().addMapLayer(nodeslayer)
-        var = QgsProject.instance().mapLayersByName("Nodes layer")
-        if not var[0].crs().isValid():
-            crs = QgsCoordinateReferenceSystem("EPSG:4326")
-            var[0].setCrs(crs)
 
 
 def test_click_create_without_layers(ae_with_project, qtbot):
@@ -39,11 +11,17 @@ def test_click_create_without_layers(ae_with_project, qtbot):
     qtbot.waitExposed(dialog)
     with qtbot.capture_exceptions() as exceptions:
         qtbot.mouseClick(dialog.create_dl, Qt.LeftButton)
-    assert len(exceptions) == 1
+    assert len(exceptions) == 0
+
+    messagebar = ae_with_project.iface.messageBar()
+    assert (
+        messagebar.messages[1][0]
+        == "Inputs not loaded properly:You need the layer and at least one matrix_procedures core"
+    ), "Level 1 error message is missing"
 
 
-def test_click_create_with_layers(ae_with_project, qtbot, timeoutDetector):
-    load_layers()
+@pytest.mark.parametrize("load_sfalls_from_layer", [None], indirect=True)
+def test_click_create_with_layers(ae_with_project, qtbot, timeoutDetector, load_sfalls_from_layer):
     dialog = DesireLinesDialog(ae_with_project)
     dialog.show()
     qtbot.addWidget(dialog)
@@ -58,8 +36,8 @@ def test_click_create_with_layers(ae_with_project, qtbot, timeoutDetector):
     # test that something cool happened on the map?
 
 
-def test_click_create_with_layers_desired_selected(ae_with_project, qtbot, timeoutDetector):
-    load_layers()
+@pytest.mark.parametrize("load_sfalls_from_layer", [None], indirect=True)
+def test_click_create_with_layers_desired_selected(ae_with_project, qtbot, timeoutDetector, load_sfalls_from_layer):
     dialog = DesireLinesDialog(ae_with_project)
     dialog.show()
     qtbot.addWidget(dialog)
@@ -76,8 +54,8 @@ def test_click_create_with_layers_desired_selected(ae_with_project, qtbot, timeo
 # Other than that, there isn't much error handling, so testing with wrong params triggers exceptions raising to the top
 # For example, one would expect something like this:
 @pytest.mark.skip(reason="Error handling implementation is required for this test")
-def test_click_create_with_layers_with_wrong_id_param(ae_with_project, qtbot):
-    load_layers()
+@pytest.mark.parametrize("load_sfalls_from_layer", [None], indirect=True)
+def test_click_create_with_layers_with_wrong_id_param(ae_with_project, qtbot, load_sfalls_from_layer):
     dialog = DesireLinesDialog(ae_with_project)
     dialog.show()
     qtbot.addWidget(dialog)

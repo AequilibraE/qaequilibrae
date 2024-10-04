@@ -50,10 +50,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.rgap = "Undefined"
         self.iter = 0
         self.miter = 1000
-        self.testing = False
 
         # Signals for the matrix_procedures tab
-        self.but_add_skim.clicked.connect(self.__add_skimming)
+        self.but_add_skim.clicked.connect(self._add_skimming)
         self.but_add_class.clicked.connect(self._create_traffic_class)
         self.cob_matrices.currentIndexChanged.connect(self.change_matrix_selected)
         self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
@@ -225,9 +224,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def _create_traffic_class(self):
         mat_name = self.cob_matrices.currentText()
         if not mat_name:
-            if self.testing:
-                raise AttributeError("Matrix not set")
-            return
+            raise AttributeError("Matrix not set")
 
         class_name = self.ln_class_name.text()
         if class_name in self.traffic_classes:
@@ -239,9 +236,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         sel = self.tbl_core_list.selectionModel().selectedRows()
         if not sel:
-            if self.testing:
-                raise AttributeError("Matrix cores not chosen")
-            return
+            raise AttributeError("Matrix cores not chosen")
         rows = [s.row() for s in sel if s.column() == 0]
         user_classes = [matrix.names[i] for i in rows]
         matrix.computational_view(user_classes)
@@ -295,14 +290,12 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.__edit_skimming_modes()
         self.skims[class_name] = []
 
-    def __add_skimming(self):
+    def _add_skimming(self):
         field = self.cob_skims_available.currentText()
         traffic_class = self.traffic_classes[self.cob_skim_class.currentText()]
         name = traffic_class._id
         if field in self.skims[name]:
-            if self.testing:
-                raise AttributeError("No skims set")
-            return
+            raise AttributeError("No skims set")
 
         table = self.skim_list_table
         idx = table.rowCount()
@@ -342,8 +335,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run(self):
         if not self.check_data():
-            if self.testing:
-                raise Exception(self.error)
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=3, duration=10)
 
         algorithm = self.cb_choose_algorithm.currentText()

@@ -1,5 +1,7 @@
 from copy import deepcopy
 from os.path import dirname, join
+from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
+from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QDate
@@ -10,15 +12,12 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_feed.ui"))
 
 
 class GTFSFeed(QDialog, FORM_CLASS):
-    def __init__(self, qgis_project, pt_object, testing=False):
-        from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
-
+    def __init__(self, qgis_project, pt_object):
         QDialog.__init__(self)
         self.iface = qgis_project.iface
         self.setupUi(self)
         self.qgis_project = qgis_project
         self._p = pt_object
-        # self.worker_thread = self._p.tools
         self.path = standard_path()
         self.feed = None
         self.but_add.clicked.connect(self.return_feed)
@@ -29,14 +28,9 @@ class GTFSFeed(QDialog, FORM_CLASS):
         self.but_add.setVisible(False)
         self.service_calendar.setVisible(False)
         self.setFixedHeight(1)
-        self.testing = testing
-        self.date = None
-        if not testing:
-            self.open_feed()
+        self.open_feed()
 
     def open_feed(self):
-        from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
-
         formats = ["GTFS Feed(*.zip)"]
         source_path_file, _ = GetOutputFileName(
             QDialog(),
@@ -76,10 +70,7 @@ class GTFSFeed(QDialog, FORM_CLASS):
             self.iface.messageBar().pushMessage("Error", self.tr("Enter agency and description"), level=3, duration=10)
             return
 
-        if not self.testing:
-            date = self.service_calendar.selectedDate().toString("yyyy-MM-dd")
-        else:
-            date = self.date
+        date = self.service_calendar.selectedDate().toString("yyyy-MM-dd")
         self.feed.set_date(date)
 
         caps = {}

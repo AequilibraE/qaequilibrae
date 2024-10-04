@@ -17,7 +17,6 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
         QtWidgets.QDialog.__init__(self)
         pth = Path(__file__).parent.parent.parent / "packages" / "aequilibrae" / "reference_files"
         models = [str(x.stem) for x in pth.glob("*.zip")]
-        print(models)
 
         self.iface = qgis_project.iface
         self.setupUi(self)

@@ -1,7 +1,7 @@
 from os.path import dirname, join, isfile
+from aequilibrae.transit import Transit
 from aequilibrae.utils.db_utils import commit_and_close
 from aequilibrae.project.database_connection import database_connection
-
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
@@ -40,15 +40,12 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.setFixedHeight(380)
         self.items = [self.config_box, self.progress_box]
 
-    def add_gtfs_feed(self, testing=False):
-        from aequilibrae.transit import Transit
-
+    def add_gtfs_feed(self):
         self._p = Transit(self.qgis_project.project)
-        self.dlg2 = GTFSFeed(self.qgis_project, self._p, testing)
-        if not testing:
-            self.dlg2.setWindowFlags(Qt.WindowStaysOnTopHint)
-            self.dlg2.show()
-            self.dlg2.exec_()
+        self.dlg2 = GTFSFeed(self.qgis_project, self._p)
+        self.dlg2.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg2.show()
+        self.dlg2.exec_()
         if self.dlg2.feed is not None:
             self.set_feed(self.dlg2.feed)
 

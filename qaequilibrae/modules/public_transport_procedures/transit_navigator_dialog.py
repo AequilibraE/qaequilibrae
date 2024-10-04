@@ -39,7 +39,6 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.filtered = {}
 
         self.sm = SupplyMetrics(None)
-        self._testing = False
         self.gtfs_types = {
             0: "Light rail",
             1: "Subway/Metro",
@@ -196,7 +195,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         )
 
     def build_label(self, layer, field, active_label, active_map, placement):
-        if not active_map and not self._testing:
+        if not active_map:
             return
         if not active_label:
             layer.setLabelsEnabled(False)

@@ -209,9 +209,10 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             self.run_thread()
         else:
             qgis.utils.iface.messageBar().pushMessage(
-                self.tr("Inputs not loaded properly. You need the layer and at least one matrix_procedures core"),
-                "",
-                level=3,
+                self.tr("Inputs not loaded properly"),
+                self.tr("You need the layer and at least one matrix_procedures core"),
+                level=1,
+                duration=10
             )
 
     def throws_error(self, error_message):

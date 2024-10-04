@@ -110,7 +110,6 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def finished(self):
         ns = self.worker_thread.node_sequence
-        print(ns)
         if len(ns) < 2:
             return
 

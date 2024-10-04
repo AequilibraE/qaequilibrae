@@ -1,12 +1,12 @@
 import pytest
-from os.path import join
+from os.path import join, exists
+from os import makedirs
 from uuid import uuid4
-from shutil import copytree
+from shutil import copytree, copyfile
 from PyQt5.QtCore import QTimer, QVariant
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
-from qgis.core import QgsPointXY, QgsGeometry
-from qgis.PyQt.QtCore import QVariant
+from qgis.core import QgsPointXY, QgsGeometry, QgsCoordinateReferenceSystem
 from qaequilibrae.qaequilibrae import AequilibraEMenu
 from qaequilibrae.modules.common_tools import ReportDialog
 
@@ -18,7 +18,9 @@ def folder_path(tmp_path):
 
 @pytest.fixture(scope="function")
 def ae(qgis_iface) -> AequilibraEMenu:
-    return AequilibraEMenu(qgis_iface)
+    ae = AequilibraEMenu(qgis_iface)
+    yield ae
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
 
 
 @pytest.fixture(scope="function")
@@ -30,6 +32,7 @@ def ae_with_project(qgis_iface, folder_path) -> AequilibraEMenu:
     _run_load_project_from_path(ae, folder_path)
     yield ae
     ae.run_close_project()
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
 
 
 @pytest.fixture(scope="function")
@@ -62,6 +65,7 @@ def pt_project(qgis_iface, folder_path) -> AequilibraEMenu:
     _run_load_project_from_path(ae, folder_path)
     yield ae
     ae.run_close_project()
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
 
 
 @pytest.fixture(scope="function")
@@ -73,6 +77,7 @@ def pt_no_feed(qgis_iface, folder_path) -> AequilibraEMenu:
     _run_load_project_from_path(ae, folder_path)
     yield ae
     ae.run_close_project()
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
 
 
 @pytest.fixture(scope="function")
@@ -125,6 +130,7 @@ def coquimbo_project(qgis_iface, create_example) -> AequilibraEMenu:
     _run_load_project_from_path(ae, create_example)
     yield ae
     ae.run_close_project()
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
 
 
 @pytest.fixture
@@ -161,3 +167,159 @@ def create_links_with_matrix():
         layer.dataProvider().addFeatures(features)
 
         QgsProject.instance().addMapLayer(layer)
+
+
+@pytest.fixture
+def run_assignment(ae_with_project):
+    from aequilibrae.paths import TrafficAssignment, TrafficClass
+
+    project = ae_with_project.project
+    project.network.build_graphs()
+
+    graph = project.network.graphs["c"]
+    graph.set_graph("free_flow_time")
+    graph.set_skimming(["free_flow_time", "distance"])
+    graph.set_blocked_centroid_flows(False)
+
+    demand = project.matrices.get_matrix("demand.aem")
+    demand.computational_view(["matrix"])
+
+    assigclass = TrafficClass("car", graph, demand)
+
+    assig = TrafficAssignment()
+
+    assig.set_classes([assigclass])
+    assig.set_vdf("BPR")
+    assig.set_vdf_parameters({"alpha": "b", "beta": "power"})
+    assig.set_capacity_field("capacity")
+    assig.set_time_field("free_flow_time")
+    assig.set_algorithm("bfw")
+    assig.max_iter = 5
+    assig.rgap_target = 0.01
+    assig.execute()
+
+    assig.save_results("assignment")
+    assig.save_skims("assignment", which_ones="all", format="omx")
+
+    return ae_with_project
+
+
+@pytest.fixture
+def create_polygons_layer(request):
+    layer = QgsVectorLayer("Polygon?crs=epsg:4326", "polygon", "memory")
+    if not layer.isValid():
+        print("Polygon layer failed to load!")
+    else:
+        field_id = QgsField("ID", QVariant.Int)
+        field_zone_id = QgsField("zone_id", QVariant.Int)
+        nickname = QgsField("name", QVariant.String)
+
+        layer.dataProvider().addAttributes([field_id, field_zone_id, nickname])
+        layer.updateFields()
+
+        polys = [
+            [
+                QgsPointXY(-71.2487, -29.8936),
+                QgsPointXY(-71.2487, -29.8895),
+                QgsPointXY(-71.2441, -29.8895),
+                QgsPointXY(-71.2441, -29.8936),
+                QgsPointXY(-71.2487, -29.8936),
+            ],
+            [
+                QgsPointXY(-71.2401, -29.8945),
+                QgsPointXY(-71.2401, -29.8928),
+                QgsPointXY(-71.2375, -29.8928),
+                QgsPointXY(-71.2375, -29.8945),
+                QgsPointXY(-71.2401, -29.8945),
+            ],
+            [
+                QgsPointXY(-71.2329, -29.8800),
+                QgsPointXY(-71.2329, -29.8758),
+                QgsPointXY(-71.2280, -29.8758),
+                QgsPointXY(-71.2280, -29.8800),
+                QgsPointXY(-71.2329, -29.8800),
+            ],
+        ]
+
+        attributes = (request.param, [None, None, None])
+
+        features = []
+        for i, (poly, zone_id, name) in enumerate(zip(polys, *attributes)):
+            feature = QgsFeature()
+            feature.setGeometry(QgsGeometry.fromPolygonXY([poly]))
+            feature.setAttributes([i + 1, zone_id, name])
+            features.append(feature)
+
+        layer.dataProvider().addFeatures(features)
+
+        QgsProject.instance().addMapLayer(layer)
+
+    return layer
+
+
+@pytest.fixture
+def load_sfalls_from_layer(folder_path, request):
+
+    fldr_pth = "test/data/SiouxFalls_project" if request.param == None else folder_path
+
+    if fldr_pth == folder_path:
+        if not exists(fldr_pth):
+            makedirs(fldr_pth)
+        copyfile("test/data/SiouxFalls_project/SiouxFalls.gpkg", f"{fldr_pth}/SiouxFalls.gpkg")
+
+    path_to_gpkg = f"{fldr_pth}/SiouxFalls.gpkg"
+
+    # append the layername part
+    gpkg_links_layer = path_to_gpkg + "|layername=links"
+    gpkg_nodes_layer = path_to_gpkg + "|layername=nodes"
+
+    linkslayer = QgsVectorLayer(gpkg_links_layer, "Links layer", "ogr")
+    nodeslayer = QgsVectorLayer(gpkg_nodes_layer, "Nodes layer", "ogr")
+
+    if not linkslayer.isValid():
+        print("Links layer failed to load!")
+    else:
+        QgsProject.instance().addMapLayer(linkslayer)
+
+    if not nodeslayer.isValid():
+        print("Nodes layer failed to load!")
+    else:
+        QgsProject.instance().addMapLayer(nodeslayer)
+        var = QgsProject.instance().mapLayersByName("Nodes layer")
+        if not var[0].crs().isValid():
+            crs = QgsCoordinateReferenceSystem("EPSG:4326")
+            var[0].setCrs(crs)
+
+
+@pytest.fixture
+def load_synthetic_future_vector():
+    import csv
+
+    path_to_csv = "test/data/SiouxFalls_project/synthetic_future_vector.csv"
+
+    datalayer = QgsVectorLayer("None?delimiter=,", "synthetic_future_vector", "memory")
+
+    fields = [
+        QgsField("index", QVariant.Int),
+        QgsField("origins", QVariant.Double),
+        QgsField("destinations", QVariant.Double),
+    ]
+    datalayer.dataProvider().addAttributes(fields)
+    datalayer.updateFields()
+
+    with open(path_to_csv, "r") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            origin = float(row["origins"])
+            destination = float(row["destinations"])
+            index = int(row["index"])
+
+            feature = QgsFeature()
+            feature.setAttributes([index, origin, destination])
+
+            datalayer.dataProvider().addFeature(feature)
+
+    if not datalayer.isValid():
+        print("Open layer failed to load!")
+    else:
+        QgsProject.instance().addMapLayer(datalayer)

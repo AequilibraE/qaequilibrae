@@ -6,16 +6,7 @@ from qaequilibrae.modules.public_transport_procedures.transit_navigator_dialog i
 @pytest.fixture
 def dialog(pt_project):
     dialog = TransitNavigatorDialog(pt_project)
-    dialog._testing = True
     return dialog
-
-
-def test_show_label_stops(dialog):
-    layer_labels(dialog.stops_layer, dialog.chb_label_stops)
-
-
-def test_show_label_zones(dialog):
-    layer_labels(dialog.zones_layer, dialog.chb_label_zones)
 
 
 def layer_labels(layer, chbox):
@@ -28,6 +19,16 @@ def layer_labels(layer, chbox):
     # Removes labels
     chbox.setChecked(False)
     assert not layer.labelsEnabled()
+
+
+def test_show_label_stops(dialog):
+    dialog.map_stops()
+    layer_labels(dialog.stops_layer, dialog.chb_label_stops)
+
+
+def test_show_label_zones(dialog):
+    dialog.map_zones()
+    layer_labels(dialog.zones_layer, dialog.chb_label_zones)
 
 
 def test_allow_filters(dialog):

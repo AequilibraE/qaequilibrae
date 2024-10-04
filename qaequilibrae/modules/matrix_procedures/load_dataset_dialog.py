@@ -157,7 +157,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
     def progress_value_from_thread(self, val):
         self.progressbar.setValue(val)
 
-    def finished_threaded_procedure(self, param):
+    def finished_threaded_procedure(self):
         self.but_load.setEnabled(True)
         self.but_save_and_use.setEnabled(True)
         self.chb_all_fields.setEnabled(True)
@@ -171,6 +171,9 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def load_from_aequilibrae_format(self):
         out_name, _ = GetOutputFileName(self, "AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed", self.path)
+        self.load_with_file_name(out_name)
+
+    def load_with_file_name(self, out_name):
         try:
             self.dataset = AequilibraeData()
             self.dataset.load(out_name)
@@ -181,15 +184,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def load_the_vector(self):
-        if self.single_use:
-            self.output_name = None
-        else:
-            self.error = None
-            self.output_name, _ = GetOutputFileName(
-                self, "AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed", self.path
-            )
-            if self.output_name is None:
-                self.error = self.tr("No name provided for the output file")
+        self.set_output_name()
 
         if self.radio_layer_matrix.isChecked() and self.error is None:
             self.output_name = self.layer.name()
@@ -216,6 +211,17 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                 )
         if self.error is not None:
             qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1, duration=10)
+
+    def set_output_name(self):
+        if self.single_use:
+            self.output_name = None
+        else:
+            self.error = None
+            self.output_name, _ = GetOutputFileName(
+                self, "AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed", self.path
+            )
+            if self.output_name is None:
+                self.error = self.tr("No name provided for the output file")
 
     def load_just_to_use(self):
         self.single_use = True
