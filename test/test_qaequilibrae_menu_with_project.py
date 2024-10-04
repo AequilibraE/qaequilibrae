@@ -35,7 +35,7 @@ def test_create_example(ae_with_project):
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
     assert (
-        messagebar.messages[2][-1] == "Error:You need to close the project currently open first"
+        messagebar.messages[2][0] == "Error:You need to close the project currently open first"
     ), "Level 2 error message is missing"
 
 
@@ -283,5 +283,5 @@ def test_gtfs_explorer(ae_with_project, qtbot):
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
     assert (
-        messagebar.messages[3][-1] == "Error:You need to import a GTFS feed first"
+        messagebar.messages[3][0] == "Error:You need to import a GTFS feed first"
     ), "Level 3 error message is missing"

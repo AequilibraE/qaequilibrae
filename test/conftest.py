@@ -17,7 +17,9 @@ def folder_path(tmp_path):
 
 @pytest.fixture(scope="function")
 def ae(qgis_iface) -> AequilibraEMenu:
-    return AequilibraEMenu(qgis_iface)
+    ae = AequilibraEMenu(qgis_iface)
+    yield ae
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
 
 
 @pytest.fixture(scope="function")
@@ -29,6 +31,7 @@ def ae_with_project(qgis_iface, folder_path) -> AequilibraEMenu:
     _run_load_project_from_path(ae, folder_path)
     yield ae
     ae.run_close_project()
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
 
 
 @pytest.fixture(scope="function")
@@ -61,6 +64,7 @@ def pt_project(qgis_iface, folder_path) -> AequilibraEMenu:
     _run_load_project_from_path(ae, folder_path)
     yield ae
     ae.run_close_project()
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
 
 
 @pytest.fixture(scope="function")
@@ -72,6 +76,7 @@ def pt_no_feed(qgis_iface, folder_path) -> AequilibraEMenu:
     _run_load_project_from_path(ae, folder_path)
     yield ae
     ae.run_close_project()
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
 
 
 @pytest.fixture(scope="function")
@@ -124,6 +129,7 @@ def coquimbo_project(qgis_iface, create_example) -> AequilibraEMenu:
     _run_load_project_from_path(ae, create_example)
     yield ae
     ae.run_close_project()
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
 
 
 @pytest.fixture

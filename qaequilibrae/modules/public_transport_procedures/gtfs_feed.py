@@ -70,7 +70,6 @@ class GTFSFeed(QDialog, FORM_CLASS):
             self.iface.messageBar().pushMessage("Error", self.tr("Enter agency and description"), level=3, duration=10)
             return
 
-        print(type(self.service_calendar.selectedDate()))
         date = self.service_calendar.selectedDate().toString("yyyy-MM-dd")
         self.feed.set_date(date)
 
