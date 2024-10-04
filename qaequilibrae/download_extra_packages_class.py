@@ -36,6 +36,7 @@ class DownloadAll:
         self.dependency_files = [pth / "requirements.txt", pth / "aequilibrae_version.txt"]
         self.target_folder = pth / "packages"
         self.no_ssl = False
+        self.__version = sys.version_info
 
     def install(self):
         reps = []
@@ -59,8 +60,12 @@ class DownloadAll:
     def install_package(self, package):
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
 
-        install_command = f'-m pip install {package} -t "{self.target_folder}"'
-        if "ortools" in package.lower():
+        pack = package
+        if self.__version >= (3, 12, 6):
+            pack = pack.split("=")[0]
+
+        install_command = f'-m pip install {pack} -t "{self.target_folder}"'
+        if pack.lower() in ["ortools", "pyarrow"]:
             install_command += " --no-deps"
 
         command = f'"{self.find_python()}" {install_command}'
