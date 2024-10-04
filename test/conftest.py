@@ -1,7 +1,8 @@
 import pytest
-from os.path import join
+from os.path import join, exists
+from os import makedirs
 from uuid import uuid4
-from shutil import copytree
+from shutil import copytree, copyfile
 from PyQt5.QtCore import QTimer, QVariant
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject, QgsVectorLayer, QgsField, QgsFeature
@@ -259,8 +260,14 @@ def create_polygons_layer(request):
 @pytest.fixture
 def load_sfalls_from_layer(folder_path, request):
 
-    p = "test/data/SiouxFalls_project" if request.param == None else folder_path
-    path_to_gpkg = f"{p}/SiouxFalls.gpkg"
+    fldr_pth = "test/data/SiouxFalls_project" if request.param == None else folder_path
+
+    if fldr_pth == folder_path:
+        if not exists(fldr_pth):
+            makedirs(fldr_pth)
+        copyfile("test/data/SiouxFalls_project/SiouxFalls.gpkg", f"{fldr_pth}/SiouxFalls.gpkg")
+
+    path_to_gpkg = f"{fldr_pth}/SiouxFalls.gpkg"
 
     # append the layername part
     gpkg_links_layer = path_to_gpkg + "|layername=links"

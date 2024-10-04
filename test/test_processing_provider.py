@@ -97,11 +97,8 @@ def test_matrix_from_layer(folder_path):
     assert np.sum(info["matrix"][parameters["matrix_core"]][:, :]) == 360600
 
 
-@pytest.mark.parametrize("load_sfalls_from_layer", [None], indirect=True)
+@pytest.mark.parametrize("load_sfalls_from_layer", ["tmp"], indirect=True)
 def test_project_from_layer(folder_path, load_sfalls_from_layer):
-    makedirs(folder_path)
-
-    action = ProjectFromLayer()
 
     linkslayer = QgsProject.instance().mapLayersByName("Links layer")[0]
 
@@ -115,6 +112,8 @@ def test_project_from_layer(folder_path, load_sfalls_from_layer):
         linkslayer.updateFeature(feature)
 
     linkslayer.commitChanges()
+
+    action = ProjectFromLayer()
 
     parameters = {
         "links": linkslayer,

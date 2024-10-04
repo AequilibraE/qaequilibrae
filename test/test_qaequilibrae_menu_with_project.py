@@ -282,6 +282,4 @@ def test_gtfs_explorer(ae_with_project, qtbot):
     assert action.text() == "Explore Transit", "Wrong text content"
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert (
-        messagebar.messages[3][0] == "Error:You need to import a GTFS feed first"
-    ), "Level 3 error message is missing"
+    assert messagebar.messages[3][0] == "Error:You need to import a GTFS feed first", "Level 3 error message is missing"
