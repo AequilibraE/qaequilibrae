@@ -35,7 +35,7 @@ jobs:
         pylupdate5 qaequilibrae/i18n/qaequilibrae.pro
         rm qaequilibrae/i18n/qaequilibrae.pro
 
-    - name: Check if there are modifications in the transltion files
+    - name: Check if there are modifications in the translation files
       id: check-modifications
       run: |
         git fetch --no-tags --depth=1 origin develop
