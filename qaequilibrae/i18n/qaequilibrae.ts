@@ -332,17 +332,17 @@
 <context>
     <name>CreateExampleDialog</name>
     <message>
-        <location filename="../modules/project_procedures/create_examples_dialog.py" line="34"/>
+        <location filename="../modules/project_procedures/create_examples_dialog.py" line="33"/>
         <source>Choose output folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/create_examples_dialog.py" line="40"/>
+        <location filename="../modules/project_procedures/create_examples_dialog.py" line="39"/>
         <source>Create</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/create_examples_dialog.py" line="28"/>
+        <location filename="../modules/project_procedures/create_examples_dialog.py" line="27"/>
         <source>Available models:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -475,7 +475,7 @@
     <name>DesireLinesDialog</name>
     <message>
         <location filename="../modules/gis/desire_lines_dialog.py" line="211"/>
-        <source>Inputs not loaded properly. You need the layer and at least one matrix_procedures core</source>
+        <source>Inputs not loaded properly</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -826,67 +826,67 @@
 <context>
     <name>DistributionModelsDialog</name>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="136"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="134"/>
         <source>AequilibraE - Iterative Proportional Fitting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="137"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="135"/>
         <source>Seed matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="141"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="139"/>
         <source>AequilibraE - Apply gravity model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="147"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="145"/>
         <source>AequilibraE - Calibrate gravity model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="148"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="146"/>
         <source>Observed matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="174"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="172"/>
         <source>Function</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="226"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="224"/>
         <source>Could not load model. {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="429"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="423"/>
         <source>Procedure error: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="384"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="379"/>
         <source>Queued</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="402"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="397"/>
         <source>Production vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="405"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="400"/>
         <source>Attraction vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="409"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="404"/>
         <source>Observed (seed) matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="413"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="408"/>
         <source>Impedance matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1225,12 +1225,12 @@
 <context>
     <name>GTFSFeed</name>
     <message>
-        <location filename="../modules/public_transport_procedures/gtfs_feed.py" line="41"/>
+        <location filename="../modules/public_transport_procedures/gtfs_feed.py" line="35"/>
         <source>Target GTFS Feed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/gtfs_feed.py" line="76"/>
+        <location filename="../modules/public_transport_procedures/gtfs_feed.py" line="70"/>
         <source>Enter agency and description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1390,22 +1390,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="178"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="181"/>
         <source>Could not load file. It might be corrupted or not a valid AequilibraE file. {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="192"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="224"/>
         <source>No name provided for the output file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="197"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="192"/>
         <source>Invalid field chosen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="214"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="209"/>
         <source>One cannot load a dataset with indices only</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1436,7 +1436,7 @@
 <context>
     <name>LoadMatrixDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="178"/>
+        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="261"/>
         <source>Invalid field chosen</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2160,37 +2160,37 @@
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="234"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="231"/>
         <source>Class name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="289"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="284"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="347"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="338"/>
         <source>Input error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="377"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="368"/>
         <source>No traffic classes to assign</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="382"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="373"/>
         <source>Missing scenario name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="387"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="378"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="455"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="446"/>
         <source>VDF parameter is not numeric</source>
         <translation type="unfinished"></translation>
     </message>
