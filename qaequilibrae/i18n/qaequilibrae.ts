@@ -478,6 +478,11 @@
         <source>Inputs not loaded properly</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../modules/gis/desire_lines_dialog.py" line="211"/>
+        <source>You need the layer and at least one matrix_procedures core</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DesireLinesProcedure</name>
