@@ -105,7 +105,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run_thread(self):
         self.worker_thread.finished.connect(self.finished)
-        self.worker_thread.start()
+        self.worker_thread.doWork()
         self.exec_()
 
     def finished(self):

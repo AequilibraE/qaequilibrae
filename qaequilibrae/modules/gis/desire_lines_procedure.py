@@ -13,18 +13,19 @@ from qgis._core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFea
 from scipy.spatial import Delaunay
 from PyQt5.QtCore import pyqtSignal
 from qgis.PyQt.QtCore import QVariant
-from aequilibrae.utils.worker_thread import WorkerThread
+from PyQt5.QtCore import QObject
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from aequilibrae.paths import allOrNothing
 
 
-class DesireLinesProcedure(WorkerThread):
+class DesireLinesProcedure(QObject):
     desire_lines = pyqtSignal(object)
 
     def __init__(
         self, parentThread, layer: str, id_field: int, matrix: AequilibraeMatrix, matrix_hash: dict, dl_type: str
     ) -> None:
-        WorkerThread.__init__(self, parentThread)
+        # QObject.__init__(self, parentThread)
+        super(DesireLinesProcedure, self).__init__(parentThread)
         self.layer = layer
         self.id_field = id_field
         self.matrix = matrix
@@ -267,7 +268,7 @@ class DesireLinesProcedure(WorkerThread):
         self.results.prepare(self.graph, self.matrix)
         self.desire_lines.emit(("text_dl", self.tr("Assigning demand")))
         self.desire_lines.emit(("job_size_dl", self.matrix.index.shape[0]))
-        assigner = allOrNothing(self.matrix, self.graph, self.results)
+        assigner = allOrNothing("AoN", self.matrix, self.graph, self.results)
         assigner.execute()
         self.report = assigner.report
         self.desire_lines.emit(("text_dl", self.tr("Collecting results")))

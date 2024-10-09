@@ -324,7 +324,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.worker_thread.assignment.connect(self.signal_handler)
         if self.cb_choose_algorithm.currentText() != "all-or-nothing":
             self.worker_thread.equilibration.connect(self.equilibration_signal_handler)
-        self.worker_thread.start()
+        self.worker_thread.doWork()
         self.exec_()
 
     def job_finished_from_thread(self):

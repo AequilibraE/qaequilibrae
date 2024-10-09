@@ -4,20 +4,20 @@ import uuid
 
 import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
-from aequilibrae.utils.worker_thread import WorkerThread
+from PyQt5.QtCore import QObject
 from scipy.sparse import coo_matrix
 
 from qgis.PyQt.QtCore import pyqtSignal
 
 
-class LoadMatrix(WorkerThread):
+class LoadMatrix(QObject):
     ProgressValue = pyqtSignal(object)
     ProgressText = pyqtSignal(object)
     ProgressMaxValue = pyqtSignal(object)
     finished_threaded_procedure = pyqtSignal(object)
 
     def __init__(self, parentThread, **kwargs):
-        WorkerThread.__init__(self, parentThread)
+        QObject.__init__(self, parentThread)
         self.matrix_type = kwargs.get("type")
         self.numpy_file = kwargs.get("file_path")
         self.layer = kwargs.get("layer")

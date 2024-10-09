@@ -1,16 +1,17 @@
 import shapely.wkb
 
-from aequilibrae.utils.worker_thread import WorkerThread
+from PyQt5.QtCore import QObject
 from PyQt5.QtCore import pyqtSignal
 
 
-class AddZonesProcedure(WorkerThread):
+class AddZonesProcedure(QObject):
     ProgressValue = pyqtSignal(object)
     ProgressText = pyqtSignal(object)
     ProgressMaxValue = pyqtSignal(object)
+    finished = pyqtSignal(object)
 
     def __init__(self, parentThread, project, area_layer, select_only, add_centroids, field_correspondence):
-        WorkerThread.__init__(self, parentThread)
+        QObject.__init__(self, parentThread)
         self.project = project
         self.lyr = area_layer
         self.select_only = select_only
@@ -34,7 +35,7 @@ class AddZonesProcedure(WorkerThread):
             if self.add_centroids:
                 zone.add_centroid(None)
             self.emit_messages(value=i + 1)
-        self.jobFinished.emit("DONE")
+        self.finished.emit("DONE")
 
     def emit_messages(self, message="", value=-1, max_val=-1):
         if len(message) > 0:

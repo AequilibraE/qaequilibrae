@@ -1,13 +1,13 @@
 from PyQt5.QtCore import pyqtSignal
 from aequilibrae.paths import NetworkSkimming
-from aequilibrae.utils.worker_thread import WorkerThread
 
+from PyQt5.QtCore import QObject
 
-class TSPProcedure(WorkerThread):
+class TSPProcedure(QObject):
     finished = pyqtSignal(object)
 
     def __init__(self, parentThread, graph, depot, vehicles):
-        WorkerThread.__init__(self, parentThread)
+        QObject.__init__(self, parentThread)
         self.graph = graph
         self.depot = depot
         self.vehicles = vehicles
@@ -74,4 +74,4 @@ class TSPProcedure(WorkerThread):
             self.node_sequence.append(p)
             plan_output += f" {p}\n"
             self.report.append(plan_output)
-        self.finished.emit("TSP")
+        self.finished.emit(["finished"])

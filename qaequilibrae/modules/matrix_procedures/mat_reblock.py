@@ -1,19 +1,19 @@
 import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
-from aequilibrae.utils.worker_thread import WorkerThread
+from PyQt5.QtCore import QObject
 from scipy.sparse import coo_matrix
 
 from qgis.PyQt.QtCore import pyqtSignal
 
 
-class MatrixReblocking(WorkerThread):
+class MatrixReblocking(QObject):
     ProgressValue = pyqtSignal(object)
     ProgressText = pyqtSignal(object)
     ProgressMaxValue = pyqtSignal(object)
     finished_threaded_procedure = pyqtSignal(object)
 
     def __init__(self, parentThread, **kwargs):
-        WorkerThread.__init__(self, parentThread)
+        QObject.__init__(self, parentThread)
         self.matrix = AequilibraeMatrix()
         self.matrices = kwargs.get("matrices")
         self.sparse = kwargs.get("sparse", False)
