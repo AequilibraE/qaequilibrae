@@ -1,6 +1,5 @@
 from aequilibrae.distribution import Ipf
-
-from aequilibrae.utils.worker_thread import WorkerThread
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 
 
 class IpfProcedure(WorkerThread):

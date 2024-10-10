@@ -103,10 +103,10 @@ class GTFSImporter(QDialog, FORM_CLASS):
         lbl = self.lbl_progress if val[1] == "master" else self.lbl_progress2
 
         if val[0] == "start":
-            lbl.setText(val[3])
-            bar.setRange(0, val[2])
+            lbl.setText(val[2])
+            bar.setRange(0, val[1])
             bar.setValue(0)
         elif val[0] == "update":
-            bar.setValue(val[2])
-            if val[1] != "master" and bar.maximum() == val[2]:
+            bar.setValue(val[1])
+            if val[0] != "master" and bar.maximum() == val[1]:
                 self.progressBar.setValue(self.progressBar.value() + 1)

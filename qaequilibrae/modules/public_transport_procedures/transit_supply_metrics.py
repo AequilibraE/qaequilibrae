@@ -23,7 +23,9 @@ class SupplyMetrics:
 
         patt_sql = """Select pattern_id, route_id, seated_capacity s_capacity, total_capacity t_capacity from routes"""
 
-        stop_sql = f"""Select stop_id, stop, name stop_name, agency_id, route_type, transit_zone zone_id from stops"""
+        stop_sql = (
+            f"""Select stop_id, stop, name stop_name, agency_id, route_type, transit_fare_zone zone_id from stops"""
+        )
 
         stop_pat_sql = """Select pattern_id, cast(from_stop as text) stop_id from route_links
                         UNION ALL

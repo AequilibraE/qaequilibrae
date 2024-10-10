@@ -400,7 +400,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             self.rgap = val[1]
         elif val[0] == "finished_threaded_procedure":
             self.job_finished_from_thread()
-        self.progress_label1.setText(f"{self.iter}/{self.miter} - Rel. Gap {self.rgap:.2E}")
+        print("val: ", val)
+        print(self.iter, self.miter, self.rgap)
+        # self.progress_label1.setText(f"{self.iter}/{self.miter} - Rel. Gap {self.rel_gap:.2E}")
 
     # Save link flows to disk
     def produce_all_outputs(self):

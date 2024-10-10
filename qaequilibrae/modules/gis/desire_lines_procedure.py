@@ -13,7 +13,7 @@ from qgis._core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFea
 from scipy.spatial import Delaunay
 from PyQt5.QtCore import pyqtSignal
 from qgis.PyQt.QtCore import QVariant
-from aequilibrae.utils.worker_thread import WorkerThread
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from aequilibrae.paths import allOrNothing
 
@@ -267,7 +267,7 @@ class DesireLinesProcedure(WorkerThread):
         self.results.prepare(self.graph, self.matrix)
         self.desire_lines.emit(("text_dl", self.tr("Assigning demand")))
         self.desire_lines.emit(("job_size_dl", self.matrix.index.shape[0]))
-        assigner = allOrNothing(self.matrix, self.graph, self.results)
+        assigner = allOrNothing("aon", self.matrix, self.graph, self.results)
         assigner.execute()
         self.report = assigner.report
         self.desire_lines.emit(("text_dl", self.tr("Collecting results")))

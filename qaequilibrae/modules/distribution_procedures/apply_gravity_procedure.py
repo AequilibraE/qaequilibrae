@@ -1,6 +1,5 @@
 from aequilibrae.distribution import GravityApplication
-from aequilibrae.utils.worker_thread import WorkerThread
-from qgis.PyQt.QtCore import *
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 
 
 class ApplyGravityProcedure(WorkerThread):

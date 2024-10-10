@@ -1,5 +1,5 @@
 import numpy as np
-from aequilibrae.utils.worker_thread import WorkerThread
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
