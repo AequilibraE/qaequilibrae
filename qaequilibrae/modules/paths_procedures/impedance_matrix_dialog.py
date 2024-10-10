@@ -128,7 +128,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.do_dist_matrix.setVisible(False)
         self.progressbar.setRange(0, self.graph.num_zones)
         self.worker_thread.skimming.connect(self.signal_handler)
-        self.worker_thread.doWork()
+        self.worker_thread.start()
         self.exec_()
 
     def signal_handler(self, val):

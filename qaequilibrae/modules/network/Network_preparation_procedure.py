@@ -3,11 +3,11 @@ from PyQt5.QtCore import pyqtSignal
 from qgis._core import QgsField, QgsFeatureRequest, QgsPointXY, QgsVectorLayer, QgsGeometry, QgsFeature, QgsSpatialIndex
 
 from qgis.PyQt.QtCore import QVariant
-from PyQt5.QtCore import QObject
+from aequilibrae.utils.worker_thread import WorkerThread
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 
 
-class NetworkPreparationProcedure(QObject):
+class NetworkPreparationProcedure(WorkerThread):
     ProgressValue = pyqtSignal(object)
     ProgressText = pyqtSignal(object)
     ProgressMaxValue = pyqtSignal(object)
@@ -23,7 +23,7 @@ class NetworkPreparationProcedure(QObject):
         new_node_layer=False,
         node_start=0,
     ):
-        QObject.__init__(self, parentThread)
+        WorkerThread.__init__(self, parentThread)
         self.line_layer = line_layer
         self.node_layer = node_layer
         self.node_ids = node_ids

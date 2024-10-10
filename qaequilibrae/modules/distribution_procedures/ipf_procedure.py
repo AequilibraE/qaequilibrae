@@ -1,11 +1,11 @@
 from aequilibrae.distribution import Ipf
 
-from PyQt5.QtCore import QObject
+from aequilibrae.utils.worker_thread import WorkerThread
 
 
-class IpfProcedure(QObject):
+class IpfProcedure(WorkerThread):
     def __init__(self, parentThread, **kwargs):
-        QObject.__init__(self, parentThread)
+        WorkerThread.__init__(self, parentThread)
         self.ipf = Ipf(**kwargs)
         self.error = None
         self.output = None
@@ -15,4 +15,4 @@ class IpfProcedure(QObject):
         self.ipf.fit()
         self.report = self.ipf.report
         self.output = self.ipf.output
-        # self.jobFinished.emit("finishedIPF")
+        self.jobFinished.emit("finishedIPF")

@@ -115,7 +115,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
 
     def run_thread(self):
         self.worker_thread.desire_lines.connect(self.signal_handler)
-        self.worker_thread.doWork()
+        self.worker_thread.start()
         self.exec_()
 
     def load_fields_to_combo_boxes(self):

@@ -1,11 +1,11 @@
 from aequilibrae.distribution import GravityCalibration
-from PyQt5.QtCore import QObject
+from aequilibrae.utils.worker_thread import WorkerThread
 from qgis.PyQt.QtCore import *
 
 
-class CalibrateGravityProcedure(QObject):
+class CalibrateGravityProcedure(WorkerThread):
     def __init__(self, parentThread, **kwargs):
-        QObject.__init__(self, parentThread)
+        WorkerThread.__init__(self, parentThread)
         self.gravity = GravityCalibration(**kwargs)
         self.error = None
         self.report = []
@@ -15,4 +15,4 @@ class CalibrateGravityProcedure(QObject):
         self.gravity.calibrate()
         self.report = self.gravity.report
         self.model = self.gravity.model
-        # self.jobFinished.emit("calibrate")
+        self.jobFinished.emit("calibrate")

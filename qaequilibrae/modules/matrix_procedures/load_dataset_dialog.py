@@ -147,7 +147,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.chb_all_fields.setEnabled(False)
         self.but_load.setEnabled(False)
         self.but_save_and_use.setEnabled(False)
-        self.worker_thread.doWork()
+        self.worker_thread.start()
         self.exec_()
 
     # VAL and VALUE have the following structure: (bar/text ID, value)

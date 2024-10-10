@@ -1,5 +1,5 @@
 import numpy as np
-from PyQt5.QtCore import QObject
+from aequilibrae.utils.worker_thread import WorkerThread
 
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
@@ -7,14 +7,14 @@ from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import multi_line, multi_point, line_types, point_types
 
 
-class SimpleTAG(QObject):
+class SimpleTAG(WorkerThread):
     ProgressText = pyqtSignal(object)
     ProgressValue = pyqtSignal(object)
     ProgressMaxValue = pyqtSignal(object)
     finished_threaded_procedure = pyqtSignal(object)
 
     def __init__(self, parentThread, flayer, tlayer, ffield, tfield, fmatch, tmatch, operation, geo_types):
-        QObject.__init__(self, parentThread)
+        WorkerThread.__init__(self, parentThread)
         self.ffield = ffield
         self.tfield = tfield
         self.fmatch = fmatch

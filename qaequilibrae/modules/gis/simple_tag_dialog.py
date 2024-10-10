@@ -181,7 +181,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
         self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
 
         self.OK.setEnabled(False)
-        self.worker_thread.doWork()
+        self.worker_thread.start()
         self.exec_()
 
     def progress_range_from_thread(self, val):

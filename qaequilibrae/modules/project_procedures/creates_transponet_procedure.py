@@ -3,20 +3,20 @@ from aequilibrae.context import get_logger
 from aequilibrae.project import Project
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import commit_and_close
-from PyQt5.QtCore import QObject
+from aequilibrae.utils.worker_thread import WorkerThread
 from string import ascii_letters
 
 logger = get_logger()
 
 
-class CreatesTranspoNetProcedure(QObject):
+class CreatesTranspoNetProcedure(WorkerThread):
     ProgressValue = pyqtSignal(object)
     ProgressText = pyqtSignal(object)
     ProgressMaxValue = pyqtSignal(object)
     finished_threaded_procedure = pyqtSignal(object)
 
     def __init__(self, parentThread, proj_folder, node_layer, node_fields, link_layer, link_fields):
-        QObject.__init__(self, parentThread)
+        WorkerThread.__init__(self, parentThread)
 
         self.proj_folder = proj_folder
         self.node_fields = node_fields

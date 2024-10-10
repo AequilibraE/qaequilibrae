@@ -3,11 +3,11 @@ from shapely.geometry import Point
 
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import commit_and_close
-from PyQt5.QtCore import QObject
+from aequilibrae.utils.worker_thread import WorkerThread
 from PyQt5.QtCore import pyqtSignal
 
 
-class AddsConnectorsProcedure(QObject):
+class AddsConnectorsProcedure(WorkerThread):
     ProgressValue = pyqtSignal(object)
     ProgressText = pyqtSignal(object)
     ProgressMaxValue = pyqtSignal(object)
@@ -16,7 +16,7 @@ class AddsConnectorsProcedure(QObject):
     def __init__(
         self, parentThread, qgis_project, link_types, modes, num_connectors, source, radius=None, layer=None, field=None
     ):
-        QObject.__init__(self, parentThread)
+        WorkerThread.__init__(self, parentThread)
         self.qgis_project = qgis_project
         self.project = qgis_project.project
         self.link_types = link_types

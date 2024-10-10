@@ -1,21 +1,21 @@
 from qgis.PyQt.QtCore import QVariant
 import numpy as np
 from uuid import uuid4
-from PyQt5.QtCore import QObject
+from aequilibrae.utils.worker_thread import WorkerThread
 import struct
 from aequilibrae.matrix import AequilibraeData
 from qaequilibrae.modules.common_tools.global_parameters import float_types, string_types, integer_types
 from qgis.PyQt.QtCore import pyqtSignal
 
 
-class LoadDataset(QObject):
+class LoadDataset(WorkerThread):
     ProgressText = pyqtSignal(object)
     ProgressValue = pyqtSignal(object)
     ProgressMaxValue = pyqtSignal(object)
     finished_threaded_procedure = pyqtSignal(object)
 
     def __init__(self, parent_thread, layer, index_field, fields, file_name):
-        QObject.__init__(self, parent_thread)
+        WorkerThread.__init__(self, parent_thread)
         self.layer = layer
         self.index_field = index_field
         self.fields = fields

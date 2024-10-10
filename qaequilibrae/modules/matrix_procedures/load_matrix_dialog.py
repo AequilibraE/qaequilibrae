@@ -115,7 +115,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
 
         self.but_load.setEnabled(False)
-        self.worker_thread.doWork()
+        self.worker_thread.start()
         self.exec_()
 
     # VAL and VALUE have the following structure: (bar/text ID, value)
