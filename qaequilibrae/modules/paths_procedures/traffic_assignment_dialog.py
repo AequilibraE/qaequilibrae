@@ -228,7 +228,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         class_name = self.ln_class_name.text()
         if class_name in self.traffic_classes:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Class name already used"), "", level=2)
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Class name already used"), "", level=2, duration=10)
 
         self.but_add_skim.setEnabled(True)
 
@@ -400,9 +400,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             self.rgap = val[1]
         elif val[0] == "finished_threaded_procedure":
             self.job_finished_from_thread()
-        print("val: ", val)
-        print(self.iter, self.miter, self.rgap)
-        # self.progress_label1.setText(f"{self.iter}/{self.miter} - Rel. Gap {self.rel_gap:.2E}")
+        self.progress_label1.setText(f"{self.iter}/{self.miter} - Rel. Gap {self.rel_gap}")
 
     # Save link flows to disk
     def produce_all_outputs(self):
