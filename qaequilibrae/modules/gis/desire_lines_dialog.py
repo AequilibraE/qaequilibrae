@@ -130,7 +130,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         # Signals that will come from traffic assignment
         if val[0] == "zones finalized":
             self.progressbar.setValue(val[1])
-        elif val[0] == "text AoN":
+        elif val[0] == "set_text":
             self.progress_label.setText(val[1])
 
         # Signals that will come from desire lines procedure

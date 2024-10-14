@@ -50,10 +50,15 @@ def test_single_class(ae_with_project, qtbot):
     dialog.cob_capacity.setCurrentText("capacity")
     dialog.cob_ffttime.setCurrentText("free_flow_time")
     dialog.cb_choose_algorithm.setCurrentText("bfw")
-    dialog.max_iter.setText("500")
+    dialog.max_iter.setText("25")
     dialog.rel_gap.setText("0.001")
 
     dialog.run()
+
+    with pytest.raises(ValueError):
+        dialog.produce_all_outputs()
+
+    dialog.close()
 
     pth = Path(dialog.project.project_base_path)
     results = pth / "results_database.sqlite"
@@ -92,7 +97,7 @@ def test_single_class(ae_with_project, qtbot):
         in file_text
     )
     assert "INFO ; Traffic Assignment specification" in file_text
-    assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 30, 'Target RGAP': 0.001}}".format(
+    assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 25, 'Target RGAP': 0.001}}".format(
         num_cores
     )
 
@@ -166,6 +171,8 @@ def test_multiclass(ae_with_project, qtbot):
 
     with pytest.raises(ValueError):
         dialog.produce_all_outputs()
+
+    dialog.close()
 
     # Assert we have a non-null result and that results are actually stored in the file
     pth = Path(dialog.project.project_base_path)
