@@ -88,14 +88,12 @@ class GTFSImporter(QDialog, FORM_CLASS):
 
         for _, feed in enumerate(self.feeds):
             feed.signal.connect(self.signal_handler)
+            feed.execute_import()
 
-            # feed.set_allow_map_match()
-            feed.doWork()
+        self.finished()
 
         self.qgis_project.projectManager.removeTab(0)
         update_project_layers(self.qgis_project)
-
-        self.close()
 
     def signal_handler(self, val):
         # print(val)
@@ -106,7 +104,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
             self.lbl_progress2.clear()
 
         if val[0] == "start":
-            if val[1] == "master":
+            if val[4] == "master":
                 self.lbl_progress.setText(val[3])
                 self.progressBar.setValue(0)
                 self.progressBar.setMaximum(val[2])
@@ -117,7 +115,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
                 self.progressBar2.setValue(0)
                 self.progressBar2.setMaximum(val[2])
         elif val[0] == "update":
-            if val[1] == "master":
+            if val[4] == "master":
                 self.progressBar.setValue(self.progressBar.value() + 1)
                 self.lbl_progress2.setText(val[3])
                 self.progressBar2.setValue(1)
@@ -133,3 +131,6 @@ class GTFSImporter(QDialog, FORM_CLASS):
             self.progressBar2.text(),
             self.lbl_progress2.text(),
         )
+
+    def finished(self):
+        self.close()

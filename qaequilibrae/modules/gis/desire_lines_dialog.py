@@ -128,19 +128,19 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
 
     def signal_handler(self, val):
         # Signals that will come from traffic assignment
-        if val[0] == "zones finalized":
-            self.progressbar.setValue(val[1])
-        elif val[0] == "set_text":
-            self.progress_label.setText(val[1])
+        if val[0] == "set_text":
+            self.progress_label.setText(val[2])
+            self.progressbar.reset()
 
         # Signals that will come from desire lines procedure
-        elif val[0] == "job_size_dl":
-            self.progressbar.setRange(0, val[1])
-        elif val[0] == "jobs_done_dl":
-            self.progressbar.setValue(val[1])
-        elif val[0] == "text_dl":
-            self.progress_label.setText(val[1])
-        elif val[0] == "finished_desire_lines_procedure":
+        elif val[0] == "start":
+            self.progress_label.setText(val[3])
+            self.progressbar.setValue(0)
+            self.progressbar.setMaximum(val[2])
+        elif val[0] == "update":
+            self.progress_label.setText(val[3])
+            self.progressbar.setValue(self.progressbar.value() + 1)
+        elif val[0] == "finished":
             self.job_finished_from_thread()
 
     def job_finished_from_thread(self):

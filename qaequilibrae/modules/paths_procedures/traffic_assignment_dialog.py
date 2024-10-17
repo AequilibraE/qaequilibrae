@@ -382,18 +382,16 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         return tries_setup
 
     def signal_handler(self, val):
-        print("signal handler: ", val)
-        if val[0] == "zones finalized":
-            self.progressbar0.setValue(val[1])
+        if val[0] == "set_position":
+            self.progressbar0.setValue(val[2])
         elif val[0] == "set_text":
-            self.progress_label0.setText(val[1])
+            self.progress_label0.setText(val[3])
         elif val[0] == "finished":
             self.progressbar0.setValue(0)
             if self.cb_choose_algorithm.currentText() == "all-or-nothing":
                 self.job_finished_from_thread()
 
     def equilibration_signal_handler(self, val):
-        print("equilibration signal handler: ", val)
         if val[0] == "key_value":
             if val[1] == "iterations":
                 self.progressbar1.setValue(val[2])
