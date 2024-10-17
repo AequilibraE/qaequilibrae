@@ -228,7 +228,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         class_name = self.ln_class_name.text()
         if class_name in self.traffic_classes:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Class name already used"), "", level=2)
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Class name already used"), "", level=2, duration=10)
 
         self.but_add_skim.setEnabled(True)
 
@@ -328,7 +328,6 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exec_()
 
     def job_finished_from_thread(self):
-        # self.report = self.worker_thread.report
         self.produce_all_outputs()
 
         self.exit_procedure()
@@ -383,24 +382,28 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         return tries_setup
 
     def signal_handler(self, val):
-        if val[0] == "zones finalized":
-            self.progressbar0.setValue(val[1])
-        elif val[0] == "text AoN":
-            self.progress_label0.setText(val[1])
-        elif val[0] == "finished_threaded_procedure":
+        if val[0] == "start":
+            self.progress_label0.setText(val[3])
+            self.progressbar0.setValue(0)
+        elif val[0] == "finished":
             self.progressbar0.setValue(0)
             if self.cb_choose_algorithm.currentText() == "all-or-nothing":
                 self.job_finished_from_thread()
 
     def equilibration_signal_handler(self, val):
-        if val[0] == "iterations":
-            self.progressbar1.setValue(val[1])
-            self.iter = val[1]
-        elif val[0] == "rgap":
-            self.rgap = val[1]
-        elif val[0] == "finished_threaded_procedure":
+        if val[0] == "start":
+            self.progress_label1.setText(val[3])
+            self.progressbar1.setValue(0)
+            self.progressbar1.setMaximum(val[2])
+        elif val[0] == "key_value":
+            if val[3] == "iterations":
+                self.progressbar1.setValue(val[2])
+                self.iter = val[2]
+            elif val[3] == "rgap":
+                self.rgap = val[2]
+        elif val[0] == "finished":
             self.job_finished_from_thread()
-        self.progress_label1.setText(f"{self.iter}/{self.miter} - Rel. Gap {self.rgap:.2E}")
+        self.progress_label1.setText(f"{self.iter}/{self.miter} - Rel. Gap {self.rgap}")
 
     # Save link flows to disk
     def produce_all_outputs(self):

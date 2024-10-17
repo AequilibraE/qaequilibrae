@@ -147,8 +147,8 @@ class DownloadAll:
 
 if __name__ == "__main__":
     result = DownloadAll().install()
-    output = ("".join([str(x).upper() for x in result]))
-    
+    output = "".join([str(x).upper() for x in result])
+
     print(output)
 
     assert "ERROR" not in output

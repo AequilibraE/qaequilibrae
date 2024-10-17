@@ -1,7 +1,7 @@
 from qgis.PyQt.QtCore import QVariant
 import numpy as np
 from uuid import uuid4
-from aequilibrae.utils.worker_thread import WorkerThread
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 import struct
 from aequilibrae.matrix import AequilibraeData
 from qaequilibrae.modules.common_tools.global_parameters import float_types, string_types, integer_types

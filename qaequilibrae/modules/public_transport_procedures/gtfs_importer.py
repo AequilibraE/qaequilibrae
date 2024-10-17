@@ -40,6 +40,20 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.setFixedHeight(380)
         self.items = [self.config_box, self.progress_box]
 
+        self.__transit_tables = [
+            "agencies",
+            "fare_attributes",
+            "fare_rules",
+            "fare_zones",
+            "pattern_mapping",
+            "route_links",
+            "routes",
+            "stop_connectors",
+            "stops",
+            "trips",
+            "trips_schedule",
+        ]
+
     def add_gtfs_feed(self):
         self._p = Transit(self.qgis_project.project)
         self.dlg2 = GTFSFeed(self.qgis_project, self._p)
@@ -69,44 +83,54 @@ class GTFSImporter(QDialog, FORM_CLASS):
 
         if self.rdo_clear.isChecked() and self.is_pt_database:
             with commit_and_close(database_connection("transit")) as conn:
-                for table in [
-                    "agencies",
-                    "fare_attributes",
-                    "fare_rules",
-                    "fare_zones",
-                    "pattern_mapping",
-                    "route_links",
-                    "routes",
-                    "stop_connectors",
-                    "stops",
-                    "trips",
-                    "trips_schedule",
-                ]:
+                for table in self.__transit_tables:
                     conn.execute(f"DELETE FROM {table};")
 
         for _, feed in enumerate(self.feeds):
             feed.signal.connect(self.signal_handler)
+            feed.execute_import()
 
-            feed.set_allow_map_match(True)
-            feed.doWork()
+        self.finished()
 
         self.qgis_project.projectManager.removeTab(0)
         update_project_layers(self.qgis_project)
 
-        self.close()
-
     def signal_handler(self, val):
+        # print(val)
         if len(val) == 1:
-            return
-
-        bar = self.progressBar if val[1] == "master" else self.progressBar2
-        lbl = self.lbl_progress if val[1] == "master" else self.lbl_progress2
+            self.progressBar.reset()
+            self.lbl_progress.clear()
+            self.progressBar2.reset()
+            self.lbl_progress2.clear()
 
         if val[0] == "start":
-            lbl.setText(val[3])
-            bar.setRange(0, val[2])
-            bar.setValue(0)
+            if val[4] == "master":
+                self.lbl_progress.setText(val[3])
+                self.progressBar.setValue(0)
+                self.progressBar.setMaximum(val[2])
+                self.progressBar2.reset()
+                self.lbl_progress2.clear()
+            else:
+                self.lbl_progress2.setText(val[3])
+                self.progressBar2.setValue(0)
+                self.progressBar2.setMaximum(val[2])
         elif val[0] == "update":
-            bar.setValue(val[2])
-            if val[1] != "master" and bar.maximum() == val[2]:
+            if val[4] == "master":
                 self.progressBar.setValue(self.progressBar.value() + 1)
+                self.lbl_progress2.setText(val[3])
+                self.progressBar2.setValue(1)
+            else:
+                self.lbl_progress2.setText(val[3])
+                self.progressBar2.setValue(val[2])
+
+        print(
+            "pbar1: ",
+            self.progressBar.text(),
+            self.lbl_progress.text(),
+            "// pbar2: ",
+            self.progressBar2.text(),
+            self.lbl_progress2.text(),
+        )
+
+    def finished(self):
+        self.close()

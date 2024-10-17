@@ -3,7 +3,7 @@ from shapely.geometry import Point
 
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import commit_and_close
-from aequilibrae.utils.worker_thread import WorkerThread
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 from PyQt5.QtCore import pyqtSignal
 
 
