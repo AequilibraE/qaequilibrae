@@ -129,8 +129,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
     def signal_handler(self, val):
         # Signals that will come from traffic assignment
         if val[0] == "set_text":
-            self.progress_label.setText(val[2])
-            self.progressbar.reset()
+            self.progress_label.setText(val[3])
 
         # Signals that will come from desire lines procedure
         elif val[0] == "start":
@@ -138,7 +137,6 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             self.progressbar.setValue(0)
             self.progressbar.setMaximum(val[2])
         elif val[0] == "update":
-            self.progress_label.setText(val[3])
             self.progressbar.setValue(self.progressbar.value() + 1)
         elif val[0] == "finished":
             self.job_finished_from_thread()

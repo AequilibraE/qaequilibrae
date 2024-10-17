@@ -47,7 +47,7 @@ class DesireLinesProcedure(WorkerThread):
             elif self.dl_type == "DelaunayLines":
                 self.do_delaunay_lines()
 
-        self.desire_lines.emit(("finished", 0))
+        self.desire_lines.emit(("finished"))
 
     def get_basic_data(self):
         layer = get_vector_layer_by_name(self.layer)
@@ -61,7 +61,6 @@ class DesireLinesProcedure(WorkerThread):
                 point = list(geom.centroid().asPoint())
                 centroid_id = feat.attributes()[idx]
                 all_centroids[centroid_id] = point
-            # self.desire_lines.emit(("jobs_done_dl", P))
             self.desire_lines.emit(("update", 0, P, f"Loading Layer Features: {P} / {feature_count}", "master"))
         # Creating resulting layer
         EPSG_code = int(layer.crs().authid().split(":")[1])
@@ -85,27 +84,26 @@ class DesireLinesProcedure(WorkerThread):
         coord_index = np.zeros((max_zone, 2))
         coord_index[coords[:, 0].astype(np.int64), 0] = coords[:, 1]
         coord_index[coords[:, 0].astype(np.int64), 1] = coords[:, 2]
-        self.desire_lines.emit(("start", self.tr("Manipulating matrix indices")))
+        self.desire_lines.emit(("set_text", 0, 1, self.tr("Manipulating matrix indices"), "master"))
         zones = self.matrix.index[:].shape[0]
         a = np.array(self.matrix.index[:], np.int64)
         ij, ji = np.meshgrid(a, a, sparse=False, indexing="ij")
         ij = ij.flatten()
         ji = ji.flatten()
         arrays = [ij, ji]
-        # self.desire_lines.emit(("set_text", 0, 0, self.tr("Collecting all matrices"),"master"))
-        self.desire_lines.emit(["start", 0, len(self.matrix.view_names), "Collecting all matrices", "master"])
+        self.desire_lines.emit(("start", 0, len(self.matrix.view_names), "Collecting all matrices", "master"))
         total_mat = np.zeros((zones, zones), np.float64)
         for i, mat in enumerate(self.matrix.view_names):
             m = self.matrix.get_matrix(mat)
             total_mat += m
             arrays.append(m.flatten())
-            self.desire_lines.emit(("jobs_done_dl", i + 1))
+            self.desire_lines.emit(("update", 0, i, f"Matrices collected: {i}", "master"))
 
         # Eliminates the cells for which we don't have geography
-        self.desire_lines.emit(["text_dl", self.tr("Filtering zones with no geography available")])
+        self.desire_lines.emit(("set_text", 0, 0, self.tr("Filtering zones with no geography available"), "master"))
         zones_with_no_geography = [x for x in self.matrix.index[:] if x not in all_centroids]
         if zones_with_no_geography:
-            self.desire_lines.emit(("job_size_dl", len(zones_with_no_geography)))
+            self.desire_lines.emit(("start", 0, len(zones_with_no_geography), "Zones with no geometry", "master"))
         for k, z in enumerate(zones_with_no_geography):
             i = self.matrix.matrix_hash[z]
             t = np.nansum(total_mat[i, :]) + np.nansum(total_mat[:, i])
@@ -113,9 +111,9 @@ class DesireLinesProcedure(WorkerThread):
             self.report.append(f"Zone {z} does not have a corresponding centroid/zone. Total flow {t}")
             total_mat[i, :] = 0
             total_mat[:, i] = 0
-            self.desire_lines.emit(("jobs_done_dl", k + 1))
+            self.desire_lines.emit(("update", 0, k, f"Zones with no geometry: {k}", "master"))
 
-        self.desire_lines.emit(("text_dl", self.tr("Filtering down to OD pairs with flows")))
+        self.desire_lines.emit(("set_text", 0, 0, self.tr("Filtering down to OD pairs with flows"), "master"))
         field_names = [x for x in self.matrix.view_names]
         nonzero = np.nonzero(total_mat.flatten())
         arrays = np.vstack(arrays).transpose()
@@ -136,7 +134,7 @@ class DesireLinesProcedure(WorkerThread):
         defaults1 = {x + "_AB": 0.0 for x in field_names}
         defaults = {x + "_BA": 0.0 for x in field_names}
         defaults = {**defaults, **defaults1}
-        self.desire_lines.emit(("text_dl", self.tr("Concatenating AB & BA flows")))
+        self.desire_lines.emit(("set_text", 0, 0, self.tr("Concatenating AB & BA flows"), "master"))
         flows = rfn.join_by(
             ["from", "to"], flows_ab, flows_ba, jointype="outer", defaults=defaults, usemask=True, asrecarray=True
         )
@@ -162,7 +160,7 @@ class DesireLinesProcedure(WorkerThread):
             attrs.extend([float(x) for x in list(rec)[2:]])
             feature.setAttributes(attrs)
             all_features.append(feature)
-            self.desire_lines.emit(("update", 0, i, f"{i}", None))
+            self.desire_lines.emit(("update", 0, i, f"Creating lines: {i} / {len(flows)}", "master"))
         if unnasigned > 0:
             self.report.append(f"Total non assigned flows (not counting intrazonals): {str(unnasigned)}")
         if flows.shape[0] > 1:
@@ -187,9 +185,9 @@ class DesireLinesProcedure(WorkerThread):
         points = []
         node_id_in_delaunay_results = {}
         i = 0
-        self.desire_lines.emit(["start", 0, len(all_centroids), self.tr("Building Delaunay dataset", "master")])
+        self.desire_lines.emit(("start", 0, len(all_centroids), self.tr("Building Delaunay dataset"), "master"))
         for k, v in all_centroids.items():
-            self.desire_lines.emit(["update", 0, i, f"{i}", "master"])
+            self.desire_lines.emit(("update", 0, i, f"Building Delaunay dataset: {i}", "master"))
             points.append(v)
             node_id_in_delaunay_results[i] = k
             i += 1
@@ -202,17 +200,17 @@ class DesireLinesProcedure(WorkerThread):
         else:
             all_edges = tri.simplices
         self.desire_lines.emit(
-            "start", 0, len(all_edges), self.tr("Building Delaunay Network: Collecting Edges"), "master"
+            ("start", 0, len(all_edges), self.tr("Building Delaunay Network: Collecting Edges"), "master")
         )
         for j, triangle in enumerate(all_edges):
-            self.desire_lines.emit(["update", 0, j, f"Edges updated: {j}", "master"])
+            self.desire_lines.emit(("update", 0, j, f"Collecting Edges: {j}", "master"))
             links = list(itertools.combinations(triangle, 2))
             for i in links:
                 edges.append([min(i[0], i[1]), max(i[0], i[1])])
         self.desire_lines.emit(("set_text", 0, 0, self.tr("Building Delaunay Network: Getting unique edges", "master")))
         edges = OrderedDict((str(x), x) for x in edges).values()
+
         # Writing Delaunay layer
-        self.desire_lines.emit(("set_text", 0, 0, self.tr("Building Delaunay Network: Assembling Layer"), "master"))
         desireline_link_id = 1
         data = []
         dl_ids_on_links = {}
@@ -220,7 +218,7 @@ class DesireLinesProcedure(WorkerThread):
             ["start", 0, len(edges), self.tr("Building Delaunay Network: Assembling Layer"), "master"]
         )
         for j, edge in enumerate(edges):
-            self.desire_lines.emit(("jobs_done_dl", j))
+            self.desire_lines.emit(("update", 0, j, f"Assembling Layer: {j}", "master"))
             a_node = node_id_in_delaunay_results[edge[0]]
             a_point = all_centroids[a_node]
             a_point = QgsPointXY(a_point[0], a_point[1])
@@ -270,17 +268,17 @@ class DesireLinesProcedure(WorkerThread):
         self.graph.set_blocked_centroid_flows(False)
         self.results = AssignmentResults()
         self.results.prepare(self.graph, self.matrix)
-        self.desire_lines.emit(("start", 0, self.matrix.index.shape[0], self.tr("Assigning demand"), "master"))
+        self.desire_lines.emit(("start", 0, 1, self.tr("Assigning demand"), "master"))
         assigner = allOrNothing("aon", self.matrix, self.graph, self.results)
         assigner.execute()
         self.report = assigner.report
-        self.desire_lines.emit(("update", 0, self.matrix.index.shape[0], self.tr("Collecting results"), "master"))
+        self.desire_lines.emit(("update", 0, 1, self.tr("Collecting results"), "master"))
         features = []
         max_edges = len(edges)
-        self.desire_lines.emit(["start", 0, max_edges, self.tr("Building resulting layer"), "master"])
+        self.desire_lines.emit(("start", 0, max_edges, self.tr("Building resulting layer"), "master"))
         link_loads = self.results.get_load_results()
         for i, link_id in enumerate(link_loads.index):
-            self.desire_lines.emit(("update", 0, i, f"{i}", "master"))
+            self.desire_lines.emit(("update", 0, i, f"Building resulting layer: {i}", "master"))
             a_node, b_node, direct, dist = dl_ids_on_links[link_id]
 
             attr = [int(link_id), a_node, b_node, direct, dist]
