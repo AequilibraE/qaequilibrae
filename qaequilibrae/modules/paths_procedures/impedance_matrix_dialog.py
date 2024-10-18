@@ -132,11 +132,11 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exec_()
 
     def signal_handler(self, val):
-        if val[0] == "zones finalized":
+        if val[0] == "set_position":
             self.progressbar.setValue(val[1])
-        elif val[0] == "text skimming":
+        elif val[0] == "set_text":
             self.progress_label.setText(val[1])
-        elif val[0] == "finished_threaded_procedure":
+        elif val[0] == "finished":
             self.finished_threaded_procedure()
 
     def finished_threaded_procedure(self):

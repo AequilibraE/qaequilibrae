@@ -11,10 +11,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 
 class LoadMatrix(WorkerThread):
-    ProgressValue = pyqtSignal(object)
-    ProgressText = pyqtSignal(object)
-    ProgressMaxValue = pyqtSignal(object)
-    finished_threaded_procedure = pyqtSignal(object)
+    signal = pyqtSignal(object)
 
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
@@ -31,9 +28,8 @@ class LoadMatrix(WorkerThread):
 
     def doWork(self):
         if self.matrix_type == "layer":
-            self.ProgressText.emit(self.tr("Loading from table"))
             feat_count = self.layer.featureCount()
-            self.ProgressMaxValue.emit(feat_count)
+            self.signal.emit(["start", 0, feat_count, self.tr("Loading from table"), "master"])
 
             # We read all the vectors and put in a list of lists
             matrix = []
@@ -45,11 +41,10 @@ class LoadMatrix(WorkerThread):
                 c = feat.attributes()[self.idx[2]]
                 matrix.append([a, b, c])
                 if P % 1000 == 0:
-                    self.ProgressValue.emit(int(P))
-                    self.ProgressText.emit(self.tr("Loading matrix: {}/{}").format(P, feat_count))
+                    txt = self.tr("Loading matrix: {}/{}").format(P, feat_count)
+                    self.signal.emit(["update", 0, int(P), txt, "master"])
 
-            self.ProgressValue.emit(0)
-            self.ProgressText.emit(self.tr("Converting to a NumPy array"))
+            self.signal.emit(["set_text", 0, 0, self.tr("Converting to a NumPy array"), "master"])
 
             matrix1 = np.array(matrix)  # transform the list of lists in NumPy array
             del matrix
@@ -68,7 +63,7 @@ class LoadMatrix(WorkerThread):
             del matrix1
 
         elif self.matrix_type == "numpy":
-            self.ProgressText.emit(self.tr("Loading from NumPy"))
+            self.signal.emit(["set_text", 0, 0, self.tr("Loading from NumPy"), "master"])
             try:
                 mat = np.load(self.numpy_file)
                 if len(mat.shape[:]) == 2:
@@ -91,5 +86,4 @@ class LoadMatrix(WorkerThread):
             except Exception as e:
                 self.report.append(f"Could not load array. {e.args}")
 
-        self.ProgressText.emit("")
-        self.finished_threaded_procedure.emit("LOADED-MATRIX")
+        self.signal.emit(["finished", 0, 0, "LOADED-MATRIX", "master"])

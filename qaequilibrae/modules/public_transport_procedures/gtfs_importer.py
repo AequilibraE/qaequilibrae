@@ -90,13 +90,12 @@ class GTFSImporter(QDialog, FORM_CLASS):
             feed.signal.connect(self.signal_handler)
             feed.execute_import()
 
-        self.finished()
-
         self.qgis_project.projectManager.removeTab(0)
         update_project_layers(self.qgis_project)
 
+        self.close()
+
     def signal_handler(self, val):
-        # print(val)
         if len(val) == 1:
             self.progressBar.reset()
             self.lbl_progress.clear()
@@ -122,15 +121,3 @@ class GTFSImporter(QDialog, FORM_CLASS):
             else:
                 self.lbl_progress2.setText(val[3])
                 self.progressBar2.setValue(val[2])
-
-        print(
-            "pbar1: ",
-            self.progressBar.text(),
-            self.lbl_progress.text(),
-            "// pbar2: ",
-            self.progressBar2.text(),
-            self.lbl_progress2.text(),
-        )
-
-    def finished(self):
-        self.close()

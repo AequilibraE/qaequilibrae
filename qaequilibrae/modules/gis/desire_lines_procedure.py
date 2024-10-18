@@ -47,7 +47,7 @@ class DesireLinesProcedure(WorkerThread):
             elif self.dl_type == "DelaunayLines":
                 self.do_delaunay_lines()
 
-        self.desire_lines.emit(("finished"))
+        self.desire_lines.emit(["finished"])
 
     def get_basic_data(self):
         layer = get_vector_layer_by_name(self.layer)

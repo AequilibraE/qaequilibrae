@@ -13,6 +13,7 @@ class LoadDataset(WorkerThread):
     ProgressValue = pyqtSignal(object)
     ProgressMaxValue = pyqtSignal(object)
     finished_threaded_procedure = pyqtSignal(object)
+    signal = pyqtSignal(object)
 
     def __init__(self, parent_thread, layer, index_field, fields, file_name):
         WorkerThread.__init__(self, parent_thread)
@@ -79,4 +80,5 @@ class LoadDataset(WorkerThread):
                 self.ProgressValue.emit(p)
 
             self.ProgressValue.emit(feat_count)
-        self.finished_threaded_procedure.emit("Done")
+        # self.finished_threaded_procedure.emit("Done")
+        self.signal.emit(["finished"])
