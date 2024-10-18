@@ -14,4 +14,4 @@ class CalibrateGravityProcedure(WorkerThread):
         self.gravity.calibrate()
         self.report = self.gravity.report
         self.model = self.gravity.model
-        self.jobFinished.emit("calibrate")
+        self.jobFinished.emit(["finished", 0, 0, "calibrate", "master"])

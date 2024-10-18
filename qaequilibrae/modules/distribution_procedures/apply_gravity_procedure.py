@@ -14,4 +14,4 @@ class ApplyGravityProcedure(WorkerThread):
         self.gravity.apply()
         self.output = self.gravity.output
         self.report = self.gravity.report
-        self.jobFinished.emit("apply_gravity")
+        self.jobFinished.emit(["finished", 0, 0, "apply_gravity", "master"])

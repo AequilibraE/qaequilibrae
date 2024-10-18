@@ -73,7 +73,7 @@ class SimpleTAG(WorkerThread):
         self.signal.emit(["start", 0, to_layer_counts, self.tr("Spatial index for target layer"), "master"])
         allfeatures = {}
         for i, feature in enumerate(self.to_layer.getFeatures()):
-            self.signal.emit(["update", 0, i + 1, f"Target layer: {i}" ,"master"])
+            self.signal.emit(["update", 0, i + 1, f"Target layer: {i}", "master"])
             self.index.addFeature(feature)
             allfeatures[feature.id()] = feature
         self.all_attr = {}
@@ -87,7 +87,7 @@ class SimpleTAG(WorkerThread):
         self.from_val = {}
         for i, feature in enumerate(self.from_layer.getFeatures()):
             if i % 1000 == 0:
-                self.signal.emit(["update", 0, i + 1, f"Source layer: {i}" ,"master"])
+                self.signal.emit(["update", 0, i + 1, f"Source layer: {i}", "master"])
             self.index_from.addFeature(feature)
             self.from_val[feature.id()] = feature.attributes()[idx]
             self.from_features[feature.id()] = feature
@@ -96,14 +96,14 @@ class SimpleTAG(WorkerThread):
         self.from_count = len(self.from_val.keys())  # Number of features in the source layer
         # Now we will have the code for all the possible configurations of input layer and output layer
         for i, feat in enumerate(self.to_layer.getFeatures()):
-            self.signal.emit(["update", 0, i + 1, f"Features: {i}" ,"master"])
+            self.signal.emit(["update", 0, i + 1, f"Features: {i}", "master"])
             self.chooses_match(feat)
             if feat.id() not in self.all_attr:
                 self.all_attr[feat.id()] = None
 
         self.signal.emit(["start", 0, to_layer_counts, self.tr("Writing data to target layer"), "master"])
         for i, feat in enumerate(self.to_layer.getFeatures()):
-            self.signal.emit(["update", 0, i + 1, f"Writing data to target layer: {i}" ,"master"])
+            self.signal.emit(["update", 0, i + 1, f"Writing data to target layer: {i}", "master"])
             if self.all_attr[feat.id()] is not None:
                 _ = self.to_layer.dataProvider().changeAttributeValues({feat.id(): {fid: self.all_attr[feat.id()]}})
 

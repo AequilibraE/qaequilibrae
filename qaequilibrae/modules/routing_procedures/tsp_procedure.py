@@ -4,7 +4,7 @@ from aequilibrae.utils.interface.worker_thread import WorkerThread
 
 
 class TSPProcedure(WorkerThread):
-    finished = pyqtSignal(object)
+    signal = pyqtSignal(object)
 
     def __init__(self, parentThread, graph, depot, vehicles):
         WorkerThread.__init__(self, parentThread)
@@ -74,4 +74,4 @@ class TSPProcedure(WorkerThread):
             self.node_sequence.append(p)
             plan_output += f" {p}\n"
             self.report.append(plan_output)
-        self.finished.emit("TSP")
+        self.signal.emit(["finished"])

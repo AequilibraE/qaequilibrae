@@ -235,7 +235,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             return self.tr("If only target is a polygon, target needs to enclose source.")
         elif order == 3:
             return self.tr("First found record is used.")
-        
+
     def signal_handler(self, val):
         if val[0] == "start":
             self.lbl_operation.setText(val[3])
@@ -252,8 +252,8 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             self.progressbar.reset()
             if self.worker_thread.error is not None:
                 qgis.utils.iface.messageBar().pushMessage(
-                self.tr("Input data not provided correctly"), self.worker_thread.error, level=3
-            )
+                    self.tr("Input data not provided correctly"), self.worker_thread.error, level=3
+                )
             self.close()
 
 
