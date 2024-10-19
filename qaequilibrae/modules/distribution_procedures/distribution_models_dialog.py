@@ -435,3 +435,4 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
             dlg2.exec_()
+        self.close()
