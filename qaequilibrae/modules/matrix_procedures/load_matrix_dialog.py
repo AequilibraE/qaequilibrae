@@ -159,8 +159,6 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                         # compression not implemented yet
                     self.exit_procedure()
 
-        print("pbar: ", self.progressbar.text(), self.progress_label.text())
-
     def __create_appropriate_name(self, nm: str) -> str:
         nm = nm.replace(" ", "_")
         if len(nm) > CORE_NAME_MAX_LENGTH - 3:

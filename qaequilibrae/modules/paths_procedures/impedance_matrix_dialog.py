@@ -143,7 +143,6 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.progressbar.reset()
             self.progress_label.clear()
             self.finished_threaded_procedure()
-        # print("pbar: ", self.progressbar.text(), self.progress_label.text())
 
     def finished_threaded_procedure(self):
         self.report = self.worker_thread.report
