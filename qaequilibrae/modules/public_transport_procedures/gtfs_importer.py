@@ -96,28 +96,16 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.close()
 
     def signal_handler(self, val):
-        if len(val) == 1:
-            self.progressBar.reset()
-            self.lbl_progress.clear()
-            self.progressBar2.reset()
-            self.lbl_progress2.clear()
-
         if val[0] == "start":
-            if val[4] == "master":
-                self.lbl_progress.setText(val[3])
-                self.progressBar.setValue(0)
-                self.progressBar.setMaximum(val[2])
-                self.progressBar2.reset()
-                self.lbl_progress2.clear()
-            else:
-                self.lbl_progress2.setText(val[3])
-                self.progressBar2.setValue(0)
-                self.progressBar2.setMaximum(val[2])
+            self.progress_bar.setValue(0)
+            self.progress_bar.setMaximum(val[2])
+            self.progress_label.setText(val[3])
         elif val[0] == "update":
-            if val[4] == "master":
-                self.progressBar.setValue(self.progressBar.value() + 1)
-                self.lbl_progress2.setText(val[3])
-                self.progressBar2.setValue(1)
-            else:
-                self.lbl_progress2.setText(val[3])
-                self.progressBar2.setValue(val[2])
+            self.progress_bar.setValue(val[2])
+            self.progress_label.setText(val[3])
+        elif val[0] == "set_text":
+            self.progress_bar.reset()
+            self.progress_label.setText(val[3])
+        elif val[0] == "finished":
+            self.progress_bar.reset()
+            self.progress_label.clear()
