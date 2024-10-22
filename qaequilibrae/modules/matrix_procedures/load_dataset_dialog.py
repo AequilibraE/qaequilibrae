@@ -140,9 +140,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.set_tables_with_fields()
 
     def run_thread(self):
-        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
-        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
-        self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
+        self.worker_thread.signal.connect(self.signal_handler)
 
         self.chb_all_fields.setEnabled(False)
         self.but_load.setEnabled(False)
@@ -150,24 +148,25 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.worker_thread.start()
         self.exec_()
 
-    # VAL and VALUE have the following structure: (bar/text ID, value)
-    def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val)
-
-    def progress_value_from_thread(self, val):
-        self.progressbar.setValue(val)
-
-    def finished_threaded_procedure(self):
-        self.but_load.setEnabled(True)
-        self.but_save_and_use.setEnabled(True)
-        self.chb_all_fields.setEnabled(True)
-        if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage(
-                self.tr("Error while loading vector:"), self.worker_thread.error, level=1
-            )
-        else:
-            self.dataset = self.worker_thread.output
-        self.exit_procedure()
+    def signal_handler(self, val):
+        if val[0] == "start":
+            self.progressbar.setValue(0)
+            self.progressbar.setMaximum(val[2])
+        elif val[0] == "update":
+            self.progressbar.setValue(val[2])
+        elif val[0] == "set_text":
+            self.progressbar.setValue(val[2])
+        elif val[0] == "finished":
+            self.but_load.setEnabled(True)
+            self.but_save_and_use.setEnabled(True)
+            self.chb_all_fields.setEnabled(True)
+            if self.worker_thread.error is not None:
+                qgis.utils.iface.messageBar().pushMessage(
+                    self.tr("Error while loading vector:"), self.worker_thread.error, level=1
+                )
+            else:
+                self.dataset = self.worker_thread.output
+            self.exit_procedure()
 
     def load_from_aequilibrae_format(self):
         out_name, _ = GetOutputFileName(self, "AequilibraE dataset", ["Aequilibrae dataset(*.aed)"], ".aed", self.path)

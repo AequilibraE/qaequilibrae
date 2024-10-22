@@ -9,10 +9,6 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 
 class LoadDataset(WorkerThread):
-    ProgressText = pyqtSignal(object)
-    ProgressValue = pyqtSignal(object)
-    ProgressMaxValue = pyqtSignal(object)
-    finished_threaded_procedure = pyqtSignal(object)
     signal = pyqtSignal(object)
 
     def __init__(self, parent_thread, layer, index_field, fields, file_name):
@@ -27,7 +23,7 @@ class LoadDataset(WorkerThread):
 
     def doWork(self):
         feat_count = self.layer.featureCount()
-        self.ProgressMaxValue.emit(feat_count)
+        self.signal.emit(["start", 0, feat_count, f"Total features: {feat_count}", "master"])
 
         # Create specification for the output file
         datafile_spec = {"entries": feat_count}
@@ -77,8 +73,7 @@ class LoadDataset(WorkerThread):
                     else:
                         self.output.data[field][p] = feat.attributes()[idx]
                 self.output.index[p] = feat.attributes()[index_idx]
-                self.ProgressValue.emit(p)
+                self.signal.emit(["update", 0, p, f"Feature count: {p}", "master"])
 
-            self.ProgressValue.emit(feat_count)
-        # self.finished_threaded_procedure.emit("Done")
+        self.signal.emit(["set_text", 0, feat_count, f"Feature count: {feat_count}", "master"])
         self.signal.emit(["finished"])
