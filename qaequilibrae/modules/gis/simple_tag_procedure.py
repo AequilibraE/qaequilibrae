@@ -1,5 +1,5 @@
 import numpy as np
-from aequilibrae.utils.worker_thread import WorkerThread
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsSpatialIndex, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
@@ -8,10 +8,7 @@ from qaequilibrae.modules.common_tools.global_parameters import multi_line, mult
 
 
 class SimpleTAG(WorkerThread):
-    ProgressText = pyqtSignal(object)
-    ProgressValue = pyqtSignal(object)
-    ProgressMaxValue = pyqtSignal(object)
-    finished_threaded_procedure = pyqtSignal(object)
+    signal = pyqtSignal(object)
 
     def __init__(self, parentThread, flayer, tlayer, ffield, tfield, fmatch, tmatch, operation, geo_types):
         WorkerThread.__init__(self, parentThread)
@@ -52,16 +49,15 @@ class SimpleTAG(WorkerThread):
         self.from_features = {}
 
     def doWork(self):
-        self.ProgressText.emit(self.tr("Initializing. Sit tight"))
-        self.ProgressValue.emit(0)
+        self.signal.emit(["set_text", 0, 0, self.tr("Initializing. Sit tight"), "master"])
+
+        to_layer_counts = self.to_layer.dataProvider().featureCount()
+        from_layer_counts = self.from_layer.dataProvider().featureCount()
 
         EPSG1 = QgsCoordinateReferenceSystem(f"EPSG:{int(self.from_layer.crs().authid().split(":")[1])}")
         EPSG2 = QgsCoordinateReferenceSystem(f"EPSG:{int(self.to_layer.crs().authid().split(":")[1])}")
         if EPSG1 != EPSG2:
             self.transform = QgsCoordinateTransform(EPSG1, EPSG2, QgsProject.instance())
-
-        # PROGRESS BAR
-        self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
 
         # FIELDS INDICES
         idx = self.from_layer.dataProvider().fieldNameIndex(self.ffield)
@@ -74,13 +70,12 @@ class SimpleTAG(WorkerThread):
             self.to_match = {feature.id(): feature.attributes()[idq2] for (feature) in self.to_layer.getFeatures()}
 
         # We create an spatial self.index to hold all the features of the layer that will receive the data
-        self.ProgressText.emit(self.tr("Spatial index for target layer"))
-        self.ProgressValue.emit(0)
+        self.signal.emit(["start", 0, to_layer_counts, self.tr("Spatial index for target layer"), "master"])
         allfeatures = {}
         for i, feature in enumerate(self.to_layer.getFeatures()):
+            self.signal.emit(["update", 0, i + 1, f"Target layer: {i}", "master"])
             self.index.addFeature(feature)
             allfeatures[feature.id()] = feature
-            self.ProgressValue.emit(i)
         self.all_attr = {}
 
         # Appending the line below would secure perfect results, but yields a VERY slow algorithm for when
@@ -88,42 +83,34 @@ class SimpleTAG(WorkerThread):
         # self.sequence_of_searches.append(self.from_count)
 
         # Dictionary with the FROM values
-        self.ProgressMaxValue.emit(self.from_layer.dataProvider().featureCount())
-        self.ProgressText.emit(self.tr("Spatial index for source layer"))
+        self.signal.emit(["start", 0, from_layer_counts, self.tr("Spatial index for source layer"), "master"])
         self.from_val = {}
         for i, feature in enumerate(self.from_layer.getFeatures()):
+            if i % 1000 == 0:
+                self.signal.emit(["update", 0, i + 1, f"Source layer: {i}", "master"])
             self.index_from.addFeature(feature)
-            self.ProgressValue.emit(i)
             self.from_val[feature.id()] = feature.attributes()[idx]
             self.from_features[feature.id()] = feature
 
-        # The spatial self.index for source layer
-        self.ProgressValue.emit(0)
-
+        self.signal.emit(["start", 0, to_layer_counts, self.tr("Performing spatial matching"), "master"])
         self.from_count = len(self.from_val.keys())  # Number of features in the source layer
-        self.ProgressText.emit(self.tr("Performing spatial matching"))
-        self.ProgressValue.emit(0)
-        self.ProgressMaxValue.emit(self.to_layer.dataProvider().featureCount())
         # Now we will have the code for all the possible configurations of input layer and output layer
         for i, feat in enumerate(self.to_layer.getFeatures()):
-            self.ProgressValue.emit(i)
-
+            self.signal.emit(["update", 0, i + 1, f"Features: {i}", "master"])
             self.chooses_match(feat)
             if feat.id() not in self.all_attr:
                 self.all_attr[feat.id()] = None
 
-        self.ProgressValue.emit(0)
-        self.ProgressText.emit(self.tr("Writing data to target layer"))
+        self.signal.emit(["start", 0, to_layer_counts, self.tr("Writing data to target layer"), "master"])
         for i, feat in enumerate(self.to_layer.getFeatures()):
-            self.ProgressValue.emit(i)
+            self.signal.emit(["update", 0, i + 1, f"Writing data to target layer: {i}", "master"])
             if self.all_attr[feat.id()] is not None:
                 _ = self.to_layer.dataProvider().changeAttributeValues({feat.id(): {fid: self.all_attr[feat.id()]}})
 
         self.to_layer.commitChanges()
         self.to_layer.updateFields()
 
-        self.ProgressValue.emit(self.to_layer.dataProvider().featureCount())
-        self.finished_threaded_procedure.emit("procedure")
+        self.signal.emit(["finished"])
 
     def chooses_match(self, feat):
         geom = feat.geometry()

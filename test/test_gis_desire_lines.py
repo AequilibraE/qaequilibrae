@@ -1,5 +1,6 @@
 import pytest
 from PyQt5.QtCore import Qt
+from qgis.core import QgsProject
 
 from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
 
@@ -32,7 +33,7 @@ def test_click_create_with_layers(ae_with_project, qtbot, timeoutDetector, load_
     assert len(exceptions) == 0
     # default is delaunay
     assert dialog.progress_label.text() == "Building resulting layer"  # Last displayed line
-    assert dialog.progressbar.value() == 61  # This number should match something in the SiouxFalls data
+    assert dialog.progressbar.value() == 62  # This number should match the number of edges in the SiouxFalls data
     # test that something cool happened on the map?
 
 
@@ -47,7 +48,7 @@ def test_click_create_with_layers_desired_selected(ae_with_project, qtbot, timeo
         qtbot.mouseClick(dialog.create_dl, Qt.LeftButton)
     assert len(exceptions) == 0
     assert dialog.progress_label.text() == "Creating Desire Lines"  # Last displayed line
-    assert dialog.progressbar.value() == 275  # This number should match something in the SiouxFalls data
+    assert dialog.progressbar.value() == 276  # This number should match the number of edges in the SiouxFalls data
     # test that something cool happened on the map?
 
 

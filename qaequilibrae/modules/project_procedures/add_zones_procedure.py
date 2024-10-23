@@ -1,13 +1,11 @@
 import shapely.wkb
 
-from aequilibrae.utils.worker_thread import WorkerThread
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 from PyQt5.QtCore import pyqtSignal
 
 
 class AddZonesProcedure(WorkerThread):
-    ProgressValue = pyqtSignal(object)
-    ProgressText = pyqtSignal(object)
-    ProgressMaxValue = pyqtSignal(object)
+    signal = pyqtSignal(object)
 
     def __init__(self, parentThread, project, area_layer, select_only, add_centroids, field_correspondence):
         WorkerThread.__init__(self, parentThread)
@@ -19,7 +17,8 @@ class AddZonesProcedure(WorkerThread):
 
     def doWork(self):
         features = list(self.lyr.selectedFeatures()) if self.select_only else list(self.lyr.getFeatures())
-        self.emit_messages(message=self.tr("Importing zones"), value=0, max_val=len(features))
+
+        self.signal.emit(["start", 0, len(features), self.tr("Importing zones"), "master"])
 
         idx_id = self.field_corresp["zone_id"]
         zoning = self.project.zoning
@@ -33,13 +32,5 @@ class AddZonesProcedure(WorkerThread):
             zone.save()
             if self.add_centroids:
                 zone.add_centroid(None)
-            self.emit_messages(value=i + 1)
-        self.jobFinished.emit("DONE")
-
-    def emit_messages(self, message="", value=-1, max_val=-1):
-        if len(message) > 0:
-            self.ProgressText.emit(message)
-        if value >= 0:
-            self.ProgressValue.emit(value)
-        if max_val >= 0:
-            self.ProgressMaxValue.emit(max_val)
+            self.signal.emit(["update", 0, i + 1, f"Num. zones: {i}", "master"])
+        self.signal.emit(["finished"])

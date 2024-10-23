@@ -29,7 +29,7 @@ class messages:
     @property
     def messsage_five(self):
         a = self.tr("QAequilibraE requires Python 3.12.")
-        b = self.tr("Please install QGIS version 3.34.6+, 3.36.2+ or 3.38.0+ to make it work.")
+        b = self.tr("Please install QGIS version 3.34.10+ or 3.38.2+ to make it work.")
         return f"{a}\r\n{b}"
 
     def tr(self, text):

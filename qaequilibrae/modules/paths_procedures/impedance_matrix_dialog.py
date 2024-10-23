@@ -126,17 +126,22 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run_thread(self):
         self.do_dist_matrix.setVisible(False)
-        self.progressbar.setRange(0, self.graph.num_zones)
-        self.worker_thread.skimming.connect(self.signal_handler)
+        self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 
     def signal_handler(self, val):
-        if val[0] == "zones finalized":
-            self.progressbar.setValue(val[1])
-        elif val[0] == "text skimming":
-            self.progress_label.setText(val[1])
-        elif val[0] == "finished_threaded_procedure":
+        if val[0] == "start":
+            self.progressbar.setMaximum(val[2])
+        elif val[0] == "update":
+            self.progress_label.setText(val[3])
+            self.progressbar.setValue(val[2])
+        elif val[0] == "set_text":
+            self.progress_label.setText(val[3])
+            self.progressbar.setValue(val[2])
+        elif val[0] == "finished":
+            self.progressbar.reset()
+            self.progress_label.clear()
             self.finished_threaded_procedure()
 
     def finished_threaded_procedure(self):

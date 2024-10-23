@@ -1,6 +1,5 @@
 from aequilibrae.distribution import GravityApplication
-from aequilibrae.utils.worker_thread import WorkerThread
-from qgis.PyQt.QtCore import *
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 
 
 class ApplyGravityProcedure(WorkerThread):
@@ -15,4 +14,4 @@ class ApplyGravityProcedure(WorkerThread):
         self.gravity.apply()
         self.output = self.gravity.output
         self.report = self.gravity.report
-        self.jobFinished.emit("apply_gravity")
+        self.jobFinished.emit(["finished", 0, 0, "apply_gravity", "master"])

@@ -1,16 +1,13 @@
 import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
-from aequilibrae.utils.worker_thread import WorkerThread
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 from scipy.sparse import coo_matrix
 
 from qgis.PyQt.QtCore import pyqtSignal
 
 
 class MatrixReblocking(WorkerThread):
-    ProgressValue = pyqtSignal(object)
-    ProgressText = pyqtSignal(object)
-    ProgressMaxValue = pyqtSignal(object)
-    finished_threaded_procedure = pyqtSignal(object)
+    signal = pyqtSignal(object)
 
     def __init__(self, parentThread, **kwargs):
         WorkerThread.__init__(self, parentThread)
@@ -27,9 +24,7 @@ class MatrixReblocking(WorkerThread):
     def doWork(self):
         if self.sparse:
             # Builds the hash
-            self.ProgressMaxValue.emit(self.num_matrices)
-            self.ProgressValue.emit(0)
-            self.ProgressText.emit(self.tr("Building correspondence"))
+            self.signal.emit(["start", 0, self.num_matrices, self.tr("Building correspondence"), "master"])
 
             indices = None
             p = 0
@@ -44,7 +39,7 @@ class MatrixReblocking(WorkerThread):
                     all_indices = np.hstack((indices, froms, tos))
                 indices = np.unique(all_indices)
                 p += 1
-                self.ProgressValue.emit(p)
+                self.signal.emit(["update", 0, p, f"counter: {p}", "master"])
             compact_shape = int(indices.shape[0])
         else:
             compact_shape = 0
@@ -62,8 +57,7 @@ class MatrixReblocking(WorkerThread):
         self.matrix.index[:] = indices[:]
 
         k = 0
-        self.ProgressMaxValue.emit(self.num_matrices)
-        self.ProgressText.emit(self.tr("Reblocking matrices"))
+        self.signal.emit(["start", 0, self.num_matrices, self.tr("Reblocking matrices"), "master"])
 
         new_mat = None
         for mat_name, mat in self.matrices.items():
@@ -73,10 +67,10 @@ class MatrixReblocking(WorkerThread):
                     new_mat["from"][mat["from"] == j] = v
                     new_mat["to"][mat["to"] == j] = v
                 k += 1
-                self.ProgressValue.emit(k)
+                self.signal.emit(["update", 0, k, f"sparse {k}", "master"])
             else:
                 k += 1
-                self.ProgressValue.emit(1)
+                self.signal.emit(["update", 0, 1, f"non-sparse{k}", "master"])
 
             # In order to differentiate the zeros from the NaNs in the future matrix
             if new_mat is None:
@@ -94,5 +88,5 @@ class MatrixReblocking(WorkerThread):
             del mat
             del new_mat
 
-        self.ProgressText.emit(self.tr("Matrix Reblocking finalized"))
-        self.finished_threaded_procedure.emit("REBLOCKED MATRICES")
+        self.signal.emit(["set_text", 0, 0, self.tr("Matrix Reblocking finalized"), "master"])
+        self.signal.emit(["finished", 0, 0, "REBLOCKED MATRICES", "master"])

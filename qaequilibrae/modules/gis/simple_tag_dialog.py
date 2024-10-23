@@ -175,30 +175,11 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
                         self.frommatchingtype = field.type()
 
     def run_thread(self):
-        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
-        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
-        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
-        self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
+        self.worker_thread.signal.connect(self.signal_handler)
 
         self.OK.setEnabled(False)
         self.worker_thread.start()
         self.exec_()
-
-    def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val)
-
-    def progress_value_from_thread(self, value):
-        self.progressbar.setValue(value)
-
-    def progress_text_from_thread(self, value):
-        self.lbl_operation.setText(value)
-
-    def finished_threaded_procedure(self, procedure):
-        if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage(
-                self.tr("Input data not provided correctly"), self.worker_thread.error, level=3
-            )
-        self.close()
 
     def run(self):
         error = False
@@ -254,6 +235,26 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             return self.tr("If only target is a polygon, target needs to enclose source.")
         elif order == 3:
             return self.tr("First found record is used.")
+
+    def signal_handler(self, val):
+        if val[0] == "start":
+            self.lbl_operation.setText(val[3])
+            self.progressbar.setValue(0)
+            self.progressbar.setMaximum(val[2])
+        elif val[0] == "update":
+            self.lbl_operation.setText(val[3])
+            self.progressbar.setValue(val[2])
+        elif val[0] == "set_text":
+            self.lbl_operation.setText(val[3])
+            self.progressbar.setValue(0)
+        elif val[0] == "finished":
+            self.lbl_operation.clear()
+            self.progressbar.reset()
+            if self.worker_thread.error is not None:
+                qgis.utils.iface.messageBar().pushMessage(
+                    self.tr("Input data not provided correctly"), self.worker_thread.error, level=3
+                )
+            self.close()
 
 
 def unload(self):

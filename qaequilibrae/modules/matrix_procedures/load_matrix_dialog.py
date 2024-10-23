@@ -109,55 +109,55 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.field_cells.addItem(field.name())
 
     def run_thread(self):
-        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
-        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
-        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
-        self.worker_thread.finished_threaded_procedure.connect(self.finished_threaded_procedure)
+        self.worker_thread.signal.connect(self.signal_handler)
 
         self.but_load.setEnabled(False)
         self.worker_thread.start()
         self.exec_()
 
-    # VAL and VALUE have the following structure: (bar/text ID, value)
-    def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val)
+    def signal_handler(self, val):
+        if val[0] == "start":
+            self.progress_label.setText(val[3])
+            self.progressbar.setValue(0)
+            self.progressbar.setMaximum(val[2])
+        elif val[0] == "update":
+            self.progress_label.setText(val[3])
+            self.progressbar.setValue(val[2])
+        elif val[0] == "set_text":
+            self.progress_label.setText(val[3])
+            self.progressbar.setValue(0)
+        elif val[0] == "finished":
+            self.progress_label.clear()
+            self.progressbar.reset()
+            self.but_load.setEnabled(True)
+            if self.worker_thread.report:
+                dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+                dlg2.show()
+                dlg2.exec_()
+            else:
+                if val[3] == "LOADED-MATRIX":
+                    self.compressed.setVisible(True)
+                    self.progress_label.setVisible(False)
 
-    def progress_value_from_thread(self, val):
-        self.progressbar.setValue(val)
+                    if self.__current_name in self.matrices.keys():
+                        i = 1
+                        while self.__current_name + "_" + str(i) in self.matrices.keys():
+                            i += 1
+                        self.__current_name = self.__current_name + "_" + str(i)
 
-    def progress_text_from_thread(self, val):
-        self.progress_label.setText(val)
+                    self.matrices[self.__current_name] = self.worker_thread.matrix
+                    self.matrix_count += 1
+                    self.update_matrix_list()
 
-    def finished_threaded_procedure(self, param):
-        self.but_load.setEnabled(True)
-        if self.worker_thread.report:
-            dlg2 = ReportDialog(self.iface, self.worker_thread.report)
-            dlg2.show()
-            dlg2.exec_()
-        else:
-            if param == "LOADED-MATRIX":
-                self.compressed.setVisible(True)
-                self.progress_label.setVisible(False)
+                    if not self.multiple:
+                        self.update_matrix_hashes()
 
-                if self.__current_name in self.matrices.keys():
-                    i = 1
-                    while self.__current_name + "_" + str(i) in self.matrices.keys():
-                        i += 1
-                    self.__current_name = self.__current_name + "_" + str(i)
-
-                self.matrices[self.__current_name] = self.worker_thread.matrix
-                self.matrix_count += 1
-                self.update_matrix_list()
-
-                if not self.multiple:
-                    self.update_matrix_hashes()
-
-            elif param == "REBLOCKED MATRICES":
-                self.matrix = self.worker_thread.matrix
-                if self.compressed.isChecked():
-                    pass
-                    # compression not implemented yet
-                self.exit_procedure()
+                elif val[3] == "REBLOCKED MATRICES":
+                    self.matrix = self.worker_thread.matrix
+                    if self.compressed.isChecked():
+                        pass
+                        # compression not implemented yet
+                    self.exit_procedure()
 
     def __create_appropriate_name(self, nm: str) -> str:
         nm = nm.replace(" ", "_")

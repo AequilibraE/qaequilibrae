@@ -667,9 +667,6 @@
             <pointsize>9</pointsize>
            </font>
           </property>
-          <property name="textAlignment">
-           <set>AlignCenter</set>
-          </property>
          </column>
          <column>
           <property name="text">
@@ -679,9 +676,6 @@
            <font>
             <pointsize>9</pointsize>
            </font>
-          </property>
-          <property name="textAlignment">
-           <set>AlignCenter</set>
           </property>
          </column>
         </widget>
@@ -867,8 +861,49 @@
        <string>Assignment</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
+       <item row="2" column="0" colspan="4">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="minimumSize">
+          <size>
+           <width>600</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="acceptDrops">
+          <bool>false</bool>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="title">
+          <string>Outputs</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="do_path_file">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Save complete path file</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLineEdit" name="output_scenario_name">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="placeholderText">
+             <string>Result_name</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item row="4" column="2" colspan="2">
-        <widget class="QLabel" name="progress_label0">
+        <widget class="QLabel" name="progress_label">
          <property name="font">
           <font>
            <pointsize>9</pointsize>
@@ -887,7 +922,7 @@
         </widget>
        </item>
        <item row="4" column="0" colspan="2">
-        <widget class="QProgressBar" name="progressbar0">
+        <widget class="QProgressBar" name="progressbar">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -933,75 +968,6 @@
          </property>
          <property name="textVisible">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="3">
-        <widget class="QPushButton" name="cancel_all">
-         <property name="text">
-          <string>CANCEL</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QProgressBar" name="progressbar1">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="palette">
-          <palette>
-           <active>
-            <colorrole role="Highlight">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>0</red>
-               <green>170</green>
-               <blue>0</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </active>
-           <inactive>
-            <colorrole role="Highlight">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>240</red>
-               <green>240</green>
-               <blue>240</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </inactive>
-           <disabled>
-            <colorrole role="Highlight">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>51</red>
-               <green>153</green>
-               <blue>255</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </disabled>
-          </palette>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-         <property name="textVisible">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="2" colspan="2">
-        <widget class="QLabel" name="progress_label1">
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Status Message 0</string>
          </property>
         </widget>
        </item>
@@ -1086,6 +1052,13 @@
          </layout>
         </widget>
        </item>
+       <item row="3" column="3">
+        <widget class="QPushButton" name="cancel_all">
+         <property name="text">
+          <string>CANCEL</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="minimumSize">
@@ -1155,47 +1128,6 @@
              <font>
               <pointsize>10</pointsize>
              </font>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="4">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="minimumSize">
-          <size>
-           <width>600</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="acceptDrops">
-          <bool>false</bool>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="title">
-          <string>Outputs</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_11">
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="do_path_file">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Save complete path file</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLineEdit" name="output_scenario_name">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="placeholderText">
-             <string>Result_name</string>
             </property>
            </widget>
           </item>

@@ -417,16 +417,16 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.worker_thread.doWork()
         self.show()
 
-    def job_finished_from_thread(self, success):
+    def job_finished_from_thread(self, val):
         error = self.worker_thread.error
         if error is not None:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), error.args[0], level=3)
         self.report.extend(self.worker_thread.report)
 
-        if success == "calibrate":
+        if val[3] == "calibrate":
             self.worker_thread.model.save(self.outfile)
 
-        if success in ["apply_gravity", "finishedIPF"]:
+        if val[3] in ["apply_gravity", "finishedIPF"]:
             self.worker_thread.output.export(self.outfile)
         self.exit_procedure()
 
@@ -435,3 +435,4 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
             dlg2.exec_()
+        self.close()

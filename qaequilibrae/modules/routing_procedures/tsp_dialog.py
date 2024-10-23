@@ -104,11 +104,11 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         self.run_thread()
 
     def run_thread(self):
-        self.worker_thread.finished.connect(self.finished)
+        self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 
-    def finished(self):
+    def signal_handler(self):
         ns = self.worker_thread.node_sequence
         if len(ns) < 2:
             return

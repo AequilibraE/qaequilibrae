@@ -47,21 +47,22 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
         self.set_columns_nodes()
 
     def run_thread(self):
-        self.worker_thread.ProgressValue.connect(self.progress_value_from_thread)
-        self.worker_thread.ProgressText.connect(self.progress_text_from_thread)
-        self.worker_thread.ProgressMaxValue.connect(self.progress_range_from_thread)
-        self.worker_thread.jobFinished.connect(self.job_finished_from_thread)
+        self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
         self.show()
 
-    def progress_range_from_thread(self, val):
-        self.progressbar.setRange(0, val)
-
-    def progress_value_from_thread(self, value):
-        self.progressbar.setValue(value)
-
-    def progress_text_from_thread(self, value):
-        self.progress_label.setText(value)
+    def signal_handler(self, val):
+        if val[0] == "start":
+            self.progress_label.setText(val[3])
+            self.progressbar.setValue(0)
+            self.progressbar.setMaximum(val[2])
+        elif val[0] == "update":
+            self.progressbar.setValue(val[2])
+        elif val[0] == "set_text":
+            self.progress_label.setText(val[3])
+            self.progressbar.reset()
+        elif val[0] == "finished":
+            self.job_finished_from_thread()
 
     def set_columns_nodes(self):
         self.cbb_node_fields.clear()
@@ -87,7 +88,7 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
             # self.cbb_node_layer.hideEvent()
             self.np_node_start.setEnabled(True)
 
-    def job_finished_from_thread(self, success):
+    def job_finished_from_thread(self):
         if self.worker_thread.error is not None:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Node layer error: "), self.worker_thread.error, level=3)
         else:

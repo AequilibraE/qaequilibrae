@@ -3,17 +3,14 @@ from aequilibrae.context import get_logger
 from aequilibrae.project import Project
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import commit_and_close
-from aequilibrae.utils.worker_thread import WorkerThread
+from aequilibrae.utils.interface.worker_thread import WorkerThread
 from string import ascii_letters
 
 logger = get_logger()
 
 
 class CreatesTranspoNetProcedure(WorkerThread):
-    ProgressValue = pyqtSignal(object)
-    ProgressText = pyqtSignal(object)
-    ProgressMaxValue = pyqtSignal(object)
-    finished_threaded_procedure = pyqtSignal(object)
+    signal = pyqtSignal(object)
 
     def __init__(self, parentThread, proj_folder, node_layer, node_fields, link_layer, link_fields):
         WorkerThread.__init__(self, parentThread)
@@ -27,21 +24,24 @@ class CreatesTranspoNetProcedure(WorkerThread):
         self.project: Project
 
     def doWork(self):
-        self.emit_messages(message=self.tr("Initializing project"), value=0, max_val=1)
+        self.signal.emit(["start", 0, 1, self.tr("Initializing project"), "master"])
         self.project = Project()
         self.project.new(self.proj_folder)
+        self.signal.emit(["update", 0, 1, "Project created", "master"])
 
         # Add the required extra fields to the link layer
-        self.emit_messages(message=self.tr("Adding extra network data fields to database"), value=0, max_val=1)
+        self.signal.emit(["start", 0, 2, self.tr("Adding extra network data fields to database"), "master"])
         self.additional_fields_to_layers("links", self.link_layer, self.link_fields)
+        self.signal.emit(["update", 0, 1, "Added additional fields", "master"])
         self.additional_fields_to_layers("nodes", self.node_layer, self.node_fields)
+        self.signal.emit(["update", 0, 2, "Added additional fields", "master"])
 
         self.transfer_layer_features("links", self.link_layer, self.link_fields)
         self.renumber_nodes()
 
-        self.emit_messages(message=self.tr("Creating layer triggers"), value=0, max_val=1)
-        self.emit_messages(message=self.tr("Spatial indices"), value=0, max_val=1)
-        self.ProgressText.emit("DONE")
+        self.signal.emit(["set_text", 0, 0, self.tr("Creating layer triggers"), "master"])
+        self.signal.emit(["set_text", 0, 0, self.tr("Spatial indices"), "master"])
+        self.signal.emit(["finished"])
 
     # Adds the non-standard fields to a layer
     def additional_fields_to_layers(self, table, layer, layer_fields):
@@ -85,7 +85,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
             conn.execute("Update Nodes set node_id=node_id+?", [max_val])
             conn.execute("COMMIT;")
 
-            self.emit_messages(message=self.tr("Transferring nodes"), value=0, max_val=self.node_layer.featureCount())
+            self.signal.emit(["start", 0, self.node_layer.featureCount(), self.tr("Transferring nodes"), "master"])
 
             find_sql = """SELECT node_id
                             FROM nodes
@@ -100,7 +100,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
             crs = int(self.node_layer.crs().authid().split(":")[1])
             for j, f in enumerate(self.node_layer.getFeatures()):
-                self.emit_messages(value=j + 1)
+                self.signal.emit(["update", 0, j + 1, f"Feature: {j}", "master"])
                 attrs = [
                     self.convert_data(f.attributes()[val]) if val >= 0 else None for val in self.node_fields.values()
                 ]
@@ -113,7 +113,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
             conn.commit()
 
     def transfer_layer_features(self, table, layer, layer_fields):
-        self.emit_messages(message=self.tr("Transferring {}").format(table), value=0, max_val=layer.featureCount())
+        self.signal.emit(["start", 0, layer.featureCount(), self.tr("Transferring {}").format(table), "master"])
 
         field_titles = ",".join(layer_fields.keys())
         all_modes = set()
@@ -125,7 +125,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         crs = int(layer.crs().authid().split(":")[1])
 
         for j, f in enumerate(layer.getFeatures()):
-            self.emit_messages(value=j + 1)
+            self.signal.emit(["update", 0, j + 1, f"Feature: {j}", "master"])
             attrs = [self.convert_data(f.attributes()[val]) if val >= 0 else None for val in layer_fields.values()]
             attrs.extend([f.geometry().asWkb().data(), crs])
             data_to_add.append(attrs)
@@ -181,11 +181,3 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
     def convert_data(self, value):
         return None if type(value) is None else value
-
-    def emit_messages(self, message="", value=-1, max_val=-1):
-        if len(message) > 0:
-            self.ProgressText.emit(message)
-        if value >= 0:
-            self.ProgressValue.emit(value)
-        if max_val >= 0:
-            self.ProgressMaxValue.emit(max_val)

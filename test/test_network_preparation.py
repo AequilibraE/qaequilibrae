@@ -58,8 +58,8 @@ def test_prepare_network(tmp_path, ae, is_node):
             node_start=int(dialog.np_node_start.text()),
         )
 
+    dialog.worker_thread.signal.connect(dialog.signal_handler)
     dialog.worker_thread.doWork()
-    dialog.job_finished_from_thread("DONE")
 
     all_layers = [layer.name() for layer in QgsProject.instance().mapLayers().values()]
     assert "net_links" in all_layers
