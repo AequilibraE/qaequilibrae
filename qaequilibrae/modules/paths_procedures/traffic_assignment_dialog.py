@@ -11,6 +11,7 @@ from aequilibrae.paths.vdf import all_vdf_functions
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
 from tempfile import gettempdir
+import time
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
@@ -62,7 +63,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.cancel_all.clicked.connect(self.exit_procedure)
 
         # Signals for the algorithm tab
-        for q in [self.progressbar0, self.progressbar1, self.progress_label0, self.progress_label1]:
+        for q in [self.progressbar, self.progress_label]:
             q.setVisible(False)
 
         for algo in self.assignment.all_algorithms:
@@ -321,9 +322,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.__edit_skimming_modes()
 
     def run_thread(self):
-        self.worker_thread.assignment.connect(self.signal_handler)
-        if self.cb_choose_algorithm.currentText() != "all-or-nothing":
-            self.worker_thread.equilibration.connect(self.equilibration_signal_handler)
+        self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
         self.exec_()
 
@@ -336,16 +335,10 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         if not self.check_data():
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=3, duration=10)
 
-        algorithm = self.cb_choose_algorithm.currentText()
         self.miter = int(self.max_iter.text())
-        if algorithm != "all-or-nothing":
-            for q in [self.progressbar1, self.progress_label1]:
-                q.setVisible(True)
-            self.progressbar1.setRange(0, self.miter)
-
-        for q in [self.progressbar0, self.progress_label0]:
+        for q in [self.progressbar, self.progress_label]:
             q.setVisible(True)
-            self.progressbar0.setRange(0, self.project.network.count_centroids())
+        self.progressbar.setRange(0, self.project.network.count_centroids())
 
         self.assignment.set_classes(list(self.traffic_classes.values()))
         self.assignment.set_vdf(self.cob_vdf.currentText())
@@ -383,27 +376,15 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def signal_handler(self, val):
         if val[0] == "start":
-            self.progress_label0.setText(val[3])
-            self.progressbar0.setValue(0)
+            self.progressbar.setValue(0)
+            self.progressbar.setMaximum(val[2])
+            self.progress_label.setText(val[3])
+        elif val[0] == "update":
+            self.progressbar.setValue(val[2])
+            self.progress_label.setText(val[3])
         elif val[0] == "finished":
-            self.progressbar0.setValue(0)
-            if self.cb_choose_algorithm.currentText() == "all-or-nothing":
+            if val[3] == "assignment":
                 self.job_finished_from_thread()
-
-    def equilibration_signal_handler(self, val):
-        if val[0] == "start":
-            self.progress_label1.setText(val[3])
-            self.progressbar1.setValue(0)
-            self.progressbar1.setMaximum(val[2])
-        elif val[0] == "key_value":
-            if val[3] == "iterations":
-                self.progressbar1.setValue(val[2])
-                self.iter = val[2]
-            elif val[3] == "rgap":
-                self.rgap = val[2]
-        elif val[0] == "finished":
-            self.job_finished_from_thread()
-        self.progress_label1.setText(f"{self.iter}/{self.miter} - Rel. Gap {self.rgap}")
 
     # Save link flows to disk
     def produce_all_outputs(self):

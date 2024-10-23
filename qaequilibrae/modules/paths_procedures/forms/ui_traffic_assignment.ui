@@ -60,7 +60,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>5</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -922,7 +922,7 @@
         </widget>
        </item>
        <item row="4" column="0" colspan="2">
-        <widget class="QProgressBar" name="progress_bar">
+        <widget class="QProgressBar" name="progressbar">
          <property name="enabled">
           <bool>true</bool>
          </property>
