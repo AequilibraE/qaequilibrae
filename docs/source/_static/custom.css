@@ -10,3 +10,13 @@
     display: none;
 }
 
+.toc-tree .toc-item {
+    list-style-type: none;
+    padding: 2px;
+}
+
+.toc-tree .toc-item a {
+    text-decoration: none;
+    color: inherit;
+    font-size: 15px;
+}
