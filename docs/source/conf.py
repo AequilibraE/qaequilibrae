@@ -16,14 +16,12 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath("../.."))
-#
 
 # -- Project information -----------------------------------------------------
 
 project = "AequilibraE for QGIS"
 copyright = "2018, AequilibraE developers"
 author = "Pedro Camargo"
-
 
 # The short X.Y.Z version
 
@@ -34,7 +32,6 @@ for line in a.readlines():
 
 # The full version, including alpha/beta/rc tags
 release = "30/07/2018"
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -74,7 +71,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -90,7 +86,14 @@ html_theme_options = {
     "show_nav_level": 0,
     "github_url": "https://github.com/AequilibraE/qaequilibrae",
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
-    "navbar_persistent": ["search-button"],
+    "navbar_center": ["navigation_header"], 
+    "navbar_align": "left",
+    "logo": {
+        "text": "AequilibraE",
+        "image_light": "_static/large_icon.png",
+        "image_dark": "_static/large_icon.png",
+        "link": "https://www.aequilibrae.com/python/latest/index.html"
+    },
 }
 
 # The name for this set of Sphinx documents.  If None, it defaults to
@@ -99,7 +102,8 @@ html_title = f"AequilibraE for QGIS"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ["_static"]
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -109,8 +113,9 @@ html_title = f"AequilibraE for QGIS"
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {}
-
+html_sidebars = {
+    "**": ["globaltoc.html"]
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 

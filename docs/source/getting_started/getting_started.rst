@@ -17,7 +17,7 @@ download it using the instructions below.
 
 .. index:: installation
 
-Step--by-step installation
+Step-by-step installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The steps for installing AequilibraE are the same as for any QGIS plugin.
@@ -76,18 +76,18 @@ the AequilibraE project, these layers are removed from your open QGIS project.
 When reopening the QGIS project containing an AequilibraE model, you will notice that the project 
 stored is automatically reopened by QAequilibraE.
 
-.. _quicktour_video:
+.. .. _quicktour_video:
 
-Quick Tour
-----------
+.. Quick Tour
+.. ----------
 
-After installing AequilibraE plug-in, you might enjoy this quick tour on QGIS interface.
-Latest versions of AequilibraE for QGIS have brought substantial changes over to the
-software operation and interface, which might cause some confusion to old users. For a brief overview
-of the new interface, we have prepared a little video tour.
+.. After installing AequilibraE plug-in, you might enjoy this quick tour on QGIS interface.
+.. Latest versions of AequilibraE for QGIS have brought substantial changes over to the
+.. software operation and interface, which might cause some confusion to old users. For a brief overview
+.. of the new interface, we have prepared a little video tour.
 
-.. raw:: html
+.. .. raw:: html
 
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/oZEcjiBRaok"
-     frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
-     picture-in-picture" allowfullscreen></iframe>
+..     <iframe width="560" height="315" src="https://www.youtube.com/embed/oZEcjiBRaok"
+..      frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
+..      picture-in-picture" allowfullscreen></iframe>
