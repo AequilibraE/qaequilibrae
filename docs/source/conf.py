@@ -50,7 +50,6 @@ templates_path = ["_templates"]
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
 source_suffix = ".rst"
 
 # The master toctree document.
@@ -79,20 +78,21 @@ pygments_style = "sphinx"
 html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
+# further. For a list of options available for each theme, see the
 # documentation.
 #
 html_theme_options = {
     "show_nav_level": 0,
     "github_url": "https://github.com/AequilibraE/qaequilibrae",
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
-    "navbar_center": ["navigation_header"], 
+    "navbar_center": ["navigation_header"],
     "navbar_align": "left",
+    "navbar_persistent": ["search-button"],
     "logo": {
         "text": "AequilibraE",
         "image_light": "_static/large_icon.png",
         "image_dark": "_static/large_icon.png",
-        "link": "https://www.aequilibrae.com/python/latest/index.html"
+        "link": "https://www.aequilibrae.com/python/latest/index.html",
     },
 }
 
@@ -104,6 +104,7 @@ html_title = f"AequilibraE for QGIS"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 html_css_files = ["custom.css"]
+html_js_files = ["toggle.js"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -113,9 +114,7 @@ html_css_files = ["custom.css"]
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-html_sidebars = {
-    "**": ["globaltoc.html"]
-}
+html_sidebars = {"**": ["globaltoc.html"]}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -145,13 +144,11 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [(master_doc, "AequilibraE.tex", "AequilibraE Documentation", "Pedro Camargo", "manual")]
 
-
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [(master_doc, "aequilibrae", "AequilibraE Documentation", [author], 1)]
-
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -169,7 +166,6 @@ texinfo_documents = [
         "Miscellaneous",
     )
 ]
-
 
 # -- Extension configuration -------------------------------------------------
 

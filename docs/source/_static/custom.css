@@ -12,11 +12,38 @@
 
 .toc-tree .toc-item {
     list-style-type: none;
-    padding: 2px;
+    padding-bottom: 2px;
 }
 
 .toc-tree .toc-item a {
     text-decoration: none;
     color: inherit;
     font-size: 15px;
+}
+
+.toc-tree .toc-item a:hover {
+    color: #8045e5;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.subitem {
+    list-style-type: none;
+    padding-left: 20px;
+    display: none;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    margin-right: 5px;
+    font-weight: bold;
+    position: absolute;
+    right: 200px
+}
+
+.toggle-btn:focus {
+    outline: none;
 }
