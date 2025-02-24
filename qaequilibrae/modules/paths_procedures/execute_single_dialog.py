@@ -13,7 +13,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 
 
 class VisualizeSingle(QDialog, FORM_CLASS):
-    def __init__(self, iface, graph, algorithm, kwargs, demand, link_layer):
+    def __init__(self, iface, graph, algorithm, kwargs, from_node, to_node, demand, link_layer):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
@@ -24,7 +24,12 @@ class VisualizeSingle(QDialog, FORM_CLASS):
         self.demand = demand
         self.link_layer = link_layer
 
-        self.debouncer = Debouncer(delay_ms=4_000, callback=self.on_input_changed)
+        self.node_from.setText(str(from_node))
+        self.node_to.setText(str(to_node))
+        self.sld_max_routes.setValue(self._kwargs["max_routes"])
+        self.label_4.setText(f"Number of routes: {self._kwargs["max_routes"]}")
+
+        self.debouncer = Debouncer(delay_ms=1_000, callback=self.on_input_changed)
 
         self.node_from.textChanged.connect(self._on_node_from_changed)
         self.node_to.textChanged.connect(self._on_node_to_changed)
@@ -58,6 +63,7 @@ class VisualizeSingle(QDialog, FORM_CLASS):
 
     @pyqtSlot(int)
     def _on_slider_changed(self, value):
+        self.label_4.setText(f"Number of routes: {value}")
         self.debouncer(("sld_max_routes", value))
 
     def on_input_changed(self, source_and_value):

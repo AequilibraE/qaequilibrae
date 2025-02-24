@@ -12,6 +12,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
 from qgis._core import QgsFeatureRequest
+from qgis.core import QgsMapLayerProxyModel
 
 from qaequilibrae.modules.common_tools import geodataframe_from_layer
 from qaequilibrae.modules.common_tools.auxiliary_functions import get_vector_layer_by_name, model_area_polygon
@@ -50,7 +51,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.__project_nodes = self.project.network.nodes.data.node_id.tolist()
         self.proj_matrices = list_matrices(self.project.matrices.fldr)
 
-        self.cob_algo.addItems(["BFSLE", "Link Penalization"])
+        self.cob_algo.addItems(["BFSLE", "Link Penalization", "BFSLE + Link Penalization"])
 
         self.cob_matrices.currentTextChanged.connect(self.set_show_matrices)
         self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
@@ -162,6 +163,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
     def exit_procedure(self):
         self.close()
+        qgis.utils.iface.messageBar().pushMessage(self.tr("Success: "), self.message, level=3)
 
     def __check_parameter_value(self, par):
         # parameter cannot be null
@@ -273,6 +275,8 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             graph,
             self.__algo,
             self.__kwargs,
+            self.from_node,
+            self.to_node, 
             float(self.ln_demand.text()),
             self.link_layer,
         )
@@ -382,6 +386,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             item.setEnabled(self.chb_set_sub_area.isChecked())
 
         self.chb_set_select_link.setEnabled(not self.chb_set_sub_area.isChecked())
+        self.cob_zoning_layer.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
     def __get_project_zones(self):
         zones = get_vector_layer_by_name(self.cob_zoning_layer.currentText())
