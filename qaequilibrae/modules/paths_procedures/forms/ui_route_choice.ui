@@ -184,7 +184,7 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>25</width>
+              <width>50</width>
               <height>20</height>
              </size>
             </property>
@@ -307,26 +307,6 @@
              <string>Select link outputs</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_8">
-             <item row="1" column="0">
-              <widget class="QCheckBox" name="chb_save_matrix">
-               <property name="text">
-                <string>Save select link matrices</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QCheckBox" name="chb_save_result">
-               <property name="text">
-                <string>Save select link results</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="0" colspan="2">
               <widget class="QLineEdit" name="ln_mat_name">
                <property name="placeholderText">
@@ -427,27 +407,8 @@
       <attribute name="title">
        <string>Workload</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_11">
-       <item row="2" column="0">
-        <widget class="QGroupBox" name="gridGroupBox">
-         <property name="title">
-          <string>Output</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_7">
-          <item row="0" column="0">
-           <widget class="QLineEdit" name="ln_rc_output">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="placeholderText">
-             <string>route_choice_output_name</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="0">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
         <widget class="QGroupBox" name="box_visualize">
          <property name="title">
           <string>Execute single</string>
@@ -514,7 +475,7 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item>
         <widget class="QGroupBox" name="box_demand">
          <property name="title">
           <string>Matrix</string>
@@ -580,7 +541,26 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item>
+        <widget class="QGroupBox" name="gridGroupBox">
+         <property name="title">
+          <string>Output</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QLineEdit" name="ln_rc_output">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="placeholderText">
+             <string>route_choice_output_name</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

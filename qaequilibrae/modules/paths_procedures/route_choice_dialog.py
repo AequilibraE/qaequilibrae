@@ -163,7 +163,8 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
     def exit_procedure(self):
         self.close()
-        qgis.utils.iface.messageBar().pushMessage(self.tr("Success: "), self.message, level=3)
+        message = f"Route choice sets saved to {self.project.project_base_path}"
+        qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
 
     def __check_parameter_value(self, par):
         # parameter cannot be null
@@ -204,7 +205,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         return graph
 
-    def __get_parameters(self):
+    def __get_parameters(self, arg):
         # parameter needs to be numeric
         if not self.max_routes.text().isdigit():
             self.error = "Max. routes needs to be a numeric integer value"
@@ -241,14 +242,13 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             "beta": float(self.ln_psl.text()),
         }
 
-        algo = self.cob_algo.currentText().lower()
-
-        if algo == "bfsle":
-            self.__kwargs["store_results"] = True
-            self.__algo = "bfsle"
-        else:
+        if arg == "assign" and not self.chb_save_choice_set.isChecked():
             self.__kwargs["store_results"] = False
-            self.__algo = "lp"
+        else:
+            self.__kwargs["store_results"] = True
+
+        algo = self.cob_algo.currentText().lower()
+        self.__algo = "bfsle" if algo == "bfsle" else "lp"
 
     def __validate_node_id(self, node_id: str):
         # Check if we have only numbers
@@ -276,7 +276,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.__algo,
             self.__kwargs,
             self.from_node,
-            self.to_node, 
+            self.to_node,
             float(self.ln_demand.text()),
             self.link_layer,
         )
@@ -310,7 +310,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             else:
                 self.error = "Check matrices inputs"
 
-        self.__get_parameters()
+        self.__get_parameters(arg)
 
         if self.error:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1)
@@ -325,7 +325,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         graph.set_graph("utility")
 
         if self.chb_set_sub_area.isChecked():
-            zones = self.__get_project_zones()  # Set selectes zones
+            zones = self.__get_project_zones()  # Set selected zones
             self.matrix = self.set_sub_area(graph, zones)
 
             # Rebuild graph for external ODs
@@ -346,26 +346,41 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             rc.add_demand(self.matrix)
             rc.prepare()
 
-            if arg == "build":
-                rc.set_save_routes(self.project.project_base_path)
+            # Set folder location to save route choice sets
+            if arg == "build" or self.chb_save_choice_set.isChecked():
+                folder = self.__check_folder_exists()
+                rc.set_save_routes(folder)
 
+            # Set selected link
             if self.chb_set_select_link.isChecked():
                 rc.set_select_links(self.select_links)
 
+            # Run route choice with assignment or not
             assig = True if arg == "assign" else False
             rc.execute(perform_assignment=assig)
 
-            if self.chb_save_choice_set.isChecked() and assig:
-                name = "route_choice_for_subarea" if self.chb_set_sub_area.isChecked() else "route_choice"
-                rc.save_link_flows(name)
+            self.__rc_name = self.ln_rc_output.text()
 
-            if self.chb_set_select_link.isChecked() and self.chb_save_result.isChecked():
-                rc.save_select_link_flows(self.ln_mat_name.text())
+            # Save assignment flows to results database
+            if arg == "assign":
+                # Save select link analysis outputs (matrix and result)
+                if self.chb_set_select_link.isChecked():
+                    rc.save_select_link_flows(self.ln_mat_name.text())
+                else:
+                    rc.save_link_flows(self.__rc_name)
 
+            # Save sub-area demand matrix
             if self.chb_set_sub_area.isChecked():
-                self.matrix.to_parquet(os.path.join(self.matrices.fldr, "subarea_demand.parquet"))
+                folder = self.__check_folder_exists()
+                self.matrix.to_parquet(os.path.join(folder, f"{self.__rc_name}.parquet"))
 
         self.exit_procedure()
+
+    def __check_folder_exists(self):
+        rc_folder = os.path.join(self.project.project_base_path, "route_choice")
+        if not os.path.isdir(rc_folder):
+            os.mkdir(rc_folder)
+        return rc_folder
 
     ###### For sub-area analysis
 
