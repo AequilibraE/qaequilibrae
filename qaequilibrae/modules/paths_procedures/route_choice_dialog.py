@@ -10,7 +10,7 @@ from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog, QLineEdit
 from qgis._core import QgsFeatureRequest
 from qgis.core import QgsMapLayerProxyModel
 
@@ -18,6 +18,7 @@ from qaequilibrae.modules.common_tools import geodataframe_from_layer
 from qaequilibrae.modules.common_tools.auxiliary_functions import get_vector_layer_by_name, model_area_polygon
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import VisualizeSingle
+from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
 from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
@@ -41,7 +42,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.all_modes = {}
         self._pairs = []
         self.link_layer = qgis_project.layers["links"][0]
-        self.__kwargs = None
+        self.parameters = {}
 
         self.select_links = {}
         self.__current_links = []
@@ -51,15 +52,15 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.__project_nodes = self.project.network.nodes.data.node_id.tolist()
         self.proj_matrices = list_matrices(self.project.matrices.fldr)
 
-        self.cob_algo.addItems(["BFSLE", "Link Penalization", "BFSLE + Link Penalization"])
+        self.cob_algo.addItems(["BFSLE", "Link Penalization", "BFSLE with Link Penalization"])
 
         self.cob_matrices.currentTextChanged.connect(self.set_show_matrices)
         self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
         self.but_add_to_cost.clicked.connect(self.add_cost_function)
         self.but_clear_cost.clicked.connect(self.clear_cost_function)
-        self.but_perform_assig.clicked.connect(lambda: self.assign_and_save(arg="assign"))
-        self.but_build_and_save.clicked.connect(lambda: self.assign_and_save(arg="build"))
-        self.but_visualize.clicked.connect(lambda: self.assign_and_save(arg="single"))
+        self.but_perform_assig.clicked.connect(self.execute_assign)
+        self.but_build_and_save.clicked.connect(self.execute_build)
+        self.but_visualize.clicked.connect(self.execute_single)
         self.chb_set_sub_area.toggled.connect(self.set_sub_area_use)
         self.chb_set_select_link.toggled.connect(self.set_select_link_use)
 
@@ -116,6 +117,15 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.tbl_array_cores.setColumnWidth(1, 80)
         self.tbl_array_cores.setHorizontalHeaderLabels(["Matrix", "Use?"])
 
+        def centers_item(item):
+            cell_widget = QWidget()
+            lay_out = QHBoxLayout(cell_widget)
+            lay_out.addWidget(item)
+            lay_out.setAlignment(Qt.AlignCenter)
+            lay_out.setContentsMargins(0, 0, 0, 0)
+            cell_widget.setLayout(lay_out)
+            return cell_widget
+
         if self.matrix is not None:
             table = self.tbl_array_cores
             table.setRowCount(self.matrix.cores)
@@ -127,56 +137,39 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 chb1 = QCheckBox()
                 chb1.setChecked(True)
                 chb1.setEnabled(True)
-                table.setCellWidget(i, 1, self.centers_item(chb1))
-
-    def centers_item(self, item):
-        cell_widget = QWidget()
-        lay_out = QHBoxLayout(cell_widget)
-        lay_out.addWidget(item)
-        lay_out.setAlignment(Qt.AlignCenter)
-        lay_out.setContentsMargins(0, 0, 0, 0)
-        cell_widget.setLayout(lay_out)
-        return cell_widget
+                table.setCellWidget(i, 1, centers_item(chb1))
 
     def add_cost_function(self):
         params = self.ln_parameter.text()
-        valid_params = self.__check_parameter_value(params)
 
-        if not valid_params:
+        # parameter cannot be null
+        if len(params) == 0:
+            self.error = "Check parameter value"
+
+        # parameter needs to be numeric
+        if not params.replace(".", "").replace("-", "").isdigit():
+            self.error = "Check parameter value"
+
+        if not self.error:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1)
             return
 
-        if len(self.cost_function) > 0 and self.parameter >= 0:
+        parameter = float(params)
+
+        if len(self.cost_function) > 0 and parameter >= 0:
             self.cost_function += " + "
-        elif len(self.cost_function) > 0 and self.parameter < 0:
+        elif len(self.cost_function) > 0 and parameter < 0:
             params = params.replace("-", " - ")
 
         self.cost_function += f"{params} * {self.cob_net_field.currentText()}"
         self.txt_cost_func.setText(self.cost_function)
 
-        self.utility.extend([(self.parameter, self.cob_net_field.currentText())])
+        self.utility.extend([(parameter, self.cob_net_field.currentText())])
 
     def clear_cost_function(self):
         self.txt_cost_func.clear()
 
         self.cost_function = ""
-
-    def exit_procedure(self):
-        self.close()
-
-    def __check_parameter_value(self, par):
-        # parameter cannot be null
-        if len(par) == 0:
-            self.error = "Check parameter value."
-            return False
-
-        # parameter needs to be numeric
-        if not par.replace(".", "").replace("-", "").isdigit():
-            self.error = "Wrong value in parameter."
-            return False
-
-        self.parameter = float(par)
-        return True
 
     def configure_graph(self):
         mode = self.cob_mode.currentText()
@@ -203,205 +196,13 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         return graph
 
-    def __get_parameters(self, arg):
-        # parameter needs to be numeric
-        if not self.max_routes.text().isdigit():
-            self.error = "Max. routes needs to be a numeric integer value"
-        max_routes = int(self.max_routes.text())
-
-        if not self.max_depth.text().isdigit():
-            self.error = "Max. depth needs to be a numeric integer value"
-        max_depth = int(self.max_depth.text())
-
-        if max_depth <= 0 and max_routes <= 0:
-            self.error = "One of max. routes or max. depth has to be greater than 0"
-
-        # Check cutoff
-        if not self.ln_cutoff.text().replace(".", "").isdigit():
-            self.error = "Probability cutoff needs to be a float number"
-
-        cutoff = float(self.ln_cutoff.text())
-        if cutoff < 0 or cutoff > 1:
-            self.error = "Probability cutoff assumes values between 0 and 1"
-
-        # Check penalty
-        if not self.penalty.text().replace(".", "").isdigit():
-            self.error = "Penalty needs to be a float number"
-
-        # Check PSL(beta)
-        if not self.ln_psl.text().replace(".", "").isdigit():
-            self.error = "PSL (beta) needs to be a float number"
-
-        self.__kwargs = {
-            "max_routes": max_routes,
-            "max_depth": max_depth,
-            "penalty": float(self.penalty.text()),
-            "cutoff_prob": cutoff,
-            "beta": float(self.ln_psl.text()),
-        }
-
-        if arg == "assign" and not self.chb_save_choice_set.isChecked():
-            self.__kwargs["store_results"] = False
-        else:
-            self.__kwargs["store_results"] = True
-
-        algo = self.cob_algo.currentText().lower()
-        self.__algo = "bfsle" if algo == "bfsle" else "lp"
-
-    def __validate_node_id(self, node_id: str):
-        # Check if we have only numbers
-        if not node_id.isdigit():
-            self.error = self.tr("Wrong input value for node ID")
-            return
-
-        # Check if node_id exists
-        node_id = int(node_id)
-        if node_id not in self.__project_nodes:
-            self.error = self.tr("Node ID doesn't exist in project")
-            return
-
-        return node_id
-
-    def _build_rc(self, graph):
-        rc = RouteChoice(graph)
-        rc.set_choice_set_generation(self.__algo, **self.__kwargs)
-        return rc
-
-    def _open_visualize_single_dlg(self, graph):
-        self.dlg2 = VisualizeSingle(
-            qgis.utils.iface.mainWindow(),
-            graph,
-            self.__algo,
-            self.__kwargs,
-            self.from_node,
-            self.to_node,
-            float(self.ln_demand.text()),
-            self.link_layer,
-        )
-        self.dlg2.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg2.show()
-        self.dlg2.open()
-        # see note in https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QDialog.html#PySide2.QtWidgets.PySide2.QtWidgets.QDialog.exec_
-
-    def assign_and_save(self, arg):
-        if arg == "single":
-            self.from_node = self.__validate_node_id(self.node_from.text())
-            self.to_node = self.__validate_node_id(self.node_to.text())
-
-            demand = self.ln_demand.text()
-            if not demand.replace(".", "").isdigit():
-                self.error = "Wrong input value for demand"
-
-        else:
-            self.set_matrix()
-
-            if self.chb_use_all_matrices.isChecked():
-                matrix_cores_to_use = self.matrix.names
-            else:
-                matrix_cores_to_use = []
-                for i, mat in enumerate(self.matrix.names):
-                    if self.tbl_array_cores.cellWidget(i, 1).findChildren(QCheckBox)[0].isChecked():
-                        matrix_cores_to_use.append(mat)
-
-            if len(matrix_cores_to_use) > 0:
-                self.matrix.computational_view(matrix_cores_to_use)
-            else:
-                self.error = "Check matrices inputs"
-
-        self.__get_parameters(arg)
-
-        if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1)
-            return
-
-        graph = self.configure_graph()
-
-        nodes_of_interest = (
-            np.array([self.from_node, self.to_node], dtype=np.int64) if arg == "single" else graph.centroids
-        )
-        graph.prepare_graph(nodes_of_interest)
-        graph.set_graph("utility")
-
-        if self.chb_set_sub_area.isChecked():
-            zones = self.__get_project_zones()  # Set selected zones
-            self.matrix = self.set_sub_area(graph, zones)
-
-            # Rebuild graph for external ODs
-            new_centroids = np.unique(self.matrix.reset_index()[["origin id", "destination id"]].to_numpy().reshape(-1))
-            graph.prepare_graph(new_centroids)
-            graph.set_graph("utility")
-
-        rc = self._build_rc(graph)
-
-        if arg == "single":
-            _ = rc.execute_single(self.from_node, self.to_node, float(demand))
-
-            plot_results(rc.get_results().to_pandas(), self.from_node, self.to_node, self.link_layer)
-
-            self._open_visualize_single_dlg(graph)
-
-        else:
-            rc.add_demand(self.matrix)
-            rc.prepare()
-
-            # Set folder location to save route choice sets
-            if arg == "build" or self.chb_save_choice_set.isChecked():
-                folder = self.__check_folder_exists()
-                rc.set_save_routes(folder)
-
-            # Set selected link
-            if self.chb_set_select_link.isChecked():
-                rc.set_select_links(self.select_links)
-
-            # Run route choice with assignment or not
-            assig = True if arg == "assign" else False
-            rc.execute(perform_assignment=assig)
-
-            self.__rc_name = self.ln_rc_output.text()
-
-            # Save assignment flows to results database
-            if arg == "assign":
-                # Save select link analysis outputs (matrix and result)
-                if self.chb_set_select_link.isChecked():
-                    rc.save_select_link_flows(self.ln_mat_name.text())
-                else:
-                    rc.save_link_flows(self.__rc_name)
-
-            # Save sub-area demand matrix
-            if self.chb_set_sub_area.isChecked():
-                folder = self.__check_folder_exists()
-                self.matrix.to_parquet(os.path.join(folder, f"{self.__rc_name}.parquet"))
-
-            message = f"Route choice sets saved to {self.project.project_base_path}"
-            qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
-
-        self.exit_procedure()
-
-    def __check_folder_exists(self):
-        rc_folder = os.path.join(self.project.project_base_path, "route_choice")
-        if not os.path.isdir(rc_folder):
-            os.mkdir(rc_folder)
-        return rc_folder
-
     ###### For sub-area analysis
-
-    def set_sub_area(self, graph, zones):
-        sub_area = SubAreaAnalysis(graph, zones, self.matrix)
-        sub_area.rc.set_choice_set_generation(self.__algo, **self.__kwargs)
-        sub_area.rc.execute(perform_assignment=True)
-
-        # I don't know why but origin and destination ID are assumed to be strings, which is
-        # raising an error when assembling the COO Matrix. We use infer objects to ensure that
-        # indexes are numeric integers
-        demand = sub_area.post_process().reset_index().infer_objects()
-        demand = demand.groupby(["origin id", "destination id"]).sum()
-        return demand
-
     def set_sub_area_use(self):
         for item in [self.cob_zoning_layer, self.chb_selected_zones, self.label_24]:
             item.setEnabled(self.chb_set_sub_area.isChecked())
 
         self.chb_set_select_link.setEnabled(not self.chb_set_sub_area.isChecked())
+        # Only polygon layers as zones
         self.cob_zoning_layer.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
     def __get_project_zones(self):
@@ -488,3 +289,169 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.ln_link_id.clear()
         self.cob_direction.setCurrentIndex(0)
         self.__current_links = []
+
+    # Validate model inputs
+    def __validate_inputs(self):
+        cob_algo = self.cob_algo.currentText().lower()
+        algo = "bfsle" if cob_algo == "bfsle" else "lp"
+
+        # parameter needs to be numeric
+        if not self.max_routes.text().isdigit():
+            self.error = "Max. routes needs to be a numeric integer value"
+        max_routes = int(self.max_routes.text())
+
+        if not self.max_depth.text().isdigit():
+            self.error = "Max. depth needs to be a numeric integer value"
+        max_depth = int(self.max_depth.text())
+
+        if max_depth <= 0 and max_routes <= 0:
+            self.error = "One of max. routes or max. depth has to be greater than 0"
+
+        # Check cutoff
+        if not self.ln_cutoff.text().replace(".", "").isdigit():
+            self.error = "Probability cutoff needs to be a numeric value"
+
+        cutoff = float(self.ln_cutoff.text())
+        if cutoff < 0 or cutoff > 1:
+            self.error = "Probability cutoff assumes values between 0 and 1"
+
+        # Check penalty
+        if not self.penalty.text().replace(".", "").isdigit():
+            self.error = "Penalty needs to be a numeric value"
+
+        penalty = float(self.penalty.text())
+        if cob_algo in ["BFSLE with Link Penalization"] and penalty <= 1.0:
+            self.error = "Penalty needs to be greater than 1.0"
+
+        # Check PSL(beta)
+        if not self.ln_psl.text().replace(".", "").isdigit():
+            self.error = "PSL (beta) needs to be a numeric value"
+
+        # TODO: For nodes in execute single
+        for node in []:
+            # Check node ID is numeric
+            if not node.isdigit():
+                self.error = "Wrong input value for node ID"
+
+            # Check if node_id exists
+            node_id = int(node)
+            if node_id not in self.__project_nodes:
+                self.error = f"Node ID {node_id} doesn't exist in project"
+
+        # Check for execute_single demand
+        demand = self.ln_demand.text()
+        if not demand.replace(".", "").isdigit():
+            self.error = "Wrong input value for demand"
+
+        # Let's check up matrix data here
+        if self.job in ["assign", "build"]:
+            self.set_matrix()
+
+            if self.chb_use_all_matrices.isChecked():
+                matrix_cores_to_use = self.matrix.names
+            else:
+                matrix_cores_to_use = []
+                for i, mat in enumerate(self.matrix.names):
+                    if self.tbl_array_cores.cellWidget(i, 1).findChildren(QCheckBox)[0].isChecked():
+                        matrix_cores_to_use.append(mat)
+
+            if len(matrix_cores_to_use) > 0:
+                self.matrix.computational_view(matrix_cores_to_use)
+            else:
+                self.error = "Check matrices inputs"
+
+        # Check saving file names too
+
+        # Populate with our model parameters
+        self.parameters = {
+            "algorithm": algo,
+            "kwargs": {
+                "max_routes": max_routes,
+                "max_depth": max_depth,
+                "penalty": penalty,
+                "cutoff_prob": cutoff,
+                "beta": float(self.ln_psl.text()),
+            },
+            "set_select_links": self.chb_set_select_link.isChecked(),
+            "select_links": self.select_links,
+        }
+
+        if self.job == "assign" and not self.chb_save_choice_set.isChecked():
+            self.parameters["kwargs"]["store_results"] = False
+        else:
+            self.parameters["kwargs"]["store_results"] = True
+
+        if self.chb_set_sub_area.isChecked():
+            self.parameters["set_sub_area"] = True
+            self.parameters["zones"] = self.__get_project_zones()
+        else:
+            self.parameters["set_sub_area"] = False
+
+        self.parameters
+
+    def execute_single(self):
+        self.job = "execute_single"
+        self.run()
+
+    def execute_assign(self):
+        self.job = "assign"
+        self.run()
+
+    def execute_build(self):
+        self.job = "build"
+        self.run()
+
+    def run(self):
+        self.__get_parameters()
+
+        if self.error:
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1)
+            return
+
+        graph = self.configure_graph()
+
+        self.worker_thread = RouteChoiceProcedure(qgis.utils.iface.mainWindow(), self.job, graph, self.parameters)
+        self.run_thread()
+
+    def run_thread(self):
+        self.worker_thread.signal.connect(self.signal_handler)
+        self.worker_thread.start()
+        self.show()
+
+    def signal_handler(self, val):
+        error = self.worker_thread.error
+        if error is not None:
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error"), error.args[0], level=1, duration=10)
+        self.report.extend(self.worker_thread.report)
+
+        if val[0] == "finished":
+            if self.job == "assign":
+                if self.chb_set_select_link.isChecked():
+                    self.worker_thread.rc.save_select_link_flows(self.ln_mat_name.text())
+                else:
+                    self.worker_thread.rc.save_link_flows(self.ln_rc_output.text())
+
+            if self.job == "execute_single":
+                self.dlg2 = VisualizeSingle(
+                    qgis.utils.iface.mainWindow(),
+                    self.worker_thread.graph,
+                    self.__algo,
+                    self.__kwargs,
+                    self.from_node,
+                    self.to_node,
+                    float(self.ln_demand.text()),
+                    self.link_layer,
+                )
+                self.dlg2.setWindowFlags(Qt.WindowStaysOnTopHint)
+                self.dlg2.show()
+                self.dlg2.open()
+                # see note in https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QDialog.html#PySide2.QtWidgets.PySide2.QtWidgets.QDialog.exec_
+
+            if self.job in ["assign", "build"]:
+                message = f"Route choice sets saved to {self.project.project_base_path}"
+                qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
+
+            self.exit_procedure()
+
+    def exit_procedure(self):
+        self.close()
