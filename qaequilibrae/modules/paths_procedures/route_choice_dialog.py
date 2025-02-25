@@ -163,8 +163,6 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
     def exit_procedure(self):
         self.close()
-        message = f"Route choice sets saved to {self.project.project_base_path}"
-        qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
 
     def __check_parameter_value(self, par):
         # parameter cannot be null
@@ -374,6 +372,9 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 folder = self.__check_folder_exists()
                 self.matrix.to_parquet(os.path.join(folder, f"{self.__rc_name}.parquet"))
 
+            message = f"Route choice sets saved to {self.project.project_base_path}"
+            qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
+
         self.exit_procedure()
 
     def __check_folder_exists(self):
@@ -391,7 +392,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         # I don't know why but origin and destination ID are assumed to be strings, which is
         # raising an error when assembling the COO Matrix. We use infer objects to ensure that
-        # indexes are numeric integers (in this case)
+        # indexes are numeric integers
         demand = sub_area.post_process().reset_index().infer_objects()
         demand = demand.groupby(["origin id", "destination id"]).sum()
         return demand
