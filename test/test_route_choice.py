@@ -12,6 +12,17 @@ from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteS
 from qaequilibrae.modules.paths_procedures.route_choice_dialog import RouteChoiceDialog
 from .utilities import create_matrix
 
+params = {
+    "algorithm": "bfsle",
+    "matrix": 1.0,
+    "node_from": "77011",
+    "node_to": "74089",
+    "kwargs": {
+        "max_routes": 3,
+        "beta": 1.1,
+    },
+}
+
 
 def test_execute_single(coquimbo_project, qtbot):
     dialog = RouteChoiceDialog(coquimbo_project)
@@ -43,17 +54,6 @@ def test_execute_single(coquimbo_project, qtbot):
 
 
 def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
-    p = {
-        "algorithm": "bfsle",
-        "matrix": 1.0,
-        "node_from": "77011",
-        "node_to": "74089",
-        "kwargs": {
-            "max_routes": 3,
-            "beta": 1.1,
-        },
-    }
-
     project = coquimbo_project.project
     project.network.build_graphs()
 
@@ -63,7 +63,7 @@ def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
     graph.set_graph("utility")
     graph.set_blocked_centroid_flows(False)
 
-    dialog = ExecuteSingleDialog(qgis_iface, graph, coquimbo_project.layers["links"][0], p)
+    dialog = ExecuteSingleDialog(qgis_iface, graph, coquimbo_project.layers["links"][0], params)
     dialog.debouncer.delay_ms = 200
     dialog.node_from.clear()
     dialog.node_to.clear()
@@ -259,3 +259,7 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     conn = sqlite3.connect(pth / "results_database.sqlite")
     results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "select_link_analysis_uncompressed" in results
+
+
+def test_route_choice_procedure(coquimbo_project, qtbot):
+    pass

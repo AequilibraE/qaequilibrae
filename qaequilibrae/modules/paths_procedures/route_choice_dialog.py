@@ -169,7 +169,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         self.cost_function = ""
 
-    def __get_graph_config(self):
+    def _get_graph_config(self):
         mode = self.cob_mode.currentText()
         mode_id = self.all_modes[mode]
 
@@ -370,7 +370,6 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.parameters["matrix"] = float(demand)
 
         if self.job in ["assign", "build"]:
-            print(0)
             # Let's check up matrix data here
             self.set_matrix()
 
@@ -403,7 +402,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
     def run(self):
         self._validate_inputs()
-        self.__get_graph_config()
+        self._get_graph_config()
 
         if self.error:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1)
