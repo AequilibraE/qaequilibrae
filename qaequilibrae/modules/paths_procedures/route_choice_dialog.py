@@ -420,10 +420,13 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
     def signal_handler(self, val):
         if val[0] == "finished":
+            message = None
+
             if self.job == "assign":
                 self.worker_thread.rc.save_link_flows(self.ln_rc_output.text())
 
             if self.parameters["set_select_links"]:
+                message = f"Route choice sets saved to {self.project.project_base_path}"
                 self.worker_thread.rc.save_select_link_flows(self.ln_mat_name.text())
 
             if self.parameters["set_sub_area"]:
@@ -431,8 +434,10 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                     os.path.join(self.parameters["rc_folder"], f"{self.ln_rc_output.text()}.parquet")
                 )
 
-            if self.job in ["assign", "build"]:
+            if self.job == "build" or self.parameters["save_choice_sets"]:
                 message = f"Route choice sets saved to {self.project.project_base_path}"
+
+            if message:
                 qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
 
             if self.job == "execute_single":

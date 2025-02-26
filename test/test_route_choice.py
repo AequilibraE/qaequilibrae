@@ -10,9 +10,10 @@ from qgis.core import QgsProject
 
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
 from qaequilibrae.modules.paths_procedures.route_choice_dialog import RouteChoiceDialog
+from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
 from .utilities import create_matrix
 
-params = {
+single_params = {
     "algorithm": "bfsle",
     "matrix": 1.0,
     "node_from": "77011",
@@ -63,7 +64,7 @@ def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
     graph.set_graph("utility")
     graph.set_blocked_centroid_flows(False)
 
-    dialog = ExecuteSingleDialog(qgis_iface, graph, coquimbo_project.layers["links"][0], params)
+    dialog = ExecuteSingleDialog(qgis_iface, graph, coquimbo_project.layers["links"][0], single_params)
     dialog.debouncer.delay_ms = 200
     dialog.node_from.clear()
     dialog.node_to.clear()
@@ -117,6 +118,9 @@ def test_assign_and_save(ae_with_project, qtbot, save):
 
         assert counter == 24
 
+        messagebar = ae_with_project.iface.messageBar()
+        assert "Success:Route choice sets saved to" in messagebar.messages[3][0]
+
 
 def test_build_and_save(ae_with_project, qtbot):
     dialog = RouteChoiceDialog(ae_with_project)
@@ -147,6 +151,9 @@ def test_build_and_save(ae_with_project, qtbot):
             counter += 1
 
     assert counter == 24
+
+    messagebar = ae_with_project.iface.messageBar()
+    assert "Success:Route choice sets saved to" in messagebar.messages[3][0]
 
 
 def test_sub_area_analysis(coquimbo_project, qtbot):
@@ -259,7 +266,3 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     conn = sqlite3.connect(pth / "results_database.sqlite")
     results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "select_link_analysis_uncompressed" in results
-
-
-def test_route_choice_procedure(coquimbo_project, qtbot):
-    pass
