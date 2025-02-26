@@ -171,30 +171,20 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         self.cost_function = ""
 
-    def configure_graph(self):
+    def __get_graph_config(self):
         mode = self.cob_mode.currentText()
         mode_id = self.all_modes[mode]
-        if mode_id not in self.project.network.graphs:
-            self.project.network.build_graphs(modes=[mode_id])
 
-        graph = self.project.network.graphs[mode_id]
+        idx = self.link_layer.dataProvider().fieldNameIndex("link_id")
+        remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
 
-        field = np.zeros((1, graph.network.shape[0]))
-        for idx, (par, col) in enumerate(self.utility):
-            field += par * graph.network[col].array
-
-        graph.network = graph.network.assign(utility=0)
-        graph.network["utility"] = field.reshape(graph.network.shape[0], 1)
-
-        if self.chb_chosen_links.isChecked():
-            graph = self.project.network.graphs.pop(mode_id)
-            idx = self.link_layer.dataProvider().fieldNameIndex("link_id")
-            remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
-            graph.exclude_links(remove)
-
-        graph.set_blocked_centroid_flows(self.chb_check_centroids.isChecked())
-
-        return graph
+        self.parameters["graph"] = {
+            "mode_id": mode_id,
+            "use_chosen_links": self.chb_chosen_links.isChecked(),
+            "links_to_remove": remove,
+            "block_centroid_flows": self.chb_check_centroids.isChecked(),
+            "utility": self.utility,
+        }
 
     ###### For sub-area analysis
     def set_sub_area_use(self):
@@ -290,7 +280,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.__current_links = []
 
     # Validate model inputs
-    def _validade_inputs(self):
+    def _validate_inputs(self):
         cob_algo = self.cob_algo.currentText().lower()
         algo = "bfsle" if cob_algo == "bfsle" else "lp"
 
@@ -414,54 +404,56 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.run()
 
     def run(self):
-        self._validade_inputs()
+        self._validate_inputs()
+        self.__get_graph_config()
 
         if self.error:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1)
             return
 
-        graph = self.configure_graph()
-
         self.worker_thread = RouteChoiceProcedure(
-            qgis.utils.iface.mainWindow(), self.job, graph, self.link_layer, self.parameters
+            qgis.utils.iface.mainWindow(), self.project, self.job, self.parameters
         )
         self.run_thread()
 
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.doWork()
-        self.show()
+        self.worker_thread.start()
+        self.exec_()
 
     def signal_handler(self, val):
         if val[0] == "finished":
             if self.job == "assign":
-                if self.chb_set_select_link.isChecked():
-                    self.worker_thread.rc.save_select_link_flows(self.ln_mat_name.text())
-                else:
-                    self.worker_thread.rc.save_link_flows(self.ln_rc_output.text())
+                self.worker_thread.rc.save_link_flows(self.ln_rc_output.text())
+
+            if self.parameters["set_select_links"]:
+                self.worker_thread.rc.save_select_link_flows(self.ln_mat_name.text())
 
             if self.parameters["set_sub_area"]:
                 self.worker_thread.matrix.to_parquet(
                     os.path.join(self.parameters["rc_folder"], f"{self.ln_rc_output.text()}.parquet")
                 )
 
-            if self.job == "execute_single":
-                self.dlg2 = ExecuteSingleDialog(
-                    qgis.utils.iface.mainWindow(),
-                    self.worker_thread.graph,
-                    self.link_layer,
-                    self.parameters,
-                )
-                self.dlg2.setWindowFlags(Qt.WindowStaysOnTopHint)
-                self.dlg2.show()
-                self.dlg2.open()
-                # see note in https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QDialog.html#PySide2.QtWidgets.PySide2.QtWidgets.QDialog.exec_
-
             if self.job in ["assign", "build"]:
                 message = f"Route choice sets saved to {self.project.project_base_path}"
                 qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
 
+            if self.job == "execute_single":
+                res = self.worker_thread.rc.get_results().to_pandas()
+                plot_results(res, self.parameters["node_from"], self.parameters["node_to"], self.link_layer)
+
             self.exit_procedure()
 
     def exit_procedure(self):
+        if self.job == "execute_single":
+            dlg2 = ExecuteSingleDialog(
+                qgis.utils.iface.mainWindow(),
+                self.worker_thread.graph,
+                self.link_layer,
+                self.parameters,
+            )
+            dlg2.show()
+            dlg2.open()
+            # see note in https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QDialog.html#PySide2.QtWidgets.PySide2.QtWidgets.QDialog.exec_
+
         self.close()

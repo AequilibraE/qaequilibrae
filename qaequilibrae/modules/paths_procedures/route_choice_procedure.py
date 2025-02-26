@@ -12,13 +12,14 @@ from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteS
 class RouteChoiceProcedure(WorkerThread):
     signal = pyqtSignal(object)
 
-    def __init__(self, parentThread, job, graph, link_layer, parameters):
+    def __init__(self, parentThread, aeq_project, job, parameters):
         WorkerThread.__init__(self, parentThread)
+        self.project = aeq_project
         self.job = job
         self.parameters = parameters
-        self.graph = graph
-        self.link_layer = link_layer
         self.matrix = parameters["matrix"]
+
+        self.graph = self.configure_graph()
 
     def doWork(self):
         if self.job == "execute_single":
@@ -38,8 +39,6 @@ class RouteChoiceProcedure(WorkerThread):
         self.rc = self._build_rc(self.graph)
         _ = self.rc.execute_single(node_from, node_to, self.matrix)
 
-        plot_results(self.rc.get_results().to_pandas(), node_from, node_to, self.link_layer)
-
     def do_assign_or_build(self):
         self._setup_graph(self.graph.centroids)
 
@@ -57,8 +56,7 @@ class RouteChoiceProcedure(WorkerThread):
 
             # Rebuild graph for external ODs
             new_centroids = np.unique(self.matrix.reset_index()[["origin id", "destination id"]].to_numpy().reshape(-1))
-            self.graph.prepare_graph(new_centroids)
-            self.graph.set_graph("utility")
+            self._setup_graph(new_centroids)
 
         self.rc = self._build_rc(self.graph)
         self.rc.add_demand(self.matrix)
@@ -75,14 +73,33 @@ class RouteChoiceProcedure(WorkerThread):
 
         self.rc.execute(assig)
 
-        print()
-
     def _setup_graph(self, nodes_of_interest):
         self.graph.prepare_graph(nodes_of_interest)
         self.graph.set_graph("utility")
 
     def _build_rc(self, graph):
-
         rc = RouteChoice(graph)
         rc.set_choice_set_generation(self.parameters["algorithm"], **self.parameters["kwargs"])
         return rc
+
+    def configure_graph(self):
+        mode_id = self.parameters["graph"]["mode_id"]
+        if mode_id not in self.project.network.graphs:
+            self.project.network.build_graphs(modes=[mode_id])
+
+        graph = self.project.network.graphs[mode_id]
+
+        field = np.zeros((1, graph.network.shape[0]))
+        for idx, (par, col) in enumerate(self.parameters["graph"]["utility"]):
+            field += par * graph.network[col].array
+
+        graph.network = graph.network.assign(utility=0)
+        graph.network["utility"] = field.reshape(graph.network.shape[0], 1)
+
+        if self.parameters["graph"]["use_chosen_links"]:
+            graph = self.project.network.graphs.pop(mode_id)
+            graph.exclude_links(self.parameters["graph"]["links_to_remove"])
+
+        graph.set_blocked_centroid_flows(self.parameters["graph"]["block_centroid_flows"])
+
+        return graph

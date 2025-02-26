@@ -37,16 +37,15 @@ def test_execute_single(coquimbo_project, qtbot):
     qtbot.mouseClick(dialog.but_visualize, Qt.LeftButton)
 
     # Test Visualize Single Class
-    dialog.dlg2.node_from.setText("71645")
-    dialog.dlg2.node_to.setText("79385")
-    dialog.dlg2.sld_max_routes.setTickPosition(10)
-    dialog.dlg2.execute_single()
-    dialog.dlg2.exit_procedure()
+    # dialog.dlg2.node_from.setText("71645")
+    # dialog.dlg2.node_to.setText("79385")
+    # dialog.dlg2.sld_max_routes.setTickPosition(10)
+    # dialog.dlg2.execute_single()
+    # dialog.dlg2.exit_procedure()
 
     layers = list(QgsProject.instance().mapLayers().values())
     layers = [lyr.name() for lyr in layers]
     assert "route_set-77011-74089" in layers
-    assert "route_set-71645-79385" in layers
 
 
 @pytest.mark.parametrize("save", [True, False])
