@@ -31,14 +31,13 @@ class ExecuteSingleDialog(QDialog, FORM_CLASS):
 
         self.debouncer = Debouncer(delay_ms=1_000, callback=self.on_input_changed)
 
-        self.node_from.returnPressed.connect(self._on_node_changed)
-        self.node_to.returnPressed.connect(self._on_node_changed)
+        self.node_from.editingFinished.connect(self._on_node_from_changed)
+        self.node_to.editingFinished.connect(self._on_node_to_changed)
         self.sld_max_routes.valueChanged.connect(self._on_slider_changed)
 
     def execute_single(self):
         from_node = int(self.node_from.text())
         to_node = int(self.node_to.text())
-        self._kwargs["max_routes"] = self.sld_max_routes.value()
 
         nodes_of_interest = np.array([from_node, to_node], dtype=np.int64)
 
@@ -55,13 +54,21 @@ class ExecuteSingleDialog(QDialog, FORM_CLASS):
         self.close()
 
     @pyqtSlot()
-    def _on_node_changed(self):
-        self.debouncer(("node_changed"))
+    def _on_node_from_changed(self):
+        self.debouncer(("node_from", self.node_from.text()))
 
     @pyqtSlot()
-    def _on_slider_changed(self):
-        self.label_4.setText(f"Number of routes: {self._kwargs["max_routes"]}")
-        self.debouncer(("slider_changed"))
+    def _on_node_to_changed(self):
+        self.debouncer(("node_to", self.node_to.text()))
 
-    def on_input_changed(self):
+    @pyqtSlot(int)
+    def _on_slider_changed(self, value):
+        self.label_4.setText(f"Number of routes: {value}")
+        self.debouncer(("sld_max_routes", value))
+
+    def on_input_changed(self, source_and_value):
+        source, value = source_and_value
+        if source == "sld_max_routes":
+            self._kwargs["max_routes"] = value
+
         self.execute_single()
