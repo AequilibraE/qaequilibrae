@@ -8,6 +8,7 @@ import pytest
 from PyQt5.QtCore import Qt
 from qgis.core import QgsProject
 
+from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
 from qaequilibrae.modules.paths_procedures.route_choice_dialog import RouteChoiceDialog
 from .utilities import create_matrix
 
@@ -34,9 +35,50 @@ def test_execute_single(coquimbo_project, qtbot):
     dialog.ln_demand.setText("1.0")
     qtbot.mouseClick(dialog.but_visualize, Qt.LeftButton)
 
+    dialog.exit_procedure()
+
     layers = list(QgsProject.instance().mapLayers().values())
     layers = [lyr.name() for lyr in layers]
     assert "route_set-77011-74089" in layers
+
+
+def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
+    p = {
+        "algorithm": "bfsle",
+        "matrix": 1.0,
+        "node_from": "77011",
+        "node_to": "74089",
+        "kwargs": {
+            "max_routes": 3,
+            "beta": 1.1,
+        },
+    }
+
+    project = coquimbo_project.project
+    project.network.build_graphs()
+
+    graph = project.network.graphs["c"]
+    graph.network = graph.network.assign(utility=graph.network.distance * 0.011)
+    graph.prepare_graph(graph.centroids)
+    graph.set_graph("utility")
+    graph.set_blocked_centroid_flows(False)
+
+    dialog = ExecuteSingleDialog(qgis_iface, graph, coquimbo_project.layers["links"][0], p)
+    dialog.debouncer.delay_ms = 200
+    dialog.node_from.clear()
+    dialog.node_to.clear()
+    qtbot.mouseClick(dialog.node_from, Qt.LeftButton)
+    qtbot.keyClicks(dialog.node_from, "71645")
+    qtbot.mouseClick(dialog.node_to, Qt.LeftButton)
+    qtbot.keyClicks(dialog.node_to, "79385")
+    qtbot.keyPress(dialog.node_to, Qt.Key_Enter)
+    qtbot.wait(400)
+
+    dialog.exit_procedure()
+
+    layers = list(QgsProject.instance().mapLayers().values())
+    layers = [lyr.name() for lyr in layers]
+    assert "route_set-71645-79385" in layers
 
 
 @pytest.mark.parametrize("save", [True, False])
