@@ -12,20 +12,20 @@ from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_execute_single.ui"))
 
 
-class VisualizeSingle(QDialog, FORM_CLASS):
-    def __init__(self, iface, graph, algorithm, kwargs, from_node, to_node, demand, link_layer):
+class ExecuteSingleDialog(QDialog, FORM_CLASS):
+    def __init__(self, iface, graph, link_layer, parameters):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
 
         self.graph = graph
-        self._algo = algorithm
-        self._kwargs = kwargs
-        self.demand = demand
+        self._algo = parameters["algorithm"]
+        self._kwargs = parameters["kwargs"]
+        self.demand = parameters["matrix"]
         self.link_layer = link_layer
 
-        self.node_from.setText(str(from_node))
-        self.node_to.setText(str(to_node))
+        self.node_from.setText(str(parameters["node_from"]))
+        self.node_to.setText(str(parameters["node_to"]))
         self.sld_max_routes.setValue(self._kwargs["max_routes"])
         self.label_4.setText(f"Number of routes: {self._kwargs["max_routes"]}")
 

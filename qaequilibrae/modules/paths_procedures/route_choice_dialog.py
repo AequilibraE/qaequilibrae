@@ -17,7 +17,7 @@ from qgis.core import QgsMapLayerProxyModel
 from qaequilibrae.modules.common_tools import geodataframe_from_layer
 from qaequilibrae.modules.common_tools.auxiliary_functions import get_vector_layer_by_name, model_area_polygon
 from qaequilibrae.modules.matrix_procedures import list_matrices
-from qaequilibrae.modules.paths_procedures.execute_single_dialog import VisualizeSingle
+from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
 from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
 from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
 
@@ -150,8 +150,8 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         if not params.replace(".", "").replace("-", "").isdigit():
             self.error = "Check parameter value"
 
-        if not self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1)
+        if self.error:
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
             return
 
         parameter = float(params)
@@ -218,7 +218,6 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         return gpd.GeoDataFrame(geometry=[poly], crs=crs)
 
     ###### For select link analysis
-
     def set_select_link_use(self):
         for item in [
             self.ln_qry_name,
@@ -291,7 +290,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.__current_links = []
 
     # Validate model inputs
-    def __validate_inputs(self):
+    def _validade_inputs(self):
         cob_algo = self.cob_algo.currentText().lower()
         algo = "bfsle" if cob_algo == "bfsle" else "lp"
 
@@ -327,24 +326,64 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         if not self.ln_psl.text().replace(".", "").isdigit():
             self.error = "PSL (beta) needs to be a numeric value"
 
-        # TODO: For nodes in execute single
-        for node in []:
-            # Check node ID is numeric
-            if not node.isdigit():
-                self.error = "Wrong input value for node ID"
+        # Check saving file names too
 
-            # Check if node_id exists
-            node_id = int(node)
-            if node_id not in self.__project_nodes:
-                self.error = f"Node ID {node_id} doesn't exist in project"
+        # Populate with our model parameters
+        self.parameters = {
+            "algorithm": algo,
+            "kwargs": {
+                "max_routes": max_routes,
+                "max_depth": max_depth,
+                "penalty": penalty,
+                "cutoff_prob": cutoff,
+                "beta": float(self.ln_psl.text()),
+            },
+            "set_select_links": self.chb_set_select_link.isChecked(),
+            "select_links": self.select_links,
+            "save_choice_sets": self.chb_save_choice_set.isChecked(),
+        }
 
-        # Check for execute_single demand
-        demand = self.ln_demand.text()
-        if not demand.replace(".", "").isdigit():
-            self.error = "Wrong input value for demand"
+        if self.job == "assign" and not self.parameters["save_choice_sets"]:
+            self.parameters["kwargs"]["store_results"] = False
+        else:
+            self.parameters["kwargs"]["store_results"] = True
 
-        # Let's check up matrix data here
+        if self.chb_set_sub_area.isChecked():
+            self.parameters["set_sub_area"] = True
+            self.parameters["zones"] = self.__get_project_zones()
+        else:
+            self.parameters["set_sub_area"] = False
+
+        if self.job == "build" or self.parameters["save_choice_sets"] or self.parameters["set_sub_area"]:
+            rc_folder = os.path.join(self.project.project_base_path, "route_choice")
+            if not os.path.isdir(rc_folder):
+                os.mkdir(rc_folder)
+            self.parameters["rc_folder"] = rc_folder
+
+        if self.job == "execute_single":
+            nds = {"node_from": self.node_from.text(), "node_to": self.node_to.text()}
+            for key, node in nds.items():
+                # Check node ID is numeric
+                if not node.isdigit():
+                    self.error = "Wrong input value for node ID"
+
+                # Check if node_id exists
+                node_id = int(node)
+                if node_id not in self.__project_nodes:
+                    self.error = f"Node ID {node_id} doesn't exist in project"
+
+                self.parameters[key] = node_id
+
+            # Check for execute_single demand
+            demand = self.ln_demand.text()
+            if not demand.replace(".", "").isdigit():
+                self.error = "Wrong input value for demand"
+
+            self.parameters["matrix"] = float(demand)
+
         if self.job in ["assign", "build"]:
+            print(0)
+            # Let's check up matrix data here
             self.set_matrix()
 
             if self.chb_use_all_matrices.isChecked():
@@ -360,34 +399,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             else:
                 self.error = "Check matrices inputs"
 
-        # Check saving file names too
-
-        # Populate with our model parameters
-        self.parameters = {
-            "algorithm": algo,
-            "kwargs": {
-                "max_routes": max_routes,
-                "max_depth": max_depth,
-                "penalty": penalty,
-                "cutoff_prob": cutoff,
-                "beta": float(self.ln_psl.text()),
-            },
-            "set_select_links": self.chb_set_select_link.isChecked(),
-            "select_links": self.select_links,
-        }
-
-        if self.job == "assign" and not self.chb_save_choice_set.isChecked():
-            self.parameters["kwargs"]["store_results"] = False
-        else:
-            self.parameters["kwargs"]["store_results"] = True
-
-        if self.chb_set_sub_area.isChecked():
-            self.parameters["set_sub_area"] = True
-            self.parameters["zones"] = self.__get_project_zones()
-        else:
-            self.parameters["set_sub_area"] = False
-
-        self.parameters
+            self.parameters["matrix"] = self.matrix
 
     def execute_single(self):
         self.job = "execute_single"
@@ -402,7 +414,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.run()
 
     def run(self):
-        self.__get_parameters()
+        self._validade_inputs()
 
         if self.error:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1)
@@ -410,20 +422,17 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         graph = self.configure_graph()
 
-        self.worker_thread = RouteChoiceProcedure(qgis.utils.iface.mainWindow(), self.job, graph, self.parameters)
+        self.worker_thread = RouteChoiceProcedure(
+            qgis.utils.iface.mainWindow(), self.job, graph, self.link_layer, self.parameters
+        )
         self.run_thread()
 
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.start()
+        self.worker_thread.doWork()
         self.show()
 
     def signal_handler(self, val):
-        error = self.worker_thread.error
-        if error is not None:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error"), error.args[0], level=1, duration=10)
-        self.report.extend(self.worker_thread.report)
-
         if val[0] == "finished":
             if self.job == "assign":
                 if self.chb_set_select_link.isChecked():
@@ -431,16 +440,17 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 else:
                     self.worker_thread.rc.save_link_flows(self.ln_rc_output.text())
 
+            if self.parameters["set_sub_area"]:
+                self.worker_thread.matrix.to_parquet(
+                    os.path.join(self.parameters["rc_folder"], f"{self.ln_rc_output.text()}.parquet")
+                )
+
             if self.job == "execute_single":
-                self.dlg2 = VisualizeSingle(
+                self.dlg2 = ExecuteSingleDialog(
                     qgis.utils.iface.mainWindow(),
                     self.worker_thread.graph,
-                    self.__algo,
-                    self.__kwargs,
-                    self.from_node,
-                    self.to_node,
-                    float(self.ln_demand.text()),
                     self.link_layer,
+                    self.parameters,
                 )
                 self.dlg2.setWindowFlags(Qt.WindowStaysOnTopHint)
                 self.dlg2.show()
