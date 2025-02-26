@@ -1,5 +1,4 @@
 import sqlite3
-import time
 from os import listdir
 from os.path import join
 from pathlib import Path
@@ -9,7 +8,6 @@ import pytest
 from PyQt5.QtCore import Qt
 from qgis.core import QgsProject
 
-from qaequilibrae.modules.matrix_procedures.results_lister import list_results
 from qaequilibrae.modules.paths_procedures.route_choice_dialog import RouteChoiceDialog
 from .utilities import create_matrix
 
@@ -35,13 +33,6 @@ def test_execute_single(coquimbo_project, qtbot):
     dialog.node_to.setText("74089")
     dialog.ln_demand.setText("1.0")
     qtbot.mouseClick(dialog.but_visualize, Qt.LeftButton)
-
-    # Test Visualize Single Class
-    # dialog.dlg2.node_from.setText("71645")
-    # dialog.dlg2.node_to.setText("79385")
-    # dialog.dlg2.sld_max_routes.setTickPosition(10)
-    # dialog.dlg2.execute_single()
-    # dialog.dlg2.exit_procedure()
 
     layers = list(QgsProject.instance().mapLayers().values())
     layers = [lyr.name() for lyr in layers]
@@ -219,12 +210,10 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     dialog.cob_matrices.setCurrentText("b''")
     qtbot.mouseClick(dialog.but_perform_assig, Qt.LeftButton)
 
-    print(dialog.parameters)
+    matrices = listdir(dialog.project.matrices.fldr)
+    assert "select_link_analysis.omx" in matrices
 
-    # matrices = listdir(dialog.project.matrices.fldr)
-    # assert "select_link_analysis.omx" in matrices
-
-    # pth = Path(dialog.project.project_base_path)
-    # conn = sqlite3.connect(pth / "results_database.sqlite")
-    # results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
-    # assert "select_link_analysis_uncompressed" in results
+    pth = Path(dialog.project.project_base_path)
+    conn = sqlite3.connect(pth / "results_database.sqlite")
+    results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+    assert "select_link_analysis_uncompressed" in results

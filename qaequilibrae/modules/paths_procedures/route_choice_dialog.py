@@ -3,14 +3,12 @@ import os
 import sys
 
 import geopandas as gpd
-import numpy as np
 import qgis
-from aequilibrae.paths import SubAreaAnalysis, RouteChoice
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog, QLineEdit
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
 from qgis._core import QgsFeatureRequest
 from qgis.core import QgsMapLayerProxyModel
 
@@ -18,8 +16,8 @@ from qaequilibrae.modules.common_tools import geodataframe_from_layer
 from qaequilibrae.modules.common_tools.auxiliary_functions import get_vector_layer_by_name, model_area_polygon
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
-from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
 from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
+from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_route_choice.ui"))

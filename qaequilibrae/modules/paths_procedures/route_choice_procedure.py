@@ -19,7 +19,7 @@ class RouteChoiceProcedure(WorkerThread):
         self.parameters = parameters
         self.matrix = parameters["matrix"]
 
-        self.graph = self.configure_graph()
+        self.graph = self._configure_graph()
 
     def doWork(self):
         if self.job == "execute_single":
@@ -34,16 +34,17 @@ class RouteChoiceProcedure(WorkerThread):
         node_to = self.parameters["node_to"]
 
         nodes_of_interest = np.array([node_from, node_to], dtype=np.int64)
-        self._setup_graph(nodes_of_interest)
+        self.graph.prepare_graph(nodes_of_interest)
+        self.graph.set_graph("utility")
 
         self.rc = self._build_rc(self.graph)
         _ = self.rc.execute_single(node_from, node_to, self.matrix)
 
     def do_assign_or_build(self):
-        self._setup_graph(self.graph.centroids)
+        self.graph.prepare_graph(self.graph.centroids)
+        self.graph.set_graph("utility")
 
         if self.parameters["set_sub_area"]:
-            print(1)
             sub_area = SubAreaAnalysis(self.graph, self.parameters["zones"], self.matrix)
             sub_area.rc.set_choice_set_generation(self.parameters["algorithm"], **self.parameters["kwargs"])
             sub_area.rc.execute(True)
@@ -56,14 +57,14 @@ class RouteChoiceProcedure(WorkerThread):
 
             # Rebuild graph for external ODs
             new_centroids = np.unique(self.matrix.reset_index()[["origin id", "destination id"]].to_numpy().reshape(-1))
-            self._setup_graph(new_centroids)
+            self.graph.prepare_graph(new_centroids)
+            self.graph.set_graph("utility")
 
         self.rc = self._build_rc(self.graph)
         self.rc.add_demand(self.matrix)
         self.rc.prepare()
 
         if self.parameters["set_select_links"]:
-            print(2)
             self.rc.set_select_links(self.parameters["select_links"])
 
         if self.job == "build" or self.parameters["save_choice_sets"]:
@@ -73,16 +74,12 @@ class RouteChoiceProcedure(WorkerThread):
 
         self.rc.execute(assig)
 
-    def _setup_graph(self, nodes_of_interest):
-        self.graph.prepare_graph(nodes_of_interest)
-        self.graph.set_graph("utility")
-
     def _build_rc(self, graph):
         rc = RouteChoice(graph)
         rc.set_choice_set_generation(self.parameters["algorithm"], **self.parameters["kwargs"])
         return rc
 
-    def configure_graph(self):
+    def _configure_graph(self):
         mode_id = self.parameters["graph"]["mode_id"]
         if mode_id not in self.project.network.graphs:
             self.project.network.build_graphs(modes=[mode_id])
