@@ -318,26 +318,6 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         if cob_algo in ["BFSLE with Link Penalization"] and penalty <= 1.0:
             self.error = "Penalty needs to be greater than 1.0"
 
-        # Populate with our model parameters
-        self.parameters = {
-            "algorithm": algo,
-            "set_select_links": self.chb_set_select_link.isChecked(),
-            "select_links": self.select_links,
-            "save_choice_sets": self.chb_save_choice_set.isChecked(),
-        }
-
-        if self.chb_set_sub_area.isChecked():
-            self.parameters["set_sub_area"] = True
-            self.parameters["zones"] = self.__get_project_zones()
-        else:
-            self.parameters["set_sub_area"] = False
-
-        if self.job == "build" or self.parameters["save_choice_sets"] or self.parameters["set_sub_area"]:
-            rc_folder = os.path.join(self.project.project_base_path, "route_choice")
-            if not os.path.isdir(rc_folder):
-                os.mkdir(rc_folder)
-            self.parameters["rc_folder"] = rc_folder
-
         if self.job == "execute_single":
             nds = {"node_from": self.node_from.text(), "node_to": self.node_to.text()}
             for node in nds.values():
@@ -376,25 +356,42 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
             return
 
-        self.parameters["kwargs"] = (
-            {
+        # Populate with our model parameters
+        self.parameters = {
+            "algorithm": algo,
+            "kwargs": {
                 "max_routes": max_routes,
                 "max_depth": max_depth,
                 "penalty": penalty,
                 "cutoff_prob": cutoff,
                 "beta": float(self.ln_psl.text()),
+                "store_results": True,
             },
-        )
+            "set_select_links": self.chb_set_select_link.isChecked(),
+            "select_links": self.select_links,
+            "save_choice_sets": self.chb_save_choice_set.isChecked(),
+        }
+
+        if self.chb_set_sub_area.isChecked():
+            self.parameters["set_sub_area"] = True
+            self.parameters["zones"] = self.__get_project_zones()
+        else:
+            self.parameters["set_sub_area"] = False
+
+        if self.job == "build" or self.parameters["save_choice_sets"] or self.parameters["set_sub_area"]:
+            rc_folder = os.path.join(self.project.project_base_path, "route_choice")
+            if not os.path.isdir(rc_folder):
+                os.mkdir(rc_folder)
+            self.parameters["rc_folder"] = rc_folder
+
         self.parameters["matrix"] = float(demand) if self.job == "execute_single" else self.matrix
 
         if self.job == "execute_single":
-            for key, value in nds:
+            for key, value in nds.items():
                 self.parameters[key] = int(value)
 
         if self.job == "assign" and not self.parameters["save_choice_sets"]:
             self.parameters["kwargs"]["store_results"] = False
-        else:
-            self.parameters["kwargs"]["store_results"] = True
 
     def execute_single(self):
         self.job = "execute_single"

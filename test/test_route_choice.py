@@ -320,4 +320,3 @@ def test_max_routes(coquimbo_project, par, error):
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == f"Input error:{error}"
-    # print(messagebar.messages)
