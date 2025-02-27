@@ -195,7 +195,7 @@ class AequilibraEMenu:
         self.dock.setWidget(self.manager)
         self.dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
-        QgsProject.instance().layerRemoved.connect(self.layer_removed)
+        QgsProject.instance().layerRemoved.connect(self.layerRemoved)
 
         # # # ########################################################################
         # ##################        SAVING PROJECT CONFIGS       #####################
@@ -249,12 +249,12 @@ class AequilibraEMenu:
         else:
             webbrowser.open_new_tab(url)
 
-    def init_processing(self):
+    def initProcessing(self):
         self.provider = Provider()
         QgsApplication.processingRegistry().addProvider(self.provider)
 
-    def init_gui(self):
-        self.init_processing()
+    def initGui(self):
+        self.initProcessing()
 
     def unload(self):
         if self.provider in QgsApplication.processingRegistry().providers():
@@ -281,7 +281,7 @@ class AequilibraEMenu:
         self.matrices.clear()
         self.layers.clear()
 
-    def layer_removed(self, layer):
+    def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
 
         # Clears the pool of layers

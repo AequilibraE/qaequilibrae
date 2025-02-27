@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
       # we test the minimum LTR version required, the newest LTR, and the latest.
-        version: [qgis-ltr --version=3.34.10]
+        version: [qgis-ltr --version=3.34.11]
 
     steps:
       - uses: actions/checkout@v4
