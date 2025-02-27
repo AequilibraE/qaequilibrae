@@ -156,15 +156,19 @@ def test_build_and_save(ae_with_project, qtbot):
     assert "Success:Route choice sets saved to" in messagebar.messages[3][0]
 
 
-def test_sub_area_analysis(coquimbo_project, qtbot):
-    pth = join(coquimbo_project.project.project_base_path, "matrices/demand.aem")
+def create_dialog_with_matrix(project):
+    pth = join(project.project.project_base_path, "matrices/demand.aem")
     create_matrix(np.arange(1, 134), pth)
 
-    matrices = coquimbo_project.project.matrices
+    matrices = project.project.matrices
     matrices.update_database()
     matrices.reload()
 
-    dialog = RouteChoiceDialog(coquimbo_project)
+    return RouteChoiceDialog(project)
+
+
+def test_sub_area_analysis(coquimbo_project, qtbot):
+    dialog = create_dialog_with_matrix(coquimbo_project)
 
     # Select zones
     dialog.qgis_project.load_layer_by_name("zones")
@@ -176,7 +180,7 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
     dialog.list_matrices()
 
     # Choice set generation
-    dialog.max_routes.setText("5")
+    dialog.max_routes.setText("3")
     dialog.cob_algo.setCurrentText("Link Penalization")
     dialog.penalty.setText("1.02")
 
@@ -210,20 +214,13 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
 
 
 def test_select_link_analysis(coquimbo_project, qtbot):
-    pth = join(coquimbo_project.project.project_base_path, "matrices/demand.aem")
-    create_matrix(np.arange(1, 134), pth)
-
-    matrices = coquimbo_project.project.matrices
-    matrices.update_database()
-    matrices.reload()
-
-    dialog = RouteChoiceDialog(coquimbo_project)
+    dialog = create_dialog_with_matrix(coquimbo_project)
 
     dialog.matrices.reload()
     dialog.list_matrices()
 
     # Choice set generation
-    dialog.max_routes.setText("5")
+    dialog.max_routes.setText("3")
     dialog.cob_algo.setCurrentText("BFSLE")
     dialog.penalty.setText("1.00")
 
@@ -266,3 +263,61 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     conn = sqlite3.connect(pth / "results_database.sqlite")
     results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "select_link_analysis_uncompressed" in results
+
+
+@pytest.mark.parametrize("par", ["", "abc", "0,10", "  "])
+def test_cost_function(coquimbo_project, qtbot, par):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    dialog.ln_parameter.setText(par)
+    dialog.cob_net_field.setCurrentText("distance")
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.LeftButton)
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == "Input error:Check parameter value input"
+
+
+@pytest.mark.parametrize(
+    "par,error",
+    [("", "Missing query name"), ("sl1", "Query name already used"), ("sl2", "Please set a link selection")],
+)
+def test_query_name(coquimbo_project, par, error):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    dialog.select_links = {"sl1": [[(7369, 1), (20983, 1)]]}
+
+    dialog.ln_qry_name.setText(par)
+    if par != "sl2":
+        dialog.ln_link_id.setText("7369")
+        dialog.cob_direction.setCurrentText("AB")
+        dialog.add_query()
+
+    dialog.save_query()
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == f"Input error:{error}"
+
+
+@pytest.mark.parametrize(
+    "par,error",
+    [
+        ("", "Max. routes needs to be a positive integer value"),
+        ("abc", "Max. routes needs to be a positive integer value"),
+        ("1.3", "Max. routes needs to be a positive integer value"),
+        ("0", "One of max. routes or max. depth has to be greater than 0"),
+        ("-1", "Max. routes needs to be a positive integer value"),
+    ],
+)
+def test_max_routes(coquimbo_project, par, error):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    depth = "0" if par == "0" else "1"
+    dialog.max_depth.setText(depth)
+    dialog.max_routes.setText(par)
+    dialog.job = None
+
+    dialog._validate_inputs()
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == f"Input error:{error}"
+    # print(messagebar.messages)

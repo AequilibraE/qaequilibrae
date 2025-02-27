@@ -140,13 +140,9 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
     def add_cost_function(self):
         params = self.ln_parameter.text()
 
-        # parameter cannot be null
-        if len(params) == 0:
-            self.error = "Check parameter value"
-
-        # parameter needs to be numeric
+        # parameter needs to be numeric and cannot be null
         if not params.replace(".", "").replace("-", "").isdigit():
-            self.error = "Check parameter value"
+            self.error = "Check parameter value input"
 
         if self.error:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
@@ -251,7 +247,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.error = self.tr("Please set a link selection")
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
             return
 
         self.select_links[query_name] = [self.__current_links]
@@ -282,33 +278,21 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         cob_algo = self.cob_algo.currentText().lower()
         algo = "bfsle" if cob_algo == "bfsle" else "lp"
 
+        # Check parameter data input
         # parameter needs to be numeric
         if not self.max_routes.text().isdigit():
-            self.error = "Max. routes needs to be a numeric integer value"
-        max_routes = int(self.max_routes.text())
+            self.error = "Max. routes needs to be a positive integer value"
 
         if not self.max_depth.text().isdigit():
-            self.error = "Max. depth needs to be a numeric integer value"
-        max_depth = int(self.max_depth.text())
-
-        if max_depth <= 0 and max_routes <= 0:
-            self.error = "One of max. routes or max. depth has to be greater than 0"
+            self.error = "Max. depth needs to be a positive integer value"
 
         # Check cutoff
         if not self.ln_cutoff.text().replace(".", "").isdigit():
             self.error = "Probability cutoff needs to be a numeric value"
 
-        cutoff = float(self.ln_cutoff.text())
-        if cutoff < 0 or cutoff > 1:
-            self.error = "Probability cutoff assumes values between 0 and 1"
-
         # Check penalty
         if not self.penalty.text().replace(".", "").isdigit():
             self.error = "Penalty needs to be a numeric value"
-
-        penalty = float(self.penalty.text())
-        if cob_algo in ["BFSLE with Link Penalization"] and penalty <= 1.0:
-            self.error = "Penalty needs to be greater than 1.0"
 
         # Check PSL(beta)
         if not self.ln_psl.text().replace(".", "").isdigit():
@@ -316,25 +300,31 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         # Check saving file names too
 
+        if self.error:
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            return
+
+        # Check parameter values
+        max_routes = int(self.max_routes.text())
+        max_depth = int(self.max_depth.text())
+        if max_depth <= 0 and max_routes <= 0:
+            self.error = "One of max. routes or max. depth has to be greater than 0"
+
+        cutoff = float(self.ln_cutoff.text())
+        if cutoff < 0 or cutoff > 1:
+            self.error = "Probability cutoff assumes values between 0 and 1"
+
+        penalty = float(self.penalty.text())
+        if cob_algo in ["BFSLE with Link Penalization"] and penalty <= 1.0:
+            self.error = "Penalty needs to be greater than 1.0"
+
         # Populate with our model parameters
         self.parameters = {
             "algorithm": algo,
-            "kwargs": {
-                "max_routes": max_routes,
-                "max_depth": max_depth,
-                "penalty": penalty,
-                "cutoff_prob": cutoff,
-                "beta": float(self.ln_psl.text()),
-            },
             "set_select_links": self.chb_set_select_link.isChecked(),
             "select_links": self.select_links,
             "save_choice_sets": self.chb_save_choice_set.isChecked(),
         }
-
-        if self.job == "assign" and not self.parameters["save_choice_sets"]:
-            self.parameters["kwargs"]["store_results"] = False
-        else:
-            self.parameters["kwargs"]["store_results"] = True
 
         if self.chb_set_sub_area.isChecked():
             self.parameters["set_sub_area"] = True
@@ -350,7 +340,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         if self.job == "execute_single":
             nds = {"node_from": self.node_from.text(), "node_to": self.node_to.text()}
-            for key, node in nds.items():
+            for node in nds.values():
                 # Check node ID is numeric
                 if not node.isdigit():
                     self.error = "Wrong input value for node ID"
@@ -360,14 +350,10 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 if node_id not in self.__project_nodes:
                     self.error = f"Node ID {node_id} doesn't exist in project"
 
-                self.parameters[key] = node_id
-
             # Check for execute_single demand
             demand = self.ln_demand.text()
             if not demand.replace(".", "").isdigit():
                 self.error = "Wrong input value for demand"
-
-            self.parameters["matrix"] = float(demand)
 
         if self.job in ["assign", "build"]:
             # Let's check up matrix data here
@@ -386,7 +372,29 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             else:
                 self.error = "Check matrices inputs"
 
-            self.parameters["matrix"] = self.matrix
+        if self.error:
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            return
+
+        self.parameters["kwargs"] = (
+            {
+                "max_routes": max_routes,
+                "max_depth": max_depth,
+                "penalty": penalty,
+                "cutoff_prob": cutoff,
+                "beta": float(self.ln_psl.text()),
+            },
+        )
+        self.parameters["matrix"] = float(demand) if self.job == "execute_single" else self.matrix
+
+        if self.job == "execute_single":
+            for key, value in nds:
+                self.parameters[key] = int(value)
+
+        if self.job == "assign" and not self.parameters["save_choice_sets"]:
+            self.parameters["kwargs"]["store_results"] = False
+        else:
+            self.parameters["kwargs"]["store_results"] = True
 
     def execute_single(self):
         self.job = "execute_single"
@@ -405,7 +413,6 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self._get_graph_config()
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1)
             return
 
         self.worker_thread = RouteChoiceProcedure(

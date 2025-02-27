@@ -1,12 +1,7 @@
-import os
-
 import numpy as np
 from PyQt5.QtCore import pyqtSignal
 from aequilibrae.paths import RouteChoice, SubAreaAnalysis
 from aequilibrae.utils.interface.worker_thread import WorkerThread
-
-from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
-from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
 
 
 class RouteChoiceProcedure(WorkerThread):
