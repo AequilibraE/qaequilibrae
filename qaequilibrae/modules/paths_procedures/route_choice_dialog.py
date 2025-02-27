@@ -288,18 +288,19 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         # Check cutoff
         if not self.ln_cutoff.text().replace(".", "").isdigit():
-            self.error = "Probability cutoff needs to be a numeric value"
+            self.error = "Probability cutoff needs to be a positive float value"
 
         # Check penalty
         if not self.penalty.text().replace(".", "").isdigit():
-            self.error = "Penalty needs to be a numeric value"
+            self.error = "Penalty needs to be a positive float value"
 
         # Check PSL(beta)
         if not self.ln_psl.text().replace(".", "").isdigit():
-            self.error = "PSL (beta) needs to be a numeric value"
+            self.error = "PSL (beta) needs to be a positive float value"
 
         # Check saving file names too
 
+        # We return in case of error because in the we'll modify the text input to numbers
         if self.error:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
             return
@@ -311,12 +312,12 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.error = "One of max. routes or max. depth has to be greater than 0"
 
         cutoff = float(self.ln_cutoff.text())
-        if cutoff < 0 or cutoff > 1:
-            self.error = "Probability cutoff assumes values between 0 and 1"
+        if cutoff > 1:
+            self.error = "Probability cutoff assumes values between 0.0 and 1.0"
 
         penalty = float(self.penalty.text())
         if cob_algo in ["BFSLE with Link Penalization"] and penalty <= 1.0:
-            self.error = "Penalty needs to be greater than 1.0"
+            self.error = "Penalty needs to be greater than 1.0 for BFSLE with Link Penalization"
 
         if self.job == "execute_single":
             nds = {"node_from": self.node_from.text(), "node_to": self.node_to.text()}

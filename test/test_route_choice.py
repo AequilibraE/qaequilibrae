@@ -13,17 +13,6 @@ from qaequilibrae.modules.paths_procedures.route_choice_dialog import RouteChoic
 from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
 from .utilities import create_matrix
 
-single_params = {
-    "algorithm": "bfsle",
-    "matrix": 1.0,
-    "node_from": "77011",
-    "node_to": "74089",
-    "kwargs": {
-        "max_routes": 3,
-        "beta": 1.1,
-    },
-}
-
 
 def test_execute_single(coquimbo_project, qtbot):
     dialog = RouteChoiceDialog(coquimbo_project)
@@ -53,6 +42,9 @@ def test_execute_single(coquimbo_project, qtbot):
     layers = [lyr.name() for lyr in layers]
     assert "route_set-77011-74089" in layers
 
+    # Check if dialog was closed
+    assert not dialog.isVisible()
+
 
 def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
     project = coquimbo_project.project
@@ -64,7 +56,18 @@ def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
     graph.set_graph("utility")
     graph.set_blocked_centroid_flows(False)
 
-    dialog = ExecuteSingleDialog(qgis_iface, graph, coquimbo_project.layers["links"][0], single_params)
+    params = {
+        "algorithm": "bfsle",
+        "matrix": 1.0,
+        "node_from": "77011",
+        "node_to": "74089",
+        "kwargs": {
+            "max_routes": 3,
+            "beta": 1.1,
+        },
+    }
+
+    dialog = ExecuteSingleDialog(qgis_iface, graph, coquimbo_project.layers["links"][0], params)
     dialog.debouncer.delay_ms = 200
     dialog.node_from.clear()
     dialog.node_to.clear()
@@ -265,6 +268,8 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     assert "select_link_analysis_uncompressed" in results
 
 
+# ### We add tests to capture the errors raised
+# Cost function
 @pytest.mark.parametrize("par", ["", "abc", "0,10", "  "])
 def test_cost_function(coquimbo_project, qtbot, par):
     dialog = create_dialog_with_matrix(coquimbo_project)
@@ -275,6 +280,36 @@ def test_cost_function(coquimbo_project, qtbot, par):
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == "Input error:Check parameter value input"
+
+
+# Cost function clean-up
+def test_clean_cost_function(coquimbo_project, qtbot):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    dialog.ln_parameter.setText("0.11")
+    dialog.cob_net_field.setCurrentText("distance")
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.LeftButton)
+    txt = "0.11 * distance"
+
+    assert dialog.txt_cost_func.toPlainText() == txt
+
+    dialog.ln_parameter.setText("0.50")
+    dialog.cob_net_field.setCurrentText("distance")
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.LeftButton)
+    txt += " + 0.50 * distance"
+
+    assert dialog.txt_cost_func.toPlainText() == txt
+
+    dialog.ln_parameter.setText("-0.33")
+    dialog.cob_net_field.setCurrentText("distance")
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.LeftButton)
+    txt += " - 0.33 * distance"
+
+    assert dialog.txt_cost_func.toPlainText() == txt
+
+    dialog.clear_cost_function()
+
+    assert dialog.txt_cost_func.toPlainText() == ""
 
 
 @pytest.mark.parametrize(
@@ -314,6 +349,102 @@ def test_max_routes(coquimbo_project, par, error):
     depth = "0" if par == "0" else "1"
     dialog.max_depth.setText(depth)
     dialog.max_routes.setText(par)
+    dialog.job = None
+
+    dialog._validate_inputs()
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == f"Input error:{error}"
+
+
+@pytest.mark.parametrize(
+    "par,error",
+    [
+        ("", "Max. depth needs to be a positive integer value"),
+        ("abc", "Max. depth needs to be a positive integer value"),
+        ("1.3", "Max. depth needs to be a positive integer value"),
+        ("0", "One of max. routes or max. depth has to be greater than 0"),
+        ("-1", "Max. depth needs to be a positive integer value"),
+    ],
+)
+def test_max_depth(coquimbo_project, par, error):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    routes = "0" if par == "0" else "1"
+    dialog.max_depth.setText(par)
+    dialog.max_routes.setText(routes)
+    dialog.job = None
+
+    dialog._validate_inputs()
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == f"Input error:{error}"
+
+
+@pytest.mark.parametrize(
+    "par,error",
+    [
+        ("", "Probability cutoff needs to be a positive float value"),
+        ("abc", "Probability cutoff needs to be a positive float value"),
+        ("1.3", "Probability cutoff assumes values between 0 and 1"),
+        ("-0.5", "Probability cutoff needs to be a positive float value"),
+    ],
+)
+def test_cutoff(coquimbo_project, par, error):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    dialog.max_routes.setText("1")
+    dialog.max_depth.setText("1")
+    dialog.ln_cutoff.setText(par)
+    dialog.job = None
+
+    dialog._validate_inputs()
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == f"Input error:{error}"
+
+
+@pytest.mark.parametrize(
+    "par,error",
+    [
+        ("", "Penalty needs to be a positive float value"),
+        ("abc", "Penalty needs to be a positive float value"),
+        ("1.0", "Penalty needs to be greater than 1.0 for BFSLE with Link Penalization"),
+        ("-0.5", "Penalty needs to be a positive float value"),
+    ],
+)
+def test_penalty(coquimbo_project, par, error):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    dialog.cob_algo.setCurrentText("BFSLE with Link Penalization")
+    dialog.max_routes.setText("1")
+    dialog.max_depth.setText("1")
+    dialog.ln_cutoff.setText("0.5")
+    dialog.penalty.setText(par)
+    dialog.job = None
+
+    dialog._validate_inputs()
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == f"Input error:{error}"
+
+
+@pytest.mark.parametrize(
+    "par,error",
+    [
+        ("", "PSL (beta) needs to be a positive float value"),
+        ("abc", "PSL (beta) needs to be a positive float value"),
+        ("-0.5", "PSL (beta) needs to be a positive float value"),
+    ],
+)
+def test_psl_beta(coquimbo_project, par, error):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    dialog.max_routes.setText("1")
+    dialog.max_depth.setText("1")
+    dialog.ln_cutoff.setText("0.5")
+    dialog.penalty.setText("1.0")
+    dialog.ln_psl.setText(par)
     dialog.job = None
 
     dialog._validate_inputs()
