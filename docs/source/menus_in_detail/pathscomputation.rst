@@ -187,10 +187,10 @@ Route choice
 With route choice sub-module it is possible to create choice sets through multiple algorithms
 and also assign trips to the network using the traditional path-size logit.
 
-In the tab "Route choice model", we'll add the model configurations. It consists of
-three different boxes. The first box "*Choice set generation*", in which we input parameters to 
-build the choice models. In the "*Route choice model"*, we'll add the parameters for the route 
-choice model, such as the cost function and the PSL (beta) value. Finally, in 
+In the tab "Route choice model", we add the model configurations. It consists of
+three different boxes. In the first box "*Choice set generation*", we input parameters to 
+build the choice models. In the "*Route choice model"*, we add the parameters for the route 
+choice model, such as the cost function and the path overlap factor (PSL/beta) value. Finally, in 
 "*Graph configuration*" we set up the graph used for computation.
 
 .. image:: ../images/route_choice_1.png

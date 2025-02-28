@@ -35,13 +35,6 @@
           <string>Choice set generation</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>Penalty</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_15">
             <property name="text">
@@ -49,10 +42,61 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Max. depth</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Algorithm</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="1">
            <widget class="QLineEdit" name="ln_cutoff">
             <property name="text">
              <string>0.00</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Max. routes</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Penalty</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cob_algo"/>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLineEdit" name="penalty">
+            <property name="text">
+             <string>1.00</string>
+            </property>
+            <property name="placeholderText">
+             <string>1.01</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="max_routes">
+            <property name="text">
+             <string>1</string>
+            </property>
+            <property name="placeholderText">
+             <string/>
             </property>
            </widget>
           </item>
@@ -66,50 +110,6 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="3">
-           <widget class="QLineEdit" name="penalty">
-            <property name="text">
-             <string>1.00</string>
-            </property>
-            <property name="placeholderText">
-             <string>1.01</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>Max. routes</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Algorithm</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="max_routes">
-            <property name="text">
-             <string>0</string>
-            </property>
-            <property name="placeholderText">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>Max. depth</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="cob_algo"/>
-          </item>
          </layout>
         </widget>
        </item>
@@ -119,88 +119,85 @@
           <string>Route choice model</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="5" column="2">
-           <widget class="QLineEdit" name="ln_psl">
-            <property name="text">
-             <string>1.00</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLabel" name="label_19">
-            <property name="text">
-             <string>PSL (beta)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="2">
-           <widget class="QTextEdit" name="txt_cost_func">
-            <property name="acceptDrops">
-             <bool>false</bool>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QComboBox" name="cob_net_field"/>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLabel" name="label_18">
-            <property name="text">
-             <string>Cost function</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="3">
+          <item row="8" column="5">
            <widget class="QPushButton" name="but_clear_cost">
             <property name="text">
              <string>Clear cost function</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QLabel" name="label_17">
+          <item row="9" column="1">
+           <widget class="QLabel" name="label_19">
             <property name="text">
-             <string>Network field</string>
+             <string>PSL (beta)</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="3">
+          <item row="6" column="5">
            <widget class="QPushButton" name="but_add_to_cost">
             <property name="text">
              <string>Add to cost function</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="3">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Network field</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="3">
+           <widget class="QLineEdit" name="ln_psl">
+            <property name="text">
+             <string>1.00</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
            <spacer name="horizontalSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Expanding</enum>
-            </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>50</width>
+              <width>40</width>
               <height>20</height>
              </size>
             </property>
            </spacer>
           </item>
-          <item row="2" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="label_16">
             <property name="text">
              <string>Parameter</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0" colspan="2">
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Cost function</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="3">
+           <widget class="QComboBox" name="cob_net_field"/>
+          </item>
+          <item row="6" column="0" colspan="2">
            <widget class="QLineEdit" name="ln_parameter">
             <property name="placeholderText">
              <string>0.10</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0" colspan="4">
+           <widget class="QTextEdit" name="txt_cost_func">
+            <property name="acceptDrops">
+             <bool>false</bool>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

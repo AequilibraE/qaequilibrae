@@ -386,7 +386,7 @@ def test_max_depth(coquimbo_project, par, error):
     [
         ("", "Probability cutoff needs to be a positive float value"),
         ("abc", "Probability cutoff needs to be a positive float value"),
-        ("1.3", "Probability cutoff assumes values between 0 and 1"),
+        ("1.3", "Probability cutoff assumes values between 0.0 and 1.0"),
         ("-0.5", "Probability cutoff needs to be a positive float value"),
     ],
 )

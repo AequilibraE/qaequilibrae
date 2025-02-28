@@ -51,6 +51,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.proj_matrices = list_matrices(self.project.matrices.fldr)
 
         self.cob_algo.addItems(["BFSLE", "Link Penalization", "BFSLE with Link Penalization"])
+        self.cob_direction.addItems(["AB", "Both", "BA"])
 
         self.cob_matrices.currentTextChanged.connect(self.set_show_matrices)
         self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
@@ -218,8 +219,6 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         ]:
             item.setEnabled(self.chb_set_select_link.isChecked())
 
-        self.cob_direction.addItems(["AB", "Both", "BA"])
-
         self.chb_set_sub_area.setEnabled(not self.chb_set_select_link.isChecked())
 
     def add_query(self):
@@ -276,7 +275,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
     # Validate model inputs
     def _validate_inputs(self):
         cob_algo = self.cob_algo.currentText().lower()
-        algo = "bfsle" if cob_algo == "bfsle" else "lp"
+        algo = "bfsle" if "bfsle" in cob_algo else "lp"
 
         # Check parameter data input
         # parameter needs to be numeric
@@ -316,7 +315,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.error = "Probability cutoff assumes values between 0.0 and 1.0"
 
         penalty = float(self.penalty.text())
-        if cob_algo in ["BFSLE with Link Penalization"] and penalty <= 1.0:
+        if cob_algo in ["bfsle with link penalization"] and penalty <= 1.0:
             self.error = "Penalty needs to be greater than 1.0 for BFSLE with Link Penalization"
 
         if self.job == "execute_single":
