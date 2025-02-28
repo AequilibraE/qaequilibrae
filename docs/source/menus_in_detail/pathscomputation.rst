@@ -255,12 +255,18 @@ We can now move directly to the "Workload" tab.
     :align: center
     :alt: Basic route choice - tab 1
 
-A new window will appear and if we are done with the route choice set generation, we can close it.
-But for the sake of this example, we add another OD pair and set the desired number of routes. 
+A new window named Execute Single will appear, loading the configuration we just used for the route
+choice set. If we are done with the choice set generation, we can close it, otherwise, we can
+generate the route choice set for another OD pair, also setting the desired number of routes.
 
-.. image:: ../images/route_choice_6.png
+.. subfigure:: AB
     :align: center
-    :alt: Basic route choice - execute single dialog
+
+    .. image:: ../images/route_choice_6_1.png
+        :alt: Basic route choice - execute single dialog - first OD pair
+
+    .. image:: ../images/route_choice_6_2.png
+        :alt: Basic route choice - execute single dialog - new OD pair
 
 After a few seconds, the output visualization for the routes is shown in the map canvas and we
 can close the Execute Single window. The figure below presents the route choice sets, in which
@@ -274,8 +280,8 @@ Build choice sets
 ~~~~~~~~~~~~~~~~~
 
 Within this workflow, we can build and save the choice sets without performing assignment.
-After :ref:`configuring the model parameters <basic_route_choice_setting>`, we can direct
-ourselves to the "Workload" tab, to select our demand matrix and the cores for computation.
+We start by :ref:`configuring the model parameters <basic_route_choice_setting>`, then go
+to the "Workload" tab and select our demand matrix and the cores for computation.
 
 .. image:: ../images/route_choice_8.png
     :width: 750
@@ -288,24 +294,38 @@ opened and we can select the cores we want.
 
 Then all we need to do is hit the "Build choice sets only". Once the task is finished, our
 route choice window will automatically close. If you go to the project folder, you will
-notice that there other folders were created, one for each centroid (index) in the demand
-matrix.
+notice that a folder named '*route choice*' containing folders with the choice sets for each 
+centroid (index) in the matrix was created.
 
 Perform assignment
 ~~~~~~~~~~~~~~~~~~
 
-This workflow allows running an assignment with a route choice set and save the choice
-set generated (if we want to). The set up is quite the same as the one above: after 
-:ref:`setting the model parameters up <basic_route_choice_setting>`, we can go to the
+This workflow runs an assignment with a route choice set and allow us to save the choice
+set generated. The set up is quite similar to the one above: after 
+:ref:`setting the model parameters up <basic_route_choice_setting>`, we go straight to the
 "Workload" tab and select the demand matrix and its cores for computation.
+
+In this example, we choose to also save the choice sets generated, by toggling the 
+"Save route choice set results" button. If we leave this button untoggled, only the flows 
+are saved into the results database.
+
+We also choose a name for saving the results in the database. Pick up a name that you can
+easily find later. Then, just hit the button "*Perform assignment*" and wait until the window
+is closed and the process is finished.
 
 .. image:: ../images/route_choice_9.png
     :width: 750
     :align: center
     :alt: Basic route choice - assignment
 
-To also save the choice sets generated, toggle the "Save route choice set results" otherwise
-only the flows are saved into the results database.
+Select link analysis
+~~~~~~~~~~~~~~~~~~~~~
+
+The left portion of the "Critical analysis" tab corresponds to the select link analysis.
+Its interface is quite similar to the one in Traffic Assignment, in which we can add and
+remove queries with selected links, and save both the matrix and the results in the databse.
+
+
 
 Sub-area analysis
 ~~~~~~~~~~~~~~~~~
@@ -318,26 +338,16 @@ checkbox "Selected features only". We could also use an external polygon layer w
 area, so that we use all the layer features rather than a part of it.
 
 .. image:: ../images/route_choice_10.png
+    :align: center
+    :alt: Basic route choice - sub-area selection
+
+Finally, select all cores of our demand matrix for computation, don't forget to add a name for 
+the output file, and hit the "*Perform assignment*" button. When the process is finished, the 
+window is closed. If you go to the project folder, you will notice that a folder named 
+'*route choice*' containing a `.parquet` file with the same output name you selected in (3) 
+containing the sub-area demand matrix.
+
+.. image:: ../images/route_choice_10_1.png
     :width: 750
     :align: center
     :alt: Basic route choice - sub-area configs
-
-Finally, we can run the assignment using all cores of our demand matrix for computation. In
-a couple seconds, the route choice window is automatically closed, indicating the end of the
-procedure.
-
-Select link analysis
-~~~~~~~~~~~~~~~~~~~~~
-
-The left portion of the "Critical analysis" tab corresponds to the select link analysis.
-Its interface is quite similar to the one in Traffic Assignment, in which we can add and
-remove queries with selected links, and save both the matrix and the results in the databse.
-
-.. Video tutorial
-.. ~~~~~~~~~~~~~~
-
-.. .. raw:: html
-
-..     <iframe width="560" height="315" src="https://www.youtube.com/embed/DRY4QpdX3qQ"
-..      frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
-..      picture-in-picture" allowfullscreen></iframe>
