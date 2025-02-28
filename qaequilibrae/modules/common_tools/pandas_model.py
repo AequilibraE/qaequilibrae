@@ -8,7 +8,6 @@ license.
 """
 
 from qgis.PyQt import QtCore
-from PyQt5.QtCore import Qt
 
 
 class PandasModel(QtCore.QAbstractTableModel):
@@ -22,7 +21,7 @@ class PandasModel(QtCore.QAbstractTableModel):
 
     def data(self, index, role):
         if index.isValid():
-            if role == Qt.DisplayRole:
+            if role == QtCore.Qt.DisplayRole:
                 return str(self._data.iloc[index.row(), index.column()])
         return None
 
@@ -33,8 +32,8 @@ class PandasModel(QtCore.QAbstractTableModel):
         return self._data.shape[1]
 
     def header_data(self, section, orientation, role):
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+        if role == QtCore.Qt.DisplayRole:
+            if orientation == QtCore.Qt.Horizontal:
                 return str(self._data.columns[section])
-            if orientation == Qt.Vertical:
+            if orientation == QtCore.Qt.Vertical:
                 return str(self._data.index[section])
