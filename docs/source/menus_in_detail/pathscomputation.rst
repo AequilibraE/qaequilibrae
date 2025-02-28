@@ -310,7 +310,7 @@ In this example, we choose to also save the choice sets generated, by toggling t
 are saved into the results database.
 
 We also choose a name for saving the results in the database. Pick up a name that you can
-easily find later. Then, just hit the button "*Perform assignment*" and wait until the window
+easily find later. Then, just hit the button "Perform assignment" and wait until the window
 is closed and the process is finished.
 
 .. image:: ../images/route_choice_9.png
@@ -325,7 +325,43 @@ The left portion of the "Critical analysis" tab corresponds to the select link a
 Its interface is quite similar to the one in Traffic Assignment, in which we can add and
 remove queries with selected links, and save both the matrix and the results in the databse.
 
+We start by toggling the "Set select link analysis" checkbox and enabling the following menus.
+Let's add our first query. Create a name, set the link direction, add the link ID, and click
+on "Add to query".
 
+.. image:: ../images/route_choice_11.png
+    :width: 750
+    :align: center
+    :alt: Basic route choice - SLA query 1 part 1
+
+Let's add another link to our *SL1* query. Let's set the link direction and link ID, add
+to the existing query with "Add to query", and click on "Save query" (4). The *SL1* query
+will immediately appear in the table at the bottom of the window (5).
+
+.. image:: ../images/route_choice_12.png
+    :width: 750
+    :align: center
+    :alt: Basic route choice - SLA query 1 part 2
+
+Just to make this example more interesting, let's create an *SL2* query. We repeat the process
+of creating a query name, setting the direction, selecting link ID, adding and saving the query.
+It will also appear at the bottom table (6). To remove any query from the query table, we can
+double-click the cell. Once this is our last query, we pick up a nice name to save our select
+link analysis results (7).
+
+.. image:: ../images/route_choice_13.png
+    :width: 750
+    :align: center
+    :alt: Basic route choice - SLA query 2
+
+The last step consists in selecting the matrix and its cores for computation, and perform the
+assignment. It's not necessary to add a name to the route choice output, once we did it in the
+previous step.
+
+.. image:: ../images/route_choice_14.png
+    :width: 750
+    :align: center
+    :alt: Basic route choice - SLA configs
 
 Sub-area analysis
 ~~~~~~~~~~~~~~~~~
@@ -342,12 +378,18 @@ area, so that we use all the layer features rather than a part of it.
     :alt: Basic route choice - sub-area selection
 
 Finally, select all cores of our demand matrix for computation, don't forget to add a name for 
-the output file, and hit the "*Perform assignment*" button. When the process is finished, the 
+the output file, and hit the "Perform assignment" button. When the process is finished, the 
 window is closed. If you go to the project folder, you will notice that a folder named 
-'*route choice*' containing a `.parquet` file with the same output name you selected in (3) 
+'*route choice*' containing a ``.parquet`` file with the same output name you selected in (3) 
 containing the sub-area demand matrix.
 
 .. image:: ../images/route_choice_10_1.png
     :width: 750
     :align: center
     :alt: Basic route choice - sub-area configs
+
+.. tip::
+
+    Try to reproduce AequilibraE's Route Choice 
+    `examples <https://www.aequilibrae.com/latest/python/route_choice/_auto_examples/index.html>`_ 
+    in QGIS!
