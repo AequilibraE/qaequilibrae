@@ -184,13 +184,13 @@ Now we can revisit the instructions for :ref:`siouxfalls-stacked-bandwidth`
 Route choice
 ------------
 
-With route choice sub-module it is possible to create choice sets through multiple algorithms
-and also assign trips to the network using the traditional path-size logit.
+With the route choice sub-module, it is possible to create choice sets with three different algorithms
+as well as assign trips to the network using the traditional path-size logit. Using this module in QAequilibraE is trivial
 
-In the tab "Route choice model", we add the model configurations. It consists of
-three different boxes. In the first box "*Choice set generation*", we input parameters to 
-build the choice models. In the "*Route choice model"*, we add the parameters for the route 
-choice model, such as the cost function and the path overlap factor (PSL/beta) value. Finally, in 
+In the tab "Route choice model", we add the model configuration. It consists of
+three different boxes. In the first box "*Choice set generation*", we input parameters for 
+the choice set construction. In the "*Route choice model"*, we add the parameters for the route 
+choice model, such as the utility function and the path overlap parameter (PSL/beta) value. Finally, in 
 "*Graph configuration*" we set up the graph used for computation.
 
 .. image:: ../images/route_choice_1.png
@@ -198,22 +198,22 @@ choice model, such as the cost function and the path overlap factor (PSL/beta) v
     :align: center
     :alt: Route Choice model tab
 
-In the tab "Critical analysis", we can select if we want to run one of select link or sub-area 
-analysis. These analysis cannot be run at the same time in QAequilibraE. If you run sub-area 
+In the tab "Critical analysis", we can select to run either a set of select link analysis or a sub-area 
+analysis. These analyses cannot be run at the same time in QAequilibraE. If you choose to run a sub-area 
 analysis, all OD pairs with demand are considered for computation. To select only a few pairs
 of interest, we encourage you to take a look at 
 `Route choice with sub-area analysis <https://www.aequilibrae.com/develop/python/route_choice/_auto_examples/plot_subarea_analysis.html>`_ 
-at AequilibraE's python documentation and run this task outside QGIS.
+at AequilibraE's Python documentation and run this task outside QGIS.
 
 .. image:: ../images/route_choice_2.png
     :width: 750
     :align: center
     :alt: Critical analysis tab
 
-Lastly, the tab "Workload" consists in running the workflows. The first box, "*Execute single*"
-consists in computing the route choices between two different nodes and visualize it, while the
-second box "*Matrix*" allows selecting the demand data used in the model, and which tasks we'll
-execute: only build the choice sets or assign the demand for route choice.
+Lastly, the tab "Workload" allows users to choose between three tasks. The first box, "*Execute single*"
+consists of computing route choices between two different nodes and visualizing it, while the
+second box "*Matrix*" allows the selection of a travel demand matrix to be assigned using the route choice specified.
+This option also allows the user to save choice sets to disk while performing route choice.
 
 .. image:: ../images/route_choice_3.png
     :width: 750
