@@ -225,9 +225,9 @@ We can run different workflows with the route choice sub-model. We'll briefly pr
 Basic route choice
 ~~~~~~~~~~~~~~~~~~
 
-In this example, we'll generate a route choice for Coquimbo. As this example folder does not
-contain any demand matrix, we can manually create an open layer and use its data to import the
-matrix to the project, as shown in :ref:`importing_matrices`.
+In this example, we'll perform route choice for the Coquimbo example model for a single OD pair. 
+As this example model does not ship with a demand matrix, we can manually create an open layer and 
+use its data to import the matrix to the project, as shown in :ref:`importing_matrices`.
 
 .. _basic_route_choice_setting:
 
@@ -236,19 +236,20 @@ matrix to the project, as shown in :ref:`importing_matrices`.
     :align: center
     :alt: Basic route choice - tab 0
 
-We start setting the route choice parameters. In the "Choice set generation" box, we select the algorithm
-to be one of BFLSE or Link Penalization, choose the values for probability cutoff and penalty, and
-choose a positive value for one of maximum number of routes or depth.
+We start by setting the route choice parameters. In the "Choice set generation" box, we select the algorithm
+to be one of Link Penalization (LP), Breadth-First Link Search on Link Elimination (BFSLE), or BFSLE with LP, 
+choose the values for probability cutoff and penalty, and choose a positive value for one of maximum number 
+of routes (LP) or search depth (BFSLE and BFSLE + LP).
 
-In the box "Route choice model" box, we configure our cost function. In this example, it is a
+In the box "Route choice model" box, we configure our utility function. In this example, it is a
 function of distance, but could be any other numeric field, such as travel time or tolls.
-We then add the parameters to the cost function and it will appear in the cost function box. We can
-change the cost function by cleaning it and adding it one more time. To add more parameters to the
-cost function, just change the values and click in "Add to cost function" one more time.
+We then add the parameters to the utility function and it will appear in the utility function box. We can
+change the utility function by cleaning it and adding it one more time. To add more parameters to the
+utility function, just change the values and click in "Add to utility function" one more time.
 
 Regarding "Graph configuration", we'll use the network for cars and allow flows through centroids.
 
-We can now move directly to the "Workload" tab.
+We can now move directly to the "Workload", select origin and destination nodes and click on the *visualize* button.
 
 .. image:: ../images/route_choice_5.png
     :width: 750
@@ -274,14 +275,14 @@ the line width corresponds to the probability of choosing each link.
 
 .. image:: ../images/route_choice_7.png
     :align: center
-    :alt: Basic route choice - map canva
+    :alt: Basic route choice - map canvas
 
 Build choice sets
 ~~~~~~~~~~~~~~~~~
 
 Within this workflow, we can build and save the choice sets without performing assignment.
 We start by :ref:`configuring the model parameters <basic_route_choice_setting>`, then go
-to the "Workload" tab and select our demand matrix and the cores for computation.
+to the "Workload" tab and select our demand matrix and its cores for computation.
 
 .. image:: ../images/route_choice_8.png
     :width: 750
@@ -297,16 +298,20 @@ route choice window will automatically close. If you go to the project folder, y
 notice that a folder named '*route choice*' containing folders with the choice sets for each 
 centroid (index) in the matrix was created.
 
+It should be noted that, although we are not performing assignment in this workflow, we
+use demand matrices to determine the OD pairs for which choice sets are needed, which are all 
+of those with positive demand.
+
 Perform assignment
 ~~~~~~~~~~~~~~~~~~
 
-This workflow runs an assignment with a route choice set and allow us to save the choice
-set generated. The set up is quite similar to the one above: after 
+This workflow runs a route choice assignment and allows the user to save the choice
+set generated while performing such. The set up is quite similar to the one above: After 
 :ref:`setting the model parameters up <basic_route_choice_setting>`, we go straight to the
 "Workload" tab and select the demand matrix and its cores for computation.
 
 In this example, we choose to also save the choice sets generated, by toggling the 
-"Save route choice set results" button. If we leave this button untoggled, only the flows 
+"Save route choice set results" button. If we leave this button untoggled, only link flows 
 are saved into the results database.
 
 We also choose a name for saving the results in the database. Pick up a name that you can
@@ -321,11 +326,12 @@ is closed and the process is finished.
 Select link analysis
 ~~~~~~~~~~~~~~~~~~~~~
 
-The left portion of the "Critical analysis" tab corresponds to the select link analysis.
+The left portion of the "Critical analysis" tab gives the user access to select link analysis.
 Its interface is quite similar to the one in Traffic Assignment, in which we can add and
 remove queries with selected links, and save both the matrix and the results in the databse.
 
 We start by toggling the "Set select link analysis" checkbox and enabling the following menus.
+
 Let's add our first query. Create a name, set the link direction, add the link ID, and click
 on "Add to query".
 
@@ -365,13 +371,11 @@ previous step.
 
 Sub-area analysis
 ~~~~~~~~~~~~~~~~~
-
-To run sub-area analysis, we have to set up the parameters for route choice, as presented
-:ref:`here <basic_route_choice_setting>`. Then we go straight to the "Critical analysis" tab
-and toggle the "Set sub-area analysis" checkbox, which enables us to choose a zone to proceed
-with the analysis. In this example, we select a couple zones in Coquimbo, and toggle the
+To perform a sub-area analysis, we start by toggling the "Set sub-area analysis" checkbox, 
+which enables us to choose a polygon layer that defines the sub-area of interest. In this example, 
+we select a couple zones in Coquimbo, and toggle the
 checkbox "Selected features only". We could also use an external polygon layer with the desired
-area, so that we use all the layer features rather than a part of it.
+region and use all the layer features rather than a part of it.
 
 .. image:: ../images/route_choice_10.png
     :align: center
