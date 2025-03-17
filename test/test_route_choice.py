@@ -10,7 +10,6 @@ from qgis.core import QgsProject
 
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
 from qaequilibrae.modules.paths_procedures.route_choice_dialog import RouteChoiceDialog
-from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
 from .utilities import create_matrix
 
 

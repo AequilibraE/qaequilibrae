@@ -14,9 +14,11 @@ class RouteChoiceProcedure(WorkerThread):
         self.parameters = parameters
         self.matrix = parameters["matrix"]
 
-        self.graph = self._configure_graph()
+        self.graph = None
 
     def doWork(self):
+        self._configure_graph()
+
         if self.job == "execute_single":
             self.do_execute_single()
         if self.job in ["assign", "build"]:
@@ -79,19 +81,17 @@ class RouteChoiceProcedure(WorkerThread):
         if mode_id not in self.project.network.graphs:
             self.project.network.build_graphs(modes=[mode_id])
 
-        graph = self.project.network.graphs[mode_id]
+        self.graph = self.project.network.graphs[mode_id]
 
-        field = np.zeros((1, graph.network.shape[0]))
+        field = np.zeros((1, self.graph.network.shape[0]))
         for idx, (par, col) in enumerate(self.parameters["graph"]["utility"]):
-            field += par * graph.network[col].array
+            field += par * self.graph.network[col].array
 
-        graph.network = graph.network.assign(utility=0)
-        graph.network["utility"] = field.reshape(graph.network.shape[0], 1)
+        self.graph.network = self.graph.network.assign(utility=0)
+        self.graph.network["utility"] = field.reshape(self.graph.network.shape[0], 1)
 
         if self.parameters["graph"]["use_chosen_links"]:
-            graph = self.project.network.graphs.pop(mode_id)
-            graph.exclude_links(self.parameters["graph"]["links_to_remove"])
+            self.graph = self.project.network.graphs.pop(mode_id)
+            self.graph.exclude_links(self.parameters["graph"]["links_to_remove"])
 
-        graph.set_blocked_centroid_flows(self.parameters["graph"]["block_centroid_flows"])
-
-        return graph
+        self.graph.set_blocked_centroid_flows(self.parameters["graph"]["block_centroid_flows"])
