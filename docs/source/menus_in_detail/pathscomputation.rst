@@ -20,7 +20,6 @@ to see if the network is connected and if paths make sense.
 Before computing a path, we go to the configuration screen.
 
 .. image:: ../images/configure_path_computation.png
-    :width: 250
     :align: center
     :alt: configure_path_computation
 
@@ -30,7 +29,6 @@ case. For zones with a single connector per zone it is slightly faster to also
 deselect this option, but use this carefully.
 
 .. image:: ../images/path_computation_configuration.png
-    :width: 250
     :align: center
     :alt: path_computation_configuration
 
@@ -40,7 +38,6 @@ created and formatted in a noticeable way. You can also select to have links
 selected in the layer, but only one path can be shown at time if you do so.
 
 .. image:: ../images/paths_generated.png
-    :width: 1696
     :align: center
     :alt: paths_generated
 
@@ -59,7 +56,6 @@ when computing shortest paths and the fields we should skim when computing those
 paths.
 
 .. image:: ../images/performing_skimming.png
-    :width: 675
     :align: center
     :alt: performing_skimming
 
