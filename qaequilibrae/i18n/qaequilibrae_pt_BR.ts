@@ -214,174 +214,179 @@
 <context>
     <name>AequilibraEMenu</name>
     <message>
-        <location filename="../qaequilibrae.py" line="113"/>
+        <location filename="../qaequilibrae.py" line="114"/>
         <source>Project</source>
         <translation>Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="132"/>
+        <location filename="../qaequilibrae.py" line="133"/>
         <source>Data</source>
         <translation>Dados</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="136"/>
+        <location filename="../qaequilibrae.py" line="137"/>
         <source>Trip Distribution</source>
         <translation>Distribuição de Viagens</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="148"/>
+        <location filename="../qaequilibrae.py" line="152"/>
         <source>Paths and assignment</source>
         <translation>Rotas e Alocações</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="154"/>
+        <location filename="../qaequilibrae.py" line="156"/>
         <source>Routing</source>
         <translation>Roteirização</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="159"/>
+        <location filename="../qaequilibrae.py" line="161"/>
         <source>Public Transport</source>
         <translation>Transporte público</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="109"/>
+        <location filename="../qaequilibrae.py" line="110"/>
         <source>Open Project</source>
         <translation>Abrir Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="117"/>
+        <location filename="../qaequilibrae.py" line="118"/>
         <source>Create project from OSM</source>
         <translation>Criar Projeto a partir do OSM</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="120"/>
+        <location filename="../qaequilibrae.py" line="121"/>
         <source>Create Project from layers</source>
         <translation>Criar Projeto a partir de Camada</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="127"/>
+        <location filename="../qaequilibrae.py" line="128"/>
         <source>Add zoning data</source>
         <translation>Adicionar Zonas</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="111"/>
+        <location filename="../qaequilibrae.py" line="112"/>
         <source>Parameters</source>
         <translation>Parâmetros</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="112"/>
+        <location filename="../qaequilibrae.py" line="113"/>
         <source>logfile</source>
         <translation>Registro de Operações</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="113"/>
+        <location filename="../qaequilibrae.py" line="114"/>
         <source>Close project</source>
         <translation>Fechar Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="123"/>
+        <location filename="../qaequilibrae.py" line="124"/>
         <source>Network Preparation</source>
         <translation>Preparar Rede</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="124"/>
+        <location filename="../qaequilibrae.py" line="125"/>
         <source>Add centroid connectors</source>
         <translation>Adicionar Conector no Centroide</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="142"/>
+        <location filename="../qaequilibrae.py" line="143"/>
         <source>Shortest path</source>
         <translation>Caminho mínimo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="145"/>
+        <location filename="../qaequilibrae.py" line="146"/>
         <source>Impedance matrix</source>
         <translation>Matriz de Impedância</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="148"/>
+        <location filename="../qaequilibrae.py" line="149"/>
         <source>Traffic Assignment</source>
         <translation>Alocação de Tráfego</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="154"/>
+        <location filename="../qaequilibrae.py" line="156"/>
         <source>Travelling Salesman Problem</source>
         <translation>Problema do Caixeiro Viajante</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="158"/>
+        <location filename="../qaequilibrae.py" line="160"/>
         <source>Import GTFS</source>
         <translation>Importar GTFS</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="163"/>
+        <location filename="../qaequilibrae.py" line="165"/>
         <source>Desire Lines</source>
         <translation>Linhas de Desejo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="164"/>
+        <location filename="../qaequilibrae.py" line="166"/>
         <source>Stacked Bandwidth</source>
         <translation>Mapa de volumes</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="165"/>
+        <location filename="../qaequilibrae.py" line="167"/>
         <source>Scenario Comparison</source>
         <translation>Comparação de Cenários</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="166"/>
+        <location filename="../qaequilibrae.py" line="168"/>
         <source>Simple tag</source>
         <translation>Etiqueta</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="132"/>
+        <location filename="../qaequilibrae.py" line="133"/>
         <source>Import matrices</source>
         <translation>Importar matrizes</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="170"/>
+        <location filename="../qaequilibrae.py" line="172"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="177"/>
+        <location filename="../qaequilibrae.py" line="179"/>
         <source>Show project info</source>
         <translation>Mostrar informações do projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="326"/>
+        <location filename="../qaequilibrae.py" line="328"/>
         <source>You need to load a project first</source>
         <translation>Você precisa carregar um projeto primeiro</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="329"/>
+        <location filename="../qaequilibrae.py" line="331"/>
         <source>You need to close the project currently open first</source>
         <translation>Você precisa fechar o projeto aberto primeiro</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="110"/>
+        <location filename="../qaequilibrae.py" line="111"/>
         <source>Create example</source>
         <translation>Criar exemplo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="159"/>
+        <location filename="../qaequilibrae.py" line="161"/>
         <source>Explore Transit</source>
         <translation>Explorar Transporte Público</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="127"/>
+        <location filename="../qaequilibrae.py" line="128"/>
         <source>Model Building</source>
         <translation>Construção de Modelos</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="131"/>
+        <location filename="../qaequilibrae.py" line="132"/>
         <source>Visualize data</source>
         <translation>Visualizar Dados</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="334"/>
+        <location filename="../qaequilibrae.py" line="336"/>
         <source>You need to import a GTFS feed first</source>
         <translation>Você precisa importar um arquivo GTFS primeiro</translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="152"/>
+        <source>Route choice</source>
+        <translation>Escolha de rota</translation>
     </message>
 </context>
 <context>
@@ -581,7 +586,7 @@
     <message>
         <location filename="../modules/processing_provider/create_transit_graph.py" line="30"/>
         <source>Project with outer stops transfers</source>
-        <translation type="unfinished"/>
+        <translation>Projeto com transferências para paradas externas</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_transit_graph.py" line="35"/>
@@ -2263,6 +2268,327 @@
     </message>
 </context>
 <context>
+    <name>RouteChoice</name>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="14"/>
+        <source>AequilibraE - Route Choice</source>
+        <translation>AequilibraE - Escolha de Rota</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="119"/>
+        <source>Route choice model</source>
+        <translation>Modelo de escolha de rota</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="35"/>
+        <source>Choice set generation</source>
+        <translation>Geração de conjunto de escolha</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="41"/>
+        <source>Probability cutoff</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="48"/>
+        <source>Max. depth</source>
+        <translation>Max. profundidade</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="55"/>
+        <source>Algorithm</source>
+        <translation>Algoritmo</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="62"/>
+        <source>0.00</source>
+        <translation>0.00</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="69"/>
+        <source>Max. routes</source>
+        <translation>Max. número de rotas</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="76"/>
+        <source>Penalty</source>
+        <translation>Penalidade</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="153"/>
+        <source>1.00</source>
+        <translation>1.00</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="89"/>
+        <source>1.01</source>
+        <translation>1.01</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="96"/>
+        <source>1</source>
+        <translation>1</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="106"/>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="125"/>
+        <source>Clear utility function</source>
+        <translation>Limpar função de utilidade</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="132"/>
+        <source>PSL (beta)</source>
+        <translation>PSL (beta)</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="139"/>
+        <source>Add to utility function</source>
+        <translation>Adicionar a função de utilidade</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="146"/>
+        <source>Network field</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="173"/>
+        <source>Parameter</source>
+        <translation>Parâmetro</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="180"/>
+        <source>Utility function</source>
+        <translation>Função de utilidade</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="190"/>
+        <source>0.10</source>
+        <translation>0.10</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="210"/>
+        <source>Graph configuration</source>
+        <translation>Configuração do grafo</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="216"/>
+        <source>Block flows through centroids</source>
+        <translation>Limitar fluxo aos centroides</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="226"/>
+        <source>Network Mode</source>
+        <translation>Modo da Rede</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="233"/>
+        <source>Remove selected links from the graph</source>
+        <translation>Remover links selecionados do grafo</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="247"/>
+        <source>Critical analysis</source>
+        <translation>Criticalidade</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="253"/>
+        <source>Select link analysis</source>
+        <translation>Análise de links selecionados</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="347"/>
+        <source>Query name</source>
+        <translation>Nome da consulta</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="269"/>
+        <source>query_name</source>
+        <translation>nome_da_consulta</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="276"/>
+        <source>Add to query</source>
+        <translation>Adicionar consulta</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="283"/>
+        <source>Save query</source>
+        <translation>Salvar consulta</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="431"/>
+        <source>12345</source>
+        <translation>12345</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="297"/>
+        <source>Link ID</source>
+        <translation>ID do link</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="304"/>
+        <source>Select link outputs</source>
+        <translation>Resultados dos links selecionados</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="310"/>
+        <source>select_link_output_name</source>
+        <translation>resultado_links_selecionados</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="320"/>
+        <source>Direction</source>
+        <translation>Direção</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="327"/>
+        <source>Set select link analysis</source>
+        <translation>Configurar seleção de links para análise</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="334"/>
+        <source>Clear</source>
+        <translation>Limpar</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="342"/>
+        <source>Links</source>
+        <translation>Links</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="358"/>
+        <source>Sub-area analysis</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="380"/>
+        <source>Set sub-area analysis</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="387"/>
+        <source>Zoning layer</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="394"/>
+        <source>Selected features only</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="405"/>
+        <source>Workload</source>
+        <translation>Ações</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="411"/>
+        <source>Execute single</source>
+        <translation>Escolha de rota simples</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="417"/>
+        <source>Demand</source>
+        <translation>Demanda</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="424"/>
+        <source>98765</source>
+        <translation>98765</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="444"/>
+        <source>Visualize</source>
+        <translation>Visualizar</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="451"/>
+        <source>Origin node ID</source>
+        <translation>ID nó origem</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="458"/>
+        <source>Destination node ID</source>
+        <translation>ID nó destino</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="468"/>
+        <source>1.0</source>
+        <translation>1.0</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="478"/>
+        <source>Matrix</source>
+        <translation>Matriz</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="484"/>
+        <source>Build choice sets only</source>
+        <translation>Apenas construir conjuntos de escolha de rotas</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="491"/>
+        <source>Perform assignment</source>
+        <translation>Executar alocação</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="499"/>
+        <source>Matrix core</source>
+        <translation>Núcleo da matriz</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="504"/>
+        <source>Use?</source>
+        <translation>Utilizar?</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="521"/>
+        <source>Use all</source>
+        <translation>Usar todos</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="531"/>
+        <source>Save route choice set results</source>
+        <translation>Salvar resultados do conjunto de rotas escolhidas</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="544"/>
+        <source>Output</source>
+        <translation>Resultado</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="553"/>
+        <source>route_choice_output_name</source>
+        <translation>nome_resultado_escolha_rota</translation>
+    </message>
+</context>
+<context>
+    <name>RouteChoiceDialog</name>
+    <message>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="356"/>
+        <source>Input error</source>
+        <translation>Erro de entrada</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="240"/>
+        <source>Missing query name</source>
+        <translation>Ausência de nome da consulta</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="243"/>
+        <source>Query name already used</source>
+        <translation>Nome de consulta já utilizado</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="246"/>
+        <source>Please set a link selection</source>
+        <translation>Por favor, configure uma seleção de links</translation>
+    </message>
+</context>
+<context>
     <name>ShortestPathDialog</name>
     <message>
         <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="53"/>
@@ -3154,6 +3480,39 @@
     </message>
 </context>
 <context>
+    <name>single_rc_config</name>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="14"/>
+        <source>AequilibraE - Execute single</source>
+        <translation>AequilibraE - Escolha de rota simples </translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="28"/>
+        <source>Destination node ID</source>
+        <translation>ID nó destino</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="35"/>
+        <source>12345</source>
+        <translation>12345</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="42"/>
+        <source>98765</source>
+        <translation>98765</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="49"/>
+        <source>Origin node ID</source>
+        <translation>ID nó origem</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="73"/>
+        <source>Max. routes</source>
+        <translation>Max. número de rotas</translation>
+    </message>
+</context>
+<context>
     <name>traffic_assignment</name>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="28"/>
@@ -3509,7 +3868,7 @@
         <translation>Centroide</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="73"/>
         <source>Layer</source>
         <translation>Camada</translation>
     </message>
@@ -3574,7 +3933,7 @@
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
         <source>Layer field</source>
         <translation>Campo da camada</translation>
     </message>
