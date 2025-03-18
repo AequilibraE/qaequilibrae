@@ -114,6 +114,8 @@ def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
 
     qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
+    # print(dialog.__dict__)
+
     if method in ["negative_exponential", "both"]:
         file_path = f"{folder_path}/neg_{method}.mod"
         assert isfile(file_path)

@@ -378,7 +378,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def run(self):
         self.chb_empty_as_zero.setVisible(False)
         try:
+            self.__counter = len(self.job_queue)
             for out_name in self.job_queue.keys():
+                self.__counter -= 1
                 self.outfile = out_name
                 self.worker_thread = self.job_queue[self.outfile]
                 self.run_thread()
@@ -425,10 +427,14 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.worker_thread.model.save(self.outfile)
             if self.job in ["apply", "ipf"]:
                 self.worker_thread.output.export(self.outfile)
-        self.exit_procedure()
+
+        if self.__counter == 0:
+            self.exit_procedure()
 
     def exit_procedure(self):
         if self.report is not None:
-            dlg2 = ReportDialog(self.iface, self.report)
+            dlg2 = ReportDialog(qgis.utils.iface.mainWindow(), self.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.open()
+
+        self.close()
