@@ -84,7 +84,7 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
     assert np.sum(np.nan_to_num(mat.matrix["matrix"])[:, :]) > 360600
 
 
-@pytest.mark.parametrize("method", ["negative_exponential", "inverse_power"])
+@pytest.mark.parametrize("method", ["negative_exponential", "inverse_power", "both"])
 def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
     proj = run_sfalls_assignment(ae_with_project)
 
@@ -93,7 +93,6 @@ def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
     )
 
     dialog = DistributionModelsDialog(proj, mode="calibrate")
-    # dialog.path = folder_path
 
     temp = list(dialog.matrices["name"])
     imped_idx = temp.index("assignment_car")
@@ -107,7 +106,7 @@ def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
         mocked_outfile.return_value = f"{folder_path}/neg_{method}.mod"
         dialog.rdo_expo.setChecked(True)
         qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
-    
+
     if method in ["inverse_power", "both"]:
         mocked_outfile.return_value = f"{folder_path}/inv_{method}.mod"
         dialog.rdo_power.setChecked(True)
@@ -115,25 +114,29 @@ def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
 
     qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
-    print(dialog.__dict__)
+    if method in ["negative_exponential", "both"]:
+        file_path = f"{folder_path}/neg_{method}.mod"
+        assert isfile(file_path)
 
-    # if method in ["negative_exponential", "both"]:
-    #     file_text = ""
-    #     with open(f"{folder_path}/neg_{method}.mod", "r", encoding="utf-8") as file:
-    #         for line in file.readlines():
-    #             file_text += line
+        file_text = ""
+        with open(file_path, "r", encoding="utf-8") as file:
+            for line in file.readlines():
+                file_text += line
 
-    #     assert "alpha: null" in file_text
-    #     assert "function: EXPO" in file_text
+        assert "alpha: null" in file_text
+        assert "function: EXPO" in file_text
 
-    # elif method in ["inverse_power", "both"]:
-    #     file_text = ""
-    #     with open(f"{folder_path}/inv_{method}.mod", "r", encoding="utf-8") as file:
-    #         for line in file.readlines():
-    #             file_text += line
+    if method in ["inverse_power", "both"]:
+        file_path = f"{folder_path}/inv_{method}.mod"
+        assert isfile(file_path)
 
-    #     assert "beta: null" in file_text
-    #     assert "function: POWER" in file_text
+        file_text = ""
+        with open(file_path, "r", encoding="utf-8") as file:
+            for line in file.readlines():
+                file_text += line
+
+        assert "beta: null" in file_text
+        assert "function: POWER" in file_text
 
 
 @pytest.mark.parametrize("method", ["negative", "power", "gamma"])

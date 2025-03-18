@@ -411,7 +411,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.start()
+        self.worker_thread.doWork()
         self.show()
 
     def signal_handler(self, val):
@@ -428,7 +428,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def exit_procedure(self):
-        self.close()
         if self.report is not None:
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
