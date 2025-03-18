@@ -177,7 +177,7 @@
           <item row="7" column="0">
            <widget class="QLabel" name="label_18">
             <property name="text">
-             <string>Cost function</string>
+             <string>Utility function</string>
             </property>
            </widget>
           </item>
