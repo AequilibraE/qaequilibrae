@@ -2462,12 +2462,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="358"/>
         <source>Sub-area analysis</source>
-        <translation type="unfinished"/>
+        <translation>Análise de sub-área</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="380"/>
         <source>Set sub-area analysis</source>
-        <translation type="unfinished"/>
+        <translation>Configurar sub-área para análise</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="387"/>
