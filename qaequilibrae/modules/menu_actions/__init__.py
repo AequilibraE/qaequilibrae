@@ -11,6 +11,7 @@ from .action_import_matrices import load_matrices
 from .action_prepare_network import prepare_network
 from .action_pt_explore import run_pt_explore
 from .action_pt_import_gtfs import run_import_gtfs
+from .action_route_choice import run_route_choice
 from .action_run_shortest_path import run_shortest_path
 from .action_run_tsp import run_tsp
 from .action_show_log import show_log

@@ -2,12 +2,13 @@ import math
 import tempfile
 from os.path import isdir
 from time import localtime, strftime
+from typing import Union
 
 import qgis
 from aequilibrae import Parameters
 from pyproj import CRS, Transformer
 from qgis.core import QgsProject
-from shapely.geometry import Point
+from shapely.geometry import Point, Polygon
 from shapely.ops import transform
 
 
@@ -106,3 +107,9 @@ def polygon_from_radius(point: Point, radius):
     buffered_point = projected_point.buffer(radius)
 
     return transform(projection_back, buffered_point)
+
+
+def model_area_polygon(poly) -> Union[Polygon, int]:
+    tol = 1e-3
+    zones = poly.to_crs(4326)
+    return zones.union_all().buffer(tol).buffer(-tol), 4326

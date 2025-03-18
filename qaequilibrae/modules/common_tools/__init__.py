@@ -1,6 +1,7 @@
 from .all_layers_from_toc import all_layers_from_toc
 from .auxiliary_functions import *
 from .data_layer_from_dataframe import layer_from_dataframe
+from .debouncer import Debouncer
 from .geodataframe_from_data_layer import geodataframe_from_layer
 from .get_output_file_name import GetOutputFileName
 from .get_output_file_name import GetOutputFolderName

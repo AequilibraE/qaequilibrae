@@ -162,6 +162,14 @@ def test_traffic_assignment_menu(ae, qtbot):
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
+def test_route_choice_menu(ae, qtbot):
+    action = ae.menuActions["Paths and assignment"][3]
+    assert action.text() == "Route choice", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
 def test_travelling_salesman_problem_menu(ae, qtbot):
     action = ae.menuActions["Routing"][0]
     assert action.text() == "Travelling Salesman Problem", "Wrong text content"

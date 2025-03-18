@@ -7,7 +7,9 @@ import sys
 from os.path import abspath, dirname, exists, join
 from shutil import copyfile
 
+import numpy as np
 from PyQt5.QtCore import QVariant
+from aequilibrae.matrix import AequilibraeMatrix
 from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsFeature,
@@ -319,3 +321,19 @@ def load_test_layer(folder, file_name):
         print("Layer failed to load!")
     else:
         QgsProject.instance().addMapLayer(layer)
+
+
+def create_matrix(index: np.ndarray, path: str):
+    """Creates a square-matrix in which all the elements are the number 10."""
+
+    names_list = ["demand"]
+    zones = index.shape[0]
+
+    mat = AequilibraeMatrix()
+    mat.create_empty(zones=zones, matrix_names=names_list, memory_only=False, file_name=path)
+    mat.index[:] = index[:]
+
+    for name in names_list:
+        mat.matrix[name][:, :] = np.full((zones, zones), 10.0)[:, :]
+
+    mat.matrices.flush()
