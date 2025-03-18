@@ -422,13 +422,12 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), error.args[0], level=2, duration=10)
         self.report.extend(self.worker_thread.report)
 
-        if val[0] == "finished":
-            if self.job == "calibrate":
-                self.worker_thread.model.save(self.outfile)
-            if self.job in ["apply", "ipf"]:
-                self.worker_thread.output.export(self.outfile)
+        if self.job == "calibrate":
+            self.worker_thread.model.save(self.outfile)
+        if self.job in ["apply", "ipf"]:
+            self.worker_thread.output.export(self.outfile)
 
-        if self.__counter == 0:
+        if val[0] == "finished":
             self.exit_procedure()
 
     def exit_procedure(self):
@@ -436,5 +435,3 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             dlg2 = ReportDialog(qgis.utils.iface.mainWindow(), self.report)
             dlg2.show()
             dlg2.open()
-
-        self.close()

@@ -1,4 +1,4 @@
-from os.path import basename, isfile, splitext, join
+from os.path import basename, isfile, splitext
 
 import numpy as np
 import openmatrix as omx
@@ -7,8 +7,6 @@ import pytest
 from aequilibrae.matrix import AequilibraeMatrix
 from PyQt5.QtCore import Qt
 from qgis.core import QgsProject
-
-from mock import patch
 
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
 from qaequilibrae.modules.distribution_procedures.distribution_models_dialog import DistributionModelsDialog
