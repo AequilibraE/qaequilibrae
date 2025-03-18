@@ -2287,7 +2287,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="41"/>
         <source>Probability cutoff</source>
-        <translation type="unfinished"/>
+        <translation>Probabilidade do cutoff</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="48"/>
