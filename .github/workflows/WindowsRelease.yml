@@ -24,7 +24,7 @@ jobs:
       - name: Check Choco install
         shell: pwsh
         run: |
-          Get-ChildItem :env
+          Get-ChildItem env:
       
       - name: Check qgis install
         shell: pwsh
