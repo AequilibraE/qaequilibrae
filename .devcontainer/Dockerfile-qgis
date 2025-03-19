@@ -1,19 +1,13 @@
-# escape=`
-
 FROM mcr.microsoft.com/windows/servercore:1809
 
-# Reset the shell.
-SHELL ["cmd", "/S", "/C"]
+# Set default shell to PowerShell
+SHELL ["PowerShell", "-Command"]
 
-# Install Chocolately
-ENV chocolateyVersion=1.4.0
-RUN @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat `
-    None -ExecutionPolicy Bypass -Command `
-    "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" `
-    && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
+# Install Chocolatey
+RUN Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-# install basic tools
-RUN powershell -NoProfile -InputFormat None -Command "choco install qgis-ltr --version=3.34.11 -y"
+# Install QGIS
+RUN choco install qgis-ltr --version=3.34.11 -y
 
-# Make sure that ssl certs are available in python
-RUN powershell -NoProfile -InputFormat None -Command "certutil -generateSSTFromWU roots.sst ; certutil -addstore -f root roots.sst ; del roots.sst"
+# # Make sure that ssl certs are available in python
+# RUN powershell -NoProfile -InputFormat None -Command "certutil -generateSSTFromWU roots.sst ; certutil -addstore -f root roots.sst ; del roots.sst"
