@@ -7,7 +7,7 @@ SHELL ["PowerShell", "-Command"]
 RUN Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 # Install QGIS
-RUN choco install qgis-ltr --version=3.34.11 -y
+RUN powershell -NoProfile -InputFormat None -Command "choco install qgis-ltr --version=3.34.11  -y"
 
-# # Make sure that ssl certs are available in python
-# RUN powershell -NoProfile -InputFormat None -Command "certutil -generateSSTFromWU roots.sst ; certutil -addstore -f root roots.sst ; del roots.sst"
+# Make sure that SSL certs are available in python
+RUN powershell -NoProfile -InputFormat None -Command "certutil -generateSSTFromWU roots.sst ; certutil -addstore -f root roots.sst ; del roots.sst"
