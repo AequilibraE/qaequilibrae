@@ -34,18 +34,14 @@ jobs:
       - name: Other qgis install check
         shell: pwsh
         run: |
-        if (Test-Path "C:\Program Files\QGIS*") { 
-            Get-ChildItem "C:\Program Files\QGIS*" -Directory 
-        } elseif (Test-Path "C:\Program Files (x86)\QGIS*") { 
-            Get-ChildItem "C:\Program Files (x86)\QGIS*" -Directory 
-        } else {
-            Write-Host "QGIS não encontrado nos caminhos padrão. Verificando a instalação via Chocolatey..."
-            $chocoPath = (Get-Command choco -ErrorAction SilentlyContinue).Source
-            if ($chocoPath) {
-                $chocoLib = Split-Path -Parent (Split-Path -Parent $chocoPath)
-                Get-ChildItem "$chocoLib\lib\qgis*" -Directory
-            }
-        }
+          Get-ChildItem -Path "C:\Program Files (x86)\"
+      
+      - name: Another qgis install check
+        shell: pwsh
+        run: |
+          $chocoPath = (Get-Command choco -ErrorAction SilentlyContinue).Source
+          $chocoLib = Split-Path -Parent (Split-Path -Parent $chocoPath)
+          Get-ChildItem "$chocoLib\lib\qgis*" -Directory
       
       # - name: Setup and test plugin on LTR
       #   shell: pwsh
