@@ -9,12 +9,12 @@ on:
 
 jobs:
   windows_test:
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     strategy:
       matrix:
+        version: [qgis-ltr --version=3.34.11]
         include:
-          - os: windows-latest
-            DOCKERFILE: Dockerfile-windows-ci
+            DOCKERFILE: .devcontainer/Dockerfile-qgis
             BASE_OS: servercore-ltsc2022
 
     permissions:
@@ -25,12 +25,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install QGIS on Chocolatey
-        uses: crazy-max/ghaction-chocolatey@v3
-        with:
-          args: install ${{ matrix.version }} -y
-
+  
       # Currently skipping tests with relative path to test folder
       - name: Setup and test plugin on Latest
         shell: pwsh
