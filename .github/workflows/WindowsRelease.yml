@@ -9,11 +9,12 @@ on:
 
 jobs:
   windows_test:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         version: [qgis-ltr --version=3.34.11]
         include:
+          - os: windows-latest
             DOCKERFILE: .devcontainer/Dockerfile-qgis
             BASE_OS: servercore-ltsc2022
 
