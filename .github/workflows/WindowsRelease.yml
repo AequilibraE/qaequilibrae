@@ -39,9 +39,7 @@ jobs:
       - name: Another qgis install check
         shell: pwsh
         run: |
-          $chocoPath = (Get-Command choco -ErrorAction SilentlyContinue).Source
-          $chocoLib = Split-Path -Parent (Split-Path -Parent $chocoPath)
-          Get-ChildItem "$chocoLib\lib\qgis*" -Directory
+          Get-ChildItem -Path "C:\ProgramData\chocolatey\lib" -Depth 2
       
       # - name: Setup and test plugin on LTR
       #   shell: pwsh
