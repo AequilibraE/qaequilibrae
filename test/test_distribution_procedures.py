@@ -13,6 +13,8 @@ from qaequilibrae.modules.distribution_procedures.distribution_models_dialog imp
 from qaequilibrae.modules.matrix_procedures.load_dataset_dialog import LoadDatasetDialog
 from .utilities import run_sfalls_assignment
 
+DISTRIBUTION_PATH = "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog"
+
 
 @pytest.mark.parametrize("method", ["csv", "parquet", "open layer"])
 def test_ipf(ae_with_project, folder_path, mocker, method):
@@ -21,10 +23,8 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
     _ = layer_from_dataframe(df, "synthetic_future_vector")
 
     file_path = f"{folder_path}/demand_ipf_D.aem"
-    mocker.patch(
-        "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog.browse_outfile",
-        return_value=file_path,
-    )
+    mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
+    mocked_outfile.return_value = file_path
 
     dialog = DistributionModelsDialog(ae_with_project, mode="ipf")
 
@@ -86,9 +86,8 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
 def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
     proj = run_sfalls_assignment(ae_with_project)
 
-    mocked_outfile = mocker.patch(
-        "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog.browse_outfile"
-    )
+    mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
+    mocker.patch(f"{DISTRIBUTION_PATH}.exit_procedure")
 
     dialog = DistributionModelsDialog(proj, mode="calibrate")
 
@@ -111,8 +110,6 @@ def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
         qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
 
     qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
-
-    # print(dialog.__dict__)
 
     if method in ["negative_exponential", "both"]:
         file_path = f"{folder_path}/neg_{method}.mod"
@@ -143,10 +140,8 @@ def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
 def test_apply_gravity(ae_with_project, method, folder_path, mocker):
 
     file_path = f"{folder_path}/matrices/ADJ-TrafficAssignment_DP.omx"
-    mocker.patch(
-        "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog.browse_outfile",
-        return_value=file_path,
-    )
+    mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
+    mocked_outfile.return_value = file_path
 
     dataset_path = "test/data/SiouxFalls_project/synthetic_future_vector.csv"
     dataset = pd.read_csv(dataset_path)
