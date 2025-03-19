@@ -39,7 +39,7 @@ jobs:
       - name: Another qgis install check
         shell: pwsh
         run: |
-          Get-ChildItem -Path "C:\ProgramData\chocolatey\lib" -Depth 2
+          Get-ChildItem -Path "C:\ProgramData\chocolatey\lib"
       
       # - name: Setup and test plugin on LTR
       #   shell: pwsh
