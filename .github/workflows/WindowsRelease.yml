@@ -9,11 +9,19 @@ on:
 
 jobs:
   windows_test:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-      # we test the minimum LTR version required, the newest LTR, and the latest.
-        version: [qgis-ltr --version=3.34.11]
+        include:
+          - os: windows-latest
+            DOCKERFILE: Dockerfile-windows-ci
+            BASE_OS: servercore-ltsc2022
+
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
