@@ -47,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: qaequilibrae
-        path: qaequilibrae.${{ env.PLUGIN_VERSION }}.zip
+        path: /home/runner/work/qaequilibrae/qaequilibrae/*.zip
         if-no-files-found: warn
   
     - name: Release plugin in QGIS
