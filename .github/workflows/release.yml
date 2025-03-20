@@ -39,7 +39,7 @@ jobs:
       run: |
         OUTPUT=$(python qaequilibrae/get_version.py)
         echo "PLUGIN_VERSION=$OUTPUT" >> $GITHUB_ENV
-        echo "FILE_PATH=/home/runner/work/qaequilibrae/qaequilibrae.$OUTPUT.zip" >> $GITHUB_ENV
+        echo "FILE_PATH=/home/runner/work/qaequilibrae/qaequilibrae/qaequilibrae.$OUTPUT.zip" >> $GITHUB_ENV
 
     - name: Build the package
       if: ${{ (github.event_name != 'release')}}
