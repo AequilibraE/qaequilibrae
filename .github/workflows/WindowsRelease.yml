@@ -71,11 +71,3 @@ jobs:
               # Copiar logs para o diretório compartilhado
               Copy-Item '`$pluginPath\log.jsonl' -Destination 'C:\repo\log.jsonl'
             "
-      
-      - name: Arquivar logs de teste
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-logs
-          path: .\log.jsonl
-          retention-days: 7
-          
