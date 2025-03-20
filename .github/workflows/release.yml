@@ -1,8 +1,5 @@
 name: VersionRelease
 
-env:
-  PLUGIN_VERSION: $(python qaequilibrae/get_version.py)
-
 on:
   push:
     branches: [develop]
@@ -37,6 +34,12 @@ jobs:
         lrelease qaequilibrae/i18n/qaequilibrae_*.ts
         sed -i "s|^*.qm.*| |" .gitignore
         git add qaequilibrae/
+    
+    - name: Get plugin version
+      run: |
+        OUTPUT=$(python qaequilibrae/get_version.py)
+        echo "PLUGIN_VERSION=$OUTPUT" >> $GITHUB_ENV
+        echo "FILE_PATH=/home/runner/work/qaequilibrae/qaequilibrae.$OUTPUT.zip" >> $GITHUB_ENV
 
     - name: Build the package
       if: ${{ (github.event_name != 'release')}}
@@ -47,7 +50,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: qaequilibrae
-        path: /home/runner/work/qaequilibrae/qaequilibrae/*.zip
+        path: ${{ env.FILE_PATH }}
         if-no-files-found: warn
   
     - name: Release plugin in QGIS
