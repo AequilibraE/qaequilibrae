@@ -12,10 +12,7 @@ jobs:
     runs-on: windows-latest
     container:
       image: ghcr.io/aequilibrae/ci-windows-qgis:latest
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-  
+
     steps:
       - name: Get code
         uses: actions/checkout@v4
