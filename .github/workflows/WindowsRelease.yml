@@ -10,64 +10,39 @@ on:
 jobs:
   windows_test:
     runs-on: ubuntu-latest
-
+    container:
+      image: ghcr.io/aequilibrae/ci-windows-qgis:latest
     steps:
-      - name: Get code
-        uses: actions/checkout@v4
 
-      - name: Executar testes no Docker Windows
+      - name: Setup and test plugin on LTR
         shell: pwsh
         run: |
-          # Obter caminho absoluto do diretório atual
-          $repoPath = (Get-Location).Path
-          
-          # Executar o container Windows com QGIS instalado via Chocolatey
-          docker run --rm `
-            -v "${repoPath}:C:\repo" `
-            ghcr.io/aequilibrae/ci-windows-qgis:latest `
-            powershell -Command "
-              # Verificar o caminho do QGIS instalado pelo Chocolatey
-              `$qgisPath = (Get-ChildItem -Path 'C:\Program Files' -Filter 'QGIS*' -Directory).FullName
-              `$qgisExec = '`$qgisPath\bin\python-qgis-ltr.bat'
-              
-              # Configurar diretórios do plugin
-              `$pluginPath = 'C:\Users\ContainerUser\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins'
-              New-Item -ItemType Directory -Path `$pluginPath -Force
-              `$aeqPath = '`$pluginPath\qaequilibrae'
-              
-              # Copiar arquivos do repositório para o diretório de plugins
-              Copy-Item 'C:\repo\qaequilibrae' -Destination `$aeqPath -Recurse
-              Copy-Item 'C:\repo\test' -Destination '`$pluginPath\test' -Recurse
-              
-              # Configurar variáveis de ambiente
-              `$env:PYTHONPATH = '`$qgisPath\apps\qgis\python'
-              `$env:QT_QPA_PLATFORM = 'offscreen'
-              
-              # Instalar dependências
-              Start-Process -FilePath `$qgisExec -ArgumentList '-m pip install -r `$pluginPath\test\requirements_test.txt' -NoNewWindow -Wait
-              
-              # Baixar pacotes extras
-              Set-Location `$aeqPath
-              Start-Process -FilePath `$qgisExec -ArgumentList 'download_extra_packages_class.py' -NoNewWindow -Wait
-              
-              # Configurar PYTHONPATH adicional
-              `$env:PYTHONPATH = '`$env:PYTHONPATH;C:\Users\ContainerUser\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins'
-              
-              # Executar testes
-              Set-Location `$pluginPath
-              Start-Process -FilePath `$qgisExec -ArgumentList '-m pytest test --report-log=`$pluginPath\log.jsonl' -NoNewWindow -Wait
-              
-              # Verificar pacotes instalados
-              Write-Host 'Pacotes instalados:'
-              Get-ChildItem -Path '`$pluginPath\qaequilibrae\packages' -Name
-              
-              # Verificar falhas
-              `$fails = Select-String -Path '`$pluginPath\log.jsonl' -Pattern 'failed'
-              if (`$fails.Matches.Length -gt 0) {
-                  Write-Error 'Verifique os erros na execução dos testes'
-                  exit 1
-              }
-              
-              # Copiar logs para o diretório compartilhado
-              Copy-Item '`$pluginPath\log.jsonl' -Destination 'C:\repo\log.jsonl'
-            "
+          $qgisPath = (Get-ChildItem -Path "C:\Program Files" -Filter "QGIS*" -Directory).FullName
+          $qgisExec = "$qgisPath\bin\python-qgis-ltr.bat"
+          $pluginPath = "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
+          $aeqPath = "$pluginPath\qaequilibrae"
+          Copy-Item "qaequilibrae" -Destination "$aeqPath" -Recurse
+          Copy-Item "test" -Destination "$pluginPath\test" -Recurse
+          $env:PYTHONPATH = "$qgisPath\apps\qgis\python"
+          $env:QT_QPA_PLATFORM = "offscreen"
+          Start-Process -FilePath "$qgisExec" -ArgumentList "-m pip install -r $pluginPath\test\requirements_test.txt" -NoNewWindow -Wait
+          Set-Location "$aeqPath"
+          Start-Process -FilePath "$qgisExec" -ArgumentList "download_extra_packages_class.py" -NoNewWindow -Wait
+          $env:PYTHONPATH = "$env:PYTHONPATH;APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
+          Set-Location "$pluginPath"
+          Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=$pluginPath\log.jsonl" -NoNewWindow -Wait
+
+      - name: Check packages installed
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages" -Name
+
+      - name: Check if tests failed
+        shell: pwsh
+        run: |
+          $pluginPath = "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
+          $fails = Select-String -Path .\*.jsonl -Pattern 'failed'
+          if ($fails.Matches.Length -gt 0) {
+              Write-Error "Check for errors in the tests run"
+              exit 1
+          }
