@@ -41,6 +41,7 @@ def plot_results(results, from_node, to_node, link_layer):
     temp_layer.renderer().symbol().deleteSymbolLayer(0)
     temp_layer.triggerRepaint()
 
+    link_layer.removeSelection()
     QgsProject.instance().addMapLayer(temp_layer)
 
 
