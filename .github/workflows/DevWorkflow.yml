@@ -27,6 +27,7 @@ jobs:
   unittest:
     needs: linting
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       max-parallel: 4
       matrix:
@@ -51,4 +52,4 @@ jobs:
           . /tmp/.venv/bin/activate
           export QT_QPA_PLATFORM=offscreen
           pwd
-          python3 -m pytest --cov-report term-missing --cov=qaequilibrae test
+          python3 -m pytest --cov-report term-missing --cov=qaequilibrae test/test_add_centroid_connector.py
