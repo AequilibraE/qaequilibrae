@@ -45,36 +45,36 @@ def _run_load_project_from_path(qgis_project, proj_path):
 
 
 def update_project_layers(qgis_project):
-    curr = qgis_project.project.conn.cursor()
-    curr.execute("select f_table_name from geometry_columns;")
-    layers = [x[0] for x in curr.fetchall()]
 
-    # Add transit_tables to layers
-    pt_database = join(qgis_project.project.project_base_path, "public_transport.sqlite")
-    if exists(pt_database):
-        layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
+    with qgis_project.project.db_connection as conn:
+        layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
 
-    descrlayout = QVBoxLayout()
-    qgis_project.geo_layers_table = QTableWidget()
-    qgis_project.geo_layers_table.doubleClicked.connect(qgis_project.load_geo_layer)
+        # Add transit_tables to layers
+        pt_database = join(qgis_project.project.project_base_path, "public_transport.sqlite")
+        if exists(pt_database):
+            layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
 
-    qgis_project.geo_layers_table.setRowCount(len(layers))
-    qgis_project.geo_layers_table.setColumnCount(1)
-    qgis_project.geo_layers_table.horizontalHeader().hide()
-    for i, f in enumerate(layers):
-        item1 = QTableWidgetItem(f)
-        item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-        qgis_project.geo_layers_table.setItem(i, 0, item1)
+        descrlayout = QVBoxLayout()
+        qgis_project.geo_layers_table = QTableWidget()
+        qgis_project.geo_layers_table.doubleClicked.connect(qgis_project.load_geo_layer)
 
-    descrlayout.addWidget(qgis_project.geo_layers_table)
+        qgis_project.geo_layers_table.setRowCount(len(layers))
+        qgis_project.geo_layers_table.setColumnCount(1)
+        qgis_project.geo_layers_table.horizontalHeader().hide()
+        for i, f in enumerate(layers):
+            item1 = QTableWidgetItem(f)
+            item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            qgis_project.geo_layers_table.setItem(i, 0, item1)
 
-    descr = QWidget()
-    descr.setLayout(descrlayout)
-    qgis_project.tabContents = [(descr, "Geo layers")]
-    qgis_project.projectManager.addTab(descr, "Geo layers")
-    qgis_project.project.conn.execute("PRAGMA temp_store = 0;")
+        descrlayout.addWidget(qgis_project.geo_layers_table)
 
-    # Creates all layers and puts them in memory
-    qgis_project.layers.clear()
-    for lyr in layers:
-        qgis_project.create_layer_by_name(lyr)
+        descr = QWidget()
+        descr.setLayout(descrlayout)
+        qgis_project.tabContents = [(descr, "Geo layers")]
+        qgis_project.projectManager.addTab(descr, "Geo layers")
+        conn.execute("PRAGMA temp_store = 0;")
+
+        # Creates all layers and puts them in memory
+        qgis_project.layers.clear()
+        for lyr in layers:
+            qgis_project.create_layer_by_name(lyr)

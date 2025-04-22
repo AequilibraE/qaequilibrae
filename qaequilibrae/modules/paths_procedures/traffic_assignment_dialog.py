@@ -12,7 +12,7 @@ from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
 from aequilibrae.project.database_connection import database_connection
-from aequilibrae.utils.db_utils import read_and_close
+from aequilibrae.utils.db_utils import commit_and_close
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 
@@ -124,23 +124,25 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             item.setEnabled(self.chb_fixed_cost.isChecked())
 
         if self.chb_fixed_cost.isChecked():
-            dt = self.project.conn.execute("pragma table_info(modes)").fetchall()
-            if "vot" in [x[1] for x in dt]:
-                sql = "select vot from modes where mode_id=?"
-                v = self.project.conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()
-                self.vot_setter.setValue(v[0])
+            with self.project.db_connection as conn:
+                dt = conn.execute("pragma table_info(modes)").fetchall()
+                if "vot" in [x[1] for x in dt]:
+                    sql = "select vot from modes where mode_id=?"
+                    v = conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()
+                    self.vot_setter.setValue(v[0])
 
     def change_class_name(self):
         nm = self.cob_mode_for_class.currentText()
         self.ln_class_name.setText(nm[:-4])
         self.set_fixed_cost_use()
 
-        dt = self.project.conn.execute("pragma table_info(modes)").fetchall()
-        if "pce" in [x[1] for x in dt]:
-            sql = "select pce from modes where mode_id=?"
-            v = self.project.conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()[0]
-            if v is not None:
-                self.pce_setter.setValue(v)
+        with self.project.db_connection as conn:
+            dt = conn.execute("pragma table_info(modes)").fetchall()
+            if "pce" in [x[1] for x in dt]:
+                sql = "select pce from modes where mode_id=?"
+                v = conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()[0]
+                if v is not None:
+                    self.pce_setter.setValue(v)
 
     def change_matrix_selected(self):
         mat_name = self.cob_matrices.currentText()
@@ -168,7 +170,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         table.setItem(0, 0, QTableWidgetItem("Project path"))
         table.setItem(0, 1, QTableWidgetItem(self.project.path_to_file))
 
-        with read_and_close(database_connection("network")) as conn:
+        with commit_and_close(database_connection("network")) as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
 
             modes = []
@@ -449,9 +451,10 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             return False
 
         sql = "Select count(*) from results where table_name=?"
-        if sum(self.project.conn.execute(sql, [self.scenario_name]).fetchone()):
-            self.error = self.tr("Result table name already exists. Choose a new name")
-            return False
+        with self.project.db_connection as conn:
+            if sum(conn.execute(sql, [self.scenario_name]).fetchone()):
+                self.error = self.tr("Result table name already exists. Choose a new name")
+                return False
 
         if self.do_select_link.isChecked():
             self.output_name = self.sl_mat_name.text()
