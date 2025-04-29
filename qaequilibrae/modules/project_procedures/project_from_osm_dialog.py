@@ -49,7 +49,7 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.place.setVisible(False)
 
         self.source_type_frame = QVBoxLayout()
-        self.source_type_frame.setAlignment(Qt.AlignLeft)
+        self.source_type_frame.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.source_type_frame.addWidget(self.choose_place)
         self.source_type_frame.addWidget(self.choose_canvas)
         self.source_type_frame.addWidget(self.place)

@@ -37,8 +37,8 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
             self.results_model: PandasModel = None
 
             for table in [self.list_matrices, self.list_results]:
-                table.setSelectionBehavior(QAbstractItemView.SelectRows)
-                table.setSelectionMode(QAbstractItemView.SingleSelection)
+                table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+                table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
             self.load_matrices()
             self.load_results()

@@ -272,7 +272,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def set_mapping(self):
         self.table.clearSelection()
-        self.table.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         if not self.from_proj:
             return
 
@@ -285,7 +285,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             return
 
         if self.by_row.isChecked():
-            self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+            self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
             self.selected_col = None
             if self.selected_row:
                 self.table.blockSignals(True)
@@ -294,7 +294,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.select_row()
             self.table.selectionModel().selectionChanged.connect(self.select_row)
         elif self.by_col.isChecked():
-            self.table.setSelectionBehavior(QAbstractItemView.SelectColumns)
+            self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectColumns)
             self.selected_row = None
             if self.selected_col:
                 self.table.blockSignals(True)

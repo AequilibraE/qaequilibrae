@@ -262,7 +262,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         table.setColumnWidth(0, 235)
         table.setColumnWidth(1, 80)
         table.clearContents()
-        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         table.setRowCount(len(dictio.keys()))
 
         for i, data_name in enumerate(dictio.keys()):

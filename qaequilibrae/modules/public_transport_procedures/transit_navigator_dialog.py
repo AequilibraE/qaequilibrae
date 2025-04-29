@@ -98,8 +98,8 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.gtfs_types = {v: k for k, v in self.gtfs_types.items()}
 
         for table in [self.list_routes, self.list_stops]:
-            table.setSelectionBehavior(QAbstractItemView.SelectRows)
-            table.setSelectionMode(QAbstractItemView.SingleSelection)
+            table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+            table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
         self.chb_agency.toggled.connect(self.allow_filter_by_agency)
         self.chb_type.toggled.connect(self.allow_filter_by_gtfs_type)

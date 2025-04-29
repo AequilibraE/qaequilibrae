@@ -71,7 +71,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.txt_ramp.setVisible(False)
 
         self.but_add_band.clicked.connect(self.add_to_bands_list)
-        self.bands_list.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.bands_list.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
 
         self.rdo_color.toggled.connect(self.color_origins)
 

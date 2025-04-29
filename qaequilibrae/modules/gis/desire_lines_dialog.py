@@ -95,7 +95,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             table.setRowCount(self.matrix.cores)
             for i, mat in enumerate(self.matrix.names):
                 item1 = QTableWidgetItem(mat)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 table.setItem(i, 0, item1)
 
                 chb1 = QCheckBox()
@@ -107,7 +107,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         cell_widget = QWidget()
         lay_out = QHBoxLayout(cell_widget)
         lay_out.addWidget(item)
-        lay_out.setAlignment(Qt.AlignCenter)
+        lay_out.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
         return cell_widget

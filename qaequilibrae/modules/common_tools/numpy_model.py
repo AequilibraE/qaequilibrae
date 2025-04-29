@@ -65,9 +65,9 @@ class NumpyModel(QtCore.QAbstractTableModel):
                         )
 
     def header_data(self, col, orientation, role=QtCore.Qt.ItemDataRole.DisplayRole):
-        if role == QtCore.Qt.ItemDataRole.DisplayRole and orientation == QtCore.Qt.Horizontal:
+        if role == QtCore.Qt.ItemDataRole.DisplayRole and orientation == QtCore.Qt.Orientation.Horizontal:
             return self.header_data[col]
-        if role == QtCore.Qt.ItemDataRole.DisplayRole and orientation != QtCore.Qt.Horizontal:
+        if role == QtCore.Qt.ItemDataRole.DisplayRole and orientation != QtCore.Qt.Orientation.Horizontal:
             return self.row_headers_data[col]
 
         return QtCore.QAbstractTableModel.headerData(self, col, orientation, role)

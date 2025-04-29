@@ -21,7 +21,7 @@ class PandasModel(QtCore.QAbstractTableModel):
 
     def data(self, index, role):
         if index.isValid():
-            if role == QtCore.Qt.DisplayRole:
+            if role == QtCore.Qt.ItemDataRole.DisplayRole:
                 return str(self._data.iloc[index.row(), index.column()])
         return None
 
@@ -32,8 +32,8 @@ class PandasModel(QtCore.QAbstractTableModel):
         return self._data.shape[1]
 
     def header_data(self, section, orientation, role):
-        if role == QtCore.Qt.DisplayRole:
-            if orientation == QtCore.Qt.Horizontal:
+        if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            if orientation == QtCore.Qt.Orientation.Horizontal:
                 return str(self._data.columns[section])
-            if orientation == QtCore.Qt.Vertical:
+            if orientation == QtCore.Qt.Orientation.Vertical:
                 return str(self._data.index[section])

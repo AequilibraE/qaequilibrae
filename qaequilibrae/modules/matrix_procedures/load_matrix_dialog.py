@@ -198,11 +198,11 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.matrix_list_view.setItem(i, 0, item_1)
 
             item_2 = QTableWidgetItem(dimensions)
-            item_2.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            item_2.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             self.matrix_list_view.setItem(i, 1, item_2)
 
             item_3 = QTableWidgetItem(total)
-            item_3.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            item_3.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             self.matrix_list_view.setItem(i, 2, item_3)
 
             i += 1

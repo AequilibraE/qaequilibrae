@@ -159,7 +159,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             self.but_add_class.setEnabled(True)
         matrices_model = PandasModel(df)
         self.tbl_core_list.setModel(matrices_model)
-        self.tbl_core_list.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tbl_core_list.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
     def __populate_project_info(self):
         table = self.tbl_project_properties
@@ -213,7 +213,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.tbl_vdf_parameters.setRowCount(len(parameters))
         for i, par in enumerate(parameters):
             core_item = QTableWidgetItem(par)
-            core_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            core_item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             table.setItem(i, 0, core_item)
 
             val_item = QLineEdit()
@@ -280,7 +280,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         idx = num_classes - 1
         for i, txt in enumerate([class_name, mode, str(len(user_classes)), fcost, str(round(pce, 4))]):
             item = QTableWidgetItem(txt)
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             table.setItem(idx, i, item)
 
         but = QPushButton()
@@ -306,7 +306,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         for i, val in enumerate([self.cob_skim_class.currentText(), field]):
             item = QTableWidgetItem(val)
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             table.setItem(idx, i, item)
 
         last_chb = QCheckBox()

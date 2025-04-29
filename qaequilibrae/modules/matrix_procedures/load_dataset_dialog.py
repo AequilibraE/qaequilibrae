@@ -79,7 +79,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                 for field in fields:
                     table.setRowCount(table.rowCount() + 1)
                     item1 = QtWidgets.QTableWidgetItem(field)
-                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                     table.setItem(table.rowCount() - 1, 0, item1)
 
     def size_it_accordingly(self, final=False):

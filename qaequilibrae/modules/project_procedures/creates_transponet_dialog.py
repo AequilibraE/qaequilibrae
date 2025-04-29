@@ -98,7 +98,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 if field not in required_fields:
                     table.setRowCount(counter + 1)
                     item1 = QtWidgets.QTableWidgetItem(field)
-                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                     table.setItem(counter, 0, item1)
                     counter += 1
 
@@ -114,7 +114,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
             for field in new_fields:
                 final_table.setRowCount(counter + 1)
                 item1 = QtWidgets.QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
 
                 chb1 = QtWidgets.QCheckBox()
@@ -191,7 +191,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 for field in fields:
                     table.setRowCount(counter + 1)
                     item1 = QtWidgets.QTableWidgetItem(field)
-                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                     table.setItem(counter, 0, item1)
                     counter += 1
                 self.counter[layer_type] = counter
@@ -209,7 +209,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 final_table.setRowCount(counter + 1)
 
                 item1 = QtWidgets.QTableWidgetItem(rf)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
 
                 chb1 = QtWidgets.QCheckBox()
@@ -230,7 +230,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         cell_widget = QtWidgets.QWidget()
         lay_out = QtWidgets.QHBoxLayout(cell_widget)
         lay_out.addWidget(item)
-        lay_out.setAlignment(Qt.AlignCenter)
+        lay_out.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
         return cell_widget

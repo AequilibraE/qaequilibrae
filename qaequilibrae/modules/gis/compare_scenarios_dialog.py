@@ -43,7 +43,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.slider_spacer.setMinimum(0)
         self.slider_spacer.setMaximum(30)
         self.slider_spacer.setValue(0)
-        self.slider_spacer.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.slider_spacer.setTickPosition(QtWidgets.QSlider.TickPosition.TicksBelow)
         self.slider_spacer.setTickInterval(10)
         self.slider_spacer.valueChanged.connect(self.spacevaluechange)
         self.cob_base_scenario.currentIndexChanged.connect(
@@ -57,7 +57,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.slider_band_size.setMinimum(5)
         self.slider_band_size.setMaximum(150)
         self.slider_band_size.setValue(50)
-        self.slider_band_size.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.slider_band_size.setTickPosition(QtWidgets.QSlider.TickPosition.TicksBelow)
         self.slider_band_size.setTickInterval(5)
         self.slider_band_size.valueChanged.connect(self.sizevaluechange)
         self.mode_frame.setVisible(False)

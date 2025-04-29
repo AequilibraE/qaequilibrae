@@ -48,8 +48,8 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.hide_all_progress_bars()
         self.available_skims_table.setColumnWidth(0, 245)
         self.skim_list.setColumnWidth(0, 245)
-        self.available_skims_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.skim_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.available_skims_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.skim_list.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
         # loads default path from parameters
         self.path = standard_path()
@@ -85,7 +85,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             for field in old_fields:
                 table.setRowCount(counter + 1)
                 item1 = QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 table.setItem(counter, 0, item1)
                 counter += 1
 
@@ -105,7 +105,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             for field in new_fields:
                 final_table.setRowCount(counter + 1)
                 item1 = QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
                 counter += 1
 

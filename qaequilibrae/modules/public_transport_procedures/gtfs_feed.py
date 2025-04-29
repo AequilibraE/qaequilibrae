@@ -59,7 +59,7 @@ class GTFSFeed(QDialog, FORM_CLASS):
         self.tbl_capacities.setRowCount(len(self.default_capacities.values()))
         for i, (key, val) in enumerate(self.default_capacities.items()):
             mode = QTableWidgetItem(str(key))
-            mode.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            mode.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             self.tbl_capacities.setItem(i, 0, mode)
             for j, v in enumerate(val):
                 self.tbl_capacities.setItem(i, j + 1, QTableWidgetItem(str(v)))
