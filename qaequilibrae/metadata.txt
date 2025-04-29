@@ -7,13 +7,13 @@ about=QAequilibraE is the GUI for AequilibraE, a transportation modeling package
 version=1.2.0
 author=Pedro Camargo
 email=pedro@outerloop.io
-repository= https://github.com/AequilibraE/QAequilibraE
+repository=https://github.com/AequilibraE/QAequilibraE
 tracker=https://github.com/aequilibrae/QAequilibraE/issues
 icon=icon.png
 hasProcessingProvider=yes
 experimental=False
 homepage=https://www.aequilibrae.com/latest/qgis/index.html
-
+supportsQt6=True
 
 # tags are comma-separated with spaces allowed
 tags= transport, transportation, modeling, modeling, traffic, GTFS
