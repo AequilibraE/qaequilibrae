@@ -9,7 +9,7 @@ import numpy as np
 import openmatrix as omx
 import pandas as pd
 import pytest
-from PyQt5.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant
 from aequilibrae import Project
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.transit import Transit
@@ -115,7 +115,7 @@ def test_project_from_layer(folder_path):
     linkslayer = QgsProject.instance().mapLayersByName("Links layer")[0]
 
     linkslayer.startEditing()
-    field = QgsField("ltype", QVariant.String)
+    field = QgsField("ltype", QMetaType.Type.QString)
     linkslayer.addAttribute(field)
     linkslayer.updateFields()
 

@@ -1,6 +1,6 @@
 import pytest
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QApplication, QDialog
+from qgis.PyQt.QtCore import Qt, QTimer
+from qgis.PyQt.QtWidgets import QApplication, QDialog
 
 from qgis.core import QgsProject
 from qaequilibrae.modules.paths_procedures.show_shortest_path_dialog import ShortestPathDialog

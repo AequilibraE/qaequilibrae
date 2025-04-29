@@ -63,7 +63,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
 
         dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj, join(self.project.matrices.fldr, file_name), proj=True)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
 
     def load_matrices(self):
         self.matrices = list_matrices(self.project.matrices.fldr)
@@ -118,7 +118,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
     def display_external_data(self):
         dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
 
     def exit_with_error(self):
         qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)

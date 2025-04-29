@@ -115,7 +115,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def load_fields_to_combo_boxes(self):
         self.zone_id_field.clear()
@@ -149,7 +149,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()
         self.exit_procedure()
 
     def check_all_inputs(self):
@@ -216,7 +216,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         error_message = ["*** ERROR ***", error_message]
         dlg2 = ReportDialog(self.iface, error_message)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
 
     def exit_procedure(self):
         self.close()

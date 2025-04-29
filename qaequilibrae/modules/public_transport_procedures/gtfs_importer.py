@@ -60,7 +60,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.dlg2 = GTFSFeed(self.qgis_project, self._p)
         self.dlg2.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg2.show()
-        self.dlg2.exec_()
+        self.dlg2.exec()
         if self.dlg2.feed is not None:
             self.set_feed(self.dlg2.feed)
 

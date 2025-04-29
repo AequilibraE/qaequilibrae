@@ -114,7 +114,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             obj_to_view = self.table_datasets.item(row, 0).text()
             dlg2 = DisplayAequilibraEFormatsDialog(self.iface, self.datasets[obj_to_view])
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()
 
     def configure_inputs(self):
         self.but_run.setVisible(True)
@@ -198,7 +198,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def load_datasets(self):
         dlg2 = LoadDatasetDialog(self.iface)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
         if isinstance(dlg2.dataset, pd.DataFrame):
             dataset_name = dlg2.output_name
             if dataset_name is not None:
@@ -433,4 +433,4 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.report is not None:
             dlg2 = ReportDialog(qgis.utils.iface.mainWindow(), self.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()

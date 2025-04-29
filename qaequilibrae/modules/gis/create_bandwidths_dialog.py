@@ -6,7 +6,7 @@ from random import randint
 from typing import Tuple, Literal, Dict, Union
 
 import qgis
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QPushButton, QTableWidgetItem, QTableWidget
@@ -249,7 +249,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             self.ramps = None
             dlg2 = LoadColorRampSelector(self.iface, self.layer)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()
             if dlg2.results is not None:
                 self.ramps = dlg2.results
                 self.txt_ramp.setText(str(self.ramps))

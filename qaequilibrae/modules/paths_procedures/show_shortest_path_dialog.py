@@ -55,7 +55,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.to_but.setEnabled(False)
         dlg2 = LoadGraphLayerSettingDialog(self.iface, self.project)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
         if len(dlg2.error) < 1 and len(dlg2.mode) > 0:
             self.mode = dlg2.mode
             self.minimize_field = dlg2.minimize_field

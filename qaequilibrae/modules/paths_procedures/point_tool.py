@@ -1,6 +1,6 @@
 # From http://gis.stackexchange.com/questions/45094/how-to-programatically-check-for-a-mouse-click-in-qgis
 # By Nathan Woodrow
-from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 from qgis.gui import QgsMapTool
 
 

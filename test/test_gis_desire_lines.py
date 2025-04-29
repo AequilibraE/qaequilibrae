@@ -1,5 +1,5 @@
 import pytest
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 
 from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
 from .utilities import load_sfalls_from_layer

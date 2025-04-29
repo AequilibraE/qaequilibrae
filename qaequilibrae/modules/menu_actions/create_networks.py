@@ -8,5 +8,5 @@ def run_create_transponet(qgisproject):
 
     dlg2 = CreatesTranspoNetDialog(qgisproject)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()
     # If we wanted modal, we would eliminate the dlg2.show()

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog

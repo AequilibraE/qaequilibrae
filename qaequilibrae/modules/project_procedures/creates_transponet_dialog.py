@@ -4,7 +4,7 @@ from functools import partial
 from os.path import isdir, join
 
 import qgis
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from aequilibrae.parameters import Parameters
 from aequilibrae.project.network.network import Network
 from qgis.PyQt import QtWidgets, uic
@@ -326,7 +326,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "start":
@@ -339,5 +339,5 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.worker_thread.report:
                 dlg2 = ReportDialog(self.iface, self.worker_thread.report)
                 dlg2.show()
-                dlg2.exec_()
+                dlg2.exec()
             self.exit_procedure()

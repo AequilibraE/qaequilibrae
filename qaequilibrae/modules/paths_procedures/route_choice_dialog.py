@@ -420,7 +420,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "finished":

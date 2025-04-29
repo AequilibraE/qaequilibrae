@@ -7,4 +7,4 @@ def run_route_choice(qgis_project):
 
     dlg2 = RouteChoiceDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

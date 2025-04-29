@@ -3,8 +3,8 @@ from shutil import copytree
 from uuid import uuid4
 
 import pytest
-from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QApplication
+from qgis.PyQt.QtCore import QTimer
+from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.common_tools import ReportDialog

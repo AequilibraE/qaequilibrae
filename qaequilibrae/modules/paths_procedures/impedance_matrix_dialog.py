@@ -127,7 +127,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.do_dist_matrix.setVisible(False)
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "start":
@@ -206,4 +206,4 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.report:
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()

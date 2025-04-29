@@ -1,5 +1,5 @@
 import numpy as np
-from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 from aequilibrae.utils.interface.worker_thread import WorkerThread
 from qgis.PyQt.QtCore import QVariant
 from qgis._core import QgsField, QgsFeatureRequest, QgsPointXY, QgsVectorLayer, QgsGeometry, QgsFeature, QgsSpatialIndex
@@ -50,7 +50,7 @@ class NetworkPreparationProcedure(WorkerThread):
         add_fields = ["A_NODE", "B_NODE"]
         for f in add_fields:
             if f not in field_names:
-                _ = new_line_layer.dataProvider().addAttributes([QgsField(f, QVariant.Int)])
+                _ = new_line_layer.dataProvider().addAttributes([QgsField(f, QMetaType.Type.Int)])
         new_line_layer.updateFields()
         self.signal.emit(["set_text", self.tr("Adding fields to line layer")])
         # If we have node IDs, we iterate over the ID field to make sure they are unique

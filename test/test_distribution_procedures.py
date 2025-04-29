@@ -5,7 +5,7 @@ import openmatrix as omx
 import pandas as pd
 import pytest
 from aequilibrae.matrix import AequilibraeMatrix
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe

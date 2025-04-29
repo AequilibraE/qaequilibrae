@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
-from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths import Graph
 from aequilibrae.paths import allOrNothing
@@ -68,11 +68,11 @@ class DesireLinesProcedure(WorkerThread):
         desireline_layer = QgsVectorLayer("LineString?crs=epsg:" + str(EPSG_code), self.dl_type, "memory")
         dlpr = desireline_layer.dataProvider()
         base_dl_fields = [
-            QgsField("link_id", QVariant.Int),
-            QgsField("A_Node", QVariant.Int),
-            QgsField("B_Node", QVariant.Int),
-            QgsField("direct", QVariant.Int),
-            QgsField("distance", QVariant.Double),
+            QgsField("link_id", QMetaType.Type.Int),
+            QgsField("A_Node", QMetaType.Type.Int),
+            QgsField("B_Node", QMetaType.Type.Int),
+            QgsField("direct", QMetaType.Type.Int),
+            QgsField("distance", QMetaType.Type.Double),
         ]
         return all_centroids, base_dl_fields, desireline_layer, dlpr
 
@@ -140,7 +140,7 @@ class DesireLinesProcedure(WorkerThread):
         )
         flows = flows.filled()
         for f in flows.dtype.names[2:]:
-            base_dl_fields.extend([QgsField(f, QVariant.Double)])
+            base_dl_fields.extend([QgsField(f, QMetaType.Type.Double)])
         dlpr.addAttributes(base_dl_fields)
         desireline_layer.updateFields()
 
@@ -174,9 +174,9 @@ class DesireLinesProcedure(WorkerThread):
         for f in self.matrix.view_names:
             base_dl_fields.extend(
                 [
-                    QgsField(f + "_ab", QVariant.Double),
-                    QgsField(f + "_ba", QVariant.Double),
-                    QgsField(f + "_tot", QVariant.Double),
+                    QgsField(f + "_ab", QMetaType.Type.Double),
+                    QgsField(f + "_ba", QMetaType.Type.Double),
+                    QgsField(f + "_tot", QMetaType.Type.Double),
                 ]
             )
         dlpr.addAttributes(base_dl_fields)

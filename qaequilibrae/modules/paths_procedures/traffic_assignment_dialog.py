@@ -6,7 +6,7 @@ from tempfile import gettempdir
 import numpy as np
 import pandas as pd
 import qgis
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from aequilibrae.parameters import Parameters
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
@@ -401,7 +401,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def job_finished_from_thread(self):
         self.produce_all_outputs()
@@ -538,4 +538,4 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.report:
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()

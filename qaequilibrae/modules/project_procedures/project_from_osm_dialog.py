@@ -2,7 +2,7 @@ import logging
 import os
 from os.path import isdir, join
 
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.place_getter import placegetter
 from qgis.PyQt import QtWidgets, uic
@@ -133,7 +133,7 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
         self.close()
         dlg2 = ReportDialog(self.iface, self.report)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
 
     def signal_handler(self, val):
         if val[0] == "start":

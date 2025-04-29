@@ -61,7 +61,7 @@ class LoadDataset(WorkerThread):
             # Get all the data
             for p, feat in enumerate(self.layer.getFeatures()):
                 for idx, field, empty in zip(idxs, fields, empties):
-                    if feat.attributes()[idx] == QVariant():
+                    if feat.attributes()[idx] == NULL:
                         self.output.loc[p, field] = empty
                     else:
                         self.output.loc[p, field] = feat.attributes()[idx]

@@ -1,5 +1,5 @@
 import numpy as np
-from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 from aequilibrae.paths import RouteChoice, SubAreaAnalysis
 from aequilibrae.utils.interface.worker_thread import WorkerThread
 

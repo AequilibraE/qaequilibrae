@@ -6,7 +6,7 @@ from uuid import uuid4
 import numpy as np
 import openmatrix as omx
 import pytest
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 

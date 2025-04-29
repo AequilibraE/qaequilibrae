@@ -1,6 +1,6 @@
 import pytest
 import sys
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTabWidget
 from qgis.core import QgsProject
 

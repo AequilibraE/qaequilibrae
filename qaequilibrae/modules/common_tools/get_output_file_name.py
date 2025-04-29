@@ -15,7 +15,7 @@ def GetOutputFileName(clss, box_name, file_types, default_type, start_path):
     dlg.setDefaultSuffix(default_type)
     new_name = None
     extension = None
-    if dlg.exec_():
+    if dlg.exec():
         new_name = dlg.selectedFiles()[0]
         new_name = new_name.replace("..", ".")
         if new_name[-4] == ".":

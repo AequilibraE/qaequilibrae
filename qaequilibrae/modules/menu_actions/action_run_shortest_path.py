@@ -7,4 +7,4 @@ def run_shortest_path(qgis_project):
 
     dlg2 = ShortestPathDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

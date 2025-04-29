@@ -147,7 +147,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_load.setEnabled(False)
         self.but_save_and_use.setEnabled(False)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "start":

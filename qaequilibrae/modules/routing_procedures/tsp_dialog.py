@@ -105,7 +105,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self):
         ns = self.worker_thread.node_sequence
@@ -127,7 +127,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.worker_thread.report is not None and not self.close_window:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()
 
     def create_path_with_selection(self, all_links):
         f = "link_id"
@@ -193,7 +193,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         pn.addFeatures(stop_nodes)
 
         # Goes back and adds the order of visitation for each node
-        pn.addAttributes([QgsField("sequence", QVariant.Int)])
+        pn.addAttributes([QgsField("sequence", QMetaType.Type.Int)])
         nl.updateFields()
         sdx = nl.dataProvider().fieldNameIndex("sequence")
 

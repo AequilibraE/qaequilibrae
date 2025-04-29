@@ -3,7 +3,7 @@ import sys
 
 import pandas as pd
 import qgis
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import commit_and_close
 from qgis.PyQt import QtWidgets, uic
