@@ -19,7 +19,7 @@ def test_no_project(ae, mocker, qtbot):
 
     assert QTabWidget.tabText(dialog.tabs, 0) == "Non-project Data"
 
-    qtbot.mouseClick(dialog.but_load_data, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_load_data, Qt.MouseClick.LeftButton)
     dialog.close()
 
 
@@ -37,17 +37,17 @@ def test_project(ae_with_project, mocker, qtbot, button_clicked):
     assert QTabWidget.tabText(dialog.tabs, 1) == "Results"
     assert QTabWidget.tabText(dialog.tabs, 2) == "Non-project Data"
 
-    qtbot.mouseClick(dialog.but_update_matrices, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_update_matrices, Qt.MouseClick.LeftButton)
 
     assert "assignment_car.omx" in dialog.matrices["file_name"].tolist()
 
     # Select matrix row to display
     dialog.list_matrices.selectRow(0)
-    qtbot.mouseClick(dialog.but_load_matrix, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_load_matrix, Qt.MouseClick.LeftButton)
 
     # Result selection
     dialog.list_results.selectRow(0)
-    qtbot.mouseClick(dialog.but_load_Results, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_load_Results, Qt.MouseClick.LeftButton)
 
     existing_layers = [vector.name() for vector in QgsProject.instance().mapLayers().values()]
     assert "assignment" in existing_layers

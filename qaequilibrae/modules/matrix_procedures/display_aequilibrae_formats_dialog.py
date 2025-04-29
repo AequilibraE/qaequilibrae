@@ -24,7 +24,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, file_path="", proj=False):
         QtWidgets.QDialog.__init__(self)
-        self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
+        self.setWindowFlag(QtCore.Qt.WindowType.WindowCloseButtonHint, False)
         self.iface = qgis_project.iface
         self.setupUi(self)
         self.data_to_show = None
@@ -53,7 +53,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.continue_with_data()
 
         if self.error:
-            self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
+            self.setWindowFlag(QtCore.Qt.WindowType.WindowCloseButtonHint, True)
             self.but_load.clicked.connect(self.get_file_name)
 
     def continue_with_data(self):
@@ -101,7 +101,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.thousand_separator.toggled.connect(self.format_showing)
         self.show_layout.addWidget(self.thousand_separator)
 
-        self.spacer = QSpacerItem(5, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.spacer = QSpacerItem(5, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.show_layout.addItem(self.spacer)
 
         # Decimals

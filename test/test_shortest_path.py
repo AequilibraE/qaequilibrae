@@ -38,7 +38,7 @@ def test_click_configure_graph(ae_with_project, qtbot, timeoutDetector):
         check_if_new_active_window_matches_class(qtbot, LoadGraphLayerSettingDialog, ShortestPathDialog)
 
     QTimer.singleShot(10, handle_trigger)
-    qtbot.mouseClick(dialog.configure_graph, Qt.LeftButton)
+    qtbot.mouseClick(dialog.configure_graph, Qt.MouseClick.LeftButton)
 
 
 # Graph preparation is intertwined with the LoadGraphLayerSettingDialog, so they cannot be tested independently
@@ -61,12 +61,12 @@ def test_prepare_graph_and_network(ae_with_project, qtbot, timeoutDetector):
             graph_dialog.close()
 
         QTimer.singleShot(10, handle_do_load_graph_trigger)
-        qtbot.mouseClick(graph_dialog.do_load_graph, Qt.LeftButton)
+        qtbot.mouseClick(graph_dialog.do_load_graph, Qt.MouseClick.LeftButton)
 
     assert dialog.from_but.isEnabled() is False
     assert dialog.to_but.isEnabled() is False
     QTimer.singleShot(10, handle_configure_graph_trigger)
-    qtbot.mouseClick(dialog.configure_graph, Qt.LeftButton)
+    qtbot.mouseClick(dialog.configure_graph, Qt.MouseClick.LeftButton)
 
 
 @pytest.fixture

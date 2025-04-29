@@ -1,5 +1,5 @@
 import pandas as pd
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import QgsVectorLayer, QgsField, QgsFeature, QgsProject
 
 
