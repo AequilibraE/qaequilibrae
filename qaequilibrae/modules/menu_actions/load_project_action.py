@@ -63,7 +63,7 @@ def update_project_layers(qgis_project):
     qgis_project.geo_layers_table.horizontalHeader().hide()
     for i, f in enumerate(layers):
         item1 = QTableWidgetItem(f)
-        item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+        item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
         qgis_project.geo_layers_table.setItem(i, 0, item1)
 
     descrlayout.addWidget(qgis_project.geo_layers_table)

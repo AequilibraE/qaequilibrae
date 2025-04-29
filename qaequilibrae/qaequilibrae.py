@@ -79,7 +79,7 @@ class AequilibraEMenu:
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
         self.set_font(self.toolbar)
-        self.toolbar.setOrientation(2)
+        self.toolbar.setOrientation(Qt.Orientation.Vertical)
 
         if QtCore.QSettings().value("locale/overrideFlag", type=bool):
             loc = QtCore.QSettings().value("locale/userLocale")
@@ -193,8 +193,8 @@ class AequilibraEMenu:
         self.manager.setLayout(p1_vertical)
 
         self.dock.setWidget(self.manager)
-        self.dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
+        self.dock.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
+        self.iface.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.dock)
         QgsProject.instance().layerRemoved.connect(self.layerRemoved)
 
         # # # ########################################################################
@@ -237,7 +237,7 @@ class AequilibraEMenu:
                     itemMenu.addAction(action)
             itemButton = QToolButton()
             itemButton.setText(menu)
-            itemButton.setPopupMode(2)
+            itemButton.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
             itemButton.setMenu(itemMenu)
 
             self.toolbar.addWidget(itemButton)

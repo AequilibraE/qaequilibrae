@@ -34,8 +34,8 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.lst_modes.addItems(sorted(list(self.modes.keys())))
         self.lst_link_types.addItems(sorted(list(self.link_types.keys())))
 
-        self.lst_modes.setSelectionMode(qgis.PyQt.QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.lst_link_types.setSelectionMode(qgis.PyQt.QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.lst_modes.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.lst_link_types.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
 
         self.rdo_network.toggled.connect(self.centroid_source)
         self.rdo_zone.toggled.connect(self.centroid_source)

@@ -8,7 +8,7 @@ from os.path import abspath, dirname, exists, join
 from shutil import copyfile
 
 import numpy as np
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.core import (
     QgsCoordinateReferenceSystem,
@@ -81,16 +81,14 @@ def create_centroids_layer():
     """Creates a vector layer in memory named 'Centroids' to be used with Coquimbo data."""
 
     nodes_layer = QgsVectorLayer("Point?crs=epsg:4326", "Centroids", "memory")
+    pr = nodes_layer.dataProvider()
+
     if not nodes_layer.isValid():
         print("Nodes layer failed to load!")
     else:
-        field_id = QgsField("ID", QMetaType.Type.Int)
-        nodes_layer.dataProvider().addAttributes([field_id])
-
-        field_zone_id = QgsField("zone_id", QMetaType.Type.Int)
-        nodes_layer.dataProvider().addAttributes([field_zone_id])
-
+        pr.addAttributes([QgsField("ID", QMetaType.Type.Int), QgsField("zone_id", QMetaType.Type.Int)])
         nodes_layer.updateFields()
+
         points = [
             QgsPointXY(-71.3509, -29.9393),
             QgsPointXY(-71.3182, -29.9619),
@@ -106,7 +104,9 @@ def create_centroids_layer():
             feature.setAttributes([i + 1, zone_id])
             features.append(feature)
 
-        nodes_layer.dataProvider().addFeatures(features)
+        pr.addFeatures(features)
+
+        nodes_layer.updateExtents()
 
         QgsProject.instance().addMapLayer(nodes_layer)
 

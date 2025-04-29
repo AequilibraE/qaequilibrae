@@ -22,7 +22,9 @@ def plot_results(results, from_node, to_node, link_layer):
 
     temp_layer = QgsVectorLayer("LineString?crs={}".format(link_layer.crs().authid()), temp_layer_name, "memory")
     provider = temp_layer.dataProvider()
-    provider.addAttributes([QgsField("link_id", QMetaType.Type.QString), QgsField("probability", QMetaType.Type.Double)])
+    provider.addAttributes(
+        [QgsField("link_id", QMetaType.Type.QString), QgsField("probability", QMetaType.Type.Double)]
+    )
     temp_layer.updateFields()
 
     features = []
