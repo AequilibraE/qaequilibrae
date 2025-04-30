@@ -9,8 +9,7 @@ from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis._core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
 from qgis.core import QgsExpression, QgsProject, QgsVectorLayerJoinInfo
 
-from qaequilibrae.modules.common_tools import find_table_fields
-from qaequilibrae.modules.common_tools import get_parameter_chain
+from qaequilibrae.modules.common_tools import find_table_fields, get_parameter_chain, layer_from_dataframe
 from qaequilibrae.modules.matrix_procedures import list_results
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
 
@@ -205,14 +204,16 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         v2 = self.cob_alternative_scenario.currentText()
         v3 = self.cob_base_data.currentText()
         v4 = self.cob_alternative_data.currentText()
-        self.base_lyr = load_result_table(self.qgis_project.project.project_base_path, v1)
+        base_lyr_result = load_result_table(self.qgis_project.project.project_base_path, v1)
+        self.base_lyr = layer_from_dataframe(base_lyr_result, v1)
         data_to_join = [[self.base_lyr, "base"]]
 
         txt = f"base_{v3}"
         data_fields = [[txt.replace("*", "ab"), txt.replace("*", "ba")]]
         txt = f"base_{v4}"
         if v1 != v2:
-            self.alter_layer = load_result_table(self.qgis_project.project.project_base_path, v2)
+            alter_layer_result = load_result_table(self.qgis_project.project.project_base_path, v2)
+            self.alter_layer = layer_from_dataframe(alter_layer_result, v2)
             data_to_join.append([self.alter_layer, "alternative"])
             txt = f"alternative_{v4}"
         data_fields.append([txt.replace("*", "ab"), txt.replace("*", "ba")])
