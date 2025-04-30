@@ -21,8 +21,7 @@ def model_path(ae_with_project):
     yield path
 
 
-# TODO: time-consuming. Will let only True by now
-@pytest.mark.parametrize("composite", [True])
+@pytest.mark.parametrize("composite", [True, False])
 def test_compare_scenarios(ae, model_path, composite):
 
     _run_load_project_from_path(ae, model_path)
