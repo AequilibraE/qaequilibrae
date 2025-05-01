@@ -9,7 +9,7 @@ from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTabWidget
 from qgis.core import QgsProject, QgsVectorLayerJoinInfo
 
-from qaequilibrae.modules.common_tools import PandasModel
+from qaequilibrae.modules.common_tools import PandasModel, layer_from_dataframe
 from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
@@ -93,7 +93,8 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.results["WARNINGS"][idx[0]] != "":
             return
 
-        lyr = load_result_table(self.project.project_base_path, table_name)
+        res_table = load_result_table(self.project.project_base_path, table_name)
+        lyr = layer_from_dataframe(res_table, table_name)
 
         if self.chb_join.isChecked():
             procedure = self.results.loc[self.results["table_name"] == table_name]["procedure"].values[0]
