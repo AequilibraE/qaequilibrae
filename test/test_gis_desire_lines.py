@@ -11,7 +11,7 @@ def test_click_create_without_layers(ae_with_project, qtbot, timeoutDetector):
     qtbot.addWidget(dialog)
     qtbot.waitExposed(dialog)
     with qtbot.capture_exceptions() as exceptions:
-        qtbot.mouseClick(dialog.create_dl, Qt.MouseClick.LeftButton)
+        qtbot.mouseClick(dialog.create_dl, Qt.MouseButton.LeftButton)
     assert len(exceptions) == 0
 
     messagebar = ae_with_project.iface.messageBar()
@@ -30,7 +30,7 @@ def test_click_create_with_layers(ae_with_project, qtbot, timeoutDetector):
     qtbot.waitExposed(dialog)
 
     with qtbot.capture_exceptions() as exceptions:
-        qtbot.mouseClick(dialog.create_dl, Qt.MouseClick.LeftButton)
+        qtbot.mouseClick(dialog.create_dl, Qt.MouseButton.LeftButton)
     assert len(exceptions) == 0
     # default is delaunay
     assert dialog.progress_label.text() == "Building resulting layer"  # Last displayed line
@@ -46,8 +46,8 @@ def test_click_create_with_layers_desired_selected(ae_with_project, qtbot, timeo
     qtbot.addWidget(dialog)
     qtbot.waitExposed(dialog)
     with qtbot.capture_exceptions() as exceptions:
-        qtbot.mouseClick(dialog.radio_desire, Qt.MouseClick.LeftButton)
-        qtbot.mouseClick(dialog.create_dl, Qt.MouseClick.LeftButton)
+        qtbot.mouseClick(dialog.radio_desire, Qt.MouseButton.LeftButton)
+        qtbot.mouseClick(dialog.create_dl, Qt.MouseButton.LeftButton)
     assert len(exceptions) == 0
     assert dialog.progress_label.text() == "Creating Desire Lines"  # Last displayed line
     assert dialog.progressbar.value() == 276  # This number should match the number of edges in the SiouxFalls data
@@ -68,6 +68,6 @@ def test_click_create_with_layers_with_wrong_id_param(ae_with_project, qtbot):
     dialog.zone_id_field.setCurrentIndex(3)
     with qtbot.capture_exceptions() as exceptions:
         # this shouldn't hang, but it does
-        qtbot.mouseClick(dialog.create_dl, Qt.MouseClick.LeftButton)
+        qtbot.mouseClick(dialog.create_dl, Qt.MouseButton.LeftButton)
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
     assert dialog.progress_label.text() == "Some error message saying id field is incorrect"

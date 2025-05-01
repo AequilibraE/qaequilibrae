@@ -9,7 +9,7 @@ import numpy as np
 import openmatrix as omx
 import pandas as pd
 import pytest
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from aequilibrae import Project
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.transit import Transit

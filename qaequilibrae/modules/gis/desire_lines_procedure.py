@@ -12,7 +12,7 @@ from aequilibrae.paths import allOrNothing
 from aequilibrae.paths.results import AssignmentResults
 from aequilibrae.utils.interface.worker_thread import WorkerThread
 from numpy.lib import recfunctions as rfn
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from qgis._core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFeature
 from scipy.spatial import Delaunay
 

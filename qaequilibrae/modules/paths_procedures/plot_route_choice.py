@@ -1,5 +1,5 @@
 import numpy as np
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import QgsVectorLayer, QgsProject, QgsField, QgsFeature, QgsSimpleLineSymbolLayer
 
 from qaequilibrae.modules.common_tools.auxiliary_functions import get_vector_layer_by_name

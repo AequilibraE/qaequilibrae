@@ -2,14 +2,12 @@ import logging
 import os
 import sys
 
-import qgis
 from aequilibrae.paths.results import PathResults
 from qgis.PyQt import QtCore, QtWidgets, uic
-from qgis._core import QgsProject, QgsVectorLayer, QgsSpatialIndex
+from qgis.core import QgsProject, QgsVectorLayer, QgsSpatialIndex
 from qgis.utils import iface
 
-from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog
-from qaequilibrae.modules.common_tools import standard_path
+from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog, standard_path
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
 
 logger = logging.getLogger("AequilibraEGUI")
@@ -153,7 +151,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.create_path_with_scratch_layer()
             else:
                 msg = self.tr("No path between {} and {}").format(self.path_from.text(), self.path_to.text())
-                qgis.utils.iface.messageBar().pushMessage(msg, "", level=2)
+                iface.messageBar().pushMessage(msg, "", level=2)
 
     def create_path_with_selection(self):
         f = "link_id"
@@ -185,7 +183,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
 
         symbol = vl.renderer().symbol()
         symbol.setWidth(1)
-        qgis.utils.iface.mapCanvas().refresh()
+        iface.mapCanvas().refresh()
 
     def exit_procedure(self):
         self.close()

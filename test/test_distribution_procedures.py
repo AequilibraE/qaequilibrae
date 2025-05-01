@@ -102,14 +102,14 @@ def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
     if method in ["negative_exponential", "both"]:
         mocked_outfile.return_value = f"{folder_path}/neg_{method}.mod"
         dialog.rdo_expo.setChecked(True)
-        qtbot.mouseClick(dialog.but_queue, Qt.MouseClick.LeftButton)
+        qtbot.mouseClick(dialog.but_queue, Qt.MouseButton.LeftButton)
 
     if method in ["inverse_power", "both"]:
         mocked_outfile.return_value = f"{folder_path}/inv_{method}.mod"
         dialog.rdo_power.setChecked(True)
-        qtbot.mouseClick(dialog.but_queue, Qt.MouseClick.LeftButton)
+        qtbot.mouseClick(dialog.but_queue, Qt.MouseButton.LeftButton)
 
-    qtbot.mouseClick(dialog.but_run, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
     if method in ["negative_exponential", "both"]:
         file_path = f"{folder_path}/neg_{method}.mod"

@@ -7,7 +7,7 @@ from aequilibrae.paths.results import PathResults
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 
 from qaequilibrae.modules.common_tools import ReportDialog

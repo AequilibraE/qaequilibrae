@@ -22,7 +22,7 @@ def test_execute_single(coquimbo_project, qtbot):
     # Route choice
     dialog.cob_net_field.setCurrentText("distance")
     dialog.ln_parameter.setText("0.00011")
-    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
 
     dialog.ln_psl.setText("1.1")
 
@@ -33,7 +33,7 @@ def test_execute_single(coquimbo_project, qtbot):
     dialog.node_from.setText("77011")
     dialog.node_to.setText("74089")
     dialog.ln_demand.setText("1.0")
-    qtbot.mouseClick(dialog.but_visualize, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_visualize, Qt.MouseButton.LeftButton)
 
     dialog.exit_procedure()
 
@@ -70,9 +70,9 @@ def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
     dialog.debouncer.delay_ms = 200
     dialog.node_from.clear()
     dialog.node_to.clear()
-    qtbot.mouseClick(dialog.node_from, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.node_from, Qt.MouseButton.LeftButton)
     qtbot.keyClicks(dialog.node_from, "71645")
-    qtbot.mouseClick(dialog.node_to, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.node_to, Qt.MouseButton.LeftButton)
     qtbot.keyClicks(dialog.node_to, "79385")
     qtbot.keyPress(dialog.node_to, Qt.Key_Enter)
     qtbot.wait(400)
@@ -94,7 +94,7 @@ def test_assign_and_save(ae_with_project, qtbot, save):
     # Route choice
     dialog.cob_net_field.setCurrentText("distance")
     dialog.ln_parameter.setText("0.01")
-    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
 
     dialog.ln_psl.setText("1.1")
 
@@ -104,7 +104,7 @@ def test_assign_and_save(ae_with_project, qtbot, save):
     dialog.chb_save_choice_set.setChecked(save)
     dialog.cob_matrices.setCurrentText("demand.aem")
     dialog.ln_rc_output.setText("route_choice")
-    qtbot.mouseClick(dialog.but_perform_assig, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_perform_assig, Qt.MouseButton.LeftButton)
 
     pth = Path(dialog.project.project_base_path)
     conn = sqlite3.connect(pth / "results_database.sqlite")
@@ -136,7 +136,7 @@ def test_build_and_save(ae_with_project, qtbot):
     # Route choice
     dialog.cob_net_field.setCurrentText("distance")
     dialog.ln_parameter.setText("0.01")
-    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
 
     dialog.ln_psl.setText("1.1")
 
@@ -144,7 +144,7 @@ def test_build_and_save(ae_with_project, qtbot):
     dialog.chb_check_centroids.setChecked(False)
 
     dialog.cob_matrices.setCurrentText("demand.aem")
-    qtbot.mouseClick(dialog.but_build_and_save, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_build_and_save, Qt.MouseButton.LeftButton)
 
     counter = 0
     rc_folder = listdir(join(dialog.project.project_base_path, "route_choice"))
@@ -189,7 +189,7 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
     # Route choice
     dialog.cob_net_field.setCurrentText("distance")
     dialog.ln_parameter.setText("0.011")
-    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
 
     dialog.ln_psl.setText("1.1")
 
@@ -204,7 +204,7 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
     dialog.chb_save_choice_set.setChecked(True)
     dialog.cob_matrices.setCurrentText("b''")
     dialog.ln_rc_output.setText("route_choice_for_subarea")
-    qtbot.mouseClick(dialog.but_perform_assig, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_perform_assig, Qt.MouseButton.LeftButton)
 
     pth = Path(dialog.project.project_base_path)
     conn = sqlite3.connect(pth / "results_database.sqlite")
@@ -229,7 +229,7 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     # Route choice
     dialog.cob_net_field.setCurrentText("distance")
     dialog.ln_parameter.setText("0.011")
-    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
 
     dialog.ln_psl.setText("1.1")
 
@@ -241,22 +241,22 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     dialog.ln_qry_name.setText("sl1")
     dialog.ln_link_id.setText("7369")
     dialog.cob_direction.setCurrentText("AB")
-    qtbot.mouseClick(dialog.but_add_qry, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_qry, Qt.MouseButton.LeftButton)
     dialog.ln_link_id.setText("20983")
     dialog.cob_direction.setCurrentText("AB")
-    qtbot.mouseClick(dialog.but_add_qry, Qt.MouseClick.LeftButton)
-    qtbot.mouseClick(dialog.but_save_qry, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_qry, Qt.MouseButton.LeftButton)
+    qtbot.mouseClick(dialog.but_save_qry, Qt.MouseButton.LeftButton)
     dialog.ln_qry_name.setText("sl2")
     dialog.ln_link_id.setText("7369")
     dialog.cob_direction.setCurrentText("AB")
-    qtbot.mouseClick(dialog.but_add_qry, Qt.MouseClick.LeftButton)
-    qtbot.mouseClick(dialog.but_save_qry, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_qry, Qt.MouseButton.LeftButton)
+    qtbot.mouseClick(dialog.but_save_qry, Qt.MouseButton.LeftButton)
     dialog.ln_mat_name.setText("select_link_analysis")
 
     # Execute workflow
     dialog.chb_save_choice_set.setChecked(True)
     dialog.cob_matrices.setCurrentText("b''")
-    qtbot.mouseClick(dialog.but_perform_assig, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_perform_assig, Qt.MouseButton.LeftButton)
 
     matrices = listdir(dialog.project.matrices.fldr)
     assert "select_link_analysis.omx" in matrices
@@ -275,7 +275,7 @@ def test_cost_function(coquimbo_project, qtbot, par):
 
     dialog.ln_parameter.setText(par)
     dialog.cob_net_field.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == "Input error:Check parameter value input"
@@ -287,21 +287,21 @@ def test_clean_cost_function(coquimbo_project, qtbot):
 
     dialog.ln_parameter.setText("0.11")
     dialog.cob_net_field.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
     txt = "0.11 * distance"
 
     assert dialog.txt_cost_func.toPlainText() == txt
 
     dialog.ln_parameter.setText("0.50")
     dialog.cob_net_field.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
     txt += " + 0.50 * distance"
 
     assert dialog.txt_cost_func.toPlainText() == txt
 
     dialog.ln_parameter.setText("-0.33")
     dialog.cob_net_field.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
     txt += " - 0.33 * distance"
 
     assert dialog.txt_cost_func.toPlainText() == txt

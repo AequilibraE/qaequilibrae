@@ -23,13 +23,13 @@ def test_single_class(ae_with_project, qtbot):
     dialog.ln_class_name.setText("car")
     dialog.pce_setter.setValue(1.0)
     dialog.chb_check_centroids.setChecked(False)
-    qtbot.mouseClick(dialog.but_add_class, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
 
     # Skimming
     dialog.cob_skims_available.setCurrentText("free_flow_time")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
     dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
@@ -102,15 +102,15 @@ def test_multiclass(ae_with_project, qtbot):
     dialog.ln_class_name.setText("car")
     dialog.pce_setter.setValue(1.0)
     dialog.chb_check_centroids.setChecked(False)
-    qtbot.mouseClick(dialog.but_add_class, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
 
     # Adds car skims
     dialog.cob_skims_available.setCurrentText("free_flow_time")
     dialog.cob_skim_class.setCurrentText("car")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
     dialog.cob_skim_class.setCurrentText("car")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     # Traffic Class Trucks
     dialog.tbl_core_list.selectRow(2)
@@ -118,15 +118,15 @@ def test_multiclass(ae_with_project, qtbot):
     dialog.ln_class_name.setText("Trucks")
     dialog.pce_setter.setValue(2.5)
     dialog.chb_check_centroids.setChecked(False)
-    qtbot.mouseClick(dialog.but_add_class, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
 
     # Adds truck skims
     dialog.cob_skims_available.setCurrentText("free_flow_time")
     dialog.cob_skim_class.setCurrentText("Trucks")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
     dialog.cob_skim_class.setCurrentText("Trucks")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     # Traffic Class Motorcycle
     dialog.tbl_core_list.selectRow(1)
@@ -134,15 +134,15 @@ def test_multiclass(ae_with_project, qtbot):
     dialog.cob_mode_for_class.setCurrentText("Motorcycle")
     dialog.pce_setter.setValue(0.2)
     dialog.chb_check_centroids.setChecked(False)
-    qtbot.mouseClick(dialog.but_add_class, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
 
     # Adds motorcycle skims
     dialog.cob_skims_available.setCurrentText("free_flow_time")
     dialog.cob_skim_class.setCurrentText("Motorcycle")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
     dialog.cob_skim_class.setCurrentText("Motorcycle")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     # Assignment setup
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
@@ -219,13 +219,13 @@ def test_all_or_nothing(ae_with_project, qtbot):
     dialog.ln_class_name.setText("car")
     dialog.pce_setter.setValue(1.0)
     dialog.chb_check_centroids.setChecked(False)
-    qtbot.mouseClick(dialog.but_add_class, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
 
     # Skimming
     dialog.cob_skims_available.setCurrentText("free_flow_time")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
     dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
@@ -266,22 +266,22 @@ def test_select_link_analysis(ae_with_project, qtbot):
     dialog.ln_class_name.setText("car")
     dialog.pce_setter.setValue(1.0)
     dialog.chb_check_centroids.setChecked(False)
-    qtbot.mouseClick(dialog.but_add_class, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
 
     # Skimming
     dialog.cob_skims_available.setCurrentText("free_flow_time")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     # Select link
     dialog.do_select_link.setChecked(True)
     dialog.input_qry_name.setText("Leaving from 1")
     dialog.input_link_id.setText("1")
-    qtbot.mouseClick(dialog.but_add_query, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_query, Qt.MouseButton.LeftButton)
     dialog.input_link_id.setText("2")
-    qtbot.mouseClick(dialog.but_add_query, Qt.MouseClick.LeftButton)
-    qtbot.mouseClick(dialog.but_build_query, Qt.MouseClick.LeftButton)
+    qtbot.mouseClick(dialog.but_add_query, Qt.MouseButton.LeftButton)
+    qtbot.mouseClick(dialog.but_build_query, Qt.MouseButton.LeftButton)
     dialog.sl_mat_name.setText("select_link_analysis")
 
     # Assignment
