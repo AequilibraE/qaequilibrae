@@ -48,10 +48,11 @@ def plot_results(results, from_node, to_node, link_layer):
 def set_links_width(results):
     links = {}
     for _, rec in results.iterrows():
-        for route in rec["route set"]:
-            if route not in links:
-                links[route] = 0
-            links[route] += rec["probability"]
+        for lnk in rec["route set"]:
+            link = abs(lnk)
+            if link not in links:
+                links[link] = 0
+            links[link] += rec["probability"]
 
     return links
 
