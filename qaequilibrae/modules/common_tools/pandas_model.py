@@ -7,21 +7,21 @@ According to the author, the code examples in the book are free to use without
 license.
 """
 
-from qgis.PyQt import QtCore
+from qgis.PyQt.QtCore import QAbstractTableModel, Qt
 
 
-class PandasModel(QtCore.QAbstractTableModel):
+class PandasModel(QAbstractTableModel):
     """
     This class populates a table view with a pandas dataframe.
     """
 
     def __init__(self, data, parent=None):
-        QtCore.QAbstractTableModel.__init__(self, parent)
+        QAbstractTableModel.__init__(self, parent)
         self._data = data
 
     def data(self, index, role):
         if index.isValid():
-            if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            if role == Qt.ItemDataRole.DisplayRole:
                 return str(self._data.iloc[index.row(), index.column()])
         return None
 
@@ -32,8 +32,8 @@ class PandasModel(QtCore.QAbstractTableModel):
         return self._data.shape[1]
 
     def header_data(self, section, orientation, role):
-        if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            if orientation == QtCore.Qt.Orientation.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
                 return str(self._data.columns[section])
-            if orientation == QtCore.Qt.Orientation.Vertical:
+            if orientation == Qt.Orientation.Vertical:
                 return str(self._data.index[section])

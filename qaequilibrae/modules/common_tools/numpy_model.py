@@ -7,12 +7,12 @@ adaptations for headers come from: http://stackoverflow.com/questions/14135543/h
 
 import numpy as np
 
-from qgis.PyQt import QtCore
+from qgis.PyQt.QtCore import QAbstractTableModel, Qt
 
 
-class NumpyModel(QtCore.QAbstractTableModel):
+class NumpyModel(QAbstractTableModel):
     def __init__(self, aeq_matrix, separator, decimals, parent=None):
-        QtCore.QAbstractTableModel.__init__(self, parent)
+        QAbstractTableModel.__init__(self, parent)
         self._array = aeq_matrix
         self.separator = separator
         self.decimals = decimals
@@ -39,9 +39,9 @@ class NumpyModel(QtCore.QAbstractTableModel):
         else:
             return self._array.matrix_view.shape[1]
 
-    def data(self, index, role=QtCore.Qt.ItemDataRole.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         if index.isValid():
-            if role == QtCore.Qt.ItemDataRole.DisplayRole:
+            if role == Qt.ItemDataRole.DisplayRole:
                 row = index.row()
                 col = index.column()
 
@@ -64,10 +64,10 @@ class NumpyModel(QtCore.QAbstractTableModel):
                             self._array.matrix_view[row, col]
                         )
 
-    def header_data(self, col, orientation, role=QtCore.Qt.ItemDataRole.DisplayRole):
-        if role == QtCore.Qt.ItemDataRole.DisplayRole and orientation == QtCore.Qt.Orientation.Horizontal:
+    def header_data(self, col, orientation, role=Qt.ItemDataRole.DisplayRole):
+        if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
             return self.header_data[col]
-        if role == QtCore.Qt.ItemDataRole.DisplayRole and orientation != QtCore.Qt.Orientation.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole and orientation != Qt.Orientation.Horizontal:
             return self.row_headers_data[col]
 
-        return QtCore.QAbstractTableModel.headerData(self, col, orientation, role)
+        return QAbstractTableModel.headerData(self, col, orientation, role)

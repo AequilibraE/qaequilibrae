@@ -101,7 +101,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             text = self.ab_FieldComboBox.currentText().upper()
             if i in text:
                 text = text.replace(i, j)
-                index = self.ba_FieldComboBox.findText(text, Qt.MatchFixedString)
+                index = self.ba_FieldComboBox.findText(text, Qt.MatchFlag.MatchFixedString)
                 if index >= 0:
                     self.ba_FieldComboBox.setCurrentIndex(index)
 
@@ -109,7 +109,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             text = self.ba_FieldComboBox.currentText().upper()
             if j in text:
                 text = text.replace(j, i)
-                index = self.ab_FieldComboBox.findText(text, Qt.MatchFixedString)
+                index = self.ab_FieldComboBox.findText(text, Qt.MatchFlag.MatchFixedString)
                 if index >= 0:
                     self.ab_FieldComboBox.setCurrentIndex(index)
 
@@ -118,7 +118,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
 
         for i in all_items:
             if "AB" in i:
-                index = self.ab_FieldComboBox.findText(i, Qt.MatchFixedString)
+                index = self.ab_FieldComboBox.findText(i, Qt.MatchFlag.MatchFixedString)
                 if index >= 0:
                     self.ab_FieldComboBox.setCurrentIndex(index)
                 break
@@ -152,11 +152,11 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
             # Up-Down buttons
 
             button_up = QToolButton()
-            button_up.setArrowType(Qt.UpArrow)
+            button_up.setArrowType(Qt.ArrowType.UpArrow)
             button_up.clicked.connect(self.click_button_inside_the_list)
 
             button_down = QToolButton()
-            button_down.setArrowType(Qt.DownArrow)
+            button_down.setArrowType(Qt.ArrowType.DownArrow)
             button_down.clicked.connect(self.click_button_inside_the_list)
 
             del_button = QPushButton("X")

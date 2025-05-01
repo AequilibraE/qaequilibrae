@@ -7,12 +7,13 @@ import openmatrix as omx
 import pandas as pd
 import qgis
 from aequilibrae.matrix import AequilibraeMatrix
-from qgis.PyQt import QtWidgets, uic, QtCore
+from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
+from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
-from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView
-from qgis._core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
-from qgis._core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
+from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QDialog, QSizePolicy
 
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
 from qaequilibrae.modules.common_tools import layer_from_dataframe
@@ -21,10 +22,10 @@ from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 
 
-class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
+class DisplayAequilibraEFormatsDialog(QDialog, FORM_CLASS):
     def __init__(self, qgis_project, file_path="", proj=False):
-        QtWidgets.QDialog.__init__(self)
-        self.setWindowFlag(QtCore.Qt.WindowType.WindowCloseButtonHint, False)
+        QDialog.__init__(self)
+        self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
         self.iface = qgis_project.iface
         self.setupUi(self)
         self.data_to_show = None
@@ -53,7 +54,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.continue_with_data()
 
         if self.error:
-            self.setWindowFlag(QtCore.Qt.WindowType.WindowCloseButtonHint, True)
+            self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, True)
             self.but_load.clicked.connect(self.get_file_name)
 
     def continue_with_data(self):
@@ -101,7 +102,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.thousand_separator.toggled.connect(self.format_showing)
         self.show_layout.addWidget(self.thousand_separator)
 
-        self.spacer = QSpacerItem(5, 0, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.spacer = QSpacerItem(5, 0, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.show_layout.addItem(self.spacer)
 
         # Decimals

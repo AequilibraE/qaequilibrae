@@ -290,9 +290,9 @@ def test_import_gtfs(pt_no_feed, allow_map_match):
 
 
 def test_add_links_from_layer(ae_with_project):
-    folder_path = ae_with_project.project.project_base_path
+    folder_path = str(ae_with_project.project.project_base_path)
 
-    load_test_layer(ae_with_project.project.project_base_path, "link")
+    load_test_layer(folder_path, "link")
     layer = QgsProject.instance().mapLayersByName("link")[0]
 
     parameters = {
@@ -300,7 +300,7 @@ def test_add_links_from_layer(ae_with_project):
         "link_type": "link_type",
         "direction": "direction",
         "modes": "modes",
-        "project_path": ae_with_project.project.project_base_path,
+        "project_path": folder_path,
     }
 
     action = AddLinksFromLayer()
