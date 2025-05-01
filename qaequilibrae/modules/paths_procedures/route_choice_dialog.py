@@ -451,6 +451,8 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.exit_procedure()
 
     def exit_procedure(self):
+        self.close()
+
         if self.job == "execute_single":
             dlg2 = ExecuteSingleDialog(
                 qgis.utils.iface.mainWindow(),
@@ -459,7 +461,5 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 self.parameters,
             )
             dlg2.show()
-            dlg2.open()
+            dlg2.exec()
             # see note in https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QDialog.html#PySide2.QtWidgets.PySide2.QtWidgets.QDialog.exec_
-
-        self.close()
