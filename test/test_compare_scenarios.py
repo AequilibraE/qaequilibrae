@@ -12,7 +12,7 @@ from .utilities import run_sfalls_assignment
 
 @pytest.fixture
 def model_path(ae_with_project):
-    path = ae_with_project.project.project_base_path
+    path = str(ae_with_project.project.project_base_path)
     proj = run_sfalls_assignment(ae_with_project)
     proj = future_assignment(proj)
 

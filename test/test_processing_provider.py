@@ -211,7 +211,7 @@ def test_renumber_from_centroids(ae_with_project, tmp_path):
 
 
 def test_assign_from_yaml(ae_with_project):
-    folder = ae_with_project.project.project_base_path
+    folder = str(ae_with_project.project.project_base_path)
     file_path = join(folder, "config.yml")
 
     assert isfile(file_path)
@@ -319,7 +319,7 @@ def test_add_links_from_layer(ae_with_project):
 
 
 def test_assign_transit_from_yaml(coquimbo_project):
-    folder = coquimbo_project.project.project_base_path
+    folder = str(coquimbo_project.project.project_base_path)
     shutil.copyfile("test/data/coquimbo_project/transit_config.yml", f"{folder}/transit_config.yml")
     shutil.copyfile("test/data/coquimbo_project/matrices/demand.aem", f"{folder}/matrices/demand.aem")
 

@@ -164,11 +164,13 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.tbl_core_list.setSelectionBehavior(QAbstractItemView.SelectRows)
 
     def __populate_project_info(self):
+        path_to_file = str(self.project.path_to_file)
+
         table = self.tbl_project_properties
         table.setRowCount(2)
 
         table.setItem(0, 0, QTableWidgetItem("Project path"))
-        table.setItem(0, 1, QTableWidgetItem(self.project.path_to_file))
+        table.setItem(0, 1, QTableWidgetItem(path_to_file))
 
         with commit_and_close(database_connection("network")) as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")

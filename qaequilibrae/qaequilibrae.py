@@ -315,7 +315,7 @@ class AequilibraEMenu:
             return
         uri = QgsDataSourceUri()
         if "transit_" not in layer_name:
-            uri.setDatabase(self.project.path_to_file)
+            uri.setDatabase(str(self.project.path_to_file))
             lname = layer_name
         else:
             uri.setDatabase(os.path.join(self.project.project_base_path, "public_transport.sqlite"))
