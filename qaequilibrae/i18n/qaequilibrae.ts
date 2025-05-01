@@ -437,17 +437,17 @@
 <context>
     <name>CompareScenariosDialog</name>
     <message>
-        <location filename="../modules/gis/compare_scenarios_dialog.py" line="69"/>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="68"/>
         <source>This is the reference case, to which the differences will refer to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/compare_scenarios_dialog.py" line="70"/>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="69"/>
         <source>This is the alternative</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/compare_scenarios_dialog.py" line="71"/>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="70"/>
         <source>It will be BASE minus ALTERNATIVE</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3870,7 +3870,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="73"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
         <source>Layer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3935,7 +3935,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
         <source>Layer field</source>
         <translation type="unfinished"></translation>
     </message>
