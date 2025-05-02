@@ -1505,17 +1505,17 @@
 <context>
     <name>ImpedanceMatrixDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="194"/>
+        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="193"/>
         <source>It is not possible to trace paths between all nodes while blocking flows through centroids</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="199"/>
+        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="198"/>
         <source>No graph loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="202"/>
+        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="201"/>
         <source>No skim fields provided</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2836,72 +2836,72 @@
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="234"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="238"/>
         <source>Class name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="287"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="291"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="413"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="417"/>
         <source>Input error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="443"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="447"/>
         <source>No traffic classes to assign</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="448"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="452"/>
         <source>Missing scenario name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="453"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="458"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="530"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="535"/>
         <source>VDF parameter is not numeric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="340"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="344"/>
         <source>Wrong value for link ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="347"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="351"/>
         <source>Link ID doesn&apos;t exist in project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="357"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="361"/>
         <source>Missing query name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="362"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="366"/>
         <source>Query name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="367"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="371"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="459"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="464"/>
         <source>Missing select link matrix name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="463"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="468"/>
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation type="unfinished"></translation>
     </message>
