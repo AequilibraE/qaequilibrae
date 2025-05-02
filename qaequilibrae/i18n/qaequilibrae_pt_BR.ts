@@ -435,17 +435,17 @@
 <context>
     <name>CompareScenariosDialog</name>
     <message>
-        <location filename="../modules/gis/compare_scenarios_dialog.py" line="69"/>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="68"/>
         <source>This is the reference case, to which the differences will refer to</source>
         <translation>Este é o modelo de referência a partir do qual a comparação é feita</translation>
     </message>
     <message>
-        <location filename="../modules/gis/compare_scenarios_dialog.py" line="70"/>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="69"/>
         <source>This is the alternative</source>
         <translation>Esse é a alternativa</translation>
     </message>
     <message>
-        <location filename="../modules/gis/compare_scenarios_dialog.py" line="71"/>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="70"/>
         <source>It will be BASE minus ALTERNATIVE</source>
         <translation>Será BASE menos ALTERNATIVA</translation>
     </message>
@@ -581,7 +581,7 @@
     <message>
         <location filename="../modules/processing_provider/create_transit_graph.py" line="27"/>
         <source>Project with walking edges</source>
-        <translation type="unfinished"/>
+        <translation>rotear acesso de pedestres</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_transit_graph.py" line="30"/>
@@ -1503,17 +1503,17 @@
 <context>
     <name>ImpedanceMatrixDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="194"/>
+        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="193"/>
         <source>It is not possible to trace paths between all nodes while blocking flows through centroids</source>
         <translation>Não é possível determinar o caminho entre todos os nós enquanto o fluxo estiver limitado aos centroides.</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="199"/>
+        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="198"/>
         <source>No graph loaded</source>
         <translation>Não há grafos carregados</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="202"/>
+        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="201"/>
         <source>No skim fields provided</source>
         <translation>Nenhum custo foi fornecido</translation>
     </message>
@@ -2834,72 +2834,72 @@
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="234"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="238"/>
         <source>Class name already used</source>
         <translation>O nome da classe já foi utilizado</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="287"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="291"/>
         <source>Remove</source>
         <translation>Remover</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="413"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="417"/>
         <source>Input error</source>
         <translation>Erro de entrada</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="443"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="447"/>
         <source>No traffic classes to assign</source>
         <translation>Não há classes de tráfego para alocar</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="448"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="452"/>
         <source>Missing scenario name</source>
         <translation>Está faltando o nome do cenário</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="453"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="458"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation>O nome para a tabela de resultados já existe. Escolha um novo nome.</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="530"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="535"/>
         <source>VDF parameter is not numeric</source>
         <translation>Parâmetro VDF não é numérico</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="340"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="344"/>
         <source>Wrong value for link ID</source>
         <translation>Valor incorreto para link ID</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="347"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="351"/>
         <source>Link ID doesn&apos;t exist in project</source>
         <translation>link ID não existe no projeto</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="357"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="361"/>
         <source>Missing query name</source>
         <translation>Ausência de nome da consulta</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="362"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="366"/>
         <source>Query name already used</source>
         <translation>Nome de consulta já utilizado</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="367"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="371"/>
         <source>Please set a link selection</source>
         <translation>Por favor, configure uma seleção de links</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="459"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="464"/>
         <source>Missing select link matrix name.</source>
         <translation>Ausência de nome da matriz de links selecionados</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="463"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="468"/>
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation>O nome para a tabela de resultados já existe. Escolha um novo nome.</translation>
     </message>
@@ -3868,7 +3868,7 @@
         <translation>Centroide</translation>
     </message>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="73"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
         <source>Layer</source>
         <translation>Camada</translation>
     </message>
@@ -3933,7 +3933,7 @@
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
         <source>Layer field</source>
         <translation>Campo da camada</translation>
     </message>
