@@ -6,14 +6,14 @@ from random import randint
 from typing import Tuple, Literal, Dict, Union
 
 import qgis
-from PyQt5.QtGui import QColor
+from qgis.PyQt.QtGui import QColor
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QPushButton, QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QToolButton, QHBoxLayout, QWidget, QDialog
-from qgis._core import QgsLineSymbol, QgsVectorLayer, QgsSymbol, QgsProject
-from qgis._core import QgsMapLayerProxyModel, QgsSimpleLineSymbolLayer, QgsExpressionContextUtils
-from qgis._core import QgsSingleSymbolRenderer, QgsRuleBasedRenderer, QgsStyle
+from qgis.core import QgsLineSymbol, QgsVectorLayer, QgsSymbol, QgsProject
+from qgis.core import QgsMapLayerProxyModel, QgsSimpleLineSymbolLayer, QgsExpressionContextUtils
+from qgis.core import QgsSingleSymbolRenderer, QgsRuleBasedRenderer, QgsStyle
 
 from qaequilibrae.modules.common_tools import get_parameter_chain
 from .set_color_ramps_dialog import LoadColorRampSelector

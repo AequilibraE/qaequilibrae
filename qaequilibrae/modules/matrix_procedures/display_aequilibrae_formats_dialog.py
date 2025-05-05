@@ -11,8 +11,8 @@ from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
 from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView
-from qgis._core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
-from qgis._core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
+from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
+from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
 
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
 from qaequilibrae.modules.common_tools import layer_from_dataframe

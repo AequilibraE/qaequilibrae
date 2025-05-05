@@ -5,7 +5,7 @@ import sys
 import qgis
 from aequilibrae.paths.results import PathResults
 from qgis.PyQt import QtCore, QtWidgets, uic
-from qgis._core import QgsProject, QgsVectorLayer, QgsSpatialIndex
+from qgis.core import QgsProject, QgsVectorLayer, QgsSpatialIndex
 from qgis.utils import iface
 
 from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog

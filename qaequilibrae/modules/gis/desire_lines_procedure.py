@@ -5,15 +5,14 @@ from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
-from PyQt5.QtCore import pyqtSignal
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths import Graph
 from aequilibrae.paths import allOrNothing
 from aequilibrae.paths.results import AssignmentResults
 from aequilibrae.utils.interface.worker_thread import WorkerThread
 from numpy.lib import recfunctions as rfn
-from qgis.PyQt.QtCore import QVariant
-from qgis._core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFeature
+from qgis.PyQt.QtCore import pyqtSignal, QVariant
+from qgis.core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFeature
 from scipy.spatial import Delaunay
 
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
