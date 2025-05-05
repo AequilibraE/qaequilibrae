@@ -2570,22 +2570,22 @@
 <context>
     <name>RouteChoiceDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="356"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="359"/>
         <source>Input error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="240"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="241"/>
         <source>Missing query name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="243"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="244"/>
         <source>Query name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="246"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="247"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"></translation>
     </message>
