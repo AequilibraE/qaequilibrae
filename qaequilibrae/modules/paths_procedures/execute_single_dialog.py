@@ -28,7 +28,7 @@ class ExecuteSingleDialog(QDialog, FORM_CLASS):
         self.sld_max_routes.setValue(self._kwargs["max_routes"])
         self.label_4.setText(f"Number of routes: {self._kwargs["max_routes"]}")
 
-        self.debouncer = Debouncer(delay_ms=1_300, callback=self.execute_single)
+        self.debouncer = Debouncer(delay_ms=700, callback=self.execute_single)
 
         self.node_from.editingFinished.connect(self.execute_single)
         self.node_from.textChanged.connect(self._on_node_from_changed)
