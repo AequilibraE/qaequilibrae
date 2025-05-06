@@ -205,7 +205,6 @@ class AequilibraEMenu:
             temp_saving = self.iface.mainWindow().findChild(QAction, action)
             if temp_saving:
                 temp_saving.triggered.connect(self.save_in_project)
-                return
 
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
         if main_menu == "AequilibraE":
