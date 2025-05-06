@@ -379,7 +379,7 @@ class AequilibraEMenu:
 
         for layer in QgsProject.instance().mapLayers().values():
             dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
-            dbpath = dbpath.split("\\\\")[-1].split(".sqlite")[0]
+            dbpath = Path(dbpath).stem
             if dbpath in aequilibrae_databases:
                 QgsProject.instance().removeMapLayer(layer)
 
