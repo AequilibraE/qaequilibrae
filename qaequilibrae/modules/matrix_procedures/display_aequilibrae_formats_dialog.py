@@ -336,7 +336,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.indices = self.data_to_show.index.astype(np.int32)
 
     def csv_file_path(self):
-        new_name, _ = GetOutputFileName(self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.data_path)
+        new_name, _ = GetOutputFileName(
+            self, "Export matrix data", ["Comma-separated file(*.csv)"], ".csv", self.data_path
+        )
         return new_name
 
     def export(self):
