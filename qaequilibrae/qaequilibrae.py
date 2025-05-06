@@ -25,7 +25,7 @@ from qaequilibrae.modules.menu_actions import run_distribution_models, run_chang
 from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet
 from qaequilibrae.modules.menu_actions import run_pt_explore, show_log, create_example
 from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig
-from qaequilibrae.modules.menu_actions import run_route_choice
+from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim
 from qaequilibrae.modules.processing_provider.provider import Provider
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
@@ -158,6 +158,9 @@ class AequilibraEMenu:
         # # # ########################################################################
         # # # #######################   TRANSIT SUB-MENU   ###########################
         self.add_menu_action(self.tr("Public Transport"), self.tr("Import GTFS"), partial(run_import_gtfs, self))
+        self.add_menu_action(
+            self.tr("Public Transport"), self.tr("Skimming and Assignment"), partial(run_pt_skim, self)
+        )
         self.add_menu_action(self.tr("Public Transport"), self.tr("Explore Transit"), partial(run_pt_explore, self))
 
         # # ########################################################################
