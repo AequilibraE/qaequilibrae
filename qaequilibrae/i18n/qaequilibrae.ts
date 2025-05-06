@@ -351,12 +351,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="328"/>
+        <location filename="../qaequilibrae.py" line="329"/>
         <source>You need to load a project first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="331"/>
+        <location filename="../qaequilibrae.py" line="332"/>
         <source>You need to close the project currently open first</source>
         <translation type="unfinished"></translation>
     </message>
@@ -381,7 +381,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="336"/>
+        <location filename="../qaequilibrae.py" line="337"/>
         <source>You need to import a GTFS feed first</source>
         <translation type="unfinished"></translation>
     </message>
@@ -761,72 +761,72 @@
 <context>
     <name>DesireLinesProcedure</name>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="88"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="87"/>
         <source>Manipulating matrix indices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="104"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="103"/>
         <source>Filtering zones with no geography available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="116"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="115"/>
         <source>Filtering down to OD pairs with flows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="137"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="136"/>
         <source>Concatenating AB &amp; BA flows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="147"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="146"/>
         <source>Creating Desire Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="188"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="187"/>
         <source>Building Delaunay dataset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="194"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="193"/>
         <source>Computing Delaunay Triangles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="202"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="201"/>
         <source>Building Delaunay Network: Collecting Edges</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="208"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="207"/>
         <source>Building Delaunay Network: Getting unique edges</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="215"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="214"/>
         <source>Building Delaunay Network: Assembling Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="235"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="234"/>
         <source>Building graph</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="267"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="266"/>
         <source>Assigning demand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="271"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="270"/>
         <source>Collecting results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="274"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="273"/>
         <source>Building resulting layer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1007,7 +1007,7 @@
 <context>
     <name>DisplayAequilibraEFormatsDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="373"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="375"/>
         <source>AequilibraE custom formats</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1065,72 +1065,72 @@
 <context>
     <name>DistributionModelsDialog</name>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="130"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="129"/>
         <source>AequilibraE - Iterative Proportional Fitting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="131"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="130"/>
         <source>Seed matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="135"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="134"/>
         <source>AequilibraE - Apply gravity model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="141"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="140"/>
         <source>AequilibraE - Calibrate gravity model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="142"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="141"/>
         <source>Observed matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="166"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="165"/>
         <source>Function</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="226"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="225"/>
         <source>Could not load model. {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="420"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="419"/>
         <source>Procedure error: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="376"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="375"/>
         <source>Queued</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="394"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="393"/>
         <source>Production vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="397"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="396"/>
         <source>Attraction vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="401"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="400"/>
         <source>Observed (seed) matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="405"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="404"/>
         <source>Impedance matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="216"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="215"/>
         <source>You need to load a dataset to proceed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1966,47 +1966,47 @@
 <context>
     <name>NetworkPreparationProcedure</name>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="41"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="40"/>
         <source>Duplicating line layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="79"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="78"/>
         <source>Links read: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="113"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="112"/>
         <source>Computing node IDs: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="134"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="133"/>
         <source>Writing new node layer: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="156"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="155"/>
         <source>Writing node IDs to links: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="184"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="183"/>
         <source>Checking node layer: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="201"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="200"/>
         <source>Processing links: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="55"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="54"/>
         <source>Adding fields to line layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="46"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="45"/>
         <source>Line layer duplicated</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2143,32 +2143,32 @@
 <context>
     <name>ProjectFromOSMDialog</name>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="40"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="39"/>
         <source>Place name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="45"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="44"/>
         <source>Current map canvas area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="62"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="61"/>
         <source>Choose folder output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="68"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="67"/>
         <source>Import network and create project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="115"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="114"/>
         <source>Establishing area for download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="57"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="56"/>
         <source>Target</source>
         <translation type="unfinished"></translation>
     </message>
