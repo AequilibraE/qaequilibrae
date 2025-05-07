@@ -123,7 +123,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
     def run_assignment(self):
         pass
-    
+
     def add_period(self):
         period_id = self.spin_period_id.value()
         start_time = ""
