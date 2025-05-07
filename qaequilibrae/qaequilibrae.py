@@ -1,17 +1,17 @@
 import glob
 import logging
-import os
 import subprocess
 import sys
 import tempfile
 import webbrowser
 from functools import partial
+from os import unlink
+from os.path import dirname, exists, join, isfile, split
 from pathlib import Path
 from uuid import uuid4
 
 import qgis
-from qgis.PyQt import QtCore
-from qgis.PyQt.QtCore import Qt, QCoreApplication, QTranslator
+from qgis.PyQt.QtCore import Qt, QTranslator, QSettings, QLocale, QCoreApplication, QSize
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication, QToolBar, QToolButton
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
@@ -28,9 +28,9 @@ from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix
 from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim
 from qaequilibrae.modules.processing_provider.provider import Provider
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "packages"))
+sys.path.insert(0, join(dirname(__file__), "packages"))
 
-if Path(os.path.join(os.path.dirname(__file__), "packages", "requirements.txt")).exists():
+if Path(join(dirname(__file__), "packages", "requirements.txt")).exists():
     pass
 else:
     version = sys.version_info
@@ -81,18 +81,18 @@ class AequilibraEMenu:
         self.set_font(self.toolbar)
         self.toolbar.setOrientation(2)
 
-        if QtCore.QSettings().value("locale/overrideFlag", type=bool):
-            loc = QtCore.QSettings().value("locale/userLocale")
+        if QSettings().value("locale/overrideFlag", type=bool):
+            loc = QSettings().value("locale/userLocale")
         else:
-            loc = QtCore.QLocale.system().name()
+            loc = QLocale.system().name()
         loc = loc if len(loc) == 5 else loc[:2]
 
-        locale_path = "{}/i18n/qaequilibrae_{}.qm".format(os.path.dirname(__file__), loc)
+        locale_path = "{}/i18n/qaequilibrae_{}.qm".format(dirname(__file__), loc)
 
-        if os.path.exists(locale_path):
+        if exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
-            QtCore.QCoreApplication.installTranslator(self.translator)
+            QCoreApplication.installTranslator(self.translator)
 
         self.menuActions = {
             self.tr("Project"): [],
@@ -188,7 +188,7 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         self.tabContents = []
-        self.toolbar.setIconSize(QtCore.QSize(16, 16))
+        self.toolbar.setIconSize(QSize(16, 16))
 
         p1_vertical = QVBoxLayout()
         p1_vertical.setContentsMargins(0, 0, 0, 0)
@@ -204,9 +204,10 @@ class AequilibraEMenu:
         # ##################        SAVING PROJECT CONFIGS       #####################
         QgsProject.instance().readProject.connect(self.reload_project)
 
-        temp_saving = self.iface.mainWindow().findChild(QAction, "mActionSaveProject")
-        if temp_saving:
-            temp_saving.triggered.connect(self.save_in_project)
+        for action in ["mActionSaveProject", "mActionSaveProjectAs"]:
+            temp_saving = self.iface.mainWindow().findChild(QAction, action)
+            if temp_saving:
+                temp_saving.triggered.connect(self.save_in_project)
 
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
         if main_menu == "AequilibraE":
@@ -269,7 +270,7 @@ class AequilibraEMenu:
         p = tempfile.gettempdir() + "/aequilibrae_*"
         for f in glob.glob(p):
             try:
-                os.unlink(f)
+                unlink(f)
             except Exception as e:
                 self.logger.error(e.args)
                 pass
@@ -321,7 +322,7 @@ class AequilibraEMenu:
             uri.setDatabase(str(self.project.path_to_file))
             lname = layer_name
         else:
-            uri.setDatabase(os.path.join(self.project.project_base_path, "public_transport.sqlite"))
+            uri.setDatabase(join(self.project.project_base_path, "public_transport.sqlite"))
             lname = layer_name[8:]
         uri.setDataSource("", lname, "geometry")
         layer = QgsVectorLayer(uri.uri(), layer_name, "spatialite")
@@ -381,9 +382,8 @@ class AequilibraEMenu:
 
         for layer in QgsProject.instance().mapLayers().values():
             dbpath = layer.source().split("dbname='")[-1].split("' table")[0]
-            dbpath = dbpath.split("|")[0].split(".sqlite")[0]
-            var = os.path.split(dbpath)
-            if var[0] == self.project.project_base_path and var[1] in aequilibrae_databases:
+            dbpath = Path(dbpath).stem
+            if dbpath in aequilibrae_databases:
                 QgsProject.instance().removeMapLayer(layer)
 
         qgis.utils.iface.mapCanvas().refresh()
@@ -393,16 +393,15 @@ class AequilibraEMenu:
         if not self.project:
             return
 
-        path = QgsProject.instance().customVariables()
+        var = str(self.project.project_base_path)
+        variables = QgsProject.instance().customVariables()
 
-        if "aequilibrae_path" not in path:
-            QgsExpressionContextUtils.setProjectVariable(
-                QgsProject.instance(), "aequilibrae_path", self.project.project_base_path
-            )
+        if "aequilibrae_path" not in variables:
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aequilibrae_path", var)
 
-        output_file_path = os.path.join(self.project.project_base_path, "qgis_layers.sqlite")
+        output_file_path = join(self.project.project_base_path, "qgis_layers.sqlite")
 
-        file_exists = True if os.path.isfile(output_file_path) else False
+        file_exists = True if isfile(output_file_path) else False
 
         for layer in QgsProject.instance().mapLayers().values():
             if layer.isTemporary():

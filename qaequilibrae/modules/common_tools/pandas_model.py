@@ -7,23 +7,17 @@ According to the author, the code examples in the book are free to use without
 license.
 """
 
-from qgis.PyQt import QtCore
+from qgis.PyQt.QtCore import QAbstractTableModel, Qt
 
 
-class PandasModel(QtCore.QAbstractTableModel):
+class PandasModel(QAbstractTableModel):
     """
     This class populates a table view with a pandas dataframe.
     """
 
     def __init__(self, data, parent=None):
-        QtCore.QAbstractTableModel.__init__(self, parent)
+        QAbstractTableModel.__init__(self, parent)
         self._data = data
-
-    def data(self, index, role):
-        if index.isValid():
-            if role == QtCore.Qt.DisplayRole:
-                return str(self._data.iloc[index.row(), index.column()])
-        return None
 
     def rowCount(self, index):
         return self._data.shape[0]
@@ -31,9 +25,13 @@ class PandasModel(QtCore.QAbstractTableModel):
     def columnCount(self, index):
         return self._data.shape[1]
 
-    def header_data(self, section, orientation, role):
-        if role == QtCore.Qt.DisplayRole:
-            if orientation == QtCore.Qt.Horizontal:
-                return str(self._data.columns[section])
-            if orientation == QtCore.Qt.Vertical:
-                return str(self._data.index[section])
+    def data(self, index, role):
+        if index.isValid():
+            if role == Qt.DisplayRole:
+                return str(self._data.iloc[index.row(), index.column()])
+        return None
+
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return str(self._data.columns[col])
+        return None

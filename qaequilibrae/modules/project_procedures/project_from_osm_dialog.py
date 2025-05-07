@@ -1,25 +1,24 @@
 import logging
-import os
-from os.path import isdir, join
+from os.path import isdir, join, dirname
 
-from PyQt5.QtCore import Qt
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.place_getter import placegetter
-from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox
 from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog
+from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QDialog
 from qgis.core import QgsProject, QgsCoordinateReferenceSystem
 from shapely.geometry import box
 
 from qaequilibrae.modules.common_tools import reporter, ReportDialog, standard_path
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
 
-class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
+class ProjectFromOSMDialog(QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
-        QtWidgets.QDialog.__init__(self)
+        QDialog.__init__(self)
         self.iface = qgis_project.iface
         self.setupUi(self)
         self.qgis_project = qgis_project
@@ -146,8 +145,12 @@ class ProjectFromOSMDialog(QtWidgets.QDialog, FORM_CLASS):
             self.progress_label.setText(val[1])
             self.progressbar.reset()
         elif val[0] == "finished":
-            lines = self.qgis_project.project.network.count_links()
-            nodes = self.qgis_project.project.network.count_nodes()
-            self.report.append(reporter(f"{lines:,} links generated"))
-            self.report.append(reporter(f"{nodes:,} nodes generated"))
-            self.leave()
+            try:
+                if self.qgis_project.project.network.builder:
+                    lines = self.qgis_project.project.network.count_links()
+                    nodes = self.qgis_project.project.network.count_nodes()
+                    self.report.append(reporter(f"{lines:,} links generated"))
+                    self.report.append(reporter(f"{nodes:,} nodes generated"))
+                    self.leave()
+            except AttributeError:
+                self.logger.info("Only display builder info")

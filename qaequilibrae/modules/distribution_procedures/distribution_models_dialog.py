@@ -38,7 +38,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.project = qgs_proj.project
 
         self.error = None
-        self.report = []
         self.job_queue = OrderedDict()
         self.model = SyntheticGravityModel()
         self.model.function = "GAMMA"
@@ -418,6 +417,8 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         error = self.worker_thread.error
         if error is not None:
             qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), error.args[0], level=2, duration=10)
+
+        self.report = []
         self.report.extend(self.worker_thread.report)
 
         if self.job == "calibrate":
@@ -426,7 +427,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.worker_thread.output.export(self.outfile)
 
         if val[0] == "finished":
-
             self.exit_procedure()
 
     def exit_procedure(self):
