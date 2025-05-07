@@ -16,6 +16,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.setupUi(self)
         self.project = qgis_project.project
         self.transit_data = Transit(self.project)
+        self.mat = AequilibraeMatrix()
 
         self.all_modes = {}
         self.proj_matrices = list_matrices(self.project.matrices.fldr)
@@ -26,8 +27,11 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.cob_line_methods.addItems(["Direct", "Connector project match"])
         self.cob_matrices.currentIndexChanged.connect(self.update_matrix_data)
 
+        self.chb_set_assignment.toggled.connect(self.set_assignment_use)
         self.but_add_period.clicked.connect(self.add_period)
         self.but_assign.clicked.connect(self.run_assignment)
+
+        self.set_assignment_use()
 
     def __populate_project_info(self):
         # Add modes
@@ -109,9 +113,8 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
     def update_matrix_data(self):
         self.cob_matrix_core.clear()
         file_name = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
-        mat = AequilibraeMatrix()
-        mat.load(join(self.project.matrices.fldr, file_name))
-        self.cob_matrix_core.addItems(mat.names)
+        self.mat.load(join(self.project.matrices.fldr, file_name))
+        self.cob_matrix_core.addItems(self.mat.names)
 
     def __get_connector_method(self):
         method = self.cob_direction.currentText()
@@ -121,7 +124,8 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             return "nearest_neighbour"
 
     def run_assignment(self):
-        pass
+        if not self.chb_set_assignment.isChecked():
+            print()
 
     def add_period(self):
         period_id = self.spin_period_id.value()
@@ -136,6 +140,21 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
     def __time_converter(self, time):
         seconds = time.hour() * 3_600 + time.minute() * 60 + time.second()
         return seconds
+
+    def set_assignment_use(self):
+        for item in [
+            self.cob_travel_time,
+            self.cob_freq,
+            self.cob_matrices,
+            self.cob_matrix_core,
+            self.ln_transit_class,
+            self.label_10,
+            self.label_13,
+            self.label_14,
+            self.label_15,
+            self.label_16,
+        ]:
+            item.setEnabled(self.chb_set_assignment.isChecked())
 
     def exit_procedure(self):
         self.close()
