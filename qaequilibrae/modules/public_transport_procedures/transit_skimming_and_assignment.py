@@ -130,7 +130,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         end_time = ""
         description = self.ln_period_desc.text()
 
-        periods = project.network.periods
+        periods = self.project.network.periods
         new_period = periods.new_period(period_id, start_time, end_time, description)
         periods.save()
 
