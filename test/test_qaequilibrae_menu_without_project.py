@@ -236,8 +236,16 @@ def test_gtfs_importer(ae, qtbot):
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
-def test_gtfs_explorer(ae, qtbot):
+def test_pt_skim_and_assign(ae, qtbot):
     action = ae.menuActions["Public Transport"][1]
+    assert action.text() == "Skimming and Assignment", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
+def test_gtfs_explorer(ae, qtbot):
+    action = ae.menuActions["Public Transport"][2]
     assert action.text() == "Explore Transit", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()

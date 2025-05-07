@@ -314,7 +314,7 @@ def test_gtfs_importer(ae_with_project, qtbot):
 
 
 def test_gtfs_explorer(ae_with_project, qtbot):
-    action = ae_with_project.menuActions["Public Transport"][1]
+    action = ae_with_project.menuActions["Public Transport"][2]
     assert action.text() == "Explore Transit", "Wrong text content"
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
