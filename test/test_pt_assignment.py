@@ -1,4 +1,5 @@
 from os.path import join
+
 import numpy as np
 
 from qaequilibrae.modules.public_transport_procedures.transit_skimming_and_assignment import TransitSkimAssign
