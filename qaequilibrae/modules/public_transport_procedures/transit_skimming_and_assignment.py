@@ -28,7 +28,6 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
         self.but_add_period.clicked.connect(self.add_period)
         self.but_assign.clicked.connect(self.run_assignment)
-        self.but_cancel.clicked.connect(self.exit_procedure)
 
     def __populate_project_info(self):
         # Add modes
@@ -126,13 +125,17 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
     def add_period(self):
         period_id = self.spin_period_id.value()
-        start_time = ""
-        end_time = ""
+        start_time = self.__time_converter(self.time_start.time())
+        end_time = self.__time_converter(self.time_end.time())
         description = self.ln_period_desc.text()
 
         periods = self.project.network.periods
-        new_period = periods.new_period(period_id, start_time, end_time, description)
+        periods.new_period(period_id, start_time, end_time, description)
         periods.save()
+
+    def __time_converter(self, time):
+        seconds = time.hour() * 3_600 + time.minute() * 60 + time.second()
+        return seconds
 
     def exit_procedure(self):
         self.close()

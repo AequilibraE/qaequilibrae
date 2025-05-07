@@ -7,22 +7,22 @@
     <x>0</x>
     <y>0</y>
     <width>724</width>
-    <height>579</height>
+    <height>622</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QTabWidget" name="tabWidget">
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="2" column="0">
+    <widget class="QTabWidget" name="tabs">
      <property name="font">
       <font>
        <pointsize>10</pointsize>
       </font>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="graph_config">
       <attribute name="title">
@@ -70,7 +70,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QTimeEdit" name="timeEdit">
+           <widget class="QTimeEdit" name="time_start">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
@@ -81,10 +81,13 @@
               <second>0</second>
              </time>
             </property>
+            <property name="displayFormat">
+             <string>HH:mm:ss</string>
+            </property>
            </widget>
           </item>
           <item row="1" column="4">
-           <widget class="QTimeEdit" name="timeEdit_2">
+           <widget class="QTimeEdit" name="time_end">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
@@ -94,6 +97,9 @@
               <minute>0</minute>
               <second>0</second>
              </time>
+            </property>
+            <property name="displayFormat">
+             <string>HH:mm:ss</string>
             </property>
            </widget>
           </item>
@@ -207,95 +213,13 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="assign_tab">
+     <widget class="QWidget" name="tab_skim_assign">
       <attribute name="title">
-       <string>Transit Class</string>
+       <string>Skimming and Assignment</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_6">
-       <item row="3" column="1">
-        <widget class="QPushButton" name="but_assign">
-         <property name="text">
-          <string>Assign</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QGroupBox" name="traffic_class">
-         <property name="title">
-          <string>Traffic Class</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_7">
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Matrix core</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QComboBox" name="cob_matrix_core"/>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Assignment class name</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2" colspan="2">
-           <widget class="QLineEdit" name="ln_transit_class"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Matrix</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="cob_matrices"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QPushButton" name="but_cancel">
-         <property name="text">
-          <string>Cancel</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QGroupBox" name="net_info">
-         <property name="title">
-          <string>Network information</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Travel Time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="cob_travel_time"/>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Frequency</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QComboBox" name="cob_freq"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
-        <widget class="QGroupBox" name="skims">
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0" colspan="4">
+        <widget class="QGroupBox" name="skims_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -305,7 +229,7 @@
          <property name="title">
           <string>Skims</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_2">
+         <layout class="QGridLayout" name="gridLayout_9">
           <item row="0" column="0" rowspan="7">
            <widget class="QTableWidget" name="available_skims_table">
             <property name="sizePolicy">
@@ -365,7 +289,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <spacer name="vtab21">
+           <spacer name="vtab21_2">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -384,7 +308,7 @@
            </spacer>
           </item>
           <item row="4" column="1">
-           <spacer name="vtab22">
+           <spacer name="vtab22_2">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -463,12 +387,87 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="0" rowspan="2">
-        <widget class="QGroupBox" name="output">
+       <item row="1" column="0" colspan="4">
+        <widget class="QGroupBox" name="traffic_class_2">
+         <property name="title">
+          <string>Transit Assignment</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="2" column="0" colspan="2">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Assignment class name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Matrix</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QComboBox" name="cob_matrix_core"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="cob_matrices"/>
+          </item>
+          <item row="2" column="2" colspan="2">
+           <widget class="QLineEdit" name="ln_transit_class"/>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>Matrix core</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="chb_set_assignment">
+            <property name="text">
+             <string>Set transit assignment</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0" rowspan="2" colspan="4">
+        <widget class="QGroupBox" name="net_info_2">
+         <property name="title">
+          <string>Network information</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_10">
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cob_travel_time"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Travel Time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Frequency</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QComboBox" name="cob_freq"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="4">
+        <widget class="QGroupBox" name="output_2">
          <property name="title">
           <string>Outputs</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_5">
+         <layout class="QGridLayout" name="gridLayout_12">
           <item row="0" column="0">
            <widget class="QLineEdit" name="ln_result_name">
             <property name="placeholderText">
@@ -477,6 +476,20 @@
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <widget class="QPushButton" name="but_create">
+         <property name="text">
+          <string>Create skims</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2" colspan="2">
+        <widget class="QPushButton" name="but_assign">
+         <property name="text">
+          <string>Perform assignment</string>
+         </property>
         </widget>
        </item>
       </layout>

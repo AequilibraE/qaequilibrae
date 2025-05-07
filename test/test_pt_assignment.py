@@ -1,6 +1,7 @@
 from os.path import join
 
 import numpy as np
+from qgis.PyQt.QtCore import Qt
 
 from qaequilibrae.modules.public_transport_procedures.transit_skimming_and_assignment import TransitSkimAssign
 from .utilities import create_matrix
@@ -23,3 +24,17 @@ def test_init(qtbot, coquimbo_project):
     for i in [0, 1]:
         path = qtbot.screenshot(dialog.tabWidget.widget(i), suffix=f"{i}")
         print(path)
+
+
+def test_create_period(qtbot, coquimbo_project):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    dialog.ln_period_desc.setText("New period desc")
+    qtbot.mouseClick(dialog.but_add_period, Qt.LeftButton)
+
+    dialog.exit_procedure()
+
+    periods = dialog.project.network.periods
+    all_periods = periods.data
+
+    assert all_periods.shape[0] == 2
