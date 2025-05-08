@@ -1,6 +1,9 @@
+from functools import partial
 from os.path import join, dirname
+import numpy as np
 
 from aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.paths import TransitAssignment, TransitClass
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.transit import Transit, TransitGraphBuilder
 from qgis.PyQt import uic
@@ -35,7 +38,8 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             table.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.but_add_period.clicked.connect(self.add_period)
-        # self.but_assign.clicked.connect(self.run_assignment)
+        self.but_assign.clicked.connect(partial(self.run, "assign"))
+        self.but_create.clicked.connect(partial(self.run, "create"))
 
     def __populate_project_info(self):
         self.load_periods()
@@ -103,14 +107,10 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.project.network.build_graphs()
         graph.create_line_geometry(method=line_method, graph=mode_id)
 
-        if self.chb_save_graph.isChecked():
-            self.transit_data.save_graphs()
-            self.transit_data.load()
+        self.period_id = self.get_period()
 
-            # Reading back into AequilibraE
-            pt_con = database_connection("transit")
-            graph_db = TransitGraphBuilder.from_db(pt_con, self.project.network.periods.default_period.period_id)
-            graph_db.vertices.drop(columns="geometry")
+        if self.chb_save_graph.isChecked():
+            self.transit_data.save_graphs(period_ids=self.period_id)
 
         # To perform an assignment we need to convert the graph builder into a graph.
         self.transit_graph = graph.to_transit_graph()
@@ -129,9 +129,42 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         else:
             return "nearest_neighbour"
 
-    def run_assignment(self):
-        if not self.chb_set_assignment.isChecked():
-            print()
+    def run(self, action):
+        # check inputs before assignment
+
+        self.build_graph()
+
+        # Get the matrix
+        mat = ""
+
+        demand_matrix_core = "pt" if action == "create" else self.cob_matrix_core.currentText()
+        class_name = "pt" if action == "create" else self.ln_transit_class.text()
+        time_field = "trav_time" if action == "create" else self.cob_travel_time.currentText()
+        frequency_field = "freq" if action == "create" else self.cob_freq.currentText()
+
+        # Create the Transit Class
+        assigclass = TransitClass(name=class_name, graph=self.transit_graph, matrix=mat)
+
+        # Create the Transit Assignment Class
+        assig = TransitAssignment()
+        assig.add_class(assigclass)
+
+        # Set assignment
+        assig.set_time_field(time_field)
+        assig.set_frequency_field(frequency_field)
+        assig.set_skimming_fields(["trav_time", "boardings", "freq"])
+        assig.set_algorithm("os")
+        assigclass.set_demand_matrix_core(demand_matrix_core)
+
+        # Perform the assignment for the transit classes added
+        assig.execute()
+
+        if action == "create":
+            assig.get_skim_results()["pt"].export(
+                join(self.project_base_path, f"matrices/{self.ln_matrix_name.text()}.omx")
+            )
+        else:
+            assig.save_results(table_name=self.ln_result_name.text())
 
     def add_period(self):
         dlg2 = NewPeriodDialog(self.iface, self.project)
@@ -161,8 +194,20 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         if not sel:
             self.iface.messageBar().pushMessage("Warning", "Please select a period", level=1, duration=10)
             return
-        rows = [s.row() for s in sel if s.column() == 0]
-        print(rows)
+        row = [s.row() for s in sel if s.column() == 0][0]
+        return self.results.iloc[row]["period_id"]
+
+    def __build_unit_matrix(self):
+        """Create an array filled with ones."""
+        zones = len(self.transit_graph.centroids)
+
+        mat = AequilibraeMatrix()
+        mat.create_empty(zones=zones, matrix_names=["pt"], memory_only=True)
+        mat.index = self.transit_graph.centroids[:]
+        mat.matrices[:, :, 0] = np.ones((zones, zones))
+        mat.computational_view()
+
+        return mat
 
     def exit_procedure(self):
         self.close()

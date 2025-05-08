@@ -136,13 +136,6 @@
        <string>Skimming</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="1" column="0" colspan="3">
-        <widget class="QPushButton" name="but_create">
-         <property name="text">
-          <string>Create skims</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0" colspan="3">
         <widget class="QGroupBox" name="skims_2">
          <property name="sizePolicy">
@@ -310,6 +303,20 @@
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLineEdit" name="ln_matrix_name">
+         <property name="placeholderText">
+          <string>matrix_name</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QPushButton" name="but_create">
+         <property name="text">
+          <string>Create skims</string>
+         </property>
         </widget>
        </item>
       </layout>
