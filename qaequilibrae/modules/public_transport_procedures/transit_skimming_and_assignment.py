@@ -7,6 +7,7 @@ from aequilibrae.paths import TransitAssignment, TransitClass
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.transit import Transit, TransitGraphBuilder
 from qgis.PyQt import uic
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
 
 from qaequilibrae.modules.common_tools import PandasModel
@@ -26,6 +27,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
         self.all_modes = {}
         self.proj_matrices = list_matrices(self.project.matrices.fldr)
+        self.skim_fields = []
 
         self.__populate_project_info()
 
@@ -38,6 +40,8 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             table.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.but_add_period.clicked.connect(self.add_period)
+        self.but_adds_to_skim.clicked.connect(self.append_to_list)
+        self.but_removes_from_skim.clicked.connect(self.removes_fields)
         self.but_assign.clicked.connect(partial(self.run, "assign"))
         self.but_create.clicked.connect(partial(self.run, "create"))
 
@@ -135,7 +139,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.build_graph()
 
         # Get the matrix
-        mat = ""
+        mat = self.__build_ones_matrix() if action == "create" else self.__get_matrix()
 
         demand_matrix_core = "pt" if action == "create" else self.cob_matrix_core.currentText()
         class_name = "pt" if action == "create" else self.ln_transit_class.text()
@@ -152,11 +156,11 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         # Set assignment
         assig.set_time_field(time_field)
         assig.set_frequency_field(frequency_field)
-        assig.set_skimming_fields(["trav_time", "boardings", "freq"])
+        assig.set_skimming_fields(self.skim_fields)
         assig.set_algorithm("os")
         assigclass.set_demand_matrix_core(demand_matrix_core)
 
-        # Perform the assignment for the transit classes added
+        # Perform the assignment
         assig.execute()
 
         if action == "create":
@@ -166,7 +170,10 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         else:
             assig.save_results(table_name=self.ln_result_name.text())
 
+        self.exit_procedure()
+
     def add_period(self):
+        """Adds new periods to periods table"""
         dlg2 = NewPeriodDialog(self.iface, self.project)
         dlg2.show()
         dlg2.exec_()
@@ -184,6 +191,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.load_periods()
 
     def load_periods(self):
+        """Updates periods table view"""
         self.results = self.project.network.periods.data
 
         self.periods_models = PandasModel(self.results)
@@ -197,7 +205,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         row = [s.row() for s in sel if s.column() == 0][0]
         return self.results.iloc[row]["period_id"]
 
-    def __build_unit_matrix(self):
+    def __build_ones_matrix(self):
         """Create an array filled with ones."""
         zones = len(self.transit_graph.centroids)
 
@@ -208,6 +216,53 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         mat.computational_view()
 
         return mat
+
+    def __get_matrix(self):
+        mat_name = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
+        mat = AequilibraeMatrix()
+        mat.load(os.path.join(self.project.matrices.fldr, mat_name))
+        mat.computational_view([self.cob_matrix_core.currentText()])
+
+        return mat
+
+    def removes_fields(self):
+        table = self.available_skims_table
+        final_table = self.skim_list
+
+        for i in final_table.selectedRanges():
+            old_fields = [final_table.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
+
+            for row in range(i.bottomRow(), i.topRow() - 1, -1):
+                final_table.removeRow(row)
+                self.skim_fields.pop(row)
+
+            counter = table.rowCount()
+            for field in old_fields:
+                table.setRowCount(counter + 1)
+                item1 = QTableWidgetItem(field)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                table.setItem(counter, 0, item1)
+                counter += 1
+
+    def append_to_list(self):
+        table = self.available_skims_table
+        final_table = self.skim_list
+
+        for i in table.selectedRanges():
+            new_fields = [table.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
+
+            for f in new_fields:
+                self.skim_fields.append(f)
+            for row in range(i.bottomRow(), i.topRow() - 1, -1):
+                table.removeRow(row)
+
+            counter = final_table.rowCount()
+            for field in new_fields:
+                final_table.setRowCount(counter + 1)
+                item1 = QTableWidgetItem(field)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                final_table.setItem(counter, 0, item1)
+                counter += 1
 
     def exit_procedure(self):
         self.close()

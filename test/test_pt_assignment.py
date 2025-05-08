@@ -24,9 +24,26 @@ def create_dialog_with_matrix(project):
 def test_init(qtbot, coquimbo_project):
     dialog = create_dialog_with_matrix(coquimbo_project)
 
+    # Add boardings, dwelling_time, and transfer_time
+    for row in [0, 6, 9]:
+        dialog.available_skims_table.selectRow(row)  # add boardings
+        qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
+    
+    assert dialog.skim_fields == ["boardings", "dwelling_time", "transfer_time"]
+
+    # Remove dwelling_time
+    dialog.skim_list.selectRow(1)
+    qtbot.mouseClick(dialog.but_removes_from_skim, Qt.LeftButton)
+
+    assert dialog.skim_fields == ["boardings", "transfer_time"]
+
+    # 
+
     for i in [0, 1, 2, 3]:
         path = qtbot.screenshot(dialog.tabWidget.widget(i), suffix=f"{i}")
         print(path)
+
+    print(dialog.skim_fields)
 
 
 @pytest.fixture
@@ -55,13 +72,11 @@ def test_create_period(qtbot, coquimbo_project, mock_period):
 
     dialog.tbl_periods.selectRow(1)
 
-    path = qtbot.screenshot(dialog.tabWidget.widget(0))
-    print(path)
-
-    dialog.get_period()
+    period_id = dialog.get_period()
+    assert period_id == 2
 
 
-def test_dialog(qtbot, qgis_iface):
+def test_new_period_dialog(qtbot, qgis_iface):
     dialog = NewPeriodDialog(qgis_iface)
 
     # Set the start and end times
