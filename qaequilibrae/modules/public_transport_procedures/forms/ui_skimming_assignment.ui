@@ -37,28 +37,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QTableWidget" name="tbl_periods">
-         <column>
-          <property name="text">
-           <string>Period ID</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Period start</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Period end</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Description</string>
-          </property>
-         </column>
-        </widget>
+        <widget class="QTableView" name="tbl_periods"/>
        </item>
       </layout>
      </widget>

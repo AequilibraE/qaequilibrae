@@ -1,13 +1,14 @@
 from os.path import join, dirname
 
 from aequilibrae.matrix import AequilibraeMatrix
-from aequilibrae.transit import Transit, TransitGraphBuilder
 from aequilibrae.project.database_connection import database_connection
+from aequilibrae.transit import Transit, TransitGraphBuilder
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
+from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
 
+from qaequilibrae.modules.common_tools import PandasModel
 from qaequilibrae.modules.matrix_procedures import list_matrices
-from qaequilibrae.modules.public_transport_procedures import NewPeriodDialog
+from qaequilibrae.modules.public_transport_procedures.new_period_dialog import NewPeriodDialog
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_skimming_assignment.ui"))
 
@@ -29,13 +30,16 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.cob_line_methods.addItems(["Direct", "Connector project match"])
         self.cob_matrices.currentIndexChanged.connect(self.update_matrix_data)
 
-        self.chb_set_assignment.toggled.connect(self.set_assignment_use)
+        for table in [self.tbl_periods]:
+            table.setSelectionBehavior(QAbstractItemView.SelectRows)
+            table.setSelectionMode(QAbstractItemView.SingleSelection)
+
         self.but_add_period.clicked.connect(self.add_period)
         # self.but_assign.clicked.connect(self.run_assignment)
 
-        self.set_assignment_use()
-
     def __populate_project_info(self):
+        self.load_periods()
+
         # Add modes
         with self.project.db_connection as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
@@ -140,32 +144,25 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             description = dlg2.description
 
             periods = self.project.network.periods
-            period_id = max(periods.data["period_id"].values)
+            period_id = max(periods.data["period_id"].values) + 1
             periods.new_period(period_id, start_time, end_time, description)
             periods.save()
 
-    def __update_periods_table(self):
+        self.load_periods()
 
-        pass
+    def load_periods(self):
+        self.results = self.project.network.periods.data
 
-    def __time_converter(self, time):
-        seconds = time.hour() * 3_600 + time.minute() * 60 + time.second()
-        return seconds
+        self.periods_models = PandasModel(self.results)
+        self.tbl_periods.setModel(self.periods_models)
 
-    def set_assignment_use(self):
-        for item in [
-            self.cob_travel_time,
-            self.cob_freq,
-            self.cob_matrices,
-            self.cob_matrix_core,
-            self.ln_transit_class,
-            self.label_10,
-            self.label_13,
-            self.label_14,
-            self.label_15,
-            self.label_16,
-        ]:
-            item.setEnabled(self.chb_set_assignment.isChecked())
+    def get_period(self):
+        sel = self.tbl_periods.selectionModel().selectedRows()
+        if not sel:
+            self.iface.messageBar().pushMessage("Warning", "Please select a period", level=1, duration=10)
+            return
+        rows = [s.row() for s in sel if s.column() == 0]
+        print(rows)
 
     def exit_procedure(self):
         self.close()
