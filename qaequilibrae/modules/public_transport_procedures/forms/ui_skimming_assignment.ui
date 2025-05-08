@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>724</width>
-    <height>622</height>
+    <height>294</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="2" column="0">
+   <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="font">
       <font>
@@ -24,182 +24,121 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="graph_config">
+     <widget class="QWidget" name="tab_period">
       <attribute name="title">
-       <string>Graph</string>
+       <string>Period</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="2" column="0">
-        <widget class="QGroupBox" name="period">
-         <property name="title">
-          <string>Period</string>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QPushButton" name="but_add_period">
+         <property name="text">
+          <string>Add new period</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="spin_period_id">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="singleStep">
-             <number>1</number>
-            </property>
-            <property name="value">
-             <number>2</number>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Description</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="4">
-           <widget class="QPushButton" name="but_add_period">
-            <property name="text">
-             <string>Add period</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Start</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QTimeEdit" name="time_start">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="minimumTime">
-             <time>
-              <hour>6</hour>
-              <minute>0</minute>
-              <second>0</second>
-             </time>
-            </property>
-            <property name="displayFormat">
-             <string>HH:mm:ss</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="4">
-           <widget class="QTimeEdit" name="time_end">
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="minimumTime">
-             <time>
-              <hour>10</hour>
-              <minute>0</minute>
-              <second>0</second>
-             </time>
-            </property>
-            <property name="displayFormat">
-             <string>HH:mm:ss</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Period ID</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>End</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1" colspan="3">
-           <widget class="QLineEdit" name="ln_period_desc"/>
-          </item>
-         </layout>
         </widget>
        </item>
+       <item row="1" column="0">
+        <widget class="QTableWidget" name="tbl_periods">
+         <column>
+          <property name="text">
+           <string>Period ID</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Period start</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Period end</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Description</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="graph_config">
+      <attribute name="title">
+       <string>Transit Graph</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
         <widget class="QGroupBox" name="graph">
          <property name="title">
-          <string>Graph</string>
+          <string/>
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
-          <item row="6" column="1">
-           <widget class="QComboBox" name="cob_line_methods"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_1">
-            <property name="text">
-             <string>Modes</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="cob_mode"/>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Line geometry method</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QCheckBox" name="chb_check_centroids">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Block flows through centroids</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>Connector method</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
-           <widget class="QComboBox" name="cob_conn_methods"/>
-          </item>
-          <item row="4" column="0">
-           <widget class="QCheckBox" name="chb_walk_edges">
-            <property name="text">
-             <string>Walking edges</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
+          <item row="1" column="0">
            <widget class="QCheckBox" name="chb_outer_stops">
             <property name="text">
              <string>Outer stops transfers</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QCheckBox" name="checkBox">
+          <item row="5" column="1" colspan="2">
+           <widget class="QComboBox" name="cob_mode"/>
+          </item>
+          <item row="1" column="2">
+           <widget class="QCheckBox" name="chb_walk_edges">
+            <property name="text">
+             <string>Walking edges</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Line geometry method</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" colspan="2">
+           <widget class="QComboBox" name="cob_conn_methods"/>
+          </item>
+          <item row="4" column="1" colspan="2">
+           <widget class="QComboBox" name="cob_line_methods"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_1">
+            <property name="text">
+             <string>Match graph for mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="chb_inner_stops">
             <property name="text">
              <string>Inner stops transfers</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QCheckBox" name="chb_save_graph">
+            <property name="text">
+             <string>Save transit graph to database</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
-        <spacer name="vtab11">
+       <item row="1" column="0">
+        <spacer name="vtab_11">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -213,12 +152,19 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_skim_assign">
+     <widget class="QWidget" name="tab_skimming">
       <attribute name="title">
-       <string>Skimming and Assignment</string>
+       <string>Skimming</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="0" column="0" colspan="4">
+       <item row="1" column="0" colspan="3">
+        <widget class="QPushButton" name="but_create">
+         <property name="text">
+          <string>Create skims</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="3">
         <widget class="QGroupBox" name="skims_2">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -227,11 +173,36 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Skims</string>
+          <string/>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
-          <item row="0" column="0" rowspan="7">
-           <widget class="QTableWidget" name="available_skims_table">
+          <item row="2" column="1">
+           <widget class="QToolButton" name="but_adds_to_skim">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonIconOnly</enum>
+            </property>
+            <property name="arrowType">
+             <enum>Qt::RightArrow</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" rowspan="7">
+           <widget class="QTableWidget" name="skim_list">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -258,57 +229,13 @@
             </attribute>
             <column>
              <property name="text">
-              <string>Available skims</string>
+              <string>Compute skims</string>
              </property>
             </column>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QToolButton" name="but_adds_to_skim">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>50</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="toolButtonStyle">
-             <enum>Qt::ToolButtonIconOnly</enum>
-            </property>
-            <property name="arrowType">
-             <enum>Qt::RightArrow</enum>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1">
            <spacer name="vtab21_2">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="4" column="1">
-           <spacer name="vtab22_2">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -351,8 +278,27 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="2" rowspan="7">
-           <widget class="QTableWidget" name="skim_list">
+          <item row="4" column="1">
+           <spacer name="vtab22_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="0" rowspan="7">
+           <widget class="QTableWidget" name="available_skims_table">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -379,7 +325,7 @@
             </attribute>
             <column>
              <property name="text">
-              <string>Compute skims</string>
+              <string>Available skims</string>
              </property>
             </column>
            </widget>
@@ -387,53 +333,53 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0" colspan="4">
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_assignment">
+      <attribute name="title">
+       <string>Transit Assignment</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
         <widget class="QGroupBox" name="traffic_class_2">
          <property name="title">
-          <string>Transit Assignment</string>
+          <string/>
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
-          <item row="2" column="0" colspan="2">
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>Assignment class name</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
+          <item row="0" column="0">
            <widget class="QLabel" name="label_14">
             <property name="text">
              <string>Matrix</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
-           <widget class="QComboBox" name="cob_matrix_core"/>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="cob_matrices"/>
-          </item>
-          <item row="2" column="2" colspan="2">
-           <widget class="QLineEdit" name="ln_transit_class"/>
-          </item>
-          <item row="1" column="2">
+          <item row="0" column="2">
            <widget class="QLabel" name="label_15">
             <property name="text">
              <string>Matrix core</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="chb_set_assignment">
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cob_matrices"/>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QLabel" name="label_16">
             <property name="text">
-             <string>Set transit assignment</string>
+             <string>Assignment class name</string>
             </property>
            </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QComboBox" name="cob_matrix_core"/>
+          </item>
+          <item row="1" column="2" colspan="2">
+           <widget class="QLineEdit" name="ln_transit_class"/>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="2" column="0" rowspan="2" colspan="4">
+       <item row="1" column="0">
         <widget class="QGroupBox" name="net_info_2">
          <property name="title">
           <string>Network information</string>
@@ -462,7 +408,7 @@
          </layout>
         </widget>
        </item>
-       <item row="4" column="0" colspan="4">
+       <item row="2" column="0">
         <widget class="QGroupBox" name="output_2">
          <property name="title">
           <string>Outputs</string>
@@ -478,14 +424,7 @@
          </layout>
         </widget>
        </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QPushButton" name="but_create">
-         <property name="text">
-          <string>Create skims</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="2" colspan="2">
+       <item row="3" column="0">
         <widget class="QPushButton" name="but_assign">
          <property name="text">
           <string>Perform assignment</string>

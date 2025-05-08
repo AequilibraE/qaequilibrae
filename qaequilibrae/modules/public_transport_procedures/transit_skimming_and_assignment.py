@@ -1,11 +1,13 @@
 from os.path import join, dirname
 
 from aequilibrae.matrix import AequilibraeMatrix
-from aequilibrae.transit import Transit
+from aequilibrae.transit import Transit, TransitGraphBuilder
+from aequilibrae.project.database_connection import database_connection
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
 
 from qaequilibrae.modules.matrix_procedures import list_matrices
+from qaequilibrae.modules.public_transport_procedures import NewPeriodDialog
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_skimming_assignment.ui"))
 
@@ -14,9 +16,9 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QDialog.__init__(self)
         self.setupUi(self)
+        self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.transit_data = Transit(self.project)
-        self.mat = AequilibraeMatrix()
 
         self.all_modes = {}
         self.proj_matrices = list_matrices(self.project.matrices.fldr)
@@ -29,7 +31,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
         self.chb_set_assignment.toggled.connect(self.set_assignment_use)
         self.but_add_period.clicked.connect(self.add_period)
-        self.but_assign.clicked.connect(self.run_assignment)
+        # self.but_assign.clicked.connect(self.run_assignment)
 
         self.set_assignment_use()
 
@@ -89,6 +91,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             connector_method=c_method,
         )
 
+        # Get project connector configs
         line_method = self.cob_line_methods.currentText().lower()
         mode = self.cob_mode.currentText()
         mode_id = self.all_modes[mode]
@@ -96,16 +99,14 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.project.network.build_graphs()
         graph.create_line_geometry(method=line_method, graph=mode_id)
 
-        # ###
-        # TODO: save the graphs and reload them?
-        # self.transit_data.save_graphs()
-        # self.transit_data.load()
+        if self.chb_save_graph.isChecked():
+            self.transit_data.save_graphs()
+            self.transit_data.load()
 
-        # Reading back into AequilibraE
-        # pt_con = database_connection("transit")
-        # graph_db = TransitGraphBuilder.from_db(pt_con, project.network.periods.default_period.period_id)
-        # graph_db.vertices.drop(columns="geometry")
-        # ###
+            # Reading back into AequilibraE
+            pt_con = database_connection("transit")
+            graph_db = TransitGraphBuilder.from_db(pt_con, self.project.network.periods.default_period.period_id)
+            graph_db.vertices.drop(columns="geometry")
 
         # To perform an assignment we need to convert the graph builder into a graph.
         self.transit_graph = graph.to_transit_graph()
@@ -113,8 +114,9 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
     def update_matrix_data(self):
         self.cob_matrix_core.clear()
         file_name = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
-        self.mat.load(join(self.project.matrices.fldr, file_name))
-        self.cob_matrix_core.addItems(self.mat.names)
+        mat = AequilibraeMatrix()
+        mat.load(join(self.project.matrices.fldr, file_name))
+        self.cob_matrix_core.addItems(mat.names)
 
     def __get_connector_method(self):
         method = self.cob_direction.currentText()
@@ -128,14 +130,23 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             print()
 
     def add_period(self):
-        period_id = self.spin_period_id.value()
-        start_time = self.__time_converter(self.time_start.time())
-        end_time = self.__time_converter(self.time_end.time())
-        description = self.ln_period_desc.text()
+        dlg2 = NewPeriodDialog(self.iface, self.project)
+        dlg2.show()
+        dlg2.exec_()
 
-        periods = self.project.network.periods
-        periods.new_period(period_id, start_time, end_time, description)
-        periods.save()
+        if len(dlg2.error) < 1:
+            start_time = dlg2.start_time
+            end_time = dlg2.end_time
+            description = dlg2.description
+
+            periods = self.project.network.periods
+            period_id = max(periods.data["period_id"].values)
+            periods.new_period(period_id, start_time, end_time, description)
+            periods.save()
+
+    def __update_periods_table(self):
+
+        pass
 
     def __time_converter(self, time):
         seconds = time.hour() * 3_600 + time.minute() * 60 + time.second()
