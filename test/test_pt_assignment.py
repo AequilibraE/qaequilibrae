@@ -23,12 +23,16 @@ def create_dialog_with_matrix(project):
 
 def test_init(qtbot, coquimbo_project):
     dialog = create_dialog_with_matrix(coquimbo_project)
+    # dialog = TransitSkimAssign(pt_project)
+
+    # select period
+    dialog.tbl_periods.selectRow(0)
 
     # Add boardings, dwelling_time, and transfer_time
     for row in [0, 6, 9]:
         dialog.available_skims_table.selectRow(row)  # add boardings
         qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
-    
+
     assert dialog.skim_fields == ["boardings", "dwelling_time", "transfer_time"]
 
     # Remove dwelling_time
@@ -37,13 +41,23 @@ def test_init(qtbot, coquimbo_project):
 
     assert dialog.skim_fields == ["boardings", "transfer_time"]
 
-    # 
+    dialog.ln_matrix_name.setText("selected_pt_skims")
 
-    for i in [0, 1, 2, 3]:
-        path = qtbot.screenshot(dialog.tabWidget.widget(i), suffix=f"{i}")
-        print(path)
+    qtbot.mouseClick(dialog.but_create, Qt.LeftButton)
 
-    print(dialog.skim_fields)
+    # for i in [0, 1, 2, 3]:
+    #     path = qtbot.screenshot(dialog.tabWidget.widget(i), suffix=f"{i}")
+    #     print(path)
+
+    matrices = coquimbo_project.project.matrices
+    mats = matrices.list()
+    print(mats)
+
+    # assert mats.iloc[0]["file_name"] == "selected_pt_skims.omx"
+
+    # mat = matrices.get_matrix("selected_pt_skims")
+    # assert mat.cores == 2
+    # assert mat.names == ["boardings", "transfer_time"]
 
 
 @pytest.fixture
