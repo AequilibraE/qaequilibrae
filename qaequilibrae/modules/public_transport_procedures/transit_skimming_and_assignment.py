@@ -16,9 +16,6 @@ from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
 from qaequilibrae.modules.common_tools import PandasModel
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from qaequilibrae.modules.public_transport_procedures.new_period_dialog import NewPeriodDialog
-from qaequilibrae.modules.public_transport_procedures.transit_skimming_and_assignment_procedures import (
-    TransitSkimAssignProcedure,
-)
 
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_skimming_assignment.ui"))
@@ -49,8 +46,9 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.but_add_period.clicked.connect(self.add_period)
         self.but_adds_to_skim.clicked.connect(self.append_to_list)
         self.but_removes_from_skim.clicked.connect(self.removes_fields)
-        self.but_assign.clicked.connect(partial(self.run, "assign"))
-        self.but_create.clicked.connect(partial(self.run, "create"))
+
+        # self.but_assign.clicked.connect(partial(self.run, "assign"))
+        # self.but_create.clicked.connect(self.execute_skim)
 
     def __populate_project_info(self):
         self.load_periods()
@@ -139,6 +137,10 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         else:
             return "nearest_neighbour"
 
+    def execute_skim(self):
+        action = "create"
+        self.run(action)
+
     def run(self, action):
         # TODO: check inputs before assignment
 
@@ -164,26 +166,30 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         time_field = "trav_time" if action == "create" else self.cob_travel_time.currentText()
         frequency_field = "freq" if action == "create" else self.cob_freq.currentText()
 
-        parameters = {
-            "class_name": "pt" if action == "create" else self.ln_transit_class.text(),
-            "time_field": "trav_time" if action == "create" else self.cob_travel_time.currentText(),
-            "frequency_field": "freq" if action == "create" else self.cob_freq.currentText(),
-            "skimming_fields": self.skim_fields,
-            "demand_matrix_core": "pt" if action == "create" else self.cob_matrix_core.currentText(),
-        }
+        # Create the Transit Class
+        assigclass = TransitClass(name=class_name, graph=self.transit_graph, matrix=mat)
 
-        self.worker_thread = TransitSkimAssignProcedure(
-            iface.mainWindow(),
-            self.transit_graph,
-            mat,
-            parameters,
-        )
-        self.run_thread()
+        # Create the Transit Assignment Class
+        self.assig = TransitAssignment()
+        self.assig.add_class(assigclass)
 
-    def run_thread(self):
-        self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.doWork()
-        self.exec_()
+        # Set assignment
+        self.assig.set_time_field(time_field)
+        self.assig.set_frequency_field(frequency_field)
+        self.assig.set_skimming_fields(self.skim_fields)
+        self.assig.set_algorithm("os")
+        assigclass.set_demand_matrix_core(demand_matrix_core)
+
+        # Perform the assignment
+        self.assig.execute()
+
+        # if action == "create":
+        #     self.worker_thread.assig.get_skim_results()["pt"].export(
+        #         join(self.project.project_base_path, f"matrices/{self.ln_matrix_name.text()}.omx")
+        #     )
+        # else:
+        #     self.worker_thread.assig.save_results(table_name=self.ln_result_name.text())
+        self.exit_procedure()
 
     def add_period(self):
         """Adds new periods to periods table"""
@@ -277,17 +283,6 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
                 item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
                 counter += 1
-
-    def signal_handler(self, val):
-        if val[0] == "finished":
-            # print(self.worker_thread.assig.results())
-            # if action == "create":
-            #     self.worker_thread.assig.get_skim_results()["pt"].export(
-            #         join(self.project.project_base_path, f"matrices/{self.ln_matrix_name.text()}.omx")
-            #     )
-            # else:
-            #     self.worker_thread.assig.save_results(table_name=self.ln_result_name.text())
-            self.exit_procedure()
 
     def exit_procedure(self):
         self.close()
