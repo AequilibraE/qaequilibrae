@@ -132,6 +132,26 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.c_method = self.__get_connector_method()
         self.period_id = int(self.get_period())
 
+        if action == "create":
+            # Check if skim_fields is not empty
+            if len(self.skim_fields) == 0:
+                self.error = "Add skims to the selection"
+
+            # Check if ln_matrix_name is not null
+            self.matrix_name = self.ln_matrix_name.text()
+            if len(self.matrix_name.replace(" ", "")) == 0:
+                self.error = "Check matrix_name"
+        else:
+            # Check if ln_transit_class is not empty
+            self.class_name = self.ln_transit_class.text()
+            if len(self.class_name.replace(" ", "")) == 0:
+                self.error = "Check PT class name"
+
+            # check if ln_result_name is not null
+            self.result_name = self.ln_result_name.text()
+            if len(self.result_name.replace(" ", "")) == 0:
+                self.error = "Check matrix_name"
+
     def run(self, action):
         # TODO: check inputs before assignment
         self.check_inputs(action)
@@ -143,7 +163,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
             mat = self.__build_ones_matrix() if action == "create" else self.__get_matrix()
 
-            class_name = "pt" if action == "create" else self.ln_transit_class.text()
+            class_name = "pt" if action == "create" else self.class_name
             demand_matrix_core = "pt" if action == "create" else self.cob_matrix_core.currentText()
             time_field = "trav_time" if action == "create" else self.cob_travel_time.currentText()
             frequency_field = "freq" if action == "create" else self.cob_freq.currentText()
@@ -158,7 +178,8 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             # Set assignment
             assig.set_time_field(time_field)
             assig.set_frequency_field(frequency_field)
-            assig.set_skimming_fields(self.skim_fields)
+            if action == "create":
+                assig.set_skimming_fields(self.skim_fields)
             assig.set_algorithm("os")
             assigclass.set_demand_matrix_core(demand_matrix_core)
 
@@ -167,10 +188,10 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
             if action == "create":
                 assig.get_skim_results()["pt"].export(
-                    join(self.project.project_base_path, f"matrices/{self.ln_matrix_name.text()}.omx")
+                    join(self.project.project_base_path, f"matrices/{self.matrix_name}.omx")
                 )
             else:
-                assig.save_results(table_name=self.ln_result_name.text())
+                assig.save_results(table_name=self.result_name)
         self.exit_procedure()
 
     def add_period(self):
