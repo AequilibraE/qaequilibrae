@@ -1,14 +1,10 @@
 from functools import partial
 from os.path import join, dirname
-import numpy as np
 
+import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths import TransitAssignment, TransitClass
-from aequilibrae.project.database_connection import database_connection
 from aequilibrae.transit import Transit
-
-# from aequilibrae.transit.transit_graph_builder import TransitGraphBuilder
-from qgis.utils import iface
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
@@ -16,7 +12,6 @@ from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
 from qaequilibrae.modules.common_tools import PandasModel
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from qaequilibrae.modules.public_transport_procedures.new_period_dialog import NewPeriodDialog
-
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_skimming_assignment.ui"))
 
@@ -47,7 +42,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.but_adds_to_skim.clicked.connect(self.append_to_list)
         self.but_removes_from_skim.clicked.connect(self.removes_fields)
 
-        # self.but_assign.clicked.connect(partial(self.run, "assign"))
+        self.but_assign.clicked.connect(partial(self.run, "assign"))
         self.but_create.clicked.connect(partial(self.run, "create"))
 
     def __populate_project_info(self):
@@ -106,7 +101,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             with_outer_stop_transfers=self.chb_outer_stops.isChecked(),
             with_inner_stop_transfers=self.chb_inner_stops.isChecked(),
             with_walking_edges=self.chb_walk_edges.isChecked(),
-            blocking_centroid_flows=False,
+            blocking_centroid_flows=self.chb_check_centroids.isChecked(),
             connector_method=c_method,
         )
 
@@ -118,8 +113,8 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.project.network.build_graphs()
         graph.create_line_geometry(method=line_method, graph=mode_id)
 
-        # if self.chb_save_graph.isChecked():
-        #     self.transit_data.save_graphs(period_ids=[self.period_id])
+        if self.chb_save_graph.isChecked():
+            self.transit_data.save_graphs(period_ids=[self.period_id])
 
         # To perform an assignment we need to convert the graph builder into a graph.
         self.transit_graph = graph.to_transit_graph()
@@ -138,29 +133,12 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         else:
             return "nearest_neighbour"
 
-    def execute_skim(self):
-        action = "create"
-        self.run(action)
-
     def run(self, action):
         # TODO: check inputs before assignment
 
         self.build_graph()
 
-        mat = AequilibraeMatrix()
-
-        if action == "create":
-            zones = len(self.transit_graph.centroids)
-
-            mat.create_empty(zones=zones, matrix_names=["pt"], memory_only=True)
-            mat.index = self.transit_graph.centroids[:]
-            mat.matrices[:, :, 0] = np.ones((zones, zones))
-            mat.computational_view()
-        else:
-            mat_name = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
-
-            mat.load(join(self.project.matrices.fldr, mat_name))
-            mat.computational_view([self.cob_matrix_core.currentText()])
+        mat = self.__build_ones_matrix() if action == "create" else self.__get_matrix()
 
         class_name = "pt" if action == "create" else self.ln_transit_class.text()
         demand_matrix_core = "pt" if action == "create" else self.cob_matrix_core.currentText()

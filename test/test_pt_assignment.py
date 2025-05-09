@@ -21,7 +21,36 @@ def create_dialog_with_matrix(project):
     return TransitSkimAssign(project)
 
 
-def test_init(qtbot, coquimbo_project):
+def test_assignment(qtbot, coquimbo_project):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    # select period
+    dialog.tbl_periods.selectRow(0)
+
+    # set transit graph config
+    dialog.chb_inner_stops.setChecked(True)
+    dialog.cob_line_methods.setCurrentText("Connector project match")
+
+    # Add boardings, alightings, and transfers
+    for row in [0, 0, 2]:
+        dialog.available_skims_table.selectRow(row)  # add boardings
+        qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
+
+    assert dialog.skim_fields == ["boardings", "alightings", "transfers"]
+
+    dialog.ln_transit_class.setText("pt_class")
+    dialog.cob_travel_time.setCurrentText("trav_time")
+    dialog.cob_freq.setCurrentText("freq")
+    dialog.ln_result_name.setText("pt_assignment")
+
+    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+
+    # Check the results table
+
+    # check if graph was saved
+
+
+def test_skimming(qtbot, coquimbo_project):
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     # select period
@@ -33,23 +62,19 @@ def test_init(qtbot, coquimbo_project):
     # Add boardings, dwelling_time, and transfer_time
     for row in [0, 6, 9]:
         dialog.available_skims_table.selectRow(row)  # add boardings
-        dialog.append_to_list()
-    
+        qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
+
     assert dialog.skim_fields == ["boardings", "dwelling_time", "transfer_time"]
 
     # Remove dwelling_time
     dialog.skim_list.selectRow(1)
-    dialog.removes_fields()
+    qtbot.mouseClick(dialog.but_removes_from_skim, Qt.LeftButton)
 
     assert dialog.skim_fields == ["boardings", "transfer_time"]
 
     dialog.ln_matrix_name.setText("selected_pt_skims")
 
-    dialog.run("create")
-
-    for i in [0, 1, 2, 3]:
-        path = qtbot.screenshot(dialog.tabWidget.widget(i), suffix=f"{i}")
-        print(path)
+    qtbot.mouseClick(dialog.but_create, Qt.LeftButton)
 
     matrices = coquimbo_project.project.matrices
     matrices.update_database()
@@ -59,6 +84,7 @@ def test_init(qtbot, coquimbo_project):
     mat = matrices.get_matrix("selected_pt_skims_omx")
     assert mat.cores == 2
     assert mat.names == ["boardings", "transfer_time"]
+
 
 @pytest.fixture
 def mock_period(mocker):
@@ -90,7 +116,7 @@ def test_create_period(qtbot, coquimbo_project, mock_period):
     assert period_id == 2
 
 
-def test_new_period_dialog(qtbot, qgis_iface):
+def test_new_period_dialog(qgis_iface):
     dialog = NewPeriodDialog(qgis_iface)
 
     # Set the start and end times
