@@ -130,7 +130,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
     def check_inputs(self, action):
         self.c_method = self.__get_connector_method()
-        self.period_id = int(self.get_period())
+        self.period_id = self.get_period()
         errors = []  # Initialize a list to collect validation errors
 
         if action == "create":
@@ -151,9 +151,10 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             # check if ln_result_name is not null
             self.result_name = self.ln_result_name.text()
             if len(self.result_name.replace(" ", "")) == 0:
-                errors.append("Check matrix_name")
+                errors.append("Check result_name")
 
-        self.error = "\n".join(errors)  # Combine all errors into a single string
+        if not self.error:
+            self.error = "\n".join(errors)  # Combine all errors into a single string
 
     def run(self, action):
         self.check_inputs(action)
@@ -227,7 +228,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             self.error = "Please select a period"
             return
         row = [s.row() for s in sel if s.column() == 0][0]
-        return self.results.iloc[row]["period_id"]
+        return int(self.results.iloc[row]["period_id"])
 
     def __build_ones_matrix(self):
         """Create an array filled with ones to create PT skimming."""

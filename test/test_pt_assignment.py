@@ -36,7 +36,7 @@ def test_assignment(qtbot, coquimbo_project):
 
     # Add boardings, alightings, and transfers
     for row in [0, 0, 2]:
-        dialog.available_skims_table.selectRow(row)  # add boardings
+        dialog.available_skims_table.selectRow(row)
         qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
 
     assert dialog.skim_fields == ["boardings", "alightings", "transfers"]
@@ -76,7 +76,7 @@ def test_skimming(qtbot, coquimbo_project):
 
     # Add boardings, dwelling_time, and transfer_time
     for row in [0, 6, 9]:
-        dialog.available_skims_table.selectRow(row)  # add boardings
+        dialog.available_skims_table.selectRow(row)
         qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
 
     assert dialog.skim_fields == ["boardings", "dwelling_time", "transfer_time"]
@@ -146,3 +146,75 @@ def test_new_period_dialog(qgis_iface):
 
     assert dialog.time_start.time() == start_time, "Start time is different than expected."
     assert dialog.time_end.time() == end_time, "End time is different than expected."
+
+
+def test_period_not_selected(qtbot, coquimbo_project):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+
+    dialog.available_skims_table.selectRow(0)
+    qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
+
+    dialog.ln_matrix_name.setText("selected_pt_skims")
+
+    qtbot.mouseClick(dialog.but_create, Qt.LeftButton)
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == "Warning:Please select a period"
+
+
+def test_no_skims(qtbot, coquimbo_project):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+    dialog.tbl_periods.selectRow(0)
+
+    dialog.ln_matrix_name.setText("selected_pt_skims")
+
+    qtbot.mouseClick(dialog.but_create, Qt.LeftButton)
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == "Warning:Add skims to the selection"
+
+
+@pytest.mark.parametrize("name", ["", "     "])
+def test_no_matrix_name(qtbot, coquimbo_project, name):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+    dialog.tbl_periods.selectRow(0)
+
+    dialog.available_skims_table.selectRow(0)
+    qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
+
+    dialog.ln_matrix_name.setText(name)
+
+    qtbot.mouseClick(dialog.but_create, Qt.LeftButton)
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == "Warning:Check matrix_name"
+
+
+@pytest.mark.parametrize("name", ["", "     "])
+def test_no_pt_class_name(qtbot, coquimbo_project, name):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+    dialog.tbl_periods.selectRow(0)
+
+    dialog.ln_transit_class.setText(name)
+
+    dialog.ln_result_name.setText("pt_assignment")
+
+    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == "Warning:Check PT class name"
+
+
+@pytest.mark.parametrize("name", ["", "     "])
+def test_no_results_name(qtbot, coquimbo_project, name):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+    dialog.tbl_periods.selectRow(0)
+
+    dialog.ln_transit_class.setText("pt_class")
+
+    dialog.ln_result_name.setText(name)
+
+    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == "Warning:Check result_name"
