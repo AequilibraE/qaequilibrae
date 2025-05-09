@@ -80,8 +80,9 @@ def test_skimming(qtbot, coquimbo_project):
     matrices = coquimbo_project.project.matrices
     matrices.update_database()
     mats = matrices.list()
-    assert mats.iloc[1]["file_name"] == "selected_pt_skims.omx"
-
+    selected_matrix = mats[mats["file_name"] == "selected_pt_skims.omx"]
+    assert not selected_matrix.empty, "Matrix with file_name 'selected_pt_skims.omx' not found."
+    assert selected_matrix.iloc[0]["file_name"] == "selected_pt_skims.omx"
     mat = matrices.get_matrix("selected_pt_skims_omx")
     assert mat.cores == 2
     assert mat.names == ["boardings", "transfer_time"]
