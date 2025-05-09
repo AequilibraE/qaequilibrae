@@ -154,6 +154,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
                 errors.append("Check matrix_name")
 
         self.error = "\n".join(errors)  # Combine all errors into a single string
+
     def run(self, action):
         self.check_inputs(action)
         if self.error:

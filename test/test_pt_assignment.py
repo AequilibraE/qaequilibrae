@@ -1,10 +1,12 @@
 from os.path import join
 
 import numpy as np
+import pandas as pd
 import pytest
 from qgis.PyQt.QtCore import Qt, QTime
 from qgis.PyQt.QtWidgets import QDialog
 
+from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
 from qaequilibrae.modules.public_transport_procedures.new_period_dialog import NewPeriodDialog
 from qaequilibrae.modules.public_transport_procedures.transit_skimming_and_assignment import TransitSkimAssign
 from .utilities import create_matrix
@@ -28,7 +30,7 @@ def test_assignment(qtbot, coquimbo_project):
     dialog.tbl_periods.selectRow(0)
 
     # set transit graph config
-    dialog.chb_inner_stops.setChecked(True)
+    dialog.chb_walk_edges.setChecked(False)
     dialog.cob_conn_methods.setCurrentText("Nearest neighbour")
     dialog.cob_line_methods.setCurrentText("Connector project match")
 
@@ -47,8 +49,19 @@ def test_assignment(qtbot, coquimbo_project):
     qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
 
     # Check the results table
+    result = load_result_table(coquimbo_project.project.project_base_path, "pt_assignment")
+    assert result.shape == (466, 2)
+    assert result.columns.tolist() == ["index", "pt_class_volume"]
 
     # check if graph was saved
+    with coquimbo_project.project.db_connection as conn:
+        df = pd.read_sql("SELECT * FROM transit_graph_configs", con=conn)
+    assert df.shape == (1, 2)
+    config = df.iloc[0]["config"]
+    assert (
+        config
+        == """{"period_id": 1, "projected_crs": "EPSG:3857", "seed": 124, "geometry_noise": true, "noise_coef": 1e-05, "with_inner_stop_transfers": false, "with_outer_stop_transfers": false, "with_walking_edges": false, "distance_upper_bound": Infinity, "blocking_centroid_flows": false, "connector_method": "nearest_neighbour", "max_connectors_per_zone": -1}"""
+    )
 
 
 def test_skimming(qtbot, coquimbo_project):
@@ -58,7 +71,8 @@ def test_skimming(qtbot, coquimbo_project):
     dialog.tbl_periods.selectRow(0)
 
     # set transit graph config
-    dialog.chb_inner_stops.setChecked(True)
+    dialog.chb_walk_edges.setChecked(False)
+    dialog.chb_save_graph.setChecked(False)
 
     # Add boardings, dwelling_time, and transfer_time
     for row in [0, 6, 9]:
@@ -80,7 +94,9 @@ def test_skimming(qtbot, coquimbo_project):
     matrices = coquimbo_project.project.matrices
     matrices.update_database()
     mats = matrices.list()
-    assert mats.iloc[1]["file_name"] == "selected_pt_skims.omx"
+    selected_matrix = mats[mats["file_name"] == "selected_pt_skims.omx"]
+    assert not selected_matrix.empty, "Matrix with file_name 'selected_pt_skims.omx' not found."
+    assert selected_matrix.iloc[0]["file_name"] == "selected_pt_skims.omx"
 
     mat = matrices.get_matrix("selected_pt_skims_omx")
     assert mat.cores == 2
