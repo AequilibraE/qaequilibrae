@@ -24,39 +24,41 @@ def create_dialog_with_matrix(project):
 def test_init(qtbot, coquimbo_project):
     dialog = create_dialog_with_matrix(coquimbo_project)
 
-    # # select period
-    # dialog.tbl_periods.selectRow(0)
+    # select period
+    dialog.tbl_periods.selectRow(0)
 
-    # # Add boardings, dwelling_time, and transfer_time
-    # for row in [0, 6, 9]:
-    #     dialog.available_skims_table.selectRow(row)  # add boardings
-    #     qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
+    # set transit graph config
+    dialog.chb_inner_stops.setChecked(True)
+
+    # Add boardings, dwelling_time, and transfer_time
+    for row in [0, 6, 9]:
+        dialog.available_skims_table.selectRow(row)  # add boardings
+        dialog.append_to_list()
     
-    # assert dialog.skim_fields == ["boardings", "dwelling_time", "transfer_time"]
+    assert dialog.skim_fields == ["boardings", "dwelling_time", "transfer_time"]
 
     # Remove dwelling_time
-    # dialog.skim_list.selectRow(1)
-    # qtbot.mouseClick(dialog.but_removes_from_skim, Qt.LeftButton)
+    dialog.skim_list.selectRow(1)
+    dialog.removes_fields()
 
-    # assert dialog.skim_fields == ["boardings", "transfer_time"]
+    assert dialog.skim_fields == ["boardings", "transfer_time"]
 
-    # dialog.ln_matrix_name.setText("selected_pt_skims")
+    dialog.ln_matrix_name.setText("selected_pt_skims")
 
-    # qtbot.mouseClick(dialog.but_create, Qt.LeftButton)
+    dialog.run("create")
 
     for i in [0, 1, 2, 3]:
         path = qtbot.screenshot(dialog.tabWidget.widget(i), suffix=f"{i}")
         print(path)
 
-    # matrices = coquimbo_project.project.matrices
-    # mats = matrices.list()
-    # print(mats)
+    matrices = coquimbo_project.project.matrices
+    matrices.update_database()
+    mats = matrices.list()
+    assert mats.iloc[1]["file_name"] == "selected_pt_skims.omx"
 
-    # assert mats.iloc[0]["file_name"] == "selected_pt_skims.omx"
-
-    # mat = matrices.get_matrix("selected_pt_skims")
-    # assert mat.cores == 2
-    # assert mat.names == ["boardings", "transfer_time"]
+    mat = matrices.get_matrix("selected_pt_skims_omx")
+    assert mat.cores == 2
+    assert mat.names == ["boardings", "transfer_time"]
 
 @pytest.fixture
 def mock_period(mocker):

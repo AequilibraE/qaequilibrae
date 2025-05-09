@@ -48,7 +48,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.but_removes_from_skim.clicked.connect(self.removes_fields)
 
         # self.but_assign.clicked.connect(partial(self.run, "assign"))
-        # self.but_create.clicked.connect(self.execute_skim)
+        self.but_create.clicked.connect(partial(self.run, "create"))
 
     def __populate_project_info(self):
         self.load_periods()
@@ -106,6 +106,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             with_outer_stop_transfers=self.chb_outer_stops.isChecked(),
             with_inner_stop_transfers=self.chb_inner_stops.isChecked(),
             with_walking_edges=self.chb_walk_edges.isChecked(),
+            blocking_centroid_flows=False,
             connector_method=c_method,
         )
 
@@ -117,8 +118,8 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.project.network.build_graphs()
         graph.create_line_geometry(method=line_method, graph=mode_id)
 
-        if self.chb_save_graph.isChecked():
-            self.transit_data.save_graphs(period_ids=[self.period_id])
+        # if self.chb_save_graph.isChecked():
+        #     self.transit_data.save_graphs(period_ids=[self.period_id])
 
         # To perform an assignment we need to convert the graph builder into a graph.
         self.transit_graph = graph.to_transit_graph()
@@ -170,25 +171,25 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         assigclass = TransitClass(name=class_name, graph=self.transit_graph, matrix=mat)
 
         # Create the Transit Assignment Class
-        self.assig = TransitAssignment()
-        self.assig.add_class(assigclass)
+        assig = TransitAssignment()
+        assig.add_class(assigclass)
 
         # Set assignment
-        self.assig.set_time_field(time_field)
-        self.assig.set_frequency_field(frequency_field)
-        self.assig.set_skimming_fields(self.skim_fields)
-        self.assig.set_algorithm("os")
+        assig.set_time_field(time_field)
+        assig.set_frequency_field(frequency_field)
+        assig.set_skimming_fields(self.skim_fields)
+        assig.set_algorithm("os")
         assigclass.set_demand_matrix_core(demand_matrix_core)
 
         # Perform the assignment
-        self.assig.execute()
+        assig.execute()
 
-        # if action == "create":
-        #     self.worker_thread.assig.get_skim_results()["pt"].export(
-        #         join(self.project.project_base_path, f"matrices/{self.ln_matrix_name.text()}.omx")
-        #     )
-        # else:
-        #     self.worker_thread.assig.save_results(table_name=self.ln_result_name.text())
+        if action == "create":
+            assig.get_skim_results()["pt"].export(
+                join(self.project.project_base_path, f"matrices/{self.ln_matrix_name.text()}.omx")
+            )
+        else:
+            assig.save_results(table_name=self.ln_result_name.text())
         self.exit_procedure()
 
     def add_period(self):
