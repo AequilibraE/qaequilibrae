@@ -131,27 +131,29 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
     def check_inputs(self, action):
         self.c_method = self.__get_connector_method()
         self.period_id = int(self.get_period())
+        errors = []  # Initialize a list to collect validation errors
 
         if action == "create":
             # Check if skim_fields is not empty
             if len(self.skim_fields) == 0:
-                self.error = "Add skims to the selection"
+                errors.append("Add skims to the selection")
 
             # Check if ln_matrix_name is not null
             self.matrix_name = self.ln_matrix_name.text()
             if len(self.matrix_name.replace(" ", "")) == 0:
-                self.error = "Check matrix_name"
+                errors.append("Check matrix_name")
         else:
             # Check if ln_transit_class is not empty
             self.class_name = self.ln_transit_class.text()
             if len(self.class_name.replace(" ", "")) == 0:
-                self.error = "Check PT class name"
+                errors.append("Check PT class name")
 
             # check if ln_result_name is not null
             self.result_name = self.ln_result_name.text()
             if len(self.result_name.replace(" ", "")) == 0:
-                self.error = "Check matrix_name"
+                errors.append("Check matrix_name")
 
+        self.error = "\n".join(errors)  # Combine all errors into a single string
     def run(self, action):
         self.check_inputs(action)
         if self.error:
