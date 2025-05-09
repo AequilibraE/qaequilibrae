@@ -153,7 +153,6 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
                 self.error = "Check matrix_name"
 
     def run(self, action):
-        # TODO: check inputs before assignment
         self.check_inputs(action)
         if self.error:
             self.iface.messageBar().pushMessage("Warning", self.error, level=1, duration=10)
