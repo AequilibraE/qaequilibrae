@@ -29,6 +29,7 @@ def test_assignment(qtbot, coquimbo_project):
 
     # set transit graph config
     dialog.chb_inner_stops.setChecked(True)
+    dialog.cob_conn_methods.setCurrentText("Nearest neighbour")
     dialog.cob_line_methods.setCurrentText("Connector project match")
 
     # Add boardings, alightings, and transfers

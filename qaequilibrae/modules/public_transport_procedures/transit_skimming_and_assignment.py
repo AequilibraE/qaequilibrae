@@ -27,6 +27,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.all_modes = {}
         self.proj_matrices = list_matrices(self.project.matrices.fldr)
         self.skim_fields = []
+        self.error = ""
 
         self.__populate_project_info()
 
@@ -46,7 +47,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         self.but_create.clicked.connect(partial(self.run, "create"))
 
     def __populate_project_info(self):
-        self.load_periods()
+        self.load_periods_table()
 
         # Add modes
         with self.project.db_connection as conn:
@@ -93,16 +94,13 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             cob.addItems(flds)
 
     def build_graph(self):
-        c_method = self.__get_connector_method()
-        self.period_id = int(self.get_period())
-
         graph = self.transit_data.create_graph(
             period_id=self.period_id,
             with_outer_stop_transfers=self.chb_outer_stops.isChecked(),
             with_inner_stop_transfers=self.chb_inner_stops.isChecked(),
             with_walking_edges=self.chb_walk_edges.isChecked(),
             blocking_centroid_flows=self.chb_check_centroids.isChecked(),
-            connector_method=c_method,
+            connector_method=self.c_method,
         )
 
         # Get project connector configs
@@ -128,46 +126,51 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
     def __get_connector_method(self):
         method = self.cob_conn_methods.currentText()
-        if method == "Overlapping regions":
-            return "overlapping_regions"
-        else:
-            return "nearest_neighbour"
+        return method.lower().replace(" ", "_")
+
+    def check_inputs(self, action):
+        self.c_method = self.__get_connector_method()
+        self.period_id = int(self.get_period())
 
     def run(self, action):
         # TODO: check inputs before assignment
-
-        self.build_graph()
-
-        mat = self.__build_ones_matrix() if action == "create" else self.__get_matrix()
-
-        class_name = "pt" if action == "create" else self.ln_transit_class.text()
-        demand_matrix_core = "pt" if action == "create" else self.cob_matrix_core.currentText()
-        time_field = "trav_time" if action == "create" else self.cob_travel_time.currentText()
-        frequency_field = "freq" if action == "create" else self.cob_freq.currentText()
-
-        # Create the Transit Class
-        assigclass = TransitClass(name=class_name, graph=self.transit_graph, matrix=mat)
-
-        # Create the Transit Assignment Class
-        assig = TransitAssignment()
-        assig.add_class(assigclass)
-
-        # Set assignment
-        assig.set_time_field(time_field)
-        assig.set_frequency_field(frequency_field)
-        assig.set_skimming_fields(self.skim_fields)
-        assig.set_algorithm("os")
-        assigclass.set_demand_matrix_core(demand_matrix_core)
-
-        # Perform the assignment
-        assig.execute()
-
-        if action == "create":
-            assig.get_skim_results()["pt"].export(
-                join(self.project.project_base_path, f"matrices/{self.ln_matrix_name.text()}.omx")
-            )
+        self.check_inputs(action)
+        if self.error:
+            self.iface.messageBar().pushMessage("Warning", self.error, level=1, duration=10)
+            return
         else:
-            assig.save_results(table_name=self.ln_result_name.text())
+            self.build_graph()
+
+            mat = self.__build_ones_matrix() if action == "create" else self.__get_matrix()
+
+            class_name = "pt" if action == "create" else self.ln_transit_class.text()
+            demand_matrix_core = "pt" if action == "create" else self.cob_matrix_core.currentText()
+            time_field = "trav_time" if action == "create" else self.cob_travel_time.currentText()
+            frequency_field = "freq" if action == "create" else self.cob_freq.currentText()
+
+            # Create the Transit Class
+            assigclass = TransitClass(name=class_name, graph=self.transit_graph, matrix=mat)
+
+            # Create the Transit Assignment Class
+            assig = TransitAssignment()
+            assig.add_class(assigclass)
+
+            # Set assignment
+            assig.set_time_field(time_field)
+            assig.set_frequency_field(frequency_field)
+            assig.set_skimming_fields(self.skim_fields)
+            assig.set_algorithm("os")
+            assigclass.set_demand_matrix_core(demand_matrix_core)
+
+            # Perform the assignment
+            assig.execute()
+
+            if action == "create":
+                assig.get_skim_results()["pt"].export(
+                    join(self.project.project_base_path, f"matrices/{self.ln_matrix_name.text()}.omx")
+                )
+            else:
+                assig.save_results(table_name=self.ln_result_name.text())
         self.exit_procedure()
 
     def add_period(self):
@@ -186,9 +189,9 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             periods.new_period(period_id, start_time, end_time, description)
             periods.save()
 
-        self.load_periods()
+        self.load_periods_table()
 
-    def load_periods(self):
+    def load_periods_table(self):
         """Updates periods table view"""
         self.results = self.project.network.periods.data
 
@@ -198,13 +201,13 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
     def get_period(self):
         sel = self.tbl_periods.selectionModel().selectedRows()
         if not sel:
-            self.iface.messageBar().pushMessage("Warning", "Please select a period", level=1, duration=10)
+            self.error = "Please select a period"
             return
         row = [s.row() for s in sel if s.column() == 0][0]
         return self.results.iloc[row]["period_id"]
 
     def __build_ones_matrix(self):
-        """Create an array filled with ones."""
+        """Create an array filled with ones to create PT skimming."""
         zones = len(self.transit_graph.centroids)
 
         mat = AequilibraeMatrix()
@@ -225,6 +228,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
         return mat
 
     def removes_fields(self):
+        """Removes selected fields from skimming"""
         table = self.available_skims_table
         final_table = self.skim_list
 
@@ -244,6 +248,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
                 counter += 1
 
     def append_to_list(self):
+        """Adds selected fields to skimming"""
         table = self.available_skims_table
         final_table = self.skim_list
 
