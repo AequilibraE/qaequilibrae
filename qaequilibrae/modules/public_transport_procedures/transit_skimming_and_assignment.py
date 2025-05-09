@@ -63,8 +63,10 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             self.cob_mode.addItem(m)
 
         # Add matrix data
-        self.cob_matrices.addItems(self.proj_matrices["name"].tolist())
-        self.update_matrix_data()
+        names = self.proj_matrices["name"].tolist()
+        self.cob_matrices.addItems(names)
+        if names:
+            self.update_matrix_data()
 
         # Add skimming data
         self.skimmeable_fields = [
@@ -199,7 +201,7 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
     def add_period(self):
         """Adds new periods to periods table"""
-        dlg2 = NewPeriodDialog(self.iface, self.project)
+        dlg2 = NewPeriodDialog(self.iface)
         dlg2.show()
         dlg2.exec_()
 

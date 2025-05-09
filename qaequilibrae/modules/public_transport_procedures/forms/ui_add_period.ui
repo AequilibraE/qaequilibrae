@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>AequilibraE - Add new period</string>
   </property>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
