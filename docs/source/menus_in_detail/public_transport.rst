@@ -84,14 +84,14 @@ method (which creates the connector edges between each stops and ODs), the line 
 (which creates a LineString for each edge), and the match graph for mode. The last checkbox indicates
 weather you want to save the assignment result in the database or not.
 
-.. image:: ../images/pt_assign_6.png
+.. image:: ../images/pt_assign_2.png
     :align: center
     :alt: transit graph tab
 
 In the "*Skimming*" tab it is possible to select the fields we want to create skims for, perform
 the skimming using a unitary matrix, and save the result as an \*.OMX file.
 
-.. image:: ../images/pt_assign_11.png
+.. image:: ../images/pt_assign_3.png
     :align: center
     :alt: skimming tab
 
@@ -99,7 +99,7 @@ Finally, in the "*Transit Assignment*" tab, we select the demand matrix and its 
 set for computation, the name of the assignment class, the fields corrresponding to the travel time
 and frequency, and the name we want to save the results table.
 
-.. image:: ../images/pt_assign_12.png
+.. image:: ../images/pt_assign_4.png
     :align: center
     :alt: transit Assignment tab
 
@@ -112,14 +112,14 @@ Skimming with custom period
 In this example we'll create a custom period and its related skimming. We start at the tab "*Periods*"
 clicking on the *Add new period* button. 
 
-.. image:: ../images/pt_assign_2.png
+.. image:: ../images/pt_assign_5.png
     :align: center
     :alt: click on add new period
 
 A new window containing the fields period start, end, and description will open. Add the appropriate
 time and description and hit the *Add period* button at the bottom.
 
-.. image:: ../images/pt_assign_3.png
+.. image:: ../images/pt_assign_6.png
     :align: center
     :alt: add new period window
 
@@ -128,7 +128,7 @@ the periods are numbered in an ascending order based on the number of the last p
 the start/end periods we added before are displayed as seconds at the table. Before continuing, select
 the desired period by clicking on it, otherwise an error will be thrown when skimming/assigning.
 
-.. image:: ../images/pt_assign_5.png
+.. image:: ../images/pt_assign_7.png
     :align: center
     :alt: select period
 
@@ -137,7 +137,7 @@ uncheck the boxes for "walking edges", "block centroid flows", and "save transit
 We can let the other settings with their default values. As Coquimbo doesn't have many walking edges,
 we'll match the graph for cars.
 
-.. image:: ../images/pt_assign_7.png
+.. image:: ../images/pt_assign_8.png
     :align: center
     :alt: skimmming graph config
 
@@ -148,7 +148,7 @@ button (see steps 1, 2, and 3). Let's create a name for our output (step 4) and 
 *Perform skimming* button. It will perform the skimming for a unit matrix, and store the result at
 the project matrices' folder.
 
-.. image:: ../images/pt_assign_8.png
+.. image:: ../images/pt_assign_9.png
     :align: center
     :alt: skimmming computation
 
@@ -163,7 +163,7 @@ of an AequilibraE's `example <https://www.aequilibrae.com/develop/python/_auto_e
 
 Let's start the example selecting the default period at the periods table.
 
-.. image:: ../images/pt_assign_13.png
+.. image:: ../images/pt_assign_10.png
     :align: center
     :alt: select default period
 
@@ -172,7 +172,7 @@ however, we'll save the transit graph in the database, just in case we want to r
 We set the "line geometry method" as "*Connector project match*" because project graphs must be build with
 this method.
 
-.. image:: ../images/pt_assign_9.png
+.. image:: ../images/pt_assign_11.png
     :align: center
     :alt: set transit graph for assignment
 
@@ -184,7 +184,7 @@ assignment class (setp 3), and the variables that corresponds to the travel time
 and 5). Lastly, select an appropriate name for the output that will be stored in the results database 
 (step 6) and just hit the *Perform Assignment* button at the bottom.
 
-.. image:: ../images/pt_assign_10.png
+.. image:: ../images/pt_assign_12.png
     :align: center
     :alt: transit assignment
 

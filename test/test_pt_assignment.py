@@ -31,6 +31,7 @@ def test_assignment(qtbot, coquimbo_project):
 
     # set transit graph config
     dialog.chb_walk_edges.setChecked(False)
+    dialog.chb_check_centroids.setChecked(False)
     dialog.cob_conn_methods.setCurrentText("Nearest neighbour")
     dialog.cob_line_methods.setCurrentText("Connector project match")
 
@@ -71,6 +72,7 @@ def test_skimming(qtbot, coquimbo_project):
     dialog.tbl_periods.selectRow(0)
 
     # set transit graph config
+    dialog.chb_check_centroids.setChecked(False)
     dialog.chb_walk_edges.setChecked(False)
     dialog.chb_save_graph.setChecked(False)
 
