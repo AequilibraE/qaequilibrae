@@ -65,7 +65,7 @@ Transit skimming and assignment
 -------------------------------
 
 QAequilibraE has now incorporated two of AequilibraE's newest features: transit skimming and transit
-assignment. In this sub-section, we'll replicate AequilibraE's examples and show you how to add
+assignment. In this section, we'll replicate AequilibraE's examples and show you how to add
 a new Period to your transit model.
 
 The Transit skimming and assignment module consists in four different tabs. "*Periods*" is the 
@@ -79,7 +79,32 @@ button for you to add a custom period as desired. Notice that, a period represen
 
 The second tab is "*Transit Graph*", in which you will add the configuration of the graph that will
 be created. The four checkboxes at the top of the tab indicate some characteristics of the network
-and you can select all that apply. 
+and you can select all that apply. The three drop-down buttons configure, respectively, the connector
+method (which creates the connector edges between each stops and ODs), the line geometry method 
+(which creates a LineString for each edge), and the match graph for mode. The last checkbox indicates
+weather you want to save the assignment result in the database or not.
+
+.. image:: ../images/pt_assign_6.png
+    :align: center
+    :alt: transit graph tab
+
+In the "*Skimming*" tab it is possible to select the fields we want to create skims for, perform
+the skimming using a unitary matrix, and save the result as an \*.OMX file.
+
+.. image:: ../images/pt_assign_11.png
+    :align: center
+    :alt: skimming tab
+
+Finally, in the "*Transit Assignment*" tab, we select the demand matrix and its core that will be
+set for computation, the name of the assignment class, the fields corrresponding to the travel time
+and frequency, and the name we want to save the results table.
+
+.. image:: ../images/pt_assign_12.png
+    :align: center
+    :alt: transit Assignment tab
+
+In the next sub-sections, we'll present two different workflows, one performing skimming with a
+custom period and the other performing assignment for the period of one day.
 
 Skimming with custom period
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -116,14 +141,26 @@ we'll match the graph for cars.
     :align: center
     :alt: skimmming graph config
 
-Moving to the "*Skimming*" tab, we can select the skims we want, as well as select a name to our
-matrices file. 
+Moving to the "*Skimming*" tab, we can select the skims we want to compute, as well as select a name 
+to our matrices file. To add a skim to computation, we select the fields one by one at the 
+"Available skims" column and add them to the "Compute skims" column by clicking on the right-arrow
+button (see steps 1, 2, and 3). Let's create a name for our output (step 4) and click on the
+*Perform skimming* button. It will perform the skimming for a unit matrix, and store the result at
+the project matrices' folder.
+
+.. image:: ../images/pt_assign_8.png
+    :align: center
+    :alt: skimmming computation
+
+When the process is finished, the PT Skimming and Assignment window will automatically close and
+you can check the outputs at the matrices folder.
 
 Transit assignment
 ~~~~~~~~~~~~~~~~~~
 
 In this example, we'll perform the assignment for all day-long also for Coquimbo. This is a reproduction
 of an AequilibraE's `example <https://www.aequilibrae.com/develop/python/_auto_examples/public_transport/plot_public_transit_assignment.html#>`_.
+
 
 
 Explore transit network
