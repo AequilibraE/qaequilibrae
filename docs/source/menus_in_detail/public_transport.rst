@@ -161,7 +161,32 @@ Transit assignment
 In this example, we'll perform the assignment for all day-long also for Coquimbo. This is a reproduction
 of an AequilibraE's `example <https://www.aequilibrae.com/develop/python/_auto_examples/public_transport/plot_public_transit_assignment.html#>`_.
 
+Let's start the example selecting the default period at the periods table.
 
+.. image:: ../images/pt_assign_13.png
+    :align: center
+    :alt: select default period
+
+Now let's configure our transit graph. We'll uncheck the buttons "walking edges" and "block centroid flows",
+however, we'll save the transit graph in the database, just in case we want to re-use it in another project.
+We set the "line geometry method" as "*Connector project match*" because project graphs must be build with
+this method.
+
+.. image:: ../images/pt_assign_9.png
+    :align: center
+    :alt: set transit graph for assignment
+
+As we're running an assignment, we'll skip the Skimming tab and move directly to "*Transit Assignment*".
+Let's select a demand matrix and its core for computation (steps 1 and 2). As Coquimbo doesn't have any 
+matrix in its matrices folder, you'll have to create one open layer and 
+:ref:`import it to the project <importing_matrices>`. Then, select an appropriate  name for the transit 
+assignment class (setp 3), and the variables that corresponds to the travel time and frequency (steps 4 
+and 5). Lastly, select an appropriate name for the output that will be stored in the results database 
+(step 6) and just hit the *Perform Assignment* button at the bottom.
+
+.. image:: ../images/pt_assign_10.png
+    :align: center
+    :alt: transit assignment
 
 Explore transit network
 -----------------------
