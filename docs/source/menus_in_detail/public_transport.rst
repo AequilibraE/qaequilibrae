@@ -61,13 +61,73 @@ project.
     :align: center
     :alt: gtfs already exists
 
-Skimming
---------
+Transit skimming and assignment
+-------------------------------
+
+QAequilibraE has now incorporated two of AequilibraE's newest features: transit skimming and transit
+assignment. In this sub-section, we'll replicate AequilibraE's examples and show you how to add
+a new Period to your transit model.
+
+The Transit skimming and assignment module consists in four different tabs. "*Periods*" is the 
+first tab and it displays a visualization of the periods in the project. It also has a clickable 
+button for you to add a custom period as desired. Notice that, a period representing all day-long 
+(``period_id == 1``) exists by default.
+
+.. image:: ../images/pt_assign_1.png
+    :align: center
+    :alt: periods tab
+
+The second tab is "*Transit Graph*", in which you will add the configuration of the graph that will
+be created. The four checkboxes at the top of the tab indicate some characteristics of the network
+and you can select all that apply. 
+
+Skimming with custom period
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this example we'll create a custom period and its related skimming. We start at the tab "*Periods*"
+clicking on the *Add new period* button. 
+
+.. image:: ../images/pt_assign_2.png
+    :align: center
+    :alt: click on add new period
+
+A new window containing the fields period start, end, and description will open. Add the appropriate
+time and description and hit the *Add period* button at the bottom.
+
+.. image:: ../images/pt_assign_3.png
+    :align: center
+    :alt: add new period window
+
+The window will close and the period will be automatically shown in the Periods table view. By default,
+the periods are numbered in an ascending order based on the number of the last period added. Notice that
+the start/end periods we added before are displayed as seconds at the table. Before continuing, select
+the desired period by clicking on it, otherwise an error will be thrown when skimming/assigning.
+
+.. image:: ../images/pt_assign_5.png
+    :align: center
+    :alt: select period
+
+At the tab "*Transit Graph*", we'll set up the configurations of the graph. For this example, we'll
+uncheck the boxes for "walking edges", "block centroid flows", and "save transit graph to database".
+We can let the other settings with their default values. As Coquimbo doesn't have many walking edges,
+we'll match the graph for cars.
+
+.. image:: ../images/pt_assign_7.png
+    :align: center
+    :alt: skimmming graph config
+
+Moving to the "*Skimming*" tab, we can select the skims we want, as well as select a name to our
+matrices file. 
+
+Transit assignment
+~~~~~~~~~~~~~~~~~~
+
+In this example, we'll perform the assignment for all day-long also for Coquimbo. This is a reproduction
+of an AequilibraE's `example <https://www.aequilibrae.com/develop/python/_auto_examples/public_transport/plot_public_transit_assignment.html#>`_.
 
 
-
-Explore Transit
----------------
+Explore transit network
+-----------------------
 
 Case you have already imported a GTFS feed into your project or you want to open a feed from an AequilibraE project 
 created with Python, you can click on **Public Transport > Explore Transit** to visualize the Transit 
