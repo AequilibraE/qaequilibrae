@@ -139,7 +139,7 @@ we'll match the graph for cars.
 
 .. image:: ../images/pt_assign_8.png
     :align: center
-    :alt: skimmming graph config
+    :alt: skimming graph config
 
 Moving to the "*Skimming*" tab, we can select the skims we want to compute, as well as select a name 
 to our matrices file. To add a skim to computation, we select the fields one by one at the 
