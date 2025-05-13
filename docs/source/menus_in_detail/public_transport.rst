@@ -31,13 +31,15 @@ Once the feed is loaded, you can select the service date, the agency name, and w
 It is also possible to add and/or modify the route capacities. When you're done, just click on **Add to importer**
 and you will return to the GTFS importer screen.
 
-.. image:: ../images/gtfs_2.png
-    :width: 45 %
-    :alt: basic settings
+.. subfigure:: AB
+    :align: center
+    :gap: 3mm
 
-.. image:: ../images/gtfs_3.png
-    :width: 45 %
-    :alt: route capacities
+    .. image:: ../images/gtfs_2.png
+        :alt: basic settings
+
+    .. image:: ../images/gtfs_3.png
+        :alt: route capacities
 
 Notice that the feed information is now available at the *Feeds to import* table view. The first time you create a 
 GTFS feed, the only option available is **Create new route system**, so you don't have to click on it.
@@ -66,7 +68,7 @@ Transit skimming and assignment
 
 QAequilibraE has now incorporated two of AequilibraE's newest features: transit skimming and transit
 assignment. In this section, we'll replicate AequilibraE's examples and show you how to add
-a new Period to your transit model.
+a new Period to your transit model. To open the menu, click on **Public Transport > Skimming and Assignment**.
 
 The Transit skimming and assignment module consists in four different tabs. "*Periods*" is the 
 first tab and it displays a visualization of the periods in the project. It also has a clickable 
