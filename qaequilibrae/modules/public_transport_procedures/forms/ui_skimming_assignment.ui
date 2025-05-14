@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>724</width>
-    <height>359</height>
+    <height>355</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -149,6 +149,26 @@
        <string>Skimming</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
+       <item row="3" column="1">
+        <widget class="QPushButton" name="but_create">
+         <property name="minimumSize">
+          <size>
+           <width>150</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Perfom skimming</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QProgressBar" name="pbar_skimming">
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0" colspan="3">
         <widget class="QGroupBox" name="skims_2">
          <property name="sizePolicy">
@@ -318,17 +338,17 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="1" column="0" colspan="2">
         <widget class="QLineEdit" name="ln_matrix_name">
          <property name="placeholderText">
           <string>matrix_name</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QPushButton" name="but_create">
+       <item row="4" column="0">
+        <widget class="QLabel" name="skimming_label">
          <property name="text">
-          <string>Perfom skimming</string>
+          <string>Perform skimming</string>
          </property>
         </widget>
        </item>
@@ -339,7 +359,72 @@
        <string>Transit Assignment</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <item row="0" column="0">
+       <item row="1" column="0" colspan="2">
+        <widget class="QGroupBox" name="net_info_2">
+         <property name="title">
+          <string>Network information</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_10">
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cob_travel_time"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Travel Time</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Frequency</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QComboBox" name="cob_freq"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <widget class="QGroupBox" name="output_2">
+         <property name="title">
+          <string>Outputs</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_12">
+          <item row="0" column="0">
+           <widget class="QLineEdit" name="ln_result_name">
+            <property name="placeholderText">
+             <string>result_name</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QProgressBar" name="pbar_assignment">
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QPushButton" name="but_assign">
+         <property name="minimumSize">
+          <size>
+           <width>150</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Perform assignment</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
         <widget class="QGroupBox" name="traffic_class_2">
          <property name="title">
           <string/>
@@ -378,53 +463,8 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="net_info_2">
-         <property name="title">
-          <string>Network information</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_10">
-          <item row="0" column="1">
-           <widget class="QComboBox" name="cob_travel_time"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Travel Time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>Frequency</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QComboBox" name="cob_freq"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QGroupBox" name="output_2">
-         <property name="title">
-          <string>Outputs</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_12">
-          <item row="0" column="0">
-           <widget class="QLineEdit" name="ln_result_name">
-            <property name="placeholderText">
-             <string>result_name</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QPushButton" name="but_assign">
+       <item row="4" column="0">
+        <widget class="QLabel" name="assignment_label">
          <property name="text">
           <string>Perform assignment</string>
          </property>

@@ -1,10 +1,7 @@
 from functools import partial
 from os.path import join, dirname
 
-import numpy as np
 from aequilibrae.matrix import AequilibraeMatrix
-from aequilibrae.paths import TransitAssignment, TransitClass
-from aequilibrae.transit import Transit
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
@@ -12,22 +9,23 @@ from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
 from qaequilibrae.modules.common_tools import PandasModel
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from qaequilibrae.modules.public_transport_procedures.new_period_dialog import NewPeriodDialog
+from qaequilibrae.modules.public_transport_procedures.transit_assignment_procedure import TransitAssignProcedure
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_skimming_assignment.ui"))
 
 
-class TransitSkimAssign(QDialog, FORM_CLASS):
+class TransitAssignDialog(QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QDialog.__init__(self)
         self.setupUi(self)
         self.iface = qgis_project.iface
         self.project = qgis_project.project
-        self.transit_data = Transit(self.project)
 
         self.all_modes = {}
         self.proj_matrices = list_matrices(self.project.matrices.fldr)
         self.skim_fields = []
         self.error = ""
+        self.configs = {}
 
         self.__populate_project_info()
 
@@ -95,30 +93,6 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             cob.clear()
             cob.addItems(flds)
 
-    def build_graph(self):
-        graph = self.transit_data.create_graph(
-            period_id=self.period_id,
-            with_outer_stop_transfers=self.chb_outer_stops.isChecked(),
-            with_inner_stop_transfers=self.chb_inner_stops.isChecked(),
-            with_walking_edges=self.chb_walk_edges.isChecked(),
-            blocking_centroid_flows=self.chb_check_centroids.isChecked(),
-            connector_method=self.c_method,
-        )
-
-        # Get project connector configs
-        line_method = self.cob_line_methods.currentText().lower()
-        mode = self.cob_mode.currentText()
-        mode_id = self.all_modes[mode]
-
-        self.project.network.build_graphs()
-        graph.create_line_geometry(method=line_method, graph=mode_id)
-
-        if self.chb_save_graph.isChecked():
-            self.transit_data.save_graphs(period_ids=[self.period_id])
-
-        # To perform an assignment we need to convert the graph builder into a graph.
-        self.transit_graph = graph.to_transit_graph()
-
     def update_matrix_data(self):
         self.cob_matrix_core.clear()
         file_name = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
@@ -128,32 +102,42 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
     def __get_connector_method(self):
         method = self.cob_conn_methods.currentText()
-        return method.lower().replace(" ", "_")
+        self.configs["connector_method"] = method.lower().replace(" ", "_")
 
     def check_inputs(self, action):
-        self.c_method = self.__get_connector_method()
-        self.period_id = self.get_period()
+        self.__get_connector_method()
+        self.configs["period_id"] = self.get_period()
         errors = []  # Initialize a list to collect validation errors
 
         if action == "create":
             # Check if skim_fields is not empty
             if len(self.skim_fields) == 0:
                 errors.append("Add skims to the selection")
+            else:
+                self.configs["skim_fields"] = self.skim_fields
 
             # Check if ln_matrix_name is not null
             self.matrix_name = self.ln_matrix_name.text()
             if len(self.matrix_name.replace(" ", "")) == 0:
                 errors.append("Check matrix_name")
+            else:
+                self.configs["matrix_name"] = self.matrix_name
+
+            self.configs["class_name"] = "pt"
         else:
             # Check if ln_transit_class is not empty
             self.class_name = self.ln_transit_class.text()
             if len(self.class_name.replace(" ", "")) == 0:
                 errors.append("Check PT class name")
+            else:
+                self.configs["class_name"] = self.class_name
 
             # check if ln_result_name is not null
             self.result_name = self.ln_result_name.text()
             if len(self.result_name.replace(" ", "")) == 0:
                 errors.append("Check result_name")
+            else:
+                self.configs["result_name"] = self.result_name
 
         if not self.error:
             self.error = "\n".join(errors)  # Combine all errors into a single string
@@ -164,39 +148,31 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             self.iface.messageBar().pushMessage("Warning", self.error, level=1, duration=10)
             return
         else:
-            self.build_graph()
+            self.pbar = self.pbar_skimming if action == "create" else self.pbar_assignment
+            self.label = self.skimming_label if action == "create" else self.assignment_label
 
-            mat = self.__build_ones_matrix() if action == "create" else self.__get_matrix()
+            self.configs["with_outer_stop_transfers"] = self.chb_outer_stops.isChecked()
+            self.configs["with_inner_stop_transfers"] = self.chb_inner_stops.isChecked()
+            self.configs["with_walking_edges"] = self.chb_walk_edges.isChecked()
+            self.configs["blocking_centroid_flows"] = self.chb_check_centroids.isChecked()
+            self.configs["save_graph"] = self.chb_save_graph.isChecked()
 
-            class_name = "pt" if action == "create" else self.class_name
-            demand_matrix_core = "pt" if action == "create" else self.cob_matrix_core.currentText()
-            time_field = "trav_time" if action == "create" else self.cob_travel_time.currentText()
-            frequency_field = "freq" if action == "create" else self.cob_freq.currentText()
+            self.configs["demand_matrix_core"] = "pt" if action == "create" else self.cob_matrix_core.currentText()
+            self.configs["time_field"] = "trav_time" if action == "create" else self.cob_travel_time.currentText()
+            self.configs["frequency_field"] = "freq" if action == "create" else self.cob_freq.currentText()
 
-            # Create the Transit Class
-            assigclass = TransitClass(name=class_name, graph=self.transit_graph, matrix=mat)
+            self.configs["line_method"] = self.cob_line_methods.currentText().lower()
+            mode = self.cob_mode.currentText()
+            self.configs["mode_id"] = self.all_modes[mode]
+            self.configs["mat_name"] = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
+            self.configs["mat_core"] = [self.cob_matrix_core.currentText()]
 
-            # Create the Transit Assignment Class
-            assig = TransitAssignment()
-            assig.add_class(assigclass)
+            self.worker_thread = TransitAssignProcedure(self.iface.mainWindow(), self.project, self.configs, action)
+            self.run_thread()
 
-            # Set assignment
-            assig.set_time_field(time_field)
-            assig.set_frequency_field(frequency_field)
-            if action == "create":
-                assig.set_skimming_fields(self.skim_fields)
-            assig.set_algorithm("os")
-            assigclass.set_demand_matrix_core(demand_matrix_core)
-
-            # Perform the assignment
-            assig.execute()
-
-            if action == "create":
-                assig.get_skim_results()["pt"].export(
-                    join(self.project.project_base_path, f"matrices/{self.matrix_name}.omx")
-                )
-            else:
-                assig.save_results(table_name=self.result_name)
+    def run_thread(self):
+        self.worker_thread.signal.connect(self.signal_handler)
+        self.worker_thread.doWork()
         self.exit_procedure()
 
     def add_period(self):
@@ -231,27 +207,6 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
             return
         row = [s.row() for s in sel if s.column() == 0][0]
         return int(self.results.iloc[row]["period_id"])
-
-    def __build_ones_matrix(self):
-        """Create an array filled with ones to create PT skimming."""
-        zones = len(self.transit_graph.centroids)
-
-        mat = AequilibraeMatrix()
-        mat.create_empty(zones=zones, matrix_names=["pt"], memory_only=True)
-        mat.index = self.transit_graph.centroids[:]
-        mat.matrices[:, :, 0] = np.ones((zones, zones))
-        mat.computational_view()
-
-        return mat
-
-    def __get_matrix(self):
-        mat_name = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
-
-        mat = AequilibraeMatrix()
-        mat.load(join(self.project.matrices.fldr, mat_name))
-        mat.computational_view([self.cob_matrix_core.currentText()])
-
-        return mat
 
     def removes_fields(self):
         """Removes selected fields from skimming"""
@@ -296,3 +251,15 @@ class TransitSkimAssign(QDialog, FORM_CLASS):
 
     def exit_procedure(self):
         self.close()
+
+    def signal_handler(self, val):
+        if val[0] == "start":
+            self.pbar.setValue(0)
+            self.pbar.setMaximum(val[1])
+            self.label.setText(val[2])
+        elif val[0] == "update":
+            self.pbar.setValue(val[1])
+            self.label.setText(val[2])
+        elif val[0] == "finished":
+            self.pbar.reset()
+            self.label.clear()
