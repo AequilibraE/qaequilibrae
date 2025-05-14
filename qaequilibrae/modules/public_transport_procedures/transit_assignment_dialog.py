@@ -164,8 +164,9 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
             self.configs["line_method"] = self.cob_line_methods.currentText().lower()
             mode = self.cob_mode.currentText()
             self.configs["mode_id"] = self.all_modes[mode]
-            self.configs["mat_name"] = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
-            self.configs["mat_core"] = [self.cob_matrix_core.currentText()]
+            if action == "assign":
+                self.configs["mat_name"] = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
+                self.configs["mat_core"] = [self.cob_matrix_core.currentText()]
 
             self.worker_thread = TransitAssignProcedure(self.iface.mainWindow(), self.project, self.configs, action)
             self.run_thread()
