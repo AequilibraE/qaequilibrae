@@ -105,6 +105,9 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.configs["connector_method"] = method.lower().replace(" ", "_")
 
     def check_inputs(self, action):
+        # Check if graph exists
+        
+
         self.__get_connector_method()
         self.configs["period_id"] = self.get_period()
         errors = []  # Initialize a list to collect validation errors
@@ -143,6 +146,10 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
             self.error = "\n".join(errors)  # Combine all errors into a single string
 
     def run(self, action):
+        # Deactivate button after click
+        button = self.but_create if action == "create" else self.but_assign
+        button.setEnabled(False)
+
         self.check_inputs(action)
         if self.error:
             self.iface.messageBar().pushMessage("Warning", self.error, level=1, duration=10)
@@ -151,19 +158,22 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
             self.pbar = self.pbar_skimming if action == "create" else self.pbar_assignment
             self.label = self.skimming_label if action == "create" else self.assignment_label
 
+            # Graph configs
             self.configs["with_outer_stop_transfers"] = self.chb_outer_stops.isChecked()
             self.configs["with_inner_stop_transfers"] = self.chb_inner_stops.isChecked()
             self.configs["with_walking_edges"] = self.chb_walk_edges.isChecked()
             self.configs["blocking_centroid_flows"] = self.chb_check_centroids.isChecked()
             self.configs["save_graph"] = self.chb_save_graph.isChecked()
+            
+            self.configs["line_method"] = self.cob_line_methods.currentText().lower()
+            mode = self.cob_mode.currentText()
+            self.configs["mode_id"] = self.all_modes[mode]
 
+            # Transit assignment configs
             self.configs["demand_matrix_core"] = "pt" if action == "create" else self.cob_matrix_core.currentText()
             self.configs["time_field"] = "trav_time" if action == "create" else self.cob_travel_time.currentText()
             self.configs["frequency_field"] = "freq" if action == "create" else self.cob_freq.currentText()
 
-            self.configs["line_method"] = self.cob_line_methods.currentText().lower()
-            mode = self.cob_mode.currentText()
-            self.configs["mode_id"] = self.all_modes[mode]
             if action == "assign":
                 self.configs["mat_name"] = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
                 self.configs["mat_core"] = [self.cob_matrix_core.currentText()]

@@ -52,21 +52,31 @@
           <string/>
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
-          <item row="3" column="0">
+          <item row="2" column="0" colspan="2">
+           <widget class="QCheckBox" name="chb_outer_stops">
+            <property name="text">
+             <string>Outer stops transfers</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1" colspan="3">
+           <widget class="QComboBox" name="cob_line_methods"/>
+          </item>
+          <item row="2" column="2" colspan="2">
+           <widget class="QCheckBox" name="chb_inner_stops">
+            <property name="text">
+             <string>Inner stops transfers</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>Connector method</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Line geometry method</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
+          <item row="7" column="0">
            <widget class="QCheckBox" name="chb_save_graph">
             <property name="text">
              <string>Save transit graph to database</string>
@@ -76,27 +86,34 @@
             </property>
            </widget>
           </item>
+          <item row="4" column="1" colspan="3">
+           <widget class="QComboBox" name="cob_conn_methods"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="chb_use_graph">
+            <property name="text">
+             <string>Use existing graph</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1" colspan="3">
+           <widget class="QComboBox" name="cob_mode"/>
+          </item>
           <item row="5" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Line geometry method</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
            <widget class="QLabel" name="label_1">
             <property name="text">
              <string>Match graph for mode</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1" colspan="3">
-           <widget class="QComboBox" name="cob_conn_methods"/>
-          </item>
-          <item row="4" column="1" colspan="3">
-           <widget class="QComboBox" name="cob_line_methods"/>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QCheckBox" name="chb_outer_stops">
-            <property name="text">
-             <string>Outer stops transfers</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" colspan="2">
+          <item row="3" column="0" colspan="2">
            <widget class="QCheckBox" name="chb_walk_edges">
             <property name="text">
              <string>Walking edges</string>
@@ -106,14 +123,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="2" colspan="2">
-           <widget class="QCheckBox" name="chb_inner_stops">
-            <property name="text">
-             <string>Inner stops transfers</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2" colspan="2">
+          <item row="3" column="2" colspan="2">
            <widget class="QCheckBox" name="chb_check_centroids">
             <property name="text">
              <string>Block centroid flows</string>
@@ -123,8 +133,12 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="1" colspan="3">
-           <widget class="QComboBox" name="cob_mode"/>
+          <item row="1" column="0" colspan="4">
+           <widget class="Line" name="hline">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

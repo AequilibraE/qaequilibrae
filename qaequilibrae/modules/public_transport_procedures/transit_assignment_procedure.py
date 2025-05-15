@@ -87,7 +87,7 @@ class TransitAssignProcedure(WorkerThread):
         assig.set_frequency_field(self.configs["frequency_field"])
         if self.action == "create":
             assig.set_skimming_fields(self.configs["skim_fields"])
-        assig.set_algorithm("os")  # thie value is default
+        assig.set_algorithm("os")  # default value
         assigclass.set_demand_matrix_core(self.configs["demand_matrix_core"])
 
         # Perform the assignment
