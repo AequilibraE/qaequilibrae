@@ -241,7 +241,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="161"/>
+        <location filename="../qaequilibrae.py" line="164"/>
         <source>Public Transport</source>
         <translation type="unfinished"></translation>
     </message>
@@ -316,22 +316,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="165"/>
+        <location filename="../qaequilibrae.py" line="168"/>
         <source>Desire Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="166"/>
+        <location filename="../qaequilibrae.py" line="169"/>
         <source>Stacked Bandwidth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="167"/>
+        <location filename="../qaequilibrae.py" line="170"/>
         <source>Scenario Comparison</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="168"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Simple tag</source>
         <translation type="unfinished"></translation>
     </message>
@@ -341,22 +341,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="172"/>
+        <location filename="../qaequilibrae.py" line="175"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="179"/>
+        <location filename="../qaequilibrae.py" line="182"/>
         <source>Show project info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="329"/>
+        <location filename="../qaequilibrae.py" line="332"/>
         <source>You need to load a project first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="332"/>
+        <location filename="../qaequilibrae.py" line="335"/>
         <source>You need to close the project currently open first</source>
         <translation type="unfinished"></translation>
     </message>
@@ -366,7 +366,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="161"/>
+        <location filename="../qaequilibrae.py" line="164"/>
         <source>Explore Transit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -381,13 +381,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="337"/>
+        <location filename="../qaequilibrae.py" line="340"/>
         <source>You need to import a GTFS feed first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="152"/>
         <source>Route choice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="161"/>
+        <source>Skimming and Assignment</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1463,6 +1468,36 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="191"/>
         <source>Allow map-match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="14"/>
+        <source>AequilibraE - Add new period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="37"/>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="44"/>
+        <source>Period end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="64"/>
+        <source>HH:mm:ss</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="74"/>
+        <source>Period start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="81"/>
+        <source>Add Period</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3258,6 +3293,154 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="115"/>
         <source>Join with layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>dialog</name>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="14"/>
+        <source>AequilibraE - PT Skimming and Assignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="29"/>
+        <source>Period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="35"/>
+        <source>Add new period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="46"/>
+        <source>Transit Graph</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="58"/>
+        <source>Connector method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="65"/>
+        <source>Line geometry method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="72"/>
+        <source>Save transit graph to database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="82"/>
+        <source>Match graph for mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="95"/>
+        <source>Outer stops transfers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="102"/>
+        <source>Walking edges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="112"/>
+        <source>Inner stops transfers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="119"/>
+        <source>Block centroid flows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="149"/>
+        <source>Skimming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="161"/>
+        <source>Perfom skimming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="276"/>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="314"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="237"/>
+        <source>Compute skims</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="333"/>
+        <source>Available skims</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="344"/>
+        <source>matrix_name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="359"/>
+        <source>Transit Assignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="365"/>
+        <source>Network information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="374"/>
+        <source>Travel Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="381"/>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="394"/>
+        <source>Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="400"/>
+        <source>result_name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="423"/>
+        <source>Perform assignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="436"/>
+        <source>Matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="443"/>
+        <source>Matrix core</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="453"/>
+        <source>Assignment class name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
