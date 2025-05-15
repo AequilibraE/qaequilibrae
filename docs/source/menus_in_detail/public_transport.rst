@@ -66,8 +66,8 @@ project.
 Transit skimming and assignment
 -------------------------------
 
-QAequilibraE has now incorporated two of AequilibraE's newest features: transit skimming and transit
-assignment. In this section, we'll replicate AequilibraE's examples and show you how to add
+QAequilibraE incorporates two of AequilibraE's transit features: skimming and 
+assignment. In this section, we'll replicate AequilibraE's Python examples and show you how to add
 a new Period to your transit model. To open the menu, click on **Public Transport > Skimming and Assignment**.
 
 The Transit skimming and assignment module consists in four different tabs. "*Periods*" is the 
@@ -91,7 +91,7 @@ weather you want to save the assignment result in the database or not.
     :alt: transit graph tab
 
 In the "*Skimming*" tab it is possible to select the fields we want to create skims for, perform
-the skimming using a unitary matrix, and save the result as an \*.OMX file.
+the actual skimming , and save the result as an \*.OMX file.
 
 .. image:: ../images/pt_assign_3.png
     :align: center

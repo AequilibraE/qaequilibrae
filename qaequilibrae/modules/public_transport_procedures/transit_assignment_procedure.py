@@ -59,7 +59,7 @@ class TransitAssignProcedure(WorkerThread):
             zones = len(self.transit_graph.centroids)
 
             mat.create_empty(zones=zones, matrix_names=["pt"], memory_only=True)
-            mat.index = self.transit_graph.centroids[:]
+            mat.index[:] = self.transit_graph.centroids[:]
             mat.matrices[:, :, 0] = np.ones((zones, zones))
             mat.computational_view()
 
