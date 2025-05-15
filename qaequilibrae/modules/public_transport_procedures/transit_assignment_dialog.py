@@ -106,7 +106,6 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
 
     def check_inputs(self, action):
         # Check if graph exists
-        
 
         self.__get_connector_method()
         self.configs["period_id"] = self.get_period()
@@ -164,7 +163,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
             self.configs["with_walking_edges"] = self.chb_walk_edges.isChecked()
             self.configs["blocking_centroid_flows"] = self.chb_check_centroids.isChecked()
             self.configs["save_graph"] = self.chb_save_graph.isChecked()
-            
+
             self.configs["line_method"] = self.cob_line_methods.currentText().lower()
             mode = self.cob_mode.currentText()
             self.configs["mode_id"] = self.all_modes[mode]
