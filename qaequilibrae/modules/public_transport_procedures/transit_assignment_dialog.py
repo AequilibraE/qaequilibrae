@@ -2,6 +2,7 @@ from functools import partial
 from os.path import join, dirname
 
 from aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.transit import Transit
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
@@ -20,6 +21,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
         self.iface = qgis_project.iface
         self.project = qgis_project.project
+        self.transit_data = Transit(self.project)
 
         self.all_modes = {}
         self.proj_matrices = list_matrices(self.project.matrices.fldr)
@@ -32,6 +34,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.cob_conn_methods.addItems(["Overlapping regions", "Nearest neighbour"])
         self.cob_line_methods.addItems(["Direct", "Connector project match"])
         self.cob_matrices.currentIndexChanged.connect(self.update_matrix_data)
+        self.chb_use_graph.toggled.connect(self.__deactivate_graph_configs)
 
         for table in [self.tbl_periods]:
             table.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -105,11 +108,18 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.configs["connector_method"] = method.lower().replace(" ", "_")
 
     def check_inputs(self, action):
-        # Check if graph exists
-
         self.__get_connector_method()
         self.configs["period_id"] = self.get_period()
         errors = []  # Initialize a list to collect validation errors
+
+        # Check if there's a graph saved in the project
+        self.configs["has_graph"] = self.chb_use_graph.isChecked()
+        if self.chb_use_graph.isChecked():
+            self.transit_data.load([self.configs["period_id"]])
+            if len(self.transit_data.graphs) == 0:
+                errors.append("No graph stored in project to be reused")
+            if self.configs["period_id"] not in self.transit_data.graphs.keys():
+                errors.append("Selected period_id not found on the graph in memory")
 
         if action == "create":
             # Check if skim_fields is not empty
@@ -177,7 +187,9 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
                 self.configs["mat_name"] = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
                 self.configs["mat_core"] = [self.cob_matrix_core.currentText()]
 
-            self.worker_thread = TransitAssignProcedure(self.iface.mainWindow(), self.project, self.configs, action)
+            self.worker_thread = TransitAssignProcedure(
+                self.iface.mainWindow(), self.project, self.transit_data, self.configs, action
+            )
             self.run_thread()
 
     def run_thread(self):
@@ -273,3 +285,17 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         elif val[0] == "finished":
             self.pbar.reset()
             self.label.clear()
+
+    def __deactivate_graph_configs(self):
+        visualize = not self.chb_use_graph.isChecked()
+        self.chb_check_centroids.setEnabled(visualize)
+        self.chb_inner_stops.setEnabled(visualize)
+        self.chb_outer_stops.setEnabled(visualize)
+        self.chb_save_graph.setEnabled(visualize)
+        self.chb_walk_edges.setEnabled(visualize)
+        self.cob_conn_methods.setEnabled(visualize)
+        self.cob_line_methods.setEnabled(visualize)
+        self.cob_mode.setEnabled(visualize)
+        self.label_1.setEnabled(visualize)
+        self.label_2.setEnabled(visualize)
+        self.label_3.setEnabled(visualize)
