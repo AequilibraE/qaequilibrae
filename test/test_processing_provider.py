@@ -37,6 +37,7 @@ from qaequilibrae.modules.processing_provider.project_from_OSM import ProjectFro
 from qaequilibrae.modules.processing_provider.project_from_layer import ProjectFromLayer
 from qaequilibrae.modules.processing_provider.provider import Provider
 from qaequilibrae.modules.processing_provider.renumber_nodes_from_layer import RenumberNodesFromLayer
+from qaequilibrae.modules.processing_provider.trip_length_distribution import TripLengthDistribution
 from .utilities import load_sfalls_from_layer, load_test_layer
 
 pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
@@ -442,3 +443,18 @@ def test_project_from_osm(folder_path):
 
     assert project.network.count_links() == 11
     assert project.network.count_nodes() == 10
+
+
+def test_trip_length_distribution(ae, folder_path):
+    parameters = {"demand_mat_name": 0,
+                  "demand_mat_core": "matrix",
+                  "skim_mat_name": 2,
+                  "skim_mat_core": "distance_blended",
+                  "file_path": folder_path,
+                  "file_name": "my_test_file"}
+    
+    action = TripLengthDistribution()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    _ = action.run(parameters, context, feedback)
