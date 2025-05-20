@@ -118,7 +118,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
             try:
                 self.transit_data.load([self.configs["period_id"]])
             except ValueError:
-                errors.append(f"No graph for period_id={self.configs["period_id"]} stored in project")
+                errors.append(f"No graph for period_id={self.configs['period_id']} stored in project")
 
         if action == "create":
             # Check if skim_fields is not empty
