@@ -1,10 +1,9 @@
 import importlib.util as iutil
-import sys
 
 import numpy as np
 import pandas as pd
 from qgis.core import QgsProcessingAlgorithm, QgsMessageLog, QgsProcessingParameterString
-from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFile, QgsProcessingMultiStepFeedback
+from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFileDestination
 from qgis.utils import plugins
 
 from qaequilibrae.i18n.translate import trlt
@@ -67,20 +66,13 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
                         multiLine=False,
                     )
                 )
-                # self.addParameter(
-                #     QgsProcessingParameterFile(
-                #         "file_path",
-                #         self.tr("File path"),
-                #         behavior=QgsProcessingParameterFile.Folder,
-                #     )
-                # )
-                # self.addParameter(
-                #     QgsProcessingParameterString(
-                #         "output_name",
-                #         self.tr("File name"),
-                #         multiLine=False,
-                #     )
-                # )
+                self.addParameter(
+                    QgsProcessingParameterFileDestination(
+                        "file_path",
+                        self.tr("File path"),
+                        fileFilter="PNG (*.png)",
+                    )
+                )
             else:
                 self.addParameter(
                     QgsProcessingParameterString(
@@ -129,16 +121,24 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         # Get plot data
         df = self.get_data(skim_matrix, demand_matrix)
 
-        feedback.pushInfo(print(df))
-
         # Draw plot
-        # import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt
 
-        return {"Output": f"Success: Matrix {self.mat_names[skim_mat_idx]} with core {skim_mat_core} processed"}
+        _, ax = plt.subplots(figsize=(10, 6))
+
+        ax.plot(df.distance, df.trips)
+        ax.set(title="Trip length distribution")
+        ax.set_xlabel("Trip length (km)")
+        ax.set_ylabel("Trips")
+
+        plt.savefig(parameters["file_path"])
+        plt.close()
+
+        return {"Output": f"Success: TLD plot saved in {parameters["file_path"]}"}
 
     def get_data(self, skim, demand):
         max_bins = int(np.ceil(skim.matrix_view.max()))
-        y, x = np.histogram((demand.matrix_view * skim.matrix_view) / 1000, bins=(0, max_bins))
+        y, x = np.histogram((demand.matrix_view * skim.matrix_view) / 1000, bins=np.arange(0, max_bins))
         return pd.DataFrame({"distance": x[1:], "trips": y})
 
     def name(self):
