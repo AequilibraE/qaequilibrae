@@ -446,13 +446,15 @@ def test_project_from_osm(folder_path):
 
 
 def test_trip_length_distribution(ae, folder_path):
-    parameters = {"demand_mat_name": 0,
-                  "demand_mat_core": "matrix",
-                  "skim_mat_name": 2,
-                  "skim_mat_core": "distance_blended",
-                  "file_path": folder_path,
-                  "file_name": "my_test_file"}
-    
+    parameters = {
+        "demand_mat_name": 0,
+        "demand_mat_core": "matrix",
+        "skim_mat_name": 2,
+        "skim_mat_core": "distance_blended",
+        "file_path": folder_path,
+        "file_name": "my_test_file",
+    }
+
     action = TripLengthDistribution()
     context = QgsProcessingContext()
     feedback = QgsProcessingFeedback()

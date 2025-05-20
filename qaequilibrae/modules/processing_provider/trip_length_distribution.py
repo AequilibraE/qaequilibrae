@@ -32,7 +32,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
                 return
 
             # Check if there's an open project and fetch its information
-            
+
             if self.project:
                 self.matrices = self.project.matrices
                 self.mat_names = self.matrices.list()["name"].tolist()
@@ -41,11 +41,10 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
                     QgsProcessingParameterEnum(
                         "demand_mat_name",
                         self.tr("Demand matrix"),
-                        self.mat_names,
+                        self.matrices.list()["name"].tolist(),
                         defaultValue=0,  # Default to the first option
                     )
                 )
-
                 self.addParameter(
                     QgsProcessingParameterString(
                         "demand_mat_core",
@@ -57,7 +56,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
                     QgsProcessingParameterEnum(
                         "skim_mat_name",
                         self.tr("Skim matrix"),
-                        self.mat_names,
+                        self.matrices.list()["name"].tolist(),
                         defaultValue=0,  # Default to the first option
                     )
                 )
@@ -68,20 +67,20 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
                         multiLine=False,
                     )
                 )
-                self.addParameter(
-                    QgsProcessingParameterFile(
-                        "file_path",
-                        self.tr("File path"),
-                        behavior=QgsProcessingParameterFile.Folder,
-                    )
-                )
-                self.addParameter(
-                    QgsProcessingParameterString(
-                        "output_name",
-                        self.tr("File name"),
-                        multiLine=False,
-                    )
-                )
+                # self.addParameter(
+                #     QgsProcessingParameterFile(
+                #         "file_path",
+                #         self.tr("File path"),
+                #         behavior=QgsProcessingParameterFile.Folder,
+                #     )
+                # )
+                # self.addParameter(
+                #     QgsProcessingParameterString(
+                #         "output_name",
+                #         self.tr("File name"),
+                #         multiLine=False,
+                #     )
+                # )
             else:
                 self.addParameter(
                     QgsProcessingParameterString(
@@ -94,11 +93,10 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
             QgsMessageLog.logMessage(f"Error checking AequilibraE project: {str(e)}")
 
     def processAlgorithm(self, parameters, context, feedback):
-        model_feedback = QgsProcessingMultiStepFeedback(3, feedback)
-
         # Checks if we have AequilibraE installed
         if iutil.find_spec("aequilibrae") is None:
-            sys.exit(self.tr("AequilibraE module not found"))
+            feedback.reportError(self.tr("AequilibraE module not found"))
+            return {"Output": "Error: AequilibraE module not found"}
 
         # Check if the demand matrix has the indicated demand matrix core
         demand_mat_idx = parameters["demand_mat_name"]
@@ -106,10 +104,13 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
 
         demand_matrix = self.matrices.get_matrix(self.mat_names[demand_mat_idx])
         demand_cores = demand_matrix.names
+
         if demand_mat_core in demand_cores:
             demand_matrix.computational_view([demand_mat_core])
+            feedback.pushInfo("Successfully set computational view for demand matrix")
         else:
-            return
+            feedback.reportError(f"Demand matrix core '{demand_mat_core}' not found in available cores: {demand_cores}")
+            return {"Output": f"Error: Demand matrix core '{demand_mat_core}' not found"}
 
         # Check if the skim matrix has the indicated skim matrix core
         skim_mat_idx = parameters["skim_mat_name"]
@@ -117,20 +118,23 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
 
         skim_matrix = self.matrices.get_matrix(self.mat_names[skim_mat_idx])
         skim_cores = skim_matrix.names
-        if skim_mat_core not in skim_cores:
+
+        if skim_mat_core in skim_cores:
             skim_matrix.computational_view([skim_mat_core])
+            feedback.pushInfo("Successfully set computational view for skim matrix")
         else:
-            return
+            feedback.reportError(f"Skim matrix core '{skim_mat_core}' not found in available cores: {skim_cores}")
+            return {"Output": f"Error: Skim matrix core '{skim_mat_core}' not found"}
 
         # Get plot data
-        # df = self.get_data(skim_matrix, demand_matrix)
+        df = self.get_data(skim_matrix, demand_matrix)
 
-        # print(df)
+        feedback.pushInfo(print(df))
 
         # Draw plot
         # import matplotlib.pyplot as plt
 
-        return {"Output": "ok"}
+        return {"Output": f"Success: Matrix {self.mat_names[skim_mat_idx]} with core {skim_mat_core} processed"}
 
     def get_data(self, skim, demand):
         max_bins = int(np.ceil(skim.matrix_view.max()))
