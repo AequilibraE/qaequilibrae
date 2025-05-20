@@ -50,23 +50,23 @@ class TransitAssignProcedure(WorkerThread):
                 self.signal.emit(["update", 4, "Saving graph"])
                 self.transit_data.save_graphs(period_ids=[self.configs["period_id"]])
 
-            # To perform an assignment we need to convert the graph builder into a graph.
-            self.signal.emit(["update", 5, "Convert into graph"])
-
         else:
+            self.signal.emit(["update", 3, "Reloading graph into project"])
             pt_con = database_connection("transit")
 
             graph = TransitGraphBuilder.from_db(pt_con, self.configs["period_id"])
-            graph.create_od_node_mapping()
+            graph.create_od_node_mapping()  # This will change with AequilibraE 1.3.2
 
+        # To perform an assignment we need to convert the graph builder into a graph.
+        self.signal.emit(["update", 5, "Convert into graph"])
         self.transit_graph = graph.to_transit_graph()
 
     def build_matrix(self):
-        mat = AequilibraeMatrix()
         if self.action == "create":
             self.signal.emit(["update", 6, "Creating ones matrix"])
             zones = len(self.transit_graph.centroids)
 
+            mat = AequilibraeMatrix()
             mat.create_empty(zones=zones, matrix_names=["pt"], memory_only=True)
             mat.index[:] = self.transit_graph.centroids[:]
             mat.matrices[:, :, 0] = np.ones((zones, zones))
@@ -76,7 +76,9 @@ class TransitAssignProcedure(WorkerThread):
             self.signal.emit(["update", 6, "Loading matrix"])
             mat_name = self.configs["mat_name"]
 
-            mat.load(join(self.project.matrices.fldr, mat_name))
+            mat = self.project.matrices.get_matrix(mat_name)
+            if not np.array_equal(mat.index, self.transit_graph.centroids):
+                mat.index[:] = self.transit_graph.centroids  # ensure we have the same centroids
             mat.computational_view(self.configs["mat_core"])
 
         return mat

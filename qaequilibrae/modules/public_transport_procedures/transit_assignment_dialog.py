@@ -162,6 +162,8 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.check_inputs(action)
         if self.error:
             self.iface.messageBar().pushMessage("Warning", self.error, level=1, duration=10)
+            button.setEnabled(True)
+            self.error = ""
             return
         else:
             self.pbar = self.pbar_skimming if action == "create" else self.pbar_assignment
@@ -184,7 +186,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
             self.configs["frequency_field"] = "freq" if action == "create" else self.cob_freq.currentText()
 
             if action == "assign":
-                self.configs["mat_name"] = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
+                self.configs["mat_name"] = self.proj_matrices.at[self.cob_matrices.currentIndex(), "name"]
                 self.configs["mat_core"] = [self.cob_matrix_core.currentText()]
 
             self.worker_thread = TransitAssignProcedure(
