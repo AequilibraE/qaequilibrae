@@ -135,9 +135,11 @@ the desired period by clicking on it, otherwise an error will be thrown when ski
     :alt: select period
 
 At the tab "*Transit Graph*", we'll set up the configurations of the graph. For this example, we'll
-uncheck the boxes for "walking edges", "block centroid flows", and "save transit graph to database".
-We can let the other settings with their default values. As Coquimbo doesn't have many walking edges,
-we'll match the graph for cars.
+uncheck the boxes for "walking edges", and "block centroid flows". For the purpose of this example,
+we'll let the box "save transit graph to database" checked so we can reuse the graph for assignment.
+Let's change the value of line geometry method to "connector project match" because graphs should
+be created using this method. Finally, as Coquimbo doesn't have many walking edges, we'll match the
+graph for cars.
 
 .. image:: ../images/pt_assign_8.png
     :align: center
@@ -169,10 +171,10 @@ Let's start the example selecting the default period at the periods table.
     :align: center
     :alt: select default period
 
-Now let's configure our transit graph. We'll uncheck the buttons "walking edges" and "block centroid flows",
-however, we'll save the transit graph in the database, just in case we want to re-use it in another project.
-We set the "line geometry method" as "*Connector project match*" because project graphs must be build with
-this method.
+Instead of setting up the graph configurations again, you can reuse the graph currently in memory.
+To do this, select the "Use existing graph" checkbox. The lower section of the "*Transit Graph*"
+tab will then be disabled. If you change your mind, simply clear the checkbox and configure the
+graph settings as needed.
 
 .. image:: ../images/pt_assign_11.png
     :align: center
