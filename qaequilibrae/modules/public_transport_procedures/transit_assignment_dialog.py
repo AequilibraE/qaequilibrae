@@ -115,11 +115,10 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         # Check if there's a graph saved in the project
         self.configs["has_graph"] = self.chb_use_graph.isChecked()
         if self.chb_use_graph.isChecked():
-            self.transit_data.load([self.configs["period_id"]])
-            if len(self.transit_data.graphs) == 0:
-                errors.append("No graph stored in project to be reused")
-            if self.configs["period_id"] not in self.transit_data.graphs.keys():
-                errors.append("Selected period_id not found on the graph in memory")
+            try:
+                self.transit_data.load([self.configs["period_id"]])
+            except ValueError:
+                errors.append(f"No graph for period_id={self.configs["period_id"]} stored in project")
 
         if action == "create":
             # Check if skim_fields is not empty
