@@ -445,18 +445,36 @@ def test_project_from_osm(folder_path):
     assert project.network.count_nodes() == 10
 
 
-def test_trip_length_distribution(ae, folder_path):
+def test_trip_length_distribution(ae_with_project, folder_path):
+    matrices = ae_with_project.project.matrices
+    mat_names = matrices.list()["name"].tolist()
+
     parameters = {
-        "demand_mat_name": 0,
+        "demand_mat_name": 3,
         "demand_mat_core": "matrix",
-        "skim_mat_name": 2,
+        "skim_mat_name": 5,
         "skim_mat_core": "distance_blended",
-        "file_path": folder_path,
-        "file_name": "my_test_file",
+        "file_path": join(folder_path, "my_file.png"),
     }
 
     action = TripLengthDistribution()
-    context = QgsProcessingContext()
-    feedback = QgsProcessingFeedback()
+    action.matrices = matrices
+    action.mat_names = mat_names
 
-    _ = action.run(parameters, context, feedback)
+    # Mock context and feedback
+    class DummyContext:
+        pass
+
+    class DummyFeedback:
+        def pushInfo(self, msg):
+            pass
+
+        def reportError(self, msg):
+            pass
+
+    context = DummyContext()
+    feedback = DummyFeedback()
+
+    _ = action.processAlgorithm(parameters, context, feedback)
+
+    assert isfile(parameters["file_path"])
