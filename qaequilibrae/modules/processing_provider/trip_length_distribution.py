@@ -1,5 +1,6 @@
 import importlib.util as iutil
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from qgis.core import QgsProcessingAlgorithm, QgsMessageLog, QgsProcessingParameterString
@@ -20,7 +21,6 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         try:
             # Attempt to retrieve the AequilibraE plugin instance
             aeq_plugin = plugins.get("qaequilibrae")
-            self.project = aeq_plugin.project
 
             if not aeq_plugin:
                 self.addParameter(
@@ -29,6 +29,8 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
                     )
                 )
                 return
+            else:
+                self.project = aeq_plugin.project
 
             # Check if there's an open project and fetch its information
 
@@ -119,14 +121,13 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
             return {"Output": f"Error: Skim matrix core '{skim_mat_core}' not found"}
 
         # Get plot data
-        df = self.get_data(skim_matrix, demand_matrix)
+        x_axis, y_axis = self.get_data(skim_matrix, demand_matrix)
 
         # Draw plot
-        import matplotlib.pyplot as plt
 
         _, ax = plt.subplots(figsize=(10, 6))
 
-        ax.plot(df.distance, df.trips)
+        plt.plot(x_axis, y_axis)
         ax.set(title="Trip length distribution")
         ax.set_xlabel("Trip length (km)")
         ax.set_ylabel("Trips")
@@ -137,9 +138,16 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         return {"Output": f"Success: TLD plot saved in {parameters["file_path"]}"}
 
     def get_data(self, skim, demand):
+        from scipy.interpolate import make_interp_spline
+
         max_bins = int(np.ceil(skim.matrix_view.max()))
         y, x = np.histogram((demand.matrix_view * skim.matrix_view) / 1000, bins=np.arange(0, max_bins))
-        return pd.DataFrame({"distance": x[1:], "trips": y})
+        df = pd.DataFrame({"distance": x[1:], "trips": y})
+
+        x_axis = np.linspace(df["distance"].min(), df["distance"].max(), 300)
+        spline = make_interp_spline(df["distance"], y, k=3)
+        y_axis = spline(x_axis)
+        return x_axis, y_axis
 
     def name(self):
         return self.tr("Trip length distribution")

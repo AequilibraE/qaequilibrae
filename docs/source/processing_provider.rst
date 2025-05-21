@@ -169,7 +169,7 @@ This tools allows you to export the data from an open layer to an existing \*.om
 
 Trip length distribution
 ~~~~~~~~~~~~~~~~~~~~~~~~
-This tool generates an Trip Length Distribution (TLD) plot for a pair of demand and skim
+This tool generates a Trip Length Distribution (TLD) plot for a pair of demand and skim
 matrices and their selected cores.
 
 .. important::
