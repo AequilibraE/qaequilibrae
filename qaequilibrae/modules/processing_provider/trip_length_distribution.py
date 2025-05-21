@@ -135,7 +135,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         plt.savefig(parameters["file_path"])
         plt.close()
 
-        return {'Output': f"Success: TLD plot saved in {parameters['file_path']}"}
+        return {"Output": f"Success: TLD plot saved in {parameters['file_path']}"}
 
     def get_data(self, skim, demand):
         from scipy.interpolate import make_interp_spline
