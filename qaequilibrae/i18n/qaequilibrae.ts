@@ -3000,6 +3000,59 @@
     </message>
 </context>
 <context>
+    <name>TripLengthDistribution</name>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="79"/>
+        <source>No AequilibraE project loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="41"/>
+        <source>Demand matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="49"/>
+        <source>Demand matrix core</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="56"/>
+        <source>Skim matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="64"/>
+        <source>Skim matrix core</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="71"/>
+        <source>File path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="92"/>
+        <source>AequilibraE module not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="156"/>
+        <source>Trip length distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="159"/>
+        <source>2. Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="165"/>
+        <source>Creates a trip-length distribution histogram and save in an output folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>bandwidths</name>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidths.ui" line="20"/>
@@ -3319,128 +3372,133 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="58"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="75"/>
         <source>Connector method</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="65"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="105"/>
         <source>Line geometry method</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="72"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="82"/>
         <source>Save transit graph to database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="82"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="112"/>
         <source>Match graph for mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="95"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="58"/>
         <source>Outer stops transfers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="102"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="119"/>
         <source>Walking edges</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="112"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="68"/>
         <source>Inner stops transfers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="119"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="129"/>
         <source>Block centroid flows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="149"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="163"/>
         <source>Skimming</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="161"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="175"/>
         <source>Perfom skimming</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="276"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="290"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="314"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="328"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="237"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="251"/>
         <source>Compute skims</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="333"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="347"/>
         <source>Available skims</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="344"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="358"/>
         <source>matrix_name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="359"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="373"/>
         <source>Transit Assignment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="365"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="379"/>
         <source>Network information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="374"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="388"/>
         <source>Travel Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="381"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="395"/>
         <source>Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="394"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="408"/>
         <source>Outputs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="400"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="414"/>
         <source>result_name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="423"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="437"/>
         <source>Perform assignment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="436"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="450"/>
         <source>Matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="443"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="457"/>
         <source>Matrix core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="453"/>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="467"/>
         <source>Assignment class name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="95"/>
+        <source>Use existing graph</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
