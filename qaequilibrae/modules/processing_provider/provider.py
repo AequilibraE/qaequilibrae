@@ -29,6 +29,8 @@ class Provider(QgsProcessingProvider):
         from .project_from_OSM import ProjectFromOSM
         from .renumber_nodes_from_layer import RenumberNodesFromLayer
         from .trip_length_distribution import TripLengthDistribution
+        from .network_simplifier import NetworkSimplifier
+        from .collapse_links import CollapseLinks
 
         self.addAlgorithm(AddConnectors())
         self.addAlgorithm(AddLinksFromLayer())
@@ -44,6 +46,8 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(ProjectFromOSM())
         self.addAlgorithm(RenumberNodesFromLayer())
         self.addAlgorithm(TripLengthDistribution())
+        self.addAlgorithm(NetworkSimplifier())
+        self.addAlgorithm(CollapseLinks())
 
     def id(self):
         """The ID used for identifying the provider.

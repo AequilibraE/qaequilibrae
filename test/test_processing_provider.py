@@ -13,6 +13,7 @@ from PyQt5.QtCore import QVariant
 from aequilibrae import Project
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.transit import Transit
+from aequilibrae.utils.create_example import create_example
 from qgis.core import (
     QgsApplication,
     QgsField,
@@ -28,6 +29,7 @@ from qaequilibrae.modules.processing_provider.add_links_from_layer import AddLin
 from qaequilibrae.modules.processing_provider.add_matrix_from_layer import AddMatrixFromLayer
 from qaequilibrae.modules.processing_provider.assign_traffic_from_yaml import TrafficAssignYAML
 from qaequilibrae.modules.processing_provider.assign_transit_from_yaml import TransitAssignYAML
+from qaequilibrae.modules.processing_provider.collapse_links import CollapseLinks
 from qaequilibrae.modules.processing_provider.create_matrix_from_layer import CreateMatrixFromLayer
 from qaequilibrae.modules.processing_provider.create_transit_graph import CreatePTGraph
 from qaequilibrae.modules.processing_provider.export_matrix import ExportMatrix
@@ -478,3 +480,24 @@ def test_trip_length_distribution(ae_with_project, folder_path):
     _ = action.processAlgorithm(parameters, context, feedback)
 
     assert isfile(parameters["file_path"])
+
+
+def test_collapse_links(folder_path):
+    project = create_example(folder_path, "nauru")
+    links_before = project.network.count_links()
+    nodes_before = project.network.count_nodes()
+    project.close()
+
+    parameters = {"PROJECT_FOLDER": folder_path, "LINK_IDS": "903,1075"}
+
+    action = CollapseLinks()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    _ = action.run(parameters, context, feedback)
+
+    project = Project()
+    project.open(folder_path)
+
+    assert project.network.count_links() < links_before
+    assert project.network.count_nodes() < nodes_before
