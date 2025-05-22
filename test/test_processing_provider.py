@@ -35,6 +35,7 @@ from qaequilibrae.modules.processing_provider.create_transit_graph import Create
 from qaequilibrae.modules.processing_provider.export_matrix import ExportMatrix
 from qaequilibrae.modules.processing_provider.import_gtfs import ImportGTFS
 from qaequilibrae.modules.processing_provider.matrix_calculator import MatrixCalculator
+from qaequilibrae.modules.processing_provider.network_simplifier import NetworkSimplifier
 from qaequilibrae.modules.processing_provider.project_from_OSM import ProjectFromOSM
 from qaequilibrae.modules.processing_provider.project_from_layer import ProjectFromLayer
 from qaequilibrae.modules.processing_provider.provider import Provider
@@ -491,6 +492,27 @@ def test_collapse_links(folder_path):
     parameters = {"PROJECT_FOLDER": folder_path, "LINK_IDS": "903,1075"}
 
     action = CollapseLinks()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    _ = action.run(parameters, context, feedback)
+
+    project = Project()
+    project.open(folder_path)
+
+    assert project.network.count_links() < links_before
+    assert project.network.count_nodes() < nodes_before
+
+
+def test_network_simplifier(folder_path):
+    project = create_example(folder_path, "nauru")
+    links_before = project.network.count_links()
+    nodes_before = project.network.count_nodes()
+    project.close()
+
+    parameters = {"PROJECT_FOLDER": folder_path}
+
+    action = NetworkSimplifier()
     context = QgsProcessingContext()
     feedback = QgsProcessingFeedback()
 
