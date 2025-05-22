@@ -1,26 +1,26 @@
 import importlib.util as iutil
 import sys
 
-from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterFile
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingException
 
 from qaequilibrae.i18n.translate import trlt
 
 
 class NetworkSimplifier(QgsProcessingAlgorithm):
 
-    def __init__(self):
-        super().__init__()
+    PROJECT_FOLDER = "PROJECT_FOLDER"
 
     def initAlgorithm(self, config=None):
+        # 1. Folder containing an AequilibraE project
         self.addParameter(
             QgsProcessingParameterFile(
-                "project_path",
-                self.tr("Project path"),
-                behavior=QgsProcessingParameterFile.Folder,
+                self.PROJECT_FOLDER, self.tr("AequilibraE Project Folder"), behavior=QgsProcessingParameterFile.Folder
             )
         )
 
     def processAlgorithm(self, parameters, context, feedback):
+        project_folder = self.parameterAsFile(parameters, self.PROJECT_FOLDER, context)
+
         # Checks if we have access to AequilibraE library
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
@@ -28,9 +28,12 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
         from aequilibrae.project import Project
         from aequilibrae.project.tools.network_simplifier import NetworkSimplifier
 
-        project = Project()
-        project.open(parameters["project_path"])
-        feedback.pushInfo(f"Open project in {parameters["project_path"]}")
+        # Check if folder contains AequilibraE project
+        try:
+            project = Project()
+            project.open(project_folder)
+        except Exception as e:
+            raise QgsProcessingException(self.tr(f"{project_folder} does not contain an AeqilibraE model: {e}"))
 
         # Check if centroids exists, otherwise create a centroid
         feedback.pushInfo("Checking centroids")
@@ -66,23 +69,25 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
             nd.is_centroid = 0
             nd.save()
 
-        # links_before = project.network.links.data.shape[0]
-        # nodes_before = project.network.nodes.data.shape[0]
+        links_before = project.network.links.data.shape[0]
+        nodes_before = project.network.nodes.data.shape[0]
 
         net = NetworkSimplifier()
-        # feedback.pushInfo("Simplify network")
-        # net.simplify(graph)
+        feedback.pushInfo("Simplify network")
+        net.simplify(graph)
         feedback.pushInfo("Saving network")
         net.rebuild_network()
 
-        # links_after = project.network.links.data.shape[0]
-        # nodes_after = project.network.nodes.data.shape[0]
+        links_after = project.network.links.data.shape[0]
+        nodes_after = project.network.nodes.data.shape[0]
 
         project.close()
-        feedback.pushInfo(f"Project closed in {parameters["project_path"]}")
+        feedback.pushInfo(f"Project closed in {project_folder}")
 
-        # exp = "This project initially had {} links and {} nodes".format(links_before, nodes_before)
-        # exp = exp + "\nNow it has {} links and {} nodes.".format(links_after, nodes_after)
+        exp = "This project initially had {} links and {} nodes".format(links_before, nodes_before)
+        exp = exp + "\nNow it has {} links and {} nodes.".format(links_after, nodes_after)
+        feedback.pushInfo(exp)
+
         return {"Output": "Ok."}
 
     def name(self):
