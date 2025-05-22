@@ -33,7 +33,7 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
             project = Project()
             project.open(project_folder)
         except Exception as e:
-            raise QgsProcessingException(self.tr(f"{project_folder} does not contain an AeqilibraE model: {e}"))
+            raise QgsProcessingException(self.tr(f"{project_folder} does not contain an AequilibraE model: {e}"))
 
         # Check if centroids exists, otherwise create a centroid
         feedback.pushInfo("Checking centroids")
