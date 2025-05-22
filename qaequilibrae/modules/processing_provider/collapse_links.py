@@ -75,7 +75,7 @@ class CollapseLinks(QgsProcessingAlgorithm):
         return "network"
 
     def shortHelpString(self):
-        return "This tool collapses links into nodes, adjusting the network in the neighborhood."
+        return self.tr("This tool collapses links into nodes, adjusting the network in the neighborhood.")
 
     def createInstance(self):
         return CollapseLinks()
