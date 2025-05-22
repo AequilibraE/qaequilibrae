@@ -1,24 +1,22 @@
 import importlib.util as iutil
 import sys
 
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from qgis._core import QgsProcessingContext, QgsProcessingFeedback
-from qgis.core import QgsProcessingAlgorithm, QgsMessageLog, QgsProcessingParameterString
-from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFileDestination
-from qgis.utils import plugins
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterFile
 
 from qaequilibrae.i18n.translate import trlt
 
 
 class NetworkSimplifier(QgsProcessingAlgorithm):
 
+    def __init__(self):
+        super().__init__()
+
     def initAlgorithm(self, config=None):
         self.addParameter(
-            QgsProcessingParameterFileDestination(
+            QgsProcessingParameterFile(
                 "project_path",
-                self.tr("Path to project"),
+                self.tr("Project path"),
+                behavior=QgsProcessingParameterFile.Folder,
             )
         )
 
@@ -38,6 +36,7 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
         feedback.pushInfo("Checking centroids")
         nodes = project.network.nodes
         centroid_count = nodes.data.query("is_centroid == 1").shape[0]
+        feedback.pushInfo(str(centroid_count))
 
         if centroid_count == 0:
             feedback.pushInfo("Creating arbitrary centroid")
@@ -53,10 +52,13 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
         feedback.pushInfo("Setting graph for computation")
         network = project.network
         network.build_graphs(modes=[mode])
+
         graph = network.graphs[mode]
         graph.set_graph("distance")
         graph.set_skimming("distance")
         graph.set_blocked_centroid_flows(False)
+
+        feedback.pushInfo(str(graph.network))
 
         # Let's revert to setting up that node as centroid in case we had to do it
         if centroid_count == 0:
@@ -64,24 +66,24 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
             nd.is_centroid = 0
             nd.save()
 
-        links_before = project.network.links.data.shape[0]
-        nodes_before = project.network.nodes.data.shape[0]
+        # links_before = project.network.links.data.shape[0]
+        # nodes_before = project.network.nodes.data.shape[0]
 
         net = NetworkSimplifier()
-        feedback.pushInfo("Simplify network")
-        net.simplify(graph)
+        # feedback.pushInfo("Simplify network")
+        # net.simplify(graph)
         feedback.pushInfo("Saving network")
         net.rebuild_network()
 
-        links_after = project.network.links.data.shape[0]
-        nodes_after = project.network.nodes.data.shape[0]
+        # links_after = project.network.links.data.shape[0]
+        # nodes_after = project.network.nodes.data.shape[0]
 
         project.close()
         feedback.pushInfo(f"Project closed in {parameters["project_path"]}")
 
-        exp = "This project initially had {} links and {} nodes".format(links_before, nodes_before)
-        exp = exp + "\nNow it has {} links and {} nodes.".format(links_after, nodes_after)
-        return {"Output": exp}
+        # exp = "This project initially had {} links and {} nodes".format(links_before, nodes_before)
+        # exp = exp + "\nNow it has {} links and {} nodes.".format(links_after, nodes_after)
+        return {"Output": "Ok."}
 
     def name(self):
         return self.tr("Network simplifier")
