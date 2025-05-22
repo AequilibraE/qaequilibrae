@@ -47,7 +47,7 @@ class CollapseLinks(QgsProcessingAlgorithm):
         try:
             link_ids = [int(n.strip()) for n in link_ids_raw.split(",") if n.strip()]
         except Exception as e:
-            raise QgsProcessingException(self.tr(f"Error parsing node IDs: {e}"))
+            raise QgsProcessingException(self.tr(f"Error parsing link IDs: {e}"))
 
         net = NetworkSimplifier()
 
