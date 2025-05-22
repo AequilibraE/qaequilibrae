@@ -23,7 +23,7 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
 
         # Checks if we have access to AequilibraE library
         if iutil.find_spec("aequilibrae") is None:
-            sys.exit(self.tr("AequilibraE module not found"))
+            raise QgsProcessingException(self.tr("AequilibraE module not found"))
 
         from aequilibrae.project import Project
         from aequilibrae.project.tools.network_simplifier import NetworkSimplifier
