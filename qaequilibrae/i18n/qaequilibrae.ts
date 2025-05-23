@@ -241,7 +241,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="161"/>
+        <location filename="../qaequilibrae.py" line="164"/>
         <source>Public Transport</source>
         <translation type="unfinished"></translation>
     </message>
@@ -316,22 +316,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="165"/>
+        <location filename="../qaequilibrae.py" line="168"/>
         <source>Desire Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="166"/>
+        <location filename="../qaequilibrae.py" line="169"/>
         <source>Stacked Bandwidth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="167"/>
+        <location filename="../qaequilibrae.py" line="170"/>
         <source>Scenario Comparison</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="168"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Simple tag</source>
         <translation type="unfinished"></translation>
     </message>
@@ -341,22 +341,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="172"/>
+        <location filename="../qaequilibrae.py" line="175"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="179"/>
+        <location filename="../qaequilibrae.py" line="182"/>
         <source>Show project info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="328"/>
+        <location filename="../qaequilibrae.py" line="332"/>
         <source>You need to load a project first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="331"/>
+        <location filename="../qaequilibrae.py" line="335"/>
         <source>You need to close the project currently open first</source>
         <translation type="unfinished"></translation>
     </message>
@@ -366,7 +366,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="161"/>
+        <location filename="../qaequilibrae.py" line="164"/>
         <source>Explore Transit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -381,13 +381,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="336"/>
+        <location filename="../qaequilibrae.py" line="340"/>
         <source>You need to import a GTFS feed first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="152"/>
         <source>Route choice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="161"/>
+        <source>Skimming and Assignment</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -761,72 +766,72 @@
 <context>
     <name>DesireLinesProcedure</name>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="88"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="87"/>
         <source>Manipulating matrix indices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="104"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="103"/>
         <source>Filtering zones with no geography available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="116"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="115"/>
         <source>Filtering down to OD pairs with flows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="137"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="136"/>
         <source>Concatenating AB &amp; BA flows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="147"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="146"/>
         <source>Creating Desire Lines</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="188"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="187"/>
         <source>Building Delaunay dataset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="194"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="193"/>
         <source>Computing Delaunay Triangles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="202"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="201"/>
         <source>Building Delaunay Network: Collecting Edges</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="208"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="207"/>
         <source>Building Delaunay Network: Getting unique edges</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="215"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="214"/>
         <source>Building Delaunay Network: Assembling Layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="235"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="234"/>
         <source>Building graph</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="267"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="266"/>
         <source>Assigning demand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="271"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="270"/>
         <source>Collecting results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/gis/desire_lines_procedure.py" line="274"/>
+        <location filename="../modules/gis/desire_lines_procedure.py" line="273"/>
         <source>Building resulting layer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1007,7 +1012,7 @@
 <context>
     <name>DisplayAequilibraEFormatsDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="373"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="375"/>
         <source>AequilibraE custom formats</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1065,72 +1070,72 @@
 <context>
     <name>DistributionModelsDialog</name>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="130"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="129"/>
         <source>AequilibraE - Iterative Proportional Fitting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="131"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="130"/>
         <source>Seed matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="135"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="134"/>
         <source>AequilibraE - Apply gravity model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="141"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="140"/>
         <source>AequilibraE - Calibrate gravity model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="142"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="141"/>
         <source>Observed matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="166"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="165"/>
         <source>Function</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="226"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="225"/>
         <source>Could not load model. {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="420"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="419"/>
         <source>Procedure error: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="376"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="375"/>
         <source>Queued</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="394"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="393"/>
         <source>Production vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="397"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="396"/>
         <source>Attraction vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="401"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="400"/>
         <source>Observed (seed) matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="405"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="404"/>
         <source>Impedance matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="216"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="215"/>
         <source>You need to load a dataset to proceed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1465,6 +1470,36 @@
         <source>Allow map-match</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="14"/>
+        <source>AequilibraE - Add new period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="37"/>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="44"/>
+        <source>Period end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="64"/>
+        <source>HH:mm:ss</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="74"/>
+        <source>Period start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="81"/>
+        <source>Add Period</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GTFSFeed</name>
@@ -1505,17 +1540,17 @@
 <context>
     <name>ImpedanceMatrixDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="194"/>
+        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="193"/>
         <source>It is not possible to trace paths between all nodes while blocking flows through centroids</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="199"/>
+        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="198"/>
         <source>No graph loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="202"/>
+        <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="201"/>
         <source>No skim fields provided</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1966,47 +2001,47 @@
 <context>
     <name>NetworkPreparationProcedure</name>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="41"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="40"/>
         <source>Duplicating line layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="79"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="78"/>
         <source>Links read: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="113"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="112"/>
         <source>Computing node IDs: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="134"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="133"/>
         <source>Writing new node layer: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="156"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="155"/>
         <source>Writing node IDs to links: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="184"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="183"/>
         <source>Checking node layer: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="201"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="200"/>
         <source>Processing links: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="55"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="54"/>
         <source>Adding fields to line layer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/Network_preparation_procedure.py" line="46"/>
+        <location filename="../modules/network/Network_preparation_procedure.py" line="45"/>
         <source>Line layer duplicated</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2143,32 +2178,32 @@
 <context>
     <name>ProjectFromOSMDialog</name>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="40"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="39"/>
         <source>Place name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="45"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="44"/>
         <source>Current map canvas area</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="62"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="61"/>
         <source>Choose folder output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="68"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="67"/>
         <source>Import network and create project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="115"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="114"/>
         <source>Establishing area for download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="57"/>
+        <location filename="../modules/project_procedures/project_from_osm_dialog.py" line="56"/>
         <source>Target</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2570,22 +2605,22 @@
 <context>
     <name>RouteChoiceDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="356"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="359"/>
         <source>Input error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="240"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="241"/>
         <source>Missing query name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="243"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="244"/>
         <source>Query name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="246"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="247"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2836,72 +2871,72 @@
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="234"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="238"/>
         <source>Class name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="287"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="291"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="413"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="417"/>
         <source>Input error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="443"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="447"/>
         <source>No traffic classes to assign</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="448"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="452"/>
         <source>Missing scenario name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="453"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="458"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="530"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="535"/>
         <source>VDF parameter is not numeric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="340"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="344"/>
         <source>Wrong value for link ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="347"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="351"/>
         <source>Link ID doesn&apos;t exist in project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="357"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="361"/>
         <source>Missing query name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="362"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="366"/>
         <source>Query name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="367"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="371"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="459"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="464"/>
         <source>Missing select link matrix name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="463"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="468"/>
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2961,6 +2996,59 @@
     <message>
         <location filename="../modules/processing_provider/assign_transit_from_yaml.py" line="119"/>
         <source>Example of valid configuration is provided in the plugin documentation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TripLengthDistribution</name>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="79"/>
+        <source>No AequilibraE project loaded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="41"/>
+        <source>Demand matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="49"/>
+        <source>Demand matrix core</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="56"/>
+        <source>Skim matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="64"/>
+        <source>Skim matrix core</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="71"/>
+        <source>File path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="92"/>
+        <source>AequilibraE module not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="156"/>
+        <source>Trip length distribution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="159"/>
+        <source>2. Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="165"/>
+        <source>Creates a trip-length distribution histogram and save in an output folder.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3258,6 +3346,159 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="115"/>
         <source>Join with layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>dialog</name>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="14"/>
+        <source>AequilibraE - PT Skimming and Assignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="29"/>
+        <source>Period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="35"/>
+        <source>Add new period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="46"/>
+        <source>Transit Graph</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="75"/>
+        <source>Connector method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="105"/>
+        <source>Line geometry method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="82"/>
+        <source>Save transit graph to database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="112"/>
+        <source>Match graph for mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="58"/>
+        <source>Outer stops transfers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="119"/>
+        <source>Walking edges</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="68"/>
+        <source>Inner stops transfers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="129"/>
+        <source>Block centroid flows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="163"/>
+        <source>Skimming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="175"/>
+        <source>Perfom skimming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="290"/>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="328"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="251"/>
+        <source>Compute skims</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="347"/>
+        <source>Available skims</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="358"/>
+        <source>matrix_name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="373"/>
+        <source>Transit Assignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="379"/>
+        <source>Network information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="388"/>
+        <source>Travel Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="395"/>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="408"/>
+        <source>Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="414"/>
+        <source>result_name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="437"/>
+        <source>Perform assignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="450"/>
+        <source>Matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="457"/>
+        <source>Matrix core</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="467"/>
+        <source>Assignment class name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="95"/>
+        <source>Use existing graph</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3870,7 +4111,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
+        <location filename="../modules/network/forms/ui_add_connectors.ui" line="73"/>
         <source>Layer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3935,7 +4176,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
         <source>Layer field</source>
         <translation type="unfinished"></translation>
     </message>

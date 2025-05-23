@@ -19,21 +19,19 @@ class PandasModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent)
         self._data = data
 
-    def data(self, index, role):
-        if index.isValid():
-            if role == Qt.ItemDataRole.DisplayRole:
-                return str(self._data.iloc[index.row(), index.column()])
-        return None
-
     def rowCount(self, index):
         return self._data.shape[0]
 
     def columnCount(self, index):
         return self._data.shape[1]
 
-    def header_data(self, section, orientation, role):
-        if role == Qt.ItemDataRole.DisplayRole:
-            if orientation == Qt.Orientation.Horizontal:
-                return str(self._data.columns[section])
-            if orientation == Qt.Orientation.Vertical:
-                return str(self._data.index[section])
+    def data(self, index, role):
+        if index.isValid():
+            if role == Qt.DisplayRole:
+                return str(self._data.iloc[index.row(), index.column()])
+        return None
+
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return str(self._data.columns[col])
+        return None

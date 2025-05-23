@@ -13,7 +13,9 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
-from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QDialog, QSizePolicy
+from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView
+from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
+from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
 
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
 from qaequilibrae.modules.common_tools import layer_from_dataframe
@@ -337,7 +339,9 @@ class DisplayAequilibraEFormatsDialog(QDialog, FORM_CLASS):
         self.indices = self.data_to_show.index.astype(np.int32)
 
     def csv_file_path(self):
-        new_name, _ = GetOutputFileName(self, self.data_type, ["Comma-separated file(*.csv)"], ".csv", self.data_path)
+        new_name, _ = GetOutputFileName(
+            self, "Export matrix data", ["Comma-separated file(*.csv)"], ".csv", self.data_path
+        )
         return new_name
 
     def export(self):

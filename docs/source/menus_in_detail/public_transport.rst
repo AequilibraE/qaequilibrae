@@ -31,13 +31,15 @@ Once the feed is loaded, you can select the service date, the agency name, and w
 It is also possible to add and/or modify the route capacities. When you're done, just click on **Add to importer**
 and you will return to the GTFS importer screen.
 
-.. image:: ../images/gtfs_2.png
-    :width: 45 %
-    :alt: basic settings
+.. subfigure:: AB
+    :align: center
+    :gap: 3mm
 
-.. image:: ../images/gtfs_3.png
-    :width: 45 %
-    :alt: route capacities
+    .. image:: ../images/gtfs_2.png
+        :alt: basic settings
+
+    .. image:: ../images/gtfs_3.png
+        :alt: route capacities
 
 Notice that the feed information is now available at the *Feeds to import* table view. The first time you create a 
 GTFS feed, the only option available is **Create new route system**, so you don't have to click on it.
@@ -61,8 +63,137 @@ project.
     :align: center
     :alt: gtfs already exists
 
-Explore Transit
----------------
+Transit skimming and assignment
+-------------------------------
+
+QAequilibraE incorporates two of AequilibraE's transit features: skimming and 
+assignment. In this section, we'll replicate AequilibraE's Python examples and show you how to add
+a new Period to your transit model. To open the menu, click on **Public Transport > Skimming and Assignment**.
+
+The Transit skimming and assignment module consists in four different tabs. "*Periods*" is the 
+first tab and it displays a visualization of the periods in the project. It also has a clickable 
+button for you to add a custom period as desired. Notice that, a period representing all day-long 
+(``period_id == 1``) exists by default.
+
+.. image:: ../images/pt_assign_1.png
+    :align: center
+    :alt: periods tab
+
+The second tab is "*Transit Graph*", in which you will add the configuration of the graph that will
+be created. The four checkboxes at the top of the tab indicate some characteristics of the network
+and you can select all that apply. The three drop-down buttons configure, respectively, the connector
+method (which creates the connector edges between each stops and ODs), the line geometry method 
+(which creates a LineString for each edge), and the match graph for mode. The last checkbox indicates
+weather you want to save the assignment result in the database or not.
+
+.. image:: ../images/pt_assign_2.png
+    :align: center
+    :alt: transit graph tab
+
+In the "*Skimming*" tab it is possible to select the fields we want to create skims for, perform
+the actual skimming , and save the result as an \*.OMX file.
+
+.. image:: ../images/pt_assign_3.png
+    :align: center
+    :alt: skimming tab
+
+Finally, in the "*Transit Assignment*" tab, we select the demand matrix and its core that will be
+set for computation, the name of the assignment class, the fields corrresponding to the travel time
+and frequency, and the name we want to save the results table.
+
+.. image:: ../images/pt_assign_4.png
+    :align: center
+    :alt: transit Assignment tab
+
+In the next sub-sections, we'll present two different workflows, one performing skimming with a
+custom period and the other performing assignment for the period of one day.
+
+Skimming with custom period
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this example we'll create a custom period and its related skimming. We start at the tab "*Periods*"
+clicking on the *Add new period* button. 
+
+.. image:: ../images/pt_assign_5.png
+    :align: center
+    :alt: click on add new period
+
+A new window containing the fields period start, end, and description will open. Add the appropriate
+time and description and hit the *Add period* button at the bottom.
+
+.. image:: ../images/pt_assign_6.png
+    :align: center
+    :alt: add new period window
+
+The window will close and the period will be automatically shown in the Periods table view. By default,
+the periods are numbered in an ascending order based on the number of the last period added. Notice that
+the start/end periods we added before are displayed as seconds at the table. Before continuing, select
+the desired period by clicking on it, otherwise an error will be thrown when skimming/assigning.
+
+.. image:: ../images/pt_assign_7.png
+    :align: center
+    :alt: select period
+
+At the tab "*Transit Graph*", we'll set up the configurations of the graph. For this example, we'll
+uncheck the boxes for "walking edges", and "block centroid flows". For the purpose of this example,
+we'll let the box "save transit graph to database" checked so we can reuse the graph for assignment.
+Let's change the value of line geometry method to "connector project match" because graphs should
+be created using this method. Finally, as Coquimbo doesn't have many walking edges, we'll match the
+graph for cars.
+
+.. image:: ../images/pt_assign_8.png
+    :align: center
+    :alt: skimming graph config
+
+Moving to the "*Skimming*" tab, we can select the skims we want to compute, as well as select a name 
+to our matrices file. To add a skim to computation, we select the fields one by one at the 
+"Available skims" column and add them to the "Compute skims" column by clicking on the right-arrow
+button (see steps 1, 2, and 3). Let's create a name for our output (step 4) and click on the
+*Perform skimming* button. It will perform the skimming for a unit matrix, and store the result at
+the project matrices' folder.
+
+.. image:: ../images/pt_assign_9.png
+    :align: center
+    :alt: skimmming computation
+
+When the process is finished, the PT Skimming and Assignment window will automatically close and
+you can check the outputs at the matrices folder.
+
+Transit assignment
+~~~~~~~~~~~~~~~~~~
+
+In this example, we'll perform the assignment for all day-long also for Coquimbo. This is a reproduction
+of an AequilibraE's `example <https://www.aequilibrae.com/develop/python/_auto_examples/public_transport/plot_public_transit_assignment.html#>`_.
+
+Let's start the example selecting the default period at the periods table.
+
+.. image:: ../images/pt_assign_10.png
+    :align: center
+    :alt: select default period
+
+Instead of setting up the graph configurations again, you can reuse the graph currently in memory.
+To do this, select the "Use existing graph" checkbox. The lower section of the "*Transit Graph*"
+tab will then be disabled. If you change your mind, simply clear the checkbox and configure the
+graph settings as needed.
+
+.. image:: ../images/pt_assign_11.png
+    :align: center
+    :alt: set transit graph for assignment
+
+As we're running an assignment, we'll skip the Skimming tab and move directly to "*Transit Assignment*".
+Let's select a demand matrix and its core for computation (steps 1 and 2). As Coquimbo doesn't have any 
+matrix in its matrices folder, you'll have to create one open layer and 
+:ref:`import it to the project <importing_matrices>`. Then, select an appropriate  name for the transit 
+assignment class (setp 3), and the variables that corresponds to the travel time and frequency (steps 4 
+and 5). Lastly, select an appropriate name for the output that will be stored in the results database 
+(step 6) and just hit the *Perform Assignment* button at the bottom.
+
+.. image:: ../images/pt_assign_12.png
+    :align: center
+    :alt: transit assignment
+
+Explore transit network
+-----------------------
 
 Case you have already imported a GTFS feed into your project or you want to open a feed from an AequilibraE project 
 created with Python, you can click on **Public Transport > Explore Transit** to visualize the Transit 

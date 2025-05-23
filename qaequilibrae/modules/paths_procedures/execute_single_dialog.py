@@ -3,7 +3,6 @@ import os
 import numpy as np
 from aequilibrae.paths.route_choice import RouteChoice
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSlot
 from qgis.PyQt.QtWidgets import QDialog
 
 from qaequilibrae.modules.common_tools.debouncer import Debouncer
@@ -29,11 +28,14 @@ class ExecuteSingleDialog(QDialog, FORM_CLASS):
         self.sld_max_routes.setValue(self._kwargs["max_routes"])
         self.label_4.setText(f"Number of routes: {self._kwargs["max_routes"]}")
 
-        self.debouncer = Debouncer(delay_ms=1_000, callback=self.on_input_changed)
+        self.debouncer = Debouncer(delay_ms=700, callback=self.execute_single)
 
-        self.node_from.editingFinished.connect(self._on_node_from_changed)
-        self.node_to.editingFinished.connect(self._on_node_to_changed)
+        self.node_from.editingFinished.connect(self.execute_single)
+        self.node_from.textChanged.connect(self._on_node_from_changed)
+        self.node_to.editingFinished.connect(self.execute_single)
+        self.node_to.textChanged.connect(self._on_node_to_changed)
         self.sld_max_routes.valueChanged.connect(self._on_slider_changed)
+        self.sld_max_routes.sliderReleased.connect(self.execute_single)
 
     def execute_single(self):
         from_node = int(self.node_from.text())
@@ -53,22 +55,12 @@ class ExecuteSingleDialog(QDialog, FORM_CLASS):
     def exit_procedure(self):
         self.close()
 
-    @pyqtSlot()
     def _on_node_from_changed(self):
-        self.debouncer(("node_from", self.node_from.text()))
+        self.debouncer()
 
-    @pyqtSlot()
     def _on_node_to_changed(self):
-        self.debouncer(("node_to", self.node_to.text()))
+        self.debouncer()
 
-    @pyqtSlot(int)
     def _on_slider_changed(self, value):
         self.label_4.setText(f"Number of routes: {value}")
-        self.debouncer(("sld_max_routes", value))
-
-    def on_input_changed(self, source_and_value):
-        source, value = source_and_value
-        if source == "sld_max_routes":
-            self._kwargs["max_routes"] = value
-
-        self.execute_single()
+        self._kwargs["max_routes"] = value

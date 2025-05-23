@@ -67,15 +67,15 @@ def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
     }
 
     dialog = ExecuteSingleDialog(qgis_iface, graph, coquimbo_project.layers["links"][0], params)
-    dialog.debouncer.delay_ms = 200
+    dialog.debouncer.delay_ms = 100
     dialog.node_from.clear()
-    dialog.node_to.clear()
-    qtbot.mouseClick(dialog.node_from, Qt.MouseButton.LeftButton)
+    qtbot.mouseClick(dialog.node_from, Qt.LeftButton)
     qtbot.keyClicks(dialog.node_from, "71645")
-    qtbot.mouseClick(dialog.node_to, Qt.MouseButton.LeftButton)
+    qtbot.wait(200)
+    dialog.node_to.clear()
+    qtbot.mouseClick(dialog.node_to, Qt.LeftButton)
     qtbot.keyClicks(dialog.node_to, "79385")
-    qtbot.keyPress(dialog.node_to, Qt.Key_Enter)
-    qtbot.wait(400)
+    qtbot.wait(200)
 
     dialog.exit_procedure()
 

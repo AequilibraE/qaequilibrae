@@ -37,6 +37,7 @@ from qaequilibrae.modules.processing_provider.project_from_OSM import ProjectFro
 from qaequilibrae.modules.processing_provider.project_from_layer import ProjectFromLayer
 from qaequilibrae.modules.processing_provider.provider import Provider
 from qaequilibrae.modules.processing_provider.renumber_nodes_from_layer import RenumberNodesFromLayer
+from qaequilibrae.modules.processing_provider.trip_length_distribution import TripLengthDistribution
 from .utilities import load_sfalls_from_layer, load_test_layer
 
 pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
@@ -168,13 +169,14 @@ def test_add_centroid_connector(pt_no_feed):
 
     assert result["Output"] == project_folder
 
-    node_qry = "select count(node_id) from nodes where is_centroid=1"
-    node_count = project.conn.execute(node_qry).fetchone()[0]
-    assert node_count == 1
+    with project.db_connection as conn:
+        node_qry = "select count(node_id) from nodes where is_centroid=1"
+        node_count = conn.execute(node_qry).fetchone()[0]
+        assert node_count == 1
 
-    link_qry = "select count(name) from links where name like 'centroid connector%'"
-    link_count = project.conn.execute(link_qry).fetchone()[0]
-    assert link_count == 3
+        link_qry = "select count(name) from links where name like 'centroid connector%'"
+        link_count = conn.execute(link_qry).fetchone()[0]
+        assert link_count == 3
 
 
 def test_renumber_from_centroids(ae_with_project, tmp_path):
@@ -202,14 +204,15 @@ def test_renumber_from_centroids(ae_with_project, tmp_path):
 
     assert result[0]["Output"] == project_folder
 
-    node_qry = "select node_id from nodes;"
-    node_count = project.conn.execute(node_qry).fetchall()
-    node_count = [n[0] for n in node_count]
-    assert node_count == list(range(1001, 1025))
+    with project.db_connection as conn:
+        node_qry = "select node_id from nodes;"
+        node_count = conn.execute(node_qry).fetchall()
+        node_count = [n[0] for n in node_count]
+        assert node_count == list(range(1001, 1025))
 
 
 def test_assign_from_yaml(ae_with_project):
-    folder = ae_with_project.project.project_base_path
+    folder = str(ae_with_project.project.project_base_path)
     file_path = join(folder, "config.yml")
 
     assert isfile(file_path)
@@ -317,7 +320,7 @@ def test_add_links_from_layer(ae_with_project):
 
 
 def test_assign_transit_from_yaml(coquimbo_project):
-    folder = coquimbo_project.project.project_base_path
+    folder = str(coquimbo_project.project.project_base_path)
     shutil.copyfile("test/data/coquimbo_project/transit_config.yml", f"{folder}/transit_config.yml")
     shutil.copyfile("test/data/coquimbo_project/matrices/demand.aem", f"{folder}/matrices/demand.aem")
 
@@ -440,3 +443,38 @@ def test_project_from_osm(folder_path):
 
     assert project.network.count_links() == 11
     assert project.network.count_nodes() == 10
+
+
+def test_trip_length_distribution(ae_with_project, folder_path):
+    matrices = ae_with_project.project.matrices
+    mat_names = matrices.list()["name"].tolist()
+
+    parameters = {
+        "demand_mat_name": 3,
+        "demand_mat_core": "matrix",
+        "skim_mat_name": 5,
+        "skim_mat_core": "distance_blended",
+        "file_path": join(folder_path, "my_file.png"),
+    }
+
+    action = TripLengthDistribution()
+    action.matrices = matrices
+    action.mat_names = mat_names
+
+    # Mock context and feedback
+    class DummyContext:
+        pass
+
+    class DummyFeedback:
+        def pushInfo(self, msg):
+            pass
+
+        def reportError(self, msg):
+            pass
+
+    context = DummyContext()
+    feedback = DummyFeedback()
+
+    _ = action.processAlgorithm(parameters, context, feedback)
+
+    assert isfile(parameters["file_path"])

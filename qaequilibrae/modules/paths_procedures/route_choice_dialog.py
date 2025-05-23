@@ -9,8 +9,7 @@ from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
-from qgis._core import QgsFeatureRequest
-from qgis.core import QgsMapLayerProxyModel
+from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest
 
 from qaequilibrae.modules.common_tools import geodataframe_from_layer
 from qaequilibrae.modules.common_tools.auxiliary_functions import get_vector_layer_by_name, model_area_polygon
@@ -139,6 +138,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 table.setCellWidget(i, 1, centers_item(chb1))
 
     def add_cost_function(self):
+        self.error = ""
         params = self.ln_parameter.text()
 
         # parameter needs to be numeric and cannot be null
@@ -234,6 +234,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.__current_links.extend([(link_id, 0)])
 
     def save_query(self):
+        self.error = ""
         query_name = self.ln_qry_name.text()
 
         if len(query_name) == 0 or not query_name:
@@ -274,6 +275,8 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
     # Validate model inputs
     def _validate_inputs(self):
+        self.error = ""
+
         cob_algo = self.cob_algo.currentText().lower()
         algo = "bfsle" if "bfsle" in cob_algo else "lp"
 
@@ -446,20 +449,20 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
             if self.job == "execute_single":
                 res = self.worker_thread.rc.get_results().to_pandas()
+
                 plot_results(res, self.parameters["node_from"], self.parameters["node_to"], self.link_layer)
+
+                dlg2 = ExecuteSingleDialog(
+                    qgis.utils.iface.mainWindow(),
+                    self.worker_thread.graph,
+                    self.link_layer,
+                    self.parameters,
+                )
+                dlg2.show()
+                dlg2.open()
+                # see note in https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QDialog.html#PySide2.QtWidgets.PySide2.QtWidgets.QDialog.exec_
 
             self.exit_procedure()
 
     def exit_procedure(self):
-        if self.job == "execute_single":
-            dlg2 = ExecuteSingleDialog(
-                qgis.utils.iface.mainWindow(),
-                self.worker_thread.graph,
-                self.link_layer,
-                self.parameters,
-            )
-            dlg2.show()
-            dlg2.open()
-            # see note in https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QDialog.html#PySide2.QtWidgets.PySide2.QtWidgets.QDialog.exec_
-
         self.close()

@@ -22,8 +22,6 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.NewNodes = False
         self.qgis_project = qgis_project
         self.project = qgis_project.project
-        self.conn = self.project.conn
-        self.path_to_file = self.project.path_to_file
 
         modes = self.project.network.modes.all_modes()
         link_types = self.project.network.link_types.all_types()

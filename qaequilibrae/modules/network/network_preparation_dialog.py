@@ -3,7 +3,7 @@ import sys
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
-from qgis._core import QgsProject
+from qgis.core import QgsProject
 
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import standard_path, get_vector_layer_by_name

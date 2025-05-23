@@ -6,7 +6,7 @@ from os.path import join
 
 import qgis
 from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis._core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
+from qgis.core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
 from qgis.core import QgsExpression, QgsProject, QgsVectorLayerJoinInfo
 
 from qaequilibrae.modules.common_tools import find_table_fields, get_parameter_chain, layer_from_dataframe

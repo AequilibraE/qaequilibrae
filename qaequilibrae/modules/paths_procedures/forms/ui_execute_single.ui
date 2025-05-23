@@ -80,7 +80,7 @@
          <bool>false</bool>
         </property>
         <property name="minimum">
-         <number>0</number>
+         <number>1</number>
         </property>
         <property name="maximum">
          <number>50</number>
@@ -89,10 +89,10 @@
          <number>1</number>
         </property>
         <property name="value">
-         <number>0</number>
+         <number>1</number>
         </property>
         <property name="sliderPosition">
-         <number>0</number>
+         <number>1</number>
         </property>
         <property name="tracking">
          <bool>true</bool>
