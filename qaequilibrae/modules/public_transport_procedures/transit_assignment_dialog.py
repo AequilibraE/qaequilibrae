@@ -2,6 +2,7 @@ from functools import partial
 from os.path import join, dirname
 
 from aequilibrae.matrix import AequilibraeMatrix
+from aequilibrae.transit import Transit
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
@@ -20,6 +21,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
         self.iface = qgis_project.iface
         self.project = qgis_project.project
+        self.transit_data = Transit(self.project)
 
         self.all_modes = {}
         self.proj_matrices = list_matrices(self.project.matrices.fldr)
@@ -32,6 +34,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.cob_conn_methods.addItems(["Overlapping regions", "Nearest neighbour"])
         self.cob_line_methods.addItems(["Direct", "Connector project match"])
         self.cob_matrices.currentIndexChanged.connect(self.update_matrix_data)
+        self.chb_use_graph.toggled.connect(self.__deactivate_graph_configs)
 
         for table in [self.tbl_periods]:
             table.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -109,6 +112,14 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.configs["period_id"] = self.get_period()
         errors = []  # Initialize a list to collect validation errors
 
+        # Check if there's a graph saved in the project
+        self.configs["has_graph"] = self.chb_use_graph.isChecked()
+        if self.chb_use_graph.isChecked():
+            try:
+                self.transit_data.load([self.configs["period_id"]])
+            except ValueError:
+                errors.append(f"No graph for period_id={self.configs['period_id']} stored in project")
+
         if action == "create":
             # Check if skim_fields is not empty
             if len(self.skim_fields) == 0:
@@ -143,32 +154,43 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
             self.error = "\n".join(errors)  # Combine all errors into a single string
 
     def run(self, action):
+        # Deactivate button after click
+        button = self.but_create if action == "create" else self.but_assign
+        button.setEnabled(False)
+
         self.check_inputs(action)
         if self.error:
             self.iface.messageBar().pushMessage("Warning", self.error, level=1, duration=10)
+            button.setEnabled(True)
+            self.error = ""
             return
         else:
             self.pbar = self.pbar_skimming if action == "create" else self.pbar_assignment
             self.label = self.skimming_label if action == "create" else self.assignment_label
 
+            # Graph configs
             self.configs["with_outer_stop_transfers"] = self.chb_outer_stops.isChecked()
             self.configs["with_inner_stop_transfers"] = self.chb_inner_stops.isChecked()
             self.configs["with_walking_edges"] = self.chb_walk_edges.isChecked()
             self.configs["blocking_centroid_flows"] = self.chb_check_centroids.isChecked()
             self.configs["save_graph"] = self.chb_save_graph.isChecked()
 
+            self.configs["line_method"] = self.cob_line_methods.currentText().lower()
+            mode = self.cob_mode.currentText()
+            self.configs["mode_id"] = self.all_modes[mode]
+
+            # Transit assignment configs
             self.configs["demand_matrix_core"] = "pt" if action == "create" else self.cob_matrix_core.currentText()
             self.configs["time_field"] = "trav_time" if action == "create" else self.cob_travel_time.currentText()
             self.configs["frequency_field"] = "freq" if action == "create" else self.cob_freq.currentText()
 
-            self.configs["line_method"] = self.cob_line_methods.currentText().lower()
-            mode = self.cob_mode.currentText()
-            self.configs["mode_id"] = self.all_modes[mode]
             if action == "assign":
-                self.configs["mat_name"] = self.proj_matrices.at[self.cob_matrices.currentIndex(), "file_name"]
+                self.configs["mat_name"] = self.proj_matrices.at[self.cob_matrices.currentIndex(), "name"]
                 self.configs["mat_core"] = [self.cob_matrix_core.currentText()]
 
-            self.worker_thread = TransitAssignProcedure(self.iface.mainWindow(), self.project, self.configs, action)
+            self.worker_thread = TransitAssignProcedure(
+                self.iface.mainWindow(), self.project, self.transit_data, self.configs, action
+            )
             self.run_thread()
 
     def run_thread(self):
@@ -264,3 +286,17 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         elif val[0] == "finished":
             self.pbar.reset()
             self.label.clear()
+
+    def __deactivate_graph_configs(self):
+        visualize = not self.chb_use_graph.isChecked()
+        self.chb_check_centroids.setEnabled(visualize)
+        self.chb_inner_stops.setEnabled(visualize)
+        self.chb_outer_stops.setEnabled(visualize)
+        self.chb_save_graph.setEnabled(visualize)
+        self.chb_walk_edges.setEnabled(visualize)
+        self.cob_conn_methods.setEnabled(visualize)
+        self.cob_line_methods.setEnabled(visualize)
+        self.cob_mode.setEnabled(visualize)
+        self.label_1.setEnabled(visualize)
+        self.label_2.setEnabled(visualize)
+        self.label_3.setEnabled(visualize)

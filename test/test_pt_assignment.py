@@ -3,6 +3,7 @@ from os.path import join
 import numpy as np
 import pandas as pd
 import pytest
+from aequilibrae.transit import Transit
 from qgis.PyQt.QtCore import Qt, QTime
 from qgis.PyQt.QtWidgets import QDialog
 
@@ -34,13 +35,6 @@ def test_assignment(qtbot, coquimbo_project):
     dialog.chb_check_centroids.setChecked(False)
     dialog.cob_conn_methods.setCurrentText("Nearest neighbour")
     dialog.cob_line_methods.setCurrentText("Connector project match")
-
-    # Add boardings, alightings, and transfers
-    for row in [0, 0, 2]:
-        dialog.available_skims_table.selectRow(row)
-        qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
-
-    assert dialog.skim_fields == ["boardings", "alightings", "transfers"]
 
     dialog.ln_transit_class.setText("pt_class")
     dialog.cob_travel_time.setCurrentText("trav_time")
@@ -220,3 +214,83 @@ def test_no_results_name(qtbot, coquimbo_project, name):
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == "Warning:Check result_name"
+
+
+def test_no_graph(qtbot, coquimbo_project, mock_period):
+    dialog = create_dialog_with_matrix(coquimbo_project)
+    qtbot.mouseClick(dialog.but_add_period, Qt.LeftButton)
+
+    dialog.tbl_periods.selectRow(1)
+
+    dialog.chb_use_graph.setChecked(True)
+
+    dialog.ln_transit_class.setText("pt")
+    dialog.ln_result_name.setText("pt_assignment")
+
+    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == "Warning:No graph for period_id=2 stored in project"
+
+
+def test_no_graph_for_period(qtbot, coquimbo_project, mock_period):
+    # Save a graph in the project before
+    data = Transit(coquimbo_project.project)
+
+    graph = data.create_graph(
+        with_outer_stop_transfers=False,
+        with_walking_edges=False,
+        blocking_centroid_flows=False,
+        connector_method="overlapping_regions",
+    )
+
+    coquimbo_project.project.network.build_graphs()
+    graph.create_line_geometry(method="connector project match", graph="c")
+    data.save_graphs()
+
+    # Configure the dialog
+    dialog = create_dialog_with_matrix(coquimbo_project)
+    qtbot.mouseClick(dialog.but_add_period, Qt.LeftButton)
+    dialog.tbl_periods.selectRow(1)
+
+    dialog.chb_use_graph.setChecked(True)
+
+    dialog.ln_transit_class.setText("pt")
+    dialog.ln_result_name.setText("pt_assignment")
+
+    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[1][0] == "Warning:No graph for period_id=2 stored in project"
+
+
+def test_reuse_graph_in_project(qtbot, coquimbo_project):
+    # Save a graph in the project before
+    data = Transit(coquimbo_project.project)
+
+    graph = data.create_graph(
+        with_outer_stop_transfers=False,
+        with_walking_edges=False,
+        blocking_centroid_flows=False,
+        connector_method="nearest_neighbour",
+    )
+
+    coquimbo_project.project.network.build_graphs()
+    graph.create_line_geometry(method="connector project match", graph="c")
+    data.save_graphs()
+
+    # Configure the dialog
+    dialog = create_dialog_with_matrix(coquimbo_project)
+    dialog.tbl_periods.selectRow(0)
+
+    dialog.chb_use_graph.setChecked(True)
+
+    dialog.ln_transit_class.setText("pt_class")
+    dialog.cob_travel_time.setCurrentText("trav_time")
+    dialog.cob_freq.setCurrentText("freq")
+    dialog.ln_result_name.setText("pt_assignment")
+
+    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+
+    # Check the results table
+    result = load_result_table(coquimbo_project.project.project_base_path, "pt_assignment")
+    assert result.shape == (466, 2)
+    assert result.columns.tolist() == ["index", "pt_class_volume"]

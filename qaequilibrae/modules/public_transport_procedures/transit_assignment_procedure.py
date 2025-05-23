@@ -4,17 +4,18 @@ import numpy as np
 from PyQt5.QtCore import pyqtSignal
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths import TransitAssignment, TransitClass
-from aequilibrae.transit import Transit
+from aequilibrae.project.database_connection import database_connection
+from aequilibrae.transit.transit_graph_builder import TransitGraphBuilder
 from aequilibrae.utils.interface.worker_thread import WorkerThread
 
 
 class TransitAssignProcedure(WorkerThread):
     signal = pyqtSignal(object)
 
-    def __init__(self, parentThread, project, configs, action):
+    def __init__(self, parentThread, project, transit_data, configs, action):
         WorkerThread.__init__(self, parentThread)
         self.project = project
-        self.transit_data = Transit(self.project)
+        self.transit_data = transit_data
         self.configs = configs
         self.action = action
 
@@ -28,36 +29,44 @@ class TransitAssignProcedure(WorkerThread):
         self.signal.emit(["finished"])
 
     def build_graph(self):
-        self.signal.emit(["update", 1, "Creating graph builder"])
-        graph = self.transit_data.create_graph(
-            period_id=self.configs["period_id"],
-            with_outer_stop_transfers=self.configs["with_outer_stop_transfers"],
-            with_inner_stop_transfers=self.configs["with_inner_stop_transfers"],
-            with_walking_edges=self.configs["with_walking_edges"],
-            blocking_centroid_flows=self.configs["blocking_centroid_flows"],
-            connector_method=self.configs["connector_method"],
-        )
+        if not self.configs["has_graph"]:
+            self.signal.emit(["update", 1, "Creating graph builder"])
+            graph = self.transit_data.create_graph(
+                period_id=self.configs["period_id"],
+                with_outer_stop_transfers=self.configs["with_outer_stop_transfers"],
+                with_inner_stop_transfers=self.configs["with_inner_stop_transfers"],
+                with_walking_edges=self.configs["with_walking_edges"],
+                blocking_centroid_flows=self.configs["blocking_centroid_flows"],
+                connector_method=self.configs["connector_method"],
+            )
 
-        self.signal.emit(["update", 2, "Building network graphs"])
-        self.project.network.build_graphs()
+            self.signal.emit(["update", 2, "Building network graphs"])
+            self.project.network.build_graphs()
 
-        self.signal.emit(["update", 3, "Creating line geometry"])
-        graph.create_line_geometry(method=self.configs["line_method"], graph=self.configs["mode_id"])
+            self.signal.emit(["update", 3, "Creating line geometry"])
+            graph.create_line_geometry(method=self.configs["line_method"], graph=self.configs["mode_id"])
 
-        if self.configs["save_graph"]:
-            self.signal.emit(["update", 4, "Saving graph"])
-            self.transit_data.save_graphs(period_ids=[self.configs["period_id"]])
+            if self.configs["save_graph"]:
+                self.signal.emit(["update", 4, "Saving graph"])
+                self.transit_data.save_graphs(period_ids=[self.configs["period_id"]])
+
+        else:
+            self.signal.emit(["update", 3, "Reloading graph into project"])
+            pt_con = database_connection("transit")
+
+            graph = TransitGraphBuilder.from_db(pt_con, self.configs["period_id"])
+            graph.create_od_node_mapping()  # This will change with AequilibraE 1.3.2
 
         # To perform an assignment we need to convert the graph builder into a graph.
         self.signal.emit(["update", 5, "Convert into graph"])
         self.transit_graph = graph.to_transit_graph()
 
     def build_matrix(self):
-        mat = AequilibraeMatrix()
         if self.action == "create":
             self.signal.emit(["update", 6, "Creating ones matrix"])
             zones = len(self.transit_graph.centroids)
 
+            mat = AequilibraeMatrix()
             mat.create_empty(zones=zones, matrix_names=["pt"], memory_only=True)
             mat.index[:] = self.transit_graph.centroids[:]
             mat.matrices[:, :, 0] = np.ones((zones, zones))
@@ -67,7 +76,9 @@ class TransitAssignProcedure(WorkerThread):
             self.signal.emit(["update", 6, "Loading matrix"])
             mat_name = self.configs["mat_name"]
 
-            mat.load(join(self.project.matrices.fldr, mat_name))
+            mat = self.project.matrices.get_matrix(mat_name)
+            if not np.array_equal(mat.index, self.transit_graph.centroids):
+                mat.index[:] = self.transit_graph.centroids  # ensure we have the same centroids
             mat.computational_view(self.configs["mat_core"])
 
         return mat
@@ -87,7 +98,7 @@ class TransitAssignProcedure(WorkerThread):
         assig.set_frequency_field(self.configs["frequency_field"])
         if self.action == "create":
             assig.set_skimming_fields(self.configs["skim_fields"])
-        assig.set_algorithm("os")  # thie value is default
+        assig.set_algorithm("os")  # default value
         assigclass.set_demand_matrix_core(self.configs["demand_matrix_core"])
 
         # Perform the assignment

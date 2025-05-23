@@ -167,6 +167,19 @@ This tools allows you to export the data from an open layer to an existing \*.om
     :align: center
     :alt: Processing provider save matrix in existing file
 
+Trip length distribution
+~~~~~~~~~~~~~~~~~~~~~~~~
+This tool generates a Trip Length Distribution (TLD) plot for a pair of demand and skim
+matrices and their selected cores.
+
+.. important::
+
+    An open AequilibraE project is required for this tool to work.
+
+.. image:: images/processing_provider_tld.png
+    :align: center
+    :alt: Processing provider TLD
+
 Paths and assignment
 --------------------
 Traffic assignment from file

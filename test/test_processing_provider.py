@@ -37,6 +37,7 @@ from qaequilibrae.modules.processing_provider.project_from_OSM import ProjectFro
 from qaequilibrae.modules.processing_provider.project_from_layer import ProjectFromLayer
 from qaequilibrae.modules.processing_provider.provider import Provider
 from qaequilibrae.modules.processing_provider.renumber_nodes_from_layer import RenumberNodesFromLayer
+from qaequilibrae.modules.processing_provider.trip_length_distribution import TripLengthDistribution
 from .utilities import load_sfalls_from_layer, load_test_layer
 
 pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
@@ -442,3 +443,38 @@ def test_project_from_osm(folder_path):
 
     assert project.network.count_links() == 11
     assert project.network.count_nodes() == 10
+
+
+def test_trip_length_distribution(ae_with_project, folder_path):
+    matrices = ae_with_project.project.matrices
+    mat_names = matrices.list()["name"].tolist()
+
+    parameters = {
+        "demand_mat_name": 3,
+        "demand_mat_core": "matrix",
+        "skim_mat_name": 5,
+        "skim_mat_core": "distance_blended",
+        "file_path": join(folder_path, "my_file.png"),
+    }
+
+    action = TripLengthDistribution()
+    action.matrices = matrices
+    action.mat_names = mat_names
+
+    # Mock context and feedback
+    class DummyContext:
+        pass
+
+    class DummyFeedback:
+        def pushInfo(self, msg):
+            pass
+
+        def reportError(self, msg):
+            pass
+
+    context = DummyContext()
+    feedback = DummyFeedback()
+
+    _ = action.processAlgorithm(parameters, context, feedback)
+
+    assert isfile(parameters["file_path"])
