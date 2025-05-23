@@ -448,7 +448,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
 
             if self.job == "execute_single":
-                res = self.worker_thread.rc.get_results().to_pandas()
+                res = self.worker_thread.rc.get_results()
 
                 plot_results(res, self.parameters["node_from"], self.parameters["node_to"], self.link_layer)
 

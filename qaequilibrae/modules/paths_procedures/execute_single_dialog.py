@@ -50,7 +50,7 @@ class ExecuteSingleDialog(QDialog, FORM_CLASS):
         rc.set_choice_set_generation(self._algo, **self._kwargs)
         _ = rc.execute_single(from_node, to_node, self.demand)
 
-        plot_results(rc.get_results().to_pandas(), from_node, to_node, self.link_layer)
+        plot_results(rc.get_results(), from_node, to_node, self.link_layer)
 
     def exit_procedure(self):
         self.close()
