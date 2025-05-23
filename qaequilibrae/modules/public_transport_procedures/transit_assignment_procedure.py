@@ -1,7 +1,7 @@
 from os.path import join
 
 import numpy as np
-from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths import TransitAssignment, TransitClass
 from aequilibrae.project.database_connection import database_connection
@@ -55,7 +55,6 @@ class TransitAssignProcedure(WorkerThread):
             pt_con = database_connection("transit")
 
             graph = TransitGraphBuilder.from_db(pt_con, self.configs["period_id"])
-            graph.create_od_node_mapping()  # This will change with AequilibraE 1.3.2
 
         # To perform an assignment we need to convert the graph builder into a graph.
         self.signal.emit(["update", 5, "Convert into graph"])
