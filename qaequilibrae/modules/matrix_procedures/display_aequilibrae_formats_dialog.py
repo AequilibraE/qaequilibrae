@@ -9,11 +9,11 @@ import qgis
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
 from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
-from qgis.PyQt import uic
+from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
-from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView
+from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QSizePolicy
 from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
 from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
 
@@ -24,9 +24,9 @@ from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_data_viewer.ui"))
 
 
-class DisplayAequilibraEFormatsDialog(QDialog, FORM_CLASS):
+class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, file_path="", proj=False):
-        QDialog.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
         self.iface = qgis_project.iface
         self.setupUi(self)
