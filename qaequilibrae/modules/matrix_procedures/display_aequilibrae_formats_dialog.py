@@ -12,8 +12,8 @@ from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerI
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
 from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView
 from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
-from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
-from qgis.core import QgsFillSymbol
+from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication, QgsLinePatternFillSymbolLayer
+from qgis.PyQt.QtGui import QColor
 
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
 from qaequilibrae.modules.common_tools import layer_from_dataframe
@@ -236,11 +236,19 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
 
-        idx = self.zones_layer.fields().indexFromName("metrics_data")
-        max_metric = self.zones_layer.maximumValue(idx)
+        all_values = []
+        for _, f in enumerate(layer.getFeatures()):
+            all_values.append(f.attributes()[1])
 
-        num_steps = 9
-        max_metric = num_steps if max_metric is None else max_metric
+        values = np.unique(all_values)
+
+        if np.inf in values:
+            values = values[~np.isinf(values)]
+        if np.nan in values:
+            values = values[~np.isnan(values)]
+
+        num_steps = values.shape[0] if values.shape[0] < 9 else 9
+        max_metric = num_steps if values.shape[0] == 0 else values.max()
         values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
         values = [0, 0.000001] + values
         color_ramp = color_ramp_shades(color_ramp_name, num_steps)
@@ -259,6 +267,32 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
                 label = f"{values[i]:,.0f} to {values[i + 1]:,.0f}"
 
             ranges.append(QgsRendererRange(values[i], values[i + 1], symbol, label))
+
+        for i in [np.inf, np.nan]:
+            myColour = color_ramp[0]
+            symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+            symbol.setColor(myColour)
+            symbol.setOpacity(1)
+
+            # Create line pattern fill layer (hatch)
+            hatch_layer = QgsLinePatternFillSymbolLayer()
+
+            # Set hatch properties
+            hatch_layer.setDistance(2.0)  # Distance between lines
+            hatch_layer.setAngle(45.0)  # Angle of lines (45 degrees)
+
+            # Create the line symbol for the hatch pattern
+            line_symbol = hatch_layer.subSymbol()
+            line_layer = line_symbol.symbolLayer(0)
+
+            # Customize the line appearance
+            line_layer.setWidth(0.5)  # Line width
+            line_layer.setColor(QColor(0, 0, 0))  # Black color
+
+            # Add the hatch layer to the symbol
+            symbol.appendSymbolLayer(hatch_layer)
+
+            ranges.append(QgsRendererRange(-np.inf, np.inf, symbol, str(i)))
 
         sizes = [0, max_metric]
         renderer = QgsGraduatedSymbolRenderer("", ranges)
