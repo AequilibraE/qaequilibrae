@@ -18,10 +18,10 @@ class NumpyModel(QtCore.QAbstractTableModel):
         self.decimals = decimals
         if self.separator:
             self.row_headers_data = ["{:,}".format(x) for x in aeq_matrix.index[:]]
-            self.header_data = ["{:,}".format(x) for x in aeq_matrix.index[:]]
+            self.headerData = ["{:,}".format(x) for x in aeq_matrix.index[:]]
         else:
             self.row_headers_data = [str(x) for x in aeq_matrix.index[:]]
-            self.header_data = [str(x) for x in aeq_matrix.index[:]]
+            self.headerData = [str(x) for x in aeq_matrix.index[:]]
 
         if np.issubdtype(aeq_matrix.dtype, np.integer):
             self.empties = np.iinfo(aeq_matrix.dtype).min
@@ -64,9 +64,9 @@ class NumpyModel(QtCore.QAbstractTableModel):
                             self._array.matrix_view[row, col]
                         )
 
-    def header_data(self, col, orientation, role=QtCore.Qt.DisplayRole):
+    def headerData(self, col, orientation, role=QtCore.Qt.DisplayRole):
         if role == QtCore.Qt.DisplayRole and orientation == QtCore.Qt.Horizontal:
-            return self.header_data[col]
+            return self.headerData[col]
         if role == QtCore.Qt.DisplayRole and orientation != QtCore.Qt.Horizontal:
             return self.row_headers_data[col]
 

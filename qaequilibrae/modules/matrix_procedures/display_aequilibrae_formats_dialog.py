@@ -13,6 +13,7 @@ from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayou
 from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView
 from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
 from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
+from qgis.core import QgsFillSymbol
 
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
 from qaequilibrae.modules.common_tools import layer_from_dataframe
@@ -210,7 +211,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def map_dt(self, dt):
         self.remove_mapping_layer(False)
-        df = pd.DataFrame({"zone_id": self.indices, "data": dt}).dropna()
+        df = pd.DataFrame({"zone_id": self.indices, "data": dt})
         self.mapping_layer = layer_from_dataframe(df, "matrix_row")
         self.make_join(self.zones_layer, "zone_id", self.mapping_layer)
         self.draw_zone_styles()
@@ -233,34 +234,60 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
 
-        idx = self.zones_layer.fields().indexFromName("metrics_data")
-        max_metric = self.zones_layer.maximumValue(idx)
+        _ = layer.fields().indexFromName(fld)
+        values_array = np.array([feat[fld] for feat in layer.getFeatures()])
+        finite_mask = np.isfinite(values_array)
+        finite_values = values_array[finite_mask]
 
         num_steps = 9
-        max_metric = num_steps if max_metric is None else max_metric
+        if finite_values.size == 0:
+            max_metric = num_steps
+        else:
+            max_metric = finite_values.max()
+            max_metric = num_steps if max_metric is None or not np.isfinite(max_metric) else max_metric
+
         values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
         values = [0, 0.000001] + values
         color_ramp = color_ramp_shades(color_ramp_name, num_steps)
         ranges = []
+
+        # 1. Hatch symbol for NaN/inf/null values
+        hatch_symbol = QgsFillSymbol.createSimple(
+            {
+                "color": "white",
+                "outline_color": "black",
+                "outline_width": "0.3",
+                "style": "bdiagonal",
+                "angle": "45",
+                "width": "1",
+            }
+        )
+        hatch_label = f"Null/NaN/Inf ({fld.replace('metrics_', '')})"
+        # Use a value range that won't overlap the data (e.g., -1e20 to -1)
+        ranges.append(QgsRendererRange(-1e20, -1, hatch_symbol, hatch_label))
+
+        # 2. Numeric ranges for valid values
         for i in range(num_steps + 1):
             myColour = color_ramp[i]
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
             symbol.setColor(myColour)
             symbol.setOpacity(1)
-
             if i == 0:
-                label = f"0/Null ({fld.replace('metrics_', '')})"
+                label = f"0 ({fld.replace('metrics_', '')})"
             elif i == 1:
                 label = f"Up to {values[i + 1]:,.0f}"
             else:
                 label = f"{values[i]:,.0f} to {values[i + 1]:,.0f}"
-
+            # Normal numeric range (from values[i] to values[i + 1])
             ranges.append(QgsRendererRange(values[i], values[i + 1], symbol, label))
 
         sizes = [0, max_metric]
         renderer = QgsGraduatedSymbolRenderer("", ranges)
         renderer.setSymbolSizes(*sizes)
-        renderer.setClassAttribute(f"""coalesce("{fld}", 0)""")
+        # Expression: send NaN/inf/null to -1e10, others keep their value
+        renderer.setClassAttribute(
+            f"""CASE WHEN "{fld}" IS NULL OR "{fld}" NOT BETWEEN -1e100 AND 1e100 THEN -10000000000 ELSE "{fld}" END"""
+        )
 
         classific_method = QgsApplication.classificationMethodRegistry().method("EqualInterval")
         renderer.setClassificationMethod(classific_method)
