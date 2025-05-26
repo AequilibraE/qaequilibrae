@@ -215,7 +215,6 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
     assert "route_choice_for_subarea.parquet" in rc_folder
 
 
-# @pytest.mark.skip("Find failure reason")
 def test_select_link_analysis(coquimbo_project, qtbot):
     dialog = create_dialog_with_matrix(coquimbo_project)
 
@@ -257,21 +256,15 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     # Execute workflow
     dialog.chb_save_choice_set.setChecked(True)
     dialog.cob_matrices.setCurrentText("b''")
-    # qtbot.mouseClick(dialog.but_perform_assig, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_perform_assig, Qt.LeftButton)
 
-    dialog.job = "assign"
-    dialog._validate_inputs()
-    dialog._get_graph_config()
-    print(dialog.parameters)
-    dialog.run()
+    matrices = listdir(dialog.project.matrices.fldr)
+    assert "select_link_analysis.omx" in matrices
 
-    # matrices = listdir(dialog.project.matrices.fldr)
-    # assert "select_link_analysis.omx" in matrices
-
-    # pth = Path(dialog.project.project_base_path)
-    # conn = sqlite3.connect(pth / "results_database.sqlite")
-    # results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
-    # assert "select_link_analysis_uncompressed" in results
+    pth = Path(dialog.project.project_base_path)
+    conn = sqlite3.connect(pth / "results_database.sqlite")
+    results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+    assert "select_link_analysis_uncompressed" in results
 
 
 # ### We add tests to capture the errors raised

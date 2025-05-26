@@ -7,7 +7,7 @@ from aequilibrae.paths.results import PathResults
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 
 from qaequilibrae.modules.common_tools import ReportDialog
@@ -193,7 +193,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         pn.addFeatures(stop_nodes)
 
         # Goes back and adds the order of visitation for each node
-        pn.addAttributes([QgsField("sequence", QVariant.Int)])
+        pn.addAttributes([QgsField("sequence", QMetaType.Type.Int)])
         nl.updateFields()
         sdx = nl.dataProvider().fieldNameIndex("sequence")
 

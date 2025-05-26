@@ -8,7 +8,7 @@ from os.path import abspath, dirname, exists, join
 from shutil import copyfile
 
 import numpy as np
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.core import (
     QgsCoordinateReferenceSystem,
@@ -84,10 +84,10 @@ def create_centroids_layer():
     if not nodes_layer.isValid():
         print("Nodes layer failed to load!")
     else:
-        field_id = QgsField("ID", QVariant.Int)
+        field_id = QgsField("ID", QMetaType.Type.Int)
         nodes_layer.dataProvider().addAttributes([field_id])
 
-        field_zone_id = QgsField("zone_id", QVariant.Int)
+        field_zone_id = QgsField("zone_id", QMetaType.Type.Int)
         nodes_layer.dataProvider().addAttributes([field_zone_id])
 
         nodes_layer.updateFields()
@@ -117,9 +117,9 @@ def create_nodes_layer(index):
     if not layer.isValid():
         print("Nodes layer failed to load!")
     else:
-        field_id = QgsField("ID", QVariant.Int)
-        field_zone_id = QgsField("zone_id", QVariant.Int)
-        nickname = QgsField("name", QVariant.String)
+        field_id = QgsField("ID", QMetaType.Type.Int)
+        field_zone_id = QgsField("zone_id", QMetaType.Type.Int)
+        nickname = QgsField("name", QMetaType.Type.QString)
 
         layer.dataProvider().addAttributes([field_id, field_zone_id, nickname])
         layer.updateFields()
@@ -152,9 +152,9 @@ def create_links_layer(index):
     if not layer.isValid():
         print("linestring layer failed to load!")
     else:
-        field_id = QgsField("ID", QVariant.Int)
-        field_zone_id = QgsField("zone_id", QVariant.Int)
-        nickname = QgsField("name", QVariant.String)
+        field_id = QgsField("ID", QMetaType.Type.Int)
+        field_zone_id = QgsField("zone_id", QMetaType.Type.Int)
+        nickname = QgsField("name", QMetaType.Type.QString)
 
         layer.dataProvider().addAttributes([field_id, field_zone_id, nickname])
         layer.updateFields()
@@ -187,9 +187,9 @@ def create_polygons_layer(index):
     if not layer.isValid():
         print("Polygon layer failed to load!")
     else:
-        field_id = QgsField("ID", QVariant.Int)
-        field_zone_id = QgsField("zone_id", QVariant.Int)
-        nickname = QgsField("name", QVariant.String)
+        field_id = QgsField("ID", QMetaType.Type.Int)
+        field_zone_id = QgsField("zone_id", QMetaType.Type.Int)
+        nickname = QgsField("name", QMetaType.Type.QString)
 
         layer.dataProvider().addAttributes([field_id, field_zone_id, nickname])
         layer.updateFields()
