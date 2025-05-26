@@ -129,8 +129,8 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
 
         plt.plot(x_axis, y_axis)
         ax.set(title="Trip length distribution")
-        ax.set_xlabel("Trip length (km)")
-        ax.set_ylabel("Trips")
+        ax.set_xlabel("Trip length")
+        ax.set_ylabel("Probability")
 
         plt.savefig(parameters["file_path"])
         plt.close()
@@ -141,7 +141,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         from scipy.interpolate import make_interp_spline
 
         max_bins = int(np.ceil(skim.matrix_view.max()))
-        y, x = np.histogram((demand.matrix_view * skim.matrix_view) / 1000, bins=np.arange(0, max_bins))
+        y, x = np.histogram((demand.matrix_view * skim.matrix_view), bins=np.arange(0, max_bins))
         df = pd.DataFrame({"distance": x[1:], "trips": y})
 
         x_axis = np.linspace(df["distance"].min(), df["distance"].max(), 300)
