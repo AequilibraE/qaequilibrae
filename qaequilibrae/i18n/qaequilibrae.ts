@@ -440,6 +440,49 @@
     </message>
 </context>
 <context>
+    <name>CollapseLinks</name>
+    <message>
+        <location filename="../modules/processing_provider/collapse_links.py" line="17"/>
+        <source>AequilibraE Project Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/collapse_links.py" line="24"/>
+        <source>Link IDs (comma-separated)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/collapse_links.py" line="34"/>
+        <source>AequilibraE module not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/collapse_links.py" line="44"/>
+        <source>{project_folder} does not contain an AeqilibraE model: {e}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/collapse_links.py" line="50"/>
+        <source>Error parsing link IDs: {e}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/collapse_links.py" line="69"/>
+        <source>Collapse links</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/collapse_links.py" line="72"/>
+        <source>5. Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/collapse_links.py" line="78"/>
+        <source>This tool collapses links into nodes, adjusting the network in the neighborhood.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CompareScenariosDialog</name>
     <message>
         <location filename="../modules/gis/compare_scenarios_dialog.py" line="68"/>
@@ -2043,6 +2086,44 @@
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="45"/>
         <source>Line layer duplicated</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NetworkSimplifier</name>
+    <message>
+        <location filename="../modules/processing_provider/network_simplifier.py" line="15"/>
+        <source>AequilibraE Project Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/network_simplifier.py" line="26"/>
+        <source>AequilibraE module not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/network_simplifier.py" line="36"/>
+        <source>{project_folder} does not contain an AequilibraE model: {e}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/network_simplifier.py" line="97"/>
+        <source>Network simplifier</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/network_simplifier.py" line="100"/>
+        <source>5. Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/network_simplifier.py" line="107"/>
+        <source>This tool simplifies the network, merging short links into longer ones or</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/network_simplifier.py" line="108"/>
+        <source>turning links into nodes, and saving theses changes into the project.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

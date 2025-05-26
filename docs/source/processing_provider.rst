@@ -17,7 +17,8 @@ You can also use the available QGIS shortcut to open the Toolbox window.
 
 At the bottom of the window, you'll find the AequilibraE logo and the available functions.
 The functions are divided into groups, following the same logic as the AequilibraE widget
-menu. Notice that not all AequilibraE functionalities are available for processing.
+menu. Notice that not all AequilibraE functionalities are available for processing, and not
+all processing tools exist at the main AequilibraE menu.
 
 .. subfigure:: AB
     :align: center
@@ -294,3 +295,28 @@ The code block below contains an example of a valid YAML configuration.
         with_walking_edges: False
         blocking_centroid_flows: False
         connector_method: overlapping_regions
+
+Network
+-------
+Collapse links
+~~~~~~~~~~~~~~
+This tool allows you to collapse one or more links into nodes, adjusting the network in
+the neighborhood if necessary.
+
+The input for the tool consists in a folder containing an AequilibraE project and a
+the link IDs of the links you want to collapse separated by a comma.
+
+.. image:: images/processing_provider_collapse_links.png
+    :align: center
+    :alt: Processing provider collapse links
+
+Network simplifier
+~~~~~~~~~~~~~~~~~~
+This tool allows you to simplify the network, merging short links into larger ones or
+turning links into nodes, and save these changes into the project.
+
+The input for the tool consists in a folder containing an AequilibraE project.
+
+.. image:: images/processing_provider_network_simplifier.png
+    :align: center
+    :alt: Processing provider Network simplifier
