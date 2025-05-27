@@ -238,17 +238,21 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         all_values = []
         for _, f in enumerate(layer.getFeatures()):
-            all_values.append(f.attributes()[1])
+            all_values.append(f["metrics_data"])
 
+        all_values = np.array(all_values, dtype=np.float32)
+        values = np.nan_to_num(all_values, nan=-1.0, posinf=3.40e38, neginf=-3.40e38)
         values = np.unique(all_values)
 
-        if np.inf in values:
-            values = values[~np.isinf(values)]
-        if np.nan in values:
-            values = values[~np.isnan(values)]
+        # shape_arr = values.shape[0]
+        values = values[values != -1.0]
+        # has_nan = True if values.shape[0] < shape_arr else False
 
-        num_steps = values.shape[0] if values.shape[0] < 9 else 9
-        max_metric = num_steps if values.shape[0] == 0 else values.max()
+        values = values[values <= 3.40e38]
+        values = values[values >= -3.40e38]
+
+        num_steps = 9
+        max_metric = num_steps if values.shape[0] == 0 else np.max(values)
         values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
         values = [0, 0.000001] + values
         color_ramp = color_ramp_shades(color_ramp_name, num_steps)
@@ -268,7 +272,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
             ranges.append(QgsRendererRange(values[i], values[i + 1], symbol, label))
 
-        for i in [np.inf, np.nan]:
+        for i in [3.40e38, np.nan]:
             myColour = color_ramp[0]
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
             symbol.setColor(myColour)
@@ -292,7 +296,11 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             # Add the hatch layer to the symbol
             symbol.appendSymbolLayer(hatch_layer)
 
-            ranges.append(QgsRendererRange(-np.inf, np.inf, symbol, str(i)))
+            label = "NaN values" if str(i) == "nan" else "Inf values"
+            lower = -1.0 if str(i) == "nan" else -np.inf
+            upper = -0.01 if str(i) == "nan" else np.inf
+
+            ranges.append(QgsRendererRange(lower, upper, symbol, label))
 
         sizes = [0, max_metric]
         renderer = QgsGraduatedSymbolRenderer("", ranges)
@@ -342,8 +350,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def remove_mapping_layer(self, clear_selection=True):
         self.remove_data_layer()
-        # if self.mapping_layer is not None:
-        #     QgsProject.instance().removeMapLayers([self.mapping_layer.id()])
         for lien in self.zones_layer.vectorJoins():
             self.zones_layer.removeJoin(lien.joinLayerId())
         self.mapping_layer = None
