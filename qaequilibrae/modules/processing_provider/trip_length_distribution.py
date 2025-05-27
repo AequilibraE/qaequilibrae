@@ -127,7 +127,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
 
         # Draw plot
         mult = floor(skim_matrix.index.shape[0] / 10)
-        b = floor(log10(skim_matrix.matrix_view.shape[0]) * mult)
+        b = max(1, floor(log10(skim_matrix.matrix_view.shape[0]) * mult))
         n, bins, patches = plt.hist(
             np.nan_to_num(skim_matrix.matrix_view.flatten(), 0),
             bins=b,
