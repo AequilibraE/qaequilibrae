@@ -8,13 +8,11 @@ import pandas as pd
 import qgis
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.PyQt import QtWidgets, uic, QtCore
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
-from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
-from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView
-from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
-from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication, QgsLinePatternFillSymbolLayer
-from qgis.core import QgsRuleBasedRenderer
 from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QRadioButton
+from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout, QAbstractItemView
+from qgis.core import QgsProject, QgsStyle, QgsRuleBasedRenderer
+from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsLinePatternFillSymbolLayer
 
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
 from qaequilibrae.modules.common_tools import layer_from_dataframe
