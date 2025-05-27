@@ -256,7 +256,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         #
         values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
-        values = [0, 0.000001] + values
+        values = [0, 0.000000000001] + values
         color_ramp = color_ramp_shades(color_ramp_name, num_steps)
 
         # Create Rule-Based renderer
@@ -285,15 +285,25 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             symbol.setOpacity(1)
 
             # Create expression for the range
-            if values[i] == values[i + 1]:
-                expression = f'"{fld}" = {values[i]}'
+            if i == 0:
+                expression = f'"{fld}" = 0'
+                label = "0"
+                description = "0"
+            elif i == 1:
+                expression = f'"{fld}" > 0 AND "{fld}" <= {values[i + 1]}'
+                label = f"Up to {values[i + 1]}"
+                description = f"Range 0 -{values[i + 1]} (not included)"
+            elif i > 1 and i <= (num_steps - 1):
+                expression = f'"{fld}" >= {values[i]} AND "{fld}" < {values[i + 1]}'
+                label = f"{values[i]}-{values[i + 1]}"
+                description = f"Range {values[i]}-{values[i + 1]} (not included)"
             else:
                 expression = f'"{fld}" >= {values[i]} AND "{fld}" <= {values[i + 1]}'
+                label = f"{values[i]}-{values[i + 1]}"
+                description = f"Range {values[i]}-{values[i + 1]} (included)"
 
             # Create rule
-            range_rule = QgsRuleBasedRenderer.Rule(
-                symbol, 0, 0, expression, f"{values[i]}-{values[i + 1]}", f"Range {values[i]}-{values[i + 1]}"
-            )
+            range_rule = QgsRuleBasedRenderer.Rule(symbol, 0, 0, expression, label, description)
             root_rule.appendChild(range_rule)
 
         # Create the renderer
