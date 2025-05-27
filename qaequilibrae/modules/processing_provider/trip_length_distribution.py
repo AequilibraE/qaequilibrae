@@ -1,8 +1,8 @@
 import importlib.util as iutil
+from math import floor, log10
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from qgis.core import QgsProcessingAlgorithm, QgsMessageLog, QgsProcessingParameterString
 from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFileDestination
 from qgis.utils import plugins
@@ -69,6 +69,9 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
                     )
                 )
                 self.addParameter(
+                    QgsProcessingParameterString("plot_name", self.tr("Plot name"), multiLine=False, optional=True)
+                )
+                self.addParameter(
                     QgsProcessingParameterFileDestination(
                         "file_path",
                         self.tr("File path"),
@@ -120,34 +123,31 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
             feedback.reportError(f"Skim matrix core '{skim_mat_core}' not found in available cores: {skim_cores}")
             return {"Output": f"Error: Skim matrix core '{skim_mat_core}' not found"}
 
-        # Get plot data
-        x_axis, y_axis = self.get_data(skim_matrix, demand_matrix)
+        plt_name = parameters["plot_name"] if "plot_name" in parameters else "Trip length distribution"
 
         # Draw plot
+        mult = floor(skim_matrix.index.shape[0] / 10)
+        b = floor(log10(skim_matrix.matrix_view.shape[0]) * mult)
+        n, bins, patches = plt.hist(
+            np.nan_to_num(skim_matrix.matrix_view.flatten(), 0),
+            bins=b,
+            weights=np.nan_to_num(demand_matrix.matrix_view.flatten()),
+            density=False,
+            facecolor="#146DB3",
+            alpha=0.75,
+        )
 
-        _, ax = plt.subplots(figsize=(10, 6))
-
-        plt.plot(x_axis, y_axis)
-        ax.set(title="Trip length distribution")
-        ax.set_xlabel("Trip length")
-        ax.set_ylabel("Probability")
+        ax = plt.gca()
+        ax.set_xlim(left=0)
+        ax.set_ylim(bottom=0)
+        plt.xlabel("Trip length")
+        plt.ylabel("Trips")
+        plt.title(plt_name)
 
         plt.savefig(parameters["file_path"])
         plt.close()
 
         return {"Output": f"Success: TLD plot saved in {parameters['file_path']}"}
-
-    def get_data(self, skim, demand):
-        from scipy.interpolate import make_interp_spline
-
-        max_bins = int(np.ceil(skim.matrix_view.max()))
-        y, x = np.histogram((demand.matrix_view * skim.matrix_view), bins=np.arange(0, max_bins))
-        df = pd.DataFrame({"distance": x[1:], "trips": y})
-
-        x_axis = np.linspace(df["distance"].min(), df["distance"].max(), 300)
-        spline = make_interp_spline(df["distance"], y, k=3)
-        y_axis = spline(x_axis)
-        return x_axis, y_axis
 
     def name(self):
         return self.tr("Trip length distribution")
