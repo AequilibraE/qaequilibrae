@@ -13,6 +13,7 @@ from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayou
 from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView
 from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
 from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication, QgsLinePatternFillSymbolLayer
+from qgis.core import QgsRuleBasedRenderer
 from qgis.PyQt.QtGui import QColor
 
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
@@ -236,84 +237,97 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
 
+        # First, we check if we have numeric values in our column
         all_values = []
         for _, f in enumerate(layer.getFeatures()):
             all_values.append(f["metrics_data"])
 
         all_values = np.array(all_values, dtype=np.float32)
-        values = np.nan_to_num(all_values, nan=-1.0, posinf=3.40e38, neginf=-3.40e38)
         values = np.unique(all_values)
 
-        # shape_arr = values.shape[0]
-        values = values[values != -1.0]
-        # has_nan = True if values.shape[0] < shape_arr else False
-
-        values = values[values <= 3.40e38]
+        # We remove infs and nans to find the largest numeric value
+        values = values[~np.isnan(values)]
+        values = values[values < 3.39e38]
         values = values[values >= -3.40e38]
 
-        num_steps = 9
-        max_metric = num_steps if values.shape[0] == 0 else np.max(values)
+        #
+        num_steps = min(max(values.shape[0], 1), 9) if values.shape[0] > 0 else 1
+        max_metric = max(values) if values.shape[0] >= 1 else 0
+
+        #
         values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
         values = [0, 0.000001] + values
         color_ramp = color_ramp_shades(color_ramp_name, num_steps)
-        ranges = []
+
+        # Create Rule-Based renderer
+        root_rule = QgsRuleBasedRenderer.Rule(None)
+
+        # Rule 1: NaN values
+        hatch_symbol = self.create_hatch(layer, color_ramp[0])
+        nan_expression = f'"{fld}" IS NULL OR "{fld}" = \'nan\' OR "{fld}" = \'NaN\''
+        nan_rule = QgsRuleBasedRenderer.Rule(hatch_symbol, filterExp=nan_expression, label="NaN Values")
+        root_rule.appendChild(nan_rule)
+
+        # Rule 2: Inf values
+        hatch_symbol = self.create_hatch(layer, color_ramp[0])
+        inf_expression = (
+            f"\"{fld}\" = 'inf' OR \"{fld}\" = '+inf' OR \"{fld}\" = '-inf' OR "
+            f'"{fld}" >= 3.40e38 OR "{fld}" <= -3.40e38'
+        )
+        inf_rule = QgsRuleBasedRenderer.Rule(hatch_symbol, filterExp=inf_expression, label="Inf Values")
+        root_rule.appendChild(inf_rule)
+
+        # Remaining rules
         for i in range(num_steps + 1):
             myColour = color_ramp[i]
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
             symbol.setColor(myColour)
             symbol.setOpacity(1)
 
-            if i == 0:
-                label = f"0/Null ({fld.replace('metrics_', '')})"
-            elif i == 1:
-                label = f"Up to {values[i + 1]:,.0f}"
+            # Create expression for the range
+            if values[i] == values[i + 1]:
+                expression = f'"{fld}" = {values[i]}'
             else:
-                label = f"{values[i]:,.0f} to {values[i + 1]:,.0f}"
+                expression = f'"{fld}" >= {values[i]} AND "{fld}" <= {values[i + 1]}'
 
-            ranges.append(QgsRendererRange(values[i], values[i + 1], symbol, label))
+            # Create rule
+            range_rule = QgsRuleBasedRenderer.Rule(
+                symbol, 0, 0, expression, f"{values[i]}-{values[i + 1]}", f"Range {values[i]}-{values[i + 1]}"
+            )
+            root_rule.appendChild(range_rule)
 
-        for i in [3.40e38, np.nan]:
-            myColour = color_ramp[0]
-            symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-            symbol.setColor(myColour)
-            symbol.setOpacity(1)
-
-            # Create line pattern fill layer (hatch)
-            hatch_layer = QgsLinePatternFillSymbolLayer()
-
-            # Set hatch properties
-            hatch_layer.setDistance(2.0)  # Distance between lines
-            hatch_layer.setAngle(45.0)  # Angle of lines (45 degrees)
-
-            # Create the line symbol for the hatch pattern
-            line_symbol = hatch_layer.subSymbol()
-            line_layer = line_symbol.symbolLayer(0)
-
-            # Customize the line appearance
-            line_layer.setWidth(0.5)  # Line width
-            line_layer.setColor(QColor(0, 0, 0))  # Black color
-
-            # Add the hatch layer to the symbol
-            symbol.appendSymbolLayer(hatch_layer)
-
-            label = "NaN values" if str(i) == "nan" else "Inf values"
-            lower = -1.0 if str(i) == "nan" else -np.inf
-            upper = -0.01 if str(i) == "nan" else np.inf
-
-            ranges.append(QgsRendererRange(lower, upper, symbol, label))
-
-        sizes = [0, max_metric]
-        renderer = QgsGraduatedSymbolRenderer("", ranges)
-        renderer.setSymbolSizes(*sizes)
-        renderer.setClassAttribute(f"""coalesce("{fld}", 0)""")
-
-        classific_method = QgsApplication.classificationMethodRegistry().method("EqualInterval")
-        renderer.setClassificationMethod(classific_method)
-
+        # Create the renderer
+        renderer = QgsRuleBasedRenderer(root_rule)
         layer.setRenderer(renderer)
         layer.triggerRepaint()
+
         self.iface.mapCanvas().setExtent(layer.extent())
         self.iface.mapCanvas().refresh()
+
+    def create_hatch(self, layer, color):
+        symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+        symbol.setColor(color)
+        symbol.setOpacity(1)
+
+        # Create line pattern fill layer (hatch)
+        hatch_layer = QgsLinePatternFillSymbolLayer()
+
+        # Set hatch properties
+        hatch_layer.setDistance(2.0)  # Distance between lines
+        hatch_layer.setAngle(45.0)  # Angle of lines (45 degrees)
+
+        # Create the line symbol for the hatch pattern
+        line_symbol = hatch_layer.subSymbol()
+        line_layer = line_symbol.symbolLayer(0)
+
+        # Customize the line appearance
+        line_layer.setWidth(0.5)  # Line width
+        line_layer.setColor(QColor(0, 0, 0))  # Black color
+
+        # Add the hatch layer to the symbol
+        symbol.appendSymbolLayer(hatch_layer)
+
+        return symbol
 
     def set_mapping(self):
         self.table.clearSelection()
