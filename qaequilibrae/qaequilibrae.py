@@ -25,7 +25,7 @@ from qaequilibrae.modules.menu_actions import run_distribution_models, run_chang
 from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet
 from qaequilibrae.modules.menu_actions import run_pt_explore, show_log, create_example
 from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig
-from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim
+from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder
 from qaequilibrae.modules.processing_provider.provider import Provider
 
 sys.path.insert(0, join(dirname(__file__), "packages"))
@@ -69,6 +69,7 @@ class AequilibraEMenu:
         self.geo_layers_list = ["links", "nodes", "zones"]
         # translator = None
         self.iface = iface
+        self.path = last_folder()
         self.project = None  # type: Project
         self.matrices = {}
         self.layers = {}  # type: Dict[QgsVectorLayer]
