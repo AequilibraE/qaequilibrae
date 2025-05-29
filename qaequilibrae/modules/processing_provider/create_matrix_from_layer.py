@@ -19,7 +19,7 @@ class CreateMatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "origin",
                 self.tr("Origin"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="matrix_layer",
                 allowMultiple=False,
             )
@@ -28,7 +28,7 @@ class CreateMatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "destination",
                 self.tr("Destination"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="matrix_layer",
                 allowMultiple=False,
             )
@@ -37,7 +37,7 @@ class CreateMatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "value",
                 self.tr("Value"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="matrix_layer",
                 allowMultiple=False,
             )
@@ -66,7 +66,7 @@ class CreateMatrixFromLayer(QgsProcessingAlgorithm):
             ),
         ]
         for param in advparams:
-            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            param.setFlags(param.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
             self.addParameter(param)
 
     def processAlgorithm(self, parameters, context, model_feedback):

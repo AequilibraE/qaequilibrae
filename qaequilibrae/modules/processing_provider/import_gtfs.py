@@ -14,14 +14,14 @@ class ImportGTFS(QgsProcessingAlgorithm):
             QgsProcessingParameterFile(
                 "project_path",
                 self.tr("Project path"),
-                behavior=QgsProcessingParameterFile.Folder,
+                behavior=QgsProcessingParameterFile.Behavior.Folder,
             )
         )
         self.addParameter(
             QgsProcessingParameterFile(
                 "gtfs_file",
                 self.tr("GTFS file"),
-                behavior=QgsProcessingParameterFile.File,
+                behavior=QgsProcessingParameterFile.Behavior.File,
                 fileFilter="ZIP (*.zip)",
             )
         )

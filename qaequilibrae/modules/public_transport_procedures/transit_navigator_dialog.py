@@ -172,7 +172,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
             f"metrics_{self.stop_target_metric}",
             self.chb_label_stops.isChecked(),
             self.mapped_stops,
-            QgsPalLayerSettings.AroundPoint,
+            QgsPalLayerSettings.Placement.AroundPoint,
         )
 
     def show_label_lines(self):
@@ -181,7 +181,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
             f"metrics_{self.line_target_metric}",
             self.chb_label_lines.isChecked(),
             self.mapped_lines,
-            QgsPalLayerSettings.Line,
+            QgsPalLayerSettings.Placement.Line,
         )
 
     def show_label_zones(self):
@@ -190,7 +190,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
             f"metrics_{self.zone_target_metric}",
             self.chb_label_zones.isChecked(),
             self.mapped_zones,
-            QgsPalLayerSettings.AroundPoint,
+            QgsPalLayerSettings.Placement.AroundPoint,
         )
 
     def build_label(self, layer, field, active_label, active_map, placement):
@@ -709,7 +709,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         renderer.setClassAttribute(f"""coalesce("{fld}", 0)""")
 
         if method != "Color":
-            renderer.setGraduatedMethod(QgsGraduatedSymbolRenderer.GraduatedSize)
+            renderer.setGraduatedMethod(QgsGraduatedSymbolRenderer.GraduatedMethod.GraduatedSize)
 
         classific_method = QgsApplication.classificationMethodRegistry().method("EqualInterval")
         renderer.setClassificationMethod(classific_method)

@@ -188,7 +188,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         self.chb_set_select_link.setEnabled(not self.chb_set_sub_area.isChecked())
         # Only polygon layers as zones
-        self.cob_zoning_layer.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+        self.cob_zoning_layer.setFilters(QgsMapLayerProxyModel.Filter.PolygonLayer)
 
     def __get_project_zones(self):
         zones = get_vector_layer_by_name(self.cob_zoning_layer.currentText())

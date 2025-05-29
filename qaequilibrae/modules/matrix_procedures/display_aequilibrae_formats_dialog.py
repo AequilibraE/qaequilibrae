@@ -190,7 +190,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if not col_id:
             return
         self.selected_col = col_id[0]
-        self.zones_layer.selectByExpression(f'"zone_id"={self.indices[col_id[0]]}', QgsVectorLayer.SetSelection)
+        self.zones_layer.selectByExpression(f'"zone_id"={self.indices[col_id[0]]}', QgsVectorLayer.SelectBehavior.SetSelection)
         self.iface.mapCanvas().refresh()
 
         core = self.mat_list.currentText()
@@ -204,7 +204,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if not row_id:
             return
         self.selected_row = row_id[0]
-        self.zones_layer.selectByExpression(f'"zone_id"={self.indices[row_id[0]]}', QgsVectorLayer.SetSelection)
+        self.zones_layer.selectByExpression(f'"zone_id"={self.indices[row_id[0]]}', QgsVectorLayer.SelectBehavior.SetSelection)
 
         core = self.mat_list.currentText()
         dt = np.array(self.data_to_show.matrix[core][row_id[0], :]).reshape(self.indices.shape[0])
@@ -313,7 +313,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.zones_layer.removeJoin(lien.joinLayerId())
         self.mapping_layer = None
         if clear_selection:
-            self.zones_layer.selectByExpression('"zone_id"-<1000', QgsVectorLayer.SetSelection)
+            self.zones_layer.selectByExpression('"zone_id"-<1000', QgsVectorLayer.SelectBehavior.SetSelection)
         self.zones_layer.triggerRepaint()
 
     def format_showing(self):

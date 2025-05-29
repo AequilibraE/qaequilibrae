@@ -21,7 +21,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "origin",
                 self.tr("Origin"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="matrix_layer",
                 allowMultiple=False,
                 defaultValue="origin",
@@ -31,7 +31,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "destination",
                 self.tr("Destination"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="matrix_layer",
                 allowMultiple=False,
                 defaultValue="destination",
@@ -41,7 +41,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "value",
                 self.tr("Value"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="matrix_layer",
                 allowMultiple=False,
                 defaultValue="value",
@@ -54,7 +54,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterFile(
                 "output_folder",
                 self.tr("Output folder"),
-                behavior=QgsProcessingParameterFile.Folder,
+                behavior=QgsProcessingParameterFile.Behavior.Folder,
                 fileFilter="All folders (*.*)",
                 defaultValue=standard_path(),
             )
@@ -73,7 +73,7 @@ class MatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterString("matrix_core", self.tr("Matrix core"), multiLine=False, defaultValue="Value"),
         ]
         for param in advparams:
-            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            param.setFlags(param.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
             self.addParameter(param)
 
     def processAlgorithm(self, parameters, context, model_feedback):

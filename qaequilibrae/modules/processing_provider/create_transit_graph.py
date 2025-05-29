@@ -12,12 +12,12 @@ class CreatePTGraph(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterFile(
-                "project_path", self.tr("Project path"), behavior=QgsProcessingParameterFile.Folder
+                "project_path", self.tr("Project path"), behavior=QgsProcessingParameterFile.Behavior.Folder
             )
         )
         self.addParameter(
             QgsProcessingParameterNumber(
-                "period_id", self.tr("Period ID"), type=QgsProcessingParameterNumber.Integer, minValue=1, defaultValue=1
+                "period_id", self.tr("Period ID"), type=QgsProcessingParameterNumber.Type.Integer, minValue=1, defaultValue=1
             )
         )
         self.addParameter(QgsProcessingParameterString("access_mode", self.tr("Modes"), multiLine=False))

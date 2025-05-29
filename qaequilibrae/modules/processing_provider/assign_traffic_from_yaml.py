@@ -14,7 +14,7 @@ class TrafficAssignYAML(QgsProcessingAlgorithm):
             QgsProcessingParameterFile(
                 "conf_file",
                 self.tr("Configuration file (*.yaml)"),
-                behavior=QgsProcessingParameterFile.File,
+                behavior=QgsProcessingParameterFile.Behavior.File,
             )
         )
 

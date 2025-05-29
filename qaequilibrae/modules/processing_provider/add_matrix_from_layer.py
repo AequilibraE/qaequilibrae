@@ -22,7 +22,7 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "origin",
                 self.tr("Origin"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="matrix_layer",
                 allowMultiple=False,
             )
@@ -31,7 +31,7 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "destination",
                 self.tr("Destination"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="matrix_layer",
                 allowMultiple=False,
             )
@@ -40,7 +40,7 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "value",
                 self.tr("Value"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="matrix_layer",
                 allowMultiple=False,
             )

@@ -25,7 +25,7 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
 
         self.path = standard_path()
-        self.cob_lyr.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+        self.cob_lyr.setFilters(QgsMapLayerProxyModel.Filter.PolygonLayer)
 
         self.but_run.clicked.connect(self.run)
         self.cob_lyr.currentIndexChanged.connect(self.changed_layer)

@@ -19,14 +19,14 @@ class AddConnectors(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterFile(
-                "project_path", self.tr("Project path"), behavior=QgsProcessingParameterFile.Folder
+                "project_path", self.tr("Project path"), behavior=QgsProcessingParameterFile.Behavior.Folder
             )
         )
         self.addParameter(
             QgsProcessingParameterNumber(
                 "num_connectors",
                 self.tr("Number of connectors per centroid"),
-                type=QgsProcessingParameterNumber.Integer,
+                type=QgsProcessingParameterNumber.Type.Integer,
                 minValue=1,
                 defaultValue=1,
             )
@@ -42,7 +42,7 @@ class AddConnectors(QgsProcessingAlgorithm):
         ]
 
         for param in advparams:
-            param.setFlags(param.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            param.setFlags(param.flags() | QgsProcessingParameterDefinition.Flag.FlagAdvanced)
             self.addParameter(param)
 
     def processAlgorithm(self, parameters, context, model_feedback):

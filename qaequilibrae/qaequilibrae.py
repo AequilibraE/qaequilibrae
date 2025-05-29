@@ -42,8 +42,8 @@ else:
         QMessageBox.information(None, "Warning", msg.messsage_five)
     else:
         if (
-            QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
-            == QMessageBox.Ok
+            QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+            == QMessageBox.StandardButton.Ok
         ):
             from qaequilibrae.download_extra_packages_class import DownloadAll
 
@@ -410,13 +410,13 @@ class AequilibraEMenu:
                 options.driverName = "SQLite"
                 options.layerName = layer_name
                 if file_exists:
-                    options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+                    options.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteLayer
 
                 transform_context = QgsProject.instance().transformContext()
 
                 error = QgsVectorFileWriter.writeAsVectorFormatV3(layer, output_file_path, transform_context, options)
 
-                if error[0] == QgsVectorFileWriter.NoError:
+                if error[0] == QgsVectorFileWriter.WriterError.NoError:
                     layer.setDataSource(output_file_path + f"|layername={layer_name}", layer.name(), "ogr")
 
                 file_exists = True

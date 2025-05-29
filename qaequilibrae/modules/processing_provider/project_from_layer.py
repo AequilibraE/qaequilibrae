@@ -15,14 +15,14 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterVectorLayer(
-                "links", self.tr("Links"), types=[QgsProcessing.TypeVectorLine], defaultValue=None
+                "links", self.tr("Links"), types=[QgsProcessing.SourceType.TypeVectorLine], defaultValue=None
             )
         )
         self.addParameter(
             QgsProcessingParameterField(
                 "link_id",
                 self.tr("Link ID"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="links",
                 allowMultiple=False,
             )
@@ -31,7 +31,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "direction",
                 self.tr("Direction"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="links",
                 allowMultiple=False,
             )
@@ -40,7 +40,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "link_type",
                 self.tr("Link type"),
-                type=QgsProcessingParameterField.String,
+                type=QgsProcessingParameterField.DataType.String,
                 parentLayerParameterName="links",
                 allowMultiple=False,
             )
@@ -49,7 +49,7 @@ class ProjectFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "modes",
                 self.tr("Modes"),
-                type=QgsProcessingParameterField.String,
+                type=QgsProcessingParameterField.DataType.String,
                 parentLayerParameterName="links",
                 allowMultiple=False,
             )

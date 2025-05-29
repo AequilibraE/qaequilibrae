@@ -17,21 +17,21 @@ class RenumberNodesFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterFile(
                 "project_path",
                 self.tr("Project path"),
-                behavior=QgsProcessingParameterFile.Folder,
+                behavior=QgsProcessingParameterFile.Behavior.Folder,
             )
         )
         self.addParameter(
             QgsProcessingParameterVectorLayer(
                 "nodes",
                 self.tr("Centroids"),
-                types=[QgsProcessing.TypeVectorPoint],
+                types=[QgsProcessing.SourceType.TypeVectorPoint],
             )
         )
         self.addParameter(
             QgsProcessingParameterField(
                 "node_id",
                 self.tr("Node ID"),
-                type=QgsProcessingParameterField.Numeric,
+                type=QgsProcessingParameterField.DataType.Numeric,
                 parentLayerParameterName="nodes",
                 allowMultiple=False,
             )

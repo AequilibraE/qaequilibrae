@@ -1,21 +1,19 @@
 from os.path import exists, join
+from pathlib import Path
+from tempfile import gettempdir
 
 import qgis
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QVBoxLayout
 
 
 # Split loading between Qt action and processing, for easier unit testing
 def run_load_project(qgis_project):
-    proj_path = _get_project_path()
+    from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFolderName
+
+    proj_path = GetOutputFolderName(str(Path(qgis_project.path).parent), "AequilibraE Project folder")
+
     return _run_load_project_from_path(qgis_project, proj_path)
-
-
-def _get_project_path():
-    from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
-
-    return QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
 
 
 def _run_load_project_from_path(qgis_project, proj_path):
@@ -23,6 +21,7 @@ def _run_load_project_from_path(qgis_project, proj_path):
 
     if proj_path is None or proj_path == "":
         return
+    
     # Cleans the project descriptor
     tab_count = 1
     for i in range(tab_count):
@@ -40,6 +39,10 @@ def _run_load_project_from_path(qgis_project, proj_path):
                 return
             else:
                 raise e
+            
+    pth = join(gettempdir(), "aequilibrae_last_folder.txt")
+    with open(pth, "w") as file:
+        file.write(proj_path)
 
     update_project_layers(qgis_project)
 

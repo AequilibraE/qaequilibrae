@@ -41,7 +41,7 @@ def test_assignment(qtbot, coquimbo_project):
     dialog.cob_freq.setCurrentText("freq")
     dialog.ln_result_name.setText("pt_assignment")
 
-    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_assign, Qt.MouseButton.LeftButton)
 
     # Check the results table
     result = load_result_table(coquimbo_project.project.project_base_path, "pt_assignment")
@@ -70,19 +70,19 @@ def test_skimming(qtbot, coquimbo_project):
     # Add boardings, dwelling_time, and transfer_time
     for row in [0, 6, 9]:
         dialog.available_skims_table.selectRow(row)
-        qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
+        qtbot.mouseClick(dialog.but_adds_to_skim, Qt.MouseButton.LeftButton)
 
     assert dialog.skim_fields == ["boardings", "dwelling_time", "transfer_time"]
 
     # Remove dwelling_time
     dialog.skim_list.selectRow(1)
-    qtbot.mouseClick(dialog.but_removes_from_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_removes_from_skim, Qt.MouseButton.LeftButton)
 
     assert dialog.skim_fields == ["boardings", "transfer_time"]
 
     dialog.ln_matrix_name.setText("selected_pt_skims")
 
-    qtbot.mouseClick(dialog.but_create, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_create, Qt.MouseButton.LeftButton)
 
     matrices = coquimbo_project.project.matrices
     matrices.update_database()
@@ -115,7 +115,7 @@ def mock_period(mocker):
 
 def test_create_period(qtbot, coquimbo_project, mock_period):
     dialog = create_dialog_with_matrix(coquimbo_project)
-    qtbot.mouseClick(dialog.but_add_period, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_period, Qt.MouseButton.LeftButton)
 
     periods = dialog.project.network.periods
     assert periods.data.shape[0] == 2
@@ -145,11 +145,11 @@ def test_period_not_selected(qtbot, coquimbo_project):
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     dialog.available_skims_table.selectRow(0)
-    qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_adds_to_skim, Qt.MouseButton.LeftButton)
 
     dialog.ln_matrix_name.setText("selected_pt_skims")
 
-    qtbot.mouseClick(dialog.but_create, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_create, Qt.MouseButton.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == "Warning:Please select a period"
@@ -161,7 +161,7 @@ def test_no_skims(qtbot, coquimbo_project):
 
     dialog.ln_matrix_name.setText("selected_pt_skims")
 
-    qtbot.mouseClick(dialog.but_create, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_create, Qt.MouseButton.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == "Warning:Add skims to the selection"
@@ -173,11 +173,11 @@ def test_no_matrix_name(qtbot, coquimbo_project, name):
     dialog.tbl_periods.selectRow(0)
 
     dialog.available_skims_table.selectRow(0)
-    qtbot.mouseClick(dialog.but_adds_to_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_adds_to_skim, Qt.MouseButton.LeftButton)
 
     dialog.ln_matrix_name.setText(name)
 
-    qtbot.mouseClick(dialog.but_create, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_create, Qt.MouseButton.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == "Warning:Check matrix_name"
@@ -192,7 +192,7 @@ def test_no_pt_class_name(qtbot, coquimbo_project, name):
 
     dialog.ln_result_name.setText("pt_assignment")
 
-    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_assign, Qt.MouseButton.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == "Warning:Check PT class name"
@@ -207,7 +207,7 @@ def test_no_results_name(qtbot, coquimbo_project, name):
 
     dialog.ln_result_name.setText(name)
 
-    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_assign, Qt.MouseButton.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == "Warning:Check result_name"
@@ -215,7 +215,7 @@ def test_no_results_name(qtbot, coquimbo_project, name):
 
 def test_no_graph(qtbot, coquimbo_project, mock_period):
     dialog = create_dialog_with_matrix(coquimbo_project)
-    qtbot.mouseClick(dialog.but_add_period, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_period, Qt.MouseButton.LeftButton)
 
     dialog.tbl_periods.selectRow(1)
 
@@ -224,7 +224,7 @@ def test_no_graph(qtbot, coquimbo_project, mock_period):
     dialog.ln_transit_class.setText("pt")
     dialog.ln_result_name.setText("pt_assignment")
 
-    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_assign, Qt.MouseButton.LeftButton)
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == "Warning:No graph for period_id=2 stored in project"
 
@@ -246,7 +246,7 @@ def test_no_graph_for_period(qtbot, coquimbo_project, mock_period):
 
     # Configure the dialog
     dialog = create_dialog_with_matrix(coquimbo_project)
-    qtbot.mouseClick(dialog.but_add_period, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_period, Qt.MouseButton.LeftButton)
     dialog.tbl_periods.selectRow(1)
 
     dialog.chb_use_graph.setChecked(True)
@@ -254,7 +254,7 @@ def test_no_graph_for_period(qtbot, coquimbo_project, mock_period):
     dialog.ln_transit_class.setText("pt")
     dialog.ln_result_name.setText("pt_assignment")
 
-    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_assign, Qt.MouseButton.LeftButton)
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[1][0] == "Warning:No graph for period_id=2 stored in project"
 
@@ -285,7 +285,7 @@ def test_reuse_graph_in_project(qtbot, coquimbo_project):
     dialog.cob_freq.setCurrentText("freq")
     dialog.ln_result_name.setText("pt_assignment")
 
-    qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_assign, Qt.MouseButton.LeftButton)
 
     # Check the results table
     result = load_result_table(coquimbo_project.project.project_base_path, "pt_assignment")
