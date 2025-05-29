@@ -1,8 +1,9 @@
 import importlib.util as iutil
-from math import floor, log10
+from math import ceil, floor, log10
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from qgis.core import QgsProcessingAlgorithm, QgsMessageLog, QgsProcessingParameterString
 from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFileDestination
 from qgis.utils import plugins
@@ -128,7 +129,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         # Draw plot
         mult = floor(skim_matrix.index.shape[0] / 10)
         b = max(1, floor(log10(skim_matrix.matrix_view.shape[0]) * mult))
-        n, bins, patches = plt.hist(
+        n, bins, _ = plt.hist(
             np.nan_to_num(skim_matrix.matrix_view.flatten(), 0),
             bins=b,
             weights=np.nan_to_num(demand_matrix.matrix_view.flatten()),
@@ -137,9 +138,18 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
             alpha=0.75,
         )
 
+        df = pd.DataFrame([n[1:], bins[1:]]).transpose().fillna(0)
+        df.columns = ["trips", "position"]
+        df["cumsum"] = df["trips"].cumsum()
+        df["rate"] = df["cumsum"] / df["trips"].sum()
+        if df["rate"].min() == df["rate"].max():
+            limit_right = ceil(df["position"].values[-1])
+        else:
+            limit_right = ceil(df[df["rate"] <= 0.99]["position"].values[-1])
+
         ax = plt.gca()
-        ax.set_xlim(left=0)
-        ax.set_ylim(bottom=0)
+        ax.set_xlim(left=0, right=limit_right)
+        ax.set_ylim(bottom=0, top=ceil(max(n[1:]) * 1.1))
         plt.xlabel("Trip length")
         plt.ylabel("Trips")
         plt.title(plt_name)
