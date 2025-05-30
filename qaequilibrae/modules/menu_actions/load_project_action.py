@@ -44,6 +44,10 @@ def _run_load_project_from_path(qgis_project, proj_path):
     with open(pth, "w") as file:
         file.write(proj_path)
 
+    pth = join(gettempdir(), "aequilibrae_last_folder.txt")
+    with open(pth, "w") as file:
+        file.write(proj_path)
+
     update_project_layers(qgis_project)
 
 

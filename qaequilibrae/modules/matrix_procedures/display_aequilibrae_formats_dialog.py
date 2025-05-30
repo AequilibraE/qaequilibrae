@@ -39,6 +39,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.mapping_layer = None
         self.selected_col = None
         self.selected_row = None
+        self.omx = None
 
         if len(file_path) > 0:
             self.data_path = file_path
@@ -357,6 +358,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def exit_procedure(self):
         if not self.from_proj:
             self.qgis_project.matrices.pop(self.data_path)
+        if self.omx is not None:
+            self.omx.close()
         self.show()
         self.close()
 
