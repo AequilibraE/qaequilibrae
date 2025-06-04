@@ -14,7 +14,9 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
         # 1. Folder containing an AequilibraE project
         self.addParameter(
             QgsProcessingParameterFile(
-                self.PROJECT_FOLDER, self.tr("AequilibraE Project Folder"), behavior=QgsProcessingParameterFile.Behavior.Folder
+                self.PROJECT_FOLDER,
+                self.tr("AequilibraE Project Folder"),
+                behavior=QgsProcessingParameterFile.Behavior.Folder,
             )
         )
 

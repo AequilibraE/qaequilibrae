@@ -17,7 +17,11 @@ class CreatePTGraph(QgsProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterNumber(
-                "period_id", self.tr("Period ID"), type=QgsProcessingParameterNumber.Type.Integer, minValue=1, defaultValue=1
+                "period_id",
+                self.tr("Period ID"),
+                type=QgsProcessingParameterNumber.Type.Integer,
+                minValue=1,
+                defaultValue=1,
             )
         )
         self.addParameter(QgsProcessingParameterString("access_mode", self.tr("Modes"), multiLine=False))

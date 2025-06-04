@@ -2,7 +2,7 @@ import os
 from functools import partial
 
 import pandas as pd
-import qgis
+from qgis.core import Qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt, QSize
 
@@ -162,8 +162,11 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
             self.but_save_and_use.setEnabled(True)
             self.chb_all_fields.setEnabled(True)
             if self.worker_thread.error is not None:
-                qgis.utils.iface.messageBar().pushMessage(
-                    self.tr("Error while loading vector:"), self.worker_thread.error, level=1
+                self.iface.messageBar().pushMessage(
+                    title=self.tr("Error while loading vector:"),
+                    text=self.worker_thread.error,
+                    level=Qgis.Critical,
+                    duration=10,
                 )
             else:
                 self.dataset = self.worker_thread.output
@@ -201,7 +204,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
 
             if len(self.selected_fields) > 0:
                 self.worker_thread = LoadDataset(
-                    qgis.utils.iface.mainWindow(),
+                    self.iface.mainWindow(),
                     layer=self.layer,
                     index_field=index_field,
                     fields=self.selected_fields,
@@ -210,11 +213,14 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.size_it_accordingly(True)
                 self.run_thread()
             else:
-                qgis.utils.iface.messageBar().pushMessage(
-                    "Error:", self.tr("One cannot load a dataset with indices only"), level=1, duration=10
+                self.iface.messageBar().pushMessage(
+                    "Error:",
+                    text=self.tr("One cannot load a dataset with indices only"),
+                    level=Qgis.Critical,
+                    duration=10,
                 )
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1, duration=10)
+            self.iface.messageBar().pushMessage(title="Error:", text=self.error, level=Qgis.Critical, duration=10)
 
     def set_output_name(self):
         if self.single_use:

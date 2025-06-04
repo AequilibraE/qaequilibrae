@@ -1,6 +1,6 @@
 import os
 
-import qgis
+from qgis.core import Qgis
 from qgis.PyQt import QtWidgets, uic
 
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
@@ -37,7 +37,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
         self.OK.clicked.connect(self.run)
 
         # We load the node and area layers existing in our canvas
-        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
+        for layer in self.iface.mapCanvas().layers():  # We iterate through all layers
             if "wkbType" in dir(layer):
                 if layer.wkbType() in self.valid_layer_types:
                     self.fromlayer.addItem(layer.name())
@@ -213,7 +213,7 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if not error:
             self.worker_thread = SimpleTAG(
-                qgis.utils.iface.mainWindow(),
+                self.iface.mainWindow(),
                 flayer,
                 tlayer,
                 ffield,
@@ -225,8 +225,11 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage(
-                self.tr("Input data not provided correctly"), self.tr("  Try again"), level=3
+            self.iface.messageBar().pushMessage(
+                title=self.tr("Input data not provided correctly"),
+                text=self.tr("Try again"),
+                level=Qgis.Info,
+                duration=10,
             )
 
     def string_order(self, order):
@@ -252,8 +255,11 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             self.lbl_operation.clear()
             self.progressbar.reset()
             if self.worker_thread.error is not None:
-                qgis.utils.iface.messageBar().pushMessage(
-                    self.tr("Input data not provided correctly"), self.worker_thread.error, level=3
+                self.iface.messageBar().pushMessage(
+                    title=self.tr("Input data not provided correctly"),
+                    text=self.worker_thread.error,
+                    level=Qgis.Critical,
+                    duration=10,
                 )
             self.close()
 

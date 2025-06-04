@@ -3,6 +3,7 @@ import os
 
 import yaml
 from aequilibrae.parameters import Parameters
+from qgis.core import Qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML, QsciScintilla
 from qgis.PyQt.QtGui import QFont
@@ -63,7 +64,10 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.error:
             self.but_save.setEnabled(False)
             self.iface.messageBar().pushMessage(
-                "Error", self.tr("Parameter structure was compromised. Please reset to default."), level=2, duration=10
+                title="Error",
+                text=self.tr("Parameter structure was compromised. Please reset to default."),
+                level=Qgis.Critical,
+                duration=10,
             )
         else:
             self.but_save.setEnabled(True)

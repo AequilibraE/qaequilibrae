@@ -4,11 +4,11 @@ from functools import partial
 
 import numpy as np
 import pandas as pd
-import qgis
 from aequilibrae.context import get_logger
 from aequilibrae.distribution import SyntheticGravityModel
 from aequilibrae.distribution.synthetic_gravity_model import valid_functions
 from aequilibrae.matrix import AequilibraeMatrix
+from qgis.core import Qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
 
@@ -212,8 +212,11 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.cob_index.clear()
                 self.cob_index.setEnabled(False)
         else:
-            qgis.utils.iface.messageBar().pushMessage(
-                "Warning: ", self.tr("You need to load a dataset to proceed"), level=1, duration=10
+            self.iface.messageBar().pushMessage(
+                title="Warning: ",
+                text=self.tr("You need to load a dataset to proceed"),
+                level=Qgis.Warning,
+                duration=10,
             )
 
     def load_model(self):
@@ -222,8 +225,11 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.model.load(file_name)
             self.update_model_parameters()
         except Exception as e:
-            qgis.utils.iface.messageBar().pushMessage(
-                "Error: ", self.tr("Could not load model. {}").format(e.args), level=2, duration=10
+            self.iface.messageBar().pushMessage(
+                title="Error: ",
+                text=self.tr("Could not load model. {}").format(e.args),
+                level=Qgis.Critical,
+                duration=10,
             )
 
     def change_vector_field(self, cob_orig, cob_dest, dt):
@@ -313,7 +319,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                         "column_field": atra_field,
                         "nan_as_zero": self.chb_empty_as_zero.isChecked(),
                     }
-                    worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), **args)
+                    worker_thread = IpfProcedure(self.iface.mainWindow(), **args)
 
             if self.job == "apply":
                 self.out_name = self.browse_outfile("aem")
@@ -333,7 +339,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                         "output": self.out_name,
                         "nan_as_zero": self.chb_empty_as_zero.isChecked(),
                     }
-                    worker_thread = ApplyGravityProcedure(qgis.utils.iface.mainWindow(), **args)
+                    worker_thread = ApplyGravityProcedure(self.iface.mainWindow(), **args)
 
             if self.job == "calibrate":
                 self.out_name = self.browse_outfile("mod")
@@ -353,14 +359,16 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                         "function": func_name,
                         "nan_as_zero": self.chb_empty_as_zero.isChecked(),
                     }
-                    worker_thread = CalibrateGravityProcedure(qgis.utils.iface.mainWindow(), **args)
+                    worker_thread = CalibrateGravityProcedure(self.iface.mainWindow(), **args)
 
             self.chb_empty_as_zero.setEnabled(False)
             if worker_thread is None:
                 return
             self.add_job_to_list(worker_thread, self.out_name)
         else:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), self.error, level=3, duration=10)
+            self.iface.messageBar().pushMessage(
+                title=self.tr("Procedure error: "), text=self.error, level=Qgis.Critical, duration=10
+            )
 
     def add_job_to_list(self, job, out_name):
         self.job_queue[out_name] = job
@@ -416,7 +424,9 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def signal_handler(self, val):
         error = self.worker_thread.error
         if error is not None:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), error.args[0], level=2, duration=10)
+            self.iface.messageBar().pushMessage(
+                title=self.tr("Procedure error: "), text=error.args[0], level=Qgis.Critical, duration=10
+            )
 
         self.report = []
         self.report.extend(self.worker_thread.report)
@@ -431,6 +441,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def exit_procedure(self):
         if self.report is not None:
-            dlg2 = ReportDialog(qgis.utils.iface.mainWindow(), self.report)
+            dlg2 = ReportDialog(self.iface.mainWindow(), self.report)
             dlg2.show()
             dlg2.exec()

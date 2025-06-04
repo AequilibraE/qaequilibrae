@@ -21,7 +21,7 @@ def _run_load_project_from_path(qgis_project, proj_path):
 
     if proj_path is None or proj_path == "":
         return
-    
+
     # Cleans the project descriptor
     tab_count = 1
     for i in range(tab_count):
@@ -39,7 +39,7 @@ def _run_load_project_from_path(qgis_project, proj_path):
                 return
             else:
                 raise e
-            
+
     pth = join(gettempdir(), "aequilibrae_last_folder.txt")
     with open(pth, "w") as file:
         file.write(proj_path)

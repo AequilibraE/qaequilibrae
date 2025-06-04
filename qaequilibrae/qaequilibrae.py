@@ -10,12 +10,11 @@ from os.path import dirname, exists, join, isfile, split
 from pathlib import Path
 from uuid import uuid4
 
-import qgis
 from qgis.PyQt.QtCore import Qt, QTranslator, QSettings, QLocale, QCoreApplication, QSize
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication, QToolBar, QToolButton
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
-from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
+from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, Qgis
 
 from qaequilibrae.message import messages
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
@@ -42,7 +41,12 @@ else:
         QMessageBox.information(None, "Warning", msg.messsage_five)
     else:
         if (
-            QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+            QMessageBox.question(
+                None,
+                msg.first_box_name,
+                msg.first_message,
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
+            )
             == QMessageBox.StandardButton.Ok
         ):
             from qaequilibrae.download_extra_packages_class import DownloadAll
@@ -309,7 +313,7 @@ class AequilibraEMenu:
             self.create_layer_by_name(layer_name)
         layer = self.layers[layer_name.lower()][0]
         QgsProject.instance().addMapLayer(layer)
-        qgis.utils.iface.mapCanvas().refresh()
+        self.iface.mapCanvas().refresh()
 
     def create_layer_by_name(self, layer_name: str):
         layer = self.create_loose_layer(layer_name)
@@ -330,16 +334,21 @@ class AequilibraEMenu:
         return layer
 
     def show_message_no_project(self):
-        self.iface.messageBar().pushMessage("Error", self.tr("You need to load a project first"), level=3, duration=10)
+        self.iface.messageBar().pushMessage(
+            title="Error", text=self.tr("You need to load a project first"), level=Qgis.Critical, duration=10
+        )
 
     def message_project_already_open(self):
         self.iface.messageBar().pushMessage(
-            "Error", self.tr("You need to close the project currently open first"), level=2, duration=10
+            title="Error",
+            text=self.tr("You need to close the project currently open first"),
+            level=Qgis.Critical,
+            duration=10,
         )
 
     def message_no_gtfs_feed(self):
         self.iface.messageBar().pushMessage(
-            "Error", self.tr("You need to import a GTFS feed first"), level=3, duration=10
+            title="Error", text=self.tr("You need to import a GTFS feed first"), level=Qgis.Critical, duration=10
         )
 
     def set_font(self, obj):
@@ -387,7 +396,7 @@ class AequilibraEMenu:
             if dbpath in aequilibrae_databases:
                 QgsProject.instance().removeMapLayer(layer)
 
-        qgis.utils.iface.mapCanvas().refresh()
+        self.iface.mapCanvas().refresh()
 
     def save_in_project(self):
         """Saves temporary layers to the project using QGIS saving buttons."""

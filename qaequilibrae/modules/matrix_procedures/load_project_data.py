@@ -2,12 +2,11 @@ import os
 from os.path import join
 
 import pandas as pd
-import qgis
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import commit_and_close
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTabWidget
-from qgis.core import QgsProject, QgsVectorLayerJoinInfo
+from qgis.core import QgsProject, QgsVectorLayerJoinInfo, Qgis
 
 from qaequilibrae.modules.common_tools import PandasModel, layer_from_dataframe
 from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
@@ -122,7 +121,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2.exec()
 
     def exit_with_error(self):
-        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+        self.iface.messageBar().pushMessage(title="Error:", text=self.error, level=Qgis.Critical)
         self.close()
 
     def exit_procedure(self):

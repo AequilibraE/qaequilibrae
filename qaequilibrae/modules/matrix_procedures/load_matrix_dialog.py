@@ -2,9 +2,9 @@ import importlib.util as iutil
 import os
 
 import numpy as np
-import qgis
 from aequilibrae.context import get_logger
 from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
+from qgis.core import Qgis
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem
@@ -174,7 +174,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.run_thread()
 
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+            self.iface.messageBar().pushMessage(title="Error:", text=self.error, level=Qgis.Critical)
 
     def update_matrix_list(self):
         if self.matrix_count > 0:
@@ -243,12 +243,10 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def build_worker_thread(self):
         if self.output_name is None:
-            self.worker_thread = MatrixReblocking(
-                qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices
-            )
+            self.worker_thread = MatrixReblocking(self.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices)
         else:
             self.worker_thread = MatrixReblocking(
-                qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
+                self.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
             )
 
     def has_errors(self):
@@ -271,5 +269,5 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             idx = [idx1, idx2, idx3]
 
             self.worker_thread = LoadMatrix(
-                qgis.utils.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
+                self.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
             )

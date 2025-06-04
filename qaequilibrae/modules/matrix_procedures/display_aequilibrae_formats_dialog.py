@@ -5,17 +5,14 @@ from math import ceil
 import numpy as np
 import openmatrix as omx
 import pandas as pd
-import qgis
 from aequilibrae.matrix import AequilibraeMatrix
-from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
-from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout
 from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QSizePolicy
 from qgis.core import QgsRendererRange, QgsGraduatedSymbolRenderer, QgsProject, QgsStyle
-from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication
+from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsApplication, Qgis
 
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
 from qaequilibrae.modules.common_tools import layer_from_dataframe
@@ -191,7 +188,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if not col_id:
             return
         self.selected_col = col_id[0]
-        self.zones_layer.selectByExpression(f'"zone_id"={self.indices[col_id[0]]}', QgsVectorLayer.SelectBehavior.SetSelection)
+        self.zones_layer.selectByExpression(
+            f'"zone_id"={self.indices[col_id[0]]}', QgsVectorLayer.SelectBehavior.SetSelection
+        )
         self.iface.mapCanvas().refresh()
 
         core = self.mat_list.currentText()
@@ -205,7 +204,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if not row_id:
             return
         self.selected_row = row_id[0]
-        self.zones_layer.selectByExpression(f'"zone_id"={self.indices[row_id[0]]}', QgsVectorLayer.SelectBehavior.SetSelection)
+        self.zones_layer.selectByExpression(
+            f'"zone_id"={self.indices[row_id[0]]}', QgsVectorLayer.SelectBehavior.SetSelection
+        )
 
         core = self.mat_list.currentText()
         dt = np.array(self.data_to_show.matrix[core][row_id[0], :]).reshape(self.indices.shape[0])
@@ -352,7 +353,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.data_to_show.export(new_name)
 
     def exit_with_error(self):
-        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1, duration=10)
+        self.iface.messageBar().pushMessage(title="Error", text=self.error, level=Qgis.Critical, duration=10)
         self.close()
 
     def exit_procedure(self):

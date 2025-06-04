@@ -2,11 +2,10 @@ import logging
 import os
 
 import pandas as pd
-import qgis
 from qgis.PyQt import uic, QtCore
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
-from qgis.core import QgsProject
+from qgis.core import QgsProject, Qgis
 
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import standard_path, get_vector_layer_by_name
@@ -50,7 +49,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.cancel.clicked.connect(self.exit_procedure)
 
         # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
+        for layer in self.iface.mapCanvas().layers():  # We iterate through all layers
             if "wkbType" in dir(layer):
                 if layer.wkbType() in poly_types or layer.wkbType() in point_types:
                     self.zoning_layer.addItem(layer.name())
@@ -196,7 +195,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
                 dl_type = "DelaunayLines"
 
             self.worker_thread = DesireLinesProcedure(
-                qgis.utils.iface.mainWindow(),
+                self.iface.mainWindow(),
                 self.zoning_layer.currentText(),
                 self.zone_id_field.currentText(),
                 self.matrix,
@@ -205,10 +204,10 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage(
-                self.tr("Inputs not loaded properly"),
-                self.tr("You need the layer and at least one matrix_procedures core"),
-                level=1,
+            self.iface.messageBar().pushMessage(
+                title=self.tr("Inputs not loaded properly"),
+                text=self.tr("You need the layer and at least one matrix_procedures core"),
+                level=Qgis.Warning,
                 duration=10,
             )
 
