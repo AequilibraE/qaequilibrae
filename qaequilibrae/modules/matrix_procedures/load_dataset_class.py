@@ -3,7 +3,7 @@ import struct
 import numpy as np
 import pandas as pd
 from aequilibrae.utils.interface.worker_thread import WorkerThread
-from qgis.PyQt.QtCore import pyqtSignal, QVariant
+from qgis.PyQt.QtCore import pyqtSignal
 
 from qaequilibrae.modules.common_tools.global_parameters import float_types, string_types, integer_types
 
