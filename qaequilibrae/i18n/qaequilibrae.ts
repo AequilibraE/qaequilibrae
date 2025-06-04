@@ -1055,7 +1055,7 @@
 <context>
     <name>DisplayAequilibraEFormatsDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="378"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="444"/>
         <source>AequilibraE custom formats</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1065,47 +1065,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="61"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="63"/>
         <source>File path: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="72"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="74"/>
         <source>Could not load dataset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="101"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="103"/>
         <source>Thousands separator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="110"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="112"/>
         <source>Decimal places</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="173"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="175"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="168"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="170"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="145"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="147"/>
         <source>No mapping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="149"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="151"/>
         <source>By origin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="153"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="155"/>
         <source>By destination</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3083,53 +3083,58 @@
 <context>
     <name>TripLengthDistribution</name>
     <message>
-        <location filename="../modules/processing_provider/trip_length_distribution.py" line="79"/>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="83"/>
         <source>No AequilibraE project loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/trip_length_distribution.py" line="41"/>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="42"/>
         <source>Demand matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/trip_length_distribution.py" line="49"/>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="50"/>
         <source>Demand matrix core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/trip_length_distribution.py" line="56"/>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="57"/>
         <source>Skim matrix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/trip_length_distribution.py" line="64"/>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="65"/>
         <source>Skim matrix core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/trip_length_distribution.py" line="71"/>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="75"/>
         <source>File path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/trip_length_distribution.py" line="92"/>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="96"/>
         <source>AequilibraE module not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/trip_length_distribution.py" line="156"/>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="166"/>
         <source>Trip length distribution</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/trip_length_distribution.py" line="159"/>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="169"/>
         <source>2. Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/trip_length_distribution.py" line="165"/>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="175"/>
         <source>Creates a trip-length distribution histogram and save in an output folder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/trip_length_distribution.py" line="72"/>
+        <source>Plot name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

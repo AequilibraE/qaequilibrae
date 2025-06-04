@@ -57,6 +57,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, True)
             self.but_load.clicked.connect(self.get_file_name)
 
+        self.remove_data_layer()
+
     def continue_with_data(self):
         self.setWindowTitle(self.tr("File path: {}").format(self.data_path))
 
@@ -215,7 +217,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def map_dt(self, dt):
         self.remove_mapping_layer(False)
-        df = pd.DataFrame({"zone_id": self.indices, "data": dt}).dropna()
+        df = pd.DataFrame({"zone_id": self.indices, "data": dt})
         self.mapping_layer = layer_from_dataframe(df, "matrix_row")
         self.make_join(self.zones_layer, "zone_id", self.mapping_layer)
         self.draw_zone_styles()
@@ -238,42 +240,107 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
 
-        idx = self.zones_layer.fields().indexFromName("metrics_data")
-        max_metric = self.zones_layer.maximumValue(idx)
+        # First, we check if we have numeric values in our column
+        all_values = []
+        for _, f in enumerate(layer.getFeatures()):
+            all_values.append(f["metrics_data"])
 
-        num_steps = 9
-        max_metric = num_steps if max_metric is None else max_metric
+        all_values = np.array(all_values, dtype=np.float32)
+        values = np.unique(all_values)
+
+        # We remove infs and nans to find the largest numeric value
+        values = values[~np.isnan(values)]
+        values = values[values < 3.39e38]
+        values = values[values >= -3.40e38]
+
+        #
+        num_steps = min(max(values.shape[0], 1), 9) if values.shape[0] > 0 else 1
+        max_metric = max(values) if values.shape[0] >= 1 else 0
+
+        #
         values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
-        values = [0, 0.000001] + values
+        values = [0, 0.000000000001] + values
         color_ramp = color_ramp_shades(color_ramp_name, num_steps)
-        ranges = []
+
+        # Create Rule-Based renderer
+        root_rule = QgsRuleBasedRenderer.Rule(None)
+
+        # Rule 1: NaN values
+        hatch_symbol = self.create_hatch(layer, color_ramp[0])
+        nan_expression = f'"{fld}" IS NULL OR "{fld}" = \'nan\' OR "{fld}" = \'NaN\''
+        nan_rule = QgsRuleBasedRenderer.Rule(hatch_symbol, filterExp=nan_expression, label="NaN Values")
+        root_rule.appendChild(nan_rule)
+
+        # Rule 2: Inf values
+        hatch_symbol = self.create_hatch(layer, color_ramp[0])
+        inf_expression = (
+            f"\"{fld}\" = 'inf' OR \"{fld}\" = '+inf' OR \"{fld}\" = '-inf' OR "
+            f'"{fld}" >= 3.40e38 OR "{fld}" <= -3.40e38'
+        )
+        inf_rule = QgsRuleBasedRenderer.Rule(hatch_symbol, filterExp=inf_expression, label="Inf Values")
+        root_rule.appendChild(inf_rule)
+
+        # Remaining rules
         for i in range(num_steps + 1):
             myColour = color_ramp[i]
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
             symbol.setColor(myColour)
             symbol.setOpacity(1)
 
+            # Create expression for the range
             if i == 0:
-                label = f"0/Null ({fld.replace('metrics_', '')})"
+                expression = f'"{fld}" = 0'
+                label = "0"
+                description = "0"
             elif i == 1:
-                label = f"Up to {values[i + 1]:,.0f}"
+                expression = f'"{fld}" > 0 AND "{fld}" <= {values[i + 1]}'
+                label = f"Up to {values[i + 1]}"
+                description = f"Range 0 -{values[i + 1]} (not included)"
+            elif i > 1 and i <= (num_steps - 1):
+                expression = f'"{fld}" >= {values[i]} AND "{fld}" < {values[i + 1]}'
+                label = f"{values[i]}-{values[i + 1]}"
+                description = f"Range {values[i]}-{values[i + 1]} (not included)"
             else:
-                label = f"{values[i]:,.0f} to {values[i + 1]:,.0f}"
+                expression = f'"{fld}" >= {values[i]} AND "{fld}" <= {values[i + 1]}'
+                label = f"{values[i]}-{values[i + 1]}"
+                description = f"Range {values[i]}-{values[i + 1]} (included)"
 
-            ranges.append(QgsRendererRange(values[i], values[i + 1], symbol, label))
+            # Create rule
+            range_rule = QgsRuleBasedRenderer.Rule(symbol, 0, 0, expression, label, description)
+            root_rule.appendChild(range_rule)
 
-        sizes = [0, max_metric]
-        renderer = QgsGraduatedSymbolRenderer("", ranges)
-        renderer.setSymbolSizes(*sizes)
-        renderer.setClassAttribute(f"""coalesce("{fld}", 0)""")
-
-        classific_method = QgsApplication.classificationMethodRegistry().method("EqualInterval")
-        renderer.setClassificationMethod(classific_method)
-
+        # Create the renderer
+        renderer = QgsRuleBasedRenderer(root_rule)
         layer.setRenderer(renderer)
         layer.triggerRepaint()
+
         self.iface.mapCanvas().setExtent(layer.extent())
         self.iface.mapCanvas().refresh()
+
+    def create_hatch(self, layer, color):
+        symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+        symbol.setColor(color)
+        symbol.setOpacity(1)
+
+        # Create line pattern fill layer (hatch)
+        hatch_layer = QgsLinePatternFillSymbolLayer()
+
+        # Set hatch properties
+        hatch_layer.setDistance(2.0)  # Distance between lines
+        hatch_layer.setAngle(45.0)  # Angle of lines (45 degrees)
+
+        # Create the line symbol for the hatch pattern
+        line_symbol = hatch_layer.subSymbol()
+        line_layer = line_symbol.symbolLayer(0)
+
+        # Customize the line appearance
+        line_layer.setWidth(0.5)  # Line width
+        line_layer.setColor(QColor(0, 0, 0))  # Black color
+
+        # Add the hatch layer to the symbol
+        symbol.appendSymbolLayer(hatch_layer)
+
+        return symbol
 
     def set_mapping(self):
         self.table.clearSelection()
@@ -309,8 +376,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.table.selectionModel().selectionChanged.connect(self.select_column)
 
     def remove_mapping_layer(self, clear_selection=True):
-        if self.mapping_layer is not None:
-            QgsProject.instance().removeMapLayers([self.mapping_layer.id()])
+        self.remove_data_layer()
         for lien in self.zones_layer.vectorJoins():
             self.zones_layer.removeJoin(lien.joinLayerId())
         self.mapping_layer = None
@@ -388,3 +454,12 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         )
 
         return data_path, data_type
+
+    def remove_data_layer(self):
+        active_layers = [name.name() for name in QgsProject.instance().mapLayers().values()]
+        if "matrix_row" in active_layers:
+            layer = QgsProject.instance().mapLayersByName("matrix_row")[0]
+            QgsProject.instance().removeMapLayers([layer.id()])
+            self.iface.mapCanvas().refresh()
+
+            self.mapping_layer = None

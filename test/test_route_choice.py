@@ -261,7 +261,6 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     dialog.job = "assign"
     dialog._validate_inputs()
     dialog._get_graph_config()
-    print(dialog.parameters)
     dialog.run()
 
     matrices = listdir(dialog.project.matrices.fldr)
