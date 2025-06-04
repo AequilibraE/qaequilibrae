@@ -6,6 +6,7 @@ from aequilibrae.transit import Transit
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
+from qgis.core import Qgis
 
 from qaequilibrae.modules.common_tools import PandasModel
 from qaequilibrae.modules.matrix_procedures import list_matrices
@@ -160,7 +161,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
 
         self.check_inputs(action)
         if self.error:
-            self.iface.messageBar().pushMessage("Warning", self.error, level=1, duration=10)
+            self.iface.messageBar().pushMessage(title="Warning", text=self.error, level=Qgis.Warning, duration=10)
             button.setEnabled(True)
             self.error = ""
             return

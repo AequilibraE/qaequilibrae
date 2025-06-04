@@ -1,14 +1,13 @@
 import os
 
 import numpy as np
-import qgis
 from aequilibrae.paths import path_computation
 from aequilibrae.paths.results import PathResults
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import QMetaType
-from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
+from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol, Qgis
 
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.routing_procedures.tsp_procedure import TSPProcedure
@@ -80,16 +79,22 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
                 for i in centroids:
                     self.cob_start.addItem(str(i))
             if len(centroids) < 3:
-                qgis.utils.iface.messageBar().pushMessage(
-                    "", self.tr("You need at least three nodes to route. "), level=3, duration=10
+                self.iface.messageBar().pushMessage(
+                    title="Error",
+                    text=self.tr("You need at least three nodes to route. "),
+                    level=Qgis.Critical,
+                    duration=10,
                 )
                 return
             centroids = np.array(centroids).astype(np.int64)
             self.graph.prepare_graph(centroids=centroids)
         else:
             if self.project.network.count_centroids() < 3:
-                qgis.utils.iface.messageBar().pushMessage(
-                    "", self.tr("You need at least three centroids to route. "), level=3, duration=10
+                self.iface.messageBar().pushMessage(
+                    title="Error",
+                    text=self.tr("You need at least three centroids to route. "),
+                    level=Qgis.Critical,
+                    duration=10,
                 )
                 return
 
@@ -99,7 +104,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         depot = int(self.cob_start.currentText())
         vehicles = 1
         self.res.prepare(self.graph)
-        self.worker_thread = TSPProcedure(qgis.utils.iface.mainWindow(), self.graph, depot, vehicles)
+        self.worker_thread = TSPProcedure(self.iface.mainWindow(), self.graph, depot, vehicles)
         self.run_thread()
 
     def run_thread(self):
@@ -164,7 +169,7 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
 
         symbol = vl.renderer().symbol()
         symbol.setWidth(1.6)
-        qgis.utils.iface.mapCanvas().refresh()
+        self.iface.mapCanvas().refresh()
 
         # Create TSP stops
         crs = self.node_layer.dataProvider().crs().authid()
@@ -210,4 +215,4 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         symbol.setSize(6)
         nl.renderer().setSymbol(symbol)
 
-        qgis.utils.iface.mapCanvas().refresh()
+        self.iface.mapCanvas().refresh()

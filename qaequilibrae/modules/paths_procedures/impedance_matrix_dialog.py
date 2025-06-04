@@ -1,11 +1,11 @@
 import importlib.util as iutil
 import os
 
-import qgis
 from aequilibrae.paths import SkimResults, NetworkSkimming
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
+from qgis.core import Qgis
 
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import standard_path
@@ -179,7 +179,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         try:
             self.run_thread()
         except ValueError as error:
-            qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
+            self.iface.messageBar().pushMessage(title="Input error", text=error.message, level=Qgis.Critical)
 
     @staticmethod
     def only_str(str_input):

@@ -5,6 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
+from qgis.core import Qgis
 
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
 from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
@@ -68,7 +69,9 @@ class GTFSFeed(QDialog, FORM_CLASS):
         descr = self.led_description.text()
         ag = self.led_agency.text()
         if "" in [descr, ag]:
-            self.iface.messageBar().pushMessage("Error", self.tr("Enter agency and description"), level=3, duration=10)
+            self.iface.messageBar().pushMessage(
+                title="Error", text=self.tr("Enter agency and description"), level=Qgis.Critical, duration=10
+            )
             return
 
         date = self.service_calendar.selectedDate().toString("yyyy-MM-dd")

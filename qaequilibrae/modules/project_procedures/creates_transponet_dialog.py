@@ -9,6 +9,7 @@ from aequilibrae.parameters import Parameters
 from aequilibrae.project.network.network import Network
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
+from qgis.core import Qgis
 
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import all_layers_from_toc
@@ -271,7 +272,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         ok, msg = self.check_data()
 
         if not ok:
-            self.iface.messageBar().pushMessage("Error", msg, level=3, duration=10)
+            self.iface.messageBar().pushMessage(title="Error", text=msg, level=Qgis.Critical, duration=10)
             return
 
         self.proj_folder = self.project_destination.text()

@@ -3,7 +3,7 @@ import sys
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
-from qgis.core import QgsProject
+from qgis.core import QgsProject, Qgis
 
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import standard_path, get_vector_layer_by_name
@@ -34,7 +34,7 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
         self.cbb_line_layer.clear()
         self.cbb_node_layer.clear()
 
-        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
+        for layer in self.iface.mapCanvas().layers():  # We iterate through all layers
             if "wkbType" in dir(layer):
                 if layer.wkbType() in line_types:
                     self.cbb_line_layer.addItem(layer.name())
@@ -89,7 +89,9 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def job_finished_from_thread(self):
         if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Node layer error: "), self.worker_thread.error, level=3)
+            self.iface.messageBar().pushMessage(
+                title=self.tr("Node layer error: "), text=self.worker_thread.error, level=Qgis.Critical
+            )
         else:
             QgsProject.instance().addMapLayer(self.worker_thread.new_line_layer)
             if self.worker_thread.new_node_layer:
@@ -104,7 +106,7 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.radioUseNodes.isChecked():
             self.pushOK.setEnabled(False)
             self.worker_thread = NetworkPreparationProcedure(
-                qgis.utils.iface.mainWindow(),
+                self.iface.mainWindow(),
                 self.cbb_line_layer.currentText(),
                 self.OutLinks.text(),
                 self.cbb_node_layer.currentText(),
@@ -115,7 +117,7 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             self.pushOK.setEnabled(False)
             self.worker_thread = NetworkPreparationProcedure(
-                qgis.utils.iface.mainWindow(),
+                self.iface.mainWindow(),
                 self.cbb_line_layer.currentText(),
                 self.OutLinks.text(),
                 new_node_layer=self.OutNodes.text(),

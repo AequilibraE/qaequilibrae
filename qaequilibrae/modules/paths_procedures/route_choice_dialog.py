@@ -9,7 +9,7 @@ from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
-from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest
+from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest, Qgis
 
 from qaequilibrae.modules.common_tools import geodataframe_from_layer
 from qaequilibrae.modules.common_tools.auxiliary_functions import get_vector_layer_by_name, model_area_polygon
@@ -146,7 +146,9 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.error = "Check parameter value input"
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.iface.messageBar().pushMessage(
+                title=self.tr("Input error"), text=self.error, level=Qgis.Critical, duration=10
+            )
             return
 
         parameter = float(params)
@@ -247,7 +249,9 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.error = self.tr("Please set a link selection")
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.iface.messageBar().pushMessage(
+                title=self.tr("Input error"), text=self.error, level=Qgis.Critical, duration=10
+            )
             return
 
         self.select_links[query_name] = [self.__current_links]
@@ -304,7 +308,9 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         # We return in case of error because in the we'll modify the text input to numbers
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.iface.messageBar().pushMessage(
+                title=self.tr("Input error"), text=self.error, level=Qgis.Critical, duration=10
+            )
             return
 
         # Check parameter values
@@ -356,7 +362,9 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 self.error = "Check matrices inputs"
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.iface.messageBar().pushMessage(
+                title=self.tr("Input error"), text=self.error, level=Qgis.Critical, duration=10
+            )
             return
 
         # Populate with our model parameters
@@ -415,9 +423,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         if self.error:
             return
 
-        self.worker_thread = RouteChoiceProcedure(
-            qgis.utils.iface.mainWindow(), self.project, self.job, self.parameters
-        )
+        self.worker_thread = RouteChoiceProcedure(self.iface.mainWindow(), self.project, self.job, self.parameters)
         self.run_thread()
 
     def run_thread(self):
@@ -445,7 +451,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 message = f"Route choice sets saved to {self.project.project_base_path}"
 
             if message:
-                qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
+                self.iface.messageBar().pushMessage(title="Success", text=message, level=Qgis.Success, duration=10)
 
             if self.job == "execute_single":
                 res = self.worker_thread.rc.get_results()
@@ -453,7 +459,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 plot_results(res, self.parameters["node_from"], self.parameters["node_to"], self.link_layer)
 
                 dlg2 = ExecuteSingleDialog(
-                    qgis.utils.iface.mainWindow(),
+                    self.iface.mainWindow(),
                     self.worker_thread.graph,
                     self.link_layer,
                     self.parameters,
