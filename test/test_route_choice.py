@@ -215,7 +215,6 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
     assert "route_choice_for_subarea.parquet" in rc_folder
 
 
-# @pytest.mark.skip("Find failure reason")
 def test_select_link_analysis(coquimbo_project, qtbot):
     dialog = create_dialog_with_matrix(coquimbo_project)
 
@@ -265,13 +264,13 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     print(dialog.parameters)
     dialog.run()
 
-    # matrices = listdir(dialog.project.matrices.fldr)
-    # assert "select_link_analysis.omx" in matrices
+    matrices = listdir(dialog.project.matrices.fldr)
+    assert "select_link_analysis.omx" in matrices
 
-    # pth = Path(dialog.project.project_base_path)
-    # conn = sqlite3.connect(pth / "results_database.sqlite")
-    # results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
-    # assert "select_link_analysis_uncompressed" in results
+    pth = Path(dialog.project.project_base_path)
+    conn = sqlite3.connect(pth / "results_database.sqlite")
+    results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+    assert "select_link_analysis_uncompressed" in results
 
 
 # ### We add tests to capture the errors raised
@@ -285,7 +284,7 @@ def test_cost_function(coquimbo_project, qtbot, par):
     qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == "Input error:Check parameter value input"
+    assert messagebar.messages[2][0] == "Input error:Check parameter value input"
 
 
 # Cost function clean-up
@@ -336,7 +335,7 @@ def test_query_name(coquimbo_project, par, error):
     dialog.save_query()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -360,7 +359,7 @@ def test_max_routes(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -384,7 +383,7 @@ def test_max_depth(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -407,7 +406,7 @@ def test_cutoff(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -432,7 +431,7 @@ def test_penalty(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -456,4 +455,4 @@ def test_psl_beta(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
