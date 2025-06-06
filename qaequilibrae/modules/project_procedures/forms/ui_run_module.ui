@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>112</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,20 +30,10 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBox"/>
+       <widget class="QComboBox" name="cbb_function"/>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Model parameters</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTextEdit" name="textEdit"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="but_run">
         <property name="text">
          <string>Run!</string>
         </property>
