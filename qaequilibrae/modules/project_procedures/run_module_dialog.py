@@ -1,32 +1,55 @@
-import os
 import ast
-import sys
+import os
+from importlib.util import spec_from_file_location, module_from_spec
+
+from aequilibrae.context import get_logger
 from qgis.PyQt import QtWidgets, uic
+from qgis.core import Qgis
+
+from qaequilibrae.modules.common_tools import LogDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_run_module.ui"))
 
 
 class RunModuleDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgis_project):
+    def __init__(self, qgis_project, logger=None):
         QtWidgets.QDialog.__init__(self)
+        self.qgis_project = qgis_project
         self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.setupUi(self)
 
-        self.cob_function.addItems(self.select_func)
+        self.logger = logger or get_logger()
+        self.filepath = os.path.join(self.project.project_base_path, "run/__init__.py")
+
+        self.items = self.list_func()
+        self.cob_function.addItems(self.items)
 
         self.but_run.clicked.connect(self.run)
-        # self.cob_function.currentIndexChanged.connect(self.select_func)
-        # self.select_func()
-
 
     def run(self):
-        pass
+        spec = spec_from_file_location("__init__", self.filepath)
+        module = module_from_spec(spec)
+        spec.loader.exec_module(module)
 
-    def select_func(self):
-        filepath = os.path.join(self.project.project_base_path, "run/__init__.py")
-        with open(filepath, "r", encoding="utf-8") as f:
+        func_name = self.items[self.cob_function.currentIndex()]
+        func = getattr(module, func_name)
+        result = func()  # If the function needs arguments, supply them here
+        self.logger.info(result)
+
+        self.iface.messageBar().pushMessage("Run module executed", "", level=Qgis.Info, duration=5)
+
+        self.exit_procedure()
+
+    def list_func(self):
+        with open(self.filepath, "r", encoding="utf-8") as f:
             file_content = f.read()
         tree = ast.parse(file_content)
         return [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
 
+    def exit_procedure(self):
+        self.close()
+
+        dlg2 = LogDialog(self.qgis_project, self)
+        dlg2.show()
+        dlg2.exec_()

@@ -30,7 +30,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="cbb_function"/>
+       <widget class="QComboBox" name="cob_function"/>
       </item>
       <item>
        <widget class="QPushButton" name="but_run">
