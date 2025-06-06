@@ -66,6 +66,14 @@ def test_logfile_menu(ae, qtbot):
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
+def test_run_module_menu(ae, qtbot):
+    action = ae.menuActions["Project"][4]
+    assert action.text() == "Run module", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
 def test_create_project_from_osm_menu(ae, qtbot):
     from qaequilibrae.modules.project_procedures import ProjectFromOSMDialog
 

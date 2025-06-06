@@ -98,7 +98,7 @@ def test_results_summary(coquimbo_project, qtbot, timeoutDetector):
         project_log = dialog.project.log()
         contents = project_log.contents()
 
-        assert """delaunay_test""" in contents[-1]
+        assert """delaunay_test""" in contents
 
 
 def test_example_function_with_kwargs(coquimbo_project, qtbot, timeoutDetector):
