@@ -3558,17 +3558,17 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="414"/>
         <source>result_name</source>
-        <translation type="unfinished"/>
+        <translation>nome_do_resultado</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="437"/>
         <source>Perform assignment</source>
-        <translation type="unfinished"/>
+        <translation>Executar alocação</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="450"/>
         <source>Matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matriz</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="457"/>
