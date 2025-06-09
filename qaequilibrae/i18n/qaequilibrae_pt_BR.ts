@@ -442,7 +442,7 @@
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="17"/>
         <source>AequilibraE Project Folder</source>
-        <translation type="unfinished"/>
+        <translation>Pasta de projeto do AequilibraE</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="24"/>
