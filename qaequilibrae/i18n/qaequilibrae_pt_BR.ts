@@ -3088,12 +3088,12 @@
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="42"/>
         <source>Demand matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matriz de demanda</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="50"/>
         <source>Demand matrix core</source>
-        <translation type="unfinished"/>
+        <translation>Núcleo da matriz de demanda</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="57"/>
