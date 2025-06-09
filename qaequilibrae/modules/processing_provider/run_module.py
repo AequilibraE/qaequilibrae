@@ -11,8 +11,6 @@ from qaequilibrae.modules.common_tools import list_func
 
 
 class RunModule(QgsProcessingAlgorithm):
-    PROJECT_FOLDER = "PROJECT_FOLDER"
-
     def initAlgorithm(self, config=None):
         try:
             # Attempt to retrieve the AequilibraE plugin instance

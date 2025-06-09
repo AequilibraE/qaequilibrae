@@ -40,6 +40,7 @@ from qaequilibrae.modules.processing_provider.project_from_OSM import ProjectFro
 from qaequilibrae.modules.processing_provider.project_from_layer import ProjectFromLayer
 from qaequilibrae.modules.processing_provider.provider import Provider
 from qaequilibrae.modules.processing_provider.renumber_nodes_from_layer import RenumberNodesFromLayer
+from qaequilibrae.modules.processing_provider.run_module import RunModule
 from qaequilibrae.modules.processing_provider.trip_length_distribution import TripLengthDistribution
 from .utilities import load_sfalls_from_layer, load_test_layer
 
@@ -523,3 +524,34 @@ def test_network_simplifier(folder_path):
 
     assert project.network.count_links() < links_before
     assert project.network.count_nodes() < nodes_before
+
+
+def test_run_module(folder_path):
+    project = create_example(folder_path)
+
+    parameters = {"available_funcs": 0}
+
+    action = RunModule()
+    action.filepath = join(project.project_base_path, "run/__init__.py")
+    action.items = ["matrix_summary", "graph_summary", "results_summary", "example_function_with_kwargs"]
+
+    # Mock context and feedback
+    class DummyContext:
+        pass
+
+    class DummyFeedback:
+        def pushInfo(self, msg):
+            pass
+
+        def reportError(self, msg):
+            pass
+
+    context = DummyContext()
+    feedback = DummyFeedback()
+
+    _ = action.processAlgorithm(parameters, context, feedback)
+
+    project_log = project.log()
+    contents = project_log.contents()[-1]
+
+    assert """{'demand_omx': {'matrix': {'total': 360600.0, 'min': 0.0, 'max': 4400.0, 'nnz': 528}}""" in contents
