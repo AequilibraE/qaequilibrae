@@ -3098,12 +3098,12 @@
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="57"/>
         <source>Skim matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matriz de custos</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="65"/>
         <source>Skim matrix core</source>
-        <translation type="unfinished"/>
+        <translation>Núcleo da matriz de custos</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="75"/>
