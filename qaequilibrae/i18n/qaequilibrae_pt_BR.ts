@@ -2122,7 +2122,7 @@
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="108"/>
         <source>turning links into nodes, and saving theses changes into the project.</source>
-        <translation type="unfinished"/>
+        <translation>simplificando links em nós, e salvando estas mudanças no projeto.</translation>
     </message>
 </context>
 <context>
