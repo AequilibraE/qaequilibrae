@@ -3538,7 +3538,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="379"/>
         <source>Network information</source>
-        <translation type="unfinished"/>
+        <translation>Informações da rede</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="388"/>
