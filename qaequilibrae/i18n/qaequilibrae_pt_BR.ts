@@ -2092,7 +2092,7 @@
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="15"/>
         <source>AequilibraE Project Folder</source>
-        <translation type="unfinished"/>
+        <translation>Pasta de projeto do AequilibraE</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="26"/>
