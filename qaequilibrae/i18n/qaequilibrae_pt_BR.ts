@@ -477,7 +477,7 @@
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="78"/>
         <source>This tool collapses links into nodes, adjusting the network in the neighborhood.</source>
-        <translation type="unfinished"/>
+        <translation>Esta ferramenta reduz links em nós, ajustando a rede em torno dessa modificação.</translation>
     </message>
 </context>
 <context>
