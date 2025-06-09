@@ -3573,12 +3573,12 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="457"/>
         <source>Matrix core</source>
-        <translation type="unfinished"/>
+        <translation>Núcleo da matriz</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="467"/>
         <source>Assignment class name</source>
-        <translation type="unfinished"/>
+        <translation>Nome da classe</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="95"/>
