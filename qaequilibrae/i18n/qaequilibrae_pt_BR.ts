@@ -3083,7 +3083,7 @@
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="83"/>
         <source>No AequilibraE project loaded.</source>
-        <translation type="unfinished"/>
+        <translation>Não há projeto do AequilibraE aberto.</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="42"/>
