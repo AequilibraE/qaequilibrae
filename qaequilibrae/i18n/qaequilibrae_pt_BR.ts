@@ -3458,7 +3458,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="75"/>
         <source>Connector method</source>
-        <translation type="unfinished"/>
+        <translation>Método dos conectores</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="105"/>
