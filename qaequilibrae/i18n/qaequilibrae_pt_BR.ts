@@ -3508,7 +3508,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="290"/>
         <source>...</source>
-        <translation type="unfinished"/>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="328"/>
