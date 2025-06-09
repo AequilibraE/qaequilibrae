@@ -3118,7 +3118,7 @@
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="166"/>
         <source>Trip length distribution</source>
-        <translation type="unfinished"/>
+        <translation>Distribuição de duração da viagem</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="169"/>
