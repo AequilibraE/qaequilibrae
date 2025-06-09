@@ -3108,12 +3108,12 @@
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="75"/>
         <source>File path</source>
-        <translation type="unfinished"/>
+        <translation>Caminho para o arquivo</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="96"/>
         <source>AequilibraE module not found</source>
-        <translation type="unfinished"/>
+        <translation>O módulo AequilibraE não foi encontrado.</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="166"/>
