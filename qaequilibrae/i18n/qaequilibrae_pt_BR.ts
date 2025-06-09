@@ -472,7 +472,7 @@
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="72"/>
         <source>5. Network</source>
-        <translation type="unfinished"/>
+        <translation>5. Rede</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="78"/>
