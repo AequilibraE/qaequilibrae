@@ -3483,7 +3483,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="119"/>
         <source>Walking edges</source>
-        <translation type="unfinished"/>
+        <translation>Bordas caminháveis</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="68"/>
