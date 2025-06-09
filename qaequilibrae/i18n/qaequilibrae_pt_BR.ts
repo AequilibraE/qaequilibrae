@@ -3128,7 +3128,7 @@
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="175"/>
         <source>Creates a trip-length distribution histogram and save in an output folder.</source>
-        <translation type="unfinished"/>
+        <translation>Cria um histograma contendo a distribuição de duração das viagens e salva em uma pasta externa.</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="72"/>
