@@ -3583,7 +3583,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="95"/>
         <source>Use existing graph</source>
-        <translation type="unfinished"/>
+        <translation>Usar grafo existente</translation>
     </message>
 </context>
 <context>
