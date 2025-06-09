@@ -1519,7 +1519,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="37"/>
         <source>Description</source>
-        <translation type="unfinished"/>
+        <translation>Descrição</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="44"/>
