@@ -462,7 +462,7 @@
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="50"/>
         <source>Error parsing link IDs: {e}</source>
-        <translation type="unfinished"/>
+        <translation>Erro ao analisar os links IDs: {e}</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="69"/>
