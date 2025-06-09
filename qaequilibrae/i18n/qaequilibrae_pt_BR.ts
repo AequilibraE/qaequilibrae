@@ -3488,7 +3488,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="68"/>
         <source>Inner stops transfers</source>
-        <translation type="unfinished"/>
+        <translation>Transferências para paradas internas</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="129"/>
