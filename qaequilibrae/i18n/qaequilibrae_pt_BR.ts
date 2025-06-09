@@ -3518,12 +3518,12 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="251"/>
         <source>Compute skims</source>
-        <translation type="unfinished"/>
+        <translation>Calcular custos</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="347"/>
         <source>Available skims</source>
-        <translation type="unfinished"/>
+        <translation>Custos disponíveis</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="358"/>
