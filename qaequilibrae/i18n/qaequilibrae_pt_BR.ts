@@ -3493,7 +3493,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="129"/>
         <source>Block centroid flows</source>
-        <translation type="unfinished"/>
+        <translation>Limitar fluxo aos centroides</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="163"/>
