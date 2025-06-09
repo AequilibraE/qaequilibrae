@@ -467,7 +467,7 @@
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="69"/>
         <source>Collapse links</source>
-        <translation type="unfinished"/>
+        <translation>Simplificar links</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="72"/>
