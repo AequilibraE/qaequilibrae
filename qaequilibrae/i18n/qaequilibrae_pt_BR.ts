@@ -447,12 +447,12 @@
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="24"/>
         <source>Link IDs (comma-separated)</source>
-        <translation type="unfinished"/>
+        <translation>IDs dos links (separados por vírgula)</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="34"/>
         <source>AequilibraE module not found</source>
-        <translation type="unfinished"/>
+        <translation>O módulo AequilibraE não foi encontrado.</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="44"/>
