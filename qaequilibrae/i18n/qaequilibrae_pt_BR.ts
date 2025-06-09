@@ -2107,12 +2107,12 @@
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="97"/>
         <source>Network simplifier</source>
-        <translation type="unfinished"/>
+        <translation>Simplificador de rede</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="100"/>
         <source>5. Network</source>
-        <translation type="unfinished"/>
+        <translation>5. Rede</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="107"/>
