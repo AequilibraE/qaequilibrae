@@ -33,7 +33,7 @@ class RunModuleDialog(QtWidgets.QDialog, FORM_CLASS):
 
         func_name = self.items[self.cob_function.currentIndex()]
         func = getattr(module, func_name)
-        result = func()  # If the function needs arguments, supply them here
+        result = func()
         self.logger.info(result)
 
         self.iface.messageBar().pushMessage("Run module executed", "", level=Qgis.Info, duration=5)

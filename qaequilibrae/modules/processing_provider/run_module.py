@@ -63,7 +63,7 @@ class RunModule(QgsProcessingAlgorithm):
         func_name = self.items[idx]
 
         func = getattr(module, func_name)
-        result = func()  # If the function needs arguments, supply them here
+        result = func()
         logger.info(result)
 
         return {"Output": "Success: Check logfile for details"}
