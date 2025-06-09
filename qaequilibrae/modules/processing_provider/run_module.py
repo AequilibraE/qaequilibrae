@@ -1,0 +1,92 @@
+from importlib.util import spec_from_file_location, module_from_spec
+from os.path import join
+
+from aequilibrae.context import get_logger
+from qgis.core import QgsProcessingAlgorithm, QgsMessageLog, QgsProcessingParameterString
+from qgis.core import QgsProcessingParameterEnum
+from qgis.utils import plugins
+
+from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.common_tools import list_func
+
+
+class RunModule(QgsProcessingAlgorithm):
+    PROJECT_FOLDER = "PROJECT_FOLDER"
+
+    def initAlgorithm(self, config=None):
+        try:
+            # Attempt to retrieve the AequilibraE plugin instance
+            aeq_plugin = plugins.get("qaequilibrae")
+
+            if not aeq_plugin:
+                self.addParameter(
+                    QgsProcessingParameterString(
+                        "PROJECT_INFO", self.tr("No AequilibraE project loaded."), optional=True
+                    )
+                )
+                return
+            else:
+                self.project = aeq_plugin.project
+
+            # Check if there's an open project and fetch its information
+            if self.project:
+                self.filepath = join(self.project.project_base_path, "run/__init__.py")
+                self.items = list_func(self.filepath)
+                self.addParameter(
+                    QgsProcessingParameterEnum(
+                        "available_funcs",
+                        self.tr("Available functions"),
+                        self.items,
+                        defaultValue=0,
+                    )
+                )
+            else:
+                self.addParameter(
+                    QgsProcessingParameterString(
+                        "PROJECT_INFO", self.tr("No AequilibraE project loaded."), optional=True
+                    )
+                )
+
+        except Exception as e:
+            # Handle cases where the plugin or project information is not accessible
+            QgsMessageLog.logMessage(f"Error checking AequilibraE project: {str(e)}")
+
+    def processAlgorithm(self, parameters, context, feedback):
+        feedback.pushInfo("Get logger")
+        logger = get_logger()
+
+        feedback.pushInfo("Define spec from location")
+        spec = spec_from_file_location("__init__", self.filepath)
+        module = module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        feedback.pushInfo("Run")
+        idx = parameters["available_funcs"]
+        func_name = self.items[idx]
+
+        func = getattr(module, func_name)
+        result = func()  # If the function needs arguments, supply them here
+        logger.info(result)
+
+        return {"Output": "Success: Check logfile for details"}
+
+    def name(self):
+        return "runmodule"
+
+    def displayName(self):
+        return self.tr("Run module")
+
+    def group(self):
+        return self.tr("1. Model Building")
+
+    def groupId(self):
+        return "modelbuilding"
+
+    def shortHelpString(self):
+        return self.tr("Run module")
+
+    def createInstance(self):
+        return RunModule()
+
+    def tr(self, message):
+        return trlt("RunModule", message)

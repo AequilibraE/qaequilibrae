@@ -1,3 +1,4 @@
+import ast
 import math
 import tempfile
 from os.path import isdir
@@ -113,3 +114,11 @@ def model_area_polygon(poly) -> Union[Polygon, int]:
     tol = 1e-3
     zones = poly.to_crs(4326)
     return zones.union_all().buffer(tol).buffer(-tol), 4326
+
+
+def list_func(filepath):
+    """Lists the existing functions in a file."""
+    with open(filepath, "r", encoding="utf-8") as f:
+        file_content = f.read()
+    tree = ast.parse(file_content)
+    return [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
