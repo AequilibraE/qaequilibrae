@@ -1514,7 +1514,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="14"/>
         <source>AequilibraE - Add new period</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Adicionar novo período</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="37"/>
