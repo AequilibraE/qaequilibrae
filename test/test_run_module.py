@@ -96,7 +96,7 @@ def test_results_summary(coquimbo_project, qtbot, timeoutDetector):
         qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
         project_log = dialog.project.log()
-        contents = project_log.contents()
+        contents = str(project_log.contents())
 
         assert """delaunay_test""" in contents
 
