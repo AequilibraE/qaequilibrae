@@ -3133,7 +3133,7 @@
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="72"/>
         <source>Plot name</source>
-        <translation type="unfinished"/>
+        <translation>Nome da figura</translation>
     </message>
 </context>
 <context>
@@ -3443,7 +3443,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="29"/>
         <source>Period</source>
-        <translation type="unfinished"/>
+        <translation>Período</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="35"/>
