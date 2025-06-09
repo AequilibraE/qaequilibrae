@@ -3123,7 +3123,7 @@
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="169"/>
         <source>2. Data</source>
-        <translation type="unfinished"/>
+        <translation>2. Dados</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/trip_length_distribution.py" line="175"/>
