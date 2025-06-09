@@ -2097,12 +2097,12 @@
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="26"/>
         <source>AequilibraE module not found</source>
-        <translation type="unfinished"/>
+        <translation>O módulo AequilibraE não foi encontrado.</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="36"/>
         <source>{project_folder} does not contain an AequilibraE model: {e}</source>
-        <translation type="unfinished"/>
+        <translation>A pasta &apos;{project_folder}&apos; não contém um modelo do AequilibraE: {e}</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="97"/>
