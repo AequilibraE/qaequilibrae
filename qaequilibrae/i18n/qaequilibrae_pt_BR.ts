@@ -3453,7 +3453,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="46"/>
         <source>Transit Graph</source>
-        <translation type="unfinished"/>
+        <translation>Grafo para transporte público</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="75"/>
