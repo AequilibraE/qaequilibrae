@@ -81,7 +81,7 @@ class RunModule(QgsProcessingAlgorithm):
         return "modelbuilding"
 
     def shortHelpString(self):
-        return self.tr("Run module")
+        return self.tr("Run entire model pipelines from AequilibraE")
 
     def createInstance(self):
         return RunModule()

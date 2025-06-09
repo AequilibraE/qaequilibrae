@@ -89,6 +89,18 @@ project only specifying the place name and the folder path and name you want to 
     :align: center
     :alt: Processing provider create project from osm
 
+Run module
+~~~~~~~~~~~
+This tool is similar to the widget menu :ref:`Run module <run-module>`, and allows you to 
+
+.. important::
+
+    An open AequilibraE project is required for this tool to work.
+
+.. image:: images/processing_provider_run_module.png
+    :align: center
+    :alt: Processing provider run module
+
 Data
 ----
 Create AequilibraE Matrix from layer

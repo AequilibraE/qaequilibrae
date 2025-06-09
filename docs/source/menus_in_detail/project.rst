@@ -80,6 +80,18 @@ using the **save to disk** button in the lower left corner of the log file box.
     :align: center
     :alt: proj logfile
 
+.. _run-module:
+
+Run module
+----------
+
+The run module allows 
+
+.. image:: ../images/run_module_dialog.png
+    :align: center
+    :alt: run module dialog
+
+
 .. Video tutorial
 .. --------------
 
