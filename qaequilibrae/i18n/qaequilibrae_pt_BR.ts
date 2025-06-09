@@ -3468,7 +3468,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="82"/>
         <source>Save transit graph to database</source>
-        <translation type="unfinished"/>
+        <translation>Salvar grafo de transporte público no banco de dados</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="112"/>
