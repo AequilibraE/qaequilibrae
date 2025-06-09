@@ -1539,7 +1539,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="81"/>
         <source>Add Period</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar período</translation>
     </message>
 </context>
 <context>
