@@ -3473,7 +3473,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="112"/>
         <source>Match graph for mode</source>
-        <translation type="unfinished"/>
+        <translation>Grafo equivalente ao modo</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="58"/>
