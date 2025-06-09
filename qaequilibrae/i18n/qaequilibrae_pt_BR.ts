@@ -3528,7 +3528,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="358"/>
         <source>matrix_name</source>
-        <translation type="unfinished"/>
+        <translation>nome_da_matriz</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="373"/>
