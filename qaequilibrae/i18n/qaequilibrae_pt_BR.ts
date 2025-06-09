@@ -3543,7 +3543,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="388"/>
         <source>Travel Time</source>
-        <translation type="unfinished"/>
+        <translation>Tempo de viagem</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="395"/>
