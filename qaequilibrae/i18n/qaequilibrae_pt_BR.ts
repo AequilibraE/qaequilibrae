@@ -2117,7 +2117,7 @@
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="107"/>
         <source>This tool simplifies the network, merging short links into longer ones or</source>
-        <translation type="unfinished"/>
+        <translation>Esta ferramenta simplifica a rede, unindo links mais curtos em links mais longos ou</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/network_simplifier.py" line="108"/>
