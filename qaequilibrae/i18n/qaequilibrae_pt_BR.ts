@@ -457,7 +457,7 @@
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="44"/>
         <source>{project_folder} does not contain an AeqilibraE model: {e}</source>
-        <translation type="unfinished"/>
+        <translation>A pasta &apos;{project_folder}&apos; não contém um modelo do AequilibraE: {e}</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="50"/>
