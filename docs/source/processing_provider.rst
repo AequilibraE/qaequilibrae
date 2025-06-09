@@ -92,6 +92,9 @@ project only specifying the place name and the folder path and name you want to 
 Run module
 ~~~~~~~~~~~
 This tool is similar to the widget menu :ref:`Run module <run-module>`, and allows you to 
+use defined entry points and arguments, and run models to the model itself. To use thie tool,
+just select one of the available functions, and once the algorithm is finished, go to the log
+file to check the outputs.
 
 .. important::
 
