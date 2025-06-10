@@ -67,8 +67,8 @@ def test_logfile_menu(ae, qtbot):
 
 
 def test_run_module_menu(ae, qtbot):
-    action = next((a for a in ae.menuActions["Project"] if a.text() == "Run module"), None)
-    assert action is not None, "Menu action 'Run module' not found"
+    action = next((a for a in ae.menuActions["Project"] if a.text() == "Run procedures"), None)
+    assert action is not None, "Menu action 'Run procedures' not found"
     assert action.text() == "Run procedures", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
