@@ -3463,7 +3463,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="105"/>
         <source>Line geometry method</source>
-        <translation type="unfinished"/>
+        <translation>Método de geometria de linha</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="82"/>
