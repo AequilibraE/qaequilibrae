@@ -112,7 +112,7 @@ class AequilibraEMenu:
         self.add_menu_action(self.tr("Project"), self.tr("Create example"), partial(create_example, self))
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Run module"), partial(run_module, self))
+        self.add_menu_action(self.tr("Project"), self.tr("Run procedures"), partial(run_module, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
 
         # # # ########################################################################

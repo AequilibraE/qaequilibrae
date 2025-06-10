@@ -78,7 +78,7 @@ def test_run_module_menu(coquimbo_project, qtbot):
         check_if_new_active_window_matches_class(qtbot, RunModuleDialog)
 
     action = coquimbo_project.menuActions["Project"][4]
-    assert action.text() == "Run module", "Wrong text content"
+    assert action.text() == "Run procedures", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = coquimbo_project.iface.messageBar()

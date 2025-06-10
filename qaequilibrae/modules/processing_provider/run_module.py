@@ -10,7 +10,7 @@ from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.common_tools import list_func
 
 
-class RunModule(QgsProcessingAlgorithm):
+class RunProcedures(QgsProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         try:
             # Attempt to retrieve the AequilibraE plugin instance
@@ -69,10 +69,10 @@ class RunModule(QgsProcessingAlgorithm):
         return {"Output": "Success: Check logfile for details"}
 
     def name(self):
-        return "runmodule"
+        return "runprocedures"
 
     def displayName(self):
-        return self.tr("Run module")
+        return self.tr("Run procedures")
 
     def group(self):
         return self.tr("1. Model Building")
@@ -84,7 +84,7 @@ class RunModule(QgsProcessingAlgorithm):
         return self.tr("Run entire model pipelines from AequilibraE")
 
     def createInstance(self):
-        return RunModule()
+        return RunProcedures()
 
     def tr(self, message):
-        return trlt("RunModule", message)
+        return trlt("RunProcedures", message)

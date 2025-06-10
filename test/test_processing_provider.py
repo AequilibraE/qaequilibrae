@@ -40,7 +40,7 @@ from qaequilibrae.modules.processing_provider.project_from_OSM import ProjectFro
 from qaequilibrae.modules.processing_provider.project_from_layer import ProjectFromLayer
 from qaequilibrae.modules.processing_provider.provider import Provider
 from qaequilibrae.modules.processing_provider.renumber_nodes_from_layer import RenumberNodesFromLayer
-from qaequilibrae.modules.processing_provider.run_module import RunModule
+from qaequilibrae.modules.processing_provider.run_module import RunProcedures
 from qaequilibrae.modules.processing_provider.trip_length_distribution import TripLengthDistribution
 from .utilities import load_sfalls_from_layer, load_test_layer
 
@@ -531,7 +531,7 @@ def test_run_module(folder_path):
 
     parameters = {"available_funcs": 0}
 
-    action = RunModule()
+    action = RunProcedures()
     action.filepath = join(project.project_base_path, "run/__init__.py")
     action.items = ["matrix_summary", "graph_summary", "results_summary", "example_function_with_kwargs"]
 

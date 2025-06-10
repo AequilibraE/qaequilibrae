@@ -36,7 +36,7 @@ class RunModuleDialog(QtWidgets.QDialog, FORM_CLASS):
         result = func()
         self.logger.info(result)
 
-        self.iface.messageBar().pushMessage("Run module executed", "", level=Qgis.Info, duration=5)
+        self.iface.messageBar().pushMessage(self.tr("Run procedures executed"), "", level=Qgis.Info, duration=5)
 
         self.exit_procedure()
 

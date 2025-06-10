@@ -69,7 +69,7 @@ def test_logfile_menu(ae, qtbot):
 def test_run_module_menu(ae, qtbot):
     action = next((a for a in ae.menuActions["Project"] if a.text() == "Run module"), None)
     assert action is not None, "Menu action 'Run module' not found"
-    assert action.text() == "Run module", "Wrong text content"
+    assert action.text() == "Run procedures", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
