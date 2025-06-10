@@ -3438,7 +3438,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="14"/>
         <source>AequilibraE - PT Skimming and Assignment</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Transporte Público - Matrizes de custo e alocação</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="29"/>
