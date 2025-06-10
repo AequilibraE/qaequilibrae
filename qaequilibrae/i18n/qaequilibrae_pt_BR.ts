@@ -391,7 +391,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="162"/>
         <source>Skimming and Assignment</source>
-        <translation type="unfinished"/>
+        <translation>Matriz de custos e alocação</translation>
     </message>
 </context>
 <context>
