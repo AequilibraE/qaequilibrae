@@ -3503,7 +3503,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="175"/>
         <source>Perfom skimming</source>
-        <translation type="unfinished"/>
+        <translation>Calcular custos</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_skimming_assignment.ui" line="290"/>
