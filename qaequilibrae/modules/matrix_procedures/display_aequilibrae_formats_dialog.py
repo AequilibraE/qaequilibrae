@@ -37,6 +37,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.selected_col = None
         self.selected_row = None
         self.omx = None
+        self.view_layer = None
 
         if len(file_path) > 0:
             self.data_path = file_path
@@ -145,7 +146,10 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
             self.no_mapping = QRadioButton()
             self.no_mapping.setText(self.tr("No mapping"))
-            self.no_mapping.toggled.connect(self.set_mapping)
+            self.no_mapping.toggled.connect(self.remove_mapping_layer)
+
+            self.cob_layer = QComboBox()
+            self.cob_layer.addItems(["zones", "centroids", "nodes"])
 
             self.by_row = QRadioButton()
             self.by_row.setText(self.tr("By origin"))
@@ -163,7 +167,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.mapping_layout.addWidget(self.no_mapping)
             self.mapping_layout.addWidget(self.by_row)
             self.mapping_layout.addWidget(self.by_col)
+            self.mapping_layout.addWidget(self.cob_layer)
             self.mapping_layout.addWidget(self.cob_colors)
+
             self._layout.addItem(self.mapping_layout)
 
         self.but_export = QPushButton()
@@ -190,7 +196,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if not col_id:
             return
         self.selected_col = col_id[0]
-        self.zones_layer.selectByExpression(f'"zone_id"={self.indices[col_id[0]]}', QgsVectorLayer.SetSelection)
+        self.view_layer.selectByExpression(f'"{self.col_id}"={self.indices[col_id[0]]}', QgsVectorLayer.SetSelection)
         self.iface.mapCanvas().refresh()
 
         core = self.mat_list.currentText()
@@ -204,7 +210,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if not row_id:
             return
         self.selected_row = row_id[0]
-        self.zones_layer.selectByExpression(f'"zone_id"={self.indices[row_id[0]]}', QgsVectorLayer.SetSelection)
+        self.view_layer.selectByExpression(f'"{self.col_id}"={self.indices[row_id[0]]}', QgsVectorLayer.SetSelection)
 
         core = self.mat_list.currentText()
         dt = np.array(self.data_to_show.matrix[core][row_id[0], :]).reshape(self.indices.shape[0])
@@ -213,9 +219,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def map_dt(self, dt):
         self.remove_mapping_layer(False)
-        df = pd.DataFrame({"zone_id": self.indices, "data": dt})
+        df = pd.DataFrame({self.col_id: self.indices, "data": dt})
         self.mapping_layer = layer_from_dataframe(df, "matrix_row")
-        self.make_join(self.zones_layer, "zone_id", self.mapping_layer)
+        self.make_join(self.view_layer, self.col_id, self.mapping_layer)
         self.draw_zone_styles()
 
     def make_join(self, base_layer, join_field, metric_layer):
@@ -231,7 +237,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def draw_zone_styles(self):
         color_ramp_name = self.cob_colors.currentText()
 
-        self.map_ranges("metrics_data", self.zones_layer, color_ramp_name)
+        self.map_ranges("metrics_data", self.view_layer, color_ramp_name)
 
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
@@ -345,8 +351,11 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             return
 
         if self.from_proj:
-            self.zones_layer = self.qgis_project.layers["zones"][0]
-            QgsProject.instance().addMapLayer(self.zones_layer)
+            lyr = self.cob_layer.currentText()
+            self.layer_name = "zones" if lyr == "zones" else "nodes"
+            self.view_layer = self.qgis_project.layers[self.layer_name][0]
+            self.col_id = "zone_id" if self.layer_name == "zones" else "node_id"
+            QgsProject.instance().addMapLayer(self.view_layer)
 
         self.remove_mapping_layer()
         if self.no_mapping.isChecked():
@@ -373,12 +382,14 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def remove_mapping_layer(self, clear_selection=True):
         self.remove_data_layer()
-        for lien in self.zones_layer.vectorJoins():
-            self.zones_layer.removeJoin(lien.joinLayerId())
-        self.mapping_layer = None
-        if clear_selection:
-            self.zones_layer.selectByExpression('"zone_id"-<1000', QgsVectorLayer.SetSelection)
-        self.zones_layer.triggerRepaint()
+        if self.view_layer is not None:
+            for lien in self.view_layer.vectorJoins():
+                self.view_layer.removeJoin(lien.joinLayerId())
+            self.mapping_layer = None
+            if clear_selection:
+                exp = '"zone_id"-<1000' if self.layer_name == "zones" else '"node_id"-<1000'
+                self.view_layer.selectByExpression(exp, QgsVectorLayer.SetSelection)
+            self.view_layer.triggerRepaint()
 
     def format_showing(self):
         if self.data_to_show is None:
