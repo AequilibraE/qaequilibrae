@@ -1,13 +1,9 @@
-from importlib.util import spec_from_file_location, module_from_spec
-from os.path import join
-
 from aequilibrae.context import get_logger
 from qgis.core import QgsProcessingAlgorithm, QgsMessageLog, QgsProcessingParameterString
 from qgis.core import QgsProcessingParameterEnum
 from qgis.utils import plugins
 
 from qaequilibrae.i18n.translate import trlt
-from qaequilibrae.modules.common_tools import list_func
 
 
 class RunProcedures(QgsProcessingAlgorithm):
@@ -28,8 +24,7 @@ class RunProcedures(QgsProcessingAlgorithm):
 
             # Check if there's an open project and fetch its information
             if self.project:
-                self.filepath = join(self.project.project_base_path, "run/__init__.py")
-                self.items = list_func(self.filepath)
+                self.items = list(self.project.parameters["run"].keys())
                 self.addParameter(
                     QgsProcessingParameterEnum(
                         "available_funcs",
@@ -53,16 +48,11 @@ class RunProcedures(QgsProcessingAlgorithm):
         feedback.pushInfo("Get logger")
         logger = get_logger()
 
-        feedback.pushInfo("Define spec from location")
-        spec = spec_from_file_location("__init__", self.filepath)
-        module = module_from_spec(spec)
-        spec.loader.exec_module(module)
-
         feedback.pushInfo("Run")
         idx = parameters["available_funcs"]
         func_name = self.items[idx]
 
-        func = getattr(module, func_name)
+        func = getattr(self.project.run, func_name)
         result = func()
         logger.info(result)
 

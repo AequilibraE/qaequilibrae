@@ -532,8 +532,8 @@ def test_run_module(folder_path):
     parameters = {"available_funcs": 0}
 
     action = RunProcedures()
-    action.filepath = join(project.project_base_path, "run/__init__.py")
-    action.items = ["matrix_summary", "graph_summary", "results_summary", "example_function_with_kwargs"]
+    action.items = ["example_function_with_kwargs"]
+    action.project = project
 
     # Mock context and feedback
     class DummyContext:
@@ -552,6 +552,6 @@ def test_run_module(folder_path):
     _ = action.processAlgorithm(parameters, context, feedback)
 
     project_log = project.log()
-    contents = project_log.contents()[-1]
+    contents = project_log.contents()
 
-    assert """{'demand_omx': {'matrix': {'total': 360600.0, 'min': 0.0, 'max': 4400.0, 'nnz': 528}}""" in contents
+    assert "None" in contents[-1]

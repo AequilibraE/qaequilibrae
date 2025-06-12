@@ -1,12 +1,10 @@
 from os.path import join
 from unittest import mock
-import pytest
 import sqlite3
 
 import numpy as np
 import pandas as pd
 from aequilibrae.parameters import Parameters
-from aequilibrae.utils.create_delaunay_network import DelaunayAnalysis
 from qgis.PyQt.QtCore import Qt
 
 from qaequilibrae.modules.project_procedures.run_module_dialog import RunModuleDialog
@@ -58,7 +56,7 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
 \tda.create_network(source, overwrite)\n
 \tda.assign_matrix(mat, result_name)\n
 """
-    # pprint.pp(func_string)
+
     folder = coquimbo_project.project.project_base_path
 
     with open(join(folder, "run", "create_delaunay.py"), "w") as file:
@@ -86,6 +84,8 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
         MockLogDialog.return_value.show = lambda *args, **kwargs: None
 
         dialog = create_dialog_with_matrix(coquimbo_project)
+
+        assert len(dialog.items) > 1
 
         dialog.cob_function.setCurrentIndex(0)
         assert dialog.cob_function.currentText() == "create_delaunay"
