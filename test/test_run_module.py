@@ -1,7 +1,11 @@
 from os.path import join
 from unittest import mock
+import pytest
+import sqlite3
 
 import numpy as np
+import pandas as pd
+from aequilibrae.parameters import Parameters
 from aequilibrae.utils.create_delaunay_network import DelaunayAnalysis
 from qgis.PyQt.QtCore import Qt
 
@@ -22,85 +26,6 @@ def create_dialog_with_matrix(project):
     return RunModuleDialog(project)
 
 
-def test_matrix_summary(coquimbo_project, qtbot, timeoutDetector):
-    with mock.patch("qaequilibrae.modules.project_procedures.run_module_dialog.LogDialog") as MockLogDialog:
-        # Make exec_ do nothing
-        MockLogDialog.return_value.exec_ = lambda *args, **kwargs: None
-        MockLogDialog.return_value.show = lambda *args, **kwargs: None
-
-        dialog = create_dialog_with_matrix(coquimbo_project)
-
-        dialog.cob_function.setCurrentIndex(0)
-        assert dialog.cob_function.currentText() == functions[0]
-
-        qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
-
-        project_log = dialog.project.log()
-        contents = project_log.contents()
-
-        mat_info = """{"b\'\'": {\'demand\': {\'total\': 176890.0, \'min\': 10.0, \'max\': 10.0, \'nnz\': 17689}}}"""
-        assert mat_info in contents[-1]
-
-
-def test_graph_summary(coquimbo_project, qtbot, timeoutDetector):
-    project = coquimbo_project.project
-
-    network = project.network
-    network.build_graphs(modes=["c"])
-
-    graph = network.graphs["c"]
-    graph.set_graph("distance")
-    graph.set_skimming("distance")
-    graph.set_blocked_centroid_flows(False)
-
-    # Patch LogDialog to avoid modal exec_ blocking the test
-    with mock.patch("qaequilibrae.modules.project_procedures.run_module_dialog.LogDialog") as MockLogDialog:
-        # Make exec_ do nothing
-        MockLogDialog.return_value.exec_ = lambda *args, **kwargs: None
-        MockLogDialog.return_value.show = lambda *args, **kwargs: None
-
-        dialog = RunModuleDialog(coquimbo_project)
-
-        dialog.cob_function.setCurrentIndex(1)
-        assert dialog.cob_function.currentText() == functions[1]
-
-        qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
-
-        project_log = dialog.project.log()
-        contents = project_log.contents()
-
-        mat_info = """{'c': {'num_links': 34546, 'num_nodes': 15724, 'num_zones': 133, 'compact_num_links': 18375, 'compact_num_nodes': 6777}}"""
-        assert mat_info in contents[-1]
-
-
-def test_results_summary(coquimbo_project, qtbot, timeoutDetector):
-    with mock.patch("qaequilibrae.modules.project_procedures.run_module_dialog.LogDialog") as MockLogDialog:
-        # Make exec_ do nothing
-        MockLogDialog.return_value.exec_ = lambda *args, **kwargs: None
-        MockLogDialog.return_value.show = lambda *args, **kwargs: None
-
-        dialog = create_dialog_with_matrix(coquimbo_project)
-
-        project = coquimbo_project.project
-        da = DelaunayAnalysis(project)
-        da.create_network("zones")
-
-        demand = project.matrices.get_matrix("b''")
-        demand.computational_view(["demand"])
-
-        da.assign_matrix(demand, "delaunay_test")
-
-        dialog.cob_function.setCurrentIndex(2)
-        assert dialog.cob_function.currentText() == functions[2]
-
-        qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
-
-        project_log = dialog.project.log()
-        contents = str(project_log.contents())
-
-        assert """delaunay_test""" in contents
-
-
 def test_example_function_with_kwargs(coquimbo_project, qtbot, timeoutDetector):
     # Patch LogDialog to avoid modal exec_ blocking the test
     with mock.patch("qaequilibrae.modules.project_procedures.run_module_dialog.LogDialog") as MockLogDialog:
@@ -110,7 +35,7 @@ def test_example_function_with_kwargs(coquimbo_project, qtbot, timeoutDetector):
 
         dialog = RunModuleDialog(coquimbo_project)
 
-        dialog.cob_function.setCurrentIndex(3)
+        dialog.cob_function.setCurrentIndex(0)
         assert dialog.cob_function.currentText() == functions[3]
 
         qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
@@ -119,3 +44,57 @@ def test_example_function_with_kwargs(coquimbo_project, qtbot, timeoutDetector):
         contents = project_log.contents()
 
         assert "None" in contents[-1]
+
+
+def test_new_function(coquimbo_project, qtbot, timeoutDetector):
+    func_string = """from aequilibrae.context import get_active_project\n
+def create_delaunay(source: str, name: str, computational_view: str, result_name: str, overwrite: bool=False):\n
+\tfrom aequilibrae.utils.create_delaunay_network import DelaunayAnalysis\n
+\tproject = get_active_project()\n
+\tmatrix = project.matrices\n
+\tmat = matrix.get_matrix(name)\n
+\tmat.computational_view(computational_view)\n
+\tda = DelaunayAnalysis(project)\n
+\tda.create_network(source, overwrite)\n
+\tda.assign_matrix(mat, result_name)\n
+"""
+    # pprint.pp(func_string)
+    folder = coquimbo_project.project.project_base_path
+
+    with open(join(folder, "run", "create_delaunay.py"), "w") as file:
+        file.write(func_string)
+
+    with open(join(folder, "run", "__init__.py"), "r") as file:
+        lines = file.readlines()
+
+    lines.insert(19, "from .create_delaunay import create_delaunay\n")
+
+    with open(join(folder, "run", "__init__.py"), "w") as file:
+        file.writelines(lines)
+
+    p = Parameters(coquimbo_project.project)
+    p.parameters["run"]["create_delaunay"] = {}
+    p.parameters["run"]["create_delaunay"]["source"] = "zones"
+    p.parameters["run"]["create_delaunay"]["name"] = "b''"
+    p.parameters["run"]["create_delaunay"]["computational_view"] = "demand"
+    p.parameters["run"]["create_delaunay"]["result_name"] = "delaunay_test"
+    p.write_back()
+
+    with mock.patch("qaequilibrae.modules.project_procedures.run_module_dialog.LogDialog") as MockLogDialog:
+        # Make exec_ do nothing
+        MockLogDialog.return_value.exec_ = lambda *args, **kwargs: None
+        MockLogDialog.return_value.show = lambda *args, **kwargs: None
+
+        dialog = create_dialog_with_matrix(coquimbo_project)
+
+        dialog.cob_function.setCurrentIndex(0)
+        assert dialog.cob_function.currentText() == "create_delaunay"
+
+        qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+
+    res_path = join(coquimbo_project.project.project_base_path, "results_database.sqlite")
+    conn = sqlite3.connect(res_path)
+
+    results = pd.read_sql("SELECT * FROM delaunay_test", conn).set_index("link_id")
+
+    assert results.shape != (0, 0)
