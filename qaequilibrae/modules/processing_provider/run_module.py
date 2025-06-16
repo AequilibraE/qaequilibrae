@@ -24,7 +24,7 @@ class RunProcedures(QgsProcessingAlgorithm):
 
             # Check if there's an open project and fetch its information
             if self.project:
-                self.items = list(self.project.parameters["run"].keys())
+                self.items = list(self.project.run._fields)
                 self.addParameter(
                     QgsProcessingParameterEnum(
                         "available_funcs",
