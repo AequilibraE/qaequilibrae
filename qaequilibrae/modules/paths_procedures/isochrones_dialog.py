@@ -48,10 +48,10 @@ class IsochronesDialog(QDialog, FORM_CLASS):
 
         self.cob_layer.addItems(["zones", "centroids", "nodes"])
 
-        self.but_plot.clicked.connect(self.run)
-
         if self.layer:
-            self.layer.selectionChanged.connect(self.map_dt)
+            self.layer.selectionChanged.connect(self.select_after)
+
+        self.but_plot.clicked.connect(self.run)
 
     def exit_procedure(self):
         self.close()
@@ -90,8 +90,9 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
 
         # First, we check if we have numeric values in our column
-        idx = int(self.line_start_id.text()) - 1
-        all_values = self.data_to_show[idx, :]
+        all_values = []
+        for _, f in enumerate(layer.getFeatures()):
+            all_values.append(f["isochrones_data"])
 
         all_values = np.array(all_values, dtype=np.float32)
         values = np.unique(all_values)
@@ -197,17 +198,17 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         lien.setJoinLayerId(metric_layer.id())
         lien.setUsingMemoryCache(True)
         lien.setJoinLayer(metric_layer)
-        lien.setPrefix("metrics_")
+        lien.setPrefix("isochrones_")
         base_layer.addJoin(lien)
 
     def remove_mapping_layer(self, clear_selection=True):
         self.remove_data_layer()
-        for lien in self.zones_layer.vectorJoins():
-            self.zones_layer.removeJoin(lien.joinLayerId())
+        for lien in self.layer.vectorJoins():
+            self.layer.removeJoin(lien.joinLayerId())
         self.mapping_layer = None
         if clear_selection:
-            self.zones_layer.selectByExpression('"zone_id"-<1000', QgsVectorLayer.SetSelection)
-        self.zones_layer.triggerRepaint()
+            self.layer.selectByExpression(f'"{self.layer_col}"-<1000', QgsVectorLayer.SetSelection)
+        self.layer.triggerRepaint()
 
     def remove_data_layer(self):
         active_layers = [name.name() for name in QgsProject.instance().mapLayers().values()]
@@ -224,6 +225,9 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         self.mapping_layer = layer_from_dataframe(df, "isochrones")
         self.make_join(self.layer, self.layer_col, self.mapping_layer)
 
+        color_ramp_name = self.cob_color.currentText()
+        self.map_ranges("isochrones_data", self.layer, color_ramp_name)
+
     def select_first(self):
         idx = int(self.line_start_id.text()) - 1
         dt = np.array(self.data_to_show[idx, :]).reshape(self.indices.shape[0])
@@ -231,16 +235,17 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         self.map_dt(dt)
 
     def select_after(self):
-        idx = ""
+        selected_features = self.layer.selectedFeatures()
+        idx = [feature.id() for feature in selected_features][0]
         dt = np.array(self.data_to_show[idx, :]).reshape(self.indices.shape[0])
         self.map_dt(dt)
 
     def run(self):
-        self.but_plot.setEnabled(False)
+        # self.but_plot.setEnabled(False)
 
         self.compute_skims()
         self.plot_isochrone()
 
-        self.map_dt()
-        # color_ramp_name = self.cob_color.currentText()
-        # self.map_ranges(self.cob_skim.currentText(), self.layer, color_ramp_name)
+        self.layer.selectionChanged.connect(self.select_after)
+
+        self.select_first()
