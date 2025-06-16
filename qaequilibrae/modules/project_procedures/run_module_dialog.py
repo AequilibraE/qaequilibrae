@@ -19,13 +19,20 @@ class RunModuleDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.logger = logger or get_logger()
 
-        self.items = list(self.project.parameters["run"].keys())
+        self.items = list(self.project.run._fields)
         self.cob_function.addItems(self.items)
 
         self.but_run.clicked.connect(self.run)
 
     def run(self):
+        # Check if selected function is also present at the Parameters file
         func_name = self.items[self.cob_function.currentIndex()]
+        parameter_keys = list(self.project.parameters["run"].keys())
+        if func_name not in parameter_keys:
+            self.iface.messageBar.pushMessage(
+                self.tr("Error"), self.tr("Please check the Parameters file"), level=Qgis.Critical, duration=5
+            )
+
         func = getattr(self.project.run, func_name)
         result = func()
         self.logger.info(result)
