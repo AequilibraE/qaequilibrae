@@ -42,6 +42,8 @@ jobs:
           python3 -m venv /tmp/.venv --system-site-packages
           . /tmp/.venv/bin/activate
           python3 -m pip install -U pip setuptools uv
+          python3 -m uv pip install "git+https://github.com/AequilibraE/aequilibrae.git@develop"
+          touch ./qaequilibrae/packages/aequilibrae_version.txt
           python3 ./ci/dependency_installation.py
           python3 -m uv pip install -r test/requirements_test.txt --constraint ./ci/constraints.txt
           export PYTHONPATH=$(pwd)/qaequilibrae/packages:$PYTHONPATH
