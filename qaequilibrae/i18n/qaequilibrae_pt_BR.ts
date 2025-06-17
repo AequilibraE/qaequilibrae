@@ -214,32 +214,32 @@
 <context>
     <name>AequilibraEMenu</name>
     <message>
-        <location filename="../qaequilibrae.py" line="115"/>
+        <location filename="../qaequilibrae.py" line="116"/>
         <source>Project</source>
         <translation>Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="134"/>
+        <location filename="../qaequilibrae.py" line="135"/>
         <source>Data</source>
         <translation>Dados</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="138"/>
+        <location filename="../qaequilibrae.py" line="139"/>
         <source>Trip Distribution</source>
         <translation>Distribuição de Viagens</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="153"/>
+        <location filename="../qaequilibrae.py" line="154"/>
         <source>Paths and assignment</source>
         <translation>Rotas e Alocações</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="157"/>
+        <location filename="../qaequilibrae.py" line="158"/>
         <source>Routing</source>
         <translation>Roteirização</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="165"/>
+        <location filename="../qaequilibrae.py" line="166"/>
         <source>Public Transport</source>
         <translation>Transporte público</translation>
     </message>
@@ -249,17 +249,17 @@
         <translation>Abrir Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="119"/>
+        <location filename="../qaequilibrae.py" line="120"/>
         <source>Create project from OSM</source>
         <translation>Criar Projeto a partir do OSM</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="122"/>
+        <location filename="../qaequilibrae.py" line="123"/>
         <source>Create Project from layers</source>
         <translation>Criar Projeto a partir de Camada</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="129"/>
+        <location filename="../qaequilibrae.py" line="130"/>
         <source>Add zoning data</source>
         <translation>Adicionar Zonas</translation>
     </message>
@@ -274,87 +274,87 @@
         <translation>Registro de Operações</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="115"/>
+        <location filename="../qaequilibrae.py" line="116"/>
         <source>Close project</source>
         <translation>Fechar Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="125"/>
+        <location filename="../qaequilibrae.py" line="126"/>
         <source>Network Preparation</source>
         <translation>Preparar Rede</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="126"/>
+        <location filename="../qaequilibrae.py" line="127"/>
         <source>Add centroid connectors</source>
         <translation>Adicionar Conector no Centroide</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="144"/>
+        <location filename="../qaequilibrae.py" line="145"/>
         <source>Shortest path</source>
         <translation>Caminho mínimo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="147"/>
+        <location filename="../qaequilibrae.py" line="148"/>
         <source>Impedance matrix</source>
         <translation>Matriz de Impedância</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="150"/>
+        <location filename="../qaequilibrae.py" line="151"/>
         <source>Traffic Assignment</source>
         <translation>Alocação de Tráfego</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="157"/>
+        <location filename="../qaequilibrae.py" line="158"/>
         <source>Travelling Salesman Problem</source>
         <translation>Problema do Caixeiro Viajante</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="161"/>
+        <location filename="../qaequilibrae.py" line="162"/>
         <source>Import GTFS</source>
         <translation>Importar GTFS</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="169"/>
+        <location filename="../qaequilibrae.py" line="170"/>
         <source>Desire Lines</source>
         <translation>Linhas de Desejo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="170"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Stacked Bandwidth</source>
         <translation>Mapa de volumes</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="171"/>
+        <location filename="../qaequilibrae.py" line="172"/>
         <source>Scenario Comparison</source>
         <translation>Comparação de Cenários</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="172"/>
+        <location filename="../qaequilibrae.py" line="173"/>
         <source>Simple tag</source>
         <translation>Etiqueta</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="134"/>
+        <location filename="../qaequilibrae.py" line="135"/>
         <source>Import matrices</source>
         <translation>Importar matrizes</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="176"/>
+        <location filename="../qaequilibrae.py" line="177"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="183"/>
+        <location filename="../qaequilibrae.py" line="184"/>
         <source>Show project info</source>
         <translation>Mostrar informações do projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="333"/>
+        <location filename="../qaequilibrae.py" line="334"/>
         <source>You need to load a project first</source>
         <translation>Você precisa carregar um projeto primeiro</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="336"/>
+        <location filename="../qaequilibrae.py" line="337"/>
         <source>You need to close the project currently open first</source>
         <translation>Você precisa fechar o projeto aberto primeiro</translation>
     </message>
@@ -364,34 +364,39 @@
         <translation>Criar exemplo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="165"/>
+        <location filename="../qaequilibrae.py" line="166"/>
         <source>Explore Transit</source>
         <translation>Explorar Transporte Público</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="129"/>
+        <location filename="../qaequilibrae.py" line="130"/>
         <source>Model Building</source>
         <translation>Construção de Modelos</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="133"/>
+        <location filename="../qaequilibrae.py" line="134"/>
         <source>Visualize data</source>
         <translation>Visualizar Dados</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="341"/>
+        <location filename="../qaequilibrae.py" line="342"/>
         <source>You need to import a GTFS feed first</source>
         <translation>Você precisa importar um arquivo GTFS primeiro</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="153"/>
+        <location filename="../qaequilibrae.py" line="154"/>
         <source>Route choice</source>
         <translation>Escolha de rota</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="162"/>
+        <location filename="../qaequilibrae.py" line="163"/>
         <source>Skimming and Assignment</source>
         <translation>Matriz de custos e alocação</translation>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="115"/>
+        <source>Run procedures</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2702,6 +2707,70 @@
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="247"/>
         <source>Please set a link selection</source>
         <translation>Por favor, configure uma seleção de links</translation>
+    </message>
+</context>
+<context>
+    <name>RunModule</name>
+    <message>
+        <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="14"/>
+        <source>Run Procedures</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="28"/>
+        <source>Available procedures</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="38"/>
+        <source>Run!</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>RunModuleDialog</name>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="32"/>
+        <source>Error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="32"/>
+        <source>Please check the Parameters file</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="40"/>
+        <source>Run procedures executed</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>RunProcedures</name>
+    <message>
+        <location filename="../modules/processing_provider/run_module.py" line="37"/>
+        <source>No AequilibraE project loaded.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/run_module.py" line="28"/>
+        <source>Available functions</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/run_module.py" line="65"/>
+        <source>Run procedures</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/run_module.py" line="68"/>
+        <source>1. Model Building</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/run_module.py" line="74"/>
+        <source>Run entire model pipelines from AequilibraE</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
