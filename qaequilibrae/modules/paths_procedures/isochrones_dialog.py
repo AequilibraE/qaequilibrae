@@ -35,7 +35,7 @@ class IsochronesDialog(QDialog, FORM_CLASS):
                 self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         # TODO: Use numeric fields. Eg.: if we have joined fields from a result table
-        #       if should appear here too.
+        #       it should appear here too.
         # Skim fields
         self.skimmeable_fields = self.project.network.skimmable_fields()
         for skim in self.skimmeable_fields:
@@ -79,6 +79,7 @@ class IsochronesDialog(QDialog, FORM_CLASS):
 
         self.data_to_show = skm.results.skims.matrix[self.cob_skim.currentText()]
         self.indices = skm.results.skims.index.astype(np.int32)
+        self.positional_dict = dict(zip(self.indices, np.arange(len(self.indices))))
 
     def plot_isochrone(self):
         lyr = "zones" if self.cob_layer.currentText() == "zones" else "nodes"
@@ -229,20 +230,18 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         self.map_ranges("isochrones_data", self.layer, color_ramp_name)
 
     def select_first(self):
-        idx = int(self.line_start_id.text()) - 1
-        dt = np.array(self.data_to_show[idx, :]).reshape(self.indices.shape[0])
+        idx = int(self.line_start_id.text())
+        dt = np.array(self.data_to_show[self.positional_dict[idx], :]).reshape(self.indices.shape[0])
 
         self.map_dt(dt)
 
     def select_after(self):
         selected_features = self.layer.selectedFeatures()
-        idx = [feature.id() for feature in selected_features][0]
-        dt = np.array(self.data_to_show[idx, :]).reshape(self.indices.shape[0])
+        idx = [feature[self.layer_col] for feature in selected_features][0]
+        dt = np.array(self.data_to_show[self.positional_dict[idx], :]).reshape(self.indices.shape[0])
         self.map_dt(dt)
 
     def run(self):
-        # self.but_plot.setEnabled(False)
-
         self.compute_skims()
         self.plot_isochrone()
 
