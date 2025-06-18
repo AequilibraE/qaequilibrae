@@ -1,6 +1,7 @@
 from math import ceil
 import os
 
+from typing import Union
 import numpy as np
 import pandas as pd
 from aequilibrae.paths import NetworkSkimming, SkimResults
@@ -10,6 +11,7 @@ from qgis.PyQt.QtCore import QMetaType
 from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView
 from qgis.core import QgsStyle, QgsVectorLayerJoinInfo, QgsRuleBasedRenderer, QgsSymbol
 from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject, QgsVectorLayer, QgsField
+from qgis.core import QgsMapLayerProxyModel
 
 from qaequilibrae.modules.common_tools import layer_from_dataframe
 
@@ -27,6 +29,19 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         self.all_modes = {}
         self.layer = None
 
+        # Layer fields
+        default_style = QgsStyle().defaultStyle()
+        self.cob_color.addItems(list(default_style.colorRampNames()))
+
+        if self.layer:
+            self.layer.selectionChanged.connect(self.select_after)
+
+        self.cob_layer.layerChanged.connect(self.configure_skim_fields)
+        self.cob_layer.setFilters(
+            QgsMapLayerProxyModel.PointLayer | QgsMapLayerProxyModel.LineLayer | QgsMapLayerProxyModel.PolygonLayer
+        )
+        self.cob_layer.setLayer(self.iface.activeLayer())
+
         # Graph config
         with self.project.db_connection as conn:
             res = conn.execute("""SELECT mode_name, mode_id FROM modes""")
@@ -34,24 +49,23 @@ class IsochronesDialog(QDialog, FORM_CLASS):
                 self.cob_modes.addItem(f"{x[0]} ({x[1]})")
                 self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
-        # TODO: Use numeric fields. Eg.: if we have joined fields from a result table
-        #       it should appear here too.
-        # Skim fields
-        self.skimmeable_fields = self.project.network.skimmable_fields()
-        for skim in self.skimmeable_fields:
-            self.cob_minimizing.addItem(skim)
-            self.cob_skim.addItem(skim)
+        self.but_plot.clicked.connect(self.run)
 
-        # Layer fields
-        default_style = QgsStyle().defaultStyle()
-        self.cob_color.addItems(list(default_style.colorRampNames()))
+        self.configure_skim_fields()
 
-        self.cob_layer.addItems(["zones", "centroids", "nodes"])
+    def configure_skim_fields(self):
+        self.layer = self.cob_layer.currentLayer()
+        self.cob_minimizing.clear()
+        self.cob_skim.clear()
 
         if self.layer:
-            self.layer.selectionChanged.connect(self.select_after)
-
-        self.but_plot.clicked.connect(self.run)
+            if self.layer.geometryType() == 1:  # 1 == LineGeometry
+                skimmeable_fields = [field.name() for field in self.layer.fields()]
+            else:
+                skimmeable_fields = self.project.network.skimmable_fields()
+            for skim in skimmeable_fields:
+                self.cob_minimizing.addItem(skim)
+                self.cob_skim.addItem(skim)
 
     def exit_procedure(self):
         self.close()
@@ -83,9 +97,7 @@ class IsochronesDialog(QDialog, FORM_CLASS):
 
     def plot_isochrone(self):
         lyr = "zones" if self.cob_layer.currentText() == "zones" else "nodes"
-        self.layer = self.qgis_project.layers[lyr][0]
         self.layer_col = "zone_id" if lyr == "zones" else "node_id"
-        QgsProject.instance().addMapLayer(self.layer)
 
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
