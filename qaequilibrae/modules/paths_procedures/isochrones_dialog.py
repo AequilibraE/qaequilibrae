@@ -29,7 +29,7 @@ class IsochronesDialog(QDialog, FORM_CLASS):
 
         # Graph config
         with self.project.db_connection as conn:
-            res = conn.execute("""select mode_name, mode_id from modes""")
+            res = conn.execute("""SELECT mode_name, mode_id FROM modes""")
             for x in res.fetchall():
                 self.cob_modes.addItem(f"{x[0]} ({x[1]})")
                 self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
