@@ -71,6 +71,20 @@ def test_logfile_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
+def test_run_module_menu(coquimbo_project, qtbot):
+    from qaequilibrae.modules.project_procedures import RunModuleDialog
+
+    def handle_trigger():
+        check_if_new_active_window_matches_class(qtbot, RunModuleDialog)
+
+    action = coquimbo_project.menuActions["Project"][4]
+    assert action.text() == "Run procedures", "Wrong text content"
+    QTimer.singleShot(10, handle_trigger)
+    action.trigger()
+    messagebar = coquimbo_project.iface.messageBar()
+    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+
+
 def test_create_project_from_osm_menu(ae_with_project):
     action = ae_with_project.menuActions["Model Building"][0]
     assert action.text() == "Create project from OSM", "Wrong text content"

@@ -1,1 +1,1 @@
-aequilibrae==1.4.2
+aequilibrae==1.4.3

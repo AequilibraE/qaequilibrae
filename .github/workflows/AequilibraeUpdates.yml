@@ -31,6 +31,9 @@ jobs:
 
       - name: Run tests
         run: |
+          . /tmp/.venv/bin/activate
+          export PYTHONPATH=$(pwd)/qaequilibrae/packages:$PYTHONPATH
+          echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
           export QT_QPA_PLATFORM=offscreen
           pwd
           python3 -m pytest --cov-report term --cov-config=.coveragerc --cov=qaequilibrae test

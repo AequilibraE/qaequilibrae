@@ -25,7 +25,7 @@ from qaequilibrae.modules.menu_actions import run_distribution_models, run_chang
 from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet
 from qaequilibrae.modules.menu_actions import run_pt_explore, show_log, create_example
 from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig
-from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder, load_isochrones
+from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder, run_module, load_isochrones
 from qaequilibrae.modules.processing_provider.provider import Provider
 
 sys.path.insert(0, join(dirname(__file__), "packages"))
@@ -112,6 +112,7 @@ class AequilibraEMenu:
         self.add_menu_action(self.tr("Project"), self.tr("Create example"), partial(create_example, self))
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
+        self.add_menu_action(self.tr("Project"), self.tr("Run procedures"), partial(run_module, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
 
         # # # ########################################################################

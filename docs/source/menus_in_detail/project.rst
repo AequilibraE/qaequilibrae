@@ -80,6 +80,23 @@ using the **save to disk** button in the lower left corner of the log file box.
     :align: center
     :alt: proj logfile
 
+.. _run-procedures:
+
+Run procedures
+--------------
+
+The run procedures allows you to define model entry points and their default arguments, and run models
+to the model itself. Usage at QAequilibraE is pretty straightforward: select one of the available
+functions, click on the *Run!* button, and wait for the log file to open with the output results of
+the model.
+
+To better understand the application of the run module, we encourage you to read about it at 
+`the AequilibraE documentation <https://www.aequilibrae.com/develop/python/run_module.html>`_.
+
+.. image:: ../images/run_module_dialog.png
+    :align: center
+    :alt: run module dialog
+
 .. Video tutorial
 .. --------------
 

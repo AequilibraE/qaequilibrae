@@ -31,6 +31,7 @@ class Provider(QgsProcessingProvider):
         from .trip_length_distribution import TripLengthDistribution
         from .network_simplifier import NetworkSimplifier
         from .collapse_links import CollapseLinks
+        from .run_module import RunProcedures
 
         self.addAlgorithm(AddConnectors())
         self.addAlgorithm(AddLinksFromLayer())
@@ -48,6 +49,7 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(TripLengthDistribution())
         self.addAlgorithm(NetworkSimplifier())
         self.addAlgorithm(CollapseLinks())
+        self.addAlgorithm(RunProcedures())
 
     def id(self):
         """The ID used for identifying the provider.
