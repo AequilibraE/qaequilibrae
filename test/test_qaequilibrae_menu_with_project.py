@@ -221,8 +221,7 @@ def test_isochrones_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, IsochronesDialog)
 
-    action = next((a for a in ae_with_project.menuActions["Paths and assignment"] if a.text() == "Isochrones"), None)
-    assert action is not None, "Action with label 'Isochrones' not found"
+    action = ae_with_project.menuActions["Paths and assignment"][2]
     assert action.text() == "Isochrones", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
