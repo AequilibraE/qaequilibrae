@@ -164,7 +164,7 @@ def test_impedance_matrix_menu(ae, qtbot):
 
 
 def test_isochrones_menu(ae, qtbot):
-    action = ae.menuActions["Paths and assignment"][2]
+    action = get_action_by_text(ae.menuActions, "Paths and assignment", "Isochrones")
     assert action.text() == "Isochrones", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
