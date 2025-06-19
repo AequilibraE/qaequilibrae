@@ -1,19 +1,17 @@
-from math import ceil
 import os
+from math import ceil
 
-from typing import Union
 import numpy as np
 import pandas as pd
-from aequilibrae.paths import NetworkSkimming, SkimResults
+from aequilibrae.paths import NetworkSkimming, SkimResults, Graph
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtCore import QMetaType
-from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView
+from qgis.PyQt.QtWidgets import QDialog
+from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject, QgsVectorLayer
 from qgis.core import QgsStyle, QgsVectorLayerJoinInfo, QgsRuleBasedRenderer, QgsSymbol
-from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject, QgsVectorLayer, QgsField
-from qgis.core import QgsMapLayerProxyModel
 
 from qaequilibrae.modules.common_tools import layer_from_dataframe
+from qaequilibrae.modules.common_tools.geodataframe_from_data_layer import geodataframe_from_layer
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_isochrones.ui"))
 
@@ -28,6 +26,7 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         self.qgis_project = qgis_project
         self.all_modes = {}
         self.layer = None
+        self.graph = None
 
         # Layer fields
         default_style = QgsStyle().defaultStyle()
@@ -36,11 +35,25 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         if self.layer:
             self.layer.selectionChanged.connect(self.select_after)
 
-        self.cob_layer.layerChanged.connect(self.configure_skim_fields)
-        self.cob_layer.setFilters(
-            QgsMapLayerProxyModel.PointLayer | QgsMapLayerProxyModel.LineLayer | QgsMapLayerProxyModel.PolygonLayer
-        )
-        self.cob_layer.setLayer(self.iface.activeLayer())
+        # Check if layer links is in the layers tab.
+        self.__prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
+
+        with self.project.db_connection as conn:
+            centroids = pd.read_sql("select node_id from nodes where is_centroid=1", con=conn).node_id.to_numpy()
+
+        self.centroids = centroids if centroids.size != 0 else None
+
+        self.__no_skimming_fields = [
+            "link_id",
+            "a_node",
+            "b_node",
+            "direction",
+            "id",
+            "__supernet_id__",
+            "__compressed_id__",
+        ]
+
+        self.cob_layer.addItems(["Nodes", "Zones"])
 
         # Graph config
         with self.project.db_connection as conn:
@@ -54,18 +67,26 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         self.configure_skim_fields()
 
     def configure_skim_fields(self):
-        self.layer = self.cob_layer.currentLayer()
         self.cob_minimizing.clear()
         self.cob_skim.clear()
 
-        if self.layer:
-            if self.layer.geometryType() == 1:  # 1 == LineGeometry
-                skimmeable_fields = [field.name() for field in self.layer.fields()]
-            else:
-                skimmeable_fields = self.project.network.skimmable_fields()
-            for skim in skimmeable_fields:
-                self.cob_minimizing.addItem(skim)
-                self.cob_skim.addItem(skim)
+        if "links" in self.__prj_layers:
+            layer = self.qgis_project.layers["links"][0]
+
+            network = geodataframe_from_layer(layer)
+            network.columns = [x.lower() for x in network.columns]
+
+            self.graph = Graph()
+            self.graph.network = network
+            self.graph.prepare_graph(self.centroids)
+
+            skimmeable_fields = [x for x in self.graph.graph.columns if x not in self.__no_skimming_fields]
+        else:
+            skimmeable_fields = self.project.network.skimmable_fields()
+
+        for skim in skimmeable_fields:
+            self.cob_minimizing.addItem(skim)
+            self.cob_skim.addItem(skim)
 
     def exit_procedure(self):
         self.close()
@@ -73,22 +94,23 @@ class IsochronesDialog(QDialog, FORM_CLASS):
     def compute_skims(self):
         self.project.network.build_graphs()
 
-        mode = self.all_modes[self.cob_modes.currentText()]
-        graph = self.project.network.graphs[mode]
+        if not self.graph:
+            mode = self.all_modes[self.cob_modes.currentText()]
+            self.graph = self.project.network.graphs[mode]
 
         # We prepare the graph to set all nodes as centroids
         if self.rdo_all_nodes.isChecked():
-            graph.prepare_graph(graph.all_nodes)
+            self.graph.prepare_graph(self.graph.all_nodes)
 
-        graph.set_graph(cost_field=self.cob_minimizing.currentText())
-        graph.set_blocked_centroid_flows(self.block_paths.isChecked())
+        self.graph.set_graph(self.cob_minimizing.currentText())
+        self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
 
-        graph.set_skimming(self.cob_skim.currentText())
+        self.graph.set_skimming(self.cob_skim.currentText())
 
         result = SkimResults()
-        result.prepare(graph)
+        result.prepare(self.graph)
 
-        skm = NetworkSkimming(graph, result)
+        skm = NetworkSkimming(self.graph, result)
         skm.execute()
 
         self.data_to_show = skm.results.skims.matrix[self.cob_skim.currentText()]
@@ -96,8 +118,10 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         self.positional_dict = dict(zip(self.indices, np.arange(len(self.indices))))
 
     def plot_isochrone(self):
-        lyr = "zones" if self.cob_layer.currentText() == "zones" else "nodes"
+        lyr = "zones" if self.cob_layer.currentText().lower() == "zones" else "nodes"
+        self.layer = self.qgis_project.layers[lyr][0]
         self.layer_col = "zone_id" if lyr == "zones" else "node_id"
+        QgsProject.instance().addMapLayer(self.layer)
 
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades

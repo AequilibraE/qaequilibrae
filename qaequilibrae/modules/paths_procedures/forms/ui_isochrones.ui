@@ -314,20 +314,13 @@
        </spacer>
       </item>
       <item row="0" column="1">
-       <widget class="QgsMapLayerComboBox" name="cob_layer"/>
+       <widget class="QComboBox" name="cob_layer"/>
       </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QgsMapLayerComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qgsmaplayercombobox.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
