@@ -71,7 +71,7 @@ def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocke
     dialog.cob_minimizing.setCurrentText("assignment_congested_time")
     dialog.cob_skim.setCurrentText("assignment_congested_time")
     dialog.block_paths.setChecked(False)
-    dialog.cob_layer.setCurrentText("Zones")
+    dialog.cob_layer.setCurrentText("Nodes")
     dialog.line_start_id.setText("1")
 
     qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
@@ -81,9 +81,21 @@ def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocke
     assert "skim_viewer" in prj_layers
 
     # Check if layer 'zones' is active
-    assert "zones" in prj_layers
+    assert "nodes" in prj_layers
 
     # Check if layer 'nodes' or 'zones' is joined with 'skim_viewer'
-    lyr = QgsProject.instance().mapLayersByName("zones")[0]
+    lyr = QgsProject.instance().mapLayersByName("nodes")[0]
     field_names = lyr.fields().names()
     assert "skim_viewer_data" in field_names
+
+    # Get the values for the 'skim_viewer_data' field
+    result1 = [f.attributes()[-1] for f in lyr.getFeatures()]
+
+    # We select another node to check if the values in the join changed.
+    lyr.selectByExpression('"node_id" = 5')
+
+    # Get the values for the 'skim_viewer_data' field
+    result2 = [f.attributes()[-1] for f in lyr.getFeatures()]
+
+    # Check if the displayed values changed
+    assert result1 != result2
