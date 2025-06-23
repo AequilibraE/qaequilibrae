@@ -80,11 +80,11 @@ class IsochronesDialog(QDialog, FORM_CLASS):
             self.graph.network = network
             self.graph.prepare_graph(self.centroids)
 
-            skimmeable_fields = [x for x in self.graph.graph.columns if x not in self.__no_skimming_fields]
+            self._skimmeable_fields = [x for x in self.graph.graph.columns if x not in self.__no_skimming_fields]
         else:
-            skimmeable_fields = self.project.network.skimmable_fields()
+            self._skimmeable_fields = self.project.network.skimmable_fields()
 
-        for skim in skimmeable_fields:
+        for skim in self._skimmeable_fields:
             self.cob_minimizing.addItem(skim)
             self.cob_skim.addItem(skim)
 
