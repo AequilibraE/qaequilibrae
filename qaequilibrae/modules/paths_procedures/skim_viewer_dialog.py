@@ -270,9 +270,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.iface.setActiveLayer(self.layer)
 
     def select_first(self):
-        print("data_to_show: ", self.data_to_show)
         dt = self.data_to_show.reshape(self.indices.shape[0])
-        print("dt: ", dt)
         self.map_dt(dt)
 
     def select_after(self):

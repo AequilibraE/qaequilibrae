@@ -148,7 +148,7 @@ class AequilibraEMenu:
         self.add_menu_action(
             self.tr("Paths and assignment"), self.tr("Impedance matrix"), partial(run_dist_matrix, self)
         )
-        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Isochrones"), partial(load_skim_viewer, self))
+        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Skim viewer"), partial(load_skim_viewer, self))
         self.add_menu_action(
             self.tr("Paths and assignment"), self.tr("Traffic Assignment"), partial(run_traffic_assig, self)
         )

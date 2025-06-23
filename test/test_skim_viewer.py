@@ -8,7 +8,7 @@ from .utilities import run_sfalls_assignment
 
 
 # TODO: ideally, we would test if all the views are correct.
-@pytest.mark.parametrize("layer", ["Nodes"])
+@pytest.mark.parametrize("layer", ["Nodes", "Zones"])
 def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, layer):
     dialog = SkimViewerDialog(ae_with_project)
 
@@ -18,29 +18,21 @@ def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, la
     dialog.cob_layer.setCurrentText(layer)
     dialog.line_start_id.setText("1")
 
-    dialog.compute_skims(1)
-    dialog.plot_isochrone()
-    dialog.select_first()
+    qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
 
-    print("dial: ", dialog.data_to_show)
+    lyr_name = layer.lower()
 
-    # print(dialog.__dict__)
+    # Check if layer 'skim_viewer' exists
+    prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
+    assert "skim_viewer" in prj_layers
 
-    # qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
+    # Check if layer 'nodes' or 'zones' is active
+    assert lyr_name in prj_layers
 
-    # lyr_name = layer.lower()
-
-    # # Check if layer 'skim_viewer' exists
-    # prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
-    # assert "skim_viewer" in prj_layers
-
-    # # Check if layer 'nodes' or 'zones' is active
-    # assert lyr_name in prj_layers
-
-    # # Check if layer 'nodes' or 'zones' is joined with 'skim_viewer'
-    # lyr = QgsProject.instance().mapLayersByName(lyr_name)[0]
-    # field_names = lyr.fields().names()
-    # assert "skim_viewer_data" in field_names
+    # Check if layer 'nodes' or 'zones' is joined with 'skim_viewer'
+    lyr = QgsProject.instance().mapLayersByName(lyr_name)[0]
+    field_names = lyr.fields().names()
+    assert "skim_viewer_data" in field_names
 
 
 def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocker):
