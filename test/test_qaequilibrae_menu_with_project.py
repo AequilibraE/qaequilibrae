@@ -215,14 +215,14 @@ def test_impedance_matrix_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-def test_isochrones_menu(ae_with_project, qtbot):
+def test_skim_viewer_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.paths_procedures.skim_viewer_dialog import SkimViewerDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, SkimViewerDialog)
 
     action = ae_with_project.menuActions["Paths and assignment"][2]
-    assert action.text() == "Isochrones", "Wrong text content"
+    assert action.text() == "Skim viewer", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()

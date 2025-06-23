@@ -3,7 +3,7 @@ from math import ceil
 
 import numpy as np
 import pandas as pd
-from aequilibrae.paths import NetworkSkimming, SkimResults, Graph
+from aequilibrae.paths import Graph
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDialog
@@ -13,7 +13,7 @@ from qgis.core import QgsStyle, QgsVectorLayerJoinInfo, QgsRuleBasedRenderer, Qg
 from qaequilibrae.modules.common_tools import layer_from_dataframe
 from qaequilibrae.modules.common_tools.geodataframe_from_data_layer import geodataframe_from_layer
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_isochrones.ui"))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_skim_viewer.ui"))
 
 
 class SkimViewerDialog(QDialog, FORM_CLASS):

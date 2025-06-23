@@ -163,9 +163,9 @@ def test_impedance_matrix_menu(ae, qtbot):
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
-def test_isochrones_menu(ae, qtbot):
+def test_skim_viewer_menu(ae, qtbot):
     action = ae.menuActions["Paths and assignment"][2]
-    assert action.text() == "Isochrones", "Wrong text content"
+    assert action.text() == "Skim viewer", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
