@@ -129,7 +129,7 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         # First, we check if we have numeric values in our column
         all_values = []
         for _, f in enumerate(layer.getFeatures()):
-            all_values.append(f["isochrones_data"])
+            all_values.append(f["skim_viewer_data"])
 
         all_values = np.array(all_values, dtype=np.float32)
         values = np.unique(all_values)
@@ -235,7 +235,7 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         lien.setJoinLayerId(metric_layer.id())
         lien.setUsingMemoryCache(True)
         lien.setJoinLayer(metric_layer)
-        lien.setPrefix("isochrones_")
+        lien.setPrefix("skim_viewer_")
         base_layer.addJoin(lien)
 
     def remove_mapping_layer(self, clear_selection=True):
@@ -249,8 +249,8 @@ class IsochronesDialog(QDialog, FORM_CLASS):
 
     def remove_data_layer(self):
         active_layers = [name.name() for name in QgsProject.instance().mapLayers().values()]
-        if "isochrones" in active_layers:
-            layer = QgsProject.instance().mapLayersByName("isochrones")[0]
+        if "skim_viewer" in active_layers:
+            layer = QgsProject.instance().mapLayersByName("skim_viewer")[0]
             QgsProject.instance().removeMapLayers([layer.id()])
             self.iface.mapCanvas().refresh()
 
@@ -259,11 +259,13 @@ class IsochronesDialog(QDialog, FORM_CLASS):
     def map_dt(self, dt):
         self.remove_mapping_layer(False)
         df = pd.DataFrame({self.layer_col: self.indices, "data": dt})
-        self.mapping_layer = layer_from_dataframe(df, "isochrones")
+        self.mapping_layer = layer_from_dataframe(df, "skim_viewer")
         self.make_join(self.layer, self.layer_col, self.mapping_layer)
 
         color_ramp_name = self.cob_color.currentText()
-        self.map_ranges("isochrones_data", self.layer, color_ramp_name)
+        self.map_ranges("skim_viewer_data", self.layer, color_ramp_name)
+
+        self.iface.setActiveLayer(self.layer)
 
     def select_first(self):
         idx = int(self.line_start_id.text())
