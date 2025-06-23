@@ -28,6 +28,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.all_modes = {}
         self.layer = None
         self.graph = None
+        self.idx = None
 
         # Layer fields
         default_style = QgsStyle().defaultStyle()
@@ -64,8 +65,8 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
                 self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         self.but_plot.clicked.connect(self.run)
-        self.cob_minimizing.currentIndexChanged.connect(self.select_after)
-        self.cob_skim.currentIndexChanged.connect(self.select_after)
+        self.cob_minimizing.currentIndexChanged.connect(self.recompute_fields)
+        self.cob_skim.currentIndexChanged.connect(self.recompute_fields)
 
         self.configure_skim_fields()
 
@@ -276,16 +277,21 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.map_dt(dt)
 
     def select_after(self):
+        selected_features = self.layer.selectedFeatures()
+        self.idx = [feature[self.layer_col] for feature in selected_features][0]
+        self.compute_skims(self.idx)
+        dt = self.data_to_show.reshape(self.indices.shape[0])
+        self.map_dt(dt)
+
+    def recompute_fields(self):
         if self.layer:
-            selected_features = self.layer.selectedFeatures()
-            idx = [feature[self.layer_col] for feature in selected_features][0]
-            self.compute_skims(idx)
+            self.compute_skims(self.idx)
             dt = self.data_to_show.reshape(self.indices.shape[0])
             self.map_dt(dt)
 
     def run(self):
-        idx = int(self.line_start_id.text())
-        self.compute_skims(idx)
+        self.idx = int(self.line_start_id.text())
+        self.compute_skims(self.idx)
         self.plot_isochrone()
 
         self.layer.selectionChanged.connect(self.select_after)

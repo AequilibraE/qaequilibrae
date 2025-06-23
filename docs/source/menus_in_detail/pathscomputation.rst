@@ -62,6 +62,50 @@ paths.
 With the results computed (AEM or OMX), one can display them on the screen, loading the 
 data using the :ref:`non-project data tab <fig_nonproject_data>` in **Data > Visualize data**. 
 
+.. _skim-viewer:
+
+Skim viewer
+-----------
+
+With the skim viewer now it's easier to view the skimming results. The skim viewer tab looks like
+this!
+
+.. image:: ../images/skim_viewer_dialog.png
+    :align: center
+    :alt: Skim viewer dialog
+
+In the *Layer* tab, one select among the nodes or zones layers for data viewing. It is also possible
+to select a color map range for plotting and the starting node/zone ID.
+
+In the *Graph* tab, one set the graph configurations, such as the mode, the minimizing (cost) 
+field, the choice to block or not flows through the centroids, and if we want to compute skims for
+all nodes or between centroids. Other useful feature for the skim viewer is allowing the user to
+use joined fields from the 'links' layer as minimizing or skimming field.
+
+Finally, in the *Skim* tab, we select the desired skimming field for plotting.
+
+We'll use the Coquimbo model for data vieweing.
+
+Skim view without joined layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: ../images/skim_viewer_no_plot.png
+    :align: center
+    :alt: Skim viewer no plot dialog
+
+.. image:: ../images/skim_viewer_first_node.png
+    :align: center
+    :alt: Skim viewer no plot dialog
+
+.. image:: ../images/skim_viewer_second_node.png
+    :align: center
+    :alt: Skim viewer no plot dialog
+
+Skim viewer with joined layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
 .. _siouxfalls-traffic-assignment-and-skimming:
 
 Traffic assignment
