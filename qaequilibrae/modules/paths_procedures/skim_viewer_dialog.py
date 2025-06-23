@@ -64,6 +64,8 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
                 self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         self.but_plot.clicked.connect(self.run)
+        self.cob_minimizing.currentIndexChanged.connect(self.select_after)
+        self.cob_skim.currentIndexChanged.connect(self.select_after)
 
         self.configure_skim_fields()
 
@@ -105,7 +107,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             if self.rdo_all_nodes.isChecked():
                 self.graph.prepare_graph(self.graph.all_nodes)
 
-            self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
+        self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
 
         self.graph.set_graph(self.cob_minimizing.currentText())
         self.graph.set_skimming(self.cob_skim.currentText())
@@ -274,11 +276,12 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.map_dt(dt)
 
     def select_after(self):
-        selected_features = self.layer.selectedFeatures()
-        idx = [feature[self.layer_col] for feature in selected_features][0]
-        self.compute_skims(idx)
-        dt = self.data_to_show.reshape(self.indices.shape[0])
-        self.map_dt(dt)
+        if self.layer:
+            selected_features = self.layer.selectedFeatures()
+            idx = [feature[self.layer_col] for feature in selected_features][0]
+            self.compute_skims(idx)
+            dt = self.data_to_show.reshape(self.indices.shape[0])
+            self.map_dt(dt)
 
     def run(self):
         idx = int(self.line_start_id.text())
