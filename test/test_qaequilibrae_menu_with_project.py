@@ -216,10 +216,10 @@ def test_impedance_matrix_menu(ae_with_project, qtbot):
 
 
 def test_isochrones_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.paths_procedures.isochrones_dialog import IsochronesDialog
+    from qaequilibrae.modules.paths_procedures.skim_viewer_dialog import SkimViewerDialog
 
     def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, IsochronesDialog)
+        check_if_new_active_window_matches_class(qtbot, SkimViewerDialog)
 
     action = ae_with_project.menuActions["Paths and assignment"][2]
     assert action.text() == "Isochrones", "Wrong text content"

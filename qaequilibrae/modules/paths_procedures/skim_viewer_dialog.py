@@ -16,7 +16,7 @@ from qaequilibrae.modules.common_tools.geodataframe_from_data_layer import geoda
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_isochrones.ui"))
 
 
-class IsochronesDialog(QDialog, FORM_CLASS):
+class SkimViewerDialog(QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QDialog.__init__(self)
         self.setupUi(self)
@@ -24,6 +24,7 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.qgis_project = qgis_project
+        self._nodes = self.project.network.nodes.data
         self.all_modes = {}
         self.layer = None
         self.graph = None
@@ -91,30 +92,31 @@ class IsochronesDialog(QDialog, FORM_CLASS):
     def exit_procedure(self):
         self.close()
 
-    def compute_skims(self):
-        self.project.network.build_graphs()
+    # TODO: disparar mudanças nos campos cost and skim.
+    def compute_skims(self, start_node):
+        self.indices = self._nodes["node_id"].sort_values().array.astype(np.int32)
 
         if not self.graph:
             mode = self.all_modes[self.cob_modes.currentText()]
+            self.project.network.build_graphs(modes=[mode])
             self.graph = self.project.network.graphs[mode]
 
-        # We prepare the graph to set all nodes as centroids
-        if self.rdo_all_nodes.isChecked():
-            self.graph.prepare_graph(self.graph.all_nodes)
+            # We prepare the graph to set all nodes as centroids
+            if self.rdo_all_nodes.isChecked():
+                self.graph.prepare_graph(self.graph.all_nodes)
+
+            self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
 
         self.graph.set_graph(self.cob_minimizing.currentText())
-        self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
-
         self.graph.set_skimming(self.cob_skim.currentText())
 
-        result = SkimResults()
-        result.prepare(self.graph)
+        end_node = np.random.choice(self.indices, 1)[0]
+        if start_node == end_node:
+            end_node = np.random.choice(self.indices, 1)[0]
+        res = self.graph.compute_path(start_node, end_node)
 
-        skm = NetworkSkimming(self.graph, result)
-        skm.execute()
-
-        self.data_to_show = skm.results.skims.matrix[self.cob_skim.currentText()]
-        self.indices = skm.results.skims.index.astype(np.int32)
+        self.data_to_show = res._skimming_array[:-1]
+        self.indices = self._nodes["node_id"].sort_values().array.astype(np.int32)
         self.positional_dict = dict(zip(self.indices, np.arange(len(self.indices))))
 
     def plot_isochrone(self):
@@ -268,19 +270,21 @@ class IsochronesDialog(QDialog, FORM_CLASS):
         self.iface.setActiveLayer(self.layer)
 
     def select_first(self):
-        idx = int(self.line_start_id.text())
-        dt = np.array(self.data_to_show[self.positional_dict[idx], :]).reshape(self.indices.shape[0])
-
+        print("data_to_show: ", self.data_to_show)
+        dt = self.data_to_show.reshape(self.indices.shape[0])
+        print("dt: ", dt)
         self.map_dt(dt)
 
     def select_after(self):
         selected_features = self.layer.selectedFeatures()
         idx = [feature[self.layer_col] for feature in selected_features][0]
-        dt = np.array(self.data_to_show[self.positional_dict[idx], :]).reshape(self.indices.shape[0])
+        self.compute_skims(idx)
+        dt = self.data_to_show.reshape(self.indices.shape[0])
         self.map_dt(dt)
 
     def run(self):
-        self.compute_skims()
+        idx = int(self.line_start_id.text())
+        self.compute_skims(idx)
         self.plot_isochrone()
 
         self.layer.selectionChanged.connect(self.select_after)
