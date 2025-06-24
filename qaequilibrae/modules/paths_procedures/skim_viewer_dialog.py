@@ -111,7 +111,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.graph.set_skimming(self.cob_skim.currentText())
 
         self.indices = self.graph.all_nodes.astype(np.int32)
-        self.idx_position = dict(zip(self.indices, np.arange(len(self.indices))))  
+        self.idx_position = dict(zip(self.indices, np.arange(len(self.indices))))
 
     def compute_skims(self, start_node):
         end_node = np.random.choice(self.indices, 1)[0]
