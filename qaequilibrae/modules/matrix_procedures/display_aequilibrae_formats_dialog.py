@@ -37,6 +37,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.selected_col = None
         self.selected_row = None
         self.omx = None
+        self.zones_layer = None
 
         if len(file_path) > 0:
             self.data_path = file_path
@@ -166,6 +167,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.mapping_layout.addWidget(self.cob_colors)
             self._layout.addItem(self.mapping_layout)
 
+            if self.zones_layer:
+                self.zones_layer.selectionChanged.connect(self.select_from_layer)
+
         self.but_export = QPushButton()
         self.but_export.setText(self.tr("Export"))
         self.but_export.clicked.connect(self.export)
@@ -183,6 +187,13 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.resize(700, 500)
         self.setLayout(self._layout)
         self.format_showing()
+
+    def select_from_layer(self):
+        self.remove_mapping_layer()
+        selected_features = self.layer.selectedFeatures()
+        idx = [feature["zone_id"] for feature in selected_features][0]
+
+        # Fazer o caminho inverso da primeira seleção,
 
     def select_column(self):
         self.selected_col = None
