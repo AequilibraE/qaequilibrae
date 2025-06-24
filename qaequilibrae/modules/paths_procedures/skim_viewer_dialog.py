@@ -7,7 +7,7 @@ from aequilibrae.paths import Graph
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDialog
-from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject, QgsVectorLayer
+from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject
 from qgis.core import QgsStyle, QgsVectorLayerJoinInfo, QgsRuleBasedRenderer, QgsSymbol
 
 from qaequilibrae.modules.common_tools import layer_from_dataframe
@@ -24,7 +24,6 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.qgis_project = qgis_project
-        self._nodes = self.project.network.nodes.data
         self.all_modes = {}
         self.layer = None
         self.graph = None
@@ -35,7 +34,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.cob_color.addItems(list(default_style.colorRampNames()))
 
         if self.layer:
-            self.layer.selectionChanged.connect(self.select_after)
+            self.layer.selectionChanged.connect(self.recompute_after_selection)
 
         # Check if layer links is in the layers tab.
         self.__prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
@@ -65,8 +64,9 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
                 self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         self.but_plot.clicked.connect(self.run)
-        self.cob_minimizing.currentIndexChanged.connect(self.recompute_fields)
-        self.cob_skim.currentIndexChanged.connect(self.recompute_fields)
+        self.cob_minimizing.currentIndexChanged.connect(self.update_cost_field)
+        self.cob_skim.currentIndexChanged.connect(self.update_skim_field)
+        self.block_paths.toggled.connect(self.update_block_flow)
 
         self.configure_skim_fields()
 
@@ -95,10 +95,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
     def exit_procedure(self):
         self.close()
 
-    # TODO: disparar mudanças nos campos cost and skim.
-    def compute_skims(self, start_node):
-        self.indices = self._nodes["node_id"].sort_values().array.astype(np.int32)
-
+    def configure_graph(self):
         if not self.graph:
             mode = self.all_modes[self.cob_modes.currentText()]
             self.project.network.build_graphs(modes=[mode])
@@ -113,16 +110,20 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.graph.set_graph(self.cob_minimizing.currentText())
         self.graph.set_skimming(self.cob_skim.currentText())
 
+        self.indices = self.graph.all_nodes.astype(np.int32)
+        self.idx_position = dict(zip(self.indices, np.arange(len(self.indices))))  
+
+    def compute_skims(self, start_node):
         end_node = np.random.choice(self.indices, 1)[0]
         if start_node == end_node:
             end_node = np.random.choice(self.indices, 1)[0]
+
         res = self.graph.compute_path(start_node, end_node)
-
         self.data_to_show = res._skimming_array[:-1]
-        self.indices = self._nodes["node_id"].sort_values().array.astype(np.int32)
-        self.positional_dict = dict(zip(self.indices, np.arange(len(self.indices))))
 
-    def plot_isochrone(self):
+        self.set_data()
+
+    def plot_data_layer(self):
         lyr = "zones" if self.cob_layer.currentText().lower() == "zones" else "nodes"
         self.layer = self.qgis_project.layers[lyr][0]
         self.layer_col = "zone_id" if lyr == "zones" else "node_id"
@@ -243,13 +244,11 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         lien.setPrefix("skim_viewer_")
         base_layer.addJoin(lien)
 
-    def remove_mapping_layer(self, clear_selection=True):
+    def remove_mapping_layer(self):
         self.remove_data_layer()
         for lien in self.layer.vectorJoins():
             self.layer.removeJoin(lien.joinLayerId())
         self.mapping_layer = None
-        if clear_selection:
-            self.layer.selectByExpression(f'"{self.layer_col}"-<1000', QgsVectorLayer.SetSelection)
         self.layer.triggerRepaint()
 
     def remove_data_layer(self):
@@ -262,7 +261,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             self.mapping_layer = None
 
     def map_dt(self, dt):
-        self.remove_mapping_layer(False)
+        self.remove_mapping_layer()
         df = pd.DataFrame({self.layer_col: self.indices, "data": dt})
         self.mapping_layer = layer_from_dataframe(df, "skim_viewer")
         self.make_join(self.layer, self.layer_col, self.mapping_layer)
@@ -272,28 +271,36 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
         self.iface.setActiveLayer(self.layer)
 
-    def select_first(self):
-        dt = self.data_to_show.reshape(self.indices.shape[0])
+    def set_data(self):
+        dt = self.data_to_show.reshape(self.graph.num_nodes)
         self.map_dt(dt)
 
-    def select_after(self):
+    def recompute_after_selection(self):
         selected_features = self.layer.selectedFeatures()
         self.idx = [feature[self.layer_col] for feature in selected_features][0]
-        self.compute_skims(self.idx)
-        dt = self.data_to_show.reshape(self.indices.shape[0])
-        self.map_dt(dt)
 
-    def recompute_fields(self):
+        self.compute_skims(self.idx)
+
+    def update_skim_field(self):
         if self.layer:
+            self.graph.set_skimming(self.cob_skim.currentText())
             self.compute_skims(self.idx)
-            dt = self.data_to_show.reshape(self.indices.shape[0])
-            self.map_dt(dt)
+
+    def update_cost_field(self):
+        if self.layer:
+            self.graph.set_skimming(self.cob_minimizing.currentText())
+            self.compute_skims(self.idx)
+
+    def update_block_flow(self):
+        if self.layer:
+            self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
+            self.compute_skims(self.idx)
 
     def run(self):
+        self.configure_graph()
+
+        self.plot_data_layer()
+        self.layer.selectionChanged.connect(self.recompute_after_selection)
+
         self.idx = int(self.line_start_id.text())
         self.compute_skims(self.idx)
-        self.plot_isochrone()
-
-        self.layer.selectionChanged.connect(self.select_after)
-
-        self.select_first()
