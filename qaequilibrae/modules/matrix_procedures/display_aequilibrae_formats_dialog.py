@@ -189,9 +189,10 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.format_showing()
 
     def select_from_layer(self):
-        self.remove_mapping_layer()
-        selected_features = self.layer.selectedFeatures()
-        idx = [feature["zone_id"] for feature in selected_features][0]
+        # self.remove_mapping_layer()
+        selected_features = self.zones_layer.selectedFeatures()
+        if selected_features:
+            idx = [feature["zone_id"] for feature in selected_features][0]
 
         # Fazer o caminho inverso da primeira seleção,
 
@@ -201,7 +202,10 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if not col_id:
             return
         self.selected_col = col_id[0]
+
+        self.zones_layer.blockSignals(True)
         self.zones_layer.selectByExpression(f'"zone_id"={self.indices[col_id[0]]}', QgsVectorLayer.SetSelection)
+        self.zones_layer.blockSignals(False)
         self.iface.mapCanvas().refresh()
 
         core = self.mat_list.currentText()
@@ -215,7 +219,10 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if not row_id:
             return
         self.selected_row = row_id[0]
+
+        self.zones_layer.blockSignals(True)
         self.zones_layer.selectByExpression(f'"zone_id"={self.indices[row_id[0]]}', QgsVectorLayer.SetSelection)
+        self.zones_layer.blockSignals(False)
 
         core = self.mat_list.currentText()
         dt = np.array(self.data_to_show.matrix[core][row_id[0], :]).reshape(self.indices.shape[0])
