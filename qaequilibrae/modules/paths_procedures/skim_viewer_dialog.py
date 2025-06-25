@@ -315,6 +315,8 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
         if self.error:
             self.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=Qgis.Critical, duration=5)
+            self.idx = None
+            self.error = None
             return
 
         self.configure_graph()
