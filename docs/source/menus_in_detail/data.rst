@@ -49,19 +49,24 @@ into \*.csv format, just click in the *export* button in the lower left corner o
     :align: center
     :alt: data visualize matrices
 
-Additionally, since version 1.0.2, we can visualize how the skim matrices look like in the map! Using the buttons
-*By origin* and *By destination*, it is possible to select the traffic zone by its origin or destination. If one
-select *By origin*, then click on the desired row, and notice that is going to be highlighted. The *zones* layer 
-(if it exists) is going to be loaded and the corresponding zones are going to receive a different color shade, according
-to the color palette selected in the dropdown menu.
+Additionally, we can visualize how the matrices look like in the map! Using the buttons
+*By origin* and *By destination*, it is possible to select the traffic zone by its origin or 
+destination. If one select *By origin*, then click on the desired row, and notice that is going
+to be highlighted. The *zones* layer (if it exists) is going to be loaded and the corresponding
+zones are going to receive a different color shade, according to the color palette selected in
+the dropdown menu. One other possibility to select the zone for displaying is directly into the
+map canvas: with the *Select features* button enabled, just click on the desired zone in the
+layer and you'll notice that the color shades will change accordingly, as well as the row selection
+in the matrix.
 
 .. image:: ../images/data-matrix-view-row.png
     :align: center
     :alt: data matrix view by origin
 
-The step-by-step when selecting *By destination*, is identical to the one before. Select the desired column 
-(destination), notice that it will be highlighted, and the *zones* layer is going to present a color shade
-according to the color palette selected.
+The step-by-step when selecting *By destination*, is identical to the one before. Select the
+desired column (destination), notice that it will be highlighted, and the *zones* layer is
+going to present a color shade according to the color palette selected. The selection of zones
+for displaying is also available for destinations, and the steps are the same as presented above.
 
 .. image:: ../images/data-matrix-view-column.png
     :align: center
