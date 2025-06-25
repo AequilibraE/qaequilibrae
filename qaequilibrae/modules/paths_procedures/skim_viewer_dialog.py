@@ -7,7 +7,7 @@ from aequilibrae.paths import Graph
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDialog
-from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject
+from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject, Qgis
 from qgis.core import QgsStyle, QgsVectorLayerJoinInfo, QgsRuleBasedRenderer, QgsSymbol
 
 from qaequilibrae.modules.common_tools import layer_from_dataframe
@@ -28,6 +28,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.layer = None
         self.graph = None
         self.idx = None
+        self.error = None
 
         # Layer fields
         default_style = QgsStyle().defaultStyle()
@@ -114,19 +115,14 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.idx_position = dict(zip(self.indices, np.arange(len(self.indices))))
 
     def compute_skims(self, start_node):
-        end_node = np.random.choice(self.indices, 1)[0]
-        if start_node == end_node:
-            end_node = np.random.choice(self.indices, 1)[0]
-
-        res = self.graph.compute_path(start_node, end_node)
+        res = self.graph.compute_path(start_node, self.indices[-1])
         self.data_to_show = res._skimming_array[:-1]
 
         self.set_data()
 
     def plot_data_layer(self):
-        lyr = "zones" if self.cob_layer.currentText().lower() == "zones" else "nodes"
-        self.layer = self.qgis_project.layers[lyr][0]
-        self.layer_col = "zone_id" if lyr == "zones" else "node_id"
+        self.layer = self.qgis_project.layers[self._lyr][0]
+        self.layer_col = "zone_id" if self._lyr == "zones" else "node_id"
         QgsProject.instance().addMapLayer(self.layer)
 
     def map_ranges(self, fld, layer, color_ramp_name):
@@ -288,7 +284,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
     def update_cost_field(self):
         if self.layer:
-            self.graph.set_skimming(self.cob_minimizing.currentText())
+            self.graph.set_graph(self.cob_minimizing.currentText())
             self.compute_skims(self.idx)
 
     def update_block_flow(self):
@@ -296,11 +292,34 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
             self.compute_skims(self.idx)
 
+    def _check_start_id(self):
+        idx = self.line_start_id.text()
+        nodes = self.project.network.nodes.data["node_id"].tolist()
+        zones = list(self.project.zoning.all_zones().keys())
+
+        if not idx.isdigit():
+            self.error = "Start ID needs to be a positive integer value"
+            return
+
+        self._lyr = "zones" if self.cob_layer.currentText().lower() == "zones" else "nodes"
+        self.idx = int(idx)
+
+        if self._lyr == "nodes" and self.idx not in nodes:
+            self.error = "Start ID relates to a non-existing node"
+
+        if self._lyr == "zones" and self.idx not in zones:
+            self.error = "Start ID relates to a non-existing zone"
+
     def run(self):
+        self._check_start_id()
+
+        if self.error:
+            self.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=Qgis.Critical, duration=5)
+            return
+
         self.configure_graph()
 
         self.plot_data_layer()
         self.layer.selectionChanged.connect(self.recompute_after_selection)
 
-        self.idx = int(self.line_start_id.text())
         self.compute_skims(self.idx)
