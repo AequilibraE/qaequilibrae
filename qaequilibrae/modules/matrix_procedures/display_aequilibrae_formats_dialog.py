@@ -189,12 +189,15 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.format_showing()
 
     def select_from_layer(self):
-        # self.remove_mapping_layer()
         selected_features = self.zones_layer.selectedFeatures()
         if selected_features:
             idx = [feature["zone_id"] for feature in selected_features][0]
-
-        # Fazer o caminho inverso da primeira seleção,
+            if self.by_row.isChecked():
+                self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+                self.table.selectRow(self.idx_mapping[idx])
+            elif self.by_col.isChecked():
+                self.table.setSelectionBehavior(QAbstractItemView.SelectColumns)
+                self.table.selectColumn(self.idx_mapping[idx])
 
     def select_column(self):
         self.selected_col = None
@@ -419,6 +422,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.format_showing()
 
         self.indices = self.data_to_show.index.astype(np.int32)
+        self.idx_mapping = dict(zip(self.indices, np.arange(self.indices.shape[0])))
 
     def csv_file_path(self):
         new_name, _ = GetOutputFileName(
