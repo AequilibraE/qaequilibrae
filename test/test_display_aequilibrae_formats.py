@@ -86,4 +86,12 @@ def test_select_elements(ae_with_project, mocker, element):
     metrics = [round(feat["metrics_data"], 0) for feat in layer.getFeatures()]
     assert metrics == [0.0, 6.0, 4.0]
 
+    # Simulate we're clicking directly to the layer
+    layer.selectByExpression('"zone_id" = 3')
+
+    metrics2 = [round(feat["metrics_data"], 0) for feat in layer.getFeatures()]
+    assert metrics2 == [4.0, 10.0, 0.0]
+
+    assert metrics != metrics2
+
     dialog.omx.close()
