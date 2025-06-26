@@ -429,7 +429,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_bandwidth_color_ramps.ui" line="230"/>
         <source>Color ramp</source>
-        <translation type="unfinished"/>
+        <translation>Gradazioni di colore</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidth_color_ramps.ui" line="243"/>
