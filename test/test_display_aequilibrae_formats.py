@@ -77,19 +77,19 @@ def test_select_elements(ae_with_project, mocker, element):
 
     # For both columns and rows
     existing_layers = [vector.name() for vector in QgsProject.instance().mapLayers().values()]
-    assert "matrix_row" in existing_layers
+    assert "visualize_data" in existing_layers
 
     layer = QgsProject.instance().mapLayersByName("zones")[0]
     field_names = [field.name() for field in layer.fields()]
-    assert "metrics_data" in field_names
+    assert "matrix_data" in field_names
 
-    metrics = [round(feat["metrics_data"], 0) for feat in layer.getFeatures()]
+    metrics = [round(feat["matrix_data"], 0) for feat in layer.getFeatures()]
     assert metrics == [0.0, 6.0, 4.0]
 
     # Simulate we're clicking directly to the layer
     layer.selectByExpression('"zone_id" = 3')
 
-    metrics2 = [round(feat["metrics_data"], 0) for feat in layer.getFeatures()]
+    metrics2 = [round(feat["matrix_data"], 0) for feat in layer.getFeatures()]
     assert metrics2 == [4.0, 10.0, 0.0]
 
     assert metrics != metrics2

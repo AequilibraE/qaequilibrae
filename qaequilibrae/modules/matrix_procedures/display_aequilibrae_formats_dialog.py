@@ -235,7 +235,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def map_dt(self, dt):
         self.remove_mapping_layer(False)
         df = pd.DataFrame({"zone_id": self.indices, "data": dt})
-        self.mapping_layer = layer_from_dataframe(df, "matrix_row")
+        self.mapping_layer = layer_from_dataframe(df, "visualize_data")
         self.make_join(self.zones_layer, "zone_id", self.mapping_layer)
         self.draw_zone_styles()
 
@@ -246,13 +246,13 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         lien.setJoinLayerId(metric_layer.id())
         lien.setUsingMemoryCache(True)
         lien.setJoinLayer(metric_layer)
-        lien.setPrefix("metrics_")
+        lien.setPrefix("matrix_")
         base_layer.addJoin(lien)
 
     def draw_zone_styles(self):
         color_ramp_name = self.cob_colors.currentText()
 
-        self.map_ranges("metrics_data", self.zones_layer, color_ramp_name)
+        self.map_ranges("matrix_data", self.zones_layer, color_ramp_name)
 
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
@@ -260,7 +260,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         # First, we check if we have numeric values in our column
         all_values = []
         for _, f in enumerate(layer.getFeatures()):
-            all_values.append(f["metrics_data"])
+            all_values.append(f["matrix_data"])
 
         all_values = np.array(all_values, dtype=np.float32)
         values = np.unique(all_values)
@@ -475,8 +475,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def remove_data_layer(self):
         active_layers = [name.name() for name in QgsProject.instance().mapLayers().values()]
-        if "matrix_row" in active_layers:
-            layer = QgsProject.instance().mapLayersByName("matrix_row")[0]
+        if "visualize_data" in active_layers:
+            layer = QgsProject.instance().mapLayersByName("visualize_data")[0]
             QgsProject.instance().removeMapLayers([layer.id()])
             self.iface.mapCanvas().refresh()
 
