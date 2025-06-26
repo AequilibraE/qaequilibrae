@@ -753,7 +753,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="156"/>
         <source>Matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matrice</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="185"/>
