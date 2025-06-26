@@ -705,7 +705,7 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="39"/>
         <source>Adding extra fields to nodes layer</source>
-        <translation type="unfinished"/>
+        <translation>Aggiunge campi ulteriori al layer dei nodi</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="42"/>
