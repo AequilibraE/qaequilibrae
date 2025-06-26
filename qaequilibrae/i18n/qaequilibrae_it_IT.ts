@@ -500,7 +500,7 @@
     <message>
         <location filename="../modules/gis/compare_scenarios_dialog.py" line="70"/>
         <source>It will be BASE minus ALTERNATIVE</source>
-        <translation type="unfinished"/>
+        <translation>Sarà BASE meno ALTERNATIVA</translation>
     </message>
 </context>
 <context>
