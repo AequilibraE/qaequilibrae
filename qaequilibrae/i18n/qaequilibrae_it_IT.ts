@@ -728,7 +728,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="40"/>
         <source>Create Desire Lines</source>
-        <translation type="unfinished"/>
+        <translation>Crea linee di desiderio</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="114"/>
