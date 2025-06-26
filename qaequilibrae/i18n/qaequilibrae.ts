@@ -1364,7 +1364,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/routing_procedures/forms/tsp.ui" line="100"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="191"/>
         <source>Mode</source>
         <translation type="unfinished"></translation>
     </message>
