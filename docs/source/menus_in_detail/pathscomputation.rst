@@ -62,6 +62,94 @@ paths.
 With the results computed (AEM or OMX), one can display them on the screen, loading the 
 data using the :ref:`non-project data tab <fig_nonproject_data>` in **Data > Visualize data**. 
 
+.. _skim-viewer:
+
+Skim viewer
+-----------
+
+The skim viewer makes it easier to view skimming results. The skim viewer window 
+looks like this:
+
+.. image:: ../images/skim_viewer_dialog.png
+    :align: center
+    :alt: Skim viewer dialog
+
+In the *Layer* group, you can select between the nodes or zones layers for data viewing. You can
+also select a color map range for plotting and the starting node/zone ID.
+
+In the *Graph* group, you can set the graph configurations, such as the mode, the minimizing (cost)
+field, the choice to block or allow flows through the centroids, and whether to compute skims for
+all nodes or between centroids. Another useful feature of the skim viewer is that it allows users to
+use joined fields from the 'links' layer as minimizing or skimming fields.
+
+Finally, in the *Skim* group, you select the desired skimming field for plotting.
+
+When visualizing the skims, you'll notice that a memory layer named 'skim_viewer' is created.
+It contains the node or zone ID for joining the nodes or zones layer and a data column that 
+holds the data to be plotted. Whenever the selected node or zone changes, the values in the data
+column also change.
+
+Skim view without joined layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For demonstration purposes, we'll use the Coquimbo model for this example. You can go directly to
+the skim viewer and set the configuration, as presented below:
+
+.. image:: ../images/skim_viewer_no_joins.png
+    :align: center
+    :alt: Skim viewer no joins dialog
+
+The output in the map canvas is:
+
+.. image:: ../images/skim_viewer_no_join_first_node.png
+    :align: center
+    :alt: Skim viewer no joins first node
+
+If you select any other node with the skim viewer window open in the background, you will
+notice that the image displayed in the map canvas automatically changes.
+
+.. image:: ../images/skim_viewer_no_join_second_node.png
+    :align: center
+    :alt: Skim viewer no joins other nodes
+
+If you want to change either the minimizing field or skimming field (or both), you can modify 
+your selection directly in the skim viewer window, and it will be automatically recomputed 
+for display in the map canvas.
+
+Skim viewer with joined layer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For this example, we'll use the Sioux Falls model. First, join the 'links'
+layer with the desired results table (see :ref:`data_visualize_data` for more information).
+Then, go to the skim viewer. When you see the window for the first time, you won't notice
+anything different, but when you click on the minimize field and available skims,
+you'll notice that the joined fields also appear here.
+
+Let's plot the zones for Sioux Falls, starting at zone ID 5, and using
+*traffic_assignment_result_congested_time* for both the costs and skimming fields. The initial
+configuration looks like this:
+
+.. image:: ../images/skim_viewer_with_joins.png
+    :align: center
+    :alt: Skim viewer with joins dialog
+
+The output in the map canvas will be:
+
+.. image:: ../images/skim_viewer_with_joins_first_zone.png
+    :align: center
+    :alt: Skim viewer with joins first zone
+
+If your zone layer is active and you select another zone with the skim viewer window 
+open in the background, you'll notice that the image in the map canvas automatically changes.
+
+.. image:: ../images/skim_viewer_with_joins_second_zone.png
+    :align: center
+    :alt: Skim viewer with joins second zone
+
+If you want to change either the minimizing field or skimming field (or both), you can modify your
+selection directly in the skim viewer window, and it will be automatically recomputed
+for display in the map canvas.
+
 .. _siouxfalls-traffic-assignment-and-skimming:
 
 Traffic assignment

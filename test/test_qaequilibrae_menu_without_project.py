@@ -163,8 +163,16 @@ def test_impedance_matrix_menu(ae, qtbot):
     assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
 
 
-def test_traffic_assignment_menu(ae, qtbot):
+def test_skim_viewer_menu(ae, qtbot):
     action = ae.menuActions["Paths and assignment"][2]
+    assert action.text() == "Skim viewer", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
+def test_traffic_assignment_menu(ae, qtbot):
+    action = ae.menuActions["Paths and assignment"][3]
     assert action.text() == "Traffic Assignment", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
@@ -172,7 +180,7 @@ def test_traffic_assignment_menu(ae, qtbot):
 
 
 def test_route_choice_menu(ae, qtbot):
-    action = ae.menuActions["Paths and assignment"][3]
+    action = ae.menuActions["Paths and assignment"][4]
     assert action.text() == "Route choice", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()

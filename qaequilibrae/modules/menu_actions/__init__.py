@@ -8,6 +8,7 @@ from .action_gis_scenario_comparison import run_scenario_comparison
 from .action_gis_simple_tag import run_tag
 from .action_gis_stacked_bandwidths import run_stacked_bandwidths
 from .action_import_matrices import load_matrices
+from .action_skim_viewer import load_skim_viewer
 from .action_prepare_network import prepare_network
 from .action_pt_explore import run_pt_explore
 from .action_pt_import_gtfs import run_import_gtfs

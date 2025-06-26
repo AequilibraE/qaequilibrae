@@ -215,13 +215,27 @@ def test_impedance_matrix_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
+def test_skim_viewer_menu(ae_with_project, qtbot):
+    from qaequilibrae.modules.paths_procedures.skim_viewer_dialog import SkimViewerDialog
+
+    def handle_trigger():
+        check_if_new_active_window_matches_class(qtbot, SkimViewerDialog)
+
+    action = ae_with_project.menuActions["Paths and assignment"][2]
+    assert action.text() == "Skim viewer", "Wrong text content"
+    QTimer.singleShot(10, handle_trigger)
+    action.trigger()
+    messagebar = ae_with_project.iface.messageBar()
+    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+
+
 def test_traffic_assignment_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, TrafficAssignmentDialog)
 
-    action = ae_with_project.menuActions["Paths and assignment"][2]
+    action = ae_with_project.menuActions["Paths and assignment"][3]
     assert action.text() == "Traffic Assignment", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
@@ -235,7 +249,7 @@ def test_route_choice_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, RouteChoiceDialog)
 
-    action = ae_with_project.menuActions["Paths and assignment"][3]
+    action = ae_with_project.menuActions["Paths and assignment"][4]
     assert action.text() == "Route choice", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
