@@ -715,7 +715,7 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="45"/>
         <source>Renumbering nodes layer</source>
-        <translation type="unfinished"/>
+        <translation>Rinumerazione del layer dei nodi</translation>
     </message>
 </context>
 <context>
