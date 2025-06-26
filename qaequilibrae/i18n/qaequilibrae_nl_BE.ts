@@ -229,17 +229,17 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="154"/>
+        <location filename="../qaequilibrae.py" line="155"/>
         <source>Paths and assignment</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="158"/>
+        <location filename="../qaequilibrae.py" line="159"/>
         <source>Routing</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="166"/>
+        <location filename="../qaequilibrae.py" line="167"/>
         <source>Public Transport</source>
         <translation type="unfinished"/>
     </message>
@@ -299,37 +299,37 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="151"/>
+        <location filename="../qaequilibrae.py" line="152"/>
         <source>Traffic Assignment</source>
         <translation>Verkeerstoedeling</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="158"/>
+        <location filename="../qaequilibrae.py" line="159"/>
         <source>Travelling Salesman Problem</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="162"/>
+        <location filename="../qaequilibrae.py" line="163"/>
         <source>Import GTFS</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="170"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Desire Lines</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="171"/>
+        <location filename="../qaequilibrae.py" line="172"/>
         <source>Stacked Bandwidth</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="172"/>
+        <location filename="../qaequilibrae.py" line="173"/>
         <source>Scenario Comparison</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="173"/>
+        <location filename="../qaequilibrae.py" line="174"/>
         <source>Simple tag</source>
         <translation type="unfinished"/>
     </message>
@@ -339,22 +339,22 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="177"/>
+        <location filename="../qaequilibrae.py" line="178"/>
         <source>Help</source>
         <translation>Help</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="184"/>
+        <location filename="../qaequilibrae.py" line="185"/>
         <source>Show project info</source>
         <translation>Toon project informatie</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="334"/>
+        <location filename="../qaequilibrae.py" line="335"/>
         <source>You need to load a project first</source>
         <translation>Je moet eerst een project inladen</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="337"/>
+        <location filename="../qaequilibrae.py" line="338"/>
         <source>You need to close the project currently open first</source>
         <translation>Je moet eerst het momenteel geopende project sluiten</translation>
     </message>
@@ -364,7 +364,7 @@
         <translation>Maak een voorbeeld</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="166"/>
+        <location filename="../qaequilibrae.py" line="167"/>
         <source>Explore Transit</source>
         <translation>Onderzoek Openbaar Vervoer</translation>
     </message>
@@ -379,23 +379,28 @@
         <translation>Visualiseer data</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="342"/>
+        <location filename="../qaequilibrae.py" line="343"/>
         <source>You need to import a GTFS feed first</source>
         <translation>Je moet eerst een GTFS specificatie inladen</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="154"/>
+        <location filename="../qaequilibrae.py" line="155"/>
         <source>Route choice</source>
         <translation>Route keuze</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="163"/>
+        <location filename="../qaequilibrae.py" line="164"/>
         <source>Skimming and Assignment</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="115"/>
         <source>Run procedures</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="151"/>
+        <source>Skim viewer</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -1357,7 +1362,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/routing_procedures/forms/tsp.ui" line="100"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="191"/>
         <source>Mode</source>
         <translation type="unfinished"/>
     </message>
@@ -1544,6 +1549,71 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="81"/>
         <source>Add Period</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="14"/>
+        <source>Skim viewer</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="43"/>
+        <source>Graph</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="98"/>
+        <source>Minimize field</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="111"/>
+        <source>Centroids to centroids</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="170"/>
+        <source>Block paths through centroids</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="204"/>
+        <source>ALL nodes to ALL nodes</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="214"/>
+        <source>Plot!</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="226"/>
+        <source>Skims</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="235"/>
+        <source>Available Skims</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="250"/>
+        <source>Layer</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="259"/>
+        <source>Color</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="266"/>
+        <source>Selected layer</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="289"/>
+        <source>Start ID</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -2854,6 +2924,14 @@
     <message>
         <location filename="../modules/gis/simple_tag_dialog.py" line="238"/>
         <source>First found record is used.</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>SkimViewerDialog</name>
+    <message>
+        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="317"/>
+        <source>Input error</source>
         <translation type="unfinished"/>
     </message>
 </context>
