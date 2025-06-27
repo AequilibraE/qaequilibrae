@@ -1,8 +1,9 @@
-import pytest
 from os import listdir, environ
+
+import pytest
+from aequilibrae.project import Project
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsRectangle
-from aequilibrae.project import Project
 
 from qaequilibrae.modules.project_procedures.project_from_osm_dialog import ProjectFromOSMDialog
 
