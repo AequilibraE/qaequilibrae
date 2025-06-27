@@ -21,6 +21,7 @@ class DownloadAll:
         "pandas",
         "py_cpuinfo",
         "pyaml",
+        "pyarrow",
         "pyogrio",
         "pyproj",
         "pytz",
