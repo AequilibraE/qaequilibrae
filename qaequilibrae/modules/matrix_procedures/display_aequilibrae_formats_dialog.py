@@ -239,6 +239,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.make_join(self.zones_layer, "zone_id", self.mapping_layer)
         self.draw_zone_styles()
 
+        self.iface.setActiveLayer(self.zones_layer)
+
     def make_join(self, base_layer, join_field, metric_layer):
         lien = QgsVectorLayerJoinInfo()
         lien.setJoinFieldName(join_field)
