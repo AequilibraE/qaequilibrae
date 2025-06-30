@@ -1,5 +1,5 @@
 ---
-title: 'QAequilibraE: a graphical user interface for transportation modeling'
+title: 'QAequilibraE: a graphical user interface for transportation modeling on QGIS'
 tags:
   - QGIS
   - Python
@@ -38,6 +38,9 @@ generating data visualization or getting useul insights.
 
 -- A Statement of need section that clearly illustrates the research purpose of the software and places it in the context of related work.
 
+QAequilibraE was born in 2017 to differenciate between the Python package and the QGIS plugin,
+whose development was occurring simultaneously at that time.
+
 The latest stable version of the QGIS plugin can be downloaded and installed through the plugins menu, and
 full documentation is available at `https://www.aequilibrae.com/develop/qgis/index.html` 
 
@@ -46,7 +49,7 @@ full documentation is available at `https://www.aequilibrae.com/develop/qgis/ind
 Although the plugin relies completely on AequilibraE's features, some functionalities are only 
 available as part of the QGIS ecossystem, of which:
 
-- Easily visualize traffic analysis zones (TAZ) data or customized skims;
+- Visualization of traffic analysis zones (TAZ) data or customized skims;
 - Run a travelling salesman problem (TSP);
 - Create different types of desire lines, allowing different visualizations and scenario comparison;
 - Iteratively explore general transit feed specifications (GTFS) on the top of a network.
