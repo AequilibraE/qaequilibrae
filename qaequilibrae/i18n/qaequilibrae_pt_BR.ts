@@ -1574,7 +1574,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="170"/>
         <source>Block paths through centroids</source>
-        <translation type="unfinished"/>
+        <translation>Limitar caminhos aos centroides</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="204"/>
