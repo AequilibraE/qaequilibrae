@@ -1614,7 +1614,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="289"/>
         <source>Start ID</source>
-        <translation type="unfinished"/>
+        <translation>ID inicial</translation>
     </message>
 </context>
 <context>
