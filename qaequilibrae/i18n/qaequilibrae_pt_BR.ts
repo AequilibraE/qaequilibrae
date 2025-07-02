@@ -396,7 +396,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="115"/>
         <source>Run procedures</source>
-        <translation type="unfinished"/>
+        <translation>Executar procedimentos</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="151"/>
