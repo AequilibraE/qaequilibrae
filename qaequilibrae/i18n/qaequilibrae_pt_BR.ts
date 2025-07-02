@@ -2745,7 +2745,7 @@
     <message>
         <location filename="../modules/processing_provider/run_module.py" line="68"/>
         <source>1. Model Building</source>
-        <translation type="unfinished"/>
+        <translation>1. Construção de modelos</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/run_module.py" line="74"/>
@@ -2842,7 +2842,7 @@
     <message>
         <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="317"/>
         <source>Input error</source>
-        <translation type="unfinished"/>
+        <translation>Erro de entrada</translation>
     </message>
 </context>
 <context>
