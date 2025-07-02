@@ -1993,9 +1993,6 @@
     </message>
 </context>
 <context>
-    <name>MatrixFromLayer</name>
-</context>
-<context>
     <name>MatrixReblocking</name>
     <message>
         <location filename="../modules/matrix_procedures/mat_reblock.py" line="26"/>
