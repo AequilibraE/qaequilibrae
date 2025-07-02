@@ -1063,57 +1063,57 @@
 <context>
     <name>DisplayAequilibraEFormatsDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="444"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="468"/>
         <source>AequilibraE custom formats</source>
         <translation>Formatos personalizados do AequilibraE</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="50"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="51"/>
         <source>Path provided is not a valid dataset</source>
         <translation>O caminho indicado não é um banco de dados válido</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="63"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="64"/>
         <source>File path: {}</source>
         <translation>Caminho para o arquivo: {}</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="74"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="75"/>
         <source>Could not load dataset</source>
         <translation>Não foi possível carregar o banco de dados</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="103"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="104"/>
         <source>Thousands separator</source>
         <translation>Separador de milhares</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="112"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="113"/>
         <source>Decimal places</source>
         <translation>Casas decimais</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="175"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="179"/>
         <source>Close</source>
         <translation>Fechar</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="170"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="174"/>
         <source>Export</source>
         <translation>Exportar</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="147"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="148"/>
         <source>No mapping</source>
         <translation>Não criar mapas</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="151"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="152"/>
         <source>By origin</source>
         <translation>Por origem</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="155"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="156"/>
         <source>By destination</source>
         <translation>Por destino</translation>
     </message>
@@ -1362,7 +1362,7 @@
         <translation>Projeto</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="191"/>
+        <location filename="../modules/routing_procedures/forms/tsp.ui" line="100"/>
         <source>Mode</source>
         <translation>Modo</translation>
     </message>
@@ -1992,96 +1992,6 @@
 </context>
 <context>
     <name>MatrixFromLayer</name>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="53"/>
-        <source>Output folder</source>
-        <translation>Pasta de saída</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="19"/>
-        <source>Matrix Layer</source>
-        <translation>Camada da matriz</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="20"/>
-        <source>Origin</source>
-        <translation>Origem</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="30"/>
-        <source>Destination</source>
-        <translation>Destino</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="40"/>
-        <source>Value</source>
-        <translation>Valor</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="50"/>
-        <source>File name</source>
-        <translation>Nome do arquivo</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="63"/>
-        <source>Matrix name</source>
-        <translation>Nome da matriz</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="66"/>
-        <source>Matrix description</source>
-        <translation>Descrição da matriz</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="73"/>
-        <source>Matrix core</source>
-        <translation>Núcleo da matriz</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="84"/>
-        <source>AequilibraE module not found</source>
-        <translation>O módulo AequilibraE não foi encontrado.</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="101"/>
-        <source>Importing layer</source>
-        <translation>Importando camadas</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="141"/>
-        <source>{}x{} matrix imported </source>
-        <translation>Matriz {}x{} importada</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="158"/>
-        <source>Import matrices</source>
-        <translation>Importar matrizes</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="164"/>
-        <source>Data</source>
-        <translation>Dados</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="174"/>
-        <source>Save a layer as a *.aem file. Notice that:</source>
-        <translation>Salvar camada como um arquivo *.aem. Repare que:</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="176"/>
-        <source>- the original matrix stored in the layer needs to be in list format</source>
-        <translation>- a matriz originalmente armazenada na camada precisa estar no formato de lista</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="178"/>
-        <source>- origin and destination fields need to be integers</source>
-        <translation>- os campos que representam origem e destino devem possuir valores inteiros</translation>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="180"/>
-        <source>- value field can be either integer or real</source>
-        <translation>- o campo de valores pode assumir formato inteiro ou decimal</translation>
-    </message>
 </context>
 <context>
     <name>MatrixReblocking</name>
