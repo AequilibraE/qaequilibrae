@@ -1589,7 +1589,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="226"/>
         <source>Skims</source>
-        <translation type="unfinished"/>
+        <translation>Custos</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="235"/>
