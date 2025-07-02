@@ -2735,12 +2735,12 @@
     <message>
         <location filename="../modules/processing_provider/run_module.py" line="28"/>
         <source>Available functions</source>
-        <translation type="unfinished"/>
+        <translation>Funções disponíveis</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/run_module.py" line="65"/>
         <source>Run procedures</source>
-        <translation type="unfinished"/>
+        <translation>Executar procedimentos</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/run_module.py" line="68"/>
