@@ -2722,7 +2722,7 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="40"/>
         <source>Run procedures executed</source>
-        <translation type="unfinished"/>
+        <translation>Procedimentos executados</translation>
     </message>
 </context>
 <context>
@@ -2730,7 +2730,7 @@
     <message>
         <location filename="../modules/processing_provider/run_module.py" line="37"/>
         <source>No AequilibraE project loaded.</source>
-        <translation type="unfinished"/>
+        <translation>Não há projeto do AequilibraE aberto.</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/run_module.py" line="28"/>
