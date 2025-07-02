@@ -1564,12 +1564,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="98"/>
         <source>Minimize field</source>
-        <translation type="unfinished"/>
+        <translation>Minimizar campo</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="111"/>
         <source>Centroids to centroids</source>
-        <translation type="unfinished"/>
+        <translation>Centroides para centroides</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="170"/>
