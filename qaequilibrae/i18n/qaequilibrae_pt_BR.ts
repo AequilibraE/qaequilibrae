@@ -1594,12 +1594,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="235"/>
         <source>Available Skims</source>
-        <translation type="unfinished"/>
+        <translation>Custos disponíveis</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="250"/>
         <source>Layer</source>
-        <translation type="unfinished"/>
+        <translation>Camada</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="259"/>
