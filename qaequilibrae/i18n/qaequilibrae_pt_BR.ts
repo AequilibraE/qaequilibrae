@@ -1584,7 +1584,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="214"/>
         <source>Plot!</source>
-        <translation type="unfinished"/>
+        <translation>Visualizar!</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="226"/>
