@@ -2699,12 +2699,12 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="28"/>
         <source>Available procedures</source>
-        <translation type="unfinished"/>
+        <translation>Procedimentos disponíveis</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="38"/>
         <source>Run!</source>
-        <translation type="unfinished"/>
+        <translation>Executar!</translation>
     </message>
 </context>
 <context>
@@ -2712,12 +2712,12 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="32"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>Erro</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="32"/>
         <source>Please check the Parameters file</source>
-        <translation type="unfinished"/>
+        <translation>Por favor, verifique o arquivo &apos;Parameters&apos;</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="40"/>
