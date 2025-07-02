@@ -1604,12 +1604,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="259"/>
         <source>Color</source>
-        <translation type="unfinished"/>
+        <translation>Cores</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="266"/>
         <source>Selected layer</source>
-        <translation type="unfinished"/>
+        <translation>Camada selecionada</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="289"/>
