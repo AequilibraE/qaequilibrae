@@ -2750,7 +2750,7 @@
     <message>
         <location filename="../modules/processing_provider/run_module.py" line="74"/>
         <source>Run entire model pipelines from AequilibraE</source>
-        <translation type="unfinished"/>
+        <translation>Execute pipelines de modelos do AequilibraE</translation>
     </message>
 </context>
 <context>
