@@ -401,7 +401,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="151"/>
         <source>Skim viewer</source>
-        <translation type="unfinished"/>
+        <translation>Visualizador de matrizes</translation>
     </message>
 </context>
 <context>
@@ -1554,7 +1554,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="14"/>
         <source>Skim viewer</source>
-        <translation type="unfinished"/>
+        <translation>Visualizador de matrizes</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="43"/>
