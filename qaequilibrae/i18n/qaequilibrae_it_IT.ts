@@ -4404,7 +4404,7 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="169"/>
         <source>Index field</source>
-        <translation type="unfinished"/>
+        <translation>Campo indice</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="201"/>
