@@ -4266,7 +4266,7 @@
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="119"/>
         <source>Allowed link types</source>
-        <translation type="unfinished"/>
+        <translation>Tipi di link ammessi</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="158"/>
