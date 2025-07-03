@@ -1559,7 +1559,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="43"/>
         <source>Graph</source>
-        <translation type="unfinished"/>
+        <translation>Grafo</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="98"/>
