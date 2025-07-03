@@ -4281,7 +4281,7 @@
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="210"/>
         <source>Connectors per centroid</source>
-        <translation type="unfinished"/>
+        <translation>Connettori per centroide</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="246"/>
