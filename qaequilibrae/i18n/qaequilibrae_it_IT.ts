@@ -1324,7 +1324,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="181"/>
         <source>Overwrite Routes</source>
-        <translation type="unfinished"/>
+        <translation>Sovrascrive percorsi</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="71"/>
