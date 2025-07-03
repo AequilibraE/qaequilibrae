@@ -4261,7 +4261,7 @@
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="113"/>
         <source>Configurations</source>
-        <translation type="unfinished"/>
+        <translation>Configurazioni</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="119"/>
