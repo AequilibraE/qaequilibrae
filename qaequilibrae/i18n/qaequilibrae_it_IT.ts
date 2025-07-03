@@ -997,7 +997,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="438"/>
         <source>jobs</source>
-        <translation type="unfinished"/>
+        <translation>Lavori</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="455"/>
