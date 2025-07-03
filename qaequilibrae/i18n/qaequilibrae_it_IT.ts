@@ -4371,7 +4371,7 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="303"/>
         <source>Create Project</source>
-        <translation type="unfinished"/>
+        <translation>Crea progetto</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="382"/>
