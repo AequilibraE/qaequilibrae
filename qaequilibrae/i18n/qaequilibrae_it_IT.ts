@@ -4376,7 +4376,7 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="382"/>
         <source>Status Message 0</source>
-        <translation type="unfinished"/>
+        <translation>Messaggio di stato 0</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="190"/>
