@@ -2294,7 +2294,7 @@
     <message>
         <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="57"/>
         <source>Importing nodes layer</source>
-        <translation type="unfinished"/>
+        <translation>Importa il layer dei nodi</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/renumber_nodes_from_layer.py" line="76"/>
