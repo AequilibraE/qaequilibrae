@@ -4326,7 +4326,7 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="216"/>
         <source>Zoning layer</source>
-        <translation type="unfinished"/>
+        <translation>Layer della zonizzazione</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="14"/>
