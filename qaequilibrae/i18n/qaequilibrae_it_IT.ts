@@ -1394,7 +1394,7 @@
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="225"/>
         <source>On a new layer</source>
-        <translation type="unfinished"/>
+        <translation>Su un nuovo layer</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="241"/>
