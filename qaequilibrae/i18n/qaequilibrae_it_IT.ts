@@ -1544,7 +1544,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="74"/>
         <source>Period start</source>
-        <translation type="unfinished"/>
+        <translation>Inizio periodo</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="81"/>
