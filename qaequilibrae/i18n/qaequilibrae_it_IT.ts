@@ -4276,7 +4276,7 @@
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="176"/>
         <source>Add conectors</source>
-        <translation type="unfinished"/>
+        <translation>Aggiunge connettori</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="210"/>
