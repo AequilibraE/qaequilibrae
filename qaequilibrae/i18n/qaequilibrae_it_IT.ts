@@ -2570,7 +2570,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="387"/>
         <source>Zoning layer</source>
-        <translation type="unfinished"/>
+        <translation>Layer della zonizzazione</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="394"/>
@@ -2852,7 +2852,7 @@
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="37"/>
         <source>Nodes layer</source>
-        <translation type="unfinished"/>
+        <translation>Layer dei nodi</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="54"/>
