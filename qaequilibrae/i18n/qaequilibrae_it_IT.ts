@@ -1294,7 +1294,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="218"/>
         <source>+</source>
-        <translation type="unfinished"/>
+        <translation>+</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="19"/>
