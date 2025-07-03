@@ -1504,7 +1504,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1617"/>
         <source>Scale</source>
-        <translation type="unfinished"/>
+        <translation>Scala</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1232"/>
