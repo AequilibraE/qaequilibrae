@@ -1216,7 +1216,7 @@
     <message>
         <location filename="../modules/processing_provider/export_matrix.py" line="20"/>
         <source>File path</source>
-        <translation type="unfinished"/>
+        <translation>Percorso del file</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/export_matrix.py" line="72"/>
