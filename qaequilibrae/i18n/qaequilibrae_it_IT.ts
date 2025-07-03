@@ -1609,7 +1609,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="266"/>
         <source>Selected layer</source>
-        <translation type="unfinished"/>
+        <translation>Layer selezionato</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="289"/>
