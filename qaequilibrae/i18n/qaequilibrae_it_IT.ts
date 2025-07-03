@@ -1579,7 +1579,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="204"/>
         <source>ALL nodes to ALL nodes</source>
-        <translation type="unfinished"/>
+        <translation>Da tutti i nodi a tutti i nodi</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="214"/>
