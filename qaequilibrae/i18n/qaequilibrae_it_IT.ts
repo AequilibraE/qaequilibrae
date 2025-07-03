@@ -1419,7 +1419,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="348"/>
         <source>Sample</source>
-        <translation type="unfinished"/>
+        <translation>Campione</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="375"/>
