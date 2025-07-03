@@ -957,7 +957,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="273"/>
         <source>Seed</source>
-        <translation type="unfinished"/>
+        <translation>Seme</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="400"/>
