@@ -1153,7 +1153,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="225"/>
         <source>Could not load model. {}</source>
-        <translation type="unfinished"/>
+        <translation>Non è stato possibile caricare il modello {}</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="419"/>
