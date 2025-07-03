@@ -1329,7 +1329,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="71"/>
         <source>Add to Existing Routes</source>
-        <translation type="unfinished"/>
+        <translation>Aggiunge ai percorsi esistenti</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="247"/>
