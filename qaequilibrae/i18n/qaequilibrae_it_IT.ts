@@ -4286,7 +4286,7 @@
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="246"/>
         <source>Creating Connectors</source>
-        <translation type="unfinished"/>
+        <translation>Creazione dei connettori</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="48"/>
