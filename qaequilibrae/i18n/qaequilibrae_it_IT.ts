@@ -4419,12 +4419,12 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="270"/>
         <source>Save and Use</source>
-        <translation type="unfinished"/>
+        <translation>Salva e usa</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="299"/>
         <source>Field</source>
-        <translation type="unfinished"/>
+        <translation>Campo</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="332"/>
