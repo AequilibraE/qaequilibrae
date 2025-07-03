@@ -1264,12 +1264,12 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="172"/>
         <source>Route capacities</source>
-        <translation type="unfinished"/>
+        <translation>Capacità dei percorsi</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="186"/>
         <source>Route Type</source>
-        <translation type="unfinished"/>
+        <translation>Tipo di percorso</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="191"/>
