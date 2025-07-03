@@ -1389,7 +1389,7 @@
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="218"/>
         <source>In a selection</source>
-        <translation type="unfinished"/>
+        <translation>In una selezione</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="225"/>
