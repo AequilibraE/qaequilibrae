@@ -1080,7 +1080,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="75"/>
         <source>Could not load dataset</source>
-        <translation type="unfinished"/>
+        <translation>Non è stato possibile carica l&apos;insieme di dati</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="104"/>
