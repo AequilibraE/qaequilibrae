@@ -1399,7 +1399,7 @@
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="241"/>
         <source>Run</source>
-        <translation type="unfinished"/>
+        <translation>Esegue</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="25"/>
