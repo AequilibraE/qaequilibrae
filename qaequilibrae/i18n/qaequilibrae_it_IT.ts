@@ -912,7 +912,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="85"/>
         <source>Data sets</source>
-        <translation type="unfinished"/>
+        <translation>Insiemi di dati</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="342"/>
