@@ -1499,7 +1499,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1746"/>
         <source>Show labels</source>
-        <translation type="unfinished"/>
+        <translation>Mostra etichette</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1617"/>
