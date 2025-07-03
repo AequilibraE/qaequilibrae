@@ -1369,7 +1369,7 @@
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="151"/>
         <source>Minimize</source>
-        <translation type="unfinished"/>
+        <translation>Minimizza</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="161"/>
@@ -1379,7 +1379,7 @@
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="202"/>
         <source>Starting node</source>
-        <translation type="unfinished"/>
+        <translation>Nodo di partenza</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="212"/>
