@@ -907,7 +907,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="51"/>
         <source># of fields</source>
-        <translation type="unfinished"/>
+        <translation>Numero di campi</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="85"/>
