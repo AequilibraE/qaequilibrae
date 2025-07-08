@@ -52,6 +52,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.select_links = {}
         self.__current_links = []
         self.__project_links = self.project.network.links.data.link_id
+        self.link_layer = qgis_project.layers["links"][0]
 
         # Signals for the matrix_procedures tab
         self.but_add_skim.clicked.connect(self._add_skimming)
