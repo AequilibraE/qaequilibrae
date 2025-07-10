@@ -30,16 +30,17 @@ class RouteChoiceProcedure(WorkerThread):
         node_from = self.parameters["node_from"]
         node_to = self.parameters["node_to"]
 
+        self.graph.set_graph("__utility__")
+
         nodes_of_interest = np.array([node_from, node_to], dtype=np.int64)
         self.graph.prepare_graph(nodes_of_interest)
-        self.graph.set_graph("utility")
 
         self.rc = self._build_rc(self.graph)
         _ = self.rc.execute_single(node_from, node_to, self.matrix)
 
     def do_assign_or_build(self):
+        self.graph.set_graph("__utility__")
         self.graph.prepare_graph(self.graph.centroids)
-        self.graph.set_graph("utility")
 
         if self.parameters["set_sub_area"]:
             sub_area = SubAreaAnalysis(self.graph, self.parameters["zones"], self.matrix)
@@ -55,7 +56,7 @@ class RouteChoiceProcedure(WorkerThread):
             # Rebuild graph for external ODs
             new_centroids = np.unique(self.matrix.reset_index()[["origin id", "destination id"]].to_numpy().reshape(-1))
             self.graph.prepare_graph(new_centroids)
-            self.graph.set_graph("utility")
+            self.graph.set_graph("__utility__")
 
         self.rc = self._build_rc(self.graph)
         self.rc.add_demand(self.matrix)
@@ -83,15 +84,17 @@ class RouteChoiceProcedure(WorkerThread):
 
         self.graph = self.project.network.graphs[mode_id]
 
-        field = np.zeros((1, self.graph.network.shape[0]))
-        for idx, (par, col) in enumerate(self.parameters["graph"]["utility"]):
-            field += par * self.graph.network[col].array
-
-        self.graph.network = self.graph.network.assign(utility=0)
-        self.graph.network["utility"] = field.reshape(self.graph.network.shape[0], 1)
-
         if self.parameters["graph"]["use_chosen_links"]:
             self.graph = self.project.network.graphs.pop(mode_id)
             self.graph.exclude_links(self.parameters["graph"]["links_to_remove"])
+
+        self.graph.network = self.graph.network.assign(__utility__=0.0)
+        self.graph.prepare_graph(self.graph.centroids)
+
+        field = np.zeros((1, self.graph.graph.shape[0]))
+        for idx, (par, col) in enumerate(self.parameters["graph"]["utility"]):
+            field += par * self.graph.graph[col].array
+
+        self.graph.graph["__utility__"] = field.reshape(self.graph.graph.shape[0], 1)
 
         self.graph.set_blocked_centroid_flows(self.parameters["graph"]["block_centroid_flows"])
