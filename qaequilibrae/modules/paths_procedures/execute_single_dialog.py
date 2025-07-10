@@ -44,8 +44,6 @@ class ExecuteSingleDialog(QDialog, FORM_CLASS):
         nodes_of_interest = np.array([from_node, to_node], dtype=np.int64)
         self.graph.prepare_graph(nodes_of_interest)
 
-        # self.graph.set_graph("__utility__")
-
         rc = RouteChoice(self.graph)
         rc.set_choice_set_generation(self._algo, **self._kwargs)
         _ = rc.execute_single(from_node, to_node, self.demand)

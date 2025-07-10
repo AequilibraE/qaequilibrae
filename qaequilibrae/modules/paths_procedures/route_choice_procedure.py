@@ -43,7 +43,6 @@ class RouteChoiceProcedure(WorkerThread):
             # Rebuild graph for external ODs
             new_centroids = np.unique(self.matrix.reset_index()[["origin id", "destination id"]].to_numpy().reshape(-1))
             self.graph.prepare_graph(new_centroids)
-            self.graph.set_graph("__utility__")
 
         self.rc = self._build_rc(self.graph)
         self.rc.add_demand(self.matrix)
