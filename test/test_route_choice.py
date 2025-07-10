@@ -47,12 +47,12 @@ def test_execute_single(coquimbo_project, qtbot):
 
 def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
     project = coquimbo_project.project
-    project.network.build_graphs()
+    project.network.build_graphs(modes=["c"])
 
     graph = project.network.graphs["c"]
-    graph.network = graph.network.assign(utility=graph.network.distance * 0.011)
+    graph.network = graph.network.assign(__utility__=graph.network.distance * 0.011)
     graph.prepare_graph(graph.centroids)
-    graph.set_graph("utility")
+    graph.set_graph("__utility__")
     graph.set_blocked_centroid_flows(False)
 
     params = {
