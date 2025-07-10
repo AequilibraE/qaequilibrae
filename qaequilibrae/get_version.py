@@ -12,3 +12,4 @@ current_version = current_time.strftime("%y.%j.%f")
 
 with open("qaequilibrae/metadata.txt", mode="a") as file:
     file.write(f"version={current_version}")
+    print(current_version)
