@@ -3,6 +3,7 @@ import os
 import sys
 
 import geopandas as gpd
+import numpy as np
 import qgis
 from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
@@ -173,13 +174,34 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         idx = self.link_layer.dataProvider().fieldNameIndex("link_id")
         remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
 
-        self.parameters["graph"] = {
-            "mode_id": mode_id,
-            "use_chosen_links": self.chb_chosen_links.isChecked(),
-            "links_to_remove": remove,
-            "block_centroid_flows": self.chb_check_centroids.isChecked(),
-            "utility": self.utility,
-        }
+        if mode_id not in self.project.network.graphs:
+            self.project.network.build_graphs(modes=[mode_id])
+
+        graph = self.project.network.graphs[mode_id]
+
+        if self.chb_chosen_links.isChecked():
+            graph = self.project.network.graphs.pop(mode_id)
+            graph.exclude_links(remove)
+
+        if self.job == "execute_single":
+            nodes_of_interest = np.array([self.parameters["node_from"], self.parameters["node_to"]], dtype=np.int64)
+        else:
+            nodes_of_interest = graph.centroids
+
+        graph.network = graph.network.assign(__utility__=0.0)
+        graph.prepare_graph(nodes_of_interest)
+
+        field = np.zeros((1, graph.graph.shape[0]))
+        for idx, (par, col) in enumerate(self.utility):
+            field += par * graph.graph[col].array
+
+        graph.graph["__utility__"] = field.reshape(graph.graph.shape[0], 1)
+
+        graph.set_blocked_centroid_flows(self.chb_check_centroids.isChecked())
+
+        graph.set_graph("__utility__")
+
+        self.parameters["graph"] = graph
 
     ###### For sub-area analysis
     def set_sub_area_use(self):

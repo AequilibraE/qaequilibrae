@@ -14,11 +14,9 @@ class RouteChoiceProcedure(WorkerThread):
         self.parameters = parameters
         self.matrix = parameters["matrix"]
 
-        self.graph = None
+        self.graph = parameters["graph"]
 
     def doWork(self):
-        self._configure_graph()
-
         if self.job == "execute_single":
             self.do_execute_single()
         if self.job in ["assign", "build"]:
@@ -28,7 +26,7 @@ class RouteChoiceProcedure(WorkerThread):
 
     def do_execute_single(self):
         self.rc = self._build_rc(self.graph)
-        _ = self.rc.execute_single(self._node_from, self._node_to, self.matrix)
+        _ = self.rc.execute_single(self.parameters["node_from"], self.parameters["node_to"], self.matrix)
 
     def do_assign_or_build(self):
         if self.parameters["set_sub_area"]:
@@ -65,34 +63,3 @@ class RouteChoiceProcedure(WorkerThread):
         rc = RouteChoice(graph)
         rc.set_choice_set_generation(self.parameters["algorithm"], **self.parameters["kwargs"])
         return rc
-
-    def _configure_graph(self):
-        mode_id = self.parameters["graph"]["mode_id"]
-        if mode_id not in self.project.network.graphs:
-            self.project.network.build_graphs(modes=[mode_id])
-
-        self.graph = self.project.network.graphs[mode_id]
-
-        if self.parameters["graph"]["use_chosen_links"]:
-            self.graph = self.project.network.graphs.pop(mode_id)
-            self.graph.exclude_links(self.parameters["graph"]["links_to_remove"])
-
-        if self.job == "execute_single":
-            self._node_from = self.parameters["node_from"]
-            self._node_to = self.parameters["node_to"]
-            nodes_of_interest = np.array([self._node_from, self._node_to], dtype=np.int64)
-        else:
-            nodes_of_interest = self.graph.centroids
-
-        self.graph.network = self.graph.network.assign(__utility__=0.0)
-        self.graph.prepare_graph(nodes_of_interest)
-
-        field = np.zeros((1, self.graph.graph.shape[0]))
-        for idx, (par, col) in enumerate(self.parameters["graph"]["utility"]):
-            field += par * self.graph.graph[col].array
-
-        self.graph.graph["__utility__"] = field.reshape(self.graph.graph.shape[0], 1)
-
-        self.graph.set_blocked_centroid_flows(self.parameters["graph"]["block_centroid_flows"])
-
-        self.graph.set_graph("__utility__")
