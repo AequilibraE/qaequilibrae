@@ -1,6 +1,5 @@
-<?xml version="1.0"?>
 <plugins>
-    <pyqgis_plugin name="QAequilibraE - Unpublished" version="25.191.0">
+    <pyqgis_plugin name="qaequilibrae" version="25.191.0">
         <description>Transportation modeling toolbox for QGIS</description>
         <qgis_minimum_version>3.34.10</qgis_minimum_version>
         <file_name>qaequilibrae.zip</file_name>

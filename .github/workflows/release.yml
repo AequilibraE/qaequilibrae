@@ -34,6 +34,9 @@ jobs:
         lrelease qaequilibrae/i18n/qaequilibrae_*.ts
         sed -i "s|^*.qm.*| |" .gitignore
         git add qaequilibrae/
+
+    - name: Update version and SHA info
+      run: python -c "from qaequilibrae.set_version import set_version; set_version(${{ github.event.pull_request.head.sha }})"
     
     - name: Get plugin version
       run: |
@@ -64,6 +67,18 @@ jobs:
         --osgeo-username ${{ secrets.QGIS_PLUGIN_REPO_USER }} 
         --osgeo-password ${{ secrets.QGIS_PLUGIN_REPO_PASSWORD }}
 
+    - name: Upload ZIP to history on DEV
+      if: ${{ (github.event_name == 'pull_request')}}
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --exclude '*' --include 'qaequilibrae*.zip'
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'us-east-1'   # optional: defaults to us-east-1
+        DEST_DIR: 'dev/qgis/version_history/'
+
     - name: Copy file to DOCS
       if: ${{ (github.event_name != 'release')}}
       run: |
@@ -73,7 +88,7 @@ jobs:
       if: ${{ (github.event_name == 'pull_request')}}
       uses: jakejarvis/s3-sync-action@master
       with:
-        args: --acl public-read --follow-symlinks --exclude '*' --include 'qaequilibrae.zip'
+        args: --acl public-read --follow-symlinks --exclude '*' --include 'qaequilibrae.zip' --include 'plugins.xml'
       env:
         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
