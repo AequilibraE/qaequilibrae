@@ -36,7 +36,7 @@ jobs:
         git add qaequilibrae/
 
     - name: Update version and SHA info
-      run: python -c "from qaequilibrae.set_version import set_version; set_version(${{ github.event.pull_request.head.sha }})"
+      run: python -c "from qaequilibrae.set_version import set_version; set_version('${{ github.event.pull_request.head.sha }}')"
     
     - name: Get plugin version
       run: |
