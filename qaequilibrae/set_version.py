@@ -13,15 +13,17 @@ def set_version(sha):
     current_time = datetime.now()
     current_version = current_time.strftime("%y.%j.%f")
 
-    with open("qaequilibrae/metadata.txt", mode="a") as file:
+    metadata_path = project_dir / "qaequilibrae" / "metadata.txt"
+    with open(metadata_path, mode="a") as file:
         file.write(f"version={current_version}\n")
         file.write(f"commitSha1={sha}")
 
     # Update version in XML
-    tree = ET.parse("docs/source/_static/plugins.xml")
+    xml_path = project_dir / "docs" / "source" / "_static" / "plugin.xml"
+    tree = ET.parse(xml_path)
     root = tree.getroot()
 
     for child in root:
         child.attrib["version"] = current_version
 
-    tree.write("docs/source/_static/plugins.xml")
+    tree.write(xml_path)
