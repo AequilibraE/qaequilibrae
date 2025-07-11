@@ -57,6 +57,8 @@ plugin will be non-functional.
     :align: center
     :alt: Fifth step
 
+.. _plugin_repository:
+
 Plugin Repository
 -----------------
 
