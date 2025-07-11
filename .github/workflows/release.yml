@@ -67,8 +67,9 @@ jobs:
         --osgeo-username ${{ secrets.QGIS_PLUGIN_REPO_USER }} 
         --osgeo-password ${{ secrets.QGIS_PLUGIN_REPO_PASSWORD }}
 
-    - name: Upload ZIP to history on DEVELOP
-      if: ${{ (github.ref == 'refs/heads/develop') && (github.event_name == 'push')}}
+    # Test in DEV first
+    - name: Upload ZIP to history on DEV
+      if: ${{ (github.event_name == 'pull_request')}}
       uses: jakejarvis/s3-sync-action@master
       with:
         args: --acl public-read --follow-symlinks --exclude '*' --include 'qaequilibrae*.zip'
