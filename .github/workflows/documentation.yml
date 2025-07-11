@@ -49,7 +49,7 @@ jobs:
       if: ${{ (github.event_name == 'pull_request')}}
       uses: jakejarvis/s3-sync-action@master
       with:
-        args: --acl public-read --follow-symlinks --delete --exclude 'qaequilibrae.zip' --exclude '_static/plugin.xml'
+        args: --acl public-read --follow-symlinks --exclude 'qaequilibrae.zip' --exclude '_static/plugin.xml' --delete
       env:
         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
