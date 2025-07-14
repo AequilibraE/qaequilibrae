@@ -5,7 +5,7 @@ from pathlib import Path
 from aequilibrae.context import get_logger
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog, QMessageBox
-from qgis.core import Qgis
+from qgis.core import Qgis, QgsMessageLog
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
 from qaequilibrae.message import messages
@@ -44,15 +44,14 @@ class RunModuleDialog(QDialog, FORM_CLASS):
             run_path = Path(self.project.project_base_path / "run" / "requirements.txt")
             target_dir = Path(__file__).parent.parent.parent / "packages"
             if os.path.isfile(run_path):
-                if (
-                    QMessageBox.question(
-                        self, self._msg.rp_box_name, self._msg.rp_message, QMessageBox.Ok | QMessageBox.Cancel
-                    )
-                    == QMessageBox.Ok
-                ):
+                self.question = QMessageBox.question(
+                    self, self._msg.rp_box_name, self._msg.rp_message, QMessageBox.Ok | QMessageBox.Cancel
+                )
+                if self.question == QMessageBox.Ok:
                     install_command = f'"{DownloadAll().find_python()}"'
                     install_command += f" -m pip install -r {run_path} --target {target_dir}"
-                    print(install_command)
+                    QgsMessageLog.logMessage(install_command)
+
                     process = subprocess.Popen(
                         install_command,
                         shell=True,
@@ -62,26 +61,22 @@ class RunModuleDialog(QDialog, FORM_CLASS):
                         universal_newlines=True,
                     )
                     ret = process.stdout.readlines()
-                    print(ret)
+                    for line in ret:
+                        QgsMessageLog.logMessage(line)
 
-                    # Verificar código de saída do processo
+                    # Check process output
                     exit_code = process.wait()
                     if exit_code != 0:
-                        QMessageBox.information(self, "Information", "Package installation failed.")
+                        QMessageBox.critical(self, "Error", "Package installation failed. Check messages log.")
+                        self.reject()
                     else:
                         QMessageBox.information(
                             self, "Information", "Restart 'Run Procedures' to validate installation."
                         )
                         self.reject()
-                        return
-                else:
-                    QMessageBox.information(self, "Information", "'Run Procedures' cannot be executed.")
-                    self.reject()
-                    return
             else:
-                QMessageBox.information(self, "Information", self._msg.rp_error)
+                QMessageBox.critical(self, "Error", self._msg.rp_error)
                 self.reject()
-                return
 
     def run(self):
         # Check if selected function is also present at the Parameters file
