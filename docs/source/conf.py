@@ -24,16 +24,6 @@ project = "AequilibraE for QGIS"
 copyright = f"{str(datetime.now().date())}, AequilibraE developers"
 author = "Pedro Camargo"
 
-# The short X.Y.Z version
-
-a = open("../../qaequilibrae/metadata.txt", "r")
-for line in a.readlines():
-    if "version" in line.rstrip():
-        version = line.rstrip()[8:]
-
-# The full version, including alpha/beta/rc tags
-release = version
-
 # -- General configuration ---------------------------------------------------
 
 # Sphinx extension module names

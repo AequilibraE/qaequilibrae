@@ -34,6 +34,9 @@ jobs:
         lrelease qaequilibrae/i18n/qaequilibrae_*.ts
         sed -i "s|^*.qm.*| |" .gitignore
         git add qaequilibrae/
+
+    - name: Update version and SHA info
+      run: python -c "from qaequilibrae.set_version import set_version; set_version('${{ github.event.pull_request.head.sha }}')"
     
     - name: Get plugin version
       run: |
@@ -52,7 +55,37 @@ jobs:
         name: qaequilibrae
         path: ${{ env.FILE_PATH }}
         if-no-files-found: warn
-  
+
+    - name: Upload ZIP to history on DEVELOP
+      if: ${{ (github.ref == 'refs/heads/develop') && (github.event_name == 'push')}}
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --exclude '*' --include 'qaequilibrae*.zip'
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'us-east-1'   # optional: defaults to us-east-1
+        DEST_DIR: 'develop/qgis/version_history/'
+
+    - name: Copy file to DOCS
+      if: ${{ (github.ref == 'refs/heads/develop') && (github.event_name == 'push')}}
+      run: |
+        cp qaequilibrae*.zip docs/source/_static/qaequilibrae.zip
+
+    - name: Upload ZIP to DEVELOP
+      if: ${{ (github.ref == 'refs/heads/develop') && (github.event_name == 'push')}}
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --exclude '*' --include 'qaequilibrae.zip' --include 'plugin.xml'
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'us-east-1'   # optional: defaults to us-east-1
+        SOURCE_DIR: 'docs/source/_static/'
+        DEST_DIR: 'develop/qgis/_static/'
+
     - name: Release plugin in QGIS
       if: ${{ (github.event_name == 'release')}}
       run: >-

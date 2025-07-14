@@ -147,24 +147,29 @@ GitHub has a nice visual explanation on how collaboration is done `GitHub Flow
 Release versions
 ~~~~~~~~~~~~~~~~~
 
-QAequilibraE uses the de-facto Python standard for `versioning
-<http://the-hitchhikers-guide-to-packaging.readthedocs.io/en/latest/specification.html>`_
+For the past few years, QAequilibraE's release versioning was related to the major and minor
+releases in AequilibraE. If you frequently update your plugin, you might have noticed that
+we recently jumped from v1.3.1 to v1.4.3, without any micro releases in between, just because
+these were the most recent AequilibraE version when the releases happened.
+
+To add the :ref:`Plugin Repository <plugin_repository>` feature, the development team decided
+to change how the QAequilibraE versioning is done. We'll move from version tags based on
+AequilibraE, for time-based tags when the release is made (so don't be scared if you see a 
+version such as 25.192.23).
+
+We'll continue using the de-facto Python standard for
+`versioning <https://the-hitchhikers-guide-to-packaging.readthedocs.io/en/latest/specification.html>`_,
+but with a different version scheme. 
 
 ::
 
   MAJOR.MINOR[.MICRO]
 
-- MAJOR designates a major revision number for the software. Usually, raising a major revision number means that
-  you are adding a lot of features, breaking backward-compatibility or drastically changing the API.
+- MAJOR designates the year of the release
 
-- MINOR usually groups moderate changes to the software like bug fixes or minor improvements. Most of the time, end \
-  users can upgrade with no risks their software to a new minor release. In case an API changes, the end users will be \
-  notified with deprecation warnings. In other words, API stability is usually a promise between two minor releases.
+- MINOR designates the number of the day in the year
 
-- Some software use a third level: MICRO. This level is used when the release cycle of minor release is quite long.
-  In that case, micro releases are dedicated to bug fixes.
-
-QAequilibraE's development is happening mostly within the Minor and Micro levels.
+- MICRO designates the hour of the day the release was made
 
 Testing
 ~~~~~~~~
@@ -172,6 +177,7 @@ Testing
 QAequilibraE testing is done with some tools:
 
 * `Black <https://black.readthedocs.io/en/stable/>`_, the uncompromising code formatter
+* `Ruff <https://docs.astral.sh/ruff/>`_, a linter and code formatter
 * `pytest <http://pytest.org/latest/>`_, a Python testing tool
 * `pytest-cov <https://pytest-cov.readthedocs.io/en/latest/index.html>`_, a tool for measuring test code coverage
 * `pytest-qt <https://pytest-qt.readthedocs.io/en/latest/index.html>`_, a tool for testing PyQt5 applications
