@@ -155,7 +155,7 @@ these were the most recent AequilibraE version when the releases happened.
 To add the :ref:`Plugin Repository <plugin_repository>` feature, the development team decided
 to change how the QAequilibraE versioning is done. We'll move from version tags based on
 AequilibraE, for time-based tags when the release is made (so don't be scared if you see a 
-version such as 25.192.587424).
+version such as 25.192.23).
 
 We'll continue using the de-facto Python standard for
 `versioning <https://the-hitchhikers-guide-to-packaging.readthedocs.io/en/latest/specification.html>`_,
@@ -169,7 +169,7 @@ but with a different version scheme.
 
 - MINOR designates the number of the day in the year
 
-- MICRO designates the time in microseconds as a decimal number
+- MICRO designates the hour of the day the release was made
 
 Testing
 ~~~~~~~~
