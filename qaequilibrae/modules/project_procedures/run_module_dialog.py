@@ -32,11 +32,11 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         self.but_run.clicked.connect(self.run)
 
     def handle_rejection(self):
-        print("FECHA ISSO")
-        # self.exit()
+        self.but_run.setVisible(False)
+        self.cob_function.setVisible(False)
+        self.label.setVisible(False)
 
     def check_missing_packages(self):
-        print("check_missing_packages")
         try:
             self.items = list(self.project.run._fields)
             self.cob_function.addItems(self.items)
@@ -84,7 +84,6 @@ class RunModuleDialog(QDialog, FORM_CLASS):
                 return
 
     def run(self):
-        print("run")
         # Check if selected function is also present at the Parameters file
         func_name = self.items[self.cob_function.currentIndex()]
         parameter_keys = list(self.project.parameters["run"].keys())
@@ -102,7 +101,6 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         self.exit_procedure()
 
     def exit_procedure(self):
-        print("exit_procedure")
         self.close()
 
         dlg2 = LogDialog(self.qgis_project, self)
