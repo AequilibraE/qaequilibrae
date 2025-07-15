@@ -8,7 +8,6 @@ from qgis.PyQt.QtWidgets import QDialog, QMessageBox
 from qgis.core import Qgis, QgsMessageLog
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
-from qaequilibrae.message import messages
 from qaequilibrae.modules.common_tools import LogDialog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_run_module.ui"))
@@ -23,7 +22,6 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
 
         self.logger = logger or get_logger()
-        self._msg = messages()
 
         self.rejected.connect(self.handle_rejection)
 
@@ -40,17 +38,21 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         try:
             self.items = list(self.project.run._fields)
             self.cob_function.addItems(self.items)
+            QgsMessageLog.logMessage(
+                "All run procedures dependencies are installed.", level=Qgis.MessageLevel.Info, notifyUser=False
+            )
+
         except ModuleNotFoundError:
             run_path = Path(self.project.project_base_path / "run" / "requirements.txt")
             target_dir = Path(__file__).parent.parent.parent / "packages"
             if os.path.isfile(run_path):
                 self.question = QMessageBox.question(
-                    self, self._msg.rp_box_name, self._msg.rp_message, QMessageBox.Ok | QMessageBox.Cancel
+                    self, "Missing requirements", self.rp_message, QMessageBox.Ok | QMessageBox.Cancel
                 )
                 if self.question == QMessageBox.Ok:
                     install_command = f'"{DownloadAll().find_python()}"'
                     install_command += f" -m pip install -r {run_path} --target {target_dir}"
-                    QgsMessageLog.logMessage(install_command)
+                    QgsMessageLog.logMessage(install_command, level=Qgis.MessageLevel.Info)
 
                     process = subprocess.Popen(
                         install_command,
@@ -62,21 +64,26 @@ class RunModuleDialog(QDialog, FORM_CLASS):
                     )
                     ret = process.stdout.readlines()
                     for line in ret:
-                        QgsMessageLog.logMessage(line)
+                        QgsMessageLog.logMessage(line, level=Qgis.MessageLevel.Info)
 
                     # Check process output
                     exit_code = process.wait()
                     if exit_code != 0:
                         QMessageBox.critical(self, "Error", "Package installation failed. Check messages log.")
-                        self.reject()
                     else:
+                        DownloadAll().clean_packages(target_dir)
                         QMessageBox.information(
                             self, "Information", "Restart 'Run Procedures' to validate installation."
                         )
-                        self.reject()
+                else:
+                    QMessageBox.warning(
+                        self, "Warning", "Without the 'requirements.txt' installation, 'Run procedures' cannot be used."
+                    )
             else:
-                QMessageBox.critical(self, "Error", self._msg.rp_error)
-                self.reject()
+                QMessageBox.warning(
+                    self, "Warning", "Missing 'requirements.txt' file. Please check the project run folder."
+                )
+            self.reject()
 
     def run(self):
         # Check if selected function is also present at the Parameters file
@@ -89,7 +96,10 @@ class RunModuleDialog(QDialog, FORM_CLASS):
 
         func = getattr(self.project.run, func_name)
         result = func()
-        self.logger.info(result)
+        if result:
+            self.logger.info(result)
+        else:
+            self.logger.info(f"{func_name} executed. Check for outputs.")
 
         self.iface.messageBar().pushMessage(self.tr("Run procedures executed"), "", level=Qgis.Info, duration=5)
 
@@ -101,3 +111,21 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         dlg2 = LogDialog(self.qgis_project, self)
         dlg2.show()
         dlg2.exec_()
+
+    @property
+    def rp_message(self):
+        """Message for run procedures"""
+        a = self.tr("There are missing requirements to run the procedures.")
+        b = self.tr("Do you want us to install these missing Python packages?")
+        c = self.tr("Without installing the packages, you cannot use 'Run Procedures'.")
+        return f"{a}\r\n{b}\r\n{c}"
+
+    # def clean_packages(self, target_folder):
+    #     for fldr in list(os.walk(target_folder))[0][1]:
+    #         for pkg in DownloadAll().must_remove:
+    #             if pkg.lower() in fldr.lower():
+    #                 if os.path.isdir(os.path.join(target_folder, fldr)):
+    #                     rmtree(os.path.join(target_folder, fldr))
+    #                     QgsMessageLog.logMessage(
+    #                         f"Duplicated packages removed from installation: {fldr}", level=Qgis.MessageLevel.Info
+    #                     )

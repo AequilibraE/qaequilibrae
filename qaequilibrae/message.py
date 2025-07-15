@@ -32,23 +32,5 @@ class messages:
         b = self.tr("Please install QGIS version 3.34.10+ or 3.38.2+ to make it work.")
         return f"{a}\r\n{b}"
 
-    @property
-    def rp_box_name(self):
-        """Box name for run procedures"""
-        return self.tr("Missing requirements")
-
-    @property
-    def rp_message(self):
-        """Message for run procedures"""
-        a = self.tr("There are missing requirements to run the procedures.")
-        b = self.tr("Do you want us to install these missing Python packages?")
-        c = self.tr("Without installing the packages, you cannot use 'Run Procedures'.")
-        return f"{a}\r\n{b}\r\n{c}"
-
-    @property
-    def rp_error(self):
-        """Message for run procedures"""
-        return self.tr("Missing 'requirements.txt' file. Please check the project run folder.")
-
     def tr(self, text):
         return QCoreApplication.translate("messages", text)
