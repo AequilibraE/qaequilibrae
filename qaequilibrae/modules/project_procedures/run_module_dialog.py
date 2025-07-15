@@ -119,13 +119,3 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         b = self.tr("Do you want us to install these missing Python packages?")
         c = self.tr("Without installing the packages, you cannot use 'Run Procedures'.")
         return f"{a}\r\n{b}\r\n{c}"
-
-    # def clean_packages(self, target_folder):
-    #     for fldr in list(os.walk(target_folder))[0][1]:
-    #         for pkg in DownloadAll().must_remove:
-    #             if pkg.lower() in fldr.lower():
-    #                 if os.path.isdir(os.path.join(target_folder, fldr)):
-    #                     rmtree(os.path.join(target_folder, fldr))
-    #                     QgsMessageLog.logMessage(
-    #                         f"Duplicated packages removed from installation: {fldr}", level=Qgis.MessageLevel.Info
-    #                     )
