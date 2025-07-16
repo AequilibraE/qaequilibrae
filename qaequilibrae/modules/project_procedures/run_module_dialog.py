@@ -62,9 +62,8 @@ class RunModuleDialog(QDialog, FORM_CLASS):
                         stderr=subprocess.STDOUT,
                         universal_newlines=True,
                     )
-                    ret = process.stdout.readlines()
-                    for line in ret:
-                        QgsMessageLog.logMessage(line, level=Qgis.MessageLevel.Info)
+                    for line in process.stdout:
+                        QgsMessageLog.logMessage(line.strip(), level=Qgis.MessageLevel.Info)
 
                     # Check process output
                     exit_code = process.wait()
@@ -118,4 +117,4 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         a = self.tr("There are missing requirements to run the procedures.")
         b = self.tr("Do you want us to install these missing Python packages?")
         c = self.tr("Without installing the packages, you cannot use 'Run Procedures'.")
-        return f"{a}\r\n{b}\r\n{c}"
+        return f"{a}\n{b}\n{c}"
