@@ -10,6 +10,7 @@ on:
 jobs:
   windows_test:
     runs-on: windows-latest
+    timeout-minutes: 20
     strategy:
       matrix:
       # we test the minimum LTR version required, the newest LTR, and the latest.
