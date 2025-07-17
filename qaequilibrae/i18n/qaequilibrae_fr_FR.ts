@@ -1991,9 +1991,6 @@
     </message>
 </context>
 <context>
-    <name>MatrixFromLayer</name>
-</context>
-<context>
     <name>MatrixReblocking</name>
     <message>
         <location filename="../modules/matrix_procedures/mat_reblock.py" line="26"/>
@@ -2669,22 +2666,22 @@
 <context>
     <name>RouteChoiceDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="359"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="381"/>
         <source>Input error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="241"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="263"/>
         <source>Missing query name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="244"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="266"/>
         <source>Query name already used</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="247"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="269"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"/>
     </message>
@@ -2710,18 +2707,33 @@
 <context>
     <name>RunModuleDialog</name>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="32"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="92"/>
         <source>Error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="32"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="92"/>
         <source>Please check the Parameters file</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="40"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="103"/>
         <source>Run procedures executed</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="117"/>
+        <source>There are missing requirements to run the procedures.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="118"/>
+        <source>Do you want us to install these missing Python packages?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="119"/>
+        <source>Without installing the packages, you cannot use &apos;Run Procedures&apos;.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -3007,72 +3019,72 @@
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="238"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="239"/>
         <source>Class name already used</source>
         <translation>Nom de segment de la demande déjà utilisé</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="291"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="292"/>
         <source>Remove</source>
         <translation>Retirer</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="417"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="418"/>
         <source>Input error</source>
         <translation>Erreur d&apos;entrant</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="447"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="448"/>
         <source>No traffic classes to assign</source>
         <translation>Aucun segment de la demande à affecter</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="452"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="453"/>
         <source>Missing scenario name</source>
         <translation>Aucun nom de scénario</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="458"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="459"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation>Le nom de table de résultats existe déjà. Choisissez un nouveau nom</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="535"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="536"/>
         <source>VDF parameter is not numeric</source>
         <translation>Le paramètre de courbe débit/vitesse n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="344"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="345"/>
         <source>Wrong value for link ID</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="351"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="352"/>
         <source>Link ID doesn&apos;t exist in project</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="361"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="362"/>
         <source>Missing query name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="366"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="367"/>
         <source>Query name already used</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="371"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="372"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="464"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="465"/>
         <source>Missing select link matrix name.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="468"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="469"/>
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation type="unfinished"/>
     </message>
