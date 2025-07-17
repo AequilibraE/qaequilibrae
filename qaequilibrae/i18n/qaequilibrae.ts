@@ -2709,18 +2709,33 @@
 <context>
     <name>RunModuleDialog</name>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="32"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="92"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="32"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="92"/>
         <source>Please check the Parameters file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="40"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="103"/>
         <source>Run procedures executed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="117"/>
+        <source>There are missing requirements to run the procedures.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="118"/>
+        <source>Do you want us to install these missing Python packages?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="119"/>
+        <source>Without installing the packages, you cannot use &apos;Run Procedures&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
