@@ -14,6 +14,7 @@ import qgis
 from qgis.PyQt.QtCore import Qt, QTranslator, QSettings, QLocale, QCoreApplication, QSize
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication, QToolBar, QToolButton
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox
+from qgis.PyQt.QtWidgets import QComboBox, QLabel
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
 from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
 
@@ -181,10 +182,12 @@ class AequilibraEMenu:
         # ########################################################################
         # #################        PROJECT MANAGER       #########################
 
-        self.showing = QCheckBox()
-        self.showing.setText(self.tr("Show project info"))
-        self.showing.setChecked(True)
-        self.toolbar.addWidget(self.showing)
+        lbl = QLabel("Model scenario")
+        lbl.setAlignment(Qt.AlignCenter)
+        self.toolbar.addWidget(lbl)
+
+        self.cob_iter = QComboBox()
+        self.toolbar.addWidget(self.cob_iter)
 
         self.projectManager = QTabWidget()
         self.toolbar.addWidget(self.projectManager)

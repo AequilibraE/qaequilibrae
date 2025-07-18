@@ -35,7 +35,6 @@ def _run_load_project_from_path(qgis_project, proj_path):
         qgis_project.projectManager.removeTab(i)
     if proj_path is not None and len(proj_path) > 0:
         qgis_project.contents = []
-        qgis_project.showing.setVisible(True)
         qgis_project.project = Project()
 
         try:
