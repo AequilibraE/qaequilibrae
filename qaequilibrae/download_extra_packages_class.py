@@ -60,6 +60,7 @@ class DownloadAll:
                 fl.write("")
 
         self.clean_packages(self.target_folder)
+        print("Error code: ", self.error)
         return self.error
 
     def install_package(self, package):
