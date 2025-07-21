@@ -43,7 +43,7 @@ class DownloadAll:
         reps = []
         command = f'"{self.find_python()}" -m pip install uv'
         _ = self.execute(command)
-        print(command)
+        QgsMessageLog.logMessage(command, level=Qgis.MessageLevel.Info)
 
         for file in self.dependency_files:
             flag = self.target_folder / file.name
@@ -71,36 +71,36 @@ class DownloadAll:
         install_command = f'-m {is_uv} pip install {package} --target "{self.target_folder}"'
 
         command = f'"{self.find_python()}" {install_command}'
-        print(command)
+        QgsMessageLog.logMessage(command, level=Qgis.MessageLevel.Info)
 
         if not self.no_ssl:
             reps = self.execute(command)
 
         if self.no_ssl or (
-            "because the ssl module is not available" in "".join(reps).lower() and sys.platform == "win32"
+            "because the SSL module is not available" in "".join(reps).lower() and sys.platform == "win32"
         ):
             command = f"python {install_command}"
-            print(command)
+            QgsMessageLog.logMessage(command, level=Qgis.MessageLevel.Info)
             reps = self.execute(command)
             self.no_ssl = True
 
-        for line in reps:
-            QgsMessageLog.logMessage(str(line))
         return reps
 
     def execute(self, command):
         lines = []
         lines.append(command)
-        with subprocess.Popen(
+        process = subprocess.Popen(
             command,
             shell=True,
             stdout=subprocess.PIPE,
             stdin=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
-        ) as proc:
-            lines.extend(proc.stdout.readlines())
-        return lines
+        )
+        for line in process.stdout:
+            QgsMessageLog.logMessage(line.strip(), level=Qgis.MessageLevel.Info)
+        exit_code = process.wait()
+        return exit_code
 
     def find_python(self):
         # Check if we're inside a virtual environment
@@ -158,11 +158,18 @@ class DownloadAll:
                             f"Duplicated packages removed from installation: {fldr}", level=Qgis.MessageLevel.Info
                         )
 
+    def remove_packages(self):
+        existing_files = list(os.walk(self.target_folder))
+        for packages in existing_files[1]:
+            shutil.rmtree(self.target_folder / packages)
+
+        for file in existing_files[2]:
+            if file == "__init__.py":
+                continue
+            (self.target_folder / file.name).unlink()
+
 
 if __name__ == "__main__":
     result = DownloadAll().install()
-    output = "".join([str(x).upper() for x in result])
 
-    print(output)
-
-    assert "ERROR" not in output
+    assert sum(result) == 0
