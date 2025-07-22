@@ -27,9 +27,7 @@ Installation
 
         # The downloader uses two files to mark when dependencies have need installed, we'll
         # remove those to get it to retry the downloads.
-        installer.remove_packages()
-
-        installer.install()
+        installer.retry_pkg_install()
 
 
 User issues

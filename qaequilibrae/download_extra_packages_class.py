@@ -163,7 +163,7 @@ class DownloadAll:
                             f"Duplicated packages removed from installation: {fldr}", level=Qgis.MessageLevel.Info
                         )
 
-    def remove_packages(self):
+    def retry_pkg_install(self):
         existing_files = list(os.walk(self.target_folder))[0]
         for packages in existing_files[1]:
             shutil.rmtree(self.target_folder / packages)
@@ -172,6 +172,7 @@ class DownloadAll:
             if file == "__init__.py":
                 continue
             (self.target_folder / file).unlink()
+        self.install()
 
 
 if __name__ == "__main__":
