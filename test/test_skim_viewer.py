@@ -10,12 +10,12 @@ from .utilities import run_sfalls_assignment
 # TODO: ideally, we would test if all the views are correct.
 @pytest.mark.parametrize("layer", ["Nodes", "Zones"])
 def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, layer):
+    ae_with_project.iface.setActiveLayer(layer)
     dialog = SkimViewerDialog(ae_with_project)
 
     dialog.cob_minimizing.setCurrentText("distance")
     dialog.cob_skim.setCurrentText("distance")
     dialog.block_paths.setChecked(False)
-    dialog.cob_layer.setCurrentText(layer)
     dialog.line_start_id.setText("1")
 
     qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
@@ -37,10 +37,11 @@ def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, la
 
 def test_parameter_changed(ae_with_project, qtbot, timeoutDetector):
     dialog = SkimViewerDialog(ae_with_project)
+    lyr = dialog.qgis_project.layers["nodes"][0]
+    dialog.iface.setActiveLayer(lyr)
 
     dialog.cob_minimizing.setCurrentIndex(8)
     dialog.cob_skim.setCurrentIndex(8)
-    dialog.cob_layer.setCurrentText("Nodes")
     dialog.line_start_id.setText("1")
 
     qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
@@ -95,6 +96,7 @@ def test_parameter_changed(ae_with_project, qtbot, timeoutDetector):
 
 
 def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocker):
+    ae_with_project.iface.setActiveLayer("Nodes")
     proj = run_sfalls_assignment(ae_with_project)
 
     function = "qaequilibrae.modules.matrix_procedures.load_project_data.DisplayAequilibraEFormatsDialog"
@@ -130,7 +132,6 @@ def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocke
     dialog.cob_minimizing.setCurrentText("assignment_congested_time")
     dialog.cob_skim.setCurrentText("assignment_congested_time")
     dialog.block_paths.setChecked(False)
-    dialog.cob_layer.setCurrentText("Nodes")
     dialog.line_start_id.setText("1")
 
     qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
@@ -170,12 +171,12 @@ def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocke
     ],
 )
 def test_start_id_errors(ae_with_project, qtbot, timeoutDetector, layer, par, error):
+    ae_with_project.iface.setActiveLayer(layer)
     dialog = SkimViewerDialog(ae_with_project)
 
     dialog.cob_minimizing.setCurrentText("distance")
     dialog.cob_skim.setCurrentText("distance")
     dialog.block_paths.setChecked(False)
-    dialog.cob_layer.setCurrentText(layer)
     dialog.line_start_id.setText(par)
 
     qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)

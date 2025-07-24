@@ -55,8 +55,6 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             "__compressed_id__",
         ]
 
-        self.cob_layer.addItems(["Nodes", "Zones"])
-
         # Graph config
         with self.project.db_connection as conn:
             res = conn.execute("""SELECT mode_name, mode_id FROM modes""")
@@ -103,7 +101,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             self.graph = self.project.network.graphs[mode]
 
             # We prepare the graph to set all nodes as centroids
-            if self.rdo_all_nodes.isChecked():
+            if self._lyr == "nodes":
                 self.graph.prepare_graph(self.graph.all_nodes)
 
         self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
@@ -121,9 +119,8 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.set_data()
 
     def plot_data_layer(self):
-        self.layer = self.qgis_project.layers[self._lyr][0]
-        self.layer_col = "zone_id" if self._lyr == "zones" else "node_id"
-        QgsProject.instance().addMapLayer(self.layer)
+        self.layer_col = "zone_id" if self.layer.name() == "zones" else "node_id"
+        # QgsProject.instance().addMapLayer(self.layer)
 
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
@@ -148,7 +145,8 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         #
         values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
         values = [0, 0.000000000001] + values
-        color_ramp = color_ramp_shades(color_ramp_name, num_steps)
+        invert = self.chb_invert.isChecked()
+        color_ramp = color_ramp_shades(color_ramp_name, num_steps, invert)
 
         # Create Rule-Based renderer
         root_rule = QgsRuleBasedRenderer.Rule(None)
@@ -293,6 +291,8 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             self.compute_skims(self.idx)
 
     def _check_start_id(self):
+        self.layer = self.iface.activeLayer()
+
         idx = self.line_start_id.text()
         nodes = self.project.network.nodes.data["node_id"].tolist()
         zones = list(self.project.zoning.all_zones().keys())
@@ -301,7 +301,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             self.error = "Start ID needs to be a positive integer value"
             return
 
-        self._lyr = "zones" if self.cob_layer.currentText().lower() == "zones" else "nodes"
+        self._lyr = "zones" if self.layer.name() == "zones" else "nodes"
         self.idx = int(idx)
 
         if self._lyr == "nodes" and self.idx not in nodes:
