@@ -8,9 +8,12 @@ from .utilities import run_sfalls_assignment
 
 
 # TODO: ideally, we would test if all the views are correct.
-@pytest.mark.parametrize("layer", ["Nodes", "Zones"])
-def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, layer):
-    ae_with_project.iface.setActiveLayer(layer)
+@pytest.mark.parametrize("layer", ["nodes", "zones"])
+def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, layer, qgis_iface):
+    lyr = ae_with_project.layers[layer][0]
+    QgsProject.instance().addMapLayer(lyr)
+    qgis_iface.setActiveLayer(lyr)
+
     dialog = SkimViewerDialog(ae_with_project)
 
     dialog.cob_minimizing.setCurrentText("distance")
@@ -35,10 +38,12 @@ def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, la
     assert "skim_viewer_data" in field_names
 
 
-def test_parameter_changed(ae_with_project, qtbot, timeoutDetector):
+def test_parameter_changed(ae_with_project, qtbot, timeoutDetector, qgis_iface):
+    lyr = ae_with_project.layers["nodes"][0]
+    QgsProject.instance().addMapLayer(lyr)
+    qgis_iface.setActiveLayer(lyr)
+
     dialog = SkimViewerDialog(ae_with_project)
-    lyr = dialog.qgis_project.layers["nodes"][0]
-    dialog.iface.setActiveLayer(lyr)
 
     dialog.cob_minimizing.setCurrentIndex(8)
     dialog.cob_skim.setCurrentIndex(8)
@@ -95,8 +100,11 @@ def test_parameter_changed(ae_with_project, qtbot, timeoutDetector):
     assert start_cost != current_cost
 
 
-def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocker):
-    ae_with_project.iface.setActiveLayer("Nodes")
+def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocker, qgis_iface):
+    lyr = ae_with_project.layers["nodes"][0]
+    QgsProject.instance().addMapLayer(lyr)
+    qgis_iface.setActiveLayer(lyr)
+
     proj = run_sfalls_assignment(ae_with_project)
 
     function = "qaequilibrae.modules.matrix_procedures.load_project_data.DisplayAequilibraEFormatsDialog"
@@ -164,14 +172,19 @@ def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocke
 @pytest.mark.parametrize(
     "layer,par,error",
     [
-        ("Zones", "", "Start ID needs to be a positive integer value"),
-        ("Zones", "52", "Start ID relates to a non-existing zone"),
-        ("Nodes", "", "Start ID needs to be a positive integer value"),
-        ("Nodes", "100", "Start ID relates to a non-existing node"),
+        ("zones", "aaa", "Start ID needs to be a positive integer value"),
+        ("zones", "52", "Start ID relates to a non-existing zone"),
+        ("zones", "", "Enter a start ID or select a feature in the active layer"),
+        ("nodes", "aaa", "Start ID needs to be a positive integer value"),
+        ("nodes", "100", "Start ID relates to a non-existing node"),
+        ("nodes", "", "Enter a start ID or select a feature in the active layer"),
     ],
 )
-def test_start_id_errors(ae_with_project, qtbot, timeoutDetector, layer, par, error):
-    ae_with_project.iface.setActiveLayer(layer)
+def test_start_id_errors(ae_with_project, qtbot, timeoutDetector, layer, par, error, qgis_iface):
+    lyr = ae_with_project.layers[layer][0]
+    QgsProject.instance().addMapLayer(lyr)
+    qgis_iface.setActiveLayer(lyr)
+
     dialog = SkimViewerDialog(ae_with_project)
 
     dialog.cob_minimizing.setCurrentText("distance")

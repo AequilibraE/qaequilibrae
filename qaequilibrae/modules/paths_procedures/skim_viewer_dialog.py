@@ -118,10 +118,6 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
         self.set_data()
 
-    def plot_data_layer(self):
-        self.layer_col = "zone_id" if self.layer.name() == "zones" else "node_id"
-        # QgsProject.instance().addMapLayer(self.layer)
-
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
 
@@ -292,17 +288,26 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
     def _check_start_id(self):
         self.layer = self.iface.activeLayer()
+        self._lyr = "zones" if self.layer.name() == "zones" else "nodes"
+        self.layer_col = "zone_id" if self.layer.name() == "zones" else "node_id"
 
-        idx = self.line_start_id.text()
+        idx = self.line_start_id.text().replace(" ", "")
         nodes = self.project.network.nodes.data["node_id"].tolist()
         zones = list(self.project.zoning.all_zones().keys())
 
-        if not idx.isdigit():
-            self.error = "Start ID needs to be a positive integer value"
-            return
+        if len(idx) == 0:
+            try:
+                selected_features = self.layer.selectedFeatures()
+                self.idx = [feature[self.layer_col] for feature in selected_features][0]
+            except IndexError:
+                self.error = "Enter a start ID or select a feature in the active layer"
+                return
+        else:
+            if not idx.isdigit():
+                self.error = "Start ID needs to be a positive integer value"
+                return
 
-        self._lyr = "zones" if self.layer.name() == "zones" else "nodes"
-        self.idx = int(idx)
+            self.idx = int(idx)
 
         if self._lyr == "nodes" and self.idx not in nodes:
             self.error = "Start ID relates to a non-existing node"
@@ -314,14 +319,15 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self._check_start_id()
 
         if self.error:
-            self.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=Qgis.Critical, duration=5)
+            self.iface.messageBar().pushMessage(
+                self.tr("Input error"), self.error, level=Qgis.MessageLevel.Critical, duration=5
+            )
             self.idx = None
             self.error = None
             return
 
         self.configure_graph()
 
-        self.plot_data_layer()
         self.layer.selectionChanged.connect(self.recompute_after_selection)
 
         self.compute_skims(self.idx)
