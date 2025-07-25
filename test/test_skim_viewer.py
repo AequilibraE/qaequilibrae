@@ -174,10 +174,8 @@ def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocke
     [
         ("zones", "aaa", "Start ID needs to be a positive integer value"),
         ("zones", "52", "Start ID relates to a non-existing zone"),
-        ("zones", "", "Enter a start ID or select a feature in the active layer"),
         ("nodes", "aaa", "Start ID needs to be a positive integer value"),
         ("nodes", "100", "Start ID relates to a non-existing node"),
-        ("nodes", "", "Enter a start ID or select a feature in the active layer"),
     ],
 )
 def test_start_id_errors(ae_with_project, qtbot, timeoutDetector, layer, par, error, qgis_iface):

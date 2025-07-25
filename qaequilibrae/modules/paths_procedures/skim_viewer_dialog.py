@@ -1,5 +1,6 @@
 import os
 from math import ceil
+from random import choice
 
 import numpy as np
 import pandas as pd
@@ -25,16 +26,36 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.project = qgis_project.project
         self.qgis_project = qgis_project
         self.all_modes = {}
-        self.layer = None
+        self.layer = self.iface.activeLayer()
         self.graph = None
         self.idx = None
         self.error = None
+
+        # Check if we have an active layer, otherwise raises an error
+        if self.layer is not None:
+            self._lyr = "zones" if self.layer.name() == "zones" else "nodes"
+            self.layer_col = "zone_id" if self.layer.name() == "zones" else "node_id"
+        else:
+            self.error = "Please set an active layer to proceed"
+            self.iface.messageBar().pushMessage(
+                self.tr("Input error"), self.error, level=Qgis.MessageLevel.Critical, duration=10
+            )
+            self.__disable_fields()  # We disable all QDialog objects if there's no active layer set
+            return
 
         # Layer fields
         default_style = QgsStyle().defaultStyle()
         self.cob_color.addItems(list(default_style.colorRampNames()))
 
-        if self.layer:
+        self._nodes = self.project.network.nodes.data["node_id"].tolist()
+        self._zones = list(self.project.zoning.all_zones().keys())
+
+        # Randomly populate the start ID if we don't have a selected layer feature
+        if not self.layer.selectedFeatures():
+            idx = choice(self._zones) if self._lyr == "zones" else choice(self._nodes)
+            self.line_start_id.setText(str(idx))
+
+        if self.idx:
             self.layer.selectionChanged.connect(self.recompute_after_selection)
 
         # Check if layer links is in the layers tab.
@@ -68,6 +89,28 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.block_paths.toggled.connect(self.update_block_flow)
 
         self.configure_skim_fields()
+
+    def __disable_fields(self):
+        dialog_elements = [
+            self.block_paths,
+            self.cob_minimizing,
+            self.cob_modes,
+            self.cob_skim,
+            self.label_1,
+            self.label_2,
+            self.label_3,
+            self.chb_invert,
+            self.cob_color,
+            self.label_5,
+            self.label_6,
+            self.line_start_id,
+            self.but_plot,
+            self.graph_config,
+            self.layer_config,
+        ]
+
+        for element in dialog_elements:
+            element.setVisible(False)
 
     def configure_skim_fields(self):
         self.cob_minimizing.clear()
@@ -272,55 +315,45 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.compute_skims(self.idx)
 
     def update_skim_field(self):
-        if self.layer:
+        if self.idx:
             self.graph.set_skimming(self.cob_skim.currentText())
             self.compute_skims(self.idx)
 
     def update_cost_field(self):
-        if self.layer:
+        if self.idx:
             self.graph.set_graph(self.cob_minimizing.currentText())
             self.compute_skims(self.idx)
 
     def update_block_flow(self):
-        if self.layer:
+        if self.idx:
             self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
             self.compute_skims(self.idx)
 
     def _check_start_id(self):
-        self.layer = self.iface.activeLayer()
-        self._lyr = "zones" if self.layer.name() == "zones" else "nodes"
-        self.layer_col = "zone_id" if self.layer.name() == "zones" else "node_id"
+        try:
+            selected_features = self.layer.selectedFeatures()
+            self.idx = [feature[self.layer_col] for feature in selected_features][0]
+        except IndexError:
+            idx = self.line_start_id.text().replace(" ", "")
 
-        idx = self.line_start_id.text().replace(" ", "")
-        nodes = self.project.network.nodes.data["node_id"].tolist()
-        zones = list(self.project.zoning.all_zones().keys())
-
-        if len(idx) == 0:
-            try:
-                selected_features = self.layer.selectedFeatures()
-                self.idx = [feature[self.layer_col] for feature in selected_features][0]
-            except IndexError:
-                self.error = "Enter a start ID or select a feature in the active layer"
-                return
-        else:
             if not idx.isdigit():
                 self.error = "Start ID needs to be a positive integer value"
                 return
 
             self.idx = int(idx)
 
-        if self._lyr == "nodes" and self.idx not in nodes:
-            self.error = "Start ID relates to a non-existing node"
+            if self._lyr == "nodes" and self.idx not in self._nodes:
+                self.error = "Start ID relates to a non-existing node"
 
-        if self._lyr == "zones" and self.idx not in zones:
-            self.error = "Start ID relates to a non-existing zone"
+            if self._lyr == "zones" and self.idx not in self._zones:
+                self.error = "Start ID relates to a non-existing zone"
 
     def run(self):
         self._check_start_id()
 
         if self.error:
             self.iface.messageBar().pushMessage(
-                self.tr("Input error"), self.error, level=Qgis.MessageLevel.Critical, duration=5
+                self.tr("Input error"), self.error, level=Qgis.MessageLevel.Critical, duration=10
             )
             self.idx = None
             self.error = None
