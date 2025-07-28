@@ -35,7 +35,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         if self.layer is not None:
             # We get the layer ID to check if it was removed from the layers' panel
             self.__layer_id = self.layer.id()
-            
+
             self._lyr = "zones" if self.layer.name() == "zones" else "nodes"
             self.layer_col = "zone_id" if self.layer.name() == "zones" else "node_id"
 
