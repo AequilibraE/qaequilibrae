@@ -186,18 +186,20 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         values = [0, 0.000000000001] + values
         invert = self.chb_invert.isChecked()
         color_ramp = color_ramp_shades(color_ramp_name, num_steps, invert)
+        # Set the hatch background as white if active layer is zones, otherwise use black for nodes
+        color = QColor(255, 255, 255) if self._lyr == "zones" else QColor(0, 0, 0)
 
         # Create Rule-Based renderer
         root_rule = QgsRuleBasedRenderer.Rule(None)
 
         # Rule 1: NaN values
-        hatch_symbol = self.create_hatch(layer, color_ramp[0])
+        hatch_symbol = self.create_hatch(layer, color)
         nan_expression = f'"{fld}" IS NULL OR "{fld}" = \'nan\' OR "{fld}" = \'NaN\''
         nan_rule = QgsRuleBasedRenderer.Rule(hatch_symbol, filterExp=nan_expression, label="NaN Values")
         root_rule.appendChild(nan_rule)
 
         # Rule 2: Inf values
-        hatch_symbol = self.create_hatch(layer, color_ramp[0])
+        hatch_symbol = self.create_hatch(layer, color)
         inf_expression = (
             f"\"{fld}\" = 'inf' OR \"{fld}\" = '+inf' OR \"{fld}\" = '-inf' OR "
             f'"{fld}" >= 3.40e38 OR "{fld}" <= -3.40e38'
@@ -364,3 +366,6 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.layer.selectionChanged.connect(self.recompute_after_selection)
 
         self.compute_skims(self.idx)
+
+        self.cob_color.setEnabled(False)
+        self.chb_invert.setEnabled(False)
