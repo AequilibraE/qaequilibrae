@@ -31,10 +31,15 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.idx = None
         self.error = None
 
+        # We get the layer ID to check if it was removed from the layers' panel
+        self.__layer_id = self.layer.id()
+
         # Check if we have an active layer, otherwise raises an error
         if self.layer is not None:
             self._lyr = "zones" if self.layer.name() == "zones" else "nodes"
             self.layer_col = "zone_id" if self.layer.name() == "zones" else "node_id"
+
+            QgsProject.instance().layersRemoved.connect(self.__on_layer_removed)
         else:
             self.error = "Please set an active layer to proceed"
             self.iface.messageBar().pushMessage(
@@ -90,6 +95,15 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
         self.configure_skim_fields()
 
+    def __on_layer_removed(self, layer_ids):
+        if self.__layer_id in layer_ids:
+            self.__disable_fields()
+            self._show_layer_removed_message()
+
+    def _show_layer_removed_message(self):
+        self.error = self.tr("Critical layer for Skim Viewer removed from the layers' panel")
+        self.iface.messageBar().pushMessage(self.tr("Error"), self.error, level=Qgis.MessageLevel.Critical, duration=10)
+
     def __disable_fields(self):
         dialog_elements = [
             self.block_paths,
@@ -135,6 +149,8 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             self.cob_skim.addItem(skim)
 
     def exit_procedure(self):
+        QgsProject.instance().layersRemoved.disconnect(self.__on_layer_removed)
+        self.layer.selectionChanged.disconnect()
         self.close()
 
     def configure_graph(self):
@@ -186,7 +202,8 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         values = [0, 0.000000000001] + values
         invert = self.chb_invert.isChecked()
         color_ramp = color_ramp_shades(color_ramp_name, num_steps, invert)
-        # Set the hatch background as white if active layer is zones, otherwise use black for nodes
+
+        # Set the hatch background white if active layer is zones, otherwise use black for nodes
         color = QColor(255, 255, 255) if self._lyr == "zones" else QColor(0, 0, 0)
 
         # Create Rule-Based renderer
