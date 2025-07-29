@@ -1557,63 +1557,48 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="43"/>
-        <source>Graph</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="98"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="131"/>
         <source>Minimize field</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="111"/>
-        <source>Centroids to centroids</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="170"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="209"/>
         <source>Block paths through centroids</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="204"/>
-        <source>ALL nodes to ALL nodes</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="214"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="237"/>
         <source>Plot!</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="226"/>
-        <source>Skims</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="235"/>
-        <source>Available Skims</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="250"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="25"/>
         <source>Layer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="259"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="74"/>
         <source>Color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="266"/>
-        <source>Selected layer</source>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="44"/>
+        <source>Start ID</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="289"/>
-        <source>Start ID</source>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="81"/>
+        <source>Invert colors</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="114"/>
+        <source>Path configuration</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="138"/>
+        <source>Plot Skim</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -2852,8 +2837,18 @@
 <context>
     <name>SkimViewerDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="317"/>
+        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="374"/>
         <source>Input error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="104"/>
+        <source>Critical layer for Skim Viewer removed from the layers&apos; panel</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="105"/>
+        <source>Error</source>
         <translation type="unfinished"/>
     </message>
 </context>
