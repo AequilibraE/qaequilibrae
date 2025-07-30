@@ -47,10 +47,10 @@ features are:
   proportional fitting (IPF).
 - Traffic assignment with all-or-nothing (AoN), method of successive averages (MSA), 
   Frank-Wolfe method (FW) and its modifications conjugate Frank-Wolfe (CFW) and
-  bi-conjugate Frank-Wolfe (BFW) methods. 
-- Route choice set generation with breadth first search on link elimination (BFS-LE),
-  link penalization (LP), or a combination of BFS-LE with link penalization.
-- Transit skimming and assignment 
+  bi-conjugate Frank-Wolfe (BFW) methods [Mitradjieva2013]. 
+- Route choice set generation with breadth first search on link elimination (BFS-LE) [RieserSchussler2013],
+  link penalization (LP), or a hybrid approach of BFS-LE with link penalization.
+- Transit skimming and assignment.
 
 Despite the traffic modelling tools, some features are only available as part of the
 QGIS ecosystem, of which:
@@ -73,7 +73,6 @@ available at `https://www.aequilibrae.com/develop/qgis/index.html`.
 
 ![Skim viewer](skim_viewer_plot.png)  
 *Figure 2: skim viewer*
-
 
 # Acknowledgements
 
