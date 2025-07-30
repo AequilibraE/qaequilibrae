@@ -7,6 +7,7 @@ on:
 jobs:
   unittest:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       max-parallel: 4
       matrix:

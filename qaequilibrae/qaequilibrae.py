@@ -48,7 +48,7 @@ else:
             from qaequilibrae.download_extra_packages_class import DownloadAll
 
             result = DownloadAll().install()
-            if "ERROR" in "".join([str(x).upper() for x in result]):
+            if result > 0:
                 QMessageBox.information(None, "Information", msg.second_message)
             else:
                 QMessageBox.information(None, "Information", msg.third_message)

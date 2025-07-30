@@ -7,3 +7,4 @@ pytest-mock
 black==24.4.2
 ruff
 pytest-reportlog
+pyarrow

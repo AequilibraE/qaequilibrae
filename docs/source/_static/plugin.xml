@@ -1,0 +1,10 @@
+<plugins>
+    <pyqgis_plugin name="qaequilibrae" version="00.00.00">
+        <description>Transportation modeling toolbox for QGIS</description>
+        <qgis_minimum_version>3.34.10</qgis_minimum_version>
+        <file_name>qaequilibrae.zip</file_name>
+        <author_name>Pedro Camargo</author_name>
+        <download_url>https://aequilibrae.com/develop/qgis/_static/qaequilibrae.zip</download_url>
+        <experimental>True</experimental>
+    </pyqgis_plugin>
+</plugins>

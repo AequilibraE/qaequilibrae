@@ -1,5 +1,6 @@
 import os
 from math import ceil
+from random import choice
 
 import numpy as np
 import pandas as pd
@@ -25,16 +26,41 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.project = qgis_project.project
         self.qgis_project = qgis_project
         self.all_modes = {}
-        self.layer = None
+        self.layer = self.iface.activeLayer()
         self.graph = None
         self.idx = None
         self.error = None
+
+        # Check if we have an active layer, otherwise raises an error
+        if self.layer is not None:
+            # We get the layer ID to check if it was removed from the layers' panel
+            self.__layer_id = self.layer.id()
+
+            self._lyr = "zones" if self.layer.name() == "zones" else "nodes"
+            self.layer_col = "zone_id" if self.layer.name() == "zones" else "node_id"
+
+            QgsProject.instance().layersRemoved.connect(self.__on_layer_removed)
+        else:
+            self.error = "Please set an active layer to proceed"
+            self.iface.messageBar().pushMessage(
+                self.tr("Input error"), self.error, level=Qgis.MessageLevel.Critical, duration=10
+            )
+            self.__disable_fields()  # We disable all QDialog objects if there's no active layer set
+            return
 
         # Layer fields
         default_style = QgsStyle().defaultStyle()
         self.cob_color.addItems(list(default_style.colorRampNames()))
 
-        if self.layer:
+        self._nodes = self.project.network.nodes.data["node_id"].tolist()
+        self._zones = list(self.project.zoning.all_zones().keys())
+
+        # Randomly populate the start ID if we don't have a selected layer feature
+        if not self.layer.selectedFeatures():
+            idx = choice(self._zones) if self._lyr == "zones" else choice(self._nodes)
+            self.line_start_id.setText(str(idx))
+
+        if self.idx:
             self.layer.selectionChanged.connect(self.recompute_after_selection)
 
         # Check if layer links is in the layers tab.
@@ -55,8 +81,6 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             "__compressed_id__",
         ]
 
-        self.cob_layer.addItems(["Nodes", "Zones"])
-
         # Graph config
         with self.project.db_connection as conn:
             res = conn.execute("""SELECT mode_name, mode_id FROM modes""")
@@ -70,6 +94,37 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.block_paths.toggled.connect(self.update_block_flow)
 
         self.configure_skim_fields()
+
+    def __on_layer_removed(self, layer_ids):
+        if self.__layer_id in layer_ids:
+            self.__disable_fields()
+            self._show_layer_removed_message()
+
+    def _show_layer_removed_message(self):
+        self.error = self.tr("Critical layer for Skim Viewer removed from the layers' panel")
+        self.iface.messageBar().pushMessage(self.tr("Error"), self.error, level=Qgis.MessageLevel.Critical, duration=10)
+
+    def __disable_fields(self):
+        dialog_elements = [
+            self.block_paths,
+            self.cob_minimizing,
+            self.cob_modes,
+            self.cob_skim,
+            self.label_1,
+            self.label_2,
+            self.label_3,
+            self.chb_invert,
+            self.cob_color,
+            self.label_5,
+            self.label_6,
+            self.line_start_id,
+            self.but_plot,
+            self.graph_config,
+            self.layer_config,
+        ]
+
+        for element in dialog_elements:
+            element.setVisible(False)
 
     def configure_skim_fields(self):
         self.cob_minimizing.clear()
@@ -94,6 +149,8 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             self.cob_skim.addItem(skim)
 
     def exit_procedure(self):
+        QgsProject.instance().layersRemoved.disconnect(self.__on_layer_removed)
+        self.layer.selectionChanged.disconnect()
         self.close()
 
     def configure_graph(self):
@@ -103,7 +160,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             self.graph = self.project.network.graphs[mode]
 
             # We prepare the graph to set all nodes as centroids
-            if self.rdo_all_nodes.isChecked():
+            if self._lyr == "nodes":
                 self.graph.prepare_graph(self.graph.all_nodes)
 
         self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
@@ -119,11 +176,6 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.data_to_show = res._skimming_array[:-1]
 
         self.set_data()
-
-    def plot_data_layer(self):
-        self.layer = self.qgis_project.layers[self._lyr][0]
-        self.layer_col = "zone_id" if self._lyr == "zones" else "node_id"
-        QgsProject.instance().addMapLayer(self.layer)
 
     def map_ranges(self, fld, layer, color_ramp_name):
         from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
@@ -148,19 +200,23 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         #
         values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
         values = [0, 0.000000000001] + values
-        color_ramp = color_ramp_shades(color_ramp_name, num_steps)
+        invert = self.chb_invert.isChecked()
+        color_ramp = color_ramp_shades(color_ramp_name, num_steps, invert)
+
+        # Set the hatch background white if active layer is zones, otherwise use black for nodes
+        color = QColor(255, 255, 255) if self._lyr == "zones" else QColor(0, 0, 0)
 
         # Create Rule-Based renderer
         root_rule = QgsRuleBasedRenderer.Rule(None)
 
         # Rule 1: NaN values
-        hatch_symbol = self.create_hatch(layer, color_ramp[0])
+        hatch_symbol = self.create_hatch(layer, color)
         nan_expression = f'"{fld}" IS NULL OR "{fld}" = \'nan\' OR "{fld}" = \'NaN\''
         nan_rule = QgsRuleBasedRenderer.Rule(hatch_symbol, filterExp=nan_expression, label="NaN Values")
         root_rule.appendChild(nan_rule)
 
         # Rule 2: Inf values
-        hatch_symbol = self.create_hatch(layer, color_ramp[0])
+        hatch_symbol = self.create_hatch(layer, color)
         inf_expression = (
             f"\"{fld}\" = 'inf' OR \"{fld}\" = '+inf' OR \"{fld}\" = '-inf' OR "
             f'"{fld}" >= 3.40e38 OR "{fld}" <= -3.40e38'
@@ -278,50 +334,55 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.compute_skims(self.idx)
 
     def update_skim_field(self):
-        if self.layer:
+        if self.idx:
             self.graph.set_skimming(self.cob_skim.currentText())
             self.compute_skims(self.idx)
 
     def update_cost_field(self):
-        if self.layer:
+        if self.idx:
             self.graph.set_graph(self.cob_minimizing.currentText())
             self.compute_skims(self.idx)
 
     def update_block_flow(self):
-        if self.layer:
+        if self.idx:
             self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
             self.compute_skims(self.idx)
 
     def _check_start_id(self):
-        idx = self.line_start_id.text()
-        nodes = self.project.network.nodes.data["node_id"].tolist()
-        zones = list(self.project.zoning.all_zones().keys())
+        try:
+            selected_features = self.layer.selectedFeatures()
+            self.idx = [feature[self.layer_col] for feature in selected_features][0]
+        except IndexError:
+            idx = self.line_start_id.text().replace(" ", "")
 
-        if not idx.isdigit():
-            self.error = "Start ID needs to be a positive integer value"
-            return
+            if not idx.isdigit():
+                self.error = "Start ID needs to be a positive integer value"
+                return
 
-        self._lyr = "zones" if self.cob_layer.currentText().lower() == "zones" else "nodes"
-        self.idx = int(idx)
+            self.idx = int(idx)
 
-        if self._lyr == "nodes" and self.idx not in nodes:
-            self.error = "Start ID relates to a non-existing node"
+            if self._lyr == "nodes" and self.idx not in self._nodes:
+                self.error = "Start ID relates to a non-existing node"
 
-        if self._lyr == "zones" and self.idx not in zones:
-            self.error = "Start ID relates to a non-existing zone"
+            if self._lyr == "zones" and self.idx not in self._zones:
+                self.error = "Start ID relates to a non-existing zone"
 
     def run(self):
         self._check_start_id()
 
         if self.error:
-            self.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=Qgis.Critical, duration=5)
+            self.iface.messageBar().pushMessage(
+                self.tr("Input error"), self.error, level=Qgis.MessageLevel.Critical, duration=10
+            )
             self.idx = None
             self.error = None
             return
 
         self.configure_graph()
 
-        self.plot_data_layer()
         self.layer.selectionChanged.connect(self.recompute_after_selection)
 
         self.compute_skims(self.idx)
+
+        self.cob_color.setEnabled(False)
+        self.chb_invert.setEnabled(False)

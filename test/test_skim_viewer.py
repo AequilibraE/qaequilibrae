@@ -8,14 +8,17 @@ from .utilities import run_sfalls_assignment
 
 
 # TODO: ideally, we would test if all the views are correct.
-@pytest.mark.parametrize("layer", ["Nodes", "Zones"])
-def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, layer):
+@pytest.mark.parametrize("layer", ["nodes", "zones"])
+def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, layer, qgis_iface):
+    lyr = ae_with_project.layers[layer][0]
+    QgsProject.instance().addMapLayer(lyr)
+    qgis_iface.setActiveLayer(lyr)
+
     dialog = SkimViewerDialog(ae_with_project)
 
     dialog.cob_minimizing.setCurrentText("distance")
     dialog.cob_skim.setCurrentText("distance")
     dialog.block_paths.setChecked(False)
-    dialog.cob_layer.setCurrentText(layer)
     dialog.line_start_id.setText("1")
 
     qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
@@ -35,12 +38,15 @@ def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, la
     assert "skim_viewer_data" in field_names
 
 
-def test_parameter_changed(ae_with_project, qtbot, timeoutDetector):
+def test_parameter_changed(ae_with_project, qtbot, timeoutDetector, qgis_iface):
+    lyr = ae_with_project.layers["nodes"][0]
+    QgsProject.instance().addMapLayer(lyr)
+    qgis_iface.setActiveLayer(lyr)
+
     dialog = SkimViewerDialog(ae_with_project)
 
     dialog.cob_minimizing.setCurrentIndex(8)
     dialog.cob_skim.setCurrentIndex(8)
-    dialog.cob_layer.setCurrentText("Nodes")
     dialog.line_start_id.setText("1")
 
     qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
@@ -94,7 +100,11 @@ def test_parameter_changed(ae_with_project, qtbot, timeoutDetector):
     assert start_cost != current_cost
 
 
-def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocker):
+def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocker, qgis_iface):
+    lyr = ae_with_project.layers["nodes"][0]
+    QgsProject.instance().addMapLayer(lyr)
+    qgis_iface.setActiveLayer(lyr)
+
     proj = run_sfalls_assignment(ae_with_project)
 
     function = "qaequilibrae.modules.matrix_procedures.load_project_data.DisplayAequilibraEFormatsDialog"
@@ -130,7 +140,6 @@ def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocke
     dialog.cob_minimizing.setCurrentText("assignment_congested_time")
     dialog.cob_skim.setCurrentText("assignment_congested_time")
     dialog.block_paths.setChecked(False)
-    dialog.cob_layer.setCurrentText("Nodes")
     dialog.line_start_id.setText("1")
 
     qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
@@ -163,19 +172,22 @@ def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocke
 @pytest.mark.parametrize(
     "layer,par,error",
     [
-        ("Zones", "", "Start ID needs to be a positive integer value"),
-        ("Zones", "52", "Start ID relates to a non-existing zone"),
-        ("Nodes", "", "Start ID needs to be a positive integer value"),
-        ("Nodes", "100", "Start ID relates to a non-existing node"),
+        ("zones", "aaa", "Start ID needs to be a positive integer value"),
+        ("zones", "52", "Start ID relates to a non-existing zone"),
+        ("nodes", "aaa", "Start ID needs to be a positive integer value"),
+        ("nodes", "100", "Start ID relates to a non-existing node"),
     ],
 )
-def test_start_id_errors(ae_with_project, qtbot, timeoutDetector, layer, par, error):
+def test_start_id_errors(ae_with_project, qtbot, timeoutDetector, layer, par, error, qgis_iface):
+    lyr = ae_with_project.layers[layer][0]
+    QgsProject.instance().addMapLayer(lyr)
+    qgis_iface.setActiveLayer(lyr)
+
     dialog = SkimViewerDialog(ae_with_project)
 
     dialog.cob_minimizing.setCurrentText("distance")
     dialog.cob_skim.setCurrentText("distance")
     dialog.block_paths.setChecked(False)
-    dialog.cob_layer.setCurrentText(layer)
     dialog.line_start_id.setText(par)
 
     qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)

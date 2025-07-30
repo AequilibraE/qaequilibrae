@@ -41,7 +41,7 @@ def test_example_function_with_kwargs(coquimbo_project, qtbot, timeoutDetector):
         project_log = dialog.project.log()
         contents = project_log.contents()
 
-        assert "None" in contents[-1]
+        assert "example_function_with_kwargs executed. Check for outputs." in contents[-1]
 
 
 def test_new_function(coquimbo_project, qtbot, timeoutDetector):

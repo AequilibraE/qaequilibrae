@@ -1063,57 +1063,57 @@
 <context>
     <name>DisplayAequilibraEFormatsDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="444"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="468"/>
         <source>AequilibraE custom formats</source>
         <translation>Format personnalisé AequilibraE</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="50"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="51"/>
         <source>Path provided is not a valid dataset</source>
         <translation>Le chemin fourni ne pointe pas vers un jeu valide de données</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="63"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="64"/>
         <source>File path: {}</source>
         <translation>Chemin du fichier: {}</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="74"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="75"/>
         <source>Could not load dataset</source>
         <translation>Impossible de charger le jeu de données</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="103"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="104"/>
         <source>Thousands separator</source>
         <translation>Séparateur de milliers</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="112"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="113"/>
         <source>Decimal places</source>
         <translation>Nombre de décimales</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="175"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="179"/>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="170"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="174"/>
         <source>Export</source>
         <translation>Exporter</translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="147"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="148"/>
         <source>No mapping</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="151"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="152"/>
         <source>By origin</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="155"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="156"/>
         <source>By destination</source>
         <translation type="unfinished"/>
     </message>
@@ -1362,7 +1362,7 @@
         <translation>Projet</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="191"/>
+        <location filename="../modules/routing_procedures/forms/tsp.ui" line="100"/>
         <source>Mode</source>
         <translation>Mode</translation>
     </message>
@@ -1557,63 +1557,48 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="43"/>
-        <source>Graph</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="98"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="131"/>
         <source>Minimize field</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="111"/>
-        <source>Centroids to centroids</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="170"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="209"/>
         <source>Block paths through centroids</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="204"/>
-        <source>ALL nodes to ALL nodes</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="214"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="237"/>
         <source>Plot!</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="226"/>
-        <source>Skims</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="235"/>
-        <source>Available Skims</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="250"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="25"/>
         <source>Layer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="259"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="74"/>
         <source>Color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="266"/>
-        <source>Selected layer</source>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="44"/>
+        <source>Start ID</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="289"/>
-        <source>Start ID</source>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="81"/>
+        <source>Invert colors</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="114"/>
+        <source>Path configuration</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="138"/>
+        <source>Plot Skim</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -1987,99 +1972,6 @@
     <message>
         <location filename="../modules/processing_provider/matrix_calculator.py" line="122"/>
         <source>Examples of valid expressions and configuration are provided in the plugin documentation.</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
-    <name>MatrixFromLayer</name>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="53"/>
-        <source>Output folder</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="19"/>
-        <source>Matrix Layer</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="20"/>
-        <source>Origin</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="30"/>
-        <source>Destination</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="40"/>
-        <source>Value</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="50"/>
-        <source>File name</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="63"/>
-        <source>Matrix name</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="66"/>
-        <source>Matrix description</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="73"/>
-        <source>Matrix core</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="84"/>
-        <source>AequilibraE module not found</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="101"/>
-        <source>Importing layer</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="141"/>
-        <source>{}x{} matrix imported </source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="158"/>
-        <source>Import matrices</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="164"/>
-        <source>Data</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="174"/>
-        <source>Save a layer as a *.aem file. Notice that:</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="176"/>
-        <source>- the original matrix stored in the layer needs to be in list format</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="178"/>
-        <source>- origin and destination fields need to be integers</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/processing_provider/matrix_from_layer.py" line="180"/>
-        <source>- value field can be either integer or real</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -2759,22 +2651,22 @@
 <context>
     <name>RouteChoiceDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="359"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="381"/>
         <source>Input error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="241"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="263"/>
         <source>Missing query name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="244"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="266"/>
         <source>Query name already used</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="247"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="269"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"/>
     </message>
@@ -2800,18 +2692,33 @@
 <context>
     <name>RunModuleDialog</name>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="32"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="92"/>
         <source>Error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="32"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="92"/>
         <source>Please check the Parameters file</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="40"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="103"/>
         <source>Run procedures executed</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="117"/>
+        <source>There are missing requirements to run the procedures.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="118"/>
+        <source>Do you want us to install these missing Python packages?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="119"/>
+        <source>Without installing the packages, you cannot use &apos;Run Procedures&apos;.</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -2930,8 +2837,18 @@
 <context>
     <name>SkimViewerDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="317"/>
+        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="374"/>
         <source>Input error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="104"/>
+        <source>Critical layer for Skim Viewer removed from the layers&apos; panel</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="105"/>
+        <source>Error</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -3097,72 +3014,72 @@
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="238"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="239"/>
         <source>Class name already used</source>
         <translation>Nom de segment de la demande déjà utilisé</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="291"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="292"/>
         <source>Remove</source>
         <translation>Retirer</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="417"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="418"/>
         <source>Input error</source>
         <translation>Erreur d&apos;entrant</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="447"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="448"/>
         <source>No traffic classes to assign</source>
         <translation>Aucun segment de la demande à affecter</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="452"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="453"/>
         <source>Missing scenario name</source>
         <translation>Aucun nom de scénario</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="458"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="459"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation>Le nom de table de résultats existe déjà. Choisissez un nouveau nom</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="535"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="536"/>
         <source>VDF parameter is not numeric</source>
         <translation>Le paramètre de courbe débit-vitesse n&apos;est pas un nombre</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="344"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="345"/>
         <source>Wrong value for link ID</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="351"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="352"/>
         <source>Link ID doesn&apos;t exist in project</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="361"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="362"/>
         <source>Missing query name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="366"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="367"/>
         <source>Query name already used</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="371"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="372"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="464"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="465"/>
         <source>Missing select link matrix name.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="468"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="469"/>
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation type="unfinished"/>
     </message>

@@ -686,7 +686,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         if max_metric is not None:
             values = [0, 0.000001] + values
         num_ramps = 1 if intervals < 1 else intervals
-        color_ramp = color_ramp_shades(color_ramp_name, num_ramps)
+        color_ramp = color_ramp_shades(color_ramp_name, num_ramps, False)
         ranges = []
         for i in range(intervals + 1):
             myColour = QtGui.QColor("#1e00ff") if method != "Color" else color_ramp[i]

@@ -1,10 +1,11 @@
 import sqlite3
-from os.path import isfile
+from os.path import isfile, join
 from pathlib import Path
 from uuid import uuid4
 
 import numpy as np
 import openmatrix as omx
+import pandas as pd
 import pytest
 from PyQt5.QtCore import Qt
 
@@ -304,3 +305,59 @@ def test_select_link_analysis(ae_with_project, qtbot):
     conn = sqlite3.connect(pth / "results_database.sqlite")
     results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "select_link_analysis" in results
+
+
+def test_link_removal(ae_with_project, qtbot):
+    links = [9, 10, 11, 13, 23, 25, 26, 27, 28, 31, 32, 34, 40, 41, 43, 44]
+    layer = ae_with_project.layers["links"][0]
+    layer.select([f.id() for f in layer.getFeatures() if f["link_id"] in links])
+
+    dialog = TrafficAssignmentDialog(ae_with_project)
+
+    test_name = "TestTrafficAssignment_LinkRemoval"
+    dialog.output_scenario_name.setText(test_name)
+    dialog.cob_matrices.setCurrentText("demand.aem")
+
+    dialog.tbl_core_list.selectRow(0)
+    dialog.cob_mode_for_class.setCurrentIndex(0)
+    dialog.ln_class_name.setText("car")
+    dialog.pce_setter.setValue(1.0)
+    dialog.chb_check_centroids.setChecked(False)
+    dialog.chb_chosen_links.setChecked(True)
+    qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
+
+    # Skimming
+    dialog.cob_skims_available.setCurrentText("free_flow_time")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    dialog.cob_skims_available.setCurrentText("distance")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+
+    dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
+    dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
+    dialog.cob_vdf.setCurrentText("BPR")
+    dialog.cob_capacity.setCurrentText("capacity")
+    dialog.cob_ffttime.setCurrentText("free_flow_time")
+    dialog.cb_choose_algorithm.setCurrentText("bfw")
+    dialog.max_iter.setText("25")
+    dialog.rel_gap.setText("0.001")
+
+    dialog.run()
+
+    with pytest.raises(ValueError):
+        dialog.produce_all_outputs()
+
+    dialog.close()
+
+    project = ae_with_project.project
+    matrices = project.matrices
+    matrices.update_database()
+    assert f"{test_name}_car" in matrices.list()["name"].values.tolist()
+
+    conn = sqlite3.connect(join(project.project_base_path, "results_database.sqlite"))
+    results = pd.read_sql(f"Select link_id, PCE_tot from {test_name}", conn).set_index("link_id")
+
+    for idx, row in results.iterrows():
+        if idx in links:
+            assert row["PCE_tot"] == 0
+        else:
+            assert row["PCE_tot"] > 0

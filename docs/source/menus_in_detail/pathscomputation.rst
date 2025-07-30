@@ -67,26 +67,32 @@ data using the :ref:`non-project data tab <fig_nonproject_data>` in **Data > Vis
 Skim viewer
 -----------
 
-The skim viewer makes it easier to view skimming results. The skim viewer window 
-looks like this:
+The skim viewer tool allows the user to easily visualize network costs, even for metrics
+that weren't skimmed yet. The skim viewer window looks like this:
 
 .. image:: ../images/skim_viewer_dialog.png
     :align: center
     :alt: Skim viewer dialog
 
-In the *Layer* group, you can select between the nodes or zones layers for data viewing. You can
-also select a color map range for plotting and the starting node/zone ID.
+In the *Layer* group, you can select the starting node/zone ID and configure the color map range
+for plotting. It is now possible for you to invert the colors in the color map, so feel free to
+customize your view as necessary. By default, every time Skim Viewer is initialized, a random
+value is assigned to the start ID. You can either use it or select a preferred start ID.
 
-In the *Graph* group, you can set the graph configurations, such as the mode, the minimizing (cost)
-field, the choice to block or allow flows through the centroids, and whether to compute skims for
-all nodes or between centroids. Another useful feature of the skim viewer is that it allows users to
-use joined fields from the 'links' layer as minimizing or skimming fields.
+In the *Path configuration* group, you can set the graph configurations, such as the mode, 
+the minimizing (cost) field, the choice to block or allow flows through the centroids. If the 
+'links' layer is at the layers' panel, Skim Viewer allows you to use its joined fields as
+minimizing or skimming fields.
 
-Finally, in the *Skim* group, you select the desired skimming field for plotting.
+To start Skim Viewer one of 'nodes' or 'zones' layer must be the active layer, otherwise an
+error is raised. To configure the start node/zone ID, it is possible to use the start ID box
+(pre-configured or customized) or select one feature in the active layer prior to the Skim Viewer
+initialization. If a feature is selected and a value for start ID is set, Skim Viewer is going
+to use the selected feature value for path calculation.
 
 When visualizing the skims, you'll notice that a memory layer named 'skim_viewer' is created.
-It contains the node or zone ID for joining the nodes or zones layer and a data column that 
-holds the data to be plotted. Whenever the selected node or zone changes, the values in the data
+It contains the node/zone ID for joining the nodes or zones layer and a data column that 
+holds the data to be plotted. Whenever the selected node/zone changes, the values in the data
 column also change.
 
 Skim view without joined layer

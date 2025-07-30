@@ -10,10 +10,11 @@ on:
 jobs:
   windows_test:
     runs-on: windows-latest
+    timeout-minutes: 20
     strategy:
       matrix:
       # we test the minimum LTR version required, the newest LTR, and the latest.
-        version: [qgis-ltr --version=3.34.11]
+        version: [qgis-ltr --version=3.40.8]
 
     steps:
       - uses: actions/checkout@v4
