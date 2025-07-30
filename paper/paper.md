@@ -80,10 +80,10 @@ network from existing layers, adding traffic zones and centroids are also availa
 the plugin's main computational features are:
 
 - Trip distribution, with calibration and application of gravity models, and iterative
-  proportional fitting (IPF).
+  proportional fitting (IPF) [@Ortuzar2011].
 - Traffic assignment with all-or-nothing (AoN), method of successive averages (MSA), 
   Frank-Wolfe method (FW) and its modifications conjugate Frank-Wolfe (CFW) and
-  bi-conjugate Frank-Wolfe (BFW) methods [@Mitradjieva2013]. 
+  bi-conjugate Frank-Wolfe (BFW) methods [@Mitradjieva2013; @Ortuzar2011]. 
 - Route choice set generation with breadth first search on link elimination (BFS-LE) [@RieserSchussler2013],
   link penalization (LP), or a hybrid approach of BFS-LE with link penalization.
 - Transit skimming and assignment [@Spiess1989; @Bell2009]
