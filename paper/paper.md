@@ -21,46 +21,64 @@ affiliations:
   - name: Outer Loop Consulting, Australia
     index: 1
 date: 30 june 2025
-bibliography: paper.bib
+# bibliography: paper.bib
 ---
 
 # Summary
 
--- A summary describing the high-level functionality and purpose of the software for a diverse, non-specialist audience.
-
-
-`QAequilibraE` offers a graphic interface for general-purpose transportation modeling build on top
-of AequilibraE, a fully-featured Python package. `QAequilibraE` provide an easy to use GUI for those
+`QAequilibraE` offers a graphical interface for general-purpose transportation modeling built on top
+of AequilibraE, a fully-featured Python package. The plugin provides an easy to use GUI for those
 taking the first steps on transportation modeling or more experienced users who want to save time
-generating data visualization or getting useul insights.
+generating data visualization or getting useful insights.
 
-# Statement of need
+The seed of the current plugin was created in 2014, to overcome an issue that its creator
+had as a PhD student as most commercial softwares don't allow low-level access to its outputs.
+`QAequilibraE` was born in 2017 to differentiate between the Python package and the QGIS plugin,
+whose development was occurring simultaneously within the same tool. Nowadays, `QAequilibraE` not only
+follows the QGIS plugin structure but some good practices for Python software development, with
+automated workflows for code testing in different platforms and documentation build. 
 
--- A Statement of need section that clearly illustrates the research purpose of the software and places it in the context of related work.
+`QAequilibraE` allows the user to build models from scratch, using existing QGIS layers or
+importing data from OpenStreetMaps (OSM). The tools to prepare the network from existing layers,
+add traffic zones and centroids are also available. However, the plugin's main computational
+features are:
 
-QAequilibraE was born in 2017 to differenciate between the Python package and the QGIS plugin,
-whose development was occurring simultaneously at that time.
+- Trip distribution, with calibration and application of gravity models, and iterative
+  proportional fitting (IPF).
+- Traffic assignment with all-or-nothing (AoN), method of successive averages (MSA), 
+  Frank-Wolfe method (FW) and its modifications conjugate Frank-Wolfe (CFW) and
+  bi-conjugate Frank-Wolfe (BFW) methods. 
+- Route choice set generation with breadth first search on link elimination (BFS-LE),
+  link penalization (LP), or a combination of BFS-LE with link penalization.
+- Transit skimming and assignment 
 
-The latest stable version of the QGIS plugin can be downloaded and installed through the plugins menu, and
-full documentation is available at `https://www.aequilibrae.com/develop/qgis/index.html` 
+Despite the traffic modelling tools, some features are only available as part of the
+QGIS ecosystem, of which:
 
-# Functionality
-
-Although the plugin relies completely on AequilibraE's features, some functionalities are only 
-available as part of the QGIS ecossystem, of which:
-
-- Visualization of traffic analysis zones (TAZ) data or customized skims;
+- Visualization of skims or traffic analysis zones (TAZ) data;
 - Run a travelling salesman problem (TSP);
-- Create different types of desire lines, allowing different visualizations and scenario comparison;
-- Iteratively explore general transit feed specifications (GTFS) on the top of a network.
+- Graphical scenario comparison;
+- Iterative exploration of general transit feed specifications (GTFS);
+- Internationalization to other languages rather than English only.
 
-# Figures
+`QAequilibraE`'s development has been at full speed in the past year, with several bug fixes,
+continuous integrations, and tooling creation. The latest stable version of the QGIS plugin
+can be downloaded and installed through the QGIS plugins menu, and its full documentation is
+available at `https://www.aequilibrae.com/develop/qgis/index.html`.
+
+# Usage Examples
+
+![Traffic assignment](traffic_assignment_plot.png)  
+*Figure 1: traffic assignment*
+
+![Skim viewer](skim_viewer_plot.png)  
+*Figure 2: skim viewer*
 
 
 # Acknowledgements
 
-We acknowledge contributions from ADEME, La Fabrique des Mobilités, EGIS France, and
-the Brazilian Institute of Applied Economics Research (IPEA) for partially-funding the development
-of the plugin.
+We acknowledge contributions from Outer Loop Consulting, ADEME, La Fabrique des Mobilités,
+EGIS France, and the Brazilian Institute of Applied Economics Research (IPEA) for 
+partially-funding the development of the plugin.
 
 # References
