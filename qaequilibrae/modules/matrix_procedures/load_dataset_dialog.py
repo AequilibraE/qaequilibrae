@@ -1,5 +1,5 @@
-import os
 from functools import partial
+from os.path import dirname, join
 
 import pandas as pd
 import qgis
@@ -12,7 +12,7 @@ from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFile
 from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types, point_types, poly_types
 from qaequilibrae.modules.matrix_procedures.load_dataset_class import LoadDataset
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_vector_loader.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_vector_loader.ui"))
 
 
 class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):

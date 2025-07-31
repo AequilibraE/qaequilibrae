@@ -1,5 +1,5 @@
-import os
 import sys
+from os.path import dirname, join
 
 import pandas as pd
 import qgis
@@ -12,7 +12,7 @@ from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.modules.project_procedures.add_zones_procedure import AddZonesProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_add_zoning.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_add_zoning.ui"))
 
 
 class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):

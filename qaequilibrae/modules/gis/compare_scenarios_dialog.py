@@ -1,11 +1,11 @@
-import os
 import sys
 from functools import partial
+from os.path import dirname, join
 
 import qgis
 from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis.core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
 from qgis.core import QgsExpression, QgsProject, QgsVectorLayerJoinInfo
+from qgis.core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
 
 from qaequilibrae.modules.common_tools import find_table_fields, get_parameter_chain, layer_from_dataframe
 from qaequilibrae.modules.matrix_procedures import list_results
@@ -13,7 +13,7 @@ from qaequilibrae.modules.matrix_procedures.load_result_table import load_result
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_compare_scenarios.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_compare_scenarios.ui"))
 
 
 class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):

@@ -1,4 +1,4 @@
-import os
+from os.path import dirname, join
 
 import qgis
 from aequilibrae.paths import SkimResults, NetworkSkimming
@@ -10,7 +10,7 @@ from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_impedance_matrix.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_impedance_matrix.ui"))
 
 
 class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):

@@ -1,7 +1,7 @@
 import logging
-import os
 import sys
 from tempfile import gettempdir
+from os.path import dirname, join
 
 import numpy as np
 import pandas as pd
@@ -17,7 +17,7 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_traffic_assignment.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_traffic_assignment.ui"))
 logger = logging.getLogger("AequilibraEGUI")
 
 

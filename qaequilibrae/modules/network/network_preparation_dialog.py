@@ -1,5 +1,5 @@
-import os
 import sys
+from os.path import dirname, join
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
@@ -12,7 +12,7 @@ from qaequilibrae.modules.network.Network_preparation_procedure import NetworkPr
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 sys.modules["qgsfieldcombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_network_preparation.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_network_preparation.ui"))
 
 
 class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):

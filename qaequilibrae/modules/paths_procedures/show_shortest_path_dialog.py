@@ -1,6 +1,6 @@
 import logging
-import os
 import sys
+from os.path import abspath, dirname, join
 
 import qgis
 from aequilibrae.paths.results import PathResults
@@ -14,9 +14,9 @@ from qaequilibrae.modules.paths_procedures.point_tool import PointTool
 
 logger = logging.getLogger("AequilibraEGUI")
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
+sys.path.append(dirname(abspath(__file__)) + "/aequilibrae/")
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_compute_path.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_compute_path.ui"))
 
 
 class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):

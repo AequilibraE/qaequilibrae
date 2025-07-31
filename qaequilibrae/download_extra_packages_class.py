@@ -3,7 +3,6 @@ import shutil
 import subprocess
 import sys
 from importlib.util import find_spec
-from os.path import join, isdir
 from pathlib import Path
 
 from qgis.core import Qgis, QgsMessageLog
@@ -157,8 +156,8 @@ class DownloadAll:
         for fldr in list(os.walk(target_folder))[0][1]:
             for pkg in self.must_remove:
                 if pkg.lower() in fldr.lower():
-                    if isdir(join(target_folder, fldr)):
-                        shutil.rmtree(join(target_folder, fldr))
+                    if os.path.isdir(os.path.join(target_folder, fldr)):
+                        shutil.rmtree(os.path.join(target_folder, fldr))
                         QgsMessageLog.logMessage(
                             f"Duplicated packages removed from installation: {fldr}", level=Qgis.MessageLevel.Info
                         )

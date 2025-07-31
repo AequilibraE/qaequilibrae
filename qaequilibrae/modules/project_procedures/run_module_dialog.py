@@ -1,5 +1,5 @@
-import os
 import subprocess
+from os.path import dirname, isfile, join
 from pathlib import Path
 
 from aequilibrae.context import get_logger
@@ -10,7 +10,7 @@ from qgis.core import Qgis, QgsMessageLog
 from qaequilibrae.download_extra_packages_class import DownloadAll
 from qaequilibrae.modules.common_tools import LogDialog
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_run_module.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_run_module.ui"))
 
 
 class RunModuleDialog(QDialog, FORM_CLASS):
@@ -45,7 +45,7 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         except ModuleNotFoundError:
             run_path = self.project.project_base_path / "run" / "requirements.txt"
             target_dir = Path(__file__).parent.parent.parent / "packages"
-            if os.path.isfile(run_path):
+            if isfile(run_path):
                 self.question = QMessageBox.question(
                     self, "Missing requirements", self.rp_message, QMessageBox.Ok | QMessageBox.Cancel
                 )

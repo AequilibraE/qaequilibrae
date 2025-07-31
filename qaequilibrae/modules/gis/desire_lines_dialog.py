@@ -1,5 +1,5 @@
 import logging
-import os
+from os.path import dirname, join
 
 import pandas as pd
 import qgis
@@ -14,7 +14,7 @@ from qaequilibrae.modules.common_tools.global_parameters import poly_types, nume
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from .desire_lines_procedure import DesireLinesProcedure
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_DesireLines.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_DesireLines.ui"))
 
 
 class DesireLinesDialog(QDialog, FORM_CLASS):

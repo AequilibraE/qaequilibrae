@@ -1,5 +1,5 @@
 import importlib.util as iutil
-import os
+from os.path import dirname, join
 
 import numpy as np
 import qgis
@@ -20,7 +20,7 @@ from qaequilibrae.modules.matrix_procedures.mat_reblock import MatrixReblocking
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_loader.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_matrix_loader.ui"))
 
 logger = get_logger()
 

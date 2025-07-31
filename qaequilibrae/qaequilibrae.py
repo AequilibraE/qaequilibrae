@@ -6,7 +6,7 @@ import tempfile
 import webbrowser
 from functools import partial
 from os import unlink
-from os.path import dirname, exists, join, isfile, split
+from os.path import dirname, exists, join, isfile
 from pathlib import Path
 from uuid import uuid4
 

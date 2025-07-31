@@ -1,5 +1,5 @@
-import os
 import sys
+from os.path import dirname, join
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
@@ -9,7 +9,7 @@ from qaequilibrae.modules.network.adds_connectors_procedure import AddsConnector
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 sys.modules["qgsfieldcombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "./forms/ui_add_connectors.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "./forms/ui_add_connectors.ui"))
 
 
 class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):

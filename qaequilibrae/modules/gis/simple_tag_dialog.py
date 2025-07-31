@@ -1,4 +1,4 @@
-import os
+from os.path import dirname, join
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
@@ -14,7 +14,7 @@ from qaequilibrae.modules.common_tools.global_parameters import (
 )
 from .simple_tag_procedure import SimpleTAG
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_simple_tag.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_simple_tag.ui"))
 
 
 class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):

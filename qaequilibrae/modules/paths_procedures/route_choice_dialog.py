@@ -1,6 +1,7 @@
 import logging
-import os
 import sys
+from os import mkdir
+from os.path import dirname, isdir, join
 
 import geopandas as gpd
 import numpy as np
@@ -18,7 +19,7 @@ from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
 from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_route_choice.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_route_choice.ui"))
 logger = logging.getLogger("AequilibraEGUI")
 
 
@@ -403,8 +404,8 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         if self.job == "build" or self.parameters["save_choice_sets"] or self.parameters["set_sub_area"]:
             rc_folder = self.project.project_base_path / "route_choice"
-            if not os.path.isdir(rc_folder):
-                os.mkdir(rc_folder)
+            if not isdir(rc_folder):
+                mkdir(rc_folder)
             self.parameters["rc_folder"] = rc_folder
 
         self.parameters["matrix"] = float(demand) if self.job == "execute_single" else self.matrix
@@ -458,7 +459,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
             if self.parameters["set_sub_area"]:
                 self.worker_thread.matrix.to_parquet(
-                    os.path.join(self.parameters["rc_folder"], f"{self.ln_rc_output.text()}.parquet")
+                    join(self.parameters["rc_folder"], f"{self.ln_rc_output.text()}.parquet")
                 )
 
             if self.job == "build" or self.parameters["save_choice_sets"]:

@@ -1,7 +1,7 @@
-import os
 import sys
 from dataclasses import dataclass
 from functools import partial
+from os.path import dirname, join
 from random import randint
 from typing import Tuple, Literal, Dict, Union
 
@@ -21,7 +21,7 @@ from .set_color_ramps_dialog import LoadColorRampSelector
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgscolorbutton"] = qgis.gui
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_bandwidths.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_bandwidths.ui"))
 
 
 @dataclass

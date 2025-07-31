@@ -1,4 +1,4 @@
-import os
+from os.path import dirname, join
 
 import numpy as np
 from aequilibrae.paths.route_choice import RouteChoice
@@ -8,7 +8,7 @@ from qgis.PyQt.QtWidgets import QDialog
 from qaequilibrae.modules.common_tools.debouncer import Debouncer
 from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_execute_single.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_execute_single.ui"))
 
 
 class ExecuteSingleDialog(QDialog, FORM_CLASS):

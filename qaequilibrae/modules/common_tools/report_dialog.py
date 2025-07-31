@@ -19,14 +19,14 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-import os
+from os.path import dirname, join
 
 from qgis.PyQt import QtWidgets, uic
 
 from .auxiliary_functions import standard_path
 from .get_output_file_name import GetOutputFileName
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_report.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_report.ui"))
 
 
 class ReportDialog(QtWidgets.QDialog, FORM_CLASS):

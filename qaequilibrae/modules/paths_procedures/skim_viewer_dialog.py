@@ -1,5 +1,5 @@
-import os
 from math import ceil
+from os.path import dirname, join
 from random import choice
 
 import numpy as np
@@ -14,7 +14,7 @@ from qgis.core import QgsStyle, QgsVectorLayerJoinInfo, QgsRuleBasedRenderer, Qg
 from qaequilibrae.modules.common_tools import layer_from_dataframe
 from qaequilibrae.modules.common_tools.geodataframe_from_data_layer import geodataframe_from_layer
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_skim_viewer.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_skim_viewer.ui"))
 
 
 class SkimViewerDialog(QDialog, FORM_CLASS):

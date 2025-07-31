@@ -1,4 +1,4 @@
-import os
+from os.path import dirname, join
 
 import numpy as np
 import qgis
@@ -11,7 +11,7 @@ from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.routing_procedures.tsp_procedure import TSPProcedure
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/tsp.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/tsp.ui"))
 
 
 class TSPDialog(QtWidgets.QDialog, FORM_CLASS):

@@ -1,4 +1,4 @@
-import os
+from os.path import dirname, join
 
 import pandas as pd
 import qgis
@@ -12,7 +12,7 @@ from qaequilibrae.modules.matrix_procedures.load_result_table import load_result
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
 from qaequilibrae.modules.matrix_procedures.results_lister import list_results
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_project_data.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_project_data.ui"))
 
 
 class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -58,9 +58,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
 
         file_name = self.matrices["file_name"][idx[0]]
 
-        dlg2 = DisplayAequilibraEFormatsDialog(
-            self.qgs_proj, os.path.join(self.project.matrices.fldr, file_name), proj=True
-        )
+        dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj, join(self.project.matrices.fldr, file_name), proj=True)
         dlg2.show()
         dlg2.exec_()
 

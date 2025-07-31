@@ -1,9 +1,9 @@
-import os
+from os.path import dirname, join
 
 from aequilibrae.project import Project
 from qgis.PyQt import QtWidgets, uic, QtCore
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_load_network_info.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_load_network_info.ui"))
 
 
 class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):

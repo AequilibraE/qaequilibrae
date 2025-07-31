@@ -1,6 +1,6 @@
-import os
 from collections import OrderedDict
 from functools import partial
+from os.path import basename, dirname, join, splitext
 
 import numpy as np
 import pandas as pd
@@ -20,7 +20,7 @@ from qaequilibrae.modules.distribution_procedures.ipf_procedure import IpfProced
 from qaequilibrae.modules.matrix_procedures import LoadDatasetDialog, DisplayAequilibraEFormatsDialog
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_distribution.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_distribution.ui"))
 
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
 
@@ -201,7 +201,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         if isinstance(dlg2.dataset, pd.DataFrame):
             dataset_name = dlg2.output_name
             if dataset_name is not None:
-                data_name = os.path.splitext(os.path.basename(dataset_name))[0]
+                data_name = splitext(basename(dataset_name))[0]
                 data_name = self.find_non_conflicting_name(data_name, self.datasets)
                 self.datasets[data_name] = dlg2.dataset
                 self.add_to_table(self.datasets, self.table_datasets)
@@ -239,7 +239,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             else:
                 file_name = self.matrices.at[cob_orig.currentIndex(), "file_name"]
                 mat = AequilibraeMatrix()
-                mat.load(os.path.join(self.project.matrices.fldr, file_name))
+                mat.load(join(self.project.matrices.fldr, file_name))
                 cob_dest.addItems(mat.names)
 
     def load_comboboxes(self, list_to_load, data_cob):
@@ -287,13 +287,13 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.job != "ipf":
                 imped_name = self.matrices.at[self.cob_imped_mat.currentIndex(), "file_name"]
                 imped_matrix = AequilibraeMatrix()
-                imped_matrix.load(os.path.join(self.project.matrices.fldr, imped_name))
+                imped_matrix.load(join(self.project.matrices.fldr, imped_name))
                 imped_matrix.computational_view([self.cob_imped_field.currentText()])
 
             if self.job != "apply":
                 seed_name = self.matrices.at[self.cob_seed_mat.currentIndex(), "file_name"]
                 seed_matrix = AequilibraeMatrix()
-                seed_matrix.load(os.path.join(self.project.matrices.fldr, seed_name))
+                seed_matrix.load(join(self.project.matrices.fldr, seed_name))
                 seed_matrix.computational_view([self.cob_seed_field.currentText()])
 
             if self.job != "calibrate":
@@ -369,7 +369,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.table_jobs.setRowCount(len(self.job_queue.keys()))
 
         for i, j in enumerate(self.job_queue.keys()):
-            data_name = os.path.splitext(os.path.basename(j))[0]
+            data_name = splitext(basename(j))[0]
             self.table_jobs.setItem(i, 0, QTableWidgetItem(str(i + 1)))
             self.table_jobs.setItem(i, 1, QTableWidgetItem(data_name))
             self.table_jobs.setItem(i, 2, QTableWidgetItem(self.tr("Queued")))
