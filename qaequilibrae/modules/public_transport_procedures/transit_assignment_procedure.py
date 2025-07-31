@@ -52,9 +52,8 @@ class TransitAssignProcedure(WorkerThread):
 
         else:
             self.signal.emit(["update", 3, "Reloading graph into project"])
-            pt_con = database_connection("transit")
 
-            graph = TransitGraphBuilder.from_db(pt_con, self.configs["period_id"])
+            graph = TransitGraphBuilder.from_db(self.project, self.configs["period_id"])
 
         # To perform an assignment we need to convert the graph builder into a graph.
         self.signal.emit(["update", 5, "Convert into graph"])

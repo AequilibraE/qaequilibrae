@@ -44,7 +44,7 @@ def test_assignment(qtbot, coquimbo_project):
     qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
 
     # Check the results table
-    result = load_result_table(coquimbo_project.project.project_base_path, "pt_assignment")
+    result = load_result_table(coquimbo_project.project._results_database_path, "pt_assignment")
     assert result.shape == (466, 2)
     assert result.columns.tolist() == ["index", "pt_class_volume"]
 
@@ -288,6 +288,6 @@ def test_reuse_graph_in_project(qtbot, coquimbo_project):
     qtbot.mouseClick(dialog.but_assign, Qt.LeftButton)
 
     # Check the results table
-    result = load_result_table(coquimbo_project.project.project_base_path, "pt_assignment")
+    result = load_result_table(coquimbo_project.project._results_database_path, "pt_assignment")
     assert result.shape == (466, 2)
     assert result.columns.tolist() == ["index", "pt_class_volume"]

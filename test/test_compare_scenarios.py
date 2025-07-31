@@ -11,9 +11,9 @@ from .utilities import run_sfalls_assignment
 
 
 @pytest.fixture
-def model_path(ae_with_project):
-    path = str(ae_with_project.project.project_base_path)
-    proj = run_sfalls_assignment(ae_with_project)
+def model_path(sf_project):
+    path = str(sf_project.project.project_base_path)
+    proj = run_sfalls_assignment(sf_project)
     proj = future_assignment(proj)
 
     proj.project.close()
@@ -43,9 +43,9 @@ def test_compare_scenarios(ae, model_path, composite):
         assert f in field_names
 
 
-def future_assignment(aeq_from_qgis):
+def future_assignment(sf_project):
 
-    project = aeq_from_qgis.project
+    project = sf_project.project
     project.network.build_graphs()
 
     graph = project.network.graphs["c"]
@@ -53,7 +53,7 @@ def future_assignment(aeq_from_qgis):
     graph.set_skimming(["free_flow_time", "distance"])
     graph.set_blocked_centroid_flows(False)
 
-    demand = project.matrices.get_matrix("demand.aem")
+    demand = project.matrices.get_matrix("demand_omx")
     demand.computational_view(["matrix"])
 
     # Calibrate gravity model
@@ -116,4 +116,4 @@ def future_assignment(aeq_from_qgis):
     assig.save_results("future_assignment")
     assig.save_skims("future_assignment", which_ones="all", format="omx")
 
-    return aeq_from_qgis
+    return sf_project

@@ -215,10 +215,11 @@ def test_renumber_from_centroids(ae_with_project, tmp_path):
         assert node_count == list(range(1001, 1025))
 
 
-def test_assign_from_yaml(ae_with_project):
-    folder = str(ae_with_project.project.project_base_path)
+def test_assign_from_yaml(sf_project):
+    folder = str(sf_project.project.project_base_path)
+    shutil.copyfile("test/data/SiouxFalls_project/config.yml", f"{folder}/config.yml")
+    
     file_path = join(folder, "config.yml")
-
     assert isfile(file_path)
 
     string_to_replace = "path_to_project"

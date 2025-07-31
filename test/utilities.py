@@ -265,12 +265,12 @@ def load_sfalls_from_layer(path):
             var[0].setCrs(crs)
 
 
-def run_sfalls_assignment(aeq_from_qgis):
+def run_sfalls_assignment(sf_project):
     """Runs traffic assignment with Sioux Falls data."""
 
     from aequilibrae.paths import TrafficAssignment, TrafficClass
 
-    project = aeq_from_qgis.project
+    project = sf_project.project
     project.network.build_graphs()
 
     graph = project.network.graphs["c"]
@@ -278,7 +278,7 @@ def run_sfalls_assignment(aeq_from_qgis):
     graph.set_skimming(["free_flow_time", "distance"])
     graph.set_blocked_centroid_flows(False)
 
-    demand = project.matrices.get_matrix("demand.aem")
+    demand = project.matrices.get_matrix("demand_omx")
     demand.computational_view(["matrix"])
 
     assigclass = TrafficClass("car", graph, demand)
@@ -298,7 +298,7 @@ def run_sfalls_assignment(aeq_from_qgis):
     assig.save_results("assignment")
     assig.save_skims("assignment", which_ones="all", format="omx")
 
-    return aeq_from_qgis
+    return sf_project
 
 
 def load_test_layer(folder, file_name):

@@ -83,8 +83,8 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
 
 
 @pytest.mark.parametrize("method", ["negative_exponential", "inverse_power", "both"])
-def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
-    proj = run_sfalls_assignment(ae_with_project)
+def test_calibrate_gravity(sf_project, method, folder_path, mocker, qtbot):
+    proj = run_sfalls_assignment(sf_project)
 
     mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
     mocker.patch(f"{DISTRIBUTION_PATH}.exit_procedure")
@@ -93,7 +93,7 @@ def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
 
     temp = list(dialog.matrices["name"])
     imped_idx = temp.index("assignment_car")
-    demand_idx = temp.index("omx")
+    demand_idx = temp.index("demand_omx")
     dialog.cob_imped_mat.setCurrentIndex(imped_idx)
     dialog.cob_imped_field.setCurrentText("free_flow_time_final")
     dialog.cob_seed_mat.setCurrentIndex(demand_idx)
