@@ -1,11 +1,8 @@
 import os
-import sqlite3
 import sys
 from functools import partial
-from os.path import join
 
 import qgis
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
 from qgis.core import QgsExpression, QgsProject, QgsVectorLayerJoinInfo
@@ -91,7 +88,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         cob_fields.clear()
         if cob_scenario.currentIndex() < 0:
             return
-        with read_and_close(self.qgis_project.project._results_database_path) as conn:
+        with self.qgis_project.project.results_connection as conn:
             lst = find_table_fields(conn, cob_scenario.currentText())
         flds = [x.replace("ab", "*") for x in lst if "ab" in x and x.replace("ab", "ba") in lst]
         cob_fields.addItems(flds)
@@ -205,7 +202,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         v2 = self.cob_alternative_scenario.currentText()
         v3 = self.cob_base_data.currentText()
         v4 = self.cob_alternative_data.currentText()
-        base_lyr_result = load_result_table(self.qgis_project.project._results_database_path, v1)
+        base_lyr_result = load_result_table(self.qgis_project.project, v1)
         self.base_lyr = layer_from_dataframe(base_lyr_result, v1)
         data_to_join = [[self.base_lyr, "base"]]
 
@@ -213,7 +210,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         data_fields = [[txt.replace("*", "ab"), txt.replace("*", "ba")]]
         txt = f"base_{v4}"
         if v1 != v2:
-            alter_layer_result = load_result_table(self.qgis_project.project._results_database_path, v2)
+            alter_layer_result = load_result_table(self.qgis_project.project, v2)
             self.alter_layer = layer_from_dataframe(alter_layer_result, v2)
             data_to_join.append([self.alter_layer, "alternative"])
             txt = f"alternative_{v4}"

@@ -5,7 +5,6 @@ import sys
 import geopandas as gpd
 import numpy as np
 import qgis
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
@@ -47,7 +46,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.__populate_project_info()
 
         self.__project_nodes = self.project.network.nodes.data.node_id.tolist()
-        self.proj_matrices = list_matrices(self.project.matrices.fldr)
+        self.proj_matrices = list_matrices(self.project)
 
         self.cob_algo.addItems(["BFSLE", "Link Penalization", "BFSLE with Link Penalization"])
         self.cob_direction.addItems(["AB", "Both", "BA"])
@@ -73,7 +72,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.set_select_link_use()
 
     def __populate_project_info(self):
-        with read_and_close(self.project._project_database_path) as conn:
+        with self.project.db_connection as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
 
             modes = []
@@ -403,7 +402,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.parameters["set_sub_area"] = False
 
         if self.job == "build" or self.parameters["save_choice_sets"] or self.parameters["set_sub_area"]:
-            rc_folder = os.path.join(self.project.project_base_path, "route_choice")
+            rc_folder = self.project.project_base_path / "route_choice"
             if not os.path.isdir(rc_folder):
                 os.mkdir(rc_folder)
             self.parameters["rc_folder"] = rc_folder

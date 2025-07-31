@@ -6,7 +6,7 @@ def run_pt_explore(qgis_project):
         qgis_project.show_message_no_project()
         return
 
-    elif not exists(join(qgis_project.project.project_base_path, "public_transport.sqlite")):
+    elif not exists(qgis_project.project._transit_database_path):
         qgis_project.message_no_gtfs_feed()
         return
 

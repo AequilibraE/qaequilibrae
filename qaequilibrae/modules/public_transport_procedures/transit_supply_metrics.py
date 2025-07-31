@@ -1,8 +1,6 @@
 from typing import List, Optional
 
 import pandas as pd
-from aequilibrae.project.database_connection import database_connection
-from aequilibrae.utils.db_utils import read_and_close
 
 
 class SupplyMetrics:
@@ -13,9 +11,9 @@ class SupplyMetrics:
     whenever *from_time* is not provided and the end of simulation when
     *to_time* is not provided"""
 
-    def __init__(self, path):
+    def __init__(self, project):
         """
-        :param path: Path to the supply file we want to compute metrics for
+        :param project: AequilibraE project we want to compute the metrics for
         """
 
         rt_sql = """Select route_id, route, agency_id, route_type, seated_capacity s_capacity, total_capacity t_capacity from routes"""
@@ -36,7 +34,7 @@ class SupplyMetrics:
         trp_pat_lnk_sql = """select pattern_id, seq stop_order, cast(from_stop as text) from_stop, 
                              cast(to_stop as text) to_stop from route_links"""
 
-        with read_and_close(path, spatial=True) as conn:
+        with project.transit_connection as conn:
             self.__raw_routes = pd.read_sql(rt_sql, conn).fillna(0)
             self.__raw_patterns = pd.read_sql(patt_sql, conn).fillna(0)
             self.__raw_stops = pd.read_sql(stop_sql, conn)

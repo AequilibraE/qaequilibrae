@@ -10,7 +10,6 @@ from aequilibrae.parameters import Parameters
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
@@ -124,7 +123,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             item.setEnabled(self.chb_fixed_cost.isChecked())
 
         if self.chb_fixed_cost.isChecked():
-            with read_and_close(self.project._project_database_path) as conn:
+            with self.project.db_connection as conn:
                 dt = conn.execute("pragma table_info(modes)").fetchall()
                 if "vot" in [x[1] for x in dt]:
                     sql = "select vot from modes where mode_id=?"
@@ -136,7 +135,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.ln_class_name.setText(nm[:-4])
         self.set_fixed_cost_use()
 
-        with read_and_close(self.project._project_database_path) as conn:
+        with self.project.db_connection as conn:
             dt = conn.execute("pragma table_info(modes)").fetchall()
             if "pce" in [x[1] for x in dt]:
                 sql = "select pce from modes where mode_id=?"
@@ -172,7 +171,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         table.setItem(0, 0, QTableWidgetItem("Project path"))
         table.setItem(0, 1, QTableWidgetItem(path_to_file))
 
-        with read_and_close(self.project._project_database_path) as conn:
+        with self.project.db_connection as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
 
             modes = []
@@ -453,7 +452,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
             return False
 
         sql = "Select count(*) from results where table_name=?"
-        with read_and_close(self.project._project_database_path) as conn:
+        with self.project.db_connection as conn:
             if sum(conn.execute(sql, [self.scenario_name]).fetchone()):
                 self.error = self.tr("Result table name already exists. Choose a new name")
                 return False

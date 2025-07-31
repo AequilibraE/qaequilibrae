@@ -1,5 +1,4 @@
 import importlib.util as iutil
-import sys
 
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingException
 

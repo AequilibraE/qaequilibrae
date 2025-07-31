@@ -1,5 +1,4 @@
 import os
-from os.path import join
 
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML
@@ -12,7 +11,7 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, parent=None):
         super(LogDialog, self).__init__(parent)
 
-        self.logfile = join(qgis_project.project.project_base_path, "aequilibrae.log")
+        self.logfile = qgis_project.project.project_base_path / "aequilibrae.log"
 
         self.iface = qgis_project.iface
         self.setupUi(self)

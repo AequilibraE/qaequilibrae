@@ -43,7 +43,7 @@ class RunModuleDialog(QDialog, FORM_CLASS):
             )
 
         except ModuleNotFoundError:
-            run_path = Path(self.project.project_base_path / "run" / "requirements.txt")
+            run_path = self.project.project_base_path / "run" / "requirements.txt"
             target_dir = Path(__file__).parent.parent.parent / "packages"
             if os.path.isfile(run_path):
                 self.question = QMessageBox.question(

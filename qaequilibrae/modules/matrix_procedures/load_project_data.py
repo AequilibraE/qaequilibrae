@@ -1,9 +1,7 @@
 import os
-from os.path import join
 
 import pandas as pd
 import qgis
-from aequilibrae.utils.db_utils import commit_and_close
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTabWidget
 from qgis.core import QgsProject, QgsVectorLayerJoinInfo
@@ -60,12 +58,14 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
 
         file_name = self.matrices["file_name"][idx[0]]
 
-        dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj, join(self.project.matrices.fldr, file_name), proj=True)
+        dlg2 = DisplayAequilibraEFormatsDialog(
+            self.qgs_proj, os.path.join(self.project.matrices.fldr, file_name), proj=True
+        )
         dlg2.show()
         dlg2.exec_()
 
     def load_matrices(self):
-        self.matrices = list_matrices(self.project.matrices.fldr)
+        self.matrices = list_matrices(self.project)
 
         self.matrices_model = PandasModel(self.matrices)
         self.list_matrices.setModel(self.matrices_model)
@@ -73,7 +73,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
     def update_matrix_table(self):
         matrices = self.project.matrices
         matrices.update_database()
-        with commit_and_close(self.project._project_database_path) as conn:
+        with self.project.db_connection_spatial as conn:
             qry = """UPDATE matrices SET name = substr(file_name, 1, length(file_name)-4) WHERE name like "b''%";"""
             conn.execute(qry)
         self.load_matrices()
@@ -92,7 +92,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.results["WARNINGS"][idx[0]] != "":
             return
 
-        res_table = load_result_table(self.project._results_database_path, table_name)
+        res_table = load_result_table(self.project, table_name)
         lyr = layer_from_dataframe(res_table, table_name)
 
         if self.chb_join.isChecked():

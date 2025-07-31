@@ -1,5 +1,3 @@
-import os
-import sqlite3
 from datetime import datetime
 
 import pytest
@@ -37,9 +35,8 @@ def test_add_new_feed(pt_no_feed, mocker):
     importer.rdo_keep.setChecked(True)
     importer.execute_importer()
 
-    db_path = os.path.join(pt_no_feed.project.project_base_path, "public_transport.sqlite")
-    conn = sqlite3.connect(db_path)
-    var = conn.execute("select count(agency_id) from agencies").fetchone()[0]
+    with pt_no_feed.project.transit_connection as conn:
+        var = conn.execute("select count(agency_id) from agencies").fetchone()[0]
 
     assert var == 1
 
@@ -79,9 +76,8 @@ def test_add_other_feed(pt_project, set_agency, set_date, is_checked, mocker):
     importer.set_feed(feed.feed)
     importer.execute_importer()
 
-    db_path = os.path.join(pt_project.project.project_base_path, "public_transport.sqlite")
-    conn = sqlite3.connect(db_path)
-    var = conn.execute("select count(agency_id) from agencies").fetchone()[0]
+    with pt_project.project.transit_connection as conn:
+        var = conn.execute("select count(agency_id) from agencies").fetchone()[0]
 
     target = 1 if is_checked else 2
     assert var == target

@@ -1,13 +1,10 @@
-import sqlite3
-from os.path import isfile, join
-from pathlib import Path
+from os.path import isfile
 from uuid import uuid4
 
 import numpy as np
 import openmatrix as omx
 import pandas as pd
 import pytest
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt.QtCore import Qt
 
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
@@ -53,7 +50,7 @@ def test_single_class(sf_project, qtbot):
     assert isfile(results)
 
     # Assert we have a non-null result and that results are actually stored in the file
-    with read_and_close(results) as conn:
+    with sf_project.project.results_connection as conn:
         assert conn.execute(f"SELECT ROUND(SUM(PCE_tot), 4) FROM {test_name}").fetchone()[0] > 0
 
     pth = sf_project.project.project_base_path
@@ -167,7 +164,7 @@ def test_multiclass(sf_project, qtbot):
     results = sf_project.project._results_database_path
     assert isfile(results)
 
-    with read_and_close(results) as conn:
+    with sf_project.project.results_connection as conn:
         assert conn.execute(f"SELECT ROUND(SUM(PCE_tot), 4) FROM {test_name}").fetchone()[0] > 0
         assert conn.execute(f"SELECT ROUND(SUM(car_tot), 4) FROM {test_name}").fetchone()[0] > 0
         assert conn.execute(f"SELECT ROUND(SUM(motorcycle_tot), 4) FROM {test_name}").fetchone()[0] > 0
@@ -247,7 +244,7 @@ def test_all_or_nothing(sf_project, qtbot):
     assert isfile(results)
 
     # Assert we have a non-null result and that results are actually stored in the file
-    with read_and_close(results) as conn:
+    with sf_project.project.results_connection as conn:
         assert conn.execute(f"SELECT ROUND(SUM(matrix_tot), 4) FROM {test_name}").fetchone()[0] == 885_300.0
 
     pth = dialog.project.project_base_path
@@ -302,7 +299,7 @@ def test_select_link_analysis(sf_project, qtbot):
     matrices.update_database()
     assert "select_link_analysis.omx" in matrices.list()["file_name"].tolist()
 
-    with read_and_close(dialog.project._results_database_path) as conn:
+    with dialog.project.results_connection as conn:
         results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "select_link_analysis" in results
 
@@ -353,7 +350,7 @@ def test_link_removal(sf_project, qtbot):
     matrices.update_database()
     assert f"{test_name}_car" in matrices.list()["name"].values.tolist()
 
-    with read_and_close(project._results_database_path) as conn:
+    with project.results_connection as conn:
         results = pd.read_sql(f"Select link_id, PCE_tot from {test_name}", conn).set_index("link_id")
 
     for idx, row in results.iterrows():

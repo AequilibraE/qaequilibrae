@@ -3,7 +3,6 @@ from os.path import join, dirname
 
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.transit import Transit
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
@@ -25,7 +24,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.transit_data = Transit(self.project)
 
         self.all_modes = {}
-        self.proj_matrices = list_matrices(self.project.matrices.fldr)
+        self.proj_matrices = list_matrices(self.project)
         self.skim_fields = []
         self.error = ""
         self.configs = {}
@@ -52,7 +51,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.load_periods_table()
 
         # Add modes
-        with read_and_close(self.project._project_database_path) as conn:
+        with self.project.db_connection as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
 
             modes = []

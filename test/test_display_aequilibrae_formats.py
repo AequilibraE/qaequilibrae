@@ -1,13 +1,11 @@
 import os
+import sys
 
 import numpy as np
 import pytest
-import sys
-
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
-
 
 pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
 

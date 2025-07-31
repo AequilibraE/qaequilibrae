@@ -100,7 +100,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.update_model_parameters()
 
     def load_matrices(self):
-        self.matrices = list_matrices(self.project.matrices.fldr)
+        self.matrices = list_matrices(self.project)
 
         self.matrices_model = PandasModel(self.matrices)
         self.list_matrices.setModel(self.matrices_model)

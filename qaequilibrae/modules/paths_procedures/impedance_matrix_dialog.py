@@ -1,9 +1,7 @@
-import importlib.util as iutil
 import os
 
 import qgis
 from aequilibrae.paths import SkimResults, NetworkSkimming
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
@@ -13,9 +11,6 @@ from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_impedance_matrix.ui"))
-
-spec = iutil.find_spec("openmatrix")
-has_omx = spec is not None
 
 
 class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -58,7 +53,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.block_paths.setChecked(True)
         self.graph = None  # type: Graph
 
-        with read_and_close(self.project._project_database_path) as conn:
+        with self.project.db_connection as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
             for x in res.fetchall():
                 self.cb_modes.addItem(f"{x[0]} ({x[1]})")
@@ -115,7 +110,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progress_label.setText("")
 
     def check_name_exists(self):
-        with read_and_close(self.project._project_database_path) as conn:
+        with self.project.db_connection as conn:
             txt = self.line_matrix.text()
             if not len(txt):
                 return False
@@ -144,8 +139,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def finished_threaded_procedure(self):
         self.report = self.worker_thread.report
-        format = "omx" if has_omx else "aem"
-        self.worker_thread.save_to_project(self.only_str(self.mat_name), format=format)
+        self.worker_thread.save_to_project(self.only_str(self.mat_name), format="aem")
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results

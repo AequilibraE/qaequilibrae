@@ -324,10 +324,10 @@ class AequilibraEMenu:
             return
         uri = QgsDataSourceUri()
         if "transit_" not in layer_name:
-            uri.setDatabase(str(self.project.path_to_file))
+            uri.setDatabase(str(self.project._project_database_path))
             lname = layer_name
         else:
-            uri.setDatabase(join(self.project.project_base_path, "public_transport.sqlite"))
+            uri.setDatabase(str(self.project._transit_database_path))
             lname = layer_name[8:]
         uri.setDataSource("", lname, "geometry")
         layer = QgsVectorLayer(uri.uri(), layer_name, "spatialite")
@@ -393,6 +393,10 @@ class AequilibraEMenu:
 
         qgis.utils.iface.mapCanvas().refresh()
 
+    @property
+    def _project_layers_database(self):
+        return self.project.project_base_path / "qgis_layers.sqlite"
+
     def save_in_project(self):
         """Saves temporary layers to the project using QGIS saving buttons."""
         if not self.project:
@@ -404,9 +408,7 @@ class AequilibraEMenu:
         if "aequilibrae_path" not in variables:
             QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aequilibrae_path", var)
 
-        output_file_path = join(self.project.project_base_path, "qgis_layers.sqlite")
-
-        file_exists = True if isfile(output_file_path) else False
+        file_exists = True if isfile(self._project_layers_database) else False
 
         for layer in QgsProject.instance().mapLayers().values():
             if layer.isTemporary():
@@ -419,10 +421,12 @@ class AequilibraEMenu:
 
                 transform_context = QgsProject.instance().transformContext()
 
-                error = QgsVectorFileWriter.writeAsVectorFormatV3(layer, output_file_path, transform_context, options)
+                error = QgsVectorFileWriter.writeAsVectorFormatV3(
+                    layer, self._project_layers_database, transform_context, options
+                )
 
                 if error[0] == QgsVectorFileWriter.NoError:
-                    layer.setDataSource(output_file_path + f"|layername={layer_name}", layer.name(), "ogr")
+                    layer.setDataSource(self._project_layers_database + f"|layername={layer_name}", layer.name(), "ogr")
 
                 file_exists = True
 

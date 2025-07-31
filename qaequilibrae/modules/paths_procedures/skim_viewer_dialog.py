@@ -5,7 +5,6 @@ from random import choice
 import numpy as np
 import pandas as pd
 from aequilibrae.paths import Graph
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDialog
@@ -67,7 +66,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         # Check if layer links is in the layers tab.
         self.__prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
 
-        with read_and_close(self.project._project_database_path) as conn:
+        with self.project.db_connection as conn:
             centroids = pd.read_sql("select node_id from nodes where is_centroid=1", con=conn).node_id.to_numpy()
             self.centroids = centroids if centroids.size != 0 else None
 

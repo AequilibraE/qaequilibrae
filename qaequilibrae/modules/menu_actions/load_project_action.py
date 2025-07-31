@@ -3,7 +3,6 @@ from pathlib import Path
 from tempfile import gettempdir
 
 import qgis
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
@@ -56,7 +55,7 @@ def _run_load_project_from_path(qgis_project, proj_path):
 
 def update_project_layers(qgis_project):
 
-    with read_and_close(qgis_project.project._project_database_path, spatial=True) as conn:
+    with qgis_project.project.db_connection_spatial as conn:
         layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
 
         # Add transit_tables to layers

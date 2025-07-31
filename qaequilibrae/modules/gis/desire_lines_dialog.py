@@ -35,7 +35,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         if qgis_project.project is None:
             self.proj_matrices = pd.DataFrame([])
         else:
-            self.proj_matrices = list_matrices(self.qgis_project.project.matrices.fldr)
+            self.proj_matrices = list_matrices(self.qgis_project.project)
         self.logger = logging.getLogger("AequilibraEGUI")
 
         self.resize(389, 385)

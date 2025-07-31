@@ -1,8 +1,6 @@
 from os.path import dirname, join, isfile
 
-from aequilibrae.project.database_connection import database_connection
 from aequilibrae.transit import Transit
-from aequilibrae.utils.db_utils import commit_and_close
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
@@ -28,7 +26,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.feeds = []
         self.done = 1
 
-        self.is_pt_database = isfile(join(qgis_project.project.project_base_path, "public_transport.sqlite"))
+        self.is_pt_database = isfile(qgis_project.project._transit_database_path)
 
         if self.is_pt_database:
             self.rdo_clear.setText(self.tr("Overwrite Routes"))
@@ -83,7 +81,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.setFixedHeight(176)
 
         if self.rdo_clear.isChecked() and self.is_pt_database:
-            with commit_and_close(self.qgis_project.project._transit_database_path) as conn:
+            with self.qgis_project.project.transit_connection as conn:
                 for table in self.__transit_tables:
                     conn.execute(f"DELETE FROM {table};")
 

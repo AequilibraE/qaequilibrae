@@ -1,11 +1,8 @@
-from os.path import join
 from unittest import mock
-import sqlite3
 
 import numpy as np
 import pandas as pd
 from aequilibrae.parameters import Parameters
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt.QtCore import Qt
 
 from qaequilibrae.modules.project_procedures.run_module_dialog import RunModuleDialog
@@ -15,7 +12,7 @@ functions = {0: "matrix_summary", 1: "graph_summary", 2: "results_summary", 3: "
 
 
 def create_dialog_with_matrix(project):
-    pth = join(project.project.project_base_path, "matrices/demand.aem")
+    pth = project.project.project_base_path / "matrices" / "demand.aem"
     create_matrix(np.arange(1, 134), pth)
 
     matrices = project.project.matrices
@@ -60,15 +57,15 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
 
     folder = coquimbo_project.project.project_base_path
 
-    with open(join(folder, "run", "create_delaunay.py"), "w") as file:
+    with open(folder / "run" / "create_delaunay.py", "w") as file:
         file.write(func_string)
 
-    with open(join(folder, "run", "__init__.py"), "r") as file:
+    with open(folder / "run" / "__init__.py", "r") as file:
         lines = file.readlines()
 
     lines.insert(19, "from .create_delaunay import create_delaunay\n")
 
-    with open(join(folder, "run", "__init__.py"), "w") as file:
+    with open(folder / "run" / "__init__.py", "w") as file:
         file.writelines(lines)
 
     p = Parameters()
@@ -93,7 +90,7 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
 
         qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
-    with read_and_close(coquimbo_project.project._results_database_path) as conn:
+    with coquimbo_project.project.results_connection as conn:
         results = pd.read_sql("SELECT * FROM delaunay_test", conn).set_index("link_id")
 
     assert results.shape != (0, 0)

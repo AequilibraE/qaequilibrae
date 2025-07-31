@@ -1,11 +1,7 @@
-import sqlite3
 from os import listdir
-from os.path import join
-from pathlib import Path
 
 import numpy as np
 import pytest
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsProject
 
@@ -108,13 +104,13 @@ def test_assign_and_save(sf_project, qtbot, save):
     dialog.ln_rc_output.setText("route_choice")
     qtbot.mouseClick(dialog.but_perform_assig, Qt.LeftButton)
 
-    with read_and_close(sf_project.project._results_database_path) as conn:
+    with sf_project.project.results_connection as conn:
         results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "route_choice_uncompressed" in results
 
     if save:
         counter = 0
-        rc_folder = listdir(join(dialog.project.project_base_path, "route_choice"))
+        rc_folder = listdir(dialog.project.project_base_path / "route_choice")
         for folder in rc_folder:
             if "origin id=" in folder:
                 counter += 1
@@ -148,7 +144,7 @@ def test_build_and_save(ae_with_project, qtbot):
     qtbot.mouseClick(dialog.but_build_and_save, Qt.LeftButton)
 
     counter = 0
-    rc_folder = listdir(join(dialog.project.project_base_path, "route_choice"))
+    rc_folder = listdir(dialog.project.project_base_path / "route_choice")
     for folder in rc_folder:
         if "origin id=" in folder:
             counter += 1
@@ -160,7 +156,7 @@ def test_build_and_save(ae_with_project, qtbot):
 
 
 def create_dialog_with_matrix(project):
-    pth = join(project.project.project_base_path, "matrices/demand.aem")
+    pth = project.project.project_base_path / "matrices" / "demand.aem"
     create_matrix(np.arange(1, 134), pth)
 
     matrices = project.project.matrices
@@ -207,11 +203,11 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
     dialog.ln_rc_output.setText("route_choice_for_subarea")
     qtbot.mouseClick(dialog.but_perform_assig, Qt.LeftButton)
 
-    with read_and_close(coquimbo_project.project._results_database_path) as conn:
+    with coquimbo_project.project.results_connection as conn:
         results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "route_choice_for_subarea_uncompressed" in results
 
-    rc_folder = listdir(join(dialog.project.project_base_path, "route_choice"))
+    rc_folder = listdir(dialog.project.project_base_path / "route_choice")
     assert "route_choice_for_subarea.parquet" in rc_folder
 
 
@@ -261,7 +257,7 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     matrices = listdir(dialog.project.matrices.fldr)
     assert "select_link_analysis.omx" in matrices
 
-    with read_and_close(coquimbo_project.project._results_database_path) as conn:
+    with coquimbo_project.project.results_connection as conn:
         results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "select_link_analysis_uncompressed" in results
 

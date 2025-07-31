@@ -3,8 +3,6 @@ from math import ceil
 from os.path import dirname, join
 
 import pandas as pd
-from aequilibrae.project.database_connection import database_connection
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import uic, QtGui
 from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView
 from qgis.core import QgsProject, QgsStyle, QgsVectorLayerJoinInfo, QgsGraduatedSymbolRenderer, QgsApplication
@@ -37,7 +35,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.zone_target_metric = ""
         self.filtered = {}
 
-        self.sm = SupplyMetrics(self.project._transit_database_path)
+        self.sm = SupplyMetrics(self.project)
         self.gtfs_types = {
             0: "Light rail",
             1: "Subway/Metro",
@@ -72,7 +70,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
                         coalesce(ST_X(ST_StartPoint(geometry))-ST_X(ST_EndPoint(geometry)),0) dx,
                         coalesce(ST_Y(ST_StartPoint(geometry))-ST_Y(ST_EndPoint(geometry)),0) dy
                  FROM routes"""
-        with read_and_close(self.project._transit_database_path, spatial=True) as conn:
+        with self.project.transit_connection as conn:
             self.all_agencies = {ag: ag_id for ag_id, ag in conn.execute(agency_sql)}
             patt_df = pd.read_sql(sql, conn)
 
