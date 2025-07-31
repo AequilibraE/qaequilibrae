@@ -14,6 +14,7 @@ from aequilibrae import Project
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.transit import Transit
 from aequilibrae.utils.create_example import create_example
+from aequilibrae.utils.db_utils import read_and_close
 from qgis.core import (
     QgsApplication,
     QgsField,
@@ -173,7 +174,7 @@ def test_add_centroid_connector(pt_no_feed):
 
     assert result["Output"] == project_folder
 
-    with project.db_connection as conn:
+    with read_and_close(project._project_database_path) as conn:
         node_qry = "select count(node_id) from nodes where is_centroid=1"
         node_count = conn.execute(node_qry).fetchone()[0]
         assert node_count == 1
@@ -208,7 +209,7 @@ def test_renumber_from_centroids(ae_with_project, tmp_path):
 
     assert result[0]["Output"] == project_folder
 
-    with project.db_connection as conn:
+    with read_and_close(project._project_database_path) as conn:
         node_qry = "select node_id from nodes;"
         node_count = conn.execute(node_qry).fetchall()
         node_count = [n[0] for n in node_count]

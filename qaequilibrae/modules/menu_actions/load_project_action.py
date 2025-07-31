@@ -3,6 +3,7 @@ from pathlib import Path
 from tempfile import gettempdir
 
 import qgis
+from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
@@ -55,12 +56,11 @@ def _run_load_project_from_path(qgis_project, proj_path):
 
 def update_project_layers(qgis_project):
 
-    with qgis_project.project.db_connection as conn:
+    with read_and_close(qgis_project.project._project_database_path, spatial=True) as conn:
         layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
 
         # Add transit_tables to layers
-        pt_database = join(qgis_project.project.project_base_path, "public_transport.sqlite")
-        if exists(pt_database):
+        if exists(qgis_project.project._transit_database_path):
             layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
 
         descrlayout = QVBoxLayout()

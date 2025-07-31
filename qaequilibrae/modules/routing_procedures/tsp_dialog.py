@@ -4,7 +4,6 @@ import numpy as np
 import qgis
 from aequilibrae.paths import path_computation
 from aequilibrae.paths.results import PathResults
-from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import QMetaType
@@ -47,14 +46,14 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.rdo_selected.isChecked():
             centroids = self.selected_nodes()
         else:
-            with read_and_close(database_connection("network")) as conn:
+            with read_and_close(self.project._project_database_path) as conn:
                 res = conn.execute("select node_id from nodes where is_centroid=1;")
                 centroids = [i[0] for i in res.fetchall()]
         for i in centroids:
             self.cob_start.addItem(str(i))
 
     def populate(self):
-        with read_and_close(database_connection("network")) as conn:
+        with read_and_close(self.project._project_database_path) as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
             for x in res.fetchall():
                 self.cob_mode.addItem(f"{x[0]} ({x[1]})")

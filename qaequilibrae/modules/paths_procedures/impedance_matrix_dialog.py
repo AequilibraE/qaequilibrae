@@ -3,6 +3,7 @@ import os
 
 import qgis
 from aequilibrae.paths import SkimResults, NetworkSkimming
+from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
@@ -57,7 +58,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.block_paths.setChecked(True)
         self.graph = None  # type: Graph
 
-        with self.project.db_connection as conn:
+        with read_and_close(self.project._project_database_path) as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
             for x in res.fetchall():
                 self.cb_modes.addItem(f"{x[0]} ({x[1]})")
@@ -114,7 +115,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.progress_label.setText("")
 
     def check_name_exists(self):
-        with self.project.db_connection as conn:
+        with read_and_close(self.project._project_database_path) as conn:
             txt = self.line_matrix.text()
             if not len(txt):
                 return False

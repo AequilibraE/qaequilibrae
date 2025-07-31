@@ -4,6 +4,7 @@ from math import ceil
 import numpy as np
 import pandas as pd
 from aequilibrae.paths import Graph
+from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDialog
@@ -40,10 +41,14 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         # Check if layer links is in the layers tab.
         self.__prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
 
-        with self.project.db_connection as conn:
+        with read_and_close(self.project._project_database_path) as conn:
             centroids = pd.read_sql("select node_id from nodes where is_centroid=1", con=conn).node_id.to_numpy()
+            self.centroids = centroids if centroids.size != 0 else None
 
-        self.centroids = centroids if centroids.size != 0 else None
+            res = conn.execute("""SELECT mode_name, mode_id FROM modes""")
+            for x in res.fetchall():
+                self.cob_modes.addItem(f"{x[0]} ({x[1]})")
+                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         self.__no_skimming_fields = [
             "link_id",
@@ -56,13 +61,6 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         ]
 
         self.cob_layer.addItems(["Nodes", "Zones"])
-
-        # Graph config
-        with self.project.db_connection as conn:
-            res = conn.execute("""SELECT mode_name, mode_id FROM modes""")
-            for x in res.fetchall():
-                self.cob_modes.addItem(f"{x[0]} ({x[1]})")
-                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         self.but_plot.clicked.connect(self.run)
         self.cob_minimizing.currentIndexChanged.connect(self.update_cost_field)

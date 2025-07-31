@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from aequilibrae.transit import Transit
+from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt.QtCore import Qt, QTime
 from qgis.PyQt.QtWidgets import QDialog
 
@@ -49,7 +50,7 @@ def test_assignment(qtbot, coquimbo_project):
     assert result.columns.tolist() == ["index", "pt_class_volume"]
 
     # check if graph was saved
-    with coquimbo_project.project.db_connection as conn:
+    with read_and_close(coquimbo_project.project._project_database_path) as conn:
         df = pd.read_sql("SELECT * FROM transit_graph_configs", con=conn)
     assert df.shape == (1, 2)
     config = df.iloc[0]["config"]

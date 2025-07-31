@@ -44,7 +44,7 @@ def test_simple_tag_polygon(coquimbo_project, to_layer, ops):
 
     zones = [97, 98, 99]
 
-    with commit_and_close(database_connection("network")) as conn:
+    with commit_and_close(coquimbo_project.project._project_database_path) as conn:
         for i, zone in enumerate(zones):
             conn.execute(f"UPDATE zones SET name='{places[i]}' WHERE zone_id={zone}")
         conn.execute("DELETE FROM zones WHERE name IS NULL;")

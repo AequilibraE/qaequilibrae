@@ -83,7 +83,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.setFixedHeight(176)
 
         if self.rdo_clear.isChecked() and self.is_pt_database:
-            with commit_and_close(database_connection("transit")) as conn:
+            with commit_and_close(self.qgis_project.project._transit_database_path) as conn:
                 for table in self.__transit_tables:
                     conn.execute(f"DELETE FROM {table};")
 

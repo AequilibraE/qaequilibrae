@@ -37,7 +37,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.zone_target_metric = ""
         self.filtered = {}
 
-        self.sm = SupplyMetrics(None)
+        self.sm = SupplyMetrics(self.project._transit_database_path)
         self.gtfs_types = {
             0: "Light rail",
             1: "Subway/Metro",
@@ -72,7 +72,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
                         coalesce(ST_X(ST_StartPoint(geometry))-ST_X(ST_EndPoint(geometry)),0) dx,
                         coalesce(ST_Y(ST_StartPoint(geometry))-ST_Y(ST_EndPoint(geometry)),0) dy
                  FROM routes"""
-        with read_and_close(database_connection("transit")) as conn:
+        with read_and_close(self.project._transit_database_path, spatial=True) as conn:
             self.all_agencies = {ag: ag_id for ag_id, ag in conn.execute(agency_sql)}
             patt_df = pd.read_sql(sql, conn)
 

@@ -5,7 +5,6 @@ import sys
 import geopandas as gpd
 import numpy as np
 import qgis
-from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
@@ -74,7 +73,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.set_select_link_use()
 
     def __populate_project_info(self):
-        with read_and_close(database_connection("network")) as conn:
+        with read_and_close(self.project._project_database_path) as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
 
             modes = []

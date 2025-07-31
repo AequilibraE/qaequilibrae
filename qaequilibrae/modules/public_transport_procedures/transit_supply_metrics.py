@@ -13,7 +13,7 @@ class SupplyMetrics:
     whenever *from_time* is not provided and the end of simulation when
     *to_time* is not provided"""
 
-    def __init__(self, path: None):
+    def __init__(self, path):
         """
         :param path: Path to the supply file we want to compute metrics for
         """
@@ -36,8 +36,7 @@ class SupplyMetrics:
         trp_pat_lnk_sql = """select pattern_id, seq stop_order, cast(from_stop as text) from_stop, 
                              cast(to_stop as text) to_stop from route_links"""
 
-        connection = database_connection("transit") if path is None else path
-        with read_and_close(connection) as conn:
+        with read_and_close(path, spatial=True) as conn:
             self.__raw_routes = pd.read_sql(rt_sql, conn).fillna(0)
             self.__raw_patterns = pd.read_sql(patt_sql, conn).fillna(0)
             self.__raw_stops = pd.read_sql(stop_sql, conn)

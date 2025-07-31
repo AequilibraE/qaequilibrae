@@ -90,7 +90,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
         sql_id = "UPDATE nodes SET node_id=? WHERE node_id=?;"
 
-        with commit_and_close(database_connection("network")) as conn:
+        with commit_and_close(self.project._project_database_path, spatial=True) as conn:
             conn.executemany(sql_values, gdf.iloc[:, 1:].to_records(index=False))
             conn.executemany(sql_id, gdf.iloc[:, :1].join(gdf.iloc[:, -1:]).to_records(index=False))
 
@@ -113,7 +113,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
         gdf = gdf[columns]
 
-        with commit_and_close(database_connection("network")) as conn:
+        with commit_and_close(self.project._project_database_path, spatial=True) as conn:
             conn.executemany(sql, gdf.to_records(index=False))
 
     def __add_linktypes_and_modes(self, all_link_types, all_modes):

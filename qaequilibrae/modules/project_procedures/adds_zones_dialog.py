@@ -4,8 +4,7 @@ import sys
 import pandas as pd
 import qgis
 from PyQt5.QtCore import Qt
-from aequilibrae.project.database_connection import database_connection
-from aequilibrae.utils.db_utils import commit_and_close
+from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
 from qgis.core import QgsMapLayerProxyModel
@@ -65,7 +64,7 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.show()
 
     def changed_layer(self):
-        with commit_and_close(database_connection("network")) as conn:
+        with read_and_close(self.project._project_database_path) as conn:
             if not self.project or not conn:
                 return
             ignore_fields = ["ogc_fid", "geometry"]

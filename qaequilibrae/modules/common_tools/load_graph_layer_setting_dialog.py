@@ -1,7 +1,6 @@
 import os
 
 from aequilibrae.project import Project
-from aequilibrae.project.database_connection import database_connection
 from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt import QtWidgets, uic, QtCore
 
@@ -21,7 +20,7 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = []
         self.all_modes = {}
 
-        with read_and_close(database_connection("network")) as conn:
+        with read_and_close(self.project._project_database_path) as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
 
             for x in res.fetchall():
