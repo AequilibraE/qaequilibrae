@@ -1,20 +1,20 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="it">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="it_IT">
 <context>
     <name>AddConnectors</name>
     <message>
         <location filename="../modules/processing_provider/Add_connectors.py" line="20"/>
         <source>Project path</source>
-        <translation>Percorso del progetto</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/Add_connectors.py" line="51"/>
         <source>AequilibraE module not found</source>
-        <translation>Modulo AequilibraE non trovato</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/Add_connectors.py" line="56"/>
         <source>Opening project</source>
-        <translation>Progetto in apertura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/Add_connectors.py" line="99"/>
@@ -24,12 +24,12 @@
     <message>
         <location filename="../modules/processing_provider/Add_connectors.py" line="25"/>
         <source>Number of connectors per centroid</source>
-        <translation>Numero di connettori per centroide</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/Add_connectors.py" line="36"/>
         <source>Modes to connect (defaults to all)</source>
-        <translation>Modi da connettere (default: tutti)</translation>
+        <translation>Modi da connettere (valore di default: tutti)</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/Add_connectors.py" line="39"/>
@@ -62,7 +62,7 @@
     <message>
         <location filename="../modules/processing_provider/add_links_from_layer.py" line="23"/>
         <source>Links</source>
-        <translation>Archi</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/add_links_from_layer.py" line="30"/>
@@ -72,12 +72,12 @@
     <message>
         <location filename="../modules/processing_provider/add_links_from_layer.py" line="39"/>
         <source>Link type</source>
-        <translation>Tipo di arco</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/add_links_from_layer.py" line="48"/>
         <source>Modes</source>
-        <translation>Modi</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/add_links_from_layer.py" line="61"/>
@@ -87,7 +87,7 @@
     <message>
         <location filename="../modules/processing_provider/add_links_from_layer.py" line="66"/>
         <source>Opening project</source>
-        <translation>Progetto in apertura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/add_links_from_layer.py" line="72"/>
@@ -523,7 +523,7 @@
     <message>
         <location filename="../modules/project_procedures/create_examples_dialog.py" line="27"/>
         <source>Available models:</source>
-        <translation>Modelli disponibili:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -536,17 +536,17 @@
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="18"/>
         <source>Origin</source>
-        <translation>Origine</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="27"/>
         <source>Destination</source>
-        <translation>Destinazione</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="36"/>
         <source>Value</source>
-        <translation>Valore</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="45"/>
@@ -556,17 +556,17 @@
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="50"/>
         <source>File path</source>
-        <translation>Percorso del file</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="55"/>
         <source>Matrix name</source>
-        <translation>Nome della matrice</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="61"/>
         <source>Matrix description</source>
-        <translation>Descrizione della matrice</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="75"/>
@@ -654,7 +654,7 @@
     <message>
         <location filename="../modules/processing_provider/create_transit_graph.py" line="42"/>
         <source>AequilibraE module not found</source>
-        <translation>Modulo AequilibraE non trovato</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_transit_graph.py" line="47"/>
@@ -664,22 +664,22 @@
     <message>
         <location filename="../modules/processing_provider/create_transit_graph.py" line="54"/>
         <source>Creating graph</source>
-        <translation>Creazione del grafo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_transit_graph.py" line="72"/>
         <source>Saving graph</source>
-        <translation>Salvataggio del grafo</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_transit_graph.py" line="86"/>
         <source>Create transit graph</source>
-        <translation>Creazione del grafo del trasporto pubblico</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_transit_graph.py" line="89"/>
         <source>4. Public Transport</source>
-        <translation>4. Trasporto pubblico</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -748,7 +748,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="132"/>
         <source>Cancel and Exit</source>
-        <translation>Cancella ed esci</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="144"/>
@@ -783,7 +783,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="269"/>
         <source>Desire Lines</source>
-        <translation>Linee di desiderio</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="287"/>
@@ -869,12 +869,12 @@
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="234"/>
         <source>Building graph</source>
-        <translation>Grafo in costruzione</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="266"/>
         <source>Assigning demand</source>
-        <translation>Domanda in assegnazione</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="270"/>
@@ -897,12 +897,12 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="39"/>
         <source>Load datasets</source>
-        <translation>Carica insiemi di dati</translation>
+        <translation>Carica set di dati</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="46"/>
         <source>Dataset name</source>
-        <translation>Nome dell&apos;insieme di dati</translation>
+        <translation>Nome del set di dati</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="51"/>
@@ -922,27 +922,27 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="103"/>
         <source>Load matrices</source>
-        <translation>Carica matrici</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="113"/>
         <source>Vectors</source>
-        <translation>Vettori</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="135"/>
         <source>Attraction</source>
-        <translation>Attrazione</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="178"/>
         <source>Production</source>
-        <translation>Produzione</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="210"/>
         <source>Impedance</source>
-        <translation>Impedenza</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="314"/>
@@ -952,7 +952,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="301"/>
         <source>Matrix</source>
-        <translation>Matrice</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="273"/>
@@ -962,17 +962,17 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="400"/>
         <source>Model</source>
-        <translation>Modello</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="363"/>
         <source>Parameter</source>
-        <translation>Parametro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="368"/>
         <source>Value</source>
-        <translation>Valore</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="406"/>
@@ -1017,7 +1017,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="444"/>
         <source>Treat empties as zeros</source>
-        <translation>Tratta i valori vuoti come zero</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="477"/>
@@ -1075,7 +1075,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="64"/>
         <source>File path: {}</source>
-        <translation>Percorso del file: {}</translation>
+        <translation>Percorso del file: []</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="75"/>
@@ -1557,63 +1557,48 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="43"/>
-        <source>Graph</source>
-        <translation>Grafo</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="98"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="131"/>
         <source>Minimize field</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="111"/>
-        <source>Centroids to centroids</source>
-        <translation>Dai centroidi ai centroidi</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="170"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="209"/>
         <source>Block paths through centroids</source>
         <translation>Blocca i percorsi attraverso i centroidi</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="204"/>
-        <source>ALL nodes to ALL nodes</source>
-        <translation>Da tutti i nodi a tutti i nodi</translation>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="214"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="237"/>
         <source>Plot!</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="226"/>
-        <source>Skims</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="235"/>
-        <source>Available Skims</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="250"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="25"/>
         <source>Layer</source>
         <translation>Layer</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="259"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="74"/>
         <source>Color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="266"/>
-        <source>Selected layer</source>
-        <translation>Layer selezionato</translation>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="44"/>
+        <source>Start ID</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="289"/>
-        <source>Start ID</source>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="81"/>
+        <source>Invert colors</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="114"/>
+        <source>Path configuration</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="138"/>
+        <source>Plot Skim</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -2852,8 +2837,18 @@
 <context>
     <name>SkimViewerDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="317"/>
+        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="374"/>
         <source>Input error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="104"/>
+        <source>Critical layer for Skim Viewer removed from the layers&apos; panel</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="105"/>
+        <source>Error</source>
         <translation type="unfinished"/>
     </message>
 </context>

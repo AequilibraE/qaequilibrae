@@ -31,7 +31,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        container: ['qgis/qgis:latest', 'qgis/qgis:ltr']
+        container: ['qgis/qgis:3.44.0', 'qgis/qgis:ltr']
     container:
       image: ${{ matrix.container }}
     steps:

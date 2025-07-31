@@ -38,9 +38,9 @@ class DownloadAll:
         self.dependency_files = [pth / "requirements.txt", pth / "aequilibrae_version.txt"]
         self.target_folder = pth / "packages"
         self.no_ssl = False
+        self.error = 0
 
     def install(self):
-        reps = []
         command = f'"{self.find_python()}" -m pip install uv'
         _ = self.execute(command)
         print(command)
@@ -54,13 +54,14 @@ class DownloadAll:
                 lines = fl.readlines()
 
             for line in lines:
-                reps.extend(self.install_package(line.strip()))
+                self.install_package(line.strip())
 
             with open(flag, "w") as fl:
                 fl.write("")
 
         self.clean_packages(self.target_folder)
-        return reps
+        print("Error code: ", self.error)
+        return self.error
 
     def install_package(self, package):
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
@@ -85,21 +86,25 @@ class DownloadAll:
             self.no_ssl = True
 
         for line in reps:
-            QgsMessageLog.logMessage(str(line))
+            QgsMessageLog.logMessage(str(line), level=Qgis.MessageLevel.Info)
+
         return reps
 
     def execute(self, command):
         lines = []
         lines.append(command)
-        with subprocess.Popen(
+        process = subprocess.Popen(
             command,
             shell=True,
             stdout=subprocess.PIPE,
             stdin=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
-        ) as proc:
-            lines.extend(proc.stdout.readlines())
+        )
+        lines.extend(process.stdout.readlines())
+        exit_code = process.wait()
+        if exit_code != 0:
+            self.error = exit_code
         return lines
 
     def find_python(self):
@@ -158,11 +163,19 @@ class DownloadAll:
                             f"Duplicated packages removed from installation: {fldr}", level=Qgis.MessageLevel.Info
                         )
 
+    def retry_pkg_install(self):
+        existing_files = list(os.walk(self.target_folder))[0]
+        for packages in existing_files[1]:
+            shutil.rmtree(self.target_folder / packages)
+
+        for file in existing_files[2]:
+            if file == "__init__.py":
+                continue
+            (self.target_folder / file).unlink()
+        self.install()
+
 
 if __name__ == "__main__":
     result = DownloadAll().install()
-    output = "".join([str(x).upper() for x in result])
 
-    print(output)
-
-    assert "ERROR" not in output
+    assert result == 0

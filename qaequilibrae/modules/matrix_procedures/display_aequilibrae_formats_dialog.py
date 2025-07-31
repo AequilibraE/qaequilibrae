@@ -279,7 +279,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         #
         values = [ceil(i * (max_metric / num_steps)) for i in range(1, num_steps + 1)]
         values = [0, 0.000000000001] + values
-        color_ramp = color_ramp_shades(color_ramp_name, num_steps)
+        color_ramp = color_ramp_shades(color_ramp_name, num_steps, False)
 
         # Create Rule-Based renderer
         root_rule = QgsRuleBasedRenderer.Rule(None)
