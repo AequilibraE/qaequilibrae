@@ -94,8 +94,8 @@ def test_parameter_changed(ae_with_project, qtbot, timeoutDetector):
     assert start_cost != current_cost
 
 
-def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocker):
-    proj = run_sfalls_assignment(ae_with_project)
+def test_plot_with_joined_results(sf_project, qtbot, timeoutDetector, mocker):
+    proj = run_sfalls_assignment(sf_project)
 
     function = "qaequilibrae.modules.matrix_procedures.load_project_data.DisplayAequilibraEFormatsDialog"
     mocker.patch(function)
@@ -113,7 +113,7 @@ def test_plot_with_joined_results(ae_with_project, qtbot, timeoutDetector, mocke
     # Check if layer 'links' is set active
     assert "links" in existing_layers
 
-    dialog = SkimViewerDialog(ae_with_project)
+    dialog = SkimViewerDialog(sf_project)
 
     # Check if link fields are in the skimmeable fields
     new_fields = [

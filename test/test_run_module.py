@@ -5,6 +5,7 @@ import sqlite3
 import numpy as np
 import pandas as pd
 from aequilibrae.parameters import Parameters
+from aequilibrae.utils.db_utils import read_and_close
 from qgis.PyQt.QtCore import Qt
 
 from qaequilibrae.modules.project_procedures.run_module_dialog import RunModuleDialog
@@ -34,14 +35,14 @@ def test_example_function_with_kwargs(coquimbo_project, qtbot, timeoutDetector):
         dialog = RunModuleDialog(coquimbo_project)
 
         dialog.cob_function.setCurrentIndex(0)
-        assert dialog.cob_function.currentText() == functions[3]
+        assert dialog.cob_function.currentText() == functions[0]
 
         qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
         project_log = dialog.project.log()
         contents = project_log.contents()
 
-        assert "example_function_with_kwargs executed. Check for outputs." in contents[-1]
+        assert "matrix_summary executed. Check for outputs." in contents[-1]
 
 
 def test_new_function(coquimbo_project, qtbot, timeoutDetector):
@@ -70,7 +71,7 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
     with open(join(folder, "run", "__init__.py"), "w") as file:
         file.writelines(lines)
 
-    p = Parameters(coquimbo_project.project)
+    p = Parameters()
     p.parameters["run"]["create_delaunay"] = {}
     p.parameters["run"]["create_delaunay"]["source"] = "zones"
     p.parameters["run"]["create_delaunay"]["name"] = "b''"
@@ -92,9 +93,7 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
 
         qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
-    res_path = join(coquimbo_project.project.project_base_path, "results_database.sqlite")
-    conn = sqlite3.connect(res_path)
-
-    results = pd.read_sql("SELECT * FROM delaunay_test", conn).set_index("link_id")
+    with read_and_close(coquimbo_project.project._results_database_path) as conn:
+        results = pd.read_sql("SELECT * FROM delaunay_test", conn).set_index("link_id")
 
     assert results.shape != (0, 0)

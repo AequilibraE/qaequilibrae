@@ -93,7 +93,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.results["WARNINGS"][idx[0]] != "":
             return
 
-        res_table = load_result_table(self.project.project_base_path, table_name)
+        res_table = load_result_table(self.project._results_database_path, table_name)
         lyr = layer_from_dataframe(res_table, table_name)
 
         if self.chb_join.isChecked():
