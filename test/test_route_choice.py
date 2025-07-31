@@ -5,7 +5,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from PyQt5.QtCore import Qt
+from aequilibrae.utils.db_utils import read_and_close
+from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
@@ -86,8 +87,8 @@ def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
 
 
 @pytest.mark.parametrize("save", [True, False])
-def test_assign_and_save(ae_with_project, qtbot, save):
-    dialog = RouteChoiceDialog(ae_with_project)
+def test_assign_and_save(sf_project, qtbot, save):
+    dialog = RouteChoiceDialog(sf_project)
 
     # Choice set generation
     dialog.max_routes.setText("3")
@@ -103,13 +104,12 @@ def test_assign_and_save(ae_with_project, qtbot, save):
     dialog.chb_check_centroids.setChecked(False)
 
     dialog.chb_save_choice_set.setChecked(save)
-    dialog.cob_matrices.setCurrentText("demand.aem")
+    dialog.cob_matrices.setCurrentText("demand_omx")
     dialog.ln_rc_output.setText("route_choice")
     qtbot.mouseClick(dialog.but_perform_assig, Qt.LeftButton)
 
-    pth = Path(dialog.project.project_base_path)
-    conn = sqlite3.connect(pth / "results_database.sqlite")
-    results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+    with read_and_close(sf_project.project._results_database_path) as conn:
+        results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "route_choice_uncompressed" in results
 
     if save:
@@ -121,7 +121,7 @@ def test_assign_and_save(ae_with_project, qtbot, save):
 
         assert counter == 24
 
-        messagebar = ae_with_project.iface.messageBar()
+        messagebar = sf_project.iface.messageBar()
         assert "Success:Route choice sets saved to" in messagebar.messages[3][0]
 
 
@@ -207,9 +207,8 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
     dialog.ln_rc_output.setText("route_choice_for_subarea")
     qtbot.mouseClick(dialog.but_perform_assig, Qt.LeftButton)
 
-    pth = Path(dialog.project.project_base_path)
-    conn = sqlite3.connect(pth / "results_database.sqlite")
-    results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+    with read_and_close(coquimbo_project.project._results_database_path) as conn:
+        results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "route_choice_for_subarea_uncompressed" in results
 
     rc_folder = listdir(join(dialog.project.project_base_path, "route_choice"))
@@ -262,9 +261,8 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     matrices = listdir(dialog.project.matrices.fldr)
     assert "select_link_analysis.omx" in matrices
 
-    pth = Path(dialog.project.project_base_path)
-    conn = sqlite3.connect(pth / "results_database.sqlite")
-    results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+    with read_and_close(coquimbo_project.project._results_database_path) as conn:
+        results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "select_link_analysis_uncompressed" in results
 
 

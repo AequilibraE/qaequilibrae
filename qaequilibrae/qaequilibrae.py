@@ -67,8 +67,7 @@ class AequilibraEMenu:
     def __init__(self, iface):
         # Closes AequilibraE projects eventually opened in memory
         self.logger = logging.getLogger("AequilibraEGUI")
-        self.geo_layers_list = ["links", "nodes", "zones"]
-        # translator = None
+        self.geo_layers_list = ["links", "nodes", "zones"]  # Maybe will change
         self.iface = iface
         self.path = last_folder()
         self.project = None  # type: Project

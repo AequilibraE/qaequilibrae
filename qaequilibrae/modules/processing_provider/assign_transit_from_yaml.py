@@ -26,7 +26,6 @@ class TransitAssignYAML(QgsProcessingAlgorithm):
         from aequilibrae import Project
         from aequilibrae.matrix import AequilibraeMatrix
         from aequilibrae.paths import TransitAssignment, TransitClass
-        from aequilibrae.project.database_connection import database_connection
         from aequilibrae.transit.transit_graph_builder import TransitGraphBuilder
 
         feedback = QgsProcessingMultiStepFeedback(5, model_feedback)
@@ -47,8 +46,7 @@ class TransitAssignYAML(QgsProcessingAlgorithm):
         project.network.build_graphs()
 
         # Load PT Graph
-        pt_con = database_connection("transit")
-        params["graph"]["public_transport_conn"] = pt_con
+        params["graph"]["project"] = project
 
         graph_db = TransitGraphBuilder.from_db(**params["graph"])
         graph_db.create_graph()

@@ -43,9 +43,9 @@ def test_compare_scenarios(ae, model_path, composite):
         assert f in field_names
 
 
-def future_assignment(sf_project):
+def future_assignment(aeq_from_qgis):
 
-    project = sf_project.project
+    project = aeq_from_qgis.project
     project.network.build_graphs()
 
     graph = project.network.graphs["c"]
@@ -116,4 +116,4 @@ def future_assignment(sf_project):
     assig.save_results("future_assignment")
     assig.save_skims("future_assignment", which_ones="all", format="omx")
 
-    return sf_project
+    return aeq_from_qgis

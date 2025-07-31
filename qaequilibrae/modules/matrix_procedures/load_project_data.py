@@ -80,7 +80,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         self.load_matrices()
 
     def load_results(self):
-        self.results = list_results(self.project.project_base_path)
+        self.results = list_results(self.project)
 
         self.results_model = PandasModel(self.results)
         self.list_results.setModel(self.results_model)
