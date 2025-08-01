@@ -36,7 +36,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.mapping_layer = None
         self.selected_col = None
         self.selected_row = None
-        self.omx = None
         self.zones_layer = None
 
         if len(file_path) > 0:
@@ -77,12 +76,12 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.exit_with_error()
 
         elif self.data_type == "OMX":
-            self.omx = omx.open_file(self.data_path, "r")
-            if not self.from_proj:
-                self.qgis_project.matrices[self.data_path] = self.omx
-            self.list_cores = self.omx.list_matrices()
-            self.list_indices = self.omx.list_mappings()
-            self.data_to_show = AequilibraeMatrix()
+            with omx.open_file(self.data_path, "a") as omx_file:
+                if not self.from_proj:
+                    self.qgis_project.matrices[self.data_path] = omx_file
+                self.list_cores = omx_file.list_matrices()
+                self.list_indices = omx_file.list_mappings()
+                self.data_to_show = AequilibraeMatrix()
 
         # differentiates between AEM AND OMX
         if self.data_type == "AEM":
@@ -445,21 +444,25 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def exit_procedure(self):
         if not self.from_proj:
             self.qgis_project.matrices.pop(self.data_path)
-        if self.omx is not None:
-            self.omx.close()
         self.show()
         self.close()
 
     def add_matrix_parameters(self, idx, field):
-        matrix_name = self.data_to_show.random_name()
-        matrix_index = np.array(list(self.omx.mapping(idx).keys()))
+        with omx.open_file(self.data_path, "a") as omx_file:
+            matrix_name = self.data_to_show.random_name()
+            matrix_index = np.array(list(omx_file.mapping(idx).keys()))
 
-        args = {"zones": matrix_index.shape[0], "matrix_names": [field], "file_name": matrix_name, "memory_only": True}
+            args = {
+                "zones": matrix_index.shape[0],
+                "matrix_names": [field],
+                "file_name": matrix_name,
+                "memory_only": True,
+            }
 
-        self.data_to_show.create_empty(**args)
-        self.data_to_show.matrix_view = np.array(self.omx[field])
-        self.data_to_show.index = np.array(list(self.omx.mapping(idx).keys()))
-        self.data_to_show.matrix[field] = self.data_to_show.matrix_view[:, :]
+            self.data_to_show.create_empty(**args)
+            self.data_to_show.matrix_view = np.array(omx_file[field])
+            self.data_to_show.index = np.array(list(omx_file.mapping(idx).keys()))
+            self.data_to_show.matrix[field] = self.data_to_show.matrix_view[:, :]
 
     def get_file_name(self):
         formats = ["Aequilibrae matrix(*.aem)", "OpenMatrix(*.omx)"]

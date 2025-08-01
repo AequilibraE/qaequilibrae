@@ -106,12 +106,12 @@ def test_matrix_from_layer(folder_path):
 
     assert isfile(parameters["file_path"])
 
-    mat = omx.open_file(parameters["file_path"])
-    assert "MAT_CORE" in mat.list_matrices()
+    with omx.open_file(parameters["file_path"], "a") as omx_file:
+        assert "MAT_CORE" in omx_file.list_matrices()
 
-    m = np.array(mat["MAT_CORE"])
-    assert m.shape == (24, 24)
-    assert m.sum() == 360600
+        m = np.array(omx_file["MAT_CORE"])
+        assert m.shape == (24, 24)
+        assert m.sum() == 360600
 
 
 def test_project_from_layer(folder_path):

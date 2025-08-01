@@ -57,11 +57,11 @@ def test_single_class(sf_project, qtbot):
     skims = pth / "matrices" / f"{test_name}_car.omx"
     assert isfile(skims)
 
-    mtx = omx.open_file(skims)
-    assert round(np.sum(np.nan_to_num(mtx["free_flow_time_final"][:])), 4) > 0
-    assert round(np.sum(np.nan_to_num(mtx["free_flow_time_blended"][:])), 4) > 0
-    assert round(np.sum(np.nan_to_num(mtx["distance_final"][:])), 4) > 0
-    assert round(np.sum(np.nan_to_num(mtx["distance_blended"][:])), 4) > 0
+    with omx.open_file(skims, "a") as omx_file:
+        assert round(np.sum(np.nan_to_num(omx_file["free_flow_time_final"][:])), 4) > 0
+        assert round(np.sum(np.nan_to_num(omx_file["free_flow_time_blended"][:])), 4) > 0
+        assert round(np.sum(np.nan_to_num(omx_file["distance_final"][:])), 4) > 0
+        assert round(np.sum(np.nan_to_num(omx_file["distance_blended"][:])), 4) > 0
 
     # Assert information exists in the log file
     num_cores = dialog.assignment.cores

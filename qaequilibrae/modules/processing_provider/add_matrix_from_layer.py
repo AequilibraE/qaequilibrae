@@ -93,9 +93,8 @@ class AddMatrixFromLayer(QgsProcessingAlgorithm):
             .astype(np.float64)
         )
 
-        mat = omx.open_file(parameters["file_path"], "a")
-        mat[parameters["matrix_core"]] = m
-        mat.close()
+        with omx.open_file(parameters["file_path"], "a") as omx_file:
+            omx_file[parameters["matrix_core"]] = m
 
         feedback.pushInfo(" ")
         feedback.setCurrentStep(3)

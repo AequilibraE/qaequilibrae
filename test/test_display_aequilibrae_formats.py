@@ -91,5 +91,3 @@ def test_select_elements(ae_with_project, mocker, element):
     assert metrics2 == [4.0, 10.0, 0.0]
 
     assert metrics != metrics2
-
-    dialog.omx.close()

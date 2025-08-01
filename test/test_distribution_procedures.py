@@ -185,7 +185,7 @@ def test_apply_gravity(ae_with_project, method, folder_path, mocker):
 
     assert isfile(file_path)
 
-    mtx = omx.open_file(file_path)
-    mtx = mtx["gravity"][:]
-    assert mtx.shape == (24, 24)  # matrix shape
-    assert mtx.sum() > 0  # matrix is not null
+    with omx.open_file(file_path, "a") as omx_file:
+        mtx = omx_file["gravity"][:]
+        assert mtx.shape == (24, 24)  # matrix shape
+        assert mtx.sum() > 0  # matrix is not null
