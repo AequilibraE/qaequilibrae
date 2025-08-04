@@ -1259,7 +1259,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="145"/>
         <source>Agency*</source>
-        <translation type="unfinished"/>
+        <translation>Agenzia o operatore*</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="172"/>
