@@ -1334,7 +1334,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="247"/>
         <source>Running</source>
-        <translation type="unfinished"/>
+        <translation>In esecuzione</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="25"/>
