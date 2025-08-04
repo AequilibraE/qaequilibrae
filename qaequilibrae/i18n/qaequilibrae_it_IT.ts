@@ -1429,7 +1429,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="408"/>
         <source>Route type from the GTFS. Standard values are 0 to 12</source>
-        <translation type="unfinished"/>
+        <translation>Tipi di percorso dal GTFS. I valori standard sono da 0 a 12</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="432"/>
