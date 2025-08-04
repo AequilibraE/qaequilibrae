@@ -1374,7 +1374,7 @@
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="161"/>
         <source>Block flows through centroids</source>
-        <translation type="unfinished"/>
+        <translation>Blocca i flussi attraverso i centroidi</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="202"/>
