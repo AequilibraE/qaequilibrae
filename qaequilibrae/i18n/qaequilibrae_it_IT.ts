@@ -429,7 +429,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_bandwidth_color_ramps.ui" line="209"/>
         <source>Field</source>
-        <translation type="unfinished"/>
+        <translation>Campo</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidth_color_ramps.ui" line="230"/>
