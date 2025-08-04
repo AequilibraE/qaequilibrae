@@ -601,7 +601,7 @@
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="152"/>
         <source>- the original matrix stored in the layer needs to be in list format</source>
-        <translation type="unfinished"/>
+        <translation>- la matrice originale salvata nel layer deve essere in formato lista</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="153"/>
