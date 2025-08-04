@@ -687,7 +687,7 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_dialog.py" line="297"/>
         <source>Link Layer has NO defined CRS</source>
-        <translation>Il sistema di riferimento (CRS) del layer degli archi non è definito</translation>
+        <translation>Il sistema di riferimento del layer degli archi non è definito</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_dialog.py" line="301"/>
