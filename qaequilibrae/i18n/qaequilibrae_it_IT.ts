@@ -1469,7 +1469,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="778"/>
         <source>Time Window</source>
-        <translation type="unfinished"/>
+        <translation>Finestra temporale</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="918"/>
