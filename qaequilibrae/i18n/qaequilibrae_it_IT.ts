@@ -1434,12 +1434,12 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="432"/>
         <source>All directions</source>
-        <translation type="unfinished"/>
+        <translation>Tutte le direzioni</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="462"/>
         <source>%</source>
-        <translation type="unfinished"/>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="498"/>
