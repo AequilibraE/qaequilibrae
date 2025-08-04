@@ -487,7 +487,7 @@
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="78"/>
         <source>This tool collapses links into nodes, adjusting the network in the neighborhood.</source>
-        <translation type="unfinished"/>
+        <translation>Questo strumento comprime gli archi in nodi, adattando la parte di rete più vicina.</translation>
     </message>
 </context>
 <context>
