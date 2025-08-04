@@ -1319,7 +1319,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="98"/>
         <source>Feeds to import</source>
-        <translation type="unfinished"/>
+        <translation>Feed da importare</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="181"/>
