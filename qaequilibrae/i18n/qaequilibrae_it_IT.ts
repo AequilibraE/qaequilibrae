@@ -834,7 +834,7 @@
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="136"/>
         <source>Concatenating AB &amp; BA flows</source>
-        <translation type="unfinished"/>
+        <translation>Concatenazione dei flussi AB e BA</translation>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="146"/>
