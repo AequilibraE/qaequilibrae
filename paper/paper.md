@@ -6,7 +6,7 @@ tags:
   - transportation modeling
 authors:
   - name: Pedro Camargo
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0001-9613-2777
     affiliation: 1
   - name: Jamie Cook
     orcid: 0000-0000-0000-0000
