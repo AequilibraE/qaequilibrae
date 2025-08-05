@@ -8,14 +8,8 @@ authors:
   - name: Pedro Camargo
     orcid: 0000-0001-9613-2777
     affiliation: 1
-  - name: Jamie Cook
-    orcid: 0000-0000-0000-0000
-    affiliation: 1
   - name: Renata Imai
-    orcid: 0000-0000-0000-0000
-    affiliation: 1
-  - name: Jake Moss
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-0551-7688
     affiliation: 1
 affiliations:
   - name: Outer Loop Consulting, Australia
