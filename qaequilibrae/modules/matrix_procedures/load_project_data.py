@@ -16,15 +16,15 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_project_data.ui
 
 
 class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgs_proj, proj=True):
+    def __init__(self, qgis_project, from_project: bool = True):
         QtWidgets.QDialog.__init__(self)
-        self.iface = qgs_proj.iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
         self.data_to_show = None
         self.error = None
-        self.qgs_proj = qgs_proj
-        self.from_proj = proj
-        self.project = qgs_proj.project if self.from_proj else None
+        self.qgis_project = qgis_project
+        self.from_proj = from_project
+        self.project = qgis_project.project if self.from_proj else None
 
         if self.from_proj:
             self.matrices: pd.DataFrame = None
@@ -56,9 +56,9 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.matrices["WARNINGS"][idx[0]] != "":
             return
 
-        file_name = self.matrices["file_name"][idx[0]]
+        file_path = self.project.project_base_path / "matrices" / self.matrices["file_name"][idx[0]]
 
-        dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj, join(self.project.matrices.fldr, file_name), proj=True)
+        dlg2 = DisplayAequilibraEFormatsDialog(self.qgis_project, file_path, from_project=True)
         dlg2.show()
         dlg2.exec_()
 
@@ -96,9 +96,9 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.chb_join.isChecked():
             procedure = self.results.loc[self.results["table_name"] == table_name]["procedure"].values[0]
             if procedure == "transit assignment":
-                self.link_layer = self.qgs_proj.layers["transit_links"][0]
+                self.link_layer = self.qgis_project.layers["transit_links"][0]
             else:
-                self.link_layer = self.qgs_proj.layers["links"][0]
+                self.link_layer = self.qgis_project.layers["links"][0]
             rem = [lien.joinLayerId() for lien in self.link_layer.vectorJoins()]
             for lien_id in rem:
                 self.link_layer.removeJoin(lien_id)
@@ -114,7 +114,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
             self.link_layer.addJoin(lien)
 
     def display_external_data(self):
-        dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj)
+        dlg2 = DisplayAequilibraEFormatsDialog(self.qgis_project)
         dlg2.show()
         dlg2.exec_()
 

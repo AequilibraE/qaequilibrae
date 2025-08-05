@@ -13,7 +13,7 @@ from uuid import uuid4
 import qgis
 from qgis.PyQt.QtCore import Qt, QTranslator, QSettings, QLocale, QCoreApplication, QSize
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication, QToolBar, QToolButton
-from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox
+from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget
 from qgis.PyQt.QtWidgets import QComboBox, QLabel
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
 from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication

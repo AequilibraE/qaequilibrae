@@ -17,7 +17,7 @@ from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
 from qaequilibrae.modules.distribution_procedures.apply_gravity_procedure import ApplyGravityProcedure
 from qaequilibrae.modules.distribution_procedures.calibrate_gravity_procedure import CalibrateGravityProcedure
 from qaequilibrae.modules.distribution_procedures.ipf_procedure import IpfProcedure
-from qaequilibrae.modules.matrix_procedures import LoadDatasetDialog, DisplayAequilibraEFormatsDialog
+from qaequilibrae.modules.matrix_procedures import LoadDatasetDialog
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_distribution.ui"))
@@ -76,7 +76,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_run.clicked.connect(self.run)
         self.but_queue.clicked.connect(self.add_job_to_queue)
         self.but_cancel.clicked.connect(self.close)
-        self.table_datasets.doubleClicked.connect(self.data_double_clicked)
 
         self.table_jobs.setColumnWidth(0, 50)
         self.table_jobs.setColumnWidth(1, 295)
@@ -106,14 +105,6 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.list_matrices.setModel(self.matrices_model)
         self.cob_imped_mat.addItems(self.matrices["name"].tolist())
         self.cob_seed_mat.addItems(self.matrices["name"].tolist())
-
-    def data_double_clicked(self, mi):
-        row = mi.row()
-        if row > -1:
-            obj_to_view = self.table_datasets.item(row, 0).text()
-            dlg2 = DisplayAequilibraEFormatsDialog(self.iface, self.datasets[obj_to_view])
-            dlg2.show()
-            dlg2.exec_()
 
     def configure_inputs(self):
         self.but_run.setVisible(True)
@@ -239,7 +230,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             else:
                 file_name = self.matrices.at[cob_orig.currentIndex(), "file_name"]
                 mat = AequilibraeMatrix()
-                mat.load(join(self.project.matrices.fldr, file_name))
+                mat.load(self.project.project_base_path / "matrices" / file_name)
                 cob_dest.addItems(mat.names)
 
     def load_comboboxes(self, list_to_load, data_cob):
@@ -287,13 +278,13 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.job != "ipf":
                 imped_name = self.matrices.at[self.cob_imped_mat.currentIndex(), "file_name"]
                 imped_matrix = AequilibraeMatrix()
-                imped_matrix.load(join(self.project.matrices.fldr, imped_name))
+                imped_matrix.load(self.project.project_base_path / "matrices" / imped_name)
                 imped_matrix.computational_view([self.cob_imped_field.currentText()])
 
             if self.job != "apply":
                 seed_name = self.matrices.at[self.cob_seed_mat.currentIndex(), "file_name"]
                 seed_matrix = AequilibraeMatrix()
-                seed_matrix.load(join(self.project.matrices.fldr, seed_name))
+                seed_matrix.load(self.project.project_base_path / "matrices" / seed_name)
                 seed_matrix.computational_view([self.cob_seed_field.currentText()])
 
             if self.job != "calibrate":

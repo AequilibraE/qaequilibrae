@@ -459,7 +459,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
             if self.parameters["set_sub_area"]:
                 self.worker_thread.matrix.to_parquet(
-                    join(self.parameters["rc_folder"], f"{self.ln_rc_output.text()}.parquet")
+                    self.parameters["rc_folder"] / f"{self.ln_rc_output.text()}.parquet"
                 )
 
             if self.job == "build" or self.parameters["save_choice_sets"]:

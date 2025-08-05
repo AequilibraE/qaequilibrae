@@ -22,7 +22,7 @@ def GetOutputFileName(clss, box_name, file_types, default_type, start_path):
             extension = new_name[-3:]
         else:
             extension = new_name[-4:]
-    return new_name, extension
+    return new_name, extension.upper()
 
 
 def GetOutputFolderName(base_path=None, message="Select a folder:"):

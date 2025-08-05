@@ -1,6 +1,8 @@
 import logging
 from math import ceil
 from os.path import dirname, join
+from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import openmatrix as omx
@@ -22,7 +24,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_data_viewer.ui"
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgis_project, file_path="", proj=False):
+    def __init__(self, qgis_project, file_path: Optional[Path] = None, from_project: bool = False):
         QtWidgets.QDialog.__init__(self)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
         self.iface = qgis_project.iface
@@ -31,16 +33,16 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = None
         self.logger = logging.getLogger("AequilibraEGUI")
         self.qgis_project = qgis_project
-        self.from_proj = proj
+        self.from_proj = from_project
         self.indices = np.array(1)
         self.mapping_layer = None
         self.selected_col = None
         self.selected_row = None
         self.zones_layer = None
 
-        if len(file_path) > 0:
+        if isinstance(file_path, Path):
             self.data_path = file_path
-            self.data_type = self.data_path[-3:].upper()
+            self.data_type = file_path.suffix.upper()
             self.continue_with_data()
             return
 
@@ -50,7 +52,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.error = self.tr("Path provided is not a valid dataset")
             self.exit_with_error()
         else:
-            self.data_type = self.data_type.upper()
             self.continue_with_data()
 
         if self.error:
@@ -465,7 +466,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.data_to_show.matrix[field] = self.data_to_show.matrix_view[:, :]
 
     def get_file_name(self):
-        formats = ["Aequilibrae matrix(*.aem)", "OpenMatrix(*.omx)"]
+        formats = ["Aequilibrae matrix (*.aem)", "OpenMatrix (*.omx)"]
         dflt = ".aem"
 
         data_path, data_type = GetOutputFileName(
