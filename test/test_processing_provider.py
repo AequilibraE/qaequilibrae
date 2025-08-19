@@ -67,7 +67,7 @@ def test_provider_exists(qgis_app):
 
 @pytest.mark.parametrize("format", [0, 1, 2])
 @pytest.mark.parametrize("source_file", ["sfalls_skims.omx", "demand.aem"])
-def test_export_matrix(folder_path, source_file, format):
+def test_export_matrix(folder_path, source_file, format, timeoutDetector):
     makedirs(folder_path)
 
     parameters = {
@@ -85,7 +85,7 @@ def test_export_matrix(folder_path, source_file, format):
     assert isfile(result["Output"])
 
 
-def test_matrix_from_layer(folder_path):
+def test_matrix_from_layer(folder_path, timeoutDetector):
     makedirs(folder_path)
 
     df = pd.read_csv("test/data/SiouxFalls_project/SiouxFalls_od.csv")
@@ -116,7 +116,7 @@ def test_matrix_from_layer(folder_path):
     assert m.sum() == 360600
 
 
-def test_project_from_layer(folder_path):
+def test_project_from_layer(folder_path, timeoutDetector):
     load_sfalls_from_layer(folder_path)
 
     linkslayer = QgsProject.instance().mapLayersByName("Links layer")[0]
@@ -155,7 +155,7 @@ def test_project_from_layer(folder_path):
     assert project.network.count_nodes() == 24
 
 
-def test_add_centroid_connector(pt_no_feed):
+def test_add_centroid_connector(pt_no_feed, timeoutDetector):
     project = pt_no_feed.project
     project_folder = project.project_base_path
 
@@ -185,7 +185,7 @@ def test_add_centroid_connector(pt_no_feed):
         assert link_count == 3
 
 
-def test_renumber_from_centroids(ae_with_project, tmp_path):
+def test_renumber_from_centroids(ae_with_project, tmp_path, timeoutDetector):
     load_sfalls_from_layer(tmp_path)
 
     project = ae_with_project.project
@@ -217,7 +217,7 @@ def test_renumber_from_centroids(ae_with_project, tmp_path):
         assert node_count == list(range(1001, 1025))
 
 
-def test_assign_from_yaml(ae_with_project):
+def test_assign_from_yaml(ae_with_project, timeoutDetector):
     folder = str(ae_with_project.project.project_base_path)
     file_path = join(folder, "config.yml")
 
@@ -253,7 +253,7 @@ def test_assign_from_yaml(ae_with_project):
     assert row
 
 
-def test_create_pt_graph(coquimbo_project):
+def test_create_pt_graph(coquimbo_project, timeoutDetector):
 
     project = coquimbo_project.project
     project_folder = project.project_base_path
@@ -278,7 +278,7 @@ def test_create_pt_graph(coquimbo_project):
 
 
 @pytest.mark.parametrize("allow_map_match", [True, False])
-def test_import_gtfs(pt_no_feed, allow_map_match):
+def test_import_gtfs(pt_no_feed, allow_map_match, timeoutDetector):
     project = pt_no_feed.project
     project_folder = project.project_base_path
 
@@ -298,7 +298,7 @@ def test_import_gtfs(pt_no_feed, allow_map_match):
     assert result[0]["Output"] == "Traffic assignment successfully completed"
 
 
-def test_add_links_from_layer(ae_with_project):
+def test_add_links_from_layer(ae_with_project, timeoutDetector):
     folder_path = ae_with_project.project.project_base_path
 
     load_test_layer(ae_with_project.project.project_base_path, "link")
@@ -325,7 +325,7 @@ def test_add_links_from_layer(ae_with_project):
     assert project.network.count_nodes() == 28
 
 
-def test_assign_transit_from_yaml(coquimbo_project):
+def test_assign_transit_from_yaml(coquimbo_project, timeoutDetector):
     folder = str(coquimbo_project.project.project_base_path)
     shutil.copyfile("test/data/coquimbo_project/transit_config.yml", f"{folder}/transit_config.yml")
     shutil.copyfile("test/data/coquimbo_project/matrices/demand.aem", f"{folder}/matrices/demand.aem")
@@ -376,7 +376,7 @@ def test_assign_transit_from_yaml(coquimbo_project):
     assert row
 
 
-def test_create_matrix_from_layer(folder_path):
+def test_create_matrix_from_layer(folder_path, timeoutDetector):
     makedirs(folder_path)
 
     df = pd.read_csv("test/data/SiouxFalls_project/SiouxFalls_od.csv")
@@ -407,7 +407,7 @@ def test_create_matrix_from_layer(folder_path):
     assert np.sum(info["matrix"][parameters["matrix_core"]][:, :]) == 360600
 
 
-def test_matrix_calc(folder_path):
+def test_matrix_calc(folder_path, timeoutDetector):
     makedirs(folder_path)
 
     parameters = {
@@ -434,7 +434,7 @@ def test_matrix_calc(folder_path):
 
 
 @pytest.mark.skipif(not bool(environ.get("CI")), reason="Runs only in GitHub Action")
-def test_project_from_osm(folder_path):
+def test_project_from_osm(folder_path, timeoutDetector):
 
     parameters = {"place_name": "Abrolhos", "project_path": folder_path}
 
@@ -451,7 +451,7 @@ def test_project_from_osm(folder_path):
     assert project.network.count_nodes() == 10
 
 
-def test_trip_length_distribution(ae_with_project, folder_path):
+def test_trip_length_distribution(ae_with_project, folder_path, timeoutDetector):
     matrices = ae_with_project.project.matrices
     mat_names = matrices.list()["name"].tolist()
 
@@ -486,7 +486,7 @@ def test_trip_length_distribution(ae_with_project, folder_path):
     assert isfile(parameters["file_path"])
 
 
-def test_collapse_links(folder_path):
+def test_collapse_links(folder_path, timeoutDetector):
     project = create_example(folder_path, "nauru")
     links_before = project.network.count_links()
     nodes_before = project.network.count_nodes()
@@ -507,7 +507,7 @@ def test_collapse_links(folder_path):
     assert project.network.count_nodes() < nodes_before
 
 
-def test_network_simplifier(folder_path):
+def test_network_simplifier(folder_path, timeoutDetector):
     project = create_example(folder_path, "nauru")
     links_before = project.network.count_links()
     nodes_before = project.network.count_nodes()
@@ -528,7 +528,7 @@ def test_network_simplifier(folder_path):
     assert project.network.count_nodes() < nodes_before
 
 
-def test_run_module(folder_path):
+def test_run_module(folder_path, timeoutDetector):
     project = create_example(folder_path)
 
     parameters = {"available_funcs": 0}
