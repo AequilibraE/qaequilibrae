@@ -1,19 +1,22 @@
+from functools import partial
+
+from qaequilibrae import get_aequilibrae_menu_instance
 from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraEProcessingAlgorithm
 
 
 class AddConnectors(QAequilibraEProcessingAlgorithm):
     def __init__(self):
-        from qaequilibrae.menu_actions.action_add_connectos import run_add_connectors
+        from qaequilibrae.modules.menu_actions.action_add_connectors import run_add_connectors
 
         super().__init__(
-            run_add_connectors,
+            partial(run_add_connectors, get_aequilibrae_menu_instance()),
             "addcentroidconnector",
             self.tr("Add centroid connectors"),
-            self.tr("1. Model Building"),
-            "modelbuilding",
+            self.tr("Network"),
+            "network",
             self.tr("Adds centroid connectors for one or all modes."),
-            [],
+            ["centroid", "connector", "network"],
         )
 
     def createInstance(self):

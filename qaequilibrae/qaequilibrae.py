@@ -6,7 +6,7 @@ import tempfile
 import webbrowser
 from functools import partial
 from os import unlink
-from os.path import dirname, exists, join, isfile, split
+from os.path import dirname, exists, join, isfile
 from pathlib import Path
 from uuid import uuid4
 
@@ -17,6 +17,7 @@ from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
 from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
 
+from qaequilibrae import set_aequilibrae_menu_instance
 from qaequilibrae.message import messages
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
 from qaequilibrae.modules.menu_actions import run_add_zones, run_show_project_data, run_tsp
@@ -64,6 +65,7 @@ if hasattr(Qt, "AA_UseHighDpiPixmaps"):
 
 class AequilibraEMenu:
     def __init__(self, iface):
+        set_aequilibrae_menu_instance(self)
         # Closes AequilibraE projects eventually opened in memory
         self.logger = logging.getLogger("AequilibraEGUI")
         self.geo_layers_list = ["links", "nodes", "zones"]
