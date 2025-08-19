@@ -24,10 +24,10 @@ class Provider(QgsProcessingProvider):
 
     def __load_matrix_procedures(self):
 
-        from .add_matrix_from_layer import AddMatrixFromLayer
-        from .create_matrix_from_layer import CreateMatrixFromLayer
-        from .export_matrix import ExportMatrix
-        from .matrix_calculator import MatrixCalculator
+        from .matrix_procedures.add_matrix_from_layer import AddMatrixFromLayer
+        from .matrix_procedures.create_matrix_from_layer import CreateMatrixFromLayer
+        from .matrix_procedures.export_matrix import ExportMatrix
+        from .matrix_procedures.matrix_calculator import MatrixCalculator
 
         self.addAlgorithm(AddMatrixFromLayer())
         self.addAlgorithm(CreateMatrixFromLayer())
@@ -36,12 +36,12 @@ class Provider(QgsProcessingProvider):
 
     def __load_network(self):
 
-        from .Add_connectors import AddConnectors
-        from .add_links_from_layer import AddLinksFromLayer
-        from .network_simplifier import NetworkSimplifier
-        from .collapse_links import CollapseLinks
-        from .renumber_nodes_from_layer import RenumberNodesFromLayer
-        from .trip_length_distribution import TripLengthDistribution
+        from .network.Add_connectors import AddConnectors
+        from .network.add_links_from_layer import AddLinksFromLayer
+        from .network.collapse_links import CollapseLinks
+        from .network.network_simplifier import NetworkSimplifier
+        from .network.renumber_nodes_from_layer import RenumberNodesFromLayer
+        from .network.trip_length_distribution import TripLengthDistribution
 
         self.addAlgorithm(AddConnectors())
         self.addAlgorithm(AddLinksFromLayer())
@@ -52,15 +52,15 @@ class Provider(QgsProcessingProvider):
 
     def __load_paths_procedures(self):
 
-        from .assign_traffic_from_yaml import TrafficAssignYAML
+        from .paths_procedures.assign_traffic_from_yaml import TrafficAssignYAML
 
         self.addAlgorithm(TrafficAssignYAML())
 
     def __load_project_procedures(self):
 
-        from .project_from_layer import ProjectFromLayer
-        from .project_from_OSM import ProjectFromOSM
-        from .run_module import RunProcedures
+        from .project_procedures.project_from_layer import ProjectFromLayer
+        from .project_procedures.project_from_OSM import ProjectFromOSM
+        from .project_procedures.run_module import RunProcedures
 
         self.addAlgorithm(ProjectFromLayer())
         self.addAlgorithm(ProjectFromOSM())
@@ -68,9 +68,9 @@ class Provider(QgsProcessingProvider):
 
     def __load_public_transport_procedures(self):
 
-        from .assign_transit_from_yaml import TransitAssignYAML
-        from .create_transit_graph import CreatePTGraph
-        from .import_gtfs import ImportGTFS
+        from .public_transport_procedures.assign_transit_from_yaml import TransitAssignYAML
+        from .public_transport_procedures.create_transit_graph import CreatePTGraph
+        from .public_transport_procedures.import_gtfs import ImportGTFS
 
         self.addAlgorithm(TransitAssignYAML())
         self.addAlgorithm(CreatePTGraph())

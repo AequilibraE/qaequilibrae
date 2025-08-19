@@ -62,7 +62,7 @@ def test_provider_exists(qgis_app):
 
     registry = QgsApplication.processingRegistry()
     provider_names = [p.name().lower() for p in registry.providers()]
-    assert "aequilibrae" in provider_names
+    assert "qaequilibrae" in provider_names
 
 
 @pytest.mark.parametrize("format", [0, 1, 2])
