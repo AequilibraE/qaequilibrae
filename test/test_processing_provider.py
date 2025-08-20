@@ -33,7 +33,6 @@ from qaequilibrae.modules.processing_provider.public_transport_procedures.assign
 )
 from qaequilibrae.modules.processing_provider.network.collapse_links import CollapseLinks
 from qaequilibrae.modules.processing_provider.matrix_procedures.create_matrix_from_layer import CreateMatrixFromLayer
-from qaequilibrae.modules.processing_provider.public_transport_procedures.create_transit_graph import CreatePTGraph
 from qaequilibrae.modules.processing_provider.matrix_procedures.export_matrix import ExportMatrix
 from qaequilibrae.modules.processing_provider.public_transport_procedures.import_gtfs import ImportGTFS
 from qaequilibrae.modules.processing_provider.matrix_procedures.matrix_calculator import MatrixCalculator
@@ -251,30 +250,6 @@ def test_assign_from_yaml(ae_with_project, timeoutDetector):
 
     row = conn.execute("SELECT * FROM test_from_yaml;").fetchone()
     assert row
-
-
-def test_create_pt_graph(coquimbo_project, timeoutDetector):
-
-    project = coquimbo_project.project
-    project_folder = project.project_base_path
-
-    parameters = {
-        "project_path": project_folder,
-        "access_mode": "c",
-        "block_flows": False,
-        "walking_edges": False,
-        "outer_stops_transfers": False,
-    }
-
-    action = CreatePTGraph()
-    context = QgsProcessingContext()
-    feedback = QgsProcessingFeedback()
-
-    result = action.run(parameters, context, feedback)
-    assert result[0]["Output"] == "PT graph successfully created"
-
-    periods = project.network.periods
-    assert periods.data.shape[0] == 1
 
 
 @pytest.mark.parametrize("allow_map_match", [True, False])

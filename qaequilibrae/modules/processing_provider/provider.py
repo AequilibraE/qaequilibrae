@@ -69,11 +69,9 @@ class Provider(QgsProcessingProvider):
     def __load_public_transport_procedures(self):
 
         from .public_transport_procedures.assign_transit_from_yaml import TransitAssignYAML
-        from .public_transport_procedures.create_transit_graph import CreatePTGraph
         from .public_transport_procedures.import_gtfs import ImportGTFS
 
         self.addAlgorithm(TransitAssignYAML())
-        self.addAlgorithm(CreatePTGraph())
         self.addAlgorithm(ImportGTFS())
 
     def id(self):

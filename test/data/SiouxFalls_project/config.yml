@@ -1,11 +1,10 @@
-project: path_to_project
 traffic_classes:
     - car:
         matrix_name: demand_mc
         matrix_core: car
         network_mode: c
         pce: 1.0
-        blocked_centroid_flows: True
+        blocked_centroid_flows: False
         skims:
             free_flow_time: [final]
             distance: [blended]
@@ -14,7 +13,7 @@ traffic_classes:
         matrix_core: motorcycle
         network_mode: c
         pce: 0.2
-        blocked_centroid_flows: True
+        blocked_centroid_flows: False
         skims:
             free_flow_time: [final, blended]
             distance: [final, blended]

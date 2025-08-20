@@ -141,10 +141,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 for key, value in tc.items():
                     self.cob_matrices.setCurrentText(value["matrix_name"])
                     self.change_matrix_selected()
-                    # idx = self.__get_index(self.tbl_core_list, value["matrix_core"], "matrix_core")
-                    # print("OLHA O IDX AQUI: ", idx)
-                    # self.tbl_core_list.selectRow(idx)
-                    print(self.tbl_core_list)
+                    names = self.project.matrices.get_matrix(value["matrix_name"]).names
+                    self.tbl_core_list.selectRow(names.index(value["matrix_core"]))
                     self.ln_class_name.setText(key)
                     self.pce_setter.setValue(value["pce"])
                     self.chb_check_centroids.setChecked(value["blocked_centroid_flows"])
