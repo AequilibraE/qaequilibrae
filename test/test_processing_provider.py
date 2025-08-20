@@ -24,21 +24,20 @@ from qgis.core import (
 from shapely.geometry import Point
 
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
-from qaequilibrae.modules.processing_provider.network.Add_connectors import AddConnectors
+from qaequilibrae.modules.processing_provider.model_building.Add_connectors import AddConnectors
 from qaequilibrae.modules.processing_provider.network.add_links_from_layer import AddLinksFromLayer
-from qaequilibrae.modules.processing_provider.matrix_procedures.add_matrix_from_layer import AddMatrixFromLayer
+from qaequilibrae.modules.processing_provider.matrix_procedures.add_matrix_from_layer import MatrixFromLayer
 from qaequilibrae.modules.processing_provider.paths_procedures.assign_traffic_from_yaml import TrafficAssignYAML
 from qaequilibrae.modules.processing_provider.public_transport_procedures.assign_transit_from_yaml import (
     TransitAssignYAML,
 )
 from qaequilibrae.modules.processing_provider.network.collapse_links import CollapseLinks
-from qaequilibrae.modules.processing_provider.matrix_procedures.create_matrix_from_layer import CreateMatrixFromLayer
 from qaequilibrae.modules.processing_provider.matrix_procedures.export_matrix import ExportMatrix
 from qaequilibrae.modules.processing_provider.public_transport_procedures.import_gtfs import ImportGTFS
 from qaequilibrae.modules.processing_provider.matrix_procedures.matrix_calculator import MatrixCalculator
 from qaequilibrae.modules.processing_provider.network.network_simplifier import NetworkSimplifier
-from qaequilibrae.modules.processing_provider.project_procedures.project_from_OSM import ProjectFromOSM
-from qaequilibrae.modules.processing_provider.project_procedures.project_from_layer import ProjectFromLayer
+from qaequilibrae.modules.processing_provider.model_building.project_from_OSM import ProjectFromOSM
+from qaequilibrae.modules.processing_provider.model_building.project_from_layer import ProjectFromLayer
 from qaequilibrae.modules.processing_provider.provider import Provider
 from qaequilibrae.modules.processing_provider.network.renumber_nodes_from_layer import RenumberNodesFromLayer
 from qaequilibrae.modules.processing_provider.project_procedures.run_module import RunProcedures
@@ -99,7 +98,7 @@ def test_matrix_from_layer(folder_path, timeoutDetector):
         "matrix_core": "MAT_CORE",
     }
 
-    action = AddMatrixFromLayer()
+    action = MatrixFromLayer()
     context = QgsProcessingContext()
     feedback = QgsProcessingFeedback()
 
@@ -349,37 +348,6 @@ def test_assign_transit_from_yaml(coquimbo_project, timeoutDetector):
 
     row = conn.execute("SELECT * FROM transit_from_yaml;").fetchone()
     assert row
-
-
-def test_create_matrix_from_layer(folder_path, timeoutDetector):
-    makedirs(folder_path)
-
-    df = pd.read_csv("test/data/SiouxFalls_project/SiouxFalls_od.csv")
-    layer = layer_from_dataframe(df, "SiouxFalls_od")
-
-    parameters = {
-        "matrix_layer": layer,
-        "origin": "O",
-        "destination": "D",
-        "value": "Ton",
-        "file_path": join(folder_path, "siouxfalls_od.aem"),
-        "matrix_core": "MAT_CORE",
-    }
-
-    action = CreateMatrixFromLayer()
-    context = QgsProcessingContext()
-    feedback = QgsProcessingFeedback()
-
-    _ = action.run(parameters, context, feedback)
-    assert isfile(parameters["file_path"])
-
-    mat = AequilibraeMatrix()
-    mat.load(parameters["file_path"])
-
-    info = mat.__dict__
-    assert info["names"] == [parameters["matrix_core"]]
-    assert info["zones"] == 24
-    assert np.sum(info["matrix"][parameters["matrix_core"]][:, :]) == 360600
 
 
 def test_matrix_calc(folder_path, timeoutDetector):
