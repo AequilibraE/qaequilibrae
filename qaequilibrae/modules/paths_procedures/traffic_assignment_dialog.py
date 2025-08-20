@@ -6,6 +6,7 @@ from tempfile import gettempdir
 import numpy as np
 import pandas as pd
 import qgis
+import yaml
 from aequilibrae.parameters import Parameters
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
@@ -16,7 +17,7 @@ from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 
-from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path
+from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_traffic_assignment.ui"))
@@ -53,6 +54,9 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.__current_links = []
         self.__project_links = self.project.network.links.data.link_id
         self.link_layer = qgis_project.layers["links"][0]
+
+        # Signals for the project tab
+        self.but_load_yaml.clicked.connect(self._load_configs)
 
         # Signals for the matrix_procedures tab
         self.but_add_skim.clicked.connect(self._add_skimming)
@@ -120,6 +124,67 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.select_link_list.cellDoubleClicked.connect(self.__remove_select_link_item)
         self.but_clean.clicked.connect(self.__clean_link_selection)
 
+    def __clean_class_configs(self):
+        objects = [self.cob_matrices]
+        for obj in objects:
+            obj.clear()
+
+    def _load_configs(self):
+        # Let's open the YAML config file
+        file_path, _ = GetOutputFileName(QtWidgets.QDialog(), "Configuration file", ["YAML (*.yml)"], ".yml", self.path)
+        if file_path:
+            with open(file_path, "r") as f:
+                params = yaml.safe_load(f)
+
+            # Populate Traffic Classes tab
+            for tc in params["traffic_classes"]:
+                for key, value in tc.items():
+                    self.cob_matrices.setCurrentText(value["matrix_name"])
+                    self.change_matrix_selected()
+                    # idx = self.__get_index(self.tbl_core_list, value["matrix_core"], "matrix_core")
+                    # print("OLHA O IDX AQUI: ", idx)
+                    # self.tbl_core_list.selectRow(idx)
+                    print(self.tbl_core_list)
+                    self.ln_class_name.setText(key)
+                    self.pce_setter.setValue(value["pce"])
+                    self.chb_check_centroids.setChecked(value["blocked_centroid_flows"])
+                    if "fixed_cost" in value:
+                        self.chb_fixed_cost.setChecked(True)
+                        self.cob_fixed_cost.setText(value["fixed_cost"])
+                        self.vot_setter.setValue(value["vot"])
+                    self._create_traffic_class(False, value["network_mode"])
+
+            # Populate Skimming tab
+
+            # Populate Critical Analysis tab
+            if "select_links" in params:
+                self.do_select_link.setChecked(True)
+
+                # We manually input `add_query` and `build_query`
+                for qry, links in params["select_links"]["selection"].items():
+                    self.__current_links.extend([tuple(link) for link in links])
+                    self.build_query(False, qry)
+
+                self.sl_mat_name.setText(params["select_links"]["output_name"])
+                if "save_matrix" in params["select_links"]:
+                    self.chb_save_matrix.setChecked(params["select_links"]["save_matrix"])
+                if "save_result" in params["select_links"]:
+                    self.chb_save_result.setChecked(params["select_links"]["save_result"])
+
+            # Populate Assignment tab
+            self.cb_choose_algorithm.setCurrentText(params["assignment"]["algorithm"])
+            self.max_iter.setText(str(params["assignment"]["max_iter"]))
+            self.rel_gap.setText(str(params["assignment"]["rgap"]))
+
+            self.cob_capacity.setCurrentText(params["assignment"]["capacity_field"])
+            self.cob_ffttime.setCurrentText(params["assignment"]["time_field"])
+
+            self.cob_vdf.setCurrentText(params["assignment"]["vdf"])
+            self.tbl_vdf_parameters.cellWidget(0, 1).setText(str(params["assignment"]["alpha"]))
+            self.tbl_vdf_parameters.cellWidget(1, 1).setText(str(params["assignment"]["beta"]))
+
+            self.output_scenario_name.setText(params["assignment"]["result_name"])
+
     def set_fixed_cost_use(self):
         for item in [self.cob_fixed_cost, self.lbl_vot, self.vot_setter]:
             item.setEnabled(self.chb_fixed_cost.isChecked())
@@ -130,6 +195,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 if "vot" in [x[1] for x in dt]:
                     sql = "select vot from modes where mode_id=?"
                     v = conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()
+                    # TODO: add an qgis error here
                     self.vot_setter.setValue(v[0])
 
     def change_class_name(self):
@@ -229,7 +295,7 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                 val_fld.addItem(x)
             table.setCellWidget(i, 2, val_fld)
 
-    def _create_traffic_class(self):
+    def _create_traffic_class(self, validate: bool = True, md: str = ""):
         mat_name = self.cob_matrices.currentText()
         if not mat_name:
             raise AttributeError("Matrix not set")
@@ -249,8 +315,12 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         user_classes = [matrix.names[i] for i in rows]
         matrix.computational_view(user_classes)
 
-        mode = self.cob_mode_for_class.currentText()
-        mode_id = self.all_modes[mode]
+        if validate:
+            mode = self.cob_mode_for_class.currentText()
+            mode_id = self.all_modes[mode]
+        else:
+            mode = ""
+            mode_id = md
         if mode_id not in self.project.network.graphs:
             self.project.network.build_graphs(modes=[mode_id])
 
@@ -355,23 +425,26 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
 
         return link_id
 
-    def build_query(self):
-        query_name = self.input_qry_name.text()
+    def build_query(self, validate: bool = True, qry_name: str = ""):
+        if validate:
+            query_name = self.input_qry_name.text()
 
-        if len(query_name) == 0 or not query_name:
-            self.error = self.tr("Missing query name")
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
-            return
+            if len(query_name) == 0 or not query_name:
+                self.error = self.tr("Missing query name")
+                qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+                return
 
-        if query_name in self.select_links:
-            self.error = self.tr("Query name already used")
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
-            return
+            if query_name in self.select_links:
+                self.error = self.tr("Query name already used")
+                qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+                return
 
-        if not self.__current_links:
-            self.error = self.tr("Please set a link selection")
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
-            return
+            if not self.__current_links:
+                self.error = self.tr("Please set a link selection")
+                qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+                return
+        else:
+            query_name = qry_name
 
         self.select_links[query_name] = self.__current_links
 

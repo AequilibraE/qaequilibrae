@@ -1,61 +1,24 @@
-import importlib.util as iutil
-import sys
+from functools import partial
 
-from qgis.core import (
-    QgsProcessingAlgorithm,
-    QgsProcessingMultiStepFeedback,
-    QgsProcessingParameterString,
-    QgsProcessingParameterFolderDestination,
-)
-
+from qaequilibrae import get_aequilibrae_menu_instance
 from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraEProcessingAlgorithm
 
 
-class ProjectFromOSM(QgsProcessingAlgorithm):
+class ProjectFromOSM(QAequilibraEProcessingAlgorithm):
 
-    def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterString("place_name", self.tr("Place name"), multiLine=False))
-        self.addParameter(
-            QgsProcessingParameterFolderDestination("project_path", self.tr("Output folder"), createByDefault=True)
+    def __init__(self):
+        from qaequilibrae.modules.menu_actions.project_from_osm_action import project_from_osm
+
+        super().__init__(
+            partial(project_from_osm, get_aequilibrae_menu_instance()),
+            "projectfromosm",
+            self.tr("Create project from OSM"),
+            self.tr("Project"),
+            "project_procedures",
+            self.tr("Creates an AequilibraE project from OpenStreetMap"),
+            ["OSM", "openstreetmap", "create", "project"],
         )
-
-    def processAlgorithm(self, parameters, context, model_feedback):
-        # Checks if we have access to aequilibrae library
-        if iutil.find_spec("aequilibrae") is None:
-            sys.exit(self.tr("AequilibraE module not found"))
-
-        from aequilibrae import Project
-
-        feedback = QgsProcessingMultiStepFeedback(2, model_feedback)
-        feedback.pushInfo(self.tr("Creating project"))
-
-        project = Project()
-        project.new(parameters["project_path"])
-
-        project.network.create_from_osm(place_name=parameters["place_name"])
-
-        feedback.pushInfo(" ")
-        feedback.setCurrentStep(2)
-
-        feedback.pushInfo(self.tr("Closing project"))
-        project.close()
-
-        return {"Output": parameters["project_path"]}
-
-    def name(self):
-        return "projectfromosm"
-
-    def displayName(self):
-        return self.tr("Create project from OSM")
-
-    def group(self):
-        return self.tr("1. Model Building")
-
-    def groupId(self):
-        return "modelbuilding"
-
-    def shortHelpString(self):
-        return self.tr("Creates an AequilibraE project from OpenStreetMap")
 
     def createInstance(self):
         return ProjectFromOSM()

@@ -47,7 +47,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
             self.but_load_Results.clicked.connect(self.load_result_table)
             self.but_load_matrix.clicked.connect(self.display_matrix)
         else:
-            QTabWidget.removeTab(self.tabs, 0)
+            QTabWidget.removeTab(self.tabs, 1)
             QTabWidget.removeTab(self.tabs, 0)
 
         self.but_load_data.clicked.connect(self.display_external_data)

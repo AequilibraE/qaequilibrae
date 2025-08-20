@@ -2,8 +2,7 @@ from copy import deepcopy
 from os.path import dirname, join
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
 
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
