@@ -14,8 +14,8 @@ class ProjectFromOSM(QAequilibraEProcessingAlgorithm):
             partial(project_from_osm, get_aequilibrae_menu_instance()),
             "projectfromosm",
             self.tr("Create project from OSM"),
-            self.tr("Project"),
-            "project_procedures",
+            self.tr("Model building"),
+            "model_building",
             self.tr("Creates an AequilibraE project from OpenStreetMap"),
             ["OSM", "openstreetmap", "create", "project"],
         )

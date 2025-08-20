@@ -26,20 +26,19 @@ from shapely.geometry import Point
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
 from qaequilibrae.modules.processing_provider.model_building.Add_connectors import AddConnectors
 from qaequilibrae.modules.processing_provider.network.add_links_from_layer import AddLinksFromLayer
-from qaequilibrae.modules.processing_provider.matrix_procedures.add_matrix_from_layer import MatrixFromLayer
+from qaequilibrae.modules.processing_provider.data_procedures.add_matrix_from_layer import MatrixFromLayer
 from qaequilibrae.modules.processing_provider.paths_procedures.assign_traffic_from_yaml import TrafficAssignYAML
 from qaequilibrae.modules.processing_provider.public_transport_procedures.assign_transit_from_yaml import (
     TransitAssignYAML,
 )
 from qaequilibrae.modules.processing_provider.network.collapse_links import CollapseLinks
-from qaequilibrae.modules.processing_provider.matrix_procedures.export_matrix import ExportMatrix
+from qaequilibrae.modules.processing_provider.data_procedures.export_matrix import ExportMatrix
 from qaequilibrae.modules.processing_provider.public_transport_procedures.import_gtfs import ImportGTFS
-from qaequilibrae.modules.processing_provider.matrix_procedures.matrix_calculator import MatrixCalculator
+from qaequilibrae.modules.processing_provider.data_procedures.matrix_calculator import MatrixCalculator
 from qaequilibrae.modules.processing_provider.network.network_simplifier import NetworkSimplifier
 from qaequilibrae.modules.processing_provider.model_building.project_from_OSM import ProjectFromOSM
 from qaequilibrae.modules.processing_provider.model_building.project_from_layer import ProjectFromLayer
 from qaequilibrae.modules.processing_provider.provider import Provider
-from qaequilibrae.modules.processing_provider.network.renumber_nodes_from_layer import RenumberNodesFromLayer
 from qaequilibrae.modules.processing_provider.project_procedures.run_module import RunProcedures
 from qaequilibrae.modules.processing_provider.network.trip_length_distribution import TripLengthDistribution
 from .utilities import load_sfalls_from_layer, load_test_layer
@@ -181,38 +180,6 @@ def test_add_centroid_connector(pt_no_feed, timeoutDetector):
         link_qry = "select count(name) from links where name like 'centroid connector%'"
         link_count = conn.execute(link_qry).fetchone()[0]
         assert link_count == 3
-
-
-def test_renumber_from_centroids(ae_with_project, tmp_path, timeoutDetector):
-    load_sfalls_from_layer(tmp_path)
-
-    project = ae_with_project.project
-    project_folder = project.project_base_path
-
-    nodeslayer = QgsProject.instance().mapLayersByName("Nodes layer")[0]
-
-    nodeslayer.startEditing()
-    for feat in nodeslayer.getFeatures():
-        value = feat["id"] + 1000
-        nodeslayer.changeAttributeValue(feat.id(), nodeslayer.fields().indexFromName("id"), value)
-
-    nodeslayer.commitChanges()
-
-    parameters = {"nodes": nodeslayer, "node_id": "id", "project_path": project_folder}
-
-    action = RenumberNodesFromLayer()
-    context = QgsProcessingContext()
-    feedback = QgsProcessingFeedback()
-
-    result = action.run(parameters, context, feedback)
-
-    assert result[0]["Output"] == project_folder
-
-    with project.db_connection as conn:
-        node_qry = "select node_id from nodes;"
-        node_count = conn.execute(node_qry).fetchall()
-        node_count = [n[0] for n in node_count]
-        assert node_count == list(range(1001, 1025))
 
 
 def test_assign_from_yaml(ae_with_project, timeoutDetector):

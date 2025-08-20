@@ -14,8 +14,8 @@ class ProjectFromLayer(QAequilibraEProcessingAlgorithm):
             partial(run_create_transponet, get_aequilibrae_menu_instance()),
             "projectfromlayer",
             self.tr("Create project from link layer"),
-            self.tr("Project"),
-            "project_procedures",
+            self.tr("Model building"),
+            "model_building",
             self.tr("Creates an AequilibraE project from a given link layer"),
             ["layer", "project", "create"],
         )

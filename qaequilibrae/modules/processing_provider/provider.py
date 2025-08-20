@@ -16,42 +16,13 @@ class Provider(QgsProcessingProvider):
 
     def loadAlgorithms(self):
 
-        self.__load_matrix_procedures()
-        self.__load_network()
-        self.__load_paths_procedures()
         self.__load_project_procedures()
         self.__load_model_building()
+        self.__load_matrix_procedures()
+        self.__load_routing_procedures()
+        self.__load_network()
+        self.__load_paths_procedures()
         self.__load_public_transport_procedures()
-
-    def __load_matrix_procedures(self):
-
-        from .matrix_procedures.add_matrix_from_layer import MatrixFromLayer
-        from .matrix_procedures.export_matrix import ExportMatrix
-        from .matrix_procedures.matrix_calculator import MatrixCalculator
-
-        self.addAlgorithm(MatrixFromLayer())
-        self.addAlgorithm(ExportMatrix())
-        self.addAlgorithm(MatrixCalculator())
-
-    def __load_network(self):
-
-        from .network.add_links_from_layer import AddLinksFromLayer
-        from .network.collapse_links import CollapseLinks
-        from .network.network_simplifier import NetworkSimplifier
-        from .network.renumber_nodes_from_layer import RenumberNodesFromLayer
-        from .network.trip_length_distribution import TripLengthDistribution
-
-        self.addAlgorithm(AddLinksFromLayer())
-        self.addAlgorithm(CollapseLinks())
-        self.addAlgorithm(NetworkSimplifier())
-        self.addAlgorithm(RenumberNodesFromLayer())
-        self.addAlgorithm(TripLengthDistribution())
-
-    def __load_paths_procedures(self):
-
-        from .paths_procedures.assign_traffic_from_yaml import TrafficAssignYAML
-
-        self.addAlgorithm(TrafficAssignYAML())
 
     def __load_project_procedures(self):
 
@@ -74,10 +45,48 @@ class Provider(QgsProcessingProvider):
         from .model_building.project_from_layer import ProjectFromLayer
         from .model_building.project_from_OSM import ProjectFromOSM
         from .model_building.Add_connectors import AddConnectors
+        from .model_building.network_preparation import PrepareNetwork
+        from .model_building.add_zones import AddZones
 
         self.addAlgorithm(ProjectFromLayer())
         self.addAlgorithm(ProjectFromOSM())
         self.addAlgorithm(AddConnectors())
+        self.addAlgorithm(PrepareNetwork())
+        self.addAlgorithm(AddZones())
+
+    def __load_matrix_procedures(self):
+
+        from .matrix_procedures.add_matrix_from_layer import MatrixFromLayer
+        from .matrix_procedures.export_matrix import ExportMatrix
+        from .matrix_procedures.matrix_calculator import MatrixCalculator
+
+        self.addAlgorithm(MatrixFromLayer())
+        self.addAlgorithm(ExportMatrix())
+        self.addAlgorithm(MatrixCalculator())
+
+    def __load_routing_procedures(self):
+
+        from .routing_procedures.tsp import RunTSP
+
+        self.addAlgorithm(RunTSP())
+
+    def __load_network(self):
+
+        from .network.add_links_from_layer import AddLinksFromLayer
+        from .network.collapse_links import CollapseLinks
+        from .network.network_simplifier import NetworkSimplifier
+        from .network.trip_length_distribution import TripLengthDistribution
+
+        self.addAlgorithm(AddLinksFromLayer())
+        self.addAlgorithm(CollapseLinks())
+        self.addAlgorithm(NetworkSimplifier())
+        self.addAlgorithm(TripLengthDistribution())
+
+    def __load_paths_procedures(self):
+
+        from .paths_procedures.assign_traffic_from_yaml import TrafficAssignYAML
+
+        self.addAlgorithm(TrafficAssignYAML())
 
     def __load_public_transport_procedures(self):
 

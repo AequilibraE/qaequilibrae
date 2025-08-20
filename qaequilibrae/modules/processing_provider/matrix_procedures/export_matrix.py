@@ -69,7 +69,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
         return self.tr("Export matrices")
 
     def group(self):
-        return self.tr("2. Data")
+        return self.tr("Data")
 
     def groupId(self):
         return "data"

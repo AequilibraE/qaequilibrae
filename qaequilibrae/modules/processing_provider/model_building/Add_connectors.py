@@ -13,8 +13,8 @@ class AddConnectors(QAequilibraEProcessingAlgorithm):
             partial(run_add_connectors, get_aequilibrae_menu_instance()),
             "addcentroidconnector",
             self.tr("Add centroid connectors"),
-            self.tr("Network"),
-            "network",
+            self.tr("Model building"),
+            "Model building",
             self.tr("Adds centroid connectors for one or all modes."),
             ["centroid", "connector", "network"],
         )

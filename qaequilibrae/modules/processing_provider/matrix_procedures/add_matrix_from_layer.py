@@ -14,7 +14,7 @@ class MatrixFromLayer(QAequilibraEProcessingAlgorithm):
             partial(load_matrices, get_aequilibrae_menu_instance()),
             "exportmatrixasomx",
             self.tr("Save matrix from layer in existing file"),
-            self.tr("2. Data"),
+            self.tr("Data"),
             "data",
             "Saves a layer to an existing *.omx file",
             ["export", "matrix", "omx"],
