@@ -27,7 +27,7 @@ from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_fr
 from qaequilibrae.modules.processing_provider.model_building.Add_connectors import AddConnectors
 from qaequilibrae.modules.processing_provider.network.add_links_from_layer import AddLinksFromLayer
 from qaequilibrae.modules.processing_provider.matrix_procedures.add_matrix_from_layer import MatrixFromLayer
-from qaequilibrae.modules.processing_provider.traffic_assignment_procedures.traffic_assignment import (
+from qaequilibrae.modules.processing_provider.assignment_procedures.traffic_assignment import (
     TrafficAssignment,
 )
 from qaequilibrae.modules.processing_provider.transit_procedures.transit_assignment import (

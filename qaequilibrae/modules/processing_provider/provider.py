@@ -85,7 +85,7 @@ class Provider(QgsProcessingProvider):
 
     def __load_traffic_assignment_procedures(self):
 
-        from .traffic_assignment_procedures.traffic_assignment import TrafficAssignment
+        from .assignment_procedures.traffic_assignment import TrafficAssignment
 
         self.addAlgorithm(TrafficAssignment())
 
