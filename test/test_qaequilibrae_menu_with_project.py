@@ -328,7 +328,7 @@ def test_gis_simple_tag_menu(ae_with_project, qtbot):
 
 
 def test_gtfs_importer(ae_with_project, qtbot):
-    from qaequilibrae.modules.public_transport_procedures.gtfs_importer import GTFSImporter
+    from qaequilibrae.modules.transit_procedures.gtfs_importer import GTFSImporter
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, GTFSImporter)

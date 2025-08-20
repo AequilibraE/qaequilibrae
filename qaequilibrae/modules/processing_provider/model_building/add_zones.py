@@ -14,7 +14,7 @@ class AddZones(QAequilibraEProcessingAlgorithm):
             "add_project_zones",
             self.tr("Add zoning data"),
             self.tr("Model building"),
-            "Model building",
+            "model_building",
             self.tr("Add project zones"),
             ["add", "project", "zones", "zoning"],
         )

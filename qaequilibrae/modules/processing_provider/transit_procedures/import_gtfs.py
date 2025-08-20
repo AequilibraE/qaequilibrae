@@ -12,10 +12,10 @@ class ImportGTFS(QAequilibraEProcessingAlgorithm):
 
         super().__init__(
             partial(run_import_gtfs, get_aequilibrae_menu_instance()),
-            "importgtfs",
+            "import_gtfs",
             self.tr("Import GTFS"),
-            self.tr("4. Public Transport"),
-            "publictransport",
+            self.tr("Public Transport"),
+            "public_transport",
             self.tr("Adds transit routes from a GTFS to an existing AequilibraE project."),
             ["public transport", "GTFS", "transit"],
         )

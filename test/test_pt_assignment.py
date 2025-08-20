@@ -8,8 +8,8 @@ from qgis.PyQt.QtCore import Qt, QTime
 from qgis.PyQt.QtWidgets import QDialog
 
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
-from qaequilibrae.modules.public_transport_procedures.new_period_dialog import NewPeriodDialog
-from qaequilibrae.modules.public_transport_procedures.transit_assignment_dialog import TransitAssignDialog
+from qaequilibrae.modules.transit_procedures.new_period_dialog import NewPeriodDialog
+from qaequilibrae.modules.transit_procedures.transit_assignment_dialog import TransitAssignDialog
 from .utilities import create_matrix
 
 
@@ -106,7 +106,7 @@ def mock_period(mocker):
     dialog.error = []
 
     mocker.patch(
-        "qaequilibrae.modules.public_transport_procedures.transit_assignment_dialog.NewPeriodDialog",
+        "qaequilibrae.modules.transit_procedures.transit_assignment_dialog.NewPeriodDialog",
         return_value=dialog,
     )
 

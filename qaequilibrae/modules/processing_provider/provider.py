@@ -21,8 +21,9 @@ class Provider(QgsProcessingProvider):
         self.__load_matrix_procedures()
         self.__load_routing_procedures()
         self.__load_network()
-        self.__load_paths_procedures()
-        self.__load_public_transport_procedures()
+        self.__load_traffic_assignment_procedures()
+        self.__load_transit_procedures()
+        self.__load_gis()
 
     def __load_project_procedures(self):
 
@@ -82,19 +83,25 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(NetworkSimplifier())
         self.addAlgorithm(TripLengthDistribution())
 
-    def __load_paths_procedures(self):
+    def __load_traffic_assignment_procedures(self):
 
-        from .paths_procedures.assign_traffic_from_yaml import TrafficAssignYAML
+        from .traffic_assignment_procedures.traffic_assignment import TrafficAssignment
 
-        self.addAlgorithm(TrafficAssignYAML())
+        self.addAlgorithm(TrafficAssignment())
 
-    def __load_public_transport_procedures(self):
+    def __load_transit_procedures(self):
 
-        from .public_transport_procedures.assign_transit_from_yaml import TransitAssignYAML
-        from .public_transport_procedures.import_gtfs import ImportGTFS
+        from .transit_procedures.transit_assignment import TransitAssignment
+        from .transit_procedures.import_gtfs import ImportGTFS
 
-        self.addAlgorithm(TransitAssignYAML())
+        self.addAlgorithm(TransitAssignment())
         self.addAlgorithm(ImportGTFS())
+
+    def __load_gis(self):
+
+        from .gis.simple_tag import SimpleTag
+
+        self.addAlgorithm(SimpleTag())
 
     def id(self):
         """The ID used for identifying the provider."""

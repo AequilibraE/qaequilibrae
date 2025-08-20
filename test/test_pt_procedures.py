@@ -5,13 +5,13 @@ from datetime import datetime
 import pytest
 from aequilibrae.transit import Transit
 
-from qaequilibrae.modules.public_transport_procedures.gtfs_feed import GTFSFeed
-from qaequilibrae.modules.public_transport_procedures.gtfs_importer import GTFSImporter
+from qaequilibrae.modules.transit_procedures.gtfs_feed import GTFSFeed
+from qaequilibrae.modules.transit_procedures.gtfs_importer import GTFSImporter
 
 
 def test_add_new_feed(pt_no_feed, mocker):
     mocker.patch(
-        "qaequilibrae.modules.public_transport_procedures.gtfs_feed.GTFSFeed.open_feed",
+        "qaequilibrae.modules.transit_procedures.gtfs_feed.GTFSFeed.open_feed",
     )
 
     importer = GTFSImporter(pt_no_feed)
@@ -50,7 +50,7 @@ def test_add_new_feed(pt_no_feed, mocker):
 )
 def test_add_other_feed(pt_project, set_agency, set_date, is_checked, mocker):
     mocker.patch(
-        "qaequilibrae.modules.public_transport_procedures.gtfs_feed.GTFSFeed.open_feed",
+        "qaequilibrae.modules.transit_procedures.gtfs_feed.GTFSFeed.open_feed",
     )
 
     importer = GTFSImporter(pt_project)

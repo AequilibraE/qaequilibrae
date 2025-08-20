@@ -14,7 +14,7 @@ class PrepareNetwork(QAequilibraEProcessingAlgorithm):
             "prepare_network",
             self.tr("Network preparation"),
             self.tr("Model building"),
-            "Model building",
+            "model_building",
             self.tr("Prepares network for import"),
             ["preparation", "network"],
         )

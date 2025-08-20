@@ -14,7 +14,7 @@ from qgis.core import QgsTextBufferSettings, QgsVectorLayerSimpleLabeling
 
 from qaequilibrae.modules.common_tools import layer_from_dataframe, PandasModel
 from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
-from qaequilibrae.modules.public_transport_procedures.transit_supply_metrics import SupplyMetrics
+from qaequilibrae.modules.transit_procedures.transit_supply_metrics import SupplyMetrics
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/transit_navigator.ui"))
 

@@ -5,23 +5,23 @@ from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraEProcessingAlgorithm
 
 
-class TransitAssignYAML(QAequilibraEProcessingAlgorithm):
+class TransitAssignment(QAequilibraEProcessingAlgorithm):
 
     def __init__(self):
         from qaequilibrae.modules.menu_actions.action_pt_skim import run_pt_skim
 
         super().__init__(
             partial(run_pt_skim, get_aequilibrae_menu_instance()),
-            "ptassignfromyaml",
+            "transit_assignment",
             self.tr("Transit assignment from file"),
-            self.tr("4. Public Transport"),
-            "publictransport",
+            self.tr("Public Transport"),
+            "public_transport",
             "Runs transit assignment",
             ["public transport", "transit", "assignment"],
         )
 
     def createInstance(self):
-        return TransitAssignYAML()
+        return TransitAssignment()
 
     def tr(self, message):
-        return trlt("ptAssignYAML", message)
+        return trlt("TransitAssignment", message)

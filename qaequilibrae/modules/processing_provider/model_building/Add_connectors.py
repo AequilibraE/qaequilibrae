@@ -14,7 +14,7 @@ class AddConnectors(QAequilibraEProcessingAlgorithm):
             "addcentroidconnector",
             self.tr("Add centroid connectors"),
             self.tr("Model building"),
-            "Model building",
+            "model_building",
             self.tr("Adds centroid connectors for one or all modes."),
             ["centroid", "connector", "network"],
         )

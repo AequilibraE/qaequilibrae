@@ -5,19 +5,19 @@ from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraEProcessingAlgorithm
 
 
-class TrafficAssignYAML(QAequilibraEProcessingAlgorithm):
+class TrafficAssignment(QAequilibraEProcessingAlgorithm):
 
     def __init__(self):
         from qaequilibrae.modules.menu_actions.action_traffic_assignment import run_traffic_assig
 
         super().__init__(
             partial(run_traffic_assig, get_aequilibrae_menu_instance()),
-            "assignmentfromyaml",
+            "traffic_assignment",
             self.tr("Traffic assignment from file"),
-            self.tr("3. Paths and assignment"),
-            "pathsandassignment",
+            self.tr("Traffic assignment"),
+            "traffic_assignment",
             "Runs traffic assignment",
-            ["traffic assignment", "assignment"],
+            ["traffic assignment", "traffic", "assignment"],
         )
 
     # def shortHelpString(self):
@@ -28,7 +28,7 @@ class TrafficAssignYAML(QAequilibraEProcessingAlgorithm):
     #     return "\n".join(help_messages)
 
     def createInstance(self):
-        return TrafficAssignYAML()
+        return TrafficAssignment()
 
     def tr(self, message):
-        return trlt("TrafficAssignYAML", message)
+        return trlt("TrafficAssignment", message)

@@ -9,8 +9,8 @@ from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
 
 from qaequilibrae.modules.common_tools import PandasModel
 from qaequilibrae.modules.matrix_procedures import list_matrices
-from qaequilibrae.modules.public_transport_procedures.new_period_dialog import NewPeriodDialog
-from qaequilibrae.modules.public_transport_procedures.transit_assignment_procedure import TransitAssignProcedure
+from qaequilibrae.modules.transit_procedures.new_period_dialog import NewPeriodDialog
+from qaequilibrae.modules.transit_procedures.transit_assignment_procedure import TransitAssignProcedure
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_skimming_assignment.ui"))
 

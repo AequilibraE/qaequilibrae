@@ -166,7 +166,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         return self.tr("Trip length distribution")
 
     def group(self) -> str:
-        return self.tr("2. Data")
+        return self.tr("Data")
 
     def groupId(self) -> str:
         return "data"
