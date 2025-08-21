@@ -69,10 +69,10 @@ class CollapseLinks(QgsProcessingAlgorithm):
         return self.tr("Collapse links")
 
     def group(self) -> str:
-        return self.tr("5. Network")
+        return self.tr("Model building")
 
     def groupId(self) -> str:
-        return "network"
+        return "model_building"
 
     def shortHelpString(self):
         return self.tr("This tool collapses links into nodes, adjusting the network in the neighborhood.")

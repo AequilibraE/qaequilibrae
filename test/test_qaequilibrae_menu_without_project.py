@@ -27,6 +27,26 @@ def check_if_new_active_window_matches_class(qtbot, windowClass):
         assert QApplication.activeWindow() is None, "Dialog window did not close properly"
 
 
+def test_open_project_menu(ae, qtbot):
+    """Testing open project menu
+    TODO: find a way to capture and close the open QFileDialog"""
+    # def handle_trigger():
+    #     check_if_new_active_window_matches_class(qtbot, QFileDialog)
+    action = ae.menuActions["Project"][0]
+    assert action.text() == "Open project", "Wrong text content"
+    # QTimer.singleShot(10, handle_trigger)
+    # action.trigger()
+
+
+def test_run_module_menu(ae, qtbot):
+    action = next((a for a in ae.menuActions["Project"] if a.text() == "Run procedures"), None)
+    assert action is not None, "Menu action 'Run procedures' not found"
+    assert action.text() == "Run procedures", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[3][0] == "Error:You need to load a project first", "Level 3 error message is missing"
+
+
 def test_trip_distribution_menu(ae, qtbot):
     action = ae.menuActions["Trip distribution"][0]
     assert action.text() == "Trip distribution", "Wrong text content"

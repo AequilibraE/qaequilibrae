@@ -5,25 +5,23 @@ from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraEProcessingAlgorithm
 
 
-class SimpleTag(QAequilibraEProcessingAlgorithm):
+class StackedBandwidth(QAequilibraEProcessingAlgorithm):
 
     def __init__(self):
-        from qaequilibrae.modules.menu_actions import run_tag
+        from qaequilibrae.modules.menu_actions import run_stacked_bandwidths
 
         super().__init__(
-            partial(run_tag, get_aequilibrae_menu_instance()),
-            "simple_tag",
-            self.tr("Simple tag"),
+            partial(run_stacked_bandwidths, get_aequilibrae_menu_instance()),
+            "stacked_bandwidths",
+            self.tr("Stacked bandwidth"),
             "GIS",
             "gis_procedures",
             "",
-            [
-                "tag",
-            ],
+            ["bandwidth", "visualization"],
         )
 
     def createInstance(self):
-        return SimpleTag()
+        return StackedBandwidth()
 
     def tr(self, message):
-        return trlt("SimpleTag", message)
+        return trlt("StackedBandwidth", message)

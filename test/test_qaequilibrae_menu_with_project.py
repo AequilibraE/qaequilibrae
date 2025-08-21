@@ -27,6 +27,26 @@ def check_if_new_active_window_matches_class(qtbot, windowClass):
         assert QApplication.activeWindow() is None, "Dialog window did not close properly"
 
 
+def test_load_project(ae_with_project):
+    messagebar = ae_with_project.iface.messageBar()
+    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert ae_with_project.project is not None, "project should be loaded"
+
+
+def test_run_module_menu(coquimbo_project, qtbot):
+    from qaequilibrae.modules.project_procedures import RunModuleDialog
+
+    def handle_trigger():
+        check_if_new_active_window_matches_class(qtbot, RunModuleDialog)
+
+    action = coquimbo_project.menuActions["Project"][1]
+    assert action.text() == "Run procedures", "Wrong text content"
+    QTimer.singleShot(10, handle_trigger)
+    action.trigger()
+    messagebar = coquimbo_project.iface.messageBar()
+    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+
+
 def test_trip_distribution_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.distribution_procedures import DistributionModelsDialog
 

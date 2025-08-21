@@ -5,25 +5,23 @@ from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraEProcessingAlgorithm
 
 
-class SimpleTag(QAequilibraEProcessingAlgorithm):
+class DesireLines(QAequilibraEProcessingAlgorithm):
 
     def __init__(self):
-        from qaequilibrae.modules.menu_actions import run_tag
+        from qaequilibrae.modules.menu_actions import run_desire_lines
 
         super().__init__(
-            partial(run_tag, get_aequilibrae_menu_instance()),
-            "simple_tag",
-            self.tr("Simple tag"),
+            partial(run_desire_lines, get_aequilibrae_menu_instance()),
+            "desire_lines",
+            self.tr("Desire lines"),
             "GIS",
             "gis_procedures",
             "",
-            [
-                "tag",
-            ],
+            ["line", "desire", "delaunay"],
         )
 
     def createInstance(self):
-        return SimpleTag()
+        return DesireLines()
 
     def tr(self, message):
-        return trlt("SimpleTag", message)
+        return trlt("DesireLines", message)

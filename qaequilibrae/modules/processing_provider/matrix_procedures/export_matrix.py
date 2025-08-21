@@ -28,7 +28,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 "output_format",
                 self.tr("File format"),
-                options=[".csv", ".omx", ".aem"],
+                options=[".csv", ".omx"],
                 defaultValue=".csv",
             )
         )
@@ -40,7 +40,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
 
         from aequilibrae.matrix import AequilibraeMatrix
 
-        file_format = ["csv", "omx", "aem"]
+        file_format = ["csv", "omx"]
         format = file_format[parameters["output_format"]]
         file_name, ext = parameters["matrix_path"].split("/")[-1].split(".")
         dst_path = join(parameters["file_path"], f"{file_name}.{format}")
@@ -51,7 +51,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
         if ext == "omx":
             if format == "omx":
                 mat.create_from_omx(omx_path=parameters["matrix_path"], **kwargs)
-            elif format in ["csv", "aem"]:
+            elif format in ["csv"]:
                 mat.create_from_omx(parameters["matrix_path"])
                 mat.export(dst_path)
         elif ext == "aem":
@@ -75,7 +75,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
         return "data"
 
     def shortHelpString(self):
-        return self.tr("Exports an existing *.omx or *.aem matrix file into *.csv, *.aem or *.omx")
+        return self.tr("Exports an existing matrix file into *.csv or *.omx")
 
     def createInstance(self):
         return ExportMatrix()

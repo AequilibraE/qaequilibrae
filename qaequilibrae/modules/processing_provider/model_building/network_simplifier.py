@@ -97,10 +97,10 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
         return self.tr("Network simplifier")
 
     def group(self) -> str:
-        return self.tr("5. Network")
+        return self.tr("Model building")
 
     def groupId(self) -> str:
-        return "network"
+        return "model_building"
 
     def shortHelpString(self):
         help_messages = [

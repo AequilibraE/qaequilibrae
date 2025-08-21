@@ -19,6 +19,7 @@ from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
 
 from qaequilibrae import set_aequilibrae_menu_instance
 from qaequilibrae.message import messages
+from qaequilibrae.modules.menu_actions import run_load_project, run_module
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs
 from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths, run_pt_explore
 from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig
@@ -94,6 +95,7 @@ class AequilibraEMenu:
             QCoreApplication.installTranslator(self.translator)
 
         self.menuActions = {
+            self.tr("Project"): [],
             self.tr("Trip distribution"): [],
             self.tr("Path computation"): [],
             self.tr("Traffic assignment"): [],
@@ -102,6 +104,13 @@ class AequilibraEMenu:
             "GIS": [],
             "AequilibraE": [],
         }
+
+        # # # ########################################################################
+        # # # #######################  PROJECT SUB-MENU  #############################
+        mmenu = self.tr("Project")
+        self.add_menu_action(mmenu, self.tr("Open project"), partial(run_load_project, self))
+        self.add_menu_action(mmenu, self.tr("Run procedures"), partial(run_module, self))
+        self.add_menu_action(mmenu, self.tr("Close project"), self.run_close_project)
 
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -134,7 +143,6 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         # # # ###################  GIS TOOLS SUB-MENU  ###############################
-
         self.add_menu_action("GIS", self.tr("Desire lines"), partial(run_desire_lines, self))
         self.add_menu_action("GIS", self.tr("Stacked bandwidth"), partial(run_stacked_bandwidths, self))
         self.add_menu_action("GIS", self.tr("Scenario comparison"), partial(run_scenario_comparison, self))

@@ -20,19 +20,18 @@ class Provider(QgsProcessingProvider):
         self.__load_model_building()
         self.__load_matrix_procedures()
         self.__load_routing_procedures()
-        self.__load_network()
         self.__load_traffic_assignment_procedures()
         self.__load_transit_procedures()
         self.__load_gis()
 
     def __load_project_procedures(self):
 
-        from .project_procedures.open_project import OpenProject
-        from .project_procedures.create_examples import CreateExamples
-        from .project_procedures.load_parameters import LoadProjectParameters
-        from .project_procedures.load_log import LoadProjectLogFile
-        from .project_procedures.run_module import RunProcedures
         from .project_procedures.close_project import CloseProject
+        from .project_procedures.create_examples import CreateExamples
+        from .project_procedures.load_log import LoadProjectLogFile
+        from .project_procedures.load_parameters import LoadProjectParameters
+        from .project_procedures.open_project import OpenProject
+        from .project_procedures.run_module import RunProcedures
 
         self.addAlgorithm(OpenProject())
         self.addAlgorithm(CreateExamples())
@@ -43,45 +42,41 @@ class Provider(QgsProcessingProvider):
 
     def __load_model_building(self):
 
+        from .model_building.Add_connectors import AddConnectors
+        from .model_building.add_links_from_layer import AddLinksFromLayer
+        from .model_building.add_zones import AddZones
+        from .model_building.collapse_links import CollapseLinks
+        from .model_building.network_simplifier import NetworkSimplifier
+        from .model_building.network_preparation import PrepareNetwork
         from .model_building.project_from_layer import ProjectFromLayer
         from .model_building.project_from_OSM import ProjectFromOSM
-        from .model_building.Add_connectors import AddConnectors
-        from .model_building.network_preparation import PrepareNetwork
-        from .model_building.add_zones import AddZones
 
+        self.addAlgorithm(AddConnectors())
+        self.addAlgorithm(AddLinksFromLayer())
+        self.addAlgorithm(AddZones())
+        self.addAlgorithm(CollapseLinks())
+        self.addAlgorithm(NetworkSimplifier())
+        self.addAlgorithm(PrepareNetwork())
         self.addAlgorithm(ProjectFromLayer())
         self.addAlgorithm(ProjectFromOSM())
-        self.addAlgorithm(AddConnectors())
-        self.addAlgorithm(PrepareNetwork())
-        self.addAlgorithm(AddZones())
 
     def __load_matrix_procedures(self):
 
-        from .matrix_procedures.add_matrix_from_layer import MatrixFromLayer
         from .matrix_procedures.export_matrix import ExportMatrix
         from .matrix_procedures.matrix_calculator import MatrixCalculator
+        from .matrix_procedures.add_matrix_from_layer import MatrixFromLayer
+        from .matrix_procedures.trip_length_distribution import TripLengthDistribution
 
-        self.addAlgorithm(MatrixFromLayer())
         self.addAlgorithm(ExportMatrix())
         self.addAlgorithm(MatrixCalculator())
+        self.addAlgorithm(MatrixFromLayer())
+        self.addAlgorithm(TripLengthDistribution())
 
     def __load_routing_procedures(self):
 
         from .routing_procedures.tsp import RunTSP
 
         self.addAlgorithm(RunTSP())
-
-    def __load_network(self):
-
-        from .network.add_links_from_layer import AddLinksFromLayer
-        from .network.collapse_links import CollapseLinks
-        from .network.network_simplifier import NetworkSimplifier
-        from .network.trip_length_distribution import TripLengthDistribution
-
-        self.addAlgorithm(AddLinksFromLayer())
-        self.addAlgorithm(CollapseLinks())
-        self.addAlgorithm(NetworkSimplifier())
-        self.addAlgorithm(TripLengthDistribution())
 
     def __load_traffic_assignment_procedures(self):
 
@@ -91,17 +86,25 @@ class Provider(QgsProcessingProvider):
 
     def __load_transit_procedures(self):
 
-        from .transit_procedures.transit_assignment import TransitAssignment
+        from .transit_procedures.explore_transit import ExploreTransit
         from .transit_procedures.import_gtfs import ImportGTFS
+        from .transit_procedures.transit_assignment import TransitAssignment
 
-        self.addAlgorithm(TransitAssignment())
+        self.addAlgorithm(ExploreTransit())
         self.addAlgorithm(ImportGTFS())
+        self.addAlgorithm(TransitAssignment())
 
     def __load_gis(self):
 
+        from .gis.desire_lines import DesireLines
+        from .gis.scenario_comparison import ScenarioComparison
         from .gis.simple_tag import SimpleTag
+        from .gis.stacked_bandwidth import StackedBandwidth
 
+        self.addAlgorithm(DesireLines())
+        self.addAlgorithm(ScenarioComparison())
         self.addAlgorithm(SimpleTag())
+        self.addAlgorithm(StackedBandwidth())
 
     def id(self):
         """The ID used for identifying the provider."""
