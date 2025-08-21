@@ -14,8 +14,8 @@ class ExploreTransit(QAequilibraEProcessingAlgorithm):
             partial(run_pt_explore, get_aequilibrae_menu_instance()),
             "explore_transit",
             self.tr("Explore transit"),
-            self.tr("Public Transport"),
-            "public_transport",
+            self.tr("Transit"),
+            "transit",
             "",
             ["public transport", "transit", "explore", "view"],
         )

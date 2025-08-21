@@ -63,14 +63,16 @@ class Provider(QgsProcessingProvider):
     def __load_matrix_procedures(self):
 
         from .matrix_procedures.export_matrix import ExportMatrix
+        from .matrix_procedures.import_matrices import ImportMatrix
         from .matrix_procedures.matrix_calculator import MatrixCalculator
-        from .matrix_procedures.add_matrix_from_layer import MatrixFromLayer
         from .matrix_procedures.trip_length_distribution import TripLengthDistribution
+        from .matrix_procedures.visualize_data import VisualizeData
 
         self.addAlgorithm(ExportMatrix())
+        self.addAlgorithm(ImportMatrix())
         self.addAlgorithm(MatrixCalculator())
-        self.addAlgorithm(MatrixFromLayer())
         self.addAlgorithm(TripLengthDistribution())
+        self.addAlgorithm(VisualizeData())
 
     def __load_routing_procedures(self):
 
@@ -112,7 +114,7 @@ class Provider(QgsProcessingProvider):
 
     def name(self):
         """The human friendly name of the plugin in Processing."""
-        return "QAequilibraE"
+        return "AequilibraE"
 
     def icon(self):
         """SQIcon used for the provider inside the Processing toolbox."""

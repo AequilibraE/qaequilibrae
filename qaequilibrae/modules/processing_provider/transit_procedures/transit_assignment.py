@@ -14,10 +14,10 @@ class TransitAssignment(QAequilibraEProcessingAlgorithm):
             partial(run_pt_skim, get_aequilibrae_menu_instance()),
             "transit_assignment",
             self.tr("Transit assignment"),
-            self.tr("Public Transport"),
-            "public_transport",
+            self.tr("Transit"),
+            "transit",
             "Runs transit assignment",
-            ["public transport", "transit", "assignment"],
+            ["public transport", "transit", "assignment", "skimming", "skim"],
         )
 
     def createInstance(self):

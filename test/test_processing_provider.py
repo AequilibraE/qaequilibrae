@@ -7,12 +7,7 @@ import pytest
 from aequilibrae import Project
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.utils.create_example import create_example
-from qgis.core import (
-    QgsApplication,
-    QgsProcessingContext,
-    QgsProcessingFeedback,
-    QgsProject,
-)
+from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingFeedback, QgsProject
 
 from qaequilibrae.modules.processing_provider.matrix_procedures.export_matrix import ExportMatrix
 from qaequilibrae.modules.processing_provider.matrix_procedures.matrix_calculator import MatrixCalculator
@@ -39,7 +34,7 @@ def test_provider_exists(qgis_app):
 
     registry = QgsApplication.processingRegistry()
     provider_names = [p.name().lower() for p in registry.providers()]
-    assert "qaequilibrae" in provider_names
+    assert "aequilibrae" in provider_names
 
 
 @pytest.mark.parametrize("format", [0, 1])

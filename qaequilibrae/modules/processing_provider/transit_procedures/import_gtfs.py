@@ -14,10 +14,10 @@ class ImportGTFS(QAequilibraEProcessingAlgorithm):
             partial(run_import_gtfs, get_aequilibrae_menu_instance()),
             "import_gtfs",
             self.tr("Import GTFS"),
-            self.tr("Public Transport"),
-            "public_transport",
+            self.tr("Transit"),
+            "transit",
             self.tr("Adds transit routes from a GTFS to an existing AequilibraE project."),
-            ["public transport", "GTFS", "transit"],
+            ["public transport", "import", "GTFS", "transit"],
         )
 
     def createInstance(self):

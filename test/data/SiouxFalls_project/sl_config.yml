@@ -5,18 +5,6 @@ traffic_classes:
         network_mode: c
         pce: 1.0
         blocked_centroid_flows: False
-        skims:
-            free_flow_time: [final]
-            distance: [blended]
-    - motorcycle:
-        matrix_name: demand_mc
-        matrix_core: motorcycle
-        network_mode: c
-        pce: 0.2
-        blocked_centroid_flows: False
-        skims:
-            free_flow_time: [final, blended]
-            distance: [final, blended]
 assignment:
     algorithm: bfw
     max_iter: 10
@@ -29,8 +17,8 @@ assignment:
     result_name: result_test_from_yaml
 select_links:
     output_name: select_link_analysis_from_yaml
-    save_matrix: False
-    save_result: False
+    save_matrix: True
+    save_result: True
     selection:
         from_node_1: [[1, 1], [2, 1]]
         random_nodes: [[3, 1], [5, 1]]

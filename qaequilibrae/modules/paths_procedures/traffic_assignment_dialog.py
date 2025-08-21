@@ -24,6 +24,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 logger = logging.getLogger("AequilibraEGUI")
 
 
+# TODO: Add a button to export configurations as a yaml file
 class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
@@ -124,14 +125,15 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.select_link_list.cellDoubleClicked.connect(self.__remove_select_link_item)
         self.but_clean.clicked.connect(self.__clean_link_selection)
 
-    def __clean_class_configs(self):
-        objects = [self.cob_matrices]
-        for obj in objects:
-            obj.clear()
+    def _browse_path(self):
+
+        file_path, _ = GetOutputFileName(QtWidgets.QDialog(), "Configuration file", ["YAML (*.yml)"], ".yml", self.path)
+        return file_path
 
     def _load_configs(self):
         # Let's open the YAML config file
-        file_path, _ = GetOutputFileName(QtWidgets.QDialog(), "Configuration file", ["YAML (*.yml)"], ".yml", self.path)
+        file_path = self._browse_path()
+
         if file_path:
             with open(file_path, "r") as f:
                 params = yaml.safe_load(f)
@@ -152,7 +154,30 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
                         self.vot_setter.setValue(value["vot"])
                     self._create_traffic_class(False, value["network_mode"])
 
-            # Populate Skimming tab
+                    # Populate Skimming tab - we'll reproduce part of the code in `_add_skimming` here
+                    if "skims" in value:
+                        for skim, config in value["skims"].items():
+                            table = self.skim_list_table
+                            idx = table.rowCount()
+                            table.setRowCount(idx + 1)
+                            for i, val in enumerate([key, skim]):
+                                item = QTableWidgetItem(val)
+                                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                                table.setItem(idx, i, item)
+
+                            status = True if "final" in config else False
+                            last_chb = QCheckBox()
+                            last_chb.setChecked(status)
+                            table.setCellWidget(idx, 2, last_chb)
+
+                            status = True if "blended" in config else False
+                            blended_chb = QCheckBox()
+                            blended_chb.setChecked(status)
+                            table.setCellWidget(idx, 3, blended_chb)
+
+                            traffic_class = self.traffic_classes[key]
+                            self.skims[traffic_class._id].append(skim)
+                        self.skimming = True
 
             # Populate Critical Analysis tab
             if "select_links" in params:
