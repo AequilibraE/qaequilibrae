@@ -1,12 +1,9 @@
 Processing Tools
 ================
 
-Some of AequilibraE's plugin functionalities are also available in a processing plugin.
+AequilibraE's plugin functionalities are also available in a processing plugin.
 The processing plugin is automatically installed with QAequilibraE and allows you to perform
-several tasks, such as creating project from links, exporting matrices, and much more,
-as a batch process. To use the processing plugin, you don't have to directly open
-the AequilibraE project, nor have the widget open, although it is mandatory to have 
-AequilibraE installed.
+several tasks, such as creating project from links, exporting matrices, and much more.
 
 To find AequilibraE's processing plugin, click on the **Processing** panel and select **Toolbox**.
 You can also use the available QGIS shortcut to open the Toolbox window.
@@ -17,7 +14,7 @@ You can also use the available QGIS shortcut to open the Toolbox window.
 
 At the bottom of the window, you'll find the AequilibraE logo and the available functions.
 The functions are divided into groups, following the same logic as the AequilibraE widget
-menu. Notice that not all AequilibraE functionalities are available for processing, and not
+menu. Notice that all AequilibraE functionalities are available for processing, but not
 all processing tools exist at the main AequilibraE menu.
 
 .. subfigure:: AB
@@ -30,6 +27,63 @@ all processing tools exist at the main AequilibraE menu.
         :alt: Toolbox Detailed
 
 In the following subsections, we'll go over all functionalities.
+
+Project
+-------
+
+.. TODO: 
+
+.. _create_example:
+
+Create example
+~~~~~~~~~~~~~~
+
+AequilibraE has three different example sets one can use as learning tool, and they were all
+made available within the QGIS ecosystem.
+
+Within **Project > Create example**, select one of the available models, the desired
+location of the output folder, and just press *Create*. The window will close automatically
+and you can open the project folder in the Project tab.
+
+.. image:: ../images/project_create_example.png
+    :align: center
+    :alt: utils create example
+
+.. _parameters_file:
+
+Parameters
+~~~~~~~~~~
+
+The parameters file is part of the AequilibraE package for Python, so all the
+reference documentation for this section can be found in its
+`documentation page <https://aequilibrae.com/latest/python/modeling_with_aequilibrae/parameter_file.html>`_.
+
+The QGIS plugin, however, has a nice interface to view and edit the parameters
+file, which can be accessed through **Project > Parameters**. This
+interface, depicted below, allows one to edit and validate parameters before
+submitting them as the new parameter file for all AequilibraE procedures.
+
+.. image:: ../images/parameters_menu.png
+    :width: 704
+    :align: center
+    :alt: parameters menu
+
+.. _logfile:
+
+Log file
+~~~~~~~~
+
+The log file contains information about which actions took place and when they happened.
+For example, after you :ref:`create a project from OSM  <create-proj-from-osm>`,
+if you access the log file, you are going to see something like the figure below,
+containing the sequence of steps followed to import the OSM network. If you wish to
+access this file later on, it is also possible to save this log file locally in your machine,
+using the **save to disk** button in the lower left corner of the log file box.
+
+.. image:: ../images/project-logfile.png
+    :width: 704
+    :align: center
+    :alt: proj logfile
 
 Model Building
 --------------
@@ -236,6 +290,48 @@ The code block below contains an example of a valid YAML configuration.
         - from_node_1: [[1, 1], [2, 1]]
         - random_nodes: [[3, 1], [5, 1]]
 
+Routing
+-------
+
+AequilibraE's routing allows the user to run a Travelling Salesman Problem (TSP),
+using a selected set of nodes or the centroids of a network. 
+
+Its usage is straightforward. For Sioux Falls, for example, we would select the
+centroids of the network, and minimize the distance travelled by car. It is also
+possible to choose the start node of our TSP (we'll let node_id 1 to be the starting
+node, but it could be any available node), and indicate we want to see the result in
+a new layer.
+
+Our prompt box would look like this:
+
+.. image:: ../images/tsp-prompt-box.png
+    :align: center
+    :alt: TSP prompt box
+
+When AequilibraE is done solving the TSP, it provides a procedure report, like the
+one in the figure below. You can export the procedure report in a .txt file if you 
+wish, by clicking on the lower right button in the window. Otherwise, you can just
+close this window (the TSP sequence can be found in the TSP stops layer).
+
+.. image:: ../images/tsp-procedure-report.png
+    :align: center
+    :alt: TSP procedure report
+
+And as we chose to display the result in a new layer, it would look like the figure below. 
+Please note that the TSP stops are labeled according their sequence.
+
+.. image:: ../images/tsp-solution.png
+    :align: center
+    :alt: TSP solution
+
+.. note::
+
+    TSP is a well-known optimization problem and it has already been implemented in several
+    different software and programming languages. However, the main problem related to
+    TSP is related to its size (hence its complexity). This means that as we increase the 
+    number of stops we want to travel to, the software will take much longer to provide you
+    with an answer, and in some cases, it might also crash.
+
 Public Transport
 ----------------
 Create transit graph
@@ -279,8 +375,8 @@ know which calendar date you are going to use.
     feed, you can load your GTFS file at their validator and it will provide you useful 
     information, including calendar date ranges.
 
-Transit assignment from file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Transit assignment
+~~~~~~~~~~~~~~~~~~
 Transit assignment from file is quite similar to the traffic assignment presented above,
 with the remarkable differences related to the transit graph and assignment, as shown in
 AequilibraE. The YAML file setup includes the project location in your machine, as well as

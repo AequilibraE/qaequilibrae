@@ -75,6 +75,8 @@ involves a LOT of stuff, but you can look at an
 ..     <iframe width="560" height="315" src="https://www.youtube.com/embed/oFi02QWYwn8" frameborder="0" allow="accelerometer;
 ..     autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
+.. _link_direction:
+
 Direction
 ---------
 
