@@ -13,19 +13,12 @@ class TrafficAssignment(QAequilibraEProcessingAlgorithm):
         super().__init__(
             partial(run_traffic_assig, get_aequilibrae_menu_instance()),
             "traffic_assignment",
-            self.tr("Traffic assignment from file"),
+            self.tr("Traffic assignment"),
             self.tr("Traffic assignment"),
             "traffic_assignment",
             "Runs traffic assignment",
-            ["traffic assignment", "traffic", "assignment"],
+            ["traffic", "assignment"],
         )
-
-    # def shortHelpString(self):
-    #     help_messages = [
-    #         self.tr("Runs traffic assignment using a YAML configuration file."),
-    #         self.tr("Example of valid configuration is provided in the plugin documentation."),
-    #     ]
-    #     return "\n".join(help_messages)
 
     def createInstance(self):
         return TrafficAssignment()

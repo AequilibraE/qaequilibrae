@@ -25,6 +25,7 @@ class Provider(QgsProcessingProvider):
         self.__load_transit_procedures()
         self.__load_gis()
         self.__load_paths_procedures()
+        self.__load_distribution_procedures()
 
     def __load_project_procedures(self):
 
@@ -125,6 +126,12 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(ImpedanceMatrix())
         self.addAlgorithm(ShortestPath())
         self.addAlgorithm(SkimViewer())
+
+    def __load_distribution_procedures(self):
+
+        from .distribution_procedures.trip_distribution import TripDistribution
+
+        self.addAlgorithm(TripDistribution())
 
     def id(self):
         """The ID used for identifying the provider."""
