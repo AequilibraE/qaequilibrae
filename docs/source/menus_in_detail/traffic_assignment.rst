@@ -61,72 +61,84 @@ we want, and the output folder.
     :align: center
     :alt: Traffic assignment perform assignment tab
 
-Let's run a traffic assignment for Sioux Falls. You don't have to worry with demand matrices:
-we'll use one of the matrices already available in the model.
-
 Basic workflow
 --------------
+
+Let's run a traffic assignment for Sioux Falls. You don't have to worry with demand matrices:
+we'll use one of the matrices already available in the model.
 
 We start selecting one of the available matrices and the matrix core that will be used for
 computation. We must click on the matrix core to select it (2), otherwise the traffic class
 creation will fail. As this is a single class traffic assignment, we'll use the default
 configurations for network mode and assignment class name (3 and 4). For the Sioux Falls
 example, we don't want to block flow through centroids because regular nodes of the network
-are centroids. When you finish, just hit the *Add Traffic class to assignment* button. You
-will notice that your traffic class will automatically appear at the table at the right-hand
-side of the screen.
+are centroids (5). When you finish, just hit the *Add Traffic class to assignment* button (6).
+You will notice that your traffic class will automatically appear at the table at the
+right-hand side of the screen.
 
-.. image:: ../images/traffic_open_matrix.png
+.. image:: ../images/traffic_assignment_1.png
     :align: center
-    :alt: Calling assignment
+    :alt: Configure traffic classes for single class assignment
 
-To select skims, we need to choose which fields/modes we will skim
+To select skims, we need to choose which fields/modes we will skim. If no mode appears
+at the class field, you should have missed any configuration on the traffic classes tab
+before. Let's continue with 'free_flow_time' and 'distance'. We select the field to skim
+(1) and the class (2) and add it (3) to the skimming table, at the bottom. Let's skim
+'free_flow_time' only for the last iteration by untoggling the 'blended' check box (4).
 
-.. image:: ../images/skim_field_selection.png
+.. image:: ../images/traffic_assignment_2.png
     :align: center
-    :alt: Skim selection
+    :alt: Traffic assignment skim selection part 1
 
-And if we want the skim for the last iteration (like we would for time) or if we
-want it averaged out for all iterations (properly averaged, that is).
+Let's repeat the skim selection process for 'distance', but now we'll use the blended
+results.
 
-.. image:: ../images/skim_blended_versus_final.png
+.. image:: ../images/traffic_assignment_3.png
     :align: center
-    :alt: Skim iterations
+    :alt: Traffic assignment skim selection part 2
 
-Next, we can choose to run a select link analysis. Its default configuration is not
+If you want to have skims for both final and blended, you don't have to untoggle any
+check boxes!
+
+Then, we can choose to run a select link analysis. Its default configuration is not
 to select any links, so we have to toggle its *"Set select link analysis"* button (1).
 The creation of queries for analysis consists in: create a name for the query,
 select the travel direction, add the link ID, and click on *Add to query*, to temporarily
 save the data to the query.
 
-.. image:: ../images/select_link_2.png
+.. image:: ../images/traffic_assignment_4.png
     :align: center
-    :alt: Select link analysis 2
+    :alt: Configure select link analysis on traffic assignment
 
 Adding more links to the previous query is straightforward. Select the direction
 and the link ID, and press *Add to query* once again.
 
-.. image:: ../images/select_link_3.png
+.. image:: ../images/traffic_assignment_5.png
     :align: center
-    :alt: Select link analysis 3
+    :alt: Add more links to the selection
 
 When we are done with the current query, we click on *Save query*, and notice that
-the query with the selected links is going to appear in the right-hand side table.
+the query with the selected links is going to appear in the right-hand side queries table.
 
-.. image:: ../images/select_link_4.png
+.. image:: ../images/traffic_assignment_6.png
     :align: center
-    :alt: Select link analysis 4
+    :alt: Save select link query
 
 To finish the select link analysis step, we choose one name to save one or both of
 the matrix and results files.
 
-.. image:: ../images/select_link_5.png
+.. image:: ../images/traffic_assignment_7.png
     :align: center
-    :alt: Select link analysis 5
+    :alt: Set output name for select link analysis
 
-The final step is to setup the assignment itself.
+The final step is to setup the assignment itself, by selecting the algorithms, setting up
+the relative gap and maximum number of iterations, volume-delay function, network information,
+and the assignment output name. When configuring the parameters of the VDF function, it is
+possible to use a value by typing it or an existing field. When configurations are done, just
+click on the *"Assign"* button and wait for the results. When QAequilibraE finishes the
+assignment procedure, the traffic assignment window automatically close.
 
-.. image:: ../images/setup_assignment.png
+.. image:: ../images/traffic_assignment_8.png
     :align: center
     :alt: Setup assignment
 
@@ -134,16 +146,18 @@ The final step is to setup the assignment itself.
 
 The result of the traffic assignment we just performed is stored in the results database
 within the project folder. It can be easily accessed and loaded by clicking
-**Data > Visualize data**, and a project data window will open. Just click on the
-*Results* tab, select the desired result, let the *Join with layer* option checked,
-and click in the *Load Result table as data layer* button at the bottom. The result table
-layer will be automatically joined with the links layer.
+**Mapping > Visualize data**, and a project data window will open. Go straight to the
+*Results* tab (1), and select the desired result (2), let the *Join with layer* option checked,
+and click in the *Load Result table as data layer* button at the bottom (3). The result table
+layer will be automatically joined with the links layer and will appear at your QGIS
+mapping canvas area.
 
-.. image:: ../images/data_visualize_data_results-v2.png
+.. image:: ../images/traffic_assignment_9.png
     :align: center
-    :alt: add_layer
+    :alt: Visualize traffic assignment result with link layer
 
-Now we can revisit the instructions for :ref:`siouxfalls-stacked-bandwidth`
+If you want to enhance your data visualization, now we can revisit the instructions for
+:ref:`siouxfalls-stacked-bandwidth`
 
 Creating a YAML configuration file
 ----------------------------------
