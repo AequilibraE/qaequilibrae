@@ -100,7 +100,7 @@ and *node id* that is compatible with your matrix.
     .. image:: ../images/desire_lines_map.png
         :alt: Desire lines
 
-.. _siouxfalls-stacked-bandwidth:
+.. _mapping_stacked_bandwidth:
 
 Stacked Bandwidth
 -----------------
@@ -129,18 +129,21 @@ color box. To add the band, we click on the *"Add band"* button (4). You'll noti
 band configuration is now available at the table and the *"Create bands"* button is enabled.
 Click on it (5) and the links layer in the canvas will automatically be updated.
 
-.. image:: ../images/stacked_bandwidth_solid_color.png
+.. image:: ../images/stacked_bandwidth_with_solid_color.png
     :align: center
     :alt: Add stacked bandwidth with solid color
 
-It is also possible to 
+It is also possible to use color ramps instead of solid colors for plotting your data.
+Select the line layer (1) and the flow variables (2 and 3). Let's select the *"Color ramp"*
+option (4) and configure the ramp (5).
 
 .. image:: ../images/stacked_bandwidth_with_color_ramp_1.png
     :align: center
     :alt: Add stacked bandwidth with color ramp - set up
 
-When the color ramp window opens, configure once again the fields and the color ramp you
-want to use. We'll use the default 'Blues' in this example.
+When the color ramp window opens, configure once again the fields (1) and the color ramp
+you want to use. We'll use the default 'Blues' in this example. Click *"Done"* (2) when
+you finished.
 
 .. image:: ../images/stacked_bandwidth_color_ramp_config.png
     :align: center
@@ -174,10 +177,10 @@ changing the project variables.
     :subcaptions: below
     :align: center
 
-    .. image:: ../images/bandwidth_maps.png
+    .. image:: ../images/stacked_bandwidth_solid_color.png
         :alt: Solid color
     
-    .. image:: ../images/bandwidth_maps.png
+    .. image:: ../images/stacked_bandwidth_color_ramp.png
         :alt: Color ramp
 
 .. _siouxfalls-scenario-comparison:

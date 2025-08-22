@@ -157,7 +157,7 @@ mapping canvas area.
     :alt: Visualize traffic assignment result with link layer
 
 If you want to enhance your data visualization, now we can revisit the instructions for
-:ref:`siouxfalls-stacked-bandwidth`
+:ref:`mapping_stacked_bandwidth`
 
 Creating a YAML configuration file
 ----------------------------------
