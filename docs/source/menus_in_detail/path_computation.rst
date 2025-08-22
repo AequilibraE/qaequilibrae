@@ -1,11 +1,11 @@
-Paths and Assignment
-====================
+Path Computation
+================
 
 From version 0.6, AequilibraE plugin does not require the user to create the graph to perform
 path computation as in previous versions. In this version, as you set up your own configurations,
 the software already computes the graph for you.
 
-.. image:: ../images/menu_paths_and_assignment.png
+.. image:: ../images/path_computation/menu_path_computation.png
     :align: center
     :alt: tab paths and assignment
 
@@ -19,7 +19,7 @@ to see if the network is connected and if paths make sense.
 
 Before computing a path, we go to the configuration screen.
 
-.. image:: ../images/configure_path_computation.png
+.. image:: ../images/path_computation/configure_path_computation.png
     :align: center
     :alt: configure_path_computation
 
@@ -28,7 +28,7 @@ going through centroids (all nodes are centroids), but that is generally not the
 case. For zones with a single connector per zone it is slightly faster to also
 deselect this option, but use this carefully.
 
-.. image:: ../images/path_computation_configuration.png
+.. image:: ../images/path_computation/path_computation_configuration.png
     :align: center
     :alt: path_computation_configuration
 
@@ -37,7 +37,7 @@ compute a path, a new layer with a copy of the links in that path will be
 created and formatted in a noticeable way. You can also select to have links
 selected in the layer, but only one path can be shown at time if you do so.
 
-.. image:: ../images/paths_generated.png
+.. image:: ../images/path_computation/paths_generated.png
     :align: center
     :alt: paths_generated
 
@@ -55,7 +55,7 @@ The main controls, however, are the mode to skim, the field we should minimize
 when computing shortest paths and the fields we should skim when computing those
 paths.
 
-.. image:: ../images/performing_skimming.png
+.. image:: ../images/path_computation/performing_skimming.png
     :align: center
     :alt: performing_skimming
 
@@ -70,7 +70,7 @@ Skim viewer
 The skim viewer tool allows the user to easily visualize network costs, even for metrics
 that weren't skimmed yet. The skim viewer window looks like this:
 
-.. image:: ../images/skim_viewer_dialog.png
+.. image:: ../images/path_computation/skim_viewer_dialog.png
     :align: center
     :alt: Skim viewer dialog
 
@@ -101,20 +101,20 @@ Skim view without joined layer
 For demonstration purposes, we'll use the Coquimbo model for this example. You can go directly to
 the skim viewer and set the configuration, as presented below:
 
-.. image:: ../images/skim_viewer_no_joins.png
+.. image:: ../images/path_computation/skim_viewer_no_joins.png
     :align: center
     :alt: Skim viewer no joins dialog
 
 The output in the map canvas is:
 
-.. image:: ../images/skim_viewer_no_join_first_node.png
+.. image:: ../images/path_computation/skim_viewer_no_join_first_node.png
     :align: center
     :alt: Skim viewer no joins first node
 
 If you select any other node with the skim viewer window open in the background, you will
 notice that the image displayed in the map canvas automatically changes.
 
-.. image:: ../images/skim_viewer_no_join_second_node.png
+.. image:: ../images/path_computation/skim_viewer_no_join_second_node.png
     :align: center
     :alt: Skim viewer no joins other nodes
 
@@ -135,20 +135,20 @@ Let's plot the zones for Sioux Falls, starting at zone ID 5, and using
 *traffic_assignment_result_congested_time* for both the costs and skimming fields. The initial
 configuration looks like this:
 
-.. image:: ../images/skim_viewer_with_joins.png
+.. image:: ../images/path_computation/skim_viewer_with_joins.png
     :align: center
     :alt: Skim viewer with joins dialog
 
 The output in the map canvas will be:
 
-.. image:: ../images/skim_viewer_with_joins_first_zone.png
+.. image:: ../images/path_computation/skim_viewer_with_joins_first_zone.png
     :align: center
     :alt: Skim viewer with joins first zone
 
 If your zone layer is active and you select another zone with the skim viewer window 
 open in the background, you'll notice that the image in the map canvas automatically changes.
 
-.. image:: ../images/skim_viewer_with_joins_second_zone.png
+.. image:: ../images/path_computation/skim_viewer_with_joins_second_zone.png
     :align: center
     :alt: Skim viewer with joins second zone
 

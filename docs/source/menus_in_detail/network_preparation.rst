@@ -38,7 +38,7 @@ note that the field **does NOT need to be named link_id**, as you will have the
 opportunity to indicate your field of choice to contain link ids when it is time
 to create the project.
 
-.. image:: ../images/create_link_id.png
+.. image:: ../images/network/create_link_id.png
     :width: 859
     :align: center
     :alt: Creating Link IDs

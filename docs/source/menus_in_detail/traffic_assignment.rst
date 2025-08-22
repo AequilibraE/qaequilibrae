@@ -6,10 +6,14 @@ Traffic assignment
 Having verified that the network seems to be in order, one can proceed to
 perform traffic assignment, since we have a demand matrix.
 
+.. image:: ../images/traffic_assignment/menu_traffic_assignment.png
+    :align: center
+    :alt: Traffic assignment widget menu
+
 The Traffic Assignment window currently has five tabs. The first one is the *Project* tab
 where you can check the project path and the available modes.
 
-.. image:: ../images/traffic_assignment_project_tab.png
+.. image:: ../images/traffic_assignment/traffic_assignment_project_tab.png
     :align: center
     :alt: Traffic assignment project tab
 
@@ -27,7 +31,7 @@ can be found in the AequilibraE documentation.
     For setting a fixed cost, one **must** have a value fot the *vot* column in the project
     *modes* table.
 
-.. image:: ../images/traffic_assignment_traffic_classes.png
+.. image:: ../images/traffic_assignment/traffic_assignment_traffic_classes.png
     :align: center
     :alt: Traffic assignment traffic classes tab
 
@@ -37,7 +41,7 @@ blended represents the averaged results for all iterations. Just check the desir
 Notice that the Class field only is populated if the traffic classes were properly set in the
 previous step.
 
-.. image:: ../images/traffic_assignment_skimming.png
+.. image:: ../images/traffic_assignment/traffic_assignment_skimming.png
     :align: center
     :alt: Traffic assignment skimming tab
 
@@ -48,7 +52,7 @@ a travel direction, and the link ID. Adding and removing links from queries, and
 should be straightforward. Saving the output matrices and results for select link analysis
 are also configured here.
 
-.. image:: ../images/traffic_assignment_link_criticality.png
+.. image:: ../images/traffic_assignment/traffic_assignment_link_criticality.png
     :align: center
     :alt: Traffic assignment critical analysis tab
 
@@ -57,7 +61,7 @@ function and its *alpha* and *beta* parameters. The fields for link capacity and
 travel time are selected. We also confirm the relative gap and maximum number of iterations
 we want, and the output folder.
 
-.. image:: ../images/traffic_assignment_assignment_tab.png
+.. image:: ../images/traffic_assignment/traffic_assignment_assignment_tab.png
     :align: center
     :alt: Traffic assignment perform assignment tab
 
@@ -76,7 +80,7 @@ are centroids (5). When you finish, just hit the *Add Traffic class to assignmen
 You will notice that your traffic class will automatically appear at the table at the
 right-hand side of the screen.
 
-.. image:: ../images/traffic_assignment_1.png
+.. image:: ../images/traffic_assignment/traffic_assignment_1.png
     :align: center
     :alt: Configure traffic classes for single class assignment
 
@@ -86,14 +90,14 @@ before. Let's continue with 'free_flow_time' and 'distance'. We select the field
 (1) and the class (2) and add it (3) to the skimming table, at the bottom. Let's skim
 'free_flow_time' only for the last iteration by untoggling the 'blended' check box (4).
 
-.. image:: ../images/traffic_assignment_2.png
+.. image:: ../images/traffic_assignment/traffic_assignment_2.png
     :align: center
     :alt: Traffic assignment skim selection part 1
 
 Let's repeat the skim selection process for 'distance', but now we'll use the blended
 results.
 
-.. image:: ../images/traffic_assignment_3.png
+.. image:: ../images/traffic_assignment/traffic_assignment_3.png
     :align: center
     :alt: Traffic assignment skim selection part 2
 
@@ -106,28 +110,28 @@ The creation of queries for analysis consists in: create a name for the query,
 select the travel direction, add the link ID, and click on *Add to query*, to temporarily
 save the data to the query.
 
-.. image:: ../images/traffic_assignment_4.png
+.. image:: ../images/traffic_assignment/traffic_assignment_4.png
     :align: center
     :alt: Configure select link analysis on traffic assignment
 
 Adding more links to the previous query is straightforward. Select the direction
 and the link ID, and press *Add to query* once again.
 
-.. image:: ../images/traffic_assignment_5.png
+.. image:: ../images/traffic_assignment/traffic_assignment_5.png
     :align: center
     :alt: Add more links to the selection
 
 When we are done with the current query, we click on *Save query*, and notice that
 the query with the selected links is going to appear in the right-hand side queries table.
 
-.. image:: ../images/traffic_assignment_6.png
+.. image:: ../images/traffic_assignment/traffic_assignment_6.png
     :align: center
     :alt: Save select link query
 
 To finish the select link analysis step, we choose one name to save one or both of
 the matrix and results files.
 
-.. image:: ../images/traffic_assignment_7.png
+.. image:: ../images/traffic_assignment/traffic_assignment_7.png
     :align: center
     :alt: Set output name for select link analysis
 
@@ -138,7 +142,7 @@ possible to use a value by typing it or an existing field. When configurations a
 click on the *"Assign"* button and wait for the results. When QAequilibraE finishes the
 assignment procedure, the traffic assignment window automatically close.
 
-.. image:: ../images/traffic_assignment_8.png
+.. image:: ../images/traffic_assignment/traffic_assignment_8.png
     :align: center
     :alt: Setup assignment
 
@@ -152,7 +156,7 @@ and click in the *Load Result table as data layer* button at the bottom (3). The
 layer will be automatically joined with the links layer and will appear at your QGIS
 mapping canvas area.
 
-.. image:: ../images/traffic_assignment_9.png
+.. image:: ../images/traffic_assignment/traffic_assignment_9.png
     :align: center
     :alt: Visualize traffic assignment result with link layer
 

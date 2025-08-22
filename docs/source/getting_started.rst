@@ -23,13 +23,13 @@ Go to the Plugins panel and click on **Manage and Install Plugins**.
 
 .. _fig_plugins_menu:
 
-.. image:: images/getting_started_1.png
+.. image:: images/getting_started/getting_started_1.png
     :align: center
     :alt: First step
 
 In the tab *All*, search for QAequilibraE.
 
-.. image:: images/getting_started_2.png
+.. image:: images/getting_started/getting_started_2.png
     :align: center
     :alt: Second step
 
@@ -39,21 +39,21 @@ features. This is necessary because AequilibraE's algorithms rely on compiled
 extensions, but it is against the QGIS's community guidelines to upload binaries
 to the repository.
 
-.. image:: images/getting_started_3.png
+.. image:: images/getting_started/getting_started_3.png
     :align: center
     :alt: Third step
 
 If you select to download the packages, QGIS will freeze for a few seconds before
 showing the image below.
 
-.. image:: images/getting_started_4.png
+.. image:: images/getting_started/getting_started_4.png
     :align: center
     :alt: Fourth step
 
 Otherwise, a message warning about installation problems will be shown, and your
 plugin will be non-functional.
 
-.. image:: images/getting_started_5.png
+.. image:: images/getting_started/getting_started_5.png
     :align: center
     :alt: Fifth step
 
@@ -71,7 +71,7 @@ Select the **Settings** tab and check the box for **Show also experimental plugi
 versions of QAequilibraE made available at the plugin store are not the versions for release
 and are labelled as experimental. 
 
-.. image:: images/getting_started_7.png
+.. image:: images/getting_started/getting_started_7.png
     :align: center
     :alt: Plugins settings tab configuration
 
@@ -86,14 +86,14 @@ with the following data:
 
 Then, just click on the **OK** button.
 
-.. image:: images/getting_started_8.png
+.. image:: images/getting_started/getting_started_8.png
     :align: center
     :alt: Plugins settings repository details
 
 The QGIS is going to validate the provided URL. It should be really quick. You'll notice that
 qaequilibrae is now appearing at your plugin repositories.
 
-.. image:: images/getting_started_9.png
+.. image:: images/getting_started/getting_started_9.png
     :align: center
     :alt: Plugins settings updated plugin repositories
 
@@ -102,7 +102,7 @@ be installed. Click on **qaequilibrae**, and hit the **Upgrade Experimental Plug
 The installation process should be the same as above, as you need to allow the installation
 of external libraries.
 
-.. image:: images/getting_started_10.png
+.. image:: images/getting_started/getting_started_10.png
     :align: center
     :alt: Plugins upgradeable
 
@@ -118,7 +118,7 @@ are stored in **qgis_layer.sqlite**, a database automatically created to store t
 to do is go to the Project panel and select **Save** or **Save as**, indicate where you want to store 
 your project file, and press save!
 
-.. image:: images/getting_started_6.png
+.. image:: images/getting_started/getting_started_6.png
     :align: center
     :alt: Saving file
 

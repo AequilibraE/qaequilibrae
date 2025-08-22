@@ -1,12 +1,12 @@
-Public Transport
-================
+Transit
+=======
 
 QAequilibraE is capable of importing a General Transit Feed Specification (GTFS) feed 
 into its public transport database. 
 
-.. image:: ../images/menu_public_transport.png
+.. image:: ../images/transit/menu_transit.png
     :align: center
-    :alt: tab public transport
+    :alt: Transit widget menu
 
 More details on the **public_transport.sqlite** are discussed on a 
 *per-table* basis in `AequilibraE's documentation <https://www.aequilibrae.com/latest/python/modeling_with_aequilibrae/transit_database/data_model/datamodel.html>`_, 
@@ -23,7 +23,7 @@ to create the public transport database in the project folder, and your QGIS scr
 until the database is created in the project folder. In the GTFS importer window, you can click on
 *Add Feed* and point to the location in your machine where the GTFS data is.
 
-.. image:: ../images/gtfs_1.png
+.. image:: ../images/transit/gtfs_1.png
     :align: center
     :alt: gtfs importer
 
@@ -35,10 +35,10 @@ and you will return to the GTFS importer screen.
     :align: center
     :gap: 3mm
 
-    .. image:: ../images/gtfs_2.png
+    .. image:: ../images/transit/gtfs_2.png
         :alt: basic settings
 
-    .. image:: ../images/gtfs_3.png
+    .. image:: ../images/transit/gtfs_3.png
         :alt: route capacities
 
 Notice that the feed information is now available at the *Feeds to import* table view. The first time you create a 
@@ -49,7 +49,7 @@ Then, you can import your GTFS feed to your project by clicking on **Execute Imp
 A window with a progress bar will open and once it is finished, you can check out the GTFS feed data you just 
 imported in your project folder.
 
-.. image:: ../images/gtfs_4.png
+.. image:: ../images/transit/gtfs_4.png
     :align: center
     :alt: gtfs loaded
 
@@ -59,7 +59,7 @@ the bottom of the page, and it is now possible to **Overwrite routes** or **Add 
 For any of these options, you follow the same steps previously presented to add feed data and load it into the
 project.
 
-.. image:: ../images/gtfs_5.png
+.. image:: ../images/transit/gtfs_5.png
     :align: center
     :alt: gtfs already exists
 
@@ -75,7 +75,7 @@ first tab and it displays a visualization of the periods in the project. It also
 button for you to add a custom period as desired. Notice that, a period representing all day-long 
 (``period_id == 1``) exists by default.
 
-.. image:: ../images/pt_assign_1.png
+.. image:: ../images/transit/pt_assign_1.png
     :align: center
     :alt: periods tab
 
@@ -86,14 +86,14 @@ method (which creates the connector edges between each stops and ODs), the line 
 (which creates a LineString for each edge), and the match graph for mode. The last checkbox indicates
 weather you want to save the assignment result in the database or not.
 
-.. image:: ../images/pt_assign_2.png
+.. image:: ../images/transit/pt_assign_2.png
     :align: center
     :alt: transit graph tab
 
 In the "*Skimming*" tab it is possible to select the fields we want to create skims for, perform
 the actual skimming , and save the result as an \*.OMX file.
 
-.. image:: ../images/pt_assign_3.png
+.. image:: ../images/transit/pt_assign_3.png
     :align: center
     :alt: skimming tab
 
@@ -101,7 +101,7 @@ Finally, in the "*Transit Assignment*" tab, we select the demand matrix and its 
 set for computation, the name of the assignment class, the fields corrresponding to the travel time
 and frequency, and the name we want to save the results table.
 
-.. image:: ../images/pt_assign_4.png
+.. image:: ../images/transit/pt_assign_4.png
     :align: center
     :alt: transit Assignment tab
 
@@ -114,14 +114,14 @@ Skimming with custom period
 In this example we'll create a custom period and its related skimming. We start at the tab "*Periods*"
 clicking on the *Add new period* button. 
 
-.. image:: ../images/pt_assign_5.png
+.. image:: ../images/transit/pt_assign_5.png
     :align: center
     :alt: click on add new period
 
 A new window containing the fields period start, end, and description will open. Add the appropriate
 time and description and hit the *Add period* button at the bottom.
 
-.. image:: ../images/pt_assign_6.png
+.. image:: ../images/transit/pt_assign_6.png
     :align: center
     :alt: add new period window
 
@@ -130,7 +130,7 @@ the periods are numbered in an ascending order based on the number of the last p
 the start/end periods we added before are displayed as seconds at the table. Before continuing, select
 the desired period by clicking on it, otherwise an error will be thrown when skimming/assigning.
 
-.. image:: ../images/pt_assign_7.png
+.. image:: ../images/transit/pt_assign_7.png
     :align: center
     :alt: select period
 
@@ -141,7 +141,7 @@ Let's change the value of line geometry method to "connector project match" beca
 be created using this method. Finally, as Coquimbo doesn't have many walking edges, we'll match the
 graph for cars.
 
-.. image:: ../images/pt_assign_8.png
+.. image:: ../images/transit/pt_assign_8.png
     :align: center
     :alt: skimming graph config
 
@@ -152,7 +152,7 @@ button (see steps 1, 2, and 3). Let's create a name for our output (step 4) and 
 *Perform skimming* button. It will perform the skimming for a unit matrix, and store the result at
 the project matrices' folder.
 
-.. image:: ../images/pt_assign_9.png
+.. image:: ../images/transit/pt_assign_9.png
     :align: center
     :alt: skimmming computation
 
@@ -167,7 +167,7 @@ of an AequilibraE's `example <https://www.aequilibrae.com/develop/python/_auto_e
 
 Let's start the example selecting the default period at the periods table.
 
-.. image:: ../images/pt_assign_10.png
+.. image:: ../images/transit/pt_assign_10.png
     :align: center
     :alt: select default period
 
@@ -176,7 +176,7 @@ To do this, select the "Use existing graph" checkbox. The lower section of the "
 tab will then be disabled. If you change your mind, simply clear the checkbox and configure the
 graph settings as needed.
 
-.. image:: ../images/pt_assign_11.png
+.. image:: ../images/transit/pt_assign_11.png
     :align: center
     :alt: set transit graph for assignment
 
@@ -188,7 +188,7 @@ assignment class (setp 3), and the variables that corresponds to the travel time
 and 5). Lastly, select an appropriate name for the output that will be stored in the results database 
 (step 6) and just hit the *Perform Assignment* button at the bottom.
 
-.. image:: ../images/pt_assign_12.png
+.. image:: ../images/transit/pt_assign_12.png
     :align: center
     :alt: transit assignment
 
@@ -200,13 +200,13 @@ created with Python, you can click on **Public Transport > Explore Transit** to 
 routes. While opening the Transit Navigator, you will notice that the layers *patterns*, *routes*, *stops* and
 *zones* from the GTFS file are going to be displayed in your map canva, and appear in the layers list.
 
-.. image:: ../images/gtfs_7.png
+.. image:: ../images/transit/gtfs_7.png
     :align: center
     :alt: gtfs display layers
 
 The navigator window has five different tabs you can explore.
 
-.. image:: ../images/gtfs_6.png
+.. image:: ../images/transit/gtfs_6.png
     :align: center
     :alt: gtfs transit explorer
 
@@ -228,12 +228,12 @@ information with different symbol colors and sizes. Notice that in the layers li
 routes is shown, as well as a data layer named *stops_metrics*, which contains the available metrics for the existing
 stops.
 
-.. image:: ../images/gtfs_8.png
+.. image:: ../images/transit/gtfs_8.png
     :align: center
     :alt: gtfs view by color
 
 |
 
-.. image:: ../images/gtfs_9.png
+.. image:: ../images/transit/gtfs_9.png
     :align: center
     :alt: gtfs view by thickness

@@ -2,7 +2,12 @@ Route choice
 ============
 
 With the route choice sub-module, it is possible to create choice sets with three different algorithms
-as well as assign trips to the network using the traditional path-size logit. Using this module in QAequilibraE is trivial
+as well as assign trips to the network using the traditional path-size logit. Using this module in
+QAequilibraE is trivial.
+
+.. image:: ../images/route_choice/menu_route_choice.png
+    :align: center
+    :alt: Route choice widget menu
 
 In the tab "Route choice model", we add the model configuration. It consists of
 three different boxes. In the first box "*Choice set generation*", we input parameters for 
@@ -10,7 +15,7 @@ the choice set construction. In the "*Route choice model"*, we add the parameter
 choice model, such as the utility function and the path overlap parameter (PSL/beta) value. Finally, in 
 "*Graph configuration*" we set up the graph used for computation.
 
-.. image:: ../images/route_choice_1.png
+.. image:: ../images/route_choice/route_choice_1.png
     :width: 750
     :align: center
     :alt: Route Choice model tab
@@ -22,7 +27,7 @@ of interest, we encourage you to take a look at
 `Route choice with sub-area analysis <https://www.aequilibrae.com/develop/python/route_choice/_auto_examples/plot_subarea_analysis.html>`_ 
 at AequilibraE's Python documentation and run this task outside QGIS.
 
-.. image:: ../images/route_choice_2.png
+.. image:: ../images/route_choice/route_choice_2.png
     :width: 750
     :align: center
     :alt: Critical analysis tab
@@ -32,15 +37,16 @@ consists of computing route choices between two different nodes and visualizing 
 second box "*Matrix*" allows the selection of a travel demand matrix to be assigned using the route choice specified.
 This option also allows the user to save choice sets to disk while performing route choice.
 
-.. image:: ../images/route_choice_3.png
+.. image:: ../images/route_choice/route_choice_3.png
     :width: 750
     :align: center
     :alt: Workload tab
 
-We can run different workflows with the route choice sub-model. We'll briefly present them.
+Basic workflow
+--------------
 
 Basic route choice
-------------------
+~~~~~~~~~~~~~~~~~~
 
 In this example, we'll perform route choice for the Coquimbo example model for a single OD pair. 
 As this example model does not ship with a demand matrix, we can manually create an open layer and 
@@ -48,7 +54,7 @@ use its data to import the matrix to the project, as shown in :ref:`importing_ma
 
 .. _basic_route_choice_setting:
 
-.. image:: ../images/route_choice_4.png
+.. image:: ../images/route_choice/route_choice_4.png
     :width: 750
     :align: center
     :alt: Basic route choice - tab 0
@@ -68,7 +74,7 @@ Regarding "Graph configuration", we'll use the network for cars and allow flows 
 
 We can now move directly to the "Workload", select origin and destination nodes and click on the *visualize* button.
 
-.. image:: ../images/route_choice_5.png
+.. image:: ../images/route_choice/route_choice_5.png
     :width: 750
     :align: center
     :alt: Basic route choice - tab 1
@@ -80,28 +86,28 @@ generate the route choice set for another OD pair, also setting the desired numb
 .. subfigure:: AB
     :align: center
 
-    .. image:: ../images/route_choice_6_1.png
+    .. image:: ../images/route_choice/route_choice_6_1.png
         :alt: Basic route choice - execute single dialog - first OD pair
 
-    .. image:: ../images/route_choice_6_2.png
+    .. image:: ../images/route_choice/route_choice_6_2.png
         :alt: Basic route choice - execute single dialog - new OD pair
 
 After a few seconds, the output visualization for the routes is shown in the map canvas and we
 can close the Execute Single window. The figure below presents the route choice sets, in which
 the line width corresponds to the probability of choosing each link.
 
-.. image:: ../images/route_choice_7.png
+.. image:: ../images/route_choice/route_choice_7.png
     :align: center
     :alt: Basic route choice - map canvas
 
 Build choice sets
------------------
+~~~~~~~~~~~~~~~~~
 
 Within this workflow, we can build and save the choice sets without performing assignment.
 We start by :ref:`configuring the model parameters <basic_route_choice_setting>`, then go
 to the "Workload" tab and select our demand matrix and its cores for computation.
 
-.. image:: ../images/route_choice_8.png
+.. image:: ../images/route_choice/route_choice_8.png
     :width: 750
     :align: center
     :alt: Basic route choice - only build choice sets
@@ -120,7 +126,7 @@ use demand matrices to determine the OD pairs for which choice sets are needed, 
 of those with positive demand.
 
 Perform assignment
-------------------
+~~~~~~~~~~~~~~~~~~
 
 This workflow runs a route choice assignment and allows the user to save the choice
 set generated while performing such. The set up is quite similar to the one above: After 
@@ -135,13 +141,13 @@ We also choose a name for saving the results in the database. Pick up a name tha
 easily find later. Then, just hit the button "Perform assignment" and wait until the window
 is closed and the process is finished.
 
-.. image:: ../images/route_choice_9.png
+.. image:: ../images/route_choice/route_choice_9.png
     :width: 750
     :align: center
     :alt: Basic route choice - assignment
 
 Select link analysis
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 The left portion of the "Critical analysis" tab gives the user access to select link analysis.
 Its interface is quite similar to the one in Traffic Assignment, in which we can add and
@@ -152,7 +158,7 @@ We start by toggling the "Set select link analysis" checkbox and enabling the fo
 Let's add our first query. Create a name, set the link direction, add the link ID, and click
 on "Add to query".
 
-.. image:: ../images/route_choice_11.png
+.. image:: ../images/route_choice/route_choice_11.png
     :width: 750
     :align: center
     :alt: Basic route choice - SLA query 1 part 1
@@ -161,7 +167,7 @@ Let's add another link to our *SL1* query. Let's set the link direction and link
 to the existing query with "Add to query", and click on "Save query" (4). The *SL1* query
 will immediately appear in the table at the bottom of the window (5).
 
-.. image:: ../images/route_choice_12.png
+.. image:: ../images/route_choice/route_choice_12.png
     :width: 750
     :align: center
     :alt: Basic route choice - SLA query 1 part 2
@@ -172,7 +178,7 @@ It will also appear at the bottom table (6). To remove any query from the query 
 double-click the cell. Once this is our last query, we pick up a nice name to save our select
 link analysis results (7).
 
-.. image:: ../images/route_choice_13.png
+.. image:: ../images/route_choice/route_choice_13.png
     :width: 750
     :align: center
     :alt: Basic route choice - SLA query 2
@@ -181,13 +187,13 @@ The last step consists in selecting the matrix and its cores for computation, an
 assignment. It's not necessary to add a name to the route choice output, once we did it in the
 previous step.
 
-.. image:: ../images/route_choice_14.png
+.. image:: ../images/route_choice/route_choice_14.png
     :width: 750
     :align: center
     :alt: Basic route choice - SLA configs
 
 Sub-area analysis
------------------
+~~~~~~~~~~~~~~~~~
 
 To perform a sub-area analysis, we start by toggling the "Set sub-area analysis" checkbox, 
 which enables us to choose a polygon layer that defines the sub-area of interest. In this example, 
@@ -195,7 +201,7 @@ we select a couple zones in Coquimbo, and toggle the
 checkbox "Selected features only". We could also use an external polygon layer with the desired
 region and use all the layer features rather than a part of it.
 
-.. image:: ../images/route_choice_10.png
+.. image:: ../images/route_choice/route_choice_10.png
     :align: center
     :alt: Basic route choice - sub-area selection
 
@@ -205,7 +211,7 @@ window is closed. If you go to the project folder, you will notice that a folder
 '*route choice*' containing a ``.parquet`` file with the same output name you selected in (3) 
 containing the sub-area demand matrix.
 
-.. image:: ../images/route_choice_10_1.png
+.. image:: ../images/route_choice/route_choice_10_1.png
     :width: 750
     :align: center
     :alt: Basic route choice - sub-area configs

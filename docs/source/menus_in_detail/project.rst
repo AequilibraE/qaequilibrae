@@ -11,7 +11,7 @@ webpage.
 Under the project tab, there are some options to choose from and the following sections
 explore some of these actions.
 
-.. image:: ../images/menu_project.png
+.. image:: ../images/project_procedures/menu_project.png
     :align: center
     :alt: tab project menu
 
@@ -41,7 +41,7 @@ the model.
 To better understand the application of the run module, we encourage you to read about it at 
 `the AequilibraE documentation <https://www.aequilibrae.com/develop/python/run_module.html>`_.
 
-.. image:: ../images/run_module_dialog.png
+.. image:: ../images/project_procedures/run_module_dialog.png
     :align: center
     :alt: run module dialog
 

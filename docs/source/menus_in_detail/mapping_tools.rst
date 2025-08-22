@@ -3,37 +3,37 @@ Mapping Tools
 
 QAequilibraE has some tools to allow the user to visualize the data.
 
-.. image:: ../images/menu_gis.png
+.. image:: ../images/mapping_tools/menu_mapping.png
     :align: center
-    :alt: tab gis menu
+    :alt: QAequilibraE mapping menu
 
 .. _data_visualize_data:
 
 Visualize data
 --------------
 
-When clicking **Mapping > Visualize data**, a new window with three different tabs opens. The tab *matrices* shows 
-the matrices available for the current project (see figure below).
+When clicking **Mapping > Visualize data**, a new window with three different tabs opens.
+The tab *Matrices* present all matrices available for the current project.
 
-.. image:: ../images/data_visualize_data_matrices.png
+.. image:: ../images/mapping_tools/data_visualize_data_matrices.png
     :align: center
     :alt: project data matrices
 
-As for the tab *results* it displays the results of procedures that took place, such as the creation of Delaunay 
-Lines, and that are saved in a **results_database.sqlite**.
+As for the tab *Results* it displays the results of procedures that took place and that are
+saved in the project 'results_database.sqlite' file.
 
-.. image:: ../images/data_visualize_data_results.png
+.. image:: ../images/mapping_tools/data_visualize_data_results.png
     :align: center
     :alt: project data results
 
-The tab *non-project data* allows you to open and visualize matrices and datasets in the following extensions: 
-\*.omx and \*.aem. **This is the only tab available if no AequilibraE project is open**. Suppose you 
+The tab *Non-project data* allows you to open and visualize matrices stored in \*.omx format. 
+**This is the only tab available if no AequilibraE project is open**. Suppose you 
 want to check a skim matrix from a previous project. When clicking the **Load data** button, you can point 
 AequilibraE the location of the file and its visualization is displayed.
 
 .. _fig_nonproject_data:
 
-.. image:: ../images/data_visualize_data_nonproject_data.png
+.. image:: ../images/mapping_tools/data_visualize_data_nonproject_data.png
     :align: center
     :alt: project data load non-project data
 
@@ -45,7 +45,7 @@ into \*.csv format, just click in the *export* button in the lower left corner o
 
 .. _fig_data_visualize_matrices:
 
-.. image:: ../images/data-visualize-loaded-matrix.png
+.. image:: ../images/mapping_tools/data-visualize-loaded-matrix.png
     :align: center
     :alt: data visualize matrices
 
@@ -56,10 +56,10 @@ to be highlighted. The *zones* layer (if it exists) is going to be loaded and th
 zones are going to receive a different color shade, according to the color palette selected in
 the dropdown menu. One other possibility to select the zone for displaying is directly into the
 map canvas: with the *Select features* button enabled, just click on the desired zone in the
-layer and you'll notice that the color shades will change accordingly, as well as the row selection
+layer and you'll notice that the color shades change accordingly, as well as the row selection
 in the matrix.
 
-.. image:: ../images/data-matrix-view-row.png
+.. image:: ../images/mapping_tools/data-matrix-view-row.png
     :align: center
     :alt: data matrix view by origin
 
@@ -68,7 +68,7 @@ desired column (destination), notice that it will be highlighted, and the *zones
 going to present a color shade according to the color palette selected. The selection of zones
 for displaying is also available for destinations, and the steps are the same as presented above.
 
-.. image:: ../images/data-matrix-view-column.png
+.. image:: ../images/mapping_tools/data-matrix-view-column.png
     :align: center
     :alt: data matrix view by destination
 
@@ -80,24 +80,37 @@ Desire Lines
 QAequilibraE is capable of doing two types of desire lines from a zone or a node layer:
 'regular' desire lines or Delaunay lines for the demand matrix provided.
 
-.. image:: ../images/desire_lines_gui.png
-    :width: 800
+.. image:: ../images/mapping_tools/desire_lines_gui.png
     :align: center
     :alt: Desire Lines GUI
 
-After selecting a matrix, the user can choose to un-check the *use all matrices*
-box and select which matrix layers/cores they want to use (the list of matrices will only
-show if the option is un-checked). Just make sure to select a *zone/node layer* 
-and *node id* that is compatible with your matrix.
+Basic workflow
+~~~~~~~~~~~~~~
+
+Let's use the Sioux Falls example and one of its default matrices. Make sure one of
+'nodes' or 'zones' layer is active in the layers list.
+
+We start selecting the input layer (1) and the field we'll use to create our desire lines
+(2). We'll use 'node_id'. Then select a matrix (3). We'll use 'demand_mc', which has more
+than one core, but we won't use all cores. Un-check the *"Use all"* box, and notice that
+a matrix core table will open at the right-hand side of the window. Un-check the cores you
+want to remove from computation (5) and click on *"Create Desire Lines"*. If you want the
+usual desire lines, change the selected field in the *Method* box. 
+
+.. image:: ../images/mapping_tools/desire_lines_config.png
+    :align: center
+    :alt: Configuring desire lines
+
+Make sure to select a zone/node layer and node ID that is compatible with your matrix.
 
 .. subfigure:: AB
     :subcaptions: below
     :align: center
 
-    .. image:: ../images/delaunay_results.png
+    .. image:: ../images/mapping_tools/delaunay_results.png
         :alt: Delaunay lines
     
-    .. image:: ../images/desire_lines_map.png
+    .. image:: ../images/mapping_tools/desire_lines_map.png
         :alt: Desire lines
 
 .. _mapping_stacked_bandwidth:
@@ -108,7 +121,7 @@ Stacked Bandwidth
 This is a tool for plotting link flows. It uses a link layer, including Delaunay lines or desire
 lines. It is also possible to choose between solid or gradient colors.
 
-.. image:: ../images/stacked_bandwidth_gui.png
+.. image:: ../images/mapping_tools/stacked_bandwidth_gui.png
     :align: center
     :alt: Stacked bandwidth GUI
 
@@ -129,7 +142,7 @@ color box. To add the band, we click on the *"Add band"* button (4). You'll noti
 band configuration is now available at the table and the *"Create bands"* button is enabled.
 Click on it (5) and the links layer in the canvas will automatically be updated.
 
-.. image:: ../images/stacked_bandwidth_with_solid_color.png
+.. image:: ../images/mapping_tools/stacked_bandwidth_with_solid_color.png
     :align: center
     :alt: Add stacked bandwidth with solid color
 
@@ -137,7 +150,7 @@ It is also possible to use color ramps instead of solid colors for plotting your
 Select the line layer (1) and the flow variables (2 and 3). Let's select the *"Color ramp"*
 option (4) and configure the ramp (5).
 
-.. image:: ../images/stacked_bandwidth_with_color_ramp_1.png
+.. image:: ../images/mapping_tools/stacked_bandwidth_with_color_ramp_1.png
     :align: center
     :alt: Add stacked bandwidth with color ramp - set up
 
@@ -145,14 +158,14 @@ When the color ramp window opens, configure once again the fields (1) and the co
 you want to use. We'll use the default 'Blues' in this example. Click *"Done"* (2) when
 you finished.
 
-.. image:: ../images/stacked_bandwidth_color_ramp_config.png
+.. image:: ../images/mapping_tools/stacked_bandwidth_color_ramp_config.png
     :align: center
     :alt: Color ramp configuration in stacked bandwidth
 
 Finally, add the configured band to the project table (1) and click on the *"Create bands"*
 button (2).
 
-.. image:: ../images/stacked_bandwidth_with_color_ramp_2.png
+.. image:: ../images/mapping_tools/stacked_bandwidth_with_color_ramp_2.png
     :align: center
     :alt: Add stacked bandwidth with color ramp - add band
 
@@ -164,10 +177,10 @@ the *Variables* tab. We'll edit the ``aeq_band_width`` variable.
     :align: center
     :gap: 8px
 
-    .. image:: ../images/project_properties.png
+    .. image:: ../images/mapping_tools/project_properties.png
         :alt: Project menu
     
-    .. image:: ../images/edit_variables.png
+    .. image:: ../images/mapping_tools/edit_variables.png
         :alt: Edit project variables
 
 And we're all set! You might need to refresh or pan the map for it to redraw after
@@ -177,10 +190,10 @@ changing the project variables.
     :subcaptions: below
     :align: center
 
-    .. image:: ../images/stacked_bandwidth_solid_color.png
+    .. image:: ../images/mapping_tools/stacked_bandwidth_solid_color.png
         :alt: Solid color
     
-    .. image:: ../images/stacked_bandwidth_color_ramp.png
+    .. image:: ../images/mapping_tools/stacked_bandwidth_color_ramp.png
         :alt: Color ramp
 
 .. _siouxfalls-scenario-comparison:
@@ -206,14 +219,14 @@ the base flows.
 As it was the case for stacked bandwidth formatting, expert mode sets project
 variables as levers to change the map formatting.
 
-.. image:: ../images/scenario_comparison_configuration.png
+.. image:: ../images/mapping_tools/scenario_comparison_configuration.png
     :width: 473
     :align: center
     :alt: scenario_comparison_configuration
 
 And this is what it looks like
 
-.. image:: ../images/scenario_comparison_map.png
+.. image:: ../images/mapping_tools/scenario_comparison_map.png
     :width: 778
     :align: center
     :alt: scenario_comparison_map
