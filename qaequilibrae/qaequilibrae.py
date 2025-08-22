@@ -19,7 +19,7 @@ from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
 
 from qaequilibrae import set_aequilibrae_menu_instance
 from qaequilibrae.message import messages
-from qaequilibrae.modules.menu_actions import run_load_project, run_module
+from qaequilibrae.modules.menu_actions import run_load_project, run_module, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs
 from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths, run_pt_explore
 from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig
@@ -101,7 +101,7 @@ class AequilibraEMenu:
             self.tr("Traffic assignment"): [],
             self.tr("Route choice"): [],
             self.tr("Transit"): [],
-            "GIS": [],
+            self.tr("Mapping"): [],
             "AequilibraE": [],
         }
 
@@ -143,9 +143,11 @@ class AequilibraEMenu:
 
         # # # ########################################################################
         # # # ###################  GIS TOOLS SUB-MENU  ###############################
-        self.add_menu_action("GIS", self.tr("Desire lines"), partial(run_desire_lines, self))
-        self.add_menu_action("GIS", self.tr("Stacked bandwidth"), partial(run_stacked_bandwidths, self))
-        self.add_menu_action("GIS", self.tr("Scenario comparison"), partial(run_scenario_comparison, self))
+        mmenu = self.tr("Mapping")
+        self.add_menu_action(mmenu, self.tr("Visualize data"), partial(run_show_project_data, self))
+        self.add_menu_action(mmenu, self.tr("Desire lines"), partial(run_desire_lines, self))
+        self.add_menu_action(mmenu, self.tr("Stacked bandwidth"), partial(run_stacked_bandwidths, self))
+        self.add_menu_action(mmenu, self.tr("Scenario comparison"), partial(run_scenario_comparison, self))
 
         # # # ########################################################################
         # # # ###################  LOOSE STUFF  ######################################

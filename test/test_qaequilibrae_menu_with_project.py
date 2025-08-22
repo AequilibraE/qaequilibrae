@@ -131,13 +131,27 @@ def test_route_choice_menu(ae_with_project, qtbot):
     assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
+def test_display_project_data_menu(ae_with_project, qtbot):
+    from qaequilibrae.modules.matrix_procedures import LoadProjectDataDialog
+
+    def handle_trigger():
+        check_if_new_active_window_matches_class(qtbot, LoadProjectDataDialog)
+
+    action = ae_with_project.menuActions["Mapping"][0]
+    assert action.text() == "Visualize data", "Wrong text content"
+    QTimer.singleShot(10, handle_trigger)
+    action.trigger()
+    messagebar = ae_with_project.iface.messageBar()
+    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+
+
 def test_gis_desire_lines_menu(ae_with_project, qtbot):
     from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, DesireLinesDialog)
 
-    action = ae_with_project.menuActions["GIS"][0]
+    action = ae_with_project.menuActions["Mapping"][1]
     assert action.text() == "Desire lines", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
@@ -151,7 +165,7 @@ def test_gis_stacked_bandwidth_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, CreateBandwidthsDialog)
 
-    action = ae_with_project.menuActions["GIS"][1]
+    action = ae_with_project.menuActions["Mapping"][2]
     assert action.text() == "Stacked bandwidth", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
@@ -165,7 +179,7 @@ def test_gis_scenario_comparison_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, CompareScenariosDialog)
 
-    action = ae_with_project.menuActions["GIS"][2]
+    action = ae_with_project.menuActions["Mapping"][3]
     assert action.text() == "Scenario comparison", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()

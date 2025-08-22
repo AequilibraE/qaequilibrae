@@ -14,8 +14,8 @@ class StackedBandwidth(QAequilibraEProcessingAlgorithm):
             partial(run_stacked_bandwidths, get_aequilibrae_menu_instance()),
             "stacked_bandwidths",
             self.tr("Stacked bandwidth"),
-            "GIS",
-            "gis_procedures",
+            self.tr("Mapping"),
+            "mapping_procedures",
             "",
             ["bandwidth", "visualization"],
         )

@@ -101,7 +101,7 @@ def test_gis_desire_lines_menu(ae, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, DesireLinesDialog)
 
-    action = ae.menuActions["GIS"][0]
+    action = ae.menuActions["Mapping"][1]
     assert action.text() == "Desire lines", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
@@ -113,14 +113,14 @@ def test_gis_stacked_bandwidth_menu(ae, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, CreateBandwidthsDialog)
 
-    action = ae.menuActions["GIS"][1]
+    action = ae.menuActions["Mapping"][2]
     assert action.text() == "Stacked bandwidth", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
 
 
 def test_gis_scenario_comparison_menu(ae, qtbot):
-    action = ae.menuActions["GIS"][2]
+    action = ae.menuActions["Mapping"][3]
     assert action.text() == "Scenario comparison", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()

@@ -21,8 +21,10 @@ class Provider(QgsProcessingProvider):
         self.__load_matrix_procedures()
         self.__load_routing_procedures()
         self.__load_traffic_assignment_procedures()
+        self.__load_route_choice()
         self.__load_transit_procedures()
         self.__load_gis()
+        self.__load_paths_procedures()
 
     def __load_project_procedures(self):
 
@@ -66,13 +68,11 @@ class Provider(QgsProcessingProvider):
         from .matrix_procedures.import_matrices import ImportMatrix
         from .matrix_procedures.matrix_calculator import MatrixCalculator
         from .matrix_procedures.trip_length_distribution import TripLengthDistribution
-        from .matrix_procedures.visualize_data import VisualizeData
 
         self.addAlgorithm(ExportMatrix())
         self.addAlgorithm(ImportMatrix())
         self.addAlgorithm(MatrixCalculator())
         self.addAlgorithm(TripLengthDistribution())
-        self.addAlgorithm(VisualizeData())
 
     def __load_routing_procedures(self):
 
@@ -102,11 +102,29 @@ class Provider(QgsProcessingProvider):
         from .gis.scenario_comparison import ScenarioComparison
         from .gis.simple_tag import SimpleTag
         from .gis.stacked_bandwidth import StackedBandwidth
+        from .gis.visualize_data import VisualizeData
 
         self.addAlgorithm(DesireLines())
         self.addAlgorithm(ScenarioComparison())
         self.addAlgorithm(SimpleTag())
         self.addAlgorithm(StackedBandwidth())
+        self.addAlgorithm(VisualizeData())
+
+    def __load_route_choice(self):
+
+        from .route_choice.route_choice import RouteChoice
+
+        self.addAlgorithm(RouteChoice())
+
+    def __load_paths_procedures(self):
+
+        from .paths_procedures.impedance_matrix import ImpedanceMatrix
+        from .paths_procedures.shortest_path import ShortestPath
+        from .paths_procedures.skim_viewer import SkimViewer
+
+        self.addAlgorithm(ImpedanceMatrix())
+        self.addAlgorithm(ShortestPath())
+        self.addAlgorithm(SkimViewer())
 
     def id(self):
         """The ID used for identifying the provider."""

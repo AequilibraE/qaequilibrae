@@ -14,8 +14,8 @@ class ScenarioComparison(QAequilibraEProcessingAlgorithm):
             partial(run_scenario_comparison, get_aequilibrae_menu_instance()),
             "scenario_comparison",
             self.tr("Scenario comparison"),
-            "GIS",
-            "gis_procedures",
+            self.tr("Mapping"),
+            "mapping_procedures",
             "",
             ["scenario", "comparison", "compare"],
         )

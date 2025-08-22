@@ -14,12 +14,10 @@ class SimpleTag(QAequilibraEProcessingAlgorithm):
             partial(run_tag, get_aequilibrae_menu_instance()),
             "simple_tag",
             self.tr("Simple tag"),
-            "GIS",
-            "gis_procedures",
+            self.tr("Mapping"),
+            "mapping_procedures",
             "",
-            [
-                "tag",
-            ],
+            ["tag"],
         )
 
     def createInstance(self):

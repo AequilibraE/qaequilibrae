@@ -14,8 +14,8 @@ class VisualizeData(QAequilibraEProcessingAlgorithm):
             partial(run_show_project_data, get_aequilibrae_menu_instance()),
             "visualize_data",
             self.tr("Visualize data"),
-            self.tr("Data"),
-            "data",
+            self.tr("Mapping"),
+            "mapping_procedures",
             "",
             ["viewer", "matrix", "data"],
         )

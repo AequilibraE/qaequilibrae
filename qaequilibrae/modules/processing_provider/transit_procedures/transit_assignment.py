@@ -13,7 +13,7 @@ class TransitAssignment(QAequilibraEProcessingAlgorithm):
         super().__init__(
             partial(run_pt_skim, get_aequilibrae_menu_instance()),
             "transit_assignment",
-            self.tr("Transit assignment"),
+            self.tr("Skimming and assignment"),
             self.tr("Transit"),
             "transit",
             "Runs transit assignment",

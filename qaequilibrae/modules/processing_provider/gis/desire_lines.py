@@ -14,8 +14,8 @@ class DesireLines(QAequilibraEProcessingAlgorithm):
             partial(run_desire_lines, get_aequilibrae_menu_instance()),
             "desire_lines",
             self.tr("Desire lines"),
-            "GIS",
-            "gis_procedures",
+            self.tr("Mapping"),
+            "mapping_procedures",
             "",
             ["line", "desire", "delaunay"],
         )
