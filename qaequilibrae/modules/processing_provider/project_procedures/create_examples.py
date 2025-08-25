@@ -8,16 +8,16 @@ from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraE
 class CreateExamples(QAequilibraEProcessingAlgorithm):
 
     def __init__(self):
-        from qaequilibrae.modules.menu_actions import show_log
+        from qaequilibrae.modules.menu_actions import create_example
 
         super().__init__(
-            partial(show_log, get_aequilibrae_menu_instance()),
+            partial(create_example, get_aequilibrae_menu_instance()),
             "create_examples",
             self.tr("Create examples"),
             self.tr("Project"),
             "project_procedures",
             self.tr("Create AequilibraE examples."),
-            ["create", "examples", "create examples", "project"],
+            ["create", "example", "project"],
         )
 
     def createInstance(self):
