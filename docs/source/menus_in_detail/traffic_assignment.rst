@@ -1,5 +1,3 @@
-.. _siouxfalls-traffic-assignment-and-skimming:
-
 Traffic assignment
 ==================
 

@@ -92,17 +92,15 @@ This workflow is based on the AequilibraE Python
 Before running the trip distribution procedures, we encourage you to run the 
 :ref:`traffic assignment procedure <traffic_assignment_workflow>` for the base-year.
 
-.. _siouxfalls-gravity-model-calibration:
-
 Calibrate Gravity Model 
-~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^
 Now that we have the demand model and a fully converged skim, we can calibrate a
 synthetic gravity model.
 
 We click on Trip distribution in the AequilibraE menu and select the Calibrate
 Gravity model option.
 
-.. image:: ../images/trip_distribution/calibrate_gravity_menu.png
+.. image:: ../images/trip_distribution/calibrate_gravity_1.png
     :align: center
     :alt: calibrate_gravity_menu
 
@@ -217,8 +215,6 @@ We can close it after checking the procedure report.
 .. important::
 
     Production and Attraction vectors **must be** balanced before running IPF. 
-
-.. _siouxfalls-forecast:
 
 Apply Gravity Model
 ^^^^^^^^^^^^^^^^^^^
