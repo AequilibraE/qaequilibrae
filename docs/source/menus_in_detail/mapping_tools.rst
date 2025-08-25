@@ -7,7 +7,7 @@ QAequilibraE has some tools to allow the user to visualize the data.
     :align: center
     :alt: QAequilibraE mapping menu
 
-.. _data_visualize_data:
+.. _mapping_visualize_data:
 
 Visualize data
 --------------

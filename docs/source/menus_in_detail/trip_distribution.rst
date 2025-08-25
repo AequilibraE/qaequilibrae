@@ -1,24 +1,156 @@
 Trip Distribution
 =================
 
-On the trip distribution tab, the user can perform Iterative Proportional Fitting (IPF)
+On the trip distribution menu, the user can perform Iterative Proportional Fitting (IPF)
 with their available matrices and vectors, as well as calibrate and apply a Synthetic Gravity
 Model.
 
-In this page each option under the **Trip Distribution > Trip Distribution** is
-presented in one of the subsections below.
+.. image:: ../images/trip_distribution/menu_trip_distribution.png
+    :align: center
+    :alt: tab trip distribution
+
+Unlike the other menus in QAequilibraE, all three procedures in trip distribution share some
+configuring stepa. We'll go over each tab and, in the end, we'll run a basic workflow
+using Sioux Falls example.
+
+"*Load datasets*" is the first tab and contains a loading button and a dataset table at
+the right side. Currently, QAequilibraE allows import dataset data from a ``*.csv`` or 
+``*.parquet`` file or loading data from an open layer. This tab is configured for IPF and
+Apply Gravity.
 
 .. subfigure:: AB
+    :subcaptions: below
     :align: center
 
-    .. image:: ../images/trip_distribution/menu_trip_distribution.png
-        :alt: tab trip distribution
+    .. image:: ../images/trip_distribution/trip_distribution_1.png
+        :alt: Load datasets
+    
+    .. image:: ../images/trip_distribution/trip_distribution_2.png
+        :alt: Dataset file format
 
-    .. image:: ../images/trip_distribution/tripdistribution-menu.png
-        :alt: trip distribution menu
+The second tab is "*Load matrices*", which is configured in all processes. It consists in
+a table view of all matrices available in the project. 
+
+.. image:: ../images/trip_distribution/trip_distribution_3.png
+    :align: center
+    :alt: Load matrices
+
+In the tab "*Vector*", we indicate the vector fields for computation. If no dataset was
+loaded in the "*Load datasets*" tab, no fields are displayed here. This tab is configured for
+IPF and Apply Gravity procedures.
+
+.. image:: ../images/trip_distribution/trip_distribution_4.png
+    :align: center
+    :alt: Configure vectors
+
+In the tab "*Impedance*" we select the matrix and matrix core that will be used for computation.
+We configure this tab at the Apply Gravity procedure.
+
+.. image:: ../images/trip_distribution/trip_distribution_5.png
+    :align: center
+    :alt: Configure impedance tab at trip distribution
+
+The tab "*Seed matrix*" (for IPF procedure) is analogous to the "*Observed matrix*" tab for the
+Calibrate Gravity procedure, and allows the user to indicate the impedance/observed matrix.
+
+.. image:: ../images/trip_distribution/trip_distribution_6.png
+    :align: center
+    :alt: Configure seed matrix tab at trip distribution
+
+The tab "*Model*" exists for Calibrate and Apply Gravity procedures, however each procedure 
+presents a different window layout. For the Calibrate Gravity, we choose the model's deterrence
+function, while for the Apply Gravity, we can load the calibrated model parameters for use.
+
+.. subfigure:: AB
+    :subcaptions: below
+    :align: center
+
+    .. image:: ../images/trip_distribution/trip_distribution_7.png
+        :alt: Model tab - Calibrate Gravity
+    
+    .. image:: ../images/trip_distribution/trip_distribution_8.png
+        :alt: Model tab - Apply Gravity
+
+Finally, the tab "*Jobs*", we can queue and/or check the jobs that are already queued and are
+going to be executed, and run them!
+
+.. image:: ../images/trip_distribution/trip_distribution_9.png
+    :align: center
+    :alt: Configure jobs at trip distribution
+
+Basic workflow
+~~~~~~~~~~~~~~
+
+We present a full forecasting workflow using the Sioux Falls example. We start creating the
+skim matrices, running the assignment for the base-year, and then distributing these trips into
+the network. Later, we estimate a set of future demand vectors which are going to be the input
+of a future year assignnment.
+
+This workflow is based on the AequilibraE Python 
+`Forecast example <https://www.aequilibrae.com/latest/python/_auto_examples/traffic_assignment/plot_forecasting.html>`_.
+
+Before 
+
+.. _siouxfalls-gravity-model-calibration:
+
+Calibrate Gravity Model 
+~~~~~~~~~~~~~~~~~~~~~~~
+Now that we have the demand model and a fully converged skim, we can calibrate a
+synthetic gravity model.
+
+We click on Trip distribution in the AequilibraE menu and select the Calibrate
+Gravity model option.
+
+.. image:: ../images/trip_distribution/calibrate_gravity_menu.png
+    :align: center
+    :alt: calibrate_gravity_menu
+
+The first thing to do is to check if all matrices we need (skim and demand) are in
+the project folder.
+
+.. image:: ../images/trip_distribution/calibrate_matrix_load_matrices.png
+    :align: center
+    :alt: calibrate_matrix_load_matrices
+
+Select which matrix/matrix core is to be used as the impedance matrix.
+
+.. image:: ../images/trip_distribution/calibrate_matrix_choose_skims.png
+    :align: center
+    :alt: calibrate_matrix_choose_skims
+
+And which one corresponds to the *observed* matrix.
+
+.. image:: ../images/trip_distribution/calibrate_matrix_choose_observed.png
+    :align: center
+    :alt: calibrate_matrix_choose_observed
+
+We then select which deterrence function we want to use (1) and choose a file output
+for the model by clicking on *Queue jobs* (2).
+
+.. image:: ../images/trip_distribution/calibrate_matrix_choose_output.png
+    :align: center
+    :alt: calibrate_matrix_choose_output
+
+In the jobs tab, we can check all jobs we queued (1) and then run the procedure (2).
+
+.. image:: ../images/trip_distribution/calibrate_matrix_run.png
+    :align: center
+    :alt: calibrate_matrix_run
+
+Inspect the procedure output.
+
+.. image:: ../images/trip_distribution/calibrate_matrix_inspect_report.png
+    :align: center
+    :alt: calibrate_matrix_inspect_report
+
+The resulting file is of type ``*.mod``, but that is just a YAML (text file).
+
+.. image:: ../images/trip_distribution/calibrate_matrix_model_result.png
+    :align: center
+    :alt: calibrate_matrix_model_result
 
 Iterative Proportional Fitting (IPF)
-------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 It is possible to balance the production/attraction vectors using IPF. There are three different
 ways to load a vector's data: loading a ``*.csv`` or ``*.parquet`` file or loading data from an 
 open layer. 
@@ -85,71 +217,10 @@ We can close it after checking the procedure report.
 
     Production and Attraction vectors **must be** balanced before running IPF. 
 
-Synthetic Gravity Models
-------------------------
-
-.. _siouxfalls-gravity-model-calibration:
-
-Calibrate Gravity
-~~~~~~~~~~~~~~~~~
-Now that we have the demand model and a fully converged skim, we can calibrate a
-synthetic gravity model.
-
-We click on Trip distribution in the AequilibraE menu and select the Calibrate
-Gravity model option.
-
-.. image:: ../images/trip_distribution/calibrate_gravity_menu.png
-    :align: center
-    :alt: calibrate_gravity_menu
-
-The first thing to do is to check if all matrices we need (skim and demand) are in
-the project folder.
-
-.. image:: ../images/trip_distribution/calibrate_matrix_load_matrices.png
-    :align: center
-    :alt: calibrate_matrix_load_matrices
-
-Select which matrix/matrix core is to be used as the impedance matrix.
-
-.. image:: ../images/trip_distribution/calibrate_matrix_choose_skims.png
-    :align: center
-    :alt: calibrate_matrix_choose_skims
-
-And which one corresponds to the *observed* matrix.
-
-.. image:: ../images/trip_distribution/calibrate_matrix_choose_observed.png
-    :align: center
-    :alt: calibrate_matrix_choose_observed
-
-We then select which deterrence function we want to use (1) and choose a file output
-for the model by clicking on *Queue jobs* (2).
-
-.. image:: ../images/trip_distribution/calibrate_matrix_choose_output.png
-    :align: center
-    :alt: calibrate_matrix_choose_output
-
-In the jobs tab, we can check all jobs we queued (1) and then run the procedure (2).
-
-.. image:: ../images/trip_distribution/calibrate_matrix_run.png
-    :align: center
-    :alt: calibrate_matrix_run
-
-Inspect the procedure output.
-
-.. image:: ../images/trip_distribution/calibrate_matrix_inspect_report.png
-    :align: center
-    :alt: calibrate_matrix_inspect_report
-
-The resulting file is of type ``*.mod``, but that is just a YAML (text file).
-
-.. image:: ../images/trip_distribution/calibrate_matrix_model_result.png
-    :align: center
-    :alt: calibrate_matrix_model_result
-
 .. _siouxfalls-forecast:
 
-Apply Gravity
-~~~~~~~~~~~~~
+Apply Gravity Model
+^^^^^^^^^^^^^^^^^^^
 If one has future matrix vectors (there are some provided with the example
 dataset), they can either apply the Iterative Proportional Fitting (IPF)
 procedure available, or apply a gravity model just calibrated. Here we present

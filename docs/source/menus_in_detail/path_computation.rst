@@ -9,60 +9,88 @@ the software already computes the graph for you.
     :align: center
     :alt: tab paths and assignment
 
-.. _siouxfalls-individual-path-computation:
-
 Shortest Path
 -------------
 
-The first thing we can do with this project is to compute a few arbitrary paths
-to see if the network is connected and if paths make sense.
+The first thing we can do with a project is to compute a few arbitrary paths to see if the
+network is connected and if paths make sense.
 
-Before computing a path, we go to the configuration screen.
+The shortest path menu consists in two complimentary windows: one for selecting the to/from
+nodes and how we want to visualize the output and the other for configuring the network graph.
 
-.. image:: ../images/path_computation/configure_path_computation.png
+.. subfigure:: AB
+    :subcaptions: below
     :align: center
-    :alt: configure_path_computation
+
+    .. image:: ../images/path_computation/shortest_path_1.png
+        :alt: Shortest path settings
+
+    .. image:: ../images/path_computation/shortest_path_2.png
+        :alt: Network graph configuration
+
+Basic workflow
+~~~~~~~~~~~~~~
+We'll use Sioux Falls example in this workflow. Open the shortest path window and notice that
+the only action available is to configure the network. We'll click on the "*Configure*"
+button (1).
+
+.. image:: ../images/path_computation/shortest_path_3.png
+    :align: center
+    :alt: Configure shortest path - first step
 
 For the case of Sioux Falls, we need to configure the graph to accept paths
 going through centroids (all nodes are centroids), but that is generally not the
 case. For zones with a single connector per zone it is slightly faster to also
 deselect this option, but use this carefully.
 
-.. image:: ../images/path_computation/path_computation_configuration.png
+.. image:: ../images/path_computation/shortest_path_4.png
     :align: center
-    :alt: path_computation_configuration
+    :alt: Configure network graph for shortest path computation
 
 If we select that paths need to be in a separate layer, then every time you
 compute a path, a new layer with a copy of the links in that path will be
 created and formatted in a noticeable way. You can also select to have links
 selected in the layer, but only one path can be shown at time if you do so.
 
-.. image:: ../images/path_computation/paths_generated.png
+.. image:: ../images/path_computation/shortest_path_output.png
     :align: center
     :alt: paths_generated
-
-.. _siouxfalls-skimming:
+    :scale: 50
 
 Impedance Matrix (aka Skimming Matrix)
 --------------------------------------
 
 We can also skim the network to look into general connectivity of the network.
 
-To perform skimming, we can select to compute a matrix from all nodes to all nodes,
-or from centroids to centroids, as well as to not allow flows through centroids.
-
-The main controls, however, are the mode to skim, the field we should minimize
-when computing shortest paths and the fields we should skim when computing those
-paths.
-
-.. image:: ../images/path_computation/performing_skimming.png
+.. image:: ../images/path_computation/impedance_matrix_1.png
     :align: center
-    :alt: performing_skimming
+    :alt: Impedance matrix window
 
-With the results computed (AEM or OMX), one can display them on the screen, loading the 
-data using the :ref:`non-project data tab <fig_nonproject_data>` in **Data > Visualize data**. 
+The "*Graph*" configurations at the top of the screen allow us to configure the graph:
+selecting the computation of a matrix from all nodes to all nodes, or from centroids to
+centroids, as well as to not allow flows through centroids. Besides chosing the mode to
+skimand the minimize field for computation.
 
-.. _skim-viewer:
+The remaining controls stand at the "*Skims*" configuration, where we select the fields
+we should skim when computing the paths.
+
+Basic workflow
+~~~~~~~~~~~~~~
+We'll use Sioux Falls example to compute the impedance matrix. We begin chosing the mode (1)
+and the field to minimize (2). Let's compute skims for centroids to centroids (3), without
+blocking flows through centroids (4) because all nodes in Sioux Falls are also centroids.
+
+To select the skims for computation, select them at the available skims panel and click on
+the arrow to add it to computation panel (steps 5 to 7). Finally, create an output name (8)
+and compute the skims (9).
+
+.. image:: ../images/path_computation/impedance_matrix_2.png
+    :align: center
+    :alt: Performing skimming
+
+With the results computed, one can display them on the screen, loading the 
+data from the *Matrix* tab, using the :ref:`Visualize data <mapping_visualize_data>` tool
+in the Mapping menu.
 
 Skim viewer
 -----------
@@ -126,7 +154,7 @@ Skim viewer with joined layer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For this example, we'll use the Sioux Falls model. First, join the 'links'
-layer with the desired results table (see :ref:`data_visualize_data` for more information).
+layer with the desired results table (see :ref:`mapping_visualize_data` for more information).
 Then, go to the skim viewer. When you see the window for the first time, you won't notice
 anything different, but when you click on the minimize field and available skims,
 you'll notice that the joined fields also appear here.
