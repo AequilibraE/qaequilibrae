@@ -1,3 +1,5 @@
+.. _mapping_tools:
+
 Mapping Tools
 =============
 
@@ -72,8 +74,6 @@ for displaying is also available for destinations, and the steps are the same as
     :align: center
     :alt: data matrix view by destination
 
-.. _siouxfalls-desire-lines:
-
 Desire Lines
 ------------
 
@@ -112,8 +112,6 @@ Make sure to select a zone/node layer and node ID that is compatible with your m
     
     .. image:: ../images/mapping_tools/desire_lines_map.png
         :alt: Desire lines
-
-.. _mapping_stacked_bandwidth:
 
 Stacked Bandwidth
 -----------------
@@ -196,7 +194,7 @@ changing the project variables.
     .. image:: ../images/mapping_tools/stacked_bandwidth_color_ramp.png
         :alt: Color ramp
 
-.. _scenario_comparison:
+.. _mapping_scenario_comparison:
 
 Scenario Comparison
 -------------------

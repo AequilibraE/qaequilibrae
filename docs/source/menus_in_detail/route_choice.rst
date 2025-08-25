@@ -1,3 +1,5 @@
+.. _route_choice:
+
 Route choice
 ============
 

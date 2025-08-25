@@ -1,3 +1,5 @@
+.. _trip_distribution:
+
 Trip Distribution
 =================
 
@@ -353,6 +355,6 @@ check its output and close it.
     :alt: Apply Gravity - Procedure output
 
 The result of this future demand matrix can also be assigned, which is what we will generate
-the outputs being used in the :ref:`scenario comparison <scenario_comparison>`. To do so, run
+the outputs being used in the :ref:`scenario comparison <mapping_scenario_comparison>`. To do so, run
 a :ref:`traffic assignnment workflow <traffic_assignment_workflow>` using the
 'demand_negative_model' as input! Try it on!

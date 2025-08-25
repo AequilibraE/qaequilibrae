@@ -1,3 +1,5 @@
+.. _paths_procedures:
+
 Path Computation
 ================
 

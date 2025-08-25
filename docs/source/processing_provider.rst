@@ -107,11 +107,8 @@ matrices and their selected cores.
 
 Mapping
 -------
-Desire lines
-~~~~~~~~~~~~
-
-Scenario comparison
-~~~~~~~~~~~~~~~~~~~
+For the tools not presented here, please refer to the :ref:`Mapping tools module <mapping_tools>`
+documentation.
 
 Simple tag
 ~~~~~~~~~~
@@ -134,12 +131,6 @@ available.
 
 Be aware that the existence of triggers in the project database might affect the
 performance of Simple tag.
-
-Stacked bandwidth
-~~~~~~~~~~~~~~~~~
-
-Visualize data
-~~~~~~~~~~~~~~
 
 Model Building
 --------------
@@ -392,14 +383,7 @@ The input for the tool consists in a folder containing an AequilibraE project.
 
 Path computation
 ----------------
-Impedance matrix
-~~~~~~~~~~~~~~~~
-
-Shortest path
-~~~~~~~~~~~~~
-
-Skim viewer
-~~~~~~~~~~~
+Please refer to the :ref:`Path computation module <paths_procedures>` documentation.
 
 Project
 -------
@@ -409,8 +393,8 @@ run procedures, or check parameter and log files.
 
 Open & Close project
 ~~~~~~~~~~~~~~~~~~~~
-These tasks are also available at the QAequilibraE widget. More about it can be found
-:ref:`here <open_and_close_project>`.
+These tasks are also available at the QAequilibraE widget. Please refer to
+:ref:`its documentation <open_and_close_project>`.
 
 .. _create_example:
 
@@ -470,6 +454,7 @@ Route choice
 ------------
 Route choice
 ~~~~~~~~~~~~
+Please refer to the :ref:`Route choice <route_choice>` documentation.
 
 Routing
 -------
@@ -515,26 +500,12 @@ Please note that the TSP stops are labeled according their sequence.
 
 Traffic Assignment
 ------------------
-Traffic assignment
-~~~~~~~~~~~~~~~~~~
-Please refer to the :ref:`Traffic Assignment menu <traffic_assignment_procedures>` documentation.
+Please refer to the :ref:`Traffic Assignment module <traffic_assignment_procedures>` documentation.
 
 Transit
 -------
-Import GTFS
-~~~~~~~~~~~
-Please refer to the :ref:`Import GTFS <transit_import_gtfs>` documentation.
-
-Explore transit
-~~~~~~~~~~~~~~~
-Please refer to the :ref:`Explore transit network <explore_transit_network>` documentation.
-
-Skimming & Assignment
-~~~~~~~~~~~~~~~~~~~~~
-Please refer to the :ref:`Transit skimming and assignment <transit_skimming_and_assignment>`
-documentation.
+Please refer to the :ref:`Transit module <transit_procedures>` documentation.
 
 Trip distribution
 -----------------
-Trip distribution
-~~~~~~~~~~~~~~~~~
+Please refer to the :ref:`Trip distribution module <trip_distribution>` documentation.
