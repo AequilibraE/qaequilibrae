@@ -215,12 +215,20 @@ the base flows.
 
 .. image:: ../images/mapping_tools/scenario_comparison_1.png
     :align: center
-    :alt: scenario_comparison_configuration
+    :alt: Scenario comparison window
 
 Basic workflow
 ~~~~~~~~~~~~~~
-Create a mapping for scenario comparison is pretty straightforward: 
+Create a mapping for scenario comparison is pretty straightforward: select the result
+name and directional value for the base scenario (1) and repeat the process for the
+alternative scenario (2). If you want, you can edit the space between bands and the
+maximum band width: it all depends on how you want your results to look like. Select
+your displaying method (3) - we'll use differences only, and just click on "*Create Comparison*"
+(4) to run the procedure.
 
+.. image:: ../images/mapping_tools/scenario_comparison_2.png
+    :align: center
+    :alt: Configuring scenario comparison
 
 And this is what it looks like!
 

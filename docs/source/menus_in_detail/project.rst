@@ -8,14 +8,14 @@ are interested in better understanding its structure, please visit its
 `documentation <https://www.aequilibrae.com/latest/python/modeling_with_aequilibrae/project.html>`_
 webpage.
 
-Under the project tab, there are some options to choose from and the following sections
+Under the project menu, there are some options to choose from and the following sections
 explore some of these actions.
 
 .. image:: ../images/project_procedures/menu_project.png
     :align: center
     :alt: tab project menu
 
-.. _siouxfalls-open-project:
+.. _open_and_close_project:
 
 Open & Close project
 --------------------
@@ -28,7 +28,7 @@ Keep in mind that to open another project or to create a new one, you **must**
 close the currently open project, otherwise AequilibraE is going to return an
 error.
 
-.. _run-procedures:
+.. _run_procedures:
 
 Run procedures
 --------------

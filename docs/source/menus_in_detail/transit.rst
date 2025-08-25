@@ -14,6 +14,8 @@ and we recommend understanding the role of each table before
 setting an AequilibraE model you intend to use. If you don't know much about GTFS, we strongly encourage you to take
 a look at the documentation provided by `Mobility Data <https://gtfs.org/documentation/schedule/reference/>`_.
 
+.. _transit_import_gtfs:
+
 Import GTFS
 -----------
 
@@ -62,6 +64,8 @@ project.
 .. image:: ../images/transit/gtfs_5.png
     :align: center
     :alt: gtfs already exists
+
+.. _transit_skimming_and_assignment:
 
 Transit skimming and assignment
 -------------------------------
@@ -191,6 +195,8 @@ and 5). Lastly, select an appropriate name for the output that will be stored in
 .. image:: ../images/transit/pt_assign_12.png
     :align: center
     :alt: transit assignment
+
+.. _explore_transit_network:
 
 Explore transit network
 -----------------------
