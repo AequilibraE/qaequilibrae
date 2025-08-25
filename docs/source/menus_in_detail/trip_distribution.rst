@@ -89,7 +89,8 @@ of a future year assignnment.
 This workflow is based on the AequilibraE Python 
 `Forecast example <https://www.aequilibrae.com/latest/python/_auto_examples/traffic_assignment/plot_forecasting.html>`_.
 
-Before 
+Before running the trip distribution procedures, we encourage you to run the 
+:ref:`traffic assignment procedure <traffic_assignment_workflow>` for the base-year.
 
 .. _siouxfalls-gravity-model-calibration:
 

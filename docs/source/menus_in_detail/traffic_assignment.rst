@@ -65,6 +65,8 @@ we want, and the output folder.
     :align: center
     :alt: Traffic assignment perform assignment tab
 
+.. _traffic_assignment_workflow:
+
 Basic workflow
 --------------
 
@@ -189,7 +191,7 @@ YAML file.
    containing the 'link_id' and 'link_direction' (check the :ref:`direction section <link_direction>` 
    here).
 
-Notice that all lines that are commented in the code below are optional. 
+**Notice that all lines that are commented in the code below are optional.**
 
 .. code-block:: yaml
     :caption: Traffic assignment configuration
