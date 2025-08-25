@@ -102,119 +102,170 @@ Gravity model option.
 
 .. image:: ../images/trip_distribution/calibrate_gravity_1.png
     :align: center
-    :alt: calibrate_gravity_menu
+    :alt: Calibrate Gravity menu
 
 The first thing to do is to check if all matrices we need (skim and demand) are in
 the project folder.
 
-.. image:: ../images/trip_distribution/calibrate_matrix_load_matrices.png
+.. image:: ../images/trip_distribution/calibrate_gravity_2.png
     :align: center
-    :alt: calibrate_matrix_load_matrices
+    :alt: Calibrate Gravity - Load matrices
 
 Select which matrix/matrix core is to be used as the impedance matrix.
 
-.. image:: ../images/trip_distribution/calibrate_matrix_choose_skims.png
+.. image:: ../images/trip_distribution/calibrate_gravity_3.png
     :align: center
-    :alt: calibrate_matrix_choose_skims
+    :alt: Calibrate Gravity - Impedance matrix
 
-And which one corresponds to the *observed* matrix.
+And which one corresponds to the observed (demand) matrix.
 
-.. image:: ../images/trip_distribution/calibrate_matrix_choose_observed.png
+.. image:: ../images/trip_distribution/calibrate_gravity_4.png
     :align: center
-    :alt: calibrate_matrix_choose_observed
+    :alt: Calibrate Gravity - Demand matrix
 
-We then select which deterrence function we want to use (1) and choose a file output
-for the model by clicking on *Queue jobs* (2).
+We then select which deterrence function we want to use (1) and choose a location to
+store the model by clicking on *Queue jobs* (2). A new window will open and you can
+choose your preferred place. Remember to pick up a place where you can easily find
+the model files: we'll use them to apply the gravity model.
 
-.. image:: ../images/trip_distribution/calibrate_matrix_choose_output.png
+.. image:: ../images/trip_distribution/calibrate_gravity_5.png
     :align: center
-    :alt: calibrate_matrix_choose_output
+    :alt: Calibrate Gravity - Queue negative exponential model
 
-In the jobs tab, we can check all jobs we queued (1) and then run the procedure (2).
+Let's queue another job. 
 
-.. image:: ../images/trip_distribution/calibrate_matrix_run.png
+.. image:: ../images/trip_distribution/calibrate_gravity_6.png
     :align: center
-    :alt: calibrate_matrix_run
+    :alt: Calibrate Gravity - Queue inverse power model
 
-Inspect the procedure output.
+In the jobs tab, we can check all jobs we queued (1) and then run the procedures (2).
+You need to click once in the button to execute all of them.
 
-.. image:: ../images/trip_distribution/calibrate_matrix_inspect_report.png
+.. image:: ../images/trip_distribution/calibrate_gravity_7.png
     :align: center
-    :alt: calibrate_matrix_inspect_report
+    :alt: Run calibrate gravity jobs 
+
+When the procedures are done, a window with each of the procedures report opens.
+You can inspect the outputs and save them.
+
+.. subfigure:: AB
+    :subcaptions: below
+    :align: center
+    :gap: 8px
+
+    .. image:: ../images/trip_distribution/calibrate_gravity_8.png
+        :alt: Negative exponential procedure output 
+    
+    .. image:: ../images/trip_distribution/calibrate_gravity_9.png
+        :alt: Inverse power procedure output
 
 The resulting file is of type ``*.mod``, but that is just a YAML (text file).
 
-.. image:: ../images/trip_distribution/calibrate_matrix_model_result.png
+.. subfigure:: AB
+    :subcaptions: below
     :align: center
-    :alt: calibrate_matrix_model_result
+
+    .. image:: ../images/trip_distribution/calibrate_gravity_11.png
+        :alt: Negative exponential model 
+    
+    .. image:: ../images/trip_distribution/calibrate_gravity_10.png
+        :alt: Inverse power model
 
 Iterative Proportional Fitting (IPF)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-It is possible to balance the production/attraction vectors using IPF. There are three different
-ways to load a vector's data: loading a ``*.csv`` or ``*.parquet`` file or loading data from an 
-open layer. 
+It is possible to balance the production/attraction vectors using Iterative Proportional Fitting
+(IPF). Let's click on the Trip Distribution menu and select Iterative Proportional Fitting.
 
-Let's click on the Iterative Proportional Fitting option to open the menu.
-
-.. image:: ../images/trip_distribution/tripdistribution-ipf-0.png
+.. image:: ../images/trip_distribution/ipf_1.png
     :align: center
-    :alt: ipf_0
+    :alt: IPF menu
 
-Loading the vector from a ``*.csv`` or ``*.parquet`` file is quite the same. Select your 
-preferred option in the menu, and click *Load*, pointing to the location of the vector file 
-in your machine.
+There are three different ways to load a vector's data: loading a ``*.csv`` or ``*.parquet``
+file or loading data from an open layer. Click on the *Load* button under "Data sets" (1). A new
+window opens. Loading the vector from a file is quite the same: select your preferred file format
+in the menu (2), and click *Load* (3), pointing to the location of the vector file in your machine.
 
-.. image:: ../images/trip_distribution/tripdistribution-ipf-1.png
+.. image:: ../images/trip_distribution/ipf_2.png
     :align: center
-    :alt: ipf_1
+    :alt: IPF - Load dataset from file
 
-Case you are loading from an open layer, just click *Import from layer*,
-point the available data layer, and the name of its index column. You can choose between *Use data*
-or *Save and use*. Case you choose to save, the vector will be saved in a temporary QGIS folder.
+Case you are loading from an open layer, just click *Import from layer*, point the available data
+layer (1), and the name of its index column (2). Let's choose to only *Use data* (3).
 
-.. image:: ../images/trip_distribution/tripdistribution-ipf-2.png
+.. image:: ../images/trip_distribution/ipf_3.png
     :align: center
-    :alt: ipf_2
+    :alt: IPF - Load dataset from layer
 
-After the vector is properly loaded, it will appear in the *Load datasets* tab.
+When the vector is loaded, it will appear in the *Load datasets* table.
 
-.. image:: ../images/trip_distribution/tripdistribution-ipf-3.png
+.. image:: ../images/trip_distribution/ipf_4.png
     :align: center
-    :alt: ipf_3
+    :alt: IPF - Loaded datasets
 
 You can now select the production/attraction (origin/destination) vectors. If your data comes
-from a table/layer opened in QGIS, you'll notice that the *Index* collapsible list is deactivated 
-because the data index was selected when loading the data.
+from a QGIS layer, you'll notice that the *Index* list is deactivated because the data index
+was configured when loading the data.
 
-.. image:: ../images/trip_distribution/tripdistribution-ipf-4.png
+.. image:: ../images/trip_distribution/ipf_5.png
     :align: center
-    :alt: ipf_4
+    :alt: IPF - Select vector
 
-And select the impedance matrix to be used.
+And select the seed (demand) matrix to be used.
 
-.. image:: ../images/trip_distribution/tripdistribution-ipf-5.png
+.. image:: ../images/trip_distribution/ipf_6.png
     :align: center
-    :alt: ipf_5
+    :alt: IPF - Demand matrix
 
-To run the procedure, simply queue the job (and select the where the output file will be saved).
-Then, you will notice that a job with the output file name will appear in the jobs table with a
+To run the procedure, queue the job (and select the where the output file will be saved).
+You'll notice that a job with the output file name will appear in the jobs table with a
 status *queued* (2). Finally, press *Run jobs* (3).
 
-.. image:: ../images/trip_distribution/tripdistribution-ipf-6.png
+.. image:: ../images/trip_distribution/ipf_7.png
     :align: center
-    :alt: ipf_6
+    :alt: IPF - Queue jobs
 
-After the job is completed, a new window showing its procedure report will open.
+After the job is completed, a new window showing its procedure report will open. We can close it
+after checking the procedure report.
 
-.. image:: ../images/trip_distribution/tripdistribution-ipf-7.png
+.. image:: ../images/trip_distribution/ipf_8.png
     :align: center
-    :alt: ipf_7
-
-We can close it after checking the procedure report.
+    :alt: IPF - procedure report
 
 .. important::
 
-    Production and Attraction vectors **must be** balanced before running IPF. 
+    Production and Attraction vectors **must be** balanced before running IPF.
+
+If you want to use the same data as we did, you can save the following code block as a CSV file
+in your machine!
+
+.. code-block::
+    :caption: Synthetic future vector
+
+    index,origins,destinations
+    1,5220.000000,29197.959184
+    2,20648.000000,41952.857143
+    3,2204.000000,23665.714286
+    4,7656.000000,12293.877551
+    5,10208.000000,2766.122449
+    6,57420.000000,31349.387755
+    7,25636.000000,6146.938776
+    8,2784.000000,5071.224490
+    9,10440.000000,4302.857143
+    10,2668.000000,8298.367347
+    11,18908.000000,18748.163265
+    12,67164.000000,58242.244898
+    13,10440.000000,59471.632653
+    14,29348.000000,12447.551020
+    15,26912.000000,15060.000000
+    16,14848.000000,4302.857143
+    17,14848.000000,10449.795918
+    18,21344.000000,15213.673469
+    19,8236.000000,13523.265306
+    20,13456.000000,31195.714286
+    21,19140.000000,13369.591837
+    22,464.000000,307.346939
+    23,11716.000000,9681.428571
+    24,35032.000000,9681.428571
 
 Apply Gravity Model
 ^^^^^^^^^^^^^^^^^^^
