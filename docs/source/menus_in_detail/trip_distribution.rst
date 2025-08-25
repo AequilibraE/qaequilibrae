@@ -78,6 +78,8 @@ going to be executed, and run them!
     :align: center
     :alt: Configure jobs at trip distribution
 
+.. _trip_distribution_workflow:
+
 Basic workflow
 ~~~~~~~~~~~~~~
 
@@ -274,61 +276,83 @@ dataset), they can either apply the Iterative Proportional Fitting (IPF)
 procedure available, or apply a gravity model just calibrated. Here we present
 the latter.
 
-.. image:: ../images/trip_distribution/apply_gravity_menu.png
+.. image:: ../images/trip_distribution/apply_gravity_1.png
     :align: center
-    :alt: apply_gravity_menu
+    :alt: Apply Gravity menu
 
 With the menu open, let's load the dataset(s) with the production/origin and
-attraction/destination vectors. We can add data into the model by loading a
-``*.csv`` or ``*.parquet`` file or through an open-layer, just like the IPF
-procedure above.
+attraction/destination vectors. We can add data into the model by loading a file or using
+an open layer, just like the IPF procedure. Let's click to load the dataset (1). A new window
+opens. Loading the vector from a file is quite the same: select your preferred file format in
+the menu (2), and click *Load* (3), pointing to the location of the vector file in your
+machine.
 
-.. image:: ../images/trip_distribution/apply_gravity_load_vectors.png
+.. image:: ../images/trip_distribution/apply_gravity_2.png
     :align: center
-    :alt: apply_gravity_load_vectors
+    :alt: Apply gravity - Load dataset from file
 
-We select the production/attraction (origin/destination) vectors.
+Case you are loading from an open layer, just click *Import from layer*, point the available data
+layer (1), and the name of its index column (2). Let's choose to only *Use data* (3).
 
-.. image:: ../images/trip_distribution/apply_gravity_select_vectors.png
+.. image:: ../images/trip_distribution/apply_gravity_3.png
     :align: center
-    :alt: apply_gravity_select_vectors
+    :alt: Apply gravity - Load dataset from layer
+
+When the vector is loaded, it will appear in the *Load datasets* table.
+
+.. image:: ../images/trip_distribution/apply_gravity_4.png
+    :align: center
+    :alt: Apply gravity - Loaded datasets
+
+Select the production/attraction (origin/destination) vectors.
+
+.. image:: ../images/trip_distribution/apply_gravity_5.png
+    :align: center
+    :alt: Apply gravity - Select vector
 
 And the impedance matrix to be used. We can select one matrix core to use in computation.
 
-.. image:: ../images/trip_distribution/apply_gravity_select_impedance_matrix.png
+.. image:: ../images/trip_distribution/apply_gravity_6.png
     :align: center
-    :alt: apply_gravity_select_impedance_matrix
+    :alt: Apply Gravity - Impedance matrix
 
-The last input is the gravity model itself, which can be done by loading a
-model that has been previously calibrated, or by selecting the deterrence
-function from the drop-down menu and typing the corresponding parameter values.
+The last input is the gravity model itself, which can be done by loading a model that has
+been previously calibrated, or by selecting the deterrence function from the drop-down menu
+and typing the corresponding parameter values. To select a deterrence function, select one
+function among the available ones (1) and configure the values for the fields *alpha* and
+*beta* (steps 2 ane 3). For each function you select, queue it into the jobs (4) table.
 
-.. image:: ../images/trip_distribution/apply_gravity_configure_model.png
+.. image:: ../images/trip_distribution/apply_gravity_7.png
     :align: center
-    :alt: apply_gravity_configure_model
+    :alt: Apply Gravity - Manual model set up
 
-As we already have a calibrated model, we'll load its configurations. When clicking *Load*
+As we already have calibrated models, we'll load its configurations. When clicking *Load*
 (1) a new window opens. Point to the path where your ``*.mod`` file is stored, and once its
-done, you'll notice that the parameters in the table view now correspond to the model data (2).
+loaded, you'll notice that the parameters in the table view now correspond to the model data (2).
 Queue the jobs by hitting the *Queue jobs* button (3).
 
-.. image:: ../images/trip_distribution/apply_gravity_queue_model.png
+.. image:: ../images/trip_distribution/apply_gravity_8.png
     :align: center
-    :alt: apply_gravity_queue_model
+    :alt: Apply Gravity - Load model from file
 
-It is possible to check all jobs qeued before running the model in the tab *Jobs* (1). If all
+It is possible to check the jobs qeued before running the model in the tab *Jobs* (1). If all
 jobs look ok, just click on the *Run jobs* button (2).
 
-.. image:: ../images/trip_distribution/apply_gravity_run.png
+.. image:: ../images/trip_distribution/apply_gravity_9.png
     :align: center
-    :alt: apply_gravity_run
+    :alt: Apply Gravity - Run models
 
-Once the process is finished, a new window with the procedure report output will open.
-You can check its results and then close it.
+We have to repeat this process of configuring, loading the calibrated models and running the
+jobs twice: one for each model we have!
 
-.. image:: ../images/trip_distribution/apply_gravity_procedure_report.png
+Once the process is finished, a new window with the procedure report output opens. You can
+check its output and close it.
+
+.. image:: ../images/trip_distribution/apply_gravity_10.png
     :align: center
-    :alt: apply_gravity_procedure_report
+    :alt: Apply Gravity - Procedure output
 
-The result of this matrix can also be assigned, which is what we will generate
-the outputs being used in the scenario comparison.
+The result of this future demand matrix can also be assigned, which is what we will generate
+the outputs being used in the :ref:`scenario comparison <scenario_comparison>`. To do so, run
+a :ref:`traffic assignnment workflow <traffic_assignment_workflow>` using the
+'demand_negative_model' as input! Try it on!

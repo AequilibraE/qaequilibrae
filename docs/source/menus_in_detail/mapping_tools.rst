@@ -196,16 +196,13 @@ changing the project variables.
     .. image:: ../images/mapping_tools/stacked_bandwidth_color_ramp.png
         :alt: Color ramp
 
-.. _siouxfalls-scenario-comparison:
+.. _scenario_comparison:
 
 Scenario Comparison
 -------------------
-
-After joining the two assignment results (the original one and the one resulting
-from the forecast we just did) to the links layer, one can compare scenarios.
-
-When joining the assignment results, make sure to name them in a way you will
-understand.
+To compare scenarios, we need to have two different assignnment results (the original one
+and another from forecast). If you don't know how to run a forecast, take a look at the
+:ref:`trip distribution workflow <trip_distribution_workflow>`.
 
 The scenario configuration requires the user to set AB/BA flows for the two
 sets of link flows being compared, as well as the space between AB/BA flows,
@@ -216,17 +213,23 @@ flows are also shown on top of the positive and negative differences, which
 gives a proper sense of how significative the differences are when compared to
 the base flows.
 
-As it was the case for stacked bandwidth formatting, expert mode sets project
-variables as levers to change the map formatting.
-
-.. image:: ../images/mapping_tools/scenario_comparison_configuration.png
-    :width: 473
+.. image:: ../images/mapping_tools/scenario_comparison_1.png
     :align: center
     :alt: scenario_comparison_configuration
 
-And this is what it looks like
+Basic workflow
+~~~~~~~~~~~~~~
+Create a mapping for scenario comparison is pretty straightforward: 
 
-.. image:: ../images/mapping_tools/scenario_comparison_map.png
-    :width: 778
+
+And this is what it looks like!
+
+.. subfigure:: AB
+    :subcaptions: below
     :align: center
-    :alt: scenario_comparison_map
+
+    .. image:: ../images/mapping_tools/scenario_comparison_3.png
+        :alt: Differences only
+    
+    .. image:: ../images/mapping_tools/scenario_comparison_4.png
+        :alt: Composite lines
