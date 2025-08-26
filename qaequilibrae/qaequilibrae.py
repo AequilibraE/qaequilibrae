@@ -184,9 +184,8 @@ class AequilibraEMenu:
         lbl = QLabel("Model scenario")
         lbl.setAlignment(Qt.AlignCenter)
         self.toolbar.addWidget(lbl)
-
-        self.cob_iter = QComboBox()
-        self.toolbar.addWidget(self.cob_iter)
+        self.cob_scenarios = QComboBox()
+        self.toolbar.addWidget(self.cob_scenarios)
 
         self.projectManager = QTabWidget()
         self.toolbar.addWidget(self.projectManager)

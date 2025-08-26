@@ -4,8 +4,7 @@ from tempfile import gettempdir
 
 import qgis
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QVBoxLayout
 
 
 # Split loading between Qt action and processing, for easier unit testing
@@ -15,12 +14,6 @@ def run_load_project(qgis_project):
     proj_path = GetOutputFolderName(str(Path(qgis_project.path).parent), "AequilibraE Project folder")
 
     return _run_load_project_from_path(qgis_project, proj_path)
-
-
-def _get_project_path():
-    from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
-
-    return QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
 
 
 def _run_load_project_from_path(qgis_project, proj_path):
@@ -49,6 +42,9 @@ def _run_load_project_from_path(qgis_project, proj_path):
     pth = join(gettempdir(), "aequilibrae_last_folder.txt")
     with open(pth, "w") as file:
         file.write(proj_path)
+
+    outdirs = qgis_project.project.list_scenarios()["scenario_name"].tolist()
+    qgis_project.cob_scenarios.addItems(outdirs)
 
     update_project_layers(qgis_project)
 
