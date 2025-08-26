@@ -31,6 +31,9 @@ provider menus are ordered alphabetically, we'll display them in the same order.
 
 Data
 ----
+With Data tools, it is possible to import/export matrices to/from the project, as
+well as perform matrix calculations and generate a trip length distribution output
+usig project data.
 
 .. _importing_matrices:
 
@@ -112,7 +115,7 @@ documentation.
 
 Simple tag
 ~~~~~~~~~~
-**GIS > Simple tag** works as a spatial join tool in AequilibraE that allows you
+**Mapping > Simple tag** works as a spatial join tool in AequilibraE that allows you
 to join useful information between layers.
 
 Suppose you have a nodes layer with a 'name' column only with ``NULL`` values,
@@ -134,6 +137,10 @@ performance of Simple tag.
 
 Model Building
 --------------
+With the Model Building tools, it is possible to effectively build an AequilibraE model,
+and to do so, there are some options, such as creating project from Open Street Maps or
+using your existing layers. Model Building also provides options for editing the model's
+network.
 
 .. _adding_centroids:
 
@@ -199,7 +206,6 @@ as ``a_node`` or ``b_node``, as it will use the existing numbering in the projec
 
 Add zoning data
 ~~~~~~~~~~~~~~~
-
 It is possible to import to AequilibraE project your own zoning system in case
 you already have one. Currently, AequilibraE only supports one projection system,
 which is the EPSG:4326 (WGS84), so make sure your zone layer is in this projection.
@@ -230,7 +236,6 @@ the link IDs of the links you want to collapse separated by a comma.
 
 Create project from OSM
 ~~~~~~~~~~~~~~~~~~~~~~~
-
 The first feature is the capability of importing networks directly from
 `Open Street Maps <https://www.openstreetmap.org/>`_ into AequilibraE's efficient
 TranspoNet format. This is also time to give a HUGE shout out to
@@ -273,7 +278,6 @@ defined as the current map canvas on QGIS...
 
 Project from layers
 ~~~~~~~~~~~~~~~~~~~
-
 The AequilibraE project can also be bootstrapped from existing line and node
 layers obtained from any other source, as long as they contain the following
 required field for the conversion:
@@ -331,7 +335,6 @@ consistent with each other.
 
 Network preparation
 ~~~~~~~~~~~~~~~~~~~
-
 When preparing your project network, you might face there are two distinct situations:
 
 1. **User has only the network links**: This is the case when one exports only links 
@@ -387,7 +390,6 @@ Please refer to the :ref:`Path computation module <paths_procedures>` documentat
 
 Project
 -------
-
 In the project menu, the user can perform actions such as open/close project, create examples,
 run procedures, or check parameter and log files.
 
@@ -400,7 +402,6 @@ These tasks are also available at the QAequilibraE widget. Please refer to
 
 Create example
 ~~~~~~~~~~~~~~
-
 AequilibraE has three different example sets one can use as learning tool, and they were all
 made available within the QGIS ecosystem.
 
@@ -414,7 +415,6 @@ and you can open the project folder in the Project tab.
 
 Log file
 ~~~~~~~~
-
 The log file contains information about which actions took place and when they happened.
 For example, after you :ref:`create a project from OSM <create_project_from_osm>`,
 if you access the log file, you are going to see something like the figure below,
@@ -431,7 +431,6 @@ using the **save to disk** button in the lower left corner of the log file box.
 
 Parameters
 ~~~~~~~~~~
-
 The parameters file is part of the AequilibraE package for Python, so all the
 reference documentation for this section can be found in its
 `Python companion page <https://aequilibrae.com/latest/python/modeling_with_aequilibrae/parameter_file.html>`_.
@@ -452,13 +451,10 @@ This is a shortcut for the task available at the QAequilibraE widget menu. Check
 
 Route choice
 ------------
-Route choice
-~~~~~~~~~~~~
 Please refer to the :ref:`Route choice <route_choice>` documentation.
 
 Routing
 -------
-
 AequilibraE's routing allows the user to run a Travelling Salesman Problem (TSP),
 using a selected set of nodes or the centroids of a network. 
 
