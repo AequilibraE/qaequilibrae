@@ -429,7 +429,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_bandwidth_color_ramps.ui" line="209"/>
         <source>Field</source>
-        <translation type="unfinished"/>
+        <translation>Campo</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_bandwidth_color_ramps.ui" line="230"/>
@@ -477,17 +477,17 @@
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="69"/>
         <source>Collapse links</source>
-        <translation type="unfinished"/>
+        <translation>Fondi archi</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="72"/>
         <source>5. Network</source>
-        <translation type="unfinished"/>
+        <translation>5. Rete</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/collapse_links.py" line="78"/>
         <source>This tool collapses links into nodes, adjusting the network in the neighborhood.</source>
-        <translation type="unfinished"/>
+        <translation>Questo strumento comprime gli archi in nodi, adattando la parte di rete più vicina.</translation>
     </message>
 </context>
 <context>
@@ -601,7 +601,7 @@
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="152"/>
         <source>- the original matrix stored in the layer needs to be in list format</source>
-        <translation type="unfinished"/>
+        <translation>- la matrice originale salvata nel layer deve essere in formato lista</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/create_matrix_from_layer.py" line="153"/>
@@ -687,12 +687,12 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_dialog.py" line="297"/>
         <source>Link Layer has NO defined CRS</source>
-        <translation type="unfinished"/>
+        <translation>Il sistema di riferimento (CRS) del layer degli archi non è definito</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_dialog.py" line="301"/>
         <source>Node Layer has NO defined CRS</source>
-        <translation type="unfinished"/>
+        <translation>Il sistema di riferimento del layer degli nodi NON è definito</translation>
     </message>
 </context>
 <context>
@@ -753,7 +753,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="144"/>
         <source>...</source>
-        <translation type="unfinished"/>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="156"/>
@@ -763,7 +763,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="185"/>
         <source>Use all</source>
-        <translation type="unfinished"/>
+        <translation>Usa tutti</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="206"/>
@@ -806,7 +806,7 @@
     <message>
         <location filename="../modules/gis/desire_lines_dialog.py" line="208"/>
         <source>Inputs not loaded properly</source>
-        <translation type="unfinished"/>
+        <translation>Input non caricati correttamente</translation>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_dialog.py" line="208"/>
@@ -834,7 +834,7 @@
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="136"/>
         <source>Concatenating AB &amp; BA flows</source>
-        <translation type="unfinished"/>
+        <translation>Concatenazione dei flussi AB e BA</translation>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="146"/>
@@ -1105,7 +1105,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="148"/>
         <source>No mapping</source>
-        <translation type="unfinished"/>
+        <translation>Nessuna mappatura</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="152"/>
@@ -1234,7 +1234,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="22"/>
         <source>GTFS Feed</source>
-        <translation type="unfinished"/>
+        <translation>Feed GTFS</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="40"/>
@@ -1259,7 +1259,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="145"/>
         <source>Agency*</source>
-        <translation type="unfinished"/>
+        <translation>Agenzia o operatore*</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_feed.ui" line="172"/>
@@ -1309,17 +1309,17 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="52"/>
         <source>Execute Importer</source>
-        <translation type="unfinished"/>
+        <translation>Esegue importazione</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="123"/>
         <source>Add Feed</source>
-        <translation type="unfinished"/>
+        <translation>Aggiunge Feed</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="98"/>
         <source>Feeds to import</source>
-        <translation type="unfinished"/>
+        <translation>Feed da importare</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="181"/>
@@ -1334,7 +1334,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/gtfs_importer.ui" line="247"/>
         <source>Running</source>
-        <translation type="unfinished"/>
+        <translation>In esecuzione</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="25"/>
@@ -1374,7 +1374,7 @@
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="161"/>
         <source>Block flows through centroids</source>
-        <translation type="unfinished"/>
+        <translation>Blocca i flussi attraverso i centroidi</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/forms/tsp.ui" line="202"/>
@@ -1429,17 +1429,17 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="408"/>
         <source>Route type from the GTFS. Standard values are 0 to 12</source>
-        <translation type="unfinished"/>
+        <translation>Tipi di percorso dal GTFS. I valori standard sono da 0 a 12</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="432"/>
         <source>All directions</source>
-        <translation type="unfinished"/>
+        <translation>Tutte le direzioni</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="462"/>
         <source>%</source>
-        <translation type="unfinished"/>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="498"/>
@@ -1469,7 +1469,7 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="778"/>
         <source>Time Window</source>
-        <translation type="unfinished"/>
+        <translation>Finestra temporale</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="918"/>
@@ -1489,12 +1489,12 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1593"/>
         <source>Map!</source>
-        <translation type="unfinished"/>
+        <translation>Mappa!</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1653"/>
         <source>Map</source>
-        <translation type="unfinished"/>
+        <translation>Mappa</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/transit_navigator.ui" line="1746"/>
@@ -1524,12 +1524,12 @@
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="14"/>
         <source>AequilibraE - Add new period</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Aggiunge nuovo periodo</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="37"/>
         <source>Description</source>
-        <translation type="unfinished"/>
+        <translation>Descrizione</translation>
     </message>
     <message>
         <location filename="../modules/public_transport_procedures/forms/ui_add_period.ui" line="44"/>
@@ -1559,7 +1559,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="131"/>
         <source>Minimize field</source>
-        <translation type="unfinished"/>
+        <translation>Minimizza campo</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="209"/>
@@ -1579,7 +1579,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="74"/>
         <source>Color</source>
-        <translation type="unfinished"/>
+        <translation>Colore</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="44"/>
@@ -1589,7 +1589,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="81"/>
         <source>Invert colors</source>
-        <translation type="unfinished"/>
+        <translation>Inverte colori</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="114"/>
