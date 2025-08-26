@@ -110,8 +110,8 @@ matrices and their selected cores.
 
 Mapping
 -------
-For the tools not presented here, please refer to the :ref:`Mapping tools module <mapping_tools>`
-documentation.
+With Mapping tools, the user can easily visualize project data. For the tools not presented
+here, please refer to the :ref:`Mapping tools module <mapping_tools>` documentation.
 
 Simple tag
 ~~~~~~~~~~
@@ -282,7 +282,7 @@ The AequilibraE project can also be bootstrapped from existing line and node
 layers obtained from any other source, as long as they contain the following
 required field for the conversion:
 
-* link ID
+* link_id
 * a_node
 * b_node
 * link direction
@@ -390,13 +390,9 @@ Please refer to the :ref:`Path computation module <paths_procedures>` documentat
 
 Project
 -------
-In the project menu, the user can perform actions such as open/close project, create examples,
-run procedures, or check parameter and log files.
-
-Open & Close project
-~~~~~~~~~~~~~~~~~~~~
-These tasks are also available at the QAequilibraE widget. Please refer to
-:ref:`its documentation <open_and_close_project>`.
+In the project menu, the user can perform actions such as open/close project, create
+examples, run procedures, or check parameter and log files. For the tools not presented
+here, please refer to the :ref:`Project <aequilibrae_project>` documentation.
 
 .. _create_example:
 
@@ -443,11 +439,6 @@ submitting them as the new parameter file for all AequilibraE procedures.
 .. image:: images/processing_provider/parameters_menu.png
     :align: center
     :alt: parameters menu
-
-Run procedures
-~~~~~~~~~~~~~~
-This is a shortcut for the task available at the QAequilibraE widget menu. Check its documentation
-:ref:`here <run_procedures>`.
 
 Route choice
 ------------
