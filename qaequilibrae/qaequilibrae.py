@@ -24,7 +24,7 @@ from qaequilibrae.modules.menu_actions import run_add_zones, run_show_project_da
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs
 from qaequilibrae.modules.menu_actions import run_distribution_models, run_change_parameters, prepare_network
 from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet
-from qaequilibrae.modules.menu_actions import run_pt_explore, show_log, create_example
+from qaequilibrae.modules.menu_actions import run_pt_explore, show_log, create_example, create_scenarios
 from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig
 from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder, run_module, load_skim_viewer
 from qaequilibrae.modules.processing_provider.provider import Provider
@@ -113,6 +113,7 @@ class AequilibraEMenu:
         self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
         self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
         self.add_menu_action(self.tr("Project"), self.tr("Run procedures"), partial(run_module, self))
+        self.add_menu_action(self.tr("Project"), self.tr("Scenarios"), partial(create_scenarios, self))
         self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
 
         # # # ########################################################################
@@ -284,6 +285,7 @@ class AequilibraEMenu:
             return
         self.remove_aequilibrae_layers()
         self.project.close()
+        self.cob_scenarios.clear()
         self.projectManager.clear()
         self.project = None
         self.matrices.clear()
@@ -333,17 +335,13 @@ class AequilibraEMenu:
         return layer
 
     def show_message_no_project(self):
-        self.iface.messageBar().pushMessage("Error", self.tr("You need to load a project first"), level=3, duration=10)
+        self.iface.messageBar().pushCritical("Error", self.tr("You need to load a project"))
 
     def message_project_already_open(self):
-        self.iface.messageBar().pushMessage(
-            "Error", self.tr("You need to close the project currently open first"), level=2, duration=10
-        )
+        self.iface.messageBar().pushCritical("Error", self.tr("You need to close the currently open project"))
 
     def message_no_gtfs_feed(self):
-        self.iface.messageBar().pushMessage(
-            "Error", self.tr("You need to import a GTFS feed first"), level=3, duration=10
-        )
+        self.iface.messageBar().pushCritical("Error", self.tr("You need to import a GTFS feed"))
 
     def set_font(self, obj):
         f = obj.font()

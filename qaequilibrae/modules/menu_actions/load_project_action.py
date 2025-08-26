@@ -9,6 +9,10 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QVBoxLa
 
 # Split loading between Qt action and processing, for easier unit testing
 def run_load_project(qgis_project):
+    if qgis_project.project:
+        qgis_project.message_project_already_open()
+        return
+
     from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFolderName
 
     proj_path = GetOutputFolderName(str(Path(qgis_project.path).parent), "AequilibraE Project folder")
