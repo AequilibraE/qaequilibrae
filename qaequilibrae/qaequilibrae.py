@@ -224,7 +224,7 @@ class AequilibraEMenu:
         if self.available_scenarios:
             name = self.available_scenarios[self.cob_scenarios.currentIndex()]
             self.project.use_scenario(name)
-            QgsMessageLog.logMessage(f"Changed active scenario: {name}", "Messages", Qgis.Info, False)
+            self.log_message(f"Changed active scenario: {name}")
 
             # Change layers
             self.projectManager.removeTab(0)
@@ -300,12 +300,15 @@ class AequilibraEMenu:
         if self.project is None:
             return
         self.remove_aequilibrae_layers()
+        self.project.use_scenario("root")
+        pth = str(self.project.project_base_path)
         self.project.close()
         self.cob_scenarios.clear()
         self.projectManager.clear()
         self.project = None
         self.matrices.clear()
         self.layers.clear()
+        self.log_message(f"Closed project on: {pth}")
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
@@ -353,13 +356,13 @@ class AequilibraEMenu:
         return layer
 
     def show_message_no_project(self):
-        self.iface.messageBar().pushCritical("Error", self.tr("You need to load a project"))
+        self.iface_error_message(text=self.tr("You need to load a project"))
 
     def message_project_already_open(self):
-        self.iface.messageBar().pushCritical("Error", self.tr("You need to close the currently open project"))
+        self.iface_error_message(text=self.tr("You need to close the currently open project"))
 
     def message_no_gtfs_feed(self):
-        self.iface.messageBar().pushCritical("Error", self.tr("You need to import a GTFS feed"))
+        self.iface_error_message(text=self.tr("You need to import a GTFS feed"))
 
     def set_font(self, obj):
         f = obj.font()
@@ -480,3 +483,9 @@ class AequilibraEMenu:
             self.layers.clear()
             for lyr in layers:
                 self.create_layer_by_name(lyr)
+
+    def log_message(self, message, level: Qgis.MessageLevel = Qgis.MessageLevel.Info, notify_user: bool = False):
+        QgsMessageLog.logMessage(message, "Messages", level, notify_user)
+
+    def iface_error_message(self, text: str = None, title: str = "Error"):
+        self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Critical, -1)

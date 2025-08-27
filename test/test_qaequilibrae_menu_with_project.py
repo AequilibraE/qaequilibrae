@@ -29,7 +29,7 @@ def check_if_new_active_window_matches_class(qtbot, windowClass):
 
 def test_load_project(ae_with_project):
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
     assert ae_with_project.project is not None, "project should be loaded"
 
 
@@ -39,7 +39,7 @@ def test_create_example(ae_with_project):
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
     assert (
-        messagebar.messages[2][0] == "Error:You need to close the project currently open first"
+        messagebar.messages[2][0] == "Error:You need to close the currently open project"
     ), "Level 2 error message is missing"
 
 
@@ -54,7 +54,7 @@ def test_parameters_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_logfile_menu(ae_with_project, qtbot):
@@ -68,7 +68,7 @@ def test_logfile_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_run_module_menu(coquimbo_project, qtbot):
@@ -82,7 +82,7 @@ def test_run_module_menu(coquimbo_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = coquimbo_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_create_project_from_osm_menu(ae_with_project):
@@ -91,7 +91,7 @@ def test_create_project_from_osm_menu(ae_with_project):
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
     assert (
-        messagebar.messages[2][0] == "Error:You need to close the project currently open first"
+        messagebar.messages[2][0] == "Error:You need to close the currently open project"
     ), "Level 2 error message is missing"
 
 
@@ -101,7 +101,7 @@ def test_create_project_from_layers_menu(ae_with_project):
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
     assert (
-        messagebar.messages[2][0] == "Error:You need to close the project currently open first"
+        messagebar.messages[2][0] == "Error:You need to close the currently open project"
     ), "Level 2 error message is missing"
 
 
@@ -115,6 +115,8 @@ def test_network_preparation_menu(ae_with_project, qtbot):
     assert action.text() == "Network Preparation", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
+    messagebar = ae_with_project.iface.messageBar()
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_add_centroid_connectors_menu(ae_with_project, qtbot):
@@ -128,7 +130,7 @@ def test_add_centroid_connectors_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_add_zoning_data_menu(ae_with_project, qtbot):
@@ -142,7 +144,7 @@ def test_add_zoning_data_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_display_project_data_menu(ae_with_project, qtbot):
@@ -156,7 +158,7 @@ def test_display_project_data_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_import_matrices_menu(ae_with_project, qtbot):
@@ -170,7 +172,7 @@ def test_import_matrices_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_trip_distribution_menu(ae_with_project, qtbot):
@@ -184,7 +186,7 @@ def test_trip_distribution_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_shortest_path_menu(ae_with_project, qtbot):
@@ -198,7 +200,7 @@ def test_shortest_path_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_impedance_matrix_menu(ae_with_project, qtbot):
@@ -212,7 +214,7 @@ def test_impedance_matrix_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_skim_viewer_menu(ae_with_project, qtbot):
@@ -226,7 +228,9 @@ def test_skim_viewer_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert (
+        messagebar.messages[2][0] == "Input error:Please set an active layer to proceed"
+    ), "Level 2 error message is missing"
 
 
 def test_traffic_assignment_menu(ae_with_project, qtbot):
@@ -240,7 +244,7 @@ def test_traffic_assignment_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_route_choice_menu(ae_with_project, qtbot):
@@ -254,7 +258,7 @@ def test_route_choice_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_travelling_salesman_problem_menu(ae_with_project, qtbot):
@@ -268,7 +272,7 @@ def test_travelling_salesman_problem_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_gis_desire_lines_menu(ae_with_project, qtbot):
@@ -282,7 +286,7 @@ def test_gis_desire_lines_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_gis_stacked_bandwidth_menu(ae_with_project, qtbot):
@@ -296,7 +300,7 @@ def test_gis_stacked_bandwidth_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_gis_scenario_comparison_menu(ae_with_project, qtbot):
@@ -310,7 +314,7 @@ def test_gis_scenario_comparison_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_gis_simple_tag_menu(ae_with_project, qtbot):
@@ -324,7 +328,7 @@ def test_gis_simple_tag_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_gtfs_importer(ae_with_project, qtbot):
@@ -338,12 +342,12 @@ def test_gtfs_importer(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-def test_gtfs_explorer(ae_with_project, qtbot):
-    action = ae_with_project.menuActions["Public Transport"][2]
+def test_gtfs_explorer(sf_project, qtbot):
+    action = sf_project.menuActions["Public Transport"][2]
     assert action.text() == "Explore Transit", "Wrong text content"
     action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:You need to import a GTFS feed first", "Level 3 error message is missing"
+    messagebar = sf_project.iface.messageBar()
+    assert messagebar.messages[2][0] == "Error:You need to import a GTFS feed", "Level 2 error message is missing"
