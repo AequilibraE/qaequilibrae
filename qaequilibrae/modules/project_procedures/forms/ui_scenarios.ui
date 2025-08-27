@@ -90,7 +90,7 @@
        <rect>
         <x>10</x>
         <y>0</y>
-        <width>91</width>
+        <width>151</width>
         <height>16</height>
        </rect>
       </property>
@@ -106,6 +106,19 @@
         <width>311</width>
         <height>20</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cob_scenarios">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="visible">
+       <bool>false</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_2">
