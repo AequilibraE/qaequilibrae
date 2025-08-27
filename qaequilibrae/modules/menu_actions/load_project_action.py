@@ -49,40 +49,6 @@ def _run_load_project_from_path(qgis_project, proj_path):
 
     outdirs = qgis_project.project.list_scenarios()["scenario_name"].tolist()
     qgis_project.cob_scenarios.addItems(outdirs)
+    qgis_project.available_scenarios.extend(outdirs)
 
-    update_project_layers(qgis_project)
-
-
-def update_project_layers(qgis_project):
-
-    with qgis_project.project.db_connection_spatial as conn:
-        layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
-
-        # Add transit_tables to layers
-        if exists(qgis_project.project._transit_database_path):
-            layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
-
-        descrlayout = QVBoxLayout()
-        qgis_project.geo_layers_table = QTableWidget()
-        qgis_project.geo_layers_table.doubleClicked.connect(qgis_project.load_geo_layer)
-
-        qgis_project.geo_layers_table.setRowCount(len(layers))
-        qgis_project.geo_layers_table.setColumnCount(1)
-        qgis_project.geo_layers_table.horizontalHeader().hide()
-        for i, f in enumerate(layers):
-            item1 = QTableWidgetItem(f)
-            item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            qgis_project.geo_layers_table.setItem(i, 0, item1)
-
-        descrlayout.addWidget(qgis_project.geo_layers_table)
-
-        descr = QWidget()
-        descr.setLayout(descrlayout)
-        qgis_project.tabContents = [(descr, "Geo layers")]
-        qgis_project.projectManager.addTab(descr, "Geo layers")
-        conn.execute("PRAGMA temp_store = 0;")
-
-        # Creates all layers and puts them in memory
-        qgis_project.layers.clear()
-        for lyr in layers:
-            qgis_project.create_layer_by_name(lyr)
+    qgis_project.update_project_layers()

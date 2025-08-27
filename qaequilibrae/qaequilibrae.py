@@ -14,9 +14,9 @@ import qgis
 from qgis.PyQt.QtCore import Qt, QTranslator, QSettings, QLocale, QCoreApplication, QSize
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication, QToolBar, QToolButton
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget
-from qgis.PyQt.QtWidgets import QComboBox, QLabel
+from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableWidgetItem, QTableWidget
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
-from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
+from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, QgsMessageLog, Qgis
 
 from qaequilibrae.message import messages
 from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
@@ -67,7 +67,8 @@ class AequilibraEMenu:
     def __init__(self, iface):
         # Closes AequilibraE projects eventually opened in memory
         self.logger = logging.getLogger("AequilibraEGUI")
-        self.geo_layers_list = ["links", "nodes", "zones"]  # Maybe will change
+        self.geo_layers_list = ["links", "nodes", "zones"]
+        self.available_scenarios = []
         self.iface = iface
         self.path = last_folder()
         self.project = None  # type: Project
@@ -188,6 +189,8 @@ class AequilibraEMenu:
         self.cob_scenarios = QComboBox()
         self.toolbar.addWidget(self.cob_scenarios)
 
+        self.cob_scenarios.currentIndexChanged.connect(self.configure_scenario)
+
         self.projectManager = QTabWidget()
         self.toolbar.addWidget(self.projectManager)
 
@@ -213,6 +216,19 @@ class AequilibraEMenu:
             temp_saving = self.iface.mainWindow().findChild(QAction, action)
             if temp_saving:
                 temp_saving.triggered.connect(self.save_in_project)
+
+    def configure_scenario(self):
+        if self.cob_scenarios.currentIndex() < 0:
+            return
+
+        if self.available_scenarios:
+            name = self.available_scenarios[self.cob_scenarios.currentIndex()]
+            self.project.use_scenario(name)
+            QgsMessageLog.logMessage(f"Changed active scenario: {name}", "Messages", Qgis.Info, False)
+
+            # Change layers
+            self.projectManager.removeTab(0)
+            self.update_project_layers(self)
 
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
         if main_menu == "AequilibraE":
@@ -428,3 +444,37 @@ class AequilibraEMenu:
                 file_exists = True
 
         QgsProject.instance().write()
+
+    def update_project_layers(self):
+
+        with self.project.db_connection_spatial as conn:
+            layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
+
+            # Add transit_tables to layers
+            if exists(self.project._transit_database_path):
+                layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
+
+            descrlayout = QVBoxLayout()
+            self.geo_layers_table = QTableWidget()
+            self.geo_layers_table.doubleClicked.connect(self.load_geo_layer)
+
+            self.geo_layers_table.setRowCount(len(layers))
+            self.geo_layers_table.setColumnCount(1)
+            self.geo_layers_table.horizontalHeader().hide()
+            for i, f in enumerate(layers):
+                item1 = QTableWidgetItem(f)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.geo_layers_table.setItem(i, 0, item1)
+
+            descrlayout.addWidget(self.geo_layers_table)
+
+            descr = QWidget()
+            descr.setLayout(descrlayout)
+            self.tabContents = [(descr, "Geo layers")]
+            self.projectManager.addTab(descr, "Geo layers")
+            conn.execute("PRAGMA temp_store = 0;")
+
+            # Creates all layers and puts them in memory
+            self.layers.clear()
+            for lyr in layers:
+                self.create_layer_by_name(lyr)

@@ -92,7 +92,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
             feed.execute_import()
 
         self.qgis_project.projectManager.removeTab(0)
-        update_project_layers(self.qgis_project)
+        self.qgis_project.update_project_layers()
 
         self.close()
 
