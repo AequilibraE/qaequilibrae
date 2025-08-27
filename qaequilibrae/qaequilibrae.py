@@ -228,7 +228,7 @@ class AequilibraEMenu:
 
             # Change layers
             self.projectManager.removeTab(0)
-            self.update_project_layers(self)
+            self.update_project_layers()
 
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
         if main_menu == "AequilibraE":
@@ -347,7 +347,9 @@ class AequilibraEMenu:
             uri.setDatabase(str(self.project._transit_database_path))
             lname = layer_name[8:]
         uri.setDataSource("", lname, "geometry")
-        layer = QgsVectorLayer(uri.uri(), layer_name, "spatialite")
+        suffix = self.available_scenarios[self.cob_scenarios.currentIndex()]
+        name = layer_name if suffix == "root" else f"{layer_name}_{suffix}"
+        layer = QgsVectorLayer(uri.uri(), name, "spatialite")
         return layer
 
     def show_message_no_project(self):
