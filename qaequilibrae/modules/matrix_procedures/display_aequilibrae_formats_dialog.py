@@ -24,7 +24,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_data_viewer.ui"
 
 
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgis_project, file_path: Optional[Path] = None, from_project: bool = False):
+    def __init__(self, qgis_project, file_path: Optional[Path] = None):
         QtWidgets.QDialog.__init__(self)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
         self.iface = qgis_project.iface
@@ -33,7 +33,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = None
         self.logger = logging.getLogger("AequilibraEGUI")
         self.qgis_project = qgis_project
-        self.from_proj = from_project
+        self.from_proj = qgis_project.project
         self.indices = np.array(1)
         self.mapping_layer = None
         self.selected_col = None
@@ -42,13 +42,13 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if isinstance(file_path, Path):
             self.data_path = file_path
-            self.data_type = file_path.suffix.upper()
+            self.data_type = file_path.suffix.upper().split(".")[1]
             self.continue_with_data()
             return
 
         self.data_path, self.data_type = self.get_file_name()
 
-        if self.data_type is None:
+        if not self.data_path or not self.data_type:
             self.error = self.tr("Path provided is not a valid dataset")
             self.exit_with_error()
         else:
@@ -77,7 +77,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.exit_with_error()
 
         elif self.data_type == "OMX":
-            with omx.open_file(self.data_path, "a") as omx_file:
+            with omx.open_file(self.data_path) as omx_file:
                 if not self.from_proj:
                     self.qgis_project.matrices[self.data_path] = omx_file
                 self.list_cores = omx_file.list_matrices()
@@ -439,7 +439,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.data_to_show.export(new_name)
 
     def exit_with_error(self):
-        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1, duration=10)
+        self.qgis_project.iface_error_message(self.error)
         self.close()
 
     def exit_procedure(self):

@@ -1,7 +1,6 @@
 from os.path import dirname, join
 
 import pandas as pd
-import qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTabWidget
 from qgis.core import QgsProject, QgsVectorLayerJoinInfo
@@ -58,7 +57,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
 
         file_path = self.project.project_base_path / "matrices" / self.matrices["file_name"][idx[0]]
 
-        dlg2 = DisplayAequilibraEFormatsDialog(self.qgis_project, file_path, from_project=True)
+        dlg2 = DisplayAequilibraEFormatsDialog(self.qgis_project, file_path)
         dlg2.show()
         dlg2.exec_()
 
@@ -119,7 +118,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         dlg2.exec_()
 
     def exit_with_error(self):
-        qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+        self.qgis_project.iface_error_message(self.error)
         self.close()
 
     def exit_procedure(self):
