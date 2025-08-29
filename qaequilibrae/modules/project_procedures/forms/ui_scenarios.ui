@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>AequilibraE - Scenarios</string>
   </property>
   <widget class="QFrame" name="frame">
    <property name="geometry">
