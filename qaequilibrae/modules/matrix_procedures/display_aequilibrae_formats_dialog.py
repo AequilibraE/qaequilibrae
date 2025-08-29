@@ -32,7 +32,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = None
         self.logger = logging.getLogger("AequilibraEGUI")
         self.qgis_project = qgis_project
-        self.from_proj = qgis_project.project
+        self.from_proj = True if qgis_project.project else False
         self.indices = np.array(1)
         self.mapping_layer = None
         self.selected_col = None

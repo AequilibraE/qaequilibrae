@@ -45,20 +45,17 @@ class CreateScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.rdo_clone.isChecked():
             if self.__init_scenario != self.cob_scenarios.currentText():
                 self.project.use_scenario(self.cob_scenarios.currentText())
-                txt = f"Changing scenario from {self.__init_scenario} to {self.cob_scenarios.currentText()}"
-                self.qgis_project.log_message(txt)
 
             self.project.clone_scenario(name, desc)
-            txt = f"Cloned '{self.cob_scenarios.currentText()}'. New scenario '{name}' addeed to the project"
-            self.qgis_project.log_message(txt)
+            self.qgis_project.log_message(f"Cloned '{self.cob_scenarios.currentText()}'")
 
             if self.__init_scenario != self.cob_scenarios.currentText():
                 self.project.use_scenario(self.__init_scenario)
-                txt = f"Changing scenario from {self.cob_scenarios.currentText()} to {self.__init_scenario}"
-                self.qgis_project.log_message(txt)
         else:
             self.project.create_empty_scenario(name, desc)
-            self.qgis_project.log_message(f"Created empty scenario. New scenario '{name}' addeed to the project")
+            self.qgis_project.log_message("Created empty scenario")
+
+        self.qgis_project.log_message(f"New scenario '{name}' addeed to the project")
 
         # Update project scenarios
         self.qgis_project.cob_scenarios.clear()

@@ -218,7 +218,6 @@ class AequilibraEMenu:
                 temp_saving.triggered.connect(self.save_in_project)
 
     def configure_scenario(self):
-        self.log_message("\tconfigure_scenario")
         if self.cob_scenarios.currentIndex() < 0:
             return
 
@@ -300,7 +299,7 @@ class AequilibraEMenu:
                 pass
 
     def run_close_project(self):
-        if self.project is None:
+        if not self.project:
             return
         self.remove_aequilibrae_layers()
         self.project.use_scenario("root")
@@ -343,7 +342,7 @@ class AequilibraEMenu:
         self.layers[layer_name.lower()] = [layer, layer.id()]
 
     def create_loose_layer(self, layer_name: str) -> QgsVectorLayer:
-        if self.project is None:
+        if not self.project:
             return
         uri = QgsDataSourceUri()
         if "transit_" not in layer_name:
@@ -377,7 +376,6 @@ class AequilibraEMenu:
 
     def reload_project(self):
         """Opens AequilibraE project when opening a QGIS project containing an AequilibraE model."""
-        self.log_message("\treload_project")
         from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
         # Check if QGIS project contains an AequilibraE model
@@ -426,7 +424,6 @@ class AequilibraEMenu:
 
     def save_in_project(self):
         """Saves temporary layers to the project using QGIS saving buttons."""
-        self.log_message("\tsave_in_project")
         if not self.project:
             return
 
@@ -466,8 +463,6 @@ class AequilibraEMenu:
         QgsProject.instance().write()
 
     def update_project_layers(self):
-        self.log_message("\tupdate_project_layers")
-
         with self.project.db_connection_spatial as conn:
             layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
 
@@ -492,6 +487,8 @@ class AequilibraEMenu:
             descr = QWidget()
             descr.setLayout(descrlayout)
             self.tabContents = [(descr, "Geo layers")]
+            for i in range(self.projectManager.count()):
+                self.projectManager.removeTab(i)
             self.projectManager.addTab(descr, "Geo layers")
             conn.execute("PRAGMA temp_store = 0;")
 

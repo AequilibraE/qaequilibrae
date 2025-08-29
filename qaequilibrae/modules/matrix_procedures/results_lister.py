@@ -11,8 +11,11 @@ def list_results(project) -> pd.DataFrame:
 
     if isfile(project._transit_database_path):
         with project.transit_connection as conn:
-            df = pd.read_sql("select * from results", conn)
-            databases.append(df)
+            # Check if 'transit_database' has a results table before reading it
+            tables = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+            if "results" in tables:
+                df = pd.read_sql("select * from results", conn)
+                databases.append(df)
 
     df = pd.concat(databases)
 
