@@ -103,8 +103,9 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             self._show_layer_removed_message()
 
     def _show_layer_removed_message(self):
-        self.error = self.tr("Critical layer for Skim Viewer removed from the layers' panel")
-        self.iface.messageBar().pushMessage(self.tr("Error"), self.error, level=Qgis.MessageLevel.Critical, duration=10)
+        if self.qgis_project.project:
+            self.error = self.tr("Critical layer for Skim Viewer removed from the layers' panel")
+            self.qgis_project.iface_error_message(self.error)
 
     def __disable_fields(self):
         dialog_elements = [
