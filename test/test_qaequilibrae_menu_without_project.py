@@ -75,6 +75,15 @@ def test_run_module_menu(ae, qtbot):
     assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
+def test_scenarios_menu(ae, qtbot):
+    action = next((a for a in ae.menuActions["Project"] if a.text() == "Scenarios"), None)
+    assert action is not None, "Menu action 'Scenarios' not found"
+    assert action.text() == "Scenarios", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
+
+
 def test_create_project_from_osm_menu(ae, qtbot):
     from qaequilibrae.modules.project_procedures import ProjectFromOSMDialog
 

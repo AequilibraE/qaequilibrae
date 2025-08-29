@@ -38,7 +38,8 @@ def test_clone_scenario(sf_project, qtbot):
 
 
 def test_clone_scenario_from_another(sf_project, qtbot):
-
+    # Let's create and edit a scenario to be different than 'root' we'll test
+    # if it was properly cloned.
     project = sf_project.project
     project.clone_scenario("disconnect_nodes", "Disconnect nodes 7, 11 and 18 from network")
     project.use_scenario("disconnect_nodes")
@@ -49,6 +50,7 @@ def test_clone_scenario_from_another(sf_project, qtbot):
     project_links.refresh()
     project.use_scenario("root")
 
+    # Add the new scenario to the cob_scenarios
     if sf_project.project.list_scenarios().shape[0] == 2:
         sf_project.available_scenarios.extend(["disconnect_nodes"])
 
