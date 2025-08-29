@@ -1,10 +1,6 @@
-from os.path import exists, join
+from os.path import join
 from pathlib import Path
 from tempfile import gettempdir
-
-import qgis
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QVBoxLayout
 
 
 # Split loading between Qt action and processing, for easier unit testing
@@ -26,8 +22,9 @@ def _run_load_project_from_path(qgis_project, proj_path):
     if proj_path is None or proj_path == "":
         return
 
+    qgis_project.log_message("\t_run_load_project_from_path")
     # Cleans the project descriptor
-    tab_count = 1
+    tab_count = qgis_project.projectManager.count()
     for i in range(tab_count):
         qgis_project.projectManager.removeTab(i)
     if proj_path is not None and len(proj_path) > 0:
@@ -39,7 +36,9 @@ def _run_load_project_from_path(qgis_project, proj_path):
             qgis_project.log_message(f"Opened project on: {proj_path}")
         except FileNotFoundError as e:
             if e.args[0] == "Model does not exist. Check your path and try again":
-                qgis.utils.iface.messageBar().pushMessage("FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL", level=1)
+                qgis_project.iface_error_message(
+                    "Check your path and try again", "FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL"
+                )
                 return
             else:
                 raise e
@@ -53,3 +52,12 @@ def _run_load_project_from_path(qgis_project, proj_path):
     qgis_project.available_scenarios.extend(outdirs)
 
     qgis_project.update_project_layers()
+
+    # qgis_project.cob_scenarios.currentIndexChanged.connect(partial(change_iteration, qgis_project))
+
+
+# def change_iteration(proj):
+#     if proj.cob_scenarios.currentText() == "root":
+#         proj.polaris_project.run_config.data_dir = proj.polaris_project.model_path
+#     else:
+#         proj.polaris_project.run_config.data_dir = proj.polaris_project.model_path / proj.cob_scenarios.currentText()

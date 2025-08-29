@@ -7,7 +7,6 @@ from typing import Optional
 import numpy as np
 import openmatrix as omx
 import pandas as pd
-import qgis
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtGui import QColor

@@ -33,6 +33,11 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
         # Check if we have an active layer, otherwise raises an error
         if self.layer is not None:
+            # If 'links' is the active layer, raises an error. We can only skim nodes or zones
+            if "links" in self.layer.name():
+                self.qgis_project.iface_error_message("Select one of 'nodes' or 'zones' layer to proceed.")
+                return
+
             # We get the layer ID to check if it was removed from the layers' panel
             self.__layer_id = self.layer.id()
 
@@ -326,6 +331,10 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
     def recompute_after_selection(self):
         selected_features = self.layer.selectedFeatures()
+        # If the user clicks in the canvas area without selecting a feature,
+        # it will not raise an error.
+        if not selected_features:
+            return
         self.idx = [feature[self.layer_col] for feature in selected_features][0]
 
         self.compute_skims(self.idx)

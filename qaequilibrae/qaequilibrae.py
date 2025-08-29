@@ -218,6 +218,7 @@ class AequilibraEMenu:
                 temp_saving.triggered.connect(self.save_in_project)
 
     def configure_scenario(self):
+        self.log_message("\tconfigure_scenario")
         if self.cob_scenarios.currentIndex() < 0:
             return
 
@@ -227,7 +228,9 @@ class AequilibraEMenu:
             self.log_message(f"Changed active scenario: {name}")
 
             # Change layers
-            self.projectManager.removeTab(0)
+            tab_count = self.projectManager.count()
+            for i in range(tab_count):
+                self.projectManager.removeTab(i)
             self.update_project_layers()
 
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
@@ -374,28 +377,28 @@ class AequilibraEMenu:
 
     def reload_project(self):
         """Opens AequilibraE project when opening a QGIS project containing an AequilibraE model."""
+        self.log_message("\treload_project")
         from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-        # Checks if project contains an AequilibraE model
+        # Check if QGIS project contains an AequilibraE model
         path = QgsProject.instance().customVariables()
-        if "aequilibrae_path" not in path:
+        if "aequilibrae_path" in path:
+            # Open AequilibraE project
+            _run_load_project_from_path(self, path["aequilibrae_path"])
+
+            # Go back to last scenario
+            if "aeq_scenario" in path:
+                self.cob_scenarios.setCurrentText(path["aeq_scenario"])
+                self.project.use_scenario(path["aeq_scenario"])
+        else:
             return
 
-        # Opens project
-        _run_load_project_from_path(self, path["aequilibrae_path"])
-
-        # Checks if the layers in the project have the same database path as the aequilibrae project layers.
+        # Check if the layers in the project have the same database path as the aequilibrae project layers.
         # if so, we replace the path in self.layers
-        prj_layer_sources = [lyr.source() for lyr in QgsProject.instance().mapLayers().values()]
-        prj_layers = [lyr for lyr in QgsProject.instance().mapLayers().values()]
-
-        geo_source = [v[0].source().replace("\\\\", "/") for v in self.layers.values()]
-        geo_names = [v[0].name() for v in self.layers.values()]
-
-        for idx, lyr in enumerate(geo_source):
-            if lyr in prj_layer_sources:
-                lidx = prj_layer_sources.index(lyr)
-                self.layers[geo_names[idx]] = [prj_layers[lidx], prj_layers[lidx].id()]
+        for lyr in QgsProject.instance().mapLayers().values():
+            if "sqlite" not in lyr.source():
+                continue
+            self.layers[str(lyr.name()).lower()] = [lyr, lyr.id()]
 
     def remove_aequilibrae_layers(self):
         """Removes layers connected to current aequilibrae project from active layers if the
@@ -412,19 +415,31 @@ class AequilibraEMenu:
         qgis.utils.iface.mapCanvas().refresh()
 
     @property
+    def _project_base_path(self):
+        if "/scenarios/" in str(self.project.project_base_path):
+            return self.project.project_base_path.parent.parent
+        return self.project.project_base_path
+
+    @property
     def _project_layers_database(self):
-        return self.project.project_base_path / "qgis_layers.sqlite"
+        return str(self._project_base_path / "qgis_layers.sqlite")
 
     def save_in_project(self):
         """Saves temporary layers to the project using QGIS saving buttons."""
+        self.log_message("\tsave_in_project")
         if not self.project:
             return
 
-        var = str(self.project.project_base_path)
         variables = QgsProject.instance().customVariables()
 
         if "aequilibrae_path" not in variables:
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aequilibrae_path", var)
+            QgsExpressionContextUtils.setProjectVariable(
+                QgsProject.instance(), "aequilibrae_path", str(self._project_base_path)
+            )
+        # Create project variable 'aeq_scenario' to store scenario info
+        QgsExpressionContextUtils.setProjectVariable(
+            QgsProject.instance(), "aeq_scenario", self.cob_scenarios.currentText()
+        )
 
         file_exists = True if isfile(self._project_layers_database) else False
 
@@ -451,6 +466,7 @@ class AequilibraEMenu:
         QgsProject.instance().write()
 
     def update_project_layers(self):
+        self.log_message("\tupdate_project_layers")
 
         with self.project.db_connection_spatial as conn:
             layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
