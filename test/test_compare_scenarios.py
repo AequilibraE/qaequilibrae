@@ -27,7 +27,7 @@ def test_compare_scenarios(ae, model_path, composite):
     _run_load_project_from_path(ae, model_path)
 
     dialog = CompareScenariosDialog(ae)
-    dialog.cob_alternative_scenario.setCurrentText("future_assignment")
+    dialog.cob_alternative_result.setCurrentText("future_assignment")
     dialog.radio_compo.setChecked(composite)
     dialog.radio_diff.setChecked(not composite)
 

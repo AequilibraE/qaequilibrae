@@ -5,7 +5,7 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
 
-from qaequilibrae.modules.public_transport_procedures.gtfs_feed import GTFSFeed
+from qaequilibrae.modules.transit_procedures import GTFSFeed
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_importer.ui"))
 

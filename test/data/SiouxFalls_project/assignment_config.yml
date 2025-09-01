@@ -1,6 +1,6 @@
 traffic_classes:
     - car:
-        matrix_name: demand.aem
+        matrix_name: demand_omx
         matrix_core: matrix
         network_mode: c
         pce: 1.0

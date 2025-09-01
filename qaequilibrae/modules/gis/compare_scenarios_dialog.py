@@ -56,7 +56,6 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.slider_band_size.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.slider_band_size.setTickInterval(5)
         self.slider_band_size.valueChanged.connect(self.sizevaluechange)
-        self.mode_frame.setVisible(False)
         self.but_run.clicked.connect(self.execute_comparison)
         self.add_fields_to_cboxes()
         self.sizevaluechange()
