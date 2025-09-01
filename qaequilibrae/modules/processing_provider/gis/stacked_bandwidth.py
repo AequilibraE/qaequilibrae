@@ -17,7 +17,7 @@ class StackedBandwidth(QAequilibraEProcessingAlgorithm):
             self.tr("Mapping"),
             "mapping_procedures",
             "",
-            ["bandwidth", "visualization"],
+            ["bandwidth", "visualization", "flow", "map"],
         )
 
     def createInstance(self):
