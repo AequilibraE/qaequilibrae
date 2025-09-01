@@ -42,11 +42,11 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.slider_spacer.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.slider_spacer.setTickInterval(10)
         self.slider_spacer.valueChanged.connect(self.spacevaluechange)
-        self.cob_base_scenario.currentIndexChanged.connect(
-            partial(self.choose_scenario, self.cob_base_scenario, self.cob_base_data)
+        self.cob_base_result.currentIndexChanged.connect(
+            partial(self.choose_scenario, self.cob_base_result, self.cob_base_data)
         )
-        self.cob_alternative_scenario.currentIndexChanged.connect(
-            partial(self.choose_scenario, self.cob_alternative_scenario, self.cob_alternative_data)
+        self.cob_alternative_result.currentIndexChanged.connect(
+            partial(self.choose_scenario, self.cob_alternative_result, self.cob_alternative_data)
         )
 
         # band slider
@@ -80,11 +80,12 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def add_fields_to_cboxes(self):
         data = list(self.results[self.results.WARNINGS == ""].table_name)
-        for cob in [self.cob_base_scenario, self.cob_alternative_scenario]:
+        for cob in [self.cob_base_result, self.cob_alternative_result]:
             cob.clear()
             cob.addItems(data)
 
     def choose_scenario(self, cob_scenario, cob_fields):
+        # We'll update the function here
         cob_fields.clear()
         if cob_scenario.currentIndex() < 0:
             return
@@ -178,16 +179,16 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def check_inputs(self):
         for combo in [
-            self.cob_base_scenario,
-            self.cob_alternative_scenario,
+            self.cob_base_result,
+            self.cob_alternative_result,
             self.cob_base_data,
             self.cob_alternative_data,
         ]:
             if combo.currentIndex() < 0:
                 return False
 
-        v1 = self.cob_base_scenario.currentText()
-        v2 = self.cob_alternative_scenario.currentText()
+        v1 = self.cob_base_result.currentText()
+        v2 = self.cob_alternative_result.currentText()
         v3 = self.cob_base_data.currentText()
         v4 = self.cob_alternative_data.currentText()
         if v1 == v2 and v3 == v4:
@@ -198,8 +199,8 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.link_layer = self.qgis_project.layers["links"][0]
         QgsProject.instance().addMapLayer(self.link_layer)
 
-        v1 = self.cob_base_scenario.currentText()
-        v2 = self.cob_alternative_scenario.currentText()
+        v1 = self.cob_base_result.currentText()
+        v2 = self.cob_alternative_result.currentText()
         v3 = self.cob_base_data.currentText()
         v4 = self.cob_alternative_data.currentText()
         base_lyr_result = load_result_table(self.qgis_project.project, v1)
