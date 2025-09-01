@@ -88,9 +88,6 @@
     </message>
 </context>
 <context>
-    <name>AddMatrixFromLayer</name>
-</context>
-<context>
     <name>AddZones</name>
     <message>
         <location filename="../modules/processing_provider/model_building/add_zones.py" line="12"/>
@@ -401,12 +398,6 @@
         <source>Create AequilibraE examples.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>CreateMatrixFromLayer</name>
-</context>
-<context>
-    <name>CreatePTGraph</name>
 </context>
 <context>
     <name>CreatesTranspoNetDialog</name>
@@ -1977,9 +1968,6 @@
     </message>
 </context>
 <context>
-    <name>RenumberNodesFromLayer</name>
-</context>
-<context>
     <name>ReportDialog</name>
     <message>
         <location filename="../modules/common_tools/report_dialog.py" line="55"/>
@@ -2659,9 +2647,6 @@
     </message>
 </context>
 <context>
-    <name>TrafficAssignYAML</name>
-</context>
-<context>
     <name>TrafficAssignment</name>
     <message>
         <location filename="../modules/processing_provider/assignment_procedures/traffic_assignment.py" line="13"/>
@@ -2741,9 +2726,6 @@
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>TransitAssignYAML</name>
 </context>
 <context>
     <name>TransitAssignment</name>
