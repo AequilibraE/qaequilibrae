@@ -18,15 +18,13 @@ from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableWidgetItem, QTableWidge
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
 from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, QgsMessageLog, Qgis
 
+from qaequilibrae import set_aequilibrae_menu_instance
 from qaequilibrae.message import messages
-from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
-from qaequilibrae.modules.menu_actions import run_add_zones, run_show_project_data, run_tsp
+from qaequilibrae.modules.menu_actions import run_load_project, run_module, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs
-from qaequilibrae.modules.menu_actions import run_distribution_models, run_change_parameters, prepare_network
-from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet
-from qaequilibrae.modules.menu_actions import run_pt_explore, show_log, create_example, create_scenarios
-from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig
-from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder, run_module, load_skim_viewer
+from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths, run_pt_explore
+from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig, create_scenarios
+from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder, load_skim_viewer
 from qaequilibrae.modules.processing_provider.provider import Provider
 
 sys.path.insert(0, join(dirname(__file__), "packages"))
@@ -65,6 +63,7 @@ if hasattr(Qt, "AA_UseHighDpiPixmaps"):
 
 class AequilibraEMenu:
     def __init__(self, iface):
+        set_aequilibrae_menu_instance(self)
         # Closes AequilibraE projects eventually opened in memory
         self.logger = logging.getLogger("AequilibraEGUI")
         self.geo_layers_list = ["links", "nodes", "zones"]
@@ -98,90 +97,67 @@ class AequilibraEMenu:
 
         self.menuActions = {
             self.tr("Project"): [],
-            self.tr("Model Building"): [],
-            self.tr("Data"): [],
-            self.tr("Trip Distribution"): [],
-            self.tr("Paths and assignment"): [],
-            self.tr("Routing"): [],
-            self.tr("Public Transport"): [],
-            "GIS": [],
+            self.tr("Trip distribution"): [],
+            self.tr("Path computation"): [],
+            self.tr("Traffic assignment"): [],
+            self.tr("Route choice"): [],
+            self.tr("Transit"): [],
+            self.tr("Mapping"): [],
             "AequilibraE": [],
         }
 
-        # # #######################   PROJECT SUB-MENU   ############################
-        self.add_menu_action(self.tr("Project"), self.tr("Open Project"), partial(run_load_project, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Create example"), partial(create_example, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
-        self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Run procedures"), partial(run_module, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Scenarios"), partial(create_scenarios, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
+        # # # ########################################################################
+        # # # #######################  PROJECT SUB-MENU  #############################
+        mmenu = self.tr("Project")
+        self.add_menu_action(mmenu, self.tr("Open project"), partial(run_load_project, self))
+        self.add_menu_action(mmenu, self.tr("Run procedures"), partial(run_module, self))
+        self.add_menu_action(mmenu, self.tr("Scenarios"), partial(create_scenarios, self))
+        self.add_menu_action(mmenu, self.tr("Close project"), self.run_close_project)
 
         # # # ########################################################################
-        # # # ################# MODEL BUILDING SUB-MENU  #######################
-        self.add_menu_action(
-            self.tr("Model Building"), self.tr("Create project from OSM"), partial(project_from_osm, self)
-        )
-        self.add_menu_action(
-            self.tr("Model Building"), self.tr("Create Project from layers"), partial(run_create_transponet, self)
-        )
-        self.add_menu_action(self.tr("Model Building"), self.tr("Network Preparation"), partial(prepare_network, self))
-        self.add_menu_action(
-            self.tr("Model Building"), self.tr("Add centroid connectors"), partial(run_add_connectors, self)
-        )
-        self.add_menu_action(self.tr("Model Building"), self.tr("Add zoning data"), partial(run_add_zones, self))
+        # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
+        mmenu = self.tr("Trip distribution")
+        self.add_menu_action(mmenu, self.tr("Trip distribution"), partial(run_distribution_models, self))
 
         # # # ########################################################################
-        # # # ####################  DATA UTILITIES SUB-MENU  #########################
-        self.add_menu_action(self.tr("Data"), self.tr("Visualize data"), partial(run_show_project_data, self))
-        self.add_menu_action(self.tr("Data"), self.tr("Import matrices"), partial(load_matrices, self))
-
-        # # # # ########################################################################
-        # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
-        self.add_menu_action(
-            self.tr("Trip Distribution"), self.tr("Trip Distribution"), partial(run_distribution_models, self)
-        )
+        # # # ###################  PATH COMPUTATION SUB-MENU  ########################
+        mmenu = self.tr("Path computation")
+        self.add_menu_action(mmenu, self.tr("Shortest path"), partial(run_shortest_path, self))
+        self.add_menu_action(mmenu, self.tr("Impedance matrix"), partial(run_dist_matrix, self))
+        self.add_menu_action(mmenu, self.tr("Skim viewer"), partial(load_skim_viewer, self))
 
         # # # ########################################################################
-        # # # ###################  PATH COMPUTATION SUB-MENU   #######################
-        self.add_menu_action(
-            self.tr("Paths and assignment"), self.tr("Shortest path"), partial(run_shortest_path, self)
-        )
-        self.add_menu_action(
-            self.tr("Paths and assignment"), self.tr("Impedance matrix"), partial(run_dist_matrix, self)
-        )
-        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Skim viewer"), partial(load_skim_viewer, self))
-        self.add_menu_action(
-            self.tr("Paths and assignment"), self.tr("Traffic Assignment"), partial(run_traffic_assig, self)
-        )
-        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Route choice"), partial(run_route_choice, self))
+        # # # ###################  TRAFFIC ASSIGNMENT SUB-MENU  ######################
+        mmenu = self.tr("Traffic assignment")
+        self.add_menu_action(mmenu, self.tr("Traffic assignment"), partial(run_traffic_assig, self))
 
         # # # ########################################################################
-        # # # #######################   ROUTING SUB-MENU   ###########################
-        self.add_menu_action(self.tr("Routing"), self.tr("Travelling Salesman Problem"), partial(run_tsp, self))
+        # # # ###################  ROUTE CHOICE SUB-MENU  ############################
+        mmenu = self.tr("Route choice")
+        self.add_menu_action(mmenu, self.tr("Route choice"), partial(run_route_choice, self))
 
         # # # ########################################################################
-        # # # #######################   TRANSIT SUB-MENU   ###########################
-        self.add_menu_action(self.tr("Public Transport"), self.tr("Import GTFS"), partial(run_import_gtfs, self))
-        self.add_menu_action(
-            self.tr("Public Transport"), self.tr("Skimming and Assignment"), partial(run_pt_skim, self)
-        )
-        self.add_menu_action(self.tr("Public Transport"), self.tr("Explore Transit"), partial(run_pt_explore, self))
+        # # # ###################  TRANSIT SUB-MENU  #################################
+        mmenu = self.tr("Transit")
+        self.add_menu_action(mmenu, self.tr("Import GTFS"), partial(run_import_gtfs, self))
+        self.add_menu_action(mmenu, self.tr("Skimming and assignment"), partial(run_pt_skim, self))
+        self.add_menu_action(mmenu, self.tr("Explore transit"), partial(run_pt_explore, self))
 
-        # # ########################################################################
-        # # #################        GIS TOOLS SUB-MENU    #########################
-        self.add_menu_action("GIS", self.tr("Desire Lines"), partial(run_desire_lines, self))
-        self.add_menu_action("GIS", self.tr("Stacked Bandwidth"), partial(run_stacked_bandwidths, self))
-        self.add_menu_action("GIS", self.tr("Scenario Comparison"), partial(run_scenario_comparison, self))
-        self.add_menu_action("GIS", self.tr("Simple tag"), partial(run_tag, self))
+        # # # ########################################################################
+        # # # ###################  GIS TOOLS SUB-MENU  ###############################
+        mmenu = self.tr("Mapping")
+        self.add_menu_action(mmenu, self.tr("Visualize data"), partial(run_show_project_data, self))
+        self.add_menu_action(mmenu, self.tr("Desire lines"), partial(run_desire_lines, self))
+        self.add_menu_action(mmenu, self.tr("Stacked bandwidth"), partial(run_stacked_bandwidths, self))
+        self.add_menu_action(mmenu, self.tr("Scenario comparison"), partial(run_scenario_comparison, self))
 
-        # # ########################################################################
-        # # #################          LOOSE STUFF         #########################
+        # # # ########################################################################
+        # # # ###################  LOOSE STUFF  ######################################
         self.add_menu_action("AequilibraE", self.tr("Help"), self.run_help)
 
         self.build_menu()
-        # ########################################################################
-        # #################        PROJECT MANAGER       #########################
+        # # # ########################################################################
+        # # # ###################  PROJECT MANAGER  ##################################
 
         lbl = QLabel("Model scenario")
         lbl.setAlignment(Qt.AlignCenter)

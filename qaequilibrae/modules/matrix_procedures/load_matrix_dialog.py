@@ -225,9 +225,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.matrix_list_view.blockSignals(False)
 
     def get_name_and_save_to_disk(self):
-        self.output_name, _ = GetOutputFileName(
-            self, "AequilibraE matrix", ["Aequilibrae Matrix(*.aem)"], ".aem", self.path
-        )
+        self.output_name, _ = GetOutputFileName(self, "Open matrix", ["Open matrix (*.omx)"], ".omx", self.path)
         self.prepare_final_matrix()
 
     def prepare_final_matrix(self):

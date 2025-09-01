@@ -1,5 +1,5 @@
 def run_pt_explore(qgis_project):
-    from qaequilibrae.modules.public_transport_procedures.transit_navigator_dialog import TransitNavigatorDialog
+    from qaequilibrae.modules.transit_procedures import TransitNavigatorDialog
     from os.path import exists, join
 
     if qgis_project.project is None:

@@ -38,5 +38,5 @@ User issues
     `Google Group <https://groups.google.com/g/aequilibrae>`_, and ensuring that 
     there is an actual bug or documentation issue, you can report it in the following ways:
 
-    * Filing a bug report in the `issue tracker <https://github.com/AequilibraE/qaequilibrae/issues>`_;
+    * Filling a bug report in the `issue tracker <https://github.com/AequilibraE/qaequilibrae/issues>`_;
     * Creating a post in our `Google Group <https://groups.google.com/g/aequilibrae>`_.

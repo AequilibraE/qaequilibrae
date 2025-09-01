@@ -1,0 +1,20 @@
+traffic_classes:
+    - car:
+        matrix_name: demand.aem
+        matrix_core: matrix
+        network_mode: c
+        pce: 1.0
+        blocked_centroid_flows: False
+        skims:
+            free_flow_time: [final]
+            distance: [blended]
+assignment:
+    algorithm: bfw
+    max_iter: 25
+    rgap: 0.001
+    vdf: BPR
+    alpha: 0.15
+    beta: 4.0
+    capacity_field: capacity
+    time_field: free_flow_time
+    result_name: result_test_from_yaml

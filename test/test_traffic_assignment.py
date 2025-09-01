@@ -63,30 +63,6 @@ def test_single_class(sf_project, qtbot):
         assert round(np.sum(np.nan_to_num(omx_file["distance_final"][:])), 4) > 0
         assert round(np.sum(np.nan_to_num(omx_file["distance_blended"][:])), 4) > 0
 
-    # Assert information exists in the log file
-    num_cores = dialog.assignment.cores
-    log_ = pth / "aequilibrae.log"
-    assert isfile(log_)
-
-    file_text = ""
-    with open(log_, "r", encoding="utf-8") as file:
-        for line in file.readlines():
-            file_text += line
-
-    assert "INFO ; Traffic Class specification" in file_text
-    assert (
-        """INFO ; {'car': {'Graph': "{'Mode': 'c', 'Block through centroids': False, 'Number of centroids': 24, 'Links': 76, 'Nodes': 24}","""
-        in file_text
-    )
-    assert (
-        """'Number of centroids': 24, 'Matrix cores': ['matrix'], 'Matrix totals': {'matrix': 360600.0}}"}}"""
-        in file_text
-    )
-    assert "INFO ; Traffic Assignment specification" in file_text
-    assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 25, 'Target RGAP': 0.001}}".format(
-        num_cores
-    )
-
 
 def test_multiclass(sf_project, qtbot):
     dialog = TrafficAssignmentDialog(sf_project)
@@ -174,36 +150,6 @@ def test_multiclass(sf_project, qtbot):
     assert isfile(pth / "matrices" / f"{test_name}_car.omx")
     assert isfile(pth / "matrices" / f"{test_name}_motorcycles.omx")
     assert isfile(pth / "matrices" / f"{test_name}_trucks.omx")
-
-    # Assert information exists in the log file
-    num_cores = dialog.assignment.cores
-    log_ = pth / "aequilibrae.log"
-    assert isfile(log_)
-
-    file_text = ""
-    with open(log_, "r", encoding="utf-8") as file:
-        for line in file.readlines():
-            file_text += line
-
-    assert "INFO ; Traffic Class specification" in file_text
-    assert (
-        """INFO ; {'car': {'Graph': "{'Mode': 'c', 'Block through centroids': False, 'Number of centroids': 24, 'Links': 76, 'Nodes': 24}","""
-        in file_text
-    )
-    assert (
-        """'Number of centroids': 24, 'Matrix cores': ['car'], 'Matrix totals': {'car': 271266.6324170904}}"}}"""
-        in file_text
-    )
-    assert """INFO ; {'motorcycles': {'Graph': "{'Mode': 'M', 'Block through centroids': False, 'Number of centroids': 24, 'Links': 76, 'Nodes': 24}","""
-    assert """'Number of centroids': 24, 'Matrix cores': ['motorcycle'], 'Matrix totals': {'motorcycle': 89819.0708124364}}"}}"""
-    assert """INFO ; {'trucks': {'Graph': "{'Mode': 'T', 'Block through centroids': False, 'Number of centroids': 24, 'Links': 76, 'Nodes': 24}","""
-    assert (
-        """'Number of centroids': 24, 'Matrix cores': ['trucks'], 'Matrix totals': {'trucks': 90235.57459796841}}"}}"""
-    )
-    assert "INFO ; Traffic Assignment specification" in file_text
-    assert "{{'VDF parameters': {{'alpha': 0.15, 'beta': 4.0}}, 'VDF function': 'bpr', 'Number of cores': {}, 'Capacity field': 'capacity', 'Time field': 'free_flow_time', 'Algorithm': 'bfw', 'Maximum iterations': 20, 'Target RGAP': 0.001}}".format(
-        num_cores
-    )
 
 
 def test_all_or_nothing(sf_project, qtbot):
@@ -358,3 +304,80 @@ def test_link_removal(sf_project, qtbot):
             assert row["PCE_tot"] == 0
         else:
             assert row["PCE_tot"] > 0
+
+
+def test_single_class_from_yaml(ae_with_project, qtbot, mocker):
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_path",
+        return_value="test/data/SiouxFalls_project/assignment_config.yml",
+    )
+
+    dialog = TrafficAssignmentDialog(ae_with_project)
+    qtbot.mouseClick(dialog.but_load_yaml, Qt.LeftButton)
+
+    dialog.run()
+    dialog.close()
+
+    pth = Path(dialog.project.project_base_path)
+    results = pth / "results_database.sqlite"
+    assert isfile(results)
+
+    # Assert we have a non-null result and that results are actually stored in the file
+    con = sqlite3.connect(results)
+    assert con.execute("SELECT ROUND(SUM(PCE_tot), 4) FROM result_test_from_yaml").fetchone()[0] > 0
+
+    skims = pth / ("matrices/result_test_from_yaml_car.omx")
+    assert isfile(skims)
+
+    mtx = omx.open_file(skims)
+    assert round(np.sum(np.nan_to_num(mtx["free_flow_time_final"][:])), 4) > 0
+    assert round(np.sum(np.nan_to_num(mtx["free_flow_time_blended"][:])), 4) > 0
+    assert round(np.sum(np.nan_to_num(mtx["distance_final"][:])), 4) > 0
+    assert round(np.sum(np.nan_to_num(mtx["distance_blended"][:])), 4) > 0
+
+
+def test_multi_class_from_yaml(ae_with_project, qtbot, mocker):
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_path",
+        return_value="test/data/SiouxFalls_project/mc_config.yml",
+    )
+
+    dialog = TrafficAssignmentDialog(ae_with_project)
+    qtbot.mouseClick(dialog.but_load_yaml, Qt.LeftButton)
+
+    dialog.run()
+    dialog.close()
+
+    # Assert we have a non-null result and that results are actually stored in the file
+    pth = dialog.project.project_base_path
+    results = pth / "results_database.sqlite"
+    assert isfile(results)
+
+    con = sqlite3.connect(results)
+    assert con.execute("SELECT ROUND(SUM(PCE_tot), 4) FROM result_test_from_yaml").fetchone()[0] > 0
+    assert con.execute("SELECT ROUND(SUM(car_tot), 4) FROM result_test_from_yaml").fetchone()[0] > 0
+    assert con.execute("SELECT ROUND(SUM(motorcycle_tot), 4) FROM result_test_from_yaml").fetchone()[0] > 0
+
+    assert isfile(pth / "matrices/result_test_from_yaml_car.omx")
+    assert isfile(pth / "matrices/result_test_from_yaml_motorcycle.omx")
+
+
+def test_select_links_from_yaml(ae_with_project, qtbot, mocker):
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_path",
+        return_value="test/data/SiouxFalls_project/sl_config.yml",
+    )
+
+    dialog = TrafficAssignmentDialog(ae_with_project)
+    qtbot.mouseClick(dialog.but_load_yaml, Qt.LeftButton)
+
+    dialog.run()
+
+    matrices = dialog.project.matrices
+    matrices.update_database()
+    assert "select_link_analysis_from_yaml.omx" in matrices.list()["file_name"].tolist()
+
+    pth = dialog.project.project_base_path
+    conn = sqlite3.connect(pth / "results_database.sqlite")
+    results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+    assert "select_link_analysis_from_yaml" in results

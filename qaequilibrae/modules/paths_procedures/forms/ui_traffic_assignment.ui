@@ -67,7 +67,14 @@
        <string>Project</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0" rowspan="2">
+       <item row="2" column="2">
+        <widget class="QPushButton" name="but_load_yaml">
+         <property name="text">
+          <string>Configure from YAML</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="3">
         <widget class="QTableWidget" name="tbl_project_properties">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -86,6 +93,22 @@
           </property>
          </column>
         </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <spacer name="hspace_4">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Minimum</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
