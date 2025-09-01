@@ -17,7 +17,7 @@ class ImportMatrix(QAequilibraEProcessingAlgorithm):
             self.tr("Data"),
             "data",
             self.tr("Saves matrix from open layer into a *.omx file"),
-            ["import", "matrix", "omx"],
+            ["import", "matrix", "omx", "matrices"],
         )
 
     def createInstance(self):
