@@ -16,7 +16,7 @@ class OpenProject(QAequilibraEProcessingAlgorithm):
             self.tr("Open project"),
             self.tr("Project"),
             "project_procedures",
-            self.tr("Open AequilibraE project into QGIS."),
+            self.tr("Open AequilibraE project"),
             ["open", "project", "open project"],
         )
 

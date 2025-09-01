@@ -142,5 +142,5 @@ class Provider(QgsProcessingProvider):
         return "AequilibraE"
 
     def icon(self):
-        """SQIcon used for the provider inside the Processing toolbox."""
+        """Icon used for the provider inside the Processing toolbox."""
         return QIcon(join(provider_path, "icon.png"))

@@ -17,7 +17,7 @@ class RouteChoice(QAequilibraEProcessingAlgorithm):
             self.tr("Route choice"),
             "route_choice",
             "",
-            ["route", "choice", "criticality"],
+            ["route", "choice", "route choice"],
         )
 
     def createInstance(self):

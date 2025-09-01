@@ -16,7 +16,7 @@ class RunProcedures(QAequilibraEProcessingAlgorithm):
             self.tr("Run procedures"),
             self.tr("Project"),
             "project_procedures",
-            self.tr("Run entire model pipelines from AequilibraE"),
+            self.tr("Run model procedures"),
             ["run procedures", "procedures"],
         )
 
