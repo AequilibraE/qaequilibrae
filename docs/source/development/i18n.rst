@@ -33,7 +33,7 @@ You'll be redirected to this page to enter your translation languages of prefere
     :align: center
     :alt: select-tx-pref-languages
 
-As soon as you have your request approved, you can log in once more in Transifex and begin translating.
+As soon as your request is approved, you can log in again into Transifex and begin translating.
 
 .. image:: ../images/development/tx_project_3.png
     :width: 1250
