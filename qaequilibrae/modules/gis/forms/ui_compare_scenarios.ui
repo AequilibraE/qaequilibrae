@@ -221,7 +221,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="cob_alternative_scenario"/>
+       <widget class="QComboBox" name="cob_alt_scenario"/>
       </item>
       <item>
        <widget class="QLabel" name="label_10">

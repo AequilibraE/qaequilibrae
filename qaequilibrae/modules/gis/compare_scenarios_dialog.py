@@ -8,8 +8,7 @@ from qgis.core import QgsExpression, QgsProject, QgsVectorLayerJoinInfo
 from qgis.core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
 
 from qaequilibrae.modules.common_tools import find_table_fields, get_parameter_chain, layer_from_dataframe
-from qaequilibrae.modules.matrix_procedures import list_results
-from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
+from qaequilibrae.modules.matrix_procedures import list_results, load_result_table
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgsmaplayercombobox"] = qgis.gui
@@ -30,6 +29,8 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.results = list_results(self.qgis_project.project)
 
+        self.__init_scenario = self.qgis_project.cob_scenarios.currentText()
+
         self.band_size = 10.0
         self.space_size = 0.0
         self.link_layer = None
@@ -42,11 +43,17 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.slider_spacer.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.slider_spacer.setTickInterval(10)
         self.slider_spacer.valueChanged.connect(self.spacevaluechange)
+        self.cob_base_scenario.currentIndexChanged.connect(
+            partial(self.choose_scenario, self.cob_base_scenario, self.cob_base_result)
+        )
+        self.cob_alt_scenario.currentIndexChanged.connect(
+            partial(self.choose_scenario, self.cob_alt_scenario, self.cob_alternative_result)
+        )
         self.cob_base_result.currentIndexChanged.connect(
-            partial(self.choose_scenario, self.cob_base_result, self.cob_base_data)
+            partial(self.choose_result, self.cob_base_scenario, self.cob_base_result, self.cob_base_data)
         )
         self.cob_alternative_result.currentIndexChanged.connect(
-            partial(self.choose_scenario, self.cob_alternative_result, self.cob_alternative_data)
+            partial(self.choose_result, self.cob_alt_scenario, self.cob_alternative_result, self.cob_alternative_data)
         )
 
         # band slider
@@ -78,18 +85,31 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.lbl_width.setText("{:3,.2f}".format(self.band_size))
 
     def add_fields_to_cboxes(self):
-        data = list(self.results[self.results.WARNINGS == ""].table_name)
-        for cob in [self.cob_base_result, self.cob_alternative_result]:
+        for cob in [self.cob_base_scenario, self.cob_alt_scenario]:
             cob.clear()
-            cob.addItems(data)
+            cob.addItems(self.qgis_project.available_scenarios)
 
-    def choose_scenario(self, cob_scenario, cob_fields):
-        # We'll update the function here
-        cob_fields.clear()
+    def choose_scenario(self, cob_scenario, cob_results):
+        cob_results.clear()
         if cob_scenario.currentIndex() < 0:
             return
+        if self.__init_scenario != cob_scenario.currentText():
+            self.qgis_project.project.use_scenario(cob_scenario.currentText())
+        flds = self.qgis_project.project.results.list()["table_name"].tolist()
+        if self.__init_scenario != cob_scenario.currentText():
+            self.qgis_project.project.use_scenario(self.__init_scenario)
+        cob_results.addItems(flds)
+
+    def choose_result(self, cob_scenario, cob_results, cob_fields):
+        cob_fields.clear()
+        if cob_results.currentIndex() < 0:
+            return
+        if self.__init_scenario != cob_scenario.currentText():
+            self.qgis_project.project.use_scenario(cob_scenario.currentText())
         with self.qgis_project.project.results_connection as conn:
-            lst = find_table_fields(conn, cob_scenario.currentText())
+            lst = find_table_fields(conn, cob_results.currentText())
+        if self.__init_scenario != cob_scenario.currentText():
+            self.qgis_project.project.use_scenario(self.__init_scenario)
         flds = [x.replace("ab", "*") for x in lst if "ab" in x and x.replace("ab", "ba") in lst]
         cob_fields.addItems(flds)
 
