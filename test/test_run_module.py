@@ -32,14 +32,14 @@ def test_example_function_with_kwargs(coquimbo_project, qtbot, timeoutDetector):
         dialog = RunModuleDialog(coquimbo_project)
 
         dialog.cob_function.setCurrentIndex(0)
-        assert dialog.cob_function.currentText() == functions[0]
+        assert dialog.cob_function.currentText() == functions[3]
 
         qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
         project_log = dialog.project.log()
         contents = project_log.contents()
 
-        assert "matrix_summary executed. Check for outputs." in contents[-1]
+        assert "example_function_with_kwargs executed. Check for outputs." in contents[-1]
 
 
 def test_new_function(coquimbo_project, qtbot, timeoutDetector):

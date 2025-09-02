@@ -4,7 +4,7 @@ from qgis.core import QgsField, QgsFeature, QgsGeometry, QgsProject, QgsVectorLa
 
 
 def layer_from_geodataframe(gdf: gpd.GeoDataFrame, layer_name: str):
-    """Transform GeoDataFrame to QGIS vector layer in memory"""
+    """Transform GeoDataFrame to QGIS LineString vector layer in memory"""
 
     # create layer
     crs = gdf.crs.__dict__["srs"]

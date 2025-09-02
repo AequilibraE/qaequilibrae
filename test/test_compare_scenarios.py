@@ -34,9 +34,9 @@ def test_compare_scenarios(ae, model_path, composite):
     dialog.execute_comparison()
 
     prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
-    assert prj_layers == ["assignment", "future_assignment", "links"]
+    assert prj_layers == ["scenario_comparison"]
 
-    link_layer = QgsProject.instance().mapLayersByName("links")[0]
+    link_layer = QgsProject.instance().mapLayersByName("scenario_comparison")[0]
     field_names = link_layer.fields().names()
     fields = ["base_matrix_ab", "base_matrix_ba", "alternative_matrix_ab", "alternative_matrix_ba"]
     for f in fields:

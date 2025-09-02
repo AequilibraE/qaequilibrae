@@ -5,11 +5,10 @@ from os.path import dirname, join
 import pandas as pd
 import qgis
 from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis.core import QgsExpression, QgsProject, QgsVectorLayerJoinInfo
+from qgis.core import QgsExpression, QgsProject
 from qgis.core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
 
-from qaequilibrae.modules.common_tools import find_table_fields, get_parameter_chain, layer_from_dataframe
-from qaequilibrae.modules.common_tools import layer_from_geodataframe
+from qaequilibrae.modules.common_tools import find_table_fields, get_parameter_chain, layer_from_geodataframe
 from qaequilibrae.modules.matrix_procedures import list_results, load_result_table
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
@@ -220,7 +219,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
             return False
         return True
 
-    def load_res_tables(self):
+    def load_result_tables(self):
         """ """
         columns = ["link_id", "a_node", "b_node", "geometry"]
 
@@ -264,39 +263,18 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         same_links = base_links.sjoin(alter_links, predicate="contains", how="inner").drop_duplicates("geometry")
         same_links = same_links[diff_links.columns]
 
-        _ = pd.concat([same_links, diff_links])
-
-    def load_result_tables(self):
-        self.link_layer = self.qgis_project.layers["links"][0]
-        QgsProject.instance().addMapLayer(self.link_layer)
-
-        v1 = self.cob_base_result.currentText()
-        v2 = self.cob_alternative_result.currentText()
-        v3 = self.cob_base_data.currentText()
-        v4 = self.cob_alternative_data.currentText()
-        base_lyr_result = load_result_table(self.qgis_project.project, v1)
-        self.base_lyr = layer_from_dataframe(base_lyr_result, v1)
-        data_to_join = [[self.base_lyr, "base"]]
-
-        txt = f"base_{v3}"
+        txt = f"base_{v5}"
         data_fields = [[txt.replace("*", "ab"), txt.replace("*", "ba")]]
-        txt = f"base_{v4}"
-        if v1 != v2:
-            alter_layer_result = load_result_table(self.qgis_project.project, v2)
-            self.alter_layer = layer_from_dataframe(alter_layer_result, v2)
-            data_to_join.append([self.alter_layer, "alternative"])
-            txt = f"alternative_{v4}"
+        values = {txt.replace("*", "ab"): 0, txt.replace("*", "ba"): 0}
+        txt = f"alternative_{v6}"
         data_fields.append([txt.replace("*", "ab"), txt.replace("*", "ba")])
+        values[txt.replace("*", "ab")] = 0
+        values[txt.replace("*", "ba")] = 0
 
-        for lyr, nm in data_to_join:
-            lien = QgsVectorLayerJoinInfo()
-            lien.setJoinFieldName("link_id")
-            lien.setTargetFieldName("link_id")
-            lien.setJoinLayerId(lyr.id())
-            lien.setUsingMemoryCache(True)
-            lien.setJoinLayer(lyr)
-            lien.setPrefix(f"{nm}_")
-            self.link_layer.addJoin(lien)
+        links = pd.concat([same_links, diff_links])
+        links.fillna(values, inplace=True)
+        self.link_layer = layer_from_geodataframe(links, "scenario_comparison")
+
         return data_fields
 
     def create_style(self, width, offset, color, line_pattern):

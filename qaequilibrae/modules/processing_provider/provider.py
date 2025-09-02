@@ -31,6 +31,7 @@ class Provider(QgsProcessingProvider):
 
         from .project_procedures.close_project import CloseProject
         from .project_procedures.create_examples import CreateExamples
+        from .project_procedures.create_scenarios import CreateScenarios
         from .project_procedures.load_log import LoadProjectLogFile
         from .project_procedures.load_parameters import LoadProjectParameters
         from .project_procedures.open_project import OpenProject
@@ -38,6 +39,7 @@ class Provider(QgsProcessingProvider):
 
         self.addAlgorithm(OpenProject())
         self.addAlgorithm(CreateExamples())
+        self.addAlgorithm(CreateScenarios())
         self.addAlgorithm(LoadProjectParameters())
         self.addAlgorithm(LoadProjectLogFile())
         self.addAlgorithm(RunProcedures())
