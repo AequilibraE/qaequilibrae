@@ -2,12 +2,14 @@ import sys
 from functools import partial
 from os.path import dirname, join
 
+import pandas as pd
 import qgis
 from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.core import QgsExpression, QgsProject, QgsVectorLayerJoinInfo
 from qgis.core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
 
 from qaequilibrae.modules.common_tools import find_table_fields, get_parameter_chain, layer_from_dataframe
+from qaequilibrae.modules.common_tools import layer_from_geodataframe
 from qaequilibrae.modules.matrix_procedures import list_results, load_result_table
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
@@ -141,9 +143,9 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.radio_compo.isChecked():
             exp = QgsExpression(
                 f"""max(maximum(coalesce("{ab_base}",0)),
-                                        maximum(coalesce("{ab_alt}",0)),
-                                        maximum(coalesce("{ba_base}",0)),
-                                        maximum(coalesce("{ba_alt}",0))) """
+                        maximum(coalesce("{ab_alt}",0)),
+                        maximum(coalesce("{ba_base}",0)),
+                        maximum(coalesce("{ba_alt}",0))) """
             )
             context = self.link_layer.createExpressionContext()
             max_value = exp.evaluate(context).real
@@ -166,7 +168,7 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.radio_diff.isChecked():
             exp = QgsExpression(
                 f"""max(maximum(abs(coalesce("{ab_base}",0)-coalesce("{ab_alt}",0))),
-                                        maximum(abs(coalesce("{ba_base}",0)-coalesce("{ba_alt}",0)))) """
+                        maximum(abs(coalesce("{ba_base}",0)-coalesce("{ba_alt}",0)))) """
             )
             context = self.link_layer.createExpressionContext()
             max_value = exp.evaluate(context).real
@@ -198,6 +200,8 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def check_inputs(self):
         for combo in [
+            self.cob_base_scenario,
+            self.cob_alt_scenario,
             self.cob_base_result,
             self.cob_alternative_result,
             self.cob_base_data,
@@ -206,13 +210,61 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
             if combo.currentIndex() < 0:
                 return False
 
-        v1 = self.cob_base_result.currentText()
-        v2 = self.cob_alternative_result.currentText()
-        v3 = self.cob_base_data.currentText()
-        v4 = self.cob_alternative_data.currentText()
-        if v1 == v2 and v3 == v4:
+        v1 = self.cob_base_scenario.currentText()
+        v2 = self.cob_alt_scenario.currentText()
+        v3 = self.cob_base_result.currentText()
+        v4 = self.cob_alternative_result.currentText()
+        v5 = self.cob_base_data.currentText()
+        v6 = self.cob_alternative_data.currentText()
+        if v1 == v2 and v3 == v4 and v5 == v6:
             return False
         return True
+
+    def load_res_tables(self):
+        """ """
+        columns = ["link_id", "a_node", "b_node", "geometry"]
+
+        v1 = self.cob_base_scenario.currentText()
+        v2 = self.cob_alt_scenario.currentText()
+        v3 = self.cob_base_result.currentText()
+        v4 = self.cob_alternative_result.currentText()
+        v5 = self.cob_base_data.currentText()
+        v6 = self.cob_alternative_data.currentText()
+
+        # Load base scenario data
+        if v1 != self.__init_scenario:
+            self.qgis_project.project.use_scenario(v1)
+        base_links = self.qgis_project.project.network.links.data
+        base_links = base_links[columns]
+        base_lyr_result = load_result_table(self.qgis_project.project, v3)
+        base_cols = ["link_id"]
+        base_cols.extend([x for x in base_lyr_result.columns if v5[:-1] in x and "_tot" not in x])
+
+        # Load alternative scenario data
+        if v1 != v2:
+            self.qgis_project.project.use_scenario(v2)
+        alter_links = self.qgis_project.project.network.links.data
+        alter_links = alter_links[columns]
+        alter_lyr_result = load_result_table(self.qgis_project.project, v4)
+        alter_cols = ["link_id"]
+        alter_cols.extend([x for x in alter_lyr_result.columns if v6[:-1] in x and "_tot" not in x])
+
+        # Go back to the currently selected scenario
+        self.qgis_project.project.use_scenario(self.__init_scenario)
+
+        # Join base links with results
+        base_links = base_links.merge(base_lyr_result[base_cols], on="link_id")
+        base_links.columns = [f"base_{x}" if "geometry" not in x else "geometry" for x in base_links.columns]
+
+        # Join anternative links with results
+        alter_links = alter_links.merge(alter_lyr_result[alter_cols], on="link_id")
+        alter_links.columns = [f"alternative_{x}" if "geometry" not in x else "geometry" for x in alter_links.columns]
+
+        diff_links = base_links.overlay(alter_links, how="symmetric_difference", keep_geom_type=True)
+        same_links = base_links.sjoin(alter_links, predicate="contains", how="inner").drop_duplicates("geometry")
+        same_links = same_links[diff_links.columns]
+
+        _ = pd.concat([same_links, diff_links])
 
     def load_result_tables(self):
         self.link_layer = self.qgis_project.layers["links"][0]
