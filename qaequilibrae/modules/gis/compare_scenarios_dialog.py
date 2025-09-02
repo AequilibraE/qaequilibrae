@@ -259,10 +259,6 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         alter_links = alter_links.merge(alter_lyr_result[alter_cols], on="link_id")
         alter_links.columns = [f"alternative_{x}" if "geometry" not in x else "geometry" for x in alter_links.columns]
 
-        diff_links = base_links.overlay(alter_links, how="symmetric_difference", keep_geom_type=True)
-        same_links = base_links.sjoin(alter_links, predicate="contains", how="inner").drop_duplicates("geometry")
-        same_links = same_links[diff_links.columns]
-
         txt = f"base_{v5}"
         data_fields = [[txt.replace("*", "ab"), txt.replace("*", "ba")]]
         values = {txt.replace("*", "ab"): 0, txt.replace("*", "ba"): 0}
@@ -270,6 +266,10 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         data_fields.append([txt.replace("*", "ab"), txt.replace("*", "ba")])
         values[txt.replace("*", "ab")] = 0
         values[txt.replace("*", "ba")] = 0
+
+        diff_links = base_links.overlay(alter_links, how="symmetric_difference", keep_geom_type=True)
+        same_links = base_links.sjoin(alter_links, predicate="contains", how="inner").drop_duplicates("geometry")
+        same_links = same_links[diff_links.columns]
 
         links = pd.concat([same_links, diff_links])
         links.fillna(values, inplace=True)

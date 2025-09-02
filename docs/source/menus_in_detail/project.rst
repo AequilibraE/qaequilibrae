@@ -45,14 +45,35 @@ To better understand the application of the run module, we encourage you to read
     :align: center
     :alt: run module dialog
 
-.. Video tutorial
-.. --------------
+Scenarios
+---------
 
-.. If you want a summary of everything that was presented on this page, you can
-.. head over to YouTube to see a demonstration of how to download these projects.
+QAequilibraE now presents a scenario system, in which you can manage multiple scenario variants
+within a single project. 
 
-.. .. raw:: html
+When a project is created, its default scenario is 'root'. QAequilibraE allows you to clone a
+scenario or create an empty scenario. To clone a scenario, you first choose the base scenario
+to clone (1) and the name of the scenario (2). An useful scenario description can also be
+added at the 'Description' box (3). By default, the scenario to clone is the currently active
+scenario, but you can choose anyone. To clone the scenario, just click on the 'OK' button
+at the bottom of the screen (4).
 
-..     <iframe width="560" height="315" src="https://www.youtube.com/embed/9PF2qHs2hUc"
-..      frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope;
-..      picture-in-picture" allowfullscreen></iframe>
+.. image:: ../images/project_procedures/scenarios_clone_menu.png
+    :align: center
+    :alt: clone project scenario
+
+To create an empty scenario, choose the 'Empty scenario' option (1), and set the scenario name
+(2) and description (3). To create an empty scenario, just click on the 'OK' button at the
+bottom of the screen (4).
+
+.. image:: ../images/project_procedures/scenarios_create_empty_menu.png
+    :align: center
+    :alt: create empty project scenario
+
+A list containing all project scenarios is presented at the bottom of the widget screen, and
+it can be used to change the currently open scenario. When changing the scenario, all geometric
+layers available at the "Geo layers" tab also change.
+
+.. image:: ../images/project_procedures/scenarios_list.png
+    :align: center
+    :alt: list project scenarios

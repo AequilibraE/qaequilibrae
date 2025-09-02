@@ -284,6 +284,7 @@ class AequilibraEMenu:
         self.cob_scenarios.clear()
         self.projectManager.clear()
         self.project = None
+        self.available_scenarios = []
         self.matrices.clear()
         self.layers.clear()
         self.log_message(f"Closed project on: {pth}")
