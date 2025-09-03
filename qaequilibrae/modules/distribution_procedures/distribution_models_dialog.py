@@ -265,7 +265,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
     def browse_outfile(self, file_type):
         file_types = {
             "mod": ["Model file", ["Model file(*.mod)"], ".mod"],
-            "aem": ["Matrix", ["Aequilibrae matrix(*.aem)"], ".aem"],
+            "omx": ["Matrix", ["Open matrix(*.omx)"], ".omx"],
         }
 
         ft = file_types[file_type]
@@ -295,7 +295,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                 atra_field = self.cob_atra_field.currentText()
 
             if self.job == "ipf":
-                self.out_name = self.browse_outfile("aem")
+                self.out_name = self.browse_outfile("omx")
                 if self.out_name is not None:
                     args = {
                         "matrix": seed_matrix,
@@ -307,7 +307,7 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
                     worker_thread = IpfProcedure(qgis.utils.iface.mainWindow(), **args)
 
             if self.job == "apply":
-                self.out_name = self.browse_outfile("aem")
+                self.out_name = self.browse_outfile("omx")
                 if self.out_name is not None:
                     for i in range(1, self.table_model.rowCount()):
                         if str(self.table_model.item(i, 0).text()) == "Alpha":

@@ -139,7 +139,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def finished_threaded_procedure(self):
         self.report = self.worker_thread.report
-        self.worker_thread.save_to_project(self.only_str(self.mat_name), format="aem")
+        self.worker_thread.save_to_project(self.only_str(self.mat_name))
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results

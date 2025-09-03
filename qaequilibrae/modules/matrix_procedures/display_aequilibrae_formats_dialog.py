@@ -466,7 +466,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def get_file_name(self):
         formats = ["Aequilibrae matrix (*.aem)", "OpenMatrix (*.omx)"]
-        dflt = ".aem"
+        dflt = ".omx"
 
         data_path, data_type = GetOutputFileName(
             self,
