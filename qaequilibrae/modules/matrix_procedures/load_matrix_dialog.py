@@ -5,9 +5,9 @@ import numpy as np
 import qgis
 from aequilibrae.context import get_logger
 from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
-from qgis.PyQt import QtWidgets, uic, QtCore
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import Qt, QSize
+from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
 
 from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_from_toc
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
@@ -28,9 +28,9 @@ logger = get_logger()
 # TODO: Add possibility to add a centroid list to guarantee the match between matrix index and graph
 # TODO: Allow user to import multiple matrices from CSV at once (like an export from TransCad or FAF data)
 # TODO: Add a remove button to the list of matrices to be loaded. Remove double-click
-class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
+class LoadMatrixDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, **kwargs):
-        QtWidgets.QDialog.__init__(self)
+        QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
@@ -78,7 +78,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.matrix_list_view.setColumnWidth(2, 125)
         self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
         self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
-        self.setMaximumSize(QtCore.QSize(100000, 100000))
+        self.setMaximumSize(QSize(100000, 100000))
         self.resize(542, 427)
         self.but_permanent_save.setVisible(True)
 

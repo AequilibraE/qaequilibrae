@@ -12,7 +12,7 @@ from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QRadioButton
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout, QAbstractItemView
-from qgis.core import QgsProject, QgsStyle, QgsRuleBasedRenderer
+from qgis.core import QgsProject, QgsStyle, QgsRuleBasedRenderer, Qgis
 from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsLinePatternFillSymbolLayer
 
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
@@ -63,6 +63,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setWindowTitle(self.tr("File path: {}").format(self.data_path))
 
         if self.data_type == "AEM":
+            self.qgis_project.log_message(
+                "Support for AEM will be removed in a future version", Qgis.MessageLevel.Warning
+            )
             self.data_to_show = AequilibraeMatrix()
             if not self.from_proj:
                 self.qgis_project.matrices[self.data_path] = self.data_to_show

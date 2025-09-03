@@ -479,3 +479,6 @@ class AequilibraEMenu:
 
     def iface_error_message(self, text: str = None, title: str = "Error"):
         self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Critical, -1)
+
+    def iface_info_message(self, text: str = None, title: str = "Info"):
+        self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Info, -1)

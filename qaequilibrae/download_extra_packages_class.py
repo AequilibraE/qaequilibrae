@@ -85,7 +85,7 @@ class DownloadAll:
             self.no_ssl = True
 
         for line in reps:
-            QgsMessageLog.logMessage(str(line), level=Qgis.MessageLevel.Info)
+            QgsMessageLog.logMessage(str(line), "Messages", level=Qgis.MessageLevel.Info)
 
         return reps
 
@@ -159,7 +159,9 @@ class DownloadAll:
                     if os.path.isdir(os.path.join(target_folder, fldr)):
                         shutil.rmtree(os.path.join(target_folder, fldr))
                         QgsMessageLog.logMessage(
-                            f"Duplicated packages removed from installation: {fldr}", level=Qgis.MessageLevel.Info
+                            f"Duplicated packages removed from installation: {fldr}",
+                            "Messages",
+                            level=Qgis.MessageLevel.Info,
                         )
 
     def retry_pkg_install(self):

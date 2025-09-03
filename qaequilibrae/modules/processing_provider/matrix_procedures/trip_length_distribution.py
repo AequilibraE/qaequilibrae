@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from qgis.core import QgsProcessingAlgorithm, QgsMessageLog, QgsProcessingParameterString
-from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFileDestination
+from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFileDestination, Qgis
 from qgis.utils import plugins
 
 from qaequilibrae.i18n.translate import trlt
@@ -88,7 +88,9 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
 
         except Exception as e:
             # Handle cases where the plugin or project information is not accessible
-            QgsMessageLog.logMessage(f"Error checking AequilibraE project: {str(e)}")
+            QgsMessageLog.logMessage(
+                f"Error checking AequilibraE project: {str(e)}", "Messages", Qgis.MessageLevel.Critical
+            )
 
     def processAlgorithm(self, parameters, context, feedback):
         # Checks if we have AequilibraE installed
