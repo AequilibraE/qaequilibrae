@@ -2,7 +2,6 @@ import sys
 from functools import partial
 from os.path import dirname, join
 
-import pandas as pd
 import qgis
 from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.core import QgsExpression, QgsProject
@@ -267,12 +266,14 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         values[txt.replace("*", "ab")] = 0
         values[txt.replace("*", "ba")] = 0
 
-        diff_links = base_links.overlay(alter_links, how="symmetric_difference", keep_geom_type=True)
-        same_links = base_links.sjoin(alter_links, predicate="contains", how="inner").drop_duplicates("geometry")
-        same_links = same_links[diff_links.columns]
+        links = base_links.merge(alter_links, on="geometry", how="outer")
 
-        links = pd.concat([same_links, diff_links])
-        links.fillna(values, inplace=True)
+        link_cols = links.columns.tolist()
+        link_cols.remove("geometry")
+        link_cols.append("geometry")
+        links = links[link_cols]
+        links.fillna(value=values, inplace=True)
+
         self.link_layer = layer_from_geodataframe(links, "scenario_comparison")
 
         return data_fields
