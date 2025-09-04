@@ -37,7 +37,7 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         try:
             self.items = list(self.project.run._fields)
             self.cob_function.addItems(self.items)
-            self.qgis_project.log_message("All run procedures dependencies are installed.")
+            self.qgis_project.message_log("All run procedures dependencies are installed.")
 
         except ModuleNotFoundError:
             run_path = self.project.project_base_path / "run" / "requirements.txt"
@@ -49,7 +49,7 @@ class RunModuleDialog(QDialog, FORM_CLASS):
                 if self.question == QMessageBox.Ok:
                     install_command = f'"{DownloadAll().find_python()}"'
                     install_command += f" -m pip install -r {run_path} --target {target_dir}"
-                    self.qgis_project.log_message(install_command)
+                    self.qgis_project.message_log(install_command)
 
                     process = subprocess.Popen(
                         install_command,
@@ -60,7 +60,7 @@ class RunModuleDialog(QDialog, FORM_CLASS):
                         universal_newlines=True,
                     )
                     for line in process.stdout:
-                        self.qgis_project.log_message(line.strip())
+                        self.qgis_project.message_log(line.strip())
 
                     # Check process output
                     exit_code = process.wait()

@@ -3,6 +3,7 @@ import sys
 from os.path import join
 
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingParameterEnum
+from qgis.core import QgsMessageLog, Qgis
 
 from qaequilibrae.i18n.translate import trlt
 
@@ -57,6 +58,9 @@ class ExportMatrix(QgsProcessingAlgorithm):
         elif ext == "aem":
             mat.load(parameters["matrix_path"])
             mat.export(dst_path)
+            QgsMessageLog.logMessage(
+                "Support for AEM will be removed in a future version", "Messages", Qgis.MessageLevel.Warning
+            )
 
         mat.close()
 

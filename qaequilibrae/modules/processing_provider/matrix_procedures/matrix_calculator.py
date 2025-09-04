@@ -2,14 +2,9 @@ import importlib.util as iutil
 import sys
 
 import yaml
-from qgis.core import (
-    QgsProcessingAlgorithm,
-    QgsProcessingMultiStepFeedback,
-    QgsProcessingParameterFile,
-    QgsProcessingParameterFileDestination,
-    QgsProcessingParameterString,
-)
-from qgis.core import QgsProcessingException
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
+from qgis.core import QgsProcessingParameterFileDestination, QgsProcessingParameterString, QgsProcessingException
+from qgis.core import QgsMessageLog, Qgis
 
 from qaequilibrae.i18n.translate import trlt
 
@@ -95,6 +90,10 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         mat.matrix[parameters["matrix_core"]][:, :] = out[:, :]
         mat.index[:] = index[:]
         mat.close()
+
+        QgsMessageLog.logMessage(
+            "Support for AEM will be removed in a future version", "Messages", Qgis.MessageLevel.Warning
+        )
 
         return {"Output": "Finished"}
 

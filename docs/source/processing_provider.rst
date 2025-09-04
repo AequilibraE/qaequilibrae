@@ -35,6 +35,10 @@ With Data tools, it is possible to import/export matrices to/from the project, a
 well as perform matrix calculations and generate a trip length distribution output
 usig project data.
 
+.. warning::
+
+    Support for AequilibraE Matrix (AEM) files will be removed in a future version.
+
 .. _importing_matrices:
 
 Importing matrices

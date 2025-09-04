@@ -63,8 +63,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setWindowTitle(self.tr("File path: {}").format(self.data_path))
 
         if self.data_type == "AEM":
-            self.qgis_project.log_message(
-                "Support for AEM will be removed in a future version", Qgis.MessageLevel.Warning
+            self.qgis_project.message_log(
+                "Support for AEM will be removed in a future version", Qgis.MessageLevel.Warning, True
             )
             self.data_to_show = AequilibraeMatrix()
             if not self.from_proj:

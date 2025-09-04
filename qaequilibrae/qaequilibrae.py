@@ -200,7 +200,7 @@ class AequilibraEMenu:
         if self.available_scenarios:
             name = self.available_scenarios[self.cob_scenarios.currentIndex()]
             self.project.use_scenario(name)
-            self.log_message(f"Changed active scenario: {name}")
+            self.message_log(f"Changed active scenario: {name}")
 
             # Change layers
             tab_count = self.projectManager.count()
@@ -287,7 +287,7 @@ class AequilibraEMenu:
         self.available_scenarios = []
         self.matrices.clear()
         self.layers.clear()
-        self.log_message(f"Closed project on: {pth}")
+        self.message_log(f"Closed project on: {pth}")
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
@@ -474,7 +474,7 @@ class AequilibraEMenu:
             for lyr in layers:
                 self.create_layer_by_name(lyr)
 
-    def log_message(self, message, level: Qgis.MessageLevel = Qgis.MessageLevel.Info, notify_user: bool = False):
+    def message_log(self, message, level: Qgis.MessageLevel = Qgis.MessageLevel.Info, notify_user: bool = False):
         QgsMessageLog.logMessage(message, "Messages", level, notify_user)
 
     def iface_error_message(self, text: str = None, title: str = "Error"):
