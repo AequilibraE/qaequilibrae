@@ -36,6 +36,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             # If 'links' is the active layer, raises an error. We can only skim nodes or zones
             if "links" in self.layer.name():
                 self.qgis_project.iface_error_message("Select one of 'nodes' or 'zones' layer to proceed.")
+                self.__disable_fields()
                 return
 
             # We get the layer ID to check if it was removed from the layers' panel
