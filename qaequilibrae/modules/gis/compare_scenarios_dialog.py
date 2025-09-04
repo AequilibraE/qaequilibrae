@@ -266,7 +266,10 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         values[txt.replace("*", "ab")] = 0
         values[txt.replace("*", "ba")] = 0
 
-        links = base_links.merge(alter_links, on="geometry", how="outer")
+        base_cols = ["base_link_id", "base_a_node", "base_b_node", "geometry"]
+        alter_cols = ["alternative_link_id", "alternative_a_node", "alternative_b_node", "geometry"]
+
+        links = base_links.merge(alter_links, left_on=base_cols, right_on=alter_cols, how="outer")
 
         link_cols = links.columns.tolist()
         link_cols.remove("geometry")
