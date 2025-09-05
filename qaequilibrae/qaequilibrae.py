@@ -475,12 +475,19 @@ class AequilibraEMenu:
                 self.create_layer_by_name(lyr)
 
     def message_log(self, message, level: Qgis.MessageLevel = Qgis.MessageLevel.Info, notify_user: bool = False):
+        """
+        Standardizes QAequilibraE message log display in the tab 'Messages'.
+
+        Uses 'Info' level and does not notify user, by default, although these are editable.
+        """
         QgsMessageLog.logMessage(message, "Messages", level, notify_user)
 
     def iface_error_message(self, text: str = None, title: str = "Error"):
+        """Standardizes QAequilibraE error messages display"""
         self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Critical, -1)
 
     def iface_info_message(self, text: str = None, title: str = "Info"):
+        """Standardizes QAequilibraE info messages display"""
         self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Info, -1)
 
     def allow_change_scenario(self):
@@ -496,7 +503,7 @@ class AequilibraEMenu:
 
     def block_change_scenario(self):
         """
-        Disable scenario changes when QDialogs are open.
+        Disables scenario changes when QDialogs are open.
 
         This function is used when initializating classes with dialogs.
         """
