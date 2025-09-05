@@ -73,7 +73,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
     def update_matrix_table(self):
         matrices = self.project.matrices
         matrices.update_database()
-        with self.project.db_connection_spatial as conn:
+        with self.project.db_connection as conn:
             qry = """UPDATE matrices SET name = substr(file_name, 1, length(file_name)-4) WHERE name like "b''%";"""
             conn.execute(qry)
         self.load_matrices()
