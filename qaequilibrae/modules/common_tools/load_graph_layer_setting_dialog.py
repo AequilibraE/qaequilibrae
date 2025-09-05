@@ -31,8 +31,6 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.do_load_graph.clicked.connect(self.exit_procedure)
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
-
     def exit_procedure(self):
         self.mode = self.all_modes[self.cb_modes.currentText()]
         self.minimize_field = self.cb_minimizing.currentText()

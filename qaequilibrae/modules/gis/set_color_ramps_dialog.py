@@ -45,8 +45,6 @@ class LoadColorRampSelector(QDialog, FORM_CLASS):
         self.change_field("AB")
         self.results = None
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
-
     def load_ramps(self):
         self.results = {}
         self.results["color ab"] = self.cbb_ab_color.currentText()

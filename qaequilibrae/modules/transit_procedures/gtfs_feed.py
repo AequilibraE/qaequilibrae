@@ -31,8 +31,6 @@ class GTFSFeed(QDialog, FORM_CLASS):
         self.setFixedHeight(1)
         self.open_feed()
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
-
     def open_feed(self):
         formats = ["GTFS Feed(*.zip)"]
         source_path_file, _ = GetOutputFileName(

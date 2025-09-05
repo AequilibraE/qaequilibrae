@@ -28,8 +28,6 @@ class GTFSImporter(QDialog, FORM_CLASS):
 
         self.is_pt_database = isfile(qgis_project.project._transit_database_path)
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
-
         if self.is_pt_database:
             self.rdo_clear.setText(self.tr("Overwrite Routes"))
             self.rdo_keep.setText(self.tr("Add to Existing Routes"))
@@ -54,6 +52,8 @@ class GTFSImporter(QDialog, FORM_CLASS):
             "trips",
             "trips_schedule",
         ]
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def add_gtfs_feed(self):
         self._p = Transit(self.qgis_project.project)

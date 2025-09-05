@@ -389,15 +389,13 @@ class AequilibraEMenu:
 
         qgis.utils.iface.mapCanvas().refresh()
 
-    @property
     def _project_base_path(self):
         if "/scenarios/" in str(self.project.project_base_path):
             return self.project.project_base_path.parent.parent
         return self.project.project_base_path
 
-    @property
     def _project_layers_database(self):
-        return str(self._project_base_path / "qgis_layers.sqlite")
+        return str(self._project_base_path() / "qgis_layers.sqlite")
 
     def save_in_project(self):
         """Saves temporary layers to the project using QGIS saving buttons."""
@@ -408,14 +406,14 @@ class AequilibraEMenu:
 
         if "aequilibrae_path" not in variables:
             QgsExpressionContextUtils.setProjectVariable(
-                QgsProject.instance(), "aequilibrae_path", str(self._project_base_path)
+                QgsProject.instance(), "aequilibrae_path", str(self._project_base_path())
             )
         # Create project variable 'aeq_scenario' to store scenario info
         QgsExpressionContextUtils.setProjectVariable(
             QgsProject.instance(), "aeq_scenario", self.cob_scenarios.currentText()
         )
 
-        file_exists = True if isfile(self._project_layers_database) else False
+        file_exists = True if isfile(self._project_layers_database()) else False
 
         for layer in QgsProject.instance().mapLayers().values():
             if layer.isTemporary():
@@ -429,11 +427,13 @@ class AequilibraEMenu:
                 transform_context = QgsProject.instance().transformContext()
 
                 error = QgsVectorFileWriter.writeAsVectorFormatV3(
-                    layer, self._project_layers_database, transform_context, options
+                    layer, self._project_layers_database(), transform_context, options
                 )
 
                 if error[0] == QgsVectorFileWriter.NoError:
-                    layer.setDataSource(self._project_layers_database + f"|layername={layer_name}", layer.name(), "ogr")
+                    layer.setDataSource(
+                        self._project_layers_database() + f"|layername={layer_name}", layer.name(), "ogr"
+                    )
 
                 file_exists = True
 
