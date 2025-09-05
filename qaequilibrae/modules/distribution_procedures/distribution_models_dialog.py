@@ -28,14 +28,15 @@ logger = get_logger()
 
 
 class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgs_proj, mode=None):
+    def __init__(self, qgis_project, mode=None):
         QtWidgets.QDialog.__init__(self)
-        self.iface = qgs_proj.iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
         self.path = standard_path()
 
-        self.qgs_proj = qgs_proj
-        self.project = qgs_proj.project
+        self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
+        self.project = qgis_project.project
 
         self.error = None
         self.job_queue = OrderedDict()
@@ -97,6 +98,8 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.load_matrices()
         self.user_chosen_model = None
         self.update_model_parameters()
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def load_matrices(self):
         self.matrices = list_matrices(self.project)

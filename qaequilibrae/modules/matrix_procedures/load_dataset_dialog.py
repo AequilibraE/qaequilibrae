@@ -16,9 +16,10 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_vector_loader.u
 
 
 class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, single_use=True):
+    def __init__(self, qgis_project, single_use=True):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.iface = qgis_project.iface
+        qgis_project.block_change_scenario()
         self.setupUi(self)
         self.path = standard_path()
 
@@ -62,6 +63,8 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
             self.but_save_and_use.setText(self.tr("Import"))
 
         self.size_it_accordingly(partial(self.size_it_accordingly, False))
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def set_tables_with_fields(self):
         self.size_it_accordingly(False)

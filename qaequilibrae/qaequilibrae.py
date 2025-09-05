@@ -482,3 +482,22 @@ class AequilibraEMenu:
 
     def iface_info_message(self, text: str = None, title: str = "Info"):
         self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Info, -1)
+
+    def allow_change_scenario(self):
+        """
+        Enables scenario changes after deactivation.
+
+        This function is used with the QDialog finished signal, which is emitted when the dialog's
+        result code has been set, either by the user or by calling done(), accept(), or reject().
+
+        See: https://doc.qt.io/qt-6/qdialog.html#finished
+        """
+        self.cob_scenarios.setEnabled(True)
+
+    def block_change_scenario(self):
+        """
+        Disable scenario changes when QDialogs are open.
+
+        This function is used when initializating classes with dialogs.
+        """
+        self.cob_scenarios.setEnabled(False)

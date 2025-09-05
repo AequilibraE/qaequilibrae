@@ -32,6 +32,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.columns = None
         self.matrix_hash = {}
         self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         if qgis_project.project is None:
             self.proj_matrices = pd.DataFrame([])
         else:
@@ -59,6 +60,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
 
         self.list_matrices()
         self.set_show_matrices()
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def list_matrices(self):
         for idx, rec in self.proj_matrices.iterrows():

@@ -29,6 +29,8 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.qgis_project = qgis_project
+        self.qgis_project.cob_scenarios.setEnabled(False)
+
         self.matrices = self.project.matrices
         self.setupUi(self)
         self.error = None
@@ -71,6 +73,8 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.set_show_matrices()
         self.set_sub_area_use()
         self.set_select_link_use()
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def __populate_project_info(self):
         with self.project.db_connection as conn:

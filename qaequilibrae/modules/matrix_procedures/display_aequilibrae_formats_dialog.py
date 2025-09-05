@@ -32,6 +32,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = None
         self.logger = logging.getLogger("AequilibraEGUI")
         self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.from_proj = True if qgis_project.project else False
         self.indices = np.array(1)
         self.mapping_layer = None
@@ -58,6 +59,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.but_load.clicked.connect(self.get_file_name)
 
         self.remove_data_layer()
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def continue_with_data(self):
         self.setWindowTitle(self.tr("File path: {}").format(self.data_path))

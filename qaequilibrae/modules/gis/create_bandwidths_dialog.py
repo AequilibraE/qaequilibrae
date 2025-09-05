@@ -39,8 +39,10 @@ class BandAttributes:
 class CreateBandwidthsDialog(QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QDialog.__init__(self)
+        self.qgis_project = qgis_project
         self.iface = qgis_project.iface
         self.setupUi(self)
+        self.qgis_project.block_change_scenario()
 
         self.tot_bands = 0
 
@@ -85,6 +87,8 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
         self.random_rgb()
         self.set_initial_value_if_available()
         self.but_load_ramp.setEnabled(False)
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def color_origins(self):
         self.mColorButton.setVisible(self.rdo_color.isChecked())
@@ -247,7 +251,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
     def load_ramp_action(self):
         if self.layer is not None:
             self.ramps = None
-            dlg2 = LoadColorRampSelector(self.iface, self.layer)
+            dlg2 = LoadColorRampSelector(self.qgis_project, self.layer)
             dlg2.show()
             dlg2.exec_()
             if dlg2.results is not None:

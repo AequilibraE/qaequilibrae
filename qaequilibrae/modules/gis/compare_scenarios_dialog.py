@@ -19,8 +19,10 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
         self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.iface = qgis_project.iface
         self.setupUi(self)
+
         self.positive_color.setColor(QtGui.QColor(0, 174, 116, 255))
         self.negative_color.setColor(QtGui.QColor(218, 0, 3, 255))
         self.common_flow_color.setColor(QtGui.QColor(0, 0, 0, 255))
@@ -71,6 +73,8 @@ class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.base_group_box.setToolTip(self.tr("This is the reference case, to which the differences will refer to"))
         self.alt_group_box.setToolTip(self.tr("This is the alternative"))
         self.color_group_box.setToolTip(self.tr("It will be BASE minus ALTERNATIVE"))
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def show_color_composite(self):
         self.common_label.setVisible(self.radio_compo.isChecked())

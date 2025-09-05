@@ -20,6 +20,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_simple_tag.ui")
 class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
+        qgis_project.block_change_scenario()
         self.iface = qgis_project.iface
         self.setupUi(self)
         self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
@@ -52,6 +53,8 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
             self.tr("Heuristic procedure that only computes the actual distance to the nearest neighbors")
         )
         self.works_field_matching()
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def reload_fields(self):
         self.matches_types()
