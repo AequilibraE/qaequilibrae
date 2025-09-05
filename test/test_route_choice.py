@@ -43,7 +43,7 @@ def test_execute_single(sf_project, qtbot, cob_field):
     assert not dialog.isVisible()
 
 
-def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
+def test_execute_single_dialog(coquimbo_project, qtbot):
     project = coquimbo_project.project
     project.network.build_graphs(modes=["c"])
 
@@ -64,7 +64,7 @@ def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
         },
     }
 
-    dialog = ExecuteSingleDialog(qgis_iface, graph, coquimbo_project.layers["links"][0], params)
+    dialog = ExecuteSingleDialog(coquimbo_project, graph, coquimbo_project.layers["links"][0], params)
     dialog.debouncer.delay_ms = 100
     dialog.node_from.clear()
     qtbot.mouseClick(dialog.node_from, Qt.LeftButton)

@@ -17,6 +17,7 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.setupUi(self)
 
         self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.progress_box.setVisible(False)
         self.progress_box.setEnabled(False)
         self.but_add.clicked.connect(self.add_gtfs_feed)
@@ -26,6 +27,8 @@ class GTFSImporter(QDialog, FORM_CLASS):
         self.done = 1
 
         self.is_pt_database = isfile(qgis_project.project._transit_database_path)
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
         if self.is_pt_database:
             self.rdo_clear.setText(self.tr("Overwrite Routes"))

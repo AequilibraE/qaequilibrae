@@ -6,13 +6,16 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_add_period.ui")
 
 
 class NewPeriodDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
-        self.iface = iface
+        self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.setupUi(self)
         self.error = []
 
         self.but_add.clicked.connect(self.exit_procedure)
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def exit_procedure(self):
         self.start_time = self.__time_converter(self.time_start.time())

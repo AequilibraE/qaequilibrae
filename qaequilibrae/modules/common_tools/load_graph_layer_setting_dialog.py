@@ -1,16 +1,16 @@
 from os.path import dirname, join
 
-from aequilibrae.project import Project
 from qgis.PyQt import QtWidgets, uic, QtCore
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_load_network_info.ui"))
 
 
 class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, project: Project):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
-        self.iface = iface
-        self.project = project
+        self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
+        self.project = qgis_project.project
         self.setupUi(self)
         self.minimize_field = ""
         self.mode = ""
@@ -30,6 +30,8 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
             self.cb_minimizing.addItem(field)
 
         self.do_load_graph.clicked.connect(self.exit_procedure)
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def exit_procedure(self):
         self.mode = self.all_modes[self.cb_modes.currentText()]

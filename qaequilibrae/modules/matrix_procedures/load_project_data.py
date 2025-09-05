@@ -26,6 +26,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         self.project = qgis_project.project if self.from_proj else None
 
         if self.from_proj:
+            self.qgis_project.block_change_scenario()
             self.matrices: pd.DataFrame = None
             self.matrices_model: PandasModel = None
 
@@ -47,6 +48,8 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
             QTabWidget.removeTab(self.tabs, 0)
 
         self.but_load_data.clicked.connect(self.display_external_data)
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def display_matrix(self):
         idx = [x.row() for x in list(self.list_matrices.selectionModel().selectedRows())]

@@ -25,6 +25,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.all_modes = {}
         self.layer = self.iface.activeLayer()
         self.graph = None
@@ -48,9 +49,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             QgsProject.instance().layersRemoved.connect(self.__on_layer_removed)
         else:
             self.error = "Please set an active layer to proceed"
-            self.iface.messageBar().pushMessage(
-                self.tr("Input error"), self.error, level=Qgis.MessageLevel.Critical, duration=10
-            )
+            self.qgis_project.iface_error_message(self.error, "Input error")
             self.__disable_fields()  # We disable all QDialog objects if there's no active layer set
             return
 
@@ -97,6 +96,8 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self.block_paths.toggled.connect(self.update_block_flow)
 
         self.configure_skim_fields()
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def __on_layer_removed(self, layer_ids):
         if self.__layer_id in layer_ids:

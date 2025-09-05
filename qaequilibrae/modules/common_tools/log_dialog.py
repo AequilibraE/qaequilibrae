@@ -10,14 +10,15 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 class LogDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, parent=None):
         super(LogDialog, self).__init__(parent)
-
-        self.logfile = qgis_project.project.project_base_path / "aequilibrae.log"
-
-        self.iface = qgis_project.iface
+        self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.setupUi(self)
         self.parameter_values = None
         self.current_data = None
         self.error = False
+
+        self.logfile = qgis_project.project.project_base_path / "aequilibrae.log"
+
         # Configures the text editor
         font = QFont()
         font.setFamily("Courier")
@@ -38,6 +39,8 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_close.setText(self.tr("Close"))
         self.but_close.clicked.connect(self.exit_procedure)
         self.but_save.clicked.connect(self.save_to_disk)
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     # Load the current parameters onto the GUI
     def load_data(self):

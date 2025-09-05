@@ -124,8 +124,8 @@ def test_create_period(qtbot, coquimbo_project, mock_period):
     assert period_id == 2
 
 
-def test_new_period_dialog(qgis_iface):
-    dialog = NewPeriodDialog(qgis_iface)
+def test_new_period_dialog(ae_with_project):
+    dialog = NewPeriodDialog(ae_with_project)
 
     # Set the start and end times
     start_time = QTime(6, 45)  # 6:45 AM

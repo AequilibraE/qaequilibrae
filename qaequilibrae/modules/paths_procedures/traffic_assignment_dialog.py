@@ -26,6 +26,7 @@ logger = logging.getLogger("AequilibraEGUI")
 class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
+        qgis_project.block_change_scenario()
         self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.setupUi(self)
@@ -122,6 +123,8 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_build_query.clicked.connect(self.build_query)
         self.select_link_list.cellDoubleClicked.connect(self.__remove_select_link_item)
         self.but_clean.clicked.connect(self.__clean_link_selection)
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def _browse_path(self):
 

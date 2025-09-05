@@ -9,6 +9,7 @@ class CreateScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project) -> None:
         QtWidgets.QDialog.__init__(self)
         self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.project = qgis_project.project
         self.setupUi(self)
 
@@ -19,6 +20,8 @@ class CreateScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_run.clicked.connect(self.run)
 
         self.populate_scenarios()
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def configure_inputs(self):
         """Update UI elements based on selected mode"""

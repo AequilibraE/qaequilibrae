@@ -17,6 +17,7 @@ class GTFSFeed(QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.setupUi(self)
         self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self._p = pt_object
         self.path = standard_path()
         self.feed = None
@@ -29,6 +30,8 @@ class GTFSFeed(QDialog, FORM_CLASS):
         self.service_calendar.setVisible(False)
         self.setFixedHeight(1)
         self.open_feed()
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def open_feed(self):
         formats = ["GTFS Feed(*.zip)"]

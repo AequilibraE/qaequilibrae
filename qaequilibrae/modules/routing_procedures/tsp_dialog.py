@@ -15,15 +15,16 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/tsp.ui"))
 
 
 class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgisproject):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = qgisproject.iface
+        self.iface = qgis_project.iface
         self.setupUi(self)
-        self.project = qgisproject.project  # type: Project
-        self._PQgis = qgisproject
+        self.project = qgis_project.project  # type: Project
+        self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
 
-        self.link_layer = self._PQgis.layers["links"][0]
-        self.node_layer = self._PQgis.layers["nodes"][0]
+        self.link_layer = self.qgis_project.layers["links"][0]
+        self.node_layer = self.qgis_project.layers["nodes"][0]
 
         QgsProject.instance().addMapLayer(self.link_layer)
         QgsProject.instance().addMapLayer(self.node_layer)
@@ -39,6 +40,8 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         self.populate_node_source()
 
         self.close_window = False
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def populate_node_source(self):
         self.cob_start.clear()

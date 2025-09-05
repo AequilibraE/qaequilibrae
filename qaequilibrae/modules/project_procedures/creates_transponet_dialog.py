@@ -20,10 +20,10 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_transponet_cons
 
 
 class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgisproject):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = qgisproject.iface
-        self.project = qgisproject
+        self.iface = qgis_project.iface
+        self.project = qgis_project
         self.setupUi(self)
 
         self.missing_data = -1

@@ -12,9 +12,10 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_execute_single.
 
 
 class ExecuteSingleDialog(QDialog, FORM_CLASS):
-    def __init__(self, iface, graph, link_layer, parameters):
+    def __init__(self, qgis_project, graph, link_layer, parameters):
         QDialog.__init__(self)
-        self.iface = iface
+        self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.setupUi(self)
 
         self.graph = graph
@@ -36,6 +37,8 @@ class ExecuteSingleDialog(QDialog, FORM_CLASS):
         self.node_to.textChanged.connect(self._on_node_to_changed)
         self.sld_max_routes.valueChanged.connect(self._on_slider_changed)
         self.sld_max_routes.sliderReleased.connect(self.execute_single)
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def execute_single(self):
         from_node = int(self.node_from.text())

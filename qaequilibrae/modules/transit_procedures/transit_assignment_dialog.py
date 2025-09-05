@@ -21,6 +21,8 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
         self.iface = qgis_project.iface
         self.project = qgis_project.project
+        self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.transit_data = Transit(self.project)
 
         self.all_modes = {}
@@ -46,6 +48,8 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
 
         self.but_assign.clicked.connect(partial(self.run, "assign"))
         self.but_create.clicked.connect(partial(self.run, "create"))
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def __populate_project_info(self):
         self.load_periods_table()
@@ -200,7 +204,7 @@ class TransitAssignDialog(QDialog, FORM_CLASS):
 
     def add_period(self):
         """Adds new periods to periods table"""
-        dlg2 = NewPeriodDialog(self.iface)
+        dlg2 = NewPeriodDialog(self.qgis_project)
         dlg2.show()
         dlg2.exec_()
 

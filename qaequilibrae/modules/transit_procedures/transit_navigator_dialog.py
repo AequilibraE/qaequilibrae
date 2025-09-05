@@ -24,6 +24,7 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.feed = None
         self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.project = qgis_project.project
         self._p = self.project.network
         self.mapped_stops = False
@@ -163,6 +164,8 @@ class TransitNavigatorDialog(QDialog, FORM_CLASS):
         self.selected_routes = None
         self.selected_from_time = None
         self.selected_to_time = None
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def show_label_stops(self):
         self.build_label(

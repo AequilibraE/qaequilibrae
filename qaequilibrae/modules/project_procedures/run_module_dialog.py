@@ -16,6 +16,7 @@ class RunModuleDialog(QDialog, FORM_CLASS):
     def __init__(self, qgis_project, logger=None):
         QDialog.__init__(self)
         self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.setupUi(self)
@@ -27,6 +28,8 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         self.check_missing_packages()
 
         self.but_run.clicked.connect(self.run)
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def handle_rejection(self):
         self.but_run.setVisible(False)

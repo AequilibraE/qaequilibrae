@@ -19,6 +19,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.setupUi(self)
 
+        qgis_project.block_change_scenario()
         self.project = qgis_project.project
         self.link_layer = qgis_project.layers["links"][0]
         self.result = SkimResults()
@@ -64,6 +65,8 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         for i, q in enumerate(self.skimmeable_fields):
             self.cb_minimizing.addItem(q)
             self.available_skims_table.setItem(i, 0, QTableWidgetItem(q))
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def removes_fields(self):
         table = self.available_skims_table

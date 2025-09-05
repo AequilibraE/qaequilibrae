@@ -16,10 +16,11 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_add_zoning.ui")
 
 
 class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgisproject):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = qgisproject.iface
-        self.project = qgisproject.project
+        self.iface = qgis_project.iface
+        self.project = qgis_project.project
+        qgis_project.block_change_scenario()
         self.setupUi(self)
 
         self.path = standard_path()
@@ -30,6 +31,8 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.changed_layer()
 
         self.progress_box.setVisible(False)
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def run(self):
         if self.cob_lyr.currentIndex() == -1:

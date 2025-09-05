@@ -29,7 +29,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.qgis_project = qgis_project
-        self.qgis_project.cob_scenarios.setEnabled(False)
+        self.qgis_project.block_change_scenario()
 
         self.matrices = self.project.matrices
         self.setupUi(self)
@@ -478,7 +478,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 plot_results(res, self.parameters["node_from"], self.parameters["node_to"], self.link_layer)
 
                 dlg2 = ExecuteSingleDialog(
-                    qgis.utils.iface.mainWindow(),
+                    self.qgis_project,
                     self.worker_thread.graph,
                     self.link_layer,
                     self.parameters,

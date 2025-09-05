@@ -21,6 +21,7 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.NewLinks = False
         self.NewNodes = False
         self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.project = qgis_project.project
 
         modes = self.project.network.modes.all_modes()
@@ -45,6 +46,8 @@ class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.chb_zone.setVisible(False)
 
         self.but_process.clicked.connect(self.run)
+
+        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def centroid_source(self):
         self.layer_box.setEnabled(self.rdo_layer.isChecked())

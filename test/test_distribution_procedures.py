@@ -45,7 +45,7 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
         dialog.cob_index.setCurrentText("index")
         dialog._has_idx = False
     else:
-        dataset = LoadDatasetDialog(dialog.iface)
+        dataset = LoadDatasetDialog(dialog.qgis_project)
         dataset.radio_layer.setChecked(True)
         dataset.size_it_accordingly(True)
         dataset.cob_index_field.setCurrentText("index")

@@ -24,6 +24,8 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def __init__(self, qgis_project) -> None:
         QtWidgets.QDialog.__init__(self)
+        self.qgis_project = qgis_project
+        self.qgis_project.block_change_scenario()
         self.iface = qgis_project.iface
         self.project = qgis_project.project  # type: Project
         self.setupUi(self)
@@ -49,11 +51,13 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.to_but.clicked.connect(self.search_for_point_to)
         self.do_dist_matrix.clicked.connect(self.produces_path)
 
+        self.finished.connect(self.qgis_project.allow_change_scenario)
+
     def prepare_graph_and_network(self):
         self.do_dist_matrix.setText(self.tr("Loading data"))
         self.from_but.setEnabled(False)
         self.to_but.setEnabled(False)
-        dlg2 = LoadGraphLayerSettingDialog(self.iface, self.project)
+        dlg2 = LoadGraphLayerSettingDialog(self.qgis_project)
         dlg2.show()
         dlg2.exec_()
         if len(dlg2.error) < 1 and len(dlg2.mode) > 0:
