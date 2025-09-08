@@ -7,7 +7,7 @@ import geopandas as gpd
 import numpy as np
 import qgis
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
 from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest
 
@@ -29,52 +29,59 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.project = qgis_project.project
         self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
+        qgis_project.block_change_scenario()
 
-        self.matrices = self.project.matrices
-        self.setupUi(self)
-        self.error = None
-        self.matrix = None
-        self.cost_function = ""
-        self.utility = []
+        try:
+            self.matrices = self.project.matrices
+            self.setupUi(self)
+            self.error = None
+            self.matrix = None
+            self.cost_function = ""
+            self.utility = []
 
-        self.all_modes = {}
-        self._pairs = []
-        self.link_layer = qgis_project.layers["links"][0]
-        self.parameters = {}
+            self.all_modes = {}
+            self._pairs = []
+            self.link_layer = qgis_project.layers["links"][0]
+            self.parameters = {}
 
-        self.select_links = {}
-        self.__current_links = []
+            self.select_links = {}
+            self.__current_links = []
 
-        self.__populate_project_info()
+            self.__populate_project_info()
 
-        self.__project_nodes = self.project.network.nodes.data.node_id.tolist()
-        self.proj_matrices = list_matrices(self.project)
+            self.__project_nodes = self.project.network.nodes.data.node_id.tolist()
+            self.proj_matrices = list_matrices(self.project)
 
-        self.cob_algo.addItems(["BFSLE", "Link Penalization", "BFSLE with Link Penalization"])
-        self.cob_direction.addItems(["AB", "Both", "BA"])
+            self.cob_algo.addItems(["BFSLE", "Link Penalization", "BFSLE with Link Penalization"])
+            self.cob_direction.addItems(["AB", "Both", "BA"])
 
-        self.cob_matrices.currentTextChanged.connect(self.set_show_matrices)
-        self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
-        self.but_add_to_cost.clicked.connect(self.add_cost_function)
-        self.but_clear_cost.clicked.connect(self.clear_cost_function)
-        self.but_perform_assig.clicked.connect(self.execute_assign)
-        self.but_build_and_save.clicked.connect(self.execute_build)
-        self.but_visualize.clicked.connect(self.execute_single)
-        self.chb_set_sub_area.toggled.connect(self.set_sub_area_use)
-        self.chb_set_select_link.toggled.connect(self.set_select_link_use)
+            self.cob_matrices.currentTextChanged.connect(self.set_show_matrices)
+            self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
+            self.but_add_to_cost.clicked.connect(self.add_cost_function)
+            self.but_clear_cost.clicked.connect(self.clear_cost_function)
+            self.but_perform_assig.clicked.connect(self.execute_assign)
+            self.but_build_and_save.clicked.connect(self.execute_build)
+            self.but_visualize.clicked.connect(self.execute_single)
+            self.chb_set_sub_area.toggled.connect(self.set_sub_area_use)
+            self.chb_set_select_link.toggled.connect(self.set_select_link_use)
 
-        self.but_add_qry.clicked.connect(self.add_query)
-        self.but_save_qry.clicked.connect(self.save_query)
-        self.tbl_selected_links.cellDoubleClicked.connect(self.__remove_select_link_item)
-        self.but_clear_qry.clicked.connect(self.__clean_link_selection)
+            self.but_add_qry.clicked.connect(self.add_query)
+            self.but_save_qry.clicked.connect(self.save_query)
+            self.tbl_selected_links.cellDoubleClicked.connect(self.__remove_select_link_item)
+            self.but_clear_qry.clicked.connect(self.__clean_link_selection)
 
-        self.list_matrices()
-        self.set_show_matrices()
-        self.set_sub_area_use()
-        self.set_select_link_use()
+            self.list_matrices()
+            self.set_show_matrices()
+            self.set_sub_area_use()
+            self.set_select_link_use()
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
+            self.finished.connect(self.qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def __populate_project_info(self):
         with self.project.db_connection as conn:

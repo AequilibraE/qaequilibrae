@@ -3,7 +3,7 @@ from os.path import dirname, join
 import qgis
 from aequilibrae.paths import SkimResults, NetworkSkimming
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
 
 from qaequilibrae.modules.common_tools import ReportDialog
@@ -16,57 +16,64 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_impedance_matri
 class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
+        qgis_project.block_change_scenario()
         self.iface = qgis_project.iface
         self.setupUi(self)
 
-        qgis_project.block_change_scenario()
-        self.project = qgis_project.project
-        self.link_layer = qgis_project.layers["links"][0]
-        self.result = SkimResults()
-        self.validtypes = integer_types + float_types
-        self.tot_skims = 0
-        self.name_skims = 0
-        self.graph = None
-        self.skimmeable_fields = []
-        self.skim_fields = []
-        self.all_modes = {}
-        self.error = None
+        try:
+            self.project = qgis_project.project
+            self.link_layer = qgis_project.layers["links"][0]
+            self.result = SkimResults()
+            self.validtypes = integer_types + float_types
+            self.tot_skims = 0
+            self.name_skims = 0
+            self.graph = None
+            self.skimmeable_fields = []
+            self.skim_fields = []
+            self.all_modes = {}
+            self.error = None
 
-        # FIRST, we connect slot signals
-        # For adding skims
-        self.but_adds_to_links.clicked.connect(self.append_to_list)
-        self.but_removes_from_links.clicked.connect(self.removes_fields)
-        self.do_dist_matrix.clicked.connect(self.run_skimming)
+            # FIRST, we connect slot signals
+            # For adding skims
+            self.but_adds_to_links.clicked.connect(self.append_to_list)
+            self.but_removes_from_links.clicked.connect(self.removes_fields)
+            self.do_dist_matrix.clicked.connect(self.run_skimming)
 
-        # SECOND, we set visibility for sections that should not be shown when the form opens (overlapping items)
-        #        and re-dimension the items that need re-dimensioning
-        self.hide_all_progress_bars()
-        self.available_skims_table.setColumnWidth(0, 245)
-        self.skim_list.setColumnWidth(0, 245)
-        self.available_skims_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.skim_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            # SECOND, we set visibility for sections that should not be shown when the form opens (overlapping items)
+            #        and re-dimension the items that need re-dimensioning
+            self.hide_all_progress_bars()
+            self.available_skims_table.setColumnWidth(0, 245)
+            self.skim_list.setColumnWidth(0, 245)
+            self.available_skims_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.skim_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
-        # loads default path from parameters
-        self.path = standard_path()
+            # loads default path from parameters
+            self.path = standard_path()
 
-        self.cb_minimizing.clear()
-        self.available_skims_table.clearContents()
-        self.block_paths.setChecked(True)
-        self.graph = None  # type: Graph
+            self.cb_minimizing.clear()
+            self.available_skims_table.clearContents()
+            self.block_paths.setChecked(True)
+            self.graph = None  # type: Graph
 
-        with self.project.db_connection as conn:
-            res = conn.execute("""select mode_name, mode_id from modes""")
-            for x in res.fetchall():
-                self.cb_modes.addItem(f"{x[0]} ({x[1]})")
-                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
+            with self.project.db_connection as conn:
+                res = conn.execute("""select mode_name, mode_id from modes""")
+                for x in res.fetchall():
+                    self.cb_modes.addItem(f"{x[0]} ({x[1]})")
+                    self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
-        self.skimmeable_fields = self.project.network.skimmable_fields()
-        self.available_skims_table.setRowCount(len(self.skimmeable_fields))
-        for i, q in enumerate(self.skimmeable_fields):
-            self.cb_minimizing.addItem(q)
-            self.available_skims_table.setItem(i, 0, QTableWidgetItem(q))
+            self.skimmeable_fields = self.project.network.skimmable_fields()
+            self.available_skims_table.setRowCount(len(self.skimmeable_fields))
+            for i, q in enumerate(self.skimmeable_fields):
+                self.cb_minimizing.addItem(q)
+                self.available_skims_table.setItem(i, 0, QTableWidgetItem(q))
 
-        self.finished.connect(qgis_project.allow_change_scenario)
+            self.finished.connect(qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def removes_fields(self):
         table = self.available_skims_table

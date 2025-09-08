@@ -2,7 +2,6 @@ import logging
 import sys
 from os.path import abspath, dirname, join
 
-import qgis
 from aequilibrae.paths.results import PathResults
 from qgis.PyQt import QtCore, QtWidgets, uic
 from qgis.core import QgsProject, QgsVectorLayer, QgsSpatialIndex
@@ -24,34 +23,42 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def __init__(self, qgis_project) -> None:
         QtWidgets.QDialog.__init__(self)
-        self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
-        self.iface = qgis_project.iface
-        self.project = qgis_project.project  # type: Project
-        self.setupUi(self)
-        self.field_types = {}
-        self.centroids = None
-        self.node_layer = qgis_project.layers["nodes"][0]
-        self.line_layer = qgis_project.layers["links"][0]
-        self.node_keys = {}
-        self.node_fields = None
-        self.index = None
-        self.matrix = None
-        self.path = standard_path()
-        self.node_id = None
+        qgis_project.block_change_scenario()
 
-        self.res = PathResults()
-        self.link_features = None
+        try:
+            self.qgis_project = qgis_project
+            self.iface = qgis_project.iface
+            self.project = qgis_project.project  # type: Project
+            self.setupUi(self)
+            self.field_types = {}
+            self.centroids = None
+            self.node_layer = qgis_project.layers["nodes"][0]
+            self.line_layer = qgis_project.layers["links"][0]
+            self.node_keys = {}
+            self.node_fields = None
+            self.index = None
+            self.matrix = None
+            self.path = standard_path()
+            self.node_id = None
 
-        self.do_dist_matrix.setEnabled(False)
-        self.from_but.setEnabled(False)
-        self.to_but.setEnabled(False)
-        self.configure_graph.clicked.connect(self.prepare_graph_and_network)
-        self.from_but.clicked.connect(self.search_for_point_from)
-        self.to_but.clicked.connect(self.search_for_point_to)
-        self.do_dist_matrix.clicked.connect(self.produces_path)
+            self.res = PathResults()
+            self.link_features = None
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
+            self.do_dist_matrix.setEnabled(False)
+            self.from_but.setEnabled(False)
+            self.to_but.setEnabled(False)
+            self.configure_graph.clicked.connect(self.prepare_graph_and_network)
+            self.from_but.clicked.connect(self.search_for_point_from)
+            self.to_but.clicked.connect(self.search_for_point_to)
+            self.do_dist_matrix.clicked.connect(self.produces_path)
+
+            self.finished.connect(self.qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QtCore.QTimer.singleShot(0, self.close)
+            return
 
     def prepare_graph_and_network(self):
         self.do_dist_matrix.setText(self.tr("Loading data"))
@@ -157,7 +164,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.create_path_with_scratch_layer()
             else:
                 msg = self.tr("No path between {} and {}").format(self.path_from.text(), self.path_to.text())
-                qgis.utils.iface.messageBar().pushMessage(msg, "", level=2)
+                self.qgis_project.iface_error_message(msg)
 
     def create_path_with_selection(self):
         f = "link_id"
@@ -189,7 +196,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
 
         symbol = vl.renderer().symbol()
         symbol.setWidth(1)
-        qgis.utils.iface.mapCanvas().refresh()
+        self.iface.mapCanvas().refresh()
 
     def exit_procedure(self):
         self.close()

@@ -3,8 +3,8 @@ from os.path import dirname, join
 
 import pandas as pd
 import qgis
-from PyQt5.QtCore import Qt
 from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
 from qgis.core import QgsMapLayerProxyModel
 
@@ -18,21 +18,29 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_add_zoning.ui")
 class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.project = qgis_project.project
         qgis_project.block_change_scenario()
-        self.setupUi(self)
 
-        self.path = standard_path()
-        self.cob_lyr.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+        try:
+            self.iface = qgis_project.iface
+            self.project = qgis_project.project
+            self.setupUi(self)
 
-        self.but_run.clicked.connect(self.run)
-        self.cob_lyr.currentIndexChanged.connect(self.changed_layer)
-        self.changed_layer()
+            self.path = standard_path()
+            self.cob_lyr.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
-        self.progress_box.setVisible(False)
+            self.but_run.clicked.connect(self.run)
+            self.cob_lyr.currentIndexChanged.connect(self.changed_layer)
+            self.changed_layer()
 
-        self.finished.connect(qgis_project.allow_change_scenario)
+            self.progress_box.setVisible(False)
+
+            self.finished.connect(qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def run(self):
         if self.cob_lyr.currentIndex() == -1:

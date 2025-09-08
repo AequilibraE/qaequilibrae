@@ -2,6 +2,7 @@ from os.path import dirname, join
 
 import pandas as pd
 from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTabWidget
 from qgis.core import QgsProject, QgsVectorLayerJoinInfo
 
@@ -25,31 +26,38 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         self.from_proj = from_project
         self.project = qgis_project.project if self.from_proj else None
 
-        if self.from_proj:
-            self.qgis_project.block_change_scenario()
-            self.matrices: pd.DataFrame = None
-            self.matrices_model: PandasModel = None
+        try:
+            if self.from_proj:
+                self.qgis_project.block_change_scenario()
+                self.matrices: pd.DataFrame = None
+                self.matrices_model: PandasModel = None
 
-            self.results: pd.DataFrame = None
-            self.results_model: PandasModel = None
+                self.results: pd.DataFrame = None
+                self.results_model: PandasModel = None
 
-            for table in [self.list_matrices, self.list_results]:
-                table.setSelectionBehavior(QAbstractItemView.SelectRows)
-                table.setSelectionMode(QAbstractItemView.SingleSelection)
+                for table in [self.list_matrices, self.list_results]:
+                    table.setSelectionBehavior(QAbstractItemView.SelectRows)
+                    table.setSelectionMode(QAbstractItemView.SingleSelection)
 
-            self.load_matrices()
-            self.load_results()
+                self.load_matrices()
+                self.load_results()
 
-            self.but_update_matrices.clicked.connect(self.update_matrix_table)
-            self.but_load_Results.clicked.connect(self.load_result_table)
-            self.but_load_matrix.clicked.connect(self.display_matrix)
-        else:
-            QTabWidget.removeTab(self.tabs, 1)
-            QTabWidget.removeTab(self.tabs, 0)
+                self.but_update_matrices.clicked.connect(self.update_matrix_table)
+                self.but_load_Results.clicked.connect(self.load_result_table)
+                self.but_load_matrix.clicked.connect(self.display_matrix)
+            else:
+                QTabWidget.removeTab(self.tabs, 1)
+                QTabWidget.removeTab(self.tabs, 0)
 
-        self.but_load_data.clicked.connect(self.display_external_data)
+            self.but_load_data.clicked.connect(self.display_external_data)
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
+            self.finished.connect(self.qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def display_matrix(self):
         idx = [x.row() for x in list(self.list_matrices.selectionModel().selectedRows())]

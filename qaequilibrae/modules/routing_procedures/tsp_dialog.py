@@ -5,7 +5,7 @@ import qgis
 from aequilibrae.paths import path_computation
 from aequilibrae.paths.results import PathResults
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtCore import QMetaType, QTimer
 from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 
 from qaequilibrae.modules.common_tools import ReportDialog
@@ -17,31 +17,39 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/tsp.ui"))
 class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.setupUi(self)
-        self.project = qgis_project.project  # type: Project
-        self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
+        qgis_project.block_change_scenario()
 
-        self.link_layer = self.qgis_project.layers["links"][0]
-        self.node_layer = self.qgis_project.layers["nodes"][0]
+        try:
+            self.iface = qgis_project.iface
+            self.setupUi(self)
+            self.project = qgis_project.project  # type: Project
+            self.qgis_project = qgis_project
 
-        QgsProject.instance().addMapLayer(self.link_layer)
-        QgsProject.instance().addMapLayer(self.node_layer)
+            self.link_layer = self.qgis_project.layers["links"][0]
+            self.node_layer = self.qgis_project.layers["nodes"][0]
 
-        self.all_modes = {}
-        self.worker_thread: TSPProcedure = None
-        self.but_run.clicked.connect(self.run)
-        self.res = PathResults()
+            QgsProject.instance().addMapLayer(self.link_layer)
+            QgsProject.instance().addMapLayer(self.node_layer)
 
-        self.rdo_selected.clicked.connect(self.populate_node_source)
-        self.rdo_centroids.clicked.connect(self.populate_node_source)
-        self.populate()
-        self.populate_node_source()
+            self.all_modes = {}
+            self.worker_thread: TSPProcedure = None
+            self.but_run.clicked.connect(self.run)
+            self.res = PathResults()
 
-        self.close_window = False
+            self.rdo_selected.clicked.connect(self.populate_node_source)
+            self.rdo_centroids.clicked.connect(self.populate_node_source)
+            self.populate()
+            self.populate_node_source()
 
-        self.finished.connect(qgis_project.allow_change_scenario)
+            self.close_window = False
+
+            self.finished.connect(qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def populate_node_source(self):
         self.cob_start.clear()

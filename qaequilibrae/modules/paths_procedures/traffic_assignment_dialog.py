@@ -12,7 +12,7 @@ from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName
@@ -27,104 +27,112 @@ class TrafficAssignmentDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
         qgis_project.block_change_scenario()
-        self.iface = qgis_project.iface
-        self.project = qgis_project.project
-        self.setupUi(self)
-        self.skimming = False
-        self.path = standard_path()
-        self.output_path = None
-        self.temp_path = None
-        self.error = None
-        self.report = None
-        self.current_modes = []
-        self.assignment = TrafficAssignment()
-        self.traffic_classes = {}
-        self.vdf_parameters = {}
-        self.matrices = pd.DataFrame([])
-        self.skims = {}
-        self.matrix = None
-        self.block_centroid_flows = None
-        self.worker_thread = None
-        self.all_modes = {}
-        self.__populate_project_info()
-        self.rgap = "Undefined"
-        self.iter = 0
-        self.miter = 1000
-        self.select_links = {}
-        self.__current_links = []
-        self.__project_links = self.project.network.links.data.link_id
-        self.link_layer = qgis_project.layers["links"][0]
 
-        # Signals for the project tab
-        self.but_load_yaml.clicked.connect(self._load_configs)
+        try:
+            self.iface = qgis_project.iface
+            self.project = qgis_project.project
+            self.setupUi(self)
+            self.skimming = False
+            self.path = standard_path()
+            self.output_path = None
+            self.temp_path = None
+            self.error = None
+            self.report = None
+            self.current_modes = []
+            self.assignment = TrafficAssignment()
+            self.traffic_classes = {}
+            self.vdf_parameters = {}
+            self.matrices = pd.DataFrame([])
+            self.skims = {}
+            self.matrix = None
+            self.block_centroid_flows = None
+            self.worker_thread = None
+            self.all_modes = {}
+            self.__populate_project_info()
+            self.rgap = "Undefined"
+            self.iter = 0
+            self.miter = 1000
+            self.select_links = {}
+            self.__current_links = []
+            self.__project_links = self.project.network.links.data.link_id
+            self.link_layer = qgis_project.layers["links"][0]
 
-        # Signals for the matrix_procedures tab
-        self.but_add_skim.clicked.connect(self._add_skimming)
-        self.but_add_class.clicked.connect(self._create_traffic_class)
-        self.cob_matrices.currentIndexChanged.connect(self.change_matrix_selected)
-        self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
-        self.chb_fixed_cost.toggled.connect(self.set_fixed_cost_use)
-        self.do_select_link.toggled.connect(self.set_select_link_use)
+            # Signals for the project tab
+            self.but_load_yaml.clicked.connect(self._load_configs)
 
-        self.do_assignment.clicked.connect(self.run)
-        self.cancel_all.clicked.connect(self.exit_procedure)
+            # Signals for the matrix_procedures tab
+            self.but_add_skim.clicked.connect(self._add_skimming)
+            self.but_add_class.clicked.connect(self._create_traffic_class)
+            self.cob_matrices.currentIndexChanged.connect(self.change_matrix_selected)
+            self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
+            self.chb_fixed_cost.toggled.connect(self.set_fixed_cost_use)
+            self.do_select_link.toggled.connect(self.set_select_link_use)
 
-        # Signals for the algorithm tab
-        for q in [self.progressbar, self.progress_label]:
-            q.setVisible(False)
+            self.do_assignment.clicked.connect(self.run)
+            self.cancel_all.clicked.connect(self.exit_procedure)
 
-        for algo in self.assignment.all_algorithms:
-            self.cb_choose_algorithm.addItem(algo)
-        self.cb_choose_algorithm.setCurrentIndex(len(self.assignment.all_algorithms) - 1)
+            # Signals for the algorithm tab
+            for q in [self.progressbar, self.progress_label]:
+                q.setVisible(False)
 
-        for vdf in all_vdf_functions:
-            self.cob_vdf.addItem(vdf)
+            for algo in self.assignment.all_algorithms:
+                self.cb_choose_algorithm.addItem(algo)
+            self.cb_choose_algorithm.setCurrentIndex(len(self.assignment.all_algorithms) - 1)
 
-        self.cob_vdf.currentIndexChanged.connect(self.__change_vdf)
+            for vdf in all_vdf_functions:
+                self.cob_vdf.addItem(vdf)
 
-        parameters = Parameters().parameters["assignment"]["equilibrium"]
-        self.rel_gap.setText(str(parameters["rgap"]))
-        self.max_iter.setText(str(parameters["maximum_iterations"]))
+            self.cob_vdf.currentIndexChanged.connect(self.__change_vdf)
 
-        # Queries
-        tables = [self.select_link_list, self.list_link_extraction]
-        for table in tables:
-            table.setColumnWidth(0, 240)
-            table.setColumnWidth(1, 120)
-            table.setColumnWidth(2, 150)
-            table.setColumnWidth(3, 40)
+            parameters = Parameters().parameters["assignment"]["equilibrium"]
+            self.rel_gap.setText(str(parameters["rgap"]))
+            self.max_iter.setText(str(parameters["maximum_iterations"]))
 
-        self.tbl_project_properties.setColumnWidth(0, 120)
-        self.tbl_project_properties.setColumnWidth(1, 450)
+            # Queries
+            tables = [self.select_link_list, self.list_link_extraction]
+            for table in tables:
+                table.setColumnWidth(0, 240)
+                table.setColumnWidth(1, 120)
+                table.setColumnWidth(2, 150)
+                table.setColumnWidth(3, 40)
 
-        # We'll temporarily remove the tab instead of disabling its resources
-        self.tabWidget.removeTab(4)
+            self.tbl_project_properties.setColumnWidth(0, 120)
+            self.tbl_project_properties.setColumnWidth(1, 450)
 
-        self.tbl_traffic_classes.setColumnWidth(0, 125)
-        self.tbl_traffic_classes.setColumnWidth(1, 125)
-        self.skim_list_table.setColumnWidth(0, 200)
-        self.skim_list_table.setColumnWidth(1, 200)
-        self.skim_list_table.setColumnWidth(2, 200)
-        self.skim_list_table.setColumnWidth(3, 200)
+            # We'll temporarily remove the tab instead of disabling its resources
+            self.tabWidget.removeTab(4)
 
-        self.tbl_vdf_parameters.setColumnWidth(0, 75)
-        self.tbl_vdf_parameters.setColumnWidth(1, 75)
-        self.tbl_vdf_parameters.setColumnWidth(2, 140)
+            self.tbl_traffic_classes.setColumnWidth(0, 125)
+            self.tbl_traffic_classes.setColumnWidth(1, 125)
+            self.skim_list_table.setColumnWidth(0, 200)
+            self.skim_list_table.setColumnWidth(1, 200)
+            self.skim_list_table.setColumnWidth(2, 200)
+            self.skim_list_table.setColumnWidth(3, 200)
 
-        self.__change_vdf()
-        self.change_matrix_selected()
-        self.change_class_name()
-        self.set_fixed_cost_use()
-        self.set_select_link_use()
+            self.tbl_vdf_parameters.setColumnWidth(0, 75)
+            self.tbl_vdf_parameters.setColumnWidth(1, 75)
+            self.tbl_vdf_parameters.setColumnWidth(2, 140)
 
-        # Set up select link analysis
-        self.cob_direction.addItems(["AB", "Both", "BA"])
-        self.but_add_query.clicked.connect(self.add_query)
-        self.but_build_query.clicked.connect(self.build_query)
-        self.select_link_list.cellDoubleClicked.connect(self.__remove_select_link_item)
-        self.but_clean.clicked.connect(self.__clean_link_selection)
+            self.__change_vdf()
+            self.change_matrix_selected()
+            self.change_class_name()
+            self.set_fixed_cost_use()
+            self.set_select_link_use()
 
-        self.finished.connect(qgis_project.allow_change_scenario)
+            # Set up select link analysis
+            self.cob_direction.addItems(["AB", "Both", "BA"])
+            self.but_add_query.clicked.connect(self.add_query)
+            self.but_build_query.clicked.connect(self.build_query)
+            self.select_link_list.cellDoubleClicked.connect(self.__remove_select_link_item)
+            self.but_clean.clicked.connect(self.__clean_link_selection)
+
+            self.finished.connect(qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def _browse_path(self):
 

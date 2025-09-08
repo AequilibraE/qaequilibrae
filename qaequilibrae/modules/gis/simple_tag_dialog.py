@@ -2,6 +2,7 @@ from os.path import dirname, join
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import QTimer
 
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import (
@@ -21,40 +22,48 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
         qgis_project.block_change_scenario()
-        self.iface = qgis_project.iface
-        self.setupUi(self)
-        self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
-        self.geography_types = [None, None]
 
-        self.fromtype = None
-        self.frommatchingtype = None
+        try:
+            self.iface = qgis_project.iface
+            self.setupUi(self)
+            self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
+            self.geography_types = [None, None]
 
-        self.fromlayer.currentIndexChanged.connect(self.set_from_fields)
-        self.tolayer.currentIndexChanged.connect(self.set_to_fields)
-        self.fromfield.currentIndexChanged.connect(self.reload_fields)
-        self.matchingfrom.currentIndexChanged.connect(self.reload_fields_matching)
-        self.needsmatching.stateChanged.connect(self.works_field_matching)
+            self.fromtype = None
+            self.frommatchingtype = None
 
-        self.OK.clicked.connect(self.run)
+            self.fromlayer.currentIndexChanged.connect(self.set_from_fields)
+            self.tolayer.currentIndexChanged.connect(self.set_to_fields)
+            self.fromfield.currentIndexChanged.connect(self.reload_fields)
+            self.matchingfrom.currentIndexChanged.connect(self.reload_fields_matching)
+            self.needsmatching.stateChanged.connect(self.works_field_matching)
 
-        # We load the node and area layers existing in our canvas
-        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if "wkbType" in dir(layer):
-                if layer.wkbType() in self.valid_layer_types:
-                    self.fromlayer.addItem(layer.name())
-                    self.tolayer.addItem(layer.name())
+            self.OK.clicked.connect(self.run)
 
-        self.enclosed.setToolTip("\n".join([self.string_order(1), self.string_order(2), self.string_order(3)]))
+            # We load the node and area layers existing in our canvas
+            for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
+                if "wkbType" in dir(layer):
+                    if layer.wkbType() in self.valid_layer_types:
+                        self.fromlayer.addItem(layer.name())
+                        self.tolayer.addItem(layer.name())
 
-        self.touching.setToolTip(
-            self.tr("Criteria to choose when there are multiple matches is largest area or length matched")
-        )
-        self.closest.setToolTip(
-            self.tr("Heuristic procedure that only computes the actual distance to the nearest neighbors")
-        )
-        self.works_field_matching()
+            self.enclosed.setToolTip("\n".join([self.string_order(1), self.string_order(2), self.string_order(3)]))
 
-        self.finished.connect(qgis_project.allow_change_scenario)
+            self.touching.setToolTip(
+                self.tr("Criteria to choose when there are multiple matches is largest area or length matched")
+            )
+            self.closest.setToolTip(
+                self.tr("Heuristic procedure that only computes the actual distance to the nearest neighbors")
+            )
+            self.works_field_matching()
+
+            self.finished.connect(qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def reload_fields(self):
         self.matches_types()

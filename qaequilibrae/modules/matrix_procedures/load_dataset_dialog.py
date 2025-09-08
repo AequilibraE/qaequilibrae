@@ -4,7 +4,7 @@ from os.path import dirname, join
 import pandas as pd
 import qgis
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import Qt, QSize
+from qgis.PyQt.QtCore import Qt, QSize, QTimer
 
 from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_from_toc
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
@@ -18,53 +18,61 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_vector_loader.u
 class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, single_use=True):
         QtWidgets.QDialog.__init__(self)
-        self.iface = qgis_project.iface
         qgis_project.block_change_scenario()
-        self.setupUi(self)
-        self.path = standard_path()
 
-        self.output_name = None
-        self.layer = None
-        self.zones = None
-        self.cells = None
-        self.error = None
-        self.selected_fields = None
-        self.worker_thread = None
-        self.dataset = None
-        self.ignore_fields = []
-        self.single_use = single_use
+        try:
+            self.iface = qgis_project.iface
+            self.setupUi(self)
+            self.path = standard_path()
 
-        self.radio_layer.clicked.connect(partial(self.size_it_accordingly, False))
-        self.radio_csv.clicked.connect(partial(self.size_it_accordingly, False))
-        self.radio_parquet.clicked.connect(partial(self.size_it_accordingly, False))
-        self.chb_all_fields.clicked.connect(self.set_tables_with_fields)
-        self.but_adds_to_links.clicked.connect(self.append_to_list)
+            self.output_name = None
+            self.layer = None
+            self.zones = None
+            self.cells = None
+            self.error = None
+            self.selected_fields = None
+            self.worker_thread = None
+            self.dataset = None
+            self.ignore_fields = []
+            self.single_use = single_use
 
-        # For changing the network layer
-        self.cob_data_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
-        self.but_removes_from_links.clicked.connect(self.removes_fields)
-        # For adding skims
-        self.but_load.clicked.connect(self.load_from_file)
-        self.but_save_and_use.clicked.connect(self.load_the_vector)
-        self.but_import_and_use.clicked.connect(self.load_just_to_use)
+            self.radio_layer.clicked.connect(partial(self.size_it_accordingly, False))
+            self.radio_csv.clicked.connect(partial(self.size_it_accordingly, False))
+            self.radio_parquet.clicked.connect(partial(self.size_it_accordingly, False))
+            self.chb_all_fields.clicked.connect(self.set_tables_with_fields)
+            self.but_adds_to_links.clicked.connect(self.append_to_list)
 
-        # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in all_layers_from_toc():  # We iterate through all layers
-            if "wkbType" in dir(layer):
-                if layer.wkbType() in [100] + point_types + poly_types:
-                    self.cob_data_layer.addItem(layer.name())
+            # For changing the network layer
+            self.cob_data_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+            self.but_removes_from_links.clicked.connect(self.removes_fields)
+            # For adding skims
+            self.but_load.clicked.connect(self.load_from_file)
+            self.but_save_and_use.clicked.connect(self.load_the_vector)
+            self.but_import_and_use.clicked.connect(self.load_just_to_use)
 
-        if not self.single_use:
-            self.radio_layer.setChecked(True)
-            self.radio_csv.setEnabled(False)
-            self.radio_parquet.setEnabled(False)
-            self.but_import_and_use.setEnabled(False)
-            self.but_load.setEnabled(False)
-            self.but_save_and_use.setText(self.tr("Import"))
+            # THIRD, we load layers in the canvas to the combo-boxes
+            for layer in all_layers_from_toc():  # We iterate through all layers
+                if "wkbType" in dir(layer):
+                    if layer.wkbType() in [100] + point_types + poly_types:
+                        self.cob_data_layer.addItem(layer.name())
 
-        self.size_it_accordingly(partial(self.size_it_accordingly, False))
+            if not self.single_use:
+                self.radio_layer.setChecked(True)
+                self.radio_csv.setEnabled(False)
+                self.radio_parquet.setEnabled(False)
+                self.but_import_and_use.setEnabled(False)
+                self.but_load.setEnabled(False)
+                self.but_save_and_use.setText(self.tr("Import"))
 
-        self.finished.connect(qgis_project.allow_change_scenario)
+            self.size_it_accordingly(partial(self.size_it_accordingly, False))
+
+            self.finished.connect(qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def set_tables_with_fields(self):
         self.size_it_accordingly(False)

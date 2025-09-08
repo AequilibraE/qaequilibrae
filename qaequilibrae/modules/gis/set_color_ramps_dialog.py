@@ -15,7 +15,6 @@ class LoadColorRampSelector(QDialog, FORM_CLASS):
     def __init__(self, qgis_project, layer):
         QDialog.__init__(self)
         self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
         self.iface = qgis_project.iface
         self.setupUi(self)
 

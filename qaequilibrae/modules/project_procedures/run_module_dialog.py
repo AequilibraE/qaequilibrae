@@ -4,6 +4,7 @@ from pathlib import Path
 
 from aequilibrae.context import get_logger
 from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QDialog, QMessageBox
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
@@ -15,21 +16,29 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_run_module.ui")
 class RunModuleDialog(QDialog, FORM_CLASS):
     def __init__(self, qgis_project, logger=None):
         QDialog.__init__(self)
-        self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
-        self.iface = qgis_project.iface
-        self.project = qgis_project.project
-        self.setupUi(self)
+        qgis_project.block_change_scenario()
 
-        self.logger = logger or get_logger()
+        try:
+            self.qgis_project = qgis_project
+            self.iface = qgis_project.iface
+            self.project = qgis_project.project
+            self.setupUi(self)
 
-        self.rejected.connect(self.handle_rejection)
+            self.logger = logger or get_logger()
 
-        self.check_missing_packages()
+            self.rejected.connect(self.handle_rejection)
 
-        self.but_run.clicked.connect(self.run)
+            self.check_missing_packages()
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
+            self.but_run.clicked.connect(self.run)
+
+            self.finished.connect(self.qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def handle_rejection(self):
         self.but_run.setVisible(False)

@@ -1,6 +1,7 @@
 from os.path import dirname, join
 
 from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import QTimer
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_scenarios.ui"))
 
@@ -8,20 +9,28 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_scenarios.ui"))
 class CreateScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project) -> None:
         QtWidgets.QDialog.__init__(self)
-        self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
-        self.project = qgis_project.project
-        self.setupUi(self)
+        qgis_project.block_change_scenario()
 
-        self.__init_scenario = self.qgis_project.cob_scenarios.currentText()
+        try:
+            self.qgis_project = qgis_project
+            self.project = qgis_project.project
+            self.setupUi(self)
 
-        self.rdo_create.clicked.connect(self.configure_inputs)
-        self.rdo_clone.clicked.connect(self.configure_inputs)
-        self.but_run.clicked.connect(self.run)
+            self.__init_scenario = self.qgis_project.cob_scenarios.currentText()
 
-        self.populate_scenarios()
+            self.rdo_create.clicked.connect(self.configure_inputs)
+            self.rdo_clone.clicked.connect(self.configure_inputs)
+            self.but_run.clicked.connect(self.run)
 
-        self.finished.connect(qgis_project.allow_change_scenario)
+            self.populate_scenarios()
+
+            self.finished.connect(qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def configure_inputs(self):
         """Update UI elements based on selected mode"""

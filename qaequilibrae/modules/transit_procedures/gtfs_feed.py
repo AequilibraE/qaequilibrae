@@ -17,7 +17,6 @@ class GTFSFeed(QDialog, FORM_CLASS):
         self.iface = qgis_project.iface
         self.setupUi(self)
         self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
         self._p = pt_object
         self.path = standard_path()
         self.feed = None

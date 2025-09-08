@@ -8,7 +8,7 @@ from typing import Tuple, Literal, Dict, Union
 import qgis
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QPushButton, QTableWidgetItem, QTableWidget
 from qgis.PyQt.QtWidgets import QToolButton, QHBoxLayout, QWidget, QDialog
 from qgis.core import QgsLineSymbol, QgsVectorLayer, QgsSymbol, QgsProject
@@ -39,56 +39,64 @@ class BandAttributes:
 class CreateBandwidthsDialog(QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QDialog.__init__(self)
-        self.qgis_project = qgis_project
-        self.iface = qgis_project.iface
-        self.setupUi(self)
-        self.qgis_project.block_change_scenario()
+        qgis_project.block_change_scenario()
 
-        self.tot_bands = 0
+        try:
+            self.qgis_project = qgis_project
+            self.iface = qgis_project.iface
+            self.setupUi(self)
 
-        self.scale = {"width": 10, "spacing": 0.001, "max_flow": -1}
+            self.tot_bands = 0
 
-        self.band_size = 10.0
-        self.space_size = 0.01
-        self.layer = None
-        self.ramps = None
-        self.drive_side = get_parameter_chain(["system", "driving side"])
+            self.scale = {"width": 10, "spacing": 0.001, "max_flow": -1}
 
-        # layers and fields for adding skims
-        self.mMapLayerComboBox.layerChanged.connect(self.add_fields_to_cboxes)
-        self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.LineLayer)
-        self.mMapLayerComboBox.setLayer(self.iface.activeLayer())
+            self.band_size = 10.0
+            self.space_size = 0.01
+            self.layer = None
+            self.ramps = None
+            self.drive_side = get_parameter_chain(["system", "driving side"])
 
-        self.ab_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, "AB"))
-        self.ba_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, "BA"))
+            # layers and fields for adding skims
+            self.mMapLayerComboBox.layerChanged.connect(self.add_fields_to_cboxes)
+            self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.LineLayer)
+            self.mMapLayerComboBox.setLayer(self.iface.activeLayer())
 
-        # List of bands
-        self.bands_list.setColumnWidth(0, 210)
-        self.bands_list.setColumnWidth(1, 210)
-        self.bands_list.setColumnWidth(2, 110)
-        self.bands_list.setColumnWidth(3, 110)
+            self.ab_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, "AB"))
+            self.ba_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, "BA"))
 
-        # loading ramps
-        self.but_load_ramp.setVisible(False)
-        self.txt_ramp.setVisible(False)
+            # List of bands
+            self.bands_list.setColumnWidth(0, 210)
+            self.bands_list.setColumnWidth(1, 210)
+            self.bands_list.setColumnWidth(2, 110)
+            self.bands_list.setColumnWidth(3, 110)
 
-        self.but_add_band.clicked.connect(self.add_to_bands_list)
-        self.bands_list.setEditTriggers(QTableWidget.NoEditTriggers)
+            # loading ramps
+            self.but_load_ramp.setVisible(False)
+            self.txt_ramp.setVisible(False)
 
-        self.rdo_color.toggled.connect(self.color_origins)
+            self.but_add_band.clicked.connect(self.add_to_bands_list)
+            self.bands_list.setEditTriggers(QTableWidget.NoEditTriggers)
 
-        self.rdo_ramp.toggled.connect(self.color_origins)
-        self.but_run.clicked.connect(self.add_bands_to_map)
-        self.but_run.setEnabled(False)
+            self.rdo_color.toggled.connect(self.color_origins)
 
-        self.but_load_ramp.clicked.connect(self.load_ramp_action)
+            self.rdo_ramp.toggled.connect(self.color_origins)
+            self.but_run.clicked.connect(self.add_bands_to_map)
+            self.but_run.setEnabled(False)
 
-        self.add_fields_to_cboxes()
-        self.random_rgb()
-        self.set_initial_value_if_available()
-        self.but_load_ramp.setEnabled(False)
+            self.but_load_ramp.clicked.connect(self.load_ramp_action)
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
+            self.add_fields_to_cboxes()
+            self.random_rgb()
+            self.set_initial_value_if_available()
+            self.but_load_ramp.setEnabled(False)
+
+            self.finished.connect(self.qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def color_origins(self):
         self.mColorButton.setVisible(self.rdo_color.isChecked())

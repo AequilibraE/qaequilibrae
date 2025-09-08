@@ -4,7 +4,7 @@ from os.path import dirname, join
 import pandas as pd
 import qgis
 from qgis.PyQt import uic, QtCore
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
 from qgis.core import QgsProject
 
@@ -20,48 +20,56 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_DesireLines.ui"
 class DesireLinesDialog(QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.setupUi(self)
-        self.error = None
-        self.validtypes = numeric_types
-        self.tot_skims = 0
-        self.name_skims = 0
-        self.matrix = None
-        self.path = standard_path()
-        self.zones = None
-        self.columns = None
-        self.matrix_hash = {}
-        self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
-        if qgis_project.project is None:
-            self.proj_matrices = pd.DataFrame([])
-        else:
-            self.proj_matrices = list_matrices(self.qgis_project.project)
-        self.logger = logging.getLogger("AequilibraEGUI")
+        qgis_project.block_change_scenario()
 
-        self.resize(389, 385)
+        try:
+            self.iface = qgis_project.iface
+            self.setupUi(self)
+            self.error = None
+            self.validtypes = numeric_types
+            self.tot_skims = 0
+            self.name_skims = 0
+            self.matrix = None
+            self.path = standard_path()
+            self.zones = None
+            self.columns = None
+            self.matrix_hash = {}
+            self.qgis_project = qgis_project
+            if qgis_project.project is None:
+                self.proj_matrices = pd.DataFrame([])
+            else:
+                self.proj_matrices = list_matrices(self.qgis_project.project)
+            self.logger = logging.getLogger("AequilibraEGUI")
 
-        self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
-        self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
+            self.resize(389, 385)
 
-        # Create desire lines
-        self.create_dl.clicked.connect(self.run)
+            self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+            self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
 
-        # cancel button
-        self.cancel.clicked.connect(self.exit_procedure)
+            # Create desire lines
+            self.create_dl.clicked.connect(self.run)
 
-        # THIRD, we load layers in the canvas to the combo-boxes
-        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-            if "wkbType" in dir(layer):
-                if layer.wkbType() in poly_types or layer.wkbType() in point_types:
-                    self.zoning_layer.addItem(layer.name())
-                    self.progress_label.setVisible(False)
-                    self.progressbar.setVisible(False)
+            # cancel button
+            self.cancel.clicked.connect(self.exit_procedure)
 
-        self.list_matrices()
-        self.set_show_matrices()
+            # THIRD, we load layers in the canvas to the combo-boxes
+            for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
+                if "wkbType" in dir(layer):
+                    if layer.wkbType() in poly_types or layer.wkbType() in point_types:
+                        self.zoning_layer.addItem(layer.name())
+                        self.progress_label.setVisible(False)
+                        self.progressbar.setVisible(False)
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
+            self.list_matrices()
+            self.set_show_matrices()
+
+            self.finished.connect(self.qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def list_matrices(self):
         for idx, rec in self.proj_matrices.iterrows():

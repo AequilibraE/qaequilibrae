@@ -3,6 +3,7 @@ from os.path import dirname, join
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt.QtCore import QTimer
 from qgis.core import QgsMapLayerProxyModel
 
 from qaequilibrae.modules.network.adds_connectors_procedure import AddsConnectorsProcedure
@@ -15,39 +16,47 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "./forms/ui_add_connector
 class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.setupUi(self)
+        qgis_project.block_change_scenario()
 
-        self.NewLinks = False
-        self.NewNodes = False
-        self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
-        self.project = qgis_project.project
+        try:
+            self.iface = qgis_project.iface
+            self.setupUi(self)
 
-        modes = self.project.network.modes.all_modes()
-        link_types = self.project.network.link_types.all_types()
+            self.NewLinks = False
+            self.NewNodes = False
+            self.qgis_project = qgis_project
+            self.project = qgis_project.project
 
-        self.modes = {m.mode_name: mode_id for mode_id, m in modes.items()}
-        self.link_types = {lt.link_type: lt_id for lt_id, lt in link_types.items()}
+            modes = self.project.network.modes.all_modes()
+            link_types = self.project.network.link_types.all_types()
 
-        self.lst_modes.addItems(sorted(list(self.modes.keys())))
-        self.lst_link_types.addItems(sorted(list(self.link_types.keys())))
+            self.modes = {m.mode_name: mode_id for mode_id, m in modes.items()}
+            self.link_types = {lt.link_type: lt_id for lt_id, lt in link_types.items()}
 
-        self.lst_modes.setSelectionMode(qgis.PyQt.QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.lst_link_types.setSelectionMode(qgis.PyQt.QtWidgets.QAbstractItemView.ExtendedSelection)
+            self.lst_modes.addItems(sorted(list(self.modes.keys())))
+            self.lst_link_types.addItems(sorted(list(self.link_types.keys())))
 
-        self.rdo_network.toggled.connect(self.centroid_source)
-        self.rdo_zone.toggled.connect(self.centroid_source)
-        self.rdo_layer.toggled.connect(self.centroid_source)
+            self.lst_modes.setSelectionMode(qgis.PyQt.QtWidgets.QAbstractItemView.ExtendedSelection)
+            self.lst_link_types.setSelectionMode(qgis.PyQt.QtWidgets.QAbstractItemView.ExtendedSelection)
 
-        self.layer_box.layerChanged.connect(self.set_fields)
-        self.layer_box.setFilters(QgsMapLayerProxyModel.PointLayer)
+            self.rdo_network.toggled.connect(self.centroid_source)
+            self.rdo_zone.toggled.connect(self.centroid_source)
+            self.rdo_layer.toggled.connect(self.centroid_source)
 
-        self.chb_zone.setVisible(False)
+            self.layer_box.layerChanged.connect(self.set_fields)
+            self.layer_box.setFilters(QgsMapLayerProxyModel.PointLayer)
 
-        self.but_process.clicked.connect(self.run)
+            self.chb_zone.setVisible(False)
 
-        self.finished.connect(self.qgis_project.allow_change_scenario)
+            self.but_process.clicked.connect(self.run)
+
+            self.finished.connect(self.qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QTimer.singleShot(0, self.close)
+            return
 
     def centroid_source(self):
         self.layer_box.setEnabled(self.rdo_layer.isChecked())

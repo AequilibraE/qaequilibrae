@@ -26,41 +26,49 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, file_path: Optional[Path] = None):
         QtWidgets.QDialog.__init__(self)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
-        self.iface = qgis_project.iface
-        self.setupUi(self)
-        self.data_to_show = None
-        self.error = None
-        self.logger = logging.getLogger("AequilibraEGUI")
-        self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
-        self.from_proj = True if qgis_project.project else False
-        self.indices = np.array(1)
-        self.mapping_layer = None
-        self.selected_col = None
-        self.selected_row = None
-        self.zones_layer = None
+        qgis_project.block_change_scenario()
 
-        if isinstance(file_path, Path):
-            self.data_path = file_path
-            self.data_type = file_path.suffix.upper().split(".")[1]
-            self.continue_with_data()
+        try:
+            self.iface = qgis_project.iface
+            self.setupUi(self)
+            self.data_to_show = None
+            self.error = None
+            self.logger = logging.getLogger("AequilibraEGUI")
+            self.qgis_project = qgis_project
+            self.from_proj = True if qgis_project.project else False
+            self.indices = np.array(1)
+            self.mapping_layer = None
+            self.selected_col = None
+            self.selected_row = None
+            self.zones_layer = None
+
+            if isinstance(file_path, Path):
+                self.data_path = file_path
+                self.data_type = file_path.suffix.upper().split(".")[1]
+                self.continue_with_data()
+                return
+
+            self.data_path, self.data_type = self.get_file_name()
+
+            if not self.data_path or not self.data_type:
+                self.error = self.tr("Path provided is not a valid dataset")
+                self.exit_with_error()
+            else:
+                self.continue_with_data()
+
+            if self.error:
+                self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
+                self.but_load.clicked.connect(self.get_file_name)
+
+            self.remove_data_layer()
+
+            self.finished.connect(self.qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.iface_error_message(str(e), "Init error")
+            qgis_project.allow_change_scenario()
+
+            QtCore.QTimer.singleShot(0, self.close)
             return
-
-        self.data_path, self.data_type = self.get_file_name()
-
-        if not self.data_path or not self.data_type:
-            self.error = self.tr("Path provided is not a valid dataset")
-            self.exit_with_error()
-        else:
-            self.continue_with_data()
-
-        if self.error:
-            self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
-            self.but_load.clicked.connect(self.get_file_name)
-
-        self.remove_data_layer()
-
-        self.finished.connect(self.qgis_project.allow_change_scenario)
 
     def continue_with_data(self):
         self.setWindowTitle(self.tr("File path: {}").format(self.data_path))

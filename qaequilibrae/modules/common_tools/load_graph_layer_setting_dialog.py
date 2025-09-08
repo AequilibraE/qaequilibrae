@@ -9,7 +9,6 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
         self.qgis_project = qgis_project
-        self.qgis_project.block_change_scenario()
         self.project = qgis_project.project
         self.setupUi(self)
         self.minimize_field = ""
