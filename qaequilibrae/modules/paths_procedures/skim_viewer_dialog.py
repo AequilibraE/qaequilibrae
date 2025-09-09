@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from aequilibrae.paths import Graph
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject, Qgis

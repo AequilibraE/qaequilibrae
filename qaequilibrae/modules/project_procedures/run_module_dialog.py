@@ -4,7 +4,6 @@ from pathlib import Path
 
 from aequilibrae.context import get_logger
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QDialog, QMessageBox
 
 from qaequilibrae.download_extra_packages_class import DownloadAll

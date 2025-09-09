@@ -3,41 +3,29 @@ from os.path import dirname, join
 
 import pandas as pd
 import qgis
-from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout, QComboBox, QCheckBox, QTableWidgetItem
 from qgis.core import QgsMapLayerProxyModel
 
-from qaequilibrae.modules.common_tools import standard_path
+from qaequilibrae.modules.common_tools import standard_path, BaseDialog
 from qaequilibrae.modules.project_procedures.add_zones_procedure import AddZonesProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_add_zoning.ui"))
 
 
-class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
+class AddZonesDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QtWidgets.QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_add_zoning.ui"), qgis_project=qgis_project)
 
-        try:
-            self.iface = qgis_project.iface
-            self.project = qgis_project.project
-            self.setupUi(self)
+    def _base_ui_setup(self):
+        self.path = standard_path()
+        self.cob_lyr.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
-            self.path = standard_path()
-            self.cob_lyr.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+        self.but_run.clicked.connect(self.run)
+        self.cob_lyr.currentIndexChanged.connect(self.changed_layer)
+        self.changed_layer()
 
-            self.but_run.clicked.connect(self.run)
-            self.cob_lyr.currentIndexChanged.connect(self.changed_layer)
-            self.changed_layer()
-
-            self.progress_box.setVisible(False)
-
-            self.finished.connect(qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.progress_box.setVisible(False)
 
     def run(self):
         if self.cob_lyr.currentIndex() == -1:
@@ -47,9 +35,9 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
 
         for row in range(self.table_fields.rowCount()):
             f = self.table_fields.item(row, 1).text()
-            if not self.table_fields.cellWidget(row, 0).findChildren(QtWidgets.QCheckBox)[0].isChecked():
+            if not self.table_fields.cellWidget(row, 0).findChildren(QCheckBox)[0].isChecked():
                 continue
-            widget = self.table_fields.cellWidget(row, 2).findChildren(QtWidgets.QComboBox)[0]
+            widget = self.table_fields.cellWidget(row, 2).findChildren(QComboBox)[0]
             source_name = widget.currentText()
             val = layer.dataProvider().fieldNameIndex(source_name)
             field_correspondence[f] = val
@@ -86,17 +74,17 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
             layer_fields = self.cob_lyr.currentLayer().fields() if self.cob_lyr.currentLayer() else []
 
             for counter, field in enumerate(fields):
-                item1 = QtWidgets.QTableWidgetItem(field)
+                item1 = QTableWidgetItem(field)
                 item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 self.table_fields.setItem(counter, 1, item1)
 
-                chb1 = QtWidgets.QCheckBox()
+                chb1 = QCheckBox()
                 chb1.setChecked(True)
                 if field in not_initializable:
                     chb1.setEnabled(False)
                 self.table_fields.setCellWidget(counter, 0, self.centers_item(chb1))
 
-                cbb = QtWidgets.QComboBox()
+                cbb = QComboBox()
                 for i in layer_fields:
                     cbb.addItem(i.name())
                 self.table_fields.setCellWidget(counter, 2, self.centers_item(cbb))

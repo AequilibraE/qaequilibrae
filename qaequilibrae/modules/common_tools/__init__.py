@@ -13,3 +13,4 @@ from .pandas_model import PandasModel
 from .parameters_dialog import ParameterDialog
 from .report_dialog import ReportDialog
 from .table_field_lister import find_table_fields
+from .base_dialog import BaseDialog
