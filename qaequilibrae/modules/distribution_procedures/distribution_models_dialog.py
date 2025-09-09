@@ -104,11 +104,8 @@ class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
 
             self.finished.connect(self.qgis_project.allow_change_scenario)
         except Exception as e:
-            qgis_project.iface_error_message(str(e), "Init error")
             qgis_project.allow_change_scenario()
-
-            QTimer.singleShot(0, self.close)
-            return
+            raise e
 
     def load_matrices(self):
         self.matrices = list_matrices(self.project)

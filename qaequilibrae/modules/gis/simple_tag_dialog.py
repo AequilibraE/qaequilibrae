@@ -59,11 +59,8 @@ class SimpleTagDialog(QtWidgets.QDialog, FORM_CLASS):
 
             self.finished.connect(qgis_project.allow_change_scenario)
         except Exception as e:
-            qgis_project.iface_error_message(str(e), "Init error")
             qgis_project.allow_change_scenario()
-
-            QTimer.singleShot(0, self.close)
-            return
+            raise e
 
     def reload_fields(self):
         self.matches_types()
