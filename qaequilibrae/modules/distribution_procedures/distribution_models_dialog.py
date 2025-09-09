@@ -9,11 +9,9 @@ from aequilibrae.context import get_logger
 from aequilibrae.distribution import SyntheticGravityModel
 from aequilibrae.distribution.synthetic_gravity_model import valid_functions
 from aequilibrae.matrix import AequilibraeMatrix
-from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
 
-from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, GetOutputFileName
+from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, GetOutputFileName, BaseDialog
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
 from qaequilibrae.modules.distribution_procedures.apply_gravity_procedure import ApplyGravityProcedure
 from qaequilibrae.modules.distribution_procedures.calibrate_gravity_procedure import CalibrateGravityProcedure
@@ -21,91 +19,81 @@ from qaequilibrae.modules.distribution_procedures.ipf_procedure import IpfProced
 from qaequilibrae.modules.matrix_procedures import LoadDatasetDialog
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
 
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_distribution.ui"))
-
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
 
 logger = get_logger()
 
 
-class DistributionModelsDialog(QtWidgets.QDialog, FORM_CLASS):
+class DistributionModelsDialog(BaseDialog):
     def __init__(self, qgis_project, mode=None):
-        QtWidgets.QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_distribution.ui"), qgis_project=qgis_project, mode=mode
+        )
 
-        try:
-            self.iface = qgis_project.iface
-            self.setupUi(self)
-            self.path = standard_path()
+    def _base_ui_setup(self, **kwargs):
+        mode = kwargs.get("mode")
+        self.path = standard_path()
 
-            self.qgis_project = qgis_project
-            self.project = qgis_project.project
+        self.error = None
+        self.job_queue = OrderedDict()
+        self.model = SyntheticGravityModel()
+        self.model.function = "GAMMA"
+        self.outfile = ""
 
-            self.error = None
-            self.job_queue = OrderedDict()
-            self.model = SyntheticGravityModel()
-            self.model.function = "GAMMA"
-            self.outfile = ""
+        self.matrices = OrderedDict()
+        self.datasets = OrderedDict()
+        self.job = mode
 
-            self.matrices = OrderedDict()
-            self.datasets = OrderedDict()
-            self.job = mode
+        self.model_tabs.setVisible(False)
+        self.resize(239, 120)
+        self.rdo_ipf.clicked.connect(self.configure_inputs)
+        self.rdo_apply_gravity.clicked.connect(self.configure_inputs)
+        self.rdo_calibrate_gravity.clicked.connect(self.configure_inputs)
 
-            self.model_tabs.setVisible(False)
-            self.resize(239, 120)
-            self.rdo_ipf.clicked.connect(self.configure_inputs)
-            self.rdo_apply_gravity.clicked.connect(self.configure_inputs)
-            self.rdo_calibrate_gravity.clicked.connect(self.configure_inputs)
+        self.but_load_data.clicked.connect(self.load_datasets)
+        self.but_load_model.clicked.connect(self.load_model)
 
-            self.but_load_data.clicked.connect(self.load_datasets)
-            self.but_load_model.clicked.connect(self.load_model)
+        self.cob_data.currentIndexChanged.connect(
+            partial(self.change_vector_field, self.cob_data, self.cob_index, "data")
+        )
+        self.cob_data.currentIndexChanged.connect(
+            partial(self.change_vector_field, self.cob_data, self.cob_prod_field, "data")
+        )
+        self.cob_data.currentIndexChanged.connect(
+            partial(self.change_vector_field, self.cob_data, self.cob_atra_field, "data")
+        )
 
-            self.cob_data.currentIndexChanged.connect(
-                partial(self.change_vector_field, self.cob_data, self.cob_index, "data")
-            )
-            self.cob_data.currentIndexChanged.connect(
-                partial(self.change_vector_field, self.cob_data, self.cob_prod_field, "data")
-            )
-            self.cob_data.currentIndexChanged.connect(
-                partial(self.change_vector_field, self.cob_data, self.cob_atra_field, "data")
-            )
+        self.cob_imped_mat.currentIndexChanged.connect(
+            partial(self.change_vector_field, self.cob_imped_mat, self.cob_imped_field, "matrix")
+        )
+        self.cob_seed_mat.currentIndexChanged.connect(
+            partial(self.change_vector_field, self.cob_seed_mat, self.cob_seed_field, "matrix")
+        )
 
-            self.cob_imped_mat.currentIndexChanged.connect(
-                partial(self.change_vector_field, self.cob_imped_mat, self.cob_imped_field, "matrix")
-            )
-            self.cob_seed_mat.currentIndexChanged.connect(
-                partial(self.change_vector_field, self.cob_seed_mat, self.cob_seed_field, "matrix")
-            )
+        self.but_run.clicked.connect(self.run)
+        self.but_queue.clicked.connect(self.add_job_to_queue)
+        self.but_cancel.clicked.connect(self.close)
 
-            self.but_run.clicked.connect(self.run)
-            self.but_queue.clicked.connect(self.add_job_to_queue)
-            self.but_cancel.clicked.connect(self.close)
+        self.table_jobs.setColumnWidth(0, 50)
+        self.table_jobs.setColumnWidth(1, 295)
+        self.table_jobs.setColumnWidth(2, 90)
 
-            self.table_jobs.setColumnWidth(0, 50)
-            self.table_jobs.setColumnWidth(1, 295)
-            self.table_jobs.setColumnWidth(2, 90)
+        self.but_run.setVisible(False)
+        self.but_queue.setVisible(False)
+        self.but_cancel.setVisible(False)
 
-            self.but_run.setVisible(False)
-            self.but_queue.setVisible(False)
-            self.but_cancel.setVisible(False)
+        if mode is not None:
+            if mode == "ipf":
+                self.rdo_ipf.setChecked(True)
+            if mode == "apply":
+                self.rdo_apply_gravity.setChecked(True)
+            if mode == "calibrate":
+                self.rdo_calibrate_gravity.setChecked(True)
+            self.configure_inputs()
 
-            if mode is not None:
-                if mode == "ipf":
-                    self.rdo_ipf.setChecked(True)
-                if mode == "apply":
-                    self.rdo_apply_gravity.setChecked(True)
-                if mode == "calibrate":
-                    self.rdo_calibrate_gravity.setChecked(True)
-                self.configure_inputs()
-
-            self.load_matrices()
-            self.user_chosen_model = None
-            self.update_model_parameters()
-
-            self.finished.connect(self.qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.load_matrices()
+        self.user_chosen_model = None
+        self.update_model_parameters()
 
     def load_matrices(self):
         self.matrices = list_matrices(self.project)

@@ -5,103 +5,89 @@ from random import choice
 import numpy as np
 import pandas as pd
 from aequilibrae.paths import Graph
-from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject, Qgis
 from qgis.core import QgsStyle, QgsVectorLayerJoinInfo, QgsRuleBasedRenderer, QgsSymbol
 
-from qaequilibrae.modules.common_tools import layer_from_dataframe
-from qaequilibrae.modules.common_tools.geodataframe_from_data_layer import geodataframe_from_layer
-
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_skim_viewer.ui"))
+from qaequilibrae.modules.common_tools import BaseDialog
+from qaequilibrae.modules.common_tools import layer_from_dataframe, geodataframe_from_layer
 
 
-class SkimViewerDialog(QDialog, FORM_CLASS):
+class SkimViewerDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QDialog.__init__(self)
-        qgis_project.block_change_scenario()
-        self.setupUi(self)
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_skim_viewer.ui"), qgis_project=qgis_project)
 
-        try:
-            self.iface = qgis_project.iface
-            self.project = qgis_project.project
-            self.qgis_project = qgis_project
-            self.all_modes = {}
-            self.layer = self.iface.activeLayer()
-            self.graph = None
-            self.idx = None
-            self.error = None
+    def _base_ui_setup(self):
+        self.all_modes = {}
+        self.layer = self.iface.activeLayer()
+        self.graph = None
+        self.idx = None
+        self.error = None
 
-            # Check if we have an active layer, otherwise raises an error
-            if self.layer is not None:
-                # If 'links' is the active layer, raises an error. We can only skim nodes or zones
-                if "links" in self.layer.name():
-                    self.qgis_project.iface_error_message("Select one of 'nodes' or 'zones' layer to proceed.")
-                    self.__disable_fields()
-                    return
-
-                # We get the layer ID to check if it was removed from the layers' panel
-                self.__layer_id = self.layer.id()
-
-                self._lyr = "zones" if self.layer.name() == "zones" else "nodes"
-                self.layer_col = "zone_id" if self.layer.name() == "zones" else "node_id"
-
-                QgsProject.instance().layersRemoved.connect(self.__on_layer_removed)
-            else:
-                self.error = "Please set an active layer to proceed"
-                self.qgis_project.iface_error_message(self.error, "Input error")
-                self.__disable_fields()  # We disable all QDialog objects if there's no active layer set
+        # Check if we have an active layer, otherwise raises an error
+        if self.layer is not None:
+            # If 'links' is the active layer, raises an error. We can only skim nodes or zones
+            if "links" in self.layer.name():
+                self.qgis_project.iface_error_message("Select one of 'nodes' or 'zones' layer to proceed.")
+                self.__disable_fields()
                 return
 
-            # Layer fields
-            default_style = QgsStyle().defaultStyle()
-            self.cob_color.addItems(list(default_style.colorRampNames()))
+            # We get the layer ID to check if it was removed from the layers' panel
+            self.__layer_id = self.layer.id()
 
-            self._nodes = self.project.network.nodes.data["node_id"].tolist()
-            self._zones = list(self.project.zoning.all_zones().keys())
+            self._lyr = "zones" if self.layer.name() == "zones" else "nodes"
+            self.layer_col = "zone_id" if self.layer.name() == "zones" else "node_id"
 
-            # Randomly populate the start ID if we don't have a selected layer feature
-            if not self.layer.selectedFeatures():
-                idx = choice(self._zones) if self._lyr == "zones" else choice(self._nodes)
-                self.line_start_id.setText(str(idx))
+            QgsProject.instance().layersRemoved.connect(self.__on_layer_removed)
+        else:
+            self.error = "Please set an active layer to proceed"
+            self.qgis_project.iface_error_message(self.error, "Input error")
+            self.__disable_fields()  # We disable all QDialog objects if there's no active layer set
+            return
 
-            if self.idx:
-                self.layer.selectionChanged.connect(self.recompute_after_selection)
+        # Layer fields
+        default_style = QgsStyle().defaultStyle()
+        self.cob_color.addItems(list(default_style.colorRampNames()))
 
-            # Check if layer links is in the layers tab.
-            self.__prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
+        self._nodes = self.project.network.nodes.data["node_id"].tolist()
+        self._zones = list(self.project.zoning.all_zones().keys())
 
-            with self.project.db_connection as conn:
-                centroids = pd.read_sql("select node_id from nodes where is_centroid=1", con=conn).node_id.to_numpy()
-                self.centroids = centroids if centroids.size != 0 else None
+        # Randomly populate the start ID if we don't have a selected layer feature
+        if not self.layer.selectedFeatures():
+            idx = choice(self._zones) if self._lyr == "zones" else choice(self._nodes)
+            self.line_start_id.setText(str(idx))
 
-                res = conn.execute("""SELECT mode_name, mode_id FROM modes""")
-                for x in res.fetchall():
-                    self.cob_modes.addItem(f"{x[0]} ({x[1]})")
-                    self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
+        if self.idx:
+            self.layer.selectionChanged.connect(self.recompute_after_selection)
 
-            self.__no_skimming_fields = [
-                "link_id",
-                "a_node",
-                "b_node",
-                "direction",
-                "id",
-                "__supernet_id__",
-                "__compressed_id__",
-            ]
+        # Check if layer links is in the layers tab.
+        self.__prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
 
-            self.but_plot.clicked.connect(self.run)
-            self.cob_minimizing.currentIndexChanged.connect(self.update_cost_field)
-            self.cob_skim.currentIndexChanged.connect(self.update_skim_field)
-            self.block_paths.toggled.connect(self.update_block_flow)
+        with self.project.db_connection as conn:
+            centroids = pd.read_sql("select node_id from nodes where is_centroid=1", con=conn).node_id.to_numpy()
+            self.centroids = centroids if centroids.size != 0 else None
 
-            self.configure_skim_fields()
+            res = conn.execute("""SELECT mode_name, mode_id FROM modes""")
+            for x in res.fetchall():
+                self.cob_modes.addItem(f"{x[0]} ({x[1]})")
+                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
-            self.finished.connect(self.qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.__no_skimming_fields = [
+            "link_id",
+            "a_node",
+            "b_node",
+            "direction",
+            "id",
+            "__supernet_id__",
+            "__compressed_id__",
+        ]
+
+        self.but_plot.clicked.connect(self.run)
+        self.cob_minimizing.currentIndexChanged.connect(self.update_cost_field)
+        self.cob_skim.currentIndexChanged.connect(self.update_skim_field)
+        self.block_paths.toggled.connect(self.update_block_flow)
+
+        self.configure_skim_fields()
 
     def __on_layer_removed(self, layer_ids):
         if self.__layer_id in layer_ids:

@@ -2,7 +2,6 @@ from os.path import dirname, join
 
 import pandas as pd
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTabWidget
 from qgis.core import QgsProject, QgsVectorLayerJoinInfo
 

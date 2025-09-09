@@ -1,61 +1,46 @@
 import logging
-import sys
-from os.path import abspath, dirname, join
+from os.path import dirname, join
 
 from aequilibrae.paths.results import PathResults
-from qgis.PyQt import QtCore, QtWidgets, uic
+from qgis.PyQt import QtCore
 from qgis.core import QgsProject, QgsVectorLayer, QgsSpatialIndex
 from qgis.utils import iface
 
-from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog
+from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog, BaseDialog
 from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
 
 logger = logging.getLogger("AequilibraEGUI")
 
-sys.path.append(dirname(abspath(__file__)) + "/aequilibrae/")
 
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_compute_path.ui"))
-
-
-class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
+class ShortestPathDialog(BaseDialog):
     clickTool = PointTool(iface.mapCanvas())
 
-    def __init__(self, qgis_project) -> None:
-        QtWidgets.QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+    def __init__(self, qgis_project):
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_compute_path.ui"), qgis_project=qgis_project)
 
-        try:
-            self.qgis_project = qgis_project
-            self.iface = qgis_project.iface
-            self.project = qgis_project.project  # type: Project
-            self.setupUi(self)
-            self.field_types = {}
-            self.centroids = None
-            self.node_layer = qgis_project.layers["nodes"][0]
-            self.line_layer = qgis_project.layers["links"][0]
-            self.node_keys = {}
-            self.node_fields = None
-            self.index = None
-            self.matrix = None
-            self.path = standard_path()
-            self.node_id = None
+    def _base_ui_setup(self):
+        self.field_types = {}
+        self.centroids = None
+        self.node_layer = self.qgis_project.layers["nodes"][0]
+        self.line_layer = self.qgis_project.layers["links"][0]
+        self.node_keys = {}
+        self.node_fields = None
+        self.index = None
+        self.matrix = None
+        self.path = standard_path()
+        self.node_id = None
 
-            self.res = PathResults()
-            self.link_features = None
+        self.res = PathResults()
+        self.link_features = None
 
-            self.do_dist_matrix.setEnabled(False)
-            self.from_but.setEnabled(False)
-            self.to_but.setEnabled(False)
-            self.configure_graph.clicked.connect(self.prepare_graph_and_network)
-            self.from_but.clicked.connect(self.search_for_point_from)
-            self.to_but.clicked.connect(self.search_for_point_to)
-            self.do_dist_matrix.clicked.connect(self.produces_path)
-
-            self.finished.connect(self.qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.do_dist_matrix.setEnabled(False)
+        self.from_but.setEnabled(False)
+        self.to_but.setEnabled(False)
+        self.configure_graph.clicked.connect(self.prepare_graph_and_network)
+        self.from_but.clicked.connect(self.search_for_point_from)
+        self.to_but.clicked.connect(self.search_for_point_to)
+        self.do_dist_matrix.clicked.connect(self.produces_path)
 
     def prepare_graph_and_network(self):
         self.do_dist_matrix.setText(self.tr("Loading data"))

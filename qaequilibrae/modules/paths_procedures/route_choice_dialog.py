@@ -1,4 +1,3 @@
-import logging
 import sys
 from os import mkdir
 from os.path import dirname, isdir, join
@@ -6,79 +5,65 @@ from os.path import dirname, isdir, join
 import geopandas as gpd
 import numpy as np
 import qgis
-from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
 from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest
 
-from qaequilibrae.modules.common_tools import geodataframe_from_layer
-from qaequilibrae.modules.common_tools.auxiliary_functions import get_vector_layer_by_name, model_area_polygon
+from qaequilibrae.modules.common_tools import BaseDialog
+from qaequilibrae.modules.common_tools import geodataframe_from_layer, get_vector_layer_by_name, model_area_polygon
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
 from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
 from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_route_choice.ui"))
-logger = logging.getLogger("AequilibraEGUI")
 
 
-class RouteChoiceDialog(QDialog, FORM_CLASS):
+class RouteChoiceDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.project = qgis_project.project
-        self.qgis_project = qgis_project
-        qgis_project.block_change_scenario()
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_route_choice.ui"), qgis_project=qgis_project)
 
-        try:
-            self.matrices = self.project.matrices
-            self.setupUi(self)
-            self.error = None
-            self.matrix = None
-            self.cost_function = ""
-            self.utility = []
+    def _base_ui_setup(self):
+        self.error = None
+        self.matrix = None
+        self.cost_function = ""
+        self.utility = []
 
-            self.all_modes = {}
-            self._pairs = []
-            self.link_layer = qgis_project.layers["links"][0]
-            self.parameters = {}
+        self.all_modes = {}
+        self._pairs = []
+        self.link_layer = self.qgis_project.layers["links"][0]
+        self.parameters = {}
 
-            self.select_links = {}
-            self.__current_links = []
+        self.select_links = {}
+        self.__current_links = []
 
-            self.__populate_project_info()
+        self.__populate_project_info()
 
-            self.__project_nodes = self.project.network.nodes.data.node_id.tolist()
-            self.proj_matrices = list_matrices(self.project)
+        self.__project_nodes = self.project.network.nodes.data.node_id.tolist()
+        self.proj_matrices = list_matrices(self.project)
 
-            self.cob_algo.addItems(["BFSLE", "Link Penalization", "BFSLE with Link Penalization"])
-            self.cob_direction.addItems(["AB", "Both", "BA"])
+        self.cob_algo.addItems(["BFSLE", "Link Penalization", "BFSLE with Link Penalization"])
+        self.cob_direction.addItems(["AB", "Both", "BA"])
 
-            self.cob_matrices.currentTextChanged.connect(self.set_show_matrices)
-            self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
-            self.but_add_to_cost.clicked.connect(self.add_cost_function)
-            self.but_clear_cost.clicked.connect(self.clear_cost_function)
-            self.but_perform_assig.clicked.connect(self.execute_assign)
-            self.but_build_and_save.clicked.connect(self.execute_build)
-            self.but_visualize.clicked.connect(self.execute_single)
-            self.chb_set_sub_area.toggled.connect(self.set_sub_area_use)
-            self.chb_set_select_link.toggled.connect(self.set_select_link_use)
+        self.cob_matrices.currentTextChanged.connect(self.set_show_matrices)
+        self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
+        self.but_add_to_cost.clicked.connect(self.add_cost_function)
+        self.but_clear_cost.clicked.connect(self.clear_cost_function)
+        self.but_perform_assig.clicked.connect(self.execute_assign)
+        self.but_build_and_save.clicked.connect(self.execute_build)
+        self.but_visualize.clicked.connect(self.execute_single)
+        self.chb_set_sub_area.toggled.connect(self.set_sub_area_use)
+        self.chb_set_select_link.toggled.connect(self.set_select_link_use)
 
-            self.but_add_qry.clicked.connect(self.add_query)
-            self.but_save_qry.clicked.connect(self.save_query)
-            self.tbl_selected_links.cellDoubleClicked.connect(self.__remove_select_link_item)
-            self.but_clear_qry.clicked.connect(self.__clean_link_selection)
+        self.but_add_qry.clicked.connect(self.add_query)
+        self.but_save_qry.clicked.connect(self.save_query)
+        self.tbl_selected_links.cellDoubleClicked.connect(self.__remove_select_link_item)
+        self.but_clear_qry.clicked.connect(self.__clean_link_selection)
 
-            self.list_matrices()
-            self.set_show_matrices()
-            self.set_sub_area_use()
-            self.set_select_link_use()
-
-            self.finished.connect(self.qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.list_matrices()
+        self.set_show_matrices()
+        self.set_sub_area_use()
+        self.set_select_link_use()
 
     def __populate_project_info(self):
         with self.project.db_connection as conn:
