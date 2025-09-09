@@ -3,175 +3,161 @@ from math import ceil
 from os.path import dirname, join
 
 import pandas as pd
-from qgis.PyQt import uic, QtGui
-from qgis.PyQt.QtCore import QTimer
-from qgis.PyQt.QtWidgets import QDialog, QAbstractItemView
+from qgis.PyQt import QtGui
+from qgis.PyQt.QtWidgets import QAbstractItemView
 from qgis.core import QgsProject, QgsStyle, QgsVectorLayerJoinInfo, QgsGraduatedSymbolRenderer, QgsApplication
-from qgis.core import QgsRendererRange
-from qgis.core import QgsSymbol, QgsPalLayerSettings, QgsTextFormat
+from qgis.core import QgsSymbol, QgsPalLayerSettings, QgsTextFormat, QgsRendererRange
 from qgis.core import QgsTextBufferSettings, QgsVectorLayerSimpleLabeling
 
-from qaequilibrae.modules.common_tools import layer_from_dataframe, PandasModel
+from qaequilibrae.modules.common_tools import layer_from_dataframe, PandasModel, BaseDialog
 from qaequilibrae.modules.gis.color_ramp_shades import color_ramp_shades
 from qaequilibrae.modules.transit_procedures.transit_supply_metrics import SupplyMetrics
 
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/transit_navigator.ui"))
 
-
-class TransitNavigatorDialog(QDialog, FORM_CLASS):
+class TransitNavigatorDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+        super().__init__(ui_file=join(dirname(__file__), "forms/transit_navigator.ui"), qgis_project=qgis_project)
 
-        try:
-            self.setupUi(self)
-            self.iface = qgis_project.iface
-            self.feed = None
-            self.qgis_project = qgis_project
-            self.project = qgis_project.project
-            self._p = self.project.network
-            self.mapped_stops = False
-            self.mapped_lines = False
-            self.mapped_zones = False
-            self.line_target_metric = ""
-            self.line_map_layer = ""
-            self.stop_target_metric = ""
-            self.zone_target_metric = ""
-            self.filtered = {}
+    def _base_ui_setup(self):
+        self.feed = None
+        self._p = self.project.network
+        self.mapped_stops = False
+        self.mapped_lines = False
+        self.mapped_zones = False
+        self.line_target_metric = ""
+        self.line_map_layer = ""
+        self.stop_target_metric = ""
+        self.zone_target_metric = ""
+        self.filtered = {}
 
-            self.sm = SupplyMetrics(self.project)
-            self.gtfs_types = {
-                0: "Light rail",
-                1: "Subway/Metro",
-                2: "Rail",
-                3: "Bus",
-                4: "Ferry",
-                5: "Cable tram",
-                6: "Aerial lift",
-                7: "Funicular",
-                11: "Trolleybus",
-                12: "Monorail",
-            }
+        self.sm = SupplyMetrics(self.project)
+        self.gtfs_types = {
+            0: "Light rail",
+            1: "Subway/Metro",
+            2: "Rail",
+            3: "Bus",
+            4: "Ferry",
+            5: "Cable tram",
+            6: "Aerial lift",
+            7: "Funicular",
+            11: "Trolleybus",
+            12: "Monorail",
+        }
 
-            fldr = join(dirname(dirname(__file__)), "style_loader")
-            self.stops_layer = qgis_project.layers["transit_stops"][0]
-            self.stops_layer.loadNamedStyle(join(fldr, "stops.qml"), True)
+        fldr = join(dirname(dirname(__file__)), "style_loader")
+        self.stops_layer = self.qgis_project.layers["transit_stops"][0]
+        self.stops_layer.loadNamedStyle(join(fldr, "stops.qml"), True)
 
-            self.zones_layer = qgis_project.layers["zones"][0]
-            self.zones_layer.loadNamedStyle(join(fldr, "zones.qml"), True)
+        self.zones_layer = self.qgis_project.layers["zones"][0]
+        self.zones_layer.loadNamedStyle(join(fldr, "zones.qml"), True)
 
-            self.patterns_layer = qgis_project.layers["transit_pattern_mapping"][0]
-            self.patterns_layer.loadNamedStyle(join(fldr, "patterns.qml"), True)
+        self.patterns_layer = self.qgis_project.layers["transit_pattern_mapping"][0]
+        self.patterns_layer.loadNamedStyle(join(fldr, "patterns.qml"), True)
 
-            self.routes_layer = qgis_project.layers["transit_routes"][0]
-            self.routes_layer.loadNamedStyle(join(fldr, "routes.qml"), True)
+        self.routes_layer = self.qgis_project.layers["transit_routes"][0]
+        self.routes_layer.loadNamedStyle(join(fldr, "routes.qml"), True)
 
-            for layer in [self.zones_layer, self.patterns_layer, self.routes_layer, self.stops_layer]:
-                QgsProject.instance().addMapLayer(layer)
+        for layer in [self.zones_layer, self.patterns_layer, self.routes_layer, self.stops_layer]:
+            QgsProject.instance().addMapLayer(layer)
 
-            agency_sql = "Select agency_id, agency from agencies"
-            sql = """SELECT pattern_id, 
-                            coalesce(ST_X(ST_StartPoint(geometry))-ST_X(ST_EndPoint(geometry)),0) dx,
-                            coalesce(ST_Y(ST_StartPoint(geometry))-ST_Y(ST_EndPoint(geometry)),0) dy
-                    FROM routes"""
-            with self.project.transit_connection as conn:
-                self.all_agencies = {ag: ag_id for ag_id, ag in conn.execute(agency_sql)}
-                patt_df = pd.read_sql(sql, conn)
+        agency_sql = "Select agency_id, agency from agencies"
+        sql = """SELECT pattern_id, 
+                        coalesce(ST_X(ST_StartPoint(geometry))-ST_X(ST_EndPoint(geometry)),0) dx,
+                        coalesce(ST_Y(ST_StartPoint(geometry))-ST_Y(ST_EndPoint(geometry)),0) dy
+                FROM routes"""
+        with self.project.transit_connection as conn:
+            self.all_agencies = {ag: ag_id for ag_id, ag in conn.execute(agency_sql)}
+            patt_df = pd.read_sql(sql, conn)
 
-            patt_df = patt_df.assign(direction=pd.NA)
-            patt_df.loc[(patt_df.dy.abs() >= patt_df.dx.abs()) & (patt_df.dy < 0), "direction"] = "N"
-            patt_df.loc[(patt_df.dy.abs() >= patt_df.dx.abs()) & (patt_df.dy > 0), "direction"] = "S"
-            patt_df.loc[(patt_df.dy.abs() < patt_df.dx.abs()) & (patt_df.dx > 0), "direction"] = "W"
-            patt_df.loc[(patt_df.dy.abs() < patt_df.dx.abs()) & (patt_df.dx < 0), "direction"] = "E"
-            self.pattern_directions = patt_df[["pattern_id", "direction"]]
-            if max(patt_df.dx.max(), patt_df.dy.max()) == 0:
-                self.rdo_ab_direction.setEnabled(False)
-                self.rdo_ba_direction.setEnabled(False)
+        patt_df = patt_df.assign(direction=pd.NA)
+        patt_df.loc[(patt_df.dy.abs() >= patt_df.dx.abs()) & (patt_df.dy < 0), "direction"] = "N"
+        patt_df.loc[(patt_df.dy.abs() >= patt_df.dx.abs()) & (patt_df.dy > 0), "direction"] = "S"
+        patt_df.loc[(patt_df.dy.abs() < patt_df.dx.abs()) & (patt_df.dx > 0), "direction"] = "W"
+        patt_df.loc[(patt_df.dy.abs() < patt_df.dx.abs()) & (patt_df.dx < 0), "direction"] = "E"
+        self.pattern_directions = patt_df[["pattern_id", "direction"]]
+        if max(patt_df.dx.max(), patt_df.dy.max()) == 0:
+            self.rdo_ab_direction.setEnabled(False)
+            self.rdo_ba_direction.setEnabled(False)
 
-            self.all_routes = pd.DataFrame([])
-            self.all_patterns = pd.DataFrame([])
-            self.all_stops = pd.DataFrame([])
-            self.stop_pattern = pd.DataFrame([])
-            self.zones = pd.DataFrame([])
-            self.reset_data_global()
-            self.cob_agency.addItems(list(self.all_agencies.keys()))
+        self.all_routes = pd.DataFrame([])
+        self.all_patterns = pd.DataFrame([])
+        self.all_stops = pd.DataFrame([])
+        self.stop_pattern = pd.DataFrame([])
+        self.zones = pd.DataFrame([])
+        self.reset_data_global()
+        self.cob_agency.addItems(list(self.all_agencies.keys()))
 
-            self.cob_type.addItems([self.gtfs_types[tp] for tp in self.all_routes["route_type"].unique()])
-            self.gtfs_types = {v: k for k, v in self.gtfs_types.items()}
+        self.cob_type.addItems([self.gtfs_types[tp] for tp in self.all_routes["route_type"].unique()])
+        self.gtfs_types = {v: k for k, v in self.gtfs_types.items()}
 
-            for table in [self.list_routes, self.list_stops]:
-                table.setSelectionBehavior(QAbstractItemView.SelectRows)
-                table.setSelectionMode(QAbstractItemView.SingleSelection)
+        for table in [self.list_routes, self.list_stops]:
+            table.setSelectionBehavior(QAbstractItemView.SelectRows)
+            table.setSelectionMode(QAbstractItemView.SingleSelection)
 
-            self.chb_agency.toggled.connect(self.allow_filter_by_agency)
-            self.chb_type.toggled.connect(self.allow_filter_by_gtfs_type)
-            self.chb_time.toggled.connect(self.allow_filter_by_time)
-            self.but_reset.clicked.connect(self.reset)
-            self.but_reset_global.clicked.connect(self.reset_global)
-            self.reset()
+        self.chb_agency.toggled.connect(self.allow_filter_by_agency)
+        self.chb_type.toggled.connect(self.allow_filter_by_gtfs_type)
+        self.chb_time.toggled.connect(self.allow_filter_by_time)
+        self.but_reset.clicked.connect(self.reset)
+        self.but_reset_global.clicked.connect(self.reset_global)
+        self.reset()
 
-            self.chb_label_stops.toggled.connect(self.show_label_stops)
-            self.chb_label_lines.toggled.connect(self.show_label_lines)
-            self.chb_label_zones.toggled.connect(self.show_label_zones)
+        self.chb_label_stops.toggled.connect(self.show_label_stops)
+        self.chb_label_lines.toggled.connect(self.show_label_lines)
+        self.chb_label_zones.toggled.connect(self.show_label_zones)
 
-            self.ln_route_id.textChanged.connect(partial(self.search_route, "route_id"))
-            self.ln_route.textChanged.connect(partial(self.search_route, "route"))
-            self.ln_pattern_id.textChanged.connect(partial(self.search_route, "pattern_id"))
+        self.ln_route_id.textChanged.connect(partial(self.search_route, "route_id"))
+        self.ln_route.textChanged.connect(partial(self.search_route, "route"))
+        self.ln_pattern_id.textChanged.connect(partial(self.search_route, "pattern_id"))
 
-            self.ln_stop_id.textChanged.connect(partial(self.search_stop, "stop_id"))
-            self.ln_stop.textChanged.connect(partial(self.search_stop, "stop"))
-            self.ln_stop_name.textChanged.connect(partial(self.search_stop, "stop_name"))
+        self.ln_stop_id.textChanged.connect(partial(self.search_stop, "stop_id"))
+        self.ln_stop.textChanged.connect(partial(self.search_stop, "stop"))
+        self.ln_stop_name.textChanged.connect(partial(self.search_stop, "stop_name"))
 
-            self.cob_agency.currentIndexChanged.connect(self.filter_direction)
-            self.cob_type.currentIndexChanged.connect(self.filter_direction)
+        self.cob_agency.currentIndexChanged.connect(self.filter_direction)
+        self.cob_type.currentIndexChanged.connect(self.filter_direction)
 
-            # Direction filtering
-            self.rdo_all_directions.toggled.connect(self.filter_direction)
-            self.rdo_ab_direction.toggled.connect(self.filter_direction)
-            self.rdo_ba_direction.toggled.connect(self.filter_direction)
+        # Direction filtering
+        self.rdo_all_directions.toggled.connect(self.filter_direction)
+        self.rdo_ab_direction.toggled.connect(self.filter_direction)
+        self.rdo_ba_direction.toggled.connect(self.filter_direction)
 
-            # Sets mapping objects
-            self.rdo_map_stops.toggled.connect(self.enable_stop_mapping)
-            self.rdo_no_map_stops.toggled.connect(self.enable_stop_mapping)
-            self.cob_stops_map_type.currentIndexChanged.connect(self.allows_colors_stops)
-            self.enable_stop_mapping()
-            self.but_map_stops.clicked.connect(self.map_stops)
-            self.sld_stop_scale.valueChanged.connect(self.draw_stop_styles)
-            self.stop_metric_layer = None
+        # Sets mapping objects
+        self.rdo_map_stops.toggled.connect(self.enable_stop_mapping)
+        self.rdo_no_map_stops.toggled.connect(self.enable_stop_mapping)
+        self.cob_stops_map_type.currentIndexChanged.connect(self.allows_colors_stops)
+        self.enable_stop_mapping()
+        self.but_map_stops.clicked.connect(self.map_stops)
+        self.sld_stop_scale.valueChanged.connect(self.draw_stop_styles)
+        self.stop_metric_layer = None
 
-            # ZONES
-            self.rdo_no_map_zones.toggled.connect(self.enable_zone_mapping)
-            self.rdo_map_zones.toggled.connect(self.enable_zone_mapping)
-            self.enable_zone_mapping()
-            self.but_map_zones.clicked.connect(self.map_zones)
-            self.sld_zone_scale.valueChanged.connect(self.draw_zone_styles)
-            self.zone_metric_layer = None
+        # ZONES
+        self.rdo_no_map_zones.toggled.connect(self.enable_zone_mapping)
+        self.rdo_map_zones.toggled.connect(self.enable_zone_mapping)
+        self.enable_zone_mapping()
+        self.but_map_zones.clicked.connect(self.map_zones)
+        self.sld_zone_scale.valueChanged.connect(self.draw_zone_styles)
+        self.zone_metric_layer = None
 
-            self.rdo_no_map_routes.toggled.connect(self.enable_line_mapping)
-            self.rdo_map_routes.toggled.connect(self.enable_line_mapping)
-            self.cob_routes_map_type.currentIndexChanged.connect(self.allows_colors_line)
-            self.enable_line_mapping()
-            self.but_map_routes.clicked.connect(self.map_lines)
-            self.sld_route_scale.valueChanged.connect(self.draw_line_styles)
-            self.line_metric_layer = None
-            self.time_from.timeChanged.connect(self.update_time)
-            self.time_to.timeChanged.connect(self.update_time)
+        self.rdo_no_map_routes.toggled.connect(self.enable_line_mapping)
+        self.rdo_map_routes.toggled.connect(self.enable_line_mapping)
+        self.cob_routes_map_type.currentIndexChanged.connect(self.allows_colors_line)
+        self.enable_line_mapping()
+        self.but_map_routes.clicked.connect(self.map_lines)
+        self.sld_route_scale.valueChanged.connect(self.draw_line_styles)
+        self.line_metric_layer = None
+        self.time_from.timeChanged.connect(self.update_time)
+        self.time_to.timeChanged.connect(self.update_time)
 
-            self.glob_filter_box.setCollapsed(True)
-            self.glob_stop_map.setCollapsed(True)
-            self.glob_route_map.setCollapsed(True)
-            self.glob_zone_map.setCollapsed(True)
+        self.glob_filter_box.setCollapsed(True)
+        self.glob_stop_map.setCollapsed(True)
+        self.glob_route_map.setCollapsed(True)
+        self.glob_zone_map.setCollapsed(True)
 
-            self.selected_stops = None
-            self.selected_patterns = None
-            self.selected_routes = None
-            self.selected_from_time = None
-            self.selected_to_time = None
-
-            self.finished.connect(self.qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.selected_stops = None
+        self.selected_patterns = None
+        self.selected_routes = None
+        self.selected_from_time = None
+        self.selected_to_time = None
 
     def show_label_stops(self):
         self.build_label(

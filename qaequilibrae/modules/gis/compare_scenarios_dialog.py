@@ -3,88 +3,74 @@ from functools import partial
 from os.path import dirname, join
 
 import qgis
-from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis.PyQt.QtCore import QTimer
+from qgis.PyQt import QtGui, QtWidgets
 from qgis.core import QgsExpression, QgsProject
 from qgis.core import QgsExpressionContextUtils, QgsLineSymbol, QgsSimpleLineSymbolLayer
 
+from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.common_tools import find_table_fields, get_parameter_chain, layer_from_geodataframe
 from qaequilibrae.modules.matrix_procedures import list_results, load_result_table
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_compare_scenarios.ui"))
 
 
-class CompareScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
+class CompareScenariosDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QtWidgets.QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_compare_scenarios.ui"), qgis_project=qgis_project)
 
-        try:
-            self.qgis_project = qgis_project
-            self.iface = qgis_project.iface
-            self.setupUi(self)
+    def _base_ui_setup(self):
 
-            self.positive_color.setColor(QtGui.QColor(0, 174, 116, 255))
-            self.negative_color.setColor(QtGui.QColor(218, 0, 3, 255))
-            self.common_flow_color.setColor(QtGui.QColor(0, 0, 0, 255))
-            self.radio_diff.toggled.connect(self.show_color_composite)
-            self.radio_compo.toggled.connect(self.show_color_composite)
+        self.positive_color.setColor(QtGui.QColor(0, 174, 116, 255))
+        self.negative_color.setColor(QtGui.QColor(218, 0, 3, 255))
+        self.common_flow_color.setColor(QtGui.QColor(0, 0, 0, 255))
+        self.radio_diff.toggled.connect(self.show_color_composite)
+        self.radio_compo.toggled.connect(self.show_color_composite)
 
-            self.results = list_results(self.qgis_project.project)
+        self.results = list_results(self.qgis_project.project)
 
-            self.__init_scenario = self.qgis_project.cob_scenarios.currentText()
+        self.__init_scenario = self.qgis_project.cob_scenarios.currentText()
 
-            self.band_size = 10.0
-            self.space_size = 0.0
-            self.link_layer = None
-            self.drive_side = get_parameter_chain(["system", "driving side"])
+        self.band_size = 10.0
+        self.space_size = 0.0
+        self.link_layer = None
+        self.drive_side = get_parameter_chain(["system", "driving side"])
 
-            # space slider
-            self.slider_spacer.setMinimum(0)
-            self.slider_spacer.setMaximum(30)
-            self.slider_spacer.setValue(0)
-            self.slider_spacer.setTickPosition(QtWidgets.QSlider.TicksBelow)
-            self.slider_spacer.setTickInterval(10)
-            self.slider_spacer.valueChanged.connect(self.spacevaluechange)
-            self.cob_base_scenario.currentIndexChanged.connect(
-                partial(self.choose_scenario, self.cob_base_scenario, self.cob_base_result)
-            )
-            self.cob_alt_scenario.currentIndexChanged.connect(
-                partial(self.choose_scenario, self.cob_alt_scenario, self.cob_alternative_result)
-            )
-            self.cob_base_result.currentIndexChanged.connect(
-                partial(self.choose_result, self.cob_base_scenario, self.cob_base_result, self.cob_base_data)
-            )
-            self.cob_alternative_result.currentIndexChanged.connect(
-                partial(
-                    self.choose_result, self.cob_alt_scenario, self.cob_alternative_result, self.cob_alternative_data
-                )
-            )
+        # space slider
+        self.slider_spacer.setMinimum(0)
+        self.slider_spacer.setMaximum(30)
+        self.slider_spacer.setValue(0)
+        self.slider_spacer.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.slider_spacer.setTickInterval(10)
+        self.slider_spacer.valueChanged.connect(self.spacevaluechange)
+        self.cob_base_scenario.currentIndexChanged.connect(
+            partial(self.choose_scenario, self.cob_base_scenario, self.cob_base_result)
+        )
+        self.cob_alt_scenario.currentIndexChanged.connect(
+            partial(self.choose_scenario, self.cob_alt_scenario, self.cob_alternative_result)
+        )
+        self.cob_base_result.currentIndexChanged.connect(
+            partial(self.choose_result, self.cob_base_scenario, self.cob_base_result, self.cob_base_data)
+        )
+        self.cob_alternative_result.currentIndexChanged.connect(
+            partial(self.choose_result, self.cob_alt_scenario, self.cob_alternative_result, self.cob_alternative_data)
+        )
 
-            # band slider
-            self.slider_band_size.setMinimum(5)
-            self.slider_band_size.setMaximum(150)
-            self.slider_band_size.setValue(50)
-            self.slider_band_size.setTickPosition(QtWidgets.QSlider.TicksBelow)
-            self.slider_band_size.setTickInterval(5)
-            self.slider_band_size.valueChanged.connect(self.sizevaluechange)
-            self.but_run.clicked.connect(self.execute_comparison)
-            self.add_fields_to_cboxes()
-            self.sizevaluechange()
-            self.spacevaluechange()
-            self.show_color_composite()
-            self.base_group_box.setToolTip(
-                self.tr("This is the reference case, to which the differences will refer to")
-            )
-            self.alt_group_box.setToolTip(self.tr("This is the alternative"))
-            self.color_group_box.setToolTip(self.tr("It will be BASE minus ALTERNATIVE"))
-
-            self.finished.connect(self.qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        # band slider
+        self.slider_band_size.setMinimum(5)
+        self.slider_band_size.setMaximum(150)
+        self.slider_band_size.setValue(50)
+        self.slider_band_size.setTickPosition(QtWidgets.QSlider.TicksBelow)
+        self.slider_band_size.setTickInterval(5)
+        self.slider_band_size.valueChanged.connect(self.sizevaluechange)
+        self.but_run.clicked.connect(self.execute_comparison)
+        self.add_fields_to_cboxes()
+        self.sizevaluechange()
+        self.spacevaluechange()
+        self.show_color_composite()
+        self.base_group_box.setToolTip(self.tr("This is the reference case, to which the differences will refer to"))
+        self.alt_group_box.setToolTip(self.tr("This is the alternative"))
+        self.color_group_box.setToolTip(self.tr("It will be BASE minus ALTERNATIVE"))
 
     def show_color_composite(self):
         self.common_label.setVisible(self.radio_compo.isChecked())

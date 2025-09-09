@@ -3,38 +3,26 @@ from os.path import dirname, isfile, join
 from pathlib import Path
 
 from aequilibrae.context import get_logger
-from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDialog, QMessageBox
+from qgis.PyQt.QtWidgets import QMessageBox
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
-from qaequilibrae.modules.common_tools import LogDialog
-
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_run_module.ui"))
+from qaequilibrae.modules.common_tools import LogDialog, BaseDialog
 
 
-class RunModuleDialog(QDialog, FORM_CLASS):
+class RunModuleDialog(BaseDialog):
     def __init__(self, qgis_project, logger=None):
-        QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_run_module.ui"), qgis_project=qgis_project, logger=logger
+        )
 
-        try:
-            self.qgis_project = qgis_project
-            self.iface = qgis_project.iface
-            self.project = qgis_project.project
-            self.setupUi(self)
+    def _base_ui_setup(self, **kwargs):
+        self.logger = kwargs.get("logger") or get_logger()
 
-            self.logger = logger or get_logger()
+        self.rejected.connect(self.handle_rejection)
 
-            self.rejected.connect(self.handle_rejection)
+        self.check_missing_packages()
 
-            self.check_missing_packages()
-
-            self.but_run.clicked.connect(self.run)
-
-            self.finished.connect(self.qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.but_run.clicked.connect(self.run)
 
     def handle_rejection(self):
         self.but_run.setVisible(False)

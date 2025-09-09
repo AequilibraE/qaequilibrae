@@ -4,49 +4,35 @@ import numpy as np
 import qgis
 from aequilibrae.paths import path_computation
 from aequilibrae.paths.results import PathResults
-from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import QMetaType, QTimer
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol
 
-from qaequilibrae.modules.common_tools import ReportDialog
+from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog
 from qaequilibrae.modules.routing_procedures.tsp_procedure import TSPProcedure
 
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/tsp.ui"))
 
-
-class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
+class TSPDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QtWidgets.QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+        super().__init__(ui_file=join(dirname(__file__), "forms/tsp.ui"), qgis_project=qgis_project)
 
-        try:
-            self.iface = qgis_project.iface
-            self.setupUi(self)
-            self.project = qgis_project.project  # type: Project
-            self.qgis_project = qgis_project
+    def _base_ui_setup(self):
+        self.link_layer = self.qgis_project.layers["links"][0]
+        self.node_layer = self.qgis_project.layers["nodes"][0]
 
-            self.link_layer = self.qgis_project.layers["links"][0]
-            self.node_layer = self.qgis_project.layers["nodes"][0]
+        QgsProject.instance().addMapLayer(self.link_layer)
+        QgsProject.instance().addMapLayer(self.node_layer)
 
-            QgsProject.instance().addMapLayer(self.link_layer)
-            QgsProject.instance().addMapLayer(self.node_layer)
+        self.all_modes = {}
+        self.worker_thread: TSPProcedure = None
+        self.but_run.clicked.connect(self.run)
+        self.res = PathResults()
 
-            self.all_modes = {}
-            self.worker_thread: TSPProcedure = None
-            self.but_run.clicked.connect(self.run)
-            self.res = PathResults()
+        self.rdo_selected.clicked.connect(self.populate_node_source)
+        self.rdo_centroids.clicked.connect(self.populate_node_source)
+        self.populate()
+        self.populate_node_source()
 
-            self.rdo_selected.clicked.connect(self.populate_node_source)
-            self.rdo_centroids.clicked.connect(self.populate_node_source)
-            self.populate()
-            self.populate_node_source()
-
-            self.close_window = False
-
-            self.finished.connect(qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.close_window = False
 
     def populate_node_source(self):
         self.cob_start.clear()

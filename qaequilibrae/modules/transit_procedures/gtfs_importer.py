@@ -1,63 +1,56 @@
 from os.path import dirname, join, isfile
 
 from aequilibrae.transit import Transit
-from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QTableWidgetItem
 
+from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.transit_procedures import GTFSFeed
 
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/gtfs_importer.ui"))
 
-
-class GTFSImporter(QDialog, FORM_CLASS):
+class GTFSImporter(BaseDialog):
     def __init__(self, qgis_project):
-        QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/gtfs_importer.ui"),
+            qgis_project=qgis_project,
+            maintains_scenario_block="GTFSFeed",
+        )
 
-        try:
-            self.iface = qgis_project.iface
-            self.setupUi(self)
-            self.qgis_project = qgis_project
-            self.progress_box.setVisible(False)
-            self.progress_box.setEnabled(False)
-            self.but_add.clicked.connect(self.add_gtfs_feed)
-            self.but_execute.clicked.connect(self.execute_importer)
-            self.list_feeds.setColumnWidth(0, 230)
-            self.feeds = []
-            self.done = 1
+    def _base_ui_setup(self):
+        self.progress_box.setVisible(False)
+        self.progress_box.setEnabled(False)
+        self.but_add.clicked.connect(self.add_gtfs_feed)
+        self.but_execute.clicked.connect(self.execute_importer)
+        self.list_feeds.setColumnWidth(0, 230)
+        self.feeds = []
+        self.done = 1
 
-            self.is_pt_database = isfile(qgis_project.project._transit_database_path)
+        self.is_pt_database = isfile(self.qgis_project.project._transit_database_path)
 
-            if self.is_pt_database:
-                self.rdo_clear.setText(self.tr("Overwrite Routes"))
-                self.rdo_keep.setText(self.tr("Add to Existing Routes"))
-            else:
-                self.label_3.setText(self.tr("Add transit table"))
-                self.rdo_clear.setText(self.tr("Create new route system"))
-                self.rdo_keep.setVisible(False)
-                self.rdo_clear.setChecked(True)
-            self.setFixedHeight(380)
-            self.items = [self.config_box, self.progress_box]
+        if self.is_pt_database:
+            self.rdo_clear.setText(self.tr("Overwrite Routes"))
+            self.rdo_keep.setText(self.tr("Add to Existing Routes"))
+        else:
+            self.label_3.setText(self.tr("Add transit table"))
+            self.rdo_clear.setText(self.tr("Create new route system"))
+            self.rdo_keep.setVisible(False)
+            self.rdo_clear.setChecked(True)
+        self.setFixedHeight(380)
+        self.items = [self.config_box, self.progress_box]
 
-            self.__transit_tables = [
-                "agencies",
-                "fare_attributes",
-                "fare_rules",
-                "fare_zones",
-                "pattern_mapping",
-                "route_links",
-                "routes",
-                "stop_connectors",
-                "stops",
-                "trips",
-                "trips_schedule",
-            ]
-
-            self.finished.connect(self.qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.__transit_tables = [
+            "agencies",
+            "fare_attributes",
+            "fare_rules",
+            "fare_zones",
+            "pattern_mapping",
+            "route_links",
+            "routes",
+            "stop_connectors",
+            "stops",
+            "trips",
+            "trips_schedule",
+        ]
 
     def add_gtfs_feed(self):
         self._p = Transit(self.qgis_project.project)

@@ -8,6 +8,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_load_network_in
 class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
+        qgis_project.block_change_scenario()
         self.qgis_project = qgis_project
         self.project = qgis_project.project
         self.setupUi(self)
@@ -29,6 +30,8 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
             self.cb_minimizing.addItem(field)
 
         self.do_load_graph.clicked.connect(self.exit_procedure)
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def exit_procedure(self):
         self.mode = self.all_modes[self.cb_modes.currentText()]

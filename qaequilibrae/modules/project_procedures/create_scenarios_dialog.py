@@ -1,33 +1,20 @@
 from os.path import dirname, join
 
-from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import QTimer
-
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_scenarios.ui"))
+from qaequilibrae.modules.common_tools import BaseDialog
 
 
-class CreateScenariosDialog(QtWidgets.QDialog, FORM_CLASS):
+class CreateScenariosDialog(BaseDialog):
     def __init__(self, qgis_project) -> None:
-        QtWidgets.QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_scenarios.ui"), qgis_project=qgis_project)
 
-        try:
-            self.qgis_project = qgis_project
-            self.project = qgis_project.project
-            self.setupUi(self)
+    def _base_ui_setup(self):
+        self.__init_scenario = self.qgis_project.cob_scenarios.currentText()
 
-            self.__init_scenario = self.qgis_project.cob_scenarios.currentText()
+        self.rdo_create.clicked.connect(self.configure_inputs)
+        self.rdo_clone.clicked.connect(self.configure_inputs)
+        self.but_run.clicked.connect(self.run)
 
-            self.rdo_create.clicked.connect(self.configure_inputs)
-            self.rdo_clone.clicked.connect(self.configure_inputs)
-            self.but_run.clicked.connect(self.run)
-
-            self.populate_scenarios()
-
-            self.finished.connect(qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.populate_scenarios()
 
     def configure_inputs(self):
         """Update UI elements based on selected mode"""

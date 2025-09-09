@@ -3,73 +3,68 @@ from os.path import dirname, join
 
 import pandas as pd
 import qgis
-from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import Qt, QSize, QTimer
+from qgis.PyQt import QtWidgets
+from qgis.PyQt.QtCore import Qt, QSize
 
+from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_from_toc
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
 from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types, point_types, poly_types
 from qaequilibrae.modules.matrix_procedures.load_dataset_class import LoadDataset
 
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_vector_loader.ui"))
 
+class LoadDatasetDialog(BaseDialog):
+    def __init__(self, qgis_project, single_use: bool = True):
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_vector_loader.ui"),
+            qgis_project=qgis_project,
+            single_use=single_use,
+        )
 
-class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgis_project, single_use=True):
-        QtWidgets.QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+    def _base_ui_setup(self, **kwargs):
+        self.path = standard_path()
 
-        try:
-            self.iface = qgis_project.iface
-            self.setupUi(self)
-            self.path = standard_path()
+        self.output_name = None
+        self.layer = None
+        self.zones = None
+        self.cells = None
+        self.error = None
+        self.selected_fields = None
+        self.worker_thread = None
+        self.dataset = None
+        self.ignore_fields = []
+        self.single_use = kwargs.get("single_use")
 
-            self.output_name = None
-            self.layer = None
-            self.zones = None
-            self.cells = None
-            self.error = None
-            self.selected_fields = None
-            self.worker_thread = None
-            self.dataset = None
-            self.ignore_fields = []
-            self.single_use = single_use
+        self.radio_layer.clicked.connect(partial(self.size_it_accordingly, False))
+        self.radio_csv.clicked.connect(partial(self.size_it_accordingly, False))
+        self.radio_parquet.clicked.connect(partial(self.size_it_accordingly, False))
+        self.chb_all_fields.clicked.connect(self.set_tables_with_fields)
+        self.but_adds_to_links.clicked.connect(self.append_to_list)
 
-            self.radio_layer.clicked.connect(partial(self.size_it_accordingly, False))
-            self.radio_csv.clicked.connect(partial(self.size_it_accordingly, False))
-            self.radio_parquet.clicked.connect(partial(self.size_it_accordingly, False))
-            self.chb_all_fields.clicked.connect(self.set_tables_with_fields)
-            self.but_adds_to_links.clicked.connect(self.append_to_list)
+        # For changing the network layer
+        self.cob_data_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+        self.but_removes_from_links.clicked.connect(self.removes_fields)
+        # For adding skims
+        self.but_load.clicked.connect(self.load_from_file)
+        self.but_save_and_use.clicked.connect(self.load_the_vector)
+        self.but_import_and_use.clicked.connect(self.load_just_to_use)
 
-            # For changing the network layer
-            self.cob_data_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
-            self.but_removes_from_links.clicked.connect(self.removes_fields)
-            # For adding skims
-            self.but_load.clicked.connect(self.load_from_file)
-            self.but_save_and_use.clicked.connect(self.load_the_vector)
-            self.but_import_and_use.clicked.connect(self.load_just_to_use)
+        # THIRD, we load layers in the canvas to the combo-boxes
+        for layer in all_layers_from_toc():  # We iterate through all layers
+            if "wkbType" in dir(layer):
+                if layer.wkbType() in [100] + point_types + poly_types:
+                    self.cob_data_layer.addItem(layer.name())
 
-            # THIRD, we load layers in the canvas to the combo-boxes
-            for layer in all_layers_from_toc():  # We iterate through all layers
-                if "wkbType" in dir(layer):
-                    if layer.wkbType() in [100] + point_types + poly_types:
-                        self.cob_data_layer.addItem(layer.name())
+        if not self.single_use:
+            self.radio_layer.setChecked(True)
+            self.radio_csv.setEnabled(False)
+            self.radio_parquet.setEnabled(False)
+            self.but_import_and_use.setEnabled(False)
+            self.but_load.setEnabled(False)
+            self.but_save_and_use.setText(self.tr("Import"))
 
-            if not self.single_use:
-                self.radio_layer.setChecked(True)
-                self.radio_csv.setEnabled(False)
-                self.radio_parquet.setEnabled(False)
-                self.but_import_and_use.setEnabled(False)
-                self.but_load.setEnabled(False)
-                self.but_save_and_use.setText(self.tr("Import"))
-
-            self.size_it_accordingly(partial(self.size_it_accordingly, False))
-
-            self.finished.connect(qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.size_it_accordingly(partial(self.size_it_accordingly, False))
 
     def set_tables_with_fields(self):
         self.size_it_accordingly(False)

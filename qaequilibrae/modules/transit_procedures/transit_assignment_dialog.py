@@ -3,58 +3,49 @@ from os.path import join, dirname
 
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.transit import Transit
-from qgis.PyQt import uic
-from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QAbstractItemView
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
 
-from qaequilibrae.modules.common_tools import PandasModel
+from qaequilibrae.modules.common_tools import PandasModel, BaseDialog
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from qaequilibrae.modules.transit_procedures.new_period_dialog import NewPeriodDialog
 from qaequilibrae.modules.transit_procedures.transit_assignment_procedure import TransitAssignProcedure
 
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_skimming_assignment.ui"))
 
-
-class TransitAssignDialog(QDialog, FORM_CLASS):
+class TransitAssignDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_skimming_assignment.ui"),
+            qgis_project=qgis_project,
+            maintains_scenario_block="NewPeriodDialog",
+        )
 
-        try:
-            self.setupUi(self)
-            self.iface = qgis_project.iface
-            self.project = qgis_project.project
-            self.qgis_project = qgis_project
-            self.transit_data = Transit(self.project)
+    def _base_ui_setup(self):
+        self.transit_data = Transit(self.project)
 
-            self.all_modes = {}
-            self.proj_matrices = list_matrices(self.project)
-            self.skim_fields = []
-            self.error = ""
-            self.configs = {}
+        self.all_modes = {}
+        self.proj_matrices = list_matrices(self.project)
+        self.skim_fields = []
+        self.error = ""
+        self.configs = {}
 
-            self.__populate_project_info()
+        self.__populate_project_info()
 
-            self.cob_conn_methods.addItems(["Overlapping regions", "Nearest neighbour"])
-            self.cob_line_methods.addItems(["Direct", "Connector project match"])
-            self.cob_matrices.currentIndexChanged.connect(self.update_matrix_data)
-            self.chb_use_graph.toggled.connect(self.__deactivate_graph_configs)
+        self.cob_conn_methods.addItems(["Overlapping regions", "Nearest neighbour"])
+        self.cob_line_methods.addItems(["Direct", "Connector project match"])
+        self.cob_matrices.currentIndexChanged.connect(self.update_matrix_data)
+        self.chb_use_graph.toggled.connect(self.__deactivate_graph_configs)
 
-            for table in [self.tbl_periods]:
-                table.setSelectionBehavior(QAbstractItemView.SelectRows)
-                table.setSelectionMode(QAbstractItemView.SingleSelection)
+        for table in [self.tbl_periods]:
+            table.setSelectionBehavior(QAbstractItemView.SelectRows)
+            table.setSelectionMode(QAbstractItemView.SingleSelection)
 
-            self.but_add_period.clicked.connect(self.add_period)
-            self.but_adds_to_skim.clicked.connect(self.append_to_list)
-            self.but_removes_from_skim.clicked.connect(self.removes_fields)
+        self.but_add_period.clicked.connect(self.add_period)
+        self.but_adds_to_skim.clicked.connect(self.append_to_list)
+        self.but_removes_from_skim.clicked.connect(self.removes_fields)
 
-            self.but_assign.clicked.connect(partial(self.run, "assign"))
-            self.but_create.clicked.connect(partial(self.run, "create"))
-
-            self.finished.connect(qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.but_assign.clicked.connect(partial(self.run, "assign"))
+        self.but_create.clicked.connect(partial(self.run, "create"))
 
     def __populate_project_info(self):
         self.load_periods_table()

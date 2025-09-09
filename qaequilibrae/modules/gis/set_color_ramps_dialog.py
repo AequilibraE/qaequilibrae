@@ -14,6 +14,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_bandwidth_color
 class LoadColorRampSelector(QDialog, FORM_CLASS):
     def __init__(self, qgis_project, layer):
         QDialog.__init__(self)
+        qgis_project.block_change_scenario()
         self.qgis_project = qgis_project
         self.iface = qgis_project.iface
         self.setupUi(self)
@@ -43,6 +44,8 @@ class LoadColorRampSelector(QDialog, FORM_CLASS):
         self.set_dual_fields()
         self.change_field("AB")
         self.results = None
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def load_ramps(self):
         self.results = {}

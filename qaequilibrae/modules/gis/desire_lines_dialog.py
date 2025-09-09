@@ -3,70 +3,58 @@ from os.path import dirname, join
 
 import pandas as pd
 import qgis
-from qgis.PyQt import uic, QtCore
-from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
+from qgis.PyQt.QtCore import Qt, QSize
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
 from qgis.core import QgsProject
 
-from qaequilibrae.modules.common_tools import ReportDialog
+from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog
 from qaequilibrae.modules.common_tools import standard_path, get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import poly_types, numeric_types, point_types
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from .desire_lines_procedure import DesireLinesProcedure
 
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_DesireLines.ui"))
 
-
-class DesireLinesDialog(QDialog, FORM_CLASS):
+class DesireLinesDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QDialog.__init__(self)
-        qgis_project.block_change_scenario()
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_DesireLines.ui"), qgis_project=qgis_project)
 
-        try:
-            self.iface = qgis_project.iface
-            self.setupUi(self)
-            self.error = None
-            self.validtypes = numeric_types
-            self.tot_skims = 0
-            self.name_skims = 0
-            self.matrix = None
-            self.path = standard_path()
-            self.zones = None
-            self.columns = None
-            self.matrix_hash = {}
-            self.qgis_project = qgis_project
-            if qgis_project.project is None:
-                self.proj_matrices = pd.DataFrame([])
-            else:
-                self.proj_matrices = list_matrices(self.qgis_project.project)
-            self.logger = logging.getLogger("AequilibraEGUI")
+    def _base_ui_setup(self):
+        self.error = None
+        self.validtypes = numeric_types
+        self.tot_skims = 0
+        self.name_skims = 0
+        self.matrix = None
+        self.path = standard_path()
+        self.zones = None
+        self.columns = None
+        self.matrix_hash = {}
+        if self.qgis_project.project is None:
+            self.proj_matrices = pd.DataFrame([])
+        else:
+            self.proj_matrices = list_matrices(self.qgis_project.project)
+        self.logger = logging.getLogger("AequilibraEGUI")
 
-            self.resize(389, 385)
+        self.resize(389, 385)
 
-            self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
-            self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
+        self.zoning_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
+        self.chb_use_all_matrices.toggled.connect(self.set_show_matrices)
 
-            # Create desire lines
-            self.create_dl.clicked.connect(self.run)
+        # Create desire lines
+        self.create_dl.clicked.connect(self.run)
 
-            # cancel button
-            self.cancel.clicked.connect(self.exit_procedure)
+        # cancel button
+        self.cancel.clicked.connect(self.exit_procedure)
 
-            # THIRD, we load layers in the canvas to the combo-boxes
-            for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
-                if "wkbType" in dir(layer):
-                    if layer.wkbType() in poly_types or layer.wkbType() in point_types:
-                        self.zoning_layer.addItem(layer.name())
-                        self.progress_label.setVisible(False)
-                        self.progressbar.setVisible(False)
+        # THIRD, we load layers in the canvas to the combo-boxes
+        for layer in qgis.utils.iface.mapCanvas().layers():  # We iterate through all layers
+            if "wkbType" in dir(layer):
+                if layer.wkbType() in poly_types or layer.wkbType() in point_types:
+                    self.zoning_layer.addItem(layer.name())
+                    self.progress_label.setVisible(False)
+                    self.progressbar.setVisible(False)
 
-            self.list_matrices()
-            self.set_show_matrices()
-
-            self.finished.connect(self.qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.list_matrices()
+        self.set_show_matrices()
 
     def list_matrices(self):
         for idx, rec in self.proj_matrices.iterrows():
@@ -196,7 +184,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             # Sets the visual of the tool
             self.progress_label.setVisible(True)
             self.progressbar.setVisible(True)
-            self.setMaximumSize(QtCore.QSize(383, 444))
+            self.setMaximumSize(QSize(383, 444))
             self.resize(383, 444)
 
             dl_type = "DesireLines"

@@ -1,59 +1,53 @@
 from os.path import dirname, join
 
 import pandas as pd
-from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTabWidget
 from qgis.core import QgsProject, QgsVectorLayerJoinInfo
 
-from qaequilibrae.modules.common_tools import PandasModel, layer_from_dataframe
+from qaequilibrae.modules.common_tools import BaseDialog, PandasModel, layer_from_dataframe
 from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
 from qaequilibrae.modules.matrix_procedures.results_lister import list_results
 
-FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_project_data.ui"))
 
-
-class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
+class LoadProjectDataDialog(BaseDialog):
     def __init__(self, qgis_project, from_project: bool = True):
-        QtWidgets.QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.setupUi(self)
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_project_data.ui"),
+            qgis_project=qgis_project,
+            maintains_scenario_block="DisplayAequilibraEFormatsDialog",
+            from_project=from_project,
+        )
+
+    def _base_ui_setup(self, **kwargs):
         self.data_to_show = None
         self.error = None
-        self.qgis_project = qgis_project
-        self.from_proj = from_project
-        self.project = qgis_project.project if self.from_proj else None
+        self.from_proj = kwargs.get("from_project")
+        self.project = self.qgis_project.project if self.from_proj else None
 
-        try:
-            if self.from_proj:
-                self.qgis_project.block_change_scenario()
-                self.matrices: pd.DataFrame = None
-                self.matrices_model: PandasModel = None
+        if self.from_proj:
+            self.matrices: pd.DataFrame = None
+            self.matrices_model: PandasModel = None
 
-                self.results: pd.DataFrame = None
-                self.results_model: PandasModel = None
+            self.results: pd.DataFrame = None
+            self.results_model: PandasModel = None
 
-                for table in [self.list_matrices, self.list_results]:
-                    table.setSelectionBehavior(QAbstractItemView.SelectRows)
-                    table.setSelectionMode(QAbstractItemView.SingleSelection)
+            for table in [self.list_matrices, self.list_results]:
+                table.setSelectionBehavior(QAbstractItemView.SelectRows)
+                table.setSelectionMode(QAbstractItemView.SingleSelection)
 
-                self.load_matrices()
-                self.load_results()
+            self.load_matrices()
+            self.load_results()
 
-                self.but_update_matrices.clicked.connect(self.update_matrix_table)
-                self.but_load_Results.clicked.connect(self.load_result_table)
-                self.but_load_matrix.clicked.connect(self.display_matrix)
-            else:
-                QTabWidget.removeTab(self.tabs, 1)
-                QTabWidget.removeTab(self.tabs, 0)
+            self.but_update_matrices.clicked.connect(self.update_matrix_table)
+            self.but_load_Results.clicked.connect(self.load_result_table)
+            self.but_load_matrix.clicked.connect(self.display_matrix)
+        else:
+            QTabWidget.removeTab(self.tabs, 1)
+            QTabWidget.removeTab(self.tabs, 0)
 
-            self.but_load_data.clicked.connect(self.display_external_data)
-
-            self.finished.connect(self.qgis_project.allow_change_scenario)
-        except Exception as e:
-            qgis_project.allow_change_scenario()
-            raise e
+        self.but_load_data.clicked.connect(self.display_external_data)
 
     def display_matrix(self):
         idx = [x.row() for x in list(self.list_matrices.selectionModel().selectedRows())]

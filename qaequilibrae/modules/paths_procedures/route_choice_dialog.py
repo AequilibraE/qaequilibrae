@@ -24,6 +24,7 @@ class RouteChoiceDialog(BaseDialog):
         super().__init__(ui_file=join(dirname(__file__), "forms/ui_route_choice.ui"), qgis_project=qgis_project)
 
     def _base_ui_setup(self):
+        self.matrices = self.project.matrices
         self.error = None
         self.matrix = None
         self.cost_function = ""

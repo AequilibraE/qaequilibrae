@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Optional
 
 from qgis.PyQt import QtWidgets, uic
@@ -5,10 +6,8 @@ from qgis.PyQt import QtWidgets, uic
 
 class BaseDialog(QtWidgets.QDialog):
     """
-    Classe base genérica para todos os QDialogs do qaequilibrae.
-
-    Esta classe encapsula a lógica comum de carregamento de UI e inicialização
-    básica que é compartilhada entre todos os dialogs do projeto.
+    Generic class for QAequilibraE 'main' dialogs
+    (i.e. dialogs called directly from one action in 'menu_actions').
     """
 
     def __init__(
@@ -16,60 +15,58 @@ class BaseDialog(QtWidgets.QDialog):
         ui_file: str,
         qgis_project=None,
         parent: Optional[QtWidgets.QWidget] = None,
-        title: Optional[str] = None,
+        maintains_scenario_block: Optional[str] = None,
         **kwargs,
     ):
         """
-        Inicializa o dialog base.
+        Initializes class.
 
         Args:
-            ui_file (str): Caminho para o arquivo .ui (relativo ao diretório forms/)
-            qgis_project: Projeto QGIS (opcional, para compatibilidade)
-            parent (QWidget): Widget pai (opcional)
-            title (str): Título da janela (opcional)
-            **kwargs: Argumentos adicionais para customização
+            ui_file (str): Path to .ui file
+            qgis_project: QGIS project
+            parent (QWidget): parent widget (if exists)
+            maintains_scenario_block (str): Class name to mantain the scenario blockage
+            **kwargs: Additional arguments
         """
         try:
             super().__init__(parent)
             qgis_project.block_change_scenario()
 
-            # Armazena referências básicas
             self.qgis_project = qgis_project
             self.iface = qgis_project.iface
             self.project = qgis_project.project
 
-            # Carrega a UI
-            self.__load_ui(ui_file)
+            # Load UI
+            uic.loadUi(ui_file, self)
 
-            # Define título se fornecido
-            if title:
-                self.setWindowTitle(title)
-
-            # Inicialização customizada
+            # Custom init
             self._base_ui_setup(**kwargs)
 
-            # Conecta sinais padrão
-            self.finished.connect(qgis_project.allow_change_scenario)
+            # Connects finished signal for scenario blockage handling
+            self.finished.connect(partial(self._handle_dialog_close, maintains_scenario_block))
+
         except Exception as e:
             qgis_project.allow_change_scenario()
             raise e
 
-    def __load_ui(self, ui_file: str):
-        """
-        Carrega o arquivo UI especificado.
+    def _handle_dialog_close(self, maintains_scenario_block):
+        open_dialogs = [
+            type(w).__name__
+            for w in QtWidgets.QApplication.allWidgets()
+            if isinstance(w, QtWidgets.QDialog) and w.isVisible()
+        ]
 
-        Args:
-            ui_file (str): Caminho para o arquivo .ui
-        """
-
-        uic.loadUi(ui_file, self)
+        if maintains_scenario_block not in open_dialogs:
+            self.qgis_project.allow_change_scenario()
+        else:
+            self.qgis_project.block_change_scenario()
 
     def _base_ui_setup(self, **kwargs):
         """
-        Configuração inicial da UI.
-        Deve ser sobrescrita pelas classes filhas para customizações específicas.
+        UI initial configuration.
+        It should be overridden by child classes for specific customizations.
 
         Args:
-            **kwargs: Argumentos adicionais passados no construtor
+            **kwargs: Additional arguments
         """
         pass

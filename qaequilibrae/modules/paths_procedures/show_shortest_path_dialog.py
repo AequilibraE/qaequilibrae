@@ -17,7 +17,11 @@ class ShortestPathDialog(BaseDialog):
     clickTool = PointTool(iface.mapCanvas())
 
     def __init__(self, qgis_project):
-        super().__init__(ui_file=join(dirname(__file__), "forms/ui_compute_path.ui"), qgis_project=qgis_project)
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_compute_path.ui"),
+            qgis_project=qgis_project,
+            maintains_scenario_block="LoadGraphLayerSettingDialog",
+        )
 
     def _base_ui_setup(self):
         self.field_types = {}
