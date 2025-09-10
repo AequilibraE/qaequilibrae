@@ -6,8 +6,23 @@ from qgis.PyQt import QtWidgets, uic
 
 class BaseDialog(QtWidgets.QDialog):
     """
-    Generic class for QAequilibraE 'main' dialogs
+    Generic class for QAequilibraE parent/main dialogs
     (i.e. dialogs called directly from one action in 'menu_actions').
+
+    This class holds the main logic for blocking/allowing scenario changes. The UI setup
+    is done with the ``_base_ui_setup`` function, that is always overriden in the class
+    configuration. ``BaseDialog`` should only be used for configuring parent dialogs,
+    as child dialogs should have an independant blocking/allowing scenario configuration.
+
+    As an example, consider the files 'paths_procedures/show_shortest_path_dialog.py' and
+    'common_tools/load_graph_layer_settings_dialog.py'. ``ShortestPathDialog`` is the parent
+    dialog, whose initialization indicated the location of its UI file, the qgis_project
+    (aka AequilibraEMenu object), and that we want to block scenario changes if the
+    ``LoadGraphLayerSettingDialog`` is opened. The other part of the UI setup is declared at
+    ``_base_ui_setup``, a function that will override the one in ``BaseDialog``. Notice that
+    ``LoadGraphLayerSettingDialog`` is called within the function
+    ``ShortestPathDialog.prepare_graph_and_network``, and as the child dialog, it has an
+    independant scenario changing configuration.
     """
 
     def __init__(
@@ -25,7 +40,7 @@ class BaseDialog(QtWidgets.QDialog):
             ui_file (str): Path to .ui file
             qgis_project: QGIS project
             parent (QWidget): parent widget (if exists)
-            maintains_scenario_block (str): Class name to mantain the scenario blockage
+            maintains_scenario_block (str): Class name to mantain the scenario blockage.
             **kwargs: Additional arguments
         """
         try:
@@ -43,13 +58,19 @@ class BaseDialog(QtWidgets.QDialog):
             self._base_ui_setup(**kwargs)
 
             # Connects finished signal for scenario blockage handling
-            self.finished.connect(partial(self._handle_dialog_close, maintains_scenario_block))
+            self.finished.connect(partial(self.__handle_dialog_close, maintains_scenario_block))
 
         except Exception as e:
             qgis_project.allow_change_scenario()
             raise e
 
-    def _handle_dialog_close(self, maintains_scenario_block):
+    def __handle_dialog_close(self, maintains_scenario_block):
+        """
+        Handles 'child' dialog closure on QAeuilibraE. When closing a parent/main dialog in
+        QAequilibraE, it checks if it opened another dialog whose information are used in
+        the parent dialog. If true, it forbids changing scenario, otherwise it allows scenario
+        changes.
+        """
         open_dialogs = [
             type(w).__name__
             for w in QtWidgets.QApplication.allWidgets()

@@ -1,7 +1,6 @@
 import os
 
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.Qsci import QsciLexerYAML
 from qgis.PyQt.QtGui import QFont
 
