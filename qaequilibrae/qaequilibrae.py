@@ -490,6 +490,10 @@ class AequilibraEMenu:
         """Standardizes QAequilibraE info messages display"""
         self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Info, -1)
 
+    def iface_warning_message(self, text: str = None, title: str = "Warning"):
+        """Standardizes QAequilibraE warning messages display"""
+        self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Warning, -1)
+
     def allow_change_scenario(self):
         """
         Enables scenario changes after deactivation.

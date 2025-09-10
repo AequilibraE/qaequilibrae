@@ -27,6 +27,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         QtWidgets.QDialog.__init__(self)
         self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
         qgis_project.block_change_scenario()
+        self.finished.connect(qgis_project.allow_change_scenario)
 
         try:
             self.iface = qgis_project.iface
@@ -62,7 +63,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
             self.remove_data_layer()
 
-            self.finished.connect(self.qgis_project.allow_change_scenario)
         except Exception as e:
             qgis_project.allow_change_scenario()
             raise e
@@ -71,9 +71,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setWindowTitle(self.tr("File path: {}").format(self.data_path))
 
         if self.data_type == "AEM":
-            self.qgis_project.message_log(
-                "Support for AEM will be removed in a future version", Qgis.MessageLevel.Warning, True
-            )
+            msg = "Support for AEM will be removed in a future version"
+            self.qgis_project.message_log(msg, Qgis.MessageLevel.Warning, True)
+            self.qgis_project.iface_warning_message(msg)
             self.data_to_show = AequilibraeMatrix()
             if not self.from_proj:
                 self.qgis_project.matrices[self.data_path] = self.data_to_show
@@ -185,8 +185,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_export.clicked.connect(self.export)
 
         self.but_close = QPushButton()
-        self.but_close.clicked.connect(self.exit_procedure)
         self.but_close.setText(self.tr("Close"))
+        self.but_close.clicked.connect(self.exit_procedure)
 
         self.but_layout = QHBoxLayout()
         self.but_layout.addWidget(self.but_export)
@@ -476,7 +476,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.data_to_show.matrix[field] = self.data_to_show.matrix_view[:, :]
 
     def get_file_name(self):
-        formats = ["Aequilibrae matrix (*.aem)", "OpenMatrix (*.omx)"]
+        formats = ["AequilibraE Matrix (*.aem)", "OpenMatrix (*.omx)"]
         dflt = ".omx"
 
         data_path, data_type = GetOutputFileName(
