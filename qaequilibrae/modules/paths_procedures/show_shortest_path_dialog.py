@@ -20,7 +20,6 @@ class ShortestPathDialog(BaseDialog):
         super().__init__(
             ui_file=join(dirname(__file__), "forms/ui_compute_path.ui"),
             qgis_project=qgis_project,
-            maintains_scenario_block="LoadGraphLayerSettingDialog",
         )
 
     def _base_ui_setup(self):

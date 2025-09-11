@@ -17,7 +17,6 @@ class TransitAssignDialog(BaseDialog):
         super().__init__(
             ui_file=join(dirname(__file__), "forms/ui_skimming_assignment.ui"),
             qgis_project=qgis_project,
-            maintains_scenario_block="NewPeriodDialog",
         )
 
     def _base_ui_setup(self):

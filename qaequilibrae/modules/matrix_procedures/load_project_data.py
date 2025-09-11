@@ -16,7 +16,6 @@ class LoadProjectDataDialog(BaseDialog):
         super().__init__(
             ui_file=join(dirname(__file__), "forms/ui_project_data.ui"),
             qgis_project=qgis_project,
-            maintains_scenario_block="DisplayAequilibraEFormatsDialog",
             from_project=from_project,
         )
 

@@ -76,6 +76,7 @@ class AequilibraEMenu:
         self.dock = QDockWidget("AequilibraE")
         self.manager = QWidget()
         self.provider = None
+        self.dialog_depth: int = 0
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -503,7 +504,10 @@ class AequilibraEMenu:
 
         See: https://doc.qt.io/qt-6/qdialog.html#finished
         """
-        self.cob_scenarios.setEnabled(True)
+        self.dialog_depth -= 1
+        if self.dialog_depth <= 0:
+            self.cob_scenarios.setEnabled(True)
+            self.dialog_depth = 0
 
     def block_change_scenario(self):
         """
@@ -512,3 +516,4 @@ class AequilibraEMenu:
         This function is used when initializating classes with dialogs.
         """
         self.cob_scenarios.setEnabled(False)
+        self.dialog_depth += 1

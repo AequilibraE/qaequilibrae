@@ -13,7 +13,6 @@ class GTFSImporter(BaseDialog):
         super().__init__(
             ui_file=join(dirname(__file__), "forms/gtfs_importer.ui"),
             qgis_project=qgis_project,
-            maintains_scenario_block="GTFSFeed",
         )
 
     def _base_ui_setup(self):

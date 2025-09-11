@@ -39,7 +39,6 @@ class CreateBandwidthsDialog(BaseDialog):
         super().__init__(
             ui_file=join(dirname(__file__), "forms/ui_bandwidths.ui"),
             qgis_project=qgis_project,
-            maintains_scenario_block="LoadColorRampSelector",
         )
 
     def _base_ui_setup(self):
