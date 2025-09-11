@@ -13,7 +13,7 @@ from .utilities import load_test_layer
 pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
 
 
-def test_dialog(ae, folder_path, timeoutDetector):
+def test_dialog(ae, folder_path):
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")
 
@@ -76,7 +76,7 @@ def test_dialog(ae, folder_path, timeoutDetector):
         assert mode in modes.all_modes().keys()
 
 
-def test_procedure(ae, folder_path, timeoutDetector):
+def test_procedure(ae, folder_path):
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")
 

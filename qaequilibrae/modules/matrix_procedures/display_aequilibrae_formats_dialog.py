@@ -73,7 +73,6 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.data_type == "AEM":
             msg = "Support for AEM will be removed in a future version"
             self.qgis_project.message_log(msg, Qgis.MessageLevel.Warning, True)
-            self.qgis_project.iface_warning_message(msg)
             self.data_to_show = AequilibraeMatrix()
             if not self.from_proj:
                 self.qgis_project.matrices[self.data_path] = self.data_to_show

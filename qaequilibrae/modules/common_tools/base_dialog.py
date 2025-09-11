@@ -1,4 +1,3 @@
-from functools import partial
 from typing import Optional
 
 from qgis.PyQt import QtWidgets, uic
@@ -13,16 +12,6 @@ class BaseDialog(QtWidgets.QDialog):
     is done with the ``_base_ui_setup`` function, that is always overriden in the class
     configuration. ``BaseDialog`` should only be used for configuring parent dialogs,
     as child dialogs should have an independant blocking/allowing scenario configuration.
-
-    As an example, consider the files 'paths_procedures/show_shortest_path_dialog.py' and
-    'common_tools/load_graph_layer_settings_dialog.py'. ``ShortestPathDialog`` is the parent
-    dialog, whose initialization indicated the location of its UI file, the qgis_project
-    (aka AequilibraEMenu object), and that we want to block scenario changes if the
-    ``LoadGraphLayerSettingDialog`` is opened. The other part of the UI setup is declared at
-    ``_base_ui_setup``, a function that will override the one in ``BaseDialog``. Notice that
-    ``LoadGraphLayerSettingDialog`` is called within the function
-    ``ShortestPathDialog.prepare_graph_and_network``, and as the child dialog, it has an
-    independant scenario changing configuration.
     """
 
     def __init__(
