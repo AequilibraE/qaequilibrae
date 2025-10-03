@@ -73,8 +73,9 @@ def test_nodes_error(pt_no_feed):
 
     dialog.run()
 
+    msg = "Error:You need at least three nodes to route."
     messagebar = pt_no_feed.iface.messageBar()
-    assert messagebar.messages[3][-1] == ":You need at least three nodes to route. ", "Level 3 error message is missing"
+    assert messagebar.messages[2][-1] == msg, "Level 2 error message is missing"
 
     nodes.removeSelection()
     pt_no_feed.run_close_project()
@@ -90,10 +91,9 @@ def test_centroid_error(pt_no_feed):
 
     dialog.run()
 
+    msg = "Error:You need at least three centroids to route."
     messagebar = pt_no_feed.iface.messageBar()
-    assert (
-        messagebar.messages[3][-1] == ":You need at least three centroids to route. "
-    ), "Level 3 error message is missing"
+    assert messagebar.messages[2][-1] == msg, "Level 2 error message is missing"
 
     pt_no_feed.run_close_project()
 
