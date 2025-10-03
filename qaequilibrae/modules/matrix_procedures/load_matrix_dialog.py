@@ -31,6 +31,7 @@ logger = get_logger()
 class LoadMatrixDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, **kwargs):
         QDialog.__init__(self)
+        self.qgis_project = None
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
@@ -174,7 +175,7 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
             self.run_thread()
 
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+            self.qgis_project.iface_error_message(self.error)
 
     def update_matrix_list(self):
         if self.matrix_count > 0:

@@ -165,9 +165,7 @@ class LoadDatasetDialog(BaseDialog):
             self.but_save_and_use.setEnabled(True)
             self.chb_all_fields.setEnabled(True)
             if self.worker_thread.error is not None:
-                qgis.utils.iface.messageBar().pushMessage(
-                    self.tr("Error while loading vector:"), self.worker_thread.error, level=1
-                )
+                self.qgis_project.iface_error_message(self.worker_thread.error, self.tr("Error while loading vector:"))
             else:
                 self.dataset = self.worker_thread.output
             self.exit_procedure()
@@ -213,11 +211,9 @@ class LoadDatasetDialog(BaseDialog):
                 self.size_it_accordingly(True)
                 self.run_thread()
             else:
-                qgis.utils.iface.messageBar().pushMessage(
-                    "Error:", self.tr("One cannot load a dataset with indices only"), level=1, duration=10
-                )
+                self.qgis_project.iface_error_message(self.tr("One cannot load a dataset with indices only"))
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1, duration=10)
+            self.qgis_project.iface_error_message(self.error)
 
     def set_output_name(self):
         if self.single_use:

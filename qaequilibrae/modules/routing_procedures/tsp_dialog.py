@@ -72,17 +72,13 @@ class TSPDialog(BaseDialog):
                 for i in centroids:
                     self.cob_start.addItem(str(i))
             if len(centroids) < 3:
-                qgis.utils.iface.messageBar().pushMessage(
-                    "", self.tr("You need at least three nodes to route. "), level=3, duration=10
-                )
+                self.qgis_project.iface_error_message(self.tr("You need at least three nodes to route."))
                 return
             centroids = np.array(centroids).astype(np.int64)
             self.graph.prepare_graph(centroids=centroids)
         else:
             if self.project.network.count_centroids() < 3:
-                qgis.utils.iface.messageBar().pushMessage(
-                    "", self.tr("You need at least three centroids to route. "), level=3, duration=10
-                )
+                self.qgis_project.iface_error_message(self.tr("You need at least three centroids to route."))
                 return
 
         self.graph.set_graph(self.cob_minimize.currentText())  # let's say we want to minimize time

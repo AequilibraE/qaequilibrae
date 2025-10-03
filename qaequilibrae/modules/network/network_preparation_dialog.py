@@ -16,9 +16,9 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_network_prepara
 
 
 class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.qgis_project = qgis_project
         self.setupUi(self)
 
         self.filename = False
@@ -89,14 +89,14 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def job_finished_from_thread(self):
         if self.worker_thread.error is not None:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Node layer error: "), self.worker_thread.error, level=3)
+            self.qgis_project.iface_error_message(self.worker_thread.error, self.tr("Node layer error:"))
         else:
             QgsProject.instance().addMapLayer(self.worker_thread.new_line_layer)
             if self.worker_thread.new_node_layer:
                 QgsProject.instance().addMapLayer(self.worker_thread.new_node_layer)
         self.exit_procedure()
         if self.worker_thread.report:
-            dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+            dlg2 = ReportDialog(self.qgis_project.iface, self.worker_thread.report)
             dlg2.show()
             dlg2.exec_()
 

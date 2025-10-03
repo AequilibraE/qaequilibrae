@@ -273,7 +273,7 @@ def test_cost_function(coquimbo_project, qtbot, par):
     qtbot.mouseClick(dialog.but_add_to_cost, Qt.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == "Input error:Check parameter value input"
+    assert messagebar.messages[2][0] == "Input error:Check parameter value input"
 
 
 # Cost function clean-up
@@ -324,7 +324,7 @@ def test_query_name(coquimbo_project, par, error):
     dialog.save_query()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -348,7 +348,7 @@ def test_max_routes(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -372,7 +372,7 @@ def test_max_depth(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -395,7 +395,7 @@ def test_cutoff(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -420,7 +420,7 @@ def test_penalty(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -444,4 +444,4 @@ def test_psl_beta(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"

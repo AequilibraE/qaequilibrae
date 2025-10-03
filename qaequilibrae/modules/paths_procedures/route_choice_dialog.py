@@ -140,7 +140,7 @@ class RouteChoiceDialog(BaseDialog):
             self.error = "Check parameter value input"
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
         parameter = float(params)
@@ -262,7 +262,7 @@ class RouteChoiceDialog(BaseDialog):
             self.error = self.tr("Please set a link selection")
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
         self.select_links[query_name] = [self.__current_links]
@@ -319,7 +319,7 @@ class RouteChoiceDialog(BaseDialog):
 
         # We return in case of error because in the we'll modify the text input to numbers
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
         # Check parameter values
@@ -371,7 +371,7 @@ class RouteChoiceDialog(BaseDialog):
                 self.error = "Check matrices inputs"
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
         # Populate with our model parameters
@@ -458,9 +458,7 @@ class RouteChoiceDialog(BaseDialog):
 
             if self.job == "build" or self.parameters["save_choice_sets"]:
                 message = f"Route choice sets saved to {self.project.project_base_path}"
-
-            if message:
-                qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
+                self.qgis_project.iface_success_message(message)
 
             if self.job == "execute_single":
                 res = self.worker_thread.rc.get_results()

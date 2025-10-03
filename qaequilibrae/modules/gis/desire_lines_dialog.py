@@ -201,12 +201,8 @@ class DesireLinesDialog(BaseDialog):
             )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage(
-                self.tr("Inputs not loaded properly"),
-                self.tr("You need the layer and at least one matrix_procedures core"),
-                level=1,
-                duration=10,
-            )
+            error = self.tr("You need the layer and at least one matrix_procedures core")
+            self.qgis_project.iface_error_message(error, self.tr("Inputs not loaded properly"))
 
     def throws_error(self, error_message):
         error_message = ["*** ERROR ***", error_message]

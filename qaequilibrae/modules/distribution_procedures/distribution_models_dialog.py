@@ -200,9 +200,7 @@ class DistributionModelsDialog(BaseDialog):
                 self.cob_index.clear()
                 self.cob_index.setEnabled(False)
         else:
-            qgis.utils.iface.messageBar().pushMessage(
-                "Warning: ", self.tr("You need to load a dataset to proceed"), level=1, duration=10
-            )
+            self.qgis_project.iface_warning_message(self.tr("You need to load a dataset to proceed"))
 
     def load_model(self):
         file_name = self.browse_outfile("mod")
@@ -210,9 +208,7 @@ class DistributionModelsDialog(BaseDialog):
             self.model.load(file_name)
             self.update_model_parameters()
         except Exception as e:
-            qgis.utils.iface.messageBar().pushMessage(
-                "Error: ", self.tr("Could not load model. {}").format(e.args), level=2, duration=10
-            )
+            self.qgis_project.iface_error_message(self.tr("Could not load model. {}").format(e.args))
 
     def change_vector_field(self, cob_orig, cob_dest, dt):
         cob_dest.clear()
@@ -348,7 +344,7 @@ class DistributionModelsDialog(BaseDialog):
                 return
             self.add_job_to_list(worker_thread, self.out_name)
         else:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), self.error, level=3, duration=10)
+            self.qgis_project.iface_error_message(self.error, self.tr("Procedure error: "))
 
     def add_job_to_list(self, job, out_name):
         self.job_queue[out_name] = job
@@ -404,7 +400,7 @@ class DistributionModelsDialog(BaseDialog):
     def signal_handler(self, val):
         error = self.worker_thread.error
         if error is not None:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Procedure error: "), error.args[0], level=2, duration=10)
+            self.qgis_project.iface_error_message(error.args[0], self.tr("Procedure error:"))
 
         self.report = []
         self.report.extend(self.worker_thread.report)
