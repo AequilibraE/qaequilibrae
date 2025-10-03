@@ -64,26 +64,28 @@ reload another plugins.
 Developing QAequilibraE and AequilibraE simultaneously
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Este caso é bem específico para features que são desenvolvidas simultâneamente no pacote Python
-e na interface do QGIS. Aqui, precisamos criar um link simbólico que reflita as mudanças no
-AequilibraE dentro do QGIS. O passo-a-passo a seguir é realizado em um sistema operacional
-Windows (caso utilize outro sistema operacional a contribuição para esta documentação é bem-vinda).
+This is a very specific case for features that are being developed simultaneously in the Python
+package and in the QGIS interface. Here, we need to create a symbolic link that reflects the
+changes in AequilibraE within QGIS. The following step-by-step instructions are for a Windows
+operating system (if you are using a different operating system, contributions to this
+documentation are welcome).
 
-Primeiramente, vamos criar um ambiente virtual para o AequilibraE. 
+First, let's create a virtual environment for AequilibraE.
 
 .. code-block::
 
-    python3 -m venv .venv
+    python -m venv .venv
     . .venv/bin/activate
+    pip install -U pip uv
 
     # Check the branch you are going to install
     git status
     git pull
 
-    # Install AequilibraE in QAequilibraE
-    pip install . -t /mnt/c/Users/renat/Documents/GitHub/qaequilibrae/qaequilibrae/packages
+    # Install AequilibraE in an editable version
+    uv pip install -e .
 
-Abra o PowerShell como administrador.
+Open PowerShell as administrator.
 
 .. code-block::
 
@@ -93,39 +95,47 @@ Abra o PowerShell como administrador.
     # Create the symbolic link
     New-Item -Path ./qaequilibrae -ItemType SymbolicLink -Value C:\Users\renat\Documents\GitHub\qaequilibrae\qaequilibrae
 
-Depois disso, prossiga com a instalação do QAequilibraE em QGIS normalmente.
+Proceed with the QAequilibraE installation in QGIS normally. Then, navigate to the folder
+where your plugin was installed and delete the AequilibraE folders. Return to the AequilibraE
+virtual environment.
 
-Esta abordagem de instalação do AequilibraE no QAequilibraE apresenta uma grande desvantagem:
-sempre que houver mudança no AequilibraE, é necessário reinstalá-lo, porém é a configuração
-mais simples para este caso.
+.. code-block::
+
+    # Install AequilibraE in QAequilibraE
+    uv pip install . --target C:\Users\renat\Documents\GitHub\qaequilibrae\qaequilibrae\packages --no-deps
+
+This approach for installing AequilibraE in QAequilibraE has a major disadvantage: whenever
+there is a change in AequilibraE, it is necessary to reinstall it, however this is the
+simplest configuration for this case.
 
 Developing QAequilibraE with AequilibraE's develop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-São dois cenários diferentes 1) você vai desenvolver atualizações no QAequilibraE com base na
-develop do AequilibraE ou 2) você vai testar no QGIS (software) se o que você fez na área de
-desenvolvimento de fato funciona.
+There are two different scenarios: 1) you will develop updates in QAequilibraE based on
+AequilibraE's develop branch, or 2) you will test in QGIS (software) whether what you did in
+the development environment actually works.
 
-O primeiro caso é muito simples: instalamos a branch develop na pasta ``qaequilibrae/packages``
-e limpamos a instalação de pacotes redundantes no QGIS. "Nossa Renata, mas não é mais fácil só
-instalar o AequilibraE direto no ambiente virtual e correr pro abraço"? Sim, mas dessa forma,
-não estaríamos desenvolvendo e testando o plugin da forma como ele é utilizado.
+The first case is very simple: we install the develop branch in the qaequilibrae/packages
+folder and clean up the installation of redundant packages in QGIS. "But wouldn't it be 
+easier to just install AequilibraE directly in the virtual environment and call it a day?" 
+Yes, but this way, we wouldn't be developing and testing the plugin in the way it is actually
+used.
 
 .. code-block::
 
     python -m uv pip install "git+https://github.com/AequilibraE/aequilibrae@develop" --target qaequilibrae/packages
     python -c "from qaequilibrae.download_extra_packages_class import DownloadAll; DownloadAll().clean_packages('qaequilibrae/packages')" 
 
-Para o segundo caso, estou presumindo que você vai testar a instalação a partir do ZIP do
-QAequilibraE. Se não me engano, essas operações de instalar a partir do git não são permitidas
-no QGIS, logo uma alternativa é instalar o binário do AequilibraE, disponível como um artefato
-na página de `execução dos testes de construção do pacote <https://github.com/AequilibraE/aequilibrae/actions/workflows/build_wheels.yml>`_.
-Procure o que corresponde a develop e se encaixa no seu sistema operacional.
+For the second case, I'm assuming you will test the installation from the QAequilibraE ZIP file.
+If I'm not mistaken, these git installation operations are not permitted in QGIS, so an
+alternative is to install the AequilibraE binary, available as an artifact of the 
+`Build workflow <https://github.com/AequilibraE/aequilibrae/actions/workflows/build_wheels.yml>`_.
+Look for the one that corresponds to develop and matches your operating system.
 
-E como vamos instalar isso no QGIS? A alternativa é instalar o QAequilibraE a partir de um arquivo
-ZIP e, no primeiro momento, cancelar a instalação dos pacotes adicionais. Uma mensagem de erro
-reportando que o QAequilibraE não funcionará é mostrada, mas podemos ignorá-la por hora. Aproveite
-e feche o QGIS também. As próximas operações são feitas no terminal do OS4GEO.
+And how do we install this in QGIS? The alternative is to install QAequilibraE from a ZIP file and,
+initially, cancel the installation of additional packages. An error message reporting that
+QAequilibraE will not work is displayed, but we can ignore it for now. Go ahead and close QGIS as
+well. The next operations are performed in the OS4GEO shell.
 
 .. code-block::
     
@@ -138,11 +148,10 @@ e feche o QGIS também. As próximas operações são feitas no terminal do OS4G
     # And install it at the 'packages' folder inside QAequilibraE, just like we did before.
     python -m pip install aequilibrae-1.5.0-cp312-cp312-win_amd64.whl --target "C:\Users\renat\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages"
 
-Reabra o QGIS. O QAequilibraE te perguntará novamente se deseja a instalação dos pacotes
-adicionais. Desta vez responda que sim e deixe o QAequilibraE remover a instalação de pacotes
-duplicados automaticamente. Se sua instalação correr sem erros, o plugin estará disponível
-para uso contendo a versão da develop do AequilibraE, caso contrário, verifique a mensagem
-de erro na tela.
+Reopen QGIS. QAequilibraE will ask you again if you want to install the additional packages.
+This time answer yes and let QAequilibraE automatically remove the installation of duplicate
+packages. If your installation runs without errors, the plugin will be available for use
+containing the develop version of AequilibraE; otherwise, check the error message on the screen.
 
 Development Guidelines
 ----------------------
@@ -312,11 +321,16 @@ All the QAequilibraE documentation is (unfortunately) written in `reStructuredTe
 Although reStructuredText is often unnecessarily convoluted to write, Sphinx is capable of converting it to 
 standard-looking HTML pages, while also bringing the docstring documentation along for the ride.
 
-To build the documentation, first make sure the required packages are installed::
+Build the documentation in HTML format with the following commands run from the ``root`` folder.
+The Dockerfile has already installed the documentation packages in your virtual environment.
 
-    pip install sphinx pydata-sphinx-theme sphinx-design sphinx-panels sphinx-subfigure
+.. code-block::
 
-Next, build the documentation in HTML format with the following commands run from the ``root`` folder::
+    . .venv/bin/activate
+    
+    # Replace the variables if needed
+    export LANG=C.UTF-8
+    export LC_ALL=C.UTF-8
 
     cd docs
     make html
