@@ -2385,7 +2385,7 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="109"/>
         <source>Do you want us to install these missing Python packages?</source>
-        <translation type="unfinished"/>
+        <translation>Você gostaria de instalar os pacotes faltantes?</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="110"/>
