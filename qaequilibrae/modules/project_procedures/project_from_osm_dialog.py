@@ -1,6 +1,7 @@
 import logging
 from os.path import isdir, join, dirname
 
+from aequilibrae.context import get_logger
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.place_getter import placegetter
 from qgis.PyQt import uic
@@ -30,8 +31,7 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.running = False
         self.bbox = None
         self.json = []
-        self.logger = logging.getLogger("aequilibrae")
-
+        self.logger = logging.getLogger("qaequilibrae") or get_logger()
         self._run_layout = QGridLayout()
 
         # Area to import network for

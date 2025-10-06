@@ -1,9 +1,11 @@
+import logging
 import sys
 from functools import partial
 from os.path import dirname, isdir, join
 
 import qgis
 from PyQt5.QtCore import Qt
+from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
 from aequilibrae.project.network.network import Network
 from qgis.PyQt import QtWidgets, uic
@@ -22,6 +24,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_transponet_cons
 class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
+        self.logger = logging.getLogger("qaequilibrae") or get_logger()
         self.iface = qgis_project.iface
         self.qgis_project = qgis_project
         self.setupUi(self)

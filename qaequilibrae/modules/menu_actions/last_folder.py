@@ -2,6 +2,8 @@ import logging
 import os
 from tempfile import gettempdir
 
+from aequilibrae.context import get_logger
+
 
 def last_folder():
     """Reads the last-used folder path and its return value.
@@ -15,6 +17,6 @@ def last_folder():
         with open(pth, "r") as file:
             return file.readline()
     except Exception as e:
-        logger = logging.getLogger("qaequilibrae")
+        logger = logging.getLogger("qaequilibrae") or get_logger()
         logger.debug(f"Could not find previously used folder: {e.args}")
         return gettempdir()

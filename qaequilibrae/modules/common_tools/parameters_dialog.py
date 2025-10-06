@@ -2,6 +2,7 @@ import logging
 from os.path import dirname, join
 
 import yaml
+from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML
@@ -32,7 +33,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         lexer.setDefaultFont(font)
         self.text_box.setLexer(lexer)
         self.text_box.setFolding(self.text_box.PlainFoldStyle)
-        self.logger = logging.getLogger("AequilibraEGUI")
+        self.logger = logging.getLogger("qaequilibrae") or get_logger()
 
         # Load the data
         self.load_original_data()

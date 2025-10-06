@@ -7,6 +7,7 @@ from typing import Optional
 import numpy as np
 import openmatrix as omx
 import pandas as pd
+from aequilibrae.context import get_logger
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtGui import QColor
@@ -34,7 +35,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.setupUi(self)
             self.data_to_show = None
             self.error = None
-            self.logger = logging.getLogger("AequilibraEGUI")
+            self.logger = logging.getLogger("qaequilibrae") or get_logger()
             self.qgis_project = qgis_project
             self.from_proj = True if qgis_project.project else False
             self.indices = np.array(1)

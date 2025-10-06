@@ -9,6 +9,7 @@ from shutil import copyfile
 
 import numpy as np
 from PyQt5.QtCore import QMetaType
+from aequilibrae.context import get_logger
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.core import (
     QgsCoordinateReferenceSystem,
@@ -20,7 +21,7 @@ from qgis.core import (
     QgsVectorLayer,
 )
 
-LOGGER = logging.getLogger("QGIS")
+LOGGER = logging.getLogger("qaequilibrae") or get_logger()
 QGIS_APP = None  # Static variable used to hold hand to running QGIS app
 CANVAS = None
 PARENT = None

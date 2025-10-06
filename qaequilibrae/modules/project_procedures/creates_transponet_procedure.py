@@ -1,3 +1,4 @@
+import logging
 from string import ascii_letters
 
 import numpy as np
@@ -8,7 +9,7 @@ from aequilibrae.utils.interface.worker_thread import WorkerThread
 
 from qaequilibrae.modules.common_tools.geodataframe_from_data_layer import geodataframe_from_layer
 
-logger = get_logger()
+logger = logging.getLogger("qaequilibrae") or get_logger()
 
 
 class CreatesTranspoNetProcedure(WorkerThread):

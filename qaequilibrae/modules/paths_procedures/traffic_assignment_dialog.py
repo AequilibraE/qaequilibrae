@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import qgis
 import yaml
+from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
@@ -18,7 +19,7 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-logger = logging.getLogger("AequilibraEGUI")
+logger = logging.getLogger("qaequilibrae") or get_logger()
 
 
 # TODO: Add a button to export configurations as a yaml file

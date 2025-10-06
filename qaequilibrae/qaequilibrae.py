@@ -65,7 +65,7 @@ class AequilibraEMenu:
     def __init__(self, iface):
         set_aequilibrae_menu_instance(self)
         # Closes AequilibraE projects eventually opened in memory
-        self.logger = logging.getLogger("AequilibraEGUI")
+        self.logger = logging.getLogger("qaequilibrae") or self.get_logger()
         self.geo_layers_list = ["links", "nodes", "zones"]
         self.available_scenarios = []
         self.iface = iface
@@ -194,6 +194,11 @@ class AequilibraEMenu:
             if temp_saving:
                 temp_saving.triggered.connect(self.save_in_project)
 
+    def get_logger(self):
+        from aequilibrae.context import get_logger
+
+        return get_logger()
+
     def configure_scenario(self):
         if self.cob_scenarios.currentIndex() < 0:
             return
@@ -265,7 +270,6 @@ class AequilibraEMenu:
             QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def removes_temporary_files(self):
-        # pass
         # Removes all the temporary files from previous uses
         p = tempfile.gettempdir() + "/aequilibrae_*"
         for f in glob.glob(p):

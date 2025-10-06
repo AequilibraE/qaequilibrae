@@ -15,8 +15,9 @@ import logging
 import os
 
 import pytest
+from aequilibrae.context import get_logger
 
-LOGGER = logging.getLogger("QGIS")
+LOGGER = logging.getLogger("qaequilibrae") or get_logger()
 
 
 @pytest.mark.parametrize("expectation", ["name", "description", "qgisMinimumVersion", "email", "author"])
