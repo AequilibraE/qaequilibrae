@@ -171,7 +171,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="121"/>
         <source>Trip distribution</source>
-        <translation>Distribuição de Viagens</translation>
+        <translation>Distribuição de viagens</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="125"/>
