@@ -1892,7 +1892,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="99"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
 </context>
 <context>
@@ -1900,7 +1900,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/open_project.py" line="13"/>
         <source>Open project</source>
-        <translation type="unfinished"/>
+        <translation>Abrir projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/open_project.py" line="13"/>
