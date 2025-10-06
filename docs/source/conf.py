@@ -27,7 +27,7 @@ author = "Pedro Camargo"
 # -- General configuration ---------------------------------------------------
 
 # Sphinx extension module names
-extensions = ["sphinx_panels", "sphinx_subfigure", "sphinx_design"]
+extensions = ["sphinx_panels", "sphinx_subfigure", "sphinx_design", "sphinx_copybutton"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
