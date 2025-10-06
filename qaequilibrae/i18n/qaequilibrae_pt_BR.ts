@@ -2781,7 +2781,7 @@
     <message>
         <location filename="../modules/processing_provider/distribution_procedures/trip_distribution.py" line="13"/>
         <source>Trip distribution</source>
-        <translation type="unfinished"/>
+        <translation>Distribuição de viagens</translation>
     </message>
 </context>
 <context>
@@ -2839,7 +2839,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="171"/>
         <source>Data</source>
-        <translation type="unfinished"/>
+        <translation>Dados</translation>
     </message>
 </context>
 <context>
