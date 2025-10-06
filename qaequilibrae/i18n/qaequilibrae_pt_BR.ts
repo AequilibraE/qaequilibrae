@@ -3033,7 +3033,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="380"/>
         <source>Scenario</source>
-        <translation type="unfinished"/>
+        <translation>Cenário</translation>
     </message>
 </context>
 <context>
