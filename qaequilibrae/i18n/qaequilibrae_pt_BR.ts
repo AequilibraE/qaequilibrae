@@ -1375,12 +1375,12 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="80"/>
         <source>Scenario to clone</source>
-        <translation type="unfinished"/>
+        <translation>Clonar cenário a partir</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="90"/>
         <source>Scenario name</source>
-        <translation type="unfinished"/>
+        <translation>Nome do cenário</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="123"/>
