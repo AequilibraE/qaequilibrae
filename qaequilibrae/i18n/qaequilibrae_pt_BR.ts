@@ -1775,7 +1775,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="107"/>
         <source>Data</source>
-        <translation type="unfinished"/>
+        <translation>Dados</translation>
     </message>
 </context>
 <context>
