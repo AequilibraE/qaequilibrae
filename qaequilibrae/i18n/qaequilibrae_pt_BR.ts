@@ -236,7 +236,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="345"/>
         <source>You need to import a GTFS feed</source>
-        <translation type="unfinished"/>
+        <translation>Você precisa importar um arquivo GTFS</translation>
     </message>
 </context>
 <context>
