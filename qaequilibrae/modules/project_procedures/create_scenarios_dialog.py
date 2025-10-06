@@ -51,7 +51,7 @@ class CreateScenariosDialog(BaseDialog):
             self.project.create_empty_scenario(name, desc)
             self.qgis_project.message_log(self.tr("Created empty scenario"))
 
-        self.qgis_project.message_log(self.tr("New scenario '{}' addeed to the project").format(name))
+        self.qgis_project.message_log(self.tr("New scenario '{}' added to the project").format(name))
 
         # Update project scenarios
         self.qgis_project.cob_scenarios.clear()
