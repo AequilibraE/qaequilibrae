@@ -1038,6 +1038,7 @@
            </widget>
           </item>
           <item row="2" column="2">
+           <widget class="QPushButton" name="do_save_python">
             <property name="text">
              <string>Export model as Python</string>
             </property>
