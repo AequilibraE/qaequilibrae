@@ -2570,7 +2570,7 @@
     <message>
         <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="99"/>
         <source>Critical layer for Skim Viewer removed from the layers&apos; panel</source>
-        <translation type="unfinished"/>
+        <translation>Camada essencial para o visualizador de matrizes removida do painel de camadas</translation>
     </message>
 </context>
 <context>
@@ -2578,7 +2578,7 @@
     <message>
         <location filename="../modules/processing_provider/gis/stacked_bandwidth.py" line="13"/>
         <source>Stacked bandwidth</source>
-        <translation type="unfinished"/>
+        <translation>Mapa de volumes</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/stacked_bandwidth.py" line="13"/>
