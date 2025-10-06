@@ -287,12 +287,12 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
         <source>Close project</source>
-        <translation type="unfinished"/>
+        <translation>Fechar projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
