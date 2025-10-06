@@ -203,6 +203,26 @@ class TrafficAssignmentDialog(BaseDialog):
 
             self.output_scenario_name.setText(params["assignment"]["result_name"])
 
+    def export_yaml(self):
+        data_dict = {"traffic_classes": [], "assignment": {}}
+
+        data_dict["assignment"]["algorithm"] = self.cb_choose_algorithm.currentText()
+        data_dict["assignment"]["max_iter"] = int(self.max_iter.text())
+        data_dict["assignment"]["rgap"] = float(self.rel_gap.text())
+        data_dict["assignment"]["vdf"] = self.cob_vdf.currentText()
+        data_dict["assignment"]["alpha"] = ""
+        data_dict["assignment"]["beta"] = ""
+        data_dict["assignment"]["capacity_field"] = self.cob_capacity.currentText()
+        data_dict["assignment"]["time_field"] = self.cob_ffttime.currentText()
+        data_dict["assignment"]["result_name"] = self.scenario_name
+
+        # TODO: change file path
+        with open("output.yaml", "w") as file:
+            yaml.dump(data_dict, file, default_flow_style=False)
+
+    def export_python(self):
+        pass
+
     def set_fixed_cost_use(self):
         for item in [self.cob_fixed_cost, self.lbl_vot, self.vot_setter]:
             item.setEnabled(self.chb_fixed_cost.isChecked())
