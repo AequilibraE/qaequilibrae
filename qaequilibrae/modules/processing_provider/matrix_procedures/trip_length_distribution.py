@@ -89,7 +89,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         except Exception as e:
             # Handle cases where the plugin or project information is not accessible
             QgsMessageLog.logMessage(
-                f"Error checking AequilibraE project: {str(e)}", "Messages", Qgis.MessageLevel.Critical
+                self.tr("Error checking AequilibraE project: {}").format(str(e)), "Messages", Qgis.MessageLevel.Critical
             )
 
     def processAlgorithm(self, parameters, context, feedback):

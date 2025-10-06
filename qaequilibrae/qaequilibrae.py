@@ -201,7 +201,7 @@ class AequilibraEMenu:
         if self.available_scenarios:
             name = self.available_scenarios[self.cob_scenarios.currentIndex()]
             self.project.use_scenario(name)
-            self.message_log(f"Changed active scenario: {name}")
+            self.message_log(self.tr("Changed active scenario: {}").format(name))
 
             # Change layers
             tab_count = self.projectManager.count()
@@ -288,7 +288,7 @@ class AequilibraEMenu:
         self.available_scenarios = []
         self.matrices.clear()
         self.layers.clear()
-        self.message_log(f"Closed project on: {pth}")
+        self.message_log(self.tr("Closed project on: {}").format(pth))
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
@@ -481,7 +481,7 @@ class AequilibraEMenu:
 
         Uses 'Info' level and does not notify user, by default, although these are editable.
         """
-        QgsMessageLog.logMessage(message, "Messages", level, notify_user)
+        QgsMessageLog.logMessage(message, self.tr("Messages"), level, notify_user)
 
     def iface_error_message(self, text: str = None, title: str = "Error"):
         """Standardizes QAequilibraE error messages display"""
