@@ -2408,7 +2408,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/run_module.py" line="13"/>
         <source>Run model procedures</source>
-        <translation type="unfinished"/>
+        <translation>Executar procedimentos do modelo</translation>
     </message>
 </context>
 <context>
