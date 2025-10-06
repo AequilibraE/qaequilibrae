@@ -1656,7 +1656,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
         <source>Logfile</source>
-        <translation type="unfinished"/>
+        <translation>Registro de Operações</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
