@@ -1941,7 +1941,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_preparation.py" line="12"/>
         <source>Prepares network for import</source>
-        <translation type="unfinished"/>
+        <translation>Preparar redes para importação</translation>
     </message>
 </context>
 <context>
@@ -1959,7 +1959,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/project_from_layer.py" line="13"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
 </context>
 <context>
