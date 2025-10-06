@@ -1385,7 +1385,7 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="123"/>
         <source>OK</source>
-        <translation type="unfinished"/>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
