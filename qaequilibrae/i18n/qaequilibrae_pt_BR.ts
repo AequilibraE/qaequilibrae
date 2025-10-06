@@ -1936,7 +1936,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_preparation.py" line="12"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_preparation.py" line="12"/>
