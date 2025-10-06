@@ -1666,7 +1666,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
         <source>Access project logfile</source>
-        <translation type="unfinished"/>
+        <translation>Acessar registro de operações do projeto</translation>
     </message>
 </context>
 <context>
