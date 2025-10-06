@@ -1365,12 +1365,12 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="45"/>
         <source>Clone scenario</source>
-        <translation type="unfinished"/>
+        <translation>Clonar cenário</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="55"/>
         <source>Create empty scenario</source>
-        <translation type="unfinished"/>
+        <translation>Criar cenário vazio</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="80"/>
