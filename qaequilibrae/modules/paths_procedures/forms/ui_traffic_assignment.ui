@@ -1030,7 +1030,20 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
+          <item row="2" column="1">
+           <widget class="QPushButton" name="do_save_yaml">
+            <property name="text">
+             <string>Export model as YAML</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+            <property name="text">
+             <string>Export model as Python</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="3">
            <widget class="QLineEdit" name="output_scenario_name">
             <property name="text">
              <string/>
