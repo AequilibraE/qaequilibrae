@@ -1581,7 +1581,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/import_matrices.py" line="13"/>
         <source>Saves matrix from open layer into a *.omx file</source>
-        <translation type="unfinished"/>
+        <translation>Salva em formato .*omx a matriz aberta em uma camada do QGIS</translation>
     </message>
 </context>
 <context>
