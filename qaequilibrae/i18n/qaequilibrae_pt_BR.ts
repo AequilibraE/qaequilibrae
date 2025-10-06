@@ -2847,12 +2847,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
         <source>Visualize data</source>
-        <translation type="unfinished"/>
+        <translation>Visualizar Dados</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
 </context>
 <context>
