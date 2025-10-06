@@ -2416,12 +2416,12 @@
     <message>
         <location filename="../modules/processing_provider/routing_procedures/tsp.py" line="13"/>
         <source>Traveling salesman problem</source>
-        <translation type="unfinished"/>
+        <translation>Problema do Caixeiro Viajante</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/routing_procedures/tsp.py" line="13"/>
         <source>Routing</source>
-        <translation type="unfinished"/>
+        <translation>Roteirização</translation>
     </message>
 </context>
 <context>
