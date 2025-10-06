@@ -121,7 +121,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="113"/>
         <source>Open project</source>
-        <translation type="unfinished"/>
+        <translation>Abrir projeto</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="116"/>
@@ -171,7 +171,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="121"/>
         <source>Trip distribution</source>
-        <translation type="unfinished"/>
+        <translation>Distribuição de Viagens</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="125"/>
