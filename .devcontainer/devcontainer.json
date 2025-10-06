@@ -35,14 +35,9 @@
 			]
 		}
 	},
-	"features": {},
 	"mounts": [
 		"source=C:/,target=/workspaces/drive_c,type=bind,consistency=cached",
 		"source=D:/,target=/workspaces/drive_d,type=bind,consistency=cached"
-	]
-	// "postCreateCommand": [
-	// 	"pip", "install", "-r", "test/requirements_test.txt",
-	// 	"pip", "install", "-r", "docs/requirements_docs.txt"
-	// ],
-	// "postAttachCommand": "python3 ./qaequilibrae/download_extra_packages_class.py"
+	],
+	"postCreateCommand": "python3 -m venv .venv --system-site-packages && . .venv/bin/activate && python -m pip install -U uv pip && python ./ci/dependency_installation.py && python -m uv pip install -r test/requirements_test.txt --constraint ./ci/constraints.txt && python -m uv pip install -r docs/requirements_docs.txt"
 }
