@@ -2768,12 +2768,12 @@
     <message>
         <location filename="../modules/processing_provider/transit_procedures/transit_assignment.py" line="13"/>
         <source>Skimming and assignment</source>
-        <translation type="unfinished"/>
+        <translation>Matriz de custos e alocação</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/transit_procedures/transit_assignment.py" line="13"/>
         <source>Transit</source>
-        <translation type="unfinished"/>
+        <translation>Transporte público</translation>
     </message>
 </context>
 <context>
