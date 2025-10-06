@@ -1977,7 +1977,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/project_from_OSM.py" line="13"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
 </context>
 <context>
@@ -2321,7 +2321,7 @@
     <message>
         <location filename="../modules/processing_provider/route_choice/route_choice.py" line="13"/>
         <source>Route choice</source>
-        <translation type="unfinished"/>
+        <translation>Escolha de rota</translation>
     </message>
 </context>
 <context>
