@@ -3893,7 +3893,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="73"/>
         <source>Configure from YAML</source>
-        <translation type="unfinished"/>
+        <translation>Configurar a partir do YAML</translation>
     </message>
 </context>
 <context>
