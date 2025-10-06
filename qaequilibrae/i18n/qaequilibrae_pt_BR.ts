@@ -384,12 +384,12 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
         <source>Create examples</source>
-        <translation type="unfinished"/>
+        <translation>Criar exemplos</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
