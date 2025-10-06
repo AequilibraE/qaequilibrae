@@ -186,7 +186,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="142"/>
         <source>Transit</source>
-        <translation type="unfinished"/>
+        <translation>Transporte público</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="149"/>
