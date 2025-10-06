@@ -191,7 +191,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="149"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="144"/>
