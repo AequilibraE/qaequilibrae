@@ -2434,7 +2434,7 @@
     <message>
         <location filename="../modules/processing_provider/gis/scenario_comparison.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
 </context>
 <context>
@@ -2442,7 +2442,7 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/shortest_path.py" line="13"/>
         <source>Shortest path</source>
-        <translation type="unfinished"/>
+        <translation>Caminho mínimo</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/paths_procedures/shortest_path.py" line="13"/>
