@@ -226,7 +226,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="339"/>
         <source>You need to load a project</source>
-        <translation type="unfinished"/>
+        <translation>Você precisa carregar um projeto</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="342"/>
