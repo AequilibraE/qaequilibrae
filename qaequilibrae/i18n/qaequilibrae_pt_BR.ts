@@ -2583,7 +2583,7 @@
     <message>
         <location filename="../modules/processing_provider/gis/stacked_bandwidth.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
 </context>
 <context>
@@ -2687,7 +2687,7 @@
     <message>
         <location filename="../modules/processing_provider/assignment_procedures/traffic_assignment.py" line="13"/>
         <source>Traffic assignment</source>
-        <translation type="unfinished"/>
+        <translation>Alocação de tráfego</translation>
     </message>
 </context>
 <context>
