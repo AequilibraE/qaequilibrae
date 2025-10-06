@@ -2552,7 +2552,7 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/skim_viewer.py" line="13"/>
         <source>Skim viewer</source>
-        <translation type="unfinished"/>
+        <translation>Visualizador de matrizes</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/paths_procedures/skim_viewer.py" line="13"/>
