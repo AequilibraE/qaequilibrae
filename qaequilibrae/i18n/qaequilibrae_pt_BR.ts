@@ -1429,7 +1429,7 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/impedance_matrix.py" line="13"/>
         <source>Impedance matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matriz de Impedância</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/paths_procedures/impedance_matrix.py" line="13"/>
