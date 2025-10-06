@@ -211,12 +211,12 @@
     <message>
         <location filename="../qaequilibrae.py" line="152"/>
         <source>Stacked bandwidth</source>
-        <translation type="unfinished"/>
+        <translation>Mapa de volumes</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="153"/>
         <source>Scenario comparison</source>
-        <translation type="unfinished"/>
+        <translation>Comparação de Cenários</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="115"/>
