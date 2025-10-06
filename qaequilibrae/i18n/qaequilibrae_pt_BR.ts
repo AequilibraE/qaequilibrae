@@ -1563,7 +1563,7 @@
     <message>
         <location filename="../modules/processing_provider/transit_procedures/import_gtfs.py" line="13"/>
         <source>Transit</source>
-        <translation type="unfinished"/>
+        <translation>Transporte público</translation>
     </message>
 </context>
 <context>
@@ -1571,7 +1571,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/import_matrices.py" line="13"/>
         <source>Import matrices</source>
-        <translation type="unfinished"/>
+        <translation>Importar matrizes</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/import_matrices.py" line="13"/>
