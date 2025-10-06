@@ -402,7 +402,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
         <source>Create scenarios</source>
-        <translation type="unfinished"/>
+        <translation>Criar cenário</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
