@@ -181,7 +181,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="133"/>
         <source>Traffic assignment</source>
-        <translation type="unfinished"/>
+        <translation>Alocação de tráfego</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="142"/>
