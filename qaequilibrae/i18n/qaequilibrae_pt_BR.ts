@@ -90,7 +90,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_zones.py" line="12"/>
         <source>Add zoning data</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar Zonas</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_zones.py" line="12"/>
