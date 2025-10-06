@@ -982,7 +982,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="82"/>
         <source>Exports an existing matrix file into *.csv or *.omx</source>
-        <translation type="unfinished"/>
+        <translation>Exportar arquivo de matriz existente para *.csv ou *.omx</translation>
     </message>
 </context>
 <context>
