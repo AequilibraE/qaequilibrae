@@ -2390,7 +2390,7 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="110"/>
         <source>Without installing the packages, you cannot use &apos;Run Procedures&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>Sem esses pacotes, não é possível executar os procedimentos do modelo.</translation>
     </message>
 </context>
 <context>
