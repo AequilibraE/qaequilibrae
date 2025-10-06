@@ -2501,12 +2501,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/simple_tag.py" line="13"/>
         <source>Simple tag</source>
-        <translation type="unfinished"/>
+        <translation>Etiqueta</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/simple_tag.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
 </context>
 <context>
