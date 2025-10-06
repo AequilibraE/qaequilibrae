@@ -2380,7 +2380,7 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="108"/>
         <source>There are missing requirements to run the procedures.</source>
-        <translation type="unfinished"/>
+        <translation>Existem requisitos faltantes para executar os procedimentos do modelo.</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="109"/>
