@@ -100,7 +100,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_zones.py" line="12"/>
         <source>Add project zones</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar zonas ao projeto.</translation>
     </message>
 </context>
 <context>
