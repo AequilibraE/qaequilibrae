@@ -1910,7 +1910,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/open_project.py" line="13"/>
         <source>Open AequilibraE project</source>
-        <translation type="unfinished"/>
+        <translation>Abrir projeto do AequilibraE</translation>
     </message>
 </context>
 <context>
