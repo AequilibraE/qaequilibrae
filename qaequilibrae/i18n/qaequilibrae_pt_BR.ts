@@ -196,17 +196,17 @@
     <message>
         <location filename="../qaequilibrae.py" line="144"/>
         <source>Skimming and assignment</source>
-        <translation type="unfinished"/>
+        <translation>Matriz de custos e alocação</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="145"/>
         <source>Explore transit</source>
-        <translation type="unfinished"/>
+        <translation>Explorar Transporte Público</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="151"/>
         <source>Desire lines</source>
-        <translation type="unfinished"/>
+        <translation>Linhas de Desejo</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="152"/>
