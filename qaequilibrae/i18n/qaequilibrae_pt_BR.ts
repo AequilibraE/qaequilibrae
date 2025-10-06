@@ -1576,7 +1576,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/import_matrices.py" line="13"/>
         <source>Data</source>
-        <translation type="unfinished"/>
+        <translation>Dados</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/import_matrices.py" line="13"/>
