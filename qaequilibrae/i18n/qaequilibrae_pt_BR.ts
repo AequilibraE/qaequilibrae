@@ -407,7 +407,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
