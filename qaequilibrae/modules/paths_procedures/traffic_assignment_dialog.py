@@ -63,6 +63,9 @@ class TrafficAssignmentDialog(BaseDialog):
         self.chb_fixed_cost.toggled.connect(self.set_fixed_cost_use)
         self.do_select_link.toggled.connect(self.set_select_link_use)
 
+        self.but_save_yaml.clicked.connect(self.export_yaml)
+        self.but_save_python.clicked.connect(self.export_python)
+
         self.do_assignment.clicked.connect(self.run)
         self.cancel_all.clicked.connect(self.exit_procedure)
 
@@ -197,6 +200,8 @@ class TrafficAssignmentDialog(BaseDialog):
             self.cob_capacity.setCurrentText(params["assignment"]["capacity_field"])
             self.cob_ffttime.setCurrentText(params["assignment"]["time_field"])
 
+            # TODO: Acho que isso pode dar erro a depender a config usada. Estou partindo do pressuposto
+            # que os valores inputados para alpha e beta são numéricos, mas podem ser colunas também.
             self.cob_vdf.setCurrentText(params["assignment"]["vdf"])
             self.tbl_vdf_parameters.cellWidget(0, 1).setText(str(params["assignment"]["alpha"]))
             self.tbl_vdf_parameters.cellWidget(1, 1).setText(str(params["assignment"]["beta"]))
@@ -204,23 +209,64 @@ class TrafficAssignmentDialog(BaseDialog):
             self.output_scenario_name.setText(params["assignment"]["result_name"])
 
     def export_yaml(self):
+        out_name, _ = GetOutputFileName(self, "Save file", ["YAML (*.yml)"], ".yml", self.path)
+
+        self.check_data()
+
         data_dict = {"traffic_classes": [], "assignment": {}}
 
+        # Add traffic class data
+        for idx, (tc, info) in enumerate(self.traffic_classes.items()):
+            data_dict["traffic_classes"].extend([{tc: {}}])
+            dc = data_dict["traffic_classes"][idx][tc]
+
+            df = self.project.matrices.list()
+            dc["matrix_name"] = df.loc[df["file_name"] == str(info.matrix.file_path).split("/")[-1]]["name"].values[0]
+            dc["matrix_core"] = info.matrix.view_names[0]
+            dc["network_mode"] = info.mode
+            dc["pce"] = info.pce
+            if self.chb_fixed_cost.isChecked():
+                dc["fixed_cost"] = info.fixed_cost_field
+                dc["vot"] = info.vot
+            dc["blocked_centroid_flows"] = info.graph.block_centroid_flows
+            if self.skims[tc]:
+                if "skims" not in dc.keys():
+                    dc["skims"] = {}
+                for i in range(self.skim_list_table.rowCount()):
+                    if self.skim_list_table.item(i, 0).text() == tc:
+                        field = self.skim_list_table.item(i, 1).text()
+                        dc["skims"][field] = []
+                        if self.skim_list_table.cellWidget(i, 2).isChecked():
+                            dc["skims"][field].extend(["final"])
+                        if self.skim_list_table.cellWidget(i, 3).isChecked():
+                            dc["skims"][field].extend(["blended"])
+
+        # Add assignment data
         data_dict["assignment"]["algorithm"] = self.cb_choose_algorithm.currentText()
         data_dict["assignment"]["max_iter"] = int(self.max_iter.text())
         data_dict["assignment"]["rgap"] = float(self.rel_gap.text())
         data_dict["assignment"]["vdf"] = self.cob_vdf.currentText()
-        data_dict["assignment"]["alpha"] = ""
-        data_dict["assignment"]["beta"] = ""
+        data_dict["assignment"]["alpha"] = float(self.tbl_vdf_parameters.cellWidget(0, 1).text())
+        data_dict["assignment"]["beta"] = float(self.tbl_vdf_parameters.cellWidget(1, 1).text())
         data_dict["assignment"]["capacity_field"] = self.cob_capacity.currentText()
         data_dict["assignment"]["time_field"] = self.cob_ffttime.currentText()
         data_dict["assignment"]["result_name"] = self.scenario_name
 
-        # TODO: change file path
-        with open("output.yaml", "w") as file:
+        # Add Select Link Analysis data
+        if self.do_select_link.isChecked():
+            data_dict["select_links"] = {"selection": {}}
+            for qry, links in self.select_links.items():
+                data_dict["select_links"]["selection"][qry] = links
+            data_dict["select_links"]["output_name"] = self.sl_mat_name.text()
+            data_dict["select_links"]["save_matrix"] = self.chb_save_matrix.isChecked()
+            data_dict["select_links"]["save_result"] = self.chb_save_result.isChecked()
+
+        with open(out_name, "w") as file:
             yaml.dump(data_dict, file, default_flow_style=False)
 
     def export_python(self):
+        # TODO: ao invés de usar um caminho genérico, colocar arquivo no run module do projeto
+        out_name, _ = GetOutputFileName(self, "Save file", ["Python (*.py)"], ".py", self.path)
         pass
 
     def set_fixed_cost_use(self):
