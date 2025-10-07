@@ -10,7 +10,12 @@ from qgis.PyQt.QtCore import Qt
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
 
-def test_single_class(sf_project, qtbot):
+def test_single_class(sf_project, qtbot, mocker):
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
+        return_value=f"{sf_project.project.project_base_path}/assignment_config.yml",
+    )
+
     dialog = TrafficAssignmentDialog(sf_project)
 
     test_name = f"TestTrafficAssignment_SC_{uuid4().hex[:6]}"
@@ -39,6 +44,9 @@ def test_single_class(sf_project, qtbot):
     dialog.max_iter.setText("25")
     dialog.rel_gap.setText("0.001")
 
+    # Save configs in YAML
+    qtbot.mouseClick(dialog.but_save_yaml, Qt.LeftButton)
+
     dialog.run()
 
     with pytest.raises(ValueError):
@@ -63,8 +71,16 @@ def test_single_class(sf_project, qtbot):
         assert round(np.sum(np.nan_to_num(omx_file["distance_final"][:])), 4) > 0
         assert round(np.sum(np.nan_to_num(omx_file["distance_blended"][:])), 4) > 0
 
+    # Check if YAML was saved
+    assert isfile(pth / "assignment_config.yml")
 
-def test_multiclass(sf_project, qtbot):
+
+def test_multiclass(sf_project, qtbot, mocker):
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
+        return_value=f"{sf_project.project.project_base_path}/mc_config.yml",
+    )
+
     dialog = TrafficAssignmentDialog(sf_project)
 
     test_name = f"TestTrafficAssignment_MC_{uuid4().hex[:6]}"
@@ -129,6 +145,9 @@ def test_multiclass(sf_project, qtbot):
     dialog.max_iter.setText("20")
     dialog.rel_gap.setText("0.001")
 
+    # Save configs in YAML
+    qtbot.mouseClick(dialog.but_save_yaml, Qt.LeftButton)
+
     dialog.run()
 
     with pytest.raises(ValueError):
@@ -150,6 +169,9 @@ def test_multiclass(sf_project, qtbot):
     assert isfile(pth / "matrices" / f"{test_name}_car.omx")
     assert isfile(pth / "matrices" / f"{test_name}_motorcycles.omx")
     assert isfile(pth / "matrices" / f"{test_name}_trucks.omx")
+
+    # Check if YAML was saved
+    assert isfile(sf_project.project.project_base_path / "mc_config.yml")
 
 
 def test_all_or_nothing(sf_project, qtbot):
@@ -198,7 +220,11 @@ def test_all_or_nothing(sf_project, qtbot):
     assert isfile(skims)
 
 
-def test_select_link_analysis(sf_project, qtbot):
+def test_select_link_analysis(sf_project, qtbot, mocker):
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
+        return_value=f"{sf_project.project.project_base_path}/sl_config.yml",
+    )
     dialog = TrafficAssignmentDialog(sf_project)
 
     test_name = f"TestTrafficAssignment_SLA_{uuid4().hex[:6]}"
@@ -239,6 +265,9 @@ def test_select_link_analysis(sf_project, qtbot):
     dialog.max_iter.setText("25")
     dialog.rel_gap.setText("0.001")
 
+    # Save configs in YAML
+    qtbot.mouseClick(dialog.but_save_yaml, Qt.LeftButton)
+
     dialog.run()
 
     matrices = dialog.project.matrices
@@ -248,6 +277,9 @@ def test_select_link_analysis(sf_project, qtbot):
     with dialog.project.results_connection as conn:
         results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "select_link_analysis" in results
+
+    # Check if YAML was saved
+    assert isfile(sf_project.project.project_base_path / "sl_config.yml")
 
 
 def test_link_removal(sf_project, qtbot):
@@ -308,7 +340,7 @@ def test_link_removal(sf_project, qtbot):
 
 def test_single_class_from_yaml(sf_project, qtbot, mocker):
     mocker.patch(
-        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_path",
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value="test/data/SiouxFalls_project/assignment_config.yml",
     )
 
@@ -337,7 +369,7 @@ def test_single_class_from_yaml(sf_project, qtbot, mocker):
 
 def test_multi_class_from_yaml(sf_project, qtbot, mocker):
     mocker.patch(
-        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_path",
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value="test/data/SiouxFalls_project/mc_config.yml",
     )
 
@@ -362,7 +394,7 @@ def test_multi_class_from_yaml(sf_project, qtbot, mocker):
 
 def test_select_links_from_yaml(sf_project, qtbot, mocker):
     mocker.patch(
-        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_path",
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value="test/data/SiouxFalls_project/sl_config.yml",
     )
 

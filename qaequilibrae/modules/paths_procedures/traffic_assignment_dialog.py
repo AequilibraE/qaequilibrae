@@ -27,6 +27,7 @@ class TrafficAssignmentDialog(BaseDialog):
         super().__init__(ui_file=join(dirname(__file__), "forms/ui_traffic_assignment.ui"), qgis_project=qgis_project)
 
     def _base_ui_setup(self):
+        self.project = self.qgis_project.project
         self.skimming = False
         self.path = standard_path()
         self.output_path = None
@@ -124,13 +125,18 @@ class TrafficAssignmentDialog(BaseDialog):
         self.select_link_list.cellDoubleClicked.connect(self.__remove_select_link_item)
         self.but_clean.clicked.connect(self.__clean_link_selection)
 
-    def _browse_path(self):
+    def _browse_yaml_path(self):
         file_path, _ = GetOutputFileName(QtWidgets.QDialog(), "Configuration file", ["YAML (*.yml)"], ".yml", self.path)
+        return file_path
+
+    def _browse_python_path(self):
+        path = str(self.project.project_base_path / "run")
+        file_path = GetOutputFileName(QtWidgets.QDialog(), "", ["Python (*.py)"], ".py", path)
         return file_path
 
     def _load_configs(self):
         # Let's open the YAML config file
-        file_path = self._browse_path()
+        file_path = self._browse_yaml_path()
 
         if file_path:
             with open(file_path, "r") as f:
@@ -209,65 +215,72 @@ class TrafficAssignmentDialog(BaseDialog):
             self.output_scenario_name.setText(params["assignment"]["result_name"])
 
     def export_yaml(self):
-        out_name, _ = GetOutputFileName(self, "Save file", ["YAML (*.yml)"], ".yml", self.path)
+        file_path = self._browse_yaml_path()
 
-        self.check_data()
+        if file_path:
+            self.check_data()
 
-        data_dict = {"traffic_classes": [], "assignment": {}}
+            data_dict = {"traffic_classes": [], "assignment": {}}
 
-        # Add traffic class data
-        for idx, (tc, info) in enumerate(self.traffic_classes.items()):
-            data_dict["traffic_classes"].extend([{tc: {}}])
-            dc = data_dict["traffic_classes"][idx][tc]
+            # Add traffic class data
+            for idx, (tc, info) in enumerate(self.traffic_classes.items()):
+                data_dict["traffic_classes"].extend([{tc: {}}])
+                dc = data_dict["traffic_classes"][idx][tc]
 
-            df = self.project.matrices.list()
-            dc["matrix_name"] = df.loc[df["file_name"] == str(info.matrix.file_path).split("/")[-1]]["name"].values[0]
-            dc["matrix_core"] = info.matrix.view_names[0]
-            dc["network_mode"] = info.mode
-            dc["pce"] = info.pce
-            if self.chb_fixed_cost.isChecked():
-                dc["fixed_cost"] = info.fixed_cost_field
-                dc["vot"] = info.vot
-            dc["blocked_centroid_flows"] = info.graph.block_centroid_flows
-            if self.skims[tc]:
-                if "skims" not in dc.keys():
-                    dc["skims"] = {}
-                for i in range(self.skim_list_table.rowCount()):
-                    if self.skim_list_table.item(i, 0).text() == tc:
-                        field = self.skim_list_table.item(i, 1).text()
-                        dc["skims"][field] = []
-                        if self.skim_list_table.cellWidget(i, 2).isChecked():
-                            dc["skims"][field].extend(["final"])
-                        if self.skim_list_table.cellWidget(i, 3).isChecked():
-                            dc["skims"][field].extend(["blended"])
+                if sys.platform == "win32":
+                    pth = str(info.matrix.file_path).split("\\")[-1]
+                else:
+                    pth = str(info.matrix.file_path).split("/")[-1]
+                df = self.project.matrices.list()
+                dc["matrix_name"] = df.loc[df["file_name"] == pth]["name"].values[0]
+                dc["matrix_core"] = info.matrix.view_names[0]
+                dc["network_mode"] = info.mode
+                dc["pce"] = info.pce
+                if self.chb_fixed_cost.isChecked():
+                    dc["fixed_cost"] = info.fixed_cost_field
+                    dc["vot"] = info.vot
+                dc["blocked_centroid_flows"] = info.graph.block_centroid_flows
+                if self.skims[tc]:
+                    if "skims" not in dc.keys():
+                        dc["skims"] = {}
+                    for i in range(self.skim_list_table.rowCount()):
+                        if self.skim_list_table.item(i, 0).text() == tc:
+                            field = self.skim_list_table.item(i, 1).text()
+                            dc["skims"][field] = []
+                            if self.skim_list_table.cellWidget(i, 2).isChecked():
+                                dc["skims"][field].extend(["final"])
+                            if self.skim_list_table.cellWidget(i, 3).isChecked():
+                                dc["skims"][field].extend(["blended"])
 
-        # Add assignment data
-        data_dict["assignment"]["algorithm"] = self.cb_choose_algorithm.currentText()
-        data_dict["assignment"]["max_iter"] = int(self.max_iter.text())
-        data_dict["assignment"]["rgap"] = float(self.rel_gap.text())
-        data_dict["assignment"]["vdf"] = self.cob_vdf.currentText()
-        data_dict["assignment"]["alpha"] = float(self.tbl_vdf_parameters.cellWidget(0, 1).text())
-        data_dict["assignment"]["beta"] = float(self.tbl_vdf_parameters.cellWidget(1, 1).text())
-        data_dict["assignment"]["capacity_field"] = self.cob_capacity.currentText()
-        data_dict["assignment"]["time_field"] = self.cob_ffttime.currentText()
-        data_dict["assignment"]["result_name"] = self.scenario_name
+            # Add assignment data
+            data_dict["assignment"]["algorithm"] = self.cb_choose_algorithm.currentText()
+            data_dict["assignment"]["max_iter"] = int(self.max_iter.text())
+            data_dict["assignment"]["rgap"] = float(self.rel_gap.text())
+            data_dict["assignment"]["vdf"] = self.cob_vdf.currentText()
+            data_dict["assignment"]["alpha"] = float(self.tbl_vdf_parameters.cellWidget(0, 1).text())
+            data_dict["assignment"]["beta"] = float(self.tbl_vdf_parameters.cellWidget(1, 1).text())
+            data_dict["assignment"]["capacity_field"] = self.cob_capacity.currentText()
+            data_dict["assignment"]["time_field"] = self.cob_ffttime.currentText()
+            data_dict["assignment"]["result_name"] = self.scenario_name
 
-        # Add Select Link Analysis data
-        if self.do_select_link.isChecked():
-            data_dict["select_links"] = {"selection": {}}
-            for qry, links in self.select_links.items():
-                data_dict["select_links"]["selection"][qry] = links
-            data_dict["select_links"]["output_name"] = self.sl_mat_name.text()
-            data_dict["select_links"]["save_matrix"] = self.chb_save_matrix.isChecked()
-            data_dict["select_links"]["save_result"] = self.chb_save_result.isChecked()
+            # Add Select Link Analysis data
+            if self.do_select_link.isChecked():
+                data_dict["select_links"] = {"selection": {}}
+                for qry, links in self.select_links.items():
+                    data_dict["select_links"]["selection"][qry] = links
+                data_dict["select_links"]["output_name"] = self.sl_mat_name.text()
+                data_dict["select_links"]["save_matrix"] = self.chb_save_matrix.isChecked()
+                data_dict["select_links"]["save_result"] = self.chb_save_result.isChecked()
 
-        with open(out_name, "w") as file:
-            yaml.dump(data_dict, file, default_flow_style=False)
+            with open(file_path, "w") as file:
+                yaml.dump(data_dict, file, default_flow_style=False)
 
     def export_python(self):
-        # TODO: ao invés de usar um caminho genérico, colocar arquivo no run module do projeto
-        out_name, _ = GetOutputFileName(self, "Save file", ["Python (*.py)"], ".py", self.path)
-        pass
+        out_name = self._browse_python_path()
+
+        if out_name:
+            pass
+        print("hello world")
 
     def set_fixed_cost_use(self):
         for item in [self.cob_fixed_cost, self.lbl_vot, self.vot_setter]:
