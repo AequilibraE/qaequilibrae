@@ -16,6 +16,11 @@ def test_single_class(sf_project, qtbot, mocker):
         return_value=f"{sf_project.project.project_base_path}/assignment_config.yml",
     )
 
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_python_path",
+        return_value=f"{sf_project.project.project_base_path}/run/traffic_assignment.py",
+    )
+
     dialog = TrafficAssignmentDialog(sf_project)
 
     test_name = f"TestTrafficAssignment_SC_{uuid4().hex[:6]}"
@@ -46,6 +51,7 @@ def test_single_class(sf_project, qtbot, mocker):
 
     # Save configs in YAML
     qtbot.mouseClick(dialog.but_save_yaml, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_save_python, Qt.LeftButton)
 
     dialog.run()
 

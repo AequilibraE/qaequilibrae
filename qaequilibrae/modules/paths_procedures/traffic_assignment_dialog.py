@@ -17,7 +17,6 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
 
-sys.modules["qgsmaplayercombobox"] = qgis.gui
 logger = logging.getLogger("AequilibraEGUI")
 
 
@@ -291,9 +290,70 @@ class TrafficAssignmentDialog(BaseDialog):
     def export_python(self):
         out_name = self._browse_python_path()
 
-        if out_name:
-            pass
-        print("hello world")
+        # Set up file main strings
+        func_string = """from aequilibrae.context import get_active_project\n
+def run_assignment():
+\tfrom aequilibrae.paths import TrafficAssignment, TrafficClass
+\n
+\tproject = get_active_project()\n
+"""
+
+        # Set up traffic class strings
+        classes = """
+
+"""
+
+        # Set up traffic assignment strings
+        assignment = """
+\tassig = TrafficAssignment()
+\tassig.set_classes(assigclass)
+\tassig.set_vdf('{}')
+\tassig.set_vdf_parameters('{}')
+\tassig.set_capacity_field('{}')
+\tassig.set_time_field('{}')
+\tassig.set_algorithm('{}')
+\tassig.max_iter = {}
+\tassig.rgap_target = {}
+"""
+        assignment = assignment.format(
+            self.cob_vdf.currentText(),
+            self.vdf_parameters,
+            self.cob_capacity.currentText(),
+            self.cob_ffttime.currentText(),
+            self.cb_choose_algorithm.currentText(),
+            self.miter,
+            float(self.rel_gap.text()),
+            
+        )
+        func_string += assignment
+
+        # Select link analysis
+        if self.do_select_link.isChecked():
+            select_link = """"""
+
+        # Execute procedure
+        func_string += "\tassig.execute()"
+
+        # Save outputs
+        func_string += f"\n\tassig.save_results({self.scenario_name})"
+        
+        if self.skimming:
+            func_string += f"""\tassig.save_skims({self.scenario_name}, which_ones="all", format="omx")"""
+
+        with open(out_name, "w") as file:
+            file.write(func_string)
+
+        with open(self.project.project_base_path / "run" / "__init__.py", "r") as file:
+            lines = file.readlines()
+
+        lines.insert(19, f"from .{out_name.split("/")[-1].split(".")[0]} import run_assignment\n")
+
+        with open(self.project.project_base_path / "run" / "__init__.py", "w") as file:
+            file.writelines(lines)
+
+        p = Parameters()
+        p.parameters["run"]["run_assignment"] = None
+        p.write_back()
 
     def set_fixed_cost_use(self):
         for item in [self.cob_fixed_cost, self.lbl_vot, self.vot_setter]:
