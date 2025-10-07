@@ -35,8 +35,8 @@ def test_single_class(sf_project, qtbot, mocker):
     dialog.cob_skims_available.setCurrentText("distance")
     qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
 
-    dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
-    dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
+    dialog.tbl_vdf_parameters.cellWidget(0, 2).setCurrentText("b")
+    dialog.tbl_vdf_parameters.cellWidget(1, 2).setCurrentText("power")
     dialog.cob_vdf.setCurrentText("BPR")
     dialog.cob_capacity.setCurrentText("capacity")
     dialog.cob_ffttime.setCurrentText("free_flow_time")

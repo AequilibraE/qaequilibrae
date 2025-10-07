@@ -21,7 +21,6 @@ sys.modules["qgsmaplayercombobox"] = qgis.gui
 logger = logging.getLogger("AequilibraEGUI")
 
 
-# TODO: Add a button to export configurations as a yaml file
 class TrafficAssignmentDialog(BaseDialog):
     def __init__(self, qgis_project):
         super().__init__(ui_file=join(dirname(__file__), "forms/ui_traffic_assignment.ui"), qgis_project=qgis_project)
@@ -206,11 +205,15 @@ class TrafficAssignmentDialog(BaseDialog):
             self.cob_capacity.setCurrentText(params["assignment"]["capacity_field"])
             self.cob_ffttime.setCurrentText(params["assignment"]["time_field"])
 
-            # TODO: Acho que isso pode dar erro a depender a config usada. Estou partindo do pressuposto
-            # que os valores inputados para alpha e beta são numéricos, mas podem ser colunas também.
             self.cob_vdf.setCurrentText(params["assignment"]["vdf"])
-            self.tbl_vdf_parameters.cellWidget(0, 1).setText(str(params["assignment"]["alpha"]))
-            self.tbl_vdf_parameters.cellWidget(1, 1).setText(str(params["assignment"]["beta"]))
+            if isinstance(params["assignment"]["alpha"], float):
+                self.tbl_vdf_parameters.cellWidget(0, 1).setText(str(params["assignment"]["alpha"]))
+            elif isinstance(params["assignment"]["alpha"], str):
+                self.tbl_vdf_parameters.cellWidget(0, 2).setCurrentText(str(params["assignment"]["alpha"]))
+            if isinstance(params["assignment"]["beta"], float):
+                self.tbl_vdf_parameters.cellWidget(1, 1).setText(str(params["assignment"]["beta"]))
+            elif isinstance(params["assignment"]["beta"], str):
+                self.tbl_vdf_parameters.cellWidget(1, 2).setCurrentText(str(params["assignment"]["beta"]))
 
             self.output_scenario_name.setText(params["assignment"]["result_name"])
 
@@ -256,12 +259,22 @@ class TrafficAssignmentDialog(BaseDialog):
             data_dict["assignment"]["algorithm"] = self.cb_choose_algorithm.currentText()
             data_dict["assignment"]["max_iter"] = int(self.max_iter.text())
             data_dict["assignment"]["rgap"] = float(self.rel_gap.text())
-            data_dict["assignment"]["vdf"] = self.cob_vdf.currentText()
-            data_dict["assignment"]["alpha"] = float(self.tbl_vdf_parameters.cellWidget(0, 1).text())
-            data_dict["assignment"]["beta"] = float(self.tbl_vdf_parameters.cellWidget(1, 1).text())
             data_dict["assignment"]["capacity_field"] = self.cob_capacity.currentText()
             data_dict["assignment"]["time_field"] = self.cob_ffttime.currentText()
             data_dict["assignment"]["result_name"] = self.scenario_name
+
+            data_dict["assignment"]["vdf"] = self.cob_vdf.currentText()
+            alpha = self.tbl_vdf_parameters.cellWidget(0, 1).text()
+            if len(alpha) > 0:
+                data_dict["assignment"]["alpha"] = float(alpha)
+            else:
+                data_dict["assignment"]["alpha"] = self.tbl_vdf_parameters.cellWidget(0, 2).currentText()
+
+            beta = self.tbl_vdf_parameters.cellWidget(1, 1).text()
+            if len(beta) > 0:
+                data_dict["assignment"]["beta"] = float(beta)
+            else:
+                data_dict["assignment"]["beta"] = self.tbl_vdf_parameters.cellWidget(1, 2).currentText()
 
             # Add Select Link Analysis data
             if self.do_select_link.isChecked():
