@@ -32,11 +32,10 @@ def create_strings(dct: dict):
 """
     func_string += assignment.format(*dct.get("assignment"))
 
-    # TODO: Select link analysis
     sl = dct.get("select_links")
     if sl:
         select_link = """\n\tfor tc in traffic_classes.values():\n\t\ttc.set_select_links({})"""
-        func_string += select_link.format(sl)
+        func_string += select_link.format(sl["select_links"])
 
     # Execute procedure
     func_string += "\n\tassig.execute()\n"
@@ -45,9 +44,13 @@ def create_strings(dct: dict):
     func_string += f"\n\tassig.save_results('{dct.get("scenario_name")}')"
 
     if dct.get("skimming"):
-        func_string += f"""\n\tassig.save_skims('{dct.get("scenario_name")}', which_ones="all", format="omx")"""
+        func_string += f"""\n\tassig.save_skims('{dct.get("scenario_name")}', which_ones='all', format='omx')"""
 
-    # TODO: save select links outputs
+    if sl:
+        if sl["save_matrix"]:
+            func_string += f"""\n\tassig.save_select_link_matrices('{sl["output_name"]}')"""
+        if sl["save_result"]:
+            func_string += f"""\n\tassig.save_select_link_flows('{sl["output_name"]}')"""
 
     out_name = dct.get("out_name")
     project_path = dct.get("project_path")

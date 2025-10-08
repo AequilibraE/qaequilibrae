@@ -294,6 +294,8 @@ class TrafficAssignmentDialog(BaseDialog):
     def export_python(self):
         out_name = self._browse_python_path()
 
+        self.check_data()
+
         info_dict = {
             "classes": [],
             "assignment": [],
@@ -334,7 +336,12 @@ class TrafficAssignmentDialog(BaseDialog):
         )
 
         if self.do_select_link.isChecked():
-            info_dict["select_links"] = [self.select_links]
+            info_dict["select_links"] = {
+                "select_links": [self.select_links],
+                "output_name": self.sl_mat_name.text(),
+                "save_matrix": self.chb_save_matrix.isChecked(),
+                "save_result": self.chb_save_result.isChecked(),
+            }
 
         _ = create_strings(info_dict)
 
