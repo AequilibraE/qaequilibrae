@@ -15,6 +15,7 @@ from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 
+from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
 
 logger = logging.getLogger("AequilibraEGUI")
@@ -50,6 +51,7 @@ class TrafficAssignmentDialog(BaseDialog):
         self.__current_links = []
         self.__project_links = self.project.network.links.data.link_id
         self.link_layer = self.qgis_project.layers["links"][0]
+        self._from_yaml = False
 
         # Signals for the project tab
         self.but_load_yaml.clicked.connect(self._load_configs)
@@ -140,6 +142,8 @@ class TrafficAssignmentDialog(BaseDialog):
             with open(file_path, "r") as f:
                 params = yaml.safe_load(f)
 
+            self._from_yaml = True
+
             # Populate Traffic Classes tab
             for tc in params["traffic_classes"]:
                 for key, value in tc.items():
@@ -188,7 +192,7 @@ class TrafficAssignmentDialog(BaseDialog):
                 # We manually input `add_query` and `build_query`
                 for qry, links in params["select_links"]["selection"].items():
                     self.__current_links.extend([tuple(link) for link in links])
-                    self.build_query(False, qry)
+                    self.build_query(qry)
 
                 self.sl_mat_name.setText(params["select_links"]["output_name"])
                 if "save_matrix" in params["select_links"]:
@@ -279,7 +283,7 @@ class TrafficAssignmentDialog(BaseDialog):
             if self.do_select_link.isChecked():
                 data_dict["select_links"] = {"selection": {}}
                 for qry, links in self.select_links.items():
-                    data_dict["select_links"]["selection"][qry] = links
+                    data_dict["select_links"]["selection"][qry] = [list(lnk) for lnk in links]
                 data_dict["select_links"]["output_name"] = self.sl_mat_name.text()
                 data_dict["select_links"]["save_matrix"] = self.chb_save_matrix.isChecked()
                 data_dict["select_links"]["save_result"] = self.chb_save_result.isChecked()
@@ -288,72 +292,47 @@ class TrafficAssignmentDialog(BaseDialog):
                 yaml.dump(data_dict, file, default_flow_style=False)
 
     def export_python(self):
-        out_name = self._browse_python_path()
+        # out_name = self._browse_python_path()
 
-        # Set up file main strings
-        func_string = """from aequilibrae.context import get_active_project\n
-def run_assignment():
-\tfrom aequilibrae.paths import TrafficAssignment, TrafficClass
-\n
-\tproject = get_active_project()\n
-"""
+        func_string = self.__build_strings()
 
-        # Set up traffic class strings
-        classes = """
+        # with open(out_name, "w") as file:
+        #     file.write(func_string)
 
-"""
+        # with open(self.project.project_base_path / "run" / "__init__.py", "r") as file:
+        #     lines = file.readlines()
 
-        # Set up traffic assignment strings
-        assignment = """
-\tassig = TrafficAssignment()
-\tassig.set_classes(assigclass)
-\tassig.set_vdf('{}')
-\tassig.set_vdf_parameters('{}')
-\tassig.set_capacity_field('{}')
-\tassig.set_time_field('{}')
-\tassig.set_algorithm('{}')
-\tassig.max_iter = {}
-\tassig.rgap_target = {}
-"""
-        assignment = assignment.format(
-            self.cob_vdf.currentText(),
-            self.vdf_parameters,
-            self.cob_capacity.currentText(),
-            self.cob_ffttime.currentText(),
-            self.cb_choose_algorithm.currentText(),
-            self.miter,
-            float(self.rel_gap.text()),
-            
+        # lines.insert(19, f"from .{out_name.split("/")[-1].split(".")[0]} import run_assignment\n")
+
+        # with open(self.project.project_base_path / "run" / "__init__.py", "w") as file:
+        #     file.writelines(lines)
+
+        # p = Parameters()
+        # p.parameters["run"]["run_assignment"] = None
+        # p.write_back()
+        print(func_string)
+
+    def __build_strings(self):
+        info_dict = {"classes": [], "assignment": [], "scenario_name": self.scenario_name, "skimming": self.skimming}
+
+        # info_dict["classes"]
+
+        info_dict["assignment"].extend(
+            [
+                self.cob_vdf.currentText(),
+                self.vdf_parameters,
+                self.cob_capacity.currentText(),
+                self.cob_ffttime.currentText(),
+                self.cb_choose_algorithm.currentText(),
+                self.miter,
+                float(self.rel_gap.text()),
+            ]
         )
-        func_string += assignment
 
-        # Select link analysis
         if self.do_select_link.isChecked():
-            select_link = """"""
+            info_dict["select_links"] = [self.select_links]
 
-        # Execute procedure
-        func_string += "\tassig.execute()"
-
-        # Save outputs
-        func_string += f"\n\tassig.save_results({self.scenario_name})"
-        
-        if self.skimming:
-            func_string += f"""\tassig.save_skims({self.scenario_name}, which_ones="all", format="omx")"""
-
-        with open(out_name, "w") as file:
-            file.write(func_string)
-
-        with open(self.project.project_base_path / "run" / "__init__.py", "r") as file:
-            lines = file.readlines()
-
-        lines.insert(19, f"from .{out_name.split("/")[-1].split(".")[0]} import run_assignment\n")
-
-        with open(self.project.project_base_path / "run" / "__init__.py", "w") as file:
-            file.writelines(lines)
-
-        p = Parameters()
-        p.parameters["run"]["run_assignment"] = None
-        p.write_back()
+        return create_strings(info_dict)
 
     def set_fixed_cost_use(self):
         for item in [self.cob_fixed_cost, self.lbl_vot, self.vot_setter]:
@@ -364,9 +343,12 @@ def run_assignment():
                 dt = conn.execute("pragma table_info(modes)").fetchall()
                 if "vot" in [x[1] for x in dt]:
                     sql = "select vot from modes where mode_id=?"
-                    v = conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()
-                    # TODO: add an qgis error here
-                    self.vot_setter.setValue(v[0])
+                    v = conn.execute(sql, [self.all_modes[self.cob_mode_for_class.currentText()]]).fetchone()[0]
+                    if v:
+                        self.vot_setter.setValue(v)
+                    else:
+                        msg = self.tr("No VoT found for mode {} in project database. Please configure it.")
+                        self.qgis_project.iface_warning_message(msg.format(self.cob_mode_for_class.currentText()))
 
     def change_class_name(self):
         nm = self.cob_mode_for_class.currentText()
@@ -595,26 +577,23 @@ def run_assignment():
 
         return link_id
 
-    def build_query(self, validate: bool = True, qry_name: str = ""):
-        if validate:
-            query_name = self.input_qry_name.text()
+    def build_query(self, qry_name: str = None):
+        query_name = qry_name if self._from_yaml else self.input_qry_name.text()
 
-            if len(query_name) == 0 or not query_name:
-                self.error = self.tr("Missing query name")
-                qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
-                return
+        if len(query_name) == 0 or not query_name:
+            self.error = self.tr("Missing query name")
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+            return
 
-            if query_name in self.select_links:
-                self.error = self.tr("Query name already used")
-                qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
-                return
+        if query_name in self.select_links:
+            self.error = self.tr("Query name already used")
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+            return
 
-            if not self.__current_links:
-                self.error = self.tr("Please set a link selection")
-                qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
-                return
-        else:
-            query_name = qry_name
+        if not self.__current_links:
+            self.error = self.tr("Please set a link selection")
+            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+            return
 
         self.select_links[query_name] = self.__current_links
 
