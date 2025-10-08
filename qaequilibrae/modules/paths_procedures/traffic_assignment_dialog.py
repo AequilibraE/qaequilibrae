@@ -158,7 +158,7 @@ class TrafficAssignmentDialog(BaseDialog):
                         self.chb_fixed_cost.setChecked(True)
                         self.cob_fixed_cost.setText(value["fixed_cost"])
                         self.vot_setter.setValue(value["vot"])
-                    self._create_traffic_class(False, value["network_mode"])
+                    self._create_traffic_class(value["network_mode"])
 
                     # Populate Skimming tab - we'll reproduce part of the code in `_add_skimming` here
                     if "skims" in value:
@@ -292,30 +292,34 @@ class TrafficAssignmentDialog(BaseDialog):
                 yaml.dump(data_dict, file, default_flow_style=False)
 
     def export_python(self):
-        # out_name = self._browse_python_path()
+        out_name = self._browse_python_path()
 
-        func_string = self.__build_strings()
+        info_dict = {
+            "classes": [],
+            "assignment": [],
+            "scenario_name": self.scenario_name,
+            "skimming": self.skimming,
+            "out_name": out_name,
+            "project_path": self.project.project_base_path,
+        }
 
-        # with open(out_name, "w") as file:
-        #     file.write(func_string)
-
-        # with open(self.project.project_base_path / "run" / "__init__.py", "r") as file:
-        #     lines = file.readlines()
-
-        # lines.insert(19, f"from .{out_name.split("/")[-1].split(".")[0]} import run_assignment\n")
-
-        # with open(self.project.project_base_path / "run" / "__init__.py", "w") as file:
-        #     file.writelines(lines)
-
-        # p = Parameters()
-        # p.parameters["run"]["run_assignment"] = None
-        # p.write_back()
-        print(func_string)
-
-    def __build_strings(self):
-        info_dict = {"classes": [], "assignment": [], "scenario_name": self.scenario_name, "skimming": self.skimming}
-
-        # info_dict["classes"]
+        df = self.project.matrices.list()
+        for tc, info in self.traffic_classes.items():
+            if sys.platform == "win32":
+                pth = str(info.matrix.file_path).split("\\")[-1]
+            else:
+                pth = str(info.matrix.file_path).split("/")[-1]
+            info_dict["classes"].extend(
+                [
+                    [
+                        info.graph.mode,
+                        info.graph.block_centroid_flows,
+                        df.loc[df["file_name"] == pth]["name"].values[0],
+                        info.matrix.view_names[0],
+                        tc,
+                    ]
+                ]
+            )
 
         info_dict["assignment"].extend(
             [
@@ -332,7 +336,11 @@ class TrafficAssignmentDialog(BaseDialog):
         if self.do_select_link.isChecked():
             info_dict["select_links"] = [self.select_links]
 
-        return create_strings(info_dict)
+        _ = create_strings(info_dict)
+
+        p = Parameters()
+        p.parameters["run"]["run_assignment"] = None
+        p.write_back()
 
     def set_fixed_cost_use(self):
         for item in [self.cob_fixed_cost, self.lbl_vot, self.vot_setter]:
@@ -447,7 +455,7 @@ class TrafficAssignmentDialog(BaseDialog):
                 val_fld.addItem(x)
             table.setCellWidget(i, 2, val_fld)
 
-    def _create_traffic_class(self, validate: bool = True, md: str = ""):
+    def _create_traffic_class(self, md: str = None):
         mat_name = self.cob_matrices.currentText()
         if not mat_name:
             raise AttributeError("Matrix not set")
@@ -467,12 +475,9 @@ class TrafficAssignmentDialog(BaseDialog):
         user_classes = [matrix.names[i] for i in rows]
         matrix.computational_view(user_classes)
 
-        if validate:
-            mode = self.cob_mode_for_class.currentText()
-            mode_id = self.all_modes[mode]
-        else:
-            mode = ""
-            mode_id = md
+        mode = "" if self._from_yaml else self.cob_mode_for_class.currentText()
+        mode_id = md if self._from_yaml else self.all_modes[mode]
+
         if mode_id not in self.project.network.graphs:
             self.project.network.build_graphs(modes=[mode_id])
 

@@ -51,6 +51,7 @@ def test_single_class(sf_project, qtbot, mocker):
 
     # Save configs in YAML
     qtbot.mouseClick(dialog.but_save_yaml, Qt.LeftButton)
+    # Save configs in Python file
     qtbot.mouseClick(dialog.but_save_python, Qt.LeftButton)
 
     dialog.run()
@@ -273,6 +274,8 @@ def test_select_link_analysis(sf_project, qtbot, mocker):
 
     # Save configs in YAML
     qtbot.mouseClick(dialog.but_save_yaml, Qt.LeftButton)
+    # Save configs in Python file
+    # qtbot.mouseClick(dialog.but_save_python, Qt.LeftButton)
 
     dialog.run()
 
