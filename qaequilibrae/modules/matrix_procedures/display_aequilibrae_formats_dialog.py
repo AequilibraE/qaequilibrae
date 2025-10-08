@@ -1,4 +1,3 @@
-import logging
 from math import ceil
 from os.path import dirname, join
 from pathlib import Path
@@ -35,7 +34,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.setupUi(self)
             self.data_to_show = None
             self.error = None
-            self.logger = logging.getLogger("qaequilibrae") or get_logger()
+            self.logger = get_logger()
             self.qgis_project = qgis_project
             self.from_proj = True if qgis_project.project else False
             self.indices = np.array(1)

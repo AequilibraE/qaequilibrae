@@ -1,4 +1,3 @@
-import logging
 import sys
 from functools import partial
 from os.path import dirname, isdir, join
@@ -24,7 +23,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_transponet_cons
 class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.logger = logging.getLogger("qaequilibrae") or get_logger()
+        self.logger = get_logger()
         self.iface = qgis_project.iface
         self.qgis_project = qgis_project
         self.setupUi(self)

@@ -1,4 +1,3 @@
-import logging
 from collections import OrderedDict
 from functools import partial
 from os.path import basename, dirname, join, splitext
@@ -22,7 +21,7 @@ from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
 
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
 
-logger = logging.getLogger("qaequilibrae") or get_logger()
+logger = get_logger()
 
 
 class DistributionModelsDialog(BaseDialog):

@@ -1,4 +1,3 @@
-import logging
 from os.path import dirname, join
 
 import pandas as pd
@@ -33,7 +32,7 @@ class DesireLinesDialog(BaseDialog):
             self.proj_matrices = pd.DataFrame([])
         else:
             self.proj_matrices = list_matrices(self.qgis_project.project)
-        self.logger = logging.getLogger("qaequilibrae") or get_logger()
+        self.logger = get_logger()
 
         self.resize(389, 385)
 

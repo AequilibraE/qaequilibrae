@@ -11,13 +11,12 @@ __copyright__ += "Disaster Reduction"
 """
 
 import configparser
-import logging
 import os
 
 import pytest
 from aequilibrae.context import get_logger
 
-LOGGER = logging.getLogger("qaequilibrae") or get_logger()
+LOGGER = get_logger()
 
 
 @pytest.mark.parametrize("expectation", ["name", "description", "qgisMinimumVersion", "email", "author"])

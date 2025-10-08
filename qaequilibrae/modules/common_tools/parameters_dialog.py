@@ -1,4 +1,3 @@
-import logging
 from os.path import dirname, join
 
 import yaml
@@ -33,7 +32,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         lexer.setDefaultFont(font)
         self.text_box.setLexer(lexer)
         self.text_box.setFolding(self.text_box.PlainFoldStyle)
-        self.logger = logging.getLogger("qaequilibrae") or get_logger()
+        self.logger = get_logger()
 
         # Load the data
         self.load_original_data()

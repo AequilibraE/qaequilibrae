@@ -1,7 +1,6 @@
 # coding=utf-8
 """Common functionality used by regression tests."""
 
-import logging
 import os
 import sys
 from os.path import abspath, dirname, exists, join
@@ -21,7 +20,7 @@ from qgis.core import (
     QgsVectorLayer,
 )
 
-LOGGER = logging.getLogger("qaequilibrae") or get_logger()
+LOGGER = get_logger()
 QGIS_APP = None  # Static variable used to hold hand to running QGIS app
 CANVAS = None
 PARENT = None

@@ -1,5 +1,4 @@
 import glob
-import logging
 import subprocess
 import sys
 import tempfile
@@ -65,7 +64,7 @@ class AequilibraEMenu:
     def __init__(self, iface):
         set_aequilibrae_menu_instance(self)
         # Closes AequilibraE projects eventually opened in memory
-        self.logger = logging.getLogger("qaequilibrae") or self.get_logger()
+        self.logger = self.get_logger()
         self.geo_layers_list = ["links", "nodes", "zones"]
         self.available_scenarios = []
         self.iface = iface

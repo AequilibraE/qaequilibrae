@@ -1,4 +1,3 @@
-import logging
 import sys
 from tempfile import gettempdir
 from os.path import dirname, join
@@ -19,7 +18,7 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-logger = logging.getLogger("qaequilibrae") or get_logger()
+logger = get_logger()
 
 
 # TODO: Add a button to export configurations as a yaml file
