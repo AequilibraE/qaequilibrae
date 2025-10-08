@@ -315,6 +315,8 @@ class TrafficAssignmentDialog(BaseDialog):
                 [
                     [
                         info.graph.mode,
+                        self.cob_ffttime.currentText(),
+                        self.skims[tc] if self.skims[tc] else [],
                         info.graph.block_centroid_flows,
                         df.loc[df["file_name"] == pth]["name"].values[0],
                         info.matrix.view_names[0],

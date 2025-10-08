@@ -11,6 +11,8 @@ def create_strings(dct: dict):
 
     # Set up traffic class strings
     loop = """\tgraph = project.network.graphs['{}']
+\tgraph.set_graph('{}')
+\tgraph.set_skimming({})
 \tgraph.set_blocked_centroid_flows({})
 \n\tdemand = matrices.get_matrix('{}')
 \tdemand.computational_view(['{}'])

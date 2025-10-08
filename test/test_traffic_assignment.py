@@ -450,17 +450,17 @@ def test_single_class_from_python(sf_project, qtbot, mocker):
     project = sf_project.project
     project.run.run_assignment()
 
-    # assert isfile(sf_project.project._results_database_path)
+    assert isfile(sf_project.project._results_database_path)
 
-    # # Assert we have a non-null result and that results are actually stored in the file
-    # with sf_project.project.results_connection as conn:
-    #     assert conn.execute(f"SELECT ROUND(SUM(PCE_tot), 4) FROM {test_name}").fetchone()[0] > 0
+    # Assert we have a non-null result and that results are actually stored in the file
+    with sf_project.project.results_connection as conn:
+        assert conn.execute(f"SELECT ROUND(SUM(PCE_tot), 4) FROM {test_name}").fetchone()[0] > 0
 
-    # skims = sf_project.project.project_base_path / "matrices" / f"{test_name}_car.omx"
-    # assert isfile(skims)
+    skims = sf_project.project.project_base_path / "matrices" / f"{test_name}_car.omx"
+    assert isfile(skims)
 
-    # with omx.open_file(skims, "a") as omx_file:
-    #     assert round(np.sum(np.nan_to_num(omx_file["free_flow_time_final"][:])), 4) > 0
-    #     assert round(np.sum(np.nan_to_num(omx_file["free_flow_time_blended"][:])), 4) > 0
-    #     assert round(np.sum(np.nan_to_num(omx_file["distance_final"][:])), 4) > 0
-    #     assert round(np.sum(np.nan_to_num(omx_file["distance_blended"][:])), 4) > 0
+    with omx.open_file(skims, "a") as omx_file:
+        assert round(np.sum(np.nan_to_num(omx_file["free_flow_time_final"][:])), 4) > 0
+        assert round(np.sum(np.nan_to_num(omx_file["free_flow_time_blended"][:])), 4) > 0
+        assert round(np.sum(np.nan_to_num(omx_file["distance_final"][:])), 4) > 0
+        assert round(np.sum(np.nan_to_num(omx_file["distance_blended"][:])), 4) > 0
