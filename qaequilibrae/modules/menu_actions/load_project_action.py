@@ -44,7 +44,7 @@ def _run_load_project_from_path(qgis_project, proj_path):
     try:
         outdirs = qgis_project.project.list_scenarios()["scenario_name"].tolist()
     except Exception as e:
-        qgis_project.message_log(f"Exception: {e.args[0]}.")
+        qgis_project.message_log(f"Exception: {str(e)}.")
         qgis_project.message_log("Upgrading project database to handle exception")
         qgis_project.project.upgrade()
         outdirs = qgis_project.project.list_scenarios()["scenario_name"].tolist()
