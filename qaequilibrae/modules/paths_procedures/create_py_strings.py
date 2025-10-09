@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 def create_strings(dct: dict):
     # Set up file main strings
     func_string = """from aequilibrae.context import get_active_project
@@ -62,7 +65,14 @@ def create_strings(dct: dict):
     with open(project_path / "run" / "__init__.py", "r") as file:
         lines = file.readlines()
 
-    lines.insert(19, f"from .{out_name.split("/")[-1].split(".")[0]} import run_assignment\n")
+    # Find the last import statement to insert after
+    import_line_idx = -1
+    for idx, line in enumerate(lines):
+        if line.strip().startswith("import") or line.strip().startswith("from"):
+            import_line_idx = idx
+    insert_idx = import_line_idx + 1
+
+    lines.insert(insert_idx, f"from .{Path(out_name).stem} import run_assignment\n")
 
     with open(project_path / "run" / "__init__.py", "w") as file:
         file.writelines(lines)

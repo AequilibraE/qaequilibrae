@@ -1,7 +1,7 @@
 import logging
-import sys
 from tempfile import gettempdir
 from os.path import dirname, join
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -233,10 +233,7 @@ class TrafficAssignmentDialog(BaseDialog):
                 data_dict["traffic_classes"].extend([{tc: {}}])
                 dc = data_dict["traffic_classes"][idx][tc]
 
-                if sys.platform == "win32":
-                    pth = str(info.matrix.file_path).split("\\")[-1]
-                else:
-                    pth = str(info.matrix.file_path).split("/")[-1]
+                pth = Path(info.matrix.file_path).name
                 df = self.project.matrices.list()
                 dc["matrix_name"] = df.loc[df["file_name"] == pth]["name"].values[0]
                 dc["matrix_core"] = info.matrix.view_names[0]
@@ -307,10 +304,7 @@ class TrafficAssignmentDialog(BaseDialog):
 
         df = self.project.matrices.list()
         for tc, info in self.traffic_classes.items():
-            if sys.platform == "win32":
-                pth = str(info.matrix.file_path).split("\\")[-1]
-            else:
-                pth = str(info.matrix.file_path).split("/")[-1]
+            pth = Path(info.matrix.file_path).name
             info_dict["classes"].extend(
                 [
                     [
