@@ -279,16 +279,17 @@ class AequilibraEMenu:
         if not self.project:
             return
         self.remove_aequilibrae_layers()
-        self.project.use_scenario("root")
-        pth = str(self.project.project_base_path)
-        self.project.close()
-        self.cob_scenarios.clear()
-        self.projectManager.clear()
-        self.project = None
-        self.available_scenarios = []
-        self.matrices.clear()
-        self.layers.clear()
-        self.message_log(f"Closed project on: {pth}")
+        if self.project:
+            self.project.use_scenario("root")
+            pth = str(self.project.project_base_path)
+            self.project.close()
+            self.cob_scenarios.clear()
+            self.projectManager.clear()
+            self.project = None
+            self.available_scenarios = []
+            self.matrices.clear()
+            self.layers.clear()
+            self.message_log(f"Closed project on: {pth}")
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]

@@ -28,7 +28,6 @@ def _run_load_project_from_path(qgis_project, proj_path):
 
         try:
             qgis_project.project.open(proj_path)
-            qgis_project.message_log(f"Opened project on: {proj_path}")
         except FileNotFoundError as e:
             if e.args[0] == "Model does not exist. Check your path and try again":
                 qgis_project.iface_error_message(
@@ -42,8 +41,17 @@ def _run_load_project_from_path(qgis_project, proj_path):
     with open(pth, "w") as file:
         file.write(proj_path)
 
-    outdirs = qgis_project.project.list_scenarios()["scenario_name"].tolist()
+    try:
+        outdirs = qgis_project.project.list_scenarios()["scenario_name"].tolist()
+    except Exception as e:
+        qgis_project.message_log(f"Exception: {e.args[0]}.")
+        qgis_project.message_log("Upgrading project database to handle exception")
+        qgis_project.project.upgrade()
+        outdirs = qgis_project.project.list_scenarios()["scenario_name"].tolist()
+
     qgis_project.cob_scenarios.addItems(outdirs)
     qgis_project.available_scenarios.extend(outdirs)
 
     qgis_project.update_project_layers()
+
+    qgis_project.message_log(f"Opened project on: {proj_path}")
