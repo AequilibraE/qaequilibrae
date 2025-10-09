@@ -11,7 +11,8 @@ perform traffic assignment, since we have a demand matrix.
     :alt: Traffic assignment widget menu
 
 The Traffic Assignment window currently has five tabs. The first one is the *Project* tab
-where you can check the project path and the available modes.
+where you can check the project path and the available modes. In the *Project* tab it is
+also possible to load configuration from a YAML file.
 
 .. image:: ../images/traffic_assignment/traffic_assignment_project_tab.png
     :align: center
@@ -59,7 +60,10 @@ are also configured here.
 In the *Assignment* tab we select the assignment algorithm and configure the volume-delay
 function and its *alpha* and *beta* parameters. The fields for link capacity and free flow
 travel time are selected. We also confirm the relative gap and maximum number of iterations
-we want, and the output folder.
+we want, and the output folder. Now it is possible to save your project configurations in
+either one Python or YAML file. While the Python file is stored inside the project run folder
+to be executed as part of 'Run procedures', the YAML file can be used as input for other
+model runs, as input in the *Project* tab.
 
 .. image:: ../images/traffic_assignment/traffic_assignment_assignment_tab.png
     :align: center
