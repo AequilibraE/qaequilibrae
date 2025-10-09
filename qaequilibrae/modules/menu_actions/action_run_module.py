@@ -5,7 +5,7 @@ def run_module(qgis_project):
     if qgis_project.project is None:
         qgis_project.show_message_no_project()
         return
-    
+
     if qgis_project.project:
         p = Parameters()
         if "run" not in p.parameters:
