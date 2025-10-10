@@ -18,6 +18,8 @@ def run_load_project(qgis_project):
 
 def _run_load_project_from_path(qgis_project, proj_path):
     from aequilibrae.project import Project
+    from aequilibrae.project.tools import MigrationManager
+    from aequilibrae.utils.spatialite_utils import connect_spatialite
 
     if proj_path is None or proj_path == "":
         return
@@ -46,7 +48,18 @@ def _run_load_project_from_path(qgis_project, proj_path):
     except Exception as e:
         qgis_project.message_log(f"Exception: {str(e)}.")
         qgis_project.message_log("Upgrading project database to handle exception")
-        qgis_project.project.upgrade()
+        # This is a copy of AequilibraE's `project.upgrade()` to upgrade only project_database.
+        connections = {
+            "project_conn": connect_spatialite(qgis_project.project._project_database_path),
+            "transit_conn": None,
+            "results_conn": None,
+        }
+        mm = MigrationManager(MigrationManager.network_migration_file)
+        with connections["project_conn"] as conn:
+            mm.mark_all_as_seen(conn)
+        mm.upgrade("project_conn", connections=connections)
+        qgis_project.message_log("Completed database upgrades")
+        connections["project_conn"].close()
         outdirs = qgis_project.project.list_scenarios()["scenario_name"].tolist()
 
     qgis_project.cob_scenarios.addItems(outdirs)
