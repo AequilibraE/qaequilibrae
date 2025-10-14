@@ -14,7 +14,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/Add_connectors.py" line="12"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
 </context>
 <context>
@@ -82,7 +82,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="144"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
 </context>
 <context>
@@ -90,17 +90,17 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_zones.py" line="12"/>
         <source>Add zoning data</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar Zonas</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_zones.py" line="12"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_zones.py" line="12"/>
         <source>Add project zones</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar zonas ao projeto.</translation>
     </message>
 </context>
 <context>
@@ -121,7 +121,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="113"/>
         <source>Open project</source>
-        <translation type="unfinished"/>
+        <translation>Abrir projeto</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="116"/>
@@ -171,7 +171,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="121"/>
         <source>Trip distribution</source>
-        <translation type="unfinished"/>
+        <translation>Distribuição de viagens</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="125"/>
@@ -181,62 +181,62 @@
     <message>
         <location filename="../qaequilibrae.py" line="133"/>
         <source>Traffic assignment</source>
-        <translation type="unfinished"/>
+        <translation>Alocação de tráfego</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="142"/>
         <source>Transit</source>
-        <translation type="unfinished"/>
+        <translation>Transporte público</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="149"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="144"/>
         <source>Skimming and assignment</source>
-        <translation type="unfinished"/>
+        <translation>Matriz de custos e alocação</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="145"/>
         <source>Explore transit</source>
-        <translation type="unfinished"/>
+        <translation>Explorar Transporte Público</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="151"/>
         <source>Desire lines</source>
-        <translation type="unfinished"/>
+        <translation>Linhas de Desejo</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="152"/>
         <source>Stacked bandwidth</source>
-        <translation type="unfinished"/>
+        <translation>Mapa de volumes</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="153"/>
         <source>Scenario comparison</source>
-        <translation type="unfinished"/>
+        <translation>Comparação de cenários</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="115"/>
         <source>Scenarios</source>
-        <translation type="unfinished"/>
+        <translation>Cenários</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="339"/>
         <source>You need to load a project</source>
-        <translation type="unfinished"/>
+        <translation>Você precisa carregar um projeto</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="342"/>
         <source>You need to close the currently open project</source>
-        <translation type="unfinished"/>
+        <translation>Você precisa fechar o projeto aberto</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="345"/>
         <source>You need to import a GTFS feed</source>
-        <translation type="unfinished"/>
+        <translation>Você precisa importar um arquivo GTFS</translation>
     </message>
 </context>
 <context>
@@ -287,17 +287,17 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
         <source>Close project</source>
-        <translation type="unfinished"/>
+        <translation>Fechar projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
         <source>Close AequilibraE project into QGIS.</source>
-        <translation type="unfinished"/>
+        <translation>Fecha projeto do AequilibraE no QGIS.</translation>
     </message>
 </context>
 <context>
@@ -340,7 +340,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="72"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
 </context>
 <context>
@@ -384,17 +384,17 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
         <source>Create examples</source>
-        <translation type="unfinished"/>
+        <translation>Criar exemplos</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
         <source>Create AequilibraE examples.</source>
-        <translation type="unfinished"/>
+        <translation>Cria exemplos do AequilibraE.</translation>
     </message>
 </context>
 <context>
@@ -402,17 +402,17 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
         <source>Create scenarios</source>
-        <translation type="unfinished"/>
+        <translation>Criar cenário</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
         <source>Create model scenarios</source>
-        <translation type="unfinished"/>
+        <translation>Criar cenários para o modelo</translation>
     </message>
 </context>
 <context>
@@ -536,12 +536,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/desire_lines.py" line="13"/>
         <source>Desire lines</source>
-        <translation type="unfinished"/>
+        <translation>Linhas de Desejo</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/desire_lines.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
 </context>
 <context>
@@ -939,12 +939,12 @@
     <message>
         <location filename="../modules/processing_provider/transit_procedures/explore_transit.py" line="13"/>
         <source>Explore transit</source>
-        <translation type="unfinished"/>
+        <translation>Explorar Transporte Público</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/transit_procedures/explore_transit.py" line="13"/>
         <source>Transit</source>
-        <translation type="unfinished"/>
+        <translation>Transporte público</translation>
     </message>
 </context>
 <context>
@@ -982,7 +982,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="82"/>
         <source>Exports an existing matrix file into *.csv or *.omx</source>
-        <translation type="unfinished"/>
+        <translation>Exportar arquivo de matriz existente para *.csv ou *.omx</translation>
     </message>
 </context>
 <context>
@@ -1345,7 +1345,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="81"/>
         <source>Invert colors</source>
-        <translation type="unfinished"/>
+        <translation>Inverter cores</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="114"/>
@@ -1360,32 +1360,32 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="19"/>
         <source>AequilibraE - Scenarios</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Cenários</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="45"/>
         <source>Clone scenario</source>
-        <translation type="unfinished"/>
+        <translation>Clonar cenário</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="55"/>
         <source>Create empty scenario</source>
-        <translation type="unfinished"/>
+        <translation>Criar cenário vazio</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="80"/>
         <source>Scenario to clone</source>
-        <translation type="unfinished"/>
+        <translation>Clonar cenário a partir</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="90"/>
         <source>Scenario name</source>
-        <translation type="unfinished"/>
+        <translation>Nome do cenário</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="123"/>
         <source>OK</source>
-        <translation type="unfinished"/>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -1429,7 +1429,7 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/impedance_matrix.py" line="13"/>
         <source>Impedance matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matriz de impedância</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/paths_procedures/impedance_matrix.py" line="13"/>
@@ -1563,7 +1563,7 @@
     <message>
         <location filename="../modules/processing_provider/transit_procedures/import_gtfs.py" line="13"/>
         <source>Transit</source>
-        <translation type="unfinished"/>
+        <translation>Transporte público</translation>
     </message>
 </context>
 <context>
@@ -1571,17 +1571,17 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/import_matrices.py" line="13"/>
         <source>Import matrices</source>
-        <translation type="unfinished"/>
+        <translation>Importar matrizes</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/import_matrices.py" line="13"/>
         <source>Data</source>
-        <translation type="unfinished"/>
+        <translation>Dados</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/import_matrices.py" line="13"/>
         <source>Saves matrix from open layer into a *.omx file</source>
-        <translation type="unfinished"/>
+        <translation>Salva em formato .*omx a matriz aberta em uma camada do QGIS</translation>
     </message>
 </context>
 <context>
@@ -1656,17 +1656,17 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
         <source>Logfile</source>
-        <translation type="unfinished"/>
+        <translation>Registro de Operações</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
         <source>Access project logfile</source>
-        <translation type="unfinished"/>
+        <translation>Acessar registro de operações do projeto</translation>
     </message>
 </context>
 <context>
@@ -1674,17 +1674,17 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_parameters.py" line="13"/>
         <source>Parameters</source>
-        <translation type="unfinished"/>
+        <translation>Parâmetros</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_parameters.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_parameters.py" line="13"/>
         <source>Access project parameters</source>
-        <translation type="unfinished"/>
+        <translation>Acessar parâmetros do projeto</translation>
     </message>
 </context>
 <context>
@@ -1775,7 +1775,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="107"/>
         <source>Data</source>
-        <translation type="unfinished"/>
+        <translation>Dados</translation>
     </message>
 </context>
 <context>
@@ -1892,7 +1892,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="99"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
 </context>
 <context>
@@ -1900,17 +1900,17 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/open_project.py" line="13"/>
         <source>Open project</source>
-        <translation type="unfinished"/>
+        <translation>Abrir projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/open_project.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/open_project.py" line="13"/>
         <source>Open AequilibraE project</source>
-        <translation type="unfinished"/>
+        <translation>Abrir projeto do AequilibraE</translation>
     </message>
 </context>
 <context>
@@ -1931,17 +1931,17 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_preparation.py" line="12"/>
         <source>Network preparation</source>
-        <translation type="unfinished"/>
+        <translation>Preparar rede</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_preparation.py" line="12"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_preparation.py" line="12"/>
         <source>Prepares network for import</source>
-        <translation type="unfinished"/>
+        <translation>Preparar redes para importação</translation>
     </message>
 </context>
 <context>
@@ -1959,7 +1959,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/project_from_layer.py" line="13"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
 </context>
 <context>
@@ -1977,7 +1977,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/project_from_OSM.py" line="13"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construção de Modelos</translation>
     </message>
 </context>
 <context>
@@ -2321,7 +2321,7 @@
     <message>
         <location filename="../modules/processing_provider/route_choice/route_choice.py" line="13"/>
         <source>Route choice</source>
-        <translation type="unfinished"/>
+        <translation>Escolha de rota</translation>
     </message>
 </context>
 <context>
@@ -2380,17 +2380,17 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="108"/>
         <source>There are missing requirements to run the procedures.</source>
-        <translation type="unfinished"/>
+        <translation>Existem requisitos faltantes para executar os procedimentos do modelo.</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="109"/>
         <source>Do you want us to install these missing Python packages?</source>
-        <translation type="unfinished"/>
+        <translation>Você gostaria de instalar os pacotes faltantes?</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="110"/>
         <source>Without installing the packages, you cannot use &apos;Run Procedures&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>Sem esses pacotes, não é possível executar os procedimentos do modelo.</translation>
     </message>
 </context>
 <context>
@@ -2403,12 +2403,12 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/run_module.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projeto</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/run_module.py" line="13"/>
         <source>Run model procedures</source>
-        <translation type="unfinished"/>
+        <translation>Executar procedimentos do modelo</translation>
     </message>
 </context>
 <context>
@@ -2416,12 +2416,12 @@
     <message>
         <location filename="../modules/processing_provider/routing_procedures/tsp.py" line="13"/>
         <source>Traveling salesman problem</source>
-        <translation type="unfinished"/>
+        <translation>Problema do Caixeiro Viajante</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/routing_procedures/tsp.py" line="13"/>
         <source>Routing</source>
-        <translation type="unfinished"/>
+        <translation>Roteirização</translation>
     </message>
 </context>
 <context>
@@ -2429,12 +2429,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/scenario_comparison.py" line="13"/>
         <source>Scenario comparison</source>
-        <translation type="unfinished"/>
+        <translation>Comparação de cenários</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/scenario_comparison.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
 </context>
 <context>
@@ -2442,7 +2442,7 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/shortest_path.py" line="13"/>
         <source>Shortest path</source>
-        <translation type="unfinished"/>
+        <translation>Caminho mínimo</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/paths_procedures/shortest_path.py" line="13"/>
@@ -2501,12 +2501,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/simple_tag.py" line="13"/>
         <source>Simple tag</source>
-        <translation type="unfinished"/>
+        <translation>Etiqueta</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/simple_tag.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
 </context>
 <context>
@@ -2552,7 +2552,7 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/skim_viewer.py" line="13"/>
         <source>Skim viewer</source>
-        <translation type="unfinished"/>
+        <translation>Visualizador de matrizes</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/paths_procedures/skim_viewer.py" line="13"/>
@@ -2570,7 +2570,7 @@
     <message>
         <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="99"/>
         <source>Critical layer for Skim Viewer removed from the layers&apos; panel</source>
-        <translation type="unfinished"/>
+        <translation>Camada essencial para o visualizador de matrizes removida do painel de camadas</translation>
     </message>
 </context>
 <context>
@@ -2578,12 +2578,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/stacked_bandwidth.py" line="13"/>
         <source>Stacked bandwidth</source>
-        <translation type="unfinished"/>
+        <translation>Mapa de volumes</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/stacked_bandwidth.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
 </context>
 <context>
@@ -2687,7 +2687,7 @@
     <message>
         <location filename="../modules/processing_provider/assignment_procedures/traffic_assignment.py" line="13"/>
         <source>Traffic assignment</source>
-        <translation type="unfinished"/>
+        <translation>Alocação de tráfego</translation>
     </message>
 </context>
 <context>
@@ -2768,12 +2768,12 @@
     <message>
         <location filename="../modules/processing_provider/transit_procedures/transit_assignment.py" line="13"/>
         <source>Skimming and assignment</source>
-        <translation type="unfinished"/>
+        <translation>Matriz de custos e alocação</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/transit_procedures/transit_assignment.py" line="13"/>
         <source>Transit</source>
-        <translation type="unfinished"/>
+        <translation>Transporte público</translation>
     </message>
 </context>
 <context>
@@ -2781,7 +2781,7 @@
     <message>
         <location filename="../modules/processing_provider/distribution_procedures/trip_distribution.py" line="13"/>
         <source>Trip distribution</source>
-        <translation type="unfinished"/>
+        <translation>Distribuição de viagens</translation>
     </message>
 </context>
 <context>
@@ -2839,7 +2839,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="171"/>
         <source>Data</source>
-        <translation type="unfinished"/>
+        <translation>Dados</translation>
     </message>
 </context>
 <context>
@@ -2847,12 +2847,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
         <source>Visualize data</source>
-        <translation type="unfinished"/>
+        <translation>Visualizar Dados</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Mapas</translation>
     </message>
 </context>
 <context>
@@ -3028,12 +3028,12 @@
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="213"/>
         <source>Alternative scenario</source>
-        <translation type="unfinished"/>
+        <translation>Cenário alternativo</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="380"/>
         <source>Scenario</source>
-        <translation type="unfinished"/>
+        <translation>Cenário</translation>
     </message>
 </context>
 <context>
@@ -3893,7 +3893,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="73"/>
         <source>Configure from YAML</source>
-        <translation type="unfinished"/>
+        <translation>Configurar a partir do YAML</translation>
     </message>
 </context>
 <context>
