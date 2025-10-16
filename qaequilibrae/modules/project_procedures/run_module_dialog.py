@@ -37,12 +37,19 @@ class RunModuleDialog(BaseDialog):
 
         except ModuleNotFoundError:
             run_path = self.project.project_base_path / "run" / "requirements.txt"
-            target_dir = Path(__file__).parent.parent.parent / "packages"
+            target_dir = self.project.project_base_path / "run" / "_dependencies"
             if isfile(run_path):
                 self.question = QMessageBox.question(
                     self, "Missing requirements", self.rp_message, QMessageBox.Ok | QMessageBox.Cancel
                 )
                 if self.question == QMessageBox.Ok:
+                    # Create '_dependencies' folder if it does not exist and add a '__init__.py' file
+                    Path(self.target_folder).mkdir(parents=True, exist_ok=True)
+                    init_file = self.target_folder / "__init__.py"
+                    if not init_file.exists():
+                        init_file.touch()
+
+                    # Prepare installation
                     install_command = f'"{DownloadAll().find_python()}"'
                     install_command += f" -m pip install -r {run_path} --target {target_dir}"
                     self.qgis_project.message_log(install_command)
