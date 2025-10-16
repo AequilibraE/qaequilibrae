@@ -45,6 +45,17 @@ To better understand the application of the run module, we encourage you to read
     :align: center
     :alt: run module dialog
 
+It is possible to use one of the default functions or create your own, including function calls
+to external libraries. To do so, don't forget to include a ``requirements.txt`` file with the
+dependencies in your project's run folder. The next time you open 'Run procedures', a message
+box asking about dependencies installation will open. If you choose to install the dependencies,
+the process resembles the one when installing QAequilibraE. Wait until it's complete, and restart
+the 'Run procedures' to validate the installation.
+
+.. image:: ../images/project_procedures/run_module_missing_requirements.png
+    :align: center
+    :alt: run module missing requirements
+
 Scenarios
 ---------
 
