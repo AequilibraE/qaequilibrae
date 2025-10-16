@@ -1,5 +1,3 @@
-from unittest import mock
-
 import numpy as np
 import pandas as pd
 from aequilibrae.parameters import Parameters
@@ -23,23 +21,15 @@ def create_dialog_with_matrix(project):
 
 
 def test_example_function_with_kwargs(coquimbo_project, qtbot, timeoutDetector):
-    # Patch LogDialog to avoid modal exec_ blocking the test
-    with mock.patch("qaequilibrae.modules.project_procedures.run_module_dialog.LogDialog") as MockLogDialog:
-        # Make exec_ do nothing
-        MockLogDialog.return_value.exec_ = lambda *args, **kwargs: None
-        MockLogDialog.return_value.show = lambda *args, **kwargs: None
+    dialog = RunModuleDialog(coquimbo_project)
 
-        dialog = RunModuleDialog(coquimbo_project)
+    dialog.cob_function.setCurrentIndex(0)
+    assert dialog.cob_function.currentText() == functions[3]
 
-        dialog.cob_function.setCurrentIndex(0)
-        assert dialog.cob_function.currentText() == functions[3]
+    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
-        qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
-
-        project_log = dialog.project.log()
-        contents = project_log.contents()
-
-        assert "example_function_with_kwargs executed. Check for outputs." in contents[-1]
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[3][0] == "example_function_with_kwargs executed:", "Level 3 error message is missing"
 
 
 def test_new_function(coquimbo_project, qtbot, timeoutDetector):
@@ -76,19 +66,14 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
     p.parameters["run"]["create_delaunay"]["result_name"] = "delaunay_test"
     p.write_back()
 
-    with mock.patch("qaequilibrae.modules.project_procedures.run_module_dialog.LogDialog") as MockLogDialog:
-        # Make exec_ do nothing
-        MockLogDialog.return_value.exec_ = lambda *args, **kwargs: None
-        MockLogDialog.return_value.show = lambda *args, **kwargs: None
+    dialog = create_dialog_with_matrix(coquimbo_project)
 
-        dialog = create_dialog_with_matrix(coquimbo_project)
+    assert len(dialog.items) > 1
 
-        assert len(dialog.items) > 1
+    dialog.cob_function.setCurrentIndex(0)
+    assert dialog.cob_function.currentText() == "create_delaunay"
 
-        dialog.cob_function.setCurrentIndex(0)
-        assert dialog.cob_function.currentText() == "create_delaunay"
-
-        qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
 
     with coquimbo_project.project.results_connection as conn:
         results = pd.read_sql("SELECT * FROM delaunay_test", conn).set_index("link_id")
