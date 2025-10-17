@@ -15,7 +15,7 @@ class GTFSFeed(QDialog, FORM_CLASS):
     def __init__(self, qgis_project, pt_object):
         QDialog.__init__(self)
         qgis_project.block_change_scenario()
-        self.iface = qgis_project.iface
+        self.qgis_project = qgis_project
         self.setupUi(self)
         self.qgis_project = qgis_project
         self._p = pt_object
@@ -70,7 +70,7 @@ class GTFSFeed(QDialog, FORM_CLASS):
         descr = self.led_description.text()
         ag = self.led_agency.text()
         if "" in [descr, ag]:
-            self.iface.messageBar().pushMessage("Error", self.tr("Enter agency and description"), level=3, duration=10)
+            self.qgis_project.iface_error_message(self.tr("Enter agency and description"))
             return
 
         date = self.service_calendar.selectedDate().toString("yyyy-MM-dd")

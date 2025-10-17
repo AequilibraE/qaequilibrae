@@ -222,9 +222,7 @@ class SimpleTagDialog(BaseDialog):
             )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage(
-                self.tr("Input data not provided correctly"), self.tr("  Try again"), level=3
-            )
+            self.qgis_project.iface_error_message(self.tr("Try again"), self.tr("Input data not provided correctly"))
 
     def string_order(self, order):
         if order == 1:
@@ -249,8 +247,8 @@ class SimpleTagDialog(BaseDialog):
             self.lbl_operation.clear()
             self.progressbar.reset()
             if self.worker_thread.error is not None:
-                qgis.utils.iface.messageBar().pushMessage(
-                    self.tr("Input data not provided correctly"), self.worker_thread.error, level=3
+                self.qgis_project.iface_error_message(
+                    self.worker_thread.error, self.tr("Input data not provided correctly")
                 )
             self.close()
 

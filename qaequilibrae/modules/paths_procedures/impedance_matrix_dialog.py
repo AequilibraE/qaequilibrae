@@ -169,7 +169,7 @@ class ImpedanceMatrixDialog(BaseDialog):
         try:
             self.run_thread()
         except ValueError as error:
-            qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
+            self.qgis_project.iface_error_message(error.message, self.tr("Input error"))
 
     @staticmethod
     def only_str(str_input):

@@ -1,12 +1,11 @@
-import logging
 from tempfile import gettempdir
 from os.path import dirname, join
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import qgis
 import yaml
+from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
@@ -18,7 +17,7 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
 
-logger = logging.getLogger("AequilibraEGUI")
+logger = get_logger()
 
 
 class TrafficAssignmentDialog(BaseDialog):
@@ -465,7 +464,7 @@ class TrafficAssignmentDialog(BaseDialog):
 
         class_name = self.ln_class_name.text()
         if class_name in self.traffic_classes:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Class name already used"), "", level=2, duration=10)
+            self.qgis_project.iface_error_message(self.tr("Class name already used"))
 
         self.but_add_skim.setEnabled(True)
 
@@ -572,15 +571,13 @@ class TrafficAssignmentDialog(BaseDialog):
 
         # Check if we have only numbers
         if not link_id.isdigit():
-            self.error = self.tr("Wrong value for link ID")
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+            self.qgis_project.iface_error_message(self.tr("Wrong value for link ID"), self.tr("Input error"))
             return
 
         # Check if link_id exists
         link_id = int(link_id)
         if link_id not in self.__project_links:
-            self.error = self.tr("Link ID doesn't exist in project")
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=2, duration=5)
+            self.qgis_project.iface_error_message(self.tr("Link ID doesn't exist in project"), self.tr("Input error"))
             return
 
         return link_id
@@ -589,19 +586,18 @@ class TrafficAssignmentDialog(BaseDialog):
         query_name = qry_name if self._from_yaml else self.input_qry_name.text()
 
         if len(query_name) == 0 or not query_name:
-            self.error = self.tr("Missing query name")
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+            self.qgis_project.iface_error_message(self.tr("Missing query name"), self.tr("Input error"))
             return
 
         if query_name in self.select_links:
-            self.error = self.tr("Query name already used")
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+            self.qgis_project.iface_error_message(self.tr("Query name already used"), self.tr("Input error"))
             return
 
         if not self.__current_links:
-            self.error = self.tr("Please set a link selection")
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+            self.qgis_project.iface_error_message(self.tr("Please set a link selection"), self.tr("Input error"))
             return
+        else:
+            query_name = qry_name
 
         self.select_links[query_name] = self.__current_links
 
@@ -645,7 +641,7 @@ class TrafficAssignmentDialog(BaseDialog):
 
     def run(self):
         if not self.check_data():
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=5)
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
         self.miter = int(self.max_iter.text())

@@ -59,7 +59,7 @@ class ExportMatrix(QgsProcessingAlgorithm):
             mat.load(parameters["matrix_path"])
             mat.export(dst_path)
             QgsMessageLog.logMessage(
-                "Support for AEM will be removed in a future version", "Messages", Qgis.MessageLevel.Warning
+                self.tr("Support for AEM will be removed in a future version"), "Messages", Qgis.MessageLevel.Warning
             )
 
         mat.close()

@@ -1,8 +1,8 @@
-import logging
 from os.path import dirname, join
 
 import pandas as pd
 import qgis
+from aequilibrae.context import get_logger
 from qgis.PyQt.QtCore import Qt, QSize
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
 from qgis.core import QgsProject
@@ -32,7 +32,7 @@ class DesireLinesDialog(BaseDialog):
             self.proj_matrices = pd.DataFrame([])
         else:
             self.proj_matrices = list_matrices(self.qgis_project.project)
-        self.logger = logging.getLogger("AequilibraEGUI")
+        self.logger = get_logger()
 
         self.resize(389, 385)
 
@@ -201,12 +201,8 @@ class DesireLinesDialog(BaseDialog):
             )
             self.run_thread()
         else:
-            qgis.utils.iface.messageBar().pushMessage(
-                self.tr("Inputs not loaded properly"),
-                self.tr("You need the layer and at least one matrix_procedures core"),
-                level=1,
-                duration=10,
-            )
+            error = self.tr("You need the layer and at least one matrix_procedures core")
+            self.qgis_project.iface_error_message(error, self.tr("Inputs not loaded properly"))
 
     def throws_error(self, error_message):
         error_message = ["*** ERROR ***", error_message]

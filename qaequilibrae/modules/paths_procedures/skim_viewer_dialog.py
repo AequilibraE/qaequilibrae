@@ -370,9 +370,7 @@ class SkimViewerDialog(BaseDialog):
         self._check_start_id()
 
         if self.error:
-            self.iface.messageBar().pushMessage(
-                self.tr("Input error"), self.error, level=Qgis.MessageLevel.Critical, duration=10
-            )
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             self.idx = None
             self.error = None
             return

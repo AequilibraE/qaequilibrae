@@ -92,7 +92,7 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         mat.close()
 
         QgsMessageLog.logMessage(
-            "Support for AEM will be removed in a future version", "Messages", Qgis.MessageLevel.Warning
+            self.tr("Support for AEM will be removed in a future version"), "Messages", Qgis.MessageLevel.Warning
         )
 
         return {"Output": "Finished"}

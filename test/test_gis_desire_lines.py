@@ -16,9 +16,9 @@ def test_click_create_without_layers(ae_with_project, qtbot, timeoutDetector):
 
     messagebar = ae_with_project.iface.messageBar()
     assert (
-        messagebar.messages[1][0]
+        messagebar.messages[2][0]
         == "Inputs not loaded properly:You need the layer and at least one matrix_procedures core"
-    ), "Level 1 error message is missing"
+    ), "Level 2 error message is missing"
 
 
 def test_click_create_with_layers(ae_with_project, qtbot, timeoutDetector):

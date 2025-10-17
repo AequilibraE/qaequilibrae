@@ -1,6 +1,6 @@
-import logging
 from os.path import dirname, join
 
+from aequilibrae.context import get_logger
 from aequilibrae.paths.results import PathResults
 from qgis.PyQt import QtCore
 from qgis.core import QgsProject, QgsVectorLayer, QgsSpatialIndex
@@ -10,7 +10,7 @@ from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog, BaseD
 from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
 
-logger = logging.getLogger("AequilibraEGUI")
+logger = get_logger()
 
 
 class ShortestPathDialog(BaseDialog):

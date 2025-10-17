@@ -1,5 +1,4 @@
 import glob
-import logging
 import subprocess
 import sys
 import tempfile
@@ -65,7 +64,7 @@ class AequilibraEMenu:
     def __init__(self, iface):
         set_aequilibrae_menu_instance(self)
         # Closes AequilibraE projects eventually opened in memory
-        self.logger = logging.getLogger("AequilibraEGUI")
+        self.logger = self.get_logger()
         self.geo_layers_list = ["links", "nodes", "zones"]
         self.available_scenarios = []
         self.iface = iface
@@ -194,6 +193,11 @@ class AequilibraEMenu:
             if temp_saving:
                 temp_saving.triggered.connect(self.save_in_project)
 
+    def get_logger(self):
+        from aequilibrae.context import get_logger
+
+        return get_logger()
+
     def configure_scenario(self):
         if self.cob_scenarios.currentIndex() < 0:
             return
@@ -201,7 +205,7 @@ class AequilibraEMenu:
         if self.available_scenarios:
             name = self.available_scenarios[self.cob_scenarios.currentIndex()]
             self.project.use_scenario(name)
-            self.message_log(f"Changed active scenario: {name}")
+            self.message_log(self.tr("Changed active scenario: {}").format(name))
 
             # Change layers
             tab_count = self.projectManager.count()
@@ -265,7 +269,6 @@ class AequilibraEMenu:
             QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def removes_temporary_files(self):
-        # pass
         # Removes all the temporary files from previous uses
         p = tempfile.gettempdir() + "/aequilibrae_*"
         for f in glob.glob(p):
@@ -288,7 +291,7 @@ class AequilibraEMenu:
         self.available_scenarios = []
         self.matrices.clear()
         self.layers.clear()
-        self.message_log(f"Closed project on: {pth}")
+        self.message_log(self.tr("Closed project on: {}").format(pth))
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
@@ -481,7 +484,7 @@ class AequilibraEMenu:
 
         Uses 'Info' level and does not notify user, by default, although these are editable.
         """
-        QgsMessageLog.logMessage(message, "Messages", level, notify_user)
+        QgsMessageLog.logMessage(message, self.tr("Messages"), level, notify_user)
 
     def iface_error_message(self, text: str = None, title: str = "Error"):
         """Standardizes QAequilibraE error messages display"""
@@ -494,6 +497,10 @@ class AequilibraEMenu:
     def iface_warning_message(self, text: str = None, title: str = "Warning"):
         """Standardizes QAequilibraE warning messages display"""
         self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Warning, -1)
+
+    def iface_success_message(self, text: str = None, title: str = "Success"):
+        """Standardizes QAequilibraE warning messages display"""
+        self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Success, -1)
 
     def allow_change_scenario(self):
         """

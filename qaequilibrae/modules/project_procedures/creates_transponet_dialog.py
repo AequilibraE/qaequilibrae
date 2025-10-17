@@ -4,6 +4,7 @@ from os.path import dirname, isdir, join
 
 import qgis
 from PyQt5.QtCore import Qt
+from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
 from aequilibrae.project.network.network import Network
 from qgis.PyQt import QtWidgets, uic
@@ -22,8 +23,9 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_transponet_cons
 class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
+        self.logger = get_logger()
         self.iface = qgis_project.iface
-        self.project = qgis_project
+        self.qgis_project = qgis_project
         self.setupUi(self)
 
         self.missing_data = -1
@@ -270,7 +272,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         ok, msg = self.check_data()
 
         if not ok:
-            self.iface.messageBar().pushMessage("Error", msg, level=3, duration=10)
+            self.qgis_project.iface_error_message(msg)
             return
 
         self.proj_folder = self.project_destination.text()

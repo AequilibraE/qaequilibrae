@@ -1,4 +1,3 @@
-import logging
 from math import ceil
 from os.path import dirname, join
 from pathlib import Path
@@ -7,6 +6,7 @@ from typing import Optional
 import numpy as np
 import openmatrix as omx
 import pandas as pd
+from aequilibrae.context import get_logger
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtGui import QColor
@@ -34,7 +34,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.setupUi(self)
             self.data_to_show = None
             self.error = None
-            self.logger = logging.getLogger("AequilibraEGUI")
+            self.logger = get_logger()
             self.qgis_project = qgis_project
             self.from_proj = True if qgis_project.project else False
             self.indices = np.array(1)
@@ -71,7 +71,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setWindowTitle(self.tr("File path: {}").format(self.data_path))
 
         if self.data_type == "AEM":
-            msg = "Support for AEM will be removed in a future version"
+            msg = self.tr("Support for AEM will be removed in a future version")
             self.qgis_project.message_log(msg, Qgis.MessageLevel.Warning, True)
             self.data_to_show = AequilibraeMatrix()
             if not self.from_proj:

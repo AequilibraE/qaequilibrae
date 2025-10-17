@@ -8,6 +8,7 @@ from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_M
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, QSize
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
+from qgis.core import Qgis
 
 from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_from_toc
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
@@ -174,7 +175,7 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
             self.run_thread()
 
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage("Error", self.error, Qgis.MessageLevel.Critical, -1)
 
     def update_matrix_list(self):
         if self.matrix_count > 0:

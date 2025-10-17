@@ -159,7 +159,7 @@ class TransitAssignDialog(BaseDialog):
 
         self.check_inputs(action)
         if self.error:
-            self.iface.messageBar().pushMessage("Warning", self.error, level=1, duration=10)
+            self.qgis_project.iface_warning_message(self.error)
             button.setEnabled(True)
             self.error = ""
             return

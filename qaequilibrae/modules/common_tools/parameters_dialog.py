@@ -1,7 +1,7 @@
-import logging
 from os.path import dirname, join
 
 import yaml
+from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML
@@ -13,7 +13,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_parameters.ui")
 class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, parent=None):
         super(ParameterDialog, self).__init__(parent)
-        self.iface = qgis_project.iface
+        self.qgis_project = qgis_project
         self.setupUi(self)
 
         self.p = Parameters()
@@ -32,7 +32,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         lexer.setDefaultFont(font)
         self.text_box.setLexer(lexer)
         self.text_box.setFolding(self.text_box.PlainFoldStyle)
-        self.logger = logging.getLogger("AequilibraEGUI")
+        self.logger = get_logger()
 
         # Load the data
         self.load_original_data()
@@ -62,8 +62,8 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if self.error:
             self.but_save.setEnabled(False)
-            self.iface.messageBar().pushMessage(
-                "Error", self.tr("Parameter structure was compromised. Please reset to default."), level=2, duration=10
+            self.qgis_project.iface_error_message(
+                self.tr("Parameter structure was compromised. Please reset to default.")
             )
         else:
             self.but_save.setEnabled(True)

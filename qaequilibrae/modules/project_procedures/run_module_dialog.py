@@ -33,7 +33,7 @@ class RunModuleDialog(BaseDialog):
         try:
             self.items = list(self.project.run._fields)
             self.cob_function.addItems(self.items)
-            self.qgis_project.message_log("All run procedures dependencies are installed.")
+            self.qgis_project.message_log(self.tr("All run procedures dependencies are installed."))
 
         except ModuleNotFoundError:
             run_path = self.project.project_base_path / "run" / "requirements.txt"
