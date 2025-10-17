@@ -596,8 +596,6 @@ class TrafficAssignmentDialog(BaseDialog):
         if not self.__current_links:
             self.qgis_project.iface_error_message(self.tr("Please set a link selection"), self.tr("Input error"))
             return
-        else:
-            query_name = qry_name
 
         self.select_links[query_name] = self.__current_links
 

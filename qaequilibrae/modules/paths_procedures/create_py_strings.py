@@ -46,16 +46,16 @@ def create_strings(dct: dict):
     func_string += "\n\tassig.execute()\n"
 
     # Save outputs
-    func_string += f"\n\tassig.save_results('{dct.get("scenario_name")}')"
+    func_string += "\n\tassig.save_results('{}')".format(dct.get("scenario_name"))
 
     if dct.get("skimming"):
-        func_string += f"""\n\tassig.save_skims('{dct.get("scenario_name")}', which_ones='all', format='omx')"""
+        func_string += "\n\tassig.save_skims('{}', which_ones='all', format='omx')".format(dct.get("scenario_name"))
 
     if sl:
         if sl["save_matrix"]:
-            func_string += f"""\n\tassig.save_select_link_matrices('{sl["output_name"]}')"""
+            func_string += "\n\tassig.save_select_link_matrices('{}')".format(sl["output_name"])
         if sl["save_result"]:
-            func_string += f"""\n\tassig.save_select_link_flows('{sl["output_name"]}')"""
+            func_string += "\n\tassig.save_select_link_flows('{}')".format(sl["output_name"])
 
     out_name = dct.get("out_name")
     project_path = dct.get("project_path")
@@ -66,13 +66,8 @@ def create_strings(dct: dict):
         lines = file.readlines()
 
     # Find the last import statement to insert after
-    import_line_idx = -1
-    for idx, line in enumerate(lines):
-        if line.strip().startswith("import") or line.strip().startswith("from"):
-            import_line_idx = idx
-    insert_idx = import_line_idx + 1
-
-    lines.insert(insert_idx, f"from .{Path(out_name).stem} import run_assignment\n")
+    pth_string = "from .{} import run_assignment\n".format(Path(out_name).stem)
+    lines.insert(0, pth_string)
 
     with open(project_path / "run" / "__init__.py", "w") as file:
         file.writelines(lines)
