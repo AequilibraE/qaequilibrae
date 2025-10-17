@@ -2907,7 +2907,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="91"/>
         <source>Error checking AequilibraE project: {}</source>
-        <translation type="unfinished"/>
+        <translation>Erro ao acessar projeto em: {}</translation>
     </message>
 </context>
 <context>
