@@ -2737,7 +2737,7 @@
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="75"/>
         <source>You need at least three nodes to route.</source>
-        <translation type="unfinished"/>
+        <translation>São necessários ao menos três nós para criar uma rota.</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="81"/>
