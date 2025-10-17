@@ -974,7 +974,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="403"/>
         <source>Procedure error:</source>
-        <translation type="unfinished"/>
+        <translation>Erro no procedimento:</translation>
     </message>
 </context>
 <context>
