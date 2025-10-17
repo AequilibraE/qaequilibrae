@@ -19,11 +19,14 @@ class RunModuleDialog(BaseDialog):
         super().__init__(ui_file=join(dirname(__file__), "forms/ui_run_module.ui"), qgis_project=qgis_project)
 
     def _base_ui_setup(self):
+        self.do_run = False
+
         self.rejected.connect(self.handle_rejection)
 
         self.check_missing_packages()
 
-        self.but_run.clicked.connect(self.run)
+        if self.do_run:
+            self.but_run.clicked.connect(self.run)
 
     def handle_rejection(self):
         self.but_run.setVisible(False)
@@ -34,6 +37,7 @@ class RunModuleDialog(BaseDialog):
         try:
             self.items = list(self.project.run._fields)
             self.cob_function.addItems(self.items)
+            self.do_run = True
 
         except ModuleNotFoundError:
             run_path = self.project.project_base_path / "run" / "requirements.txt"
