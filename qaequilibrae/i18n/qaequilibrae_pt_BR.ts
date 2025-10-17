@@ -2592,7 +2592,7 @@
     <message>
         <location filename="../modules/gis/simple_tag_dialog.py" line="225"/>
         <source>Try again</source>
-        <translation type="unfinished"/>
+        <translation>Tente novamente</translation>
     </message>
     <message>
         <location filename="../modules/gis/simple_tag_dialog.py" line="229"/>
