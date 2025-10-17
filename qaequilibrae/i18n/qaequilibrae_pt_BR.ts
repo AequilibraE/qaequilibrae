@@ -2620,7 +2620,7 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/skim_viewer.py" line="13"/>
         <source>Path computation</source>
-        <translation type="unfinished"/>
+        <translation>Computação de caminhos</translation>
     </message>
 </context>
 <context>
