@@ -1398,7 +1398,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="114"/>
         <source>Path configuration</source>
-        <translation type="unfinished"/>
+        <translation>Computação de caminhos</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="138"/>
