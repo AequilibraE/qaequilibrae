@@ -445,7 +445,7 @@
     <message>
         <location filename="../modules/project_procedures/create_scenarios_dialog.py" line="54"/>
         <source>New scenario &apos;{}&apos; added to the project</source>
-        <translation type="unfinished"/>
+        <translation>Cenário &apos;{}&apos; adicionado ao projeto</translation>
     </message>
 </context>
 <context>
