@@ -440,7 +440,7 @@
     <message>
         <location filename="../modules/project_procedures/create_scenarios_dialog.py" line="52"/>
         <source>Created empty scenario</source>
-        <translation type="unfinished"/>
+        <translation>Cenário vazio criado</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/create_scenarios_dialog.py" line="54"/>
