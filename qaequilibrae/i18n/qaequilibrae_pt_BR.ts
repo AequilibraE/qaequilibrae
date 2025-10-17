@@ -2742,7 +2742,7 @@
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="81"/>
         <source>You need at least three centroids to route.</source>
-        <translation type="unfinished"/>
+        <translation>São necessários ao menos três centroides para criar uma rota.</translation>
     </message>
 </context>
 <context>
