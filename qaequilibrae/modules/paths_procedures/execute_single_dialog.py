@@ -1,27 +1,29 @@
-import os
+from os.path import dirname, join
 
 import numpy as np
 from aequilibrae.paths.route_choice import RouteChoice
-from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDialog
 
-from qaequilibrae.modules.common_tools.debouncer import Debouncer
+from qaequilibrae.modules.common_tools import Debouncer, BaseDialog
 from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_execute_single.ui"))
 
+class ExecuteSingleDialog(BaseDialog):
+    def __init__(self, qgis_project, graph, link_layer, parameters):
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_execute_single.ui"),
+            qgis_project=qgis_project,
+            graph=graph,
+            link_layer=link_layer,
+            parameters=parameters,
+        )
 
-class ExecuteSingleDialog(QDialog, FORM_CLASS):
-    def __init__(self, iface, graph, link_layer, parameters):
-        QDialog.__init__(self)
-        self.iface = iface
-        self.setupUi(self)
-
-        self.graph = graph
+    def _base_ui_setup(self, **kwargs):
+        self.graph = kwargs.get("graph")
+        parameters = kwargs.get("parameters")
         self._algo = parameters["algorithm"]
         self._kwargs = parameters["kwargs"]
         self.demand = parameters["matrix"]
-        self.link_layer = link_layer
+        self.link_layer = kwargs.get("link_layer")
 
         self.node_from.setText(str(parameters["node_from"]))
         self.node_to.setText(str(parameters["node_to"]))

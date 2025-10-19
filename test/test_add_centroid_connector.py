@@ -1,6 +1,4 @@
 import pytest
-from aequilibrae.project.database_connection import database_connection
-from aequilibrae.utils.db_utils import read_and_close
 from qgis.core import QgsProject
 from shapely.geometry import Point
 
@@ -24,7 +22,7 @@ def test_add_connectors_from_zones_dialog(pt_no_feed, in_zone):
 
     dialog.run()
 
-    with read_and_close(database_connection("network")) as conn:
+    with dialog.project.db_connection as conn:
         node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
         link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
 
@@ -50,7 +48,7 @@ def test_add_connectors_from_zones_procedure(pt_no_feed):
     dialog.worker_thread = AddsConnectorsProcedure(pt_no_feed.iface.mainWindow(), **parameters)
     dialog.worker_thread.doWork()
 
-    with read_and_close(database_connection("network")) as conn:
+    with dialog.project.db_connection as conn:
         node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
         link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
 
@@ -83,7 +81,7 @@ def test_add_connectors_from_network_dialog(pt_no_feed, node_id, radius, point):
 
     assert dialog.sb_radius.value() == radius
 
-    with read_and_close(database_connection("network")) as conn:
+    with dialog.project.db_connection as conn:
         node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
         link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
 
@@ -115,7 +113,7 @@ def test_add_connectors_from_network_procedure(
     dialog.worker_thread = AddsConnectorsProcedure(pt_no_feed.iface.mainWindow(), **parameters)
     dialog.worker_thread.doWork()
 
-    with read_and_close(database_connection("network")) as conn:
+    with dialog.project.db_connection as conn:
         node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
         link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
 
@@ -135,7 +133,7 @@ def test_add_connectors_from_layer_dialog(pt_no_feed):
 
     dialog.run()
 
-    with read_and_close(database_connection("network")) as conn:
+    with dialog.project.db_connection as conn:
         node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
         link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
 
@@ -163,7 +161,7 @@ def test_add_connectors_from_layer_procedure(pt_no_feed):
     dialog.worker_thread = AddsConnectorsProcedure(pt_no_feed.iface.mainWindow(), **parameters)
     dialog.worker_thread.doWork()
 
-    with read_and_close(database_connection("network")) as conn:
+    with dialog.project.db_connection as conn:
         node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
         link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
 

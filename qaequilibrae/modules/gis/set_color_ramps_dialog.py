@@ -1,6 +1,6 @@
-import os
 import sys
 from functools import partial
+from os.path import dirname, join
 
 import qgis
 from qgis.PyQt import uic
@@ -8,14 +8,17 @@ from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QgsStyle
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_bandwidth_color_ramps.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_bandwidth_color_ramps.ui"))
 
 
 class LoadColorRampSelector(QDialog, FORM_CLASS):
-    def __init__(self, iface, layer):
+    def __init__(self, qgis_project, layer):
         QDialog.__init__(self)
-        self.iface = iface
+        qgis_project.block_change_scenario()
+        self.qgis_project = qgis_project
+        self.iface = qgis_project.iface
         self.setupUi(self)
+
         self.layer = layer
         myStyle = QgsStyle().defaultStyle()
 
@@ -41,6 +44,8 @@ class LoadColorRampSelector(QDialog, FORM_CLASS):
         self.set_dual_fields()
         self.change_field("AB")
         self.results = None
+
+        self.finished.connect(qgis_project.allow_change_scenario)
 
     def load_ramps(self):
         self.results = {}

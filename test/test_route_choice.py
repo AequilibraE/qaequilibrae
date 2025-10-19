@@ -1,11 +1,8 @@
-import sqlite3
 from os import listdir
-from os.path import join
-from pathlib import Path
 
 import numpy as np
 import pytest
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
@@ -46,7 +43,7 @@ def test_execute_single(sf_project, qtbot, cob_field):
     assert not dialog.isVisible()
 
 
-def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
+def test_execute_single_dialog(coquimbo_project, qtbot):
     project = coquimbo_project.project
     project.network.build_graphs(modes=["c"])
 
@@ -67,7 +64,7 @@ def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
         },
     }
 
-    dialog = ExecuteSingleDialog(qgis_iface, graph, coquimbo_project.layers["links"][0], params)
+    dialog = ExecuteSingleDialog(coquimbo_project, graph, coquimbo_project.layers["links"][0], params)
     dialog.debouncer.delay_ms = 100
     dialog.node_from.clear()
     qtbot.mouseClick(dialog.node_from, Qt.LeftButton)
@@ -86,8 +83,8 @@ def test_execute_single_dialog(coquimbo_project, qtbot, qgis_iface):
 
 
 @pytest.mark.parametrize("save", [True, False])
-def test_assign_and_save(ae_with_project, qtbot, save):
-    dialog = RouteChoiceDialog(ae_with_project)
+def test_assign_and_save(sf_project, qtbot, save):
+    dialog = RouteChoiceDialog(sf_project)
 
     # Choice set generation
     dialog.max_routes.setText("3")
@@ -103,25 +100,24 @@ def test_assign_and_save(ae_with_project, qtbot, save):
     dialog.chb_check_centroids.setChecked(False)
 
     dialog.chb_save_choice_set.setChecked(save)
-    dialog.cob_matrices.setCurrentText("demand.aem")
+    dialog.cob_matrices.setCurrentText("demand_omx")
     dialog.ln_rc_output.setText("route_choice")
     qtbot.mouseClick(dialog.but_perform_assig, Qt.LeftButton)
 
-    pth = Path(dialog.project.project_base_path)
-    conn = sqlite3.connect(pth / "results_database.sqlite")
-    results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+    with sf_project.project.results_connection as conn:
+        results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "route_choice_uncompressed" in results
 
     if save:
         counter = 0
-        rc_folder = listdir(join(dialog.project.project_base_path, "route_choice"))
+        rc_folder = listdir(dialog.project.project_base_path / "route_choice")
         for folder in rc_folder:
             if "origin id=" in folder:
                 counter += 1
 
         assert counter == 24
 
-        messagebar = ae_with_project.iface.messageBar()
+        messagebar = sf_project.iface.messageBar()
         assert "Success:Route choice sets saved to" in messagebar.messages[3][0]
 
 
@@ -148,7 +144,7 @@ def test_build_and_save(ae_with_project, qtbot):
     qtbot.mouseClick(dialog.but_build_and_save, Qt.LeftButton)
 
     counter = 0
-    rc_folder = listdir(join(dialog.project.project_base_path, "route_choice"))
+    rc_folder = listdir(dialog.project.project_base_path / "route_choice")
     for folder in rc_folder:
         if "origin id=" in folder:
             counter += 1
@@ -160,7 +156,7 @@ def test_build_and_save(ae_with_project, qtbot):
 
 
 def create_dialog_with_matrix(project):
-    pth = join(project.project.project_base_path, "matrices/demand.aem")
+    pth = project.project.project_base_path / "matrices" / "demand.aem"
     create_matrix(np.arange(1, 134), pth)
 
     matrices = project.project.matrices
@@ -207,12 +203,11 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
     dialog.ln_rc_output.setText("route_choice_for_subarea")
     qtbot.mouseClick(dialog.but_perform_assig, Qt.LeftButton)
 
-    pth = Path(dialog.project.project_base_path)
-    conn = sqlite3.connect(pth / "results_database.sqlite")
-    results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+    with coquimbo_project.project.results_connection as conn:
+        results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "route_choice_for_subarea_uncompressed" in results
 
-    rc_folder = listdir(join(dialog.project.project_base_path, "route_choice"))
+    rc_folder = listdir(dialog.project.project_base_path / "route_choice")
     assert "route_choice_for_subarea.parquet" in rc_folder
 
 
@@ -262,9 +257,8 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     matrices = listdir(dialog.project.matrices.fldr)
     assert "select_link_analysis.omx" in matrices
 
-    pth = Path(dialog.project.project_base_path)
-    conn = sqlite3.connect(pth / "results_database.sqlite")
-    results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
+    with coquimbo_project.project.results_connection as conn:
+        results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "select_link_analysis_uncompressed" in results
 
 
@@ -279,7 +273,7 @@ def test_cost_function(coquimbo_project, qtbot, par):
     qtbot.mouseClick(dialog.but_add_to_cost, Qt.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == "Input error:Check parameter value input"
+    assert messagebar.messages[2][0] == "Input error:Check parameter value input"
 
 
 # Cost function clean-up
@@ -330,7 +324,7 @@ def test_query_name(coquimbo_project, par, error):
     dialog.save_query()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -354,7 +348,7 @@ def test_max_routes(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -378,7 +372,7 @@ def test_max_depth(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -401,7 +395,7 @@ def test_cutoff(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -426,7 +420,7 @@ def test_penalty(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"
 
 
 @pytest.mark.parametrize(
@@ -450,4 +444,4 @@ def test_psl_beta(coquimbo_project, par, error):
     dialog._validate_inputs()
 
     messagebar = coquimbo_project.iface.messageBar()
-    assert messagebar.messages[1][0] == f"Input error:{error}"
+    assert messagebar.messages[2][0] == f"Input error:{error}"

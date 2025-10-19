@@ -4,3 +4,4 @@ sphinx-gallery
 sphinx-design
 sphinx-panels
 sphinx-subfigure
+sphinx-copybutton

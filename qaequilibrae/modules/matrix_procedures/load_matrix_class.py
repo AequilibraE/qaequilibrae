@@ -1,6 +1,6 @@
-import os
-import tempfile
-import uuid
+from pathlib import Path
+from tempfile import gettempdir
+from uuid import uuid4
 
 import numpy as np
 from aequilibrae.utils.interface.worker_thread import WorkerThread
@@ -47,7 +47,7 @@ class LoadMatrix(WorkerThread):
 
         # Bring it all to memory mapped
         self.matrix = np.memmap(
-            os.path.join(tempfile.gettempdir(), "aequilibrae_temp_file_" + str(uuid.uuid4().hex) + ".mat"),
+            Path(gettempdir()) / f"aequilibrae_temp_file_{uuid4().hex}.mat",
             dtype=[("from", np.uint64), ("to", np.uint64), ("flow", np.float64)],
             mode="w+",
             shape=(int(matrix1.shape[0]),),

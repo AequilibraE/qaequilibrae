@@ -1,12 +1,12 @@
 def run_pt_explore(qgis_project):
-    from qaequilibrae.modules.public_transport_procedures.transit_navigator_dialog import TransitNavigatorDialog
+    from qaequilibrae.modules.transit_procedures import TransitNavigatorDialog
     from os.path import exists, join
 
     if qgis_project.project is None:
         qgis_project.show_message_no_project()
         return
 
-    elif not exists(join(qgis_project.project.project_base_path, "public_transport.sqlite")):
+    elif not exists(qgis_project.project._transit_database_path):
         qgis_project.message_no_gtfs_feed()
         return
 

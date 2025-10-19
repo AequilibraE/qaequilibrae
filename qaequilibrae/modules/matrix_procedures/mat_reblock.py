@@ -49,9 +49,7 @@ class MatrixReblocking(WorkerThread):
         new_index = {k: i for i, k in enumerate(indices)}
 
         names = [str(n) for n in self.matrices.keys()]
-        self.matrix.create_empty(
-            file_name=self.file_name, zones=compact_shape, matrix_names=names, data_type=np.float64, memory_only=False
-        )
+        self.matrix.create_empty(zones=compact_shape, matrix_names=names, data_type=np.float64)
 
         self.matrix.index[:] = indices[:]
 
@@ -86,6 +84,8 @@ class MatrixReblocking(WorkerThread):
 
             del mat
             del new_mat
+
+        self.matrix.export(self.file_name)
 
         self.signal.emit(["set_text", self.tr("Matrix Reblocking finalized")])
         self.signal.emit(["finished", "REBLOCKED MATRICES"])

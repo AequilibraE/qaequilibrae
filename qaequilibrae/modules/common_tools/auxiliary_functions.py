@@ -1,10 +1,7 @@
 import math
-import tempfile
-from os.path import isdir
 from time import localtime, strftime
 from typing import Union
 
-import qgis
 from aequilibrae import Parameters
 from pyproj import CRS, Transformer
 from qgis.core import QgsProject
@@ -12,24 +9,9 @@ from shapely.geometry import Point, Polygon
 from shapely.ops import transform
 
 
-def user_message(message, level):
-    if level == "WARNING":
-        level = 1
-    if level == "ERROR":
-        level = 3
-
-    qgis.utils.iface.messageBar().pushMessage(message, "", level=level)
-
-
 # Just a shorthand function to return the current standard path
 def standard_path():
     return get_parameter_chain(["system", "default_directory"])
-
-
-def tempPath():
-    tmp_path = get_parameter_chain(["system", "temp directory"])
-    tmp_path = tmp_path if isdir(tmp_path) else tempfile.gettempdir()
-    return tmp_path
 
 
 # Returns the parameter for a given hierarchy of groups in a dictionary of dictionaries (recovered from a yml)

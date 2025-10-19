@@ -28,10 +28,9 @@ Got a bigger instance we could use as an example? Send it over!
    :maxdepth: 1
 
    menus_in_detail/project
-   menus_in_detail/build_model
-   menus_in_detail/data
-   menus_in_detail/tripdistribution
-   menus_in_detail/pathscomputation
-   menus_in_detail/routing
-   menus_in_detail/public_transport
-   menus_in_detail/gistools
+   menus_in_detail/trip_distribution
+   menus_in_detail/path_computation
+   menus_in_detail/traffic_assignment
+   menus_in_detail/route_choice
+   menus_in_detail/transit
+   menus_in_detail/mapping_tools

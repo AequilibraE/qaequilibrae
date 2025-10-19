@@ -1,5 +1,5 @@
 def run_pt_skim(qgis_project):
-    from qaequilibrae.modules.public_transport_procedures import TransitAssignDialog
+    from qaequilibrae.modules.transit_procedures import TransitAssignDialog
 
     if qgis_project.project is None:
         qgis_project.show_message_no_project()

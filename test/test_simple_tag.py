@@ -1,6 +1,4 @@
 import pytest
-from aequilibrae.project.database_connection import database_connection
-from aequilibrae.utils.db_utils import commit_and_close
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.gis.simple_tag_dialog import SimpleTagDialog
@@ -44,7 +42,7 @@ def test_simple_tag_polygon(coquimbo_project, to_layer, ops):
 
     zones = [97, 98, 99]
 
-    with commit_and_close(database_connection("network")) as conn:
+    with coquimbo_project.project.db_connection as conn:
         for i, zone in enumerate(zones):
             conn.execute(f"UPDATE zones SET name='{places[i]}' WHERE zone_id={zone}")
         conn.execute("DELETE FROM zones WHERE name IS NULL;")

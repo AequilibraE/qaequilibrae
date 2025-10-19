@@ -23,13 +23,12 @@ __copyright__ = (
     "Copyright (c) 2014 Tim Sutton, tim@linfiniti.com"
 )
 
-import logging
-
+from aequilibrae.context import get_logger
 from qgis.PyQt.QtCore import QObject, pyqtSlot, pyqtSignal
 from qgis.core import QgsMapLayerRegistry
 from qgis.gui import QgsMapCanvasLayer
 
-LOGGER = logging.getLogger("QGIS")
+LOGGER = get_logger()
 
 
 # noinspection PyMethodMayBeStatic,PyPep8Naming

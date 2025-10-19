@@ -1,30 +1,21 @@
-import importlib.util as iutil
-import os
+from os.path import dirname, join
 
 import qgis
 from aequilibrae.paths import SkimResults, NetworkSkimming
-from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
 
-from qaequilibrae.modules.common_tools import ReportDialog
+from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog
 from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_impedance_matrix.ui"))
 
-spec = iutil.find_spec("openmatrix")
-has_omx = spec is not None
-
-
-class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
+class ImpedanceMatrixDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QtWidgets.QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.setupUi(self)
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_impedance_matrix.ui"), qgis_project=qgis_project)
 
-        self.project = qgis_project.project
-        self.link_layer = qgis_project.layers["links"][0]
+    def _base_ui_setup(self):
+        self.link_layer = self.qgis_project.layers["links"][0]
         self.result = SkimResults()
         self.validtypes = integer_types + float_types
         self.tot_skims = 0
@@ -143,8 +134,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def finished_threaded_procedure(self):
         self.report = self.worker_thread.report
-        format = "omx" if has_omx else "aem"
-        self.worker_thread.save_to_project(self.only_str(self.mat_name), format=format)
+        self.worker_thread.save_to_project(self.only_str(self.mat_name))
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results
@@ -179,7 +169,7 @@ class ImpedanceMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         try:
             self.run_thread()
         except ValueError as error:
-            qgis.utils.iface.messageBar().pushMessage("Input error", error.message, level=3)
+            self.qgis_project.iface_error_message(error.message, self.tr("Input error"))
 
     @staticmethod
     def only_str(str_input):

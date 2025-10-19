@@ -1,37 +1,30 @@
-import logging
-import os
 import sys
+from os import mkdir
+from os.path import dirname, isdir, join
 
 import geopandas as gpd
 import numpy as np
 import qgis
-from aequilibrae.project.database_connection import database_connection
-from aequilibrae.utils.db_utils import read_and_close
-from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
 from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest
 
-from qaequilibrae.modules.common_tools import geodataframe_from_layer
-from qaequilibrae.modules.common_tools.auxiliary_functions import get_vector_layer_by_name, model_area_polygon
+from qaequilibrae.modules.common_tools import BaseDialog
+from qaequilibrae.modules.common_tools import geodataframe_from_layer, get_vector_layer_by_name, model_area_polygon
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
 from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
 from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_route_choice.ui"))
-logger = logging.getLogger("AequilibraEGUI")
 
 
-class RouteChoiceDialog(QDialog, FORM_CLASS):
+class RouteChoiceDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.project = qgis_project.project
-        self.qgis_project = qgis_project
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_route_choice.ui"), qgis_project=qgis_project)
+
+    def _base_ui_setup(self):
         self.matrices = self.project.matrices
-        self.setupUi(self)
         self.error = None
         self.matrix = None
         self.cost_function = ""
@@ -39,7 +32,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         self.all_modes = {}
         self._pairs = []
-        self.link_layer = qgis_project.layers["links"][0]
+        self.link_layer = self.qgis_project.layers["links"][0]
         self.parameters = {}
 
         self.select_links = {}
@@ -48,7 +41,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.__populate_project_info()
 
         self.__project_nodes = self.project.network.nodes.data.node_id.tolist()
-        self.proj_matrices = list_matrices(self.project.matrices.fldr)
+        self.proj_matrices = list_matrices(self.project)
 
         self.cob_algo.addItems(["BFSLE", "Link Penalization", "BFSLE with Link Penalization"])
         self.cob_direction.addItems(["AB", "Both", "BA"])
@@ -74,7 +67,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
         self.set_select_link_use()
 
     def __populate_project_info(self):
-        with read_and_close(database_connection("network")) as conn:
+        with self.project.db_connection as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
 
             modes = []
@@ -147,7 +140,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.error = "Check parameter value input"
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
         parameter = float(params)
@@ -269,7 +262,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.error = self.tr("Please set a link selection")
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
         self.select_links[query_name] = [self.__current_links]
@@ -326,7 +319,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
         # We return in case of error because in the we'll modify the text input to numbers
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
         # Check parameter values
@@ -378,7 +371,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 self.error = "Check matrices inputs"
 
         if self.error:
-            qgis.utils.iface.messageBar().pushMessage(self.tr("Input error"), self.error, level=1, duration=10)
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
         # Populate with our model parameters
@@ -404,9 +397,9 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
             self.parameters["set_sub_area"] = False
 
         if self.job == "build" or self.parameters["save_choice_sets"] or self.parameters["set_sub_area"]:
-            rc_folder = os.path.join(self.project.project_base_path, "route_choice")
-            if not os.path.isdir(rc_folder):
-                os.mkdir(rc_folder)
+            rc_folder = self.project.project_base_path / "route_choice"
+            if not isdir(rc_folder):
+                mkdir(rc_folder)
             self.parameters["rc_folder"] = rc_folder
 
         self.parameters["matrix"] = float(demand) if self.job == "execute_single" else self.matrix
@@ -460,14 +453,12 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
 
             if self.parameters["set_sub_area"]:
                 self.worker_thread.matrix.to_parquet(
-                    os.path.join(self.parameters["rc_folder"], f"{self.ln_rc_output.text()}.parquet")
+                    self.parameters["rc_folder"] / f"{self.ln_rc_output.text()}.parquet"
                 )
 
             if self.job == "build" or self.parameters["save_choice_sets"]:
                 message = f"Route choice sets saved to {self.project.project_base_path}"
-
-            if message:
-                qgis.utils.iface.messageBar().pushMessage("Success", message, level=3, duration=10)
+                self.qgis_project.iface_success_message(message)
 
             if self.job == "execute_single":
                 res = self.worker_thread.rc.get_results()
@@ -475,7 +466,7 @@ class RouteChoiceDialog(QDialog, FORM_CLASS):
                 plot_results(res, self.parameters["node_from"], self.parameters["node_to"], self.link_layer)
 
                 dlg2 = ExecuteSingleDialog(
-                    qgis.utils.iface.mainWindow(),
+                    self.qgis_project,
                     self.worker_thread.graph,
                     self.link_layer,
                     self.parameters,

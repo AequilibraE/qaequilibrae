@@ -1,33 +1,32 @@
-import os
+import pprint
 import subprocess
+import sys
+from os.path import dirname, isfile, join
 from pathlib import Path
 
-from aequilibrae.context import get_logger
-from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDialog, QMessageBox
-from qgis.core import Qgis, QgsMessageLog
+from qgis.PyQt.QtWidgets import QMessageBox
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
-from qaequilibrae.modules.common_tools import LogDialog
-
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_run_module.ui"))
+from qaequilibrae.modules.common_tools import BaseDialog
 
 
-class RunModuleDialog(QDialog, FORM_CLASS):
-    def __init__(self, qgis_project, logger=None):
-        QDialog.__init__(self)
-        self.qgis_project = qgis_project
-        self.iface = qgis_project.iface
-        self.project = qgis_project.project
-        self.setupUi(self)
+class RunModuleDialog(BaseDialog):
+    def __init__(self, qgis_project):
+        dependencies_dir = qgis_project.project.project_base_path / "run" / "_dependencies"
+        if dependencies_dir.exists() and str(dependencies_dir) not in sys.path:
+            sys.path.insert(0, str(dependencies_dir))
 
-        self.logger = logger or get_logger()
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_run_module.ui"), qgis_project=qgis_project)
+
+    def _base_ui_setup(self):
+        self.do_run = False
 
         self.rejected.connect(self.handle_rejection)
 
         self.check_missing_packages()
 
-        self.but_run.clicked.connect(self.run)
+        if self.do_run:
+            self.but_run.clicked.connect(self.run)
 
     def handle_rejection(self):
         self.but_run.setVisible(False)
@@ -38,21 +37,26 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         try:
             self.items = list(self.project.run._fields)
             self.cob_function.addItems(self.items)
-            QgsMessageLog.logMessage(
-                "All run procedures dependencies are installed.", level=Qgis.MessageLevel.Info, notifyUser=False
-            )
+            self.do_run = True
 
         except ModuleNotFoundError:
-            run_path = Path(self.project.project_base_path / "run" / "requirements.txt")
-            target_dir = Path(__file__).parent.parent.parent / "packages"
-            if os.path.isfile(run_path):
+            run_path = self.project.project_base_path / "run" / "requirements.txt"
+            target_dir = self.project.project_base_path / "run" / "_dependencies"
+            if isfile(run_path):
                 self.question = QMessageBox.question(
                     self, "Missing requirements", self.rp_message, QMessageBox.Ok | QMessageBox.Cancel
                 )
                 if self.question == QMessageBox.Ok:
+                    # Create '_dependencies' folder if it does not exist and add a '__init__.py' file
+                    Path(target_dir).mkdir(parents=True, exist_ok=True)
+                    init_file = target_dir / "__init__.py"
+                    if not init_file.exists():
+                        init_file.touch()
+
+                    # Prepare installation
                     install_command = f'"{DownloadAll().find_python()}"'
-                    install_command += f" -m pip install -r {run_path} --target {target_dir}"
-                    QgsMessageLog.logMessage(install_command, level=Qgis.MessageLevel.Info)
+                    install_command += f' -m pip install -r "{run_path}" --target "{target_dir}"'
+                    self.qgis_project.message_log(install_command)
 
                     process = subprocess.Popen(
                         install_command,
@@ -63,7 +67,7 @@ class RunModuleDialog(QDialog, FORM_CLASS):
                         universal_newlines=True,
                     )
                     for line in process.stdout:
-                        QgsMessageLog.logMessage(line.strip(), level=Qgis.MessageLevel.Info)
+                        self.qgis_project.message_log(line.strip())
 
                     # Check process output
                     exit_code = process.wait()
@@ -89,27 +93,21 @@ class RunModuleDialog(QDialog, FORM_CLASS):
         func_name = self.items[self.cob_function.currentIndex()]
         parameter_keys = list(self.project.parameters["run"].keys())
         if func_name not in parameter_keys:
-            self.iface.messageBar.pushMessage(
-                self.tr("Error"), self.tr("Please check the Parameters file"), level=Qgis.Critical, duration=5
-            )
+            self.qgis_project.iface_error_message(self.tr("Please check the Parameters file"))
 
+        # Run function and log output
         func = getattr(self.project.run, func_name)
         result = func()
-        if result:
-            self.logger.info(result)
-        else:
-            self.logger.info(f"{func_name} executed. Check for outputs.")
 
-        self.iface.messageBar().pushMessage(self.tr("Run procedures executed"), "", level=Qgis.Info, duration=5)
+        message = self.tr("Check 'Messages' tab.") if result else ""
+        self.qgis_project.iface_success_message(message, self.tr("{} executed").format(func_name))
+        if result:
+            self.qgis_project.message_log(pprint.pformat(result))
 
         self.exit_procedure()
 
     def exit_procedure(self):
         self.close()
-
-        dlg2 = LogDialog(self.qgis_project, self)
-        dlg2.show()
-        dlg2.exec_()
 
     @property
     def rp_message(self):

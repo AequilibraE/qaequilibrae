@@ -45,7 +45,7 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
         dialog.cob_index.setCurrentText("index")
         dialog._has_idx = False
     else:
-        dataset = LoadDatasetDialog(dialog.iface)
+        dataset = LoadDatasetDialog(dialog.qgis_project)
         dataset.radio_layer.setChecked(True)
         dataset.size_it_accordingly(True)
         dataset.cob_index_field.setCurrentText("index")
@@ -83,8 +83,8 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
 
 
 @pytest.mark.parametrize("method", ["negative_exponential", "inverse_power", "both"])
-def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
-    proj = run_sfalls_assignment(ae_with_project)
+def test_calibrate_gravity(sf_project, method, folder_path, mocker, qtbot):
+    proj = run_sfalls_assignment(sf_project)
 
     mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
     mocker.patch(f"{DISTRIBUTION_PATH}.exit_procedure")
@@ -93,7 +93,7 @@ def test_calibrate_gravity(ae_with_project, method, folder_path, mocker, qtbot):
 
     temp = list(dialog.matrices["name"])
     imped_idx = temp.index("assignment_car")
-    demand_idx = temp.index("omx")
+    demand_idx = temp.index("demand_omx")
     dialog.cob_imped_mat.setCurrentIndex(imped_idx)
     dialog.cob_imped_field.setCurrentText("free_flow_time_final")
     dialog.cob_seed_mat.setCurrentIndex(demand_idx)
@@ -185,7 +185,7 @@ def test_apply_gravity(ae_with_project, method, folder_path, mocker):
 
     assert isfile(file_path)
 
-    mtx = omx.open_file(file_path)
-    mtx = mtx["gravity"][:]
-    assert mtx.shape == (24, 24)  # matrix shape
-    assert mtx.sum() > 0  # matrix is not null
+    with omx.open_file(file_path, "a") as omx_file:
+        mtx = omx_file["gravity"][:]
+        assert mtx.shape == (24, 24)  # matrix shape
+        assert mtx.sum() > 0  # matrix is not null

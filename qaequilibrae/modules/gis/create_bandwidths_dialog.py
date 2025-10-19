@@ -1,27 +1,25 @@
-import os
 import sys
 from dataclasses import dataclass
 from functools import partial
+from os.path import dirname, join
 from random import randint
 from typing import Tuple, Literal, Dict, Union
 
 import qgis
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QPushButton, QTableWidgetItem, QTableWidget
-from qgis.PyQt.QtWidgets import QToolButton, QHBoxLayout, QWidget, QDialog
+from qgis.PyQt.QtWidgets import QToolButton, QHBoxLayout, QWidget
 from qgis.core import QgsLineSymbol, QgsVectorLayer, QgsSymbol, QgsProject
 from qgis.core import QgsMapLayerProxyModel, QgsSimpleLineSymbolLayer, QgsExpressionContextUtils
 from qgis.core import QgsSingleSymbolRenderer, QgsRuleBasedRenderer, QgsStyle
 
-from qaequilibrae.modules.common_tools import get_parameter_chain
+from qaequilibrae.modules.common_tools import BaseDialog, get_parameter_chain
 from .set_color_ramps_dialog import LoadColorRampSelector
 
 sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgscolorbutton"] = qgis.gui
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_bandwidths.ui"))
 
 
 @dataclass
@@ -36,12 +34,14 @@ class BandAttributes:
     direction: Tuple[Literal["ab", "ba"], Literal["ab", "ba"]]
 
 
-class CreateBandwidthsDialog(QDialog, FORM_CLASS):
+class CreateBandwidthsDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.setupUi(self)
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_bandwidths.ui"),
+            qgis_project=qgis_project,
+        )
 
+    def _base_ui_setup(self):
         self.tot_bands = 0
 
         self.scale = {"width": 10, "spacing": 0.001, "max_flow": -1}
@@ -247,7 +247,7 @@ class CreateBandwidthsDialog(QDialog, FORM_CLASS):
     def load_ramp_action(self):
         if self.layer is not None:
             self.ramps = None
-            dlg2 = LoadColorRampSelector(self.iface, self.layer)
+            dlg2 = LoadColorRampSelector(self.qgis_project, self.layer)
             dlg2.show()
             dlg2.exec_()
             if dlg2.results is not None:

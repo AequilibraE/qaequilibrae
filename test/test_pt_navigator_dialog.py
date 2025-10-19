@@ -1,6 +1,6 @@
 import pytest
 
-from qaequilibrae.modules.public_transport_procedures.transit_navigator_dialog import TransitNavigatorDialog
+from qaequilibrae.modules.transit_procedures.transit_navigator_dialog import TransitNavigatorDialog
 
 
 @pytest.fixture

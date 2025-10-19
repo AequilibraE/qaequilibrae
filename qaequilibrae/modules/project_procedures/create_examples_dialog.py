@@ -1,5 +1,4 @@
-import os
-from os.path import isdir, join
+from os.path import isdir, dirname, join
 from pathlib import Path
 
 from aequilibrae.utils.create_example import create_example
@@ -9,7 +8,7 @@ from qgis.PyQt.QtWidgets import QWidget, QFileDialog
 
 from qaequilibrae.modules.common_tools import standard_path
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../common_tools/forms/ui_empty.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
 
 class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):

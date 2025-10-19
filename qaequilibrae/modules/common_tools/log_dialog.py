@@ -1,5 +1,4 @@
 import os
-from os.path import join
 
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML
@@ -11,34 +10,42 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui
 class LogDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, parent=None):
         super(LogDialog, self).__init__(parent)
+        qgis_project.block_change_scenario()
 
-        self.logfile = join(qgis_project.project.project_base_path, "aequilibrae.log")
+        try:
+            self.qgis_project = qgis_project
+            self.setupUi(self)
+            self.parameter_values = None
+            self.current_data = None
+            self.error = False
 
-        self.iface = qgis_project.iface
-        self.setupUi(self)
-        self.parameter_values = None
-        self.current_data = None
-        self.error = False
-        # Configures the text editor
-        font = QFont()
-        font.setFamily("Courier")
-        font.setFixedPitch(True)
-        font.setPointSize(12)
-        lexer = QsciLexerYAML()  # The lexer doesn't really matter
-        lexer.setDefaultFont(font)
-        self.text_box.setLexer(lexer)
-        self.text_box.setFolding(self.text_box.PlainFoldStyle)
+            self.logfile = qgis_project.project.project_base_path / "aequilibrae.log"
 
-        # Load the data
-        self.load_data()
+            # Configures the text editor
+            font = QFont()
+            font.setFamily("Courier")
+            font.setFixedPitch(True)
+            font.setPointSize(12)
+            lexer = QsciLexerYAML()  # The lexer doesn't really matter
+            lexer.setDefaultFont(font)
+            self.text_box.setLexer(lexer)
+            self.text_box.setFolding(self.text_box.PlainFoldStyle)
 
-        # Connect all buttons
-        self.but_validate.setVisible(False)
-        self.but_defaults.setVisible(False)
-        self.but_save.setVisible(True)
-        self.but_close.setText(self.tr("Close"))
-        self.but_close.clicked.connect(self.exit_procedure)
-        self.but_save.clicked.connect(self.save_to_disk)
+            # Load the data
+            self.load_data()
+
+            # Connect all buttons
+            self.but_validate.setVisible(False)
+            self.but_defaults.setVisible(False)
+            self.but_save.setVisible(True)
+            self.but_close.setText(self.tr("Close"))
+            self.but_close.clicked.connect(self.exit_procedure)
+            self.but_save.clicked.connect(self.save_to_disk)
+
+            self.finished.connect(self.qgis_project.allow_change_scenario)
+        except Exception as e:
+            qgis_project.allow_change_scenario()
+            raise e
 
     # Load the current parameters onto the GUI
     def load_data(self):

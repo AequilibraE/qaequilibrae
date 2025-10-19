@@ -1,0 +1,24 @@
+traffic_classes:
+    - car:
+        matrix_name: demand_mc
+        matrix_core: car
+        network_mode: c
+        pce: 1.0
+        blocked_centroid_flows: False
+assignment:
+    algorithm: bfw
+    max_iter: 10
+    rgap: 0.001
+    vdf: BPR2
+    alpha: 0.15
+    beta: 4.0
+    capacity_field: capacity
+    time_field: free_flow_time
+    result_name: result_test_from_yaml
+select_links:
+    output_name: select_link_analysis_from_yaml
+    save_matrix: True
+    save_result: True
+    selection:
+        from_node_1: [[1, 1], [2, 1]]
+        random_nodes: [[3, 1], [5, 1]]

@@ -1,30 +1,23 @@
-import os
 from math import ceil
+from os.path import dirname, join
 from random import choice
 
 import numpy as np
 import pandas as pd
 from aequilibrae.paths import Graph
-from qgis.PyQt import uic
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject, Qgis
 from qgis.core import QgsStyle, QgsVectorLayerJoinInfo, QgsRuleBasedRenderer, QgsSymbol
 
-from qaequilibrae.modules.common_tools import layer_from_dataframe
-from qaequilibrae.modules.common_tools.geodataframe_from_data_layer import geodataframe_from_layer
-
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_skim_viewer.ui"))
+from qaequilibrae.modules.common_tools import BaseDialog
+from qaequilibrae.modules.common_tools import layer_from_dataframe, geodataframe_from_layer
 
 
-class SkimViewerDialog(QDialog, FORM_CLASS):
+class SkimViewerDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QDialog.__init__(self)
-        self.setupUi(self)
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_skim_viewer.ui"), qgis_project=qgis_project)
 
-        self.iface = qgis_project.iface
-        self.project = qgis_project.project
-        self.qgis_project = qgis_project
+    def _base_ui_setup(self):
         self.all_modes = {}
         self.layer = self.iface.activeLayer()
         self.graph = None
@@ -33,6 +26,12 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
         # Check if we have an active layer, otherwise raises an error
         if self.layer is not None:
+            # If 'links' is the active layer, raises an error. We can only skim nodes or zones
+            if "links" in self.layer.name():
+                self.qgis_project.iface_error_message("Select one of 'nodes' or 'zones' layer to proceed.")
+                self.__disable_fields()
+                return
+
             # We get the layer ID to check if it was removed from the layers' panel
             self.__layer_id = self.layer.id()
 
@@ -42,9 +41,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             QgsProject.instance().layersRemoved.connect(self.__on_layer_removed)
         else:
             self.error = "Please set an active layer to proceed"
-            self.iface.messageBar().pushMessage(
-                self.tr("Input error"), self.error, level=Qgis.MessageLevel.Critical, duration=10
-            )
+            self.qgis_project.iface_error_message(self.error, "Input error")
             self.__disable_fields()  # We disable all QDialog objects if there's no active layer set
             return
 
@@ -68,8 +65,12 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
         with self.project.db_connection as conn:
             centroids = pd.read_sql("select node_id from nodes where is_centroid=1", con=conn).node_id.to_numpy()
+            self.centroids = centroids if centroids.size != 0 else None
 
-        self.centroids = centroids if centroids.size != 0 else None
+            res = conn.execute("""SELECT mode_name, mode_id FROM modes""")
+            for x in res.fetchall():
+                self.cob_modes.addItem(f"{x[0]} ({x[1]})")
+                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         self.__no_skimming_fields = [
             "link_id",
@@ -80,13 +81,6 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             "__supernet_id__",
             "__compressed_id__",
         ]
-
-        # Graph config
-        with self.project.db_connection as conn:
-            res = conn.execute("""SELECT mode_name, mode_id FROM modes""")
-            for x in res.fetchall():
-                self.cob_modes.addItem(f"{x[0]} ({x[1]})")
-                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
 
         self.but_plot.clicked.connect(self.run)
         self.cob_minimizing.currentIndexChanged.connect(self.update_cost_field)
@@ -101,8 +95,9 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
             self._show_layer_removed_message()
 
     def _show_layer_removed_message(self):
-        self.error = self.tr("Critical layer for Skim Viewer removed from the layers' panel")
-        self.iface.messageBar().pushMessage(self.tr("Error"), self.error, level=Qgis.MessageLevel.Critical, duration=10)
+        if self.qgis_project.project:
+            self.error = self.tr("Critical layer for Skim Viewer removed from the layers' panel")
+            self.qgis_project.iface_error_message(self.error)
 
     def __disable_fields(self):
         dialog_elements = [
@@ -329,6 +324,10 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
 
     def recompute_after_selection(self):
         selected_features = self.layer.selectedFeatures()
+        # If the user clicks in the canvas area without selecting a feature,
+        # it will not raise an error.
+        if not selected_features:
+            return
         self.idx = [feature[self.layer_col] for feature in selected_features][0]
 
         self.compute_skims(self.idx)
@@ -371,9 +370,7 @@ class SkimViewerDialog(QDialog, FORM_CLASS):
         self._check_start_id()
 
         if self.error:
-            self.iface.messageBar().pushMessage(
-                self.tr("Input error"), self.error, level=Qgis.MessageLevel.Critical, duration=10
-            )
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             self.idx = None
             self.error = None
             return

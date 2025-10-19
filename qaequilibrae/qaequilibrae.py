@@ -1,31 +1,29 @@
 import glob
-import logging
 import subprocess
 import sys
 import tempfile
 import webbrowser
 from functools import partial
 from os import unlink
-from os.path import dirname, exists, join, isfile, split
+from os.path import dirname, exists, join, isfile
 from pathlib import Path
 from uuid import uuid4
 
 import qgis
 from qgis.PyQt.QtCore import Qt, QTranslator, QSettings, QLocale, QCoreApplication, QSize
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication, QToolBar, QToolButton
-from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget, QCheckBox
+from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget
+from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableWidgetItem, QTableWidget
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
-from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication
+from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, QgsMessageLog, Qgis
 
+from qaequilibrae import set_aequilibrae_menu_instance
 from qaequilibrae.message import messages
-from qaequilibrae.modules.menu_actions import load_matrices, run_add_connectors, run_stacked_bandwidths, run_tag
-from qaequilibrae.modules.menu_actions import run_add_zones, run_show_project_data, run_tsp
+from qaequilibrae.modules.menu_actions import run_load_project, run_module, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs
-from qaequilibrae.modules.menu_actions import run_distribution_models, run_change_parameters, prepare_network
-from qaequilibrae.modules.menu_actions import run_load_project, project_from_osm, run_create_transponet
-from qaequilibrae.modules.menu_actions import run_pt_explore, show_log, create_example
-from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig
-from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder, run_module, load_skim_viewer
+from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths, run_pt_explore
+from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig, create_scenarios
+from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder, load_skim_viewer
 from qaequilibrae.modules.processing_provider.provider import Provider
 
 sys.path.insert(0, join(dirname(__file__), "packages"))
@@ -64,10 +62,11 @@ if hasattr(Qt, "AA_UseHighDpiPixmaps"):
 
 class AequilibraEMenu:
     def __init__(self, iface):
+        set_aequilibrae_menu_instance(self)
         # Closes AequilibraE projects eventually opened in memory
-        self.logger = logging.getLogger("AequilibraEGUI")
+        self.logger = self.get_logger()
         self.geo_layers_list = ["links", "nodes", "zones"]
-        # translator = None
+        self.available_scenarios = []
         self.iface = iface
         self.path = last_folder()
         self.project = None  # type: Project
@@ -76,6 +75,7 @@ class AequilibraEMenu:
         self.dock = QDockWidget("AequilibraE")
         self.manager = QWidget()
         self.provider = None
+        self.dialog_depth: int = 0
 
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
@@ -97,94 +97,75 @@ class AequilibraEMenu:
 
         self.menuActions = {
             self.tr("Project"): [],
-            self.tr("Model Building"): [],
-            self.tr("Data"): [],
-            self.tr("Trip Distribution"): [],
-            self.tr("Paths and assignment"): [],
-            self.tr("Routing"): [],
-            self.tr("Public Transport"): [],
-            "GIS": [],
+            self.tr("Trip distribution"): [],
+            self.tr("Path computation"): [],
+            self.tr("Traffic assignment"): [],
+            self.tr("Route choice"): [],
+            self.tr("Transit"): [],
+            self.tr("Mapping"): [],
             "AequilibraE": [],
         }
 
-        # # #######################   PROJECT SUB-MENU   ############################
-        self.add_menu_action(self.tr("Project"), self.tr("Open Project"), partial(run_load_project, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Create example"), partial(create_example, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Parameters"), partial(run_change_parameters, self))
-        self.add_menu_action(self.tr("Project"), self.tr("logfile"), partial(show_log, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Run procedures"), partial(run_module, self))
-        self.add_menu_action(self.tr("Project"), self.tr("Close project"), self.run_close_project)
+        # # # ########################################################################
+        # # # #######################  PROJECT SUB-MENU  #############################
+        mmenu = self.tr("Project")
+        self.add_menu_action(mmenu, self.tr("Open project"), partial(run_load_project, self))
+        self.add_menu_action(mmenu, self.tr("Run procedures"), partial(run_module, self))
+        self.add_menu_action(mmenu, self.tr("Scenarios"), partial(create_scenarios, self))
+        self.add_menu_action(mmenu, self.tr("Close project"), self.run_close_project)
 
         # # # ########################################################################
-        # # # ################# MODEL BUILDING SUB-MENU  #######################
-        self.add_menu_action(
-            self.tr("Model Building"), self.tr("Create project from OSM"), partial(project_from_osm, self)
-        )
-        self.add_menu_action(
-            self.tr("Model Building"), self.tr("Create Project from layers"), partial(run_create_transponet, self)
-        )
-        self.add_menu_action(self.tr("Model Building"), self.tr("Network Preparation"), partial(prepare_network, self))
-        self.add_menu_action(
-            self.tr("Model Building"), self.tr("Add centroid connectors"), partial(run_add_connectors, self)
-        )
-        self.add_menu_action(self.tr("Model Building"), self.tr("Add zoning data"), partial(run_add_zones, self))
+        # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
+        mmenu = self.tr("Trip distribution")
+        self.add_menu_action(mmenu, self.tr("Trip distribution"), partial(run_distribution_models, self))
 
         # # # ########################################################################
-        # # # ####################  DATA UTILITIES SUB-MENU  #########################
-        self.add_menu_action(self.tr("Data"), self.tr("Visualize data"), partial(run_show_project_data, self))
-        self.add_menu_action(self.tr("Data"), self.tr("Import matrices"), partial(load_matrices, self))
-
-        # # # # ########################################################################
-        # # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
-        self.add_menu_action(
-            self.tr("Trip Distribution"), self.tr("Trip Distribution"), partial(run_distribution_models, self)
-        )
+        # # # ###################  PATH COMPUTATION SUB-MENU  ########################
+        mmenu = self.tr("Path computation")
+        self.add_menu_action(mmenu, self.tr("Shortest path"), partial(run_shortest_path, self))
+        self.add_menu_action(mmenu, self.tr("Impedance matrix"), partial(run_dist_matrix, self))
+        self.add_menu_action(mmenu, self.tr("Skim viewer"), partial(load_skim_viewer, self))
 
         # # # ########################################################################
-        # # # ###################  PATH COMPUTATION SUB-MENU   #######################
-        self.add_menu_action(
-            self.tr("Paths and assignment"), self.tr("Shortest path"), partial(run_shortest_path, self)
-        )
-        self.add_menu_action(
-            self.tr("Paths and assignment"), self.tr("Impedance matrix"), partial(run_dist_matrix, self)
-        )
-        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Skim viewer"), partial(load_skim_viewer, self))
-        self.add_menu_action(
-            self.tr("Paths and assignment"), self.tr("Traffic Assignment"), partial(run_traffic_assig, self)
-        )
-        self.add_menu_action(self.tr("Paths and assignment"), self.tr("Route choice"), partial(run_route_choice, self))
+        # # # ###################  TRAFFIC ASSIGNMENT SUB-MENU  ######################
+        mmenu = self.tr("Traffic assignment")
+        self.add_menu_action(mmenu, self.tr("Traffic assignment"), partial(run_traffic_assig, self))
 
         # # # ########################################################################
-        # # # #######################   ROUTING SUB-MENU   ###########################
-        self.add_menu_action(self.tr("Routing"), self.tr("Travelling Salesman Problem"), partial(run_tsp, self))
+        # # # ###################  ROUTE CHOICE SUB-MENU  ############################
+        mmenu = self.tr("Route choice")
+        self.add_menu_action(mmenu, self.tr("Route choice"), partial(run_route_choice, self))
 
         # # # ########################################################################
-        # # # #######################   TRANSIT SUB-MENU   ###########################
-        self.add_menu_action(self.tr("Public Transport"), self.tr("Import GTFS"), partial(run_import_gtfs, self))
-        self.add_menu_action(
-            self.tr("Public Transport"), self.tr("Skimming and Assignment"), partial(run_pt_skim, self)
-        )
-        self.add_menu_action(self.tr("Public Transport"), self.tr("Explore Transit"), partial(run_pt_explore, self))
+        # # # ###################  TRANSIT SUB-MENU  #################################
+        mmenu = self.tr("Transit")
+        self.add_menu_action(mmenu, self.tr("Import GTFS"), partial(run_import_gtfs, self))
+        self.add_menu_action(mmenu, self.tr("Skimming and assignment"), partial(run_pt_skim, self))
+        self.add_menu_action(mmenu, self.tr("Explore transit"), partial(run_pt_explore, self))
 
-        # # ########################################################################
-        # # #################        GIS TOOLS SUB-MENU    #########################
-        self.add_menu_action("GIS", self.tr("Desire Lines"), partial(run_desire_lines, self))
-        self.add_menu_action("GIS", self.tr("Stacked Bandwidth"), partial(run_stacked_bandwidths, self))
-        self.add_menu_action("GIS", self.tr("Scenario Comparison"), partial(run_scenario_comparison, self))
-        self.add_menu_action("GIS", self.tr("Simple tag"), partial(run_tag, self))
+        # # # ########################################################################
+        # # # ###################  GIS TOOLS SUB-MENU  ###############################
+        mmenu = self.tr("Mapping")
+        self.add_menu_action(mmenu, self.tr("Visualize data"), partial(run_show_project_data, self))
+        self.add_menu_action(mmenu, self.tr("Desire lines"), partial(run_desire_lines, self))
+        self.add_menu_action(mmenu, self.tr("Stacked bandwidth"), partial(run_stacked_bandwidths, self))
+        self.add_menu_action(mmenu, self.tr("Scenario comparison"), partial(run_scenario_comparison, self))
 
-        # # ########################################################################
-        # # #################          LOOSE STUFF         #########################
+        # # # ########################################################################
+        # # # ###################  LOOSE STUFF  ######################################
         self.add_menu_action("AequilibraE", self.tr("Help"), self.run_help)
 
         self.build_menu()
-        # ########################################################################
-        # #################        PROJECT MANAGER       #########################
+        # # # ########################################################################
+        # # # ###################  PROJECT MANAGER  ##################################
 
-        self.showing = QCheckBox()
-        self.showing.setText(self.tr("Show project info"))
-        self.showing.setChecked(True)
-        self.toolbar.addWidget(self.showing)
+        lbl = QLabel("Model scenario")
+        lbl.setAlignment(Qt.AlignCenter)
+        self.toolbar.addWidget(lbl)
+        self.cob_scenarios = QComboBox()
+        self.toolbar.addWidget(self.cob_scenarios)
+
+        self.cob_scenarios.currentIndexChanged.connect(self.configure_scenario)
 
         self.projectManager = QTabWidget()
         self.toolbar.addWidget(self.projectManager)
@@ -211,6 +192,26 @@ class AequilibraEMenu:
             temp_saving = self.iface.mainWindow().findChild(QAction, action)
             if temp_saving:
                 temp_saving.triggered.connect(self.save_in_project)
+
+    def get_logger(self):
+        from aequilibrae.context import get_logger
+
+        return get_logger()
+
+    def configure_scenario(self):
+        if self.cob_scenarios.currentIndex() < 0:
+            return
+
+        if self.available_scenarios:
+            name = self.available_scenarios[self.cob_scenarios.currentIndex()]
+            self.project.use_scenario(name)
+            self.message_log(self.tr("Changed active scenario: {}").format(name))
+
+            # Change layers
+            tab_count = self.projectManager.count()
+            for i in range(tab_count):
+                self.projectManager.removeTab(i)
+            self.update_project_layers()
 
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
         if main_menu == "AequilibraE":
@@ -268,7 +269,6 @@ class AequilibraEMenu:
             QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def removes_temporary_files(self):
-        # pass
         # Removes all the temporary files from previous uses
         p = tempfile.gettempdir() + "/aequilibrae_*"
         for f in glob.glob(p):
@@ -279,14 +279,19 @@ class AequilibraEMenu:
                 pass
 
     def run_close_project(self):
-        if self.project is None:
+        if not self.project:
             return
         self.remove_aequilibrae_layers()
+        self.project.use_scenario("root")
+        pth = str(self.project.project_base_path)
         self.project.close()
+        self.cob_scenarios.clear()
         self.projectManager.clear()
         self.project = None
+        self.available_scenarios = []
         self.matrices.clear()
         self.layers.clear()
+        self.message_log(self.tr("Closed project on: {}").format(pth))
 
     def layerRemoved(self, layer):
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
@@ -318,31 +323,29 @@ class AequilibraEMenu:
         self.layers[layer_name.lower()] = [layer, layer.id()]
 
     def create_loose_layer(self, layer_name: str) -> QgsVectorLayer:
-        if self.project is None:
+        if not self.project:
             return
         uri = QgsDataSourceUri()
         if "transit_" not in layer_name:
-            uri.setDatabase(str(self.project.path_to_file))
+            uri.setDatabase(str(self.project._project_database_path))
             lname = layer_name
         else:
-            uri.setDatabase(join(self.project.project_base_path, "public_transport.sqlite"))
+            uri.setDatabase(str(self.project._transit_database_path))
             lname = layer_name[8:]
         uri.setDataSource("", lname, "geometry")
-        layer = QgsVectorLayer(uri.uri(), layer_name, "spatialite")
+        suffix = self.available_scenarios[self.cob_scenarios.currentIndex()]
+        name = layer_name if suffix == "root" else f"{layer_name}_{suffix}"
+        layer = QgsVectorLayer(uri.uri(), name, "spatialite")
         return layer
 
     def show_message_no_project(self):
-        self.iface.messageBar().pushMessage("Error", self.tr("You need to load a project first"), level=3, duration=10)
+        self.iface_error_message(text=self.tr("You need to load a project"))
 
     def message_project_already_open(self):
-        self.iface.messageBar().pushMessage(
-            "Error", self.tr("You need to close the project currently open first"), level=2, duration=10
-        )
+        self.iface_error_message(text=self.tr("You need to close the currently open project"))
 
     def message_no_gtfs_feed(self):
-        self.iface.messageBar().pushMessage(
-            "Error", self.tr("You need to import a GTFS feed first"), level=3, duration=10
-        )
+        self.iface_error_message(text=self.tr("You need to import a GTFS feed"))
 
     def set_font(self, obj):
         f = obj.font()
@@ -356,26 +359,25 @@ class AequilibraEMenu:
         """Opens AequilibraE project when opening a QGIS project containing an AequilibraE model."""
         from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-        # Checks if project contains an AequilibraE model
+        # Check if QGIS project contains an AequilibraE model
         path = QgsProject.instance().customVariables()
-        if "aequilibrae_path" not in path:
+        if "aequilibrae_path" in path:
+            # Open AequilibraE project
+            _run_load_project_from_path(self, path["aequilibrae_path"])
+
+            # Go back to last scenario
+            if "aeq_scenario" in path:
+                self.cob_scenarios.setCurrentText(path["aeq_scenario"])
+                self.project.use_scenario(path["aeq_scenario"])
+        else:
             return
 
-        # Opens project
-        _run_load_project_from_path(self, path["aequilibrae_path"])
-
-        # Checks if the layers in the project have the same database path as the aequilibrae project layers.
+        # Check if the layers in the project have the same database path as the aequilibrae project layers.
         # if so, we replace the path in self.layers
-        prj_layer_sources = [lyr.source() for lyr in QgsProject.instance().mapLayers().values()]
-        prj_layers = [lyr for lyr in QgsProject.instance().mapLayers().values()]
-
-        geo_source = [v[0].source().replace("\\\\", "/") for v in self.layers.values()]
-        geo_names = [v[0].name() for v in self.layers.values()]
-
-        for idx, lyr in enumerate(geo_source):
-            if lyr in prj_layer_sources:
-                lidx = prj_layer_sources.index(lyr)
-                self.layers[geo_names[idx]] = [prj_layers[lidx], prj_layers[lidx].id()]
+        for lyr in QgsProject.instance().mapLayers().values():
+            if "sqlite" not in lyr.source():
+                continue
+            self.layers[str(lyr.name()).lower()] = [lyr, lyr.id()]
 
     def remove_aequilibrae_layers(self):
         """Removes layers connected to current aequilibrae project from active layers if the
@@ -391,20 +393,31 @@ class AequilibraEMenu:
 
         qgis.utils.iface.mapCanvas().refresh()
 
+    def _project_base_path(self):
+        if "/scenarios/" in str(self.project.project_base_path):
+            return self.project.project_base_path.parent.parent
+        return self.project.project_base_path
+
+    def _project_layers_database(self):
+        return str(self._project_base_path() / "qgis_layers.sqlite")
+
     def save_in_project(self):
         """Saves temporary layers to the project using QGIS saving buttons."""
         if not self.project:
             return
 
-        var = str(self.project.project_base_path)
         variables = QgsProject.instance().customVariables()
 
         if "aequilibrae_path" not in variables:
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aequilibrae_path", var)
+            QgsExpressionContextUtils.setProjectVariable(
+                QgsProject.instance(), "aequilibrae_path", str(self._project_base_path())
+            )
+        # Create project variable 'aeq_scenario' to store scenario info
+        QgsExpressionContextUtils.setProjectVariable(
+            QgsProject.instance(), "aeq_scenario", self.cob_scenarios.currentText()
+        )
 
-        output_file_path = join(self.project.project_base_path, "qgis_layers.sqlite")
-
-        file_exists = True if isfile(output_file_path) else False
+        file_exists = True if isfile(self._project_layers_database()) else False
 
         for layer in QgsProject.instance().mapLayers().values():
             if layer.isTemporary():
@@ -417,11 +430,97 @@ class AequilibraEMenu:
 
                 transform_context = QgsProject.instance().transformContext()
 
-                error = QgsVectorFileWriter.writeAsVectorFormatV3(layer, output_file_path, transform_context, options)
+                error = QgsVectorFileWriter.writeAsVectorFormatV3(
+                    layer, self._project_layers_database(), transform_context, options
+                )
 
                 if error[0] == QgsVectorFileWriter.NoError:
-                    layer.setDataSource(output_file_path + f"|layername={layer_name}", layer.name(), "ogr")
+                    layer.setDataSource(
+                        self._project_layers_database() + f"|layername={layer_name}", layer.name(), "ogr"
+                    )
 
                 file_exists = True
 
         QgsProject.instance().write()
+
+    def update_project_layers(self):
+        with self.project.db_connection_spatial as conn:
+            layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
+
+            # Add transit_tables to layers
+            if exists(self.project._transit_database_path):
+                layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
+
+            descrlayout = QVBoxLayout()
+            self.geo_layers_table = QTableWidget()
+            self.geo_layers_table.doubleClicked.connect(self.load_geo_layer)
+
+            self.geo_layers_table.setRowCount(len(layers))
+            self.geo_layers_table.setColumnCount(1)
+            self.geo_layers_table.horizontalHeader().hide()
+            for i, f in enumerate(layers):
+                item1 = QTableWidgetItem(f)
+                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.geo_layers_table.setItem(i, 0, item1)
+
+            descrlayout.addWidget(self.geo_layers_table)
+
+            descr = QWidget()
+            descr.setLayout(descrlayout)
+            self.tabContents = [(descr, "Geo layers")]
+            for i in range(self.projectManager.count()):
+                self.projectManager.removeTab(i)
+            self.projectManager.addTab(descr, "Geo layers")
+            conn.execute("PRAGMA temp_store = 0;")
+
+            # Creates all layers and puts them in memory
+            self.layers.clear()
+            for lyr in layers:
+                self.create_layer_by_name(lyr)
+
+    def message_log(self, message, level: Qgis.MessageLevel = Qgis.MessageLevel.Info, notify_user: bool = False):
+        """
+        Standardizes QAequilibraE message log display in the tab 'Messages'.
+
+        Uses 'Info' level and does not notify user, by default, although these are editable.
+        """
+        QgsMessageLog.logMessage(message, self.tr("Messages"), level, notify_user)
+
+    def iface_error_message(self, text: str = None, title: str = "Error"):
+        """Standardizes QAequilibraE error messages display"""
+        self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Critical, -1)
+
+    def iface_info_message(self, text: str = None, title: str = "Info"):
+        """Standardizes QAequilibraE info messages display"""
+        self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Info, -1)
+
+    def iface_warning_message(self, text: str = None, title: str = "Warning"):
+        """Standardizes QAequilibraE warning messages display"""
+        self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Warning, -1)
+
+    def iface_success_message(self, text: str = None, title: str = "Success"):
+        """Standardizes QAequilibraE warning messages display"""
+        self.iface.messageBar().pushMessage(title, text, Qgis.MessageLevel.Success, -1)
+
+    def allow_change_scenario(self):
+        """
+        Enables scenario changes after deactivation.
+
+        This function is used with the QDialog finished signal, which is emitted when the dialog's
+        result code has been set, either by the user or by calling done(), accept(), or reject().
+
+        See: https://doc.qt.io/qt-6/qdialog.html#finished
+        """
+        self.dialog_depth -= 1
+        if self.dialog_depth <= 0:
+            self.cob_scenarios.setEnabled(True)
+            self.dialog_depth = 0
+
+    def block_change_scenario(self):
+        """
+        Disables scenario changes when QDialogs are open.
+
+        This function is used when initializating classes with dialogs.
+        """
+        self.cob_scenarios.setEnabled(False)
+        self.dialog_depth += 1

@@ -1,10 +1,10 @@
 import itertools
-import logging
 import struct
 from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
+from aequilibrae.context import get_logger
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths import Graph
 from aequilibrae.paths import allOrNothing
@@ -32,7 +32,7 @@ class DesireLinesProcedure(WorkerThread):
         self.error = None
         self.matrix_hash = matrix_hash
         self.report = []
-        self.logger = logging.getLogger("aequilibrae")
+        self.logger = get_logger()
         self.nodes_to_indices = {matrix.index[x]: x for x in range(matrix.zones)}
         self.python_version = 8 * struct.calcsize("P")
 

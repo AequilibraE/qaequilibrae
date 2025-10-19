@@ -29,46 +29,8 @@ def check_if_new_active_window_matches_class(qtbot, windowClass):
 
 def test_load_project(ae_with_project):
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
     assert ae_with_project.project is not None, "project should be loaded"
-
-
-def test_create_example(ae_with_project):
-    action = ae_with_project.menuActions["Project"][1]
-    assert action.text() == "Create example", "Wrong text content"
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert (
-        messagebar.messages[2][0] == "Error:You need to close the project currently open first"
-    ), "Level 2 error message is missing"
-
-
-def test_parameters_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.common_tools import ParameterDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, ParameterDialog)
-
-    action = ae_with_project.menuActions["Project"][2]
-    assert action.text() == "Parameters", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
-
-def test_logfile_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.common_tools import LogDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, LogDialog)
-
-    action = ae_with_project.menuActions["Project"][3]
-    assert action.text() == "logfile", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_run_module_menu(coquimbo_project, qtbot):
@@ -77,100 +39,26 @@ def test_run_module_menu(coquimbo_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, RunModuleDialog)
 
-    action = coquimbo_project.menuActions["Project"][4]
+    action = coquimbo_project.menuActions["Project"][1]
     assert action.text() == "Run procedures", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = coquimbo_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-def test_create_project_from_osm_menu(ae_with_project):
-    action = ae_with_project.menuActions["Model Building"][0]
-    assert action.text() == "Create project from OSM", "Wrong text content"
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert (
-        messagebar.messages[2][0] == "Error:You need to close the project currently open first"
-    ), "Level 2 error message is missing"
-
-
-def test_create_project_from_layers_menu(ae_with_project):
-    action = ae_with_project.menuActions["Model Building"][1]
-    assert action.text() == "Create Project from layers", "Wrong text content"
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert (
-        messagebar.messages[2][0] == "Error:You need to close the project currently open first"
-    ), "Level 2 error message is missing"
-
-
-def test_network_preparation_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.network import NetworkPreparationDialog
+def test_scenarios_menu(ae_with_project, qtbot):
+    from qaequilibrae.modules.project_procedures import CreateScenariosDialog
 
     def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, NetworkPreparationDialog)
+        check_if_new_active_window_matches_class(qtbot, CreateScenariosDialog)
 
-    action = ae_with_project.menuActions["Model Building"][2]
-    assert action.text() == "Network Preparation", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-
-
-def test_add_centroid_connectors_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.network import AddConnectorsDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, AddConnectorsDialog)
-
-    action = ae_with_project.menuActions["Model Building"][3]
-    assert action.text() == "Add centroid connectors", "Wrong text content"
+    action = ae_with_project.menuActions["Project"][2]
+    assert action.text() == "Scenarios", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
-
-def test_add_zoning_data_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.project_procedures import AddZonesDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, AddZonesDialog)
-
-    action = ae_with_project.menuActions["Model Building"][4]
-    assert action.text() == "Add zoning data", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
-
-def test_display_project_data_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.matrix_procedures import LoadProjectDataDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, LoadProjectDataDialog)
-
-    action = ae_with_project.menuActions["Data"][0]
-    assert action.text() == "Visualize data", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
-
-def test_import_matrices_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.matrix_procedures import LoadMatrixDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, LoadMatrixDialog)
-
-    action = ae_with_project.menuActions["Data"][1]
-    assert action.text() == "Import matrices", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_trip_distribution_menu(ae_with_project, qtbot):
@@ -179,12 +67,12 @@ def test_trip_distribution_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, DistributionModelsDialog)
 
-    action = ae_with_project.menuActions["Trip Distribution"][0]
-    assert action.text() == "Trip Distribution", "Wrong text content"
+    action = ae_with_project.menuActions["Trip distribution"][0]
+    assert action.text() == "Trip distribution", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_shortest_path_menu(ae_with_project, qtbot):
@@ -193,12 +81,12 @@ def test_shortest_path_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, ShortestPathDialog)
 
-    action = ae_with_project.menuActions["Paths and assignment"][0]
+    action = ae_with_project.menuActions["Path computation"][0]
     assert action.text() == "Shortest path", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_impedance_matrix_menu(ae_with_project, qtbot):
@@ -207,12 +95,12 @@ def test_impedance_matrix_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, ImpedanceMatrixDialog)
 
-    action = ae_with_project.menuActions["Paths and assignment"][1]
+    action = ae_with_project.menuActions["Path computation"][1]
     assert action.text() == "Impedance matrix", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_skim_viewer_menu(ae_with_project, qtbot):
@@ -221,12 +109,14 @@ def test_skim_viewer_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, SkimViewerDialog)
 
-    action = ae_with_project.menuActions["Paths and assignment"][2]
+    action = ae_with_project.menuActions["Path computation"][2]
     assert action.text() == "Skim viewer", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert (
+        messagebar.messages[2][0] == "Input error:Please set an active layer to proceed"
+    ), "Level 2 error message is missing"
 
 
 def test_traffic_assignment_menu(ae_with_project, qtbot):
@@ -235,12 +125,12 @@ def test_traffic_assignment_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, TrafficAssignmentDialog)
 
-    action = ae_with_project.menuActions["Paths and assignment"][3]
-    assert action.text() == "Traffic Assignment", "Wrong text content"
+    action = ae_with_project.menuActions["Traffic assignment"][0]
+    assert action.text() == "Traffic assignment", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_route_choice_menu(ae_with_project, qtbot):
@@ -249,26 +139,26 @@ def test_route_choice_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, RouteChoiceDialog)
 
-    action = ae_with_project.menuActions["Paths and assignment"][4]
+    action = ae_with_project.menuActions["Route choice"][0]
     assert action.text() == "Route choice", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-def test_travelling_salesman_problem_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.routing_procedures import TSPDialog
+def test_display_project_data_menu(ae_with_project, qtbot):
+    from qaequilibrae.modules.matrix_procedures import LoadProjectDataDialog
 
     def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, TSPDialog)
+        check_if_new_active_window_matches_class(qtbot, LoadProjectDataDialog)
 
-    action = ae_with_project.menuActions["Routing"][0]
-    assert action.text() == "Travelling Salesman Problem", "Wrong text content"
+    action = ae_with_project.menuActions["Mapping"][0]
+    assert action.text() == "Visualize data", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_gis_desire_lines_menu(ae_with_project, qtbot):
@@ -277,12 +167,12 @@ def test_gis_desire_lines_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, DesireLinesDialog)
 
-    action = ae_with_project.menuActions["GIS"][0]
-    assert action.text() == "Desire Lines", "Wrong text content"
+    action = ae_with_project.menuActions["Mapping"][1]
+    assert action.text() == "Desire lines", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_gis_stacked_bandwidth_menu(ae_with_project, qtbot):
@@ -291,12 +181,12 @@ def test_gis_stacked_bandwidth_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, CreateBandwidthsDialog)
 
-    action = ae_with_project.menuActions["GIS"][1]
-    assert action.text() == "Stacked Bandwidth", "Wrong text content"
+    action = ae_with_project.menuActions["Mapping"][2]
+    assert action.text() == "Stacked bandwidth", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_gis_scenario_comparison_menu(ae_with_project, qtbot):
@@ -305,45 +195,31 @@ def test_gis_scenario_comparison_menu(ae_with_project, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, CompareScenariosDialog)
 
-    action = ae_with_project.menuActions["GIS"][2]
-    assert action.text() == "Scenario Comparison", "Wrong text content"
+    action = ae_with_project.menuActions["Mapping"][3]
+    assert action.text() == "Scenario comparison", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
-
-
-def test_gis_simple_tag_menu(ae_with_project, qtbot):
-    from qaequilibrae.modules.gis import SimpleTagDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, SimpleTagDialog)
-
-    action = ae_with_project.menuActions["GIS"][3]
-    assert action.text() == "Simple tag", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
 def test_gtfs_importer(ae_with_project, qtbot):
-    from qaequilibrae.modules.public_transport_procedures.gtfs_importer import GTFSImporter
+    from qaequilibrae.modules.transit_procedures.gtfs_importer import GTFSImporter
 
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, GTFSImporter)
 
-    action = ae_with_project.menuActions["Public Transport"][0]
+    action = ae_with_project.menuActions["Transit"][0]
     assert action.text() == "Import GTFS", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert len(messagebar.messages[3]) == 0, "Messagebar should be empty" + str(messagebar.messages)
+    assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
 
 
-def test_gtfs_explorer(ae_with_project, qtbot):
-    action = ae_with_project.menuActions["Public Transport"][2]
-    assert action.text() == "Explore Transit", "Wrong text content"
+def test_gtfs_explorer(sf_project, qtbot):
+    action = sf_project.menuActions["Transit"][2]
+    assert action.text() == "Explore transit", "Wrong text content"
     action.trigger()
-    messagebar = ae_with_project.iface.messageBar()
-    assert messagebar.messages[3][0] == "Error:You need to import a GTFS feed first", "Level 3 error message is missing"
+    messagebar = sf_project.iface.messageBar()
+    assert messagebar.messages[2][0] == "Error:You need to import a GTFS feed", "Level 2 error message is missing"

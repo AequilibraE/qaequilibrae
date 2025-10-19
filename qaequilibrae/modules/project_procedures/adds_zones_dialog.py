@@ -1,29 +1,23 @@
-import os
 import sys
+from os.path import dirname, join
 
 import pandas as pd
 import qgis
-from PyQt5.QtCore import Qt
-from aequilibrae.project.database_connection import database_connection
-from aequilibrae.utils.db_utils import commit_and_close
-from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout, QComboBox, QCheckBox, QTableWidgetItem
 from qgis.core import QgsMapLayerProxyModel
 
-from qaequilibrae.modules.common_tools import standard_path
+from qaequilibrae.modules.common_tools import standard_path, BaseDialog
 from qaequilibrae.modules.project_procedures.add_zones_procedure import AddZonesProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_add_zoning.ui"))
 
 
-class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgisproject):
-        QtWidgets.QDialog.__init__(self)
-        self.iface = qgisproject.iface
-        self.project = qgisproject.project
-        self.setupUi(self)
+class AddZonesDialog(BaseDialog):
+    def __init__(self, qgis_project):
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_add_zoning.ui"), qgis_project=qgis_project)
 
+    def _base_ui_setup(self):
         self.path = standard_path()
         self.cob_lyr.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
@@ -41,9 +35,9 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
 
         for row in range(self.table_fields.rowCount()):
             f = self.table_fields.item(row, 1).text()
-            if not self.table_fields.cellWidget(row, 0).findChildren(QtWidgets.QCheckBox)[0].isChecked():
+            if not self.table_fields.cellWidget(row, 0).findChildren(QCheckBox)[0].isChecked():
                 continue
-            widget = self.table_fields.cellWidget(row, 2).findChildren(QtWidgets.QComboBox)[0]
+            widget = self.table_fields.cellWidget(row, 2).findChildren(QComboBox)[0]
             source_name = widget.currentText()
             val = layer.dataProvider().fieldNameIndex(source_name)
             field_correspondence[f] = val
@@ -65,7 +59,7 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
         self.show()
 
     def changed_layer(self):
-        with commit_and_close(database_connection("network")) as conn:
+        with self.project.db_connection as conn:
             if not self.project or not conn:
                 return
             ignore_fields = ["ogc_fid", "geometry"]
@@ -80,17 +74,17 @@ class AddZonesDialog(QtWidgets.QDialog, FORM_CLASS):
             layer_fields = self.cob_lyr.currentLayer().fields() if self.cob_lyr.currentLayer() else []
 
             for counter, field in enumerate(fields):
-                item1 = QtWidgets.QTableWidgetItem(field)
+                item1 = QTableWidgetItem(field)
                 item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 self.table_fields.setItem(counter, 1, item1)
 
-                chb1 = QtWidgets.QCheckBox()
+                chb1 = QCheckBox()
                 chb1.setChecked(True)
                 if field in not_initializable:
                     chb1.setEnabled(False)
                 self.table_fields.setCellWidget(counter, 0, self.centers_item(chb1))
 
-                cbb = QtWidgets.QComboBox()
+                cbb = QComboBox()
                 for i in layer_fields:
                     cbb.addItem(i.name())
                 self.table_fields.setCellWidget(counter, 2, self.centers_item(cbb))

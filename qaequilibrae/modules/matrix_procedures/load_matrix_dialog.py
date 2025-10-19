@@ -1,13 +1,14 @@
 import importlib.util as iutil
-import os
+from os.path import dirname, join
 
 import numpy as np
 import qgis
 from aequilibrae.context import get_logger
 from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
-from qgis.PyQt import QtWidgets, uic, QtCore
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import Qt, QSize
+from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
+from qgis.core import Qgis
 
 from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_from_toc
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
@@ -20,7 +21,7 @@ from qaequilibrae.modules.matrix_procedures.mat_reblock import MatrixReblocking
 spec = iutil.find_spec("openmatrix")
 has_omx = spec is not None
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_matrix_loader.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_matrix_loader.ui"))
 
 logger = get_logger()
 
@@ -28,9 +29,9 @@ logger = get_logger()
 # TODO: Add possibility to add a centroid list to guarantee the match between matrix index and graph
 # TODO: Allow user to import multiple matrices from CSV at once (like an export from TransCad or FAF data)
 # TODO: Add a remove button to the list of matrices to be loaded. Remove double-click
-class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
+class LoadMatrixDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, **kwargs):
-        QtWidgets.QDialog.__init__(self)
+        QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
         self.path = standard_path()
@@ -78,7 +79,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.matrix_list_view.setColumnWidth(2, 125)
         self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
         self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
-        self.setMaximumSize(QtCore.QSize(100000, 100000))
+        self.setMaximumSize(QSize(100000, 100000))
         self.resize(542, 427)
         self.but_permanent_save.setVisible(True)
 
@@ -174,7 +175,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
             self.run_thread()
 
         if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error:", self.error, level=1)
+            qgis.utils.iface.messageBar().pushMessage("Error", self.error, Qgis.MessageLevel.Critical, -1)
 
     def update_matrix_list(self):
         if self.matrix_count > 0:
@@ -225,9 +226,7 @@ class LoadMatrixDialog(QtWidgets.QDialog, FORM_CLASS):
         self.matrix_list_view.blockSignals(False)
 
     def get_name_and_save_to_disk(self):
-        self.output_name, _ = GetOutputFileName(
-            self, "AequilibraE matrix", ["Aequilibrae Matrix(*.aem)"], ".aem", self.path
-        )
+        self.output_name, _ = GetOutputFileName(self, "Open matrix", ["Open matrix (*.omx)"], ".omx", self.path)
         self.prepare_final_matrix()
 
     def prepare_final_matrix(self):

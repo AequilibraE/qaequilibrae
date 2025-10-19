@@ -1,15 +1,14 @@
-from os.path import exists, join
+from os.path import join
 from pathlib import Path
 from tempfile import gettempdir
-
-import qgis
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QTableWidget
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QVBoxLayout
 
 
 # Split loading between Qt action and processing, for easier unit testing
 def run_load_project(qgis_project):
+    if qgis_project.project:
+        qgis_project.message_project_already_open()
+        return
+
     from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFolderName
 
     proj_path = GetOutputFolderName(str(Path(qgis_project.path).parent), "AequilibraE Project folder")
@@ -17,32 +16,25 @@ def run_load_project(qgis_project):
     return _run_load_project_from_path(qgis_project, proj_path)
 
 
-def _get_project_path():
-    from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
-
-    return QFileDialog.getExistingDirectory(QWidget(), "AequilibraE Project folder", standard_path())
-
-
 def _run_load_project_from_path(qgis_project, proj_path):
     from aequilibrae.project import Project
+    from aequilibrae.project.tools import MigrationManager
+    from aequilibrae.utils.spatialite_utils import connect_spatialite
 
     if proj_path is None or proj_path == "":
         return
 
-    # Cleans the project descriptor
-    tab_count = 1
-    for i in range(tab_count):
-        qgis_project.projectManager.removeTab(i)
     if proj_path is not None and len(proj_path) > 0:
         qgis_project.contents = []
-        qgis_project.showing.setVisible(True)
         qgis_project.project = Project()
 
         try:
             qgis_project.project.open(proj_path)
         except FileNotFoundError as e:
             if e.args[0] == "Model does not exist. Check your path and try again":
-                qgis.utils.iface.messageBar().pushMessage("FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL", level=1)
+                qgis_project.iface_error_message(
+                    "Check your path and try again", "FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL"
+                )
                 return
             else:
                 raise e
@@ -51,40 +43,28 @@ def _run_load_project_from_path(qgis_project, proj_path):
     with open(pth, "w") as file:
         file.write(proj_path)
 
-    update_project_layers(qgis_project)
+    try:
+        outdirs = qgis_project.project.list_scenarios()["scenario_name"].tolist()
+    except Exception as e:
+        qgis_project.message_log(f"Exception: {str(e)}.")
+        qgis_project.message_log("Upgrading project database to handle exception")
+        # This is a copy of AequilibraE's `project.upgrade()` to upgrade only project_database.
+        connections = {
+            "project_conn": connect_spatialite(qgis_project.project._project_database_path),
+            "transit_conn": None,
+            "results_conn": None,
+        }
+        mm = MigrationManager(MigrationManager.network_migration_file)
+        with connections["project_conn"] as conn:
+            mm.mark_all_as_seen(conn)
+        mm.upgrade("project_conn", connections=connections)
+        qgis_project.message_log("Completed database upgrades")
+        connections["project_conn"].close()
+        outdirs = qgis_project.project.list_scenarios()["scenario_name"].tolist()
 
+    qgis_project.cob_scenarios.addItems(outdirs)
+    qgis_project.available_scenarios.extend(outdirs)
 
-def update_project_layers(qgis_project):
+    qgis_project.update_project_layers()
 
-    with qgis_project.project.db_connection as conn:
-        layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
-
-        # Add transit_tables to layers
-        pt_database = join(qgis_project.project.project_base_path, "public_transport.sqlite")
-        if exists(pt_database):
-            layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
-
-        descrlayout = QVBoxLayout()
-        qgis_project.geo_layers_table = QTableWidget()
-        qgis_project.geo_layers_table.doubleClicked.connect(qgis_project.load_geo_layer)
-
-        qgis_project.geo_layers_table.setRowCount(len(layers))
-        qgis_project.geo_layers_table.setColumnCount(1)
-        qgis_project.geo_layers_table.horizontalHeader().hide()
-        for i, f in enumerate(layers):
-            item1 = QTableWidgetItem(f)
-            item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            qgis_project.geo_layers_table.setItem(i, 0, item1)
-
-        descrlayout.addWidget(qgis_project.geo_layers_table)
-
-        descr = QWidget()
-        descr.setLayout(descrlayout)
-        qgis_project.tabContents = [(descr, "Geo layers")]
-        qgis_project.projectManager.addTab(descr, "Geo layers")
-        conn.execute("PRAGMA temp_store = 0;")
-
-        # Creates all layers and puts them in memory
-        qgis_project.layers.clear()
-        for lyr in layers:
-            qgis_project.create_layer_by_name(lyr)
+    qgis_project.message_log(f"Opened project on: {proj_path}")
