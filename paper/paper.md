@@ -1,5 +1,5 @@
 ---
-title: '`QAequilibraE`: a graphical user interface for transportation modeling on QGIS'
+title: '`QAequilibraE`: a graphical user interface for transportation modelling in QGIS'
 tags:
   - QGIS
   - Python
@@ -20,7 +20,7 @@ bibliography: paper.bib
 
 # Summary
 
-`QAequilibraE` is a user-friendly graphical interface for transportation modeling that runs as a plugin
+`QAequilibraE` is a user-friendly graphical interface for transportation modelling that runs as a plugin
 within QGIS, the popular open-source geographic information system. Built on top of AequilibraE, a
 comprehensive Python package for transportation analysis, `QAequilibraE` makes transportation
 modeling accessible to both newcomers and experienced practitioners who need efficient tools for
