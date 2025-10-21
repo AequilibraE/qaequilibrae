@@ -1,3 +1,23 @@
+---
+title: '`QAequilibraE`: a graphical user interface for transportation modelling in QGIS'
+tags:
+  - QGIS
+  - Python
+  - transportation modeling
+authors:
+  - name: Pedro Camargo
+    orcid: 0000-0001-9613-2777
+    affiliation: 1
+  - name: Renata Imai
+    orcid: 0000-0002-0551-7688
+    affiliation: 1
+affiliations:
+  - name: Outer Loop Consulting, Australia
+    index: 1
+date: 30 june 2025
+bibliography: paper.bib
+---
+
 # Summary
 
 `QAequilibraE` is a user-friendly graphical interface for transportation modelling that runs as a plugin
