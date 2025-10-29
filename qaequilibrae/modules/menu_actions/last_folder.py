@@ -4,7 +4,7 @@ from tempfile import gettempdir
 
 def last_folder():
     """Reads the last-used folder path and its return value.
-    If the folder does not exist or cannot be find, function returns a temporary directory."""
+    If the folder does not exist or cannot be found, function returns a temporary directory."""
     from aequilibrae.context import get_logger
 
     pth = os.path.join(gettempdir(), "aequilibrae_last_folder.txt")
