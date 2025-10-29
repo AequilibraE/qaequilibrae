@@ -183,7 +183,7 @@ class DistributionModelsDialog(BaseDialog):
             self.table_model.setCellWidget(i - 1, 1, item)
 
     def load_datasets(self):
-        dlg2 = LoadDatasetDialog(self.iface)
+        dlg2 = LoadDatasetDialog(self.qgis_project)
         dlg2.show()
         dlg2.exec_()
         if isinstance(dlg2.dataset, pd.DataFrame):
