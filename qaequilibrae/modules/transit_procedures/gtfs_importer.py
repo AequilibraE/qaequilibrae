@@ -4,7 +4,7 @@ from aequilibrae.transit import Transit
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem
 
-from qaequilibrae.modules.common_tools import BaseDialog
+from qaequilibrae.modules.common_tools import BaseDialog, ProgressBar
 from qaequilibrae.modules.transit_procedures import GTFSFeed
 
 
@@ -73,39 +73,32 @@ class GTFSImporter(BaseDialog):
         self.list_feeds.setItem(self.list_feeds.rowCount() - 1, 0, feed_txt)
 
     def execute_importer(self):
-        for item in self.items:
-            item.setVisible(not item.isVisible())
-            item.setEnabled(not item.isEnabled())
-        self.setFixedHeight(176)
-
         if self.rdo_clear.isChecked() and self.is_pt_database:
             with self.qgis_project.project.transit_connection as conn:
                 for table in self.__transit_tables:
                     conn.execute(f"DELETE FROM {table};")
 
-        for _, feed in enumerate(self.feeds):
-            feed.signal.connect(self.signal_handler)
+        dlg = ProgressBar(self.qgis_project)
+        dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+
+        for i, feed in enumerate(self.feeds):
+            dlg.pbar_1.setMinimum(0)
+            dlg.pbar_1.setMaximum(len(self.feeds))
+            dlg.pbar_1.setValue(i)
+            dlg.label_1.setText(f"Processando feed {i+1} de {len(self.feeds)}: {feed.gtfs_data.agency.agency}")
+            feed.signal.connect(dlg.signal_handler)
             if self.check_allow_map_match.isChecked():
                 feed.set_allow_map_match()
+            if i == 0:
+                dlg.show()
+                dlg.exec_()
             feed.execute_import()
+
+        dlg.pbar_1.setValue(len(self.feeds))
+        dlg.label_1.setText("Importação concluída!")
+        dlg.exit_procedure()
 
         self.qgis_project.projectManager.removeTab(0)
         self.qgis_project.update_project_layers()
 
         self.close()
-
-    def signal_handler(self, val):
-
-        if val[0] == "start":
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-            self.progress_label.setText(val[2])
-        elif val[0] == "update":
-            self.progressbar.setValue(val[1])
-            self.progress_label.setText(val[2])
-        elif val[0] == "set_text":
-            self.progressbar.reset()
-            self.progress_label.setText(val[1])
-        elif val[0] == "finished":
-            self.progressbar.reset()
-            self.progress_label.clear()

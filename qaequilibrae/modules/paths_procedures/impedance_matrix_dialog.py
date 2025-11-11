@@ -1,6 +1,5 @@
 from os.path import dirname, join
 
-import qgis
 from aequilibrae.paths import SkimResults, NetworkSkimming
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
