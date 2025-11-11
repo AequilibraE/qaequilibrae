@@ -16,8 +16,6 @@ class GTFSImporter(BaseDialog):
         )
 
     def _base_ui_setup(self):
-        self.progress_box.setVisible(False)
-        self.progress_box.setEnabled(False)
         self.but_add.clicked.connect(self.add_gtfs_feed)
         self.but_execute.clicked.connect(self.execute_importer)
         self.list_feeds.setColumnWidth(0, 230)
@@ -35,7 +33,6 @@ class GTFSImporter(BaseDialog):
             self.rdo_keep.setVisible(False)
             self.rdo_clear.setChecked(True)
         self.setFixedHeight(380)
-        self.items = [self.config_box, self.progress_box]
 
         self.__transit_tables = [
             "agencies",
@@ -80,6 +77,7 @@ class GTFSImporter(BaseDialog):
 
         dlg = ProgressBar(self.qgis_project)
         dlg.setWindowFlags(Qt.WindowStaysOnTopHint)
+        dlg.show()
 
         for i, feed in enumerate(self.feeds):
             dlg.pbar_1.setMinimum(0)
@@ -90,7 +88,6 @@ class GTFSImporter(BaseDialog):
             if self.check_allow_map_match.isChecked():
                 feed.set_allow_map_match()
             if i == 0:
-                dlg.show()
                 dlg.exec_()
             feed.execute_import()
 

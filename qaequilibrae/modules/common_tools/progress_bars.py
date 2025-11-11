@@ -17,8 +17,10 @@ class ProgressBar(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
         self.qgis_project = qgis_project
 
+        self.finished.connect(qgis_project.allow_change_scenario)
+
     def signal_handler(self, val):
-        self.qgis_project.message_log(val)
+        # self.qgis_project.message_log(str(val))
         if val[0] == "finished":
             self.exit_procedure()
         elif val[0] == "refresh":
@@ -38,5 +40,4 @@ class ProgressBar(QtWidgets.QDialog, FORM_CLASS):
             self.label_2.setText(val[2])
 
     def exit_procedure(self):
-        self.qgis_project.allow_change_scenario()
         self.close()
