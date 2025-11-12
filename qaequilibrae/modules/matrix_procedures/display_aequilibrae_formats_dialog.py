@@ -444,7 +444,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def export(self):
         new_name = self.csv_file_path()
 
-        if new_name is not None:
+        if new_name:
             self.data_to_show.export(new_name)
 
     def exit_with_error(self):

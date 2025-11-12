@@ -42,8 +42,9 @@ class GTFSFeed(QDialog, FORM_CLASS):
             ".zip",
             self.path,
         )
-        if source_path_file is not None:
-            self.set_data(source_path_file)
+        if not source_path_file:
+            return
+        self.set_data(source_path_file)
 
     def set_data(self, source_path_file):
         for item in self.items:

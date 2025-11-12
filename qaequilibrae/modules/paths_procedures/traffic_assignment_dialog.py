@@ -130,7 +130,7 @@ class TrafficAssignmentDialog(BaseDialog):
 
     def _browse_python_path(self):
         path = str(self.project.project_base_path / "run")
-        file_path = GetOutputFileName(QtWidgets.QDialog(), "", ["Python (*.py)"], ".py", path)
+        file_path, _ = GetOutputFileName(QtWidgets.QDialog(), "", ["Python (*.py)"], ".py", path)
         return file_path
 
     def _load_configs(self):
@@ -290,59 +290,60 @@ class TrafficAssignmentDialog(BaseDialog):
     def export_python(self):
         out_name = self._browse_python_path()
 
-        self.check_data()
+        if out_name:
+            self.check_data()
 
-        info_dict = {
-            "classes": [],
-            "assignment": [],
-            "scenario_name": self.scenario_name,
-            "skimming": self.skimming,
-            "out_name": out_name,
-            "project_path": self.project.project_base_path,
-        }
+            info_dict = {
+                "classes": [],
+                "assignment": [],
+                "scenario_name": self.scenario_name,
+                "skimming": self.skimming,
+                "out_name": out_name,
+                "project_path": self.project.project_base_path,
+            }
 
-        df = self.project.matrices.list()
-        for tc, info in self.traffic_classes.items():
-            pth = Path(info.matrix.file_path).name
-            info_dict["classes"].extend(
-                [
+            df = self.project.matrices.list()
+            for tc, info in self.traffic_classes.items():
+                pth = Path(info.matrix.file_path).name
+                info_dict["classes"].extend(
                     [
-                        info.graph.mode,
-                        self.cob_ffttime.currentText(),
-                        self.skims[tc] if self.skims[tc] else [],
-                        info.graph.block_centroid_flows,
-                        df.loc[df["file_name"] == pth]["name"].values[0],
-                        info.matrix.view_names[0],
-                        tc,
+                        [
+                            info.graph.mode,
+                            self.cob_ffttime.currentText(),
+                            self.skims[tc] if self.skims[tc] else [],
+                            info.graph.block_centroid_flows,
+                            df.loc[df["file_name"] == pth]["name"].values[0],
+                            info.matrix.view_names[0],
+                            tc,
+                        ]
                     ]
+                )
+
+            info_dict["assignment"].extend(
+                [
+                    self.cob_vdf.currentText(),
+                    self.vdf_parameters,
+                    self.cob_capacity.currentText(),
+                    self.cob_ffttime.currentText(),
+                    self.cb_choose_algorithm.currentText(),
+                    self.miter,
+                    float(self.rel_gap.text()),
                 ]
             )
 
-        info_dict["assignment"].extend(
-            [
-                self.cob_vdf.currentText(),
-                self.vdf_parameters,
-                self.cob_capacity.currentText(),
-                self.cob_ffttime.currentText(),
-                self.cb_choose_algorithm.currentText(),
-                self.miter,
-                float(self.rel_gap.text()),
-            ]
-        )
+            if self.do_select_link.isChecked():
+                info_dict["select_links"] = {
+                    "select_links": [self.select_links],
+                    "output_name": self.sl_mat_name.text(),
+                    "save_matrix": self.chb_save_matrix.isChecked(),
+                    "save_result": self.chb_save_result.isChecked(),
+                }
 
-        if self.do_select_link.isChecked():
-            info_dict["select_links"] = {
-                "select_links": [self.select_links],
-                "output_name": self.sl_mat_name.text(),
-                "save_matrix": self.chb_save_matrix.isChecked(),
-                "save_result": self.chb_save_result.isChecked(),
-            }
+            _ = create_strings(info_dict)
 
-        _ = create_strings(info_dict)
-
-        p = Parameters()
-        p.parameters["run"]["run_assignment"] = None
-        p.write_back()
+            p = Parameters()
+            p.parameters["run"]["run_assignment"] = None
+            p.write_back()
 
     def set_fixed_cost_use(self):
         for item in [self.cob_fixed_cost, self.lbl_vot, self.vot_setter]:

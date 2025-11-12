@@ -204,6 +204,8 @@ class DistributionModelsDialog(BaseDialog):
 
     def load_model(self):
         file_name = self.browse_outfile("mod")
+        if not file_name:
+            return
         try:
             self.model.load(file_name)
             self.update_model_parameters()
