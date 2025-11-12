@@ -1,7 +1,7 @@
 import tempfile
 
 from qgis.PyQt.QtWidgets import QFileDialog
-
+from qgis.core import Qgis, QgsMessageLog
 
 def GetOutputFileName(clss, box_name, file_types, default_type, start_path):
     dlg = QFileDialog(clss)
@@ -22,7 +22,10 @@ def GetOutputFileName(clss, box_name, file_types, default_type, start_path):
             extension = new_name[-3:]
         else:
             extension = new_name[-4:]
-    return new_name, extension.upper()
+        return new_name, extension.upper()
+    else:
+        QgsMessageLog.logMessage("No file selected.", "Messages", level=Qgis.MessageLevel.Info)
+        return None, None
 
 
 def GetOutputFolderName(base_path=None, message="Select a folder:"):
