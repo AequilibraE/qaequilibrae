@@ -3,6 +3,7 @@ import tempfile
 from qgis.PyQt.QtWidgets import QFileDialog
 from qgis.core import Qgis, QgsMessageLog
 
+
 def GetOutputFileName(clss, box_name, file_types, default_type, start_path):
     dlg = QFileDialog(clss)
     dlg.setDirectory(start_path)

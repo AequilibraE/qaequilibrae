@@ -42,6 +42,7 @@ def test_add_new_feed(pt_no_feed, mocker):
 
     assert var == 1
 
+
 def test_get_output_file_name_no_selection(mocker):
     from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
 
@@ -60,6 +61,7 @@ def test_get_output_file_name_no_selection(mocker):
 
     assert name is None
     assert ext is None
+
 
 @pytest.mark.parametrize(
     ("is_checked", "set_date", "set_agency"),
