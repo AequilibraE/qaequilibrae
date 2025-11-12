@@ -89,7 +89,7 @@ class AddConnectorsDialog(BaseDialog):
 
         self.project.network.links.refresh()
         self.project.network.nodes.refresh()
-        self.exit_procedure()
+        progress_bar.exit_procedure()
 
     def exit_procedure(self):
         self.close()

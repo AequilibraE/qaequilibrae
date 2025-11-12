@@ -5,7 +5,7 @@ import qgis
 from qgis.PyQt import QtWidgets, uic
 from qgis.core import QgsProject
 
-from qaequilibrae.modules.common_tools import ReportDialog
+from qaequilibrae.modules.common_tools import ReportDialog, ProgressBar
 from qaequilibrae.modules.common_tools import standard_path, get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import line_types, point_types
 from qaequilibrae.modules.network.Network_preparation_procedure import NetworkPreparationProcedure
@@ -46,24 +46,6 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
         self.uses_nodes()
         self.set_columns_nodes()
 
-    def run_thread(self):
-        self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.start()
-        self.show()
-
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-        elif val[0] == "update":
-            self.progressbar.setValue(val[1])
-        elif val[0] == "set_text":
-            self.progress_label.setText(val[1])
-            self.progressbar.reset()
-        elif val[0] == "finished":
-            self.job_finished_from_thread()
-
     def set_columns_nodes(self):
         self.cbb_node_fields.clear()
         if self.cbb_node_layer.currentIndex() >= 0:
@@ -94,34 +76,38 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
             QgsProject.instance().addMapLayer(self.worker_thread.new_line_layer)
             if self.worker_thread.new_node_layer:
                 QgsProject.instance().addMapLayer(self.worker_thread.new_node_layer)
-        self.exit_procedure()
-        if self.worker_thread.report:
-            dlg2 = ReportDialog(self.qgis_project.iface, self.worker_thread.report)
-            dlg2.show()
-            dlg2.exec_()
 
     def run(self):
         if self.radioUseNodes.isChecked():
             self.pushOK.setEnabled(False)
             self.worker_thread = NetworkPreparationProcedure(
-                qgis.utils.iface.mainWindow(),
+                self.qgis_project.iface.mainWindow(),
                 self.cbb_line_layer.currentText(),
                 self.OutLinks.text(),
                 self.cbb_node_layer.currentText(),
                 self.cbb_node_fields.currentText(),
             )
-            self.run_thread()
 
         else:
             self.pushOK.setEnabled(False)
             self.worker_thread = NetworkPreparationProcedure(
-                qgis.utils.iface.mainWindow(),
+                self.qgis_project.iface.mainWindow(),
                 self.cbb_line_layer.currentText(),
                 self.OutLinks.text(),
                 new_node_layer=self.OutNodes.text(),
                 node_start=int(self.np_node_start.text()),
             )
-            self.run_thread()
+
+        progress_bar = ProgressBar(self.qgis_project, self.worker_thread)
+        self.worker_thread = progress_bar.run()
+
+        self.job_finished_from_thread()
+        progress_bar.exit_procedure()
+
+        if self.worker_thread.report:
+            dlg2 = ReportDialog(self.qgis_project.iface, self.worker_thread.report)
+            dlg2.show()
+            dlg2.exec_()
 
     def exit_procedure(self):
         self.close()

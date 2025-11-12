@@ -24,7 +24,7 @@ class ProgressBar(QtWidgets.QDialog, FORM_CLASS):
 
     def run(self):
         self.run_threaded_procedure()
-        self.exit_procedure()
+        return self.worker_thread
 
     def run_threaded_procedure(self):
         self.worker_thread.signal.connect(self.signal_handler)
@@ -32,6 +32,7 @@ class ProgressBar(QtWidgets.QDialog, FORM_CLASS):
         self.exec_()
 
     def signal_handler(self, val):
+        # TODO: remove any unnecessary val[0]
         if val[0] == "finished":
             self.exit_procedure()
         elif val[0] == "refresh":
@@ -51,17 +52,14 @@ class ProgressBar(QtWidgets.QDialog, FORM_CLASS):
 
     def exit_procedure(self):
         self.close()
-        return self.worker_thread
 
     def finish_procedure(self):
         """
         Killing the progress bar also kills the parent dialog.
         """
+        self.qgis_project.dialog_depth = -1
+        self.qgis_project.allow_change_scenario()
+
         for widget in QtWidgets.QApplication.topLevelWidgets():
             if isinstance(widget, QtWidgets.QDialog) and widget != self and widget.isVisible():
                 widget.close()
-
-        self.qgis_project.message_log("Process interrupted by the user: ")
-
-        self.qgis_project.dialog_depth = -1
-        self.qgis_project.allow_change_scenario()

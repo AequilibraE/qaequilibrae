@@ -70,34 +70,23 @@ class GTFSImporter(BaseDialog):
         self.list_feeds.setItem(self.list_feeds.rowCount() - 1, 0, feed_txt)
 
     def execute_importer(self):
+        print("ping")
         if self.rdo_clear.isChecked() and self.is_pt_database:
             with self.qgis_project.project.transit_connection as conn:
                 for table in self.__transit_tables:
                     conn.execute(f"DELETE FROM {table};")
 
         for _, feed in enumerate(self.feeds):
-            feed.signal.connect(self.signal_handler)
             if self.check_allow_map_match.isChecked():
                 feed.set_allow_map_match()
-            feed.execute_import()
+
+            progress_bar = ProgressBar(self.qgis_project, feed)
+        #     _ = progress_bar.run()
 
         self.qgis_project.projectManager.removeTab(0)
         self.qgis_project.update_project_layers()
 
+        progress_bar.exit_procedure()
+
+    def exit_procedure(self):
         self.close()
-
-    def signal_handler(self, val):
-
-        if val[0] == "start":
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-            self.progress_label.setText(val[2])
-        elif val[0] == "update":
-            self.progressbar.setValue(val[1])
-            self.progress_label.setText(val[2])
-        elif val[0] == "set_text":
-            self.progressbar.reset()
-            self.progress_label.setText(val[1])
-        elif val[0] == "finished":
-            self.progressbar.reset()
-            self.progress_label.clear()
