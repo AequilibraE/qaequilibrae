@@ -4,7 +4,7 @@ from os.path import dirname, join
 import qgis
 from qgis.core import QgsMapLayerProxyModel
 
-from qaequilibrae.modules.common_tools import BaseDialog
+from qaequilibrae.modules.common_tools import BaseDialog, ProgressBar
 from qaequilibrae.modules.network.adds_connectors_procedure import AddsConnectorsProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
@@ -83,25 +83,13 @@ class AddConnectorsDialog(BaseDialog):
             parameters["field"] = self.field_box.currentField()
 
         self.worker_thread = AddsConnectorsProcedure(qgis.utils.iface.mainWindow(), **parameters)
-        self.run_thread()
 
-    def run_thread(self):
-        self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.start()
-        self.exec_()
+        progress_bar = ProgressBar(self.qgis_project, self.worker_thread)
+        _ = progress_bar.run()
 
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-        elif val[0] == "update":
-            self.progressbar.setValue(val[1])
-        elif val[0] == "finished":
-            self.but_process.setEnabled(True)
-            self.project.network.links.refresh()
-            self.project.network.nodes.refresh()
-            self.exit_procedure()
+        self.project.network.links.refresh()
+        self.project.network.nodes.refresh()
+        self.exit_procedure()
 
     def exit_procedure(self):
         self.close()
