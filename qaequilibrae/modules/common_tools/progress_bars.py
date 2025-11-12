@@ -20,7 +20,7 @@ class ProgressBar(QtWidgets.QDialog, FORM_CLASS):
             item.setEnabled(False)
         self.setFixedHeight(90)
 
-        self.finished.connect(qgis_project.allow_change_scenario)
+        self.finished.connect(self.finish_procedure)
 
     def run(self):
         self.run_threaded_procedure()
@@ -35,17 +35,16 @@ class ProgressBar(QtWidgets.QDialog, FORM_CLASS):
         if val[0] == "finished":
             self.exit_procedure()
         elif val[0] == "refresh":
-            pass
+            self.pbar_1.reset()
         elif val[0] == "reset":
-            pass
+            self.pbar_1.reset()
         elif val[0] == "start":
-            self.pbar_1.setValue(0)
-            self.pbar_1.setMaximum(val[1])
+            self.pbar_1.setRange(0, val[1])
             self.label_1.setText(val[2])
         elif val[0] == "set_position":
-            pass
+            self.pbar_1.setValue(val[1])
         elif val[0] == "set_text":
-            pass
+            self.label_1.setText(val[1])
         elif val[0] == "update":
             self.pbar_1.setValue(val[1])
             self.label_1.setText(val[2])
@@ -56,6 +55,13 @@ class ProgressBar(QtWidgets.QDialog, FORM_CLASS):
 
     def finish_procedure(self):
         """
-        The idea of `finish_procedure` is
+        Killing the progress bar also kills the parent dialog.
         """
-        pass
+        for widget in QtWidgets.QApplication.topLevelWidgets():
+            if isinstance(widget, QtWidgets.QDialog) and widget != self and widget.isVisible():
+                widget.close()
+
+        self.qgis_project.message_log("Process interrupted by the user: ")
+
+        self.qgis_project.dialog_depth = -1
+        self.qgis_project.allow_change_scenario()
