@@ -16,6 +16,7 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
+from qaequilibrae.modules.common_tools import ProgressBar
 
 logger = get_logger()
 
@@ -70,9 +71,6 @@ class TrafficAssignmentDialog(BaseDialog):
         self.cancel_all.clicked.connect(self.exit_procedure)
 
         # Signals for the algorithm tab
-        for q in [self.progressbar, self.progress_label]:
-            q.setVisible(False)
-
         for algo in self.assignment.all_algorithms:
             self.cb_choose_algorithm.addItem(algo)
         self.cb_choose_algorithm.setCurrentIndex(len(self.assignment.all_algorithms) - 1)
@@ -627,25 +625,12 @@ class TrafficAssignmentDialog(BaseDialog):
     def __remove_class(self):
         self.__edit_skimming_modes()
 
-    def run_thread(self):
-        self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.start()
-        self.exec_()
-
-    def job_finished_from_thread(self):
-        self.produce_all_outputs()
-
-        self.exit_procedure()
-
     def run(self):
         if not self.check_data():
             self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
         self.miter = int(self.max_iter.text())
-        for q in [self.progressbar, self.progress_label]:
-            q.setVisible(True)
-        self.progressbar.setRange(0, self.project.network.count_centroids())
 
         self.assignment.set_classes(list(self.traffic_classes.values()))
         self.assignment.set_vdf(self.cob_vdf.currentText())
@@ -661,8 +646,17 @@ class TrafficAssignmentDialog(BaseDialog):
             for traffic_class in self.traffic_classes.values():
                 traffic_class.set_select_links(self.select_links)
 
-        self.worker_thread = self.assignment.assignment
-        self.run_thread()
+        worker_thread = self.assignment.assignment
+
+        progress_bar = ProgressBar(self.qgis_project, worker_thread)
+        _ = progress_bar.run()
+        self.produce_all_outputs()
+        progress_bar.exit_procedure()
+
+        if self.report:
+            dlg2 = ReportDialog(self.iface, self.report)
+            dlg2.show()
+            dlg2.exec_()
 
     def check_data(self):
         self.error = None
@@ -696,17 +690,6 @@ class TrafficAssignmentDialog(BaseDialog):
         self.temp_path = gettempdir()
         tries_setup = self.set_assignment()
         return tries_setup
-
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-            self.progress_label.setText(val[2])
-        elif val[0] == "update":
-            self.progressbar.setValue(val[1])
-            self.progress_label.setText(val[2])
-        elif val[0] == "finished":
-            self.job_finished_from_thread()
 
     # Save link flows to disk
     def produce_all_outputs(self):

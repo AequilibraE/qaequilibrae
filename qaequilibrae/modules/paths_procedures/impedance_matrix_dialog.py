@@ -4,7 +4,7 @@ from aequilibrae.paths import SkimResults, NetworkSkimming
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
 
-from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog
+from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog, ProgressBar
 from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types
 
@@ -33,7 +33,6 @@ class ImpedanceMatrixDialog(BaseDialog):
 
         # SECOND, we set visibility for sections that should not be shown when the form opens (overlapping items)
         #        and re-dimension the items that need re-dimensioning
-        self.hide_all_progress_bars()
         self.available_skims_table.setColumnWidth(0, 245)
         self.skim_list.setColumnWidth(0, 245)
         self.available_skims_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -97,12 +96,6 @@ class ImpedanceMatrixDialog(BaseDialog):
                 final_table.setItem(counter, 0, item1)
                 counter += 1
 
-    def hide_all_progress_bars(self):
-        self.progressbar.setVisible(False)
-        self.progress_label.setVisible(False)
-        self.progressbar.setValue(0)
-        self.progress_label.setText("")
-
     def check_name_exists(self):
         with self.project.db_connection as conn:
             txt = self.line_matrix.text()
@@ -111,30 +104,6 @@ class ImpedanceMatrixDialog(BaseDialog):
             if conn.execute("Select count(*) from matrices where name=?", [txt]).fetchone()[0]:
                 return False
             return True
-
-    def run_thread(self):
-        self.do_dist_matrix.setVisible(False)
-        self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.start()
-        self.exec_()
-
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.progressbar.setMaximum(val[1])
-        elif val[0] == "update":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(val[1])
-        elif val[0] == "set_text":
-            self.progress_label.setText(val[1])
-        elif val[0] == "finished":
-            self.progressbar.reset()
-            self.progress_label.clear()
-            self.finished_threaded_procedure()
-
-    def finished_threaded_procedure(self):
-        self.report = self.worker_thread.report
-        self.worker_thread.save_to_project(self.only_str(self.mat_name))
-        self.exit_procedure()
 
     def run_skimming(self):  # Saving results
         if not self.check_name_exists():
@@ -162,11 +131,20 @@ class ImpedanceMatrixDialog(BaseDialog):
 
         self.funding1.setVisible(False)
         self.funding2.setVisible(False)
-        self.progressbar.setVisible(True)
-        self.progress_label.setVisible(True)
-        self.worker_thread = NetworkSkimming(self.graph, self.result)
+        worker_thread = NetworkSkimming(self.graph, self.result)
         try:
-            self.run_thread()
+            self.do_dist_matrix.setVisible(False)
+            progress_bar = ProgressBar(self.qgis_project, worker_thread)
+            worker_thread = progress_bar.run()
+
+            self.report = worker_thread.report
+            worker_thread.save_to_project(self.only_str(self.mat_name))
+
+            progress_bar.exit_procedure()
+            if self.report:
+                dlg2 = ReportDialog(self.iface, self.report)
+                dlg2.show()
+                dlg2.exec_()
         except ValueError as error:
             self.qgis_project.iface_error_message(error.message, self.tr("Input error"))
 

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1013</width>
-    <height>552</height>
+    <height>453</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -1002,141 +1002,84 @@
        <string>Assignment</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="2" column="0" colspan="4">
-        <widget class="QGroupBox" name="groupBox">
+       <item row="3" column="3">
+        <widget class="QPushButton" name="cancel_all">
+         <property name="text">
+          <string>CANCEL</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" rowspan="2" colspan="3">
+        <widget class="QGroupBox" name="vdf_box">
          <property name="minimumSize">
           <size>
-           <width>600</width>
+           <width>330</width>
            <height>0</height>
           </size>
          </property>
-         <property name="acceptDrops">
-          <bool>false</bool>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
          <property name="title">
-          <string>Outputs</string>
+          <string>Volume-Delay function</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_11">
-          <item row="2" column="3">
-           <widget class="QPushButton" name="but_save_python">
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Export to Python</string>
+             <string>Function</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="do_path_file">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Save complete path file</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QPushButton" name="but_save_yaml">
-            <property name="text">
-             <string>Export to YAML</string>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cob_vdf">
+            <property name="minimumSize">
+             <size>
+              <width>180</width>
+              <height>0</height>
+             </size>
             </property>
            </widget>
           </item>
-          <item row="0" column="0" colspan="4">
-           <widget class="QLineEdit" name="output_scenario_name">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="placeholderText">
-             <string>Result_name</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <spacer name="horizontalSpacer_4">
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer_3">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Maximum</enum>
+            </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
+              <width>72</width>
               <height>20</height>
              </size>
             </property>
            </spacer>
           </item>
+          <item row="1" column="0" colspan="3">
+           <widget class="QTableWidget" name="tbl_vdf_parameters">
+            <property name="minimumSize">
+             <size>
+              <width>310</width>
+              <height>140</height>
+             </size>
+            </property>
+            <column>
+             <property name="text">
+              <string>Parameter</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Value</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Field</string>
+             </property>
+            </column>
+           </widget>
+          </item>
          </layout>
-        </widget>
-       </item>
-       <item row="4" column="2" colspan="2">
-        <widget class="QLabel" name="progress_label">
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Status Message 0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="3">
-        <widget class="QPushButton" name="do_assignment">
-         <property name="text">
-          <string>ASSIGN</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QProgressBar" name="progressbar">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="palette">
-          <palette>
-           <active>
-            <colorrole role="Highlight">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>0</red>
-               <green>170</green>
-               <blue>0</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </active>
-           <inactive>
-            <colorrole role="Highlight">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>240</red>
-               <green>240</green>
-               <blue>240</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </inactive>
-           <disabled>
-            <colorrole role="Highlight">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>51</red>
-               <green>153</green>
-               <blue>255</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </disabled>
-          </palette>
-         </property>
-         <property name="value">
-          <number>0</number>
-         </property>
-         <property name="textVisible">
-          <bool>true</bool>
-         </property>
         </widget>
        </item>
        <item row="0" column="0">
@@ -1220,13 +1163,6 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="3">
-        <widget class="QPushButton" name="cancel_all">
-         <property name="text">
-          <string>CANCEL</string>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="minimumSize">
@@ -1302,75 +1238,77 @@
          </layout>
         </widget>
        </item>
-       <item row="0" column="1" rowspan="2" colspan="3">
-        <widget class="QGroupBox" name="vdf_box">
+       <item row="3" column="0" colspan="3">
+        <widget class="QPushButton" name="do_assignment">
+         <property name="text">
+          <string>ASSIGN</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="4">
+        <widget class="QGroupBox" name="groupBox">
          <property name="minimumSize">
           <size>
-           <width>330</width>
+           <width>600</width>
            <height>0</height>
           </size>
          </property>
-         <property name="title">
-          <string>Volume-Delay function</string>
+         <property name="acceptDrops">
+          <bool>false</bool>
          </property>
-         <layout class="QGridLayout" name="gridLayout_5">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_6">
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="title">
+          <string>Outputs</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="2" column="3">
+           <widget class="QPushButton" name="but_save_python">
             <property name="text">
-             <string>Function</string>
+             <string>Export to Python</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="cob_vdf">
-            <property name="minimumSize">
-             <size>
-              <width>180</width>
-              <height>0</height>
-             </size>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="do_path_file">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Save complete path file</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="2">
-           <spacer name="horizontalSpacer_3">
+          <item row="2" column="2">
+           <widget class="QPushButton" name="but_save_yaml">
+            <property name="text">
+             <string>Export to YAML</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="4">
+           <widget class="QLineEdit" name="output_scenario_name">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="placeholderText">
+             <string>Result_name</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <spacer name="horizontalSpacer_4">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Maximum</enum>
-            </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>72</width>
+              <width>40</width>
               <height>20</height>
              </size>
             </property>
            </spacer>
-          </item>
-          <item row="1" column="0" colspan="3">
-           <widget class="QTableWidget" name="tbl_vdf_parameters">
-            <property name="minimumSize">
-             <size>
-              <width>310</width>
-              <height>140</height>
-             </size>
-            </property>
-            <column>
-             <property name="text">
-              <string>Parameter</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Value</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Field</string>
-             </property>
-            </column>
-           </widget>
           </item>
          </layout>
         </widget>
