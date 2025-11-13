@@ -227,7 +227,8 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
 
     def get_name_and_save_to_disk(self):
         self.output_name, _ = GetOutputFileName(self, "Open matrix", ["Open matrix (*.omx)"], ".omx", self.path)
-        self.prepare_final_matrix()
+        if self.output_name:
+            self.prepare_final_matrix()
 
     def prepare_final_matrix(self):
         self.compressed.setVisible(False)
