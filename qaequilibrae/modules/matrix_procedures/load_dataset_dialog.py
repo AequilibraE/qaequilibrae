@@ -175,7 +175,7 @@ class LoadDatasetDialog(BaseDialog):
             out_name, _ = GetOutputFileName(self, "Load file", ["Comma-separated values (*.csv)"], ".csv", self.path)
         elif self.radio_parquet.isChecked():
             out_name, _ = GetOutputFileName(self, "Load file", ["Parquet (*.parquet)"], ".parquet", self.path)
-        
+
         if out_name:
             self.load_with_file_name(out_name)
 
