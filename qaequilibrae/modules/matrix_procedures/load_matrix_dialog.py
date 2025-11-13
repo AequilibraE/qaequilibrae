@@ -1,4 +1,3 @@
-import importlib.util as iutil
 from os.path import dirname, join
 
 import numpy as np
@@ -18,9 +17,6 @@ from qaequilibrae.modules.common_tools.report_dialog import ReportDialog
 from qaequilibrae.modules.matrix_procedures.load_matrix_class import LoadMatrix
 from qaequilibrae.modules.matrix_procedures.mat_reblock import MatrixReblocking
 
-spec = iutil.find_spec("openmatrix")
-has_omx = spec is not None
-
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_matrix_loader.ui"))
 
 logger = get_logger()
@@ -30,14 +26,13 @@ logger = get_logger()
 # TODO: Allow user to import multiple matrices from CSV at once (like an export from TransCad or FAF data)
 # TODO: Add a remove button to the list of matrices to be loaded. Remove double-click
 class LoadMatrixDialog(QDialog, FORM_CLASS):
-    def __init__(self, iface, **kwargs):
+    def __init__(self, qgis_project, **kwargs):
         QDialog.__init__(self)
-        self.iface = iface
+        self.qgis_project = qgis_project
         self.setupUi(self)
         self.path = standard_path()
         self.sparse = kwargs.get("sparse", False)
         self.multiple = kwargs.get("multiple", True)
-        self.allow_single_use = kwargs.get("single_use", False)
         self.output_name = None
         self.layer = None
         self.orig = None
@@ -54,12 +49,6 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
 
         # Buttons
         self.but_load.clicked.connect(self.load_the_matrix)
-
-        if self.allow_single_use:
-            self.but_save_for_single_use.clicked.connect(self.prepare_final_matrix)
-        else:
-            self.but_save_for_single_use.setVisible(False)
-
         self.but_permanent_save.clicked.connect(self.get_name_and_save_to_disk)
 
         # THIRD, we load layers in the canvas to the combo-boxes
@@ -80,11 +69,7 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
         self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
         self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
         self.setMaximumSize(QSize(100000, 100000))
-        self.resize(542, 427)
         self.but_permanent_save.setVisible(True)
-
-        self.but_save_for_single_use.setEnabled(False)
-        self.but_permanent_save.setEnabled(False)
 
     def slot_double_clicked(self, mi):
         row = mi.row()
@@ -110,56 +95,56 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
                 if field.type() in float_types:
                     self.field_cells.addItem(field.name())
 
-    def run_thread(self):
-        self.worker_thread.signal.connect(self.signal_handler)
+    # def run_thread(self):
+    #     self.worker_thread.signal.connect(self.signal_handler)
 
-        self.but_load.setEnabled(False)
-        self.worker_thread.start()
-        self.exec_()
+    #     self.but_load.setEnabled(False)
+    #     self.worker_thread.start()
+    #     self.exec_()
 
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-        elif val[0] == "update":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(val[1])
-        elif val[0] == "set_text":
-            self.progress_label.setText(val[1])
-            self.progressbar.setValue(0)
-        elif val[0] == "finished":
-            self.progress_label.clear()
-            self.progressbar.reset()
-            self.but_load.setEnabled(True)
-            if self.worker_thread.report:
-                dlg2 = ReportDialog(self.iface, self.worker_thread.report)
-                dlg2.show()
-                dlg2.exec_()
-            else:
-                if val[1] == "LOADED-MATRIX":
-                    self.compressed.setVisible(True)
-                    self.progress_label.setVisible(False)
+    # def signal_handler(self, val):
+    #     if val[0] == "start":
+    #         self.progress_label.setText(val[2])
+    #         self.progressbar.setValue(0)
+    #         self.progressbar.setMaximum(val[1])
+    #     elif val[0] == "update":
+    #         self.progress_label.setText(val[2])
+    #         self.progressbar.setValue(val[1])
+    #     elif val[0] == "set_text":
+    #         self.progress_label.setText(val[1])
+    #         self.progressbar.setValue(0)
+    #     elif val[0] == "finished":
+    #         self.progress_label.clear()
+    #         self.progressbar.reset()
+    #         self.but_load.setEnabled(True)
+    #         if self.worker_thread.report:
+    #             dlg2 = ReportDialog(self.qgis_project.iface, self.worker_thread.report)
+    #             dlg2.show()
+    #             dlg2.exec_()
+    #         else:
+    #             if val[1] == "LOADED-MATRIX":
+    #                 self.compressed.setVisible(True)
+    #                 self.progress_label.setVisible(False)
 
-                    if self.__current_name in self.matrices.keys():
-                        i = 1
-                        while self.__current_name + "_" + str(i) in self.matrices.keys():
-                            i += 1
-                        self.__current_name = self.__current_name + "_" + str(i)
+    #                 if self.__current_name in self.matrices.keys():
+    #                     i = 1
+    #                     while self.__current_name + "_" + str(i) in self.matrices.keys():
+    #                         i += 1
+    #                     self.__current_name = self.__current_name + "_" + str(i)
 
-                    self.matrices[self.__current_name] = self.worker_thread.matrix
-                    self.matrix_count += 1
-                    self.update_matrix_list()
+    #                 self.matrices[self.__current_name] = self.worker_thread.matrix
+    #                 self.matrix_count += 1
+    #                 self.update_matrix_list()
 
-                    if not self.multiple:
-                        self.update_matrix_hashes()
+    #                 if not self.multiple:
+    #                     self.update_matrix_hashes()
 
-                elif val[1] == "REBLOCKED MATRICES":
-                    self.matrix = self.worker_thread.matrix
-                    if self.compressed.isChecked():
-                        pass
-                        # compression not implemented yet
-                    self.exit_procedure()
+    #             elif val[1] == "REBLOCKED MATRICES":
+    #                 self.matrix = self.worker_thread.matrix
+    #                 if self.compressed.isChecked():
+    #                     pass
+    #                     # compression not implemented yet
+    #                 self.exit_procedure()
 
     def __create_appropriate_name(self, nm: str) -> str:
         nm = nm.replace(" ", "_")
@@ -171,18 +156,16 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
     def load_the_matrix(self):
         self.has_errors()
 
-        if self.worker_thread is not None:
+        if self.worker_thread:
             self.run_thread()
 
-        if self.error is not None:
-            qgis.utils.iface.messageBar().pushMessage("Error", self.error, Qgis.MessageLevel.Critical, -1)
+        if self.error:
+            self.qgis_project.iface_error_message(self.error)
 
     def update_matrix_list(self):
         if self.matrix_count > 0:
-            self.but_save_for_single_use.setEnabled(True)
             self.but_permanent_save.setEnabled(True)
         else:
-            self.but_save_for_single_use.setEnabled(False)
             self.but_permanent_save.setEnabled(False)
 
         self.matrix_list_view.clearContents()
@@ -227,28 +210,21 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
 
     def get_name_and_save_to_disk(self):
         self.output_name, _ = GetOutputFileName(self, "Open matrix", ["Open matrix (*.omx)"], ".omx", self.path)
-        self.prepare_final_matrix()
-
-    def prepare_final_matrix(self):
         self.compressed.setVisible(False)
         self.progress_label.setVisible(True)
 
-        self.build_worker_thread()
+        if self.output_name:
+            self.worker_thread = MatrixReblocking(
+                self.qgis_project.iface.mainWindow(),
+                sparse=self.sparse,
+                matrices=self.matrices,
+                file_name=self.output_name,
+            )
 
         self.run_thread()
 
     def exit_procedure(self):
         self.close()
-
-    def build_worker_thread(self):
-        if self.output_name is None:
-            self.worker_thread = MatrixReblocking(
-                qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices
-            )
-        else:
-            self.worker_thread = MatrixReblocking(
-                qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
-            )
 
     def has_errors(self):
         self.error = None
@@ -260,9 +236,8 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
         ):
             self.error = self.tr("Invalid field chosen")
 
-        if self.error is None:
+        if not self.error:
             self.compressed.setVisible(False)
-            self.progress_label.setVisible(True)
             self.__current_name = self.__create_appropriate_name(self.field_cells.currentText().lower())
             idx1 = self.layer.dataProvider().fieldNameIndex(self.field_from.currentText())
             idx2 = self.layer.dataProvider().fieldNameIndex(self.field_to.currentText())
@@ -270,5 +245,5 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
             idx = [idx1, idx2, idx3]
 
             self.worker_thread = LoadMatrix(
-                qgis.utils.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
+                self.qgis_project.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
             )

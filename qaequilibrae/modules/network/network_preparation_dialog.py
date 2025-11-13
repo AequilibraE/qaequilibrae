@@ -70,7 +70,7 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
             self.np_node_start.setEnabled(True)
 
     def job_finished_from_thread(self):
-        if self.worker_thread.error is not None:
+        if self.worker_thread.error:
             self.qgis_project.iface_error_message(self.worker_thread.error, self.tr("Node layer error:"))
         else:
             QgsProject.instance().addMapLayer(self.worker_thread.new_line_layer)
