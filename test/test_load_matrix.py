@@ -18,12 +18,8 @@ def test_save_matrix(ae_with_project, folder_path, timeoutDetector):
     dialog.field_from.setCurrentText("O")
     dialog.field_to.setCurrentText("D")
     dialog.field_cells.setCurrentText("Ton")
-    dialog.has_errors()
-    dialog.worker_thread.signal.connect(dialog.signal_handler)
-    dialog.worker_thread.doWork()
-    dialog.worker_thread.report = None
-    dialog.build_worker_thread()
-    dialog.worker_thread.doWork()
+    dialog.load_the_matrix()
+    dialog.prepare_final_matrix()
 
     from aequilibrae.matrix import AequilibraeMatrix
 
@@ -34,4 +30,4 @@ def test_save_matrix(ae_with_project, folder_path, timeoutDetector):
     assert np.sum(np.nan_to_num(mat.matrix["ton"])[:, :]) == 360600
     assert (mat.index == np.arange(1, 25)).all()
 
-    dialog.close()
+    assert not dialog.isVisible()  # Check if dialog was closed

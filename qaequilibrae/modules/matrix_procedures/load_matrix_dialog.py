@@ -7,13 +7,10 @@ from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_M
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, QSize
 from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
-from qgis.core import Qgis
 
-from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_from_toc
-from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
-from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
+from qaequilibrae.modules.common_tools import GetOutputFileName, ProgressBar, ReportDialog
+from qaequilibrae.modules.common_tools import all_layers_from_toc, get_vector_layer_by_name, standard_path
 from qaequilibrae.modules.common_tools.global_parameters import float_types, integer_types
-from qaequilibrae.modules.common_tools.report_dialog import ReportDialog
 from qaequilibrae.modules.matrix_procedures.load_matrix_class import LoadMatrix
 from qaequilibrae.modules.matrix_procedures.mat_reblock import MatrixReblocking
 
@@ -50,6 +47,7 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
         # Buttons
         self.but_load.clicked.connect(self.load_the_matrix)
         self.but_permanent_save.clicked.connect(self.get_name_and_save_to_disk)
+        self.compressed.setVisible(False)  # Not yet implemented
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in all_layers_from_toc():  # We iterate through all layers
@@ -69,7 +67,8 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
         self.matrix_list_view.itemChanged.connect(self.change_matrix_name)
         self.matrix_list_view.doubleClicked.connect(self.slot_double_clicked)
         self.setMaximumSize(QSize(100000, 100000))
-        self.but_permanent_save.setVisible(True)
+        self.resize(500, 410)
+        self.but_permanent_save.setEnabled(False)
 
     def slot_double_clicked(self, mi):
         row = mi.row()
@@ -95,56 +94,34 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
                 if field.type() in float_types:
                     self.field_cells.addItem(field.name())
 
-    # def run_thread(self):
-    #     self.worker_thread.signal.connect(self.signal_handler)
+    def run_thread(self):
+        progress_bar = ProgressBar(self.qgis_project, self.worker_thread)
+        progress_bar.run_threaded_procedure()
 
-    #     self.but_load.setEnabled(False)
-    #     self.worker_thread.start()
-    #     self.exec_()
+        if progress_bar.worker_thread.report:
+            dlg2 = ReportDialog(self.qgis_project.iface, progress_bar.worker_thread.report)
+            dlg2.show()
+            dlg2.exec_()
+        else:
+            if progress_bar.finished == "LOADED-MATRIX":
+                # self.compressed.setVisible(True)
+                if self.__current_name in self.matrices.keys():
+                    i = 1
+                    while self.__current_name + "_" + str(i) in self.matrices.keys():
+                        i += 1
+                    self.__current_name = self.__current_name + "_" + str(i)
 
-    # def signal_handler(self, val):
-    #     if val[0] == "start":
-    #         self.progress_label.setText(val[2])
-    #         self.progressbar.setValue(0)
-    #         self.progressbar.setMaximum(val[1])
-    #     elif val[0] == "update":
-    #         self.progress_label.setText(val[2])
-    #         self.progressbar.setValue(val[1])
-    #     elif val[0] == "set_text":
-    #         self.progress_label.setText(val[1])
-    #         self.progressbar.setValue(0)
-    #     elif val[0] == "finished":
-    #         self.progress_label.clear()
-    #         self.progressbar.reset()
-    #         self.but_load.setEnabled(True)
-    #         if self.worker_thread.report:
-    #             dlg2 = ReportDialog(self.qgis_project.iface, self.worker_thread.report)
-    #             dlg2.show()
-    #             dlg2.exec_()
-    #         else:
-    #             if val[1] == "LOADED-MATRIX":
-    #                 self.compressed.setVisible(True)
-    #                 self.progress_label.setVisible(False)
+                self.matrices[self.__current_name] = progress_bar.worker_thread.matrix
+                self.matrix_count += 1
+                self.update_matrix_list()
 
-    #                 if self.__current_name in self.matrices.keys():
-    #                     i = 1
-    #                     while self.__current_name + "_" + str(i) in self.matrices.keys():
-    #                         i += 1
-    #                     self.__current_name = self.__current_name + "_" + str(i)
-
-    #                 self.matrices[self.__current_name] = self.worker_thread.matrix
-    #                 self.matrix_count += 1
-    #                 self.update_matrix_list()
-
-    #                 if not self.multiple:
-    #                     self.update_matrix_hashes()
-
-    #             elif val[1] == "REBLOCKED MATRICES":
-    #                 self.matrix = self.worker_thread.matrix
-    #                 if self.compressed.isChecked():
-    #                     pass
-    #                     # compression not implemented yet
-    #                 self.exit_procedure()
+                if not self.multiple:
+                    self.update_matrix_hashes()
+            elif progress_bar.finished == "REBLOCKED MATRICES":
+                self.matrix = progress_bar.worker_thread.matrix
+                # if self.compressed.isChecked():
+                #     pass  # compression not implemented yet
+                progress_bar.finish_procedure()
 
     def __create_appropriate_name(self, nm: str) -> str:
         nm = nm.replace(" ", "_")
@@ -156,10 +133,10 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
     def load_the_matrix(self):
         self.has_errors()
 
-        if self.worker_thread:
+        if self.worker_thread is not None:
             self.run_thread()
 
-        if self.error:
+        if self.error is not None:
             self.qgis_project.iface_error_message(self.error)
 
     def update_matrix_list(self):
@@ -210,21 +187,27 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
 
     def get_name_and_save_to_disk(self):
         self.output_name, _ = GetOutputFileName(self, "Open matrix", ["Open matrix (*.omx)"], ".omx", self.path)
-        self.compressed.setVisible(False)
-        self.progress_label.setVisible(True)
+        self.prepare_final_matrix()
 
-        if self.output_name:
-            self.worker_thread = MatrixReblocking(
-                self.qgis_project.iface.mainWindow(),
-                sparse=self.sparse,
-                matrices=self.matrices,
-                file_name=self.output_name,
-            )
+    def prepare_final_matrix(self):
+        # self.compressed.setVisible(False)
+
+        self.build_worker_thread()
 
         self.run_thread()
 
     def exit_procedure(self):
         self.close()
+
+    def build_worker_thread(self):
+        if self.output_name is None:
+            self.worker_thread = MatrixReblocking(
+                qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices
+            )
+        else:
+            self.worker_thread = MatrixReblocking(
+                qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
+            )
 
     def has_errors(self):
         self.error = None
@@ -236,8 +219,8 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
         ):
             self.error = self.tr("Invalid field chosen")
 
-        if not self.error:
-            self.compressed.setVisible(False)
+        if self.error is None:
+            # self.compressed.setVisible(False)
             self.__current_name = self.__create_appropriate_name(self.field_cells.currentText().lower())
             idx1 = self.layer.dataProvider().fieldNameIndex(self.field_from.currentText())
             idx2 = self.layer.dataProvider().fieldNameIndex(self.field_to.currentText())
@@ -245,5 +228,5 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
             idx = [idx1, idx2, idx3]
 
             self.worker_thread = LoadMatrix(
-                self.qgis_project.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
+                qgis.utils.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
             )

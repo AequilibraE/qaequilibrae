@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>385</width>
-    <height>400</height>
+    <height>410</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -73,7 +73,7 @@
     </widget>
    </item>
    <item row="1" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="group_buttons">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>

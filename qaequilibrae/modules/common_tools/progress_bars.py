@@ -34,6 +34,8 @@ class ProgressBar(QtWidgets.QDialog, FORM_CLASS):
     def signal_handler(self, val):
         # TODO: remove any unnecessary val[0]
         if val[0] == "finished":
+            if len(val) > 1:
+                self.finished = val[1]
             self.exit_procedure()
         elif val[0] == "refresh":
             self.pbar_1.reset()
