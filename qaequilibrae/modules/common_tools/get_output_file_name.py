@@ -18,10 +18,8 @@ def GetOutputFileName(clss, box_name, file_types, default_type, start_path):
     if dlg.exec_():
         new_name = dlg.selectedFiles()[0]
         new_name = new_name.replace("..", ".")
-        if new_name[-4] == ".":
-            extension = new_name[-3:]
-        else:
-            extension = new_name[-4:]
+        last_dot = new_name.rfind(".")
+        extension = new_name[last_dot + 1 :]
         return new_name, extension.upper()
     else:
         return None, None
