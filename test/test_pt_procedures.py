@@ -33,7 +33,7 @@ def test_add_new_feed(pt_no_feed, mocker):
 
     importer.set_feed(feed.feed)
     importer.rdo_keep.setChecked(True)
-    # importer.execute_importer()
+    importer.execute_importer()
 
     with pt_no_feed.project.transit_connection as conn:
         var = conn.execute("select count(agency_id) from agencies").fetchone()[0]
@@ -74,7 +74,7 @@ def test_add_other_feed(pt_project, set_agency, set_date, is_checked, mocker):
     if not is_checked:
         importer.rdo_keep.setChecked(True)
     importer.set_feed(feed.feed)
-    # importer.execute_importer()
+    importer.execute_importer()
 
     with pt_project.project.transit_connection as conn:
         var = conn.execute("select count(agency_id) from agencies").fetchone()[0]

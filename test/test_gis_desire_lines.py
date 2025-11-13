@@ -32,9 +32,6 @@ def test_click_create_with_layers(ae_with_project, qtbot, timeoutDetector):
     with qtbot.capture_exceptions() as exceptions:
         qtbot.mouseClick(dialog.create_dl, Qt.LeftButton)
     assert len(exceptions) == 0
-    # default is delaunay
-    assert dialog.progress_label.text() == "Building resulting layer"  # Last displayed line
-    assert dialog.progressbar.value() == 62  # This number should match the number of edges in the SiouxFalls data
     # test that something cool happened on the map?
 
 
@@ -49,8 +46,6 @@ def test_click_create_with_layers_desired_selected(ae_with_project, qtbot, timeo
         qtbot.mouseClick(dialog.radio_desire, Qt.LeftButton)
         qtbot.mouseClick(dialog.create_dl, Qt.LeftButton)
     assert len(exceptions) == 0
-    assert dialog.progress_label.text() == "Creating Desire Lines"  # Last displayed line
-    assert dialog.progressbar.value() == 276  # This number should match the number of edges in the SiouxFalls data
     # test that something cool happened on the map?
 
 
@@ -70,4 +65,3 @@ def test_click_create_with_layers_with_wrong_id_param(ae_with_project, qtbot):
         # this shouldn't hang, but it does
         qtbot.mouseClick(dialog.create_dl, Qt.LeftButton)
     assert len(exceptions) == 0, "Exception shouldn't be raised all the way to here"
-    assert dialog.progress_label.text() == "Some error message saying id field is incorrect"

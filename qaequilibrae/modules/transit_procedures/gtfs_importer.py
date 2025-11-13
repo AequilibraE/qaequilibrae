@@ -70,23 +70,30 @@ class GTFSImporter(BaseDialog):
         self.list_feeds.setItem(self.list_feeds.rowCount() - 1, 0, feed_txt)
 
     def execute_importer(self):
-        print("ping")
         if self.rdo_clear.isChecked() and self.is_pt_database:
             with self.qgis_project.project.transit_connection as conn:
                 for table in self.__transit_tables:
                     conn.execute(f"DELETE FROM {table};")
 
-        for _, feed in enumerate(self.feeds):
-            if self.check_allow_map_match.isChecked():
-                feed.set_allow_map_match()
+        if self.check_allow_map_match.isChecked():
+            self.feeds[0].set_allow_map_match()
 
-            progress_bar = ProgressBar(self.qgis_project, feed)
-        #     _ = progress_bar.run()
+        progress_bar = ProgressBar(self.qgis_project, self.feeds[0])
+        progress_bar.worker_thread.signal.connect(progress_bar.signal_handler)
+        progress_bar.worker_thread.doWork()
 
         self.qgis_project.projectManager.removeTab(0)
         self.qgis_project.update_project_layers()
 
-        progress_bar.exit_procedure()
+        progress_bar.finish_procedure()
+
+    def remove_feed(self):
+        """
+        TODO: Allow removal of selected feed from the list when double-clicking it. If the feed
+        list has one item, disable the `Add feed` button. It can only be re-enabled if the existing
+        feed is removed.
+        """
+        pass
 
     def exit_procedure(self):
         self.close()
