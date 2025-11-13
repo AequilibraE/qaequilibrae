@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>471</height>
+    <height>442</height>
    </rect>
   </property>
   <property name="font">
@@ -278,43 +278,17 @@
     </property>
    </widget>
   </widget>
-  <widget class="QProgressBar" name="progressbar">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>430</y>
-     <width>251</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
-  </widget>
   <widget class="QPushButton" name="OK">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>430</y>
-     <width>75</width>
+     <x>240</x>
+     <y>410</y>
+     <width>151</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
     <string>OK</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lbl_operation">
-   <property name="geometry">
-    <rect>
-     <x>12</x>
-     <y>408</y>
-     <width>211</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Waiting for inputs</string>
    </property>
   </widget>
  </widget>
