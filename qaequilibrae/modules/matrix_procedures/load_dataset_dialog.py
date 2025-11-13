@@ -7,7 +7,7 @@ from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import Qt, QSize
 
 from qaequilibrae.modules.common_tools import BaseDialog, GetOutputFileName, ProgressBar
-from qaequilibrae.modules.common_tools import all_layers_from_toc, standard_path, get_vector_layer_by_name
+from qaequilibrae.modules.common_tools import all_layers_from_toc, get_vector_layer_by_name, standard_path
 from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types, point_types, poly_types
 from qaequilibrae.modules.matrix_procedures.load_dataset_class import LoadDataset
 
@@ -43,10 +43,10 @@ class LoadDatasetDialog(BaseDialog):
         # For changing the network layer
         self.cob_data_layer.currentIndexChanged.connect(self.load_fields_to_combo_boxes)
         self.but_removes_from_links.clicked.connect(self.removes_fields)
+
         # For adding skims
         self.but_load.clicked.connect(self.load_from_file)
         self.but_save_and_use.clicked.connect(self.load_the_vector)
-        self.but_import_and_use.clicked.connect(self.load_just_to_use)
 
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in all_layers_from_toc():  # We iterate through all layers
@@ -58,7 +58,6 @@ class LoadDatasetDialog(BaseDialog):
             self.radio_layer.setChecked(True)
             self.radio_csv.setEnabled(False)
             self.radio_parquet.setEnabled(False)
-            self.but_import_and_use.setEnabled(False)
             self.but_load.setEnabled(False)
             self.but_save_and_use.setText(self.tr("Import"))
 
@@ -94,14 +93,14 @@ class LoadDatasetDialog(BaseDialog):
             if final:
                 if self.radio_layer.isChecked():
                     if self.chb_all_fields.isChecked():
-                        set_size(453, 120)
+                        set_size(450, 120)
                 else:
-                    set_size(453, 410)
+                    set_size(450, 400)
             else:
                 if self.chb_all_fields.isChecked():
-                    set_size(449, 120)
+                    set_size(450, 120)
                 else:
-                    set_size(449, 410)
+                    set_size(450, 400)
 
     def removes_fields(self):
         for i in self.table_fields_to_import.selectedRanges():
@@ -162,7 +161,7 @@ class LoadDatasetDialog(BaseDialog):
     def load_the_vector(self):
         self.set_output_name()
 
-        if self.radio_layer.isChecked() and not self.error:
+        if self.radio_layer.isChecked() and self.error is None:
             self.output_name = self.layer.name()
             if self.cob_data_layer.currentIndex() < 0 or self.cob_index_field.currentIndex() < 0:
                 self.error = self.tr("Invalid field chosen")
@@ -170,7 +169,7 @@ class LoadDatasetDialog(BaseDialog):
             index_field = self.cob_index_field.currentText()
 
             if len(self.selected_fields) > 0:
-                worker_thread = LoadDataset(
+                self.worker_thread = LoadDataset(
                     qgis.utils.iface.mainWindow(),
                     layer=self.layer,
                     index_field=index_field,
@@ -178,27 +177,26 @@ class LoadDatasetDialog(BaseDialog):
                     file_name=self.output_name,
                 )
                 self.size_it_accordingly(True)
-                self.enable_disable_buttons(False)
 
-                progress_bar = ProgressBar(self.qgis_project, worker_thread)
-                worker_thread = progress_bar.run()
+                self.chb_all_fields.setEnabled(False)
+                self.but_load.setEnabled(False)
+                self.but_save_and_use.setEnabled(False)
 
-                self.enable_disable_buttons(True)
+                progress_bar = ProgressBar(self.qgis_project, self.worker_thread)
+                progress_bar.run_threaded_procedure()
 
-                if worker_thread.error is not None:
-                    self.qgis_project.iface_error_message(worker_thread.error, self.tr("Error while loading vector:"))
+                if progress_bar.worker_thread.error is not None:
+                    self.qgis_project.iface_error_message(
+                        progress_bar.worker_thread.error, self.tr("Error while loading vector:")
+                    )
                 else:
-                    self.dataset = worker_thread.output
-                progress_bar.exit_procedure()
+                    self.dataset = progress_bar.worker_thread.output
+
+                progress_bar.finish_procedure()
             else:
                 self.qgis_project.iface_error_message(self.tr("One cannot load a dataset with indices only"))
-        if self.error:
+        if self.error is not None:
             self.qgis_project.iface_error_message(self.error)
-
-    def enable_disable_buttons(self, enable: bool):
-        self.but_load.setEnabled(enable)
-        self.but_save_and_use.setEnabled(enable)
-        self.chb_all_fields.setEnabled(enable)
 
     def set_output_name(self):
         if self.single_use:
@@ -209,10 +207,6 @@ class LoadDatasetDialog(BaseDialog):
             self.output_name, _ = GetOutputFileName(self, "Save layer vector", formats, ".csv", self.path)
             if self.output_name is None:
                 self.error = self.tr("No name provided for the output file")
-
-    def load_just_to_use(self):
-        self.single_use = True
-        self.load_the_vector()
 
     def exit_procedure(self):
         self.close()

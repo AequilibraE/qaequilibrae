@@ -68,5 +68,5 @@ class LoadDataset(WorkerThread):
                 self.signal.emit(["update", p, f"Feature count: {p}"])
             self.output.set_index(self.index_field, inplace=True)
 
-        # self.signal.emit(["set_text", feat_count])
-        # self.signal.emit(["finished"])
+        self.signal.emit(["set_text", str(feat_count)])
+        self.signal.emit(["finished"])
