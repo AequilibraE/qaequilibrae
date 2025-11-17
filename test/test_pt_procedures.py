@@ -6,8 +6,6 @@ from aequilibrae.transit import Transit
 from qaequilibrae.modules.transit_procedures.gtfs_feed import GTFSFeed
 from qaequilibrae.modules.transit_procedures.gtfs_importer import GTFSImporter
 
-from qgis.PyQt.QtWidgets import QDialog
-
 
 def test_add_new_feed(pt_no_feed, mocker):
     mocker.patch(
