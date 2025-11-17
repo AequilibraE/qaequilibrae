@@ -1,5 +1,6 @@
 from os.path import isdir, join, dirname
 
+import qgis
 from aequilibrae.context import get_logger
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.place_getter import placegetter
@@ -12,6 +13,7 @@ from qgis.core import QgsProject, QgsCoordinateReferenceSystem
 from shapely.geometry import box
 
 from qaequilibrae.modules.common_tools import reporter, ReportDialog, standard_path, ProgressBar
+from qaequilibrae.modules.project_procedures.project_from_osm_procedure import ProjectFromOSMProcedure
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
@@ -91,7 +93,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
             self.output_path.setText(join(new_name, new_folder))
 
     def run(self):
-        self.resize(280, 300)
         if self.choose_canvas.isChecked():
             self.report.append(reporter("Chose to download network for canvas area"))
             QgsProject.instance().setCrs(QgsCoordinateReferenceSystem.fromEpsgId(4326))
@@ -103,23 +104,22 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
             self.report.extend(r)
 
         self.qgis_project.project = Project()
+        self.qgis_project.project.new(self.output_path.text())
 
-        progress_bar = ProgressBar(self.qgis_project, self.qgis_project.project)
-        progress_bar.worker_thread.new(self.output_path.text())
-        progress_bar.worker_thread.network.signal.connect(progress_bar.signal_handler)
-        progress_bar.worker_thread.network.create_from_osm(box(*bbox))
+        worker_thread = ProjectFromOSMProcedure(qgis.utils.iface.mainWindow(), self.qgis_project, bbox)
+
+        progress_bar = ProgressBar(self.qgis_project, worker_thread, 2)
+        progress_bar.run_threaded_procedure()
 
         try:
-            if progress_bar.worker_thread.network.builder:
-                lines = progress_bar.worker_thread.network.count_links()
-                nodes = progress_bar.worker_thread.network.count_nodes()
+            if self.qgis_project.project.network.builder:
+                lines = self.qgis_project.project.network.count_links()
+                nodes = self.qgis_project.project.network.count_nodes()
                 self.report.append(reporter(f"{lines:,} links generated"))
                 self.report.append(reporter(f"{nodes:,} nodes generated"))
                 self.leave()
         except AttributeError:
             self.logger.info("Only display builder info")
-
-        progress_bar.finish_procedure()
 
         dlg2 = ReportDialog(self.iface, self.report)
         dlg2.show()

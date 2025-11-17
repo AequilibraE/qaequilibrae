@@ -94,35 +94,6 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
                 if field.type() in float_types:
                     self.field_cells.addItem(field.name())
 
-    def run_thread(self):
-        progress_bar = ProgressBar(self.qgis_project, self.worker_thread)
-        progress_bar.run_threaded_procedure()
-
-        if progress_bar.worker_thread.report:
-            dlg2 = ReportDialog(self.qgis_project.iface, progress_bar.worker_thread.report)
-            dlg2.show()
-            dlg2.exec_()
-        else:
-            if progress_bar.finished == "LOADED-MATRIX":
-                # self.compressed.setVisible(True)
-                if self.__current_name in self.matrices.keys():
-                    i = 1
-                    while self.__current_name + "_" + str(i) in self.matrices.keys():
-                        i += 1
-                    self.__current_name = self.__current_name + "_" + str(i)
-
-                self.matrices[self.__current_name] = progress_bar.worker_thread.matrix
-                self.matrix_count += 1
-                self.update_matrix_list()
-
-                if not self.multiple:
-                    self.update_matrix_hashes()
-            elif progress_bar.finished == "REBLOCKED MATRICES":
-                self.matrix = progress_bar.worker_thread.matrix
-                # if self.compressed.isChecked():
-                #     pass  # compression not implemented yet
-                progress_bar.finish_procedure()
-
     def __create_appropriate_name(self, nm: str) -> str:
         nm = nm.replace(" ", "_")
         if len(nm) > CORE_NAME_MAX_LENGTH - 3:
@@ -134,7 +105,22 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
         self.has_errors()
 
         if self.worker_thread is not None:
-            self.run_thread()
+            # self.compressed.setVisible(True)
+            progress_bar = ProgressBar(self.qgis_project, self.worker_thread, 2)
+            progress_bar.run_threaded_procedure()
+
+            if self.__current_name in self.matrices.keys():
+                i = 1
+                while self.__current_name + "_" + str(i) in self.matrices.keys():
+                    i += 1
+                self.__current_name = self.__current_name + "_" + str(i)
+
+            self.matrices[self.__current_name] = progress_bar.worker_thread.matrix
+            self.matrix_count += 1
+            self.update_matrix_list()
+
+            if not self.multiple:
+                self.update_matrix_hashes()
 
         if self.error is not None:
             self.qgis_project.iface_error_message(self.error)
@@ -192,22 +178,24 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
     def prepare_final_matrix(self):
         # self.compressed.setVisible(False)
 
-        self.build_worker_thread()
-
-        self.run_thread()
-
-    def exit_procedure(self):
-        self.close()
-
-    def build_worker_thread(self):
-        if self.output_name is None:
-            self.worker_thread = MatrixReblocking(
-                qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices
-            )
-        else:
+        if self.output_name:
             self.worker_thread = MatrixReblocking(
                 qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
             )
+        else:
+            self.qgis_project.iface_warning_message("Set an output file name to save the matrix permanently.")
+
+        progress_bar = ProgressBar(self.qgis_project, self.worker_thread)
+        progress_bar.run_threaded_procedure()
+
+        self.matrix = progress_bar.worker_thread.matrix
+        # if self.compressed.isChecked():
+        #     pass
+        #     # compression not implemented yet
+        # progress_bar.set_finish_procedure()
+
+    def exit_procedure(self):
+        self.close()
 
     def has_errors(self):
         self.error = None
