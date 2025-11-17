@@ -88,19 +88,20 @@ class LoadDatasetDialog(BaseDialog):
             self.resize(w, h)
 
         if self.radio_csv.isChecked() or self.radio_parquet.isChecked():
-            set_size(154, 124)
+            set_size(155, 120)
         else:
+            self.but_load.setEnabled(False)
             if final:
                 if self.radio_layer.isChecked():
                     if self.chb_all_fields.isChecked():
-                        set_size(450, 120)
+                        set_size(450, 410)
                 else:
-                    set_size(450, 400)
+                    set_size(450, 120)
             else:
                 if self.chb_all_fields.isChecked():
-                    set_size(450, 120)
+                    set_size(450, 410)
                 else:
-                    set_size(450, 400)
+                    set_size(450, 120)
 
     def removes_fields(self):
         for i in self.table_fields_to_import.selectedRanges():
@@ -176,13 +177,7 @@ class LoadDatasetDialog(BaseDialog):
                     fields=self.selected_fields,
                     file_name=self.output_name,
                 )
-                self.size_it_accordingly(True)
-
-                self.chb_all_fields.setEnabled(False)
-                self.but_load.setEnabled(False)
-                self.but_save_and_use.setEnabled(False)
-
-                progress_bar = ProgressBar(self.qgis_project, self.worker_thread)
+                progress_bar = ProgressBar(self.qgis_project, self.worker_thread, 2)
                 progress_bar.run_threaded_procedure()
 
                 if progress_bar.worker_thread.error is not None:
@@ -191,8 +186,6 @@ class LoadDatasetDialog(BaseDialog):
                     )
                 else:
                     self.dataset = progress_bar.worker_thread.output
-
-                progress_bar.finish_procedure()
             else:
                 self.qgis_project.iface_error_message(self.tr("One cannot load a dataset with indices only"))
         if self.error is not None:

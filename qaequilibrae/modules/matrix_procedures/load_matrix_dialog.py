@@ -192,7 +192,6 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
         # if self.compressed.isChecked():
         #     pass
         #     # compression not implemented yet
-        # progress_bar.set_finish_procedure()
 
     def exit_procedure(self):
         self.close()

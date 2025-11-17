@@ -85,7 +85,7 @@ class GTFSImporter(BaseDialog):
         self.qgis_project.projectManager.removeTab(0)
         self.qgis_project.update_project_layers()
 
-        progress_bar.finish_procedure()
+        progress_bar.set_finish_procedure()
 
     def remove_feed(self):
         """

@@ -651,7 +651,7 @@ class TrafficAssignmentDialog(BaseDialog):
         progress_bar = ProgressBar(self.qgis_project, worker_thread)
         _ = progress_bar.run()
         self.produce_all_outputs()
-        progress_bar.exit_procedure()
+        progress_bar.set_finish_procedure()
 
         if self.report:
             dlg2 = ReportDialog(self.iface, self.report)

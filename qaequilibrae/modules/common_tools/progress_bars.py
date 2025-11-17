@@ -1,6 +1,6 @@
 from os.path import dirname, join
 
-from qgis.PyQt import QtWidgets, QtCore, uic
+from qgis.PyQt import QtWidgets, uic
 
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "../common_tools/forms/ui_progress_bar.ui"))
@@ -36,8 +36,9 @@ class ProgressBar(QtWidgets.QDialog, FORM_CLASS):
     def signal_handler(self, val):
         # TODO: remove any unnecessary val[0]
         print(val)
+        break_values = ["LOADED-MATRIX", "LOADED-DATASET"]
         if val[0] == "finished":
-            if len(val) > 1 and val[1] == "LOADED-MATRIX":
+            if len(val) > 1 and val[1] in break_values:
                 self.exit_procedure()
             self.finish_signals -= 1
             if self.finish_signals == 0:

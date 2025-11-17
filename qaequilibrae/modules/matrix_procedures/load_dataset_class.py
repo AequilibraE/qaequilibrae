@@ -69,4 +69,4 @@ class LoadDataset(WorkerThread):
             self.output.set_index(self.index_field, inplace=True)
 
         self.signal.emit(["set_text", str(feat_count)])
-        self.signal.emit(["finished"])
+        self.signal.emit(["finished", "LOADED-DATASET"])
