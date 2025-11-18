@@ -21,6 +21,7 @@ class GTFSImporter(BaseDialog):
         self.but_add.clicked.connect(self.add_gtfs_feed)
         self.but_execute.clicked.connect(self.execute_importer)
         self.list_feeds.setColumnWidth(0, 230)
+        self.list_feeds.cellDoubleClicked.connect(self.remove_feed)
         self.feeds = []
         self.done = 1
 
@@ -71,6 +72,18 @@ class GTFSImporter(BaseDialog):
         feed_txt = QTableWidgetItem(f"{feed.gtfs_data.agency.agency} ({feed.gtfs_data.feed_date})")
         feed_txt.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
         self.list_feeds.setItem(self.list_feeds.rowCount() - 1, 0, feed_txt)
+
+        # Disable add button when we have a feed (max 1 feed allowed)
+        if len(self.feeds) >= 1:
+            self.but_add.setEnabled(False)
+
+    def remove_feed(self, row):
+        self.feeds.pop(row)
+        self.list_feeds.removeRow(row)
+
+        # enable add button when no feeds are present
+        if len(self.feeds) == 0:
+            self.but_add.setEnabled(True)
 
     def execute_importer(self):
         for item in self.items:
