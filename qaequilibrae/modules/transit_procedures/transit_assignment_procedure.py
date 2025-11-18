@@ -103,7 +103,7 @@ class TransitAssignProcedure(WorkerThread):
         if self.action == "create":
             self.signal.emit(["update", 10, "Saving skimming results"])
             assig.get_skim_results()["pt"].export(
-                self.project.project_base_path / "matrices" / f"{self.configs["matrix_name"]}.omx"
+                self.project.project_base_path / "matrices" / f"{self.configs['matrix_name']}.omx"
             )
         else:
             self.signal.emit(["update", 10, "Saving results"])
