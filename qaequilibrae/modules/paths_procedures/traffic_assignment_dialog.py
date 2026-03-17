@@ -440,6 +440,8 @@ class TrafficAssignmentDialog(BaseDialog):
         table.clearContents()
         if self.cob_vdf.currentText().lower() in ["bpr", "bpr2", "inrets", "conical"]:
             parameters = ["alpha", "beta"]
+        elif self.cob_vdf.currentText().lower() == "akcelik":
+            parameters = ["alpha", "tau"]
         else:
             return
 
@@ -450,6 +452,8 @@ class TrafficAssignmentDialog(BaseDialog):
             table.setItem(i, 0, core_item)
 
             val_item = QLineEdit()
+            if self.cob_vdf.currentText().lower() == "akcelik" and par == "alpha":
+                val_item.setText("0.25")
             table.setCellWidget(i, 1, val_item)
 
             val_fld = QComboBox()
