@@ -1358,7 +1358,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="14"/>
         <source>Skim viewer</source>
-        <translation type="unfinished"/>
+        <translation>Visualisation de données de skim</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="131"/>
