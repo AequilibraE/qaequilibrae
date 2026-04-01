@@ -2714,7 +2714,7 @@
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="267"/>
         <source>Line layer name</source>
-        <translation>Nom de la couche de tronçons</translation>
+        <translation>Nom de la couche</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="288"/>
