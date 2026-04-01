@@ -1634,7 +1634,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/import_matrices.py" line="13"/>
         <source>Saves matrix from open layer into a *.omx file</source>
-        <translation type="unfinished"/>
+        <translation>Enregistre une matrice open layer (couche SIG, format liste) en fichier *.omx</translation>
     </message>
 </context>
 <context>
@@ -1675,7 +1675,7 @@
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="188"/>
         <source>Could not load file. It might be corrupted or not a valid file format. {}</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de charger le fichier. Il peut être corrompu ou n&apos;est pas un format valide. {}</translation>
     </message>
 </context>
 <context>
