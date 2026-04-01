@@ -2369,7 +2369,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="544"/>
         <source>Output</source>
-        <translation>Output</translation>
+        <translation>Résultat</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="553"/>
