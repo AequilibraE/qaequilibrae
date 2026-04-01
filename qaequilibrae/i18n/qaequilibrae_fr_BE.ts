@@ -1606,7 +1606,7 @@
     <message>
         <location filename="../modules/processing_provider/transit_procedures/import_gtfs.py" line="13"/>
         <source>Import GTFS</source>
-        <translation type="unfinished"/>
+        <translation>Import de GTFS</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/transit_procedures/import_gtfs.py" line="13"/>
