@@ -1675,7 +1675,7 @@
     <message>
         <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="188"/>
         <source>Could not load file. It might be corrupted or not a valid file format. {}</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de charger le fichier. Il peut être corrompu ou n&apos;est pas un format valide. {}</translation>
     </message>
 </context>
 <context>
@@ -1688,7 +1688,7 @@
     <message>
         <location filename="../modules/matrix_procedures/load_matrix_class.py" line="40"/>
         <source>Loading matrix: {}/{}</source>
-        <translation type="unfinished"/>
+        <translation>Chargement de matrice: {}/{}</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/load_matrix_class.py" line="43"/>
@@ -1709,12 +1709,12 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
         <source>Logfile</source>
-        <translation type="unfinished"/>
+        <translation>Fichier de log</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
