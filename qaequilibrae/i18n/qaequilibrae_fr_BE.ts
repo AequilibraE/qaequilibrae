@@ -1968,7 +1968,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/open_project.py" line="13"/>
         <source>Open AequilibraE project</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir un projet AequilibraE</translation>
     </message>
 </context>
 <context>
@@ -1976,7 +1976,7 @@
     <message>
         <location filename="../modules/common_tools/parameters_dialog.py" line="65"/>
         <source>Parameter structure was compromised. Please reset to default.</source>
-        <translation type="unfinished"/>
+        <translation>La structure des paramètres à été modifiée. Veuillez réappliquer les paramètres par défaut pour continuer.</translation>
     </message>
     <message>
         <location filename="../modules/common_tools/parameters_dialog.py" line="99"/>
