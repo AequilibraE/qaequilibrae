@@ -435,17 +435,17 @@
     <message>
         <location filename="../modules/project_procedures/create_scenarios_dialog.py" line="46"/>
         <source>Cloned &apos;{}&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Scénario cloné &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/create_scenarios_dialog.py" line="52"/>
         <source>Created empty scenario</source>
-        <translation type="unfinished"/>
+        <translation>Créer un scénario vide</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/create_scenarios_dialog.py" line="54"/>
         <source>New scenario &apos;{}&apos; added to the project</source>
-        <translation type="unfinished"/>
+        <translation>Nouveau scénario &apos;{}&apos; ajouté au projet</translation>
     </message>
 </context>
 <context>
