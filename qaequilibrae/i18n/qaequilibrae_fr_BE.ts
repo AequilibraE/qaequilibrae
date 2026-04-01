@@ -2339,7 +2339,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="484"/>
         <source>Build choice sets only</source>
-        <translation type="unfinished"/>
+        <translation>Uniquement calculer les choix d&apos;itinéraires</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="491"/>
