@@ -2615,12 +2615,12 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/skim_viewer.py" line="13"/>
         <source>Skim viewer</source>
-        <translation type="unfinished"/>
+        <translation>Visualisation de données de skim</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/paths_procedures/skim_viewer.py" line="13"/>
         <source>Path computation</source>
-        <translation type="unfinished"/>
+        <translation>Calculs de chemins</translation>
     </message>
 </context>
 <context>
