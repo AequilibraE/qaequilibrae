@@ -1505,7 +1505,7 @@
     <message>
         <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="172"/>
         <source>Input error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur d&apos;input</translation>
     </message>
 </context>
 <context>
