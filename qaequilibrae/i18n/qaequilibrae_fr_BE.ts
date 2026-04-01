@@ -2229,7 +2229,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="283"/>
         <source>Save query</source>
-        <translation type="unfinished"/>
+        <translation>Sauver la requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="431"/>
