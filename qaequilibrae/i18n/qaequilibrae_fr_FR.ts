@@ -2471,7 +2471,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/run_module.py" line="13"/>
         <source>Run model procedures</source>
-        <translation type="unfinished"/>
+        <translation>Exécution de scripts</translation>
     </message>
 </context>
 <context>
@@ -2479,12 +2479,12 @@
     <message>
         <location filename="../modules/processing_provider/routing_procedures/tsp.py" line="13"/>
         <source>Traveling salesman problem</source>
-        <translation type="unfinished"/>
+        <translation>Problème du postier</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/routing_procedures/tsp.py" line="13"/>
         <source>Routing</source>
-        <translation type="unfinished"/>
+        <translation>Planification d&apos;itinéraires</translation>
     </message>
 </context>
 <context>
