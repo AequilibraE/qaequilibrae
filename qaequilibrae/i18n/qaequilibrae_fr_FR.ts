@@ -251,7 +251,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="487"/>
         <source>Messages</source>
-        <translation type="unfinished"/>
+        <translation>Messages</translation>
     </message>
 </context>
 <context>
