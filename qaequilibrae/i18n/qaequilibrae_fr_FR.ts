@@ -2159,12 +2159,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="139"/>
         <source>Add to utility function</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter à la fonction d&apos;utilité</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="146"/>
         <source>Network field</source>
-        <translation type="unfinished"/>
+        <translation>Champ du réseau</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="173"/>
