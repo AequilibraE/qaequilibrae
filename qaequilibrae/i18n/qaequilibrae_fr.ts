@@ -2823,7 +2823,7 @@
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="693"/>
         <source>Result matrix name already exists. Choose a new name.</source>
-        <translation type="unfinished"/>
+        <translation>Cette matrice de résultat existe déjà. Veuillez choisir un nom nouveau.</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="360"/>
