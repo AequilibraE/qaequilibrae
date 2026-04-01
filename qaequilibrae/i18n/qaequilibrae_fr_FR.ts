@@ -2114,12 +2114,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="62"/>
         <source>0.00</source>
-        <translation type="unfinished"/>
+        <translation>0.00</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="69"/>
         <source>Max. routes</source>
-        <translation type="unfinished"/>
+        <translation>Itinéraires max.</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="76"/>
