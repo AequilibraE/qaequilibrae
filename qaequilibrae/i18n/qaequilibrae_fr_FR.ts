@@ -4114,7 +4114,7 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="141"/>
         <source>NODE layer fields</source>
-        <translation>NOEUDS</translation>
+        <translation>Nœuds</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="275"/>
