@@ -1413,27 +1413,27 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="45"/>
         <source>Clone scenario</source>
-        <translation type="unfinished"/>
+        <translation>Cloner un scénario</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="55"/>
         <source>Create empty scenario</source>
-        <translation type="unfinished"/>
+        <translation>Créer un scénario vide</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="80"/>
         <source>Scenario to clone</source>
-        <translation type="unfinished"/>
+        <translation>Scénario à cloner</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="90"/>
         <source>Scenario name</source>
-        <translation type="unfinished"/>
+        <translation>Nom de scénario</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="123"/>
         <source>OK</source>
-        <translation type="unfinished"/>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -1477,7 +1477,7 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/impedance_matrix.py" line="13"/>
         <source>Impedance matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matrice d&apos;impédance</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/paths_procedures/impedance_matrix.py" line="13"/>
