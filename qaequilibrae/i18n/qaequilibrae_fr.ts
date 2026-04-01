@@ -435,7 +435,7 @@
     <message>
         <location filename="../modules/project_procedures/create_scenarios_dialog.py" line="46"/>
         <source>Cloned &apos;{}&apos;</source>
-        <translation type="unfinished"/>
+        <translation>Scénario cloné &apos;{}&apos;</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/create_scenarios_dialog.py" line="52"/>
