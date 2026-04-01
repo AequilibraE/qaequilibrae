@@ -1758,7 +1758,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="25"/>
         <source>Configuration file (*.yaml)</source>
-        <translation type="unfinished"/>
+        <translation>Fichier de configuration (*.yaml)</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="32"/>
