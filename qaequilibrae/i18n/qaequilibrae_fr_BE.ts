@@ -486,7 +486,7 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="43"/>
         <source>Renumbering nodes layer</source>
-        <translation type="unfinished"/>
+        <translation>Renumérotation de la couche de nœuds</translation>
     </message>
 </context>
 <context>
@@ -569,7 +569,7 @@
     <message>
         <location filename="../modules/processing_provider/gis/desire_lines.py" line="13"/>
         <source>Desire lines</source>
-        <translation type="unfinished"/>
+        <translation>Lignes de désir</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/desire_lines.py" line="13"/>
