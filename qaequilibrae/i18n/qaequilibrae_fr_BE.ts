@@ -1907,7 +1907,7 @@
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="54"/>
         <source>Adding fields to line layer</source>
-        <translation type="unfinished"/>
+        <translation>Ajout de champs à la couche de lignes</translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="45"/>
