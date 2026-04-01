@@ -2387,12 +2387,12 @@
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="374"/>
         <source>Input error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur d&apos;input</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="256"/>
         <source>Missing query name</source>
-        <translation type="unfinished"/>
+        <translation>Aucun nom de requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="259"/>
