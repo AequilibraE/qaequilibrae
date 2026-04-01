@@ -3623,12 +3623,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="49"/>
         <source>Origin node ID</source>
-        <translation type="unfinished"/>
+        <translation>ID nœud d&apos;origine</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="73"/>
         <source>Max. routes</source>
-        <translation type="unfinished"/>
+        <translation>Itinéraires max.</translation>
     </message>
 </context>
 <context>
@@ -3911,27 +3911,27 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="719"/>
         <source>Link ID</source>
-        <translation type="unfinished"/>
+        <translation>ID de tronçon</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="726"/>
         <source>12345</source>
-        <translation type="unfinished"/>
+        <translation>12345</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="733"/>
         <source>Direction</source>
-        <translation type="unfinished"/>
+        <translation>Direction</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="746"/>
         <source>Clear</source>
-        <translation type="unfinished"/>
+        <translation>Effacer</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="759"/>
         <source>Save select link matrices</source>
-        <translation type="unfinished"/>
+        <translation>Sauver les matrice d&apos;arborescence(s)</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="769"/>
