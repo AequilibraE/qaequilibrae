@@ -246,12 +246,12 @@
     <message>
         <location filename="../qaequilibrae.py" line="294"/>
         <source>Closed project on: {}</source>
-        <translation type="unfinished"/>
+        <translation>Projet fermé : {}</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="487"/>
         <source>Messages</source>
-        <translation type="unfinished"/>
+        <translation>Messages</translation>
     </message>
 </context>
 <context>
