@@ -2897,7 +2897,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="177"/>
         <source>Creates a trip-length distribution histogram and save in an output folder.</source>
-        <translation type="unfinished"/>
+        <translation>Créé un histogramme de distribution des longueurs de trajet et l&apos;enregistre dans le dossier indiqué.</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="72"/>
