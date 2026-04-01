@@ -2415,12 +2415,12 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="28"/>
         <source>Available procedures</source>
-        <translation type="unfinished"/>
+        <translation>Scripts disponibles</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="38"/>
         <source>Run!</source>
-        <translation type="unfinished"/>
+        <translation>Executer!</translation>
     </message>
 </context>
 <context>
