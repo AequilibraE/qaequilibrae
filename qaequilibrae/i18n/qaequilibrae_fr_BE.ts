@@ -881,7 +881,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="157"/>
         <source>No mapping</source>
-        <translation type="unfinished"/>
+        <translation>Pas de mapping</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="161"/>
