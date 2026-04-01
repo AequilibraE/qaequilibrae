@@ -1798,7 +1798,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="114"/>
         <source>Runs a matrix calculation based on a matrix configuration file (*.yaml) and an expression.</source>
-        <translation type="unfinished"/>
+        <translation>Calcul une matrice à partir d&apos;un fichier de configuration de matrices (*.yaml) et d&apos;une expression</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="115"/>
