@@ -2497,7 +2497,7 @@
     <message>
         <location filename="../modules/processing_provider/gis/scenario_comparison.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Outils de visualisation</translation>
     </message>
 </context>
 <context>
@@ -2505,12 +2505,12 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/shortest_path.py" line="13"/>
         <source>Shortest path</source>
-        <translation type="unfinished"/>
+        <translation>Plus court chemin</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/paths_procedures/shortest_path.py" line="13"/>
         <source>Path computation</source>
-        <translation type="unfinished"/>
+        <translation>Calculs de chemins</translation>
     </message>
 </context>
 <context>
