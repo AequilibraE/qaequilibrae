@@ -2274,17 +2274,17 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="358"/>
         <source>Sub-area analysis</source>
-        <translation type="unfinished"/>
+        <translation>Analyse par zone(s)</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="380"/>
         <source>Set sub-area analysis</source>
-        <translation type="unfinished"/>
+        <translation>Utiliser une analyse par zone(s)</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="387"/>
         <source>Zoning layer</source>
-        <translation type="unfinished"/>
+        <translation>Couche de zonage</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="394"/>
