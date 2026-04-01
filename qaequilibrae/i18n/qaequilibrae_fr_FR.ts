@@ -569,7 +569,7 @@
     <message>
         <location filename="../modules/processing_provider/gis/desire_lines.py" line="13"/>
         <source>Desire lines</source>
-        <translation type="unfinished"/>
+        <translation>Lignes de désir</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/desire_lines.py" line="13"/>
