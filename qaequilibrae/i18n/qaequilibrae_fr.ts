@@ -3608,17 +3608,17 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="28"/>
         <source>Destination node ID</source>
-        <translation type="unfinished"/>
+        <translation>ID nœud de destination</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="35"/>
         <source>12345</source>
-        <translation type="unfinished"/>
+        <translation>12345</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="42"/>
         <source>98765</source>
-        <translation type="unfinished"/>
+        <translation>98765</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_execute_single.ui" line="49"/>
