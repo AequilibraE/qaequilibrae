@@ -4134,7 +4134,7 @@
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="190"/>
         <source>Limit connector creation to zone</source>
-        <translation type="unfinished"/>
+        <translation>Limiter la création de connecteur à la zone</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
