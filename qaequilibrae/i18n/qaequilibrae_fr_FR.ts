@@ -2299,7 +2299,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="411"/>
         <source>Execute single</source>
-        <translation type="unfinished"/>
+        <translation>Exécution unique</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="417"/>
