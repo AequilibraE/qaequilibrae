@@ -77,7 +77,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="150"/>
         <source>Adds links from a layer to an existing AequilibraE project</source>
-        <translation type="unfinished"/>
+        <translation>Ajoute des tronçons depuis une couche à un projet AequilibraE existant</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="144"/>
