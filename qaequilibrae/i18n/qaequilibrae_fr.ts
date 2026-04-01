@@ -3971,12 +3971,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="1026"/>
         <source>Export to Python</source>
-        <translation type="unfinished"/>
+        <translation>Exporter en Python</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="1043"/>
         <source>Export to YAML</source>
-        <translation type="unfinished"/>
+        <translation>Exporter en YAML</translation>
     </message>
 </context>
 <context>
