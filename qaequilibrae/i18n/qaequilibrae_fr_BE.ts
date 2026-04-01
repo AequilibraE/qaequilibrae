@@ -2443,7 +2443,7 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="117"/>
         <source>Without installing the packages, you cannot use &apos;Run Procedures&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>Sans installation des packages, vous ne pouvez pas utiliser l&apos;exécution de scripts</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="102"/>
