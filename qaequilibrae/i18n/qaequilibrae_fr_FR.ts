@@ -2737,12 +2737,12 @@
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="75"/>
         <source>You need at least three nodes to route.</source>
-        <translation type="unfinished"/>
+        <translation>Il faut au moins trois nœuds pour établir un itinéraire.</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="81"/>
         <source>You need at least three centroids to route.</source>
-        <translation type="unfinished"/>
+        <translation>Il faut au moins trois centroïdes pour établir un itinéraire.</translation>
     </message>
 </context>
 <context>
@@ -2750,7 +2750,7 @@
     <message>
         <location filename="../modules/processing_provider/assignment_procedures/traffic_assignment.py" line="13"/>
         <source>Traffic assignment</source>
-        <translation type="unfinished"/>
+        <translation>Affectation du trafic</translation>
     </message>
 </context>
 <context>
