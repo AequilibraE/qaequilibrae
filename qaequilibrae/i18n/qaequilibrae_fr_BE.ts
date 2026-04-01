@@ -2249,12 +2249,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="310"/>
         <source>select_link_output_name</source>
-        <translation type="unfinished"/>
+        <translation>arborescence_output_nom</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="320"/>
         <source>Direction</source>
-        <translation type="unfinished"/>
+        <translation>Direction</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="327"/>
