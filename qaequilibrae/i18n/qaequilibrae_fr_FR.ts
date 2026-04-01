@@ -47,7 +47,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="61"/>
         <source>AequilibraE module not found</source>
-        <translation type="unfinished"/>
+        <translation>Module AequilibraE non trouvé</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="66"/>
