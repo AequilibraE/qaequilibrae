@@ -3956,27 +3956,27 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="853"/>
         <source>Save query</source>
-        <translation type="unfinished"/>
+        <translation>Sauver la requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="910"/>
         <source>Set select link analysis</source>
-        <translation type="unfinished"/>
+        <translation>Analyse de tronçon(s)</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="73"/>
         <source>Configure from YAML</source>
-        <translation type="unfinished"/>
+        <translation>Configurer depuis un YAML</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="1026"/>
         <source>Export to Python</source>
-        <translation type="unfinished"/>
+        <translation>Exporter en Python</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="1043"/>
         <source>Export to YAML</source>
-        <translation type="unfinished"/>
+        <translation>Exporter en YAML</translation>
     </message>
 </context>
 <context>
@@ -4202,12 +4202,12 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="185"/>
         <source>CSV</source>
-        <translation type="unfinished"/>
+        <translation>CSV</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="440"/>
         <source>Parquet</source>
-        <translation type="unfinished"/>
+        <translation>Parquet</translation>
     </message>
 </context>
 </TS>
