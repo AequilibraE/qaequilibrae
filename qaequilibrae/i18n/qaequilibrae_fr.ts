@@ -2374,12 +2374,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="553"/>
         <source>route_choice_output_name</source>
-        <translation type="unfinished"/>
+        <translation>choix_itineraires_output_nom</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/route_choice/route_choice.py" line="13"/>
         <source>Route choice</source>
-        <translation type="unfinished"/>
+        <translation>Choix d&apos;itinéraires</translation>
     </message>
 </context>
 <context>
@@ -2387,12 +2387,12 @@
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="374"/>
         <source>Input error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur d&apos;input</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="256"/>
         <source>Missing query name</source>
-        <translation type="unfinished"/>
+        <translation>Aucun nom de requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="259"/>
