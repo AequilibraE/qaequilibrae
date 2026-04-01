@@ -1423,12 +1423,12 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="80"/>
         <source>Scenario to clone</source>
-        <translation type="unfinished"/>
+        <translation>Scénario à cloner</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="90"/>
         <source>Scenario name</source>
-        <translation type="unfinished"/>
+        <translation>Nom de scénario</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="123"/>
