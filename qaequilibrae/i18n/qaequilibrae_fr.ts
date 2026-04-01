@@ -995,17 +995,17 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="14"/>
         <source>Matrix path</source>
-        <translation type="unfinished"/>
+        <translation>Emplacement de la matrice</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="28"/>
         <source>File format</source>
-        <translation type="unfinished"/>
+        <translation>Format de fichier</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="40"/>
         <source>AequilibraE module not found</source>
-        <translation type="unfinished"/>
+        <translation>Module AequilibraE non trouvé</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="73"/>
