@@ -886,12 +886,12 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="161"/>
         <source>By origin</source>
-        <translation type="unfinished"/>
+        <translation>Par origine</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="165"/>
         <source>By destination</source>
-        <translation type="unfinished"/>
+        <translation>Par destination</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="74"/>
