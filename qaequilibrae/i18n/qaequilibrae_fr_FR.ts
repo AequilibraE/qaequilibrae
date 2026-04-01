@@ -1945,12 +1945,12 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="107"/>
         <source>turning links into nodes, and saving theses changes into the project.</source>
-        <translation type="unfinished"/>
+        <translation>les tronçons de mouvement en nœuds &amp; enregistre ces modifications dans le projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="99"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construction de modèle</translation>
     </message>
 </context>
 <context>
