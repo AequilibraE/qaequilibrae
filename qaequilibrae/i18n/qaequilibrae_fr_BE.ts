@@ -1573,7 +1573,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_impedance_matrix.ui" line="388"/>
         <source>Compute skims</source>
-        <translation type="unfinished"/>
+        <translation>Calcul des indicateurs</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_impedance_matrix.ui" line="461"/>
