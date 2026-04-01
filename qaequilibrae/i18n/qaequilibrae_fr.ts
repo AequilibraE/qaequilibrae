@@ -1709,12 +1709,12 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
         <source>Logfile</source>
-        <translation type="unfinished"/>
+        <translation>Fichier de log</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="13"/>
