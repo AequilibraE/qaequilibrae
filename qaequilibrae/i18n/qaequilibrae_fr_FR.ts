@@ -2415,12 +2415,12 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="28"/>
         <source>Available procedures</source>
-        <translation type="unfinished"/>
+        <translation>Scripts disponibles</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="38"/>
         <source>Run!</source>
-        <translation type="unfinished"/>
+        <translation>Executer!</translation>
     </message>
 </context>
 <context>
@@ -2428,7 +2428,7 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="96"/>
         <source>Please check the Parameters file</source>
-        <translation type="unfinished"/>
+        <translation>Merci de vérifier le fichier de paramètres</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="115"/>
