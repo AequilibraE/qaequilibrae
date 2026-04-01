@@ -995,7 +995,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="14"/>
         <source>Matrix path</source>
-        <translation type="unfinished"/>
+        <translation>Emplacement de la matrice</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="28"/>
