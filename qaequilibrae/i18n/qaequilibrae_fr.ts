@@ -2294,7 +2294,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="405"/>
         <source>Workload</source>
-        <translation type="unfinished"/>
+        <translation>Exécution</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="411"/>
