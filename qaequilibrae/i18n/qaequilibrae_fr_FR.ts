@@ -2359,7 +2359,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="521"/>
         <source>Use all</source>
-        <translation type="unfinished"/>
+        <translation>Tout utiliser</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="531"/>
