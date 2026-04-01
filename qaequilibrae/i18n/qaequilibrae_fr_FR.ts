@@ -2094,7 +2094,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="35"/>
         <source>Choice set generation</source>
-        <translation type="unfinished"/>
+        <translation>Choix de génération d&apos;itinéraires</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="41"/>
