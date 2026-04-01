@@ -14,7 +14,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/Add_connectors.py" line="12"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construction de modèle</translation>
     </message>
 </context>
 <context>
