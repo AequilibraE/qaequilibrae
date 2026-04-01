@@ -2453,7 +2453,7 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="103"/>
         <source>{} executed</source>
-        <translation type="unfinished"/>
+        <translation>{} exécuté</translation>
     </message>
 </context>
 <context>
