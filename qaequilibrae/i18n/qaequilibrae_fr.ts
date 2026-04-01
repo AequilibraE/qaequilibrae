@@ -2448,12 +2448,12 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="102"/>
         <source>Check &apos;Messages&apos; tab.</source>
-        <translation type="unfinished"/>
+        <translation>Vérifiez l&apos;onglet &apos;Messages&apos;</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="103"/>
         <source>{} executed</source>
-        <translation type="unfinished"/>
+        <translation>{} exécuté</translation>
     </message>
 </context>
 <context>
@@ -2461,12 +2461,12 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/run_module.py" line="13"/>
         <source>Run procedures</source>
-        <translation type="unfinished"/>
+        <translation>Exécution de scripts</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/run_module.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/run_module.py" line="13"/>
