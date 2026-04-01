@@ -3320,12 +3320,12 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="358"/>
         <source>matrix_name</source>
-        <translation type="unfinished"/>
+        <translation>nom_matrice</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="373"/>
         <source>Transit Assignment</source>
-        <translation type="unfinished"/>
+        <translation>Affectation TC</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="379"/>
