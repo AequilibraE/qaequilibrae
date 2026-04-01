@@ -3936,22 +3936,22 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="769"/>
         <source>Save select link results</source>
-        <translation type="unfinished"/>
+        <translation>Sauver les résultats d&apos;arborescence(s)</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="785"/>
         <source>output_name</source>
-        <translation type="unfinished"/>
+        <translation>output_name</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="820"/>
         <source>query_name</source>
-        <translation type="unfinished"/>
+        <translation>nom_requete</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="833"/>
         <source>Add to query</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter à la requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="853"/>
