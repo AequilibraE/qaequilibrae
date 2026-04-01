@@ -2397,7 +2397,7 @@
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="259"/>
         <source>Query name already used</source>
-        <translation type="unfinished"/>
+        <translation>Nom de requête déjà utilisé</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="262"/>
