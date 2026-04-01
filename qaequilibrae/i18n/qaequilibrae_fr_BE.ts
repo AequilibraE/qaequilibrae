@@ -2793,7 +2793,7 @@
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="574"/>
         <source>Wrong value for link ID</source>
-        <translation type="unfinished"/>
+        <translation>Mauvaise valeur pour l&apos;ID de tronçon</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="580"/>
