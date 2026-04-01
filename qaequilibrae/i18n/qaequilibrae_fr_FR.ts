@@ -22,7 +22,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="16"/>
         <source>Project path</source>
-        <translation type="unfinished"/>
+        <translation>Emplacement du projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="23"/>
