@@ -1338,22 +1338,22 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="44"/>
         <source>Period end</source>
-        <translation type="unfinished"/>
+        <translation>Fin de période</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="64"/>
         <source>HH:mm:ss</source>
-        <translation type="unfinished"/>
+        <translation>HH:mm:ss</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="74"/>
         <source>Period start</source>
-        <translation type="unfinished"/>
+        <translation>Début de période</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="81"/>
         <source>Add Period</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter la période</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="14"/>
