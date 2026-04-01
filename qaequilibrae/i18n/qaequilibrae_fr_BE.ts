@@ -2484,7 +2484,7 @@
     <message>
         <location filename="../modules/processing_provider/routing_procedures/tsp.py" line="13"/>
         <source>Routing</source>
-        <translation type="unfinished"/>
+        <translation>Planification d&apos;itinéraires</translation>
     </message>
 </context>
 <context>
