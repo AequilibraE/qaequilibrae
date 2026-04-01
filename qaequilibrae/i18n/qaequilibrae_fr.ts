@@ -62,12 +62,12 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="128"/>
         <source>Adding links</source>
-        <translation type="unfinished"/>
+        <translation>Ajout de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="133"/>
         <source>Closing project</source>
-        <translation type="unfinished"/>
+        <translation>Fermeture du rpojet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="141"/>
