@@ -201,7 +201,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="144"/>
         <source>Explore transit</source>
-        <translation type="unfinished"/>
+        <translation>Explorer le réseau TC</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="150"/>
