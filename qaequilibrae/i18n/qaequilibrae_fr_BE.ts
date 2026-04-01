@@ -2737,7 +2737,7 @@
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="75"/>
         <source>You need at least three nodes to route.</source>
-        <translation type="unfinished"/>
+        <translation>Il faut au moins trois nœuds pour établir un itinéraire.</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="81"/>
