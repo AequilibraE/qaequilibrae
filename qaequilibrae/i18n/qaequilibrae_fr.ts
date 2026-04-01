@@ -2344,7 +2344,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="491"/>
         <source>Perform assignment</source>
-        <translation>Exécuter une affectation</translation>
+        <translation>Lancer l&apos;affectation</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="499"/>
@@ -3345,22 +3345,22 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="408"/>
         <source>Outputs</source>
-        <translation type="unfinished"/>
+        <translation>Résultats</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="414"/>
         <source>result_name</source>
-        <translation type="unfinished"/>
+        <translation>nom_resultat</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="437"/>
         <source>Perform assignment</source>
-        <translation type="unfinished"/>
+        <translation>Lancer l&apos;affection</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="450"/>
         <source>Matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matrice</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="457"/>
