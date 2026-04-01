@@ -345,12 +345,12 @@
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="69"/>
         <source>Collapse links</source>
-        <translation type="unfinished"/>
+        <translation>Réduction de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="78"/>
         <source>This tool collapses links into nodes, adjusting the network in the neighborhood.</source>
-        <translation type="unfinished"/>
+        <translation>Cet outil réduit les tronçons en nœuds, ajustant le réseau direct aux alentours</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="72"/>
@@ -399,7 +399,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
         <source>Create examples</source>
-        <translation type="unfinished"/>
+        <translation>Générer des exemples</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
