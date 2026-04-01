@@ -1763,7 +1763,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="32"/>
         <source>Expression</source>
-        <translation type="unfinished"/>
+        <translation>Expression</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="33"/>
