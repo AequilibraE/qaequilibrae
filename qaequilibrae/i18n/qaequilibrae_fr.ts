@@ -345,7 +345,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="69"/>
         <source>Collapse links</source>
-        <translation type="unfinished"/>
+        <translation>Réduction de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="78"/>
