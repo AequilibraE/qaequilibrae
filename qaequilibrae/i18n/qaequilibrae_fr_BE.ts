@@ -1930,7 +1930,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="35"/>
         <source>{project_folder} does not contain an AequilibraE model: {e}</source>
-        <translation type="unfinished"/>
+        <translation>{project_folder} ne contient pas de modèle AequilibraE : {e}</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="96"/>
