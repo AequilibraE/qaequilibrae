@@ -2234,17 +2234,17 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="431"/>
         <source>12345</source>
-        <translation type="unfinished"/>
+        <translation>12345</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="297"/>
         <source>Link ID</source>
-        <translation type="unfinished"/>
+        <translation>ID de tronçon</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="304"/>
         <source>Select link outputs</source>
-        <translation type="unfinished"/>
+        <translation>Arborescence</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="310"/>
