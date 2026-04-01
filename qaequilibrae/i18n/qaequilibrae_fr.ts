@@ -2410,7 +2410,7 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="14"/>
         <source>Run Procedures</source>
-        <translation type="unfinished"/>
+        <translation>Exécution de scripts</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="28"/>
