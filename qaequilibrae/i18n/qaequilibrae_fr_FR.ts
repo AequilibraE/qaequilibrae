@@ -3235,7 +3235,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="29"/>
         <source>Period</source>
-        <translation type="unfinished"/>
+        <translation>Période</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="35"/>
