@@ -2841,7 +2841,7 @@
     <message>
         <location filename="../modules/processing_provider/transit_procedures/transit_assignment.py" line="13"/>
         <source>Transit</source>
-        <translation type="unfinished"/>
+        <translation>Transports en commun</translation>
     </message>
 </context>
 <context>
@@ -2849,7 +2849,7 @@
     <message>
         <location filename="../modules/processing_provider/distribution_procedures/trip_distribution.py" line="13"/>
         <source>Trip distribution</source>
-        <translation type="unfinished"/>
+        <translation>Distribution</translation>
     </message>
 </context>
 <context>
