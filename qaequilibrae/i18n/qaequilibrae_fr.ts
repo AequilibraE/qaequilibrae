@@ -1353,7 +1353,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="81"/>
         <source>Add Period</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter la période</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="14"/>
