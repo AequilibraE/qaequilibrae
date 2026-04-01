@@ -2104,12 +2104,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="48"/>
         <source>Max. depth</source>
-        <translation type="unfinished"/>
+        <translation>Profondeur max.</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="55"/>
         <source>Algorithm</source>
-        <translation type="unfinished"/>
+        <translation>Algorithme</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="62"/>
