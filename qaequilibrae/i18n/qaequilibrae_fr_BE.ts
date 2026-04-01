@@ -3365,17 +3365,17 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="457"/>
         <source>Matrix core</source>
-        <translation type="unfinished"/>
+        <translation>Cœur de la matrice</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="467"/>
         <source>Assignment class name</source>
-        <translation type="unfinished"/>
+        <translation>Nom du segment à l&apos;affectation</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="95"/>
         <source>Use existing graph</source>
-        <translation type="unfinished"/>
+        <translation>Utiliser un graphe existant</translation>
     </message>
 </context>
 <context>
