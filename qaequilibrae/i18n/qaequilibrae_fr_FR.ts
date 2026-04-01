@@ -161,7 +161,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="113"/>
         <source>Run procedures</source>
-        <translation type="unfinished"/>
+        <translation>Exécution de scripts</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="127"/>
