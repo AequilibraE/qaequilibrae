@@ -2798,22 +2798,22 @@
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="580"/>
         <source>Link ID doesn&apos;t exist in project</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;ID de tronçon n&apos;existe pas dans le projet</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="589"/>
         <source>Missing query name</source>
-        <translation type="unfinished"/>
+        <translation>Aucun nom de requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="593"/>
         <source>Query name already used</source>
-        <translation type="unfinished"/>
+        <translation>Nom de requête déjà utilisé</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="597"/>
         <source>Please set a link selection</source>
-        <translation type="unfinished"/>
+        <translation>Merci de définir un choix de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="689"/>
