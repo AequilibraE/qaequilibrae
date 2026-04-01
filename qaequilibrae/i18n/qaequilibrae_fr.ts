@@ -1803,12 +1803,12 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="115"/>
         <source>Results are stored in an AequilibraE Matrix.</source>
-        <translation type="unfinished"/>
+        <translation>Le résultat est stocké sous la forme d&apos;une matrice AequilibraE</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="116"/>
         <source>Please notice that:</source>
-        <translation type="unfinished"/>
+        <translation>Veuillez noter que :</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="117"/>
