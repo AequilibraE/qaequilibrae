@@ -2828,7 +2828,7 @@
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="360"/>
         <source>No VoT found for mode {} in project database. Please configure it.</source>
-        <translation type="unfinished"/>
+        <translation>Aucune valeur du temps pour le mode {} dans la base de donnée projet. Merci de la renseigner.</translation>
     </message>
 </context>
 <context>
@@ -2836,12 +2836,12 @@
     <message>
         <location filename="../modules/processing_provider/transit_procedures/transit_assignment.py" line="13"/>
         <source>Skimming and assignment</source>
-        <translation type="unfinished"/>
+        <translation>Affectation TC</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/transit_procedures/transit_assignment.py" line="13"/>
         <source>Transit</source>
-        <translation type="unfinished"/>
+        <translation>Transports en commun</translation>
     </message>
 </context>
 <context>
@@ -2849,7 +2849,7 @@
     <message>
         <location filename="../modules/processing_provider/distribution_procedures/trip_distribution.py" line="13"/>
         <source>Trip distribution</source>
-        <translation type="unfinished"/>
+        <translation>Distribution</translation>
     </message>
 </context>
 <context>
