@@ -121,7 +121,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="112"/>
         <source>Open project</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir un projet</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="115"/>
