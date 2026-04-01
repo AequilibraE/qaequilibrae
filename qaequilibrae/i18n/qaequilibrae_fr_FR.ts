@@ -1408,7 +1408,7 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="19"/>
         <source>AequilibraE - Scenarios</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Scénarios</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="45"/>
