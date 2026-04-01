@@ -320,7 +320,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="17"/>
         <source>AequilibraE Project Folder</source>
-        <translation type="unfinished"/>
+        <translation>Dossier du projet AequilibraE</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="24"/>
