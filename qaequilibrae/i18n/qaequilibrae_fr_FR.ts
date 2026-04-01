@@ -2857,12 +2857,12 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="83"/>
         <source>No AequilibraE project loaded.</source>
-        <translation type="unfinished"/>
+        <translation>Aucun projet AequilibraE chargé.</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="42"/>
         <source>Demand matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matrice de demande</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="50"/>
