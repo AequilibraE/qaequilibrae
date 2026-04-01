@@ -3260,7 +3260,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="82"/>
         <source>Save transit graph to database</source>
-        <translation type="unfinished"/>
+        <translation>Sauver le graphe TC dans la database</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="112"/>
