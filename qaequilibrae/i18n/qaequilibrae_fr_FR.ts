@@ -803,7 +803,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="484"/>
         <source>Apply Gravity</source>
-        <translation>Appliquer le gravitaire</translation>
+        <translation>Appliquer le modèle gravitaire</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="491"/>
