@@ -1864,7 +1864,7 @@
     <message>
         <location filename="../modules/network/network_preparation_dialog.py" line="92"/>
         <source>Node layer error:</source>
-        <translation type="unfinished"/>
+        <translation>Erreur, couche de nœuds :</translation>
     </message>
 </context>
 <context>
