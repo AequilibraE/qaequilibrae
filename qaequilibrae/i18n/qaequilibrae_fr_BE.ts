@@ -312,7 +312,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
         <source>Close AequilibraE project into QGIS.</source>
-        <translation type="unfinished"/>
+        <translation>Fermer le projet AequilibraE dans QGIS</translation>
     </message>
 </context>
 <context>
