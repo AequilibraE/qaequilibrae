@@ -2169,7 +2169,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="173"/>
         <source>Parameter</source>
-        <translation type="unfinished"/>
+        <translation>Facteur</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="180"/>
