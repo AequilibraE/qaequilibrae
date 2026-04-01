@@ -141,7 +141,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="142"/>
         <source>Import GTFS</source>
-        <translation>Importer de GTFS</translation>
+        <translation>Import de GTFS</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="156"/>
@@ -1606,7 +1606,7 @@
     <message>
         <location filename="../modules/processing_provider/transit_procedures/import_gtfs.py" line="13"/>
         <source>Import GTFS</source>
-        <translation type="unfinished"/>
+        <translation>Import de GTFS</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/transit_procedures/import_gtfs.py" line="13"/>
