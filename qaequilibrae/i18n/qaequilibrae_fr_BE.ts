@@ -2344,17 +2344,17 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="491"/>
         <source>Perform assignment</source>
-        <translation type="unfinished"/>
+        <translation>Exécuter une affectation</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="499"/>
         <source>Matrix core</source>
-        <translation type="unfinished"/>
+        <translation>Cœur de la matrice</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="504"/>
         <source>Use?</source>
-        <translation type="unfinished"/>
+        <translation>Utiliser?</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="521"/>
