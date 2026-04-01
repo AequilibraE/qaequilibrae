@@ -1950,7 +1950,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="99"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construction de modèle</translation>
     </message>
 </context>
 <context>
