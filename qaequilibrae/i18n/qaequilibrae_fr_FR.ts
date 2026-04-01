@@ -1940,7 +1940,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="106"/>
         <source>This tool simplifies the network, merging short links into longer ones or</source>
-        <translation type="unfinished"/>
+        <translation>Cette fonction simplifie le réseau, regroupe les tronçons courts en plus longs ou</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="107"/>
