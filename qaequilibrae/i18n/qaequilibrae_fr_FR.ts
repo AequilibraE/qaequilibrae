@@ -2402,7 +2402,7 @@
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="262"/>
         <source>Please set a link selection</source>
-        <translation type="unfinished"/>
+        <translation>Merci de définir un choix de tronçons</translation>
     </message>
 </context>
 <context>
@@ -2410,7 +2410,7 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="14"/>
         <source>Run Procedures</source>
-        <translation type="unfinished"/>
+        <translation>Exécution de scripts</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_run_module.ui" line="28"/>
