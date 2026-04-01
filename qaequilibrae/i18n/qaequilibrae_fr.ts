@@ -2633,7 +2633,7 @@
     <message>
         <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="99"/>
         <source>Critical layer for Skim Viewer removed from the layers&apos; panel</source>
-        <translation type="unfinished"/>
+        <translation>Couche essentielle pour le visualiseur skim retirée du panneau des couches</translation>
     </message>
 </context>
 <context>
@@ -2641,12 +2641,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/stacked_bandwidth.py" line="13"/>
         <source>Stacked bandwidth</source>
-        <translation type="unfinished"/>
+        <translation>Bandes de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/stacked_bandwidth.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Outils de visualisation</translation>
     </message>
 </context>
 <context>
@@ -2737,12 +2737,12 @@
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="75"/>
         <source>You need at least three nodes to route.</source>
-        <translation type="unfinished"/>
+        <translation>Il faut au moins trois nœuds pour établir un itinéraire.</translation>
     </message>
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="81"/>
         <source>You need at least three centroids to route.</source>
-        <translation type="unfinished"/>
+        <translation>Il faut au moins trois centroïdes pour établir un itinéraire.</translation>
     </message>
 </context>
 <context>
@@ -2750,7 +2750,7 @@
     <message>
         <location filename="../modules/processing_provider/assignment_procedures/traffic_assignment.py" line="13"/>
         <source>Traffic assignment</source>
-        <translation type="unfinished"/>
+        <translation>Affectation du trafic</translation>
     </message>
 </context>
 <context>
