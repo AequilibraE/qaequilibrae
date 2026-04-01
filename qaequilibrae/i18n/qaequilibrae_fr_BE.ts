@@ -417,12 +417,12 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
         <source>Create scenarios</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un scénario</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
