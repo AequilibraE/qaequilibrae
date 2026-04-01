@@ -2184,22 +2184,22 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="210"/>
         <source>Graph configuration</source>
-        <translation type="unfinished"/>
+        <translation>Configuration du graphe</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="216"/>
         <source>Block flows through centroids</source>
-        <translation type="unfinished"/>
+        <translation>Bloquer les flux traversant les centroïdes</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="226"/>
         <source>Network Mode</source>
-        <translation type="unfinished"/>
+        <translation>Mode du réseau</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="233"/>
         <source>Remove selected links from the graph</source>
-        <translation type="unfinished"/>
+        <translation>Retirer les tronçons sélectionnés du graphe</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="247"/>
