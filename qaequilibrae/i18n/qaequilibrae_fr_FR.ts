@@ -1788,12 +1788,12 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="53"/>
         <source>Getting matrices from configuration file</source>
-        <translation type="unfinished"/>
+        <translation>Récupération des matrices depuis le fichier de configuration</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="104"/>
         <source>Matrix calculator</source>
-        <translation type="unfinished"/>
+        <translation>Calculatrice de matrices</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="114"/>
