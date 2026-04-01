@@ -156,7 +156,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="137"/>
         <source>Route choice</source>
-        <translation type="unfinished"/>
+        <translation>Choix d&apos;itinéraires</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="113"/>
