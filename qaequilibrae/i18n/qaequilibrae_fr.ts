@@ -471,12 +471,12 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="35"/>
         <source>Adding extra fields to links layer</source>
-        <translation type="unfinished"/>
+        <translation>Ajout de champs supplémentaires à la couche de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="37"/>
         <source>Adding extra fields to nodes layer</source>
-        <translation type="unfinished"/>
+        <translation>Ajout de champs supplémentaires à la couche de nœuds</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="40"/>
