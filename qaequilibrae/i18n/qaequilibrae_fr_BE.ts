@@ -325,12 +325,12 @@
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="24"/>
         <source>Link IDs (comma-separated)</source>
-        <translation type="unfinished"/>
+        <translation>ID de tronçons (séparés par des virgules)</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="34"/>
         <source>AequilibraE module not found</source>
-        <translation type="unfinished"/>
+        <translation>Module AequilibraE non trouvé</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="44"/>
