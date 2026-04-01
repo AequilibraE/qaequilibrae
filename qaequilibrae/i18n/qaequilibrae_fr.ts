@@ -3230,22 +3230,22 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="14"/>
         <source>AequilibraE - PT Skimming and Assignment</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Affectation TC</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="29"/>
         <source>Period</source>
-        <translation type="unfinished"/>
+        <translation>Période</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="35"/>
         <source>Add new period</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter une nouvelle période</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="46"/>
         <source>Transit Graph</source>
-        <translation type="unfinished"/>
+        <translation>Graphe TC</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="75"/>
