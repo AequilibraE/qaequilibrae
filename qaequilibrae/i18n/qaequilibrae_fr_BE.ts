@@ -1393,7 +1393,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="81"/>
         <source>Invert colors</source>
-        <translation type="unfinished"/>
+        <translation>Inverser les couleurs</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="114"/>
