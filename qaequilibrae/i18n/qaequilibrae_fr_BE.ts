@@ -1912,7 +1912,7 @@
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="45"/>
         <source>Line layer duplicated</source>
-        <translation type="unfinished"/>
+        <translation>Couche de lignes dupliquée</translation>
     </message>
 </context>
 <context>
