@@ -499,7 +499,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="40"/>
         <source>Create Desire Lines</source>
-        <translation>Générer des lignes de désir</translation>
+        <translation>Générer les lignes</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="114"/>
