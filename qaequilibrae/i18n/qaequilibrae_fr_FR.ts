@@ -3350,7 +3350,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="414"/>
         <source>result_name</source>
-        <translation type="unfinished"/>
+        <translation>nom_resultat</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="437"/>
