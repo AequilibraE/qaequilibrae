@@ -2808,12 +2808,12 @@
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="593"/>
         <source>Query name already used</source>
-        <translation type="unfinished"/>
+        <translation>Nom de requête déjà utilisé</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="597"/>
         <source>Please set a link selection</source>
-        <translation type="unfinished"/>
+        <translation>Merci de définir un choix de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="689"/>
