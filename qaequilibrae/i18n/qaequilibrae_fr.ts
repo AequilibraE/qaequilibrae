@@ -1573,7 +1573,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_impedance_matrix.ui" line="388"/>
         <source>Compute skims</source>
-        <translation>Indicateurs à calculer</translation>
+        <translation>Calcul des indicateurs</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_impedance_matrix.ui" line="461"/>
@@ -3290,47 +3290,47 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="163"/>
         <source>Skimming</source>
-        <translation type="unfinished"/>
+        <translation>Indicateurs OD</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="175"/>
         <source>Perfom skimming</source>
-        <translation type="unfinished"/>
+        <translation>Lancer le calcul d&apos;indicateurs</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="290"/>
         <source>...</source>
-        <translation type="unfinished"/>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="328"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xcxc&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="251"/>
         <source>Compute skims</source>
-        <translation type="unfinished"/>
+        <translation>Calcul des indicateurs</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="347"/>
         <source>Available skims</source>
-        <translation type="unfinished"/>
+        <translation>Indicateurs disponibles</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="358"/>
         <source>matrix_name</source>
-        <translation type="unfinished"/>
+        <translation>nom_matrice</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="373"/>
         <source>Transit Assignment</source>
-        <translation type="unfinished"/>
+        <translation>Affectation TC</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="379"/>
         <source>Network information</source>
-        <translation type="unfinished"/>
+        <translation>Informations du réseau</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="388"/>
