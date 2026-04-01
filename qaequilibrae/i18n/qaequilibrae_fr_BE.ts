@@ -1413,12 +1413,12 @@
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="45"/>
         <source>Clone scenario</source>
-        <translation type="unfinished"/>
+        <translation>Cloner un scénario</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="55"/>
         <source>Create empty scenario</source>
-        <translation type="unfinished"/>
+        <translation>Créer un scénario vide</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="80"/>
