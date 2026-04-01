@@ -1333,7 +1333,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="37"/>
         <source>Description</source>
-        <translation type="unfinished"/>
+        <translation>Description</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="44"/>
