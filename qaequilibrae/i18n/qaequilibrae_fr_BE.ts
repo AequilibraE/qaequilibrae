@@ -2818,7 +2818,7 @@
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="689"/>
         <source>Missing select link matrix name.</source>
-        <translation type="unfinished"/>
+        <translation>Il manque un nom de matrice</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="693"/>
