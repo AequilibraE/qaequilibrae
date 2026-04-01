@@ -3355,7 +3355,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="437"/>
         <source>Perform assignment</source>
-        <translation type="unfinished"/>
+        <translation>Lancer l&apos;affection</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="450"/>
