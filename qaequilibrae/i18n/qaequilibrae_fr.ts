@@ -231,7 +231,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="345"/>
         <source>You need to close the currently open project</source>
-        <translation type="unfinished"/>
+        <translation>Vous devez d&apos;abord fermer le projet actuel</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="348"/>
