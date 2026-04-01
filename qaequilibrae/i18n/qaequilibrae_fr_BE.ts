@@ -2209,7 +2209,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="253"/>
         <source>Select link analysis</source>
-        <translation type="unfinished"/>
+        <translation>Arborescence</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="347"/>
