@@ -2284,17 +2284,17 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="387"/>
         <source>Zoning layer</source>
-        <translation type="unfinished"/>
+        <translation>Couche de zonage</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="394"/>
         <source>Selected features only</source>
-        <translation type="unfinished"/>
+        <translation>Utiliser uniquement les éléments sélectionnés</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="405"/>
         <source>Workload</source>
-        <translation type="unfinished"/>
+        <translation>Exécution</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="411"/>
