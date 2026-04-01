@@ -166,7 +166,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="127"/>
         <source>Skim viewer</source>
-        <translation type="unfinished"/>
+        <translation>Visualisation de données de skim</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="120"/>
