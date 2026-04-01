@@ -3966,7 +3966,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="73"/>
         <source>Configure from YAML</source>
-        <translation type="unfinished"/>
+        <translation>Configurer depuis un YAML</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="1026"/>
