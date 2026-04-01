@@ -399,7 +399,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
         <source>Create examples</source>
-        <translation type="unfinished"/>
+        <translation>Générer des exemples</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
