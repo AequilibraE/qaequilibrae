@@ -1793,7 +1793,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="104"/>
         <source>Matrix calculator</source>
-        <translation type="unfinished"/>
+        <translation>Calculatrice de matrices</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="114"/>
