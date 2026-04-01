@@ -37,12 +37,12 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="39"/>
         <source>Link type</source>
-        <translation type="unfinished"/>
+        <translation>Type de tronçon</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="48"/>
         <source>Modes</source>
-        <translation type="unfinished"/>
+        <translation>Modes</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="61"/>
