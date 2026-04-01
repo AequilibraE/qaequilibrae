@@ -896,7 +896,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="74"/>
         <source>Support for AEM will be removed in a future version</source>
-        <translation type="unfinished"/>
+        <translation>Le support des fichiers *.aem sera supprimé dans une future version</translation>
     </message>
 </context>
 <context>
@@ -1030,7 +1030,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="61"/>
         <source>Support for AEM will be removed in a future version</source>
-        <translation>Le support des fichier *.aem sera retiré dans une future version</translation>
+        <translation>Le support des fichiers *.aem sera supprimé dans une future version</translation>
     </message>
 </context>
 <context>
