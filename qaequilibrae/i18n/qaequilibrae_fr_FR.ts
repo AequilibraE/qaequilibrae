@@ -2793,17 +2793,17 @@
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="574"/>
         <source>Wrong value for link ID</source>
-        <translation type="unfinished"/>
+        <translation>Mauvaise valeur pour l&apos;ID de tronçon</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="580"/>
         <source>Link ID doesn&apos;t exist in project</source>
-        <translation type="unfinished"/>
+        <translation>L&apos;ID de tronçon n&apos;existe pas dans le projet</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="589"/>
         <source>Missing query name</source>
-        <translation type="unfinished"/>
+        <translation>Aucun nom de requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="593"/>
