@@ -2214,17 +2214,17 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="347"/>
         <source>Query name</source>
-        <translation type="unfinished"/>
+        <translation>Nom de requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="269"/>
         <source>query_name</source>
-        <translation type="unfinished"/>
+        <translation>nom_requete</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="276"/>
         <source>Add to query</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter à la requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="283"/>
