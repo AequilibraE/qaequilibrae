@@ -1732,7 +1732,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_parameters.py" line="13"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_parameters.py" line="13"/>
