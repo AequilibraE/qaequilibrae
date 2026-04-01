@@ -445,7 +445,7 @@
     <message>
         <location filename="../modules/project_procedures/create_scenarios_dialog.py" line="54"/>
         <source>New scenario &apos;{}&apos; added to the project</source>
-        <translation type="unfinished"/>
+        <translation>Nouveau scénario &apos;{}&apos; ajouté au projet</translation>
     </message>
 </context>
 <context>
@@ -471,17 +471,17 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="35"/>
         <source>Adding extra fields to links layer</source>
-        <translation type="unfinished"/>
+        <translation>Ajout de champs supplémentaires à la couche de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="37"/>
         <source>Adding extra fields to nodes layer</source>
-        <translation type="unfinished"/>
+        <translation>Ajout de champs supplémentaires à la couche de nœuds</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="40"/>
         <source>Building links layer</source>
-        <translation type="unfinished"/>
+        <translation>Création de la couche de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_procedure.py" line="43"/>
