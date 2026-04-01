@@ -3245,22 +3245,22 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="46"/>
         <source>Transit Graph</source>
-        <translation type="unfinished"/>
+        <translation>Graphe TC</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="75"/>
         <source>Connector method</source>
-        <translation type="unfinished"/>
+        <translation>Méthode de connexion</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="105"/>
         <source>Line geometry method</source>
-        <translation type="unfinished"/>
+        <translation>Méthode de géométrie de ligne</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="82"/>
         <source>Save transit graph to database</source>
-        <translation type="unfinished"/>
+        <translation>Sauver le graphe TC dans la database</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="112"/>
