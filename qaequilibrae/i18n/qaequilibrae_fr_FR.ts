@@ -2204,7 +2204,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="247"/>
         <source>Critical analysis</source>
-        <translation>Analyse de criticité</translation>
+        <translation>Analyse</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="253"/>
@@ -3791,7 +3791,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="710"/>
         <source>Critical analysis</source>
-        <translation>Analyse de criticité</translation>
+        <translation>Analyse</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="949"/>
