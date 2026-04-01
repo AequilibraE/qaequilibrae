@@ -201,12 +201,12 @@
     <message>
         <location filename="../qaequilibrae.py" line="144"/>
         <source>Explore transit</source>
-        <translation type="unfinished"/>
+        <translation>Explorer le réseau TC</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="150"/>
         <source>Desire lines</source>
-        <translation type="unfinished"/>
+        <translation>Lignes de désir</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="151"/>
