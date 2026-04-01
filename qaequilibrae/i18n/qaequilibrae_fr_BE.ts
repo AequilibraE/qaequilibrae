@@ -587,7 +587,7 @@
     <message>
         <location filename="../modules/gis/desire_lines_dialog.py" line="204"/>
         <source>You need the layer and at least one matrix_procedures core</source>
-        <translation type="unfinished"/>
+        <translation>Vous avez besoin d&apos;une couche et d&apos;au moins une matrice</translation>
     </message>
 </context>
 <context>
