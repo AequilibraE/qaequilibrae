@@ -2324,7 +2324,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="458"/>
         <source>Destination node ID</source>
-        <translation type="unfinished"/>
+        <translation>ID du nœud de destination</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="468"/>
