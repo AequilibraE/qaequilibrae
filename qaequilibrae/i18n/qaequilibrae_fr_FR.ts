@@ -216,22 +216,22 @@
     <message>
         <location filename="../qaequilibrae.py" line="152"/>
         <source>Scenario comparison</source>
-        <translation type="unfinished"/>
+        <translation>Comparaison de scénarios</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="114"/>
         <source>Scenarios</source>
-        <translation type="unfinished"/>
+        <translation>Scénarios</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="342"/>
         <source>You need to load a project</source>
-        <translation type="unfinished"/>
+        <translation>Vous devez d&apos;abord charger un projet</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="345"/>
         <source>You need to close the currently open project</source>
-        <translation type="unfinished"/>
+        <translation>Vous devez d&apos;abord fermer le projet actuel</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="348"/>
