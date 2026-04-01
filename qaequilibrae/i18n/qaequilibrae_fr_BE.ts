@@ -1808,7 +1808,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="116"/>
         <source>Please notice that:</source>
-        <translation type="unfinished"/>
+        <translation>Veuillez noter que :</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="117"/>
