@@ -2750,7 +2750,7 @@
     <message>
         <location filename="../modules/processing_provider/assignment_procedures/traffic_assignment.py" line="13"/>
         <source>Traffic assignment</source>
-        <translation type="unfinished"/>
+        <translation>Affectation du trafic</translation>
     </message>
 </context>
 <context>
