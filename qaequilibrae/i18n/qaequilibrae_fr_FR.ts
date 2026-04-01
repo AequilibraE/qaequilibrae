@@ -1378,32 +1378,32 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="25"/>
         <source>Layer</source>
-        <translation type="unfinished"/>
+        <translation>Couche</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="74"/>
         <source>Color</source>
-        <translation type="unfinished"/>
+        <translation>Couleur</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="44"/>
         <source>Start ID</source>
-        <translation type="unfinished"/>
+        <translation>ID de départ</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="81"/>
         <source>Invert colors</source>
-        <translation type="unfinished"/>
+        <translation>Inverser les couleurs</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="114"/>
         <source>Path configuration</source>
-        <translation type="unfinished"/>
+        <translation>Configuration de chemin</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="138"/>
         <source>Plot Skim</source>
-        <translation type="unfinished"/>
+        <translation>Afficher le skim</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="19"/>
