@@ -2089,7 +2089,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="119"/>
         <source>Route choice model</source>
-        <translation type="unfinished"/>
+        <translation>Modèle de choix d&apos;itinéraires</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="35"/>
