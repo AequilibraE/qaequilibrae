@@ -3310,7 +3310,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="251"/>
         <source>Compute skims</source>
-        <translation type="unfinished"/>
+        <translation>Calcul des indicateurs</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="347"/>
