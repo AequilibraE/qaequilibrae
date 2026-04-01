@@ -1634,7 +1634,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/import_matrices.py" line="13"/>
         <source>Saves matrix from open layer into a *.omx file</source>
-        <translation type="unfinished"/>
+        <translation>Enregistre une matrice open layer (couche SIG, format liste) en fichier *.omx</translation>
     </message>
 </context>
 <context>
