@@ -1737,7 +1737,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_parameters.py" line="13"/>
         <source>Access project parameters</source>
-        <translation type="unfinished"/>
+        <translation>Accéder aux paramètres du projet</translation>
     </message>
 </context>
 <context>
