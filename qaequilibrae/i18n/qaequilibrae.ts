@@ -934,37 +934,37 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="211"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="213"/>
         <source>Could not load model. {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="347"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="349"/>
         <source>Procedure error: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="359"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="361"/>
         <source>Queued</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="377"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="379"/>
         <source>Production vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="380"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="382"/>
         <source>Attraction vector is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="384"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="386"/>
         <source>Observed (seed) matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="388"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="390"/>
         <source>Impedance matrix is missing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -974,7 +974,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="403"/>
+        <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="405"/>
         <source>Procedure error:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1446,7 +1446,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/transit_procedures/gtfs_feed.py" line="73"/>
+        <location filename="../modules/transit_procedures/gtfs_feed.py" line="74"/>
         <source>Enter agency and description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1660,22 +1660,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="226"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="228"/>
         <source>No name provided for the output file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="199"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="201"/>
         <source>Invalid field chosen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="214"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="216"/>
         <source>One cannot load a dataset with indices only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="188"/>
+        <location filename="../modules/matrix_procedures/load_dataset_dialog.py" line="190"/>
         <source>Could not load file. It might be corrupted or not a valid file format. {}</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1701,7 +1701,7 @@
 <context>
     <name>LoadMatrixDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="261"/>
+        <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="262"/>
         <source>Invalid field chosen</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2758,77 +2758,77 @@
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="467"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="468"/>
         <source>Class name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="521"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="522"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="642"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="643"/>
         <source>Input error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="672"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="673"/>
         <source>No traffic classes to assign</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="677"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="678"/>
         <source>Missing scenario name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="683"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="684"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="760"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="761"/>
         <source>VDF parameter is not numeric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="574"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="575"/>
         <source>Wrong value for link ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="580"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="581"/>
         <source>Link ID doesn&apos;t exist in project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="589"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="590"/>
         <source>Missing query name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="593"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="594"/>
         <source>Query name already used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="597"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="598"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="689"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="690"/>
         <source>Missing select link matrix name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="693"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="694"/>
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="360"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="361"/>
         <source>No VoT found for mode {} in project database. Please configure it.</source>
         <translation type="unfinished"></translation>
     </message>
