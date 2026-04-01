@@ -1338,7 +1338,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="44"/>
         <source>Period end</source>
-        <translation type="unfinished"/>
+        <translation>Fin de période</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="64"/>
