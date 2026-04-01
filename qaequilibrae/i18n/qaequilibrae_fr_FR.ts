@@ -176,7 +176,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="124"/>
         <source>Path computation</source>
-        <translation type="unfinished"/>
+        <translation>Calcul de chemin</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="132"/>
