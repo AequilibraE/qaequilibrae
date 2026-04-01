@@ -3106,7 +3106,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="380"/>
         <source>Scenario</source>
-        <translation type="unfinished"/>
+        <translation>Scénario</translation>
     </message>
 </context>
 <context>
@@ -3230,27 +3230,27 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="14"/>
         <source>AequilibraE - PT Skimming and Assignment</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Affectation TC</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="29"/>
         <source>Period</source>
-        <translation type="unfinished"/>
+        <translation>Période</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="35"/>
         <source>Add new period</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter une nouvelle période</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="46"/>
         <source>Transit Graph</source>
-        <translation type="unfinished"/>
+        <translation>Graphe TC</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="75"/>
         <source>Connector method</source>
-        <translation type="unfinished"/>
+        <translation>Méthode de connexion</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="105"/>
