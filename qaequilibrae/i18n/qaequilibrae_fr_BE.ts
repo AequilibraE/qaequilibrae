@@ -1818,7 +1818,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="120"/>
         <source>- expression must be written according to NumPy syntax.</source>
-        <translation type="unfinished"/>
+        <translation>- les expressions doivent être écrites avec une syntaxe spécifique</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="121"/>
