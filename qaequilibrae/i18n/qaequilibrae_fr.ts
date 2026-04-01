@@ -302,7 +302,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
         <source>Close project</source>
-        <translation type="unfinished"/>
+        <translation>Fermer le projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
