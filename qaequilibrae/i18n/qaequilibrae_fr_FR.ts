@@ -2602,12 +2602,12 @@
     <message>
         <location filename="../modules/gis/simple_tag_dialog.py" line="231"/>
         <source>If only target is a polygon, target needs to enclose source.</source>
-        <translation type="unfinished"/>
+        <translation>Si seule la couche cible est polygonale, la cible doit envelopper la source</translation>
     </message>
     <message>
         <location filename="../modules/gis/simple_tag_dialog.py" line="233"/>
         <source>First found record is used.</source>
-        <translation type="unfinished"/>
+        <translation>Le premier résultat trouvé est utilisé</translation>
     </message>
 </context>
 <context>
