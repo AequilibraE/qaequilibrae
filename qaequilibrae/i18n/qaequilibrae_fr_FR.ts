@@ -1323,7 +1323,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/gtfs_importer.ui" line="191"/>
         <source>Allow map-match</source>
-        <translation type="unfinished"/>
+        <translation>Appliquer le map-matching</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_add_period.ui" line="14"/>
