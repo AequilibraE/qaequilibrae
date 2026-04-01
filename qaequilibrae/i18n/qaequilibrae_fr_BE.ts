@@ -3330,32 +3330,32 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="379"/>
         <source>Network information</source>
-        <translation type="unfinished"/>
+        <translation>Informations du réseau</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="388"/>
         <source>Travel Time</source>
-        <translation type="unfinished"/>
+        <translation>Temps de parcours</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="395"/>
         <source>Frequency</source>
-        <translation type="unfinished"/>
+        <translation>Fréquence</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="408"/>
         <source>Outputs</source>
-        <translation type="unfinished"/>
+        <translation>Résultats</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="414"/>
         <source>result_name</source>
-        <translation type="unfinished"/>
+        <translation>nom_resultat</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="437"/>
         <source>Perform assignment</source>
-        <translation type="unfinished"/>
+        <translation>Lancer l&apos;affection</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="450"/>
