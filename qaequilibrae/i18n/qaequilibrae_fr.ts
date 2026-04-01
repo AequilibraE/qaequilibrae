@@ -1813,7 +1813,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="117"/>
         <source>- each key in the configuration file corresponds to the name of the matrix in the input expression;</source>
-        <translation type="unfinished"/>
+        <translation>- chaque &quot;clé&quot; dans le fichier de configuration correspond au nom d&apos;une matrice qui peut-être utilisé dans votre expression;</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="120"/>
