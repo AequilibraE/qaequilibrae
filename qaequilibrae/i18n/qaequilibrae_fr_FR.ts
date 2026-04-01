@@ -2124,22 +2124,22 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="76"/>
         <source>Penalty</source>
-        <translation type="unfinished"/>
+        <translation>Pénalité</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="153"/>
         <source>1.00</source>
-        <translation type="unfinished"/>
+        <translation>1.00</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="89"/>
         <source>1.01</source>
-        <translation type="unfinished"/>
+        <translation>1.01</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="96"/>
         <source>1</source>
-        <translation type="unfinished"/>
+        <translation>1</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="106"/>
