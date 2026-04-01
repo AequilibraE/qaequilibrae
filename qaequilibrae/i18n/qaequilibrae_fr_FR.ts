@@ -2912,7 +2912,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="91"/>
         <source>Error checking AequilibraE project: {}</source>
-        <translation type="unfinished"/>
+        <translation>Erreur à la vérification du projet AequilibraE : {}</translation>
     </message>
 </context>
 <context>
@@ -2920,12 +2920,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
         <source>Visualize data</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les données</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Outils de visualisation</translation>
     </message>
 </context>
 <context>
@@ -3101,12 +3101,12 @@
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="213"/>
         <source>Alternative scenario</source>
-        <translation type="unfinished"/>
+        <translation>Scénario alternatif</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="380"/>
         <source>Scenario</source>
-        <translation type="unfinished"/>
+        <translation>Scénario</translation>
     </message>
 </context>
 <context>
@@ -3230,7 +3230,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="14"/>
         <source>AequilibraE - PT Skimming and Assignment</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Affectation TC</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="29"/>
