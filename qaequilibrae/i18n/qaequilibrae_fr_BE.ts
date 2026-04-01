@@ -246,12 +246,12 @@
     <message>
         <location filename="../qaequilibrae.py" line="294"/>
         <source>Closed project on: {}</source>
-        <translation type="unfinished"/>
+        <translation>Projet fermé : {}</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="487"/>
         <source>Messages</source>
-        <translation type="unfinished"/>
+        <translation>Messages</translation>
     </message>
 </context>
 <context>
@@ -302,7 +302,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
         <source>Close project</source>
-        <translation type="unfinished"/>
+        <translation>Fermer le projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
