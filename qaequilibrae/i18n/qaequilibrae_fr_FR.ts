@@ -196,7 +196,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="143"/>
         <source>Skimming and assignment</source>
-        <translation type="unfinished"/>
+        <translation>Affectation TC</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="144"/>
