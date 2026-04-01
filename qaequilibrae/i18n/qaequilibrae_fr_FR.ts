@@ -409,7 +409,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_examples.py" line="13"/>
         <source>Create AequilibraE examples.</source>
-        <translation type="unfinished"/>
+        <translation>Générer des exemples AequilibraE</translation>
     </message>
 </context>
 <context>
