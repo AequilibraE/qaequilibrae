@@ -969,7 +969,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="203"/>
         <source>You need to load a dataset to proceed</source>
-        <translation type="unfinished"/>
+        <translation>Vous devez charger un jeu de données pour continuer</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="403"/>
