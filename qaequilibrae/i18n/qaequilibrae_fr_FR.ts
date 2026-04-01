@@ -312,7 +312,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
         <source>Close AequilibraE project into QGIS.</source>
-        <translation type="unfinished"/>
+        <translation>Fermer le projet AequilibraE dans QGIS</translation>
     </message>
 </context>
 <context>
@@ -320,7 +320,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="17"/>
         <source>AequilibraE Project Folder</source>
-        <translation type="unfinished"/>
+        <translation>Dossier du projet AequilibraE</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="24"/>
