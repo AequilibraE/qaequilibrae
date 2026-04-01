@@ -2189,32 +2189,32 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="216"/>
         <source>Block flows through centroids</source>
-        <translation type="unfinished"/>
+        <translation>Bloquer les flux traversant les centroïdes</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="226"/>
         <source>Network Mode</source>
-        <translation type="unfinished"/>
+        <translation>Mode du réseau</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="233"/>
         <source>Remove selected links from the graph</source>
-        <translation type="unfinished"/>
+        <translation>Retirer les tronçons sélectionnés du graphe</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="247"/>
         <source>Critical analysis</source>
-        <translation type="unfinished"/>
+        <translation>Analyse de criticité</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="253"/>
         <source>Select link analysis</source>
-        <translation type="unfinished"/>
+        <translation>Arborescence</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="347"/>
         <source>Query name</source>
-        <translation type="unfinished"/>
+        <translation>Nom de requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="269"/>
