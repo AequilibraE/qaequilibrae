@@ -2030,12 +2030,12 @@
     <message>
         <location filename="../modules/processing_provider/model_building/project_from_OSM.py" line="13"/>
         <source>Creates an AequilibraE project from OpenStreetMap</source>
-        <translation type="unfinished"/>
+        <translation>Créer un projet AequilibraE à partir d&apos;OSM (OpenStreetMap)</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/project_from_OSM.py" line="13"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construction de modèle</translation>
     </message>
 </context>
 <context>
