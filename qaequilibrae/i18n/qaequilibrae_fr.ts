@@ -2428,7 +2428,7 @@
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="96"/>
         <source>Please check the Parameters file</source>
-        <translation type="unfinished"/>
+        <translation>Merci de vérifier le fichier de paramètres</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/run_module_dialog.py" line="115"/>
