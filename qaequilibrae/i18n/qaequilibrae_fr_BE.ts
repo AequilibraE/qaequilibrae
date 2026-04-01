@@ -3931,7 +3931,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="759"/>
         <source>Save select link matrices</source>
-        <translation type="unfinished"/>
+        <translation>Sauver les matrice d&apos;arborescence(s)</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="769"/>
