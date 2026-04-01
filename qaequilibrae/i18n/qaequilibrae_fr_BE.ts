@@ -3360,7 +3360,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="450"/>
         <source>Matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matrice</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="457"/>
