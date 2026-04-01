@@ -886,17 +886,17 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="161"/>
         <source>By origin</source>
-        <translation type="unfinished"/>
+        <translation>Par origine</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="165"/>
         <source>By destination</source>
-        <translation type="unfinished"/>
+        <translation>Par destination</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="74"/>
         <source>Support for AEM will be removed in a future version</source>
-        <translation type="unfinished"/>
+        <translation>Le support des fichiers *.aem sera supprimé dans une future version</translation>
     </message>
 </context>
 <context>
