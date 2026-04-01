@@ -2144,17 +2144,17 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="106"/>
         <source>0</source>
-        <translation type="unfinished"/>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="125"/>
         <source>Clear utility function</source>
-        <translation type="unfinished"/>
+        <translation>Effacer la fonction d&apos;utilité</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="132"/>
         <source>PSL (beta)</source>
-        <translation type="unfinished"/>
+        <translation>PSL (beta)</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="139"/>
