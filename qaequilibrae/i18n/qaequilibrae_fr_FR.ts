@@ -3240,7 +3240,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="35"/>
         <source>Add new period</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter une nouvelle période</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="46"/>
