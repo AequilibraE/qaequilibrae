@@ -2719,7 +2719,7 @@
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="288"/>
         <source>Enter name for new network layer</source>
-        <translation>Saisir le nom de la couche de tronçons</translation>
+        <translation>Saisir le nom de la couche de tronçons générée</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="380"/>
