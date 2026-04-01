@@ -1999,7 +1999,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_preparation.py" line="12"/>
         <source>Prepares network for import</source>
-        <translation type="unfinished"/>
+        <translation>Préparer le réseau pour import</translation>
     </message>
 </context>
 <context>
@@ -2007,7 +2007,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/project_from_layer.py" line="13"/>
         <source>Create project from link layer</source>
-        <translation type="unfinished"/>
+        <translation>Créer un projet à partir de couches</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/project_from_layer.py" line="13"/>
