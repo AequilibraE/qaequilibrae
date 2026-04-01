@@ -2359,12 +2359,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="521"/>
         <source>Use all</source>
-        <translation type="unfinished"/>
+        <translation>Tout utiliser</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="531"/>
         <source>Save route choice set results</source>
-        <translation type="unfinished"/>
+        <translation>Sauver le jeu de choix d&apos;itinéraires</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="544"/>
