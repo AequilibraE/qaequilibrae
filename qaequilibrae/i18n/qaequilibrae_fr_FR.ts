@@ -2564,12 +2564,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/simple_tag.py" line="13"/>
         <source>Simple tag</source>
-        <translation type="unfinished"/>
+        <translation>Tag simple</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/simple_tag.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Outils de visualisation</translation>
     </message>
 </context>
 <context>
@@ -2592,7 +2592,7 @@
     <message>
         <location filename="../modules/gis/simple_tag_dialog.py" line="225"/>
         <source>Try again</source>
-        <translation type="unfinished"/>
+        <translation>Essayez encore</translation>
     </message>
     <message>
         <location filename="../modules/gis/simple_tag_dialog.py" line="229"/>
