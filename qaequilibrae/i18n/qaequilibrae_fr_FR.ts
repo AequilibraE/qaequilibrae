@@ -2184,7 +2184,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="210"/>
         <source>Graph configuration</source>
-        <translation type="unfinished"/>
+        <translation>Configuration du graphe</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="216"/>
