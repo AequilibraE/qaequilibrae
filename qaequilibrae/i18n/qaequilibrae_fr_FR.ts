@@ -2872,12 +2872,12 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="57"/>
         <source>Skim matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matrice indicateur OD</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="65"/>
         <source>Skim matrix core</source>
-        <translation type="unfinished"/>
+        <translation>Cœur de la matrice d&apos;indicateur</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="75"/>
