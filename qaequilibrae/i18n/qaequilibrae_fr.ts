@@ -206,7 +206,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="150"/>
         <source>Desire lines</source>
-        <translation type="unfinished"/>
+        <translation>Lignes de désir</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="151"/>
