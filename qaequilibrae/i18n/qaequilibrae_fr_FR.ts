@@ -2219,27 +2219,27 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="269"/>
         <source>query_name</source>
-        <translation type="unfinished"/>
+        <translation>nom_requete</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="276"/>
         <source>Add to query</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter à la requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="283"/>
         <source>Save query</source>
-        <translation type="unfinished"/>
+        <translation>Sauver la requête</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="431"/>
         <source>12345</source>
-        <translation type="unfinished"/>
+        <translation>12345</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="297"/>
         <source>Link ID</source>
-        <translation type="unfinished"/>
+        <translation>ID de tronçon</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="304"/>
