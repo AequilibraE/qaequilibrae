@@ -1030,7 +1030,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="61"/>
         <source>Support for AEM will be removed in a future version</source>
-        <translation type="unfinished"/>
+        <translation>Le support des fichier *.aem sera retiré dans une future version</translation>
     </message>
 </context>
 <context>
