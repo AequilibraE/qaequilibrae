@@ -2641,12 +2641,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/stacked_bandwidth.py" line="13"/>
         <source>Stacked bandwidth</source>
-        <translation type="unfinished"/>
+        <translation>Bandes de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/stacked_bandwidth.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Outils de visualisation</translation>
     </message>
 </context>
 <context>
