@@ -3926,7 +3926,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="746"/>
         <source>Clear</source>
-        <translation type="unfinished"/>
+        <translation>Effacer</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="759"/>
