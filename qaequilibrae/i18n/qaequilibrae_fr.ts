@@ -3157,7 +3157,7 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="65"/>
         <source>Load matrix</source>
-        <translation>Charger la matrice</translation>
+        <translation>Afficher la matrice</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="28"/>
