@@ -2012,7 +2012,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/project_from_layer.py" line="13"/>
         <source>Creates an AequilibraE project from a given link layer</source>
-        <translation type="unfinished"/>
+        <translation>Créer un projet AequilibraE à partir de couches nœuds et tronçons</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/project_from_layer.py" line="13"/>
