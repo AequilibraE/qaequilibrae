@@ -974,7 +974,7 @@
     <message>
         <location filename="../modules/distribution_procedures/distribution_models_dialog.py" line="403"/>
         <source>Procedure error:</source>
-        <translation type="unfinished"/>
+        <translation>Erreur de procédure :</translation>
     </message>
 </context>
 <context>
@@ -982,12 +982,12 @@
     <message>
         <location filename="../modules/processing_provider/transit_procedures/explore_transit.py" line="13"/>
         <source>Explore transit</source>
-        <translation type="unfinished"/>
+        <translation>Explorer le réseau TC</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/transit_procedures/explore_transit.py" line="13"/>
         <source>Transit</source>
-        <translation type="unfinished"/>
+        <translation>Transports en commun</translation>
     </message>
 </context>
 <context>
