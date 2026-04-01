@@ -1989,17 +1989,17 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_preparation.py" line="12"/>
         <source>Network preparation</source>
-        <translation type="unfinished"/>
+        <translation>Préparation du réseau</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_preparation.py" line="12"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construction de modèle</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_preparation.py" line="12"/>
         <source>Prepares network for import</source>
-        <translation type="unfinished"/>
+        <translation>Préparer le réseau pour import</translation>
     </message>
 </context>
 <context>
