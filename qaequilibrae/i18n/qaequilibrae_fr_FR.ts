@@ -1783,7 +1783,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="50"/>
         <source>Plase use a valid file name.</source>
-        <translation type="unfinished"/>
+        <translation>Merci de choisir un chemin de fichier valide</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="53"/>
