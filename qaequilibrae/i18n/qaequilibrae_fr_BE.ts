@@ -1398,17 +1398,17 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="114"/>
         <source>Path configuration</source>
-        <translation type="unfinished"/>
+        <translation>Configuration de chemin</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="138"/>
         <source>Plot Skim</source>
-        <translation type="unfinished"/>
+        <translation>Afficher le skim</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="19"/>
         <source>AequilibraE - Scenarios</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Scénarios</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/forms/ui_scenarios.ui" line="45"/>
