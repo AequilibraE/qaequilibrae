@@ -2259,17 +2259,17 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="327"/>
         <source>Set select link analysis</source>
-        <translation type="unfinished"/>
+        <translation>Analyse de tronçon(s)</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="334"/>
         <source>Clear</source>
-        <translation type="unfinished"/>
+        <translation>Effacer</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="342"/>
         <source>Links</source>
-        <translation type="unfinished"/>
+        <translation>Tronçons</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="358"/>
