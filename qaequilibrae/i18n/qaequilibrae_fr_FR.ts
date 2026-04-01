@@ -2867,7 +2867,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="50"/>
         <source>Demand matrix core</source>
-        <translation type="unfinished"/>
+        <translation>Cœur de la matrice de demande</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="57"/>
