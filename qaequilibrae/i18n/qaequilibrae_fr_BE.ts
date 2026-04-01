@@ -2742,7 +2742,7 @@
     <message>
         <location filename="../modules/routing_procedures/tsp_dialog.py" line="81"/>
         <source>You need at least three centroids to route.</source>
-        <translation type="unfinished"/>
+        <translation>Il faut au moins trois centroïdes pour établir un itinéraire.</translation>
     </message>
 </context>
 <context>
