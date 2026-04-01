@@ -1000,27 +1000,27 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="28"/>
         <source>File format</source>
-        <translation type="unfinished"/>
+        <translation>Format de fichier</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="40"/>
         <source>AequilibraE module not found</source>
-        <translation type="unfinished"/>
+        <translation>Module AequilibraE non trouvé</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="73"/>
         <source>Export matrices</source>
-        <translation type="unfinished"/>
+        <translation>Export de matrices</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="21"/>
         <source>File path</source>
-        <translation type="unfinished"/>
+        <translation>Emplacement du fichier</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="76"/>
         <source>Data</source>
-        <translation type="unfinished"/>
+        <translation>Data</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="82"/>
