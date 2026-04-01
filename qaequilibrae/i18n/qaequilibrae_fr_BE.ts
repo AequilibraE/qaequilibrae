@@ -1920,12 +1920,12 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="14"/>
         <source>AequilibraE Project Folder</source>
-        <translation type="unfinished"/>
+        <translation>Dossier du projet AequilibraE</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="25"/>
         <source>AequilibraE module not found</source>
-        <translation type="unfinished"/>
+        <translation>Module AequilibraE non trouvé</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="35"/>
