@@ -241,7 +241,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="208"/>
         <source>Changed active scenario: {}</source>
-        <translation type="unfinished"/>
+        <translation>Scénario actuel modifié : {}</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="294"/>
