@@ -2304,17 +2304,17 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="417"/>
         <source>Demand</source>
-        <translation type="unfinished"/>
+        <translation>Demande</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="424"/>
         <source>98765</source>
-        <translation type="unfinished"/>
+        <translation>98765</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="444"/>
         <source>Visualize</source>
-        <translation type="unfinished"/>
+        <translation>Visualiser</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="451"/>
