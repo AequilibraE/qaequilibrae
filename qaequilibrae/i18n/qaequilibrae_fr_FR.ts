@@ -427,7 +427,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/create_scenarios.py" line="13"/>
         <source>Create model scenarios</source>
-        <translation type="unfinished"/>
+        <translation>Créer un modèle de scénarios</translation>
     </message>
 </context>
 <context>
