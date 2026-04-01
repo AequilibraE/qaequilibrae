@@ -2159,27 +2159,27 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="139"/>
         <source>Add to utility function</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter à la fonction d&apos;utilité</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="146"/>
         <source>Network field</source>
-        <translation type="unfinished"/>
+        <translation>Champ du réseau</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="173"/>
         <source>Parameter</source>
-        <translation type="unfinished"/>
+        <translation>Facteur</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="180"/>
         <source>Utility function</source>
-        <translation type="unfinished"/>
+        <translation>Fonction d&apos;utilité</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="190"/>
         <source>0.10</source>
-        <translation type="unfinished"/>
+        <translation>0.10</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="210"/>
