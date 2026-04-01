@@ -1482,7 +1482,7 @@
     <message>
         <location filename="../modules/processing_provider/paths_procedures/impedance_matrix.py" line="13"/>
         <source>Path computation</source>
-        <translation type="unfinished"/>
+        <translation>Calculs de chemins</translation>
     </message>
 </context>
 <context>
@@ -1505,7 +1505,7 @@
     <message>
         <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="172"/>
         <source>Input error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur d&apos;input</translation>
     </message>
 </context>
 <context>
