@@ -2274,12 +2274,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="358"/>
         <source>Sub-area analysis</source>
-        <translation>Analyse par zone(s)</translation>
+        <translation>Analyse par sous-zonage</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="380"/>
         <source>Set sub-area analysis</source>
-        <translation>Utiliser une analyse par zone(s)</translation>
+        <translation>Utiliser une analyse par sous-zonage</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="387"/>
