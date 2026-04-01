@@ -1907,12 +1907,12 @@
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="54"/>
         <source>Adding fields to line layer</source>
-        <translation type="unfinished"/>
+        <translation>Ajout de champs à la couche de lignes</translation>
     </message>
     <message>
         <location filename="../modules/network/Network_preparation_procedure.py" line="45"/>
         <source>Line layer duplicated</source>
-        <translation type="unfinished"/>
+        <translation>Couche de lignes dupliquée</translation>
     </message>
 </context>
 <context>
@@ -1920,22 +1920,22 @@
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="14"/>
         <source>AequilibraE Project Folder</source>
-        <translation type="unfinished"/>
+        <translation>Dossier du projet AequilibraE</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="25"/>
         <source>AequilibraE module not found</source>
-        <translation type="unfinished"/>
+        <translation>Module AequilibraE non trouvé</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="35"/>
         <source>{project_folder} does not contain an AequilibraE model: {e}</source>
-        <translation type="unfinished"/>
+        <translation>{project_folder} ne contient pas de modèle AequilibraE : {e}</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="96"/>
         <source>Network simplifier</source>
-        <translation type="unfinished"/>
+        <translation>Simplifieur de réseau</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="106"/>
