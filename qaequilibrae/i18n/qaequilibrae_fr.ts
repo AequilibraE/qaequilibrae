@@ -1010,17 +1010,17 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="73"/>
         <source>Export matrices</source>
-        <translation type="unfinished"/>
+        <translation>Export de matrices</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="21"/>
         <source>File path</source>
-        <translation type="unfinished"/>
+        <translation>Emplacement du fichier</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="76"/>
         <source>Data</source>
-        <translation type="unfinished"/>
+        <translation>Data</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="82"/>
