@@ -2344,7 +2344,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="491"/>
         <source>Perform assignment</source>
-        <translation>Exécuter une affectation</translation>
+        <translation>Lancer l&apos;affectation</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="499"/>
@@ -3360,17 +3360,17 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="450"/>
         <source>Matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matrice</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="457"/>
         <source>Matrix core</source>
-        <translation type="unfinished"/>
+        <translation>Cœur de la matrice</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="467"/>
         <source>Assignment class name</source>
-        <translation type="unfinished"/>
+        <translation>Nom du segment à l&apos;affectation</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="95"/>
