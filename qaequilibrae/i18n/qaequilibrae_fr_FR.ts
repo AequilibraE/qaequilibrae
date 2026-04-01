@@ -1363,12 +1363,12 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="131"/>
         <source>Minimize field</source>
-        <translation type="unfinished"/>
+        <translation>Minimiser le champ</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="209"/>
         <source>Block paths through centroids</source>
-        <translation type="unfinished"/>
+        <translation>Bloquer les chemins traversant les centroïdes</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="237"/>
