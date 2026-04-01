@@ -2925,7 +2925,7 @@
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Outils de visualisation</translation>
     </message>
 </context>
 <context>
@@ -3101,12 +3101,12 @@
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="213"/>
         <source>Alternative scenario</source>
-        <translation type="unfinished"/>
+        <translation>Scénario alternatif</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="380"/>
         <source>Scenario</source>
-        <translation type="unfinished"/>
+        <translation>Scénario</translation>
     </message>
 </context>
 <context>
