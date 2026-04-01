@@ -2304,7 +2304,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="417"/>
         <source>Demand</source>
-        <translation type="unfinished"/>
+        <translation>Demande</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="424"/>
