@@ -2912,7 +2912,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="91"/>
         <source>Error checking AequilibraE project: {}</source>
-        <translation type="unfinished"/>
+        <translation>Erreur à la vérification du projet AequilibraE : {}</translation>
     </message>
 </context>
 <context>
@@ -2920,7 +2920,7 @@
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
         <source>Visualize data</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les données</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
