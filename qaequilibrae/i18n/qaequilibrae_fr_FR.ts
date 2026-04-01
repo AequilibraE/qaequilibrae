@@ -355,7 +355,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="72"/>
         <source>Model building</source>
-        <translation type="unfinished"/>
+        <translation>Construction de modèle</translation>
     </message>
 </context>
 <context>
