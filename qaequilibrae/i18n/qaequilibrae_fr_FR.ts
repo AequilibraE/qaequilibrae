@@ -2628,7 +2628,7 @@
     <message>
         <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="373"/>
         <source>Input error</source>
-        <translation type="unfinished"/>
+        <translation>Erreur d&apos;input</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="99"/>
