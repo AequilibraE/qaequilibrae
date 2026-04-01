@@ -27,12 +27,12 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="23"/>
         <source>Links</source>
-        <translation type="unfinished"/>
+        <translation>Tronçons</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="30"/>
         <source>Direction</source>
-        <translation type="unfinished"/>
+        <translation>Direction</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="39"/>
