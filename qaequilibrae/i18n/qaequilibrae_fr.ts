@@ -2694,7 +2694,7 @@
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="162"/>
         <source>Node layer name</source>
-        <translation>Nom de la couche de nœuds</translation>
+        <translation>Nom de la couche</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="183"/>
