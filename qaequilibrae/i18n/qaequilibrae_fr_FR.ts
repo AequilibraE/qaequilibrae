@@ -57,7 +57,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="72"/>
         <source>Importing links layer</source>
-        <translation type="unfinished"/>
+        <translation>Import de la couche de tronçons</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="128"/>
