@@ -4139,7 +4139,7 @@
     <message>
         <location filename="../modules/network/forms/ui_add_connectors.ui" line="19"/>
         <source>AequilibraE - Add centroid connectors</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Ajouter des connecteurs</translation>
     </message>
 </context>
 <context>
@@ -4202,12 +4202,12 @@
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="185"/>
         <source>CSV</source>
-        <translation type="unfinished"/>
+        <translation>CSV</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/forms/ui_vector_loader.ui" line="440"/>
         <source>Parquet</source>
-        <translation type="unfinished"/>
+        <translation>Parquet</translation>
     </message>
 </context>
 </TS>
