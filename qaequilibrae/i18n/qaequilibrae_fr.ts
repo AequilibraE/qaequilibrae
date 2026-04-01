@@ -3285,7 +3285,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="129"/>
         <source>Block centroid flows</source>
-        <translation type="unfinished"/>
+        <translation>Bloquer les flux traversant les centroïdes</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="163"/>
