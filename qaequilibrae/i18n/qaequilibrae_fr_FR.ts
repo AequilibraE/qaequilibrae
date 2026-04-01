@@ -9,7 +9,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/Add_connectors.py" line="12"/>
         <source>Adds centroid connectors for one or all modes.</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter des connecteurs pour un ou tous les modes</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/Add_connectors.py" line="12"/>
@@ -1166,7 +1166,7 @@
         <translation>Projet</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="156"/>
+        <location filename="../modules/routing_procedures/forms/tsp.ui" line="100"/>
         <source>Mode</source>
         <translation>Mode</translation>
     </message>
