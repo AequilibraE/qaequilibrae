@@ -1388,7 +1388,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="44"/>
         <source>Start ID</source>
-        <translation type="unfinished"/>
+        <translation>ID de départ</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="81"/>
