@@ -2397,12 +2397,12 @@
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="259"/>
         <source>Query name already used</source>
-        <translation type="unfinished"/>
+        <translation>Nom de requête déjà utilisé</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/route_choice_dialog.py" line="262"/>
         <source>Please set a link selection</source>
-        <translation type="unfinished"/>
+        <translation>Merci de définir un choix de tronçons</translation>
     </message>
 </context>
 <context>
