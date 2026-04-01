@@ -307,7 +307,7 @@
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
         <source>Project</source>
-        <translation type="unfinished"/>
+        <translation>Projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/project_procedures/close_project.py" line="47"/>
