@@ -52,7 +52,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="66"/>
         <source>Opening project</source>
-        <translation type="unfinished"/>
+        <translation>Ouverture du projet</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="72"/>
