@@ -216,12 +216,12 @@
     <message>
         <location filename="../qaequilibrae.py" line="152"/>
         <source>Scenario comparison</source>
-        <translation type="unfinished"/>
+        <translation>Comparaison de scénarios</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="114"/>
         <source>Scenarios</source>
-        <translation type="unfinished"/>
+        <translation>Scénarios</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="342"/>
