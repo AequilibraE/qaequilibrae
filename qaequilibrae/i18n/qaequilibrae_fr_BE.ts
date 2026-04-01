@@ -2084,7 +2084,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="14"/>
         <source>AequilibraE - Route Choice</source>
-        <translation type="unfinished"/>
+        <translation>AequilibraE - Choix d&apos;itinéraire</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="119"/>
