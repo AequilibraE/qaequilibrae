@@ -574,7 +574,7 @@
     <message>
         <location filename="../modules/processing_provider/gis/desire_lines.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Outils de visualisation</translation>
     </message>
 </context>
 <context>
