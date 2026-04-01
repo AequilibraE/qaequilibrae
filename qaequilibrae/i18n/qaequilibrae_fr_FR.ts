@@ -3555,12 +3555,12 @@
     <message>
         <location filename="../modules/gis/forms/ui_simple_tag.ui" line="190"/>
         <source>Destination field</source>
-        <translation>Champ de destination</translation>
+        <translation>Champ destination</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_simple_tag.ui" line="203"/>
         <source>Origin field</source>
-        <translation>Champ de la source</translation>
+        <translation>Champ source</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_simple_tag.ui" line="216"/>
