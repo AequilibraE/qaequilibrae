@@ -3791,7 +3791,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="710"/>
         <source>Critical analysis</source>
-        <translation type="unfinished"/>
+        <translation>Analyse</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="949"/>
