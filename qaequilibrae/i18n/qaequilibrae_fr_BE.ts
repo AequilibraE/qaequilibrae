@@ -350,7 +350,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="78"/>
         <source>This tool collapses links into nodes, adjusting the network in the neighborhood.</source>
-        <translation type="unfinished"/>
+        <translation>Cet outil réduit les tronçons en nœuds, ajustant le réseau direct aux alentours</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="72"/>
