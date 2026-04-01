@@ -2699,7 +2699,7 @@
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="183"/>
         <source>Enter name for node layer with centroids</source>
-        <translation>Saisir le nom de la couche de nœuds incluant les centroïdes</translation>
+        <translation>Saisir le nom de la couche de nœuds générée (incluant les centroïdes)</translation>
     </message>
     <message>
         <location filename="../modules/network/forms/ui_network_preparation.ui" line="232"/>
