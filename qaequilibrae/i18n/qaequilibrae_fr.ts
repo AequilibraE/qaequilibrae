@@ -2284,7 +2284,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="387"/>
         <source>Zoning layer</source>
-        <translation type="unfinished"/>
+        <translation>Couche de zonage</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="394"/>
