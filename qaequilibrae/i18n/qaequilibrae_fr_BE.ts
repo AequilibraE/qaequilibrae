@@ -1833,7 +1833,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/matrix_calculator.py" line="94"/>
         <source>Support for AEM will be removed in a future version</source>
-        <translation type="unfinished"/>
+        <translation>Le support des fichiers *.aem sera supprimé dans une future version</translation>
     </message>
 </context>
 <context>
