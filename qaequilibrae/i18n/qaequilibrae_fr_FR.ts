@@ -211,7 +211,7 @@
     <message>
         <location filename="../qaequilibrae.py" line="151"/>
         <source>Stacked bandwidth</source>
-        <translation type="unfinished"/>
+        <translation>Bandes de tronçons</translation>
     </message>
     <message>
         <location filename="../qaequilibrae.py" line="152"/>
