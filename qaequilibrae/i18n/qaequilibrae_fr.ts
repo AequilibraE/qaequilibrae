@@ -2892,7 +2892,7 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="168"/>
         <source>Trip length distribution</source>
-        <translation type="unfinished"/>
+        <translation>Distribution des longueurs de trajets</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="177"/>
