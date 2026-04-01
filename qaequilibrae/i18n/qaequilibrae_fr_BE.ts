@@ -2897,22 +2897,22 @@
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="177"/>
         <source>Creates a trip-length distribution histogram and save in an output folder.</source>
-        <translation type="unfinished"/>
+        <translation>Créé un histogramme de distribution des longueurs de trajet et l&apos;enregistre dans le dossier indiqué.</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="72"/>
         <source>Plot name</source>
-        <translation type="unfinished"/>
+        <translation>Nom du graphique</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="171"/>
         <source>Data</source>
-        <translation type="unfinished"/>
+        <translation>Data</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="91"/>
         <source>Error checking AequilibraE project: {}</source>
-        <translation type="unfinished"/>
+        <translation>Erreur à la vérification du projet AequilibraE : {}</translation>
     </message>
 </context>
 <context>
@@ -2920,12 +2920,12 @@
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
         <source>Visualize data</source>
-        <translation type="unfinished"/>
+        <translation>Afficher les données</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/visualize_data.py" line="13"/>
         <source>Mapping</source>
-        <translation type="unfinished"/>
+        <translation>Outils de visualisation</translation>
     </message>
 </context>
 <context>
@@ -3101,7 +3101,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="213"/>
         <source>Alternative scenario</source>
-        <translation type="unfinished"/>
+        <translation>Scénario alternatif</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_compare_scenarios.ui" line="380"/>
