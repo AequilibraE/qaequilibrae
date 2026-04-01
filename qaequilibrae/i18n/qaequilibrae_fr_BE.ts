@@ -2492,7 +2492,7 @@
     <message>
         <location filename="../modules/processing_provider/gis/scenario_comparison.py" line="13"/>
         <source>Scenario comparison</source>
-        <translation type="unfinished"/>
+        <translation>Comparaison de scénarios</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/gis/scenario_comparison.py" line="13"/>
