@@ -2259,7 +2259,7 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="327"/>
         <source>Set select link analysis</source>
-        <translation type="unfinished"/>
+        <translation>Analyse de tronçon(s)</translation>
     </message>
     <message>
         <location filename="../modules/paths_procedures/forms/ui_route_choice.ui" line="334"/>
