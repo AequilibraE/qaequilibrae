@@ -3275,7 +3275,7 @@
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="119"/>
         <source>Walking edges</source>
-        <translation type="unfinished"/>
+        <translation>Accès piétons</translation>
     </message>
     <message>
         <location filename="../modules/transit_procedures/forms/ui_skimming_assignment.ui" line="68"/>
