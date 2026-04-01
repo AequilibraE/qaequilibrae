@@ -2597,7 +2597,7 @@
     <message>
         <location filename="../modules/gis/simple_tag_dialog.py" line="229"/>
         <source>If source layer is a polygon, source needs to enclose target.</source>
-        <translation type="unfinished"/>
+        <translation>Si la couche source est un polygone, la source doit envelopper la cible</translation>
     </message>
     <message>
         <location filename="../modules/gis/simple_tag_dialog.py" line="231"/>
