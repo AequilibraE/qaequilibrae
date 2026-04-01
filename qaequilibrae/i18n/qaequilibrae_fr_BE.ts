@@ -828,12 +828,12 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="191"/>
         <source>Vector</source>
-        <translation type="unfinished"/>
+        <translation>Vecteur</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="204"/>
         <source>Index</source>
-        <translation type="unfinished"/>
+        <translation>Index</translation>
     </message>
 </context>
 <context>
