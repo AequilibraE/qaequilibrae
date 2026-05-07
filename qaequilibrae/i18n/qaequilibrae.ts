@@ -4004,7 +4004,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="73"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
         <source>Layer</source>
         <translation type="unfinished"></translation>
     </message>
