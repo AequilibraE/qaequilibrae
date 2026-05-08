@@ -3,11 +3,11 @@ from os.path import dirname, join
 import pandas as pd
 import qgis
 from aequilibrae.context import get_logger
-from qgis.PyQt.QtCore import Qt, QSize
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
 from qgis.core import QgsProject
 
-from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog
+from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog, ProgressBar
 from qaequilibrae.modules.common_tools import standard_path, get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import poly_types, numeric_types, point_types
 from qaequilibrae.modules.matrix_procedures import list_matrices
@@ -50,8 +50,6 @@ class DesireLinesDialog(BaseDialog):
             if "wkbType" in dir(layer):
                 if layer.wkbType() in poly_types or layer.wkbType() in point_types:
                     self.zoning_layer.addItem(layer.name())
-                    self.progress_label.setVisible(False)
-                    self.progressbar.setVisible(False)
 
         self.list_matrices()
         self.set_show_matrices()
@@ -108,11 +106,6 @@ class DesireLinesDialog(BaseDialog):
         cell_widget.setLayout(lay_out)
         return cell_widget
 
-    def run_thread(self):
-        self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.start()
-        self.exec_()
-
     def load_fields_to_combo_boxes(self):
         self.zone_id_field.clear()
         if self.zoning_layer.currentIndex() >= 0:
@@ -121,32 +114,12 @@ class DesireLinesDialog(BaseDialog):
                 if field.type() in numeric_types:
                     self.zone_id_field.addItem(field.name())
 
-    def signal_handler(self, val):
-        # Signals that will come from traffic assignment
-        if val[0] == "set_text":
-            self.progress_label.setText(val[1])
-
-        # Signals that will come from desire lines procedure
-        elif val[0] == "start":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-        elif val[0] == "update":
-            self.progressbar.setValue(self.progressbar.value() + 1)
-        elif val[0] == "finished":
-            self.job_finished_from_thread()
-
     def job_finished_from_thread(self):
         try:
             QgsProject.instance().addMapLayer(self.worker_thread.result_layer)
         except Exception as e:
             self.worker_thread.report.append("Could not load desire lines to map")
             self.logger.error(f"Could not load desire lines to map. {e.args}")
-        if self.worker_thread.report:
-            dlg2 = ReportDialog(self.iface, self.worker_thread.report)
-            dlg2.show()
-            dlg2.exec_()
-        self.exit_procedure()
 
     def check_all_inputs(self):
         self.set_matrix()
@@ -181,17 +154,11 @@ class DesireLinesDialog(BaseDialog):
 
     def run(self):
         if self.check_all_inputs():
-            # Sets the visual of the tool
-            self.progress_label.setVisible(True)
-            self.progressbar.setVisible(True)
-            self.setMaximumSize(QSize(383, 444))
-            self.resize(383, 444)
-
             dl_type = "DesireLines"
             if self.radio_delaunay.isChecked():
                 dl_type = "DelaunayLines"
 
-            self.worker_thread = DesireLinesProcedure(
+            worker_thread = DesireLinesProcedure(
                 qgis.utils.iface.mainWindow(),
                 self.zoning_layer.currentText(),
                 self.zone_id_field.currentText(),
@@ -199,7 +166,18 @@ class DesireLinesDialog(BaseDialog):
                 self.matrix_hash,
                 dl_type,
             )
-            self.run_thread()
+
+            progress_bar = ProgressBar(self.qgis_project, worker_thread)
+            self.worker_thread = progress_bar.run()
+
+            self.job_finished_from_thread()
+            progress_bar.exit_procedure()
+
+            if self.worker_thread.report:
+                dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+                dlg2.show()
+                dlg2.exec_()
+
         else:
             error = self.tr("You need the layer and at least one matrix_procedures core")
             self.qgis_project.iface_error_message(error, self.tr("Inputs not loaded properly"))

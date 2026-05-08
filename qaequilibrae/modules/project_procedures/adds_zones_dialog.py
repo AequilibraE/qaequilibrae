@@ -7,7 +7,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QWidget, QHBoxLayout, QComboBox, QCheckBox, QTableWidgetItem
 from qgis.core import QgsMapLayerProxyModel
 
-from qaequilibrae.modules.common_tools import standard_path, BaseDialog
+from qaequilibrae.modules.common_tools import standard_path, BaseDialog, ProgressBar
 from qaequilibrae.modules.project_procedures.add_zones_procedure import AddZonesProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
@@ -25,8 +25,6 @@ class AddZonesDialog(BaseDialog):
         self.cob_lyr.currentIndexChanged.connect(self.changed_layer)
         self.changed_layer()
 
-        self.progress_box.setVisible(False)
-
     def run(self):
         if self.cob_lyr.currentIndex() == -1:
             return
@@ -43,9 +41,8 @@ class AddZonesDialog(BaseDialog):
             field_correspondence[f] = val
 
         self.setFixedHeight(65)
-        self.progress_box.setVisible(True)
         self.input_box.setVisible(False)
-        self.worker_thread = AddZonesProcedure(
+        worker_thread = AddZonesProcedure(
             qgis.utils.iface.mainWindow(),
             self.project,
             layer,
@@ -54,9 +51,9 @@ class AddZonesDialog(BaseDialog):
             field_correspondence,
         )
 
-        self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.start()
-        self.show()
+        progress_bar = ProgressBar(self.qgis_project, worker_thread)
+        _ = progress_bar.run()
+        progress_bar.exit_procedure()
 
     def changed_layer(self):
         with self.project.db_connection as conn:
@@ -97,16 +94,6 @@ class AddZonesDialog(BaseDialog):
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
         return cell_widget
-
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-        elif val[0] == "update":
-            self.progressbar.setValue(val[1])
-        elif val[0] == "finished":
-            self.exit_procedure()
 
     def exit_procedure(self):
         self.close()

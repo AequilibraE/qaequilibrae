@@ -1,17 +1,19 @@
 from os.path import isdir, join, dirname
 
+import qgis
 from aequilibrae.context import get_logger
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.place_getter import placegetter
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox
+from qgis.PyQt.QtWidgets import QVBoxLayout, QGroupBox
 from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QDialog
 from qgis.core import QgsProject, QgsCoordinateReferenceSystem
 from shapely.geometry import box
 
-from qaequilibrae.modules.common_tools import reporter, ReportDialog, standard_path
+from qaequilibrae.modules.common_tools import reporter, ReportDialog, standard_path, ProgressBar
+from qaequilibrae.modules.project_procedures.project_from_osm_procedure import ProjectFromOSMProcedure
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
@@ -74,19 +76,8 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.buttons_widget = QWidget()
         self.buttons_widget.setLayout(self.buttons_frame)
 
-        self.progressbar = QProgressBar()
-        self.progress_label = QLabel()
-
-        self.update_widget = QWidget()
-        self.update_frame = QVBoxLayout()
-        self.update_frame.addWidget(self.progressbar)
-        self.update_frame.addWidget(self.progress_label)
-        self.update_widget.setLayout(self.update_frame)
-        self.update_widget.setVisible(False)
-
         self._run_layout.addWidget(self.source_type_widget)
         self._run_layout.addWidget(self.buttons_widget)
-        self._run_layout.addWidget(self.update_widget)
 
         self.setLayout(self._run_layout)
         self.resize(280, 250)
@@ -102,54 +93,40 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
             self.output_path.setText(join(new_name, new_folder))
 
     def run(self):
-        self.update_widget.setVisible(True)
-        self.resize(280, 300)
         if self.choose_canvas.isChecked():
             self.report.append(reporter("Chose to download network for canvas area"))
             QgsProject.instance().setCrs(QgsCoordinateReferenceSystem.fromEpsgId(4326))
             e = self.iface.mapCanvas().extent()
             bbox = [e.xMinimum(), e.yMinimum(), e.xMaximum(), e.yMaximum()]
         else:
-            self.progress_label.setText(self.tr("Establishing area for download"))
             self.report.append(reporter("Chose to download network for place"))
             bbox, r = placegetter(self.place.text())
             self.report.extend(r)
 
         self.qgis_project.project = Project()
         self.qgis_project.project.new(self.output_path.text())
-        self.qgis_project.project.network.signal.connect(self.signal_handler)
 
-        self.qgis_project.project.network.create_from_osm(box(*bbox))
+        worker_thread = ProjectFromOSMProcedure(qgis.utils.iface.mainWindow(), self.qgis_project, bbox)
+
+        progress_bar = ProgressBar(self.qgis_project, worker_thread, 2)
+        progress_bar.run_threaded_procedure()
+
+        try:
+            if self.qgis_project.project.network.builder:
+                lines = self.qgis_project.project.network.count_links()
+                nodes = self.qgis_project.project.network.count_nodes()
+                self.report.append(reporter(f"{lines:,} links generated"))
+                self.report.append(reporter(f"{nodes:,} nodes generated"))
+                self.leave()
+        except AttributeError:
+            self.logger.info("Only display builder info")
+
+        dlg2 = ReportDialog(self.iface, self.report)
+        dlg2.show()
+        dlg2.exec_()
 
     def change_place_type(self):
         if self.choose_place.isChecked():
             self.place.setVisible(True)
         else:
             self.place.setVisible(False)
-
-    def leave(self):
-        self.close()
-        dlg2 = ReportDialog(self.iface, self.report)
-        dlg2.show()
-        dlg2.exec_()
-
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-        elif val[0] == "update":
-            self.progressbar.setValue(val[1])
-        elif val[0] == "set_text":
-            self.progress_label.setText(val[1])
-            self.progressbar.reset()
-        elif val[0] == "finished":
-            try:
-                if self.qgis_project.project.network.builder:
-                    lines = self.qgis_project.project.network.count_links()
-                    nodes = self.qgis_project.project.network.count_nodes()
-                    self.report.append(reporter(f"{lines:,} links generated"))
-                    self.report.append(reporter(f"{nodes:,} nodes generated"))
-                    self.leave()
-            except AttributeError:
-                self.logger.info("Only display builder info")

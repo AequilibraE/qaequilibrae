@@ -2,7 +2,7 @@ from os.path import dirname, join
 
 import qgis
 
-from qaequilibrae.modules.common_tools import BaseDialog, get_vector_layer_by_name
+from qaequilibrae.modules.common_tools import BaseDialog, ProgressBar, get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import (
     multi_line,
     multi_poly,
@@ -172,13 +172,6 @@ class SimpleTagDialog(BaseDialog):
                     if self.matchingfrom.currentText() == field.name():
                         self.frommatchingtype = field.type()
 
-    def run_thread(self):
-        self.worker_thread.signal.connect(self.signal_handler)
-
-        self.OK.setEnabled(False)
-        self.worker_thread.start()
-        self.exec_()
-
     def run(self):
         error = False
         for wdgt in [self.fromlayer, self.fromfield, self.tolayer, self.tofield]:
@@ -208,8 +201,10 @@ class SimpleTagDialog(BaseDialog):
         else:
             operation = "CLOSEST"
 
-        if not error:
-            self.worker_thread = SimpleTAG(
+        if error:
+            self.qgis_project.iface_error_message(self.tr("Try again"), self.tr("Input data not provided correctly"))
+        else:
+            worker_thread = SimpleTAG(
                 qgis.utils.iface.mainWindow(),
                 flayer,
                 tlayer,
@@ -220,9 +215,13 @@ class SimpleTagDialog(BaseDialog):
                 operation,
                 self.geography_types,
             )
-            self.run_thread()
-        else:
-            self.qgis_project.iface_error_message(self.tr("Try again"), self.tr("Input data not provided correctly"))
+            progress_bar = ProgressBar(self.qgis_project, worker_thread)
+            self.OK.setEnabled(False)
+            worker_thread = progress_bar.run()
+
+            if worker_thread.error:
+                self.qgis_project.iface_error_message(worker_thread.error, self.tr("Input data not provided correctly"))
+            progress_bar.exit_procedure()
 
     def string_order(self, order):
         if order == 1:
@@ -231,26 +230,6 @@ class SimpleTagDialog(BaseDialog):
             return self.tr("If only target is a polygon, target needs to enclose source.")
         elif order == 3:
             return self.tr("First found record is used.")
-
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.lbl_operation.setText(val[2])
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-        elif val[0] == "update":
-            self.lbl_operation.setText(val[2])
-            self.progressbar.setValue(val[1])
-        elif val[0] == "set_text":
-            self.lbl_operation.setText(val[1])
-            self.progressbar.setValue(0)
-        elif val[0] == "finished":
-            self.lbl_operation.clear()
-            self.progressbar.reset()
-            if self.worker_thread.error is not None:
-                self.qgis_project.iface_error_message(
-                    self.worker_thread.error, self.tr("Input data not provided correctly")
-                )
-            self.close()
 
 
 def unload(self):

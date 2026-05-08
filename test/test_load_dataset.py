@@ -43,6 +43,8 @@ def test_load_dialog(ae_with_project, method, folder_path, timeoutDetector):
     assert dialog.dataset.shape[0] == 24
     assert (dialog.dataset.sum(axis=0)["origins"] == dialog.dataset.sum(axis=0)["destinations"]) > 0
 
+    assert not dialog.isVisible()  # Check if dialog was closed
+
 
 def test_load_dataset_class(folder_path):
     df = pd.read_csv("test/data/SiouxFalls_project/synthetic_future_vector.csv")

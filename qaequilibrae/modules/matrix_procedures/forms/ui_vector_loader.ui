@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>498</width>
+    <width>440</width>
     <height>410</height>
    </rect>
   </property>
@@ -34,119 +34,10 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QPushButton" name="but_import_and_use">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>95</y>
-     <width>131</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="palette">
-    <palette>
-     <active>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </active>
-     <inactive>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </inactive>
-     <disabled>
-      <colorrole role="Button">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>180</red>
-         <green>180</green>
-         <blue>180</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </disabled>
-    </palette>
-   </property>
-   <property name="text">
-    <string>Use data</string>
-   </property>
-  </widget>
-  <widget class="QProgressBar" name="progressbar">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>10</y>
-     <width>31</width>
-     <height>101</height>
-    </rect>
-   </property>
-   <property name="palette">
-    <palette>
-     <active>
-      <colorrole role="Highlight">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>0</red>
-         <green>170</green>
-         <blue>0</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </active>
-     <inactive>
-      <colorrole role="Highlight">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>240</red>
-         <green>240</green>
-         <blue>240</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </inactive>
-     <disabled>
-      <colorrole role="Highlight">
-       <brush brushstyle="SolidPattern">
-        <color alpha="255">
-         <red>51</red>
-         <green>153</green>
-         <blue>255</blue>
-        </color>
-       </brush>
-      </colorrole>
-     </disabled>
-    </palette>
-   </property>
-   <property name="value">
-    <number>0</number>
-   </property>
-   <property name="textVisible">
-    <bool>true</bool>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
-   </property>
-  </widget>
   <widget class="QComboBox" name="cob_index_field">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>239</x>
      <y>53</y>
      <width>190</width>
      <height>24</height>
@@ -159,7 +50,7 @@
   <widget class="QLabel" name="lbl_from">
    <property name="geometry">
     <rect>
-     <x>171</x>
+     <x>160</x>
      <y>57</y>
      <width>121</width>
      <height>16</height>
@@ -223,9 +114,9 @@
   <widget class="QPushButton" name="but_save_and_use">
    <property name="geometry">
     <rect>
-     <x>304</x>
+     <x>239</x>
      <y>95</y>
-     <width>136</width>
+     <width>190</width>
      <height>23</height>
     </rect>
    </property>
@@ -273,7 +164,7 @@
   <widget class="QTableWidget" name="table_fields_to_import">
    <property name="geometry">
     <rect>
-     <x>247</x>
+     <x>239</x>
      <y>149</y>
      <width>190</width>
      <height>251</height>
@@ -303,7 +194,7 @@
   <widget class="QToolButton" name="but_removes_from_links">
    <property name="geometry">
     <rect>
-     <x>214</x>
+     <x>210</x>
      <y>250</y>
      <width>21</width>
      <height>19</height>
@@ -322,7 +213,7 @@
   <widget class="QToolButton" name="but_adds_to_links">
    <property name="geometry">
     <rect>
-     <x>214</x>
+     <x>210</x>
      <y>230</y>
      <width>21</width>
      <height>19</height>
@@ -343,7 +234,7 @@
     <rect>
      <x>11</x>
      <y>95</y>
-     <width>131</width>
+     <width>190</width>
      <height>23</height>
     </rect>
    </property>
@@ -391,7 +282,7 @@
   <widget class="QComboBox" name="cob_data_layer">
    <property name="geometry">
     <rect>
-     <x>250</x>
+     <x>239</x>
      <y>17</y>
      <width>190</width>
      <height>24</height>
@@ -404,7 +295,7 @@
   <widget class="QLabel" name="lbl_from_2">
    <property name="geometry">
     <rect>
-     <x>171</x>
+     <x>159</x>
      <y>20</y>
      <width>121</width>
      <height>16</height>
@@ -417,7 +308,7 @@
   <widget class="QLabel" name="lbl_from_3">
    <property name="geometry">
     <rect>
-     <x>283</x>
+     <x>272</x>
      <y>130</y>
      <width>131</width>
      <height>16</height>
