@@ -30,7 +30,7 @@ jobs:
         if: ${{ (matrix.version == 'qgis')}}
         run: |
           $qgisPath = (Get-ChildItem -Path "C:\Program Files" -Filter "QGIS*" -Directory).FullName
-          $qgisExec = "$qgisPath\bin\python-qgis.bat"
+          $qgisExec = "$qgisPath\bin\python-qgis-qt6.bat"
           $pluginPath = "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
           $aeqPath = "$pluginPath\qaequilibrae"
           Copy-Item "qaequilibrae" -Destination "$aeqPath" -Recurse
