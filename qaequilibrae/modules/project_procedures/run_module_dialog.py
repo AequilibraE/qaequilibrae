@@ -3,21 +3,6 @@ import pprint
 import subprocess
 import sys
 
-
-class SafeStdout:
-    def write(self, msg):
-        pass
-
-    def flush(self):
-        pass
-
-
-if sys.stdout is None:
-    sys.stdout = SafeStdout()
-
-if sys.stderr is None:
-    sys.stderr = SafeStdout()
-
 from os.path import dirname, isfile, join
 from pathlib import Path
 
@@ -27,6 +12,24 @@ from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QProgressBar, QTextEdit, Q
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
 from qaequilibrae.modules.common_tools import BaseDialog
+
+
+class SafeWrapper:
+    # Wrapper class around sys.stdout / sys.stderr to suppress flush() warning in output
+    def __init__(self, stream):
+        self.stream = stream
+
+    def write(self, msg):
+        if self.stream:
+            self.stream.write(msg)
+
+    def flush(self):
+        if self.stream and hasattr(self.stream, "flush"):
+            self.stream.flush()
+
+
+sys.stdout = SafeWrapper(sys.__stdout__)
+sys.stderr = SafeWrapper(sys.__stderr__)
 
 
 class LogBridge(QObject):
@@ -198,7 +201,8 @@ class RunModuleDialog(BaseDialog):
         handler.emit = emit
 
         handler.setFormatter(logging.Formatter(
-            "%(asctime)s - %(levelname)7s - %(indent_str)s%(message)s"
+            "%(asctime)s - %(levelname)7s - %(indent_str)s%(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
         ))
 
         logger.addHandler(handler)
@@ -221,6 +225,10 @@ class RunModuleDialog(BaseDialog):
 
         def worker(task, *args, **kwargs):
             import traceback
+
+            # Override dynamic convergence graph update in QGIS (will cause model to freeze)
+            from four_step.common.notebooks.dynamic_graph import DynamicGraph
+            DynamicGraph.update = lambda self, data: None
 
             root_logger = logging.getLogger()
             qgis_handler = self.attach_qgis_logging(root_logger, tag="Model Run", task=task)
