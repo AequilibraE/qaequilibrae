@@ -8,7 +8,7 @@ from pathlib import Path
 
 from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis
 from qgis.PyQt.QtCore import QObject, pyqtSignal
-from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QProgressBar, QTextEdit, QCheckBox, QLabel
+from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QProgressBar, QTextEdit, QCheckBox, QLabel, QMessageBox
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
 from qaequilibrae.modules.common_tools import BaseDialog
