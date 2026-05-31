@@ -200,10 +200,9 @@ class RunModuleDialog(BaseDialog):
 
         handler.emit = emit
 
-        handler.setFormatter(logging.Formatter(
-            "%(asctime)s - %(levelname)7s - %(indent_str)s%(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S"
-        ))
+        handler.setFormatter(
+            logging.Formatter("%(asctime)s - %(levelname)7s - %(indent_str)s%(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+        )
 
         logger.addHandler(handler)
         return handler
@@ -228,6 +227,7 @@ class RunModuleDialog(BaseDialog):
 
             # Override dynamic convergence graph update in QGIS (will cause model to freeze)
             from four_step.common.notebooks.dynamic_graph import DynamicGraph
+
             DynamicGraph.update = lambda self, data: None
 
             root_logger = logging.getLogger()
