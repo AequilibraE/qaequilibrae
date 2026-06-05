@@ -50,4 +50,4 @@ jobs:
           . /tmp/.venv/bin/activate
           export QT_QPA_PLATFORM=offscreen
           pwd
-        # python3 -m pytest --cov-report term-missing --cov=qaequilibrae test
+          python3 -m pytest test/test_comp*
