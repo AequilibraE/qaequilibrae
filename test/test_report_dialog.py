@@ -1,4 +1,4 @@
-from os.path import isfile, join
+from os.path import isfile
 
 from qaequilibrae.modules.common_tools.report_dialog import ReportDialog
 from .utilities import run_sfalls_assignment
