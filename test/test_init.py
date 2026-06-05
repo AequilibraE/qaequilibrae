@@ -1,5 +1,5 @@
 """
-This test was originally written by Tim Sutton using unittest. 
+This test was originally written by Tim Sutton using unittest.
 We updated its framework to use pytest instead.
 
 __author__ = "Tim Sutton <tim@linfiniti.com>"

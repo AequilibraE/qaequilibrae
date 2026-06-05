@@ -1,24 +1,24 @@
-from .all_layers_from_toc import all_layers_from_toc
-from .auxiliary_functions import standard_path
-from .auxiliary_functions import get_parameter_chain
-from .auxiliary_functions import get_parameters_group
-from .auxiliary_functions import get_vector_layer_by_name
-from .auxiliary_functions import reporter
-from .auxiliary_functions import haversine
-from .auxiliary_functions import only_str
-from .auxiliary_functions import polygon_from_radius
-from .auxiliary_functions import model_area_polygon
-from .data_layer_from_dataframe import layer_from_dataframe
-from .data_layer_from_geodataframe import layer_from_geodataframe
-from .debouncer import Debouncer
-from .geodataframe_from_data_layer import geodataframe_from_layer
-from .get_output_file_name import GetOutputFileName
-from .get_output_file_name import GetOutputFolderName
-from .load_graph_layer_setting_dialog import LoadGraphLayerSettingDialog
-from .log_dialog import LogDialog
-from .numpy_model import NumpyModel
-from .pandas_model import PandasModel
-from .parameters_dialog import ParameterDialog
-from .report_dialog import ReportDialog
-from .table_field_lister import find_table_fields
-from .base_dialog import BaseDialog
+from .all_layers_from_toc import all_layers_from_toc as all_layers_from_toc
+from .auxiliary_functions import standard_path as standard_path
+from .auxiliary_functions import get_parameter_chain as get_parameter_chain
+from .auxiliary_functions import get_parameters_group as get_parameters_group
+from .auxiliary_functions import get_vector_layer_by_name as get_vector_layer_by_name
+from .auxiliary_functions import reporter as reporter
+from .auxiliary_functions import haversine as haversine
+from .auxiliary_functions import only_str as only_str
+from .auxiliary_functions import polygon_from_radius as polygon_from_radius
+from .auxiliary_functions import model_area_polygon as model_area_polygon
+from .data_layer_from_dataframe import layer_from_dataframe as layer_from_dataframe
+from .data_layer_from_geodataframe import layer_from_geodataframe as layer_from_geodataframe
+from .debouncer import Debouncer as Debouncer
+from .geodataframe_from_data_layer import geodataframe_from_layer as geodataframe_from_layer
+from .get_output_file_name import GetOutputFileName as GetOutputFileName
+from .get_output_file_name import GetOutputFolderName as GetOutputFolderName
+from .load_graph_layer_setting_dialog import LoadGraphLayerSettingDialog as LoadGraphLayerSettingDialog
+from .log_dialog import LogDialog as LogDialog
+from .numpy_model import NumpyModel as NumpyModel
+from .pandas_model import PandasModel as PandasModel
+from .parameters_dialog import ParameterDialog as ParameterDialog
+from .report_dialog import ReportDialog as ReportDialog
+from .table_field_lister import find_table_fields as find_table_fields
+from .base_dialog import BaseDialog as BaseDialog

@@ -1,8 +1,8 @@
-from .display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
-from .load_dataset_dialog import LoadDatasetDialog
-from .load_matrix_class import LoadMatrix
-from .load_matrix_dialog import LoadMatrixDialog
-from .load_project_data import LoadProjectDataDialog
-from .load_result_table import load_result_table
-from .matrix_lister import list_matrices
-from .results_lister import list_results
+from .display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog as DisplayAequilibraEFormatsDialog
+from .load_dataset_dialog import LoadDatasetDialog as LoadDatasetDialog
+from .load_matrix_class import LoadMatrix as LoadMatrix
+from .load_matrix_dialog import LoadMatrixDialog as LoadMatrixDialog
+from .load_project_data import LoadProjectDataDialog as LoadProjectDataDialog
+from .load_result_table import load_result_table as load_result_table
+from .matrix_lister import list_matrices as list_matrices
+from .results_lister import list_results as list_results
