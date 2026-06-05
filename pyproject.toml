@@ -1,10 +1,5 @@
-[tool.black]
-line-length = 120
-target-version = ['py312']
-include = '\.pyi?$'
-
 [build-system]
-requires = ["setuptools", "cython", "pyaml", "pyqt5", "requests", "scipy", "shapely", "pandas", "pyarrow", "pyproj"]
+requires = ["setuptools", "cython"]
 
 [tool.qgis-plugin-ci]
 plugin_path = "qaequilibrae"
