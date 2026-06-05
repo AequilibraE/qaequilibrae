@@ -9,15 +9,8 @@ project_slug = "qaequilibrae"
 [tool.coverage.run]
 omit = ["qaequilibrae/packages/*"]
 
-[tool.flake8]
-ignore = ["E203", "E266", "E501", "W503", "F403", "F401"]
-max-line-length = 120
-max-complexity = 20
-select = ["B", "C", "E", "F", "W", "T4", "B9"]
-exclude = [".idea", ".git", "__pycache__", "sphinx", ".venv", "qaequilibrae/packages/*", "test", "docs"]
-
 [tool.ruff]
 line-length = 120
 
 [tool.ruff.lint]
-ignore = ["E203", "E266", "E501", "F403", "F401"]
+ignore = ["E203", "E266", "E501"]

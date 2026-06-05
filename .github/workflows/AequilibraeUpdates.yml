@@ -26,7 +26,7 @@ jobs:
           python3 -m uv pip install "git+https://github.com/AequilibraE/aequilibrae.git@develop"
           touch ./qaequilibrae/packages/aequilibrae_version.txt
           python3 ./ci/dependency_installation.py
-          python3 -m uv pip install -r test/requirements_test.txt --constraint ./ci/constraints.txt
+          python3 -m uv pip install -r test/requirements_test.txt
           export PYTHONPATH=$(pwd)/qaequilibrae/packages:$PYTHONPATH
           echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
 
