@@ -94,7 +94,7 @@ class DownloadAll:
         lines.append(command)
         process = subprocess.Popen(
             command,
-            # shell=True,
+            shell=True,
             stdout=subprocess.PIPE,
             stdin=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,

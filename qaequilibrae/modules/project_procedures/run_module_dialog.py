@@ -60,7 +60,7 @@ class RunModuleDialog(BaseDialog):
 
                     process = subprocess.Popen(
                         install_command,
-                        # shell=True,
+                        shell=True,
                         stdout=subprocess.PIPE,
                         stdin=subprocess.DEVNULL,
                         stderr=subprocess.STDOUT,
