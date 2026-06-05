@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "cython"]
+requires = ["setuptools", "cython", "pyaml", "pyqt5", "requests", "scipy", "shapely", "pandas", "pyarrow", "pyproj"]
 
 [tool.qgis-plugin-ci]
 plugin_path = "qaequilibrae"

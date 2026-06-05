@@ -60,6 +60,8 @@ qaequilibrae/packages
 docs/build
 docs/source/_static
 
+test/.qgis-settings
+
 __pycache__/
 
 # VS Code
