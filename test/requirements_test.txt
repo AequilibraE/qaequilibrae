@@ -1,3 +1,4 @@
+pandas
 pytest-qgis
 pytest-qt
 pytest-cov
