@@ -1,5 +1,6 @@
 from os.path import dirname, join
 
+import numpy as np
 import pandas as pd
 from aequilibrae.context import get_logger
 from aequilibrae.paths import Graph
@@ -72,8 +73,14 @@ class ShortestPathDialog(BaseDialog):
         self.mode = dlg2.mode
         self.minimize_field = dlg2.minimize_field.lower()
 
-        mode_mask = network["modes"].astype(str).str.contains(str(self.mode), na=False)
-        network = network[mode_mask]
+        mode_mask = network["modes"].astype(str).str.contains(str(self.mode), na=False, regex=False)
+        network = network.loc[mode_mask].copy(deep=True).infer_objects()
+        network = pd.DataFrame(network, copy=True)
+        network.reset_index(drop=True, inplace=True)
+
+        # Graph Cython code expects writable NumPy buffers for numeric columns.
+        for col in network.select_dtypes(include=["number"]).columns:
+            network[col] = np.ascontiguousarray(network[col].to_numpy(copy=True))
 
         if network.shape[0] == 0:
             self.project.iface_error_message("No link with the mode you are interested in")

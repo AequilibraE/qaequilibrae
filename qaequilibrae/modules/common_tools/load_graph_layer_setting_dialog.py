@@ -30,7 +30,15 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
             self.cb_modes.addItem(key)
             self.all_modes[key] = rec.mode_id
 
-        self.cb_minimizing.addItems(sorted(min_fields))
+        dual_fields = []
+        for f in min_fields:
+            if f[-2:] == "ab":
+                if f[:-2] + "ba" in min_fields:
+                    dual_fields.append(f[:-3])
+            elif f[-3:] != "_ba":
+                dual_fields.append(f)
+
+        self.cb_minimizing.addItems(sorted(dual_fields))
 
         self.do_load_graph.clicked.connect(self.exit_procedure)
 
