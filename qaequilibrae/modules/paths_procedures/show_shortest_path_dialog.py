@@ -202,7 +202,8 @@ class ShortestPathDialog(BaseDialog):
         vl.updateFields()  # tell the vector layer to fetch changes from the provider
 
         # add features
-        data = data[data.__data_key__.isin(self.res.path * self.res.path_link_directions)]
+        all_links = []
+        data = data[data["__data_key__"].isin(self.res.path * self.res.path_link_directions)]
         for _, rec in data.iterrows():
             fet = self.link_features[rec.link_id]
             attrs = [rec.link_id, rec.a_node, rec.b_node, int(rec.direction)]
@@ -236,5 +237,5 @@ class ShortestPathDialog(BaseDialog):
 
     def _centroids_from_model(self):
         with self.project.db_connection as conn:
-            df = pd.read_sql("SELECT node_id FROM Nodes WHERE is_centroid=1", conn)
-            return df.node_id.to_numpy()
+            centroids = pd.read_sql("select node_id from nodes where is_centroid=1", con=conn).node_id.to_numpy()
+            return centroids if centroids.size != 0 else None
