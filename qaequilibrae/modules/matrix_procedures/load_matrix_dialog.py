@@ -2,6 +2,7 @@ import importlib.util as iutil
 from os.path import dirname, join
 
 import numpy as np
+import qgis
 from aequilibrae.context import get_logger
 from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
 from qgis.PyQt import uic

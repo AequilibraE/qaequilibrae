@@ -35,5 +35,3 @@ def test_import_layer(folder_path):
         print("Layer failed to load!")
     else:
         QgsProject.instance().addMapLayer(layer)
-
-    

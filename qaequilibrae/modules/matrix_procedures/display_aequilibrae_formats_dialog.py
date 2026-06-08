@@ -10,7 +10,7 @@ from aequilibrae.context import get_logger
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QRadioButton
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QRadioButton, QSizePolicy
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout, QAbstractItemView
 from qgis.core import QgsProject, QgsStyle, QgsRuleBasedRenderer, Qgis
 from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsLinePatternFillSymbolLayer

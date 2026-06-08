@@ -3,6 +3,7 @@ from os.path import dirname, join
 
 import qgis
 from qgis.core import QgsMapLayerProxyModel
+from qgis.PyQt import QtWidgets
 
 from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.network.adds_connectors_procedure import AddsConnectorsProcedure

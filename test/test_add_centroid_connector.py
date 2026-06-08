@@ -131,13 +131,13 @@ def test_add_connectors_from_layer_dialog(pt_no_feed):
     dialog.lst_modes.setCurrentRow(1)
     dialog.lst_link_types.setCurrentRow(11)
 
-    # dialog.run()
+    dialog.run()
 
     with dialog.project.db_connection as conn:
         node_count = conn.execute("select count(node_id) from nodes where is_centroid=1").fetchone()[0]
         link_count = conn.execute("select count(name) from links where name like 'centroid connector%'").fetchone()[0]
 
-    # assert node_count == 3 and link_count == 2
+    assert node_count == 3 and link_count == 2
 
 
 def test_add_connectors_from_layer_procedure(pt_no_feed):
