@@ -44,7 +44,7 @@ def test_single_class(sf_project, qtbot, mocker):
     dialog.max_iter.setText("25")
     dialog.rel_gap.setText("0.001")
 
-    qtbot.mouseClick(dialog.but_save_yaml, Qt.LeftButton)  # Save configs in YAML
+    qtbot.mouseClick(dialog.but_save_yaml, Qt.MouseButton.LeftButton)  # Save configs in YAML
 
     dialog.run()
 
@@ -113,10 +113,10 @@ def test_multiclass(sf_project, qtbot, mocker):
     # Adds truck skims
     dialog.cob_skims_available.setCurrentText("free_flow_time")
     dialog.cob_skim_class.setCurrentText("trucks")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
     dialog.cob_skim_class.setCurrentText("trucks")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     # Traffic Class Motorcycle
     dialog.tbl_core_list.selectRow(1)
@@ -129,10 +129,10 @@ def test_multiclass(sf_project, qtbot, mocker):
     # Adds motorcycle skims
     dialog.cob_skims_available.setCurrentText("free_flow_time")
     dialog.cob_skim_class.setCurrentText("motorcycles")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
     dialog.cob_skim_class.setCurrentText("motorcycles")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     # Assignment setup
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
@@ -144,7 +144,7 @@ def test_multiclass(sf_project, qtbot, mocker):
     dialog.max_iter.setText("20")
     dialog.rel_gap.setText("0.001")
 
-    qtbot.mouseClick(dialog.but_save_yaml, Qt.LeftButton)  # Save configs in YAML
+    qtbot.mouseClick(dialog.but_save_yaml, Qt.MouseButton.LeftButton)  # Save configs in YAML
 
     dialog.run()
 
@@ -263,7 +263,7 @@ def test_select_link_analysis(sf_project, qtbot, mocker):
     dialog.max_iter.setText("25")
     dialog.rel_gap.setText("0.001")
 
-    qtbot.mouseClick(dialog.but_save_yaml, Qt.LeftButton)  # Save configs in YAML
+    qtbot.mouseClick(dialog.but_save_yaml, Qt.MouseButton.LeftButton)  # Save configs in YAML
 
     dialog.run()
 
@@ -296,13 +296,13 @@ def test_link_removal(sf_project, qtbot):
     dialog.pce_setter.setValue(1.0)
     dialog.chb_check_centroids.setChecked(False)
     dialog.chb_chosen_links.setChecked(True)
-    qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
 
     # Skimming
     dialog.cob_skims_available.setCurrentText("free_flow_time")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
     dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
@@ -342,7 +342,7 @@ def test_single_class_from_yaml(sf_project, qtbot, mocker):
     )
 
     dialog = TrafficAssignmentDialog(sf_project)
-    qtbot.mouseClick(dialog.but_load_yaml, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_load_yaml, Qt.MouseButton.LeftButton)
 
     dialog.run()
     dialog.close()
@@ -371,7 +371,7 @@ def test_multi_class_from_yaml(sf_project, qtbot, mocker):
     )
 
     dialog = TrafficAssignmentDialog(sf_project)
-    qtbot.mouseClick(dialog.but_load_yaml, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_load_yaml, Qt.MouseButton.LeftButton)
 
     dialog.run()
     dialog.close()
@@ -396,7 +396,7 @@ def test_select_links_from_yaml(sf_project, qtbot, mocker):
     )
 
     dialog = TrafficAssignmentDialog(sf_project)
-    qtbot.mouseClick(dialog.but_load_yaml, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_load_yaml, Qt.MouseButton.LeftButton)
 
     dialog.run()
 
@@ -426,13 +426,13 @@ def test_single_class_from_python(sf_project, qtbot, mocker):
     dialog.ln_class_name.setText("car")
     dialog.pce_setter.setValue(1.0)
     dialog.chb_check_centroids.setChecked(False)
-    qtbot.mouseClick(dialog.but_add_class, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
 
     # Skimming
     dialog.cob_skims_available.setCurrentText("free_flow_time")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
     dialog.cob_skims_available.setCurrentText("distance")
-    qtbot.mouseClick(dialog.but_add_skim, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     dialog.tbl_vdf_parameters.cellWidget(0, 2).setCurrentText("b")
     dialog.tbl_vdf_parameters.cellWidget(1, 2).setCurrentText("power")
@@ -443,7 +443,7 @@ def test_single_class_from_python(sf_project, qtbot, mocker):
     dialog.max_iter.setText("25")
     dialog.rel_gap.setText("0.001")
 
-    qtbot.mouseClick(dialog.but_save_python, Qt.LeftButton)  # Save configs in Python file
+    qtbot.mouseClick(dialog.but_save_python, Qt.MouseButton.LeftButton)  # Save configs in Python file
 
     dialog.close()
 

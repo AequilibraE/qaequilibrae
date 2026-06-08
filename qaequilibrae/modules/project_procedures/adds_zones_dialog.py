@@ -75,7 +75,7 @@ class AddZonesDialog(BaseDialog):
 
             for counter, field in enumerate(fields):
                 item1 = QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 self.table_fields.setItem(counter, 1, item1)
 
                 chb1 = QCheckBox()

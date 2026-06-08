@@ -168,7 +168,7 @@ class TrafficAssignmentDialog(BaseDialog):
                             table.setRowCount(idx + 1)
                             for i, val in enumerate([key, skim]):
                                 item = QTableWidgetItem(val)
-                                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                                item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                                 table.setItem(idx, i, item)
 
                             status = True if "final" in config else False

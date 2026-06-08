@@ -21,7 +21,7 @@ def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, la
     dialog.block_paths.setChecked(False)
     dialog.line_start_id.setText("1")
 
-    qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_plot, Qt.MouseButton.LeftButton)
 
     lyr_name = layer.lower()
 
@@ -49,7 +49,7 @@ def test_parameter_changed(ae_with_project, qtbot, timeoutDetector, qgis_iface):
     dialog.cob_skim.setCurrentIndex(8)
     dialog.line_start_id.setText("1")
 
-    qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_plot, Qt.MouseButton.LeftButton)
 
     start_skim = dialog.cob_skim.currentText()
     start_cost = dialog.cob_minimizing.currentText()
@@ -70,7 +70,7 @@ def test_parameter_changed(ae_with_project, qtbot, timeoutDetector, qgis_iface):
     result1 = [f.attributes()[-1] for f in lyr.getFeatures()]
 
     # Change the value of block path through centroids
-    qtbot.mouseClick(dialog.block_paths, Qt.LeftButton)
+    qtbot.mouseClick(dialog.block_paths, Qt.MouseButton.LeftButton)
 
     result2 = [f.attributes()[-1] for f in lyr.getFeatures()]
 
@@ -114,7 +114,7 @@ def test_plot_with_joined_results(sf_project, qtbot, timeoutDetector, mocker, qg
 
     # Result selection
     dlg.list_results.selectRow(0)
-    qtbot.mouseClick(dlg.but_load_Results, Qt.LeftButton)
+    qtbot.mouseClick(dlg.but_load_Results, Qt.MouseButton.LeftButton)
 
     # Check if layer 'assignment' exists
     existing_layers = [vector.name() for vector in QgsProject.instance().mapLayers().values()]
@@ -142,7 +142,7 @@ def test_plot_with_joined_results(sf_project, qtbot, timeoutDetector, mocker, qg
     dialog.block_paths.setChecked(False)
     dialog.line_start_id.setText("1")
 
-    qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_plot, Qt.MouseButton.LeftButton)
 
     # Check if layer 'skim_viewer' exists
     prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
@@ -190,7 +190,7 @@ def test_start_id_errors(ae_with_project, qtbot, timeoutDetector, layer, par, er
     dialog.block_paths.setChecked(False)
     dialog.line_start_id.setText(par)
 
-    qtbot.mouseClick(dialog.but_plot, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_plot, Qt.MouseButton.LeftButton)
 
     messagebar = ae_with_project.iface.messageBar()
     assert messagebar.messages[2][0] == f"Input error:{error}"
