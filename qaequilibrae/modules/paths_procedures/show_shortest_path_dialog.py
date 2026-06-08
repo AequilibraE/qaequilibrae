@@ -12,6 +12,7 @@ from qgis.utils import iface
 
 from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog, BaseDialog
 from qaequilibrae.modules.common_tools import standard_path, geodataframe_from_layer
+from qaequilibrae.modules.common_tools.writable_dataframe import make_writable_network_dataframe
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
 
 logger = get_logger()
@@ -71,20 +72,27 @@ class ShortestPathDialog(BaseDialog):
             return
 
         self.mode = dlg2.mode
-        self.minimize_field = dlg2.minimize_field.lower()
+        self.mfield = dlg2.minimize_field.lower()
 
         mode_mask = network["modes"].astype(str).str.contains(str(self.mode), na=False, regex=False)
         network = network.loc[mode_mask].copy(deep=True).infer_objects()
-        network = pd.DataFrame(network, copy=True)
-        network.reset_index(drop=True, inplace=True)
-
-        # Graph Cython code expects writable NumPy buffers for numeric columns.
-        for col in network.select_dtypes(include=["number"]).columns:
-            network[col] = np.ascontiguousarray(network[col].to_numpy(copy=True))
 
         if network.shape[0] == 0:
             self.project.iface_error_message("No link with the mode you are interested in")
             return None
+
+        needed = {
+            "link_id",
+            "a_node",
+            "b_node",
+            "direction",
+            self.mfield,
+            f"{self.mfield}_ab",
+            f"{self.mfield}_ba",
+        }
+
+        network = network[[c for c in network.columns if c in needed]]
+        network = make_writable_network_dataframe(network)
 
         self.graph = Graph()
         self.graph.network = network
@@ -95,8 +103,8 @@ class ShortestPathDialog(BaseDialog):
             remove = [feat.attributes()[idx] for feat in self.line_layer.selectedFeatures()]
             self.graph.exclude_links(remove)
 
-        self.graph.set_graph(self.minimize_field)
-        self.graph.set_skimming([self.minimize_field])
+        self.graph.set_graph(self.mfield)
+        self.graph.set_skimming([self.mfield])
         self.graph.set_blocked_centroid_flows(dlg2.block_connector)
 
         self.res.prepare(self.graph)
