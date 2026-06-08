@@ -10,7 +10,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from qgis.PyQt.QtCore import Qt, QTranslator, QSettings, QLocale, QCoreApplication, QSize
-from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication, QToolBar, QToolButton
+from qgis.PyQt.QtWidgets import QVBoxLayout, QToolBar, QToolButton
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget
 from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableWidgetItem, QTableWidget
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
@@ -56,12 +56,6 @@ else:
                 QMessageBox.information(None, "Information", msg.third_message)
         else:
             QMessageBox.information(None, "Information", msg.fourth_message)
-
-if hasattr(Qt, "AA_EnableHighDpiScaling"):
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
-
-if hasattr(Qt, "AA_UseHighDpiPixmaps"):
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
 
 class AequilibraEMenu:
@@ -164,7 +158,7 @@ class AequilibraEMenu:
         # # # ###################  PROJECT MANAGER  ##################################
 
         lbl = QLabel("Model scenario")
-        lbl.setAlignment(Qt.AlignCenter)
+        lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.toolbar.addWidget(lbl)
         self.cob_scenarios = QComboBox()
         self.toolbar.addWidget(self.cob_scenarios)
@@ -464,7 +458,7 @@ class AequilibraEMenu:
             self.geo_layers_table.horizontalHeader().hide()
             for i, f in enumerate(layers):
                 item1 = QTableWidgetItem(f)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 self.geo_layers_table.setItem(i, 0, item1)
 
             descrlayout.addWidget(self.geo_layers_table)

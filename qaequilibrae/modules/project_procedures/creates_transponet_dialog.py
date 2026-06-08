@@ -3,13 +3,12 @@ from functools import partial
 from os.path import dirname, isdir, join
 
 import qgis
-from PyQt5.QtCore import Qt
 from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
 from aequilibrae.project.network.network import Network
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
-from qgis.core import Qgis
+from qgis.PyQt.QtCore import Qt
 
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import all_layers_from_toc

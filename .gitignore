@@ -66,6 +66,8 @@ __pycache__/
 .vscode
 .venv
 .venv_qt6
+test/.qgis-settings
+.ruff_cache
 
 # End of https://www.gitignore.io/api/jetbrains
 # qgis-plugin-ci

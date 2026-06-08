@@ -471,7 +471,7 @@ class RouteChoiceDialog(BaseDialog):
                 )
                 dlg2.show()
                 dlg2.open()
-                # see note in https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QDialog.html#PySide2.QtWidgets.PySide2.QtWidgets.QDialog.exec_
+                # see note in https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QDialog.html#PySide2.QtWidgets.PySide2.QtWidgets.QDialog.exec
 
             self.exit_procedure()
 

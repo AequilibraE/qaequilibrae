@@ -19,7 +19,7 @@ def patch_report_dialog(monkeypatch):
         def show(*args, **kwargs):
             pass
 
-        def exec_(*args, **kwargs):
+        def exec(*args, **kwargs):
             return None
 
     monkeypatch.setattr(project_from_osm_dialog, "ReportDialog", DummyReportDialog)

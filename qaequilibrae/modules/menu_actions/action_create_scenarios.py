@@ -7,4 +7,4 @@ def create_scenarios(qgis_project):
 
     dlg2 = CreateScenariosDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

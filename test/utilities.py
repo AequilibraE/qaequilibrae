@@ -7,7 +7,7 @@ from os.path import abspath, dirname, exists, join
 from shutil import copyfile
 
 import numpy as np
-from PyQt5.QtCore import QMetaType
+from qgis.PyQt.QtCore import QMetaType
 from aequilibrae.context import get_logger
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.core import (
