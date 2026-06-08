@@ -21,21 +21,21 @@ After creating your account, direct yourself to `team's page
 access to the project. Approving your request might take a couple of days (we are a small team of
 developers!), so don't worry.
 
-.. image:: ../images/tx_project_1.png
+.. image:: ../images/development/tx_project_1.png
     :width: 1250
     :align: center
     :alt: ask-to-join-tx-project
 
 You'll be redirected to this page to enter your translation languages of preference.
 
-.. image:: ../images/tx_project_2.png
+.. image:: ../images/development/tx_project_2.png
     :width: 1250
     :align: center
     :alt: select-tx-pref-languages
 
-As soon as you have your request approved, you can log in once more in Transifex and begin translating.
+As soon as your request is approved, you can log in again into Transifex and begin translating.
 
-.. image:: ../images/tx_project_3.png
+.. image:: ../images/development/tx_project_3.png
     :width: 1250
     :align: center
     :alt: tx-waiting-for-approval
@@ -46,14 +46,14 @@ Translating into your language
 
 Your project screen should look like the one in the figure below. If you feel comfortable translating into any of these idioms, just drag your cursor to the right side of each translatable idiom and click on the **Translate** button. 
 
-.. image:: ../images/tx_project_4.png
+.. image:: ../images/development/tx_project_4.png
     :width: 1250
     :align: center
     :alt: tx-project-page
 
 You'll be redirected to a new page.
 
-.. image:: ../images/tx_project_6.png
+.. image:: ../images/development/tx_project_6.png
     :width: 1250
     :align: center
     :alt: tx-project-page
@@ -76,7 +76,7 @@ Suggesting a new translation language
 If your language is unavailable and you want to contribute, you can request it directly to
 the AequilibraE Team! In your project screen, look for the **Request a language** button on the page.
 
-.. image:: ../images/tx_project_7.png
+.. image:: ../images/development/tx_project_7.png
     :width: 1250
     :align: center
     :alt: tx-request-language
@@ -84,7 +84,7 @@ the AequilibraE Team! In your project screen, look for the **Request a language*
 Select your language and create a request. As soon as possible, we'll approve the creation of the
 language, and you can start translating!
 
-.. image:: ../images/tx_project_5.png
+.. image:: ../images/development/tx_project_5.png
     :width: 479
     :align: center
     :alt: tx-request-a-language

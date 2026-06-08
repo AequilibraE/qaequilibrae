@@ -1,5 +1,5 @@
-import os
 import sys
+from os.path import dirname, join
 
 import qgis
 from qgis.PyQt import QtWidgets, uic
@@ -12,13 +12,13 @@ from qaequilibrae.modules.network.Network_preparation_procedure import NetworkPr
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 sys.modules["qgsfieldcombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_network_preparation.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_network_preparation.ui"))
 
 
 class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface):
+    def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.iface = iface
+        self.qgis_project = qgis_project
         self.setupUi(self)
 
         self.filename = False
@@ -89,16 +89,14 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def job_finished_from_thread(self):
         if self.worker_thread.error is not None:
-            self.iface.messageBar().pushMessage(
-                title=self.tr("Node layer error: "), text=self.worker_thread.error, level=Qgis.Critical
-            )
+            self.qgis_project.iface_error_message(self.worker_thread.error, self.tr("Node layer error:"))
         else:
             QgsProject.instance().addMapLayer(self.worker_thread.new_line_layer)
             if self.worker_thread.new_node_layer:
                 QgsProject.instance().addMapLayer(self.worker_thread.new_node_layer)
         self.exit_procedure()
         if self.worker_thread.report:
-            dlg2 = ReportDialog(self.iface, self.worker_thread.report)
+            dlg2 = ReportDialog(self.qgis_project.iface, self.worker_thread.report)
             dlg2.show()
             dlg2.exec()
 

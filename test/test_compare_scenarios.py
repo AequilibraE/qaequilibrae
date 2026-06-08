@@ -11,9 +11,9 @@ from .utilities import run_sfalls_assignment
 
 
 @pytest.fixture
-def model_path(ae_with_project):
-    path = str(ae_with_project.project.project_base_path)
-    proj = run_sfalls_assignment(ae_with_project)
+def model_path(sf_project):
+    path = str(sf_project.project.project_base_path)
+    proj = run_sfalls_assignment(sf_project)
     proj = future_assignment(proj)
 
     proj.project.close()
@@ -27,16 +27,16 @@ def test_compare_scenarios(ae, model_path, composite):
     _run_load_project_from_path(ae, model_path)
 
     dialog = CompareScenariosDialog(ae)
-    dialog.cob_alternative_scenario.setCurrentText("future_assignment")
+    dialog.cob_alternative_result.setCurrentText("future_assignment")
     dialog.radio_compo.setChecked(composite)
     dialog.radio_diff.setChecked(not composite)
 
     dialog.execute_comparison()
 
     prj_layers = [lyr.name() for lyr in QgsProject.instance().mapLayers().values()]
-    assert prj_layers == ["assignment", "future_assignment", "links"]
+    assert prj_layers == ["scenario_comparison"]
 
-    link_layer = QgsProject.instance().mapLayersByName("links")[0]
+    link_layer = QgsProject.instance().mapLayersByName("scenario_comparison")[0]
     field_names = link_layer.fields().names()
     fields = ["base_matrix_ab", "base_matrix_ba", "alternative_matrix_ab", "alternative_matrix_ba"]
     for f in fields:
@@ -53,7 +53,7 @@ def future_assignment(aeq_from_qgis):
     graph.set_skimming(["free_flow_time", "distance"])
     graph.set_blocked_centroid_flows(False)
 
-    demand = project.matrices.get_matrix("demand.aem")
+    demand = project.matrices.get_matrix("demand_omx")
     demand.computational_view(["matrix"])
 
     # Calibrate gravity model

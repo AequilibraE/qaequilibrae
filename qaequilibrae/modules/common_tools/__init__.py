@@ -1,6 +1,7 @@
 from .all_layers_from_toc import all_layers_from_toc
 from .auxiliary_functions import *
 from .data_layer_from_dataframe import layer_from_dataframe
+from .data_layer_from_geodataframe import layer_from_geodataframe
 from .debouncer import Debouncer
 from .geodataframe_from_data_layer import geodataframe_from_layer
 from .get_output_file_name import GetOutputFileName
@@ -12,3 +13,4 @@ from .pandas_model import PandasModel
 from .parameters_dialog import ParameterDialog
 from .report_dialog import ReportDialog
 from .table_field_lister import find_table_fields
+from .base_dialog import BaseDialog

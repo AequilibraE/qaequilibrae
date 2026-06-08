@@ -1,5 +1,5 @@
 def run_import_gtfs(qgis_project):
-    from qaequilibrae.modules.public_transport_procedures import GTFSImporter
+    from qaequilibrae.modules.transit_procedures import GTFSImporter
 
     if qgis_project.project is None:
         qgis_project.show_message_no_project()

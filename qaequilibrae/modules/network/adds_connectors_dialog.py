@@ -1,27 +1,23 @@
-import os
 import sys
+from os.path import dirname, join
 
 import qgis
-from qgis.PyQt import QtWidgets, uic
 from qgis.core import QgsMapLayerProxyModel
 
+from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.network.adds_connectors_procedure import AddsConnectorsProcedure
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 sys.modules["qgsfieldcombobox"] = qgis.gui
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "./forms/ui_add_connectors.ui"))
 
 
-class AddConnectorsDialog(QtWidgets.QDialog, FORM_CLASS):
+class AddConnectorsDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QtWidgets.QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.setupUi(self)
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_add_connectors.ui"), qgis_project=qgis_project)
 
+    def _base_ui_setup(self):
         self.NewLinks = False
         self.NewNodes = False
-        self.qgis_project = qgis_project
-        self.project = qgis_project.project
 
         modes = self.project.network.modes.all_modes()
         link_types = self.project.network.link_types.all_types()

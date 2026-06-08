@@ -1,5 +1,3 @@
-from os.path import join
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -8,13 +6,13 @@ from qgis.PyQt.QtCore import Qt, QTime
 from qgis.PyQt.QtWidgets import QDialog
 
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
-from qaequilibrae.modules.public_transport_procedures.new_period_dialog import NewPeriodDialog
-from qaequilibrae.modules.public_transport_procedures.transit_assignment_dialog import TransitAssignDialog
+from qaequilibrae.modules.transit_procedures.new_period_dialog import NewPeriodDialog
+from qaequilibrae.modules.transit_procedures.transit_assignment_dialog import TransitAssignDialog
 from .utilities import create_matrix
 
 
 def create_dialog_with_matrix(project):
-    pth = join(project.project.project_base_path, "matrices/demand.aem")
+    pth = project.project.project_base_path / "matrices" / "demand.aem"
     create_matrix(np.arange(1, 134), pth)
 
     matrices = project.project.matrices
@@ -44,7 +42,7 @@ def test_assignment(qtbot, coquimbo_project):
     qtbot.mouseClick(dialog.but_assign, Qt.MouseButton.LeftButton)
 
     # Check the results table
-    result = load_result_table(coquimbo_project.project.project_base_path, "pt_assignment")
+    result = load_result_table(coquimbo_project.project, "pt_assignment")
     assert result.shape == (466, 2)
     assert result.columns.tolist() == ["index", "pt_class_volume"]
 
@@ -106,7 +104,7 @@ def mock_period(mocker):
     dialog.error = []
 
     mocker.patch(
-        "qaequilibrae.modules.public_transport_procedures.transit_assignment_dialog.NewPeriodDialog",
+        "qaequilibrae.modules.transit_procedures.transit_assignment_dialog.NewPeriodDialog",
         return_value=dialog,
     )
 
@@ -126,8 +124,8 @@ def test_create_period(qtbot, coquimbo_project, mock_period):
     assert period_id == 2
 
 
-def test_new_period_dialog(qgis_iface):
-    dialog = NewPeriodDialog(qgis_iface)
+def test_new_period_dialog(ae_with_project):
+    dialog = NewPeriodDialog(ae_with_project)
 
     # Set the start and end times
     start_time = QTime(6, 45)  # 6:45 AM
@@ -288,6 +286,6 @@ def test_reuse_graph_in_project(qtbot, coquimbo_project):
     qtbot.mouseClick(dialog.but_assign, Qt.MouseButton.LeftButton)
 
     # Check the results table
-    result = load_result_table(coquimbo_project.project.project_base_path, "pt_assignment")
+    result = load_result_table(coquimbo_project.project, "pt_assignment")
     assert result.shape == (466, 2)
     assert result.columns.tolist() == ["index", "pt_class_volume"]

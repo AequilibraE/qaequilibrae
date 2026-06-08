@@ -1,20 +1,19 @@
-import logging
-import os
+from os.path import dirname, join
 
 import yaml
+from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
-from qgis.core import Qgis
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.Qsci import QsciLexerYAML, QsciScintilla
+from qgis.PyQt.Qsci import QsciLexerYAML
 from qgis.PyQt.QtGui import QFont
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_parameters.ui"))
+FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_parameters.ui"))
 
 
 class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, parent=None):
         super(ParameterDialog, self).__init__(parent)
-        self.iface = qgis_project.iface
+        self.qgis_project = qgis_project
         self.setupUi(self)
 
         self.p = Parameters()
@@ -32,8 +31,8 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         lexer = QsciLexerYAML()
         lexer.setDefaultFont(font)
         self.text_box.setLexer(lexer)
-        self.text_box.setFolding(QsciScintilla.FoldStyle.PlainFoldStyle)
-        self.logger = logging.getLogger("AequilibraEGUI")
+        self.text_box.setFolding(self.text_box.PlainFoldStyle)
+        self.logger = get_logger()
 
         # Load the data
         self.load_original_data()
@@ -63,11 +62,8 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
 
         if self.error:
             self.but_save.setEnabled(False)
-            self.iface.messageBar().pushMessage(
-                title="Error",
-                text=self.tr("Parameter structure was compromised. Please reset to default."),
-                level=Qgis.Critical,
-                duration=10,
+            self.qgis_project.iface_error_message(
+                self.tr("Parameter structure was compromised. Please reset to default.")
             )
         else:
             self.but_save.setEnabled(True)

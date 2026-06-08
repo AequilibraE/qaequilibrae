@@ -1,34 +1,32 @@
-import logging
-import os
-import sys
+from os.path import dirname, join
 
+from aequilibrae.context import get_logger
 from aequilibrae.paths.results import PathResults
-from qgis.PyQt import QtCore, QtWidgets, uic
-from qgis.core import QgsProject, QgsVectorLayer, QgsSpatialIndex, Qgis
+from qgis.PyQt import QtCore
+from qgis.core import QgsProject, QgsVectorLayer, QgsSpatialIndex
 from qgis.utils import iface
 
-from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog, standard_path
+from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog, BaseDialog
+from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
 
-logger = logging.getLogger("AequilibraEGUI")
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/aequilibrae/")
-
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_compute_path.ui"))
+logger = get_logger()
 
 
-class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
+class ShortestPathDialog(BaseDialog):
     clickTool = PointTool(iface.mapCanvas())
 
-    def __init__(self, qgis_project) -> None:
-        QtWidgets.QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.project = qgis_project.project  # type: Project
-        self.setupUi(self)
+    def __init__(self, qgis_project):
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_compute_path.ui"),
+            qgis_project=qgis_project,
+        )
+
+    def _base_ui_setup(self):
         self.field_types = {}
         self.centroids = None
-        self.node_layer = qgis_project.layers["nodes"][0]
-        self.line_layer = qgis_project.layers["links"][0]
+        self.node_layer = self.qgis_project.layers["nodes"][0]
+        self.line_layer = self.qgis_project.layers["links"][0]
         self.node_keys = {}
         self.node_fields = None
         self.index = None
@@ -51,7 +49,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
         self.do_dist_matrix.setText(self.tr("Loading data"))
         self.from_but.setEnabled(False)
         self.to_but.setEnabled(False)
-        dlg2 = LoadGraphLayerSettingDialog(self.iface, self.project)
+        dlg2 = LoadGraphLayerSettingDialog(self.qgis_project)
         dlg2.show()
         dlg2.exec()
         if len(dlg2.error) < 1 and len(dlg2.mode) > 0:
@@ -151,7 +149,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
                     self.create_path_with_scratch_layer()
             else:
                 msg = self.tr("No path between {} and {}").format(self.path_from.text(), self.path_to.text())
-                self.iface.messageBar().pushMessage(title="Error", text=msg, level=Qgis.Critical)
+                self.qgis_project.iface_error_message(msg)
 
     def create_path_with_selection(self):
         f = "link_id"
@@ -183,7 +181,7 @@ class ShortestPathDialog(QtWidgets.QDialog, FORM_CLASS):
 
         symbol = vl.renderer().symbol()
         symbol.setWidth(1)
-        iface.mapCanvas().refresh()
+        self.iface.mapCanvas().refresh()
 
     def exit_procedure(self):
         self.close()

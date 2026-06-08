@@ -1,32 +1,29 @@
-import os
-from os.path import join
+from os.path import dirname, join
 
 import pandas as pd
-from aequilibrae.project.database_connection import database_connection
-from aequilibrae.utils.db_utils import commit_and_close
-from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTabWidget
 from qgis.core import QgsProject, QgsVectorLayerJoinInfo, Qgis
 
-from qaequilibrae.modules.common_tools import PandasModel, layer_from_dataframe
+from qaequilibrae.modules.common_tools import BaseDialog, PandasModel, layer_from_dataframe
 from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
 from qaequilibrae.modules.matrix_procedures.results_lister import list_results
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_project_data.ui"))
 
+class LoadProjectDataDialog(BaseDialog):
+    def __init__(self, qgis_project, from_project: bool = True):
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_project_data.ui"),
+            qgis_project=qgis_project,
+            from_project=from_project,
+        )
 
-class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgs_proj, proj=True):
-        QtWidgets.QDialog.__init__(self)
-        self.iface = qgs_proj.iface
-        self.setupUi(self)
+    def _base_ui_setup(self, **kwargs):
         self.data_to_show = None
         self.error = None
-        self.qgs_proj = qgs_proj
-        self.from_proj = proj
-        self.project = qgs_proj.project if self.from_proj else None
+        self.from_proj = kwargs.get("from_project")
+        self.project = self.qgis_project.project if self.from_proj else None
 
         if self.from_proj:
             self.matrices: pd.DataFrame = None
@@ -46,7 +43,7 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
             self.but_load_Results.clicked.connect(self.load_result_table)
             self.but_load_matrix.clicked.connect(self.display_matrix)
         else:
-            QTabWidget.removeTab(self.tabs, 0)
+            QTabWidget.removeTab(self.tabs, 1)
             QTabWidget.removeTab(self.tabs, 0)
 
         self.but_load_data.clicked.connect(self.display_external_data)
@@ -58,14 +55,14 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.matrices["WARNINGS"][idx[0]] != "":
             return
 
-        file_name = self.matrices["file_name"][idx[0]]
+        file_path = self.project.project_base_path / "matrices" / self.matrices["file_name"][idx[0]]
 
-        dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj, join(self.project.matrices.fldr, file_name), proj=True)
+        dlg2 = DisplayAequilibraEFormatsDialog(self.qgis_project, file_path)
         dlg2.show()
         dlg2.exec()
 
     def load_matrices(self):
-        self.matrices = list_matrices(self.project.matrices.fldr)
+        self.matrices = list_matrices(self.project)
 
         self.matrices_model = PandasModel(self.matrices)
         self.list_matrices.setModel(self.matrices_model)
@@ -73,13 +70,13 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
     def update_matrix_table(self):
         matrices = self.project.matrices
         matrices.update_database()
-        with commit_and_close(database_connection("network")) as conn:
+        with self.project.db_connection as conn:
             qry = """UPDATE matrices SET name = substr(file_name, 1, length(file_name)-4) WHERE name like "b''%";"""
             conn.execute(qry)
         self.load_matrices()
 
     def load_results(self):
-        self.results = list_results(self.project.project_base_path)
+        self.results = list_results(self.project)
 
         self.results_model = PandasModel(self.results)
         self.list_results.setModel(self.results_model)
@@ -92,15 +89,15 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.results["WARNINGS"][idx[0]] != "":
             return
 
-        res_table = load_result_table(self.project.project_base_path, table_name)
+        res_table = load_result_table(self.project, table_name)
         lyr = layer_from_dataframe(res_table, table_name)
 
         if self.chb_join.isChecked():
             procedure = self.results.loc[self.results["table_name"] == table_name]["procedure"].values[0]
             if procedure == "transit assignment":
-                self.link_layer = self.qgs_proj.layers["transit_links"][0]
+                self.link_layer = self.qgis_project.layers["transit_links"][0]
             else:
-                self.link_layer = self.qgs_proj.layers["links"][0]
+                self.link_layer = self.qgis_project.layers["links"][0]
             rem = [lien.joinLayerId() for lien in self.link_layer.vectorJoins()]
             for lien_id in rem:
                 self.link_layer.removeJoin(lien_id)
@@ -116,12 +113,12 @@ class LoadProjectDataDialog(QtWidgets.QDialog, FORM_CLASS):
             self.link_layer.addJoin(lien)
 
     def display_external_data(self):
-        dlg2 = DisplayAequilibraEFormatsDialog(self.qgs_proj)
+        dlg2 = DisplayAequilibraEFormatsDialog(self.qgis_project)
         dlg2.show()
         dlg2.exec()
 
     def exit_with_error(self):
-        self.iface.messageBar().pushMessage(title="Error:", text=self.error, level=Qgis.Critical)
+        self.qgis_project.iface_error_message(self.error)
         self.close()
 
     def exit_procedure(self):

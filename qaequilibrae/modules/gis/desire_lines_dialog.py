@@ -1,26 +1,23 @@
-import logging
-import os
+from os.path import dirname, join
 
 import pandas as pd
-from qgis.PyQt import uic, QtCore
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QDialog
-from qgis.core import QgsProject, Qgis
+from aequilibrae.context import get_logger
+from qgis.PyQt.QtCore import Qt, QSize
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
+from qgis.core import QgsProject
 
-from qaequilibrae.modules.common_tools import ReportDialog
+from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog
 from qaequilibrae.modules.common_tools import standard_path, get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import poly_types, numeric_types, point_types
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from .desire_lines_procedure import DesireLinesProcedure
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_DesireLines.ui"))
 
-
-class DesireLinesDialog(QDialog, FORM_CLASS):
+class DesireLinesDialog(BaseDialog):
     def __init__(self, qgis_project):
-        QDialog.__init__(self)
-        self.iface = qgis_project.iface
-        self.setupUi(self)
+        super().__init__(ui_file=join(dirname(__file__), "forms/ui_DesireLines.ui"), qgis_project=qgis_project)
+
+    def _base_ui_setup(self):
         self.error = None
         self.validtypes = numeric_types
         self.tot_skims = 0
@@ -30,12 +27,11 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
         self.zones = None
         self.columns = None
         self.matrix_hash = {}
-        self.qgis_project = qgis_project
-        if qgis_project.project is None:
+        if self.qgis_project.project is None:
             self.proj_matrices = pd.DataFrame([])
         else:
-            self.proj_matrices = list_matrices(self.qgis_project.project.matrices.fldr)
-        self.logger = logging.getLogger("AequilibraEGUI")
+            self.proj_matrices = list_matrices(self.qgis_project.project)
+        self.logger = get_logger()
 
         self.resize(389, 385)
 
@@ -187,7 +183,7 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             # Sets the visual of the tool
             self.progress_label.setVisible(True)
             self.progressbar.setVisible(True)
-            self.setMaximumSize(QtCore.QSize(383, 444))
+            self.setMaximumSize(QSize(383, 444))
             self.resize(383, 444)
 
             dl_type = "DesireLines"
@@ -204,12 +200,8 @@ class DesireLinesDialog(QDialog, FORM_CLASS):
             )
             self.run_thread()
         else:
-            self.iface.messageBar().pushMessage(
-                title=self.tr("Inputs not loaded properly"),
-                text=self.tr("You need the layer and at least one matrix_procedures core"),
-                level=Qgis.Warning,
-                duration=10,
-            )
+            error = self.tr("You need the layer and at least one matrix_procedures core")
+            self.qgis_project.iface_error_message(error, self.tr("Inputs not loaded properly"))
 
     def throws_error(self, error_message):
         error_message = ["*** ERROR ***", error_message]

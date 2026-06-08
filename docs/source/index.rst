@@ -37,11 +37,12 @@ QGIS
       Want to enhance your experience with AequilibraE? 
       Dive in our processing provider tools!
 
-   .. grid-item-card:: :material-outlined:`arrow_forward;1.5em` Want to go further?
-      :link: https://www.aequilibrae.com/latest/python/index.html
+   .. grid-item-card:: :material-outlined:`question_mark;1.5em` Frequently Asked Questions
+      :link: faqs
+      :link-type: any
       :text-align: center
-      
-      Explore our Python library!
+
+      Any problems? Check out our FAQs!
 
 .. toctree::
    :hidden:

@@ -16,7 +16,8 @@ class messages:
     def second_message(self):
         a = self.tr("Errors may have happened during installation.")
         b = self.tr("Please inspect the messages on your General Log message tab")
-        return f"{a}\r\n{b}"
+        c = self.tr("or go to the QAequilibraE FAQs and check for manual installation.")
+        return f"{a}\r\n{b}\r\n{c}"
 
     @property
     def third_message(self):

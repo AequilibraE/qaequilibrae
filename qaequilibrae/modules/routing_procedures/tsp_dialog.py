@@ -1,30 +1,22 @@
-import os
+from os.path import dirname, join
 
 import numpy as np
 from aequilibrae.paths import path_computation
 from aequilibrae.paths.results import PathResults
-from aequilibrae.project.database_connection import database_connection
-from aequilibrae.utils.db_utils import read_and_close
-from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import QMetaType
 from qgis.core import QgsVectorLayer, QgsField, QgsProject, QgsMarkerSymbol, Qgis
 
-from qaequilibrae.modules.common_tools import ReportDialog
+from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog
 from qaequilibrae.modules.routing_procedures.tsp_procedure import TSPProcedure
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/tsp.ui"))
 
+class TSPDialog(BaseDialog):
+    def __init__(self, qgis_project):
+        super().__init__(ui_file=join(dirname(__file__), "forms/tsp.ui"), qgis_project=qgis_project)
 
-class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgisproject):
-        QtWidgets.QDialog.__init__(self)
-        self.iface = qgisproject.iface
-        self.setupUi(self)
-        self.project = qgisproject.project  # type: Project
-        self._PQgis = qgisproject
-
-        self.link_layer = self._PQgis.layers["links"][0]
-        self.node_layer = self._PQgis.layers["nodes"][0]
+    def _base_ui_setup(self):
+        self.link_layer = self.qgis_project.layers["links"][0]
+        self.node_layer = self.qgis_project.layers["nodes"][0]
 
         QgsProject.instance().addMapLayer(self.link_layer)
         QgsProject.instance().addMapLayer(self.node_layer)
@@ -46,14 +38,14 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.rdo_selected.isChecked():
             centroids = self.selected_nodes()
         else:
-            with read_and_close(database_connection("network")) as conn:
+            with self.project.db_connection as conn:
                 res = conn.execute("select node_id from nodes where is_centroid=1;")
                 centroids = [i[0] for i in res.fetchall()]
         for i in centroids:
             self.cob_start.addItem(str(i))
 
     def populate(self):
-        with read_and_close(database_connection("network")) as conn:
+        with self.project.db_connection as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
             for x in res.fetchall():
                 self.cob_mode.addItem(f"{x[0]} ({x[1]})")
@@ -79,23 +71,13 @@ class TSPDialog(QtWidgets.QDialog, FORM_CLASS):
                 for i in centroids:
                     self.cob_start.addItem(str(i))
             if len(centroids) < 3:
-                self.iface.messageBar().pushMessage(
-                    title="Error",
-                    text=self.tr("You need at least three nodes to route. "),
-                    level=Qgis.Critical,
-                    duration=10,
-                )
+                self.qgis_project.iface_error_message(self.tr("You need at least three nodes to route."))
                 return
             centroids = np.array(centroids).astype(np.int64)
             self.graph.prepare_graph(centroids=centroids)
         else:
             if self.project.network.count_centroids() < 3:
-                self.iface.messageBar().pushMessage(
-                    title="Error",
-                    text=self.tr("You need at least three centroids to route. "),
-                    level=Qgis.Critical,
-                    duration=10,
-                )
+                self.qgis_project.iface_error_message(self.tr("You need at least three centroids to route."))
                 return
 
         self.graph.set_graph(self.cob_minimize.currentText())  # let's say we want to minimize time

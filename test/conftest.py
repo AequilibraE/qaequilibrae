@@ -85,20 +85,33 @@ def pt_no_feed(qgis_iface, folder_path) -> AequilibraEMenu:
 
 
 @pytest.fixture
-def create_example(folder_path):
+def coquimbo_project(qgis_iface, folder_path) -> AequilibraEMenu:
     from aequilibrae.utils.create_example import create_example
 
     project = create_example(folder_path, "coquimbo")
     project.close()
-    yield folder_path
 
-
-@pytest.fixture
-def coquimbo_project(qgis_iface, create_example) -> AequilibraEMenu:
     ae = AequilibraEMenu(qgis_iface)
     from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-    _run_load_project_from_path(ae, create_example)
+    _run_load_project_from_path(ae, folder_path)
+    yield ae
+    ae.run_close_project()
+    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
+    QgsProject.instance().removeAllMapLayers()
+
+
+@pytest.fixture
+def sf_project(qgis_iface, folder_path) -> AequilibraEMenu:
+    from aequilibrae.utils.create_example import create_example
+
+    project = create_example(folder_path)
+    project.close()
+
+    ae = AequilibraEMenu(qgis_iface)
+    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+
+    _run_load_project_from_path(ae, folder_path)
     yield ae
     ae.run_close_project()
     qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}

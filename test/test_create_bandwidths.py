@@ -48,7 +48,7 @@ def test_color_ramp(ae, folder_path, dual_fields):
     dialog.rdo_ramp.setChecked(True)
 
     # Create color ramps
-    color_ramp = LoadColorRampSelector(dialog.iface, dialog.layer)
+    color_ramp = LoadColorRampSelector(dialog.qgis_project, dialog.layer)
     color_ramp.chk_dual_fields.setChecked(dual_fields)
     color_ramp.cbb_ab_color.setCurrentText("Blues")
     color_ramp.set_dual_fields()

@@ -33,149 +33,75 @@ def test_open_project_menu(ae, qtbot):
     # def handle_trigger():
     #     check_if_new_active_window_matches_class(qtbot, QFileDialog)
     action = ae.menuActions["Project"][0]
-    assert action.text() == "Open Project", "Wrong text content"
+    assert action.text() == "Open project", "Wrong text content"
     # QTimer.singleShot(10, handle_trigger)
     # action.trigger()
 
 
-def test_create_example(ae, qtbot):
-    from qaequilibrae.modules.project_procedures import CreateExampleDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, CreateExampleDialog)
-
-    action = ae.menuActions["Project"][1]
-    assert action.text() == "Create example", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-
-
-def test_parameters_menu(ae, qtbot):
-    action = ae.menuActions["Project"][2]
-    assert action.text() == "Parameters", "Wrong text content"
+def test_run_module_menu(ae, qtbot):
+    action = next((a for a in ae.menuActions["Project"] if a.text() == "Run procedures"), None)
+    assert action is not None, "Menu action 'Run procedures' not found"
+    assert action.text() == "Run procedures", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
-def test_logfile_menu(ae, qtbot):
-    action = ae.menuActions["Project"][3]
-    assert action.text() == "logfile", "Wrong text content"
+def test_scenarios_menu(ae, qtbot):
+    action = next((a for a in ae.menuActions["Project"] if a.text() == "Scenarios"), None)
+    assert action is not None, "Menu action 'Scenarios' not found"
+    assert action.text() == "Scenarios", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
-
-
-def test_create_project_from_osm_menu(ae, qtbot):
-    from qaequilibrae.modules.project_procedures import ProjectFromOSMDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, ProjectFromOSMDialog)
-
-    action = ae.menuActions["Model Building"][0]
-    assert action.text() == "Create project from OSM", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-
-
-def test_create_project_from_layers_menu(ae, qtbot):
-    from qaequilibrae.modules.project_procedures import CreatesTranspoNetDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, CreatesTranspoNetDialog)
-
-    action = ae.menuActions["Model Building"][1]
-    assert action.text() == "Create Project from layers", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-
-
-def test_network_preparation_menu(ae, qtbot):
-    from qaequilibrae.modules.network import NetworkPreparationDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, NetworkPreparationDialog)
-
-    action = ae.menuActions["Model Building"][2]
-    assert action.text() == "Network Preparation", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
-
-
-def test_add_centroid_connectors_menu(ae, qtbot):
-    action = ae.menuActions["Model Building"][3]
-    assert action.text() == "Add centroid connectors", "Wrong text content"
-    action.trigger()
-    messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
-
-
-def test_add_zoning_data_menu(ae, qtbot):
-    action = ae.menuActions["Model Building"][4]
-    assert action.text() == "Add zoning data", "Wrong text content"
-    action.trigger()
-    messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
-
-
-def test_import_matrices_menu(ae, qtbot):
-    from qaequilibrae.modules.matrix_procedures import LoadMatrixDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, LoadMatrixDialog)
-
-    action = ae.menuActions["Data"][1]
-    assert action.text() == "Import matrices", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
 def test_trip_distribution_menu(ae, qtbot):
-    action = ae.menuActions["Trip Distribution"][0]
-    assert action.text() == "Trip Distribution", "Wrong text content"
+    action = ae.menuActions["Trip distribution"][0]
+    assert action.text() == "Trip distribution", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
 def test_shortest_path_menu(ae, qtbot):
-    action = ae.menuActions["Paths and assignment"][0]
+    action = ae.menuActions["Path computation"][0]
     assert action.text() == "Shortest path", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
 def test_impedance_matrix_menu(ae, qtbot):
-    action = ae.menuActions["Paths and assignment"][1]
+    action = ae.menuActions["Path computation"][1]
     assert action.text() == "Impedance matrix", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
+
+
+def test_skim_viewer_menu(ae, qtbot):
+    action = ae.menuActions["Path computation"][2]
+    assert action.text() == "Skim viewer", "Wrong text content"
+    action.trigger()
+    messagebar = ae.iface.messageBar()
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
 def test_traffic_assignment_menu(ae, qtbot):
-    action = ae.menuActions["Paths and assignment"][2]
-    assert action.text() == "Traffic Assignment", "Wrong text content"
+    action = ae.menuActions["Traffic assignment"][0]
+    assert action.text() == "Traffic assignment", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
 def test_route_choice_menu(ae, qtbot):
-    action = ae.menuActions["Paths and assignment"][3]
+    action = ae.menuActions["Route choice"][0]
     assert action.text() == "Route choice", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
-
-
-def test_travelling_salesman_problem_menu(ae, qtbot):
-    action = ae.menuActions["Routing"][0]
-    assert action.text() == "Travelling Salesman Problem", "Wrong text content"
-    action.trigger()
-    messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
 def test_gis_desire_lines_menu(ae, qtbot):
@@ -184,8 +110,8 @@ def test_gis_desire_lines_menu(ae, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, DesireLinesDialog)
 
-    action = ae.menuActions["GIS"][0]
-    assert action.text() == "Desire Lines", "Wrong text content"
+    action = ae.menuActions["Mapping"][1]
+    assert action.text() == "Desire lines", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
 
@@ -196,30 +122,18 @@ def test_gis_stacked_bandwidth_menu(ae, qtbot):
     def handle_trigger():
         check_if_new_active_window_matches_class(qtbot, CreateBandwidthsDialog)
 
-    action = ae.menuActions["GIS"][1]
-    assert action.text() == "Stacked Bandwidth", "Wrong text content"
+    action = ae.menuActions["Mapping"][2]
+    assert action.text() == "Stacked bandwidth", "Wrong text content"
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
 
 
 def test_gis_scenario_comparison_menu(ae, qtbot):
-    action = ae.menuActions["GIS"][2]
-    assert action.text() == "Scenario Comparison", "Wrong text content"
+    action = ae.menuActions["Mapping"][3]
+    assert action.text() == "Scenario comparison", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
-
-
-def test_gis_simple_tag_menu(ae, qtbot):
-    from qaequilibrae.modules.gis import SimpleTagDialog
-
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, SimpleTagDialog)
-
-    action = ae.menuActions["GIS"][3]
-    assert action.text() == "Simple tag", "Wrong text content"
-    QTimer.singleShot(10, handle_trigger)
-    action.trigger()
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
 def test_help_menu(ae, qtbot):
@@ -229,24 +143,24 @@ def test_help_menu(ae, qtbot):
 
 
 def test_gtfs_importer(ae, qtbot):
-    action = ae.menuActions["Public Transport"][0]
+    action = ae.menuActions["Transit"][0]
     assert action.text() == "Import GTFS", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
 def test_pt_skim_and_assign(ae, qtbot):
-    action = ae.menuActions["Public Transport"][1]
-    assert action.text() == "Skimming and Assignment", "Wrong text content"
+    action = ae.menuActions["Transit"][1]
+    assert action.text() == "Skimming and assignment", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
 def test_gtfs_explorer(ae, qtbot):
-    action = ae.menuActions["Public Transport"][2]
-    assert action.text() == "Explore Transit", "Wrong text content"
+    action = ae.menuActions["Transit"][2]
+    assert action.text() == "Explore transit", "Wrong text content"
     action.trigger()
     messagebar = ae.iface.messageBar()
-    assert messagebar.messages[2][0] == "Error:You need to load a project first", "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"

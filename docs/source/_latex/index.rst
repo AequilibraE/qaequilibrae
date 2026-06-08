@@ -10,3 +10,4 @@ QGIS
    ../getting_started
    ../menus_in_detail
    ../processing_provider
+   ../faqs

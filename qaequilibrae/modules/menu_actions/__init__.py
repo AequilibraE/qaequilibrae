@@ -8,6 +8,7 @@ from .action_gis_scenario_comparison import run_scenario_comparison
 from .action_gis_simple_tag import run_tag
 from .action_gis_stacked_bandwidths import run_stacked_bandwidths
 from .action_import_matrices import load_matrices
+from .action_skim_viewer import load_skim_viewer
 from .action_prepare_network import prepare_network
 from .action_pt_explore import run_pt_explore
 from .action_pt_import_gtfs import run_import_gtfs
@@ -23,3 +24,5 @@ from .create_networks import run_create_transponet
 from .load_project_action import run_load_project
 from .project_from_osm_action import project_from_osm
 from .last_folder import last_folder
+from .action_run_module import run_module
+from .action_create_scenarios import create_scenarios

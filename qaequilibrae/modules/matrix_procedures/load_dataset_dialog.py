@@ -1,25 +1,27 @@
-import os
 from functools import partial
+from os.path import dirname, join
 
 import pandas as pd
-from qgis.core import Qgis
-from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import Qt, QSize
 
+from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_from_toc
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path, get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
 from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types, point_types, poly_types
 from qaequilibrae.modules.matrix_procedures.load_dataset_class import LoadDataset
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_vector_loader.ui"))
 
+class LoadDatasetDialog(BaseDialog):
+    def __init__(self, qgis_project, single_use: bool = True):
+        super().__init__(
+            ui_file=join(dirname(__file__), "forms/ui_vector_loader.ui"),
+            qgis_project=qgis_project,
+            single_use=single_use,
+        )
 
-class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, iface, single_use=True):
-        QtWidgets.QDialog.__init__(self)
-        self.iface = iface
-        self.setupUi(self)
+    def _base_ui_setup(self, **kwargs):
         self.path = standard_path()
 
         self.output_name = None
@@ -31,7 +33,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.worker_thread = None
         self.dataset = None
         self.ignore_fields = []
-        self.single_use = single_use
+        self.single_use = kwargs.get("single_use")
 
         self.radio_layer.clicked.connect(partial(self.size_it_accordingly, False))
         self.radio_csv.clicked.connect(partial(self.size_it_accordingly, False))
@@ -162,12 +164,7 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
             self.but_save_and_use.setEnabled(True)
             self.chb_all_fields.setEnabled(True)
             if self.worker_thread.error is not None:
-                self.iface.messageBar().pushMessage(
-                    title=self.tr("Error while loading vector:"),
-                    text=self.worker_thread.error,
-                    level=Qgis.Critical,
-                    duration=10,
-                )
+                self.qgis_project.iface_error_message(self.worker_thread.error, self.tr("Error while loading vector:"))
             else:
                 self.dataset = self.worker_thread.output
             self.exit_procedure()
@@ -177,7 +174,9 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
             out_name, _ = GetOutputFileName(self, "Load file", ["Comma-separated values (*.csv)"], ".csv", self.path)
         elif self.radio_parquet.isChecked():
             out_name, _ = GetOutputFileName(self, "Load file", ["Parquet (*.parquet)"], ".parquet", self.path)
-        self.load_with_file_name(out_name)
+
+        if out_name:
+            self.load_with_file_name(out_name)
 
     def load_with_file_name(self, out_name):
         try:
@@ -213,14 +212,9 @@ class LoadDatasetDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.size_it_accordingly(True)
                 self.run_thread()
             else:
-                self.iface.messageBar().pushMessage(
-                    "Error:",
-                    text=self.tr("One cannot load a dataset with indices only"),
-                    level=Qgis.Critical,
-                    duration=10,
-                )
+                self.qgis_project.iface_error_message(self.tr("One cannot load a dataset with indices only"))
         if self.error is not None:
-            self.iface.messageBar().pushMessage(title="Error:", text=self.error, level=Qgis.Critical, duration=10)
+            self.qgis_project.iface_error_message(self.error)
 
     def set_output_name(self):
         if self.single_use:

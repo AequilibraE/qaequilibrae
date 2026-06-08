@@ -3,10 +3,9 @@ import shutil
 import subprocess
 import sys
 from importlib.util import find_spec
-from os.path import join, isdir
 from pathlib import Path
 
-from qgis.core import QgsMessageLog
+from qgis.core import Qgis, QgsMessageLog
 
 
 class DownloadAll:
@@ -38,9 +37,9 @@ class DownloadAll:
         self.dependency_files = [pth / "requirements.txt", pth / "aequilibrae_version.txt"]
         self.target_folder = pth / "packages"
         self.no_ssl = False
+        self.error = 0
 
     def install(self):
-        reps = []
         command = f'"{self.find_python()}" -m pip install uv'
         _ = self.execute(command)
         print(command)
@@ -54,13 +53,14 @@ class DownloadAll:
                 lines = fl.readlines()
 
             for line in lines:
-                reps.extend(self.install_package(line.strip()))
+                self.install_package(line.strip())
 
             with open(flag, "w") as fl:
                 fl.write("")
 
-        self.clean_packages()
-        return reps
+        self.clean_packages(self.target_folder)
+        print("Error code: ", self.error)
+        return self.error
 
     def install_package(self, package):
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
@@ -85,21 +85,25 @@ class DownloadAll:
             self.no_ssl = True
 
         for line in reps:
-            QgsMessageLog.logMessage(str(line))
+            QgsMessageLog.logMessage(str(line), "Messages", level=Qgis.MessageLevel.Info)
+
         return reps
 
     def execute(self, command):
         lines = []
         lines.append(command)
-        with subprocess.Popen(
+        process = subprocess.Popen(
             command,
             shell=True,
             stdout=subprocess.PIPE,
             stdin=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
-        ) as proc:
-            lines.extend(proc.stdout.readlines())
+        )
+        lines.extend(process.stdout.readlines())
+        exit_code = process.wait()
+        if exit_code != 0:
+            self.error = exit_code
         return lines
 
     def find_python(self):
@@ -147,19 +151,32 @@ class DownloadAll:
                     c = c + ".dev0"
                 fl.write(f"{c}\n")
 
-    def clean_packages(self):
+    def clean_packages(self, target_folder):
 
-        for fldr in list(os.walk(self.target_folder))[0][1]:
+        for fldr in list(os.walk(target_folder))[0][1]:
             for pkg in self.must_remove:
                 if pkg.lower() in fldr.lower():
-                    if isdir(join(self.target_folder, fldr)):
-                        shutil.rmtree(join(self.target_folder, fldr))
+                    if os.path.isdir(os.path.join(target_folder, fldr)):
+                        shutil.rmtree(os.path.join(target_folder, fldr))
+                        QgsMessageLog.logMessage(
+                            f"Duplicated packages removed from installation: {fldr}",
+                            "Messages",
+                            level=Qgis.MessageLevel.Info,
+                        )
+
+    def retry_pkg_install(self):
+        existing_files = list(os.walk(self.target_folder))[0]
+        for packages in existing_files[1]:
+            shutil.rmtree(self.target_folder / packages)
+
+        for file in existing_files[2]:
+            if file == "__init__.py":
+                continue
+            (self.target_folder / file).unlink()
+        self.install()
 
 
 if __name__ == "__main__":
     result = DownloadAll().install()
-    output = "".join([str(x).upper() for x in result])
 
-    print(output)
-
-    assert "ERROR" not in output
+    assert result == 0
