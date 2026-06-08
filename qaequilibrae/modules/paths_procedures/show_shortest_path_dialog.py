@@ -72,7 +72,7 @@ class ShortestPathDialog(BaseDialog):
         self.mode = dlg2.mode
         self.minimize_field = dlg2.minimize_field.lower()
 
-        mode_mask = network["modes"].astype(str).str.contains(str(mode_id), na=False)
+        mode_mask = network["modes"].astype(str).str.contains(str(self.mode), na=False)
         network = network[mode_mask]
 
         if network.shape[0] == 0:
