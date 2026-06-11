@@ -34,7 +34,7 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
         self.cbb_line_layer.clear()
         self.cbb_node_layer.clear()
 
-        for layer in self.iface.mapCanvas().layers():  # We iterate through all layers
+        for layer in self.qgis_project.iface.mapCanvas().layers():  # We iterate through all layers
             if "wkbType" in dir(layer):
                 if layer.wkbType() in line_types:
                     self.cbb_line_layer.addItem(layer.name())

@@ -243,10 +243,10 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
 
     def build_worker_thread(self):
         if self.output_name is None:
-            self.worker_thread = MatrixReblocking(self.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices)
+            self.worker_thread = MatrixReblocking(qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices)
         else:
             self.worker_thread = MatrixReblocking(
-                self.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
+                qgis.utils.iface.mainWindow(), sparse=self.sparse, matrices=self.matrices, file_name=self.output_name
             )
 
     def has_errors(self):
@@ -269,5 +269,5 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
             idx = [idx1, idx2, idx3]
 
             self.worker_thread = LoadMatrix(
-                self.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
+                qgis.utils.iface.mainWindow(), type="layer", layer=self.layer, idx=idx, sparse=self.sparse
             )

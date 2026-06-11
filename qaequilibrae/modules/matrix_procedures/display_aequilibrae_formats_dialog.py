@@ -25,7 +25,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_data_viewer.ui"
 class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project, file_path: Optional[Path] = None):
         QtWidgets.QDialog.__init__(self)
-        self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
+        self.setWindowFlag(QtCore.Qt.WindowType.WindowCloseButtonHint, False)
         qgis_project.block_change_scenario()
         self.finished.connect(qgis_project.allow_change_scenario)
 
@@ -58,7 +58,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.continue_with_data()
 
             if self.error:
-                self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, True)
+                self.setWindowFlag(QtCore.Qt.WindowType.WindowCloseButtonHint, True)
                 self.but_load.clicked.connect(self.get_file_name)
 
             self.remove_data_layer()
@@ -202,10 +202,10 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         if selected_features:
             idx = [feature["zone_id"] for feature in selected_features][0]
             if self.by_row.isChecked():
-                self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+                self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
                 self.table.selectRow(self.idx_mapping[idx])
             elif self.by_col.isChecked():
-                self.table.setSelectionBehavior(QAbstractItemView.SelectColumns)
+                self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectColumns)
                 self.table.selectColumn(self.idx_mapping[idx])
 
     def select_column(self):

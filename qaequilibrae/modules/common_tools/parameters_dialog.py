@@ -31,7 +31,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         lexer = QsciLexerYAML()
         lexer.setDefaultFont(font)
         self.text_box.setLexer(lexer)
-        self.text_box.setFolding(self.text_box.PlainFoldStyle)
+        self.text_box.setFolding(self.text_box.FoldStyle.PlainFoldStyle)
         self.logger = get_logger()
 
         # Load the data
