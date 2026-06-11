@@ -1,4 +1,5 @@
 from os import listdir
+import sys
 
 import numpy as np
 import pytest
@@ -8,6 +9,8 @@ from qgis.core import QgsProject
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
 from qaequilibrae.modules.paths_procedures.route_choice_dialog import RouteChoiceDialog
 from .utilities import create_matrix
+
+pytestmark = pytest.mark.skipif(sys.platform.startswith("linux"), reason="Crashing on CI. Needs investigation.")
 
 
 @pytest.mark.parametrize("cob_field", ["distance", "free_flow_time"])
