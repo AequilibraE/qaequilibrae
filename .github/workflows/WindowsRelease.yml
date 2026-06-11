@@ -14,13 +14,13 @@ jobs:
     strategy:
       matrix:
       # we test the minimum LTR version required, the newest LTR, and the latest.
-        version: [qgis-ltr --version=3.40.8]
+        version: [qgis-latest]
 
     steps:
       - uses: actions/checkout@v6
       
       - name: Install QGIS on Chocolatey
-        uses: crazy-max/ghaction-chocolatey@v3
+        uses: crazy-max/ghaction-chocolatey@v4
         with:
           args: install ${{ matrix.version }} -y
 
