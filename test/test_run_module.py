@@ -123,7 +123,7 @@ def test_install_external_libraries(coquimbo_project, qtbot):
 
     def handle_dialog():
         dialog = wait_for_active_window(qtbot)
-        ok_button = dialog.button(QMessageBox.Ok)
+        ok_button = dialog.button(QMessageBox.StandardButton.Ok)
         qtbot.mouseClick(ok_button, Qt.MouseButton.LeftButton, delay=1)
 
     QTimer.singleShot(100, handle_dialog)

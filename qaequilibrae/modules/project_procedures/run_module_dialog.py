@@ -44,9 +44,9 @@ class RunModuleDialog(BaseDialog):
             target_dir = self.project.project_base_path / "run" / "_dependencies"
             if isfile(run_path):
                 self.question = QMessageBox.question(
-                    self, "Missing requirements", self.rp_message, QMessageBox.Ok | QMessageBox.Cancel
+                    self, "Missing requirements", self.rp_message, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel
                 )
-                if self.question == QMessageBox.Ok:
+                if self.question == QMessageBox.StandardButton.Ok:
                     # Create '_dependencies' folder if it does not exist and add a '__init__.py' file
                     Path(target_dir).mkdir(parents=True, exist_ok=True)
                     init_file = target_dir / "__init__.py"

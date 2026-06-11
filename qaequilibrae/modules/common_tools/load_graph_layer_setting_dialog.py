@@ -7,7 +7,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_load_network_in
 
 class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
-        QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
+        QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowType.WindowStaysOnTopHint)
         qgis_project.block_change_scenario()
         self.qgis_project = qgis_project
         self.project = qgis_project.project
