@@ -1,10 +1,6 @@
 geopandas
-rtree
 pytest-qgis
 pytest-qt
 pytest-cov
 pytest-mock
-black==24.4.2
-ruff
 pytest-reportlog
-pyarrow
