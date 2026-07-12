@@ -531,11 +531,6 @@ class TransitNavigatorDialog(BaseDialog):
         df = self.sm.zone_metrics(
             from_minute=from_time, to_minute=to_time, routes=routes, patterns=patterns, stops=stops
         )
-        print("#################")
-        print(type(sample), print(type(self.sm.list_zone_metrics())))
-        print(sample)
-        print(self.sm.list_zone_metrics())
-        print("#################")
 
         df[self.sm.list_zone_metrics()] /= sample
 
