@@ -49,8 +49,8 @@ else:
         QMessageBox.information(None, "Warning", msg.messsage_five)
     else:
         if (
-            QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
-            == QMessageBox.Ok
+                QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
+                == QMessageBox.Ok
         ):
             from qaequilibrae.download_extra_packages_class import DownloadAll
 
