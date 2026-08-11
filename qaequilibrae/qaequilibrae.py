@@ -453,11 +453,13 @@ class AequilibraEMenu:
         QgsProject.instance().write()
 
     def update_project_layers(self):
+        from qaequilibrae.modules.common_tools.auxiliary_functions import project_has_transit
+
         with self.project.db_connection_spatial as conn:
             layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
 
             # Add transit_tables to layers
-            if exists(self.project._transit_database_path):
+            if project_has_transit(self.project):
                 layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
 
             descrlayout = QVBoxLayout()
