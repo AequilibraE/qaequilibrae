@@ -76,7 +76,7 @@ def mock_load_graph_layer_setting_dialog(mocker):
     mock_dialog.remove_chosen_links = True
     mock_dialog.error = []
     mock_dialog.mode = "c"
-    mock_dialog.mfield = "distance"
+    mock_dialog.minimize_field = "distance"
     mock_dialog.block_connector = False
 
     mocker.patch(
