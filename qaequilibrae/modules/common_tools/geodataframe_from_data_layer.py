@@ -20,7 +20,6 @@ def geodataframe_from_layer(layer: QgsVectorLayer) -> gpd.GeoDataFrame:
         geometries.append(wkb)
         wkbs.append(wkb)
 
-
     df = pd.DataFrame(rows, columns=fields)
 
     gdf = gpd.GeoDataFrame(df.copy(deep=True), geometry=gpd.GeoSeries.from_wkb(geometries), crs=layer.crs().authid())
