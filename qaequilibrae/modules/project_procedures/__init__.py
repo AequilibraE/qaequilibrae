@@ -1,6 +1,6 @@
-from .adds_zones_dialog import AddZonesDialog
-from .create_examples_dialog import CreateExampleDialog
-from .create_scenarios_dialog import CreateScenariosDialog
-from .creates_transponet_dialog import CreatesTranspoNetDialog
-from .project_from_osm_dialog import ProjectFromOSMDialog
-from .run_module_dialog import RunModuleDialog
+from .adds_zones_dialog import AddZonesDialog as AddZonesDialog
+from .create_examples_dialog import CreateExampleDialog as CreateExampleDialog
+from .create_scenarios_dialog import CreateScenariosDialog as CreateScenariosDialog
+from .creates_transponet_dialog import CreatesTranspoNetDialog as CreatesTranspoNetDialog
+from .project_from_osm_dialog import ProjectFromOSMDialog as ProjectFromOSMDialog
+from .run_module_dialog import RunModuleDialog as RunModuleDialog

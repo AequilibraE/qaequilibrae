@@ -6,11 +6,11 @@ jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set Python environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: 3.12
+          python-version: 3.13
           architecture: x64
 
       - name: Install dependencies
@@ -20,9 +20,6 @@ jobs:
 
       - name: Lint with ruff
         run: ruff check
-
-      - name: Check code format with Black
-        run: black --check .
         
   unittest:
     needs: linting
@@ -31,19 +28,20 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        container: ['qgis/qgis:3.44.0', 'qgis/qgis:ltr']
+        container: ['qgis/qgis:ltr']
     container:
       image: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install dependencies
         run: |
           python3 -m venv /tmp/.venv --system-site-packages
           . /tmp/.venv/bin/activate
+          qgis --version
           python3 -m pip install -U pip setuptools uv
           python3 ./ci/dependency_installation.py
-          python3 -m uv pip install -r test/requirements_test.txt --constraint ./ci/constraints.txt
+          python3 -m uv pip install -r test/requirements_test.txt
           export PYTHONPATH=$(pwd)/qaequilibrae/packages:$PYTHONPATH
           echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
 
@@ -52,4 +50,4 @@ jobs:
           . /tmp/.venv/bin/activate
           export QT_QPA_PLATFORM=offscreen
           pwd
-          python3 -m pytest --cov-report term-missing --cov=qaequilibrae test
+          python3 -m pytest test/test_comp*

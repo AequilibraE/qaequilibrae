@@ -1,5 +1,4 @@
 geopandas
-rtree
 pytest-qgis
 pytest-qt
 pytest-cov

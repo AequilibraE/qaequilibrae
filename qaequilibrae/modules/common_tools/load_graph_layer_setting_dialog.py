@@ -4,8 +4,6 @@ from typing import Tuple
 
 import pandas as pd
 from qgis.PyQt import QtWidgets, uic, QtCore
-from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsProject
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_load_network_info.ui"))
 

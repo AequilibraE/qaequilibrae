@@ -14,13 +14,13 @@ jobs:
       max-parallel: 4
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
   
     - name: Set up Python 3.12
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: 3.12
   
@@ -37,7 +37,10 @@ jobs:
         git add qaequilibrae/
 
     - name: Update version and SHA info
-      run: python -c "from qaequilibrae.set_version import set_version; set_version('${{ github.event.pull_request.head.sha }}')"
+      run: |
+        SHORT_SHA="${{ github.event.pull_request.head.sha }}"
+        SHORT_SHA="${SHORT_SHA:0:7}"
+        python -c "from qaequilibrae.set_version import set_version; set_version('$SHORT_SHA')"
     
     - name: Get plugin version
       run: |

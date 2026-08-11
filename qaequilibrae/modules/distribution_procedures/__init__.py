@@ -19,7 +19,7 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from .apply_gravity_procedure import ApplyGravityProcedure
-from .calibrate_gravity_procedure import CalibrateGravityProcedure
-from .distribution_models_dialog import DistributionModelsDialog
-from .ipf_procedure import IpfProcedure
+from .apply_gravity_procedure import ApplyGravityProcedure as ApplyGravityProcedure
+from .calibrate_gravity_procedure import CalibrateGravityProcedure as CalibrateGravityProcedure
+from .distribution_models_dialog import DistributionModelsDialog as DistributionModelsDialog
+from .ipf_procedure import IpfProcedure as IpfProcedure

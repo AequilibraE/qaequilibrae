@@ -19,5 +19,5 @@
  -----------------------------------------------------------------------------------------------------------
  """
 
-from .adds_connectors_dialog import AddConnectorsDialog
-from .network_preparation_dialog import NetworkPreparationDialog
+from .adds_connectors_dialog import AddConnectorsDialog as AddConnectorsDialog
+from .network_preparation_dialog import NetworkPreparationDialog as NetworkPreparationDialog

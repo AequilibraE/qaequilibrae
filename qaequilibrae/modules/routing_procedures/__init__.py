@@ -1,1 +1,1 @@
-from .tsp_dialog import TSPDialog
+from .tsp_dialog import TSPDialog as TSPDialog

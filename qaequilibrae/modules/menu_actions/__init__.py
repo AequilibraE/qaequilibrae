@@ -1,28 +1,28 @@
-from .action_add_connectors import run_add_connectors
-from .action_add_zoning import run_add_zones
-from .action_create_example import create_example
-from .action_distribution import run_distribution_models
-from .action_edit_parameters import run_change_parameters
-from .action_gis_desire_lines import run_desire_lines
-from .action_gis_scenario_comparison import run_scenario_comparison
-from .action_gis_simple_tag import run_tag
-from .action_gis_stacked_bandwidths import run_stacked_bandwidths
-from .action_import_matrices import load_matrices
-from .action_skim_viewer import load_skim_viewer
-from .action_prepare_network import prepare_network
-from .action_pt_explore import run_pt_explore
-from .action_pt_import_gtfs import run_import_gtfs
-from .action_pt_skim import run_pt_skim
-from .action_route_choice import run_route_choice
-from .action_run_shortest_path import run_shortest_path
-from .action_run_tsp import run_tsp
-from .action_show_log import show_log
-from .action_show_project_data import run_show_project_data
-from .action_skim_matrix import run_dist_matrix
-from .action_traffic_assignment import run_traffic_assig
-from .create_networks import run_create_transponet
-from .load_project_action import run_load_project
-from .project_from_osm_action import project_from_osm
-from .last_folder import last_folder
-from .action_run_module import run_module
-from .action_create_scenarios import create_scenarios
+from .action_add_connectors import run_add_connectors as run_add_connectors
+from .action_add_zoning import run_add_zones as run_add_zones
+from .action_create_example import create_example as create_example
+from .action_distribution import run_distribution_models as run_distribution_models
+from .action_edit_parameters import run_change_parameters as run_change_parameters
+from .action_gis_desire_lines import run_desire_lines as run_desire_lines
+from .action_gis_scenario_comparison import run_scenario_comparison as run_scenario_comparison
+from .action_gis_simple_tag import run_tag as run_tag
+from .action_gis_stacked_bandwidths import run_stacked_bandwidths as run_stacked_bandwidths
+from .action_import_matrices import load_matrices as load_matrices
+from .action_skim_viewer import load_skim_viewer as load_skim_viewer
+from .action_prepare_network import prepare_network as prepare_network
+from .action_pt_explore import run_pt_explore as run_pt_explore
+from .action_pt_import_gtfs import run_import_gtfs as run_import_gtfs
+from .action_pt_skim import run_pt_skim as run_pt_skim
+from .action_route_choice import run_route_choice as run_route_choice
+from .action_run_shortest_path import run_shortest_path as run_shortest_path
+from .action_run_tsp import run_tsp as run_tsp
+from .action_show_log import show_log as show_log
+from .action_show_project_data import run_show_project_data as run_show_project_data
+from .action_skim_matrix import run_dist_matrix as run_dist_matrix
+from .action_traffic_assignment import run_traffic_assig as run_traffic_assig
+from .create_networks import run_create_transponet as run_create_transponet
+from .load_project_action import run_load_project as run_load_project
+from .project_from_osm_action import project_from_osm as project_from_osm
+from .last_folder import last_folder as last_folder
+from .action_run_module import run_module as run_module
+from .action_create_scenarios import create_scenarios as create_scenarios

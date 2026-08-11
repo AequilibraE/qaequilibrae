@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from aequilibrae.paths import Graph
 from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject, Qgis
+from qgis.core import QgsLinePatternFillSymbolLayer, QgsProject
 from qgis.core import QgsStyle, QgsVectorLayerJoinInfo, QgsRuleBasedRenderer, QgsSymbol
 
 from qaequilibrae.modules.common_tools import BaseDialog

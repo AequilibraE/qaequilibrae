@@ -31,7 +31,7 @@ class SupplyMetrics:
         trp_sch_sql = """Select trip_id, seq stop_order, arrival/60 arrival, departure/60 departure
                         from trips_schedule"""
 
-        trp_pat_lnk_sql = """select pattern_id, seq stop_order, cast(from_stop as text) from_stop, 
+        trp_pat_lnk_sql = """select pattern_id, seq stop_order, cast(from_stop as text) from_stop,
                              cast(to_stop as text) to_stop from route_links"""
 
         with project.transit_connection as conn:

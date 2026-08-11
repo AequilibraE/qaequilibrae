@@ -3,7 +3,7 @@ This class's first version was from https://stackoverflow.com/a/31557937/1480643
 and was updated using Matrin Fizpatrick's "Create GUI applications with Python
 and PyQt5" code. Please see page 341 for further reference.
 
-According to the author, the code examples in the book are free to use without 
+According to the author, the code examples in the book are free to use without
 license.
 """
 
