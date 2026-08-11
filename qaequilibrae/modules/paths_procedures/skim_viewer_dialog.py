@@ -54,7 +54,7 @@ class SkimViewerDialog(BaseDialog):
 
         # Randomly populate the start ID if we don't have a selected layer feature
         if not self.layer.selectedFeatures():
-            idx = choice(self._zones) if self._lyr == "zones" else choice(self._nodes)
+            idx = choice(self._zones) if self._lyr == "zones" else choice(self._nodes)  # nosec B311
             self.line_start_id.setText(str(idx))
 
         if self.idx:

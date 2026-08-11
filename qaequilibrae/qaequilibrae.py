@@ -1,8 +1,6 @@
 import glob
-import subprocess
 import sys
 import tempfile
-import webbrowser
 from functools import partial
 from os import unlink
 from os.path import dirname, exists, join, isfile
@@ -10,7 +8,8 @@ from pathlib import Path
 from uuid import uuid4
 
 import qgis
-from qgis.PyQt.QtCore import Qt, QTranslator, QSettings, QLocale, QCoreApplication, QSize
+from qgis.PyQt.QtCore import Qt, QTranslator, QSettings, QLocale, QCoreApplication, QSize, QUrl
+from qgis.PyQt.QtGui import QDesktopServices
 from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication, QToolBar, QToolButton
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget
 from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableWidgetItem, QTableWidget
@@ -262,11 +261,8 @@ class AequilibraEMenu:
             self.toolbar.addWidget(itemButton)
 
     def run_help(self):
-        url = "http://www.aequilibrae.com/latest/qgis/index.html"
-        if sys.platform == "darwin":  # in case of OS X
-            subprocess.Popen(["open", url])
-        else:
-            webbrowser.open_new_tab(url)
+        url = "https://www.aequilibrae.com/latest/qgis/index.html"
+        QDesktopServices.openUrl(QUrl(url))
 
     def initProcessing(self):
         self.provider = Provider()

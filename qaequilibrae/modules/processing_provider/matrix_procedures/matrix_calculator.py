@@ -7,21 +7,12 @@ from qgis.core import QgsProcessingParameterFileDestination, QgsProcessingParame
 from qgis.core import QgsMessageLog, Qgis
 
 from qaequilibrae.i18n.translate import trlt
+from .matrix_expression import MatrixExpressionError, evaluate
 
 
 class MatrixCalculator(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
-        self.operation_map = {
-            "min(": "np.min(",
-            "max(": "np.max(",
-            "abs(": "np.absolute(",
-            "ln(": "np.log(",
-            "exp(": "np.exp(",
-            "power(": "np.power(",
-            "null_diag(": "np.null_diag(",
-        }
-
         self.addParameter(
             QgsProcessingParameterFile(
                 "conf_file",
@@ -66,19 +57,10 @@ class MatrixCalculator(QgsProcessingAlgorithm):
                 index[:] = mat.index[:]
                 mat.close()
 
-        expression = parameters["procedure"]
-
-        # Replace the expression for numpy operations
-        for key in self.operation_map.keys():
-            if key in expression:
-                expression = expression.replace(key, self.operation_map[key])
-
-        # Replace the expression for matrices variables
-        for key in matrices.keys():
-            if key in expression:
-                expression = expression.replace(key, f"matrices['{key}']")
-
-        out = eval(expression)
+        try:
+            out = evaluate(parameters["procedure"], matrices)
+        except MatrixExpressionError as error:
+            raise QgsProcessingException(self.tr("Invalid expression: {}").format(error)) from error
 
         mat = AequilibraeMatrix()
         mat.create_empty(

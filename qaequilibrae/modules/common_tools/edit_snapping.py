@@ -24,6 +24,7 @@ class EditSnapping:
         self.watched.add(layer_id)
         layer.editingStarted.connect(partial(self.edit_started, layer_id))
         layer.editingStopped.connect(partial(self.edit_stopped, layer_id))
+
     def edit_started(self, layer_id: str):
         if not self.editing:
             self.saved_config = QDomDocument("qaequilibrae-snapping")

@@ -84,7 +84,8 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
         flds = [fld for fld, idx in self.node_fields.items() if idx >= 0]
         setting = [f"{fld}=?" for fld in flds if fld != "node_id"]
-        sql_values = f'UPDATE nodes SET {",".join(setting)} WHERE node_id=?;'
+        # Only the column names are interpolated, and they are the keys of our own node_fields schema
+        sql_values = f'UPDATE nodes SET {",".join(setting)} WHERE node_id=?;'  # nosec B608
 
         sql_id = "UPDATE nodes SET node_id=? WHERE node_id=?;"
 
@@ -118,8 +119,9 @@ class CreatesTranspoNetProcedure(WorkerThread):
                 fields.append(fld)
                 markers.append("0")
 
+        # Only the table and column names are interpolated, and they are the keys of our own layer_fields schema
         sql = f"""INSERT INTO {table} ({",".join(fields)},geometry)
-                  VALUES ({",".join(markers)},GeomFromWKB(?, {crs}))"""
+                  VALUES ({",".join(markers)},GeomFromWKB(?, {crs}))"""  # nosec B608
 
         columns.extend(["geoms"])
 

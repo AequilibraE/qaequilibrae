@@ -1,4 +1,5 @@
 import sys
+from ast import literal_eval
 from dataclasses import dataclass
 from functools import partial
 from os.path import dirname, join
@@ -239,7 +240,7 @@ class CreateBandwidthsDialog(BaseDialog):
     def random_rgb(self):
         rgb = []
         for i in range(3):
-            rgb.append(randint(0, 255))
+            rgb.append(randint(0, 255))  # nosec B311
         a = QColor()
         a.setRgb(rgb[0], rgb[1], rgb[2])
         self.mColorButton.setColor(a)
@@ -299,7 +300,8 @@ class CreateBandwidthsDialog(BaseDialog):
                 cl = self.bands_list.item(i, 2).background().color()
             else:
                 color_ramp_style = True
-                cl = eval(self.bands_list.item(i, 2).text())
+                # The cell holds str(dict) as written by add_to_bands_list, so a literal is all we ever need
+                cl = literal_eval(self.bands_list.item(i, 2).text())
             text_ab = self.bands_list.item(i, 0).text()
             text_ba = self.bands_list.item(i, 1).text()
             bands_ab.append((text_ab, ab, cl, "ab"))

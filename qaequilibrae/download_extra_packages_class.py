@@ -1,6 +1,6 @@
 import os
 import shutil
-import subprocess
+import subprocess  # nosec B404
 import sys
 from importlib.util import find_spec
 from pathlib import Path
@@ -40,9 +40,9 @@ class DownloadAll:
         self.error = 0
 
     def install(self):
-        command = f'"{self.find_python()}" -m pip install uv'
+        command = [str(self.find_python()), "-m", "pip", "install", "uv"]
         _ = self.execute(command)
-        print(command)
+        print(" ".join(command))
 
         for file in self.dependency_files:
             flag = self.target_folder / file.name
@@ -66,12 +66,12 @@ class DownloadAll:
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
 
         spec = find_spec("uv")
-        is_uv = "" if spec is None else "uv"
+        installer = ["pip"] if spec is None else ["uv", "pip"]
 
-        install_command = f'-m {is_uv} pip install {package} --target "{self.target_folder}"'
+        install_command = ["-m", *installer, "install", *package.split(), "--target", str(self.target_folder)]
 
-        command = f'"{self.find_python()}" {install_command}'
-        print(command)
+        command = [str(self.find_python()), *install_command]
+        print(" ".join(command))
 
         if not self.no_ssl:
             reps = self.execute(command)
@@ -79,8 +79,8 @@ class DownloadAll:
         if self.no_ssl or (
             "because the ssl module is not available" in "".join(reps).lower() and sys.platform == "win32"
         ):
-            command = f"python {install_command}"
-            print(command)
+            command = ["python", *install_command]
+            print(" ".join(command))
             reps = self.execute(command)
             self.no_ssl = True
 
@@ -90,11 +90,12 @@ class DownloadAll:
         return reps
 
     def execute(self, command):
+        """Runs *command*, given as an argument list, and returns it followed by its output."""
         lines = []
-        lines.append(command)
-        process = subprocess.Popen(
+        lines.append(" ".join(command))
+        # Argument list, no shell: every element is either a literal or a path we resolved ourselves
+        process = subprocess.Popen(  # nosec B603
             command,
-            shell=True,
             stdout=subprocess.PIPE,
             stdin=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
@@ -177,6 +178,4 @@ class DownloadAll:
 
 
 if __name__ == "__main__":
-    result = DownloadAll().install()
-
-    assert result == 0
+    sys.exit(DownloadAll().install())
