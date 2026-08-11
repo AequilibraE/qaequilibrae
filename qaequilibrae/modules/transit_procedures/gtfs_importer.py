@@ -1,10 +1,10 @@
-from os.path import dirname, join, isfile
+from os.path import dirname, join
 
 from aequilibrae.transit import Transit
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem
 
-from qaequilibrae.modules.common_tools import BaseDialog
+from qaequilibrae.modules.common_tools import BaseDialog, project_has_transit
 from qaequilibrae.modules.transit_procedures import GTFSFeed
 
 
@@ -24,7 +24,7 @@ class GTFSImporter(BaseDialog):
         self.feeds = []
         self.done = 1
 
-        self.is_pt_database = isfile(self.qgis_project.project._transit_database_path)
+        self.is_pt_database = project_has_transit(self.qgis_project.project)
 
         if self.is_pt_database:
             self.rdo_clear.setText(self.tr("Overwrite Routes"))

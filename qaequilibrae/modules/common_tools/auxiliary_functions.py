@@ -1,4 +1,5 @@
 import math
+from os.path import isfile
 from time import localtime, strftime
 from typing import Union
 
@@ -45,6 +46,19 @@ def get_vector_layer_by_name(layer_name):
         return None
     else:
         return layer[0]
+
+
+# AequilibraE builds an empty public_transport.sqlite whenever a project is opened, so the file
+# being on disk says nothing about whether there is a route system in it
+def project_has_transit(project) -> bool:
+    if not isfile(project._transit_database_path):
+        return False
+
+    with project.transit_connection as conn:
+        sql = "select name from sqlite_master where type='table' and name='routes'"
+        if conn.execute(sql).fetchone() is None:
+            return False
+        return conn.execute("select exists(select 1 from routes)").fetchone()[0] == 1
 
 
 # Haversine formula here:
