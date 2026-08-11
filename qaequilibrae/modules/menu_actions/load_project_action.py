@@ -16,6 +16,19 @@ def run_load_project(qgis_project):
     return _run_load_project_from_path(qgis_project, proj_path)
 
 
+def _project_root(proj_path):
+    """Maps a scenario folder back to the project root it belongs to.
+
+    Scenarios live in ``<project root>/scenarios/<name>`` and their databases have no
+    ``scenarios`` table, so they cannot be opened as a project. QGIS projects saved while a
+    scenario was active stored that folder instead of the project root, so we walk back up.
+    """
+    path = Path(proj_path)
+    if path.parent.name == "scenarios" and (path.parent.parent / "project_database.sqlite").is_file():
+        return str(path.parent.parent)
+    return proj_path
+
+
 def _run_load_project_from_path(qgis_project, proj_path):
     from aequilibrae.project import Project
     from aequilibrae.project.tools import MigrationManager
@@ -23,6 +36,8 @@ def _run_load_project_from_path(qgis_project, proj_path):
 
     if proj_path is None or proj_path == "":
         return
+
+    proj_path = _project_root(proj_path)
 
     if proj_path is not None and len(proj_path) > 0:
         qgis_project.contents = []
