@@ -21,8 +21,8 @@ Snapping to node
 
 When editing a transportation network, especially an AequilibraE network,
 **snap-to-vertex** prevents the user from creating nodes that are infinitesimally
-close, yet disjoint. QAequilibraE enables it for you: the moment you toggle any
-AequilibraE layer for edit, vertex snapping is turned on against every AequilibraE
+close, yet disjoint. When loading layers from the QAequilibraE panel,
+vertex snapping is turned on against every AequilibraE
 layer loaded in your QGIS project, so link endpoints land exactly on the existing
 nodes. Layers that do not belong to the model, such as basemaps, are left out, so
 you do not snap to them by accident.
