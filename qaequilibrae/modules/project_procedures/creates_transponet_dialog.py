@@ -5,7 +5,6 @@ from os.path import dirname, isdir, join
 import qgis
 from PyQt5.QtCore import Qt
 from aequilibrae.context import get_logger
-from aequilibrae.parameters import Parameters
 from aequilibrae.project.network.network import Network
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QWidget, QFileDialog
@@ -19,6 +18,19 @@ from qaequilibrae.modules.project_procedures.creates_transponet_procedure import
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_transponet_construction.ui"))
 
+# Fields of the standard AequilibraE link and node layers. Any other field is up to the user to bring from
+# the layer being imported
+extra_link_fields = ["name", "speed_ab", "speed_ba", "travel_time_ab", "travel_time_ba", "capacity_ab", "capacity_ba"]
+standard_link_fields = Network.req_link_flds + extra_link_fields
+standard_node_fields = Network.req_node_flds + ["modes", "link_types"]
+
+# Fields computed by the project's triggers, so they can never be brought from the layer
+computed_link_fields = ["a_node", "b_node", "distance"]
+computed_node_fields = ["modes", "link_types"]
+
+# Fields AequilibraE requires, but that QAequilibraE can populate on its own
+initializable_link_fields = ["link_id"]
+
 
 class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
@@ -31,9 +43,14 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.missing_data = -1
         self.path = standard_path()
 
-        self.required_fields_links = Network.req_link_flds
+        # We list the standard layers, minus whatever the project computes on its own
+        self.standard_fields_links = [fld for fld in standard_link_fields if fld not in computed_link_fields]
+        self.standard_fields_nodes = [fld for fld in standard_node_fields if fld not in computed_node_fields]
 
-        self.required_fields_nodes = Network.req_node_flds
+        # The fields AequilibraE requires are taken from the layer. The remaining standard ones start out
+        # initialized, as most layers being imported will not have them
+        self.from_layer_links = [fld for fld in Network.req_link_flds if fld not in computed_link_fields]
+        self.from_layer_nodes = [fld for fld in Network.req_node_flds if fld not in computed_node_fields]
 
         self.link_layer = False
         self.node_layer = False
@@ -84,19 +101,19 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.but_removes_from_nodes.clicked.connect(partial(self.removes_fields, "nodes"))
 
     def removes_fields(self, layer_type):
-        layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
+        layer_fields, table, final_table, standard_fields = self.__find_layer_changed(layer_type)
 
         for i in final_table.selectedRanges():
             old_fields = [final_table.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
 
             for row in range(i.bottomRow(), i.topRow() - 1, -1):
-                if final_table.item(row, 0).text() in required_fields:
+                if final_table.item(row, 0).text() in standard_fields:
                     break
                 final_table.removeRow(row)
 
             counter = table.rowCount()
             for field in old_fields:
-                if field not in required_fields:
+                if field not in standard_fields:
                     table.setRowCount(counter + 1)
                     item1 = QtWidgets.QTableWidgetItem(field)
                     item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
@@ -104,7 +121,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                     counter += 1
 
     def append_to_list(self, layer_type):
-        layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
+        layer_fields, table, final_table, standard_fields = self.__find_layer_changed(layer_type)
         for i in table.selectedRanges():
             new_fields = [table.item(row, 0).text() for row in range(i.topRow(), i.bottomRow() + 1)]
 
@@ -135,10 +152,6 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def __find_layer_changed(self, layer_type):
         layer_fields = None
-        p = Parameters()
-
-        def fkey(f):
-            return list(f.keys())[0]
 
         if layer_type == "nodes":
             table = self.table_available_node_field
@@ -146,42 +159,26 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
             # TODO : Change for the method .currentlayer()
             # Repeat the change throughout
             self.node_layer = get_vector_layer_by_name(self.node_layers_list.currentText())
-            required_fields = self.required_fields_nodes
-            if self.node_layer:
-                layer_fields = self.node_layer.fields()
-                layer_fields = [f for f in layer_fields if f.name().lower() not in Network.protected_fields]
-
-            flds = p.parameters["network"]["nodes"]["fields"]
-            ndflds = [f"{fkey(f)}" for f in flds if fkey(f).lower() not in Network.req_node_flds]
-            required_fields.extend(ndflds)
+            standard_fields = self.standard_fields_nodes
+            unavailable_fields = Network.protected_fields + computed_node_fields
+            layer = self.node_layer
 
         if layer_type == "links":
             table = self.table_available_link_fields
             final_table = self.table_link_fields
             self.link_layer = get_vector_layer_by_name(self.link_layers_list.currentText())
-            required_fields = self.required_fields_links
+            standard_fields = self.standard_fields_links
+            unavailable_fields = Network.protected_fields + computed_link_fields
+            layer = self.link_layer
 
-            fields = p.parameters["network"]["links"]["fields"]
-            flds = fields["one-way"]
+        if layer:
+            layer_fields = [f for f in layer.fields() if f.name().lower() not in unavailable_fields]
 
-            owlf = [f"{fkey(f)}" for f in flds if fkey(f).lower() not in Network.req_link_flds]
-
-            flds = fields["two-way"]
-            twlf = []
-            for f in flds:
-                twlf.extend([f"{fkey(f)}_ab", f"{fkey(f)}_ba"])
-
-            required_fields = required_fields + owlf + twlf
-
-            if self.link_layer:
-                layer_fields = self.link_layer.fields()
-                layer_fields = [f for f in layer_fields if f.name().lower() not in Network.protected_fields]
-
-        return layer_fields, table, final_table, required_fields
+        return layer_fields, table, final_table, standard_fields
 
     def changed_layer(self, layer_type):
         try:
-            layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
+            layer_fields, table, final_table, standard_fields = self.__find_layer_changed(layer_type)
             table.clearContents()
             table.setRowCount(0)
             # We create the comboboxes that will hold the definitions for all the fields that are mandatory for
@@ -202,27 +199,30 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
 
             counter = 0
             if layer_type == "links":
-                init_fields = [x for x in required_fields if x not in Network.req_link_flds]
+                from_layer, can_initialize = self.from_layer_links, initializable_link_fields
             else:
-                init_fields = [x for x in required_fields if x not in Network.req_node_flds]
+                from_layer, can_initialize = self.from_layer_nodes, []
 
-            for rf in required_fields:
+            for rf in standard_fields:
                 final_table.setRowCount(counter + 1)
 
                 item1 = QtWidgets.QTableWidgetItem(rf)
                 item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
 
+                # The fields AequilibraE requires come from the layer and cannot be switched off, unless we
+                # are able to initialize them ourselves. All the other ones start out initialized
                 chb1 = QtWidgets.QCheckBox()
-                if rf in init_fields:
-                    chb1.setChecked(True)
-                    chb1.stateChanged.connect(partial(self.set_field_to_default, layer_type))
-                else:
-                    chb1.setChecked(True)
-                    chb1.stateChanged.connect(partial(self.set_field_to_default, layer_type))
-                    chb1.setChecked(False)
-                    chb1.setEnabled(False)
+                chb1.setChecked(rf not in from_layer)
+                chb1.setEnabled(rf not in from_layer or rf in can_initialize)
+                chb1.stateChanged.connect(partial(self.set_field_to_default, layer_type))
                 final_table.setCellWidget(counter, 1, self.centers_item(chb1))
+
+                if rf in from_layer and layer_fields is not None:
+                    cbb = QtWidgets.QComboBox()
+                    for field in layer_fields:
+                        cbb.addItem(field.name())
+                    final_table.setCellWidget(counter, 2, self.centers_item(cbb))
                 counter += 1
         except Exception as e:
             self.logger.error(e.args)
@@ -237,7 +237,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         return cell_widget
 
     def set_field_to_default(self, layer_type):
-        layer_fields, table, final_table, required_fields = self.__find_layer_changed(layer_type)
+        layer_fields, table, final_table, standard_fields = self.__find_layer_changed(layer_type)
 
         if layer_fields is not None:
             ch_box = self.sender()

@@ -301,14 +301,15 @@ The AequilibraE project can also be bootstrapped from existing line and node
 layers obtained from any other source, as long as they contain the following
 required field for the conversion:
 
-* link_id
-* a_node
-* b_node
 * link direction
-* length
-* speed
 * allowed modes
 * link type
+
+The *link_id* field can also be brought from the layer, but QAequilibraE
+numbers the links for you if you would rather not provide it.
+
+The *a_node*, *b_node* and *distance* fields cannot be brought from the layer, as
+AequilibraE computes them from the link geometry and the nodes layer.
 
 These requirements often create quite a bit of manual work, as most networks
 available do not have complete (or reliable) information. Manually editing the
@@ -328,15 +329,22 @@ presented with the following screen.
     :align: center
     :alt: project_from_layers_links
 
-The first 7 fields for links are mandatory, and one needs to associate the
-corresponding layer fields to the network fields.
+The list on the right side of the screen holds the fields of the standard
+AequilibraE link layer: *link_id*, *direction*, *modes*, *link_type*, *name*,
+*speed_ab/ba*, *travel_time_ab/ba* and *capacity_ab/ba*.
 
-The other fields that will be listed on the left side come from the parameters
-file (see the manual for that portion for more details), but the user can add
-more fields from the layer, as all of them are listed on the left side of the
-screen
+The fields AequilibraE requires are taken from the layer, and one needs to
+associate the corresponding layer field to each of them. The remaining ones start
+out with *Initialize?* checked, which leaves them empty in the new project —
+uncheck the box to bring one of them from the layer instead. *link_id* is the only
+required field whose box you can check, in which case QAequilibraE numbers the
+links sequentially for you.
 
-In the case of the nodes layer, only two fields are mandatory.
+Any other field is up to the user to bring from the layer being imported. All the
+layer fields are listed on the left side of the screen, and the ones added to the
+list on the right are created in the project with the same name.
+
+In the case of the nodes layer, both fields are mandatory.
 
 .. image:: images/processing_provider/project_from_layers_nodes.png
     :width: 614
