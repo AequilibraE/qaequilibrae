@@ -4,3 +4,4 @@ pytest-qt
 pytest-cov
 pytest-mock
 pytest-reportlog
+ruff==0.14.8
