@@ -1,7 +1,6 @@
 def run_pt_explore(qgis_project):
     from qaequilibrae.modules.transit_procedures import TransitNavigatorDialog
     from qaequilibrae.modules.common_tools import project_has_transit
-    from os.path import exists
 
     if qgis_project.project is None:
         qgis_project.show_message_no_project()
