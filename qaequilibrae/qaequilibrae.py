@@ -19,6 +19,7 @@ from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, Qgs
 
 from qaequilibrae import set_aequilibrae_menu_instance
 from qaequilibrae.message import messages
+from qaequilibrae.pandas_compat import ensure_regex_capable_strings
 from qaequilibrae.modules.menu_actions import run_load_project, run_module, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs
 from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths, run_pt_explore
@@ -27,6 +28,14 @@ from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, las
 from qaequilibrae.modules.processing_provider.provider import Provider
 
 sys.path.insert(0, join(dirname(__file__), "packages"))
+
+# Has to run before the first dataframe is built, so before any dialog imports pandas
+if ensure_regex_capable_strings():
+    QgsMessageLog.logMessage(
+        "PyArrow was built without regex support, so pandas will use Python string storage",
+        "AequilibraE",
+        Qgis.Info,
+    )
 
 if Path(join(dirname(__file__), "packages", "requirements.txt")).exists():
     pass
