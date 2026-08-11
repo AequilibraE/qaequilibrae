@@ -379,6 +379,84 @@
     </message>
 </context>
 <context>
+    <name>CreateEmptyProject</name>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="17"/>
+        <source>New AequilibraE project folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="26"/>
+        <source>AequilibraE module not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="34"/>
+        <source>Folder already exists and is not empty: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="38"/>
+        <source>Could not remove empty folder: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="41"/>
+        <source>Creating project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="47"/>
+        <source>Could not create project: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="54"/>
+        <source>Project created in </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="55"/>
+        <source>Default modes: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="56"/>
+        <source>Default link types: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="64"/>
+        <source>Create empty project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="67"/>
+        <source>Model building</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="74"/>
+        <source>Creates a new empty AequilibraE project, with no links, nodes or zones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="75"/>
+        <source>The project is created with the default modes and link types, and can be</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="76"/>
+        <source>populated afterwards with the other Model building tools.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="77"/>
+        <source>The folder you point to must not exist, or must be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CreateExampleDialog</name>
     <message>
         <location filename="../modules/project_procedures/create_examples_dialog.py" line="32"/>
