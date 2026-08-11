@@ -6,18 +6,22 @@ from qgis.core import QgsVectorLayer
 def geodataframe_from_layer(layer: QgsVectorLayer) -> gpd.GeoDataFrame:
     """Creates a gpd.GeoDataFrame from a data layer."""
 
-    data = []
-    geoms = []
+    fields = [f.name().lower() for f in layer.fields()]
+    rows = []
+    geometries = []
+    wkbs = []
 
     for feat in layer.getFeatures():
-        data.append(feat.attributes())
-        geoms.append(feat.geometry().asWkt())
+        rows.append(feat.attributes())
 
-    columns = [field.name() for field in layer.fields()]
+        geom = feat.geometry()
+        wkb = bytes(geom.asWkb())
 
-    df = pd.DataFrame(data, columns=columns)
+        geometries.append(wkb)
+        wkbs.append(wkb)
 
-    df = gpd.GeoDataFrame(df, geometry=gpd.GeoSeries.from_wkt(geoms), crs=layer.crs().authid())
-    df["geoms"] = df["geometry"].to_wkb()
+    df = pd.DataFrame(rows, columns=fields)
 
-    return df
+    gdf = gpd.GeoDataFrame(df.copy(deep=True), geometry=gpd.GeoSeries.from_wkb(geometries), crs=layer.crs().authid())
+    gdf["geoms"] = wkbs
+    return gdf

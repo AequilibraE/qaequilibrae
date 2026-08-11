@@ -1,12 +1,17 @@
 from os.path import dirname, join
 
+from typing import Tuple
+
+import pandas as pd
 from qgis.PyQt import QtWidgets, uic, QtCore
+from qgis.PyQt.QtCore import QVariant
+from qgis.core import QgsProject
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_load_network_info.ui"))
 
 
 class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, qgis_project):
+    def __init__(self, qgis_project, modes: pd.DataFrame, min_fields: Tuple[str]):
         QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
         qgis_project.block_change_scenario()
         self.qgis_project = qgis_project
@@ -19,15 +24,21 @@ class LoadGraphLayerSettingDialog(QtWidgets.QDialog, FORM_CLASS):
         self.error = []
         self.all_modes = {}
 
-        with self.project.db_connection as conn:
-            res = conn.execute("""select mode_name, mode_id from modes""")
+        for _, rec in modes.iterrows():
+            key = f"{rec.mode_name} ({rec.mode_id})"
 
-            for x in res.fetchall():
-                self.cb_modes.addItem(f"{x[0]} ({x[1]})")
-                self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
+            self.cb_modes.addItem(key)
+            self.all_modes[key] = rec.mode_id
 
-        for field in self.project.network.skimmable_fields():
-            self.cb_minimizing.addItem(field)
+        dual_fields = []
+        for f in min_fields:
+            if f[-2:] == "ab":
+                if f[:-2] + "ba" in min_fields:
+                    dual_fields.append(f[:-3])
+            elif f[-3:] != "_ba":
+                dual_fields.append(f)
+
+        self.cb_minimizing.addItems(sorted(dual_fields))
 
         self.do_load_graph.clicked.connect(self.exit_procedure)
 
