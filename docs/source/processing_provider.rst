@@ -249,7 +249,7 @@ must either not exist yet, or be empty.
 
 An empty project is the natural starting point when you intend to build your model
 incrementally with the other Model building tools, such as
-`Add links from layer to project`_ and `Add zoning data`_.
+Add links from layer to project and :ref:`Add zoning data <add-zoning-data>`.
 
 .. _create_project_from_osm:
 

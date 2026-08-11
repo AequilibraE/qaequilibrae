@@ -32,8 +32,12 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
         if isdir(project_folder):
             if listdir(project_folder):
                 raise QgsProcessingException(self.tr("Folder already exists and is not empty: ") + project_folder)
-            rmdir(project_folder)
-
+            try:
+                rmdir(project_folder)
+            except OSError as e:
+                raise QgsProcessingException(
+                    self.tr("Could not remove empty folder: ") + project_folder + f" ({e})"
+                ) from e
         feedback.pushInfo(self.tr("Creating project"))
 
         project = Project()

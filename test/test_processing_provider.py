@@ -175,11 +175,11 @@ def test_create_empty_project(folder_path, pre_create_folder):
     parameters = {"PROJECT_FOLDER": folder_path}
 
     action = CreateEmptyProject()
+    action.initAlgorithm()
     context = QgsProcessingContext()
     feedback = QgsProcessingFeedback()
 
     results, ok = action.run(parameters, context, feedback)
-
     assert ok
     assert results["Output"] == folder_path
     assert isdir(folder_path)
