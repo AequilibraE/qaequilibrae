@@ -18,16 +18,21 @@ def folder_path(tmp_path):
 
 @pytest.fixture(scope="function")
 def timeoutDetector(qgis_iface) -> None:
+    # Raising from here would cross a Qt slot boundary, and PyQt5 turns an unhandled exception
+    # in a slot into qFatal() - an aborted process rather than a failed test. Record the reason
+    # and let teardown fail the test normally.
+    timed_out = []
+
     def handle_trigger():
         # Check if a report window has openned
         window = QApplication.activeWindow()
         if isinstance(window, ReportDialog):
             window.close()
-            raise Exception("Test timed out because of a report dialog showing")
+            timed_out.append("Test timed out because of a report dialog showing")
         else:
             if window:
                 window.close()
-            raise Exception("Test timed out")
+            timed_out.append("Test timed out")
 
     timer = QTimer()
     timer.timeout.connect(handle_trigger)
@@ -35,6 +40,46 @@ def timeoutDetector(qgis_iface) -> None:
     timer.start(3000)
     yield timer
     timer.stop()
+
+    if timed_out:
+        pytest.fail(timed_out[0])
+
+
+# Every dialog in the plugin is opened with a blocking exec_(). If a test triggers one and
+# nothing closes it, exec_() never returns and the run hangs until the CI job is killed, with
+# no indication of where it stopped. The timer below only ever fires while an event loop is
+# running - which is precisely the blocked case - so closing the window there lets exec_()
+# return and the test fails on its own assertions instead of hanging.
+# Generous on purpose: a test doing slow work inside a modal progress dialog must finish on
+# its own. Lower this only if no legitimate test holds a dialog open that long.
+DIALOG_WATCHDOG_MS = 60000
+
+
+@pytest.fixture(scope="function", autouse=True)
+def dialog_watchdog(qgis_iface):
+    closed = []
+
+    def close_stray_window():
+        window = QApplication.activeModalWidget() or QApplication.activeWindow()
+        if window is None:
+            return
+        closed.append(type(window).__name__)
+        window.close()
+        # A dialog is free to ignore closeEvent, so fall back to ending its event loop directly
+        if window.isVisible() and hasattr(window, "done"):
+            window.done(0)
+
+    timer = QTimer()
+    timer.timeout.connect(close_stray_window)
+    timer.start(DIALOG_WATCHDOG_MS)
+    yield timer
+    timer.stop()
+
+    if closed:
+        pytest.fail(
+            f"Blocked for {DIALOG_WATCHDOG_MS // 1000}s on a dialog nothing closed, so the "
+            f"watchdog closed it: {', '.join(closed)}"
+        )
 
 
 @pytest.fixture(scope="function")

@@ -531,7 +531,10 @@ class TransitNavigatorDialog(BaseDialog):
         df = self.sm.zone_metrics(
             from_minute=from_time, to_minute=to_time, routes=routes, patterns=patterns, stops=stops
         )
-        df.loc[:, self.sm.list_zone_metrics()] /= sample
+        # Whole-column assignment, as the metrics come back as integers and expanding them by the
+        # sample rate makes them fractional. Pandas 3 refuses to write floats into an int column.
+        metrics = self.sm.list_zone_metrics()
+        df[metrics] = df[metrics] / sample
 
         self.zone_metric_layer = layer_from_dataframe(df, "zone_metrics")
 
