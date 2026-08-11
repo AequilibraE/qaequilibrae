@@ -11,6 +11,7 @@ from .auxiliary_functions import model_area_polygon as model_area_polygon
 from .data_layer_from_dataframe import layer_from_dataframe as layer_from_dataframe
 from .data_layer_from_geodataframe import layer_from_geodataframe as layer_from_geodataframe
 from .debouncer import Debouncer as Debouncer
+from .edit_snapping import EditSnapping as EditSnapping
 from .geodataframe_from_data_layer import geodataframe_from_layer as geodataframe_from_layer
 from .get_output_file_name import GetOutputFileName as GetOutputFileName
 from .get_output_file_name import GetOutputFolderName as GetOutputFolderName
