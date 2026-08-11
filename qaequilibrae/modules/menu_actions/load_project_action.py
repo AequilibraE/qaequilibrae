@@ -17,12 +17,7 @@ def run_load_project(qgis_project):
 
 
 def _project_root(proj_path):
-    """Maps a scenario folder back to the project root it belongs to.
-
-    Scenarios live in ``<project root>/scenarios/<name>`` and their databases have no
-    ``scenarios`` table, so they cannot be opened as a project. QGIS projects saved while a
-    scenario was active stored that folder instead of the project root, so we walk back up.
-    """
+    """Maps a scenario folder back to the project root it belongs to"""
     path = Path(proj_path)
     if path.parent.name == "scenarios" and (path.parent.parent / "project_database.sqlite").is_file():
         return str(path.parent.parent)

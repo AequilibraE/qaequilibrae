@@ -374,8 +374,6 @@ class AequilibraEMenu:
             # Open AequilibraE project
             _run_load_project_from_path(self, path["aequilibrae_path"])
 
-            # Go back to last scenario. It may be gone by now, and failing here would abort
-            # the opening of the QGIS project itself, so we just stay on the root scenario.
             scenario = path.get("aeq_scenario")
             if scenario and scenario in self.available_scenarios:
                 self.cob_scenarios.setCurrentText(scenario)
@@ -407,8 +405,6 @@ class AequilibraEMenu:
         qgis.utils.iface.mapCanvas().refresh()
 
     def _project_base_path(self):
-        # project_base_path follows the active scenario into <project root>/scenarios/<name>, but the
-        # layer database and the path we store in the QGIS project must always be the project root.
         return self.project.root_scenario.base_path
 
     def _project_layers_database(self):

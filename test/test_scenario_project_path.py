@@ -4,11 +4,6 @@ from qaequilibrae.modules.menu_actions.load_project_action import _project_root,
 
 
 def test_base_path_is_root_while_scenario_is_active(sf_project):
-    """The path saved into the QGIS project must be the project root, never the scenario folder.
-
-    ``project_base_path`` follows the active scenario, and storing that folder made QGIS try to
-    reopen a scenario database - which has no ``scenarios`` table - on the next project load.
-    """
     root = Path(sf_project.project.project_base_path)
 
     sf_project.project.clone_scenario("a_scenario", "Scenario for test")
