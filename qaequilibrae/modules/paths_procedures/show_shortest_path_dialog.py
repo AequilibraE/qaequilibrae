@@ -62,7 +62,7 @@ class ShortestPathDialog(BaseDialog):
         if "modes" not in network.columns:
             raise ValueError("Your network does not have mode information")
 
-        numeric_fields = network.select_dtypes(include=['number']).columns.tolist()
+        numeric_fields = network.select_dtypes(include=["number"]).columns.tolist()
 
         dlg2 = LoadGraphLayerSettingDialog(self.qgis_project, all_modes, numeric_fields)
         dlg2.show()
