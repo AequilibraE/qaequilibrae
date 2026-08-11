@@ -453,8 +453,7 @@ class AequilibraEMenu:
         QgsProject.instance().write()
 
     def update_project_layers(self):
-        from qaequilibrae.modules.common_tools import project_has_transit
-
+        from qaequilibrae.modules.common_tools.auxiliary_functions import project_has_transit
         with self.project.db_connection_spatial as conn:
             layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
 
