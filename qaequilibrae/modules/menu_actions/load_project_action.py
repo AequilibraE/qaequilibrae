@@ -16,6 +16,14 @@ def run_load_project(qgis_project):
     return _run_load_project_from_path(qgis_project, proj_path)
 
 
+def _project_root(proj_path):
+    """Maps a scenario folder back to the project root it belongs to"""
+    path = Path(proj_path)
+    if path.parent.name == "scenarios" and (path.parent.parent / "project_database.sqlite").is_file():
+        return str(path.parent.parent)
+    return proj_path
+
+
 def _run_load_project_from_path(qgis_project, proj_path):
     from aequilibrae.project import Project
     from aequilibrae.project.tools import MigrationManager
@@ -23,6 +31,8 @@ def _run_load_project_from_path(qgis_project, proj_path):
 
     if proj_path is None or proj_path == "":
         return
+
+    proj_path = _project_root(proj_path)
 
     if proj_path is not None and len(proj_path) > 0:
         qgis_project.contents = []

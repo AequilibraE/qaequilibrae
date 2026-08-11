@@ -20,6 +20,7 @@ from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, Qgs
 from qaequilibrae import set_aequilibrae_menu_instance
 from qaequilibrae.message import messages
 from qaequilibrae.pandas_compat import ensure_regex_capable_strings
+from qaequilibrae.modules.common_tools import EditSnapping
 from qaequilibrae.modules.menu_actions import run_load_project, run_module, run_show_project_data
 from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs
 from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths, run_pt_explore
@@ -81,6 +82,7 @@ class AequilibraEMenu:
         self.project = None  # type: Project
         self.matrices = {}
         self.layers = {}  # type: Dict[QgsVectorLayer]
+        self.snapping = EditSnapping(self)
         self.dock = QDockWidget("AequilibraE")
         self.manager = QWidget()
         self.provider = None
@@ -303,6 +305,7 @@ class AequilibraEMenu:
         self.message_log(self.tr("Closed project on: {}").format(pth))
 
     def layerRemoved(self, layer):
+        self.snapping.layer_removed(layer)
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
 
         # Clears the pool of layers
@@ -330,6 +333,7 @@ class AequilibraEMenu:
     def create_layer_by_name(self, layer_name: str):
         layer = self.create_loose_layer(layer_name)
         self.layers[layer_name.lower()] = [layer, layer.id()]
+        self.snapping.watch(layer)
 
     def create_loose_layer(self, layer_name: str) -> QgsVectorLayer:
         if not self.project:
@@ -374,10 +378,12 @@ class AequilibraEMenu:
             # Open AequilibraE project
             _run_load_project_from_path(self, path["aequilibrae_path"])
 
-            # Go back to last scenario
-            if "aeq_scenario" in path:
-                self.cob_scenarios.setCurrentText(path["aeq_scenario"])
-                self.project.use_scenario(path["aeq_scenario"])
+            scenario = path.get("aeq_scenario")
+            if scenario and scenario in self.available_scenarios:
+                self.cob_scenarios.setCurrentText(scenario)
+                self.project.use_scenario(scenario)
+            elif scenario:
+                self.message_log(self.tr("Scenario '{}' no longer exists. Using 'root'.").format(scenario))
         else:
             return
 
@@ -387,6 +393,7 @@ class AequilibraEMenu:
             if "sqlite" not in lyr.source():
                 continue
             self.layers[str(lyr.name()).lower()] = [lyr, lyr.id()]
+            self.snapping.watch(lyr)
 
     def remove_aequilibrae_layers(self):
         """Removes layers connected to current aequilibrae project from active layers if the
@@ -403,9 +410,7 @@ class AequilibraEMenu:
         qgis.utils.iface.mapCanvas().refresh()
 
     def _project_base_path(self):
-        if "/scenarios/" in str(self.project.project_base_path):
-            return self.project.project_base_path.parent.parent
-        return self.project.project_base_path
+        return self.project.root_scenario.base_path
 
     def _project_layers_database(self):
         return str(self._project_base_path() / "qgis_layers.sqlite")
@@ -453,11 +458,13 @@ class AequilibraEMenu:
         QgsProject.instance().write()
 
     def update_project_layers(self):
+        from qaequilibrae.modules.common_tools.auxiliary_functions import project_has_transit
+
         with self.project.db_connection_spatial as conn:
             layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
 
             # Add transit_tables to layers
-            if exists(self.project._transit_database_path):
+            if project_has_transit(self.project):
                 layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
 
             descrlayout = QVBoxLayout()

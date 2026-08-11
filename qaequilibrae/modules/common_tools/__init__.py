@@ -3,6 +3,7 @@ from .auxiliary_functions import standard_path as standard_path
 from .auxiliary_functions import get_parameter_chain as get_parameter_chain
 from .auxiliary_functions import get_parameters_group as get_parameters_group
 from .auxiliary_functions import get_vector_layer_by_name as get_vector_layer_by_name
+from .auxiliary_functions import project_has_transit as project_has_transit
 from .auxiliary_functions import reporter as reporter
 from .auxiliary_functions import haversine as haversine
 from .auxiliary_functions import only_str as only_str
@@ -11,6 +12,7 @@ from .auxiliary_functions import model_area_polygon as model_area_polygon
 from .data_layer_from_dataframe import layer_from_dataframe as layer_from_dataframe
 from .data_layer_from_geodataframe import layer_from_geodataframe as layer_from_geodataframe
 from .debouncer import Debouncer as Debouncer
+from .edit_snapping import EditSnapping as EditSnapping
 from .geodataframe_from_data_layer import geodataframe_from_layer as geodataframe_from_layer
 from .get_output_file_name import GetOutputFileName as GetOutputFileName
 from .get_output_file_name import GetOutputFolderName as GetOutputFolderName
