@@ -54,7 +54,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         existing_fields = data.data.columns.tolist()
 
         for f in set(layer_fields.keys()):
-            if f.lower() in existing_fields:
+            if f.lower() in existing_fields or layer_fields[f] < 0:
                 continue
             field = fields[layer_fields[f]]
             if not field.isNumeric():
@@ -82,7 +82,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         gdf = gdf.sjoin(nodes)
         gdf.drop(columns={"geometry", "index_right"}, inplace=True)
 
-        flds = list(self.node_fields.keys())
+        flds = [fld for fld, idx in self.node_fields.items() if idx >= 0]
         setting = [f"{fld}=?" for fld in flds if fld != "node_id"]
         sql_values = f'UPDATE nodes SET {",".join(setting)} WHERE node_id=?;'
 
@@ -93,7 +93,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
             conn.executemany(sql_id, gdf.iloc[:, :1].join(gdf.iloc[:, -1:]).to_records(index=False))
 
     def transfer_layer_features(self, table, layer, layer_fields):
-        # We ensure that `link_id`, `a_node`, `b_node`, and `direction` fields are always integers
+        # We ensure that `link_id` and `direction` fields are always integers
         gdf = geodataframe_from_layer(layer).infer_objects()
 
         all_modes = set("".join(gdf.iloc[:, layer_fields["modes"]].unique()))
@@ -102,11 +102,25 @@ class CreatesTranspoNetProcedure(WorkerThread):
 
         crs = int(layer.crs().authid().split(":")[1])
         fields = [k for k, v in layer_fields.items() if v >= 0]
-        field_titles = ",".join(fields)
-        sql = f"""INSERT INTO {table} ({field_titles},geometry)
-                  VALUES ({','.join(['?'] * len(fields))},GeomFromWKB(?, {crs}))"""
-
         columns = [gdf.columns.tolist()[idx] for idx in layer_fields.values() if idx >= 0]
+
+        # `link_id` does not need to come from the layer, in which case we number the links sequentially
+        if layer_fields.get("link_id", -1) < 0:
+            gdf = gdf.assign(__aeq_link_id__=np.arange(1, gdf.shape[0] + 1))
+            fields.insert(0, "link_id")
+            columns.insert(0, "__aeq_link_id__")
+
+        # `a_node` and `b_node` are computed by the database triggers from the link geometry, but the links
+        # table only accepts them as integers, so we seed them the same way AequilibraE itself does
+        markers = ["?"] * len(fields)
+        for fld in ["a_node", "b_node"]:
+            if fld not in fields:
+                fields.append(fld)
+                markers.append("0")
+
+        sql = f"""INSERT INTO {table} ({",".join(fields)},geometry)
+                  VALUES ({",".join(markers)},GeomFromWKB(?, {crs}))"""
+
         columns.extend(["geoms"])
 
         gdf = gdf[columns]
