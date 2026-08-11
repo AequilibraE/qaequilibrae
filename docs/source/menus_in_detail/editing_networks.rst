@@ -19,29 +19,39 @@ behind the AequilibraE network, particularly the section on
 Snapping to node
 ----------------
 
-Before editing any transportation network, especially an AequilibraE network,
-one should enable the option to **snap-to-vertex** inside QGIS. This option will
-prevent the user from creating nodes that are infinitesimally close, yet
-disjoint. To enable this function, one can access the option
-**Project > Snapping Options**, click the little horseshoe, and then the
-*Snapping on Intersection* button, as depicted below
+When editing a transportation network, especially an AequilibraE network,
+**snap-to-vertex** prevents the user from creating nodes that are infinitesimally
+close, yet disjoint. When loading layers from the QAequilibraE panel,
+vertex snapping is turned on against every AequilibraE
+layer loaded in your QGIS project, so link endpoints land exactly on the existing
+nodes. Layers that do not belong to the model, such as basemaps, are left out, so
+you do not snap to them by accident.
+
+Your own snapping configuration is saved when the first AequilibraE layer starts
+being edited and restored once the last one leaves edit mode, so nothing changes
+outside of an editing session.
+
+The snapping tolerance - how close you have to get to an existing vertex before the
+cursor snaps to it - is the one already configured for the QGIS project, which you can
+change under **Project > Snapping Options**
 
 .. image:: ../images/network/snapping_for_project.png
     :width: 1056
     :align: center
     :alt: Snapping to vertex for one project
 
-To make this option default for all future projects, one can access the menu
-**Settings > Options** and select the *Digitizing* menu from the side options.
-After that it is just a matter of enabling snapping by default, as shown below
+To change the tolerance used by default in all future projects, one can access the
+menu **Settings > Options** and select the *Digitizing* menu from the side options,
+as shown below
 
 .. image:: ../images/network/snapping_for_all_future.png
     :width: 1056
     :align: center
     :alt: Snapping to vertex for all projects
 
-In both cases you can tune how close you can (or have to) get to an existing
-vertex before the cursor snaps to it, but that is a purely preference issue.
+You can still override any of it from the QGIS snapping toolbar while editing, just
+keep in mind that toggling another AequilibraE layer for edit re-applies the defaults
+described above.
 
 For more resources, you can just make a quick
 `online search <https://duckduckgo.com/?q=QGIS+snapping+to+vertex&atb=v179-1&ia=web>`_
