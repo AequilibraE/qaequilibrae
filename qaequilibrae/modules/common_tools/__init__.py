@@ -1,5 +1,6 @@
 from .all_layers_from_toc import all_layers_from_toc
 from .auxiliary_functions import *
+from .auxiliary_functions import project_has_transit
 from .data_layer_from_dataframe import layer_from_dataframe
 from .data_layer_from_geodataframe import layer_from_geodataframe
 from .debouncer import Debouncer
