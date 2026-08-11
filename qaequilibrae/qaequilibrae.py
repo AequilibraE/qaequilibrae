@@ -49,8 +49,8 @@ else:
         QMessageBox.information(None, "Warning", msg.messsage_five)
     else:
         if (
-                QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
-                == QMessageBox.Ok
+            QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
+            == QMessageBox.Ok
         ):
             from qaequilibrae.download_extra_packages_class import DownloadAll
 
@@ -454,6 +454,7 @@ class AequilibraEMenu:
 
     def update_project_layers(self):
         from qaequilibrae.modules.common_tools.auxiliary_functions import project_has_transit
+
         with self.project.db_connection_spatial as conn:
             layers = [x[0] for x in conn.execute("select f_table_name from geometry_columns;").fetchall()]
 
