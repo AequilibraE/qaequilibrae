@@ -5,6 +5,6 @@ pytest-qt
 pytest-cov
 pytest-mock
 black==24.4.2
-ruff
+ruff==0.14.8
 pytest-reportlog
 pyarrow
