@@ -207,7 +207,18 @@ class ShortestPathDialog(BaseDialog):
 
         data = self.graph.graph.assign(__data_key__=self.graph.graph.link_id * self.graph.graph.direction)
 
-        exclude = ["link_id", "a_node", "b_node", "direction", "__data_key__"]
+        # Alongside the fields added above, the graph carries aequilibrae's own bookkeeping
+        # columns, which mean nothing outside of it
+        exclude = [
+            "link_id",
+            "a_node",
+            "b_node",
+            "direction",
+            "__data_key__",
+            "id",
+            "__supernet_id__",
+            "__compressed_id__",
+        ]
 
         added_fields = [fld for fld in data if fld not in exclude]
         graph_fields.extend([QgsField(fld, QVariant.Double) for fld in added_fields])
@@ -219,9 +230,19 @@ class ShortestPathDialog(BaseDialog):
         # add features
         all_links = []
         data = data[data["__data_key__"].isin(self.res.path * self.res.path_link_directions)]
+        # The graph numbers its nodes by position, so they have to be translated back into the
+        # node IDs the user knows
+        all_nodes = self.graph.all_nodes
         for _, rec in data.iterrows():
-            fet = self.link_features[rec.link_id]
-            attrs = [rec.link_id, rec.a_node, rec.b_node, int(rec.direction)]
+            fet = self.link_features[int(rec.link_id)]
+            # iterrows() types each row to hold every column at once, so an integer column comes
+            # back as a NumPy float, and QGIS cannot write those into the fields declared above
+            attrs = [
+                int(rec.link_id),
+                int(all_nodes[int(rec.a_node)]),
+                int(all_nodes[int(rec.b_node)]),
+                int(rec.direction),
+            ]
             attrs.extend([float(rec[fld]) for fld in added_fields])
 
             feat = QgsFeature(vl.fields())
