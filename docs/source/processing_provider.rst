@@ -236,6 +236,21 @@ the link IDs of the links you want to collapse separated by a comma.
     :align: center
     :alt: Processing provider collapse links
 
+.. _create_empty_project:
+
+Create empty project
+~~~~~~~~~~~~~~~~~~~~
+This tool creates a new AequilibraE project containing no links, nodes, or zones. The
+project is created with the default modes and link types, which are read from the
+:ref:`parameters file <parameters_file>`.
+
+The only input for the tool is the folder that will hold the new project. This folder
+must either not exist yet, or be empty.
+
+An empty project is the natural starting point when you intend to build your model
+incrementally with the other Model building tools, such as
+`Add links from layer to project`_ and `Add zoning data`_.
+
 .. _create_project_from_osm:
 
 Create project from OSM

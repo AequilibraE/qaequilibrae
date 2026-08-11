@@ -51,6 +51,7 @@ class Provider(QgsProcessingProvider):
         from .model_building.add_links_from_layer import AddLinksFromLayer
         from .model_building.add_zones import AddZones
         from .model_building.collapse_links import CollapseLinks
+        from .model_building.create_empty_project import CreateEmptyProject
         from .model_building.network_simplifier import NetworkSimplifier
         from .model_building.network_preparation import PrepareNetwork
         from .model_building.project_from_layer import ProjectFromLayer
@@ -60,6 +61,7 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(AddLinksFromLayer())
         self.addAlgorithm(AddZones())
         self.addAlgorithm(CollapseLinks())
+        self.addAlgorithm(CreateEmptyProject())
         self.addAlgorithm(NetworkSimplifier())
         self.addAlgorithm(PrepareNetwork())
         self.addAlgorithm(ProjectFromLayer())
