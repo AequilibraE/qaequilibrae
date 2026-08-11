@@ -13,13 +13,17 @@ class EditSnapping:
     def __init__(self, qgis_project):
         self.qgis_project = qgis_project
         self.editing = set()
+        self.watched = set()
         self.saved_config = None  # type: QDomDocument
 
     def watch(self, layer: QgsVectorLayer):
         """Makes an AequilibraE layer configure snapping whenever it is toggled for edit"""
-        layer.editingStarted.connect(partial(self.edit_started, layer.id()))
-        layer.editingStopped.connect(partial(self.edit_stopped, layer.id()))
-
+        layer_id = layer.id()
+        if layer_id in self.watched:
+            return
+        self.watched.add(layer_id)
+        layer.editingStarted.connect(partial(self.edit_started, layer_id))
+        layer.editingStopped.connect(partial(self.edit_stopped, layer_id))
     def edit_started(self, layer_id: str):
         if not self.editing:
             self.saved_config = QDomDocument("qaequilibrae-snapping")

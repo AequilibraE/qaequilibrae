@@ -27,6 +27,9 @@ def layers(qgis_iface):
     unrelated = QgsVectorLayer("Polygon?crs=epsg:4326", "unrelated", "memory")
     QgsProject.instance().addMapLayers([links, nodes, unrelated])
     yield links, nodes, unrelated
+    for lyr in (links, nodes, unrelated):
+        if lyr.isEditable():
+            lyr.rollBack()
     QgsProject.instance().removeAllMapLayers()
 
 
