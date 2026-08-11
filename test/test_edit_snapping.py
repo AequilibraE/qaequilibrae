@@ -1,4 +1,5 @@
 import pytest
+from qgis.PyQt import sip
 from qgis.core import Qgis, QgsProject, QgsSnappingConfig, QgsVectorLayer
 
 from qaequilibrae.modules.common_tools import EditSnapping
@@ -27,8 +28,10 @@ def layers(qgis_iface):
     unrelated = QgsVectorLayer("Polygon?crs=epsg:4326", "unrelated", "memory")
     QgsProject.instance().addMapLayers([links, nodes, unrelated])
     yield links, nodes, unrelated
+    # A test that removes a layer from the project destroys the C++ object behind the wrapper,
+    # so calling anything on it here would raise instead of tearing the fixture down
     for lyr in (links, nodes, unrelated):
-        if lyr.isEditable():
+        if not sip.isdeleted(lyr) and lyr.isEditable():
             lyr.rollBack()
     QgsProject.instance().removeAllMapLayers()
 

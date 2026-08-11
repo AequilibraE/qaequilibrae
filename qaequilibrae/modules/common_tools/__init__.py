@@ -3,6 +3,7 @@ from .auxiliary_functions import standard_path as standard_path
 from .auxiliary_functions import get_parameter_chain as get_parameter_chain
 from .auxiliary_functions import get_parameters_group as get_parameters_group
 from .auxiliary_functions import get_vector_layer_by_name as get_vector_layer_by_name
+from .auxiliary_functions import project_has_transit as project_has_transit
 from .auxiliary_functions import reporter as reporter
 from .auxiliary_functions import haversine as haversine
 from .auxiliary_functions import only_str as only_str
