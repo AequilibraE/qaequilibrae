@@ -308,7 +308,7 @@ required field for the conversion:
 The *link_id* field can also be brought from the layer, but QAequilibraE
 numbers the links for you if you would rather not provide it.
 
-The *a_node*, *b_node* and *length* fields cannot be brought from the layer, as
+The *a_node*, *b_node* and *distance* fields cannot be brought from the layer, as
 AequilibraE computes them from the link geometry and the nodes layer.
 
 These requirements often create quite a bit of manual work, as most networks
