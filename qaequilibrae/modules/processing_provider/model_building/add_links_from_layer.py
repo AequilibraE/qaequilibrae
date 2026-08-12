@@ -11,7 +11,6 @@ from qaequilibrae.modules.common_tools import geodataframe_from_layer
 
 
 class AddLinksFromLayer(QgsProcessingAlgorithm):
-
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterFile(

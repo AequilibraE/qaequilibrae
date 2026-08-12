@@ -16,13 +16,15 @@ def layer_from_geodataframe(gdf: gpd.GeoDataFrame, layer_name: str):
         return (
             QMetaType.Type.Double
             if "float" in ftype.name
-            else QMetaType.Type.LongLong if "int" in ftype.name else QMetaType.Type.QString
+            else QMetaType.Type.LongLong
+            if "int" in ftype.name
+            else QMetaType.Type.QString
         )
 
     field_names = list(gdf.dtypes.index)
     field_names.remove("geometry")
     types = [qgs_type(gdf.dtypes[fname]) for fname in field_names]
-    attributes = [QgsField(fname, dtype) for fname, dtype in zip(field_names, types)]
+    attributes = [QgsField(fname, dtype) for fname, dtype in zip(field_names, types, strict=True)]
     pr.addAttributes(attributes)
     vl.updateFields()
 

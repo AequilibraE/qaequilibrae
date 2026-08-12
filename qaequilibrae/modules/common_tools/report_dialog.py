@@ -1,23 +1,23 @@
 """
- -----------------------------------------------------------------------------------------------------------
- Package:    AequilibraE
+-----------------------------------------------------------------------------------------------------------
+Package:    AequilibraE
 
- Name:       Report dialog
- Purpose:    Dialog for showing the report from algorithm runs
+Name:       Report dialog
+Purpose:    Dialog for showing the report from algorithm runs
 
- Original Author:  Pedro Camargo (c@margo.co)
- Contributors:
- Last edited by: Pedro Camargo
+Original Author:  Pedro Camargo (c@margo.co)
+Contributors:
+Last edited by: Pedro Camargo
 
- Website:    www.AequilibraE.com
- Repository:  https://github.com/AequilibraE/AequilibraE
+Website:    www.AequilibraE.com
+Repository:  https://github.com/AequilibraE/AequilibraE
 
- Created:    2014-03-19
- Updated:    2018-07-01
- Copyright:   (c) AequilibraE authors
- Licence:     See LICENSE.TXT
- -----------------------------------------------------------------------------------------------------------
- """
+Created:    2014-03-19
+Updated:    2018-07-01
+Copyright:   (c) AequilibraE authors
+Licence:     See LICENSE.TXT
+-----------------------------------------------------------------------------------------------------------
+"""
 
 from os.path import dirname, join
 

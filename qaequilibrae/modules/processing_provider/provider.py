@@ -13,7 +13,6 @@ if str(provider_path) not in sys.path:
 
 
 class Provider(QgsProcessingProvider):
-
     def loadAlgorithms(self):
 
         self.__load_project_procedures()

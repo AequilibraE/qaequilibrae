@@ -28,7 +28,7 @@ class ExecuteSingleDialog(BaseDialog):
         self.node_from.setText(str(parameters["node_from"]))
         self.node_to.setText(str(parameters["node_to"]))
         self.sld_max_routes.setValue(self._kwargs["max_routes"])
-        self.label_4.setText(f"Number of routes: {self._kwargs["max_routes"]}")
+        self.label_4.setText(f"Number of routes: {self._kwargs['max_routes']}")
 
         self.debouncer = Debouncer(delay_ms=700, callback=self.execute_single)
 

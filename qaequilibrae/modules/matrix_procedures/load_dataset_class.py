@@ -57,10 +57,9 @@ class LoadDataset(WorkerThread):
         datafile_spec["file_path"] = self.output_name
 
         if self.error is None:
-
             # Get all the data
             for p, feat in enumerate(self.layer.getFeatures()):
-                for idx, field, empty in zip(idxs, fields, empties):
+                for idx, field, empty in zip(idxs, fields, empties, strict=True):
                     if feat.attributes()[idx] == QVariant():
                         self.output.loc[p, field] = empty
                     else:
