@@ -2,47 +2,119 @@ import logging
 import pprint
 import subprocess  # nosec B404
 import sys
-
 from os.path import dirname, isfile, join
 from pathlib import Path
 
-from qgis.core import QgsTask, QgsApplication, QgsMessageLog, Qgis
+from qgis.core import Qgis, QgsApplication, QgsMessageLog, QgsTask
+from qgis.PyQt import sip
 from qgis.PyQt.QtCore import QObject, pyqtSignal
-from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QProgressBar, QTextEdit, QCheckBox, QLabel, QMessageBox
+from qgis.PyQt.QtWidgets import (
+    QCheckBox,
+    QDialog,
+    QDialogButtonBox,
+    QLabel,
+    QMessageBox,
+    QProgressBar,
+    QTextEdit,
+    QVBoxLayout,
+)
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
 from qaequilibrae.modules.common_tools import BaseDialog
 
+MESSAGE_TAG = "Model Run"
 
-class SafeWrapper:
-    # Wrapper class around sys.stdout / sys.stderr to suppress flush() warning in output
-    def __init__(self, stream):
-        self.stream = stream
 
-    def write(self, msg):
-        if self.stream:
-            self.stream.write(msg)
+def has_content(result) -> bool:
+    """Whether a run procedure returned something worth showing.
+
+    ``bool(result)`` is not enough: procedures may return a DataFrame, and pandas raises
+    on the truth value of one.
+    """
+    if result is None:
+        return False
+    if hasattr(result, "empty"):  # pandas DataFrame/Series
+        return not result.empty
+    return bool(result)
+
+
+def silence_dynamic_convergence_graph() -> None:
+    """Stop an ipywidgets convergence chart from freezing the run.
+
+    Models built on top of the notebook helpers draw convergence with an ipywidgets
+    ``DynamicGraph``. There is no notebook comm channel inside QGIS, so the redraw blocks
+    forever. Models that do not ship the helper are left untouched.
+    """
+    try:
+        from four_step.common.notebooks.dynamic_graph import DynamicGraph
+    except ImportError:
+        return
+
+    DynamicGraph.update = lambda self, data: None
+
+
+class StreamRelay:
+    """File-like object forwarding whatever a run procedure prints to a callback.
+
+    QGIS runs without a console on Windows, so ``sys.stdout``/``sys.stderr`` can be ``None``
+    and a bare ``print()`` inside a procedure raises. Text is buffered until a newline so the
+    log shows whole lines, with :meth:`drain` emitting whatever is left at the end of the run.
+    """
+
+    def __init__(self, emit, stream=None):
+        self._emit = emit
+        self._stream = stream
+        self._buffer = ""
+
+    def write(self, text):
+        if self._stream is not None:
+            self._stream.write(text)
+        self._buffer += text
+        while "\n" in self._buffer:
+            line, self._buffer = self._buffer.split("\n", 1)
+            self._emit(line)
+        return len(text)
 
     def flush(self):
-        if self.stream and hasattr(self.stream, "flush"):
-            self.stream.flush()
+        if self._stream is not None:
+            self._stream.flush()
+
+    def drain(self):
+        if self._buffer:
+            self._emit(self._buffer)
+            self._buffer = ""
+
+    def isatty(self):
+        return False
 
 
-sys.stdout = SafeWrapper(sys.__stdout__)
-sys.stderr = SafeWrapper(sys.__stderr__)
+class OptionalIndentFormatter(logging.Formatter):
+    """Formatter that tolerates records without the optional ``indent_str`` attribute.
+
+    Models that nest their logging supply ``indent_str`` through a ``LoggerAdapter``; plain
+    AequilibraE records do not, and a missing key would make every line fail to format.
+    """
+
+    def format(self, record):
+        if not hasattr(record, "indent_str"):
+            record.indent_str = ""
+        return super().format(record)
 
 
 class LogBridge(QObject):
+    """Carries worker-thread output to the GUI thread through queued signal connections."""
+
     log_line = pyqtSignal(str)
     stage_line = pyqtSignal(str)
-    finished_state = pyqtSignal(bool)  # True = canceled, False = completed
 
 
-class LogDialog(QDialog):
+class RunLogDialog(QDialog):
+    """Live log and progress indicator for a model run."""
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setWindowTitle("Model Run")
+        self.setWindowTitle(self.tr("Model Run"))
         self.resize(700, 450)
 
         layout = QVBoxLayout()
@@ -50,21 +122,23 @@ class LogDialog(QDialog):
         self.stage_label = QLabel("")
         layout.addWidget(self.stage_label)
 
-        # Spinner (indeterminate)
+        # Indeterminate: run procedures report no progress we could scale a bar to
         self.bar = QProgressBar()
         self.bar.setRange(0, 0)
         layout.addWidget(self.bar)
 
-        # Log output
         self.text = QTextEdit()
         self.text.setReadOnly(True)
         self.text.setFontFamily("Consolas")
         layout.addWidget(self.text)
 
-        # Auto-scroll toggle
-        self.auto_scroll = QCheckBox("Auto scroll")
+        self.auto_scroll = QCheckBox(self.tr("Auto scroll"))
         self.auto_scroll.setChecked(True)
         layout.addWidget(self.auto_scroll)
+
+        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        self.buttons.rejected.connect(self.reject)
+        layout.addWidget(self.buttons)
 
         self.setLayout(layout)
 
@@ -74,7 +148,6 @@ class LogDialog(QDialog):
             self.text.ensureCursorVisible()
 
     def mark_finished(self):
-        # stop spinner
         self.bar.setRange(0, 1)
         self.bar.setValue(1)
 
@@ -83,6 +156,9 @@ class LogDialog(QDialog):
 
 
 class RunModuleDialog(BaseDialog):
+    #: Emitted on the GUI thread once a run has ended, whichever way it ended.
+    run_completed = pyqtSignal()
+
     def __init__(self, qgis_project):
         dependencies_dir = qgis_project.project.project_base_path / "run" / "_dependencies"
         if dependencies_dir.exists() and str(dependencies_dir) not in sys.path:
@@ -92,6 +168,9 @@ class RunModuleDialog(BaseDialog):
 
     def _base_ui_setup(self):
         self.do_run = False
+        self.log_dialog = None
+        self.task = None
+        self.bridge = None
 
         self.rejected.connect(self.handle_rejection)
 
@@ -163,8 +242,14 @@ class RunModuleDialog(BaseDialog):
                 )
             self.reject()
 
-    def attach_qgis_logging(self, logger=None, tag="Model Run", task=None):
+    def attach_qgis_logging(self, logger=None, tag=MESSAGE_TAG, bridge=None):
+        """Mirror every record on ``logger`` into the QGIS message log and the run dialog.
+
+        Attached to the root logger, so AequilibraE's own logger and anything the model logs
+        are both picked up. The caller owns the returned handler and must remove it.
+        """
         logger = logger or logging.getLogger()
+        bridge = bridge or self.bridge
 
         handler = logging.Handler()
 
@@ -172,45 +257,39 @@ class RunModuleDialog(BaseDialog):
             try:
                 msg = handler.format(record)
 
-                # Map Python logging levels → QGIS levels
                 if record.levelno >= logging.ERROR:
-                    level = Qgis.Critical
+                    level = Qgis.MessageLevel.Critical
                 elif record.levelno >= logging.WARNING:
-                    level = Qgis.Warning
+                    level = Qgis.MessageLevel.Warning
                 else:
-                    level = Qgis.Info
+                    level = Qgis.MessageLevel.Info
 
                 QgsMessageLog.logMessage(msg, tag, level)
 
-                # thread-safe UI update via signals
-                if hasattr(self, "_bridge"):
-                    self._bridge.log_line.emit(msg)
+                if bridge is not None:
+                    bridge.log_line.emit(msg)
 
-                    # Use INFO lines as "current stage" candidates
+                    # Info lines double as the "what is happening now" caption
                     if record.levelno <= logging.INFO:
                         stage = f"{getattr(record, 'indent_str', '')}{record.getMessage()}".strip()
-                        self._bridge.stage_line.emit(stage)
-
-                        # Optional: try to update task description if available
-                        if task is not None and hasattr(task, "setDescription"):
-                            try:
-                                task.setDescription(stage[:120])
-                            except Exception:
-                                pass
+                        bridge.stage_line.emit(stage)
 
             except Exception:
+                # A logging handler must never raise back into whatever was being logged
                 handler.handleError(record)
 
         handler.emit = emit
-
         handler.setFormatter(
-            logging.Formatter("%(asctime)s - %(levelname)7s - %(indent_str)s%(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+            OptionalIndentFormatter(
+                "%(asctime)s - %(levelname)7s - %(indent_str)s%(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+            )
         )
 
         logger.addHandler(handler)
         return handler
 
     def run(self):
+        # Check if selected function is also present at the Parameters file
         func_name = self.items[self.cob_function.currentIndex()]
         parameter_keys = list(self.project.parameters["run"].keys())
         if func_name not in parameter_keys:
@@ -219,85 +298,120 @@ class RunModuleDialog(BaseDialog):
 
         func = getattr(self.project.run, func_name)
 
-        # Open QGIS log panel (dock only; can't force specific tab reliably)
-        QgsMessageLog.logMessage("Starting model run ...", "Model Run", Qgis.Info)
+        self.but_run.setEnabled(False)
 
-        # Signal bridge for thread-safe UI updates
-        self._bridge = LogBridge()
+        # The run outlives this dialog if the user closes it, so hold the scenario lock for the
+        # duration of the task rather than only until 'finished' fires on the dialog
+        self.qgis_project.block_change_scenario()
 
-        def worker(task, *args, **kwargs):
+        self.bridge = LogBridge()
+        if self.log_dialog is not None and not sip.isdeleted(self.log_dialog):
+            # Log windows from earlier runs stay parented to this dialog otherwise
+            self.log_dialog.deleteLater()
+        self.log_dialog = RunLogDialog(self)
+        self.bridge.log_line.connect(self.log_dialog.append)
+        self.bridge.stage_line.connect(self.log_dialog.set_stage)
+        self.log_dialog.show()
+
+        QgsMessageLog.logMessage(self.tr("Starting model run..."), MESSAGE_TAG, Qgis.MessageLevel.Info)
+
+        # QgsTaskWrapper.finished() does 'if self.returned_values:' on whatever the worker
+        # returns, which raises for a DataFrame or an array and swallows the completion
+        # callback with it. Hand the result over on the side and return nothing.
+        outcome = {}
+        self.task = QgsTask.fromFunction(
+            self.tr("Running {}").format(func_name),
+            self._worker(func, outcome),
+            on_finished=self._on_finished(func_name, outcome),
+        )
+        QgsApplication.taskManager().addTask(self.task)
+
+    def _worker(self, func, outcome):
+        """Build the callable the task manager runs on a background thread.
+
+        Everything the worker needs is bound here, on the GUI thread, so the background thread
+        never touches the dialog.
+        """
+        bridge = self.bridge
+        running_msg = self.tr("Model running, please wait...")
+        done_msg = self.tr("Model run finished!")
+
+        # The task manager always passes the task in, even though nothing here needs it
+        def worker(task):
             import traceback
 
-            # Override dynamic convergence graph update in QGIS (will cause model to freeze)
-            from four_step.common.notebooks.dynamic_graph import DynamicGraph
-
-            DynamicGraph.update = lambda self, data: None
+            silence_dynamic_convergence_graph()
 
             root_logger = logging.getLogger()
-            qgis_handler = self.attach_qgis_logging(root_logger, tag="Model Run", task=task)
+            handler = self.attach_qgis_logging(root_logger, bridge=bridge)
+
+            # Procedures print as much as they log, and QGIS may leave us without a console
+            relay = StreamRelay(bridge.log_line.emit, sys.__stdout__)
+            stdout, stderr = sys.stdout, sys.stderr
+            sys.stdout = sys.stderr = relay
 
             try:
-                task.setProgress(0)
-                QgsMessageLog.logMessage("Model running, please wait ...", "Model Run", Qgis.Info)
-
-                result = func()
-
-                QgsMessageLog.logMessage("Model run finished!", "Model Run", Qgis.Info)
-                return result
+                QgsMessageLog.logMessage(running_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
+                outcome["result"] = func()
+                QgsMessageLog.logMessage(done_msg, MESSAGE_TAG, Qgis.MessageLevel.Info)
 
             except Exception:
-                QgsMessageLog.logMessage(traceback.format_exc(), "Model Run", Qgis.Critical)
+                QgsMessageLog.logMessage(traceback.format_exc(), MESSAGE_TAG, Qgis.MessageLevel.Critical)
                 raise
 
             finally:
-                root_logger.removeHandler(qgis_handler)
+                sys.stdout, sys.stderr = stdout, stderr
+                relay.drain()
+                root_logger.removeHandler(handler)
 
-        def finished(exception, result=None):
-            canceled = self._task.isCanceled() if hasattr(self, "_task") else False
+        return worker
 
-            if hasattr(self, "log_dialog"):
-                self.log_dialog.mark_finished()
-                self.log_dialog.append(">>> Model run finished")
+    def _on_finished(self, func_name, outcome):
+        """Build the completion callback, which the task manager calls on the GUI thread.
 
-            if exception is not None:
-                self.qgis_project.iface_error_message(str(exception))
-                return
+        Messages are translated up front so the callback never calls into the dialog's C++ side,
+        which the user may have closed by the time the run ends.
+        """
+        finished_msg = self.tr(">>> Model run finished")
+        canceled_msg = self.tr("Model run canceled")
+        check_msg = self.tr("Check 'Messages' tab.")
+        executed_msg = self.tr("{} executed").format(func_name)
 
-            if canceled:
-                self.qgis_project.iface_error_message("Model run canceled")
-                return
+        def finished(exception, _result=None):
+            canceled = self.task is not None and self.task.isCanceled()
+            result = outcome.get("result")
+            self.task = None
+            self.bridge = None
+            self.qgis_project.allow_change_scenario()
 
-            message = self.tr("Check 'Messages' tab.") if result else ""
-            self.qgis_project.iface_success_message(
-                message,
-                self.tr("{} executed").format(func_name),
-            )
+            alive = not sip.isdeleted(self)
 
-            if result:
-                self.qgis_project.message_log(pprint.pformat(result))
+            if alive:
+                self.but_run.setEnabled(True)
+                if self.log_dialog is not None and not sip.isdeleted(self.log_dialog):
+                    self.log_dialog.mark_finished()
+                    self.log_dialog.append(finished_msg)
 
-            # optional: leave dialog open so user can inspect/save logs
-            # self.exit_procedure()
+            try:
+                # A canceled task also arrives with a generic exception, so check it first
+                if canceled:
+                    self.qgis_project.iface_error_message(canceled_msg)
+                    return
 
-        # Create task FIRST
-        self._task = QgsTask.fromFunction(
-            f"Running {func_name}",
-            worker,
-            on_finished=finished,
-        )
+                if exception is not None:
+                    self.qgis_project.iface_error_message(str(exception))
+                    return
 
-        # Create dialog with the real task object
-        self.log_dialog = LogDialog(self)
+                message = check_msg if has_content(result) else ""
+                self.qgis_project.iface_success_message(message, executed_msg)
 
-        # Connect signals
-        self._bridge.log_line.connect(self.log_dialog.append)
-        self._bridge.stage_line.connect(self.log_dialog.set_stage)
-        self._bridge.finished_state.connect(self.log_dialog.mark_finished)
+                if has_content(result):
+                    self.qgis_project.message_log(pprint.pformat(result))
+            finally:
+                if alive:
+                    self.run_completed.emit()
 
-        self.log_dialog.show()
-
-        # Start task
-        QgsApplication.taskManager().addTask(self._task)
+        return finished
 
     def exit_procedure(self):
         self.close()

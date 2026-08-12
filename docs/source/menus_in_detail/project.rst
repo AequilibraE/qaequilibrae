@@ -35,10 +35,16 @@ Run procedures
 
 The run procedures allows you to define model entry points and their default arguments, and run models
 to the model itself. Usage at QAequilibraE is pretty straightforward: select one of the available
-functions, click on the *Run!* button, and wait for the log file to open with the output results of
-the model.
+functions and click on the *Run!* button.
 
-To better understand the application of the run module, we encourage you to read about it at 
+The procedure runs in the background, so QGIS stays responsive while the model works. A *Model Run*
+window opens with a progress indicator and the log the model produces as it goes, both what it logs
+and what it prints. Leave *Auto scroll* ticked to follow the latest line, or untick it to read back
+through the output while the run continues. The same log is also written to the QGIS *Log Messages*
+panel, under the *Model Run* tab. When the run ends, a message is pushed to the message bar, and any
+value the procedure returned is written to the *Messages* tab.
+
+To better understand the application of the run module, we encourage you to read about it at
 `the AequilibraE documentation <https://www.aequilibrae.com/develop/python/run_module.html>`_.
 
 .. image:: ../images/project_procedures/run_module_dialog.png

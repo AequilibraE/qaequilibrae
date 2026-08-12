@@ -1,13 +1,52 @@
+import logging
+
 import numpy as np
 import pandas as pd
+import pytest
 from aequilibrae.parameters import Parameters
+from qgis.core import Qgis
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QApplication, QMessageBox
 
-from qaequilibrae.modules.project_procedures.run_module_dialog import RunModuleDialog
+from qaequilibrae.modules.project_procedures.run_module_dialog import LogBridge, RunModuleDialog, has_content
 from .utilities import create_matrix
 
 functions = {0: "matrix_summary", 1: "graph_summary", 2: "results_summary", 3: "example_function_with_kwargs"}
+
+# Procedures run on a background task now, so every test has to wait for it. Generous because
+# the slowest procedure below builds a graph and assigns a matrix.
+RUN_TIMEOUT = 60_000
+
+
+def run_procedure(dialog, qtbot, timeout=RUN_TIMEOUT):
+    """Click 'run' and block until the background task has reported back."""
+    with qtbot.waitSignal(dialog.run_completed, timeout=timeout):
+        qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
+
+
+def select_function(dialog, name):
+    dialog.cob_function.setCurrentIndex(dialog.items.index(name))
+    assert dialog.cob_function.currentText() == name
+
+
+def add_run_function(project, name, source, parameters=None):
+    """Drop a procedure into the project's run module and register it in the parameters file."""
+    folder = project.project.project_base_path
+
+    with open(folder / "run" / f"{name}.py", "w") as file:
+        file.write(source)
+
+    with open(folder / "run" / "__init__.py", "r") as file:
+        lines = file.readlines()
+
+    lines.insert(19, f"from .{name} import {name}\n")
+
+    with open(folder / "run" / "__init__.py", "w") as file:
+        file.writelines(lines)
+
+    p = Parameters()
+    p.parameters["run"][name] = parameters
+    p.write_back()
 
 
 def create_dialog_with_matrix(project):
@@ -21,19 +60,119 @@ def create_dialog_with_matrix(project):
     return RunModuleDialog(project)
 
 
-def test_example_function_with_kwargs(coquimbo_project, qtbot, timeoutDetector):
+@pytest.mark.parametrize(
+    "result,expected",
+    [
+        (None, False),
+        ({}, False),
+        ({"a": 1}, True),
+        ([], False),
+        (pd.DataFrame(), False),
+        (pd.DataFrame({"a": [1]}), True),
+    ],
+)
+def test_has_content(result, expected):
+    # A procedure returning a DataFrame used to blow up on 'if result', because pandas
+    # refuses to give a truth value for one
+    assert has_content(result) is expected
+
+
+def test_example_function_with_kwargs(coquimbo_project, qtbot):
     dialog = RunModuleDialog(coquimbo_project)
 
     dialog.cob_function.setCurrentIndex(0)
     assert dialog.cob_function.currentText() == functions[3]
 
-    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
+    run_procedure(dialog, qtbot)
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[3][0] == "example_function_with_kwargs executed:", "Level 3 error message is missing"
 
 
-def test_new_function(coquimbo_project, qtbot, timeoutDetector):
+def test_run_streams_output_to_log_dialog(coquimbo_project, qtbot):
+    dialog = RunModuleDialog(coquimbo_project)
+    select_function(dialog, "example_function_with_kwargs")
+
+    run_procedure(dialog, qtbot)
+
+    assert dialog.log_dialog is not None, "No log dialog was created for the run"
+    assert dialog.log_dialog.isVisible()
+
+    log_text = dialog.log_dialog.text.toPlainText()
+    # The procedure only 'print's, so seeing it here means stdout is relayed to the dialog
+    assert "arg1: parameters.yml argument" in log_text
+    assert ">>> Model run finished" in log_text
+
+    assert dialog.but_run.isEnabled(), "Run button was left disabled after the run"
+
+
+def test_second_run_gets_a_fresh_log_window(coquimbo_project, qtbot):
+    dialog = RunModuleDialog(coquimbo_project)
+    select_function(dialog, "example_function_with_kwargs")
+
+    run_procedure(dialog, qtbot)
+    first_log = dialog.log_dialog
+
+    run_procedure(dialog, qtbot)
+
+    assert dialog.log_dialog is not first_log, "The second run reused the first run's log window"
+    assert ">>> Model run finished" in dialog.log_dialog.text.toPlainText()
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert len(messagebar.messages[Qgis.MessageLevel.Success]) == 2
+
+
+def test_dataframe_result_is_reported(coquimbo_project, qtbot):
+    dialog = RunModuleDialog(coquimbo_project)
+    select_function(dialog, "results_summary")
+
+    run_procedure(dialog, qtbot)
+
+    messagebar = coquimbo_project.iface.messageBar()
+    assert messagebar.messages[Qgis.MessageLevel.Success][-1].startswith("results_summary executed")
+    assert not messagebar.messages[Qgis.MessageLevel.Critical]
+
+
+def test_failing_procedure_reports_the_error(coquimbo_project, qtbot):
+    add_run_function(
+        coquimbo_project,
+        "always_fails",
+        "def always_fails():\n\traise RuntimeError('procedure blew up')\n",
+    )
+
+    dialog = RunModuleDialog(coquimbo_project)
+    select_function(dialog, "always_fails")
+
+    run_procedure(dialog, qtbot)
+
+    messagebar = coquimbo_project.iface.messageBar()
+    errors = messagebar.messages[Qgis.MessageLevel.Critical]
+    assert any("procedure blew up" in message for message in errors), errors
+    assert not messagebar.messages[Qgis.MessageLevel.Success]
+    assert dialog.but_run.isEnabled(), "Run button was left disabled after a failed run"
+
+
+def test_log_handler_accepts_records_without_indent(coquimbo_project):
+    # AequilibraE's own records carry no 'indent_str', and a formatter demanding one would
+    # silently drop every line the run logs
+    dialog = RunModuleDialog(coquimbo_project)
+    dialog.bridge = LogBridge()
+
+    lines = []
+    dialog.bridge.log_line.connect(lines.append)
+
+    logger = logging.getLogger("qaequilibrae.test.run_module")
+    logger.propagate = False
+    handler = dialog.attach_qgis_logging(logger)
+    try:
+        logger.warning("a record with no indent")
+    finally:
+        logger.removeHandler(handler)
+
+    assert any("a record with no indent" in line for line in lines), lines
+
+
+def test_new_function(coquimbo_project, qtbot):
     func_string = """from aequilibrae.context import get_active_project\n
 def create_delaunay(source: str, name: str, computational_view: str, result_name: str, overwrite: bool=False):\n
 \tfrom aequilibrae.utils.create_delaunay_network import DelaunayAnalysis\n
@@ -46,35 +185,25 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
 \tda.assign_matrix(mat, result_name)\n
 """
 
-    folder = coquimbo_project.project.project_base_path
-
-    with open(folder / "run" / "create_delaunay.py", "w") as file:
-        file.write(func_string)
-
-    with open(folder / "run" / "__init__.py", "r") as file:
-        lines = file.readlines()
-
-    lines.insert(19, "from .create_delaunay import create_delaunay\n")
-
-    with open(folder / "run" / "__init__.py", "w") as file:
-        file.writelines(lines)
-
-    p = Parameters()
-    p.parameters["run"]["create_delaunay"] = {}
-    p.parameters["run"]["create_delaunay"]["source"] = "zones"
-    p.parameters["run"]["create_delaunay"]["name"] = "b''"
-    p.parameters["run"]["create_delaunay"]["computational_view"] = "demand"
-    p.parameters["run"]["create_delaunay"]["result_name"] = "delaunay_test"
-    p.write_back()
+    add_run_function(
+        coquimbo_project,
+        "create_delaunay",
+        func_string,
+        parameters={
+            "source": "zones",
+            "name": "b''",
+            "computational_view": "demand",
+            "result_name": "delaunay_test",
+        },
+    )
 
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     assert len(dialog.items) > 1
 
-    dialog.cob_function.setCurrentIndex(0)
-    assert dialog.cob_function.currentText() == "create_delaunay"
+    select_function(dialog, "create_delaunay")
 
-    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
+    run_procedure(dialog, qtbot)
 
     with coquimbo_project.project.results_connection as conn:
         results = pd.read_sql("SELECT * FROM delaunay_test", conn).set_index("link_id")
@@ -138,9 +267,7 @@ def test_install_external_libraries(coquimbo_project, qtbot):
     dialog.cob_function.setCurrentIndex(4)
     assert dialog.cob_function.currentText() == "seaborn_plot"
 
-    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
+    run_procedure(dialog, qtbot)
 
     messagebar = coquimbo_project.iface.messageBar()
     assert "seaborn_plot executed" in messagebar.messages[3][0]
-
-    assert not dialog.isVisible()
