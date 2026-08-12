@@ -14,6 +14,5 @@ line-length = 120
 
 [tool.ruff.lint]
 # Ruff 0.16 grew its default rule set from 59 to 413 rules. Pinned to the pre-0.16 default
-# so the version bump does not change what CI enforces. Broadening this is a separate change.
 select = ["E4", "E7", "E9", "F"]
 ignore = ["E203", "E266", "E501"]
