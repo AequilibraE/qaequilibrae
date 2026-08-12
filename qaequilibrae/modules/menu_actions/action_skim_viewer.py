@@ -7,4 +7,4 @@ def load_skim_viewer(qgis_project):
 
     dlg2 = SkimViewerDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

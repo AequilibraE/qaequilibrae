@@ -7,4 +7,4 @@ def project_from_osm(qgis_project):
 
     dlg2 = ProjectFromOSMDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

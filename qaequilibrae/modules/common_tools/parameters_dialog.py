@@ -4,7 +4,7 @@ import yaml
 from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.Qsci import QsciLexerYAML
+from qgis.PyQt.Qsci import QsciLexerYAML, QsciScintilla
 from qgis.PyQt.QtGui import QFont
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_parameters.ui"))
@@ -31,7 +31,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         lexer = QsciLexerYAML()
         lexer.setDefaultFont(font)
         self.text_box.setLexer(lexer)
-        self.text_box.setFolding(self.text_box.PlainFoldStyle)
+        self.text_box.setFolding(QsciScintilla.FoldStyle.PlainFoldStyle)
         self.logger = get_logger()
 
         # Load the data

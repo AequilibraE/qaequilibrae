@@ -1,7 +1,7 @@
 from string import ascii_letters
 
 import numpy as np
-from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 from aequilibrae import Project
 from aequilibrae.context import get_logger
 from aequilibrae.utils.interface.worker_thread import WorkerThread

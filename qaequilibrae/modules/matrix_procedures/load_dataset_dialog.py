@@ -82,7 +82,7 @@ class LoadDatasetDialog(BaseDialog):
                 for field in fields:
                     table.setRowCount(table.rowCount() + 1)
                     item1 = QtWidgets.QTableWidgetItem(field)
-                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                     table.setItem(table.rowCount() - 1, 0, item1)
 
     def size_it_accordingly(self, final=False):
@@ -150,7 +150,7 @@ class LoadDatasetDialog(BaseDialog):
         self.but_load.setEnabled(False)
         self.but_save_and_use.setEnabled(False)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "start":

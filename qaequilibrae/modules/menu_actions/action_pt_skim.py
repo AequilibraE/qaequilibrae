@@ -7,4 +7,4 @@ def run_pt_skim(qgis_project):
 
     dlg2 = TransitAssignDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

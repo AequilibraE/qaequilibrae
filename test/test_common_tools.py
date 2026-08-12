@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import QDialog
 
 # def test_get_file_name_cancelled(mocker):
 #     mocker.patch(
-#         "qaequilibrae.modules.common_tools.get_output_file_name.QFileDialog.exec_",
+#         "qaequilibrae.modules.common_tools.get_output_file_name.QFileDialog.exec",
 #         return_value=False,
 #     )
 
@@ -33,7 +33,7 @@ from qgis.PyQt.QtWidgets import QDialog
 )
 def test_get_file_name(mocker, is_filename_chosen, filename, exp_fname, exp_ext):
     mocker.patch(
-        "qaequilibrae.modules.common_tools.get_output_file_name.QFileDialog.exec_",
+        "qaequilibrae.modules.common_tools.get_output_file_name.QFileDialog.exec",
         return_value=is_filename_chosen,
     )
     mocker.patch(

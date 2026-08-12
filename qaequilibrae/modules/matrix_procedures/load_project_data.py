@@ -33,8 +33,8 @@ class LoadProjectDataDialog(BaseDialog):
             self.results_model: PandasModel = None
 
             for table in [self.list_matrices, self.list_results]:
-                table.setSelectionBehavior(QAbstractItemView.SelectRows)
-                table.setSelectionMode(QAbstractItemView.SingleSelection)
+                table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+                table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
             self.load_matrices()
             self.load_results()
@@ -59,7 +59,7 @@ class LoadProjectDataDialog(BaseDialog):
 
         dlg2 = DisplayAequilibraEFormatsDialog(self.qgis_project, file_path)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
 
     def load_matrices(self):
         self.matrices = list_matrices(self.project)
@@ -115,7 +115,7 @@ class LoadProjectDataDialog(BaseDialog):
     def display_external_data(self):
         dlg2 = DisplayAequilibraEFormatsDialog(self.qgis_project)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
 
     def exit_with_error(self):
         self.qgis_project.iface_error_message(self.error)

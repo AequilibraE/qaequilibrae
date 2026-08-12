@@ -39,9 +39,9 @@ class NumpyModel(QtCore.QAbstractTableModel):
         else:
             return self._array.matrix_view.shape[1]
 
-    def data(self, index, role=QtCore.Qt.DisplayRole):
+    def data(self, index, role=QtCore.Qt.ItemDataRole.DisplayRole):
         if index.isValid():
-            if role == QtCore.Qt.DisplayRole:
+            if role == QtCore.Qt.ItemDataRole.DisplayRole:
                 row = index.row()
                 col = index.column()
 
@@ -64,10 +64,10 @@ class NumpyModel(QtCore.QAbstractTableModel):
                             self._array.matrix_view[row, col]
                         )
 
-    def headerData(self, col, orientation, role=QtCore.Qt.DisplayRole):
-        if role == QtCore.Qt.DisplayRole and orientation == QtCore.Qt.Horizontal:
+    def headerData(self, col, orientation, role=QtCore.Qt.ItemDataRole.DisplayRole):
+        if role == QtCore.Qt.ItemDataRole.DisplayRole and orientation == QtCore.Qt.Orientation.Horizontal:
             return self.headerData[col]
-        if role == QtCore.Qt.DisplayRole and orientation != QtCore.Qt.Horizontal:
+        if role == QtCore.Qt.ItemDataRole.DisplayRole and orientation != QtCore.Qt.Orientation.Horizontal:
             return self.row_headers_data[col]
 
         return QtCore.QAbstractTableModel.headerData(self, col, orientation, role)

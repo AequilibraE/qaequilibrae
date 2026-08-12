@@ -13,12 +13,13 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-      # we test the minimum LTR version required, the newest LTR, and the latest.
-        version: [qgis-ltr --version=3.40.8]
+      # We test the minimum LTR version required (Qt5) and the latest release (QGIS 4, Qt6).
+      # QGIS 4 keeps its profiles under QGIS4\, while the 3.x line uses QGIS3\.
+        version: [qgis, qgis-ltr --version=3.40.8]
 
     steps:
       - uses: actions/checkout@v6
-      
+
       - name: Install QGIS on Chocolatey
         uses: crazy-max/ghaction-chocolatey@v4
         with:
@@ -31,7 +32,7 @@ jobs:
         run: |
           $qgisPath = (Get-ChildItem -Path "C:\Program Files" -Filter "QGIS*" -Directory).FullName
           $qgisExec = "$qgisPath\bin\python-qgis.bat"
-          $pluginPath = "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
+          $pluginPath = "$env:APPDATA\QGIS\QGIS4\profiles\default\python\plugins"
           $aeqPath = "$pluginPath\qaequilibrae"
           Copy-Item "qaequilibrae" -Destination "$aeqPath" -Recurse
           Copy-Item "test" -Destination "$pluginPath\test" -Recurse
@@ -40,7 +41,7 @@ jobs:
           Start-Process -FilePath "$qgisExec" -ArgumentList "-m pip install -r $pluginPath\test\requirements_test.txt" -NoNewWindow -Wait
           Set-Location "$aeqPath"
           Start-Process -FilePath "$qgisExec" -ArgumentList "download_extra_packages_class.py" -NoNewWindow -Wait
-          $env:PYTHONPATH = "$env:PYTHONPATH;APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
+          $env:PYTHONPATH = "$env:PYTHONPATH;APPDATA\QGIS\QGIS4\profiles\default\python\plugins"
           Set-Location "$pluginPath"
           Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=.\log.jsonl" -NoNewWindow -Wait
 
@@ -66,12 +67,11 @@ jobs:
       - name: Check packages installed
         shell: pwsh
         run: |
-          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages" -Name
+          Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS*\profiles\default\python\plugins\qaequilibrae\packages" -Name
 
       - name: Check if tests failed
         shell: pwsh
         run: |
-          $pluginPath = "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
           $fails = Select-String -Path .\*.jsonl -Pattern 'failed'
           if ($fails.Matches.Length -gt 0) {
               Write-Error "Check for errors in the tests run"

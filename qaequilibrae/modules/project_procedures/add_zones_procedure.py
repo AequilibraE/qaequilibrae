@@ -1,5 +1,5 @@
 import shapely.wkb
-from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 from aequilibrae.utils.interface.worker_thread import WorkerThread
 
 

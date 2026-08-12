@@ -47,7 +47,7 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.place.setVisible(False)
 
         self.source_type_frame = QVBoxLayout()
-        self.source_type_frame.setAlignment(Qt.AlignLeft)
+        self.source_type_frame.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.source_type_frame.addWidget(self.choose_place)
         self.source_type_frame.addWidget(self.choose_canvas)
         self.source_type_frame.addWidget(self.place)
@@ -131,7 +131,7 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.close()
         dlg2 = ReportDialog(self.iface, self.report)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
 
     def signal_handler(self, val):
         if val[0] == "start":

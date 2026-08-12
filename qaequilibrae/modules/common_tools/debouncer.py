@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QTimer
+from qgis.PyQt.QtCore import QTimer
 
 
 class Debouncer:

@@ -36,8 +36,8 @@ class TransitAssignDialog(BaseDialog):
         self.chb_use_graph.toggled.connect(self.__deactivate_graph_configs)
 
         for table in [self.tbl_periods]:
-            table.setSelectionBehavior(QAbstractItemView.SelectRows)
-            table.setSelectionMode(QAbstractItemView.SingleSelection)
+            table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+            table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
         self.but_add_period.clicked.connect(self.add_period)
         self.but_adds_to_skim.clicked.connect(self.append_to_list)
@@ -201,7 +201,7 @@ class TransitAssignDialog(BaseDialog):
         """Adds new periods to periods table"""
         dlg2 = NewPeriodDialog(self.qgis_project)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
 
         if len(dlg2.error) < 1:
             start_time = dlg2.start_time
@@ -246,7 +246,7 @@ class TransitAssignDialog(BaseDialog):
             for field in old_fields:
                 table.setRowCount(counter + 1)
                 item1 = QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 table.setItem(counter, 0, item1)
                 counter += 1
 
@@ -267,7 +267,7 @@ class TransitAssignDialog(BaseDialog):
             for field in new_fields:
                 final_table.setRowCount(counter + 1)
                 item1 = QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
                 counter += 1
 

@@ -7,4 +7,4 @@ def create_example(qgis_project):
 
     dlg2 = CreateExampleDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

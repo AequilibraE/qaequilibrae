@@ -19,7 +19,7 @@ def patch_report_dialog(monkeypatch):
         def show(*args, **kwargs):
             pass
 
-        def exec_(*args, **kwargs):
+        def exec(*args, **kwargs):
             return None
 
     monkeypatch.setattr(project_from_osm_dialog, "ReportDialog", DummyReportDialog)
@@ -34,7 +34,7 @@ def test_choose_place(ae, qtbot, folder_path, patch_report_dialog):
 
     dialog.output_path.setText(folder_path)
 
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
     dirname = listdir(folder_path)
     assert "project_database.sqlite" in dirname
@@ -63,7 +63,7 @@ def test_select_canvas_area(ae, qtbot, folder_path, patch_report_dialog):
 
     dialog.output_path.setText(folder_path)
 
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
     dirname = listdir(folder_path)
     assert "project_database.sqlite" in dirname

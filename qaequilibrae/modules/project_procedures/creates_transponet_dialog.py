@@ -3,7 +3,7 @@ from functools import partial
 from os.path import dirname, isdir, join
 
 import qgis
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from aequilibrae.context import get_logger
 from aequilibrae.project.network.network import Network
 from qgis.PyQt import QtWidgets, uic
@@ -116,7 +116,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 if field not in standard_fields:
                     table.setRowCount(counter + 1)
                     item1 = QtWidgets.QTableWidgetItem(field)
-                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                     table.setItem(counter, 0, item1)
                     counter += 1
 
@@ -132,7 +132,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
             for field in new_fields:
                 final_table.setRowCount(counter + 1)
                 item1 = QtWidgets.QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
 
                 chb1 = QtWidgets.QCheckBox()
@@ -189,7 +189,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 for field in fields:
                     table.setRowCount(counter + 1)
                     item1 = QtWidgets.QTableWidgetItem(field)
-                    item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                     table.setItem(counter, 0, item1)
                     counter += 1
                 self.counter[layer_type] = counter
@@ -207,7 +207,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 final_table.setRowCount(counter + 1)
 
                 item1 = QtWidgets.QTableWidgetItem(rf)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
 
                 # The fields AequilibraE requires come from the layer and cannot be switched off, unless we
@@ -231,7 +231,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         cell_widget = QtWidgets.QWidget()
         lay_out = QtWidgets.QHBoxLayout(cell_widget)
         lay_out.addWidget(item)
-        lay_out.setAlignment(Qt.AlignCenter)
+        lay_out.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
         return cell_widget
@@ -327,7 +327,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "start":
@@ -340,5 +340,5 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
             if self.worker_thread.report:
                 dlg2 = ReportDialog(self.iface, self.worker_thread.report)
                 dlg2.show()
-                dlg2.exec_()
+                dlg2.exec()
             self.exit_procedure()

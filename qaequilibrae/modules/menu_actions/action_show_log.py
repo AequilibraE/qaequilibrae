@@ -6,4 +6,4 @@ def show_log(qgis_project):
         return
     dlg2 = LogDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

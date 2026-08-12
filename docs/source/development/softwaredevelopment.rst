@@ -23,15 +23,21 @@ the Python installation used by `QGIS <https://qgis.org/en/site/>`_ on Windows.
 We have not yet found an ideal source of recommendations for developing QAequilibraE, but a
 good initial take can be found in `this article <https://doi.org/10.1371/journal.pbio.1001745>`_.
 
-Please notice that QAequilibraE installation MUST WORK at least in the most recent long-term
-release (LTR).
+Please notice that QAequilibraE supports both QGIS 3.40+ (Qt5/PyQt5) and QGIS 4
+(Qt6/PyQt6), and its installation MUST WORK on the most recent long-term release (LTR)
+as well as on the most recent QGIS 4 release. In practice this means writing to the
+subset both bindings accept: fully-scoped enums (``Qt.AlignmentFlag.AlignCenter``, not
+``Qt.AlignCenter``), ``exec()`` rather than the removed ``exec_()``, imports routed
+through the ``qgis.PyQt`` shim rather than ``PyQt5`` directly, and never passing a bare
+int where an enum is expected, since PyQt6 refuses to coerce it.
 
 Developing QAequilibraE
 -----------------------
 
 We recommend using a dedicated virtual environment to develop QAequilibraE, using the
-version of Python related to the most recent QGIS long-term release. When this section
-was updated (October/2025),LTR 3.40.12 was coming with a default 3.12.11 Python environment.
+version of Python that ships with the QGIS release you target. When this section was
+updated (August/2026), both LTR 3.40 and QGIS 4.0.2 were coming with a default 3.12
+Python environment.
 
 We also assume you are using one of `PyCharm <https://www.jetbrains.com/pycharm>`_ or 
 `VSCode <https://code.visualstudio.com/>`_, which are good IDEs for Python. If you are using
@@ -85,12 +91,14 @@ First, let's create a virtual environment for AequilibraE.
     # Install AequilibraE in an editable version
     uv pip install -e .
 
-Open PowerShell as administrator.
+Open PowerShell as administrator. Note that QGIS 4 keeps its profiles under ``QGIS4``,
+while the 3.x line still uses ``QGIS3`` - substitute whichever matches the QGIS you are
+developing against.
 
 .. code-block::
 
     # Navigate to where your QGIS plugins are
-    cd C:\Users\renat\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins
+    cd C:\Users\renat\AppData\Roaming\QGIS\QGIS4\profiles\default\python\plugins
 
     # Create the symbolic link
     New-Item -Path ./qaequilibrae -ItemType SymbolicLink -Value C:\Users\renat\Documents\GitHub\qaequilibrae\qaequilibrae
@@ -146,7 +154,7 @@ well. The next operations are performed in the OS4GEO shell.
     cd C:\Users\renat\Downloads\aequilibrae_wheels
 
     # And install it at the 'packages' folder inside QAequilibraE, just like we did before.
-    python -m pip install aequilibrae-1.5.0-cp312-cp312-win_amd64.whl --target "C:\Users\renat\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\qaequilibrae\packages"
+    python -m pip install aequilibrae-1.5.0-cp312-cp312-win_amd64.whl --target "C:\Users\renat\AppData\Roaming\QGIS\QGIS4\profiles\default\python\plugins\qaequilibrae\packages"
 
 Reopen QGIS. QAequilibraE will ask you again if you want to install the additional packages.
 This time answer yes and let QAequilibraE automatically remove the installation of duplicate
@@ -286,7 +294,7 @@ QAequilibraE testing is done with some tools:
 * `Ruff <https://docs.astral.sh/ruff/>`_, a linter and code formatter
 * `pytest <http://pytest.org/latest/>`_, a Python testing tool
 * `pytest-cov <https://pytest-cov.readthedocs.io/en/latest/index.html>`_, a tool for measuring test code coverage
-* `pytest-qt <https://pytest-qt.readthedocs.io/en/latest/index.html>`_, a tool for testing PyQt5 applications
+* `pytest-qt <https://pytest-qt.readthedocs.io/en/latest/index.html>`_, a tool for testing PyQt6 applications
 * `pytest-qgis <https://pypi.org/project/pytest-qgis/>`_, a tool for writing QGIS tests
 
 To run the tests locally, you will need to figure out what to do...

@@ -72,7 +72,7 @@ class CreateBandwidthsDialog(BaseDialog):
         self.txt_ramp.setVisible(False)
 
         self.but_add_band.clicked.connect(self.add_to_bands_list)
-        self.bands_list.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.bands_list.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
 
         self.rdo_color.toggled.connect(self.color_origins)
 
@@ -102,7 +102,7 @@ class CreateBandwidthsDialog(BaseDialog):
             text = self.ab_FieldComboBox.currentText().upper()
             if i in text:
                 text = text.replace(i, j)
-                index = self.ba_FieldComboBox.findText(text, Qt.MatchFixedString)
+                index = self.ba_FieldComboBox.findText(text, Qt.MatchFlag.MatchFixedString)
                 if index >= 0:
                     self.ba_FieldComboBox.setCurrentIndex(index)
 
@@ -110,7 +110,7 @@ class CreateBandwidthsDialog(BaseDialog):
             text = self.ba_FieldComboBox.currentText().upper()
             if j in text:
                 text = text.replace(j, i)
-                index = self.ab_FieldComboBox.findText(text, Qt.MatchFixedString)
+                index = self.ab_FieldComboBox.findText(text, Qt.MatchFlag.MatchFixedString)
                 if index >= 0:
                     self.ab_FieldComboBox.setCurrentIndex(index)
 
@@ -119,7 +119,7 @@ class CreateBandwidthsDialog(BaseDialog):
 
         for i in all_items:
             if "AB" in i:
-                index = self.ab_FieldComboBox.findText(i, Qt.MatchFixedString)
+                index = self.ab_FieldComboBox.findText(i, Qt.MatchFlag.MatchFixedString)
                 if index >= 0:
                     self.ab_FieldComboBox.setCurrentIndex(index)
                 break
@@ -153,11 +153,11 @@ class CreateBandwidthsDialog(BaseDialog):
             # Up-Down buttons
 
             button_up = QToolButton()
-            button_up.setArrowType(Qt.UpArrow)
+            button_up.setArrowType(Qt.ArrowType.UpArrow)
             button_up.clicked.connect(self.click_button_inside_the_list)
 
             button_down = QToolButton()
-            button_down.setArrowType(Qt.DownArrow)
+            button_down.setArrowType(Qt.ArrowType.DownArrow)
             button_down.clicked.connect(self.click_button_inside_the_list)
 
             del_button = QPushButton("X")
@@ -250,7 +250,7 @@ class CreateBandwidthsDialog(BaseDialog):
             self.ramps = None
             dlg2 = LoadColorRampSelector(self.qgis_project, self.layer)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()
             if dlg2.results is not None:
                 self.ramps = dlg2.results
                 self.txt_ramp.setText(str(self.ramps))

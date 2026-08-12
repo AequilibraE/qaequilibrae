@@ -36,8 +36,8 @@ class ImpedanceMatrixDialog(BaseDialog):
         self.hide_all_progress_bars()
         self.available_skims_table.setColumnWidth(0, 245)
         self.skim_list.setColumnWidth(0, 245)
-        self.available_skims_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.skim_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.available_skims_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.skim_list.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
         # loads default path from parameters
         self.path = standard_path()
@@ -73,7 +73,7 @@ class ImpedanceMatrixDialog(BaseDialog):
             for field in old_fields:
                 table.setRowCount(counter + 1)
                 item1 = QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 table.setItem(counter, 0, item1)
                 counter += 1
 
@@ -93,7 +93,7 @@ class ImpedanceMatrixDialog(BaseDialog):
             for field in new_fields:
                 final_table.setRowCount(counter + 1)
                 item1 = QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 final_table.setItem(counter, 0, item1)
                 counter += 1
 
@@ -116,7 +116,7 @@ class ImpedanceMatrixDialog(BaseDialog):
         self.do_dist_matrix.setVisible(False)
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "start":
@@ -194,4 +194,4 @@ class ImpedanceMatrixDialog(BaseDialog):
         if self.report:
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()

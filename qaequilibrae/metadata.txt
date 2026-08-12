@@ -1,7 +1,8 @@
 [general]
 name=qaequilibrae
-qgisMinimumVersion=3.34.10
-qgisMaximumVersion=3.99.0
+qgisMinimumVersion=3.40
+qgisMaximumVersion=4.99.0
+supportsQt6=True
 description=Transportation modeling toolbox for QGIS
 about=QAequilibraE is the GUI for AequilibraE, a transportation modeling package designed to be an open-source alternative to traditional commercial packages. It is a comprehensive set of tools for modeling and visualization, including incredibly fast equilibrium traffic assignment, synthetic gravity models, network editing, and GTFS importer. http://www.aequilibrae.com/.
 author=Pedro Camargo

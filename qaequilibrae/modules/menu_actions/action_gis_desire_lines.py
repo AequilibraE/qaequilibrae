@@ -3,4 +3,4 @@ def run_desire_lines(qgis_project):
 
     dlg2 = DesireLinesDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()
