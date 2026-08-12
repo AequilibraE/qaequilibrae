@@ -22,5 +22,6 @@ from .numpy_model import NumpyModel as NumpyModel
 from .pandas_model import PandasModel as PandasModel
 from .parameters_dialog import ParameterDialog as ParameterDialog
 from .report_dialog import ReportDialog as ReportDialog
+from .sql_identifiers import quote_identifier as quote_identifier
 from .table_field_lister import find_table_fields as find_table_fields
 from .base_dialog import BaseDialog as BaseDialog

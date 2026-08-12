@@ -1,5 +1,5 @@
 import pprint
-import subprocess
+import subprocess  # nosec B404
 import sys
 from os.path import dirname, isfile, join
 from pathlib import Path
@@ -54,13 +54,13 @@ class RunModuleDialog(BaseDialog):
                         init_file.touch()
 
                     # Prepare installation
-                    install_command = f'"{DownloadAll().find_python()}"'
-                    install_command += f' -m pip install -r "{run_path}" --target "{target_dir}"'
-                    self.qgis_project.message_log(install_command)
+                    install_command = [str(DownloadAll().find_python())]
+                    install_command += ["-m", "pip", "install", "-r", str(run_path), "--target", str(target_dir)]
+                    self.qgis_project.message_log(" ".join(install_command))
 
-                    process = subprocess.Popen(
+                    # Argument list, no shell: every element is either a literal or a path we resolved ourselves
+                    process = subprocess.Popen(  # nosec B603
                         install_command,
-                        shell=True,
                         stdout=subprocess.PIPE,
                         stdin=subprocess.DEVNULL,
                         stderr=subprocess.STDOUT,

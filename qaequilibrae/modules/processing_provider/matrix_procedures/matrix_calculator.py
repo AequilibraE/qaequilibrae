@@ -1,27 +1,19 @@
 import importlib.util as iutil
 import sys
 
+import numpy as np
 import yaml
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
 from qgis.core import QgsProcessingParameterFileDestination, QgsProcessingParameterString, QgsProcessingException
 from qgis.core import QgsMessageLog, Qgis
 
 from qaequilibrae.i18n.translate import trlt
+from .matrix_expression import MatrixExpressionError, evaluate
 
 
 class MatrixCalculator(QgsProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
-        self.operation_map = {
-            "min(": "np.min(",
-            "max(": "np.max(",
-            "abs(": "np.absolute(",
-            "ln(": "np.log(",
-            "exp(": "np.exp(",
-            "power(": "np.power(",
-            "null_diag(": "np.null_diag(",
-        }
-
         self.addParameter(
             QgsProcessingParameterFile(
                 "conf_file",
@@ -66,19 +58,18 @@ class MatrixCalculator(QgsProcessingAlgorithm):
                 index[:] = mat.index[:]
                 mat.close()
 
-        expression = parameters["procedure"]
+        try:
+            out = evaluate(parameters["procedure"], matrices)
+        except MatrixExpressionError as error:
+            raise QgsProcessingException(self.tr("Invalid expression: {}").format(error)) from error
 
-        # Replace the expression for numpy operations
-        for key in self.operation_map.keys():
-            if key in expression:
-                expression = expression.replace(key, self.operation_map[key])
-
-        # Replace the expression for matrices variables
-        for key in matrices.keys():
-            if key in expression:
-                expression = expression.replace(key, f"matrices['{key}']")
-
-        out = eval(expression)
+        # Expressions such as min(matrix) collapse to a single number, which cannot be written out
+        expected = (len(index), len(index))
+        if np.shape(out) != expected:
+            got = self.tr("a single number") if np.shape(out) == () else f"{np.shape(out)}"
+            raise QgsProcessingException(
+                self.tr("The expression returned {}, but the result must be a {}x{} matrix").format(got, *expected)
+            )
 
         mat = AequilibraeMatrix()
         mat.create_empty(

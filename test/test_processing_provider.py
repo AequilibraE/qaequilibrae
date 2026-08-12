@@ -110,6 +110,28 @@ def test_matrix_calc(folder_path):
     assert np.sum(info["matrix"][parameters["matrix_core"]][:, :]) > 0
 
 
+def test_matrix_calc_rejects_a_result_that_is_not_a_matrix(folder_path):
+    makedirs(folder_path)
+
+    # min() collapses to a single number, which cannot be written out as a matrix
+    parameters = {
+        "conf_file": "test/data/SiouxFalls_project/matrix_config.yml",
+        "procedure": "min(cars)",
+        "file_path": f"{folder_path}/scalar.aem",
+        "matrix_core": "new_core",
+    }
+
+    action = MatrixCalculator()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    with pytest.raises(QgsProcessingException, match="must be a"):
+        action.processAlgorithm(parameters, context, feedback)
+
+    assert not isfile(parameters["file_path"])
+
+
 def test_trip_length_distribution(ae_with_project, folder_path):
     matrices = ae_with_project.project.matrices
     mat_names = matrices.list()["name"].tolist()

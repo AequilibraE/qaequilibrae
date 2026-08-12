@@ -1,0 +1,11 @@
+# Picked up by the QGIS plugins website scanner, which looks for this file at the top level of
+# the plugin directory inside the ZIP. Kept in sync with .pre-commit-config.yaml at the repo root.
+# https://plugins.qgis.org/docs/security-scanning/config-files
+[flake8]
+max-line-length = 120
+max-complexity = 20
+extend-ignore = E203, E266, E501, W503
+exclude = packages, __pycache__
+# Sub-packages re-export their public names through __init__.py
+per-file-ignores =
+    *__init__.py: F401, F403, F824

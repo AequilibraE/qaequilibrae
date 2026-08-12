@@ -1,5 +1,8 @@
 import sys
-import xml.etree.ElementTree as ET
+
+# The only XML this module ever reads is docs/source/_static/plugin.xml from this repository,
+# so the entity-expansion attacks B405/B314 warn about do not apply here
+import xml.etree.ElementTree as ET  # nosec B405
 from datetime import datetime
 from pathlib import Path
 
@@ -20,7 +23,7 @@ def set_version(sha):
 
     # Update version in XML
     xml_path = project_dir / "docs" / "source" / "_static" / "plugin.xml"
-    tree = ET.parse(xml_path)
+    tree = ET.parse(xml_path)  # nosec B314
     root = tree.getroot()
 
     for child in root:
