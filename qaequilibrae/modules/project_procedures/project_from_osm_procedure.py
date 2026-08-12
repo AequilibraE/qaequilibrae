@@ -38,7 +38,7 @@ class ProjectFromOSMProcedure(WorkerThread):
             self.project = Project()
             self.project.new(self.output_path)
 
-            self.project.network.signal.connect(self.__relay, Qt.ConnectionType.DirectConnection)
+            self.project.network.signal.connect(self.relay_progress, Qt.ConnectionType.DirectConnection)
             self.project.network.create_from_osm(box(*bbox))
 
             self.report.append(reporter(f"{self.project.network.count_links():,} links generated"))
@@ -63,14 +63,19 @@ class ProjectFromOSMProcedure(WorkerThread):
             self.error = self.tr("We could not find a reference for place name") + f' "{self.place_name}"'
         return bbox
 
-    def __relay(self, val):
+    def relay_progress(self, val):
         """Relays the progress AequilibraE reports for the download and build stages as our own"""
         if val[0] == "start":
+            # Zero whenever AequilibraE iterates over something it cannot take the length of,
+            # which is the case for the busiest stage of all - the one reporting once per link
             self.__maximum = val[1]
+            # A new stage starts on the screen right away, however recently the last one ended
+            self.__last_update = 0.0
         elif val[0] == "update":
             now = monotonic()
-            # We always relay the last update of a stage, so the progress bar does not stop short
-            if now - self.__last_update < min_seconds_between_updates and val[1] < self.__maximum:
+            # The update completing a stage always goes through, so the bar does not stop short
+            completes_stage = 0 < self.__maximum <= val[1]
+            if not completes_stage and now - self.__last_update < min_seconds_between_updates:
                 return
             self.__last_update = now
         elif val[0] == "finished":
