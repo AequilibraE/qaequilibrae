@@ -41,7 +41,7 @@ jobs:
           Start-Process -FilePath "$qgisExec" -ArgumentList "-m pip install -r $pluginPath\test\requirements_test.txt" -NoNewWindow -Wait
           Set-Location "$aeqPath"
           Start-Process -FilePath "$qgisExec" -ArgumentList "download_extra_packages_class.py" -NoNewWindow -Wait
-          $env:PYTHONPATH = "$env:PYTHONPATH;APPDATA\QGIS\QGIS4\profiles\default\python\plugins"
+          $env:PYTHONPATH = "$env:PYTHONPATH;$pluginPath;$aeqPath\packages"
           Set-Location "$pluginPath"
           Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=.\log.jsonl" -NoNewWindow -Wait
 
@@ -60,7 +60,7 @@ jobs:
           Start-Process -FilePath "$qgisExec" -ArgumentList "-m pip install -r $pluginPath\test\requirements_test.txt" -NoNewWindow -Wait
           Set-Location "$aeqPath"
           Start-Process -FilePath "$qgisExec" -ArgumentList "download_extra_packages_class.py" -NoNewWindow -Wait
-          $env:PYTHONPATH = "$env:PYTHONPATH;APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
+          $env:PYTHONPATH = "$env:PYTHONPATH;$pluginPath;$aeqPath\packages"
           Set-Location "$pluginPath"
           Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=$pluginPath\log.jsonl" -NoNewWindow -Wait
 
@@ -72,7 +72,14 @@ jobs:
       - name: Check if tests failed
         shell: pwsh
         run: |
-          $fails = Select-String -Path .\*.jsonl -Pattern 'failed'
+          # The profile folder differs per matrix entry: QGIS 4 uses QGIS4\, the 3.x line QGIS3\
+          $log = Get-ChildItem -Path "$env:APPDATA\QGIS\QGIS*\profiles\default\python\plugins\log.jsonl" -ErrorAction SilentlyContinue | Select-Object -First 1
+          # No report at all means pytest died before running anything, which used to pass unnoticed
+          if (-not $log) {
+              Write-Error "No test report was produced - the test run did not complete"
+              exit 1
+          }
+          $fails = Select-String -Path $log.FullName -Pattern 'failed'
           if ($fails.Matches.Length -gt 0) {
               Write-Error "Check for errors in the tests run"
               exit 1

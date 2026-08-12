@@ -1,4 +1,5 @@
 import glob
+import logging
 import sys
 import tempfile
 from functools import partial
@@ -17,15 +18,9 @@ from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
 from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, QgsMessageLog, Qgis
 
 from qaequilibrae import set_aequilibrae_menu_instance
-from qaequilibrae.message import messages
+from qaequilibrae.message import messages, FAQ_URL
+from qaequilibrae.missing_dependencies import DisabledSnapping, disabled_action, temporary_folder
 from qaequilibrae.pandas_compat import ensure_regex_capable_strings
-from qaequilibrae.modules.common_tools import EditSnapping
-from qaequilibrae.modules.menu_actions import run_load_project, run_module, run_show_project_data
-from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs
-from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths, run_pt_explore
-from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig, create_scenarios
-from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder, load_skim_viewer
-from qaequilibrae.modules.processing_provider.provider import Provider
 
 sys.path.insert(0, join(dirname(__file__), "packages"))
 
@@ -60,12 +55,54 @@ else:
         else:
             QMessageBox.information(None, "Information", msg.fourth_message)
 
+# Everything under qaequilibrae.modules reaches AequilibraE at import time, so these imports can only
+# happen after "packages" is on sys.path and populated. Moving any of them above the block above
+# turns a first run without the dependencies into a ModuleNotFoundError while QGIS is still loading
+# the plugin, which is exactly when the user should be getting offered the installation instead.
+try:
+    from qaequilibrae.modules.common_tools import EditSnapping  # noqa: E402
+    from qaequilibrae.modules.menu_actions import run_load_project, run_module, run_show_project_data  # noqa: E402
+    from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison  # noqa: E402
+    from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths  # noqa: E402
+    from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix  # noqa: E402
+    from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder  # noqa: E402
+    from qaequilibrae.modules.menu_actions import run_pt_explore, create_scenarios, run_import_gtfs  # noqa: E402
+    from qaequilibrae.modules.menu_actions import run_traffic_assig, load_skim_viewer  # noqa: E402
+    from qaequilibrae.modules.processing_provider.provider import Provider  # noqa: E402
+
+    DEPENDENCY_ERROR = None
+except ImportError as import_error:
+    # The offer above was declined, or it failed, so the dependencies are still not there. Raising
+    # would only get QGIS to swap the plugin for a traceback dialog, so the plugin loads with its
+    # menus in place instead - as messages.fourth_message promises - and every entry point that
+    # needs AequilibraE is swapped for a stand-in that says how to install it. Anything added to
+    # the imports above needs a stand-in here; test_missing_dependencies.py checks that it has one.
+    DEPENDENCY_ERROR = import_error
+
+    EditSnapping = DisabledSnapping
+    Provider = None
+    last_folder = temporary_folder
+    run_load_project = run_module = run_show_project_data = disabled_action
+    run_desire_lines = run_scenario_comparison = disabled_action
+    run_distribution_models = run_stacked_bandwidths = disabled_action
+    run_shortest_path = run_dist_matrix = disabled_action
+    run_route_choice = run_pt_skim = disabled_action
+    run_pt_explore = create_scenarios = run_import_gtfs = disabled_action
+    run_traffic_assig = load_skim_viewer = disabled_action
+
 
 class AequilibraEMenu:
     def __init__(self, iface):
         set_aequilibrae_menu_instance(self)
         # Closes AequilibraE projects eventually opened in memory
         self.logger = self.get_logger()
+        if DEPENDENCY_ERROR is not None:
+            self.message_log(
+                self.tr("Loaded without AequilibraE ({}). Menu entries will explain how to install it.").format(
+                    DEPENDENCY_ERROR
+                ),
+                Qgis.MessageLevel.Warning,
+            )
         self.geo_layers_list = ["links", "nodes", "zones"]
         self.available_scenarios = []
         self.iface = iface
@@ -196,6 +233,9 @@ class AequilibraEMenu:
                 temp_saving.triggered.connect(self.save_in_project)
 
     def get_logger(self):
+        if DEPENDENCY_ERROR is not None:
+            return logging.getLogger("AequilibraEGUI")
+
         from aequilibrae.context import get_logger
 
         return get_logger()
@@ -253,10 +293,14 @@ class AequilibraEMenu:
             self.toolbar.addWidget(itemButton)
 
     def run_help(self):
-        url = "https://www.aequilibrae.com/latest/qgis/index.html"
-        QDesktopServices.openUrl(QUrl(url))
+        QDesktopServices.openUrl(QUrl(FAQ_URL))
 
     def initProcessing(self):
+        if DEPENDENCY_ERROR is not None:
+            # Registering the provider makes QGIS import every algorithm, and all of them need
+            # AequilibraE. The menu still loads, so the user keeps a route to the instructions.
+            return
+
         self.provider = Provider()
         QgsApplication.processingRegistry().addProvider(self.provider)
 
@@ -358,6 +402,12 @@ class AequilibraEMenu:
 
     def reload_project(self):
         """Opens AequilibraE project when opening a QGIS project containing an AequilibraE model."""
+        if DEPENDENCY_ERROR is not None:
+            # Driven by a QGIS signal rather than by the menu, so it still fires in degraded mode
+            if "aequilibrae_path" in QgsProject.instance().customVariables():
+                self.iface_warning_message(text=messages().missing_dependencies_summary)
+            return
+
         from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
         # Check if QGIS project contains an AequilibraE model
