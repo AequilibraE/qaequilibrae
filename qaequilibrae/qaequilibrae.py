@@ -19,13 +19,6 @@ from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, Qgs
 from qaequilibrae import set_aequilibrae_menu_instance
 from qaequilibrae.message import messages
 from qaequilibrae.pandas_compat import ensure_regex_capable_strings
-from qaequilibrae.modules.common_tools import EditSnapping
-from qaequilibrae.modules.menu_actions import run_load_project, run_module, run_show_project_data
-from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs
-from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths, run_pt_explore
-from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig, create_scenarios
-from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder, load_skim_viewer
-from qaequilibrae.modules.processing_provider.provider import Provider
 
 sys.path.insert(0, join(dirname(__file__), "packages"))
 
@@ -61,6 +54,19 @@ else:
                 QMessageBox.information(None, "Information", msg.third_message)
         else:
             QMessageBox.information(None, "Information", msg.fourth_message)
+
+# Everything under qaequilibrae.modules reaches AequilibraE at import time, so these imports can only
+# happen after "packages" is on sys.path and populated. Moving any of them above the block above
+# turns a first run without the dependencies into a ModuleNotFoundError while QGIS is still loading
+# the plugin, which is exactly when the user should be getting offered the installation instead.
+from qaequilibrae.modules.common_tools import EditSnapping  # noqa: E402
+from qaequilibrae.modules.menu_actions import run_load_project, run_module, run_show_project_data  # noqa: E402
+from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison, run_import_gtfs  # noqa: E402
+from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths  # noqa: E402
+from qaequilibrae.modules.menu_actions import run_shortest_path, run_dist_matrix, run_traffic_assig  # noqa: E402
+from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder, load_skim_viewer  # noqa: E402
+from qaequilibrae.modules.menu_actions import run_pt_explore, create_scenarios  # noqa: E402
+from qaequilibrae.modules.processing_provider.provider import Provider  # noqa: E402
 
 if hasattr(Qt, "AA_EnableHighDpiScaling"):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
