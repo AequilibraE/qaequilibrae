@@ -1,4 +1,5 @@
-from os.path import join
+import sys
+from os.path import dirname, join
 from shutil import copytree
 from uuid import uuid4
 
@@ -7,8 +8,14 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication
 from qgis.core import QgsProject
 
-from qaequilibrae.modules.common_tools import ReportDialog
-from qaequilibrae.qaequilibrae import AequilibraEMenu
+# AequilibraE and the other dependencies are vendored in qaequilibrae/packages, and only qaequilibrae.py
+# puts that folder on sys.path - which these tests never reach, because they import plugin modules
+# directly. Relying on the runner to export PYTHONPATH instead is what left Windows CI unable to import
+# AequilibraE at all. Appended rather than inserted, so an installed AequilibraE still takes precedence.
+sys.path.append(join(dirname(dirname(__file__)), "qaequilibrae", "packages"))
+
+from qaequilibrae.modules.common_tools import ReportDialog  # noqa: E402
+from qaequilibrae.qaequilibrae import AequilibraEMenu  # noqa: E402
 
 
 @pytest.fixture
