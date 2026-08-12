@@ -40,7 +40,7 @@ jobs:
           Start-Process -FilePath "$qgisExec" -ArgumentList "-m pip install -r $pluginPath\test\requirements_test.txt" -NoNewWindow -Wait
           Set-Location "$aeqPath"
           Start-Process -FilePath "$qgisExec" -ArgumentList "download_extra_packages_class.py" -NoNewWindow -Wait
-          $env:PYTHONPATH = "$env:PYTHONPATH;APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
+          $env:PYTHONPATH = "$env:PYTHONPATH;$pluginPath;$aeqPath\packages"
           Set-Location "$pluginPath"
           Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=.\log.jsonl" -NoNewWindow -Wait
 
@@ -59,7 +59,7 @@ jobs:
           Start-Process -FilePath "$qgisExec" -ArgumentList "-m pip install -r $pluginPath\test\requirements_test.txt" -NoNewWindow -Wait
           Set-Location "$aeqPath"
           Start-Process -FilePath "$qgisExec" -ArgumentList "download_extra_packages_class.py" -NoNewWindow -Wait
-          $env:PYTHONPATH = "$env:PYTHONPATH;APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
+          $env:PYTHONPATH = "$env:PYTHONPATH;$pluginPath;$aeqPath\packages"
           Set-Location "$pluginPath"
           Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=$pluginPath\log.jsonl" -NoNewWindow -Wait
 
@@ -72,7 +72,13 @@ jobs:
         shell: pwsh
         run: |
           $pluginPath = "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins"
-          $fails = Select-String -Path .\*.jsonl -Pattern 'failed'
+          $log = "$pluginPath\log.jsonl"
+          # No report at all means pytest died before running anything, which used to pass unnoticed
+          if (-not (Test-Path $log)) {
+              Write-Error "No test report at $log - the test run did not complete"
+              exit 1
+          }
+          $fails = Select-String -Path $log -Pattern 'failed'
           if ($fails.Matches.Length -gt 0) {
               Write-Error "Check for errors in the tests run"
               exit 1
