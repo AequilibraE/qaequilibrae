@@ -4,7 +4,7 @@ from aequilibrae.transit import Transit
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem
 
-from qaequilibrae.modules.common_tools import BaseDialog, project_has_transit
+from qaequilibrae.modules.common_tools import BaseDialog, project_has_transit, quote_identifier
 from qaequilibrae.modules.transit_procedures import GTFSFeed
 
 
@@ -80,9 +80,8 @@ class GTFSImporter(BaseDialog):
 
         if self.rdo_clear.isChecked() and self.is_pt_database:
             with self.qgis_project.project.transit_connection as conn:
-                # The table names are the fixed list built in the constructor, not user input
                 for table in self.__transit_tables:
-                    conn.execute(f"DELETE FROM {table};")  # nosec B608
+                    conn.execute(f"DELETE FROM {quote_identifier(table)};")
 
         for _, feed in enumerate(self.feeds):
             feed.signal.connect(self.signal_handler)
