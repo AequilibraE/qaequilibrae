@@ -242,7 +242,7 @@ def test_create_empty_project_on_populated_folder(tmp_path):
         action.processAlgorithm(parameters, context, feedback)
 
 
-@pytest.mark.parametrize("model_name", ["", "   ", "sub/folder", "sub\\folder", "model:name"])
+@pytest.mark.parametrize("model_name", ["", "   ", "sub/folder", "sub\\folder", "model:name", ".", ".."])
 def test_create_empty_project_with_unusable_model_name(tmp_path, model_name):
     parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": model_name}
 
@@ -253,6 +253,9 @@ def test_create_empty_project_with_unusable_model_name(tmp_path, model_name):
 
     with pytest.raises(QgsProcessingException):
         action.processAlgorithm(parameters, context, feedback)
+
+    # "." resolves to the parent folder, which must survive the rejection untouched
+    assert isdir(str(tmp_path))
 
 
 def test_network_simplifier(folder_path):

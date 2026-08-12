@@ -16,6 +16,9 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
     # The model name becomes a folder name, so anything a file system could choke on is out
     INVALID_NAME_CHARACTERS = '\\/:*?"<>|'
 
+    # These resolve to the parent folder itself (or above it) instead of a new folder inside it
+    RESERVED_NAMES = (".", "..")
+
     def initAlgorithm(self, config=None):
         # 1. Existing folder the new model folder will be created in
         self.addParameter(
@@ -43,6 +46,11 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
             raise QgsProcessingException(
                 self.tr("The model name cannot contain any of these characters: ") + self.INVALID_NAME_CHARACTERS
             )
+
+        # Caught before joining, since these would point the project folder at the parent folder
+        # itself and leave the empty-folder handling below ready to remove it
+        if model_name in self.RESERVED_NAMES:
+            raise QgsProcessingException(self.tr("The model name cannot be '.' or '..'"))
 
         project_folder = join(parent_folder, model_name)
 
