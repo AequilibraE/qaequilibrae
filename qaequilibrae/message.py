@@ -1,5 +1,8 @@
 from qgis.PyQt.QtCore import QCoreApplication
 
+# Landing page for the QGIS plugin, which carries the manual installation instructions
+FAQ_URL = "https://www.aequilibrae.com/latest/qgis/index.html"
+
 
 class messages:
     @property
@@ -26,6 +29,25 @@ class messages:
     @property
     def fourth_message(self):
         return self.tr("Without installing the packages, the plugin will be mostly non-functional")
+
+    @property
+    def missing_dependencies_box_name(self):
+        return self.tr("AequilibraE is not installed")
+
+    @property
+    def missing_dependencies_message(self):
+        """Shown when a menu entry is used while the plugin is loaded without its dependencies."""
+        a = self.tr("This tool needs the Python packages QAequilibraE depends on, which are not installed.")
+        b = self.tr("Restart QGIS and accept the offer to install them,")
+        c = self.tr("or follow the manual installation instructions at:")
+        return f"{a}\r\n\r\n{b}\r\n{c}\r\n{FAQ_URL}"
+
+    @property
+    def missing_dependencies_summary(self):
+        """One-line version of the message above, for the message bar and the log."""
+        a = self.tr("QAequilibraE is loaded without the Python packages it depends on.")
+        b = self.tr("See {} for how to install them.").format(FAQ_URL)
+        return f"{a} {b}"
 
     @property
     def messsage_five(self):
