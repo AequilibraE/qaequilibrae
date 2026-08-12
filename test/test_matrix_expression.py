@@ -65,3 +65,13 @@ def test_null_diag_zeroes_the_diagonal_without_touching_the_input(matrices):
 def test_rejects_anything_outside_matrix_algebra(matrices, expression):
     with pytest.raises(MatrixExpressionError):
         evaluate(expression, matrices)
+
+
+@pytest.mark.parametrize("expression", ["np.min(cars)", "cars.min()"])
+def test_a_qualified_call_says_so_rather_than_blaming_the_function(matrices, expression):
+    # 'min' is supported, so reporting it as unknown would send people looking in the wrong place
+    with pytest.raises(MatrixExpressionError, match="unqualified") as error:
+        evaluate(expression, matrices)
+
+    assert "Unknown function" not in str(error.value)
+    assert "min(...)" in str(error.value)

@@ -19,7 +19,6 @@ import argparse
 import json
 import os
 import shutil
-import stat
 import subprocess  # nosec B404
 import sys
 import tarfile
@@ -110,6 +109,26 @@ def repository_root():
     return Path(process.stdout.strip())
 
 
+def executable_files(root, worktree):
+    """Plugin-relative paths that git marks executable.
+
+    Executability has to come from git rather than from the files on disk: it is git's mode that
+    ends up in the ZIP, copying into the scan directory does not carry mode bits across, and
+    Windows has no executable bit to read in the first place.
+    """
+    command = ["git", "ls-files", "-s", PLUGIN_DIR] if worktree else ["git", "ls-tree", "-r", "HEAD", PLUGIN_DIR]
+    listing = subprocess.run(command, cwd=root, capture_output=True, text=True, check=True)  # nosec B603 B607
+
+    executable = set()
+    for line in listing.stdout.splitlines():
+        if "\t" not in line:
+            continue
+        details, path = line.split("\t", 1)
+        if details.split()[0] == "100755":
+            executable.add(Path(path).relative_to(PLUGIN_DIR).as_posix())
+    return executable
+
+
 def export_plugin(destination, worktree):
     """Writes the packaged plugin tree into *destination* and returns its path."""
     root = repository_root()
@@ -132,7 +151,7 @@ def export_plugin(destination, worktree):
             archive.extractall(destination, **extraction)  # nosec B202
         archive_path.unlink()
 
-    return destination / PLUGIN_DIR
+    return destination / PLUGIN_DIR, executable_files(root, worktree)
 
 
 def check_bandit(plugin_path):
@@ -213,7 +232,7 @@ def report_flake8(plugin_path):
         print(f"  ... and {len(issues) - 20} more")
 
 
-def report_files(plugin_path):
+def report_files(plugin_path, marked_executable):
     """The website's package inspection: suspicious types, hidden files, executable bits."""
     suspicious, hidden, executable = [], [], []
 
@@ -226,7 +245,7 @@ def report_files(plugin_path):
                 suspicious.append(relative)
             if name.startswith("."):
                 hidden.append(relative)
-            if full_path.stat().st_mode & (stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH):
+            if relative in marked_executable:
                 executable.append(relative)
 
     print("\nPackaged files (non-blocking)")
@@ -244,14 +263,14 @@ def main():
     args = parser.parse_args()
 
     with tempfile.TemporaryDirectory() as work_dir:
-        plugin_path = export_plugin(Path(work_dir), args.worktree)
+        plugin_path, marked_executable = export_plugin(Path(work_dir), args.worktree)
         print(f"Scanning {PLUGIN_DIR} as {'in the working tree' if args.worktree else 'committed at HEAD'}\n")
 
         bandit_findings = check_bandit(plugin_path)
         secret_findings = check_secrets(plugin_path)
         report_bandit_advisories(plugin_path)
         report_flake8(plugin_path)
-        report_files(plugin_path)
+        report_files(plugin_path, marked_executable)
 
     blocking = len(bandit_findings) + sum(len(s) for s in secret_findings.values())
     if blocking:

@@ -84,9 +84,13 @@ def _evaluate(node, matrices):
 
 
 def _evaluate_call(node, matrices):
-    if not isinstance(node.func, ast.Name) or node.func.id not in FUNCTIONS:
-        name = node.func.id if isinstance(node.func, ast.Name) else getattr(node.func, "attr", "?")
-        raise MatrixExpressionError(f"Unknown function '{name}'. Available: {', '.join(sorted(FUNCTIONS))}")
+    if not isinstance(node.func, ast.Name):
+        attribute = getattr(node.func, "attr", "")
+        hint = f" Write '{attribute}(...)' instead." if attribute in FUNCTIONS else ""
+        raise MatrixExpressionError(f"Only unqualified function calls are supported.{hint}")
+
+    if node.func.id not in FUNCTIONS:
+        raise MatrixExpressionError(f"Unknown function '{node.func.id}'. Available: {', '.join(sorted(FUNCTIONS))}")
 
     if node.keywords:
         raise MatrixExpressionError(f"'{node.func.id}' does not take keyword arguments")

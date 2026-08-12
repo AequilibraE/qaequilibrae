@@ -1,6 +1,7 @@
 import importlib.util as iutil
 import sys
 
+import numpy as np
 import yaml
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
 from qgis.core import QgsProcessingParameterFileDestination, QgsProcessingParameterString, QgsProcessingException
@@ -61,6 +62,14 @@ class MatrixCalculator(QgsProcessingAlgorithm):
             out = evaluate(parameters["procedure"], matrices)
         except MatrixExpressionError as error:
             raise QgsProcessingException(self.tr("Invalid expression: {}").format(error)) from error
+
+        # Expressions such as min(matrix) collapse to a single number, which cannot be written out
+        expected = (len(index), len(index))
+        if np.shape(out) != expected:
+            got = self.tr("a single number") if np.shape(out) == () else f"{np.shape(out)}"
+            raise QgsProcessingException(
+                self.tr("The expression returned {}, but the result must be a {}x{} matrix").format(got, *expected)
+            )
 
         mat = AequilibraeMatrix()
         mat.create_empty(
