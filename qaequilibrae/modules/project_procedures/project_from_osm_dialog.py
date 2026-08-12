@@ -166,10 +166,16 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         if self.logfile is None or not isfile(self.logfile):
             return
 
-        with open(self.logfile, "r") as log:
-            log.seek(self.__log_position)
-            new_entries = log.read()
-            self.__log_position = log.tell()
+        # This runs on a timer, and PyQt turns an exception crossing a slot boundary into a
+        # qFatal() - so a log we cannot read has to cost us the tick, not the QGIS session.
+        # No encoding is given on purpose, to match the one AequilibraE writes the file with
+        try:
+            with open(self.logfile, "r", errors="replace") as log:
+                log.seek(self.__log_position)
+                new_entries = log.read()
+                self.__log_position = log.tell()
+        except OSError:
+            return
 
         if not new_entries.strip():
             return
