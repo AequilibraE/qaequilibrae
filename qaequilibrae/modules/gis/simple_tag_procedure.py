@@ -54,8 +54,8 @@ class SimpleTAG(WorkerThread):
         to_layer_counts = self.to_layer.dataProvider().featureCount()
         from_layer_counts = self.from_layer.dataProvider().featureCount()
 
-        EPSG1 = QgsCoordinateReferenceSystem(f"EPSG:{int(self.from_layer.crs().authid().split(":")[1])}")
-        EPSG2 = QgsCoordinateReferenceSystem(f"EPSG:{int(self.to_layer.crs().authid().split(":")[1])}")
+        EPSG1 = QgsCoordinateReferenceSystem(f"EPSG:{int(self.from_layer.crs().authid().split(':')[1])}")
+        EPSG2 = QgsCoordinateReferenceSystem(f"EPSG:{int(self.to_layer.crs().authid().split(':')[1])}")
         if EPSG1 != EPSG2:
             self.transform = QgsCoordinateTransform(EPSG1, EPSG2, QgsProject.instance())
 

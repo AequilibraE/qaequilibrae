@@ -6,7 +6,6 @@ from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraE
 
 
 class TrafficAssignment(QAequilibraEProcessingAlgorithm):
-
     def __init__(self):
         from qaequilibrae.modules.menu_actions.action_traffic_assignment import run_traffic_assig
 

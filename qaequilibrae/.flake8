@@ -1,5 +1,6 @@
 # Picked up by the QGIS plugins website scanner, which looks for this file at the top level of
-# the plugin directory inside the ZIP. Kept in sync with .pre-commit-config.yaml at the repo root.
+# the plugin directory inside the ZIP. ci/security_scan.py reproduces that scan locally.
+# Linting for development is ruff (see pyproject.toml); this file exists for the website only.
 # https://plugins.qgis.org/docs/security-scanning/config-files
 [flake8]
 max-line-length = 120

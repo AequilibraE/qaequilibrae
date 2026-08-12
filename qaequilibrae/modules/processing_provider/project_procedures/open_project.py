@@ -6,7 +6,6 @@ from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraE
 
 
 class OpenProject(QAequilibraEProcessingAlgorithm):
-
     def __init__(self):
         from qaequilibrae.modules.menu_actions.load_project_action import run_load_project
 

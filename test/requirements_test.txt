@@ -3,7 +3,6 @@ pytest-qgis
 pytest-qt
 pytest-cov
 pytest-mock
-black==24.4.2
-ruff==0.14.8
+ruff==0.16.2
 pytest-reportlog
 pyarrow

@@ -6,7 +6,6 @@ from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraE
 
 
 class RunProcedures(QAequilibraEProcessingAlgorithm):
-
     def __init__(self):
         from qaequilibrae.modules.menu_actions.action_run_module import run_module
 

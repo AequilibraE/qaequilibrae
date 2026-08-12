@@ -9,7 +9,6 @@ from qaequilibrae.i18n.translate import trlt
 
 
 class ExportMatrix(QgsProcessingAlgorithm):
-
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterFile(

@@ -6,7 +6,6 @@ from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraE
 
 
 class CreateScenarios(QAequilibraEProcessingAlgorithm):
-
     def __init__(self):
         from qaequilibrae.modules.menu_actions import create_scenarios
 
