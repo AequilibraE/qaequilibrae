@@ -113,7 +113,7 @@ class RouteChoiceDialog(BaseDialog):
             cell_widget = QWidget()
             lay_out = QHBoxLayout(cell_widget)
             lay_out.addWidget(item)
-            lay_out.setAlignment(Qt.AlignCenter)
+            lay_out.setAlignment(Qt.AlignmentFlag.AlignCenter)
             lay_out.setContentsMargins(0, 0, 0, 0)
             cell_widget.setLayout(lay_out)
             return cell_widget
@@ -123,7 +123,7 @@ class RouteChoiceDialog(BaseDialog):
             table.setRowCount(self.matrix.cores)
             for i, mat in enumerate(self.matrix.names):
                 item1 = QTableWidgetItem(mat)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 table.setItem(i, 0, item1)
 
                 chb1 = QCheckBox()
@@ -438,7 +438,7 @@ class RouteChoiceDialog(BaseDialog):
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "finished":
@@ -473,7 +473,7 @@ class RouteChoiceDialog(BaseDialog):
                 )
                 dlg2.show()
                 dlg2.open()
-                # see note in https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QDialog.html#PySide2.QtWidgets.PySide2.QtWidgets.QDialog.exec_
+                # see note in https://doc.qt.io/qt-6/qdialog.html#exec
 
             self.exit_procedure()
 

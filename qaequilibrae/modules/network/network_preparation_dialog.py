@@ -98,7 +98,7 @@ class NetworkPreparationDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.qgis_project.iface, self.worker_thread.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()
 
     def run(self):
         if self.radioUseNodes.isChecked():

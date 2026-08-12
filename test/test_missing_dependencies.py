@@ -13,6 +13,7 @@ import ast
 import importlib.util
 import sys
 from contextlib import contextmanager
+from enum import IntFlag
 from pathlib import Path
 
 import pytest
@@ -40,10 +41,15 @@ class RecordingMessageBox:
     """Stands in for QMessageBox so the install prompt cannot block the test run.
 
     Answering Cancel is the case being tested: it is what leaves the dependencies missing.
+
+    The buttons live under a nested ``StandardButton`` because that is where PyQt6 keeps them,
+    and the plugin spells them that way so it works under both Qt5 and Qt6. IntFlag is what
+    makes ``Ok | Cancel`` combine the way the real enum does.
     """
 
-    Ok = 1
-    Cancel = 2
+    class StandardButton(IntFlag):
+        Ok = 1
+        Cancel = 2
 
     def __init__(self):
         self.shown = []
@@ -53,7 +59,7 @@ class RecordingMessageBox:
 
     def question(self, parent, title, text, *args, **kwargs):
         self.shown.append((title, text))
-        return self.Cancel
+        return self.StandardButton.Cancel
 
 
 @contextmanager

@@ -14,4 +14,4 @@ def run_module(qgis_project):
 
     dlg2 = RunModuleDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

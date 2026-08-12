@@ -5,4 +5,4 @@ def run_show_project_data(qgis_project):
 
     dlg2 = LoadProjectDataDialog(qgis_project, has_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

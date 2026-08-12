@@ -167,7 +167,7 @@ class TrafficAssignmentDialog(BaseDialog):
                             table.setRowCount(idx + 1)
                             for i, val in enumerate([key, skim]):
                                 item = QTableWidgetItem(val)
-                                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                                item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                                 table.setItem(idx, i, item)
 
                             status = True if "final" in config else False
@@ -391,7 +391,7 @@ class TrafficAssignmentDialog(BaseDialog):
             self.but_add_class.setEnabled(True)
         matrices_model = PandasModel(df)
         self.tbl_core_list.setModel(matrices_model)
-        self.tbl_core_list.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tbl_core_list.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
     def __populate_project_info(self):
         path_to_file = str(self.project.path_to_file)
@@ -447,7 +447,7 @@ class TrafficAssignmentDialog(BaseDialog):
         self.tbl_vdf_parameters.setRowCount(len(parameters))
         for i, par in enumerate(parameters):
             core_item = QTableWidgetItem(par)
-            core_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            core_item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             table.setItem(i, 0, core_item)
 
             val_item = QLineEdit()
@@ -515,7 +515,7 @@ class TrafficAssignmentDialog(BaseDialog):
         idx = num_classes - 1
         for i, txt in enumerate([class_name, mode, str(len(user_classes)), fcost, str(round(pce, 4))]):
             item = QTableWidgetItem(txt)
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             table.setItem(idx, i, item)
 
         but = QPushButton()
@@ -541,7 +541,7 @@ class TrafficAssignmentDialog(BaseDialog):
 
         for i, val in enumerate([self.cob_skim_class.currentText(), field]):
             item = QTableWidgetItem(val)
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             table.setItem(idx, i, item)
 
         last_chb = QCheckBox()
@@ -631,7 +631,7 @@ class TrafficAssignmentDialog(BaseDialog):
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def job_finished_from_thread(self):
         self.produce_all_outputs()
@@ -769,4 +769,4 @@ class TrafficAssignmentDialog(BaseDialog):
         if self.report:
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()

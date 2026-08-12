@@ -11,7 +11,7 @@ from uuid import uuid4
 import qgis
 from qgis.PyQt.QtCore import Qt, QTranslator, QSettings, QLocale, QCoreApplication, QSize, QUrl
 from qgis.PyQt.QtGui import QDesktopServices
-from qgis.PyQt.QtWidgets import QVBoxLayout, QApplication, QToolBar, QToolButton
+from qgis.PyQt.QtWidgets import QVBoxLayout, QToolBar, QToolButton
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget
 from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableWidgetItem, QTableWidget
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
@@ -29,7 +29,7 @@ if ensure_regex_capable_strings():
     QgsMessageLog.logMessage(
         "PyArrow was built without regex support, so pandas will use Python string storage",
         "AequilibraE",
-        Qgis.Info,
+        Qgis.MessageLevel.Info,
     )
 
 if Path(join(dirname(__file__), "packages", "requirements.txt")).exists():
@@ -43,10 +43,8 @@ else:
     if version < (3, 12) and sys.platform == "win32":
         QMessageBox.information(None, "Warning", msg.messsage_five)
     else:
-        if (
-            QMessageBox.question(None, msg.first_box_name, msg.first_message, QMessageBox.Ok | QMessageBox.Cancel)
-            == QMessageBox.Ok
-        ):
+        buttons = QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel
+        if QMessageBox.question(None, msg.first_box_name, msg.first_message, buttons) == QMessageBox.StandardButton.Ok:
             from qaequilibrae.download_extra_packages_class import DownloadAll
 
             result = DownloadAll().install()
@@ -92,12 +90,6 @@ except ImportError as import_error:
     run_pt_explore = create_scenarios = run_import_gtfs = disabled_action
     run_traffic_assig = load_skim_viewer = disabled_action
 
-if hasattr(Qt, "AA_EnableHighDpiScaling"):
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
-
-if hasattr(Qt, "AA_UseHighDpiPixmaps"):
-    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
-
 
 class AequilibraEMenu:
     def __init__(self, iface):
@@ -127,7 +119,7 @@ class AequilibraEMenu:
         # The self.toolbar will hold everything
         self.toolbar = QToolBar()
         self.set_font(self.toolbar)
-        self.toolbar.setOrientation(2)
+        self.toolbar.setOrientation(Qt.Orientation.Vertical)
 
         if QSettings().value("locale/overrideFlag", type=bool):
             loc = QSettings().value("locale/userLocale")
@@ -207,7 +199,7 @@ class AequilibraEMenu:
         # # # ###################  PROJECT MANAGER  ##################################
 
         lbl = QLabel("Model scenario")
-        lbl.setAlignment(Qt.AlignCenter)
+        lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.toolbar.addWidget(lbl)
         self.cob_scenarios = QComboBox()
         self.toolbar.addWidget(self.cob_scenarios)
@@ -227,8 +219,8 @@ class AequilibraEMenu:
         self.manager.setLayout(p1_vertical)
 
         self.dock.setWidget(self.manager)
-        self.dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
+        self.dock.setAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea)
+        self.iface.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.dock)
         QgsProject.instance().layerRemoved.connect(self.layerRemoved)
 
         # # # ########################################################################
@@ -295,7 +287,7 @@ class AequilibraEMenu:
                     itemMenu.addAction(action)
             itemButton = QToolButton()
             itemButton.setText(menu)
-            itemButton.setPopupMode(2)
+            itemButton.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
             itemButton.setMenu(itemMenu)
 
             self.toolbar.addWidget(itemButton)
@@ -522,7 +514,7 @@ class AequilibraEMenu:
             self.geo_layers_table.horizontalHeader().hide()
             for i, f in enumerate(layers):
                 item1 = QTableWidgetItem(f)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 self.geo_layers_table.setItem(i, 0, item1)
 
             descrlayout.addWidget(self.geo_layers_table)

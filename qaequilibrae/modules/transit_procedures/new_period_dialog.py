@@ -7,7 +7,7 @@ FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_add_period.ui")
 
 class NewPeriodDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
-        QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowStaysOnTopHint)
+        QtWidgets.QDialog.__init__(self, None, QtCore.Qt.WindowType.WindowStaysOnTopHint)
         qgis_project.block_change_scenario()
 
         try:

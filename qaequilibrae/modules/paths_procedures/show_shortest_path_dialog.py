@@ -5,7 +5,7 @@ from aequilibrae.context import get_logger
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import PathResults
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType
 from qgis.core import QgsProject, QgsVectorLayer, QgsSpatialIndex, QgsField, QgsFeature
 from qgis.utils import iface
 
@@ -65,7 +65,7 @@ class ShortestPathDialog(BaseDialog):
 
         dlg2 = LoadGraphLayerSettingDialog(self.qgis_project, all_modes, numeric_fields)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
 
         if len(dlg2.error) > 0 or len(dlg2.mode) <= 0:
             return
@@ -198,10 +198,10 @@ class ShortestPathDialog(BaseDialog):
         pr = vl.dataProvider()
 
         graph_fields = [
-            QgsField("link_id", QVariant.LongLong),
-            QgsField("a_node", QVariant.LongLong),
-            QgsField("b_node", QVariant.LongLong),
-            QgsField("direction", QVariant.Int),
+            QgsField("link_id", QMetaType.Type.LongLong),
+            QgsField("a_node", QMetaType.Type.LongLong),
+            QgsField("b_node", QMetaType.Type.LongLong),
+            QgsField("direction", QMetaType.Type.Int),
         ]
 
         data = self.graph.graph.assign(__data_key__=self.graph.graph.link_id * self.graph.graph.direction)
@@ -220,7 +220,7 @@ class ShortestPathDialog(BaseDialog):
         ]
 
         added_fields = [fld for fld in data if fld not in exclude]
-        graph_fields.extend([QgsField(fld, QVariant.Double) for fld in added_fields])
+        graph_fields.extend([QgsField(fld, QMetaType.Type.Double) for fld in added_fields])
 
         # add fields
         pr.addAttributes(graph_fields)

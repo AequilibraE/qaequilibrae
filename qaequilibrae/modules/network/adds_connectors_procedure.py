@@ -1,5 +1,5 @@
 from aequilibrae.utils.interface.worker_thread import WorkerThread
-from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtSignal
 import shapely.wkb
 
 from qaequilibrae.modules.common_tools import polygon_from_radius

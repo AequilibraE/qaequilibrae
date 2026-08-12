@@ -115,7 +115,7 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
 
         self.but_load.setEnabled(False)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "start":
@@ -135,7 +135,7 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
             if self.worker_thread.report:
                 dlg2 = ReportDialog(self.iface, self.worker_thread.report)
                 dlg2.show()
-                dlg2.exec_()
+                dlg2.exec()
             else:
                 if val[1] == "LOADED-MATRIX":
                     self.compressed.setVisible(True)
@@ -199,11 +199,11 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
             self.matrix_list_view.setItem(i, 0, item_1)
 
             item_2 = QTableWidgetItem(dimensions)
-            item_2.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            item_2.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             self.matrix_list_view.setItem(i, 1, item_2)
 
             item_3 = QTableWidgetItem(total)
-            item_3.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            item_3.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             self.matrix_list_view.setItem(i, 2, item_3)
 
             i += 1

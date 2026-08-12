@@ -6,12 +6,12 @@ from qaequilibrae.modules.project_procedures import CreateScenariosDialog
 def test_create_empty_scenario(sf_project, qtbot):
     dialog = CreateScenariosDialog(sf_project)
 
-    qtbot.mouseClick(dialog.rdo_create, Qt.LeftButton)
+    qtbot.mouseClick(dialog.rdo_create, Qt.MouseButton.LeftButton)
 
     dialog.txt_name.setText("test_empty_scenario")
     dialog.txt_desc.setText("Empty scenario created for test")
 
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
     # Check if dialog was closed
     assert not dialog.isVisible()
@@ -27,7 +27,7 @@ def test_clone_scenario(sf_project, qtbot):
     dialog.txt_name.setText("test_clone_root_scenario")
     dialog.txt_desc.setText("Clone 'root' scenario for test")
 
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
     # Check if dialog was closed
     assert not dialog.isVisible()
@@ -60,7 +60,7 @@ def test_clone_scenario_from_another(sf_project, qtbot):
     dialog.txt_name.setText("clone_disconnect_nodes_scenario")
     dialog.txt_desc.setText("Clone 'clone_disconnect_nodes_scenario' scenario for test")
 
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
     # Check if dialog was closed
     assert not dialog.isVisible()

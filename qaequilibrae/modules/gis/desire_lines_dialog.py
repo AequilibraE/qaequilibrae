@@ -91,7 +91,7 @@ class DesireLinesDialog(BaseDialog):
             table.setRowCount(self.matrix.cores)
             for i, mat in enumerate(self.matrix.names):
                 item1 = QTableWidgetItem(mat)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 table.setItem(i, 0, item1)
 
                 chb1 = QCheckBox()
@@ -103,7 +103,7 @@ class DesireLinesDialog(BaseDialog):
         cell_widget = QWidget()
         lay_out = QHBoxLayout(cell_widget)
         lay_out.addWidget(item)
-        lay_out.setAlignment(Qt.AlignCenter)
+        lay_out.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
         return cell_widget
@@ -111,7 +111,7 @@ class DesireLinesDialog(BaseDialog):
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def load_fields_to_combo_boxes(self):
         self.zone_id_field.clear()
@@ -145,7 +145,7 @@ class DesireLinesDialog(BaseDialog):
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()
         self.exit_procedure()
 
     def check_all_inputs(self):
@@ -208,7 +208,7 @@ class DesireLinesDialog(BaseDialog):
         error_message = ["*** ERROR ***", error_message]
         dlg2 = ReportDialog(self.iface, error_message)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
 
     def exit_procedure(self):
         self.close()

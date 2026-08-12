@@ -54,9 +54,9 @@ class GTFSImporter(BaseDialog):
     def add_gtfs_feed(self):
         self._p = Transit(self.qgis_project.project)
         self.dlg2 = GTFSFeed(self.qgis_project, self._p)
-        self.dlg2.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg2.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint)
         self.dlg2.show()
-        self.dlg2.exec_()
+        self.dlg2.exec()
         if self.dlg2.feed is not None:
             self.set_feed(self.dlg2.feed)
 
@@ -69,7 +69,7 @@ class GTFSImporter(BaseDialog):
         self.feeds.append(feed)
         self.list_feeds.setRowCount(self.list_feeds.rowCount() + 1)
         feed_txt = QTableWidgetItem(f"{feed.gtfs_data.agency.agency} ({feed.gtfs_data.feed_date})")
-        feed_txt.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+        feed_txt.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
         self.list_feeds.setItem(self.list_feeds.rowCount() - 1, 0, feed_txt)
 
     def execute_importer(self):

@@ -5,7 +5,7 @@ import openmatrix as omx
 import pandas as pd
 import pytest
 from aequilibrae.matrix import AequilibraeMatrix
-from PyQt5.QtCore import Qt
+from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
@@ -102,14 +102,14 @@ def test_calibrate_gravity(sf_project, method, folder_path, mocker, qtbot):
     if method in ["negative_exponential", "both"]:
         mocked_outfile.return_value = f"{folder_path}/neg_{method}.mod"
         dialog.rdo_expo.setChecked(True)
-        qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
+        qtbot.mouseClick(dialog.but_queue, Qt.MouseButton.LeftButton)
 
     if method in ["inverse_power", "both"]:
         mocked_outfile.return_value = f"{folder_path}/inv_{method}.mod"
         dialog.rdo_power.setChecked(True)
-        qtbot.mouseClick(dialog.but_queue, Qt.LeftButton)
+        qtbot.mouseClick(dialog.but_queue, Qt.MouseButton.LeftButton)
 
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
     if method in ["negative_exponential", "both"]:
         file_path = f"{folder_path}/neg_{method}.mod"

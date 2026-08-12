@@ -75,7 +75,7 @@ class AddZonesDialog(BaseDialog):
 
             for counter, field in enumerate(fields):
                 item1 = QTableWidgetItem(field)
-                item1.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 self.table_fields.setItem(counter, 1, item1)
 
                 chb1 = QCheckBox()
@@ -93,7 +93,7 @@ class AddZonesDialog(BaseDialog):
         cell_widget = QWidget()
         lay_out = QHBoxLayout(cell_widget)
         lay_out.addWidget(item)
-        lay_out.setAlignment(Qt.AlignCenter)
+        lay_out.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lay_out.setContentsMargins(0, 0, 0, 0)
         cell_widget.setLayout(lay_out)
         return cell_widget

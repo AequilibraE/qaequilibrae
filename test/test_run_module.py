@@ -27,7 +27,7 @@ def test_example_function_with_kwargs(coquimbo_project, qtbot, timeoutDetector):
     dialog.cob_function.setCurrentIndex(0)
     assert dialog.cob_function.currentText() == functions[3]
 
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
     assert messagebar.messages[3][0] == "example_function_with_kwargs executed:", "Level 3 error message is missing"
@@ -74,7 +74,7 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
     dialog.cob_function.setCurrentIndex(0)
     assert dialog.cob_function.currentText() == "create_delaunay"
 
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
     with coquimbo_project.project.results_connection as conn:
         results = pd.read_sql("SELECT * FROM delaunay_test", conn).set_index("link_id")
@@ -123,8 +123,8 @@ def test_install_external_libraries(coquimbo_project, qtbot):
 
     def handle_dialog():
         dialog = wait_for_active_window(qtbot)
-        ok_button = dialog.button(QMessageBox.Ok)
-        qtbot.mouseClick(ok_button, Qt.LeftButton, delay=1)
+        ok_button = dialog.button(QMessageBox.StandardButton.Ok)
+        qtbot.mouseClick(ok_button, Qt.MouseButton.LeftButton, delay=1)
 
     QTimer.singleShot(100, handle_dialog)
     QTimer.singleShot(5_000, handle_dialog)
@@ -138,7 +138,7 @@ def test_install_external_libraries(coquimbo_project, qtbot):
     dialog.cob_function.setCurrentIndex(4)
     assert dialog.cob_function.currentText() == "seaborn_plot"
 
-    qtbot.mouseClick(dialog.but_run, Qt.LeftButton)
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
     messagebar = coquimbo_project.iface.messageBar()
     assert "seaborn_plot executed" in messagebar.messages[3][0]

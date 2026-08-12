@@ -12,4 +12,4 @@ def run_pt_explore(qgis_project):
 
     dlg2 = TransitNavigatorDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()

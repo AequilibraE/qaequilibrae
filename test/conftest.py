@@ -4,8 +4,8 @@ from shutil import copytree
 from uuid import uuid4
 
 import pytest
-from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QApplication
+from qgis.PyQt.QtCore import QTimer
+from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsProject
 
 # AequilibraE and the other dependencies are vendored in qaequilibrae/packages, and only qaequilibrae.py
@@ -25,7 +25,7 @@ def folder_path(tmp_path):
 
 @pytest.fixture(scope="function")
 def timeoutDetector(qgis_iface) -> None:
-    # Raising from here would cross a Qt slot boundary, and PyQt5 turns an unhandled exception
+    # Raising from here would cross a Qt slot boundary, and PyQt turns an unhandled exception
     # in a slot into qFatal() - an aborted process rather than a failed test. Record the reason
     # and let teardown fail the test normally.
     timed_out = []
@@ -52,10 +52,10 @@ def timeoutDetector(qgis_iface) -> None:
         pytest.fail(timed_out[0])
 
 
-# Every dialog in the plugin is opened with a blocking exec_(). If a test triggers one and
-# nothing closes it, exec_() never returns and the run hangs until the CI job is killed, with
+# Every dialog in the plugin is opened with a blocking exec(). If a test triggers one and
+# nothing closes it, exec() never returns and the run hangs until the CI job is killed, with
 # no indication of where it stopped. The timer below only ever fires while an event loop is
-# running - which is precisely the blocked case - so closing the window there lets exec_()
+# running - which is precisely the blocked case - so closing the window there lets exec()
 # return and the test fails on its own assertions instead of hanging.
 # Generous on purpose: a test doing slow work inside a modal progress dialog must finish on
 # its own. Lower this only if no legitimate test holds a dialog open that long.

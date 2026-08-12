@@ -185,7 +185,7 @@ class DistributionModelsDialog(BaseDialog):
     def load_datasets(self):
         dlg2 = LoadDatasetDialog(self.qgis_project)
         dlg2.show()
-        dlg2.exec_()
+        dlg2.exec()
         if isinstance(dlg2.dataset, pd.DataFrame):
             dataset_name = dlg2.output_name
             if dataset_name is not None:
@@ -247,7 +247,7 @@ class DistributionModelsDialog(BaseDialog):
         table.setColumnWidth(0, 235)
         table.setColumnWidth(1, 80)
         table.clearContents()
-        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         table.setRowCount(len(dictio.keys()))
 
         for i, data_name in enumerate(dictio.keys()):
@@ -419,4 +419,4 @@ class DistributionModelsDialog(BaseDialog):
         if self.report is not None:
             dlg2 = ReportDialog(qgis.utils.iface.mainWindow(), self.report)
             dlg2.show()
-            dlg2.exec_()
+            dlg2.exec()

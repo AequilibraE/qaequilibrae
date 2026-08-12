@@ -28,8 +28,8 @@ class AddConnectorsDialog(BaseDialog):
         self.lst_modes.addItems(sorted(list(self.modes.keys())))
         self.lst_link_types.addItems(sorted(list(self.link_types.keys())))
 
-        self.lst_modes.setSelectionMode(qgis.PyQt.QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.lst_link_types.setSelectionMode(qgis.PyQt.QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.lst_modes.setSelectionMode(qgis.PyQt.QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.lst_link_types.setSelectionMode(qgis.PyQt.QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
 
         self.rdo_network.toggled.connect(self.centroid_source)
         self.rdo_zone.toggled.connect(self.centroid_source)
@@ -88,7 +88,7 @@ class AddConnectorsDialog(BaseDialog):
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "start":

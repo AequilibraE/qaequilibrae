@@ -177,7 +177,7 @@ class SimpleTagDialog(BaseDialog):
 
         self.OK.setEnabled(False)
         self.worker_thread.start()
-        self.exec_()
+        self.exec()
 
     def run(self):
         error = False

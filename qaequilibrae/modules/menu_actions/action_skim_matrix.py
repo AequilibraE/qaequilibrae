@@ -7,4 +7,4 @@ def run_dist_matrix(qgis_project):
 
     dlg2 = ImpedanceMatrixDialog(qgis_project)
     dlg2.show()
-    dlg2.exec_()
+    dlg2.exec()
