@@ -41,21 +41,33 @@ def import_time_nodes(tree: ast.AST):
             pending.extend(ast.iter_child_nodes(node))
 
 
+def with_parents(name: str):
+    """A dotted name preceded by every package Python runs on the way to it."""
+    parts = name.split(".")
+    return [".".join(parts[: depth + 1]) for depth in range(len(parts))]
+
+
 def imported_names(node, module: str, is_package: bool):
-    """The modules a single import statement can pull in, as dotted names."""
+    """The modules a single import statement can pull in, as dotted names.
+
+    Reaching a submodule executes each package `__init__.py` above it, and several of those
+    re-export dialogs that import AequilibraE, so the parents count as imports of their own.
+    """
     if isinstance(node, ast.Import):
-        return [alias.name for alias in node.names]
-
-    if node.level == 0:
-        base = node.module
+        names = [alias.name for alias in node.names]
     else:
-        package = module if is_package else module.rpartition(".")[0]
-        for _ in range(node.level - 1):
-            package = package.rpartition(".")[0]
-        base = f"{package}.{node.module}" if node.module else package
+        if node.level == 0:
+            base = node.module
+        else:
+            package = module if is_package else module.rpartition(".")[0]
+            for _ in range(node.level - 1):
+                package = package.rpartition(".")[0]
+            base = f"{package}.{node.module}" if node.module else package
 
-    # `from x import y` imports x, and y too when y is a submodule rather than an attribute
-    return [base] + [f"{base}.{alias.name}" for alias in node.names]
+        # `from x import y` imports x, and y too when y is a submodule rather than an attribute
+        names = [base] + [f"{base}.{alias.name}" for alias in node.names]
+
+    return list(dict.fromkeys(parent for name in names for parent in with_parents(name)))
 
 
 def bootstrap_line(tree: ast.AST) -> int:
