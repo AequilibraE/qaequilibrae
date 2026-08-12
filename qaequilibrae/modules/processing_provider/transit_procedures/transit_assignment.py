@@ -6,7 +6,6 @@ from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraE
 
 
 class TransitAssignment(QAequilibraEProcessingAlgorithm):
-
     def __init__(self):
         from qaequilibrae.modules.menu_actions.action_pt_skim import run_pt_skim
 

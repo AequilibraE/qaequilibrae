@@ -42,7 +42,6 @@ def remove_aequilibrae_layers():
 
 
 class CloseProject(QAequilibraEProcessingAlgorithm):
-
     def __init__(self):
         super().__init__(
             close_project_action,

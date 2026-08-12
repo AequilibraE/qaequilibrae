@@ -12,7 +12,6 @@ from qaequilibrae.i18n.translate import trlt
 
 
 class TripLengthDistribution(QgsProcessingAlgorithm):
-
     def initAlgorithm(self, config=None):
         """
         Define parameters and outputs of the algorithm and attempt to load information
@@ -109,8 +108,8 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
             demand_matrix.computational_view([demand_mat_core])
             feedback.pushInfo("Successfully set computational view for demand matrix")
         else:
-            feedback.reportError(f"Demand matrix core '{demand_mat_core}' not found in available cores: {demand_cores}")
-            return {"Output": f"Error: Demand matrix core '{demand_mat_core}' not found"}
+            feedback.reportError(f"Demand matrix core {demand_mat_core!r} not found in available cores: {demand_cores}")
+            return {"Output": f"Error: Demand matrix core {demand_mat_core!r} not found"}
 
         # Check if the skim matrix has the indicated skim matrix core
         skim_mat_idx = parameters["skim_mat_name"]
@@ -123,8 +122,8 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
             skim_matrix.computational_view([skim_mat_core])
             feedback.pushInfo("Successfully set computational view for skim matrix")
         else:
-            feedback.reportError(f"Skim matrix core '{skim_mat_core}' not found in available cores: {skim_cores}")
-            return {"Output": f"Error: Skim matrix core '{skim_mat_core}' not found"}
+            feedback.reportError(f"Skim matrix core {skim_mat_core!r} not found in available cores: {skim_cores}")
+            return {"Output": f"Error: Skim matrix core {skim_mat_core!r} not found"}
 
         plt_name = parameters["plot_name"] if "plot_name" in parameters else "Trip length distribution"
 

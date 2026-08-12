@@ -20,7 +20,10 @@ jobs:
 
       - name: Lint with ruff
         run: ruff check
-        
+
+      - name: Check formatting with ruff
+        run: ruff format --check --diff
+
   unittest:
     needs: linting
     runs-on: ubuntu-latest

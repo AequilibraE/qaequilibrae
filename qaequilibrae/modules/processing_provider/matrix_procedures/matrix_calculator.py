@@ -12,7 +12,6 @@ from .matrix_expression import MatrixExpressionError, evaluate
 
 
 class MatrixCalculator(QgsProcessingAlgorithm):
-
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterFile(

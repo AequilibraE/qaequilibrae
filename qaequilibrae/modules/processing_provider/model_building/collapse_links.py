@@ -8,7 +8,6 @@ from qaequilibrae.i18n.translate import trlt
 
 
 class CollapseLinks(QgsProcessingAlgorithm):
-
     PROJECT_FOLDER = "PROJECT_FOLDER"
     LINK_IDS = "LINK_IDS"
 
@@ -41,13 +40,13 @@ class CollapseLinks(QgsProcessingAlgorithm):
             project = Project()
             project.open(project_folder)
         except Exception as e:
-            raise QgsProcessingException(self.tr(f"{project_folder} does not contain an AeqilibraE model: {e}"))
+            raise QgsProcessingException(self.tr(f"{project_folder} does not contain an AeqilibraE model: {e}")) from e
 
         # Parse LINK_IDS
         try:
             link_ids = [int(n.strip()) for n in link_ids_raw.split(",") if n.strip()]
         except Exception as e:
-            raise QgsProcessingException(self.tr(f"Error parsing link IDs: {e}"))
+            raise QgsProcessingException(self.tr(f"Error parsing link IDs: {e}")) from e
 
         net = NetworkSimplifier()
 

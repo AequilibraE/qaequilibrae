@@ -86,7 +86,7 @@ class CreatesTranspoNetProcedure(WorkerThread):
         flds = [fld for fld, idx in self.node_fields.items() if idx >= 0]
         # The non-standard column names come from the layer the user picked, so they are quoted
         setting = [f"{quote_identifier(fld)}=?" for fld in flds if fld != "node_id"]
-        sql_values = f'UPDATE nodes SET {",".join(setting)} WHERE node_id=?;'
+        sql_values = f"UPDATE nodes SET {','.join(setting)} WHERE node_id=?;"
 
         sql_id = "UPDATE nodes SET node_id=? WHERE node_id=?;"
 

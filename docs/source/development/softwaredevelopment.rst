@@ -178,7 +178,7 @@ Style
 
 * Python code should follow (mostly) the `pycodestyle style guide <https://pycodestyle.pycqa.org/en/latest/>`_.
 * Python docstrings should follow the `reStructuredText Docstring Format <https://www.python.org/dev/peps/pep-0287/>`_.
-* We are big fans of auto-code formatting. For that, we use `Black <https://black.readthedocs.io/en/stable/>`_.
+* We are big fans of auto-code formatting. For that, we use `Ruff <https://docs.astral.sh/ruff/formatter/>`_.
 * Negating some of what we have said so far, we use maximum line length of 120 characters.
 
 Imports
@@ -290,7 +290,6 @@ Testing
 
 QAequilibraE testing is done with some tools:
 
-* `Black <https://black.readthedocs.io/en/stable/>`_, the uncompromising code formatter
 * `Ruff <https://docs.astral.sh/ruff/>`_, a linter and code formatter
 * `pytest <http://pytest.org/latest/>`_, a Python testing tool
 * `pytest-cov <https://pytest-cov.readthedocs.io/en/latest/index.html>`_, a tool for measuring test code coverage

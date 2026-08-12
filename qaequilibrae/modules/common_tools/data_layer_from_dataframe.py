@@ -13,12 +13,14 @@ def layer_from_dataframe(df: pd.DataFrame, layer_name: str) -> QgsVectorLayer:
         return (
             QMetaType.Type.Double
             if "float" in ftype.name
-            else QMetaType.Type.LongLong if "int" in ftype.name else QMetaType.Type.QString
+            else QMetaType.Type.LongLong
+            if "int" in ftype.name
+            else QMetaType.Type.QString
         )
 
     field_names = list(df.dtypes.index)
     types = [qgs_type(df.dtypes[fname]) for fname in field_names]
-    attributes = [QgsField(fname, dtype) for fname, dtype in zip(field_names, types)]
+    attributes = [QgsField(fname, dtype) for fname, dtype in zip(field_names, types, strict=True)]
     pr.addAttributes(attributes)
     vl.updateFields()  # tell the vector layer to fetch changes from the provider
 

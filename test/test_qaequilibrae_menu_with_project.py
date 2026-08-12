@@ -114,9 +114,9 @@ def test_skim_viewer_menu(ae_with_project, qtbot):
     QTimer.singleShot(10, handle_trigger)
     action.trigger()
     messagebar = ae_with_project.iface.messageBar()
-    assert (
-        messagebar.messages[2][0] == "Input error:Please set an active layer to proceed"
-    ), "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Input error:Please set an active layer to proceed", (
+        "Level 2 error message is missing"
+    )
 
 
 def test_traffic_assignment_menu(ae_with_project, qtbot):

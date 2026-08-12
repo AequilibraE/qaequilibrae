@@ -9,7 +9,6 @@ from qaequilibrae.i18n.translate import trlt
 
 
 class CreateEmptyProject(QgsProcessingAlgorithm):
-
     PARENT_FOLDER = "PARENT_FOLDER"
     MODEL_NAME = "MODEL_NAME"
 
@@ -77,7 +76,7 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
         try:
             project.new(project_folder)
         except Exception as e:
-            raise QgsProcessingException(self.tr("Could not create project: ") + str(e))
+            raise QgsProcessingException(self.tr("Could not create project: ") + str(e)) from e
 
         modes = list(project.network.modes.all_modes().keys())
         link_types = list(project.network.link_types.all_types().keys())

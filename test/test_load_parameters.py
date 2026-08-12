@@ -10,9 +10,9 @@ def test_load_parameters_dialog(ae_with_project, qtbot):
     dialog.validate_data()
 
     messagebar = ae_with_project.iface.messageBar()
-    assert (
-        messagebar.messages[2][0] == "Error:Parameter structure was compromised. Please reset to default."
-    ), "Level 2 error message is missing"
+    assert messagebar.messages[2][0] == "Error:Parameter structure was compromised. Please reset to default.", (
+        "Level 2 error message is missing"
+    )
 
     dialog.load_default_data()
 
