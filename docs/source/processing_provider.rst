@@ -244,8 +244,9 @@ This tool creates a new AequilibraE project containing no links, nodes, or zones
 project is created with the default modes and link types, which are read from the
 :ref:`parameters file <parameters_file>`.
 
-The only input for the tool is the folder that will hold the new project. This folder
-must either not exist yet, or be empty.
+The tool takes two inputs: the *parent folder*, which you browse to, and the *model name*,
+which defaults to ``new model``. The model is created in a folder named after the model
+inside the parent folder, and that folder must either not exist yet, or be empty.
 
 An empty project is the natural starting point when you intend to build your model
 incrementally with the other Model building tools, such as

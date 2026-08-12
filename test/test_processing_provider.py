@@ -188,13 +188,23 @@ def test_collapse_links(folder_path):
     assert project.network.count_nodes() < nodes_before
 
 
-@pytest.mark.parametrize("pre_create_folder", [True, False])
-def test_create_empty_project(folder_path, pre_create_folder):
-    # QGIS may hand us an already existing (but empty) folder, so both cases must work
-    if pre_create_folder:
-        makedirs(folder_path)
+def test_create_empty_project_defaults_the_model_name():
+    action = CreateEmptyProject()
+    action.initAlgorithm()
 
-    parameters = {"PROJECT_FOLDER": folder_path}
+    assert action.parameterDefinition("MODEL_NAME").defaultValue() == "new model"
+
+
+@pytest.mark.parametrize("pre_create_folder", [True, False])
+def test_create_empty_project(tmp_path, pre_create_folder):
+    parent_folder = str(tmp_path)
+    project_folder = join(parent_folder, "new model")
+
+    # The model folder is allowed to exist as long as it is empty, so both cases must work
+    if pre_create_folder:
+        makedirs(project_folder)
+
+    parameters = {"PARENT_FOLDER": parent_folder, "MODEL_NAME": "new model"}
 
     action = CreateEmptyProject()
     action.initAlgorithm()
@@ -203,12 +213,12 @@ def test_create_empty_project(folder_path, pre_create_folder):
 
     results, ok = action.run(parameters, context, feedback)
     assert ok
-    assert results["Output"] == folder_path
-    assert isdir(folder_path)
-    assert isfile(join(folder_path, "project_database.sqlite"))
+    assert results["Output"] == project_folder
+    assert isdir(project_folder)
+    assert isfile(join(project_folder, "project_database.sqlite"))
 
     project = Project()
-    project.open(folder_path)
+    project.open(project_folder)
 
     assert project.network.count_links() == 0
     assert project.network.count_nodes() == 0
@@ -218,10 +228,10 @@ def test_create_empty_project(folder_path, pre_create_folder):
     project.close()
 
 
-def test_create_empty_project_on_populated_folder(folder_path):
-    create_example(folder_path, "nauru").close()
+def test_create_empty_project_on_populated_folder(tmp_path):
+    create_example(join(str(tmp_path), "nauru"), "nauru").close()
 
-    parameters = {"PROJECT_FOLDER": folder_path}
+    parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "nauru"}
 
     action = CreateEmptyProject()
     action.initAlgorithm()
@@ -230,6 +240,22 @@ def test_create_empty_project_on_populated_folder(folder_path):
 
     with pytest.raises(QgsProcessingException):
         action.processAlgorithm(parameters, context, feedback)
+
+
+@pytest.mark.parametrize("model_name", ["", "   ", "sub/folder", "sub\\folder", "model:name", ".", ".."])
+def test_create_empty_project_with_unusable_model_name(tmp_path, model_name):
+    parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": model_name}
+
+    action = CreateEmptyProject()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    with pytest.raises(QgsProcessingException):
+        action.processAlgorithm(parameters, context, feedback)
+
+    # "." resolves to the parent folder, which must survive the rejection untouched
+    assert isdir(str(tmp_path))
 
 
 def test_network_simplifier(folder_path):
