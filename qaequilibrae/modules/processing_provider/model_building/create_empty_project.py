@@ -10,8 +10,8 @@ from qaequilibrae.i18n.translate import trlt
 
 class CreateEmptyProject(QgsProcessingAlgorithm):
 
-    parent_folder = "PARENT_FOLDER"
-    model_name = "MODEL_NAME"
+    PARENT_FOLDER = "PARENT_FOLDER"
+    MODEL_NAME = "MODEL_NAME"
 
     # The model name becomes a folder name, so anything a file system could choke on is out
     INVALID_NAME_CHARACTERS = '\\/:*?"<>|'
@@ -20,18 +20,18 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
         # 1. Existing folder the new model folder will be created in
         self.addParameter(
             QgsProcessingParameterFile(
-                self.parent_folder, self.tr("Parent folder"), behavior=QgsProcessingParameterFile.Folder
+                self.PARENT_FOLDER, self.tr("Parent folder"), behavior=QgsProcessingParameterFile.Folder
             )
         )
 
         # 2. Name of the model's own folder, created inside the parent folder
         self.addParameter(
-            QgsProcessingParameterString(self.model_name, self.tr("Model name"), defaultValue="new model")
+            QgsProcessingParameterString(self.MODEL_NAME, self.tr("Model name"), defaultValue="new model")
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        parent_folder = self.parameterAsFile(parameters, self.parent_folder, context)
-        model_name = self.parameterAsString(parameters, self.model_name, context).strip()
+        parent_folder = self.parameterAsFile(parameters, self.PARENT_FOLDER, context)
+        model_name = self.parameterAsString(parameters, self.MODEL_NAME, context).strip()
 
         if not isdir(parent_folder):
             raise QgsProcessingException(self.tr("Parent folder does not exist: ") + parent_folder)
