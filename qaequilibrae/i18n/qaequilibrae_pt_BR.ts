@@ -268,6 +268,11 @@
         <source>Scenario &apos;{}&apos; no longer exists. Using &apos;root&apos;.</source>
         <translation type="unfinished"/>
     </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="357"/>
+        <source>Could not close the project while unloading: {}</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>BandwidthColorRamps</name>
@@ -1289,7 +1294,7 @@
         <translation>Projeto</translation>
     </message>
     <message>
-        <location filename="../modules/routing_procedures/forms/tsp.ui" line="100"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="156"/>
         <source>Mode</source>
         <translation>Modo</translation>
     </message>
@@ -2559,22 +2564,22 @@
 <context>
     <name>RouteChoiceDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="374"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="380"/>
         <source>Input error</source>
         <translation>Erro de entrada</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="256"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="262"/>
         <source>Missing query name</source>
         <translation>Ausência de nome da consulta</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="259"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="265"/>
         <source>Query name already used</source>
         <translation>Nome de consulta já utilizado</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="262"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="268"/>
         <source>Please set a link selection</source>
         <translation>Por favor, configure uma seleção de links</translation>
     </message>
@@ -2968,82 +2973,82 @@
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="493"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="510"/>
         <source>Class name already used</source>
         <translation>O nome da classe já foi utilizado</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="554"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="571"/>
         <source>Remove</source>
         <translation>Remover</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="675"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="692"/>
         <source>Input error</source>
         <translation>Erro de entrada</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="715"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="732"/>
         <source>No traffic classes to assign</source>
         <translation>Não há classes de tráfego para alocar</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="720"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="737"/>
         <source>Missing scenario name</source>
         <translation>Está faltando o nome do cenário</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="726"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="743"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation>O nome para a tabela de resultados já existe. Escolha um novo nome.</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="803"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="820"/>
         <source>VDF parameter is not numeric</source>
         <translation>Parâmetro VDF não é numérico</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="607"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="624"/>
         <source>Wrong value for link ID</source>
         <translation>Valor incorreto para link ID</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="613"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="630"/>
         <source>Link ID doesn&apos;t exist in project</source>
         <translation>link ID não existe no projeto</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="622"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="639"/>
         <source>Missing query name</source>
         <translation>Ausência de nome da consulta</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="626"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="643"/>
         <source>Query name already used</source>
         <translation>Nome de consulta já utilizado</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="630"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="647"/>
         <source>Please set a link selection</source>
         <translation>Por favor, configure uma seleção de links</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="732"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="749"/>
         <source>Missing select link matrix name.</source>
         <translation>Ausência de nome da matriz de links selecionados</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="736"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="753"/>
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation>O nome para a tabela de resultados já existe. Escolha um novo nome.</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="365"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="382"/>
         <source>No VoT found for mode {} in project database. Please configure it.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="700"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="717"/>
         <source>Assignment setup error</source>
         <translation type="unfinished"/>
     </message>
@@ -4219,7 +4224,7 @@
         <translation>Centroide</translation>
     </message>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="73"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
         <source>Layer</source>
         <translation>Camada</translation>
     </message>
@@ -4284,7 +4289,7 @@
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
         <source>Layer field</source>
         <translation>Campo da camada</translation>
     </message>
