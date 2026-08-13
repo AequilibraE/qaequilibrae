@@ -7,11 +7,10 @@ from qgis.PyQt.QtCore import Qt
 from aequilibrae.context import get_logger
 from aequilibrae.project.network.network import Network
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog
 
-from qaequilibrae.modules.common_tools import ReportDialog
+from qaequilibrae.modules.common_tools import LiveLogBridge, ReportDialog, connect_progress_widgets
 from qaequilibrae.modules.common_tools import all_layers_from_toc
-from qaequilibrae.modules.common_tools import get_vector_layer_by_name, standard_path
+from qaequilibrae.modules.common_tools import GetOutputFolderName, get_vector_layer_by_name, standard_path
 from qaequilibrae.modules.common_tools.global_parameters import point_types, line_types
 from qaequilibrae.modules.project_procedures.creates_transponet_procedure import CreatesTranspoNetProcedure
 
@@ -67,6 +66,8 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         self.node_field_indices = {}
         self.link_field_indices = {}
         self.report = None
+        self.progress_bridge = LiveLogBridge()
+        connect_progress_widgets(self.progress_bridge, self.progressbar, self.progress_label)
 
         for layer in all_layers_from_toc():  # We iterate through all layers
             if "wkbType" in dir(layer):
@@ -256,7 +257,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 final_table.setCellWidget(row, 2, self.centers_item(cbb))
 
     def choose_folder(self):
-        self.proj_folder = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", self.path)
+        self.proj_folder = GetOutputFolderName(self.path, "Parent folder")
         if self.proj_folder is None or len(self.proj_folder) == 0:
             return
         new_folder = "new_project"
@@ -331,16 +332,13 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def signal_handler(self, val):
         if val[0] == "start":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
+            self.progress_bridge.progress_started.emit(val[1], val[2])
         elif val[0] == "update":
-            self.progressbar.setValue(val[1])
+            self.progress_bridge.progress_updated.emit(val[1])
         elif val[0] == "finished":
-            # Imported here so project_procedures and menu_actions do not import each other at plugin load
+            self.progress_bridge.finished.emit()
             from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
 
-            # The project the procedure built is left open, so the panel takes it over from here
             self.qgis_project.project = self.worker_thread.project
             show_project_in_panel(self.qgis_project, self.worker_thread.proj_folder)
 
