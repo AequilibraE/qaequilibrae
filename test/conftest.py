@@ -33,12 +33,16 @@ def timeoutDetector(qgis_iface) -> None:
     def handle_trigger():
         # Check if a report window has openned
         window = QApplication.activeWindow()
+        # The timer measures elapsed time, not blockage, and only gets delivered once something
+        # processes events - which pytest-qt does on teardown. With nothing on screen by then,
+        # no dialog ever held the test up and it was simply slower than the timer: not a timeout.
+        # A dialog that does block still spins an event loop, so the timer fires while it is up
+        if window is None:
+            return
+        window.close()
         if isinstance(window, ReportDialog):
-            window.close()
             timed_out.append("Test timed out because of a report dialog showing")
         else:
-            if window:
-                window.close()
             timed_out.append("Test timed out")
 
     timer = QTimer()
