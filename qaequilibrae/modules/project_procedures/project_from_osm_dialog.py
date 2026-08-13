@@ -6,7 +6,7 @@ from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox, QPlainTextEdit
 from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
-from qgis.PyQt.QtWidgets import QDialog
+from qgis.PyQt.QtWidgets import QDialog, QWidget
 from qgis.core import QgsProject, QgsCoordinateReferenceSystem
 
 from qaequilibrae.modules.common_tools import GetOutputFolderName, ReportDialog, standard_path
