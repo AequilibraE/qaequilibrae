@@ -135,9 +135,7 @@ class TrafficAssignmentDialog(BaseDialog):
         return file_path
 
     def __select_option(self, combo: QComboBox, value: str, description: str):
-        """Selects `value` in `combo`, refusing a config that asks for an option that is not there.
-
-        """
+        """Selects `value` in `combo`, refusing a config that asks for an option that is not there."""
         idx = combo.findText(value, Qt.MatchFlag.MatchFixedString)
         if idx < 0:
             options = ", ".join(combo.itemText(i) for i in range(combo.count()))
