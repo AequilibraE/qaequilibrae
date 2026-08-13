@@ -134,6 +134,14 @@ class TrafficAssignmentDialog(BaseDialog):
         file_path, _ = GetOutputFileName(QtWidgets.QDialog(), "", ["Python (*.py)"], ".py", path)
         return file_path
 
+    def __select_option(self, combo: QComboBox, value: str, description: str):
+        """Selects `value` in `combo`, refusing a config that asks for an option that is not there."""
+        idx = combo.findText(value, Qt.MatchFlag.MatchFixedString)
+        if idx < 0:
+            options = ", ".join(combo.itemText(i) for i in range(combo.count()))
+            raise ValueError(f"'{value}' is not an available {description}. Options are: {options}")
+        combo.setCurrentIndex(idx)
+
     def _load_configs(self):
         # Let's open the YAML config file
         file_path = self._browse_yaml_path()
@@ -147,16 +155,20 @@ class TrafficAssignmentDialog(BaseDialog):
             # Populate Traffic Classes tab
             for tc in params["traffic_classes"]:
                 for key, value in tc.items():
-                    self.cob_matrices.setCurrentText(value["matrix_name"])
+                    self.__select_option(self.cob_matrices, value["matrix_name"], "matrix")
                     self.change_matrix_selected()
-                    names = self.project.matrices.get_matrix(value["matrix_name"]).names
+                    # From the combo rather than from the config, so that the cores listed below
+                    # come from the same matrix `_create_traffic_class` is going to pick up
+                    names = self.project.matrices.get_matrix(self.cob_matrices.currentText()).names
                     self.tbl_core_list.selectRow(names.index(value["matrix_core"]))
                     self.ln_class_name.setText(key)
                     self.pce_setter.setValue(value["pce"])
                     self.chb_check_centroids.setChecked(value["blocked_centroid_flows"])
+                    # Cleared as much as set: `_create_traffic_class` reads this checkbox for every
+                    # class, so leaving it on would hand the next class the previous one's fixed cost
+                    self.chb_fixed_cost.setChecked("fixed_cost" in value)
                     if "fixed_cost" in value:
-                        self.chb_fixed_cost.setChecked(True)
-                        self.cob_fixed_cost.setText(value["fixed_cost"])
+                        self.__select_option(self.cob_fixed_cost, value["fixed_cost"], "fixed cost field")
                         self.vot_setter.setValue(value["vot"])
                     self._create_traffic_class(value["network_mode"])
 
@@ -201,25 +213,27 @@ class TrafficAssignmentDialog(BaseDialog):
                     self.chb_save_result.setChecked(params["select_links"]["save_result"])
 
             # Populate Assignment tab
-            self.cb_choose_algorithm.setCurrentText(params["assignment"]["algorithm"])
+            self.__select_option(self.cb_choose_algorithm, params["assignment"]["algorithm"], "algorithm")
             self.max_iter.setText(str(params["assignment"]["max_iter"]))
             self.rel_gap.setText(str(params["assignment"]["rgap"]))
 
-            self.cob_capacity.setCurrentText(params["assignment"]["capacity_field"])
-            self.cob_ffttime.setCurrentText(params["assignment"]["time_field"])
+            self.__select_option(self.cob_capacity, params["assignment"]["capacity_field"], "capacity field")
+            self.__select_option(self.cob_ffttime, params["assignment"]["time_field"], "free-flow time field")
 
-            # The combo is populated from `all_vdf_functions`, which is lower case, and
-            # QComboBox matches case-sensitively. Without normalizing, a config asking for
-            # "BPR2" silently leaves the combo on whatever it already showed.
-            self.cob_vdf.setCurrentText(params["assignment"]["vdf"].lower())
+            # Ahead of the parameters below, because changing it rebuilds the parameters table.
+            # `all_vdf_functions` fills the combo in lower case, so a config asking for "BPR2"
+            # only ever lands because the match below ignores case
+            self.__select_option(self.cob_vdf, params["assignment"]["vdf"], "volume-delay function")
             if isinstance(params["assignment"]["alpha"], float):
                 self.tbl_vdf_parameters.cellWidget(0, 1).setText(str(params["assignment"]["alpha"]))
             elif isinstance(params["assignment"]["alpha"], str):
-                self.tbl_vdf_parameters.cellWidget(0, 2).setCurrentText(str(params["assignment"]["alpha"]))
+                cob_alpha = self.tbl_vdf_parameters.cellWidget(0, 2)
+                self.__select_option(cob_alpha, params["assignment"]["alpha"], "field for the VDF alpha")
             if isinstance(params["assignment"]["beta"], float):
                 self.tbl_vdf_parameters.cellWidget(1, 1).setText(str(params["assignment"]["beta"]))
             elif isinstance(params["assignment"]["beta"], str):
-                self.tbl_vdf_parameters.cellWidget(1, 2).setCurrentText(str(params["assignment"]["beta"]))
+                cob_beta = self.tbl_vdf_parameters.cellWidget(1, 2)
+                self.__select_option(cob_beta, params["assignment"]["beta"], "field for the VDF beta")
 
             self.output_scenario_name.setText(params["assignment"]["result_name"])
 
@@ -242,7 +256,10 @@ class TrafficAssignmentDialog(BaseDialog):
                 dc["matrix_core"] = info.matrix.view_names[0]
                 dc["network_mode"] = info.mode
                 dc["pce"] = info.pce
-                if self.chb_fixed_cost.isChecked():
+                # Taken from the class rather than from the checkbox, which only reflects the class
+                # currently being edited: keying off it would write the fixed cost for classes that
+                # do not have one, or drop it from those that do
+                if info.fixed_cost_field:
                     dc["fixed_cost"] = info.fixed_cost_field
                     dc["vot"] = info.vot
                 dc["blocked_centroid_flows"] = info.graph.block_centroid_flows

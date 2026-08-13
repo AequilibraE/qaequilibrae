@@ -1,0 +1,21 @@
+# Every name here is spelled with a case the project does not use, which is legitimate:
+# nothing downstream treats matrix, field, VDF or algorithm names as case-sensitive
+traffic_classes:
+    - car:
+        matrix_name: Demand_OMX
+        matrix_core: matrix
+        network_mode: c
+        pce: 1.0
+        blocked_centroid_flows: False
+        fixed_cost: TOLL
+        vot: 2.5
+assignment:
+    algorithm: BFW
+    max_iter: 10
+    rgap: 0.001
+    vdf: BPR
+    alpha: B
+    beta: Power
+    capacity_field: Capacity
+    time_field: Free_Flow_Time
+    result_name: result_mixed_case_from_yaml

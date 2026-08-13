@@ -5,6 +5,7 @@ import numpy as np
 import openmatrix as omx
 import pandas as pd
 import pytest
+import yaml
 from qgis.PyQt.QtCore import Qt
 
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
@@ -411,6 +412,114 @@ def test_multi_class_from_yaml(sf_project, qtbot, mocker):
     pth = sf_project.project.project_base_path
     assert isfile(pth / "matrices" / "result_test_from_yaml_car.omx")
     assert isfile(pth / "matrices" / "result_test_from_yaml_motorcycle.omx")
+
+
+def test_fixed_cost_from_yaml(sf_project, qtbot, mocker):
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
+        return_value="test/data/SiouxFalls_project/fixed_cost_config.yml",
+    )
+
+    dialog = TrafficAssignmentDialog(sf_project)
+    qtbot.mouseClick(dialog.but_load_yaml, Qt.MouseButton.LeftButton)
+
+    # The config gives a fixed cost to the car class only
+    assert dialog.cob_fixed_cost.currentText() == "toll"
+    assert dialog.vot_setter.value() == 2.5
+    assert dialog.traffic_classes["car"].fixed_cost_field == "toll"
+    assert dialog.traffic_classes["car"].vot == 2.5
+
+    # ... so the class loaded after it must not inherit one
+    assert not dialog.chb_fixed_cost.isChecked()
+    assert dialog.traffic_classes["motorcycle"].fixed_cost_field == ""
+
+    # And that distinction has to survive a round trip through the exporter
+    saved_yaml = f"{sf_project.project.project_base_path}/fixed_cost_config.yml"
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
+        return_value=saved_yaml,
+    )
+    qtbot.mouseClick(dialog.but_save_yaml, Qt.MouseButton.LeftButton)
+
+    with open(saved_yaml, "r") as f:
+        saved = yaml.safe_load(f)
+
+    saved_classes = {name: config for tc in saved["traffic_classes"] for name, config in tc.items()}
+    assert saved_classes["car"]["fixed_cost"] == "toll"
+    assert saved_classes["car"]["vot"] == 2.5
+    assert "fixed_cost" not in saved_classes["motorcycle"]
+
+    dialog.run()
+    dialog.close()
+
+    assert isfile(sf_project.project._results_database_path)
+
+    with sf_project.project.results_connection as conn:
+        assert conn.execute("SELECT ROUND(SUM(PCE_tot), 4) FROM result_fixed_cost_from_yaml").fetchone()[0] > 0
+
+
+def test_mixed_case_from_yaml(sf_project, qtbot, mocker):
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
+        return_value="test/data/SiouxFalls_project/mixed_case_config.yml",
+    )
+
+    dialog = TrafficAssignmentDialog(sf_project)
+    qtbot.mouseClick(dialog.but_load_yaml, Qt.MouseButton.LeftButton)
+
+    # Every option the config names in a different case still resolves to the project's own spelling
+    assert dialog.cob_matrices.currentText() == "demand_omx"
+    assert dialog.cob_fixed_cost.currentText() == "toll"
+    assert dialog.cb_choose_algorithm.currentText() == "bfw"
+    assert dialog.cob_capacity.currentText() == "capacity"
+    assert dialog.cob_ffttime.currentText() == "free_flow_time"
+    assert dialog.cob_vdf.currentText() == "bpr"
+    assert dialog.tbl_vdf_parameters.cellWidget(0, 2).currentText() == "b"
+    assert dialog.tbl_vdf_parameters.cellWidget(1, 2).currentText() == "power"
+
+    dialog.run()
+    dialog.close()
+
+    with sf_project.project.results_connection as conn:
+        assert conn.execute("SELECT ROUND(SUM(PCE_tot), 4) FROM result_mixed_case_from_yaml").fetchone()[0] > 0
+
+
+@pytest.mark.parametrize(
+    "section, key",
+    [
+        ("traffic_class", "matrix_name"),
+        ("traffic_class", "fixed_cost"),
+        ("assignment", "algorithm"),
+        ("assignment", "capacity_field"),
+        ("assignment", "time_field"),
+        ("assignment", "vdf"),
+        ("assignment", "alpha"),
+    ],
+)
+def test_config_with_unavailable_option(sf_project, mocker, section, key):
+    with open("test/data/SiouxFalls_project/mixed_case_config.yml", "r") as f:
+        config = yaml.safe_load(f)
+
+    target = config["traffic_classes"][0]["car"] if section == "traffic_class" else config["assignment"]
+    target[key] = "not_an_option"
+
+    config_path = f"{sf_project.project.project_base_path}/invalid_config.yml"
+    with open(config_path, "w") as f:
+        yaml.dump(config, f)
+
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
+        return_value=config_path,
+    )
+
+    dialog = TrafficAssignmentDialog(sf_project)
+
+    # Loaded directly instead of through the button: an exception crossing a Qt slot never makes it
+    # back here, and refusing the config is the whole point of this test
+    with pytest.raises(ValueError, match="'not_an_option' is not an available"):
+        dialog._load_configs()
+
+    dialog.close()
 
 
 def test_select_links_from_yaml(sf_project, qtbot, mocker):
