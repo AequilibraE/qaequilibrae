@@ -19,7 +19,8 @@ from pathlib import Path
 import pytest
 
 from qaequilibrae.message import FAQ_URL
-from qaequilibrae.missing_dependencies import DisabledSnapping, disabled_action, temporary_folder
+from qaequilibrae.missing_dependencies import DisabledLinkSplitter, DisabledSnapping
+from qaequilibrae.missing_dependencies import disabled_action, temporary_folder
 
 PLUGIN_SOURCE = Path(__file__).parent.parent / "qaequilibrae" / "qaequilibrae.py"
 PROBE_MODULE = "qaequilibrae_without_dependencies"
@@ -203,6 +204,14 @@ def test_stand_ins_absorb_what_the_menu_asks_of_them():
     snapping = DisabledSnapping(object())
     snapping.watch(object())
     snapping.layer_removed(object())
+
+    splitter = DisabledLinkSplitter(object())
+    splitter.watch(object(), "links")
+    splitter.layer_removed(object())
+
+    # The menu builds its toggle from this, and hands the new state back when it is clicked
+    assert splitter.enabled() is False
+    splitter.set_enabled(True)
 
     assert Path(temporary_folder()).is_dir()
 

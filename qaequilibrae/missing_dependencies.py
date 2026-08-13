@@ -52,3 +52,22 @@ class DisabledSnapping:
 
     def layer_removed(self, layer):
         pass
+
+
+class DisabledLinkSplitter(DisabledSnapping):
+    """Stands in for ``LinkSplitter``, which lives behind the same imports.
+
+    The menu still builds its toggle, so the setting has to be readable and writable even though
+    there is no links layer here for it to act on.
+    """
+
+    def watch(self, layer, layer_name):
+        pass
+
+    @staticmethod
+    def enabled() -> bool:
+        return False
+
+    @staticmethod
+    def set_enabled(enabled: bool):
+        pass
