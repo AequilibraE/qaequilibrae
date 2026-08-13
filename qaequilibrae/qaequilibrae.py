@@ -20,6 +20,7 @@ from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, Qgs
 from qaequilibrae import set_aequilibrae_menu_instance
 from qaequilibrae.message import messages, FAQ_URL
 from qaequilibrae.missing_dependencies import DisabledSnapping, disabled_action, temporary_folder
+from qaequilibrae.modules.style_loader.editor_styles import load_editor_styles
 from qaequilibrae.pandas_compat import ensure_regex_capable_strings
 
 sys.path.insert(0, join(dirname(__file__), "packages"))
@@ -365,6 +366,7 @@ class AequilibraEMenu:
     def create_layer_by_name(self, layer_name: str):
         layer = self.create_loose_layer(layer_name)
         self.layers[layer_name.lower()] = [layer, layer.id()]
+        load_editor_styles(layer, layer_name, self.project)
         self.snapping.watch(layer)
 
     def create_loose_layer(self, layer_name: str) -> QgsVectorLayer:
@@ -431,6 +433,7 @@ class AequilibraEMenu:
             if "sqlite" not in lyr.source():
                 continue
             self.layers[str(lyr.name()).lower()] = [lyr, lyr.id()]
+            load_editor_styles(lyr, QgsDataSourceUri(lyr.source()).table(), self.project)
             self.snapping.watch(lyr)
 
     def remove_aequilibrae_layers(self):
