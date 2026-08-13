@@ -133,6 +133,26 @@ def test_shows_the_logfile_as_it_is_written(dialog, folder_path):
     assert "Building Network" in shown
 
 
+def test_status_and_progress_use_the_live_log_panel(dialog):
+    assert dialog.log_view is dialog.log_panel.text
+    assert dialog.progressbar is dialog.log_panel.bar
+    assert dialog.progress_label is dialog.log_panel.stage_label
+
+    dialog.signal_handler(["set_text", "Creating project"])
+    assert dialog.log_panel.stage_label.text() == "Creating project"
+
+    dialog.signal_handler(["start", 10, "Downloading network"])
+    assert dialog.progressbar.maximum() == 10
+    assert dialog.progressbar.value() == 0
+    assert dialog.progress_label.text() == "Downloading network"
+
+    dialog.signal_handler(["update", 4, ""])
+    assert dialog.progressbar.value() == 4
+
+    dialog.log_bridge.log_line.emit("Imported a link")
+    assert "Imported a link" in dialog.log_view.toPlainText()
+
+
 def test_panel_shows_the_imported_model(dialog, folder_path, patch_report_dialog):
     """The import leaves a project open, and the panel is only aware of it if it is told
 

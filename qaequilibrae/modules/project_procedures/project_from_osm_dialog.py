@@ -3,13 +3,18 @@ from os.path import isdir, isfile, join, dirname
 import qgis
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtGui import QFont
-from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox, QPlainTextEdit
+from qgis.PyQt.QtWidgets import QVBoxLayout, QGroupBox
 from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
 from qgis.PyQt.QtWidgets import QDialog, QWidget
 from qgis.core import QgsProject, QgsCoordinateReferenceSystem
 
-from qaequilibrae.modules.common_tools import GetOutputFolderName, ReportDialog, standard_path
+from qaequilibrae.modules.common_tools import (
+    GetOutputFolderName,
+    LiveLogBridge,
+    LiveLogWidget,
+    ReportDialog,
+    standard_path,
+)
 from qaequilibrae.modules.project_procedures.project_from_osm_procedure import ProjectFromOSMProcedure
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "../common_tools/forms/ui_empty.ui"))
@@ -31,9 +36,9 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.running = False
         self.logfile = None
         self.__log_position = 0
+        self.log_bridge = LiveLogBridge()
         self._run_layout = QGridLayout()
 
-        # Area to import network for
         self.choose_place = QRadioButton()
         self.choose_place.setText(self.tr("Place name"))
         self.choose_place.toggled.connect(self.change_place_type)
@@ -55,7 +60,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.source_type_widget = QGroupBox(self.tr("Target"))
         self.source_type_widget.setLayout(self.source_type_frame)
 
-        # Buttons and output
         self.but_choose_output = QPushButton()
         self.but_choose_output.setText(self.tr("Choose folder output"))
         self.but_choose_output.clicked.connect(self.choose_output)
@@ -74,19 +78,11 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.buttons_widget = QWidget()
         self.buttons_widget.setLayout(self.buttons_frame)
 
-        self.progressbar = QProgressBar()
-        self.progress_label = QLabel()
-
-        # The network import is long enough that the log is the only way of telling what it is doing
-        self.log_view = QPlainTextEdit()
-        self.log_view.setReadOnly(True)
-        self.log_view.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
-        self.log_view.setMaximumBlockCount(5000)
-        log_font = QFont()
-        log_font.setFamily("Courier")
-        log_font.setFixedPitch(True)
-        log_font.setPointSize(9)
-        self.log_view.setFont(log_font)
+        self.log_panel = LiveLogWidget(self, line_wrap=False)
+        self.log_view = self.log_panel.text
+        self.progressbar = self.log_panel.bar
+        self.progress_label = self.log_panel.stage_label
+        self.log_panel.connect_bridge(self.log_bridge)
 
         self.log_timer = QTimer(self)
         self.log_timer.setInterval(log_refresh_interval)
@@ -94,9 +90,7 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
 
         self.update_widget = QWidget()
         self.update_frame = QVBoxLayout()
-        self.update_frame.addWidget(self.progressbar)
-        self.update_frame.addWidget(self.progress_label)
-        self.update_frame.addWidget(self.log_view)
+        self.update_frame.addWidget(self.log_panel)
         self.update_widget.setLayout(self.update_frame)
         self.update_widget.setVisible(False)
 
@@ -122,8 +116,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         if self.running:
             return
 
-        # An empty folder is not a harmless mistake: AequilibraE reads it as the current
-        # directory and quietly writes the whole project into wherever QGIS was started
         output_path = self.output_path.text().strip()
         if not output_path:
             self.qgis_project.iface_error_message(self.tr("Choose a folder to create the project in"))
@@ -168,19 +160,15 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
             self.place.setVisible(False)
 
     def start_tailing_log(self):
-        """AequilibraE only opens the log file when it creates the project, so we tail it as it appears"""
         self.logfile = join(self.output_path.text(), "aequilibrae.log")
         self.__log_position = 0
-        self.log_view.clear()
+        self.log_panel.clear()
         self.log_timer.start()
 
     def refresh_log(self):
         if self.logfile is None or not isfile(self.logfile):
             return
 
-        # This runs on a timer, and PyQt turns an exception crossing a slot boundary into a
-        # qFatal() - so a log we cannot read has to cost us the tick, not the QGIS session.
-        # No encoding is given on purpose, to match the one AequilibraE writes the file with
         try:
             with open(self.logfile, "r", errors="replace") as log:
                 log.seek(self.__log_position)
@@ -192,9 +180,7 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         if not new_entries.strip():
             return
 
-        self.log_view.appendPlainText(new_entries.strip("\n"))
-        scrollbar = self.log_view.verticalScrollBar()
-        scrollbar.setValue(scrollbar.maximum())
+        self.log_bridge.log_line.emit(new_entries.strip("\n"))
 
     def leave(self):
         self.close()
@@ -204,20 +190,19 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
 
     def signal_handler(self, val):
         if val[0] == "start":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
+            self.log_bridge.progress_started.emit(val[1], val[2])
         elif val[0] == "update":
-            self.progressbar.setValue(val[1])
+            self.log_bridge.progress_updated.emit(val[1])
         elif val[0] == "set_text":
-            self.progress_label.setText(val[1])
-            self.progressbar.reset()
+            self.log_bridge.stage_line.emit(val[1])
+            self.log_bridge.progress_reset.emit()
         elif val[0] == "finished":
             self.job_finished()
 
     def job_finished(self):
         self.log_timer.stop()
         self.refresh_log()
+        self.log_bridge.finished.emit()
         self.running = False
 
         self.report.extend(self.worker_thread.report)
@@ -227,26 +212,21 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
             self.failed_to_import()
             return
 
-        # Imported here so project_procedures and menu_actions do not import each other at plugin load
         from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
 
         self.qgis_project.project = self.worker_thread.project
-        # The project the import leaves behind is open, but nothing has told the panel about it,
-        # so without this the model shows as loaded with no scenario and no layer to load
         show_project_in_panel(self.qgis_project, self.worker_thread.output_path)
         self.leave()
 
     def failed_to_import(self):
-        """Lets the user fix whatever went wrong and try again, rather than losing the log they can see"""
         try:
             if self.worker_thread.project is not None:
                 self.worker_thread.project.close()
         except Exception:
-            # A project that failed halfway through is not worth a second error message
             pass
 
-        self.progress_label.setText(self.error)
-        self.progressbar.reset()
+        self.log_bridge.stage_line.emit(self.error)
+        self.log_bridge.progress_reset.emit()
         self.qgis_project.iface_error_message(self.error, self.tr("Could not import network from OSM"))
 
         self.source_type_widget.setEnabled(True)
@@ -254,8 +234,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.output_path.setEnabled(True)
         self.but_run.setEnabled(True)
 
-    # The import cannot be interrupted, and letting the dialog go while the thread still
-    # reports back to it would take QGIS down with it
     def closeEvent(self, event):
         if self.running:
             event.ignore()

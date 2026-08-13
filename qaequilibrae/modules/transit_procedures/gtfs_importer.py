@@ -4,7 +4,13 @@ from aequilibrae.transit import Transit
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem
 
-from qaequilibrae.modules.common_tools import BaseDialog, project_has_transit, quote_identifier
+from qaequilibrae.modules.common_tools import (
+    BaseDialog,
+    LiveLogBridge,
+    connect_progress_widgets,
+    project_has_transit,
+    quote_identifier,
+)
 from qaequilibrae.modules.transit_procedures import GTFSFeed
 
 
@@ -23,6 +29,8 @@ class GTFSImporter(BaseDialog):
         self.list_feeds.setColumnWidth(0, 230)
         self.feeds = []
         self.done = 1
+        self.progress_bridge = LiveLogBridge()
+        connect_progress_widgets(self.progress_bridge, self.progressbar, self.progress_label)
 
         self.is_pt_database = project_has_transit(self.qgis_project.project)
 
@@ -97,15 +105,12 @@ class GTFSImporter(BaseDialog):
     def signal_handler(self, val):
 
         if val[0] == "start":
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-            self.progress_label.setText(val[2])
+            self.progress_bridge.progress_started.emit(val[1], val[2])
         elif val[0] == "update":
-            self.progressbar.setValue(val[1])
-            self.progress_label.setText(val[2])
+            self.progress_bridge.stage_line.emit(val[2])
+            self.progress_bridge.progress_updated.emit(val[1])
         elif val[0] == "set_text":
-            self.progressbar.reset()
-            self.progress_label.setText(val[1])
+            self.progress_bridge.progress_reset.emit()
+            self.progress_bridge.stage_line.emit(val[1])
         elif val[0] == "finished":
-            self.progressbar.reset()
-            self.progress_label.clear()
+            self.progress_bridge.finished.emit()
