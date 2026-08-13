@@ -15,7 +15,7 @@ def test_desirelines(ae_with_project, is_delaunay):
     # Create desirelines
     dialog = DesireLinesDialog(ae_with_project)
     dialog.zone_id_field.setCurrentText("node_id")
-    dialog.cob_matrices.setCurrentText("demand.aem")
+    dialog.cob_matrices.setCurrentText("demand")
     dialog.set_matrix()
     dialog.matrix.computational_view()
     dialog.radio_delaunay.setChecked(is_delaunay)

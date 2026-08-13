@@ -89,8 +89,7 @@ def future_assignment(aeq_from_qgis):
     ipf = Ipf(**args)
     ipf.fit()
 
-    ipf.save_to_project(name="demand_ipfd", file_name="demand_ipfd.aem")
-    ipf.save_to_project(name="demand_ipfd_omx", file_name="demand_ipfd.omx")
+    ipf.save_to_project(name="demand_ipfd", file_name="demand_ipfd.omx")
 
     imped = proj_matrices.get_matrix("assignment_car")
     imped.computational_view(["final_time_with_intrazonals"])

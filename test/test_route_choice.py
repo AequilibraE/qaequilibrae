@@ -140,7 +140,7 @@ def test_build_and_save(ae_with_project, qtbot):
     # Graph configuration
     dialog.chb_check_centroids.setChecked(False)
 
-    dialog.cob_matrices.setCurrentText("demand.aem")
+    dialog.cob_matrices.setCurrentText("demand")
     qtbot.mouseClick(dialog.but_build_and_save, Qt.MouseButton.LeftButton)
 
     counter = 0
@@ -156,7 +156,7 @@ def test_build_and_save(ae_with_project, qtbot):
 
 
 def create_dialog_with_matrix(project):
-    pth = project.project.project_base_path / "matrices" / "demand.aem"
+    pth = project.project.project_base_path / "matrices" / "demand.omx"
     create_matrix(np.arange(1, 134), pth)
 
     matrices = project.project.matrices
@@ -199,7 +199,7 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
 
     # Execute workflow
     dialog.chb_save_choice_set.setChecked(True)
-    dialog.cob_matrices.setCurrentText("b''")
+    dialog.cob_matrices.setCurrentText("demand_omx")
     dialog.ln_rc_output.setText("route_choice_for_subarea")
     qtbot.mouseClick(dialog.but_perform_assig, Qt.MouseButton.LeftButton)
 
@@ -251,7 +251,7 @@ def test_select_link_analysis(coquimbo_project, qtbot):
 
     # Execute workflow
     dialog.chb_save_choice_set.setChecked(True)
-    dialog.cob_matrices.setCurrentText("b''")
+    dialog.cob_matrices.setCurrentText("demand_omx")
     qtbot.mouseClick(dialog.but_perform_assig, Qt.MouseButton.LeftButton)
 
     matrices = listdir(dialog.project.matrices.fldr)

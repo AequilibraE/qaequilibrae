@@ -12,7 +12,7 @@ from .utilities import create_matrix
 
 
 def create_dialog_with_matrix(project):
-    pth = project.project.project_base_path / "matrices" / "demand.aem"
+    pth = project.project.project_base_path / "matrices" / "demand.omx"
     create_matrix(np.arange(1, 134), pth)
 
     matrices = project.project.matrices

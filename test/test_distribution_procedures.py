@@ -22,7 +22,7 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
     df = pd.read_csv("test/data/SiouxFalls_project/synthetic_future_vector.csv")
     _ = layer_from_dataframe(df, "synthetic_future_vector")
 
-    file_path = f"{folder_path}/demand_ipf_D.aem"
+    file_path = f"{folder_path}/demand_ipf_D.omx"
     mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
     mocked_outfile.return_value = file_path
 
@@ -61,7 +61,7 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
     dialog.load_comboboxes(dialog.datasets.keys(), dialog.cob_data)
 
     temp = list(dialog.matrices["name"])
-    demand_idx = temp.index("demand.aem")
+    demand_idx = temp.index("demand")
     dialog.cob_seed_mat.setCurrentIndex(demand_idx)
     dialog.cob_seed_field.setCurrentText("matrix")
 
@@ -78,8 +78,8 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
 
     mat = AequilibraeMatrix()
     mat.load(file_path)
-    assert mat.matrix["matrix"].shape == (24, 24)
-    assert np.sum(np.nan_to_num(mat.matrix["matrix"])[:, :]) > 360600
+    assert mat.get_matrix("matrix").shape == (24, 24)
+    assert np.sum(np.nan_to_num(mat.get_matrix("matrix"))[:, :]) > 360600
 
 
 @pytest.mark.parametrize("method", ["negative_exponential", "inverse_power", "both"])

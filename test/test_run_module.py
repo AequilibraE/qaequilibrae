@@ -11,7 +11,7 @@ functions = {0: "matrix_summary", 1: "graph_summary", 2: "results_summary", 3: "
 
 
 def create_dialog_with_matrix(project):
-    pth = project.project.project_base_path / "matrices" / "demand.aem"
+    pth = project.project.project_base_path / "matrices" / "demand.omx"
     create_matrix(np.arange(1, 134), pth)
 
     matrices = project.project.matrices
@@ -62,7 +62,7 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
     p = Parameters()
     p.parameters["run"]["create_delaunay"] = {}
     p.parameters["run"]["create_delaunay"]["source"] = "zones"
-    p.parameters["run"]["create_delaunay"]["name"] = "b''"
+    p.parameters["run"]["create_delaunay"]["name"] = "demand_omx"
     p.parameters["run"]["create_delaunay"]["computational_view"] = "demand"
     p.parameters["run"]["create_delaunay"]["result_name"] = "delaunay_test"
     p.write_back()

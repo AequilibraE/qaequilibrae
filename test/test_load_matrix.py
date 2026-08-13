@@ -7,7 +7,7 @@ from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrix
 
 # TODO: test removing the matrices
 def test_save_matrix(ae_with_project, folder_path, timeoutDetector):
-    file_name = f"{folder_path}/test_matrix.aem"
+    file_name = f"{folder_path}/test_matrix.omx"
 
     df = pd.read_csv("test/data/SiouxFalls_project/SiouxFalls_od.csv")
     _ = layer_from_dataframe(df, "open_layer")
@@ -30,8 +30,8 @@ def test_save_matrix(ae_with_project, folder_path, timeoutDetector):
     mat = AequilibraeMatrix()
     mat.load(file_name)
 
-    assert mat.matrix["ton"].shape == (24, 24)
-    assert np.sum(np.nan_to_num(mat.matrix["ton"])[:, :]) == 360600
+    assert mat.get_matrix("ton").shape == (24, 24)
+    assert np.sum(np.nan_to_num(mat.get_matrix("ton"))[:, :]) == 360600
     assert (mat.index == np.arange(1, 25)).all()
 
     dialog.close()

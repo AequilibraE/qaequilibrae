@@ -1,11 +1,11 @@
 import importlib.util as iutil
 import sys
+from pathlib import Path
 
 import numpy as np
 import yaml
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
 from qgis.core import QgsProcessingParameterFileDestination, QgsProcessingParameterString, QgsProcessingException
-from qgis.core import QgsMessageLog, Qgis
 
 from qaequilibrae.i18n.translate import trlt
 from .matrix_expression import MatrixExpressionError, evaluate
@@ -27,7 +27,7 @@ class MatrixCalculator(QgsProcessingAlgorithm):
             )
         )
         self.addParameter(
-            QgsProcessingParameterFileDestination("file_path", self.tr("File path"), "AequilibraE Matrix (*.aem)")
+            QgsProcessingParameterFileDestination("file_path", self.tr("File path"), "OpenMatrix (*.omx)")
         )
 
     def processAlgorithm(self, parameters, context, model_feedback):
@@ -51,8 +51,13 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         index = []
         for matrix in params:
             for name, values in matrix.items():
+                matrix_path = Path(values["matrix_path"])
+                if matrix_path.suffix.upper() != ".OMX":
+                    raise QgsProcessingException(
+                        self.tr("Only OpenMatrix (*.omx) files are supported: {}").format(matrix_path)
+                    )
                 mat = AequilibraeMatrix()
-                mat.load(values["matrix_path"])
+                mat.load(matrix_path)
                 matrices[name] = mat.get_matrix(values["matrix_core"])
                 index[:] = mat.index[:]
                 mat.close()
@@ -71,19 +76,11 @@ class MatrixCalculator(QgsProcessingAlgorithm):
             )
 
         mat = AequilibraeMatrix()
-        mat.create_empty(
-            file_name=parameters["file_path"],
-            zones=len(index),
-            matrix_names=[parameters["matrix_core"]],
-            memory_only=False,
-        )
+        mat.create_empty(zones=len(index), matrix_names=[parameters["matrix_core"]])
         mat.matrix[parameters["matrix_core"]][:, :] = out[:, :]
         mat.index[:] = index[:]
+        mat.export(parameters["file_path"])
         mat.close()
-
-        QgsMessageLog.logMessage(
-            self.tr("Support for AEM will be removed in a future version"), "Messages", Qgis.MessageLevel.Warning
-        )
 
         return {"Output": "Finished"}
 
@@ -102,7 +99,7 @@ class MatrixCalculator(QgsProcessingAlgorithm):
     def shortHelpString(self):
         help_messages = [
             self.tr("Runs a matrix calculation based on a matrix configuration file (*.yaml) and an expression."),
-            self.tr("Results are stored in an AequilibraE Matrix."),
+            self.tr("Results are stored in an OpenMatrix (*.omx) file."),
             self.tr("Please notice that:"),
             self.tr(
                 "- each key in the configuration file corresponds to the name of the matrix in the input expression;"

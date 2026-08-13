@@ -1,6 +1,6 @@
 - cars:
-    matrix_path: test/data/SiouxFalls_project/matrices/demand_mc.aem
+    matrix_path: test/data/SiouxFalls_project/matrices/demand_mc.omx
     matrix_core: car
 - heavy_vehicles:
-    matrix_path: test/data/SiouxFalls_project/matrices/demand_mc.aem
+    matrix_path: test/data/SiouxFalls_project/matrices/demand_mc.omx
     matrix_core: trucks
