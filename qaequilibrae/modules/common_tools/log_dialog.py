@@ -3,6 +3,7 @@ import os
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML, QsciScintilla
 from qgis.PyQt.QtGui import QFont
+from qaequilibrae.modules.common_tools.get_output_file_name import last_accessed_folder, remember_folder
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "forms/ui_parameters.ui"))
 
@@ -58,9 +59,10 @@ class LogDialog(QtWidgets.QDialog, FORM_CLASS):
     def save_to_disk(self):
         options = QtWidgets.QFileDialog.Options()
         file_path, _ = QtWidgets.QFileDialog.getSaveFileName(
-            self, self.tr("Save logfile"), "", "logfile (*.log)", options=options
+            self, self.tr("Save logfile"), last_accessed_folder(), "logfile (*.log)", options=options
         )
         if file_path:
+            remember_folder(file_path)
             with open(file_path, "w") as log:
                 log.writelines(self.text_box.text())
 

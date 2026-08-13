@@ -6,10 +6,10 @@ from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtGui import QFont
 from qgis.PyQt.QtWidgets import QProgressBar, QLabel, QVBoxLayout, QGroupBox, QPlainTextEdit
 from qgis.PyQt.QtWidgets import QRadioButton, QGridLayout, QPushButton, QLineEdit
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog, QDialog
+from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QgsProject, QgsCoordinateReferenceSystem
 
-from qaequilibrae.modules.common_tools import ReportDialog, standard_path
+from qaequilibrae.modules.common_tools import GetOutputFolderName, ReportDialog, standard_path
 from qaequilibrae.modules.project_procedures.project_from_osm_procedure import ProjectFromOSMProcedure
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "../common_tools/forms/ui_empty.ui"))
@@ -109,7 +109,7 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.resize(280, 250)
 
     def choose_output(self):
-        new_name = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", standard_path())
+        new_name = GetOutputFolderName(standard_path(), "Parent folder")
         if new_name is not None and len(new_name) > 0:
             new_folder = "new_project"
             counter = 1
