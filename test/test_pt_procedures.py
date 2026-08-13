@@ -41,6 +41,25 @@ def test_add_new_feed(pt_no_feed, mocker):
     assert var == 1
 
 
+def test_gtfs_import_progress_uses_shared_bridge(pt_no_feed):
+    importer = GTFSImporter(pt_no_feed)
+
+    importer.signal_handler(["start", 9, "Reading GTFS"])
+    assert importer.progressbar.maximum() == 9
+    assert importer.progressbar.value() == 0
+    assert importer.progress_label.text() == "Reading GTFS"
+
+    importer.signal_handler(["update", 4, "Building routes"])
+    assert importer.progressbar.value() == 4
+    assert importer.progress_label.text() == "Building routes"
+
+    importer.signal_handler(["set_text", "Finishing import"])
+    assert importer.progress_label.text() == "Finishing import"
+
+    importer.signal_handler(["finished"])
+    assert importer.progress_label.text() == ""
+
+
 @pytest.mark.parametrize(
     ("is_checked", "set_date", "set_agency"),
     [(False, (2016, 6, 17), "New agency"), (True, (2016, 8, 21), "Other agency")],

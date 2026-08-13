@@ -7,20 +7,11 @@ from pathlib import Path
 
 from qgis.core import Qgis, QgsApplication, QgsMessageLog, QgsTask
 from qgis.PyQt import sip
-from qgis.PyQt.QtCore import QObject, pyqtSignal
-from qgis.PyQt.QtWidgets import (
-    QCheckBox,
-    QDialog,
-    QDialogButtonBox,
-    QLabel,
-    QMessageBox,
-    QProgressBar,
-    QTextEdit,
-    QVBoxLayout,
-)
+from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtWidgets import QMessageBox
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
-from qaequilibrae.modules.common_tools import BaseDialog
+from qaequilibrae.modules.common_tools import BaseDialog, LiveLogBridge, LiveLogDialog
 
 MESSAGE_TAG = "Model Run"
 
@@ -101,58 +92,16 @@ class OptionalIndentFormatter(logging.Formatter):
         return super().format(record)
 
 
-class LogBridge(QObject):
-    """Carries worker-thread output to the GUI thread through queued signal connections."""
-
-    log_line = pyqtSignal(str)
-    stage_line = pyqtSignal(str)
+LogBridge = LiveLogBridge
 
 
-class RunLogDialog(QDialog):
+class RunLogDialog(LiveLogDialog):
     """Live log and progress indicator for a model run."""
 
     def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self.setWindowTitle(self.tr("Model Run"))
-        self.resize(700, 450)
-
-        layout = QVBoxLayout()
-
-        self.stage_label = QLabel("")
-        layout.addWidget(self.stage_label)
-
         # Indeterminate: run procedures report no progress we could scale a bar to
-        self.bar = QProgressBar()
-        self.bar.setRange(0, 0)
-        layout.addWidget(self.bar)
-
-        self.text = QTextEdit()
-        self.text.setReadOnly(True)
-        self.text.setFontFamily("Consolas")
-        layout.addWidget(self.text)
-
-        self.auto_scroll = QCheckBox(self.tr("Auto scroll"))
-        self.auto_scroll.setChecked(True)
-        layout.addWidget(self.auto_scroll)
-
-        self.buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
-        self.buttons.rejected.connect(self.reject)
-        layout.addWidget(self.buttons)
-
-        self.setLayout(layout)
-
-    def append(self, msg):
-        self.text.append(msg)
-        if self.auto_scroll.isChecked():
-            self.text.ensureCursorVisible()
-
-    def mark_finished(self):
-        self.bar.setRange(0, 1)
-        self.bar.setValue(1)
-
-    def set_stage(self, msg):
-        self.stage_label.setText(msg)
+        super().__init__("", parent=parent, initial_indeterminate=True)
+        self.setWindowTitle(self.tr("Model Run"))
 
 
 class RunModuleDialog(BaseDialog):
@@ -309,8 +258,7 @@ class RunModuleDialog(BaseDialog):
             # Log windows from earlier runs stay parented to this dialog otherwise
             self.log_dialog.deleteLater()
         self.log_dialog = RunLogDialog(self)
-        self.bridge.log_line.connect(self.log_dialog.append)
-        self.bridge.stage_line.connect(self.log_dialog.set_stage)
+        self.log_dialog.connect_bridge(self.bridge)
         self.log_dialog.show()
 
         QgsMessageLog.logMessage(self.tr("Starting model run..."), MESSAGE_TAG, Qgis.MessageLevel.Info)

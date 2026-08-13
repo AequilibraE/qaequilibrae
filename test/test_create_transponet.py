@@ -77,6 +77,21 @@ def test_dialog_only_offers_standard_fields(ae, folder_path):
         assert checkbox_for(dialog.table_link_fields, field).isEnabled()
 
 
+def test_progress_uses_shared_bridge(ae, folder_path):
+    load_test_layer(folder_path, "node")
+    load_test_layer(folder_path, "link")
+
+    dialog = CreatesTranspoNetDialog(ae)
+
+    dialog.signal_handler(["start", 5, "Creating links"])
+    assert dialog.progressbar.maximum() == 5
+    assert dialog.progressbar.value() == 0
+    assert dialog.progress_label.text() == "Creating links"
+
+    dialog.signal_handler(["update", 3, ""])
+    assert dialog.progressbar.value() == 3
+
+
 def test_dialog(ae, folder_path):
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")
