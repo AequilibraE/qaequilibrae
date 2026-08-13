@@ -445,8 +445,9 @@ def test_network_fix_is_picked_up_when_dialog_reopens(sf_project, qtbot):
     dialog = TrafficAssignmentDialog(sf_project)
     _configure_single_class(dialog, qtbot)
 
-    with pytest.raises(ValueError, match="NaN"):
-        dialog.run()
+    dialog.run()
+    assert "NaN" in dialog.error
+    assert dialog.worker_thread is None
 
     dialog.close()
 
