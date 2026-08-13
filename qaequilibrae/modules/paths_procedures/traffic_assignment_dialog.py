@@ -47,7 +47,7 @@ class TrafficAssignmentDialog(BaseDialog):
         self.iter = 0
         self.miter = 1000
         self.select_links = {}
-        self.__rebuilt_modes = []
+        self.__rebuilt_modes = set()
         self.__current_links = []
         self.__project_links = self.project.network.links.data.link_id
         self.link_layer = self.qgis_project.layers["links"][0]
@@ -208,7 +208,10 @@ class TrafficAssignmentDialog(BaseDialog):
             self.cob_capacity.setCurrentText(params["assignment"]["capacity_field"])
             self.cob_ffttime.setCurrentText(params["assignment"]["time_field"])
 
-            self.cob_vdf.setCurrentText(params["assignment"]["vdf"])
+            # The combo is populated from `all_vdf_functions`, which is lower case, and
+            # QComboBox matches case-sensitively. Without normalizing, a config asking for
+            # "BPR2" silently leaves the combo on whatever it already showed.
+            self.cob_vdf.setCurrentText(params["assignment"]["vdf"].lower())
             if isinstance(params["assignment"]["alpha"], float):
                 self.tbl_vdf_parameters.cellWidget(0, 1).setText(str(params["assignment"]["alpha"]))
             elif isinstance(params["assignment"]["alpha"], str):
@@ -460,7 +463,7 @@ class TrafficAssignmentDialog(BaseDialog):
             table.setCellWidget(i, 2, val_fld)
 
     def __graph_for_mode(self, mode_id: str):
-        """Returns the graph for a mode, rebuilding it once per dialog session.
+        """Returns the graph for a mode, rebuilding it the first time this dialog needs it.
 
         Graphs are cached in the project, so they outlive this dialog. They also carry a
         snapshot of the links table taken when they were built, and get mutated along the
@@ -469,10 +472,14 @@ class TrafficAssignmentDialog(BaseDialog):
         which is why a failed assignment used to keep failing until the project was closed
         and reopened. Building on first use keeps the retry within the dialog, while still
         sharing the graph between classes of the same mode.
+
+        A mode can be built more than once in a session: the chosen links path pops its
+        graph out of the project, so the next class using that mode gets a fresh one
+        rather than the copy with links excluded.
         """
         if mode_id not in self.__rebuilt_modes or mode_id not in self.project.network.graphs:
             self.project.network.build_graphs(modes=[mode_id])
-            self.__rebuilt_modes.append(mode_id)
+            self.__rebuilt_modes.add(mode_id)
 
         return self.project.network.graphs[mode_id]
 
