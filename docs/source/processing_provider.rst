@@ -37,7 +37,8 @@ usig project data.
 
 .. warning::
 
-    Support for AequilibraE Matrix (AEM) files will be removed in a future version.
+    Support for AequilibraE Matrix (AEM) files has been removed. Matrices must be
+    stored in OpenMatrix (\*.omx) format.
 
 .. _importing_matrices:
 
@@ -57,8 +58,8 @@ Export matrices
 The *Export matrices* tool is analogous to the *Export* button in the matrix viewer 
 (see: :ref:`this figure <fig_data_visualize_matrices>` for more details). 
 Its usage is straightforward: select the matrix you want to export, specify the path
-on your machine to store the file, and select its output format. Only \*.aem and \*.omx files can 
-be used as input, and the output format can be either one of \*.aem, \*.omx, or \*.csv.
+on your machine to store the file, and select its output format. Only \*.omx files can
+be used as input, and the output format can be either one of \*.omx or \*.csv.
 
 .. image:: images/processing_provider/processing_provider_export_matrices.png
     :align: center
@@ -66,8 +67,8 @@ be used as input, and the output format can be either one of \*.aem, \*.omx, or 
 
 Matrix calculator
 ~~~~~~~~~~~~~~~~~
-Under the hood, this tool performs several matrix calculations using NumPy. Its output is 
-an AequilibraE matrix stored in the file path you provide. Notice that not all matrices
+Under the hood, this tool performs several matrix calculations using NumPy. Its output is
+an OpenMatrix (\*.omx) file stored in the file path you provide. Notice that not all matrices
 operations available in NumPy are also available here. We currently handle the following
 operations.
 
@@ -91,7 +92,7 @@ the YAML file and an expression that can be used for calculation.
 
     # For each matrix used for calculation
     - matrix_name1:
-        matrix_path: path to file
+        matrix_path: path to *.omx file
         matrix_core: specifiy the core name
 
 .. code-block:: yaml

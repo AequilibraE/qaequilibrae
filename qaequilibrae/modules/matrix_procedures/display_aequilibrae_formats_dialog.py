@@ -12,7 +12,7 @@ from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QSpinBox, QLabel, QSpacerItem, QRadioButton
 from qgis.PyQt.QtWidgets import QHBoxLayout, QTableView, QPushButton, QVBoxLayout, QAbstractItemView
-from qgis.core import QgsProject, QgsStyle, QgsRuleBasedRenderer, Qgis
+from qgis.core import QgsProject, QgsStyle, QgsRuleBasedRenderer
 from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsLinePatternFillSymbolLayer
 
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
@@ -70,34 +70,25 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def continue_with_data(self):
         self.setWindowTitle(self.tr("File path: {}").format(self.data_path))
 
-        if self.data_type == "AEM":
-            msg = self.tr("Support for AEM will be removed in a future version")
-            self.qgis_project.message_log(msg, Qgis.MessageLevel.Warning, True)
-            self.data_to_show = AequilibraeMatrix()
-            if not self.from_proj:
-                self.qgis_project.matrices[self.data_path] = self.data_to_show
-            try:
-                self.data_to_show.load(self.data_path)
-                self.list_cores = self.data_to_show.names
-                self.list_indices = self.data_to_show.index_names
-            except Exception as e:
-                self.error = self.tr("Could not load dataset")
-                self.logger.error(e.args)
-                self.exit_with_error()
+        if self.data_type != "OMX":
+            self.error = self.tr("Only OpenMatrix (*.omx) files are supported")
+            self.exit_with_error()
+            return
 
-        elif self.data_type == "OMX":
+        try:
             with omx.open_file(self.data_path) as omx_file:
                 if not self.from_proj:
                     self.qgis_project.matrices[self.data_path] = omx_file
                 self.list_cores = omx_file.list_matrices()
                 self.list_indices = omx_file.list_mappings()
                 self.data_to_show = AequilibraeMatrix()
+        except Exception as e:
+            self.error = self.tr("Could not load dataset")
+            self.logger.error(e.args)
+            self.exit_with_error()
+            return
 
-        # differentiates between AEM AND OMX
-        if self.data_type == "AEM":
-            self.data_to_show.computational_view([self.data_to_show.names[0]])
-        elif self.data_type == "OMX":
-            self.add_matrix_parameters(self.list_indices[0], self.list_cores[0])
+        self.add_matrix_parameters(self.list_indices[0], self.list_cores[0])
 
         # Elements that will be used during the displaying
         self._layout = QVBoxLayout()
@@ -424,13 +415,8 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
     def change_matrix_cores(self):
         idx = self.idx_list.currentText()
         core = self.mat_list.currentText()
-        if self.data_type == "AEM":
-            self.data_to_show.computational_view([core])
-            self.data_to_show.set_index(idx)
-            self.format_showing()
-        elif self.data_type == "OMX":
-            self.add_matrix_parameters(idx, core)
-            self.format_showing()
+        self.add_matrix_parameters(idx, core)
+        self.format_showing()
 
         self.indices = self.data_to_show.index.astype(np.int32)
         self.idx_mapping = dict(zip(self.indices, np.arange(self.indices.shape[0])))
@@ -475,7 +461,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.data_to_show.matrix[field] = self.data_to_show.matrix_view[:, :]
 
     def get_file_name(self):
-        formats = ["AequilibraE Matrix (*.aem)", "OpenMatrix (*.omx)"]
+        formats = ["OpenMatrix (*.omx)"]
         dflt = ".omx"
 
         data_path, data_type = GetOutputFileName(

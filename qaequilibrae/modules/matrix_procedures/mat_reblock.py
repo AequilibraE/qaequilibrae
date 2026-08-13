@@ -13,7 +13,7 @@ class MatrixReblocking(WorkerThread):
         self.matrix = AequilibraeMatrix()
         self.matrices = kwargs.get("matrices")
         self.sparse = kwargs.get("sparse", False)
-        self.file_name = kwargs.get("file_name", AequilibraeMatrix().random_name())
+        self.file_name = kwargs.get("file_name", AequilibraeMatrix().random_name().with_suffix(".omx"))
 
         self.num_matrices = len(self.matrices.keys())
         self.matrix_hash = {}

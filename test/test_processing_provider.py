@@ -90,7 +90,7 @@ def test_matrix_calc(folder_path):
     parameters = {
         "conf_file": "test/data/SiouxFalls_project/matrix_config.yml",
         "procedure": "(cars - (heavy_vehicles * 0.25)).T",
-        "file_path": f"{folder_path}/hello.aem",
+        "file_path": f"{folder_path}/hello.omx",
         "matrix_core": "new_core",
     }
 
@@ -107,7 +107,7 @@ def test_matrix_calc(folder_path):
     info = mat.__dict__
     assert info["names"] == [parameters["matrix_core"]]
     assert info["zones"] == 24
-    assert np.sum(info["matrix"][parameters["matrix_core"]][:, :]) > 0
+    assert np.sum(mat.get_matrix(parameters["matrix_core"])) > 0
 
 
 def test_matrix_calc_rejects_a_result_that_is_not_a_matrix(folder_path):
@@ -117,7 +117,7 @@ def test_matrix_calc_rejects_a_result_that_is_not_a_matrix(folder_path):
     parameters = {
         "conf_file": "test/data/SiouxFalls_project/matrix_config.yml",
         "procedure": "min(cars)",
-        "file_path": f"{folder_path}/scalar.aem",
+        "file_path": f"{folder_path}/scalar.omx",
         "matrix_core": "new_core",
     }
 

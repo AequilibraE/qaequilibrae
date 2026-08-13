@@ -22,7 +22,7 @@ def test_display_data_no_path(ae, mocker):
     assert messagebar.messages[2][0] == error_message, "Level 2 error message is missing"
 
 
-@pytest.mark.parametrize("path", ["demand.aem", "SiouxFalls.omx"])
+@pytest.mark.parametrize("path", ["demand.omx", "SiouxFalls.omx"])
 def test_display_data_with_project(tmpdir, ae_with_project, mocker, path):
     file_path = f"test/data/SiouxFalls_project/matrices/{path}"
     name, extension = path.split(".")
@@ -46,7 +46,7 @@ def test_display_data_with_project(tmpdir, ae_with_project, mocker, path):
     assert os.path.isfile(f"{tmpdir}/{name}.csv")
 
 
-@pytest.mark.parametrize("path", ["demand.aem", "SiouxFalls.omx"])
+@pytest.mark.parametrize("path", ["demand.omx", "SiouxFalls.omx"])
 def test_display_data_without_project(tmpdir, ae, mocker, path):
     file_path = f"test/data/SiouxFalls_project/matrices/{path}"
     name, extension = path.split(".")
