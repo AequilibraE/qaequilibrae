@@ -14,13 +14,13 @@ jobs:
       max-parallel: 4
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
     - name: Set up Python 3.12
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: 3.12
 
@@ -43,14 +43,14 @@ jobs:
         files_changed=$(git diff --name-only)
       
         if echo "${files_changed}" | grep --quiet "qaequilibrae/i18n/qaequilibrae.ts"; then
-          echo "is_file=$is_file" >> $GITHUB_OUTPUT
+          echo "is_file=is_file" >> "$GITHUB_OUTPUT"
         else
           echo "Translation file wasn't modified."
         fi
     
     - name: Create PR
-      if: steps.check-modifications.outputs.is_file == ${{ env.VALIDATE_FILE }}
-      uses: peter-evans/create-pull-request@v6
+      if: ${{ steps.check-modifications.outputs.is_file == env.VALIDATE_FILE }}
+      uses: peter-evans/create-pull-request@v8
       with:
         commit-message: Update translation file
         title: Updates translation file
