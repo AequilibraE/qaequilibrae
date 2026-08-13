@@ -337,6 +337,13 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
         elif val[0] == "update":
             self.progressbar.setValue(val[1])
         elif val[0] == "finished":
+            # Imported here so project_procedures and menu_actions do not import each other at plugin load
+            from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
+
+            # The project the procedure built is left open, so the panel takes it over from here
+            self.qgis_project.project = self.worker_thread.project
+            show_project_in_panel(self.qgis_project, self.worker_thread.proj_folder)
+
             if self.worker_thread.report:
                 dlg2 = ReportDialog(self.iface, self.worker_thread.report)
                 dlg2.show()

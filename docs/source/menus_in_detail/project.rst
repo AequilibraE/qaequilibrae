@@ -26,7 +26,11 @@ a project, and **Project > Close project** to close it.
 
 Keep in mind that to open another project or to create a new one, you **must**
 close the currently open project, otherwise AequilibraE is going to return an
-error.
+error. That applies to the tools that build a model as well
+(:ref:`from OSM <create_project_from_osm>`,
+:ref:`from layers <project_from_layers>` or
+:ref:`from an example <create_example>`), since each of them leaves the model it
+created open, with its layers listed in the Project tab.
 
 .. _run_procedures:
 
