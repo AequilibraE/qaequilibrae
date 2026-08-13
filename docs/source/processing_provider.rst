@@ -37,7 +37,8 @@ usig project data.
 
 .. warning::
 
-    Support for AequilibraE Matrix (AEM) files will be removed in a future version.
+    Support for AequilibraE Matrix (AEM) files has been removed. Matrices must be
+    stored in OpenMatrix (\*.omx) format.
 
 .. _importing_matrices:
 
@@ -57,8 +58,8 @@ Export matrices
 The *Export matrices* tool is analogous to the *Export* button in the matrix viewer 
 (see: :ref:`this figure <fig_data_visualize_matrices>` for more details). 
 Its usage is straightforward: select the matrix you want to export, specify the path
-on your machine to store the file, and select its output format. Only \*.aem and \*.omx files can 
-be used as input, and the output format can be either one of \*.aem, \*.omx, or \*.csv.
+on your machine to store the file, and select its output format. Only \*.omx files can
+be used as input, and the output format can be either one of \*.omx or \*.csv.
 
 .. image:: images/processing_provider/processing_provider_export_matrices.png
     :align: center
@@ -66,8 +67,8 @@ be used as input, and the output format can be either one of \*.aem, \*.omx, or 
 
 Matrix calculator
 ~~~~~~~~~~~~~~~~~
-Under the hood, this tool performs several matrix calculations using NumPy. Its output is 
-an AequilibraE matrix stored in the file path you provide. Notice that not all matrices
+Under the hood, this tool performs several matrix calculations using NumPy. Its output is
+an OpenMatrix (\*.omx) file stored in the file path you provide. Notice that not all matrices
 operations available in NumPy are also available here. We currently handle the following
 operations.
 
@@ -91,7 +92,7 @@ the YAML file and an expression that can be used for calculation.
 
     # For each matrix used for calculation
     - matrix_name1:
-        matrix_path: path to file
+        matrix_path: path to *.omx file
         matrix_core: specifiy the core name
 
 .. code-block:: yaml
@@ -294,6 +295,9 @@ defined as the current map canvas on QGIS...
     :align: center
     :alt: Download OSM networks for named place
 
+Once the import is over, the new model is opened and its layers are listed in the
+Project tab, ready to be added to the map.
+
 .. _project_from_layers:
 
 Project from layers
@@ -352,7 +356,8 @@ In the case of the nodes layer, both fields are mandatory.
     :align: center
     :alt: project_from_layers_nodes
 
-After filling all fields, it is just a matter of saving it!
+After filling all fields, it is just a matter of saving it! The model is opened as soon
+as it is built, and its layers are listed in the Project tab.
 
 After running this tool a sqlite file (spatialite enabled) will be created and
 you can edit the network (create, move or delete links and nodes) and both
@@ -430,8 +435,8 @@ AequilibraE has three different example sets one can use as learning tool, and t
 made available within the QGIS ecosystem.
 
 Within **Project > Create example**, select one of the available models, the desired
-location of the output folder, and just press *Create*. The window will close automatically
-and you can open the project folder in the Project tab.
+location of the output folder, and just press *Create*. The window closes automatically
+and the new model is opened, with its layers listed in the Project tab.
 
 .. image:: images/processing_provider/project_create_example.png
     :align: center

@@ -16,6 +16,7 @@ from .edit_snapping import EditSnapping as EditSnapping
 from .geodataframe_from_data_layer import geodataframe_from_layer as geodataframe_from_layer
 from .get_output_file_name import GetOutputFileName as GetOutputFileName
 from .get_output_file_name import GetOutputFolderName as GetOutputFolderName
+from .link_splitter import LinkSplitter as LinkSplitter
 from .load_graph_layer_setting_dialog import LoadGraphLayerSettingDialog as LoadGraphLayerSettingDialog
 from .log_dialog import LogDialog as LogDialog
 from .numpy_model import NumpyModel as NumpyModel

@@ -50,7 +50,7 @@ def add_run_function(project, name, source, parameters=None):
 
 
 def create_dialog_with_matrix(project):
-    pth = project.project.project_base_path / "matrices" / "demand.aem"
+    pth = project.project.project_base_path / "matrices" / "demand.omx"
     create_matrix(np.arange(1, 134), pth)
 
     matrices = project.project.matrices
@@ -191,7 +191,7 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
         func_string,
         parameters={
             "source": "zones",
-            "name": "b''",
+            "name": "demand_omx",
             "computational_view": "demand",
             "result_name": "delaunay_test",
         },

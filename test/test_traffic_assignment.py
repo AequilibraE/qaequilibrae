@@ -10,6 +10,27 @@ from qgis.PyQt.QtCore import Qt
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
 
+def test_nan_demand_is_replaced_with_zero(sf_project, qtbot, mocker):
+    matrix_path = sf_project.project.project_base_path / "matrices" / "demand.omx"
+    with omx.open_file(matrix_path, "a") as omx_file:
+        omx_file["matrix"][0, 1] = np.nan
+
+    dialog = TrafficAssignmentDialog(sf_project)
+    dialog.cob_matrices.setCurrentText("demand_omx")
+    dialog.tbl_core_list.selectRow(0)
+    dialog.cob_mode_for_class.setCurrentIndex(0)
+    dialog.ln_class_name.setText("car")
+    warning = mocker.patch("qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.logger.warning")
+
+    dialog._create_traffic_class()
+
+    assert dialog.traffic_classes["car"].matrix.matrix_view[0, 1] == 0.0
+    warning.assert_called_once_with("Replaced 1 NaN demand value with zero in matrix 'demand_omx' (core(s): matrix).")
+    with omx.open_file(matrix_path, "r") as omx_file:
+        assert np.isnan(omx_file["matrix"][0, 1])
+    dialog.close()
+
+
 def test_single_class(sf_project, qtbot, mocker):
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
@@ -35,9 +56,9 @@ def test_single_class(sf_project, qtbot, mocker):
     dialog.cob_skims_available.setCurrentText("distance")
     qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
+    dialog.cob_vdf.setCurrentText("bpr")
     dialog.tbl_vdf_parameters.cellWidget(0, 2).setCurrentText("b")
     dialog.tbl_vdf_parameters.cellWidget(1, 2).setCurrentText("power")
-    dialog.cob_vdf.setCurrentText("BPR")
     dialog.cob_capacity.setCurrentText("capacity")
     dialog.cob_ffttime.setCurrentText("free_flow_time")
     dialog.cb_choose_algorithm.setCurrentText("bfw")
@@ -135,9 +156,9 @@ def test_multiclass(sf_project, qtbot, mocker):
     qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
     # Assignment setup
+    dialog.cob_vdf.setCurrentText("bpr")
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
     dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
-    dialog.cob_vdf.setCurrentText("BPR")
     dialog.cob_capacity.setCurrentText("capacity")
     dialog.cob_ffttime.setCurrentText("free_flow_time")
     dialog.cb_choose_algorithm.setCurrentText("bfw")
@@ -192,9 +213,9 @@ def test_all_or_nothing(sf_project, qtbot):
     dialog.cob_skims_available.setCurrentText("distance")
     qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
+    dialog.cob_vdf.setCurrentText("bpr")
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
     dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
-    dialog.cob_vdf.setCurrentText("BPR")
     dialog.cob_capacity.setCurrentText("capacity")
     dialog.cob_ffttime.setCurrentText("free_flow_time")
     dialog.cb_choose_algorithm.setCurrentText("all-or-nothing")
@@ -254,9 +275,9 @@ def test_select_link_analysis(sf_project, qtbot, mocker):
     dialog.sl_mat_name.setText("select_link_analysis")
 
     # Assignment
+    dialog.cob_vdf.setCurrentText("bpr")
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
     dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
-    dialog.cob_vdf.setCurrentText("BPR")
     dialog.cob_capacity.setCurrentText("capacity")
     dialog.cob_ffttime.setCurrentText("free_flow_time")
     dialog.cb_choose_algorithm.setCurrentText("bfw")
@@ -304,9 +325,9 @@ def test_link_removal(sf_project, qtbot):
     dialog.cob_skims_available.setCurrentText("distance")
     qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
+    dialog.cob_vdf.setCurrentText("bpr")
     dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
     dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
-    dialog.cob_vdf.setCurrentText("BPR")
     dialog.cob_capacity.setCurrentText("capacity")
     dialog.cob_ffttime.setCurrentText("free_flow_time")
     dialog.cb_choose_algorithm.setCurrentText("bfw")
@@ -373,6 +394,9 @@ def test_multi_class_from_yaml(sf_project, qtbot, mocker):
     dialog = TrafficAssignmentDialog(sf_project)
     qtbot.mouseClick(dialog.but_load_yaml, Qt.MouseButton.LeftButton)
 
+    # The config asks for BPR2, and the combo entries are lower case
+    assert dialog.cob_vdf.currentText() == "bpr2"
+
     dialog.run()
     dialog.close()
 
@@ -409,6 +433,58 @@ def test_select_links_from_yaml(sf_project, qtbot, mocker):
         assert "select_link_analysis_from_yaml" in results
 
 
+def _configure_single_class(dialog, qtbot):
+    dialog.output_scenario_name.setText(f"TestTrafficAssignment_Stale_{uuid4().hex[:6]}")
+    dialog.cob_matrices.setCurrentText("demand")
+
+    dialog.tbl_core_list.selectRow(0)
+    dialog.cob_mode_for_class.setCurrentIndex(0)
+    dialog.ln_class_name.setText("car")
+    dialog.pce_setter.setValue(1.0)
+    dialog.chb_check_centroids.setChecked(False)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
+
+    dialog.cob_vdf.setCurrentText("bpr")
+    dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
+    dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
+    dialog.cob_capacity.setCurrentText("capacity")
+    dialog.cob_ffttime.setCurrentText("free_flow_time")
+    dialog.cb_choose_algorithm.setCurrentText("all-or-nothing")
+
+
+def test_network_fix_is_picked_up_when_dialog_reopens(sf_project, qtbot):
+    """An assignment that failed on bad link data must succeed once the data is fixed.
+
+    Graphs are cached in the project and outlive the dialog, so a stale one used to make
+    the very same assignment fail on every reopen until the project itself was closed.
+    """
+    project = sf_project.project
+
+    with project.db_connection as conn:
+        conn.execute("UPDATE links SET capacity_ab = NULL WHERE link_id = 1")
+
+    dialog = TrafficAssignmentDialog(sf_project)
+    _configure_single_class(dialog, qtbot)
+
+    dialog.run()
+    assert "NaN" in dialog.error
+    assert dialog.worker_thread is None
+
+    dialog.close()
+
+    # The user fixes the network and opens the dialog again, without closing the project
+    with project.db_connection as conn:
+        conn.execute("UPDATE links SET capacity_ab = 1000 WHERE link_id = 1")
+
+    dialog = TrafficAssignmentDialog(sf_project)
+    _configure_single_class(dialog, qtbot)
+
+    graph = dialog.traffic_classes["car"].graph.graph
+    assert not pd.isna(graph["capacity"]).any()
+
+    dialog.close()
+
+
 def test_single_class_from_python(sf_project, qtbot, mocker):
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_python_path",
@@ -434,9 +510,9 @@ def test_single_class_from_python(sf_project, qtbot, mocker):
     dialog.cob_skims_available.setCurrentText("distance")
     qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
 
+    dialog.cob_vdf.setCurrentText("bpr")
     dialog.tbl_vdf_parameters.cellWidget(0, 2).setCurrentText("b")
     dialog.tbl_vdf_parameters.cellWidget(1, 2).setCurrentText("power")
-    dialog.cob_vdf.setCurrentText("BPR")
     dialog.cob_capacity.setCurrentText("capacity")
     dialog.cob_ffttime.setCurrentText("free_flow_time")
     dialog.cb_choose_algorithm.setCurrentText("bfw")

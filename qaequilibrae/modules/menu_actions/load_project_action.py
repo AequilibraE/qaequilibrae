@@ -26,28 +26,39 @@ def _project_root(proj_path):
 
 def _run_load_project_from_path(qgis_project, proj_path):
     from aequilibrae.project import Project
-    from aequilibrae.project.tools import MigrationManager
-    from aequilibrae.utils.spatialite_utils import connect_spatialite
 
     if proj_path is None or proj_path == "":
         return
 
     proj_path = _project_root(proj_path)
 
-    if proj_path is not None and len(proj_path) > 0:
-        qgis_project.contents = []
-        qgis_project.project = Project()
+    qgis_project.contents = []
+    qgis_project.project = Project()
 
-        try:
-            qgis_project.project.open(proj_path)
-        except FileNotFoundError as e:
-            if e.args[0] == "Model does not exist. Check your path and try again":
-                qgis_project.iface_error_message(
-                    "Check your path and try again", "FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL"
-                )
-                return
-            else:
-                raise e
+    try:
+        qgis_project.project.open(proj_path)
+    except FileNotFoundError as e:
+        if e.args[0] == "Model does not exist. Check your path and try again":
+            qgis_project.iface_error_message(
+                "Check your path and try again", "FOLDER DOES NOT CONTAIN AN AEQUILIBRAE MODEL"
+            )
+            return
+        else:
+            raise e
+
+    show_project_in_panel(qgis_project, proj_path)
+
+
+def show_project_in_panel(qgis_project, proj_path):
+    """Fills the panel for a project AequilibraE already has open.
+
+    Every way of getting to an open project - the menu, a QGIS project carrying a model, an
+    import from OSM - has to come through here, or the plugin ends up holding a project whose
+    scenarios and layers the panel knows nothing about.
+    """
+    from aequilibrae.project.tools import MigrationManager
+    from aequilibrae.utils.spatialite_utils import connect_spatialite
+    from qaequilibrae.modules.network.node_numbering import reserve_node_ids_for_centroids
 
     pth = join(gettempdir(), "aequilibrae_last_folder.txt")
     with open(pth, "w") as file:
@@ -74,6 +85,9 @@ def _run_load_project_from_path(qgis_project, proj_path):
 
     qgis_project.cob_scenarios.addItems(outdirs)
     qgis_project.available_scenarios.extend(outdirs)
+
+    # After the upgrade above, and after an OSM import has put AequilibraE's own triggers back
+    reserve_node_ids_for_centroids(qgis_project.project)
 
     qgis_project.update_project_layers()
 

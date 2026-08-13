@@ -116,6 +116,26 @@ def test_dialog(ae, folder_path):
         assert mode in modes.all_modes().keys()
 
 
+def test_dialog_opens_the_model_it_creates(ae, folder_path):
+    """The procedure leaves the new project open, so the panel takes it over from there"""
+    load_test_layer(folder_path, "node")
+    load_test_layer(folder_path, "link")
+
+    dialog = CreatesTranspoNetDialog(ae)
+    dialog.project_destination.setText(folder_path)
+
+    map_standard_fields(dialog)
+
+    dialog.create_net()
+
+    assert ae.project is dialog.worker_thread.project
+    assert ae.available_scenarios == ["root"]
+    assert {"links", "nodes"} <= set(ae.layers)
+    assert ae.projectManager.count() == 1
+
+    ae.run_close_project()
+
+
 def test_dialog_bringing_extra_field_from_layer(ae, folder_path):
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")

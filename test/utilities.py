@@ -330,10 +330,11 @@ def create_matrix(index: np.ndarray, path: str):
     zones = index.shape[0]
 
     mat = AequilibraeMatrix()
-    mat.create_empty(zones=zones, matrix_names=names_list, memory_only=False, file_name=path)
+    mat.create_empty(zones=zones, matrix_names=names_list)
     mat.index[:] = index[:]
 
     for name in names_list:
         mat.matrix[name][:, :] = np.full((zones, zones), 10.0)[:, :]
 
-    mat.matrices.flush()
+    mat.export(path)
+    mat.close()

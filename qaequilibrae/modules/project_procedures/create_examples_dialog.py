@@ -72,5 +72,10 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
             self.output_path.setText(join(new_name, new_folder))
 
     def run(self):
-        create_example(self.output_path.text(), self.place)
+        # Imported here so project_procedures and menu_actions do not import each other at plugin load
+        from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
+
+        # create_example hands back an open project, which is the one the panel goes on to show
+        self.qgis_project.project = create_example(self.output_path.text(), self.place)
+        show_project_in_panel(self.qgis_project, self.output_path.text())
         self.close()
