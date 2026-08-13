@@ -14,6 +14,15 @@ IMPORT_TIMEOUT_MS = 300000
 
 
 @pytest.fixture
+def dialog(ae):
+    """Tailing the log leaves a timer running, which would go on firing into the tests after this one"""
+    dlg = ProjectFromOSMDialog(ae)
+    yield dlg
+    dlg.log_timer.stop()
+    dlg.close()
+
+
+@pytest.fixture
 def patch_report_dialog(monkeypatch):
     from qaequilibrae.modules.project_procedures import project_from_osm_dialog
 
@@ -76,8 +85,28 @@ def test_swallows_the_progress_finishing_only_one_stage(qtbot):
     assert relayed == [["start", 1, "Downloading"]]
 
 
-def test_shows_the_logfile_as_it_is_written(ae, folder_path):
-    dialog = ProjectFromOSMDialog(ae)
+def test_refuses_to_run_without_an_output_folder(dialog, qtbot):
+    # AequilibraE would take an empty path for the current directory and create the project there
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
+
+    assert not dialog.running
+    assert dialog.worker_thread is None
+    assert not dialog.log_timer.isActive()
+    assert dialog.iface.messageBar().messages[2][0] == "Error:Choose a folder to create the project in"
+
+
+def test_refuses_to_run_without_a_place_name(dialog, qtbot, folder_path):
+    dialog.output_path.setText(folder_path)
+    dialog.choose_place.setChecked(True)
+
+    qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
+
+    assert not dialog.running
+    assert dialog.worker_thread is None
+    assert dialog.iface.messageBar().messages[2][0] == "Error:Type the name of the place to import"
+
+
+def test_shows_the_logfile_as_it_is_written(dialog, folder_path):
     dialog.output_path.setText(folder_path)
 
     # The log file only shows up when AequilibraE creates the project, so tailing starts before it exists
@@ -104,9 +133,7 @@ def test_shows_the_logfile_as_it_is_written(ae, folder_path):
 
 
 @pytest.mark.skipif(not bool(environ.get("CI")), reason="Runs only in GitHub Action")
-def test_choose_place(ae, qtbot, folder_path, patch_report_dialog):
-    dialog = ProjectFromOSMDialog(ae)
-
+def test_choose_place(dialog, qtbot, folder_path, patch_report_dialog):
     dialog.choose_place.setChecked(True)
     dialog.place.setText("Abrolhos Archipelago, Brazil")
 
@@ -131,9 +158,7 @@ def test_choose_place(ae, qtbot, folder_path, patch_report_dialog):
 
 
 @pytest.mark.skipif(not bool(environ.get("CI")), reason="Runs only in GitHub Action")
-def test_select_canvas_area(ae, qtbot, folder_path, patch_report_dialog):
-    dialog = ProjectFromOSMDialog(ae)
-
+def test_select_canvas_area(dialog, qtbot, folder_path, patch_report_dialog):
     # Define the extent you want to zoom to (xmin, ymin, xmax, ymax)
     # We'll still use Abrolhos Archipelago
     extent = QgsRectangle(-38.712296, -17.981662, -38.691573, -17.96017)
@@ -163,9 +188,7 @@ def test_select_canvas_area(ae, qtbot, folder_path, patch_report_dialog):
 
 
 @pytest.mark.skipif(not bool(environ.get("CI")), reason="Runs only in GitHub Action")
-def test_place_not_found_keeps_the_dialog_open(ae, qtbot, folder_path):
-    dialog = ProjectFromOSMDialog(ae)
-
+def test_place_not_found_keeps_the_dialog_open(dialog, qtbot, folder_path):
     dialog.choose_place.setChecked(True)
     dialog.place.setText("Nowhere in particular, made up on the spot")
     dialog.output_path.setText(folder_path)
@@ -174,4 +197,4 @@ def test_place_not_found_keeps_the_dialog_open(ae, qtbot, folder_path):
 
     assert dialog.error is not None
     assert dialog.but_run.isEnabled()
-    assert ae.project is None
+    assert dialog.qgis_project.project is None

@@ -122,6 +122,18 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         if self.running:
             return
 
+        # An empty folder is not a harmless mistake: AequilibraE reads it as the current
+        # directory and quietly writes the whole project into wherever QGIS was started
+        output_path = self.output_path.text().strip()
+        if not output_path:
+            self.qgis_project.iface_error_message(self.tr("Choose a folder to create the project in"))
+            return
+        self.output_path.setText(output_path)
+
+        if self.choose_place.isChecked() and not self.place.text().strip():
+            self.qgis_project.iface_error_message(self.tr("Type the name of the place to import"))
+            return
+
         if self.choose_canvas.isChecked():
             QgsProject.instance().setCrs(QgsCoordinateReferenceSystem.fromEpsgId(4326))
             e = self.iface.mapCanvas().extent()
