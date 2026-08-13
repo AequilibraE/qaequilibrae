@@ -3,10 +3,9 @@ from pathlib import Path
 
 from aequilibrae.utils.create_example import create_example
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtWidgets import QGridLayout, QPushButton, QLineEdit, QComboBox, QLabel, QVBoxLayout
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog
+from qgis.PyQt.QtWidgets import QGridLayout, QPushButton, QLineEdit, QComboBox, QLabel, QVBoxLayout, QWidget
 
-from qaequilibrae.modules.common_tools import standard_path
+from qaequilibrae.modules.common_tools import GetOutputFolderName, standard_path
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "../common_tools/forms/ui_empty.ui"))
 
@@ -62,7 +61,7 @@ class CreateExampleDialog(QtWidgets.QDialog, FORM_CLASS):
     def choose_output(self):
         self.place = self.cb_models.currentText()
 
-        new_name = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", standard_path())
+        new_name = GetOutputFolderName(standard_path(), "Parent folder")
         if new_name is not None and len(new_name) > 0:
             new_folder = f"example_{self.place}"
             counter = 1
