@@ -1,6 +1,7 @@
 from os import listdir
 
 import numpy as np
+import pandas as pd
 import pytest
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsProject
@@ -260,6 +261,48 @@ def test_select_link_analysis(coquimbo_project, qtbot):
     with coquimbo_project.project.results_connection as conn:
         results = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
     assert "select_link_analysis_uncompressed" in results
+
+
+def _dialog_with_graph(project, qtbot):
+    dialog = RouteChoiceDialog(project)
+
+    dialog.cob_net_field.setCurrentText("free_flow_time")
+    dialog.ln_parameter.setText("-0.01")
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
+
+    dialog.chb_check_centroids.setChecked(False)
+    dialog.job = "assign"
+    dialog._get_graph_config()
+
+    return dialog
+
+
+def test_network_fix_is_picked_up_when_dialog_reopens(sf_project, qtbot):
+    """Route choice on bad link data must work once the data is fixed.
+
+    Graphs are cached in the project and outlive the dialog, so a stale one used to make
+    the very same run fail on every reopen until the project itself was closed.
+    """
+    project = sf_project.project
+
+    with project.db_connection as conn:
+        conn.execute("UPDATE links SET free_flow_time = NULL WHERE link_id = 1")
+
+    dialog = _dialog_with_graph(sf_project, qtbot)
+
+    assert pd.isna(dialog.parameters["graph"].graph["free_flow_time"]).any()
+
+    dialog.close()
+
+    # The user fixes the network and opens the dialog again, without closing the project
+    with project.db_connection as conn:
+        conn.execute("UPDATE links SET free_flow_time = 6 WHERE link_id = 1")
+
+    dialog = _dialog_with_graph(sf_project, qtbot)
+
+    assert not pd.isna(dialog.parameters["graph"].graph["free_flow_time"]).any()
+
+    dialog.close()
 
 
 # ### We add tests to capture the errors raised

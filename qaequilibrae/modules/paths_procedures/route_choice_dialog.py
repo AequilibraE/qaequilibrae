@@ -36,6 +36,7 @@ class RouteChoiceDialog(BaseDialog):
         self.parameters = {}
 
         self.select_links = {}
+        self.__rebuilt_modes = set()
         self.__current_links = []
 
         self.__populate_project_info()
@@ -160,6 +161,14 @@ class RouteChoiceDialog(BaseDialog):
 
         self.cost_function = ""
 
+    def __graph_for_mode(self, mode_id: str):
+        """Returns the graph for a mode, rebuilding it once per dialog session."""
+        if mode_id not in self.__rebuilt_modes or mode_id not in self.project.network.graphs:
+            self.project.network.build_graphs(modes=[mode_id])
+            self.__rebuilt_modes.add(mode_id)
+
+        return self.project.network.graphs[mode_id]
+
     def _get_graph_config(self):
         mode = self.cob_mode.currentText()
         mode_id = self.all_modes[mode]
@@ -167,10 +176,7 @@ class RouteChoiceDialog(BaseDialog):
         idx = self.link_layer.dataProvider().fieldNameIndex("link_id")
         remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
 
-        if mode_id not in self.project.network.graphs:
-            self.project.network.build_graphs(modes=[mode_id])
-
-        graph = self.project.network.graphs[mode_id]
+        graph = self.__graph_for_mode(mode_id)
 
         if self.chb_chosen_links.isChecked():
             graph = self.project.network.graphs.pop(mode_id)
