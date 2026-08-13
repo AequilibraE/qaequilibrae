@@ -409,6 +409,57 @@ def test_select_links_from_yaml(sf_project, qtbot, mocker):
         assert "select_link_analysis_from_yaml" in results
 
 
+def _configure_single_class(dialog, qtbot):
+    dialog.output_scenario_name.setText(f"TestTrafficAssignment_Stale_{uuid4().hex[:6]}")
+    dialog.cob_matrices.setCurrentText("demand")
+
+    dialog.tbl_core_list.selectRow(0)
+    dialog.cob_mode_for_class.setCurrentIndex(0)
+    dialog.ln_class_name.setText("car")
+    dialog.pce_setter.setValue(1.0)
+    dialog.chb_check_centroids.setChecked(False)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
+
+    dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
+    dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
+    dialog.cob_vdf.setCurrentText("BPR")
+    dialog.cob_capacity.setCurrentText("capacity")
+    dialog.cob_ffttime.setCurrentText("free_flow_time")
+    dialog.cb_choose_algorithm.setCurrentText("all-or-nothing")
+
+
+def test_network_fix_is_picked_up_when_dialog_reopens(sf_project, qtbot):
+    """An assignment that failed on bad link data must succeed once the data is fixed.
+
+    Graphs are cached in the project and outlive the dialog, so a stale one used to make
+    the very same assignment fail on every reopen until the project itself was closed.
+    """
+    project = sf_project.project
+
+    with project.db_connection as conn:
+        conn.execute("UPDATE links SET capacity_ab = NULL WHERE link_id = 1")
+
+    dialog = TrafficAssignmentDialog(sf_project)
+    _configure_single_class(dialog, qtbot)
+
+    with pytest.raises(ValueError, match="NaN"):
+        dialog.run()
+
+    dialog.close()
+
+    # The user fixes the network and opens the dialog again, without closing the project
+    with project.db_connection as conn:
+        conn.execute("UPDATE links SET capacity_ab = 1000 WHERE link_id = 1")
+
+    dialog = TrafficAssignmentDialog(sf_project)
+    _configure_single_class(dialog, qtbot)
+
+    graph = dialog.traffic_classes["car"].graph.graph
+    assert not pd.isna(graph["capacity"]).any()
+
+    dialog.close()
+
+
 def test_single_class_from_python(sf_project, qtbot, mocker):
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_python_path",

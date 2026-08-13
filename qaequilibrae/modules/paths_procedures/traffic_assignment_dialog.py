@@ -47,6 +47,7 @@ class TrafficAssignmentDialog(BaseDialog):
         self.iter = 0
         self.miter = 1000
         self.select_links = {}
+        self.__rebuilt_modes = []
         self.__current_links = []
         self.__project_links = self.project.network.links.data.link_id
         self.link_layer = self.qgis_project.layers["links"][0]
@@ -458,6 +459,23 @@ class TrafficAssignmentDialog(BaseDialog):
                 val_fld.addItem(x)
             table.setCellWidget(i, 2, val_fld)
 
+    def __graph_for_mode(self, mode_id: str):
+        """Returns the graph for a mode, rebuilding it once per dialog session.
+
+        Graphs are cached in the project, so they outlive this dialog. They also carry a
+        snapshot of the links table taken when they were built, and get mutated along the
+        way (cost field, skimming, centroid blocking). Reusing the graph left behind by a
+        previous dialog means assigning a network that no longer matches the database,
+        which is why a failed assignment used to keep failing until the project was closed
+        and reopened. Building on first use keeps the retry within the dialog, while still
+        sharing the graph between classes of the same mode.
+        """
+        if mode_id not in self.__rebuilt_modes or mode_id not in self.project.network.graphs:
+            self.project.network.build_graphs(modes=[mode_id])
+            self.__rebuilt_modes.append(mode_id)
+
+        return self.project.network.graphs[mode_id]
+
     def _create_traffic_class(self, md: str = None):
         mat_name = self.cob_matrices.currentText()
         if not mat_name:
@@ -481,10 +499,7 @@ class TrafficAssignmentDialog(BaseDialog):
         mode = "" if self._from_yaml else self.cob_mode_for_class.currentText()
         mode_id = md if self._from_yaml else self.all_modes[mode]
 
-        if mode_id not in self.project.network.graphs:
-            self.project.network.build_graphs(modes=[mode_id])
-
-        graph = self.project.network.graphs[mode_id]
+        graph = self.__graph_for_mode(mode_id)
 
         if self.chb_chosen_links.isChecked():
             graph = self.project.network.graphs.pop(mode_id)
