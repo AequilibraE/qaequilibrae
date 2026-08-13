@@ -58,6 +58,7 @@ def show_project_in_panel(qgis_project, proj_path):
     """
     from aequilibrae.project.tools import MigrationManager
     from aequilibrae.utils.spatialite_utils import connect_spatialite
+    from qaequilibrae.modules.network.node_numbering import reserve_node_ids_for_centroids
 
     pth = join(gettempdir(), "aequilibrae_last_folder.txt")
     with open(pth, "w") as file:
@@ -84,6 +85,9 @@ def show_project_in_panel(qgis_project, proj_path):
 
     qgis_project.cob_scenarios.addItems(outdirs)
     qgis_project.available_scenarios.extend(outdirs)
+
+    # After the upgrade above, and after an OSM import has put AequilibraE's own triggers back
+    reserve_node_ids_for_centroids(qgis_project.project)
 
     qgis_project.update_project_layers()
 

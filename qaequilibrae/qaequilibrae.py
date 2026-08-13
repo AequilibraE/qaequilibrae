@@ -19,7 +19,8 @@ from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, Qgs
 
 from qaequilibrae import get_aequilibrae_menu_instance, set_aequilibrae_menu_instance
 from qaequilibrae.message import messages, FAQ_URL
-from qaequilibrae.missing_dependencies import DisabledSnapping, disabled_action, temporary_folder
+from qaequilibrae.missing_dependencies import DisabledLinkSplitter, DisabledSnapping
+from qaequilibrae.missing_dependencies import disabled_action, temporary_folder
 from qaequilibrae.modules.style_loader.editor_styles import load_editor_styles
 from qaequilibrae.pandas_compat import ensure_regex_capable_strings
 
@@ -61,7 +62,7 @@ else:
 # turns a first run without the dependencies into a ModuleNotFoundError while QGIS is still loading
 # the plugin, which is exactly when the user should be getting offered the installation instead.
 try:
-    from qaequilibrae.modules.common_tools import EditSnapping  # noqa: E402
+    from qaequilibrae.modules.common_tools import EditSnapping, LinkSplitter  # noqa: E402
     from qaequilibrae.modules.menu_actions import run_load_project, run_module, run_show_project_data  # noqa: E402
     from qaequilibrae.modules.menu_actions import run_desire_lines, run_scenario_comparison  # noqa: E402
     from qaequilibrae.modules.menu_actions import run_distribution_models, run_stacked_bandwidths  # noqa: E402
@@ -81,6 +82,7 @@ except ImportError as import_error:
     DEPENDENCY_ERROR = import_error
 
     EditSnapping = DisabledSnapping
+    LinkSplitter = DisabledLinkSplitter
     Provider = None
     last_folder = temporary_folder
     run_load_project = run_module = run_show_project_data = disabled_action
@@ -112,6 +114,7 @@ class AequilibraEMenu:
         self.matrices = {}
         self.layers = {}  # type: Dict[QgsVectorLayer]
         self.snapping = EditSnapping(self)
+        self.splitter = LinkSplitter(self)
         self.dock = QDockWidget("AequilibraE")
         self.manager = QWidget()
         self.provider = None
@@ -153,6 +156,12 @@ class AequilibraEMenu:
         self.add_menu_action(mmenu, self.tr("Run procedures"), partial(run_module, self))
         self.add_menu_action(mmenu, self.tr("Scenarios"), partial(create_scenarios, self))
         self.add_menu_action(mmenu, self.tr("Close project"), self.run_close_project)
+        self.add_menu_action(
+            mmenu,
+            self.tr("Break links at nodes while digitizing"),
+            self.splitter.set_enabled,
+            checked=self.splitter.enabled(),
+        )
 
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -244,6 +253,8 @@ class AequilibraEMenu:
         return get_logger()
 
     def configure_scenario(self):
+        from qaequilibrae.modules.network.node_numbering import reserve_node_ids_for_centroids
+
         if self.cob_scenarios.currentIndex() < 0:
             return
 
@@ -252,19 +263,26 @@ class AequilibraEMenu:
             self.project.use_scenario(name)
             self.message_log(self.tr("Changed active scenario: {}").format(name))
 
+            # Each scenario is a database of its own, so it needs the node id floor of its own
+            reserve_node_ids_for_centroids(self.project)
+
             # Change layers
             tab_count = self.projectManager.count()
             for i in range(tab_count):
                 self.projectManager.removeTab(i)
             self.update_project_layers()
 
-    def add_menu_action(self, main_menu: str, text: str, function, submenu=None):
+    def add_menu_action(self, main_menu: str, text: str, function, submenu=None, checked: bool = None):
+        """Adds one menu entry. Passing ``checked`` makes it a toggle, handed its new state."""
         if main_menu == "AequilibraE":
             action = QToolButton()
             action.setText(text)
             action.clicked.connect(function)
         else:
             action = QAction(text, self.manager)
+            if checked is not None:
+                action.setCheckable(True)
+                action.setChecked(checked)
             action.triggered.connect(function)
         if submenu is None:
             self.menuActions[main_menu].append(action)
@@ -372,6 +390,7 @@ class AequilibraEMenu:
 
     def layerRemoved(self, layer):
         self.snapping.layer_removed(layer)
+        self.splitter.layer_removed(layer)
         layers_to_re_create = [key for key, val in self.layers.items() if val[1] == layer]
 
         # Clears the pool of layers
@@ -401,6 +420,7 @@ class AequilibraEMenu:
         self.layers[layer_name.lower()] = [layer, layer.id()]
         load_editor_styles(layer, layer_name, self.project)
         self.snapping.watch(layer)
+        self.splitter.watch(layer, layer_name)
 
     def create_loose_layer(self, layer_name: str) -> QgsVectorLayer:
         if not self.project:
@@ -465,9 +485,11 @@ class AequilibraEMenu:
         for lyr in QgsProject.instance().mapLayers().values():
             if "sqlite" not in lyr.source():
                 continue
+            table = QgsDataSourceUri(lyr.source()).table()
             self.layers[str(lyr.name()).lower()] = [lyr, lyr.id()]
-            load_editor_styles(lyr, QgsDataSourceUri(lyr.source()).table(), self.project)
+            load_editor_styles(lyr, table, self.project)
             self.snapping.watch(lyr)
+            self.splitter.watch(lyr, table)
 
     def remove_aequilibrae_layers(self):
         """Removes layers connected to current aequilibrae project from active layers if the
