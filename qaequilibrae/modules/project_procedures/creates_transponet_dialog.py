@@ -7,11 +7,10 @@ from qgis.PyQt.QtCore import Qt
 from aequilibrae.context import get_logger
 from aequilibrae.project.network.network import Network
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtWidgets import QWidget, QFileDialog
 
 from qaequilibrae.modules.common_tools import ReportDialog
 from qaequilibrae.modules.common_tools import all_layers_from_toc
-from qaequilibrae.modules.common_tools import get_vector_layer_by_name, standard_path
+from qaequilibrae.modules.common_tools import GetOutputFolderName, get_vector_layer_by_name, standard_path
 from qaequilibrae.modules.common_tools.global_parameters import point_types, line_types
 from qaequilibrae.modules.project_procedures.creates_transponet_procedure import CreatesTranspoNetProcedure
 
@@ -256,7 +255,7 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                 final_table.setCellWidget(row, 2, self.centers_item(cbb))
 
     def choose_folder(self):
-        self.proj_folder = QFileDialog.getExistingDirectory(QWidget(), "Parent folder", self.path)
+        self.proj_folder = GetOutputFolderName(self.path, "Parent folder")
         if self.proj_folder is None or len(self.proj_folder) == 0:
             return
         new_folder = "new_project"
