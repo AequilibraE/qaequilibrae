@@ -20,16 +20,12 @@ def test_nan_demand_is_replaced_with_zero(sf_project, qtbot, mocker):
     dialog.tbl_core_list.selectRow(0)
     dialog.cob_mode_for_class.setCurrentIndex(0)
     dialog.ln_class_name.setText("car")
-    warning = mocker.patch(
-        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.logger.warning"
-    )
+    warning = mocker.patch("qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.logger.warning")
 
     dialog._create_traffic_class()
 
     assert dialog.traffic_classes["car"].matrix.matrix_view[0, 1] == 0.0
-    warning.assert_called_once_with(
-        "Replaced 1 NaN demand value with zero in matrix 'demand_omx' (core(s): matrix)."
-    )
+    warning.assert_called_once_with("Replaced 1 NaN demand value with zero in matrix 'demand_omx' (core(s): matrix).")
     with omx.open_file(matrix_path, "r") as omx_file:
         assert np.isnan(omx_file["matrix"][0, 1])
     dialog.close()
