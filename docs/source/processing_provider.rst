@@ -294,6 +294,9 @@ defined as the current map canvas on QGIS...
     :align: center
     :alt: Download OSM networks for named place
 
+Once the import is over, the new model is opened and its layers are listed in the
+Project tab, ready to be added to the map.
+
 .. _project_from_layers:
 
 Project from layers
@@ -352,7 +355,8 @@ In the case of the nodes layer, both fields are mandatory.
     :align: center
     :alt: project_from_layers_nodes
 
-After filling all fields, it is just a matter of saving it!
+After filling all fields, it is just a matter of saving it! The model is opened as soon
+as it is built, and its layers are listed in the Project tab.
 
 After running this tool a sqlite file (spatialite enabled) will be created and
 you can edit the network (create, move or delete links and nodes) and both
@@ -430,8 +434,8 @@ AequilibraE has three different example sets one can use as learning tool, and t
 made available within the QGIS ecosystem.
 
 Within **Project > Create example**, select one of the available models, the desired
-location of the output folder, and just press *Create*. The window will close automatically
-and you can open the project folder in the Project tab.
+location of the output folder, and just press *Create*. The window closes automatically
+and the new model is opened, with its layers listed in the Project tab.
 
 .. image:: images/processing_provider/project_create_example.png
     :align: center

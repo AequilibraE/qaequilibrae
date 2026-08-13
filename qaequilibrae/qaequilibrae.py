@@ -17,7 +17,7 @@ from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableWidgetItem, QTableWidge
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
 from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, QgsMessageLog, Qgis
 
-from qaequilibrae import set_aequilibrae_menu_instance
+from qaequilibrae import get_aequilibrae_menu_instance, set_aequilibrae_menu_instance
 from qaequilibrae.message import messages, FAQ_URL
 from qaequilibrae.missing_dependencies import DisabledSnapping, disabled_action, temporary_folder
 from qaequilibrae.modules.style_loader.editor_styles import load_editor_styles
@@ -228,10 +228,12 @@ class AequilibraEMenu:
         # ##################        SAVING PROJECT CONFIGS       #####################
         QgsProject.instance().readProject.connect(self.reload_project)
 
+        self.saving_actions = []
         for action in ["mActionSaveProject", "mActionSaveProjectAs"]:
             temp_saving = self.iface.mainWindow().findChild(QAction, action)
             if temp_saving:
                 temp_saving.triggered.connect(self.save_in_project)
+                self.saving_actions.append(temp_saving)
 
     def get_logger(self):
         if DEPENDENCY_ERROR is not None:
@@ -309,8 +311,39 @@ class AequilibraEMenu:
         self.initProcessing()
 
     def unload(self):
+        """Undoes what __init__ put in place, which QGIS asks for when the plugin is disabled,
+        reloaded or uninstalled. Whatever is left behind here outlives the plugin: the panel
+        stays docked to the main window, and QGIS keeps signalling into a menu that is gone.
+        """
         if self.provider in QgsApplication.processingRegistry().providers():
             QgsApplication.processingRegistry().removeProvider(self.provider)
+        self.provider = None
+
+        connections = [
+            (QgsProject.instance().layerRemoved, self.layerRemoved),
+            (QgsProject.instance().readProject, self.reload_project),
+        ]
+        connections += [(saving.triggered, self.save_in_project) for saving in self.saving_actions]
+        for signal, slot in connections:
+            try:
+                signal.disconnect(slot)
+            except (TypeError, RuntimeError):
+                # Nothing left connected, or Qt has already taken the sender down
+                pass
+        self.saving_actions = []
+
+        # The panel is the only way of closing a project, and it is on its way out
+        try:
+            self.run_close_project()
+        except Exception as e:
+            self.message_log(self.tr("Could not close the project while unloading: {}").format(e))
+
+        self.iface.removeDockWidget(self.dock)
+        self.dock.setParent(None)
+        self.dock.deleteLater()
+
+        if get_aequilibrae_menu_instance() is self:
+            set_aequilibrae_menu_instance(None)
 
     def removes_temporary_files(self):
         # Removes all the temporary files from previous uses
