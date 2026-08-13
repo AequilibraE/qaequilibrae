@@ -1,6 +1,7 @@
 import importlib.util as iutil
 import sys
 from os.path import join
+from pathlib import Path
 
 from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingParameterEnum
 from qgis.core import QgsProcessingException
@@ -42,12 +43,12 @@ class ExportMatrix(QgsProcessingAlgorithm):
 
         file_format = ["csv", "omx"]
         format = file_format[parameters["output_format"]]
-        file_name, ext = parameters["matrix_path"].split("/")[-1].split(".")
+        matrix_path = Path(parameters["matrix_path"])
 
-        if ext != "omx":
+        if matrix_path.suffix.lower() != ".omx":
             raise QgsProcessingException(self.tr("Only OpenMatrix (*.omx) files can be exported"))
 
-        dst_path = join(parameters["file_path"], f"{file_name}.{format}")
+        dst_path = join(parameters["file_path"], f"{matrix_path.stem}.{format}")
 
         kwargs = {"file_path": dst_path, "memory_only": False}
         mat = AequilibraeMatrix()

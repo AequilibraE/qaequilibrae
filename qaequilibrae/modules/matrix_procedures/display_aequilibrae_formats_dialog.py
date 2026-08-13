@@ -77,16 +77,19 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
 
         try:
             with omx.open_file(self.data_path) as omx_file:
-                if not self.from_proj:
-                    self.qgis_project.matrices[self.data_path] = omx_file
                 self.list_cores = omx_file.list_matrices()
                 self.list_indices = omx_file.list_mappings()
-                self.data_to_show = AequilibraeMatrix()
         except Exception as e:
             self.error = self.tr("Could not load dataset")
             self.logger.error(e.args)
             self.exit_with_error()
             return
+
+        self.data_to_show = AequilibraeMatrix()
+        if not self.from_proj:
+            # The file handle above is closed by the time we leave the context manager, so we
+            # register the matrix itself, which add_matrix_parameters fills with the core on display
+            self.qgis_project.matrices[self.data_path] = self.data_to_show
 
         self.add_matrix_parameters(self.list_indices[0], self.list_cores[0])
 
