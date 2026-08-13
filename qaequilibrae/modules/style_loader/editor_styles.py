@@ -10,6 +10,8 @@ def load_editor_styles(layer: QgsVectorLayer, layer_name: str, project) -> None:
 
     _set_next_id_default(layer, "ogc_fid")
     _set_next_id_default(layer, "link_id")
+    _set_default(layer, "a_node", "0")
+    _set_default(layer, "b_node", "0")
 
     with project.db_connection as conn:
         mode_ids = [row[0] for row in conn.execute("SELECT mode_id FROM modes").fetchall()]
@@ -26,11 +28,14 @@ def load_editor_styles(layer: QgsVectorLayer, layer_name: str, project) -> None:
 
 
 def _set_next_id_default(layer: QgsVectorLayer, field_name: str) -> None:
+    _set_default(layer, field_name, f'coalesce(maximum("{field_name}"), 0) + 1')
+
+
+def _set_default(layer: QgsVectorLayer, field_name: str, expression: str) -> None:
     field_index = layer.fields().indexOf(field_name)
     if field_index < 0:
         return
 
-    expression = f'coalesce(maximum("{field_name}"), 0) + 1'
     layer.setDefaultValueDefinition(field_index, QgsDefaultValue(expression, False))
 
 

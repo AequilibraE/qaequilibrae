@@ -27,6 +27,18 @@ def test_link_identifiers_default_to_the_next_available_values(ae_with_project):
         assert layer.defaultValue(field_index) == 77
 
 
+def test_link_nodes_default_to_zero(ae_with_project):
+    layer = ae_with_project.layers["links"][0]
+
+    for field_name in ("a_node", "b_node"):
+        field_index = layer.fields().indexOf(field_name)
+        default = layer.defaultValueDefinition(field_index)
+
+        assert default.expression() == "0"
+        assert not default.applyOnUpdate()
+        assert layer.defaultValue(field_index) == 0
+
+
 def test_link_modes_are_presented_as_values_from_the_modes_table(ae_with_project):
     layer = ae_with_project.layers["links"][0]
     items = _value_map_items(layer, "modes")
