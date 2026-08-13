@@ -58,6 +58,50 @@ For more resources, you can just make a quick
 or even go directly to a one of many existing
 `tutorials <https://www.giscourse.com/editing-vector-layers-in-qgis/>`_.
 
+Digitizing links
+----------------
+
+The attribute form of the links layer is configured when the layer is loaded from the
+QAequilibraE panel, so a new link only asks for what the model cannot work out on its own.
+
+* **link_id** and **ogc_fid** are filled with the next values available.
+* **a_node** and **b_node** are hidden. The database works both out from the endpoints of
+  the link as soon as it is saved, so there is nothing there to fill in.
+* **modes** and **link_type** are drop-downs built from the *modes* and *link_types*
+  tables of your project, so a value the model does not know about cannot be typed in by
+  accident. **link_type** starts on *default* and cannot be left empty, since a link
+  without a link type is refused by the database.
+* Both drop-downs then offer whatever you chose last, which saves picking them again for
+  every link of a run. QGIS remembers those for as long as the layer stays loaded, so the
+  first link after reopening the project starts from the defaults above.
+
+Nodes created while digitizing are numbered from 10,000 up, leaving the lower numbers free
+for you to assign to centroids. Nodes that already exist are never renumbered, and a model
+already numbering past 10,000 simply carries on from where it was.
+
+Digitizing zones
+----------------
+
+A new zone comes with its **zone_id** and **ogc_fid** already filled in, each following the
+largest currently in use, so a model numbering its zones by hand carries on from where it
+left off. Both remain editable, since a zone numbering that follows the study area rather
+than the order zones were drawn in is entirely normal.
+
+Breaking links at nodes
+-----------------------
+
+A link drawn across nodes it snapped to along the way is saved as one link per stretch
+between them, so the network is connected at each of those nodes rather than having a
+single link running over the top of them. The attributes you entered are copied to every
+stretch, and each one gets its own link id.
+
+Only nodes that already exist break the link, which is why it pays to snap. Crossing
+another link where no node exists is a topology problem this cannot see: the crossed link
+is never touched, and neither is anything else already in the model.
+
+The behavior can be turned off under **Project > Break links at nodes while digitizing**,
+and the choice is remembered across QGIS sessions.
+
 Topological Editing
 -------------------
 
