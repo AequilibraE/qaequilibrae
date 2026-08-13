@@ -227,7 +227,14 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
             self.failed_to_import()
             return
 
+        # Imported here because menu_actions reaches back into project_procedures while the
+        # plugin is still building its menus, and importing it at module level closes the circle
+        from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
+
         self.qgis_project.project = self.worker_thread.project
+        # The project the import leaves behind is open, but nothing has told the panel about it,
+        # so without this the model shows as loaded with no scenario and no layer to load
+        show_project_in_panel(self.qgis_project, self.worker_thread.output_path)
         self.leave()
 
     def failed_to_import(self):

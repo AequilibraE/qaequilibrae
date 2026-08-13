@@ -1,5 +1,6 @@
 from os import listdir, environ, makedirs
 from os.path import join
+from types import SimpleNamespace
 
 import pytest
 from aequilibrae.project import Project
@@ -130,6 +131,30 @@ def test_shows_the_logfile_as_it_is_written(dialog, folder_path):
     shown = dialog.log_view.toPlainText()
     assert shown.count("Downloading data") == 1
     assert "Building Network" in shown
+
+
+def test_panel_shows_the_imported_model(dialog, folder_path, patch_report_dialog):
+    """The import leaves a project open, and the panel is only aware of it if it is told
+
+    Without this the plugin reports a model as open while the panel holds no scenario and no
+    layer to load, so there is no way of getting the network on the screen.
+    """
+    project = Project()
+    project.new(folder_path)
+
+    # Standing in for an import that has just succeeded, so the test does not hit the network
+    dialog.output_path.setText(folder_path)
+    dialog.worker_thread = SimpleNamespace(project=project, output_path=folder_path, report=[], error=None)
+
+    dialog.job_finished()
+
+    ae = dialog.qgis_project
+    assert ae.project is project
+    assert ae.available_scenarios == ["root"]
+    assert {"links", "nodes"} <= set(ae.layers)
+    assert ae.projectManager.count() == 1
+
+    ae.run_close_project()
 
 
 @pytest.mark.skipif(not bool(environ.get("CI")), reason="Runs only in GitHub Action")
