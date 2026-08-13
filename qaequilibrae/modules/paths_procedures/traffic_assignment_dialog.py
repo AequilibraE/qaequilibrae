@@ -648,15 +648,25 @@ class TrafficAssignmentDialog(BaseDialog):
             q.setVisible(True)
         self.progressbar.setRange(0, self.project.network.count_centroids())
 
-        self.assignment.set_classes(list(self.traffic_classes.values()))
-        self.assignment.set_vdf(self.cob_vdf.currentText())
-        self.assignment.set_vdf_parameters(self.vdf_parameters)
-        self.assignment.set_capacity_field(self.cob_capacity.currentText())
-        self.assignment.set_time_field(self.cob_ffttime.currentText())
-        self.assignment.max_iter = self.miter
-        self.assignment.rgap_target = float(self.rel_gap.text())
-        self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
-        self.assignment.log_specification()
+        # AequilibraE is the sole authority on whether the network data can be assigned, so we do not
+        # pre-check any of it. We just surface whatever the library refuses to accept
+        try:
+            self.assignment.set_classes(list(self.traffic_classes.values()))
+            self.assignment.set_vdf(self.cob_vdf.currentText())
+            self.assignment.set_vdf_parameters(self.vdf_parameters)
+            self.assignment.set_capacity_field(self.cob_capacity.currentText())
+            self.assignment.set_time_field(self.cob_ffttime.currentText())
+            self.assignment.max_iter = self.miter
+            self.assignment.rgap_target = float(self.rel_gap.text())
+            self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
+            self.assignment.log_specification()
+        except Exception as e:
+            for q in [self.progressbar, self.progress_label]:
+                q.setVisible(False)
+            self.error = str(e.args[0]) if e.args else str(e)
+            logger.error(f"Could not set up the traffic assignment. {e.args}")
+            self.qgis_project.iface_error_message(self.error, self.tr("Assignment setup error"))
+            return
 
         if self.do_select_link.isChecked():
             for traffic_class in self.traffic_classes.values():
