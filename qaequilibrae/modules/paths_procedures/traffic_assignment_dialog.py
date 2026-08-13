@@ -137,11 +137,6 @@ class TrafficAssignmentDialog(BaseDialog):
     def __select_option(self, combo: QComboBox, value: str, description: str):
         """Selects `value` in `combo`, refusing a config that asks for an option that is not there.
 
-        None of these combos are editable, so `setCurrentText` keeps the current item whenever the
-        text does not match one of the options exactly. A config naming a field this project does
-        not have would leave whatever happened to be selected in place, and the assignment would
-        quietly run on the wrong field. Matching is case-insensitive, since neither the database
-        field names nor the names of the VDFs and algorithms are case-sensitive anywhere else.
         """
         idx = combo.findText(value, Qt.MatchFlag.MatchFixedString)
         if idx < 0:
