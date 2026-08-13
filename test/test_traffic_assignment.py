@@ -10,6 +10,31 @@ from qgis.PyQt.QtCore import Qt
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
 
+def test_nan_demand_is_replaced_with_zero(sf_project, qtbot, mocker):
+    matrix_path = sf_project.project.project_base_path / "matrices" / "demand.omx"
+    with omx.open_file(matrix_path, "a") as omx_file:
+        omx_file["matrix"][0, 1] = np.nan
+
+    dialog = TrafficAssignmentDialog(sf_project)
+    dialog.cob_matrices.setCurrentText("demand_omx")
+    dialog.tbl_core_list.selectRow(0)
+    dialog.cob_mode_for_class.setCurrentIndex(0)
+    dialog.ln_class_name.setText("car")
+    warning = mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.logger.warning"
+    )
+
+    dialog._create_traffic_class()
+
+    assert dialog.traffic_classes["car"].matrix.matrix_view[0, 1] == 0.0
+    warning.assert_called_once_with(
+        "Replaced 1 NaN demand value with zero in matrix 'demand_omx' (core(s): matrix)."
+    )
+    with omx.open_file(matrix_path, "r") as omx_file:
+        assert np.isnan(omx_file["matrix"][0, 1])
+    dialog.close()
+
+
 def test_single_class(sf_project, qtbot, mocker):
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",

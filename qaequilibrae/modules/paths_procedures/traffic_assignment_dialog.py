@@ -478,6 +478,16 @@ class TrafficAssignmentDialog(BaseDialog):
         user_classes = [matrix.names[i] for i in rows]
         matrix.computational_view(user_classes)
 
+        nan_mask = np.isnan(matrix.matrix_view)
+        nan_count = np.count_nonzero(nan_mask)
+        if nan_count:
+            matrix.matrix_view[nan_mask] = 0.0
+            value_label = "value" if nan_count == 1 else "values"
+            logger.warning(
+                f"Replaced {nan_count:,} NaN demand {value_label} with zero in matrix '{mat_name}' "
+                f"(core(s): {', '.join(user_classes)})."
+            )
+
         mode = "" if self._from_yaml else self.cob_mode_for_class.currentText()
         mode_id = md if self._from_yaml else self.all_modes[mode]
 
