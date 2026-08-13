@@ -17,11 +17,7 @@ MESSAGE_TAG = "Model Run"
 
 
 def has_content(result) -> bool:
-    """Whether a run procedure returned something worth showing.
-
-    ``bool(result)`` is not enough: procedures may return a DataFrame, and pandas raises
-    on the truth value of one.
-    """
+    """Return whether a run result is worth reporting."""
     if result is None:
         return False
     if hasattr(result, "empty"):  # pandas DataFrame/Series
@@ -30,12 +26,7 @@ def has_content(result) -> bool:
 
 
 def silence_dynamic_convergence_graph() -> None:
-    """Stop an ipywidgets convergence chart from freezing the run.
-
-    Models built on top of the notebook helpers draw convergence with an ipywidgets
-    ``DynamicGraph``. There is no notebook comm channel inside QGIS, so the redraw blocks
-    forever. Models that do not ship the helper are left untouched.
-    """
+    """Disable notebook-only convergence redraws inside QGIS."""
     try:
         from four_step.common.notebooks.dynamic_graph import DynamicGraph
     except ImportError:
@@ -45,12 +36,7 @@ def silence_dynamic_convergence_graph() -> None:
 
 
 class StreamRelay:
-    """File-like object forwarding whatever a run procedure prints to a callback.
-
-    QGIS runs without a console on Windows, so ``sys.stdout``/``sys.stderr`` can be ``None``
-    and a bare ``print()`` inside a procedure raises. Text is buffered until a newline so the
-    log shows whole lines, with :meth:`drain` emitting whatever is left at the end of the run.
-    """
+    """Line-buffered stdout/stderr relay."""
 
     def __init__(self, emit, stream=None):
         self._emit = emit
@@ -80,12 +66,6 @@ class StreamRelay:
 
 
 class OptionalIndentFormatter(logging.Formatter):
-    """Formatter that tolerates records without the optional ``indent_str`` attribute.
-
-    Models that nest their logging supply ``indent_str`` through a ``LoggerAdapter``; plain
-    AequilibraE records do not, and a missing key would make every line fail to format.
-    """
-
     def format(self, record):
         if not hasattr(record, "indent_str"):
             record.indent_str = ""
@@ -96,16 +76,12 @@ LogBridge = LiveLogBridge
 
 
 class RunLogDialog(LiveLogDialog):
-    """Live log and progress indicator for a model run."""
-
     def __init__(self, parent=None):
-        # Indeterminate: run procedures report no progress we could scale a bar to
         super().__init__("", parent=parent, initial_indeterminate=True)
         self.setWindowTitle(self.tr("Model Run"))
 
 
 class RunModuleDialog(BaseDialog):
-    #: Emitted on the GUI thread once a run has ended, whichever way it ended.
     run_completed = pyqtSignal()
 
     def __init__(self, qgis_project):
@@ -249,8 +225,6 @@ class RunModuleDialog(BaseDialog):
 
         self.but_run.setEnabled(False)
 
-        # The run outlives this dialog if the user closes it, so hold the scenario lock for the
-        # duration of the task rather than only until 'finished' fires on the dialog
         self.qgis_project.block_change_scenario()
 
         self.bridge = LogBridge()
@@ -263,9 +237,7 @@ class RunModuleDialog(BaseDialog):
 
         QgsMessageLog.logMessage(self.tr("Starting model run..."), MESSAGE_TAG, Qgis.MessageLevel.Info)
 
-        # QgsTaskWrapper.finished() does 'if self.returned_values:' on whatever the worker
-        # returns, which raises for a DataFrame or an array and swallows the completion
-        # callback with it. Hand the result over on the side and return nothing.
+        # Avoid QgsTaskWrapper truth-testing DataFrames/arrays on completion.
         outcome = {}
         self.task = QgsTask.fromFunction(
             self.tr("Running {}").format(func_name),
@@ -275,11 +247,7 @@ class RunModuleDialog(BaseDialog):
         QgsApplication.taskManager().addTask(self.task)
 
     def _worker(self, func, outcome):
-        """Build the callable the task manager runs on a background thread.
-
-        Everything the worker needs is bound here, on the GUI thread, so the background thread
-        never touches the dialog.
-        """
+        """Build the background callable without touching dialog state there."""
         bridge = self.bridge
         running_msg = self.tr("Model running, please wait...")
         done_msg = self.tr("Model run finished!")
@@ -293,7 +261,6 @@ class RunModuleDialog(BaseDialog):
             root_logger = logging.getLogger()
             handler = self.attach_qgis_logging(root_logger, bridge=bridge)
 
-            # Procedures print as much as they log, and QGIS may leave us without a console
             relay = StreamRelay(bridge.log_line.emit, sys.__stdout__)
             stdout, stderr = sys.stdout, sys.stderr
             sys.stdout = sys.stderr = relay
@@ -315,11 +282,7 @@ class RunModuleDialog(BaseDialog):
         return worker
 
     def _on_finished(self, func_name, outcome):
-        """Build the completion callback, which the task manager calls on the GUI thread.
-
-        Messages are translated up front so the callback never calls into the dialog's C++ side,
-        which the user may have closed by the time the run ends.
-        """
+        """Build the GUI-thread completion callback."""
         finished_msg = self.tr(">>> Model run finished")
         canceled_msg = self.tr("Model run canceled")
         check_msg = self.tr("Check 'Messages' tab.")
@@ -341,7 +304,6 @@ class RunModuleDialog(BaseDialog):
                     self.log_dialog.append(finished_msg)
 
             try:
-                # A canceled task also arrives with a generic exception, so check it first
                 if canceled:
                     self.qgis_project.iface_error_message(canceled_msg)
                     return

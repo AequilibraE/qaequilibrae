@@ -33,7 +33,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.log_bridge = LiveLogBridge()
         self._run_layout = QGridLayout()
 
-        # Area to import network for
         self.choose_place = QRadioButton()
         self.choose_place.setText(self.tr("Place name"))
         self.choose_place.toggled.connect(self.change_place_type)
@@ -55,7 +54,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.source_type_widget = QGroupBox(self.tr("Target"))
         self.source_type_widget.setLayout(self.source_type_frame)
 
-        # Buttons and output
         self.but_choose_output = QPushButton()
         self.but_choose_output.setText(self.tr("Choose folder output"))
         self.but_choose_output.clicked.connect(self.choose_output)
@@ -74,7 +72,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.buttons_widget = QWidget()
         self.buttons_widget.setLayout(self.buttons_frame)
 
-        # The network import is long enough that the log is the only way of telling what it is doing
         self.log_panel = LiveLogWidget(self, line_wrap=False)
         self.log_view = self.log_panel.text
         self.progressbar = self.log_panel.bar
@@ -113,8 +110,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         if self.running:
             return
 
-        # An empty folder is not a harmless mistake: AequilibraE reads it as the current
-        # directory and quietly writes the whole project into wherever QGIS was started
         output_path = self.output_path.text().strip()
         if not output_path:
             self.qgis_project.iface_error_message(self.tr("Choose a folder to create the project in"))
@@ -159,7 +154,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
             self.place.setVisible(False)
 
     def start_tailing_log(self):
-        """AequilibraE only opens the log file when it creates the project, so we tail it as it appears"""
         self.logfile = join(self.output_path.text(), "aequilibrae.log")
         self.__log_position = 0
         self.log_panel.clear()
@@ -169,9 +163,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         if self.logfile is None or not isfile(self.logfile):
             return
 
-        # This runs on a timer, and PyQt turns an exception crossing a slot boundary into a
-        # qFatal() - so a log we cannot read has to cost us the tick, not the QGIS session.
-        # No encoding is given on purpose, to match the one AequilibraE writes the file with
         try:
             with open(self.logfile, "r", errors="replace") as log:
                 log.seek(self.__log_position)
@@ -215,22 +206,17 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
             self.failed_to_import()
             return
 
-        # Imported here so project_procedures and menu_actions do not import each other at plugin load
         from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
 
         self.qgis_project.project = self.worker_thread.project
-        # The project the import leaves behind is open, but nothing has told the panel about it,
-        # so without this the model shows as loaded with no scenario and no layer to load
         show_project_in_panel(self.qgis_project, self.worker_thread.output_path)
         self.leave()
 
     def failed_to_import(self):
-        """Lets the user fix whatever went wrong and try again, rather than losing the log they can see"""
         try:
             if self.worker_thread.project is not None:
                 self.worker_thread.project.close()
         except Exception:
-            # A project that failed halfway through is not worth a second error message
             pass
 
         self.log_bridge.stage_line.emit(self.error)
@@ -242,8 +228,6 @@ class ProjectFromOSMDialog(QDialog, FORM_CLASS):
         self.output_path.setEnabled(True)
         self.but_run.setEnabled(True)
 
-    # The import cannot be interrupted, and letting the dialog go while the thread still
-    # reports back to it would take QGIS down with it
     def closeEvent(self, event):
         if self.running:
             event.ignore()

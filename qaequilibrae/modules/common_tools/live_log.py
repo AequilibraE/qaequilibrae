@@ -13,8 +13,6 @@ from qgis.PyQt.QtWidgets import (
 
 
 class LiveLogBridge(QObject):
-    """Carries worker output to a live log display through Qt signals."""
-
     log_line = pyqtSignal(str)
     stage_line = pyqtSignal(str)
     progress_started = pyqtSignal(int, str)
@@ -24,8 +22,6 @@ class LiveLogBridge(QObject):
 
 
 class LiveLogWidget(QWidget):
-    """Reusable live log, status label, and progress bar for long-running procedures."""
-
     def __init__(self, parent=None, *, initial_indeterminate=False, line_wrap=False):
         super().__init__(parent)
 
@@ -105,8 +101,6 @@ class LiveLogWidget(QWidget):
 
 
 def connect_progress_widgets(bridge, progressbar, progress_label, *, clear_on_finished=True):
-    """Connect a live-log bridge to existing progress widgets."""
-
     def start_progress(maximum, msg):
         progress_label.setText(msg)
         progressbar.setValue(0)
@@ -128,8 +122,6 @@ def connect_progress_widgets(bridge, progressbar, progress_label, *, clear_on_fi
 
 
 class LiveLogDialog(QDialog):
-    """Dialog wrapper around :class:`LiveLogWidget`."""
-
     def __init__(self, title, parent=None, *, initial_indeterminate=False):
         super().__init__(parent)
 
@@ -146,22 +138,10 @@ class LiveLogDialog(QDialog):
         layout.addWidget(self.buttons)
 
         self.setLayout(layout)
-
-    @property
-    def auto_scroll(self):
-        return self.log.auto_scroll
-
-    @property
-    def bar(self):
-        return self.log.bar
-
-    @property
-    def stage_label(self):
-        return self.log.stage_label
-
-    @property
-    def text(self):
-        return self.log.text
+        self.auto_scroll = self.log.auto_scroll
+        self.bar = self.log.bar
+        self.stage_label = self.log.stage_label
+        self.text = self.log.text
 
     def append(self, msg):
         self.log.append(msg)
