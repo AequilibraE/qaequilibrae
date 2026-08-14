@@ -34,3 +34,4 @@ Got a bigger instance we could use as an example? Send it over!
    menus_in_detail/route_choice
    menus_in_detail/transit
    menus_in_detail/mapping_tools
+   menus_in_detail/options

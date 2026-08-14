@@ -99,8 +99,9 @@ Only nodes that already exist break the link, which is why it pays to snap. Cros
 another link where no node exists is a topology problem this cannot see: the crossed link
 is never touched, and neither is anything else already in the model.
 
-The behavior can be turned off under **Project > Break links at nodes while digitizing**,
-and the choice is remembered across QGIS sessions.
+The behavior can be turned off under **Options > Break links at nodes while digitizing**
+in the QAequilibraE panel, and the choice is remembered across QGIS sessions. See
+:ref:`the Options menu <break_links_option>`.
 
 Topological Editing
 -------------------

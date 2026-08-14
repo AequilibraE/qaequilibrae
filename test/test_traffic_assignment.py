@@ -32,6 +32,45 @@ def test_nan_demand_is_replaced_with_zero(sf_project, qtbot, mocker):
     dialog.close()
 
 
+def test_double_click_removes_a_skim(sf_project, qtbot):
+    """The signal is emitted rather than double-clicked, so the check does not depend on the
+    dialog being shown and on where the row lands in the viewport. It still goes through the
+    connection, which is the half of this that can break."""
+    dialog = TrafficAssignmentDialog(sf_project)
+
+    dialog.cob_matrices.setCurrentText("demand")
+    dialog.tbl_core_list.selectRow(0)
+    dialog.cob_mode_for_class.setCurrentIndex(0)
+    dialog.ln_class_name.setText("car")
+    dialog.pce_setter.setValue(1.0)
+    dialog.chb_check_centroids.setChecked(False)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
+
+    dialog.cob_skims_available.setCurrentText("free_flow_time")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
+    dialog.cob_skims_available.setCurrentText("distance")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
+
+    assert dialog.skims["car"] == ["free_flow_time", "distance"]
+    assert dialog.skim_list_table.rowCount() == 2
+
+    dialog.skim_list_table.cellDoubleClicked.emit(0, 0)
+
+    assert dialog.skims["car"] == ["distance"], "the wrong skim was dropped"
+    assert dialog.skim_list_table.rowCount() == 1
+    assert dialog.skim_list_table.item(0, 1).text() == "distance"
+    assert dialog.skimming
+
+    # Taking the last one back leaves nothing to skim, so nothing should be saved either
+    dialog.skim_list_table.cellDoubleClicked.emit(0, 0)
+
+    assert dialog.skims["car"] == []
+    assert dialog.skim_list_table.rowCount() == 0
+    assert not dialog.skimming
+
+    dialog.close()
+
+
 def test_single_class(sf_project, qtbot, mocker):
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",

@@ -58,6 +58,7 @@ class TrafficAssignmentDialog(BaseDialog):
 
         # Signals for the matrix_procedures tab
         self.but_add_skim.clicked.connect(self._add_skimming)
+        self.skim_list_table.cellDoubleClicked.connect(self._remove_skimming)
         self.but_add_class.clicked.connect(self._create_traffic_class)
         self.cob_matrices.currentIndexChanged.connect(self.change_matrix_selected)
         self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
@@ -430,7 +431,6 @@ class TrafficAssignmentDialog(BaseDialog):
             for x in res.fetchall():
                 modes.append(f"{x[0]} ({x[1]})")
                 self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
-                self.skims[x[1]] = []
 
         table.setItem(1, 0, QTableWidgetItem("Modes"))
         table.setItem(1, 1, QTableWidgetItem(", ".join(modes)))
@@ -603,6 +603,27 @@ class TrafficAssignmentDialog(BaseDialog):
 
         self.skims[name].append(field)
         self.skimming = True
+
+    def _remove_skimming(self, line):
+        """Drops the skim on `line`, which is how a skim added by mistake is taken back.
+
+        Double-clicking columns 2 and 3 never gets here, since the checkboxes sitting in those
+        cells take the mouse events themselves. That is the behavior we want: toggling a skim
+        between final and blended should not be one stray double-click away from deleting it.
+        """
+        table = self.skim_list_table
+        class_name = table.item(line, 0).text()
+        field = table.item(line, 1).text()
+
+        table.removeRow(line)
+
+        # Keyed by the class name, which is what `TrafficClass._id` holds
+        if field in self.skims.get(class_name, []):
+            self.skims[class_name].remove(field)
+
+        # Every skim owns exactly one row, so an empty table means nothing is being skimmed and
+        # `produce_all_outputs` must not go looking for skims to save
+        self.skimming = table.rowCount() > 0
 
     def add_query(self):
         link_id = self.__validate_link_id()

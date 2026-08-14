@@ -40,7 +40,7 @@ In the *Skimming* tab it is possible to select the skimming fields for each traf
 the results desired: final or blended. Final stands for the result of the last iteration, while
 blended represents the averaged results for all iterations. Just check the desired boxes.
 Notice that the Class field only is populated if the traffic classes were properly set in the
-previous step.
+previous step. To remove a skim from the table, double-click it.
 
 .. image:: ../images/traffic_assignment/traffic_assignment_skimming.png
     :align: center
@@ -109,6 +109,10 @@ results.
 
 If you want to have skims for both final and blended, you don't have to untoggle any
 check boxes!
+
+Added a skim you did not want? Double-click it in the skimming table and it is removed.
+Double-click the *Class* or *Field* column, as the check boxes take the clicks on the two
+columns to their right.
 
 Then, we can choose to run a select link analysis. Its default configuration is not
 to select any links, so we have to toggle its *"Set select link analysis"* button (1).
