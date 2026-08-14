@@ -56,15 +56,19 @@ def test_prepare_graph_and_network(ae_with_project, qtbot, timeoutDetector):
         def handle_do_load_graph_trigger():
             global graph_dialog
             assert graph_dialog.isVisible() is False, "Dialog did not close properly"
-            assert dialog.from_but.isEnabled() is True
-            assert dialog.to_but.isEnabled() is True
+            assert dialog.do_dist_matrix.isEnabled() is True
+            assert dialog.path_from.isEnabled() is True
+            assert dialog.path_to.isEnabled() is True
             graph_dialog.close()
 
         QTimer.singleShot(10, handle_do_load_graph_trigger)
         qtbot.mouseClick(graph_dialog.do_load_graph, Qt.MouseButton.LeftButton)
 
-    assert dialog.from_but.isEnabled() is False
-    assert dialog.to_but.isEnabled() is False
+    # Configuring is the only thing on offer until there is a graph
+    assert dialog.do_dist_matrix.isEnabled() is False
+    assert dialog.path_from.isEnabled() is False
+    assert dialog.path_to.isEnabled() is False
+    assert dialog.configure_graph.isEnabled() is True
     QTimer.singleShot(10, handle_configure_graph_trigger)
     qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton)
 
@@ -97,8 +101,6 @@ def test_shortest_path_dialog(ae_with_project, mock_load_graph_layer_setting_dia
 
     dialog = ShortestPathDialog(ae_with_project)
     dialog.prepare_graph_and_network()
-    dialog.search_for_point_from()
-    dialog.search_for_point_to()
     dialog.path_from.setText("1")
     dialog.path_to.setText("6")
     dialog.rdo_selection.setChecked(False)
@@ -109,3 +111,126 @@ def test_shortest_path_dialog(ae_with_project, mock_load_graph_layer_setting_dia
 
     path = QgsProject.instance().mapLayersByName("1 to 6")[0]
     assert path.featureCount() == 4
+
+    dialog.close()
+
+
+def test_map_clicks_alternate_between_the_boxes(ae_with_project, mock_load_graph_layer_setting_dialog):
+    """Two clicks on the map fill From then To, each leaving a marker of its own behind."""
+    from qgis.core import QgsPointXY
+
+    ae_with_project.load_layer_by_name("links")
+
+    dialog = ShortestPathDialog(ae_with_project)
+    dialog.prepare_graph_and_network()
+
+    # Configuring the graph puts the canvas in picking mode, aimed at From
+    assert ae_with_project.iface.mapCanvas().mapTool() is dialog.clickTool
+    assert dialog.fill_target == "from"
+
+    nodes = {feat["node_id"]: feat.geometry().asPoint() for feat in dialog.node_layer.getFeatures()}
+
+    def click_on(node_id):
+        point = nodes[node_id]
+        dialog.clickTool.point = QgsPointXY(point.x(), point.y())
+        dialog.clickTool.signal.emit(1)
+
+    click_on(1)
+    assert dialog.path_from.text() == "1"
+    assert dialog.path_to.text() == ""
+    assert dialog.fill_target == "to", "the next click should have been aimed at To"
+
+    click_on(6)
+    assert dialog.path_from.text() == "1"
+    assert dialog.path_to.text() == "6"
+    assert dialog.fill_target == "from", "the boxes should alternate"
+
+    # One marker per end, told apart by colour and sitting on the nodes that were picked
+    assert set(dialog.node_markers) == {"from", "to"}
+    assert dialog.node_markers["from"].color() != dialog.node_markers["to"].color()
+    assert dialog.node_markers["from"].center() == nodes[1]
+    assert dialog.node_markers["to"].center() == nodes[6]
+
+    # A third click goes back to From, and moves that marker rather than adding one
+    from_marker = dialog.node_markers["from"]
+    click_on(10)
+    assert dialog.path_from.text() == "10"
+    assert dialog.node_markers["from"] is from_marker
+
+    dialog.close()
+
+    # Closing gives the canvas back and takes the markers off it
+    assert ae_with_project.iface.mapCanvas().mapTool() is not dialog.clickTool
+    assert dialog.node_markers == {}
+
+
+def test_clicking_a_box_aims_the_next_map_click_at_it(ae_with_project, mock_load_graph_layer_setting_dialog):
+    """Choosing a box by hand overrides the alternation."""
+    from qgis.PyQt.QtCore import QCoreApplication, QEvent
+    from qgis.PyQt.QtGui import QFocusEvent
+
+    ae_with_project.load_layer_by_name("links")
+
+    dialog = ShortestPathDialog(ae_with_project)
+    dialog.prepare_graph_and_network()
+    assert dialog.fill_target == "from"
+
+    # setFocus() does nothing while the dialog is not shown, and calling event() directly would
+    # skip the filter entirely - only sendEvent() runs an event past the installed filters
+    QCoreApplication.sendEvent(dialog.path_to, QFocusEvent(QEvent.Type.FocusIn))
+    assert dialog.fill_target == "to"
+
+    QCoreApplication.sendEvent(dialog.path_from, QFocusEvent(QEvent.Type.FocusIn))
+    assert dialog.fill_target == "from"
+
+    dialog.close()
+
+
+def test_cancelling_the_configuration_leaves_the_dialog_as_it_was(
+    ae_with_project, mock_load_graph_layer_setting_dialog
+):
+    """Giving up partway must not leave the inputs greyed out under a "Loading data" button."""
+    ae_with_project.load_layer_by_name("links")
+
+    dialog = ShortestPathDialog(ae_with_project)
+
+    # Cancelled before ever configuring: everything stays out of reach, and the button goes
+    # back to its own label rather than being stuck on "Loading data"
+    mock_load_graph_layer_setting_dialog.mode = ""
+    dialog.prepare_graph_and_network()
+    assert dialog.path_from.isEnabled() is False
+    assert dialog.do_dist_matrix.isEnabled() is False
+    assert dialog.do_dist_matrix.text() == "Compute"
+
+    # Configured once, then cancelled out of a second attempt: the working state survives
+    mock_load_graph_layer_setting_dialog.mode = "c"
+    dialog.prepare_graph_and_network()
+    assert dialog.path_from.isEnabled() is True
+    assert dialog.do_dist_matrix.text() == "Display"
+
+    mock_load_graph_layer_setting_dialog.mode = ""
+    dialog.prepare_graph_and_network()
+    assert dialog.path_from.isEnabled() is True
+    assert dialog.path_to.isEnabled() is True
+    assert dialog.do_dist_matrix.isEnabled() is True
+    assert dialog.do_dist_matrix.text() == "Display"
+    assert ae_with_project.iface.mapCanvas().mapTool() is dialog.clickTool
+
+    dialog.close()
+
+
+def test_escape_still_gives_the_canvas_back(ae_with_project, mock_load_graph_layer_setting_dialog):
+    """Escape goes straight to reject(), so it never delivers a close event to clean up in."""
+    ae_with_project.load_layer_by_name("links")
+
+    dialog = ShortestPathDialog(ae_with_project)
+    dialog.prepare_graph_and_network()
+    dialog.mark_node("from", next(dialog.node_layer.getFeatures()).geometry().asPoint())
+
+    assert ae_with_project.iface.mapCanvas().mapTool() is dialog.clickTool
+    assert dialog.node_markers
+
+    dialog.reject()
+
+    assert ae_with_project.iface.mapCanvas().mapTool() is not dialog.clickTool
+    assert dialog.node_markers == {}
