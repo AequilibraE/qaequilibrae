@@ -15,14 +15,14 @@ class ExportMatrix(QgsProcessingAlgorithm):
             QgsProcessingParameterFile(
                 "matrix_path",
                 self.tr("Matrix path"),
-                behavior=QgsProcessingParameterFile.File,
+                behavior=QgsProcessingParameterFile.Behavior.File,
             )
         )
         self.addParameter(
             QgsProcessingParameterFile(
                 "file_path",
                 self.tr("File path"),
-                behavior=QgsProcessingParameterFile.Folder,
+                behavior=QgsProcessingParameterFile.Behavior.Folder,
             )
         )
         self.addParameter(

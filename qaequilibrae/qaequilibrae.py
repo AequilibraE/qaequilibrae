@@ -536,7 +536,7 @@ class AequilibraEMenu:
                 options.driverName = "SQLite"
                 options.layerName = layer_name
                 if file_exists:
-                    options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+                    options.actionOnExistingFile = QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteLayer
 
                 transform_context = QgsProject.instance().transformContext()
 
@@ -544,7 +544,7 @@ class AequilibraEMenu:
                     layer, self._project_layers_database(), transform_context, options
                 )
 
-                if error[0] == QgsVectorFileWriter.NoError:
+                if error[0] == QgsVectorFileWriter.WriterError.NoError:
                     layer.setDataSource(
                         self._project_layers_database() + f"|layername={layer_name}", layer.name(), "ogr"
                     )

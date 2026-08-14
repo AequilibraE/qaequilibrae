@@ -217,13 +217,10 @@ def check_secrets(plugin_path):
 
 def report_flake8(plugin_path):
     """Flake8. Informational on the website, so informational here too."""
-    config = plugin_path / ".flake8"
-    arguments = ["--max-line-length=120"]
-    if config.is_file():
-        arguments.append(f"--config={config}")
-    arguments.append(".")
-
-    process = run_tool("flake8", arguments, cwd=plugin_path)
+    # The config sits next to this script instead of inside the plugin directory, so it has to be
+    # pointed at explicitly: the tree being scanned is the packaged one and does not contain it.
+    config = Path(__file__).resolve().parent / ".flake8"
+    process = run_tool("flake8", [f"--config={config}", "."], cwd=plugin_path)
     issues = [line for line in process.stdout.splitlines() if line.strip()]
     print(f"\nFlake8 (non-blocking): {len(issues)} issues")
     for issue in issues[:20]:
