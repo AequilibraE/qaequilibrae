@@ -3,7 +3,8 @@ import struct
 import numpy as np
 import pandas as pd
 from aequilibrae.utils.interface.worker_thread import WorkerThread
-from qgis.PyQt.QtCore import pyqtSignal, QVariant
+from qgis.PyQt.QtCore import pyqtSignal
+from qgis.core import NULL
 
 from qaequilibrae.modules.common_tools.global_parameters import float_types, string_types, integer_types
 
@@ -60,7 +61,7 @@ class LoadDataset(WorkerThread):
             # Get all the data
             for p, feat in enumerate(self.layer.getFeatures()):
                 for idx, field, empty in zip(idxs, fields, empties, strict=True):
-                    if feat.attributes()[idx] == QVariant():
+                    if feat.attributes()[idx] == NULL:
                         self.output.loc[p, field] = empty
                     else:
                         self.output.loc[p, field] = feat.attributes()[idx]

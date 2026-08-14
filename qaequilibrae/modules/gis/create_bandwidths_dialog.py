@@ -55,7 +55,7 @@ class CreateBandwidthsDialog(BaseDialog):
 
         # layers and fields for adding skims
         self.mMapLayerComboBox.layerChanged.connect(self.add_fields_to_cboxes)
-        self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.LineLayer)
+        self.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.Filter.LineLayer)
         self.mMapLayerComboBox.setLayer(self.iface.activeLayer())
 
         self.ab_FieldComboBox.currentIndexChanged.connect(partial(self.choose_a_field, "AB"))

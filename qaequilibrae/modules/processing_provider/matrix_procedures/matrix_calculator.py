@@ -17,7 +17,7 @@ class MatrixCalculator(QgsProcessingAlgorithm):
             QgsProcessingParameterFile(
                 "conf_file",
                 self.tr("Configuration file (*.yaml)"),
-                behavior=QgsProcessingParameterFile.File,
+                behavior=QgsProcessingParameterFile.Behavior.File,
             )
         )
         self.addParameter(QgsProcessingParameterString("procedure", self.tr("Expression"), multiLine=True))

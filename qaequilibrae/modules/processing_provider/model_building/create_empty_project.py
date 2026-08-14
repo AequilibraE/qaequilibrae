@@ -22,7 +22,7 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
         # 1. Existing folder the new model folder will be created in
         self.addParameter(
             QgsProcessingParameterFile(
-                self.PARENT_FOLDER, self.tr("Parent folder"), behavior=QgsProcessingParameterFile.Folder
+                self.PARENT_FOLDER, self.tr("Parent folder"), behavior=QgsProcessingParameterFile.Behavior.Folder
             )
         )
 

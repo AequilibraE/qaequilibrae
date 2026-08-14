@@ -1,0 +1,14 @@
+# Config for the Flake8 pass in ci/security_scan.py, which reproduces the scan that the QGIS
+# plugins website runs on every uploaded version. It lives here rather than at the top level of
+# the plugin directory, so it is not shipped in the ZIP: the website would pick it up there, but
+# its Flake8 findings are informational and never block publication.
+# Linting for development is ruff (see pyproject.toml).
+# https://plugins.qgis.org/docs/security-scanning/config-files
+[flake8]
+max-line-length = 120
+max-complexity = 20
+extend-ignore = E203, E266, E501, W503
+exclude = packages, __pycache__
+# Sub-packages re-export their public names through __init__.py
+per-file-ignores =
+    *__init__.py: F401, F403, F824

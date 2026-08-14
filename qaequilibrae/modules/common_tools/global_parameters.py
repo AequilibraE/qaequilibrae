@@ -1,12 +1,12 @@
 from qgis.core import QgsWkbTypes
 
-point_types = [QgsWkbTypes.Point, QgsWkbTypes.Point25D]
-line_types = [QgsWkbTypes.LineString, QgsWkbTypes.LineString25D]
-poly_types = [QgsWkbTypes.Polygon, QgsWkbTypes.Polygon25D]
+point_types = [QgsWkbTypes.Type.Point, QgsWkbTypes.Type.Point25D]
+line_types = [QgsWkbTypes.Type.LineString, QgsWkbTypes.Type.LineString25D]
+poly_types = [QgsWkbTypes.Type.Polygon, QgsWkbTypes.Type.Polygon25D]
 
-multi_poly = [QgsWkbTypes.MultiPolygon]
-multi_line = [QgsWkbTypes.MultiLineString]
-multi_point = [QgsWkbTypes.MultiPoint]
+multi_poly = [QgsWkbTypes.Type.MultiPolygon]
+multi_line = [QgsWkbTypes.Type.MultiLineString]
+multi_point = [QgsWkbTypes.Type.MultiPoint]
 
 integer_types = [2, 4]
 float_types = [6]

@@ -36,7 +36,7 @@ class AddConnectorsDialog(BaseDialog):
         self.rdo_layer.toggled.connect(self.centroid_source)
 
         self.layer_box.layerChanged.connect(self.set_fields)
-        self.layer_box.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self.layer_box.setFilters(QgsMapLayerProxyModel.Filter.PointLayer)
 
         self.chb_zone.setVisible(False)
 
