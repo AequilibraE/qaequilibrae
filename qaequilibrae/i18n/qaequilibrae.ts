@@ -345,37 +345,37 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="23"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="25"/>
         <source>Link IDs (comma-separated)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="33"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="35"/>
         <source>AequilibraE module not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="43"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="45"/>
         <source>{project_folder} does not contain an AeqilibraE model: {e}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="49"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="51"/>
         <source>Error parsing link IDs: {e}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="68"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="70"/>
         <source>Collapse links</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="77"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="79"/>
         <source>This tool collapses links into nodes, adjusting the network in the neighborhood.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="71"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="73"/>
         <source>Model building</source>
         <translation type="unfinished"></translation>
     </message>
@@ -969,7 +969,7 @@
 <context>
     <name>DisplayAequilibraEFormatsDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="470"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="474"/>
         <source>AequilibraE custom formats</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1778,7 +1778,7 @@
 <context>
     <name>LoadDataset</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="50"/>
+        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="51"/>
         <source>Field {} does has a type not supported.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2076,32 +2076,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="24"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="26"/>
         <source>AequilibraE module not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="34"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="36"/>
         <source>{project_folder} does not contain an AequilibraE model: {e}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="95"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="97"/>
         <source>Network simplifier</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="105"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="107"/>
         <source>This tool simplifies the network, merging short links into longer ones or</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="106"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="108"/>
         <source>turning links into nodes, and saving theses changes into the project.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="98"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="100"/>
         <source>Model building</source>
         <translation type="unfinished"></translation>
     </message>
