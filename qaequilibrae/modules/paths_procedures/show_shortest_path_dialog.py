@@ -38,7 +38,7 @@ class ShortestPathDialog(BaseDialog):
         self.field_types = {}
         self.centroids = None
         self.node_layer = self.qgis_project.layers["nodes"][0]
-        self.line_layer = self.qgis_project.layers["links"][0]
+        self.line_layer = self._links_layer_on_canvas()
         self.node_keys = {}
         self.node_fields = None
         self.index = None
@@ -343,15 +343,18 @@ class ShortestPathDialog(BaseDialog):
 
     def give_canvas_back(self):
         """The map tool and the markers live on the canvas, so they outlive this dialog unless
-        they are taken down on the way out.
-
-        Reached from both ``closeEvent`` and ``finished`` because neither covers every exit on
-        its own: Escape goes straight to ``reject()`` without a close event, while closing a
-        dialog that was never shown never reaches ``reject()`` and so never emits ``finished``.
-        Doing the work twice is harmless - both steps below are no-ops the second time around.
-        """
+        they are taken down on the way out"""
         self.release_map_tool()
         self.clear_markers()
+
+    def _links_layer_on_canvas(self):
+        """Returns the links layer, putting it on the map first if it is not there already."""
+        layer = self._loaded_links_layer()
+        if layer is not None:
+            return layer
+
+        self.qgis_project.load_layer_by_name("links")
+        return self.qgis_project.layers["links"][0]
 
     def _loaded_links_layer(self):
         if "links" not in self.qgis_project.layers:

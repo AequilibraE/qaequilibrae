@@ -53,12 +53,14 @@ def test_double_click_removes_a_skim(sf_project, qtbot):
 
     assert dialog.skims["car"] == ["free_flow_time", "distance"]
     assert dialog.skim_list_table.rowCount() == 2
+    # Listed alphabetically, whichever order they went in
+    assert [dialog.skim_list_table.item(i, 1).text() for i in range(2)] == ["distance", "free_flow_time"]
 
     dialog.skim_list_table.cellDoubleClicked.emit(0, 0)
 
-    assert dialog.skims["car"] == ["distance"], "the wrong skim was dropped"
+    assert dialog.skims["car"] == ["free_flow_time"], "the wrong skim was dropped"
     assert dialog.skim_list_table.rowCount() == 1
-    assert dialog.skim_list_table.item(0, 1).text() == "distance"
+    assert dialog.skim_list_table.item(0, 1).text() == "free_flow_time"
     assert dialog.skimming
 
     # Taking the last one back leaves nothing to skim, so nothing should be saved either
@@ -69,6 +71,261 @@ def test_double_click_removes_a_skim(sf_project, qtbot):
     assert not dialog.skimming
 
     dialog.close()
+
+
+def _available_skims(dialog):
+    combo = dialog.cob_skims_available
+    return [combo.itemText(i) for i in range(combo.count())]
+
+
+def _add_car_class(dialog, qtbot, name="car", core=0, mode=0):
+    dialog.cob_matrices.setCurrentText("demand")
+    dialog.tbl_core_list.selectRow(core)
+    dialog.cob_mode_for_class.setCurrentIndex(mode)
+    dialog.ln_class_name.setText(name)
+    dialog.pce_setter.setValue(1.0)
+    dialog.chb_check_centroids.setChecked(False)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
+
+
+def test_a_skim_already_added_is_no_longer_on_offer(sf_project, qtbot):
+    """Adding the same skim twice used to raise AttributeError, so it is kept off the list."""
+    dialog = TrafficAssignmentDialog(sf_project)
+    _add_car_class(dialog, qtbot)
+
+    assert "free_flow_time" in _available_skims(dialog)
+
+    dialog.cob_skims_available.setCurrentText("free_flow_time")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
+
+    assert "free_flow_time" not in _available_skims(dialog)
+    assert dialog.skim_list_table.rowCount() == 1
+
+    # Double-clicking it away puts it back up for grabs
+    dialog.skim_list_table.cellDoubleClicked.emit(0, 0)
+
+    assert "free_flow_time" in _available_skims(dialog)
+    assert dialog.skim_list_table.rowCount() == 0
+    assert dialog.skims["car"] == []
+
+    dialog.close()
+
+
+def test_skim_options_are_per_class(sf_project, qtbot):
+    """A field taken for one class is still available to the others."""
+    dialog = TrafficAssignmentDialog(sf_project)
+    dialog.cob_matrices.setCurrentText("demand_mc")
+
+    _add_car_class(dialog, qtbot, name="car", core=0, mode=0)
+    dialog.cob_matrices.setCurrentText("demand_mc")
+    _add_car_class(dialog, qtbot, name="trucks", core=2, mode=4)
+
+    dialog.cob_skim_class.setCurrentText("car")
+    dialog.cob_skims_available.setCurrentText("distance")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
+    assert "distance" not in _available_skims(dialog)
+
+    dialog.cob_skim_class.setCurrentText("trucks")
+    assert "distance" in _available_skims(dialog), "the other class never claimed this field"
+
+    dialog.cob_skim_class.setCurrentText("car")
+    assert "distance" not in _available_skims(dialog)
+
+    dialog.close()
+
+
+def test_skims_and_classes_are_listed_alphabetically(sf_project, qtbot):
+    dialog = TrafficAssignmentDialog(sf_project)
+    dialog.cob_matrices.setCurrentText("demand_mc")
+
+    # Added in an order that is neither alphabetical nor reversed
+    _add_car_class(dialog, qtbot, name="trucks", core=2, mode=4)
+    dialog.cob_matrices.setCurrentText("demand_mc")
+    _add_car_class(dialog, qtbot, name="car", core=0, mode=0)
+
+    classes = [dialog.cob_skim_class.itemText(i) for i in range(dialog.cob_skim_class.count())]
+    assert classes == ["car", "trucks"]
+
+    assert _available_skims(dialog) == sorted(_available_skims(dialog))
+
+    def add(class_name, field):
+        dialog.cob_skim_class.setCurrentText(class_name)
+        dialog.cob_skims_available.setCurrentText(field)
+        qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
+
+    add("trucks", "free_flow_time")
+    add("car", "free_flow_time")
+    add("trucks", "distance")
+
+    table = dialog.skim_list_table
+    listed = [(table.item(i, 0).text(), table.item(i, 1).text()) for i in range(table.rowCount())]
+    assert listed == [
+        ("car", "free_flow_time"),
+        ("trucks", "distance"),
+        ("trucks", "free_flow_time"),
+    ]
+
+    dialog.close()
+
+
+def test_each_class_gets_its_own_band(sf_project, qtbot):
+    """Neighbouring classes have to land on different shades for the blocks to read apart."""
+    dialog = TrafficAssignmentDialog(sf_project)
+    dialog.cob_matrices.setCurrentText("demand_mc")
+
+    for name, core, mode in [("car", 0, 0), ("motorcycles", 1, 5), ("trucks", 2, 4)]:
+        dialog.cob_matrices.setCurrentText("demand_mc")
+        _add_car_class(dialog, qtbot, name=name, core=core, mode=mode)
+
+    for class_name, field in [("trucks", "free_flow_time"), ("car", "distance"), ("trucks", "distance")]:
+        dialog.cob_skim_class.setCurrentText(class_name)
+        dialog.cob_skims_available.setCurrentText(field)
+        qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
+
+    shades, _ = dialog.skim_bands()
+    table = dialog.skim_list_table
+    banded = [(table.item(i, 0).text(), table.item(i, 1).background().color()) for i in range(table.rowCount())]
+
+    # car sorts first and takes the first band; trucks is the next class listed and takes the other
+    assert [name for name, _ in banded] == ["car", "trucks", "trucks"]
+    assert banded[0][1] == shades[0]
+    assert banded[1][1] == shades[1]
+    assert banded[2][1] == shades[1], "rows of one class share a band"
+
+    # 'motorcycles' has no skims, so it must not consume a band and leave car and trucks alike
+    assert banded[0][1] != banded[1][1]
+
+    dialog.close()
+
+
+def test_bands_come_from_the_palette(sf_project, qtbot):
+    """Hardcoded shades would be unreadable under a dark QGIS theme."""
+    from qgis.PyQt.QtGui import QColor, QPalette
+
+    dialog = TrafficAssignmentDialog(sf_project)
+    table = dialog.skim_list_table
+
+    # The stock light theme: the first band is the table's own row colour, the second the very
+    # light grey a step away from it
+    shades, text_color = dialog.skim_bands()
+    assert shades[0] == table.palette().color(QPalette.ColorRole.Base)
+    assert shades[0].name() == "#ffffff"
+    assert shades[1].name() == "#f0f0f0"
+    assert text_color == table.palette().color(QPalette.ColorRole.Text)
+
+    # A dark theme has to give shades of its own, and a text colour that shows up on them
+    dark = QPalette(table.palette())
+    dark.setColor(QPalette.ColorRole.Base, QColor("#232323"))
+    dark.setColor(QPalette.ColorRole.Text, QColor("#e0e0e0"))
+    table.setPalette(dark)
+
+    shades, text_color = dialog.skim_bands()
+    assert shades[0].name() == "#232323"
+    assert shades[1].lightness() > shades[0].lightness(), "the band must lift off a dark base"
+    assert text_color.name() == "#e0e0e0"
+
+    dialog.close()
+
+
+def test_final_and_blended_choices_survive_a_reorder(sf_project, qtbot):
+    """The table is rebuilt to keep it sorted, so the check boxes have to be carried across."""
+    dialog = TrafficAssignmentDialog(sf_project)
+    _add_car_class(dialog, qtbot)
+
+    dialog.cob_skims_available.setCurrentText("free_flow_time")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
+
+    table = dialog.skim_list_table
+    table.cellWidget(0, 3).setChecked(False)  # free_flow_time: final only
+
+    # "distance" sorts ahead of it, so the row it is on has to move
+    dialog.cob_skims_available.setCurrentText("distance")
+    qtbot.mouseClick(dialog.but_add_skim, Qt.MouseButton.LeftButton)
+
+    assert [table.item(i, 1).text() for i in range(2)] == ["distance", "free_flow_time"]
+    assert table.cellWidget(0, 2).isChecked() and table.cellWidget(0, 3).isChecked(), "the new skim"
+    assert table.cellWidget(1, 2).isChecked()
+    assert not table.cellWidget(1, 3).isChecked(), "the unticked box did not follow its skim"
+
+    dialog.close()
+
+
+def test_every_vdf_offers_the_parameters_it_actually_takes(sf_project, qtbot):
+    """Akcelik used to land on an empty table, leaving nothing to fill in."""
+    dialog = TrafficAssignmentDialog(sf_project)
+    table = dialog.tbl_vdf_parameters
+
+    def rows():
+        return [table.item(i, 0).text() for i in range(table.rowCount())]
+
+    dialog.cob_vdf.setCurrentText("bpr")
+    assert rows() == ["alpha", "beta"]
+
+    dialog.cob_vdf.setCurrentText("akcelik")
+    assert rows() == ["alpha", "tau", "length"]
+
+    # INRETS takes alpha alone, and the row the previous function left must not linger
+    dialog.cob_vdf.setCurrentText("inrets")
+    assert rows() == ["alpha"]
+
+    dialog.close()
+
+
+def test_akcelik_assignment_and_yaml_round_trip(sf_project, qtbot, mocker):
+    saved_yaml = f"{sf_project.project.project_base_path}/akcelik_config.yml"
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
+        return_value=saved_yaml,
+    )
+
+    dialog = TrafficAssignmentDialog(sf_project)
+    test_name = f"TestTrafficAssignment_AK_{uuid4().hex[:6]}"
+    dialog.output_scenario_name.setText(test_name)
+    _add_car_class(dialog, qtbot)
+
+    dialog.cob_vdf.setCurrentText("akcelik")
+    table = dialog.tbl_vdf_parameters
+    table.cellWidget(0, 1).setText("0.25")  # alpha, as a scalar
+    table.cellWidget(1, 1).setText("0.8")  # tau, as a scalar
+    table.cellWidget(2, 2).setCurrentText("distance")  # length, taken from a network field
+
+    dialog.cob_capacity.setCurrentText("capacity")
+    dialog.cob_ffttime.setCurrentText("free_flow_time")
+    dialog.cb_choose_algorithm.setCurrentText("bfw")
+    dialog.max_iter.setText("10")
+    dialog.rel_gap.setText("0.01")
+
+    qtbot.mouseClick(dialog.but_save_yaml, Qt.MouseButton.LeftButton)
+
+    dialog.run()
+    assert dialog.error is None, f"the assignment refused the configuration: {dialog.error}"
+
+    with pytest.raises(ValueError):
+        dialog.produce_all_outputs()
+    dialog.close()
+
+    with sf_project.project.results_connection as conn:
+        assert conn.execute(f"SELECT ROUND(SUM(PCE_tot), 4) FROM {test_name}").fetchone()[0] > 0
+
+    # Akcelik's own parameters have to survive the trip out to YAML ...
+    with open(saved_yaml, "r") as f:
+        saved = yaml.safe_load(f)
+    assert saved["assignment"]["alpha"] == 0.25
+    assert saved["assignment"]["tau"] == 0.8
+    assert saved["assignment"]["length"] == "distance"
+    assert "beta" not in saved["assignment"], "beta belongs to another function"
+
+    # ... and back in again
+    reopened = TrafficAssignmentDialog(sf_project)
+    qtbot.mouseClick(reopened.but_load_yaml, Qt.MouseButton.LeftButton)
+
+    assert reopened.cob_vdf.currentText() == "akcelik"
+    table = reopened.tbl_vdf_parameters
+    assert [table.item(i, 0).text() for i in range(table.rowCount())] == ["alpha", "tau", "length"]
+    assert table.cellWidget(0, 1).text() == "0.25"
+    assert table.cellWidget(1, 1).text() == "0.8"
+    assert table.cellWidget(2, 2).currentText() == "distance"
+    reopened.close()
 
 
 def test_single_class(sf_project, qtbot, mocker):

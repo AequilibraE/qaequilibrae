@@ -73,6 +73,43 @@ def test_prepare_graph_and_network(ae_with_project, qtbot, timeoutDetector):
     qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton)
 
 
+def test_links_layer_is_loaded_when_it_is_not_on_the_canvas(ae_with_project):
+    """Everything the dialog offers is done against the network on screen."""
+    assert not QgsProject.instance().mapLayersByName("links"), "the fixture starts without it"
+
+    dialog = ShortestPathDialog(ae_with_project)
+
+    assert QgsProject.instance().mapLayersByName("links")
+    assert dialog.line_layer.id() in QgsProject.instance().mapLayers()
+
+    dialog.close()
+
+
+def test_a_links_layer_already_on_the_canvas_is_reused(ae_with_project):
+    ae_with_project.load_layer_by_name("links")
+    already_there = QgsProject.instance().mapLayersByName("links")[0]
+
+    dialog = ShortestPathDialog(ae_with_project)
+
+    assert dialog.line_layer is already_there
+    assert len(QgsProject.instance().mapLayersByName("links")) == 1, "a second copy was added"
+
+    dialog.close()
+
+
+def test_links_layer_removed_from_the_canvas_is_put_back(ae_with_project):
+    """The panel rebuilds a removed layer in memory, but that replacement is not on the map."""
+    ae_with_project.load_layer_by_name("links")
+    QgsProject.instance().removeMapLayer(QgsProject.instance().mapLayersByName("links")[0])
+    assert not QgsProject.instance().mapLayersByName("links")
+
+    dialog = ShortestPathDialog(ae_with_project)
+
+    assert dialog.line_layer.id() in QgsProject.instance().mapLayers()
+
+    dialog.close()
+
+
 @pytest.fixture
 def mock_load_graph_layer_setting_dialog(mocker):
     """Mock patch for LoadGraphLayerSettingDialog."""

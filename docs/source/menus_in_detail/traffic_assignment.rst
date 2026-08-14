@@ -58,8 +58,9 @@ are also configured here.
     :alt: Traffic assignment critical analysis tab
 
 In the *Assignment* tab we select the assignment algorithm and configure the volume-delay
-function and its *alpha* and *beta* parameters. The fields for link capacity and free flow
-travel time are selected. We also confirm the relative gap and maximum number of iterations
+function and its parameters. The parameter list follows the function chosen: *alpha* and
+*beta* for BPR, BPR2 and Conical, *alpha* alone for INRETS, and *alpha*, *tau* and *length*
+for Akcelik. The fields for link capacity and free flow travel time are selected. We also confirm the relative gap and maximum number of iterations
 we want, and the output folder. Now it is possible to save your project configurations in
 either one Python or YAML file. While the Python file is stored inside the project run folder
 to be executed as part of 'Run procedures', the YAML file can be used as input for other
@@ -112,7 +113,8 @@ check boxes!
 
 Added a skim you did not want? Double-click it in the skimming table and it is removed.
 Double-click the *Class* or *Field* column, as the check boxes take the clicks on the two
-columns to their right.
+columns to their right. Removing it also puts the field back on the list of fields available
+to that class, which is where it went when it was added.
 
 Then, we can choose to run a select link analysis. Its default configuration is not
 to select any links, so we have to toggle its *"Set select link analysis"* button (1).
