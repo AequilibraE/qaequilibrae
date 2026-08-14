@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="it">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="it_IT">
 <context>
     <name>AddConnectors</name>
     <message>
@@ -27,7 +27,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="22"/>
         <source>Links</source>
-        <translation>Archi</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="29"/>
@@ -37,12 +37,12 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="38"/>
         <source>Link type</source>
-        <translation>Tipo di arco</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="47"/>
         <source>Modes</source>
-        <translation>Modi</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="60"/>
@@ -52,7 +52,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="65"/>
         <source>Opening project</source>
-        <translation>Progetto in apertura</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="71"/>
@@ -268,6 +268,11 @@
         <source>Scenario &apos;{}&apos; no longer exists. Using &apos;root&apos;.</source>
         <translation type="unfinished"/>
     </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="357"/>
+        <source>Could not close the project while unloading: {}</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>BandwidthColorRamps</name>
@@ -360,7 +365,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="68"/>
         <source>Collapse links</source>
-        <translation>Comprimi archi</translation>
+        <translation>Fondi archi</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="77"/>
@@ -514,7 +519,7 @@
     <message>
         <location filename="../modules/project_procedures/create_examples_dialog.py" line="25"/>
         <source>Available models:</source>
-        <translation>Modelli disponibili:</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -576,7 +581,7 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_dialog.py" line="299"/>
         <source>Link Layer has NO defined CRS</source>
-        <translation>Il sistema di riferimento del layer degli archi NON è definito</translation>
+        <translation>Il sistema di riferimento (CRS) del layer degli archi non è definito</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_dialog.py" line="303"/>
@@ -637,7 +642,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="132"/>
         <source>Cancel and Exit</source>
-        <translation>Cancella ed esci</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="144"/>
@@ -672,7 +677,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="269"/>
         <source>Desire Lines</source>
-        <translation>Linee di desiderio</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="287"/>
@@ -768,12 +773,12 @@
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="234"/>
         <source>Building graph</source>
-        <translation>Grafo in costruzione</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="266"/>
         <source>Assigning demand</source>
-        <translation>Domanda in assegnazione</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="270"/>
@@ -796,12 +801,12 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="39"/>
         <source>Load datasets</source>
-        <translation>Carica insiemi di dati</translation>
+        <translation>Carica set di dati</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="46"/>
         <source>Dataset name</source>
-        <translation>Nome dell&apos;insieme di dati</translation>
+        <translation>Nome del set di dati</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="51"/>
@@ -821,27 +826,27 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="103"/>
         <source>Load matrices</source>
-        <translation>Carica matrici</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="113"/>
         <source>Vectors</source>
-        <translation>Vettori</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="135"/>
         <source>Attraction</source>
-        <translation>Attrazione</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="178"/>
         <source>Production</source>
-        <translation>Produzione</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="210"/>
         <source>Impedance</source>
-        <translation>Impedenza</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="314"/>
@@ -851,7 +856,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="301"/>
         <source>Matrix</source>
-        <translation>Matrice</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="273"/>
@@ -861,17 +866,17 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="400"/>
         <source>Model</source>
-        <translation>Modello</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="363"/>
         <source>Parameter</source>
-        <translation>Parametro</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="368"/>
         <source>Value</source>
-        <translation>Valore</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="406"/>
@@ -916,7 +921,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="444"/>
         <source>Treat empties as zeros</source>
-        <translation>Tratta i valori vuoti come zero</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="477"/>
@@ -974,7 +979,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="71"/>
         <source>File path: {}</source>
-        <translation>Percorso del file: {}</translation>
+        <translation>Percorso del file: []</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="83"/>
@@ -1289,7 +1294,7 @@
         <translation>Progetto</translation>
     </message>
     <message>
-        <location filename="../modules/routing_procedures/forms/tsp.ui" line="100"/>
+        <location filename="../modules/paths_procedures/forms/ui_skim_viewer.ui" line="156"/>
         <source>Mode</source>
         <translation>Modo</translation>
     </message>
@@ -2559,22 +2564,22 @@
 <context>
     <name>RouteChoiceDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="374"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="380"/>
         <source>Input error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="256"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="262"/>
         <source>Missing query name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="259"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="265"/>
         <source>Query name already used</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="262"/>
+        <location filename="../modules/paths_procedures/route_choice_dialog.py" line="268"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"/>
     </message>
@@ -2968,82 +2973,82 @@
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="493"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="510"/>
         <source>Class name already used</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="554"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="571"/>
         <source>Remove</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="675"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="692"/>
         <source>Input error</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="715"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="732"/>
         <source>No traffic classes to assign</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="720"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="737"/>
         <source>Missing scenario name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="726"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="743"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="803"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="820"/>
         <source>VDF parameter is not numeric</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="607"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="624"/>
         <source>Wrong value for link ID</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="613"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="630"/>
         <source>Link ID doesn&apos;t exist in project</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="622"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="639"/>
         <source>Missing query name</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="626"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="643"/>
         <source>Query name already used</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="630"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="647"/>
         <source>Please set a link selection</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="732"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="749"/>
         <source>Missing select link matrix name.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="736"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="753"/>
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="365"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="382"/>
         <source>No VoT found for mode {} in project database. Please configure it.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="700"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="717"/>
         <source>Assignment setup error</source>
         <translation type="unfinished"/>
     </message>
@@ -4219,7 +4224,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/network/forms/ui_add_connectors.ui" line="73"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="224"/>
         <source>Layer</source>
         <translation type="unfinished"/>
     </message>
@@ -4284,7 +4289,7 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
+        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
         <source>Layer field</source>
         <translation type="unfinished"/>
     </message>
