@@ -22,16 +22,19 @@ def layer_labels(layer, chbox):
 
 
 def test_show_label_stops(dialog):
+    """The stops layer gains and loses its labels with the check box."""
     dialog.map_stops()
     layer_labels(dialog.stops_layer, dialog.chb_label_stops)
 
 
 def test_show_label_zones(dialog):
+    """The zones layer gains and loses its labels with the check box."""
     dialog.map_zones()
     layer_labels(dialog.zones_layer, dialog.chb_label_zones)
 
 
 def test_allow_filters(dialog):
+    """Each filter's controls are only enabled while its own check box is ticked."""
     for mode in [True, False, True]:
         dialog.chb_agency.setChecked(mode)
         assert dialog.cob_agency.isEnabled() == mode
@@ -45,6 +48,7 @@ def test_allow_filters(dialog):
 
 
 def test_search_stop(dialog):
+    """Searching by stop id, name or code narrows the stops down to the one matched."""
     assert dialog.stops.shape[0] > 10
     dialog.ln_stop_id.setText("10000000028")
 
@@ -63,6 +67,7 @@ def test_search_stop(dialog):
 
 
 def test_search_route(dialog):
+    """Searching by route id or short name narrows to that route and the stops it serves."""
     assert dialog.routes.shape[0] == 2
 
     dialog.ln_route_id.setText("10001000000")
@@ -78,6 +83,7 @@ def test_search_route(dialog):
 
 
 def test_filter_direction(dialog):
+    """Filtering by agency and then by direction leaves the matching routes listed."""
     dialog.chb_agency.setChecked(True)
     dialog.cob_agency.setCurrentText("Liserco")
 
@@ -88,6 +94,7 @@ def test_filter_direction(dialog):
 
 
 def test_select_element(dialog):
+    """Selecting a route or a stop from the tables keeps the related records in view."""
     dialog.reset_global()
     dialog.list_routes.selectRow(0)
     assert dialog.routes.shape[0] == 2
@@ -98,11 +105,13 @@ def test_select_element(dialog):
 
 
 def test_enable_stop_mapping(dialog):
+    """Switching to zone mapping is accepted."""
     # Enable zone mapping
     dialog.rdo_map_zones.setChecked(True)
 
 
 def test_drap_maps(dialog):
+    """Mapping zones from the button runs without error."""
     dialog.but_map_zones.click()
 
 
@@ -111,6 +120,7 @@ def all_items(cob):
 
 
 def test_map_stops(dialog):
+    """Every combination of stop map type and metric can be drawn."""
     for map_type in all_items(dialog.cob_stops_map_type):
         dialog.cob_stops_map_type.setCurrentText(map_type)
         for metric in all_items(dialog.cob_stops_map_info):
@@ -119,10 +129,12 @@ def test_map_stops(dialog):
 
 
 def test_map_lines(dialog):
+    """Every route metric on offer can be drawn."""
     for metric in all_items(dialog.cob_routes_map_info):
         dialog.cob_routes_map_info.setCurrentText(metric)
         dialog.but_map_routes.click()
 
 
 def test_map_zones(dialog):
+    """The zones map can be drawn."""
     dialog.but_map_zones.click()

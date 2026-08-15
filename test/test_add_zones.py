@@ -8,6 +8,7 @@ from .utilities import create_polygons_layer
 
 
 def test_add_zones_dialog(pt_project):
+    """Polygons from a layer become project zones, with centroids added for them."""
     _ = create_polygons_layer([97, 98, 99])
 
     dialog = AddZonesDialog(pt_project)
@@ -22,6 +23,7 @@ def test_add_zones_dialog(pt_project):
 
 
 def test_add_zones_procedure(pt_project):
+    """The zone-adding procedure imports the polygons without going through the dialog."""
     layer = create_polygons_layer([97, 98, 99])
 
     corresp = {"zone_id": 0, "area": 0, "name": 0, "population": 0, "employment": 0}

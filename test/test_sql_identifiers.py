@@ -15,10 +15,12 @@ from qaequilibrae.modules.common_tools import quote_identifier
     ],
 )
 def test_quotes_and_doubles_embedded_quotes(name, expected):
+    """Identifiers are double-quoted, with any embedded quote doubled."""
     assert quote_identifier(name) == expected
 
 
 def test_a_hostile_column_name_stays_a_column_name():
+    """A column name carrying SQL is used as a name only, and drops no tables."""
     # The names reaching our INSERT/UPDATE builders come from user-supplied layers
     hostile = 'name"; DROP TABLE nodes; --'
 

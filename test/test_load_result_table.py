@@ -28,6 +28,7 @@ def project():
 
 
 def test_reads_an_existing_result_table(project):
+    """A result table is read back with its columns and values intact."""
     result = load_result_table(project, "assignment_result")
 
     assert result.columns.tolist() == ["link_id", "matrix_tot"]
@@ -35,11 +36,13 @@ def test_reads_an_existing_result_table(project):
 
 
 def test_matches_the_table_name_case_insensitively(project):
+    """The table name is matched the way SQLite does, ignoring case."""
     # SQLite resolves table names case-insensitively, so the helper must not be stricter
     assert load_result_table(project, "Assignment_Result").shape == (2, 2)
 
 
 def test_unknown_table_is_rejected(project):
+    """A name that matches no result table is refused rather than queried."""
     with pytest.raises(ValueError, match="no result table named"):
         load_result_table(project, "not_a_table")
 
@@ -54,6 +57,7 @@ def test_unknown_table_is_rejected(project):
     ],
 )
 def test_injection_payloads_are_rejected_and_leave_the_database_alone(project, payload):
+    """SQL smuggled in through the table name is refused and the database is left untouched."""
     with pytest.raises(ValueError, match="no result table named"):
         load_result_table(project, payload)
 
@@ -62,6 +66,7 @@ def test_injection_payloads_are_rejected_and_leave_the_database_alone(project, p
 
 
 def test_a_table_whose_name_contains_a_quote_is_still_readable(project):
+    """A table name carrying a double quote is quoted properly rather than rejected."""
     project.connection.execute('CREATE TABLE "odd""name" (link_id INTEGER);')
     project.connection.execute('INSERT INTO "odd""name" VALUES (3);')
     project.connection.commit()

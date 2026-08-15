@@ -10,10 +10,12 @@ def _value_map_items(layer, field_name):
 
 
 def test_mode_combinations_with_a_single_mode():
+    """A project with one mode offers exactly that one combination."""
     assert _mode_combinations(["c"]) == [("c", "c")]
 
 
 def test_mode_combinations_carry_the_spelling_the_links_already_use():
+    """Combinations are listed once, sorted, and in whatever order the links already spell them."""
     entries = _mode_combinations(["b", "c", "t", "w"], ["ct", "cwbt"])
     values = [value for _, value in entries]
 
@@ -26,6 +28,7 @@ def test_mode_combinations_carry_the_spelling_the_links_already_use():
 
 
 def test_zone_identifiers_default_to_the_next_available_values(ae_with_project):
+    """A new zone is pre-filled with the next zone_id and ogc_fid, computed on insert only."""
     layer = ae_with_project.layers["zones"][0]
 
     for field_name, expected in (("ogc_fid", 4), ("zone_id", 4)):
@@ -46,6 +49,7 @@ def test_zone_ids_carry_on_from_a_numbering_of_their_own(pt_no_feed):
 
 
 def test_link_identifiers_default_to_the_next_available_values(ae_with_project):
+    """A new link is pre-filled with the next link_id and ogc_fid."""
     layer = ae_with_project.layers["links"][0]
 
     for field_name in ("ogc_fid", "link_id"):
@@ -58,6 +62,7 @@ def test_link_identifiers_default_to_the_next_available_values(ae_with_project):
 
 
 def test_link_nodes_default_to_zero(ae_with_project):
+    """a_node and b_node start at zero, since the database triggers work them out."""
     layer = ae_with_project.layers["links"][0]
 
     for field_name in ("a_node", "b_node"):
@@ -70,6 +75,7 @@ def test_link_nodes_default_to_zero(ae_with_project):
 
 
 def test_link_nodes_are_hidden_from_the_attribute_form(ae_with_project):
+    """a_node and b_node are hidden from the form, being none of the user's business."""
     layer = ae_with_project.layers["links"][0]
 
     for field_name in ("a_node", "b_node"):
@@ -77,6 +83,7 @@ def test_link_nodes_are_hidden_from_the_attribute_form(ae_with_project):
 
 
 def test_link_modes_are_presented_as_values_from_the_modes_table(ae_with_project):
+    """The modes field offers every combination of the project's modes, sorted and consistently spelled."""
     layer = ae_with_project.layers["links"][0]
     items = _value_map_items(layer, "modes")
     values = [value for _, value in items]
@@ -102,6 +109,7 @@ def test_modes_a_project_already_uses_are_offered_as_they_are_stored(pt_no_feed)
 
 
 def test_link_types_are_presented_as_values_from_the_link_types_table(ae_with_project):
+    """The link_type field offers the project's link types by name, without their ids."""
     layer = ae_with_project.layers["links"][0]
     items = _value_map_items(layer, "link_type")
 
@@ -110,6 +118,7 @@ def test_link_types_are_presented_as_values_from_the_link_types_table(ae_with_pr
 
 
 def test_link_type_defaults_to_the_default_link_type(ae_with_project):
+    """A new link starts on the 'default' link type."""
     layer = ae_with_project.layers["links"][0]
     field_index = layer.fields().indexOf("link_type")
     default = layer.defaultValueDefinition(field_index)
@@ -120,6 +129,7 @@ def test_link_type_defaults_to_the_default_link_type(ae_with_project):
 
 
 def test_modes_and_link_type_offer_the_previously_used_value(ae_with_project):
+    """Only modes and link_type repeat the last value used; an id or a name never would."""
     layer = ae_with_project.layers["links"][0]
     config = layer.editFormConfig()
 
@@ -131,6 +141,7 @@ def test_modes_and_link_type_offer_the_previously_used_value(ae_with_project):
 
 
 def test_link_type_cannot_be_left_empty(ae_with_project):
+    """link_type carries a hard not-null constraint, so a link cannot be saved without one."""
     layer = ae_with_project.layers["links"][0]
     field_index = layer.fields().indexOf("link_type")
     not_null = QgsFieldConstraints.Constraint.ConstraintNotNull

@@ -11,6 +11,7 @@ pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running 
 
 
 def test_bandwidth(ae, folder_path):
+    """Stacked bandwidths from an AB/BA field pair add a colour layer and a width layer to the map."""
     load_test_layer(folder_path, "link")
 
     layer = QgsProject.instance().mapLayersByName(link_layer)[0]
@@ -35,6 +36,7 @@ def test_bandwidth(ae, folder_path):
 
 @pytest.mark.parametrize("dual_fields", [True, False])
 def test_color_ramp(ae, folder_path, dual_fields):
+    """A colour ramp built over one field, or over an AB/BA pair, feeds the bandwidth layers."""
     load_test_layer(folder_path, "link")
 
     layer = QgsProject.instance().mapLayersByName(link_layer)[0]

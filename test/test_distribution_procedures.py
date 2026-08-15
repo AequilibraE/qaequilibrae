@@ -18,6 +18,7 @@ DISTRIBUTION_PATH = "qaequilibrae.modules.distribution_procedures.distribution_m
 
 @pytest.mark.parametrize("method", ["csv", "parquet", "open layer"])
 def test_ipf(ae_with_project, folder_path, mocker, method):
+    """IPF balances a seed matrix to target vectors read from CSV, parquet or an open layer."""
 
     df = pd.read_csv("test/data/SiouxFalls_project/synthetic_future_vector.csv")
     _ = layer_from_dataframe(df, "synthetic_future_vector")
@@ -84,6 +85,7 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
 
 @pytest.mark.parametrize("method", ["negative_exponential", "inverse_power", "both"])
 def test_calibrate_gravity(sf_project, method, folder_path, mocker, qtbot):
+    """Calibrating a gravity model writes a .mod file naming the function it fitted."""
     proj = run_sfalls_assignment(sf_project)
 
     mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
@@ -138,6 +140,7 @@ def test_calibrate_gravity(sf_project, method, folder_path, mocker, qtbot):
 
 @pytest.mark.parametrize("method", ["negative", "power", "gamma"])
 def test_apply_gravity(ae_with_project, method, folder_path, mocker):
+    """Applying a gravity model, loaded or configured by hand, produces a non-empty matrix."""
 
     file_path = f"{folder_path}/matrices/ADJ-TrafficAssignment_DP.omx"
     mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")

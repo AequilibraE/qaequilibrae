@@ -39,6 +39,7 @@ def test_open_project_menu(ae, qtbot):
 
 
 def test_run_module_menu(ae, qtbot):
+    """Run procedures is labelled correctly and reports that a project is needed."""
     action = next((a for a in ae.menuActions["Project"] if a.text() == "Run procedures"), None)
     assert action is not None, "Menu action 'Run procedures' not found"
     assert action.text() == "Run procedures", "Wrong text content"
@@ -48,6 +49,7 @@ def test_run_module_menu(ae, qtbot):
 
 
 def test_scenarios_menu(ae, qtbot):
+    """Scenarios is labelled correctly and reports that a project is needed."""
     action = next((a for a in ae.menuActions["Project"] if a.text() == "Scenarios"), None)
     assert action is not None, "Menu action 'Scenarios' not found"
     assert action.text() == "Scenarios", "Wrong text content"
@@ -57,6 +59,7 @@ def test_scenarios_menu(ae, qtbot):
 
 
 def test_trip_distribution_menu(ae, qtbot):
+    """Trip distribution is labelled correctly and reports that a project is needed."""
     action = ae.menuActions["Trip distribution"][0]
     assert action.text() == "Trip distribution", "Wrong text content"
     action.trigger()
@@ -65,6 +68,7 @@ def test_trip_distribution_menu(ae, qtbot):
 
 
 def test_shortest_path_menu(ae, qtbot):
+    """Shortest path is labelled correctly and reports that a project is needed."""
     action = ae.menuActions["Path computation"][0]
     assert action.text() == "Shortest path", "Wrong text content"
     action.trigger()
@@ -73,6 +77,7 @@ def test_shortest_path_menu(ae, qtbot):
 
 
 def test_impedance_matrix_menu(ae, qtbot):
+    """Impedance matrix is labelled correctly and reports that a project is needed."""
     action = ae.menuActions["Path computation"][1]
     assert action.text() == "Impedance matrix", "Wrong text content"
     action.trigger()
@@ -81,6 +86,7 @@ def test_impedance_matrix_menu(ae, qtbot):
 
 
 def test_skim_viewer_menu(ae, qtbot):
+    """Skim viewer is labelled correctly and reports that a project is needed."""
     action = ae.menuActions["Path computation"][2]
     assert action.text() == "Skim viewer", "Wrong text content"
     action.trigger()
@@ -89,6 +95,7 @@ def test_skim_viewer_menu(ae, qtbot):
 
 
 def test_traffic_assignment_menu(ae, qtbot):
+    """Traffic assignment is labelled correctly and reports that a project is needed."""
     action = ae.menuActions["Traffic assignment"][0]
     assert action.text() == "Traffic assignment", "Wrong text content"
     action.trigger()
@@ -97,6 +104,7 @@ def test_traffic_assignment_menu(ae, qtbot):
 
 
 def test_route_choice_menu(ae, qtbot):
+    """Route choice is labelled correctly and reports that a project is needed."""
     action = ae.menuActions["Route choice"][0]
     assert action.text() == "Route choice", "Wrong text content"
     action.trigger()
@@ -105,6 +113,7 @@ def test_route_choice_menu(ae, qtbot):
 
 
 def test_gis_desire_lines_menu(ae, qtbot):
+    """Desire lines opens its dialog even with no project, since it works off any layer."""
     from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
 
     def handle_trigger():
@@ -117,6 +126,7 @@ def test_gis_desire_lines_menu(ae, qtbot):
 
 
 def test_gis_stacked_bandwidth_menu(ae, qtbot):
+    """Stacked bandwidth opens its dialog even with no project, since it works off any layer."""
     from qaequilibrae.modules.gis import CreateBandwidthsDialog
 
     def handle_trigger():
@@ -129,6 +139,7 @@ def test_gis_stacked_bandwidth_menu(ae, qtbot):
 
 
 def test_gis_scenario_comparison_menu(ae, qtbot):
+    """Scenario comparison is labelled correctly and reports that a project is needed."""
     action = ae.menuActions["Mapping"][3]
     assert action.text() == "Scenario comparison", "Wrong text content"
     action.trigger()
@@ -143,6 +154,7 @@ def test_help_menu(ae, qtbot):
 
 
 def test_gtfs_importer(ae, qtbot):
+    """Import GTFS is labelled correctly and reports that a project is needed."""
     action = ae.menuActions["Transit"][0]
     assert action.text() == "Import GTFS", "Wrong text content"
     action.trigger()
@@ -151,6 +163,7 @@ def test_gtfs_importer(ae, qtbot):
 
 
 def test_pt_skim_and_assign(ae, qtbot):
+    """Skimming and assignment is labelled correctly and reports that a project is needed."""
     action = ae.menuActions["Transit"][1]
     assert action.text() == "Skimming and assignment", "Wrong text content"
     action.trigger()
@@ -159,6 +172,7 @@ def test_pt_skim_and_assign(ae, qtbot):
 
 
 def test_gtfs_explorer(ae, qtbot):
+    """Explore transit is labelled correctly and reports that a project is needed."""
     action = ae.menuActions["Transit"][2]
     assert action.text() == "Explore transit", "Wrong text content"
     action.trigger()

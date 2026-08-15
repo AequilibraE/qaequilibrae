@@ -72,12 +72,14 @@ def create_dialog_with_matrix(project):
     ],
 )
 def test_has_content(result, expected):
+    """Emptiness is judged without asking a DataFrame for its truth value, which raises."""
     # A procedure returning a DataFrame used to blow up on 'if result', because pandas
     # refuses to give a truth value for one
     assert has_content(result) is expected
 
 
 def test_example_function_with_kwargs(coquimbo_project, qtbot):
+    """A procedure taking keyword arguments from the parameters file runs and reports success."""
     dialog = RunModuleDialog(coquimbo_project)
 
     dialog.cob_function.setCurrentIndex(0)
@@ -90,6 +92,7 @@ def test_example_function_with_kwargs(coquimbo_project, qtbot):
 
 
 def test_run_streams_output_to_log_dialog(coquimbo_project, qtbot):
+    """What a procedure prints is relayed to the log window, which closes out with a finish line."""
     dialog = RunModuleDialog(coquimbo_project)
     select_function(dialog, "example_function_with_kwargs")
 
@@ -107,6 +110,7 @@ def test_run_streams_output_to_log_dialog(coquimbo_project, qtbot):
 
 
 def test_second_run_gets_a_fresh_log_window(coquimbo_project, qtbot):
+    """A second run opens its own log window rather than appending to the first."""
     dialog = RunModuleDialog(coquimbo_project)
     select_function(dialog, "example_function_with_kwargs")
 
@@ -123,6 +127,7 @@ def test_second_run_gets_a_fresh_log_window(coquimbo_project, qtbot):
 
 
 def test_dataframe_result_is_reported(coquimbo_project, qtbot):
+    """A procedure returning a DataFrame is reported as successful, not as an error."""
     dialog = RunModuleDialog(coquimbo_project)
     select_function(dialog, "results_summary")
 
@@ -134,6 +139,7 @@ def test_dataframe_result_is_reported(coquimbo_project, qtbot):
 
 
 def test_failing_procedure_reports_the_error(coquimbo_project, qtbot):
+    """A procedure that raises reports the message and leaves the run button usable."""
     add_run_function(
         coquimbo_project,
         "always_fails",
@@ -153,6 +159,7 @@ def test_failing_procedure_reports_the_error(coquimbo_project, qtbot):
 
 
 def test_log_handler_accepts_records_without_indent(coquimbo_project):
+    """Log records lacking AequilibraE's 'indent_str' are still relayed rather than dropped."""
     # AequilibraE's own records carry no 'indent_str', and a formatter demanding one would
     # silently drop every line the run logs
     dialog = RunModuleDialog(coquimbo_project)
@@ -173,6 +180,7 @@ def test_log_handler_accepts_records_without_indent(coquimbo_project):
 
 
 def test_new_function(coquimbo_project, qtbot):
+    """A procedure added to the project's run folder is offered and writes its results."""
     func_string = """from aequilibrae.context import get_active_project\n
 def create_delaunay(source: str, name: str, computational_view: str, result_name: str, overwrite: bool=False):\n
 \tfrom aequilibrae.utils.create_delaunay_network import DelaunayAnalysis\n
@@ -223,6 +231,7 @@ def wait_for_active_window(qtbot):
 
 
 def test_install_external_libraries(coquimbo_project, qtbot):
+    """A run folder with a requirements.txt gets its dependencies installed before the procedure runs."""
     # This test is a bit time-consuming due to the second QTimer.singleShot waiting
     # 5 seconds for running the installation of the external library.
     folder = coquimbo_project.project.project_base_path

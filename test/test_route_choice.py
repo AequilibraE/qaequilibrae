@@ -13,6 +13,7 @@ from .utilities import create_matrix
 
 @pytest.mark.parametrize("cob_field", ["distance", "free_flow_time"])
 def test_execute_single(sf_project, qtbot, cob_field):
+    """A single origin-destination run draws its route set as a layer, on either cost field."""
     dialog = RouteChoiceDialog(sf_project)
 
     # Choice set generation
@@ -45,6 +46,7 @@ def test_execute_single(sf_project, qtbot, cob_field):
 
 
 def test_execute_single_dialog(coquimbo_project, qtbot):
+    """Retyping the origin and destination redraws the route set for the new pair."""
     project = coquimbo_project.project
     project.network.build_graphs(modes=["c"])
 
@@ -85,6 +87,7 @@ def test_execute_single_dialog(coquimbo_project, qtbot):
 
 @pytest.mark.parametrize("save", [True, False])
 def test_assign_and_save(sf_project, qtbot, save):
+    """A full assignment writes its results table, and optionally the choice sets per origin."""
     dialog = RouteChoiceDialog(sf_project)
 
     # Choice set generation
@@ -123,6 +126,7 @@ def test_assign_and_save(sf_project, qtbot, save):
 
 
 def test_build_and_save(ae_with_project, qtbot):
+    """Building choice sets without assigning still writes one folder per origin."""
     dialog = RouteChoiceDialog(ae_with_project)
 
     dialog.matrices.reload()
@@ -168,6 +172,7 @@ def create_dialog_with_matrix(project):
 
 
 def test_sub_area_analysis(coquimbo_project, qtbot):
+    """A sub-area run restricted to the selected zones writes its results and a parquet of the sets."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     # Select zones
@@ -213,6 +218,7 @@ def test_sub_area_analysis(coquimbo_project, qtbot):
 
 
 def test_select_link_analysis(coquimbo_project, qtbot):
+    """Select link queries produce their own matrix alongside the results table."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     dialog.matrices.reload()
@@ -309,6 +315,7 @@ def test_network_fix_is_picked_up_when_dialog_reopens(sf_project, qtbot):
 # Cost function
 @pytest.mark.parametrize("par", ["", "abc", "0,10", "  "])
 def test_cost_function(coquimbo_project, qtbot, par):
+    """A blank or non-numeric parameter is refused when adding a term to the cost function."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     dialog.ln_parameter.setText(par)
@@ -321,6 +328,7 @@ def test_cost_function(coquimbo_project, qtbot, par):
 
 # Cost function clean-up
 def test_clean_cost_function(coquimbo_project, qtbot):
+    """Terms accumulate into the cost function with their signs, and clearing empties it."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     dialog.ln_parameter.setText("0.11")
@@ -354,6 +362,7 @@ def test_clean_cost_function(coquimbo_project, qtbot):
     [("", "Missing query name"), ("sl1", "Query name already used"), ("sl2", "Please set a link selection")],
 )
 def test_query_name(coquimbo_project, par, error):
+    """A missing, duplicated or empty select link query is refused with its own message."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     dialog.select_links = {"sl1": [[(7369, 1), (20983, 1)]]}
@@ -381,6 +390,7 @@ def test_query_name(coquimbo_project, par, error):
     ],
 )
 def test_max_routes(coquimbo_project, par, error):
+    """Max. routes must be a positive integer, and cannot be zero alongside a zero depth."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     depth = "0" if par == "0" else "1"
@@ -405,6 +415,7 @@ def test_max_routes(coquimbo_project, par, error):
     ],
 )
 def test_max_depth(coquimbo_project, par, error):
+    """Max. depth must be a positive integer, and cannot be zero alongside zero routes."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     routes = "0" if par == "0" else "1"
@@ -428,6 +439,7 @@ def test_max_depth(coquimbo_project, par, error):
     ],
 )
 def test_cutoff(coquimbo_project, par, error):
+    """The probability cutoff must be a positive float between zero and one."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     dialog.max_routes.setText("1")
@@ -451,6 +463,7 @@ def test_cutoff(coquimbo_project, par, error):
     ],
 )
 def test_penalty(coquimbo_project, par, error):
+    """The penalty must be a positive float, and above 1.0 when link penalization is used."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     dialog.cob_algo.setCurrentText("BFSLE with Link Penalization")
@@ -475,6 +488,7 @@ def test_penalty(coquimbo_project, par, error):
     ],
 )
 def test_psl_beta(coquimbo_project, par, error):
+    """The PSL beta must be a positive float."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     dialog.max_routes.setText("1")

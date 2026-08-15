@@ -55,6 +55,7 @@ def _committed_links(project, link_ids):
 
 
 def test_a_line_is_cut_at_every_interior_vertex_sitting_on_a_node():
+    """A line crossing two nodes comes back as three stretches."""
     vertices = _points((0, 0), (1, 1), (2, 2), (3, 3))
     pieces = split_at(vertices, {(1.0, 1.0), (2.0, 2.0)})
 
@@ -66,6 +67,7 @@ def test_a_line_is_cut_at_every_interior_vertex_sitting_on_a_node():
 
 
 def test_a_line_that_only_meets_nodes_at_its_ends_stays_whole():
+    """Nodes at the ends are not interior, so the line is left as one piece."""
     vertices = _points((0, 0), (1, 1), (2, 2))
     pieces = split_at(vertices, {(0.0, 0.0), (2.0, 2.0)})
 
@@ -73,6 +75,7 @@ def test_a_line_that_only_meets_nodes_at_its_ends_stays_whole():
 
 
 def test_a_vertex_repeated_on_a_node_does_not_make_a_link_of_no_length():
+    """A duplicated vertex on a node splits once, rather than producing a zero-length link."""
     vertices = _points((0, 0), (1, 1), (1, 1), (2, 2))
     pieces = split_at(vertices, {(1.0, 1.0)})
 
@@ -83,6 +86,7 @@ def test_a_vertex_repeated_on_a_node_does_not_make_a_link_of_no_length():
 
 
 def test_a_line_revisiting_the_same_node_is_cut_at_both_passes():
+    """A line passing the same node twice is cut on both passes."""
     vertices = _points((0, 0), (1, 1), (2, 0), (1, 1), (0, 2))
     pieces = split_at(vertices, {(1.0, 1.0)})
 
@@ -90,6 +94,7 @@ def test_a_line_revisiting_the_same_node_is_cut_at_both_passes():
 
 
 def test_multipart_geometry_is_only_read_when_it_holds_a_single_line():
+    """Multipart geometries are only read when they hold one line; anything else is left alone."""
     single = QgsGeometry.fromMultiPolylineXY([_points((0, 0), (1, 1))])
     several = QgsGeometry.fromMultiPolylineXY([_points((0, 0), (1, 1)), _points((2, 2), (3, 3))])
 
@@ -99,6 +104,7 @@ def test_multipart_geometry_is_only_read_when_it_holds_a_single_line():
 
 
 def test_digitizing_through_a_node_leaves_one_link_per_stretch(ae_with_project, qtbot):
+    """A link drawn across a node commits as two links sharing that node, with no node added."""
     project = ae_with_project.project
     layer = _links_layer(ae_with_project)
     first, middle, last = _node_coordinates(project, [1, 2, 6])
@@ -145,6 +151,7 @@ def test_a_link_digitized_after_a_split_does_not_reuse_an_id(ae_with_project, qt
 
 
 def test_digitizing_clear_of_the_nodes_leaves_a_single_link(ae_with_project, qtbot):
+    """A link drawn clear of every node is saved exactly as drawn."""
     layer = _links_layer(ae_with_project)
     first, last = _node_coordinates(ae_with_project.project, [1, 6])
     midpoint = ((first[0] + last[0]) / 2, (first[1] + last[1]) / 2 + 0.01)
@@ -159,6 +166,7 @@ def test_digitizing_clear_of_the_nodes_leaves_a_single_link(ae_with_project, qtb
 
 
 def test_the_toggle_stops_the_link_from_being_broken(ae_with_project, qtbot):
+    """With the option off, a link drawn across a node is saved whole."""
     layer = _links_layer(ae_with_project)
     vertices = _points(*_node_coordinates(ae_with_project.project, [1, 2, 6]))
 
@@ -175,6 +183,7 @@ def test_the_toggle_stops_the_link_from_being_broken(ae_with_project, qtbot):
 
 
 def test_the_toggle_is_on_by_default_and_survives_being_set(ae_with_project):
+    """The option starts on and remembers being switched off and back on."""
     assert LinkSplitter.enabled()
 
     LinkSplitter.set_enabled(False)
@@ -187,6 +196,7 @@ def test_the_toggle_is_on_by_default_and_survives_being_set(ae_with_project):
 
 
 def test_only_the_links_layer_is_watched(ae_with_project):
+    """Only the links layer is watched, and it is dropped when removed from the map."""
     splitter = ae_with_project.splitter
     nodes_layer_id = ae_with_project.layers["nodes"][1]
     links_layer_id = ae_with_project.layers["links"][1]

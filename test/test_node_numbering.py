@@ -18,6 +18,7 @@ def _node_ids(project):
 
 
 def test_nodes_created_by_a_new_link_start_at_the_floor(ae_with_project):
+    """Nodes minted for a new link start above the reserved centroid range."""
     project = ae_with_project.project
     existing = _node_ids(project)
 
@@ -30,6 +31,7 @@ def test_nodes_created_by_a_new_link_start_at_the_floor(ae_with_project):
 
 
 def test_node_ids_keep_climbing_once_past_the_floor(ae_with_project):
+    """Subsequent links keep counting up from there rather than restarting."""
     project = ae_with_project.project
     existing = _node_ids(project)
 
@@ -41,6 +43,7 @@ def test_node_ids_keep_climbing_once_past_the_floor(ae_with_project):
 
 
 def test_reserving_twice_leaves_the_triggers_alone(ae_with_project):
+    """Reserving again is a no-op, so the triggers are not rewritten or nested."""
     project = ae_with_project.project
 
     with project.db_connection as conn:
@@ -55,6 +58,7 @@ def test_reserving_twice_leaves_the_triggers_alone(ae_with_project):
 
 
 def test_the_floor_can_be_moved_without_nesting_the_expression(ae_with_project):
+    """The floor can be set to a different value and takes effect cleanly."""
     project = ae_with_project.project
     reserve_node_ids_for_centroids(project, 500_000)
 
@@ -64,6 +68,7 @@ def test_the_floor_can_be_moved_without_nesting_the_expression(ae_with_project):
 
 
 def test_existing_node_ids_are_left_alone(ae_with_project):
+    """Nodes already in the model keep the ids they had."""
     project = ae_with_project.project
 
     assert _node_ids(project) == list(range(1, 25))

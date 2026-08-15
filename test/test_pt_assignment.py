@@ -23,6 +23,7 @@ def create_dialog_with_matrix(project):
 
 
 def test_assignment(qtbot, coquimbo_project):
+    """A transit assignment writes its volumes to a results table and stores the graph it built."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     # select period
@@ -55,6 +56,7 @@ def test_assignment(qtbot, coquimbo_project):
 
 
 def test_skimming(qtbot, coquimbo_project):
+    """Skims can be added and removed from the selection, and only the remaining ones are saved."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     # select period
@@ -112,6 +114,7 @@ def mock_period(mocker):
 
 
 def test_create_period(qtbot, coquimbo_project, mock_period):
+    """A new time period is added to the project and can then be selected for assignment."""
     dialog = create_dialog_with_matrix(coquimbo_project)
     qtbot.mouseClick(dialog.but_add_period, Qt.MouseButton.LeftButton)
 
@@ -125,6 +128,7 @@ def test_create_period(qtbot, coquimbo_project, mock_period):
 
 
 def test_new_period_dialog(ae_with_project):
+    """The period dialog holds the start time, end time and description it was given."""
     dialog = NewPeriodDialog(ae_with_project)
 
     # Set the start and end times
@@ -140,6 +144,7 @@ def test_new_period_dialog(ae_with_project):
 
 
 def test_period_not_selected(qtbot, coquimbo_project):
+    """Skimming without a period selected warns instead of running."""
     dialog = create_dialog_with_matrix(coquimbo_project)
 
     dialog.available_skims_table.selectRow(0)
@@ -154,6 +159,7 @@ def test_period_not_selected(qtbot, coquimbo_project):
 
 
 def test_no_skims(qtbot, coquimbo_project):
+    """Skimming with nothing in the selection warns instead of running."""
     dialog = create_dialog_with_matrix(coquimbo_project)
     dialog.tbl_periods.selectRow(0)
 
@@ -167,6 +173,7 @@ def test_no_skims(qtbot, coquimbo_project):
 
 @pytest.mark.parametrize("name", ["", "     "])
 def test_no_matrix_name(qtbot, coquimbo_project, name):
+    """A blank or whitespace-only matrix name is rejected with a warning."""
     dialog = create_dialog_with_matrix(coquimbo_project)
     dialog.tbl_periods.selectRow(0)
 
@@ -183,6 +190,7 @@ def test_no_matrix_name(qtbot, coquimbo_project, name):
 
 @pytest.mark.parametrize("name", ["", "     "])
 def test_no_pt_class_name(qtbot, coquimbo_project, name):
+    """A blank or whitespace-only transit class name is rejected with a warning."""
     dialog = create_dialog_with_matrix(coquimbo_project)
     dialog.tbl_periods.selectRow(0)
 
@@ -198,6 +206,7 @@ def test_no_pt_class_name(qtbot, coquimbo_project, name):
 
 @pytest.mark.parametrize("name", ["", "     "])
 def test_no_results_name(qtbot, coquimbo_project, name):
+    """A blank or whitespace-only result name is rejected with a warning."""
     dialog = create_dialog_with_matrix(coquimbo_project)
     dialog.tbl_periods.selectRow(0)
 
@@ -212,6 +221,7 @@ def test_no_results_name(qtbot, coquimbo_project, name):
 
 
 def test_no_graph(qtbot, coquimbo_project, mock_period):
+    """Asking to reuse a stored graph warns when the project holds none at all."""
     dialog = create_dialog_with_matrix(coquimbo_project)
     qtbot.mouseClick(dialog.but_add_period, Qt.MouseButton.LeftButton)
 
@@ -228,6 +238,7 @@ def test_no_graph(qtbot, coquimbo_project, mock_period):
 
 
 def test_no_graph_for_period(qtbot, coquimbo_project, mock_period):
+    """A stored graph belonging to another period does not count as one for this period."""
     # Save a graph in the project before
     data = Transit(coquimbo_project.project)
 
@@ -258,6 +269,7 @@ def test_no_graph_for_period(qtbot, coquimbo_project, mock_period):
 
 
 def test_reuse_graph_in_project(qtbot, coquimbo_project):
+    """A graph stored for the selected period is reused, and the assignment runs off it."""
     # Save a graph in the project before
     data = Transit(coquimbo_project.project)
 

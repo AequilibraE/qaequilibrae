@@ -4,6 +4,7 @@ from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_fr
 
 
 def test_layer_from_dataframe():
+    """A dataframe becomes a layer whose features carry the same values, row for row."""
     data = {"id": [1, 2, 3], "name": ["foo", "bar", "car"]}
     df = pd.DataFrame(data)
 

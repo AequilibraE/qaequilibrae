@@ -35,6 +35,7 @@ places = ["Valparaiso", "Santiago", "Antofagasta"]
 @pytest.mark.parametrize("ops", ["ENCLOSED", "TOUCHING", "CLOSEST"])
 @pytest.mark.parametrize("to_layer", ["polygon", "linestring", "point"])
 def test_simple_tag_polygon(coquimbo_project, to_layer, ops):
+    """Zone names are tagged onto polygon, line and point layers by enclosure, touching or proximity."""
     if to_layer == "point" and ops == "TOUCHING":
         pytest.skip(f"'{ops}' does not apply to polygon-{to_layer}")
 
@@ -93,6 +94,7 @@ def test_simple_tag_polygon(coquimbo_project, to_layer, ops):
 @pytest.mark.parametrize("ops", ["ENCLOSED", "TOUCHING", "CLOSEST"])
 @pytest.mark.parametrize("to_layer", ["polygon", "linestring", "point"])
 def test_simple_tag_linestring(coquimbo_project, to_layer, ops):
+    """Link names are tagged from a line layer, with the operations that apply to each target type."""
     if to_layer != "polygon" and ops == "ENCLOSED":
         pytest.skip(f"'{ops}' does not apply to linestring-{to_layer}")
     if to_layer == "point" and ops == "TOUCHING":
@@ -144,6 +146,7 @@ def test_simple_tag_linestring(coquimbo_project, to_layer, ops):
 @pytest.mark.parametrize("ops", ["ENCLOSED", "CLOSEST"])
 @pytest.mark.parametrize("to_layer", ["polygon", "linestring", "point"])
 def test_simple_tag_point(coquimbo_project, to_layer, ops):
+    """Node attributes are tagged from a point layer onto each target geometry type."""
     if to_layer != "polygon" and ops == "ENCLOSED":
         pytest.skip(f"'{ops}' does not apply to point-{to_layer}")
 

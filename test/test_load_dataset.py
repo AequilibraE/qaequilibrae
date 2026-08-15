@@ -10,6 +10,7 @@ from qaequilibrae.modules.matrix_procedures.load_dataset_dialog import LoadDatas
 
 @pytest.mark.parametrize("method", ["csv", "parquet", "open layer"])
 def test_load_dialog(ae_with_project, method, folder_path, timeoutDetector):
+    """A vector dataset loads from CSV, parquet or an open layer, keeping its fields and totals."""
     df = pd.read_csv("test/data/SiouxFalls_project/synthetic_future_vector.csv")
     _ = layer_from_dataframe(df, "synthetic_future_vector")
 
@@ -45,6 +46,7 @@ def test_load_dialog(ae_with_project, method, folder_path, timeoutDetector):
 
 
 def test_load_dataset_class(folder_path):
+    """The loader class reads a layer into a dataset without going through the dialog."""
     df = pd.read_csv("test/data/SiouxFalls_project/synthetic_future_vector.csv")
     layer = layer_from_dataframe(df, "synthetic_future_vector")
 

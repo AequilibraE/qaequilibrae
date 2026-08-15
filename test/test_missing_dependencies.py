@@ -140,6 +140,7 @@ def test_declining_the_install_is_what_left_the_dependencies_missing(degraded_pl
 
 
 def test_menu_builds_and_every_action_explains_the_missing_dependencies(degraded_plugin, qgis_iface):
+    """The menus are still built without AequilibraE, with Help the one working entry."""
     menu = degraded_plugin.AequilibraEMenu(qgis_iface)
 
     # The menus are present, which is what messages.fourth_message promises
@@ -163,6 +164,7 @@ def test_processing_provider_is_not_registered(degraded_plugin, qgis_iface):
 
 
 def test_logger_falls_back_to_the_standard_library(degraded_plugin, qgis_iface):
+    """Without AequilibraE's logger, the plugin falls back to the standard library's."""
     menu = degraded_plugin.AequilibraEMenu(qgis_iface)
 
     assert menu.logger is not None
@@ -187,6 +189,7 @@ def test_reload_project_does_not_raise_on_a_qgis_project_with_a_model(degraded_p
 
 
 def test_disabled_action_points_at_the_installation_instructions(monkeypatch):
+    """Every stand-in menu entry shows a message carrying the link to the installation instructions."""
     from qaequilibrae import missing_dependencies
 
     message_box = RecordingMessageBox()
@@ -201,6 +204,7 @@ def test_disabled_action_points_at_the_installation_instructions(monkeypatch):
 
 
 def test_stand_ins_absorb_what_the_menu_asks_of_them():
+    """The stand-ins accept every call the menu makes of the real snapping and splitter objects."""
     snapping = DisabledSnapping(object())
     snapping.watch(object())
     snapping.layer_removed(object())

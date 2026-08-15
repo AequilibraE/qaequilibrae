@@ -4,6 +4,7 @@ from qaequilibrae.modules.paths_procedures.impedance_matrix_dialog import Impeda
 
 
 def test_import_impedance_matrix(ae_with_project, qtbot):
+    """Skimming two fields saves a project matrix carrying one core per field."""
     dialog = ImpedanceMatrixDialog(ae_with_project)
 
     dialog.block_paths.setChecked(False)

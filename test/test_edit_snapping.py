@@ -61,6 +61,7 @@ def known_config():
 
 
 def test_editing_turns_snapping_on_for_the_model_layers(snapping, layers):
+    """Editing a model layer switches snapping on, to vertices, for every model layer."""
     links, _, _ = layers
     links.startEditing()
 
@@ -75,6 +76,7 @@ def test_editing_turns_snapping_on_for_the_model_layers(snapping, layers):
 
 
 def test_layers_outside_the_model_are_not_snapped_to(snapping, layers):
+    """Layers that do not belong to the model, such as basemaps, are left out."""
     links, _, _ = layers
     links.startEditing()
 
@@ -82,6 +84,7 @@ def test_layers_outside_the_model_are_not_snapped_to(snapping, layers):
 
 
 def test_editing_any_model_layer_snaps_to_all_of_them(snapping, layers):
+    """Editing the nodes layer snaps to the links layer too, not just to itself."""
     _, nodes, _ = layers
     nodes.startEditing()
 
@@ -91,6 +94,7 @@ def test_editing_any_model_layer_snaps_to_all_of_them(snapping, layers):
 
 
 def test_configuration_is_restored_when_editing_stops(snapping, layers, known_config):
+    """The user's own snapping configuration comes back once editing ends."""
     links, _, _ = layers
 
     links.startEditing()
@@ -105,6 +109,7 @@ def test_configuration_is_restored_when_editing_stops(snapping, layers, known_co
 
 
 def test_configuration_is_restored_only_after_the_last_layer_stops(snapping, layers, known_config):
+    """With two layers being edited, the restore waits for the second one to finish."""
     links, nodes, _ = layers
 
     links.startEditing()
@@ -118,6 +123,7 @@ def test_configuration_is_restored_only_after_the_last_layer_stops(snapping, lay
 
 
 def test_removing_a_layer_while_editing_restores_the_configuration(snapping, layers, known_config):
+    """Removing a layer mid-edit still restores, since removal emits no editingStopped."""
     links, _, _ = layers
     layer_id = links.id()
 
@@ -134,6 +140,7 @@ def test_removing_a_layer_while_editing_restores_the_configuration(snapping, lay
 
 
 def test_unloaded_layers_are_not_snapping_targets(snapping, layers):
+    """A layer built in memory but never added to the map is not a snapping target."""
     links, _, _ = layers
 
     # The menu keeps layers built but never added to the QGIS project
