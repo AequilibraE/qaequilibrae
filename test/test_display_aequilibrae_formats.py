@@ -11,7 +11,6 @@ pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running 
 
 
 def test_display_data_no_path(ae, mocker):
-    """Opening the viewer without a dataset pushes an error to the message bar."""
     function = "qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog.DisplayAequilibraEFormatsDialog.get_file_name"
     mocker.patch(function, return_value=(None, None))
 
@@ -25,7 +24,6 @@ def test_display_data_no_path(ae, mocker):
 
 @pytest.mark.parametrize("path", ["demand.omx", "SiouxFalls.omx"])
 def test_display_data_with_project(tmpdir, ae_with_project, mocker, path):
-    """An OMX matrix is read, listed by core and index, and exported to CSV, with a project open."""
     file_path = f"test/data/SiouxFalls_project/matrices/{path}"
     name, extension = path.split(".")
     file_func = "qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog.DisplayAequilibraEFormatsDialog.get_file_name"
@@ -50,7 +48,6 @@ def test_display_data_with_project(tmpdir, ae_with_project, mocker, path):
 
 @pytest.mark.parametrize("path", ["demand.omx", "SiouxFalls.omx"])
 def test_display_data_without_project(tmpdir, ae, mocker, path):
-    """The same matrix is read and exported with no project open at all."""
     file_path = f"test/data/SiouxFalls_project/matrices/{path}"
     name, extension = path.split(".")
     file_func = "qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog.DisplayAequilibraEFormatsDialog.get_file_name"
@@ -76,7 +73,6 @@ def test_display_data_without_project(tmpdir, ae, mocker, path):
 # TODO: Ideally, we would test if the visualization is working
 @pytest.mark.parametrize("element", ["row", "columns"])
 def test_select_elements(ae_with_project, mocker, element):
-    """Selecting a row or a column writes those values onto the zones layer for display."""
     file_path = "test/data/SiouxFalls_project/matrices/sfalls_skims.omx"
     _, extension = file_path.split(".")
     file_func = "qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog.DisplayAequilibraEFormatsDialog.get_file_name"

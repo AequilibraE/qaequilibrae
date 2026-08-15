@@ -12,7 +12,6 @@ pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running 
 
 
 def test_no_project(ae, mocker, qtbot):
-    """With no project open, only the non-project data tab is offered."""
     file_func = "qaequilibrae.modules.matrix_procedures.load_project_data.DisplayAequilibraEFormatsDialog"
     mocker.patch(file_func)
 
@@ -27,7 +26,6 @@ def test_no_project(ae, mocker, qtbot):
 # TODO: Re-write the tests - they're really time consuming
 @pytest.mark.parametrize("button_clicked", [True, False])
 def test_project(sf_project, mocker, qtbot, button_clicked):
-    """With a project open, matrices and results are listed, and a result joins onto the links layer."""
     proj = run_sfalls_assignment(sf_project)
 
     function = "qaequilibrae.modules.matrix_procedures.load_project_data.DisplayAequilibraEFormatsDialog"

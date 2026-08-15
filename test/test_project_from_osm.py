@@ -58,7 +58,6 @@ def relayed_progress(stages):
 
 
 def test_does_not_flood_the_dialog_with_per_link_progress(qtbot):
-    """Per-link progress is throttled, since relaying every message across threads is what stalls QGIS."""
     # AequilibraE reports a maximum of zero for the stages it iterates a generator over, which
     # is precisely the stage reporting once per link. Every one of these crosses a thread
     # boundary as a queued signal, so relaying them all is what makes QGIS crawl
@@ -71,7 +70,6 @@ def test_does_not_flood_the_dialog_with_per_link_progress(qtbot):
 
 
 def test_relays_the_update_that_completes_a_stage(qtbot):
-    """However fast a stage runs, the update that finishes it still reaches the bar."""
     stages = [["start", 3, "Total polygons: 3"]] + [["update", i, ""] for i in [1, 2, 3]]
 
     relayed = relayed_progress(stages)
@@ -81,7 +79,6 @@ def test_relays_the_update_that_completes_a_stage(qtbot):
 
 
 def test_swallows_the_progress_finishing_only_one_stage(qtbot):
-    """A stage reporting 'finished' is swallowed, since only the procedure knows the import is over."""
     # The downloader and the builder each report "finished", but only the procedure knows
     # when the whole import is over
     relayed = relayed_progress([["start", 1, "Downloading"], ["finished"]])
@@ -90,7 +87,6 @@ def test_swallows_the_progress_finishing_only_one_stage(qtbot):
 
 
 def test_refuses_to_run_without_an_output_folder(dialog, qtbot):
-    """Running without an output folder is refused, rather than building a project in the current directory."""
     # AequilibraE would take an empty path for the current directory and create the project there
     qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
 
@@ -101,7 +97,6 @@ def test_refuses_to_run_without_an_output_folder(dialog, qtbot):
 
 
 def test_refuses_to_run_without_a_place_name(dialog, qtbot, folder_path):
-    """Importing by place name is refused when no place has been typed."""
     dialog.output_path.setText(folder_path)
     dialog.choose_place.setChecked(True)
 
@@ -113,7 +108,6 @@ def test_refuses_to_run_without_a_place_name(dialog, qtbot, folder_path):
 
 
 def test_shows_the_logfile_as_it_is_written(dialog, folder_path):
-    """The log panel tails the file from before it exists, showing only what is newly appended."""
     dialog.output_path.setText(folder_path)
 
     # The log file only shows up when AequilibraE creates the project, so tailing starts before it exists
@@ -140,7 +134,6 @@ def test_shows_the_logfile_as_it_is_written(dialog, folder_path):
 
 
 def test_status_and_progress_use_the_live_log_panel(dialog):
-    """Progress signals and log lines drive the shared live log panel."""
     assert dialog.log_view is dialog.log_panel.text
     assert dialog.progressbar is dialog.log_panel.bar
     assert dialog.progress_label is dialog.log_panel.stage_label
@@ -186,7 +179,6 @@ def test_panel_shows_the_imported_model(dialog, folder_path, patch_report_dialog
 
 @pytest.mark.skipif(not bool(environ.get("CI")), reason="Runs only in GitHub Action")
 def test_choose_place(dialog, qtbot, folder_path, patch_report_dialog):
-    """Importing by place name builds a project with links and nodes in it."""
     dialog.choose_place.setChecked(True)
     dialog.place.setText("Abrolhos Archipelago, Brazil")
 
@@ -212,7 +204,6 @@ def test_choose_place(dialog, qtbot, folder_path, patch_report_dialog):
 
 @pytest.mark.skipif(not bool(environ.get("CI")), reason="Runs only in GitHub Action")
 def test_select_canvas_area(dialog, qtbot, folder_path, patch_report_dialog):
-    """Importing the canvas extent builds a project with links and nodes in it."""
     # Define the extent you want to zoom to (xmin, ymin, xmax, ymax)
     # We'll still use Abrolhos Archipelago
     extent = QgsRectangle(-38.712296, -17.981662, -38.691573, -17.96017)
@@ -243,7 +234,6 @@ def test_select_canvas_area(dialog, qtbot, folder_path, patch_report_dialog):
 
 @pytest.mark.skipif(not bool(environ.get("CI")), reason="Runs only in GitHub Action")
 def test_place_not_found_keeps_the_dialog_open(dialog, qtbot, folder_path):
-    """A place that cannot be found leaves the dialog usable and no project open."""
     dialog.choose_place.setChecked(True)
     dialog.place.setText("Nowhere in particular, made up on the spot")
     dialog.output_path.setText(folder_path)

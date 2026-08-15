@@ -23,7 +23,6 @@ def model_path(sf_project):
 
 @pytest.mark.parametrize("composite", [True, False])
 def test_compare_scenarios(ae, model_path, composite):
-    """Comparing two result sets builds a layer carrying both scenarios' flows, composite or difference."""
 
     _run_load_project_from_path(ae, model_path)
 

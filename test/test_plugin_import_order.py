@@ -110,12 +110,10 @@ def plugin_tree():
 
 
 def test_plugin_puts_its_packages_folder_on_the_path(plugin_tree):
-    """qaequilibrae.py still adds its vendored packages folder to sys.path."""
     assert bootstrap_line(plugin_tree) > 0, f"{PLUGIN_MODULE} no longer adds `packages` to sys.path"
 
 
 def test_nothing_imports_aequilibrae_before_the_packages_bootstrap(plugin_tree):
-    """No import above that line reaches AequilibraE, which on a fresh install would kill the plugin."""
     offenders = list(
         imports_reaching_aequilibrae(PLUGIN_MODULE, chain=[], seen=set(), before_line=bootstrap_line(plugin_tree))
     )

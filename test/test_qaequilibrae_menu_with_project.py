@@ -28,14 +28,12 @@ def check_if_new_active_window_matches_class(qtbot, windowClass):
 
 
 def test_load_project(ae_with_project):
-    """Loading a project through the panel leaves it open with no errors reported."""
     messagebar = ae_with_project.iface.messageBar()
     assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
     assert ae_with_project.project is not None, "project should be loaded"
 
 
 def test_run_module_menu(coquimbo_project, qtbot):
-    """Run procedures opens its dialog once a project is open."""
     from qaequilibrae.modules.project_procedures import RunModuleDialog
 
     def handle_trigger():
@@ -50,7 +48,6 @@ def test_run_module_menu(coquimbo_project, qtbot):
 
 
 def test_scenarios_menu(ae_with_project, qtbot):
-    """Scenarios opens its dialog once a project is open."""
     from qaequilibrae.modules.project_procedures import CreateScenariosDialog
 
     def handle_trigger():
@@ -65,7 +62,6 @@ def test_scenarios_menu(ae_with_project, qtbot):
 
 
 def test_trip_distribution_menu(ae_with_project, qtbot):
-    """Trip distribution opens its dialog once a project is open."""
     from qaequilibrae.modules.distribution_procedures import DistributionModelsDialog
 
     def handle_trigger():
@@ -80,7 +76,6 @@ def test_trip_distribution_menu(ae_with_project, qtbot):
 
 
 def test_shortest_path_menu(ae_with_project, qtbot):
-    """Shortest path opens its dialog once a project is open."""
     from qaequilibrae.modules.paths_procedures.show_shortest_path_dialog import ShortestPathDialog
 
     def handle_trigger():
@@ -95,7 +90,6 @@ def test_shortest_path_menu(ae_with_project, qtbot):
 
 
 def test_impedance_matrix_menu(ae_with_project, qtbot):
-    """Impedance matrix opens its dialog once a project is open."""
     from qaequilibrae.modules.paths_procedures.impedance_matrix_dialog import ImpedanceMatrixDialog
 
     def handle_trigger():
@@ -110,7 +104,6 @@ def test_impedance_matrix_menu(ae_with_project, qtbot):
 
 
 def test_skim_viewer_menu(ae_with_project, qtbot):
-    """Skim viewer asks for an active layer before it will open."""
     from qaequilibrae.modules.paths_procedures.skim_viewer_dialog import SkimViewerDialog
 
     def handle_trigger():
@@ -127,7 +120,6 @@ def test_skim_viewer_menu(ae_with_project, qtbot):
 
 
 def test_traffic_assignment_menu(ae_with_project, qtbot):
-    """Traffic assignment opens its dialog once a project is open."""
     from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
     def handle_trigger():
@@ -142,7 +134,6 @@ def test_traffic_assignment_menu(ae_with_project, qtbot):
 
 
 def test_route_choice_menu(ae_with_project, qtbot):
-    """Route choice opens its dialog once a project is open."""
     from qaequilibrae.modules.paths_procedures.route_choice_dialog import RouteChoiceDialog
 
     def handle_trigger():
@@ -157,7 +148,6 @@ def test_route_choice_menu(ae_with_project, qtbot):
 
 
 def test_display_project_data_menu(ae_with_project, qtbot):
-    """Visualize data opens its dialog once a project is open."""
     from qaequilibrae.modules.matrix_procedures import LoadProjectDataDialog
 
     def handle_trigger():
@@ -172,7 +162,6 @@ def test_display_project_data_menu(ae_with_project, qtbot):
 
 
 def test_gis_desire_lines_menu(ae_with_project, qtbot):
-    """Desire lines opens its dialog once a project is open."""
     from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
 
     def handle_trigger():
@@ -187,7 +176,6 @@ def test_gis_desire_lines_menu(ae_with_project, qtbot):
 
 
 def test_gis_stacked_bandwidth_menu(ae_with_project, qtbot):
-    """Stacked bandwidth opens its dialog once a project is open."""
     from qaequilibrae.modules.gis import CreateBandwidthsDialog
 
     def handle_trigger():
@@ -202,7 +190,6 @@ def test_gis_stacked_bandwidth_menu(ae_with_project, qtbot):
 
 
 def test_gis_scenario_comparison_menu(ae_with_project, qtbot):
-    """Scenario comparison opens its dialog once a project is open."""
     from qaequilibrae.modules.gis import CompareScenariosDialog
 
     def handle_trigger():
@@ -217,7 +204,6 @@ def test_gis_scenario_comparison_menu(ae_with_project, qtbot):
 
 
 def test_gtfs_importer(ae_with_project, qtbot):
-    """Import GTFS opens its dialog once a project is open."""
     from qaequilibrae.modules.transit_procedures.gtfs_importer import GTFSImporter
 
     def handle_trigger():
@@ -232,7 +218,6 @@ def test_gtfs_importer(ae_with_project, qtbot):
 
 
 def test_gtfs_explorer(sf_project, qtbot):
-    """Explore transit reports that a GTFS feed is needed on a project without one."""
     action = sf_project.menuActions["Transit"][2]
     assert action.text() == "Explore transit", "Wrong text content"
     action.trigger()

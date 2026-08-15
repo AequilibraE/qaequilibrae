@@ -8,7 +8,6 @@ from qaequilibrae.modules.project_procedures.create_examples_dialog import Creat
 
 @pytest.mark.parametrize("place_name", ["coquimbo", "nauru", "sioux_falls"])
 def test_create_example(ae, place_name, folder_path):
-    """Each bundled example model can be created into a folder of its own."""
     dialog = CreateExampleDialog(ae)
 
     dialog.place = place_name

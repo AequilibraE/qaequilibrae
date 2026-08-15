@@ -8,7 +8,6 @@ from qaequilibrae.modules.transit_procedures.gtfs_importer import GTFSImporter
 
 
 def test_add_new_feed(pt_no_feed, mocker):
-    """A GTFS feed imported into a project with no transit registers its agency."""
     mocker.patch(
         "qaequilibrae.modules.transit_procedures.gtfs_feed.GTFSFeed.open_feed",
     )
@@ -43,7 +42,6 @@ def test_add_new_feed(pt_no_feed, mocker):
 
 
 def test_gtfs_import_progress_uses_shared_bridge(pt_no_feed):
-    """Progress signals from the importer drive its bar and stage label, and clear on finish."""
     importer = GTFSImporter(pt_no_feed)
 
     importer.signal_handler(["start", 9, "Reading GTFS"])
@@ -67,7 +65,6 @@ def test_gtfs_import_progress_uses_shared_bridge(pt_no_feed):
     [(False, (2016, 6, 17), "New agency"), (True, (2016, 8, 21), "Other agency")],
 )
 def test_add_other_feed(pt_project, set_agency, set_date, is_checked, mocker):
-    """A second feed either replaces the existing routes or is added alongside them."""
     mocker.patch(
         "qaequilibrae.modules.transit_procedures.gtfs_feed.GTFSFeed.open_feed",
     )

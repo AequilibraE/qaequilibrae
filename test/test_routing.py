@@ -8,7 +8,6 @@ from qaequilibrae.modules.routing_procedures.tsp_procedure import TSPProcedure
 
 @pytest.mark.parametrize("in_selection", [False, True])
 def test_create_from_centroids(ae_with_project, in_selection):
-    """A tour over every centroid is solved, and drawn as layers when asked for."""
     dialog = TSPDialog(ae_with_project)
 
     dialog.chb_block.setChecked(True)
@@ -32,7 +31,6 @@ def test_create_from_centroids(ae_with_project, in_selection):
 
 @pytest.mark.parametrize("in_selection", [False, True])
 def test_create_from_nodes(pt_project, in_selection):
-    """A tour over the selected nodes is solved from the chosen starting node."""
     nodes = pt_project.layers["nodes"][0]
     node_selection = [74034, 74035, 74101]
     nodes.select([f.id() for f in nodes.getFeatures() if f["node_id"] in node_selection])
@@ -62,7 +60,6 @@ def test_create_from_nodes(pt_project, in_selection):
 
 
 def test_nodes_error(pt_no_feed):
-    """Fewer than three selected nodes is refused with a message."""
     nodes = pt_no_feed.layers["nodes"][0]
     node_selection = [74034, 74035]
     nodes.select([f.id() for f in nodes.getFeatures() if f["node_id"] in node_selection])
@@ -85,7 +82,6 @@ def test_nodes_error(pt_no_feed):
 
 
 def test_centroid_error(pt_no_feed):
-    """Fewer than three centroids is refused with a message."""
     dialog = TSPDialog(pt_no_feed)
 
     dialog.rdo_centroids.setChecked(True)
@@ -104,7 +100,6 @@ def test_centroid_error(pt_no_feed):
 
 @pytest.mark.parametrize("has_solution", [True, False])
 def test_routing_procedure(ae_with_project, has_solution):
-    """The solver reports its objective value, or says so when the network admits no tour."""
     import numpy as np
 
     if not has_solution:

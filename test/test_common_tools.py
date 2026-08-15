@@ -32,7 +32,6 @@ from qgis.PyQt.QtWidgets import QDialog
     ],
 )
 def test_get_file_name(mocker, is_filename_chosen, filename, exp_fname, exp_ext):
-    """The chosen filename and its extension are normalised, and cancelling returns nothing."""
     mocker.patch(
         "qaequilibrae.modules.common_tools.get_output_file_name.QFileDialog.exec",
         return_value=is_filename_chosen,
@@ -59,7 +58,6 @@ def test_get_file_name(mocker, is_filename_chosen, filename, exp_fname, exp_ext)
 
 
 def test_get_file_name_uses_and_updates_last_accessed_folder(mocker, tmp_path):
-    """The file dialog opens on the last folder used and records wherever the user ends up."""
     last_folder = tmp_path / "last"
     selected_folder = tmp_path / "selected"
     fallback_folder = tmp_path / "fallback"
@@ -96,7 +94,6 @@ def test_get_file_name_uses_and_updates_last_accessed_folder(mocker, tmp_path):
 
 
 def test_get_output_folder_uses_and_updates_last_accessed_folder(mocker, tmp_path):
-    """The folder dialog likewise opens on the last folder used and records the new one."""
     last_folder = tmp_path / "last"
     selected_folder = tmp_path / "selected"
     fallback_folder = tmp_path / "fallback"

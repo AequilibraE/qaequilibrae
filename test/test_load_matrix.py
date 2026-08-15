@@ -7,7 +7,6 @@ from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrix
 
 # TODO: test removing the matrices
 def test_save_matrix(ae_with_project, folder_path, timeoutDetector):
-    """A sparse origin/destination/value table becomes a square OMX matrix with a 1-based index."""
     file_name = f"{folder_path}/test_matrix.omx"
 
     df = pd.read_csv("test/data/SiouxFalls_project/SiouxFalls_od.csv")

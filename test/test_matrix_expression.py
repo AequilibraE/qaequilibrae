@@ -13,7 +13,6 @@ def matrices():
 
 
 def test_arithmetic_and_transposition(matrices):
-    """The expression the calculator is documented with evaluates as written."""
     # The expression the matrix calculator is documented with
     result = evaluate("(cars - (trucks * 0.25)).T", matrices)
 
@@ -37,14 +36,12 @@ def test_arithmetic_and_transposition(matrices):
     ],
 )
 def test_documented_operations(matrices, expression, expected):
-    """Every documented operator and function returns what its NumPy equivalent would."""
     result = evaluate(expression, matrices)
 
     assert np.allclose(result, expected(matrices["cars"], matrices["trucks"]))
 
 
 def test_null_diag_zeroes_the_diagonal_without_touching_the_input(matrices):
-    """null_diag zeroes the diagonal of a copy, leaving the source matrix alone."""
     result = evaluate("null_diag(cars)", matrices)
 
     assert np.array_equal(np.diag(result), np.zeros(3))
@@ -66,14 +63,12 @@ def test_null_diag_zeroes_the_diagonal_without_touching_the_input(matrices):
     ],
 )
 def test_rejects_anything_outside_matrix_algebra(matrices, expression):
-    """Imports, attribute walks, comprehensions and unknown names are all refused."""
     with pytest.raises(MatrixExpressionError):
         evaluate(expression, matrices)
 
 
 @pytest.mark.parametrize("expression", ["np.min(cars)", "cars.min()"])
 def test_a_qualified_call_says_so_rather_than_blaming_the_function(matrices, expression):
-    """A qualified call is reported as such, not as an unknown function the user does have."""
     # 'min' is supported, so reporting it as unknown would send people looking in the wrong place
     with pytest.raises(MatrixExpressionError, match="unqualified") as error:
         evaluate(expression, matrices)

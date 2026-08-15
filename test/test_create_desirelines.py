@@ -7,7 +7,6 @@ from qaequilibrae.modules.gis.desire_lines_procedure import DesireLinesProcedure
 
 @pytest.mark.parametrize("is_delaunay", [True, False])
 def test_desirelines(ae_with_project, is_delaunay):
-    """Desire lines and their Delaunay variant are each built from the demand matrix over the nodes layer."""
     # Activate nodes layer
     ae_with_project.load_layer_by_name("nodes")
 

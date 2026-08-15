@@ -2,7 +2,6 @@ from qaequilibrae.modules.common_tools.parameters_dialog import ParameterDialog
 
 
 def test_load_parameters_dialog(ae_with_project, qtbot):
-    """A malformed parameter tree is refused, and edits made after a reset are saved."""
     dialog = ParameterDialog(ae_with_project)
 
     assert dialog.but_close.text() == "Cancel and close"

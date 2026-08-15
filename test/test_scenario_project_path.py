@@ -4,7 +4,6 @@ from qaequilibrae.modules.menu_actions.load_project_action import _project_root,
 
 
 def test_base_path_is_root_while_scenario_is_active(sf_project):
-    """With a scenario active, layer storage still resolves to the project root, not the scenario folder."""
     root = Path(sf_project.project.project_base_path)
 
     sf_project.project.clone_scenario("a_scenario", "Scenario for test")
@@ -18,7 +17,6 @@ def test_base_path_is_root_while_scenario_is_active(sf_project):
 
 
 def test_project_root_maps_scenario_folder_back(sf_project, tmp_path):
-    """A scenario folder maps back to its root, while an unrelated 'scenarios' path is left alone."""
     root = Path(sf_project.project.project_base_path)
     sf_project.project.clone_scenario("a_scenario", "Scenario for test")
 

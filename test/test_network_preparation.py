@@ -12,7 +12,6 @@ pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running 
 
 @pytest.mark.parametrize("is_node", [True, False])
 def test_prepare_network(folder_path, ae, is_node):
-    """A link layer becomes a network, either against existing nodes or with new ones numbered from a given start."""
 
     load_test_layer(folder_path, "link")
     if is_node:

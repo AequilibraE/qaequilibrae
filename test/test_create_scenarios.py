@@ -4,7 +4,6 @@ from qaequilibrae.modules.project_procedures import CreateScenariosDialog
 
 
 def test_create_empty_scenario(sf_project, qtbot):
-    """An empty scenario is registered under the name and description given."""
     dialog = CreateScenariosDialog(sf_project)
 
     qtbot.mouseClick(dialog.rdo_create, Qt.MouseButton.LeftButton)
@@ -23,7 +22,6 @@ def test_create_empty_scenario(sf_project, qtbot):
 
 
 def test_clone_scenario(sf_project, qtbot):
-    """Cloning defaults to the active scenario and records the new name and description."""
     dialog = CreateScenariosDialog(sf_project)
 
     dialog.txt_name.setText("test_clone_root_scenario")
@@ -40,7 +38,6 @@ def test_clone_scenario(sf_project, qtbot):
 
 
 def test_clone_scenario_from_another(sf_project, qtbot):
-    """A clone of a non-root scenario carries that scenario's network, not root's."""
     # Let's create and edit a scenario to be different than 'root' we'll test
     # if it was properly cloned.
     project = sf_project.project

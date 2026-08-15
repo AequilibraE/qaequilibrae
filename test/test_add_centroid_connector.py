@@ -9,7 +9,6 @@ from .utilities import create_centroids_layer
 
 @pytest.mark.parametrize("in_zone", [True, False])
 def test_add_connectors_from_zones_dialog(pt_no_feed, in_zone):
-    """One connector per zone is built from the zoning layer, optionally kept inside the zone."""
     dialog = AddConnectorsDialog(pt_no_feed)
     dialog.rdo_zone.setChecked(True)
     dialog.chb_zone.setChecked(in_zone)
@@ -31,7 +30,6 @@ def test_add_connectors_from_zones_dialog(pt_no_feed, in_zone):
 
 
 def test_add_connectors_from_zones_procedure(pt_no_feed):
-    """Asking the zone-based procedure for two connectors gives every centroid two of them."""
     dialog = AddConnectorsDialog(pt_no_feed)
     dialog.source = "zone"
 
@@ -65,7 +63,6 @@ def test_add_connectors_from_zones_procedure(pt_no_feed):
     ],
 )
 def test_add_connectors_from_network_dialog(pt_no_feed, node_id, radius, point):
-    """Connectors are only built to nodes within the search radius, so too small a radius finds none."""
     dialog = AddConnectorsDialog(pt_no_feed)
     dialog.rdo_network.setChecked(True)
 
@@ -97,7 +94,6 @@ def test_add_connectors_from_network_dialog(pt_no_feed, node_id, radius, point):
 def test_add_connectors_from_network_procedure(
     pt_no_feed,
 ):
-    """The network-based procedure connects a centroid to the nearest node inside the radius."""
     dialog = AddConnectorsDialog(pt_no_feed)
 
     nodes = dialog.project.network.nodes
@@ -125,7 +121,6 @@ def test_add_connectors_from_network_procedure(
 
 
 def test_add_connectors_from_layer_dialog(pt_no_feed):
-    """Centroids taken from a chosen layer get connectors of their own."""
     create_centroids_layer()
 
     dialog = AddConnectorsDialog(pt_no_feed)
@@ -146,7 +141,6 @@ def test_add_connectors_from_layer_dialog(pt_no_feed):
 
 
 def test_add_connectors_from_layer_procedure(pt_no_feed):
-    """The layer-based procedure reads centroid IDs from the named field and connects them."""
     create_centroids_layer()
 
     nodes_layer = QgsProject.instance().mapLayersByName("Centroids")[0]

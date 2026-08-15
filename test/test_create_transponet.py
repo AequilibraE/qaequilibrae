@@ -45,7 +45,6 @@ def map_standard_fields(dialog):
 
 
 def test_dialog_only_offers_standard_fields(ae, folder_path):
-    """Only standard fields are listed, with the ones AequilibraE computes or requires locked accordingly."""
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")
 
@@ -79,7 +78,6 @@ def test_dialog_only_offers_standard_fields(ae, folder_path):
 
 
 def test_progress_uses_shared_bridge(ae, folder_path):
-    """Progress signals from the worker drive the dialog's bar and label."""
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")
 
@@ -95,7 +93,6 @@ def test_progress_uses_shared_bridge(ae, folder_path):
 
 
 def test_dialog(ae, folder_path):
-    """A project built from node and link layers carries the mapped fields, link types and modes."""
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")
 
@@ -155,7 +152,6 @@ def test_dialog_opens_the_model_it_creates(ae, folder_path):
 
 
 def test_dialog_bringing_extra_field_from_layer(ae, folder_path):
-    """A non-standard field can be pulled in from the layer and reaches the new project."""
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")
 
@@ -181,7 +177,6 @@ def test_dialog_bringing_extra_field_from_layer(ae, folder_path):
 
 
 def test_dialog_initializing_link_id(ae, folder_path):
-    """Leaving link_id uninitialized has QAequilibraE number the links itself."""
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")
 
@@ -205,7 +200,6 @@ def test_dialog_initializing_link_id(ae, folder_path):
 
 
 def test_procedure(ae, folder_path):
-    """The procedure builds the same project without going through the dialog."""
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")
 
@@ -243,7 +237,6 @@ def test_procedure(ae, folder_path):
 
 
 def test_procedure_without_link_id(ae, folder_path):
-    """The procedure numbers the links itself when the layer supplies no link_id."""
     load_test_layer(folder_path, "node")
     load_test_layer(folder_path, "link")
 

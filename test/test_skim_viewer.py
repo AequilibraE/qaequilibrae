@@ -10,7 +10,6 @@ from .utilities import run_sfalls_assignment
 # TODO: ideally, we would test if all the views are correct.
 @pytest.mark.parametrize("layer", ["nodes", "zones"])
 def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, layer, qgis_iface):
-    """Skims from a chosen origin are joined onto the active nodes or zones layer."""
     lyr = ae_with_project.layers[layer][0]
     QgsProject.instance().addMapLayer(lyr)
     qgis_iface.setActiveLayer(lyr)
@@ -40,7 +39,6 @@ def test_plot_without_joined_results(ae_with_project, qtbot, timeoutDetector, la
 
 
 def test_parameter_changed(ae_with_project, qtbot, timeoutDetector, qgis_iface):
-    """Changing centroid blocking redraws the values; changing to an identical field does not."""
     lyr = ae_with_project.layers["nodes"][0]
     QgsProject.instance().addMapLayer(lyr)
     qgis_iface.setActiveLayer(lyr)
@@ -103,7 +101,6 @@ def test_parameter_changed(ae_with_project, qtbot, timeoutDetector, qgis_iface):
 
 
 def test_plot_with_joined_results(sf_project, qtbot, timeoutDetector, mocker, qgis_iface):
-    """Fields joined from an assignment become skimmable, and picking another origin redraws."""
     lyr = sf_project.layers["nodes"][0]
     QgsProject.instance().addMapLayer(lyr)
     qgis_iface.setActiveLayer(lyr)
@@ -182,7 +179,6 @@ def test_plot_with_joined_results(sf_project, qtbot, timeoutDetector, mocker, qg
     ],
 )
 def test_start_id_errors(ae_with_project, qtbot, timeoutDetector, layer, par, error, qgis_iface):
-    """A non-numeric or non-existent start ID is refused with a message naming the problem."""
     lyr = ae_with_project.layers[layer][0]
     QgsProject.instance().addMapLayer(lyr)
     qgis_iface.setActiveLayer(lyr)

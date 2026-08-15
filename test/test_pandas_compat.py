@@ -14,14 +14,12 @@ def string_storage():
 
 
 def test_detects_pyarrow_without_regex_kernels(monkeypatch):
-    """A PyArrow build missing the regex kernels is recognised as such."""
     monkeypatch.delattr(pc, "match_substring_regex", raising=False)
 
     assert pyarrow_lacks_regex_kernels()
 
 
 def test_leaves_a_healthy_pyarrow_alone(monkeypatch, string_storage):
-    """A PyArrow that does have the kernels is left as pandas' string storage."""
     # Set the kernels so the test also runs on installs whose PyArrow lacks them
     for kernel in ("match_substring_regex", "replace_substring_regex", "count_substring_regex"):
         monkeypatch.setattr(pc, kernel, getattr(pc, kernel, object()), raising=False)
@@ -33,7 +31,6 @@ def test_leaves_a_healthy_pyarrow_alone(monkeypatch, string_storage):
 
 
 def test_regex_string_operations_work_after_the_fallback(monkeypatch, string_storage):
-    """After falling back to Python strings, the mode-filtering regex AequilibraE uses still works."""
     monkeypatch.delattr(pc, "match_substring_regex", raising=False)
 
     assert ensure_regex_capable_strings()

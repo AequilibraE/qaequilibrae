@@ -30,7 +30,6 @@ def qgis_app():
 
 
 def test_provider_exists(qgis_app):
-    """The AequilibraE provider registers itself with the QGIS processing registry."""
     provider = Provider()
     QgsApplication.processingRegistry().addProvider(provider)
 
@@ -41,7 +40,6 @@ def test_provider_exists(qgis_app):
 
 @pytest.mark.parametrize("format", [0, 1])
 def test_export_matrix(folder_path, format):
-    """A matrix is exported to a file in either of the offered formats."""
     makedirs(folder_path)
 
     parameters = {
@@ -60,7 +58,6 @@ def test_export_matrix(folder_path, format):
 
 
 def test_add_links_from_layer(ae_with_project):
-    """Links imported from a layer land in the project, with their nodes built for them."""
     folder_path = ae_with_project.project.project_base_path
 
     load_test_layer(ae_with_project.project.project_base_path, "link")
@@ -88,7 +85,6 @@ def test_add_links_from_layer(ae_with_project):
 
 
 def test_matrix_calc(folder_path):
-    """A matrix expression is evaluated and written out under the requested core name."""
     makedirs(folder_path)
 
     parameters = {
@@ -115,7 +111,6 @@ def test_matrix_calc(folder_path):
 
 
 def test_matrix_calc_rejects_a_result_that_is_not_a_matrix(folder_path):
-    """An expression collapsing to a single number is refused, and no file is written."""
     makedirs(folder_path)
 
     # min() collapses to a single number, which cannot be written out as a matrix
@@ -138,7 +133,6 @@ def test_matrix_calc_rejects_a_result_that_is_not_a_matrix(folder_path):
 
 
 def test_trip_length_distribution(ae_with_project, folder_path):
-    """A trip length distribution is plotted from a demand matrix and a skim."""
     matrices = ae_with_project.project.matrices
     mat_names = matrices.list()["name"].tolist()
 
@@ -174,7 +168,6 @@ def test_trip_length_distribution(ae_with_project, folder_path):
 
 
 def test_collapse_links(folder_path):
-    """Collapsing the named links leaves the network with fewer links and nodes."""
     project = create_example(folder_path, "nauru")
     links_before = project.network.count_links()
     nodes_before = project.network.count_nodes()
@@ -196,7 +189,6 @@ def test_collapse_links(folder_path):
 
 
 def test_create_empty_project_defaults_the_model_name():
-    """The model name parameter offers 'new model' as its default."""
     action = CreateEmptyProject()
     action.initAlgorithm()
 
@@ -205,7 +197,6 @@ def test_create_empty_project_defaults_the_model_name():
 
 @pytest.mark.parametrize("pre_create_folder", [True, False])
 def test_create_empty_project(tmp_path, pre_create_folder):
-    """An empty project is created, with its modes and link types, into a new or empty folder."""
     parent_folder = str(tmp_path)
     project_folder = join(parent_folder, "new model")
 
@@ -238,7 +229,6 @@ def test_create_empty_project(tmp_path, pre_create_folder):
 
 
 def test_create_empty_project_on_populated_folder(tmp_path):
-    """Creating into a folder that already holds a model is refused."""
     create_example(join(str(tmp_path), "nauru"), "nauru").close()
 
     parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "nauru"}
@@ -254,7 +244,6 @@ def test_create_empty_project_on_populated_folder(tmp_path):
 
 @pytest.mark.parametrize("model_name", ["", "   ", "sub/folder", "sub\\folder", "model:name", ".", ".."])
 def test_create_empty_project_with_unusable_model_name(tmp_path, model_name):
-    """Blank, path-like and dot model names are refused, leaving the parent folder untouched."""
     parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": model_name}
 
     action = CreateEmptyProject()
@@ -270,7 +259,6 @@ def test_create_empty_project_with_unusable_model_name(tmp_path, model_name):
 
 
 def test_network_simplifier(folder_path):
-    """Simplifying the network leaves it with fewer links and nodes than it started with."""
     project = create_example(folder_path, "nauru")
     links_before = project.network.count_links()
     nodes_before = project.network.count_nodes()
