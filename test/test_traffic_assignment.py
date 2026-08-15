@@ -12,6 +12,7 @@ from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import Traf
 
 
 def test_nan_demand_is_replaced_with_zero(sf_project, qtbot, mocker):
+    """A NaN in the demand matrix is zeroed for the assignment, and logged, without touching the file."""
     matrix_path = sf_project.project.project_base_path / "matrices" / "demand.omx"
     with omx.open_file(matrix_path, "a") as omx_file:
         omx_file["matrix"][0, 1] = np.nan
@@ -135,6 +136,7 @@ def test_skim_options_are_per_class(sf_project, qtbot):
 
 
 def test_skims_and_classes_are_listed_alphabetically(sf_project, qtbot):
+    """Classes, available fields and the skimming table are all ordered by name, not by when they were added."""
     dialog = TrafficAssignmentDialog(sf_project)
     dialog.cob_matrices.setCurrentText("demand_mc")
 
@@ -272,6 +274,7 @@ def test_every_vdf_offers_the_parameters_it_actually_takes(sf_project, qtbot):
 
 
 def test_akcelik_assignment_and_yaml_round_trip(sf_project, qtbot, mocker):
+    """Akcelik runs end to end with alpha, tau and length, and those survive a save and reload."""
     saved_yaml = f"{sf_project.project.project_base_path}/akcelik_config.yml"
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
@@ -329,6 +332,7 @@ def test_akcelik_assignment_and_yaml_round_trip(sf_project, qtbot, mocker):
 
 
 def test_single_class(sf_project, qtbot, mocker):
+    """A single-class BPR assignment produces link flows, both requested skims, and a YAML config."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value=f"{sf_project.project.project_base_path}/assignment_config.yml",
@@ -393,6 +397,7 @@ def test_single_class(sf_project, qtbot, mocker):
 
 
 def test_multiclass(sf_project, qtbot, mocker):
+    """Three classes assigned together each produce their own flow column and skim matrix."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value=f"{sf_project.project.project_base_path}/mc_config.yml",
@@ -491,6 +496,7 @@ def test_multiclass(sf_project, qtbot, mocker):
 
 
 def test_all_or_nothing(sf_project, qtbot):
+    """All-or-nothing loads the whole matrix onto shortest paths, so the total matches the demand exactly."""
     dialog = TrafficAssignmentDialog(sf_project)
 
     test_name = f"TestTrafficAssignment_AON_{uuid4().hex[:6]}"
@@ -537,6 +543,7 @@ def test_all_or_nothing(sf_project, qtbot):
 
 
 def test_select_link_analysis(sf_project, qtbot, mocker):
+    """A select link query writes both its own matrix and its own results table."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value=f"{sf_project.project.project_base_path}/sl_config.yml",
@@ -598,6 +605,7 @@ def test_select_link_analysis(sf_project, qtbot, mocker):
 
 
 def test_link_removal(sf_project, qtbot):
+    """Links selected on the layer are excluded from the graph, so they carry no flow."""
     links = [9, 10, 11, 13, 23, 25, 26, 27, 28, 31, 32, 34, 40, 41, 43, 44]
     layer = sf_project.layers["links"][0]
     layer.select([f.id() for f in layer.getFeatures() if f["link_id"] in links])
@@ -654,6 +662,7 @@ def test_link_removal(sf_project, qtbot):
 
 
 def test_single_class_from_yaml(sf_project, qtbot, mocker):
+    """A single-class assignment configured entirely from a YAML file produces the same outputs."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value="test/data/SiouxFalls_project/assignment_config.yml",
@@ -683,6 +692,7 @@ def test_single_class_from_yaml(sf_project, qtbot, mocker):
 
 
 def test_multi_class_from_yaml(sf_project, qtbot, mocker):
+    """A multi-class YAML config restores every class, including a VDF named in the wrong case."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value="test/data/SiouxFalls_project/mc_config.yml",
@@ -711,6 +721,7 @@ def test_multi_class_from_yaml(sf_project, qtbot, mocker):
 
 
 def test_fixed_cost_from_yaml(sf_project, qtbot, mocker):
+    """A fixed cost belongs to the class that declares it, and is not inherited by the next one."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value="test/data/SiouxFalls_project/fixed_cost_config.yml",
@@ -755,6 +766,7 @@ def test_fixed_cost_from_yaml(sf_project, qtbot, mocker):
 
 
 def test_mixed_case_from_yaml(sf_project, qtbot, mocker):
+    """Every option a config names in a different case still resolves to the project's own spelling."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value="test/data/SiouxFalls_project/mixed_case_config.yml",
@@ -793,6 +805,7 @@ def test_mixed_case_from_yaml(sf_project, qtbot, mocker):
     ],
 )
 def test_config_with_unavailable_option(sf_project, mocker, section, key):
+    """A config asking for an option the project does not have is refused, naming the option."""
     with open("test/data/SiouxFalls_project/mixed_case_config.yml", "r") as f:
         config = yaml.safe_load(f)
 
@@ -819,6 +832,7 @@ def test_config_with_unavailable_option(sf_project, mocker, section, key):
 
 
 def test_select_links_from_yaml(sf_project, qtbot, mocker):
+    """A select link analysis configured from YAML writes its matrix and results table."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
         return_value="test/data/SiouxFalls_project/sl_config.yml",
@@ -891,6 +905,7 @@ def test_network_fix_is_picked_up_when_dialog_reopens(sf_project, qtbot):
 
 
 def test_single_class_from_python(sf_project, qtbot, mocker):
+    """The exported Python file reproduces the assignment when run through the project's run module."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_python_path",
         return_value=f"{sf_project.project.project_base_path}/run/traffic_assignment.py",

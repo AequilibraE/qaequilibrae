@@ -112,9 +112,6 @@ If you want to have skims for both final and blended, you don't have to untoggle
 check boxes!
 
 Added a skim you did not want? Double-click it in the skimming table and it is removed.
-Double-click the *Class* or *Field* column, as the check boxes take the clicks on the two
-columns to their right. Removing it also puts the field back on the list of fields available
-to that class, which is where it went when it was added.
 
 Then, we can choose to run a select link analysis. Its default configuration is not
 to select any links, so we have to toggle its *"Set select link analysis"* button (1).

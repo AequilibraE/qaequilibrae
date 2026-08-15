@@ -27,6 +27,7 @@ def check_if_new_active_window_matches_class(qtbot, windowClass, previousClass):
 
 
 def test_click_configure_graph(ae_with_project, qtbot, timeoutDetector):
+    """The Configure button opens the graph settings dialog."""
     from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog
 
     dialog = ShortestPathDialog(ae_with_project)
@@ -44,6 +45,7 @@ def test_click_configure_graph(ae_with_project, qtbot, timeoutDetector):
 # Graph preparation is intertwined with the LoadGraphLayerSettingDialog, so they cannot be tested independently
 # TODO: for some reason, there is a segfault after this test is finished, couldn't find out why
 def test_prepare_graph_and_network(ae_with_project, qtbot, timeoutDetector):
+    """Loading a graph through the settings dialog is what brings the picking inputs to life."""
     dialog = ShortestPathDialog(ae_with_project)
     dialog.show()
     qtbot.addWidget(dialog)
@@ -86,6 +88,7 @@ def test_links_layer_is_loaded_when_it_is_not_on_the_canvas(ae_with_project):
 
 
 def test_a_links_layer_already_on_the_canvas_is_reused(ae_with_project):
+    """A links layer already on the map is picked up rather than added a second time."""
     ae_with_project.load_layer_by_name("links")
     already_there = QgsProject.instance().mapLayersByName("links")[0]
 
@@ -129,6 +132,7 @@ def mock_load_graph_layer_setting_dialog(mocker):
 
 
 def test_shortest_path_dialog(ae_with_project, mock_load_graph_layer_setting_dialog):
+    """A path between two typed node IDs lands in a new layer, with the selected links left out."""
     ae_with_project.load_layer_by_name("links")
 
     layer = QgsProject.instance().mapLayersByName("links")[0]
