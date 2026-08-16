@@ -49,6 +49,25 @@ deselect this option, but use this carefully.
     :align: center
     :alt: Configure network graph for shortest path computation
 
+Choosing the nodes
+~~~~~~~~~~~~~~~~~~
+
+The **From** and **To** boxes and the compute button are greyed out until the graph is
+configured, since none of them mean anything without one.
+
+Once it is, the map is ready to be clicked and the cursor turns into a crosshair over it.
+Clicking anywhere on the map picks the model node nearest to the click, so there is no need
+to hit a node exactly.
+
+The first click fills **From** and the second fills **To**, and from there the clicks keep
+alternating between the two boxes. To go back and change one of them, click inside the box
+you want to replace and the next click on the map lands there instead. Both boxes also accept
+a node ID typed by hand.
+
+Each end is marked on the map as soon as it is picked, well before anything is computed: a
+green circle for **From** and a red square for **To**. Picking a new node for either end
+moves its marker, and the markers are removed when the window is closed.
+
 If we select that paths need to be in a separate layer, then every time you
 compute a path, a new layer with a copy of the links in that path will be
 created and formatted in a noticeable way. You can also select to have links

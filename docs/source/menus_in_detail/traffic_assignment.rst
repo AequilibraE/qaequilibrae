@@ -40,7 +40,7 @@ In the *Skimming* tab it is possible to select the skimming fields for each traf
 the results desired: final or blended. Final stands for the result of the last iteration, while
 blended represents the averaged results for all iterations. Just check the desired boxes.
 Notice that the Class field only is populated if the traffic classes were properly set in the
-previous step.
+previous step. To remove a skim from the table, double-click it.
 
 .. image:: ../images/traffic_assignment/traffic_assignment_skimming.png
     :align: center
@@ -58,8 +58,9 @@ are also configured here.
     :alt: Traffic assignment critical analysis tab
 
 In the *Assignment* tab we select the assignment algorithm and configure the volume-delay
-function and its *alpha* and *beta* parameters. The fields for link capacity and free flow
-travel time are selected. We also confirm the relative gap and maximum number of iterations
+function and its parameters. The parameter list follows the function chosen: *alpha* and
+*beta* for BPR, BPR2 and Conical, *alpha* alone for INRETS, and *alpha*, *tau* and *length*
+for Akcelik. The fields for link capacity and free flow travel time are selected. We also confirm the relative gap and maximum number of iterations
 we want, and the output folder. Now it is possible to save your project configurations in
 either one Python or YAML file. While the Python file is stored inside the project run folder
 to be executed as part of 'Run procedures', the YAML file can be used as input for other
@@ -109,6 +110,8 @@ results.
 
 If you want to have skims for both final and blended, you don't have to untoggle any
 check boxes!
+
+Added a skim you did not want? Double-click it in the skimming table and it is removed.
 
 Then, we can choose to run a select link analysis. Its default configuration is not
 to select any links, so we have to toggle its *"Set select link analysis"* button (1).

@@ -12,12 +12,29 @@ from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QColor, QPalette
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
 
 logger = get_logger()
+
+# What each volume-delay function actually takes, mirroring the parameter bounds AequilibraE
+# checks in TrafficAssignment.set_vdf_parameters. Offering the wrong set here either leaves the
+# user with nothing to fill in (Akcelik) or with a field the function never reads (INRETS).
+# How far the second band sits from the first, in absolute HSL lightness. Two figures because
+# a step that reads clearly against white is nearly invisible against a dark background
+BAND_STEP_FROM_LIGHT = 15
+BAND_STEP_FROM_DARK = 18
+
+VDF_PARAMETERS = {
+    "bpr": ["alpha", "beta"],
+    "bpr2": ["alpha", "beta"],
+    "conical": ["alpha", "beta"],
+    "inrets": ["alpha"],
+    "akcelik": ["alpha", "tau", "length"],
+}
 
 
 class TrafficAssignmentDialog(BaseDialog):
@@ -58,6 +75,8 @@ class TrafficAssignmentDialog(BaseDialog):
 
         # Signals for the matrix_procedures tab
         self.but_add_skim.clicked.connect(self._add_skimming)
+        self.skim_list_table.cellDoubleClicked.connect(self._remove_skimming)
+        self.cob_skim_class.currentIndexChanged.connect(self.refresh_available_skims)
         self.but_add_class.clicked.connect(self._create_traffic_class)
         self.cob_matrices.currentIndexChanged.connect(self.change_matrix_selected)
         self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
@@ -172,30 +191,15 @@ class TrafficAssignmentDialog(BaseDialog):
                         self.vot_setter.setValue(value["vot"])
                     self._create_traffic_class(value["network_mode"])
 
-                    # Populate Skimming tab - we'll reproduce part of the code in `_add_skimming` here
+                    # Populate Skimming tab, through the same redraw the buttons go through
                     if "skims" in value:
+                        traffic_class = self.traffic_classes[key]
+                        choices = self.skim_choices()
                         for skim, config in value["skims"].items():
-                            table = self.skim_list_table
-                            idx = table.rowCount()
-                            table.setRowCount(idx + 1)
-                            for i, val in enumerate([key, skim]):
-                                item = QTableWidgetItem(val)
-                                item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
-                                table.setItem(idx, i, item)
-
-                            status = True if "final" in config else False
-                            last_chb = QCheckBox()
-                            last_chb.setChecked(status)
-                            table.setCellWidget(idx, 2, last_chb)
-
-                            status = True if "blended" in config else False
-                            blended_chb = QCheckBox()
-                            blended_chb.setChecked(status)
-                            table.setCellWidget(idx, 3, blended_chb)
-
-                            traffic_class = self.traffic_classes[key]
                             self.skims[traffic_class._id].append(skim)
-                        self.skimming = True
+                            choices[(key, skim)] = ("final" in config, "blended" in config)
+                        self.redraw_skim_table(choices)
+                        self.refresh_available_skims()
 
             # Populate Critical Analysis tab
             if "select_links" in params:
@@ -224,16 +228,19 @@ class TrafficAssignmentDialog(BaseDialog):
             # `all_vdf_functions` fills the combo in lower case, so a config asking for "BPR2"
             # only ever lands because the match below ignores case
             self.__select_option(self.cob_vdf, params["assignment"]["vdf"], "volume-delay function")
-            if isinstance(params["assignment"]["alpha"], float):
-                self.tbl_vdf_parameters.cellWidget(0, 1).setText(str(params["assignment"]["alpha"]))
-            elif isinstance(params["assignment"]["alpha"], str):
-                cob_alpha = self.tbl_vdf_parameters.cellWidget(0, 2)
-                self.__select_option(cob_alpha, params["assignment"]["alpha"], "field for the VDF alpha")
-            if isinstance(params["assignment"]["beta"], float):
-                self.tbl_vdf_parameters.cellWidget(1, 1).setText(str(params["assignment"]["beta"]))
-            elif isinstance(params["assignment"]["beta"], str):
-                cob_beta = self.tbl_vdf_parameters.cellWidget(1, 2)
-                self.__select_option(cob_beta, params["assignment"]["beta"], "field for the VDF beta")
+
+            # Driven by the rows the function above just put in the table, so each function
+            # picks up its own parameters and ignores any the config carries for another one
+            table = self.tbl_vdf_parameters
+            for i in range(table.rowCount()):
+                name = table.item(i, 0).text()
+                if name not in params["assignment"]:
+                    continue
+                value = params["assignment"][name]
+                if isinstance(value, str):
+                    self.__select_option(table.cellWidget(i, 2), value, f"field for the VDF {name}")
+                else:
+                    table.cellWidget(i, 1).setText(str(value))
 
             self.output_scenario_name.setText(params["assignment"]["result_name"])
 
@@ -284,17 +291,13 @@ class TrafficAssignmentDialog(BaseDialog):
             data_dict["assignment"]["result_name"] = self.scenario_name
 
             data_dict["assignment"]["vdf"] = self.cob_vdf.currentText()
-            alpha = self.tbl_vdf_parameters.cellWidget(0, 1).text()
-            if len(alpha) > 0:
-                data_dict["assignment"]["alpha"] = float(alpha)
-            else:
-                data_dict["assignment"]["alpha"] = self.tbl_vdf_parameters.cellWidget(0, 2).currentText()
-
-            beta = self.tbl_vdf_parameters.cellWidget(1, 1).text()
-            if len(beta) > 0:
-                data_dict["assignment"]["beta"] = float(beta)
-            else:
-                data_dict["assignment"]["beta"] = self.tbl_vdf_parameters.cellWidget(1, 2).currentText()
+            # Written row by row rather than as a fixed alpha/beta pair, so that a function with
+            # its own parameters - Akcelik's tau and length - survives the round trip
+            table = self.tbl_vdf_parameters
+            for i in range(table.rowCount()):
+                name = table.item(i, 0).text()
+                typed = table.cellWidget(i, 1).text()
+                data_dict["assignment"][name] = float(typed) if typed else table.cellWidget(i, 2).currentText()
 
             # Add Select Link Analysis data
             if self.do_select_link.isChecked():
@@ -430,7 +433,6 @@ class TrafficAssignmentDialog(BaseDialog):
             for x in res.fetchall():
                 modes.append(f"{x[0]} ({x[1]})")
                 self.all_modes[f"{x[0]} ({x[1]})"] = x[1]
-                self.skims[x[1]] = []
 
         table.setItem(1, 0, QTableWidgetItem("Modes"))
         table.setItem(1, 1, QTableWidgetItem(", ".join(modes)))
@@ -439,10 +441,10 @@ class TrafficAssignmentDialog(BaseDialog):
         for m in modes:
             self.cob_mode_for_class.addItem(m)
 
-        flds = self.project.network.skimmable_fields()
+        self.skimmable_fields = self.project.network.skimmable_fields()
         for cob in [self.cob_skims_available, self.cob_capacity, self.cob_ffttime, self.cob_fixed_cost]:
             cob.clear()
-            cob.addItems(flds)
+            cob.addItems(self.skimmable_fields)
 
         self.matrices = self.project.matrices.list()
         for idx, rec in self.matrices.iterrows():
@@ -454,18 +456,36 @@ class TrafficAssignmentDialog(BaseDialog):
 
     def __edit_skimming_modes(self):
         self.cob_skim_class.clear()
-        for class_name in set(self.traffic_classes.keys()):
+        # Sorted rather than iterated over a set, which put the classes in an order that had
+        # nothing to do with either their names or the order they were created in
+        for class_name in sorted(self.traffic_classes):
             self.cob_skim_class.addItem(class_name)
+        self.refresh_available_skims()
+
+    def refresh_available_skims(self):
+        """Offers only the fields not already being skimmed for the class on display"""
+        taken = self.skims.get(self.cob_skim_class.currentText(), [])
+        # Alphabetical, rather than the order the fields happen to sit in on the links table
+        available = sorted(fld for fld in self.skimmable_fields if fld not in taken)
+
+        # Held on to so that switching class, or removing a skim, does not move the selection
+        # out from under someone who had already picked a field
+        chosen = self.cob_skims_available.currentText()
+        self.cob_skims_available.clear()
+        self.cob_skims_available.addItems(available)
+        if chosen in available:
+            self.cob_skims_available.setCurrentText(chosen)
+
+        self.but_add_skim.setEnabled(bool(available) and bool(self.traffic_classes))
 
     def __change_vdf(self):
         table = self.tbl_vdf_parameters
         table.clearContents()
-        if self.cob_vdf.currentText().lower() in ["bpr", "bpr2", "inrets", "conical"]:
-            parameters = ["alpha", "beta"]
-        else:
-            return
+        parameters = VDF_PARAMETERS.get(self.cob_vdf.currentText().lower(), [])
 
-        self.tbl_vdf_parameters.setRowCount(len(parameters))
+        # clearContents() empties the cells but keeps the rows, so an unknown function used to
+        # leave the previous function's empty rows sitting there
+        table.setRowCount(len(parameters))
         for i, par in enumerate(parameters):
             core_item = QTableWidgetItem(par)
             core_item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
@@ -508,8 +528,6 @@ class TrafficAssignmentDialog(BaseDialog):
         class_name = self.ln_class_name.text()
         if class_name in self.traffic_classes:
             self.qgis_project.iface_error_message(self.tr("Class name already used"))
-
-        self.but_add_skim.setEnabled(True)
 
         matrix = self.project.matrices.get_matrix(mat_name)
 
@@ -574,35 +592,114 @@ class TrafficAssignmentDialog(BaseDialog):
         table.setCellWidget(idx, 5, but)
 
         self.current_modes.append(mode)
-        self.__edit_skimming_modes()
+        # Seeded before the combos are rebuilt, because refreshing them reads it back
         self.skims[class_name] = []
+        self.__edit_skimming_modes()
+
+    def skim_choices(self):
+        """Reads the final/blended choices out of the table, keyed by class and field.
+
+        They live nowhere else - `self.skims` only records which fields are being skimmed - so
+        they have to be carried across a redraw by hand.
+        """
+        table = self.skim_list_table
+        return {
+            (table.item(i, 0).text(), table.item(i, 1).text()): (
+                table.cellWidget(i, 2).isChecked(),
+                table.cellWidget(i, 3).isChecked(),
+            )
+            for i in range(table.rowCount())
+        }
+
+    def skim_bands(self):
+        """The two shades the skimming table bands its classes with, and the text colour to go
+        with them, all taken from the table's own palette so that a QGIS colour theme gets
+        shades belonging to it rather than a hardcoded pair."""
+        palette = self.skim_list_table.palette()
+        base = palette.color(QPalette.ColorRole.Base)
+
+        lightness = base.lightness()
+        if lightness > 127:
+            shifted = lightness - BAND_STEP_FROM_LIGHT
+        else:
+            shifted = lightness + BAND_STEP_FROM_DARK
+        # hue() is -1 on a grey, which fromHsl does not take
+        banded = QColor.fromHsl(max(base.hue(), 0), base.saturation(), max(0, min(255, shifted)))
+
+        return [base, banded], palette.color(QPalette.ColorRole.Text)
+
+    def redraw_skim_table(self, choices):
+        """Rebuilds the table from `self.skims`, by class and then by field, both alphabetical."""
+        table = self.skim_list_table
+        table.setRowCount(0)
+
+        # Tuples, so the table is ordered by class first and by field within each class
+        rows = sorted((class_name, field) for class_name, fields in self.skims.items() for field in fields)
+        table.setRowCount(len(rows))
+
+        # Banded over the classes actually on the table, so that a class with no skims of its
+        # own does not eat a shade and leave two neighbouring blocks looking alike
+        shades, text_color = self.skim_bands()
+        listed = sorted({class_name for class_name, _ in rows})
+        bands = {name: shades[i % len(shades)] for i, name in enumerate(listed)}
+
+        for i, (class_name, field) in enumerate(rows):
+            band = bands[class_name]
+            for column, text in enumerate([class_name, field]):
+                item = QTableWidgetItem(text)
+                item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
+                item.setBackground(band)
+                item.setForeground(text_color)
+                table.setItem(i, column, item)
+
+            for column, checked in zip((2, 3), choices.get((class_name, field), (True, True))):
+                checkbox = QCheckBox()
+                checkbox.setChecked(checked)
+                # Cell widgets are painted by the widget, not by the item, so the band has to be
+                # put on the check box itself for it to reach the whole row
+                checkbox.setAutoFillBackground(True)
+                checkbox.setStyleSheet(f"QCheckBox {{ background-color: {band.name()}; }}")
+                table.setCellWidget(i, column, checkbox)
+
+        # Every skim owns exactly one row, so an empty table means nothing is being skimmed and
+        # `produce_all_outputs` must not go looking for skims to save
+        self.skimming = table.rowCount() > 0
 
     def _add_skimming(self):
         field = self.cob_skims_available.currentText()
         traffic_class = self.traffic_classes[self.cob_skim_class.currentText()]
         name = traffic_class._id
-        if field in self.skims[name]:
-            raise AttributeError("No skims set")
+        if not field or field in self.skims[name]:
+            # Nothing left to add, or already added: `refresh_available_skims` keeps both off
+            # the list, so getting here at all means the two fell out of step
+            return
 
-        table = self.skim_list_table
-        idx = table.rowCount()
-        table.setRowCount(idx + 1)
-
-        for i, val in enumerate([self.cob_skim_class.currentText(), field]):
-            item = QTableWidgetItem(val)
-            item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
-            table.setItem(idx, i, item)
-
-        last_chb = QCheckBox()
-        last_chb.setChecked(True)
-        table.setCellWidget(idx, 2, last_chb)
-
-        blended_chb = QCheckBox()
-        blended_chb.setChecked(True)
-        table.setCellWidget(idx, 3, blended_chb)
-
+        choices = self.skim_choices()
         self.skims[name].append(field)
-        self.skimming = True
+        self.redraw_skim_table(choices)
+        self.refresh_available_skims()
+
+    def _remove_skimming(self, line):
+        """Drops the skim on `line`, which is how a skim added by mistake is taken back.
+
+        Double-clicking columns 2 and 3 never gets here, since the checkboxes sitting in those
+        cells take the mouse events themselves. That is the behavior we want: toggling a skim
+        between final and blended should not be one stray double-click away from deleting it.
+        """
+        table = self.skim_list_table
+        class_name = table.item(line, 0).text()
+        field = table.item(line, 1).text()
+
+        choices = self.skim_choices()
+
+        # Keyed by the class name, which is what `TrafficClass._id` holds
+        if field in self.skims.get(class_name, []):
+            self.skims[class_name].remove(field)
+
+        self.redraw_skim_table(choices)
+
+        # The field is back up for grabs
+        self.refresh_available_skims()
 
     def add_query(self):
         link_id = self.__validate_link_id()

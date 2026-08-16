@@ -68,9 +68,19 @@ class DownloadAll:
         spec = find_spec("uv")
         installer = ["pip"] if spec is None else ["uv", "pip"]
 
+        python = str(self.find_python())
         install_command = ["-m", *installer, "install", *package.split(), "--target", str(self.target_folder)]
 
-        command = [str(self.find_python()), *install_command]
+        # uv chooses an interpreter of its own - virtual environments first, then its managed
+        # installs, then whatever is on PATH - instead of the one running this. A QGIS install is
+        # not a virtual environment, so uv resolves against some other Python that happens to be
+        # around and the wheels it downloads are built for the wrong one: CI landed cp314 wheels
+        # beside a QGIS on 3.12, and every compiled module then failed to import. pip needs no
+        # such flag, since it always installs for the interpreter that runs it.
+        if spec is not None and os.path.isabs(python):
+            install_command += ["--python", python]
+
+        command = [python, *install_command]
         print(" ".join(command))
 
         if not self.no_ssl:

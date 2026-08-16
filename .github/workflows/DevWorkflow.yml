@@ -91,12 +91,29 @@ jobs:
           Copy-Item "test" -Destination "$pluginPath\test" -Recurse
           $env:PYTHONPATH = "$qgisPath\apps\qgis\python"
           $env:QT_QPA_PLATFORM = "offscreen"
-          Start-Process -FilePath "$qgisExec" -ArgumentList "-m pip install -r $pluginPath\test\requirements_test.txt" -NoNewWindow -Wait
+          $pip = Start-Process -FilePath "$qgisExec" -ArgumentList "-m pip install -r $pluginPath\test\requirements_test.txt" -NoNewWindow -Wait -PassThru
+          if ($pip.ExitCode -ne 0) { throw "Installing the test requirements failed (exit $($pip.ExitCode)); pytest cannot run without pytest-reportlog" }
           Set-Location "$aeqPath"
-          Start-Process -FilePath "$qgisExec" -ArgumentList "download_extra_packages_class.py" -NoNewWindow -Wait
+          $deps = Start-Process -FilePath "$qgisExec" -ArgumentList "download_extra_packages_class.py" -NoNewWindow -Wait -PassThru
+          if ($deps.ExitCode -ne 0) { throw "Downloading the plugin dependencies failed (exit $($deps.ExitCode)); an empty packages folder crashes the interpreter during collection" }
+          $aon = Get-ChildItem -Path "$aeqPath\packages\aequilibrae\paths\cython" -Filter "AoN*.pyd" -ErrorAction SilentlyContinue
+          if (-not $aon) {
+              Get-ChildItem -Path "$aeqPath\packages\aequilibrae\paths\cython" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
+              throw "AequilibraE installed without its compiled extensions - 'import aequilibrae.paths' will fail"
+          }
+          # uv reports success even when it resolves the wheels for a different interpreter, so the
+          # ABI tag is the only thing that gives it away before conftest dies on the import
+          $pyDir = (Get-ChildItem -Path "$qgisPath\apps" -Filter "Python3*" -Directory | Select-Object -First 1).Name
+          $expected = "cp" + $pyDir.Substring(6)
+          if ($aon.Name -notlike "*$expected*") {
+              throw "AequilibraE was built for the wrong Python: got $($aon.Name), but QGIS runs $pyDir (expected $expected)"
+          }
+          Write-Host "AequilibraE compiled extension present: $($aon.Name) (matches $pyDir)"
           $env:PYTHONPATH = "$env:PYTHONPATH;$pluginPath;$aeqPath\packages"
           Set-Location "$pluginPath"
-          Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=.\log.jsonl" -NoNewWindow -Wait
+          $tests = Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=$pluginPath\log.jsonl" -NoNewWindow -Wait -PassThru
+          # 4 is a usage error, 5 is nothing collected - both mean pytest never got as far as a test
+          Write-Host "pytest exited with $($tests.ExitCode)"
 
       - name: Setup and test plugin on LTR
         shell: pwsh
@@ -110,12 +127,29 @@ jobs:
           Copy-Item "test" -Destination "$pluginPath\test" -Recurse
           $env:PYTHONPATH = "$qgisPath\apps\qgis\python"
           $env:QT_QPA_PLATFORM = "offscreen"
-          Start-Process -FilePath "$qgisExec" -ArgumentList "-m pip install -r $pluginPath\test\requirements_test.txt" -NoNewWindow -Wait
+          $pip = Start-Process -FilePath "$qgisExec" -ArgumentList "-m pip install -r $pluginPath\test\requirements_test.txt" -NoNewWindow -Wait -PassThru
+          if ($pip.ExitCode -ne 0) { throw "Installing the test requirements failed (exit $($pip.ExitCode)); pytest cannot run without pytest-reportlog" }
           Set-Location "$aeqPath"
-          Start-Process -FilePath "$qgisExec" -ArgumentList "download_extra_packages_class.py" -NoNewWindow -Wait
+          $deps = Start-Process -FilePath "$qgisExec" -ArgumentList "download_extra_packages_class.py" -NoNewWindow -Wait -PassThru
+          if ($deps.ExitCode -ne 0) { throw "Downloading the plugin dependencies failed (exit $($deps.ExitCode)); an empty packages folder crashes the interpreter during collection" }
+          $aon = Get-ChildItem -Path "$aeqPath\packages\aequilibrae\paths\cython" -Filter "AoN*.pyd" -ErrorAction SilentlyContinue
+          if (-not $aon) {
+              Get-ChildItem -Path "$aeqPath\packages\aequilibrae\paths\cython" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
+              throw "AequilibraE installed without its compiled extensions - 'import aequilibrae.paths' will fail"
+          }
+          # uv reports success even when it resolves the wheels for a different interpreter, so the
+          # ABI tag is the only thing that gives it away before conftest dies on the import
+          $pyDir = (Get-ChildItem -Path "$qgisPath\apps" -Filter "Python3*" -Directory | Select-Object -First 1).Name
+          $expected = "cp" + $pyDir.Substring(6)
+          if ($aon.Name -notlike "*$expected*") {
+              throw "AequilibraE was built for the wrong Python: got $($aon.Name), but QGIS runs $pyDir (expected $expected)"
+          }
+          Write-Host "AequilibraE compiled extension present: $($aon.Name) (matches $pyDir)"
           $env:PYTHONPATH = "$env:PYTHONPATH;$pluginPath;$aeqPath\packages"
           Set-Location "$pluginPath"
-          Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=$pluginPath\log.jsonl" -NoNewWindow -Wait
+          $tests = Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=$pluginPath\log.jsonl" -NoNewWindow -Wait -PassThru
+          # 4 is a usage error, 5 is nothing collected - both mean pytest never got as far as a test
+          Write-Host "pytest exited with $($tests.ExitCode)"
 
       - name: Check packages installed
         shell: pwsh

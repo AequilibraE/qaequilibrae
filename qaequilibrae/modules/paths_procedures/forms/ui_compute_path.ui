@@ -40,7 +40,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QPushButton" name="from_but">
+    <widget class="QLabel" name="lbl_from">
      <property name="text">
       <string>From</string>
      </property>
@@ -57,7 +57,7 @@
     </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QPushButton" name="to_but">
+    <widget class="QLabel" name="lbl_to">
      <property name="text">
       <string>To</string>
      </property>

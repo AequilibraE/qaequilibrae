@@ -146,6 +146,7 @@ class AequilibraEMenu:
             self.tr("Route choice"): [],
             self.tr("Transit"): [],
             self.tr("Mapping"): [],
+            self.tr("Options"): [],
             "AequilibraE": [],
         }
 
@@ -156,12 +157,6 @@ class AequilibraEMenu:
         self.add_menu_action(mmenu, self.tr("Run procedures"), partial(run_module, self))
         self.add_menu_action(mmenu, self.tr("Scenarios"), partial(create_scenarios, self))
         self.add_menu_action(mmenu, self.tr("Close project"), self.run_close_project)
-        self.add_menu_action(
-            mmenu,
-            self.tr("Break links at nodes while digitizing"),
-            self.splitter.set_enabled,
-            checked=self.splitter.enabled(),
-        )
 
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -199,6 +194,16 @@ class AequilibraEMenu:
         self.add_menu_action(mmenu, self.tr("Desire lines"), partial(run_desire_lines, self))
         self.add_menu_action(mmenu, self.tr("Stacked bandwidth"), partial(run_stacked_bandwidths, self))
         self.add_menu_action(mmenu, self.tr("Scenario comparison"), partial(run_scenario_comparison, self))
+
+        # # # ########################################################################
+        # # # ###################  OPTIONS SUB-MENU  #################################
+        mmenu = self.tr("Options")
+        self.add_menu_action(
+            mmenu,
+            self.tr("Break links at nodes while digitizing"),
+            self.splitter.set_enabled,
+            checked=self.splitter.enabled(),
+        )
 
         # # # ########################################################################
         # # # ###################  LOOSE STUFF  ######################################

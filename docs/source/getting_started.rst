@@ -5,7 +5,7 @@ In this section we describe how you can install AequilibraE's QGIS plugin.
 
 .. note::
 
-    The recommendations on this page are as current as of April 2024.
+    The recommendations on this page are as current as of August 2026.
 
 Installation
 ------------

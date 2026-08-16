@@ -1,6 +1,6 @@
 # From http://gis.stackexchange.com/questions/45094/how-to-programatically-check-for-a-mouse-click-in-qgis
 # By Nathan Woodrow
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.gui import QgsMapTool
 
 
@@ -10,18 +10,11 @@ class PointTool(QgsMapTool):
     def __init__(self, canvas):
         QgsMapTool.__init__(self, canvas)
         self.canvas = canvas
-
-    def canvasPressEvent(self, event):
-        x = event.pos().x()
-        y = event.pos().y()
-
-        _ = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
-
-    def canvasMoveEvent(self, event):
-        x = event.pos().x()
-        y = event.pos().y()
-
-        _ = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
+        self.point = None
+        # QgsMapTool.activate() is what hands this cursor to the canvas, so this class must not
+        # override activate(): the empty override it used to carry is why picking a node left
+        # the user with whatever cursor the previous map tool had
+        self.setCursor(Qt.CursorShape.CrossCursor)
 
     def canvasReleaseEvent(self, event):
         # Get the click
@@ -30,12 +23,6 @@ class PointTool(QgsMapTool):
 
         self.point = self.canvas.getCoordinateTransform().toMapCoordinates(x, y)
         self.signal.emit(1)
-
-    def activate(self):
-        pass
-
-    def deactivate(self):
-        pass
 
     def isZoomTool(self):
         return False
