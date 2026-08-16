@@ -101,7 +101,14 @@ jobs:
               Get-ChildItem -Path "$aeqPath\packages\aequilibrae\paths\cython" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
               throw "AequilibraE installed without its compiled extensions - 'import aequilibrae.paths' will fail"
           }
-          Write-Host "AequilibraE compiled extension present: $($aon.Name)"
+          # uv reports success even when it resolves the wheels for a different interpreter, so the
+          # ABI tag is the only thing that gives it away before conftest dies on the import
+          $pyDir = (Get-ChildItem -Path "$qgisPath\apps" -Filter "Python3*" -Directory | Select-Object -First 1).Name
+          $expected = "cp" + $pyDir.Substring(6)
+          if ($aon.Name -notlike "*$expected*") {
+              throw "AequilibraE was built for the wrong Python: got $($aon.Name), but QGIS runs $pyDir (expected $expected)"
+          }
+          Write-Host "AequilibraE compiled extension present: $($aon.Name) (matches $pyDir)"
           $env:PYTHONPATH = "$env:PYTHONPATH;$pluginPath;$aeqPath\packages"
           Set-Location "$pluginPath"
           $tests = Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=$pluginPath\log.jsonl" -NoNewWindow -Wait -PassThru
@@ -130,7 +137,14 @@ jobs:
               Get-ChildItem -Path "$aeqPath\packages\aequilibrae\paths\cython" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
               throw "AequilibraE installed without its compiled extensions - 'import aequilibrae.paths' will fail"
           }
-          Write-Host "AequilibraE compiled extension present: $($aon.Name)"
+          # uv reports success even when it resolves the wheels for a different interpreter, so the
+          # ABI tag is the only thing that gives it away before conftest dies on the import
+          $pyDir = (Get-ChildItem -Path "$qgisPath\apps" -Filter "Python3*" -Directory | Select-Object -First 1).Name
+          $expected = "cp" + $pyDir.Substring(6)
+          if ($aon.Name -notlike "*$expected*") {
+              throw "AequilibraE was built for the wrong Python: got $($aon.Name), but QGIS runs $pyDir (expected $expected)"
+          }
+          Write-Host "AequilibraE compiled extension present: $($aon.Name) (matches $pyDir)"
           $env:PYTHONPATH = "$env:PYTHONPATH;$pluginPath;$aeqPath\packages"
           Set-Location "$pluginPath"
           $tests = Start-Process -FilePath "$qgisExec" -ArgumentList "-m pytest test --report-log=$pluginPath\log.jsonl" -NoNewWindow -Wait -PassThru
