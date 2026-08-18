@@ -28,6 +28,11 @@ saved in the project 'results_database.sqlite' file.
     :align: center
     :alt: project data results
 
+In both tabs, a record can be deleted by double-clicking it. QAequilibraE asks you to confirm
+before anything happens, and that confirmation defaults to *No*. Deleting a matrix removes its
+record from the project and its file from the 'matrices' folder, while deleting a result removes
+its record and its table from the results database. Neither can be undone.
+
 The tab *Non-project data* allows you to open and visualize matrices stored in \*.omx format. 
 **This is the only tab available if no AequilibraE project is open**. Suppose you 
 want to check a skim matrix from a previous project. When clicking the **Load data** button, you can point 
