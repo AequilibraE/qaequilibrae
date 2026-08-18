@@ -195,8 +195,19 @@ def test_create_empty_project_defaults_the_model_name():
     assert action.parameterDefinition("MODEL_NAME").defaultValue() == "new model"
 
 
+@pytest.fixture
+def no_menu_instance():
+    """Runs an algorithm the way Processing does with the plugin absent, whatever ran before"""
+    from qaequilibrae import get_aequilibrae_menu_instance, set_aequilibrae_menu_instance
+
+    previous = get_aequilibrae_menu_instance()
+    set_aequilibrae_menu_instance(None)
+    yield
+    set_aequilibrae_menu_instance(previous)
+
+
 @pytest.mark.parametrize("pre_create_folder", [True, False])
-def test_create_empty_project(tmp_path, pre_create_folder):
+def test_create_empty_project(no_menu_instance, tmp_path, pre_create_folder):
     parent_folder = str(tmp_path)
     project_folder = join(parent_folder, "new model")
 
@@ -226,6 +237,40 @@ def test_create_empty_project(tmp_path, pre_create_folder):
     assert len(project.network.link_types.all_types()) > 0
 
     project.close()
+
+
+def test_create_empty_project_shows_in_the_panel(ae, tmp_path):
+    """A model created from scratch reaches the panel, like every other way of creating one"""
+    parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "new model"}
+
+    action = CreateEmptyProject()
+    action.initAlgorithm()
+
+    results, ok = action.run(parameters, QgsProcessingContext(), QgsProcessingFeedback())
+    assert ok
+
+    assert str(ae.project.project_base_path) == results["Output"]
+    assert ae.available_scenarios == ["root"]
+    assert {"links", "nodes", "zones"} <= set(ae.layers)
+    assert ae.projectManager.count() == 1
+
+    ae.run_close_project()
+
+
+def test_create_empty_project_leaves_the_open_project_alone(ae_with_project, tmp_path):
+    """The panel holds one project at a time, so the new model is only created on disk"""
+    in_the_panel = ae_with_project.project
+
+    parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "new model"}
+
+    action = CreateEmptyProject()
+    action.initAlgorithm()
+
+    results, ok = action.run(parameters, QgsProcessingContext(), QgsProcessingFeedback())
+    assert ok
+    assert isfile(join(results["Output"], "project_database.sqlite"))
+
+    assert ae_with_project.project is in_the_panel
 
 
 def test_create_empty_project_on_populated_folder(tmp_path):
