@@ -6,7 +6,7 @@ import openmatrix as omx
 import pandas as pd
 import pytest
 import yaml
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QItemSelectionModel
 
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
@@ -483,7 +483,7 @@ def test_multiclass(sf_project, qtbot, mocker):
     with sf_project.project.results_connection as conn:
         assert conn.execute(f"SELECT ROUND(SUM(PCE_tot), 4) FROM {test_name}").fetchone()[0] > 0
         assert conn.execute(f"SELECT ROUND(SUM(car_tot), 4) FROM {test_name}").fetchone()[0] > 0
-        assert conn.execute(f"SELECT ROUND(SUM(motorcycle_tot), 4) FROM {test_name}").fetchone()[0] > 0
+        assert conn.execute(f"SELECT ROUND(SUM(motorcycles_tot), 4) FROM {test_name}").fetchone()[0] > 0
         assert conn.execute(f"SELECT ROUND(SUM(trucks_tot), 4) FROM {test_name}").fetchone()[0] > 0
 
     pth = dialog.project.project_base_path
@@ -535,7 +535,7 @@ def test_all_or_nothing(sf_project, qtbot):
 
     # Assert we have a non-null result and that results are actually stored in the file
     with sf_project.project.results_connection as conn:
-        assert conn.execute(f"SELECT ROUND(SUM(matrix_tot), 4) FROM {test_name}").fetchone()[0] == 885_300.0
+        assert conn.execute(f"SELECT ROUND(SUM(car_tot), 4) FROM {test_name}").fetchone()[0] == 885_300.0
 
     pth = dialog.project.project_base_path
     skims = pth / "matrices" / f"{test_name}_car.omx"
@@ -960,3 +960,123 @@ def test_single_class_from_python(sf_project, qtbot, mocker):
         assert round(np.sum(np.nan_to_num(omx_file["free_flow_time_blended"][:])), 4) > 0
         assert round(np.sum(np.nan_to_num(omx_file["distance_final"][:])), 4) > 0
         assert round(np.sum(np.nan_to_num(omx_file["distance_blended"][:])), 4) > 0
+
+
+def add_class(dialog, qtbot, matrix, rows, name, mode_index=0):
+    """Fills the class form and clicks Add, the way a user builds one"""
+    dialog.cob_matrices.setCurrentText(matrix)
+    table = dialog.tbl_core_list
+    table.clearSelection()
+    flags = QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows
+    for row in rows:
+        table.selectionModel().select(table.model().index(row, 0), flags)
+    dialog.cob_mode_for_class.setCurrentIndex(mode_index)
+    dialog.ln_class_name.setText(name)
+    dialog.pce_setter.setValue(1.0)
+    dialog.chb_check_centroids.setChecked(False)
+    qtbot.mouseClick(dialog.but_add_class, Qt.MouseButton.LeftButton)
+
+
+def test_classes_reading_cores_of_the_same_name(sf_project, qtbot):
+    """Both SiouxFalls demand matrices carry a core called `matrix`, which used to leave the two
+    classes writing the same result columns - and only saying so once the assignment had run."""
+    dialog = TrafficAssignmentDialog(sf_project)
+
+    add_class(dialog, qtbot, "demand", [0], "car")
+    add_class(dialog, qtbot, "demand_omx", [0], "van", mode_index=4)
+
+    assert dialog.class_cores == {"car": ["matrix"], "van": ["matrix"]}, "the cores picked are not remembered"
+    assert dialog.traffic_classes["car"].matrix.view_names == ["car"]
+    assert dialog.traffic_classes["van"].matrix.view_names == ["van"]
+
+    dialog.output_scenario_name.setText(f"TestSameCore_{uuid4().hex[:6]}")
+    assert dialog.check_data(), dialog.error
+
+    dialog.close()
+
+
+def test_a_class_reading_several_cores_prefixes_them(sf_project, qtbot):
+    """One name is not enough to tell several cores apart, so those keep theirs behind the class"""
+    dialog = TrafficAssignmentDialog(sf_project)
+
+    add_class(dialog, qtbot, "demand_mc", [0, 1], "car")
+
+    assert dialog.class_cores["car"] == ["car", "motorcycle"]
+    assert dialog.traffic_classes["car"].matrix.view_names == ["car_car", "car_motorcycle"]
+
+    dialog.close()
+
+
+def test_class_name_reused_or_empty_is_refused(sf_project, qtbot):
+    """The result columns are named after the class, so it has to be there and it has to be its own"""
+    dialog = TrafficAssignmentDialog(sf_project)
+
+    add_class(dialog, qtbot, "demand", [0], "car")
+    first = dialog.traffic_classes["car"]
+    add_class(dialog, qtbot, "demand_omx", [0], "car", mode_index=4)
+
+    assert list(dialog.traffic_classes) == ["car"]
+    assert dialog.class_cores["car"] == ["matrix"]
+    assert dialog.traffic_classes["car"] is first, "the second class overwrote the first"
+
+    add_class(dialog, qtbot, "demand_omx", [0], "", mode_index=4)
+
+    assert list(dialog.traffic_classes) == ["car"]
+
+    dialog.close()
+
+
+def test_check_data_catches_result_fields_that_meet_in_the_middle(sf_project, qtbot):
+    """Unique class names normally settle it, but two prefixed names can still land on the same
+    string - and the assignment is far too long a wait for that to surface at save time."""
+    dialog = TrafficAssignmentDialog(sf_project)
+
+    add_class(dialog, qtbot, "demand_mc", [0, 1], "car")
+    add_class(dialog, qtbot, "demand_mc", [0], "car_car", mode_index=4)
+
+    dialog.output_scenario_name.setText(f"TestCollision_{uuid4().hex[:6]}")
+
+    assert not dialog.check_data()
+    assert "car_car" in dialog.error
+
+    dialog.close()
+
+
+def test_yaml_carries_the_core_the_matrix_knows(sf_project, qtbot, mocker):
+    """The class relabels its computational view, so the config has to come from what the user
+    picked - a core named after the class is not one the matrix could be asked for again."""
+    saved_yaml = f"{sf_project.project.project_base_path}/same_core_config.yml"
+    mocker.patch(
+        "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
+        return_value=saved_yaml,
+    )
+
+    dialog = TrafficAssignmentDialog(sf_project)
+
+    add_class(dialog, qtbot, "demand", [0], "car")
+    add_class(dialog, qtbot, "demand_omx", [0], "van", mode_index=4)
+
+    dialog.output_scenario_name.setText("result_same_core")
+    dialog.cob_vdf.setCurrentText("bpr")
+    dialog.tbl_vdf_parameters.cellWidget(0, 1).setText("0.15")
+    dialog.tbl_vdf_parameters.cellWidget(1, 1).setText("4.0")
+    dialog.cob_capacity.setCurrentText("capacity")
+    dialog.cob_ffttime.setCurrentText("free_flow_time")
+
+    qtbot.mouseClick(dialog.but_save_yaml, Qt.MouseButton.LeftButton)
+    dialog.close()
+
+    with open(saved_yaml, "r") as f:
+        saved = yaml.safe_load(f)
+
+    cores = {name: cfg["matrix_core"] for entry in saved["traffic_classes"] for name, cfg in entry.items()}
+    assert cores == {"car": "matrix", "van": "matrix"}
+
+    # Which is the half that matters: the config has to be loadable again
+    reopened = TrafficAssignmentDialog(sf_project)
+    qtbot.mouseClick(reopened.but_load_yaml, Qt.MouseButton.LeftButton)
+
+    assert reopened.class_cores == {"car": ["matrix"], "van": ["matrix"]}
+    assert reopened.traffic_classes["van"].matrix.view_names == ["van"]
+
+    reopened.close()
