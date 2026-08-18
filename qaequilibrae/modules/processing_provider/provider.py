@@ -18,6 +18,7 @@ class Provider(QgsProcessingProvider):
         self.__load_project_procedures()
         self.__load_model_building()
         self.__load_matrix_procedures()
+        self.__load_data_procedures()
         self.__load_routing_procedures()
         self.__load_traffic_assignment_procedures()
         self.__load_route_choice()
@@ -77,6 +78,14 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(ImportMatrix())
         self.addAlgorithm(MatrixCalculator())
         self.addAlgorithm(TripLengthDistribution())
+
+    def __load_data_procedures(self):
+
+        from .data_procedures.add_link_type import AddLinkType
+        from .data_procedures.add_mode import AddMode
+
+        self.addAlgorithm(AddLinkType())
+        self.addAlgorithm(AddMode())
 
     def __load_routing_procedures(self):
 
