@@ -5,7 +5,7 @@ from aequilibrae.distribution import Ipf
 from aequilibrae.paths import TrafficAssignment, TrafficClass
 from qgis.core import QgsProject
 
-from qaequilibrae.modules.gis.compare_scenarios_dialog import CompareScenariosDialog
+from qaequilibrae.modules.gis.compare_scenarios_dialog import CompareScenariosDialog, directional_field_pairs
 from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 from .utilities import run_sfalls_assignment
 
@@ -41,6 +41,48 @@ def test_compare_scenarios(ae, model_path, composite):
     fields = ["base_matrix_ab", "base_matrix_ba", "alternative_matrix_ab", "alternative_matrix_ba"]
     for f in fields:
         assert f in field_names
+
+
+def test_directional_field_pairs():
+    """Result tables mix cases, and the pair has to come back spelled as the table spells it"""
+    fields = ["link_id", "matrix_ab", "matrix_ba", "matrix_tot", "VOC_AB", "VOC_BA", "VOC_max", "Preload_AB"]
+
+    assert dict(directional_field_pairs(fields)) == {
+        "matrix_*": ("matrix_ab", "matrix_ba"),
+        "VOC_*": ("VOC_AB", "VOC_BA"),
+    }, "a field without its counterpart, or without a direction at all, is not a pair"
+
+    # Paired on the suffix, so the "ab" in the middle of a class called "cab" is left alone
+    assert dict(directional_field_pairs(["cab_ab", "cab_ba"])) == {"cab_*": ("cab_ab", "cab_ba")}
+
+
+@pytest.mark.parametrize("field", ["matrix_*", "Preload_*", "Congested_Time_*", "VOC_*"])
+def test_compare_scenarios_on_every_offered_field(ae, model_path, field):
+    """Only the flow columns are lower case, and the rest used to reach the layer under a name
+    it did not carry - which surfaced as `evaluate()` handing back None to be read for `.real`."""
+    _run_load_project_from_path(ae, model_path)
+
+    dialog = CompareScenariosDialog(ae)
+    dialog.cob_alternative_result.setCurrentText("future_assignment")
+    dialog.cob_base_data.setCurrentText(field)
+    dialog.cob_alternative_data.setCurrentText(field)
+    assert dialog.cob_base_data.currentText() == field, "the field is not on offer"
+    base_pair = dialog.cob_base_data.currentData()
+    alter_pair = dialog.cob_alternative_data.currentData()
+    dialog.radio_compo.setChecked(True)
+
+    dialog.execute_comparison()
+
+    link_layer = QgsProject.instance().mapLayersByName("scenario_comparison")[0]
+    names = link_layer.fields().names()
+    # Read off the combo rather than off the label, since the label is the one thing that does
+    # not have to match the column - which is exactly what went wrong here
+    for prefix, pair in [("base", base_pair), ("alternative", alter_pair)]:
+        for column in pair:
+            assert f"{prefix}_{column}" in names
+
+    # The bandwidths only get built once the maximum is known, so the styling is the proof
+    assert link_layer.renderer().symbol().symbolLayerCount() > 1
 
 
 def future_assignment(aeq_from_qgis):
