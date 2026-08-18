@@ -94,8 +94,7 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
         return {"Output": project_folder}
 
     def show_in_panel(self, project, project_folder, feedback):
-        """Hands the new model to the panel, the way every other way of creating one does.
-        """
+        """Hands the new model to the panel, the way every other way of creating one does."""
         from qaequilibrae import get_aequilibrae_menu_instance
         from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
 
