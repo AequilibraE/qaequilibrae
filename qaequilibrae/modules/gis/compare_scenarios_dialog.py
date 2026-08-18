@@ -15,6 +15,26 @@ sys.modules["qgsfieldcombobox"] = qgis.gui
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 
 
+def directional_field_pairs(fields):
+    """The fields that come as an AB/BA pair, each as a label to show and the two column names.
+
+    The pairing is case-insensitive because a result table mixes cases: AequilibraE capitalises
+    the fields it computes itself (`Preload_AB`, `VOC_AB`), while the flow columns carry the case
+    of the traffic class they belong to. The names handed back are the ones the table actually
+    uses - the label is only ever shown, never used to read a column back, which is what used to
+    leave every capitalised field pointing at a column that was not there.
+    """
+    by_lower = {f.lower(): f for f in fields}
+    pairs = []
+    # Matched on the suffix rather than anywhere in the name, so that a class called "cab" is
+    # not paired with itself through the "ab" in the middle of it
+    for lower, name in by_lower.items():
+        counterpart = by_lower.get(f"{lower[:-2]}ba") if lower.endswith("ab") else None
+        if counterpart is not None:
+            pairs.append((f"{name[:-2]}*", (name, counterpart)))
+    return pairs
+
+
 class CompareScenariosDialog(BaseDialog):
     def __init__(self, qgis_project):
         super().__init__(ui_file=join(dirname(__file__), "forms/ui_compare_scenarios.ui"), qgis_project=qgis_project)
@@ -110,8 +130,8 @@ class CompareScenariosDialog(BaseDialog):
             lst = find_table_fields(conn, cob_results.currentText())
         if self.__init_scenario != cob_scenario.currentText():
             self.qgis_project.project.use_scenario(self.__init_scenario)
-        flds = [x.replace("ab", "*") for x in lst if "ab" in x and x.replace("ab", "ba") in lst]
-        cob_fields.addItems(flds)
+        for label, pair in directional_field_pairs(lst):
+            cob_fields.addItem(label, pair)
 
     def execute_comparison(self):
         if not self.check_inputs():
@@ -139,16 +159,16 @@ class CompareScenariosDialog(BaseDialog):
 
         # Create the bandwidths for the common flow, if requested
         if self.radio_compo.isChecked():
-            exp = QgsExpression(
+            max_value = self.band_max_value(
                 f"""max(maximum(coalesce("{ab_base}",0)),
                         maximum(coalesce("{ab_alt}",0)),
                         maximum(coalesce("{ba_base}",0)),
                         maximum(coalesce("{ba_alt}",0))) """
             )
-            context = self.link_layer.createExpressionContext()
-            max_value = exp.evaluate(context).real
+            if max_value is None:
+                return
 
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_max_value", float(max_value))
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_max_value", max_value)
             max_value = "@aeq_band_max_value"
 
             # We create the styles for AB and BA directions and add to the fields
@@ -164,15 +184,15 @@ class CompareScenariosDialog(BaseDialog):
 
         # If we want a plot of the differences only
         if self.radio_diff.isChecked():
-            exp = QgsExpression(
+            max_value = self.band_max_value(
                 f"""max(maximum(abs(coalesce("{ab_base}",0)-coalesce("{ab_alt}",0))),
                         maximum(abs(coalesce("{ba_base}",0)-coalesce("{ba_alt}",0)))) """
             )
-            context = self.link_layer.createExpressionContext()
-            max_value = exp.evaluate(context).real
+            if max_value is None:
+                return
             ab_offset = ba_offset = "0"
 
-            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_max_value", float(max_value))
+            QgsExpressionContextUtils.setProjectVariable(QgsProject.instance(), "aeq_band_max_value", max_value)
             max_value = "@aeq_band_max_value"
 
         # We now create the positive and negative bandwidths for each side of the link
@@ -195,6 +215,29 @@ class CompareScenariosDialog(BaseDialog):
         self.link_layer.renderer().symbol().deleteSymbolLayer(0)
         self.link_layer.triggerRepaint()
         self.exit_procedure()
+
+    def band_max_value(self, expression: str):
+        """The value the bandwidths get scaled against, or None if the expression got nowhere.
+
+        `QgsExpression.evaluate` answers NULL for everything it could not work out - a field the
+        layer does not carry, a layer with no features - and the caller cannot tell that from a
+        legitimate zero, so it has to be checked rather than read straight through.
+        """
+        exp = QgsExpression(expression)
+        value = exp.evaluate(self.link_layer.createExpressionContext())
+        if value is not None:
+            return float(value)
+
+        reason = exp.evalErrorString() or exp.parserErrorString() or self.tr("no value came back")
+        self.qgis_project.iface_error_message(
+            self.tr("Could not measure the fields being compared: {}").format(reason),
+            self.tr("Scenario comparison"),
+        )
+        # Both are the band sizes as text by now, and a second run reads them as numbers again
+        self.sizevaluechange()
+        self.spacevaluechange()
+        self.but_run.setEnabled(True)
+        return None
 
     def check_inputs(self):
         for combo in [
@@ -226,8 +269,9 @@ class CompareScenariosDialog(BaseDialog):
         v2 = self.cob_alt_scenario.currentText()
         v3 = self.cob_base_result.currentText()
         v4 = self.cob_alternative_result.currentText()
-        v5 = self.cob_base_data.currentText()
-        v6 = self.cob_alternative_data.currentText()
+        # The columns as the result tables spell them, rather than as the combos show them
+        base_fields = list(self.cob_base_data.currentData())
+        alter_fields = list(self.cob_alternative_data.currentData())
 
         # Load base scenario data
         if v1 != self.__init_scenario:
@@ -235,8 +279,7 @@ class CompareScenariosDialog(BaseDialog):
         base_links = self.qgis_project.project.network.links.data
         base_links = base_links[columns]
         base_lyr_result = load_result_table(self.qgis_project.project, v3)
-        base_cols = ["link_id"]
-        base_cols.extend([x for x in base_lyr_result.columns if v5[:-1] in x and "_tot" not in x])
+        base_cols = ["link_id"] + base_fields
 
         # Load alternative scenario data
         if v1 != v2:
@@ -244,8 +287,7 @@ class CompareScenariosDialog(BaseDialog):
         alter_links = self.qgis_project.project.network.links.data
         alter_links = alter_links[columns]
         alter_lyr_result = load_result_table(self.qgis_project.project, v4)
-        alter_cols = ["link_id"]
-        alter_cols.extend([x for x in alter_lyr_result.columns if v6[:-1] in x and "_tot" not in x])
+        alter_cols = ["link_id"] + alter_fields
 
         # Go back to the currently selected scenario
         self.qgis_project.project.use_scenario(self.__init_scenario)
@@ -258,13 +300,8 @@ class CompareScenariosDialog(BaseDialog):
         alter_links = alter_links.merge(alter_lyr_result[alter_cols], on="link_id")
         alter_links.columns = [f"alternative_{x}" if "geometry" not in x else "geometry" for x in alter_links.columns]
 
-        txt = f"base_{v5}"
-        data_fields = [[txt.replace("*", "ab"), txt.replace("*", "ba")]]
-        values = {txt.replace("*", "ab"): 0, txt.replace("*", "ba"): 0}
-        txt = f"alternative_{v6}"
-        data_fields.append([txt.replace("*", "ab"), txt.replace("*", "ba")])
-        values[txt.replace("*", "ab")] = 0
-        values[txt.replace("*", "ba")] = 0
+        data_fields = [[f"base_{f}" for f in base_fields], [f"alternative_{f}" for f in alter_fields]]
+        values = {field: 0 for pair in data_fields for field in pair}
 
         base_cols = ["base_link_id", "base_a_node", "base_b_node", "geometry"]
         alter_cols = ["alternative_link_id", "alternative_a_node", "alternative_b_node", "geometry"]
