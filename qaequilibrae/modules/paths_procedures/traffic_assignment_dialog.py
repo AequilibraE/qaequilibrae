@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import defaultdict
 from tempfile import gettempdir
 from os.path import dirname, join
 from pathlib import Path
@@ -527,11 +527,13 @@ class TrafficAssignmentDialog(BaseDialog):
         if not mat_name:
             raise AttributeError("Matrix not set")
 
-        class_name = self.ln_class_name.text()
+        # Stripped, since the name goes on to name the result columns
+        class_name = self.ln_class_name.text().strip()
         if not class_name:
             self.qgis_project.iface_error_message(self.tr("Class name cannot be empty"))
             return
-        if class_name in self.traffic_classes:
+        # Folded, because SQLite refuses two columns that differ only by case
+        if class_name.lower() in {name.lower() for name in self.traffic_classes}:
             self.qgis_project.iface_error_message(self.tr("Class name already used"))
             return
 
@@ -544,13 +546,7 @@ class TrafficAssignmentDialog(BaseDialog):
         user_classes = [matrix.names[i] for i in rows]
         matrix.computational_view(user_classes)
 
-        # AequilibraE names the result columns after the matrix cores, so two classes reading
-        # cores of the same name write the same column twice - and that only fails once the
-        # results are saved, with the whole assignment already run. Class names are unique, so
-        # they are what tells the columns apart: a class reading a single core lends it its own
-        # name, and one reading several prefixes each of them. Only the labels change - the
-        # numbers are already in `matrix_view`, and the cores in the file keep their own names,
-        # which is why `class_cores` has to hold on to them for the YAML config.
+        # Columns are named after the cores: relabel with the class name, keep the real ones for the YAML
         self.class_cores[class_name] = user_classes
         if len(user_classes) == 1:
             matrix.view_names = [class_name]
@@ -879,14 +875,12 @@ class TrafficAssignmentDialog(BaseDialog):
         return tries_setup
 
     def __repeated_result_fields(self):
-        """The names the result columns are built from, for any that more than one class claims.
-
-        Prefixing the cores with the class name in `_create_traffic_class` is what normally keeps
-        these apart, and unique class names make that enough - but nothing stops two prefixed
-        names from meeting in the middle, and finding out at save time costs a whole assignment.
-        """
-        claimed = Counter(name for cls in self.traffic_classes.values() for name in cls.matrix.view_names)
-        return sorted(name for name, times in claimed.items() if times > 1)
+        """Result field names claimed by more than one class, folded as SQLite folds column names."""
+        claimed = defaultdict(list)
+        for cls in self.traffic_classes.values():
+            for name in cls.matrix.view_names:
+                claimed[name.lower()].append(name)
+        return sorted({name for claims in claimed.values() if len(claims) > 1 for name in claims})
 
     def signal_handler(self, val):
         if val[0] == "start":

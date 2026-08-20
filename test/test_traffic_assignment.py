@@ -963,7 +963,7 @@ def test_single_class_from_python(sf_project, qtbot, mocker):
 
 
 def add_class(dialog, qtbot, matrix, rows, name, mode_index=0):
-    """Fills the class form and clicks Add, the way a user builds one"""
+    """Fills the class form and clicks Add."""
     dialog.cob_matrices.setCurrentText(matrix)
     table = dialog.tbl_core_list
     table.clearSelection()
@@ -978,8 +978,7 @@ def add_class(dialog, qtbot, matrix, rows, name, mode_index=0):
 
 
 def test_classes_reading_cores_of_the_same_name(sf_project, qtbot):
-    """Both SiouxFalls demand matrices carry a core called `matrix`, which used to leave the two
-    classes writing the same result columns - and only saying so once the assignment had run."""
+    """Both SiouxFalls demand matrices carry a core called `matrix`, which used to collide at save time."""
     dialog = TrafficAssignmentDialog(sf_project)
 
     add_class(dialog, qtbot, "demand", [0], "car")
@@ -996,7 +995,7 @@ def test_classes_reading_cores_of_the_same_name(sf_project, qtbot):
 
 
 def test_a_class_reading_several_cores_prefixes_them(sf_project, qtbot):
-    """One name is not enough to tell several cores apart, so those keep theirs behind the class"""
+    """A class reading several cores keeps each core name behind the class name."""
     dialog = TrafficAssignmentDialog(sf_project)
 
     add_class(dialog, qtbot, "demand_mc", [0, 1], "car")
@@ -1007,44 +1006,53 @@ def test_a_class_reading_several_cores_prefixes_them(sf_project, qtbot):
     dialog.close()
 
 
-def test_class_name_reused_or_empty_is_refused(sf_project, qtbot):
-    """The result columns are named after the class, so it has to be there and it has to be its own"""
+@pytest.mark.parametrize("second_name", ["car", "CAR", "  car  ", "   "])
+def test_class_name_reused_or_empty_is_refused(sf_project, qtbot, second_name):
+    """The class names the result columns, so it must be present and unique down to a fold."""
     dialog = TrafficAssignmentDialog(sf_project)
 
     add_class(dialog, qtbot, "demand", [0], "car")
     first = dialog.traffic_classes["car"]
-    add_class(dialog, qtbot, "demand_omx", [0], "car", mode_index=4)
+
+    add_class(dialog, qtbot, "demand_omx", [0], second_name, mode_index=4)
 
     assert list(dialog.traffic_classes) == ["car"]
     assert dialog.class_cores["car"] == ["matrix"]
     assert dialog.traffic_classes["car"] is first, "the second class overwrote the first"
 
-    add_class(dialog, qtbot, "demand_omx", [0], "", mode_index=4)
+    dialog.close()
+
+
+def test_class_name_is_stripped(sf_project, qtbot):
+    """Blanks around the name would follow it into the result column names"""
+    dialog = TrafficAssignmentDialog(sf_project)
+
+    add_class(dialog, qtbot, "demand", [0], "  car  ")
 
     assert list(dialog.traffic_classes) == ["car"]
+    assert dialog.traffic_classes["car"].matrix.view_names == ["car"]
 
     dialog.close()
 
 
-def test_check_data_catches_result_fields_that_meet_in_the_middle(sf_project, qtbot):
-    """Unique class names normally settle it, but two prefixed names can still land on the same
-    string - and the assignment is far too long a wait for that to surface at save time."""
+@pytest.mark.parametrize("colliding_name", ["car_car", "Car_Car"])
+def test_check_data_catches_result_fields_that_meet_in_the_middle(sf_project, qtbot, colliding_name):
+    """Unique class names are not enough: two prefixed names can still land on the same string."""
     dialog = TrafficAssignmentDialog(sf_project)
 
     add_class(dialog, qtbot, "demand_mc", [0, 1], "car")
-    add_class(dialog, qtbot, "demand_mc", [0], "car_car", mode_index=4)
+    add_class(dialog, qtbot, "demand_mc", [0], colliding_name, mode_index=4)
 
     dialog.output_scenario_name.setText(f"TestCollision_{uuid4().hex[:6]}")
 
     assert not dialog.check_data()
-    assert "car_car" in dialog.error
+    assert colliding_name in dialog.error
 
     dialog.close()
 
 
 def test_yaml_carries_the_core_the_matrix_knows(sf_project, qtbot, mocker):
-    """The class relabels its computational view, so the config has to come from what the user
-    picked - a core named after the class is not one the matrix could be asked for again."""
+    """The class relabels its view, so the config has to record the core the user actually picked."""
     saved_yaml = f"{sf_project.project.project_base_path}/same_core_config.yml"
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",

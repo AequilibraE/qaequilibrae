@@ -100,7 +100,7 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
 
         qgis_project = get_aequilibrae_menu_instance()
 
-        # Processing also runs with no plugin around it, as it does under the test suite
+        # Processing also runs with no plugin around it
         if qgis_project is None:
             project.close()
             return

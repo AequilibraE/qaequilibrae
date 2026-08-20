@@ -197,7 +197,7 @@ def test_create_empty_project_defaults_the_model_name():
 
 @pytest.fixture
 def no_menu_instance():
-    """Runs an algorithm the way Processing does with the plugin absent, whatever ran before"""
+    """Runs an algorithm with no plugin instance, whatever ran before."""
     from qaequilibrae import get_aequilibrae_menu_instance, set_aequilibrae_menu_instance
 
     previous = get_aequilibrae_menu_instance()
@@ -240,7 +240,7 @@ def test_create_empty_project(no_menu_instance, tmp_path, pre_create_folder):
 
 
 def test_create_empty_project_shows_in_the_panel(ae, tmp_path):
-    """A model created from scratch reaches the panel, like every other way of creating one"""
+    """A model created from scratch reaches the panel."""
     parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "new model"}
 
     action = CreateEmptyProject()
@@ -258,7 +258,7 @@ def test_create_empty_project_shows_in_the_panel(ae, tmp_path):
 
 
 def test_create_empty_project_leaves_the_open_project_alone(ae_with_project, tmp_path):
-    """The panel holds one project at a time, so the new model is only created on disk"""
+    """The panel holds one project at a time, so the new model is only created on disk."""
     in_the_panel = ae_with_project.project
 
     parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "new model"}

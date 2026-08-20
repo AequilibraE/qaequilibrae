@@ -58,8 +58,7 @@ def test_directional_field_pairs():
 
 @pytest.mark.parametrize("field", ["matrix_*", "Preload_*", "Congested_Time_*", "VOC_*"])
 def test_compare_scenarios_on_every_offered_field(ae, model_path, field):
-    """Only the flow columns are lower case, and the rest used to reach the layer under a name
-    it did not carry - which surfaced as `evaluate()` handing back None to be read for `.real`."""
+    """Only the flow columns are lower case; the rest used to reach the layer under a name it did not carry."""
     _run_load_project_from_path(ae, model_path)
 
     dialog = CompareScenariosDialog(ae)
@@ -75,8 +74,7 @@ def test_compare_scenarios_on_every_offered_field(ae, model_path, field):
 
     link_layer = QgsProject.instance().mapLayersByName("scenario_comparison")[0]
     names = link_layer.fields().names()
-    # Read off the combo rather than off the label, since the label is the one thing that does
-    # not have to match the column - which is exactly what went wrong here
+    # Off the combo, not the label: the label is the one thing that need not match the column
     for prefix, pair in [("base", base_pair), ("alternative", alter_pair)]:
         for column in pair:
             assert f"{prefix}_{column}" in names

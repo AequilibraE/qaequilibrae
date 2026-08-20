@@ -16,18 +16,10 @@ sys.modules["qgsmaplayercombobox"] = qgis.gui
 
 
 def directional_field_pairs(fields):
-    """The fields that come as an AB/BA pair, each as a label to show and the two column names.
-
-    The pairing is case-insensitive because a result table mixes cases: AequilibraE capitalises
-    the fields it computes itself (`Preload_AB`, `VOC_AB`), while the flow columns carry the case
-    of the traffic class they belong to. The names handed back are the ones the table actually
-    uses - the label is only ever shown, never used to read a column back, which is what used to
-    leave every capitalised field pointing at a column that was not there.
-    """
+    """AB/BA pairs as (label, (ab, ba)), matched case-insensitively and named as the table names them."""
     by_lower = {f.lower(): f for f in fields}
     pairs = []
-    # Matched on the suffix rather than anywhere in the name, so that a class called "cab" is
-    # not paired with itself through the "ab" in the middle of it
+    # Suffix rather than substring, so a class called "cab" is not paired with itself
     for lower, name in by_lower.items():
         counterpart = by_lower.get(f"{lower[:-2]}ba") if lower.endswith("ab") else None
         if counterpart is not None:
@@ -217,12 +209,7 @@ class CompareScenariosDialog(BaseDialog):
         self.exit_procedure()
 
     def band_max_value(self, expression: str):
-        """The value the bandwidths get scaled against, or None if the expression got nowhere.
-
-        `QgsExpression.evaluate` answers NULL for everything it could not work out - a field the
-        layer does not carry, a layer with no features - and the caller cannot tell that from a
-        legitimate zero, so it has to be checked rather than read straight through.
-        """
+        """Value the bandwidths scale against, or None if the expression could not be evaluated."""
         exp = QgsExpression(expression)
         value = exp.evaluate(self.link_layer.createExpressionContext())
         if value is not None:
@@ -233,7 +220,7 @@ class CompareScenariosDialog(BaseDialog):
             self.tr("Could not measure the fields being compared: {}").format(reason),
             self.tr("Scenario comparison"),
         )
-        # Both are the band sizes as text by now, and a second run reads them as numbers again
+        # Both are expression text by now, and a second run reads them as numbers again
         self.sizevaluechange()
         self.spacevaluechange()
         self.but_run.setEnabled(True)
@@ -269,7 +256,7 @@ class CompareScenariosDialog(BaseDialog):
         v2 = self.cob_alt_scenario.currentText()
         v3 = self.cob_base_result.currentText()
         v4 = self.cob_alternative_result.currentText()
-        # The columns as the result tables spell them, rather than as the combos show them
+        # The real column names, not the starred labels
         base_fields = list(self.cob_base_data.currentData())
         alter_fields = list(self.cob_alternative_data.currentData())
 
