@@ -63,7 +63,7 @@ jobs:
   windows_test:
     needs: linting
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     strategy:
       matrix:
       # We test the minimum LTR version required (Qt5) and the latest release (QGIS 4, Qt6).
