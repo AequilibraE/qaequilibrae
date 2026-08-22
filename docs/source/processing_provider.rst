@@ -33,7 +33,7 @@ Data
 ----
 With Data tools, it is possible to import/export matrices to/from the project, as
 well as perform matrix calculations and generate a trip length distribution output
-usig project data. It is also where the modes and the link types the network is
+using project data. It is also where the modes and the link types the network is
 built from are added to the model.
 
 .. warning::

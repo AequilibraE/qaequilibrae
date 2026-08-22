@@ -41,6 +41,7 @@ class AddModeDialog(AddNetworkRecordDialog):
 
         try:
             modes.add(mode)
+            mode.save()
         except Exception as e:
             self.report(self.tr("Could not add the mode: {}").format(e), is_error=True)
             return
