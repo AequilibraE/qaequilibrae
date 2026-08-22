@@ -73,7 +73,15 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Cache QGIS installation
+        id: cache-qgis
+        uses: actions/cache@v6
+        with:
+          path: C:\Program Files\QGIS*
+          key: ${{ runner.os }}-qgis-${{ matrix.version }}
+
       - name: Install QGIS on Chocolatey
+        if: steps.cache-qgis.outputs.cache-hit != 'true'
         uses: crazy-max/ghaction-chocolatey@v4
         with:
           args: install ${{ matrix.version }} -y
