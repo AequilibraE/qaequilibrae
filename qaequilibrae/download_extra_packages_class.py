@@ -2,7 +2,6 @@ import os
 import shutil
 import subprocess  # nosec B404
 import sys
-from importlib.util import find_spec
 from pathlib import Path
 
 from qgis.core import Qgis, QgsMessageLog
@@ -38,12 +37,21 @@ class DownloadAll:
         self.target_folder = pth / "packages"
         self.no_ssl = False
         self.error = 0
+        self.env = self.build_env()
+
+    def build_env(self):
+        """Build the environment used by subprocesses launched from QGIS."""
+        env = os.environ.copy()
+        if sys.platform == "darwin":
+            # Some QGIS macOS builds contain a Python whose prefix points to the build machine.
+            # The running interpreter has already corrected this, so use its prefix for children.
+            try:
+                env["PYTHONHOME"] = str(Path(os.__file__).parents[2])
+            except (IndexError, TypeError):
+                pass
+        return env
 
     def install(self):
-        command = [str(self.find_python()), "-m", "pip", "install", "uv"]
-        _ = self.execute(command)
-        print(" ".join(command))
-
         for file in self.dependency_files:
             flag = self.target_folder / file.name
             if flag.exists():
@@ -52,11 +60,15 @@ class DownloadAll:
             with open(file, "r") as fl:
                 lines = fl.readlines()
 
+            error_before = self.error
             for line in lines:
-                self.install_package(line.strip())
+                package = line.strip()
+                if package:
+                    self.install_package(package)
 
-            with open(flag, "w") as fl:
-                fl.write("")
+            if self.error == error_before:
+                with open(flag, "w") as fl:
+                    fl.write("")
 
         self.clean_packages(self.target_folder)
         print("Error code: ", self.error)
@@ -65,21 +77,8 @@ class DownloadAll:
     def install_package(self, package):
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
 
-        spec = find_spec("uv")
-        installer = ["pip"] if spec is None else ["uv", "pip"]
-
         python = str(self.find_python())
-        install_command = ["-m", *installer, "install", *package.split(), "--target", str(self.target_folder)]
-
-        # uv chooses an interpreter of its own - virtual environments first, then its managed
-        # installs, then whatever is on PATH - instead of the one running this. A QGIS install is
-        # not a virtual environment, so uv resolves against some other Python that happens to be
-        # around and the wheels it downloads are built for the wrong one: CI landed cp314 wheels
-        # beside a QGIS on 3.12, and every compiled module then failed to import. pip needs no
-        # such flag, since it always installs for the interpreter that runs it.
-        if spec is not None and os.path.isabs(python):
-            install_command += ["--python", python]
-
+        install_command = ["-m", "pip", "install", *package.split(), "--target", str(self.target_folder)]
         command = [python, *install_command]
         print(" ".join(command))
 
@@ -110,6 +109,7 @@ class DownloadAll:
             stdin=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
+            env=self.env,
         )
         lines.extend(process.stdout.readlines())
         exit_code = process.wait()
@@ -136,12 +136,32 @@ class DownloadAll:
         # 'C:\\Program Files\\QGIS 3.30.0\\bin\\qgis-bin.exe' respectively so we need to explore in that area
         # of the filesystem
         elif sys.platform == "darwin":
-            python_exe = sys_exe.parent / "bin" / "python3"
+            app_root = sys_exe.parents[1]  # .../QGIS.app/Contents
+            search_dirs = [
+                sys_exe.parent,
+                sys_exe.parent / "bin",
+                app_root / "Resources" / "python" / "bin",
+                *app_root.glob("Frameworks/Python.framework/Versions/*/bin"),
+            ]
+            candidates = []
+            for directory in search_dirs:
+                candidates.append(directory / "python3")
+                candidates.extend(sorted(directory.glob("python3.[0-9]*"), reverse=True))
+
+            python_exe = next(
+                (candidate for candidate in candidates if candidate.exists() and os.access(candidate, os.X_OK)),
+                None,
+            )
+            if python_exe is None:
+                raise FileNotFoundError(
+                    "Can't find the Python executable bundled with QGIS. Looked in: "
+                    + ", ".join(str(candidate) for candidate in candidates)
+                )
         elif sys.platform == "win32":
             python_exe = Path(sys.base_prefix) / "python3.exe"
 
         if not python_exe.exists():
-            raise FileExistsError("Can't find a python executable to use")
+            raise FileNotFoundError("Can't find a python executable to use")
         print(python_exe)
         return python_exe
 
