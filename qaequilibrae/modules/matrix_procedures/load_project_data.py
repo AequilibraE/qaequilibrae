@@ -1,13 +1,15 @@
 from os.path import dirname, join
 
 import pandas as pd
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTabWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QMessageBox, QTabWidget
 from qgis.core import QgsProject, QgsVectorLayerJoinInfo
 
 from qaequilibrae.modules.common_tools import BaseDialog, PandasModel, layer_from_dataframe
 from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
+from qaequilibrae.modules.matrix_procedures.matrix_deleter import delete_matrix
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
+from qaequilibrae.modules.matrix_procedures.results_deleter import delete_result
 from qaequilibrae.modules.matrix_procedures.results_lister import list_results
 
 
@@ -42,6 +44,9 @@ class LoadProjectDataDialog(BaseDialog):
             self.but_update_matrices.clicked.connect(self.update_matrix_table)
             self.but_load_Results.clicked.connect(self.load_result_table)
             self.but_load_matrix.clicked.connect(self.display_matrix)
+
+            self.list_matrices.doubleClicked.connect(self.delete_matrix_record)
+            self.list_results.doubleClicked.connect(self.delete_result_record)
         else:
             QTabWidget.removeTab(self.tabs, 1)
             QTabWidget.removeTab(self.tabs, 0)
@@ -74,6 +79,20 @@ class LoadProjectDataDialog(BaseDialog):
             qry = """UPDATE matrices SET name = substr(file_name, 1, length(file_name)-4) WHERE name like "b''%";"""
             conn.execute(qry)
         self.load_matrices()
+
+    def delete_matrix_record(self, index):
+        """Deletes the double-clicked matrix, after the user confirms it."""
+        row = index.row()
+        if row < 0:
+            return
+
+        matrix_name = self.matrices["name"].iloc[row]
+        question = self.tr("Delete the matrix '{}' and its file from disk?").format(matrix_name)
+        if not self.confirm_deletion(self.tr("Delete matrix"), question):
+            return
+
+        if self.run_deletion(delete_matrix, matrix_name):
+            self.load_matrices()
 
     def load_results(self):
         self.results = list_results(self.project)
@@ -111,6 +130,49 @@ class LoadProjectDataDialog(BaseDialog):
             lien.setJoinLayer(lyr)
             lien.setPrefix(f"{table_name}_")
             self.link_layer.addJoin(lien)
+
+    def delete_result_record(self, index):
+        """Deletes the double-clicked result, after the user confirms it."""
+        row = index.row()
+        if row < 0:
+            return
+
+        table_name = self.results["table_name"].iloc[row]
+        question = self.tr("Delete the result '{}' and its table from the results database?").format(table_name)
+        if not self.confirm_deletion(self.tr("Delete result"), question):
+            return
+
+        if self.run_deletion(delete_result, table_name):
+            self.load_results()
+
+    def run_deletion(self, deleter, name: str) -> bool:
+        """Runs a deletion, reporting a failure instead of letting it escape the slot.
+
+        An exception crossing a Qt slot boundary takes QGIS down with it, and deleting reaches
+        both the filesystem and databases the user may have open elsewhere, so anything that goes
+        wrong is reported on the message bar and the table is left showing the record.
+        """
+        try:
+            deleter(self.project, name)
+        except Exception as e:
+            self.qgis_project.iface_error_message(self.tr("Could not delete '{}': {}").format(name, e))
+            return False
+        return True
+
+    def confirm_deletion(self, title: str, question: str) -> bool:
+        """Asks the user to confirm a deletion, defaulting to not going ahead with it.
+
+        Deleting is not undoable and is reached by double-clicking a row, which is easy to do by
+        accident, so 'No' is both the default button and what any dismissal of the box amounts to.
+        """
+        answer = QMessageBox.question(
+            self,
+            title,
+            f"{question}\n\n{self.tr('This cannot be undone.')}",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        return answer == QMessageBox.StandardButton.Yes
 
     def display_external_data(self):
         dlg2 = DisplayAequilibraEFormatsDialog(self.qgis_project)

@@ -16,7 +16,10 @@ def list_results(project) -> pd.DataFrame:
                 df = pd.read_sql("select * from results", conn)
                 databases.append(df)
 
-    df = pd.concat(databases)
+    # Both databases number their rows from zero, so concatenating them as-is leaves duplicate
+    # labels. Callers reach a record by the row number a table view hands them, which is a
+    # position, and only a fresh index makes the two agree.
+    df = pd.concat(databases, ignore_index=True)
 
     if isfile(project._results_database_path):
         with project.results_connection as conn:
