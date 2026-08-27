@@ -33,12 +33,63 @@ Data
 ----
 With Data tools, it is possible to import/export matrices to/from the project, as
 well as perform matrix calculations and generate a trip length distribution output
-usig project data.
+using project data. It is also where the modes and the link types the network is
+built from are added to the model.
 
 .. warning::
 
     Support for AequilibraE Matrix (AEM) files has been removed. Matrices must be
     stored in OpenMatrix (\*.omx) format.
+
+.. _add_link_type:
+
+Add link type
+~~~~~~~~~~~~~
+Every link in an AequilibraE network carries a link type, and a link can only be saved
+with one the model already knows about. **Data > Add link type** adds a new one to the
+open project.
+
+The table at the top lists the link types the project already has, exactly as they are
+stored in the *link_types* table, so you can see which identifiers and names are taken
+before filling in the form below it.
+
+.. image:: images/processing_provider/data-add_link_type.png
+    :align: center
+    :alt: Add link type
+
+A link type needs two things: a **link type ID**, which is the single letter used to
+refer to it wherever a set of link types is chosen (when
+:ref:`adding centroid connectors <adding_centroids>`, for example), and a **link type
+name**, which is what the links themselves carry. The dialog offers the first identifier
+that is still free, and the name may only contain letters and underscores.
+
+*Description*, *lanes*, *lane capacity* and *speed* are optional, and the three numbers
+are left empty in the model while they read *Not set*. A model built with an older
+version of AequilibraE may not have all of these columns, and the ones it does not have
+are not offered.
+
+The dialog stays open after each addition, so several link types can be added in a row,
+and each new link type is immediately available in the attribute form used to
+:ref:`digitize links <editing_networks>`.
+
+.. _add_mode:
+
+Add mode
+~~~~~~~~
+Modes work the same way as link types: each link lists the modes allowed on it, and only
+modes the model knows about can be used. **Data > Add mode** adds one to the open project.
+
+.. image:: images/processing_provider/data-add_mode.png
+    :align: center
+    :alt: Add mode
+
+A **mode ID** is the single letter that identifies the mode in the *modes* field of the
+links layer, and the **mode name** is its descriptive name. As with link types, the first
+free identifier is offered, and names may only contain letters and underscores.
+
+*PCE* (passenger-car equivalent), *value of time* and *persons per vehicle* are the
+defaults this mode brings to traffic assignment, and can be edited later in the modes
+table. Persons per vehicle can be zero, which is how non-travel uses are represented.
 
 .. _importing_matrices:
 
