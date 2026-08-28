@@ -3,6 +3,19 @@ from pathlib import Path
 from qaequilibrae.modules.menu_actions.load_project_action import _project_root, _run_load_project_from_path
 
 
+def test_failed_load_does_not_claim_project_is_open(ae, tmp_path, sioux_falls_project_path):
+    _run_load_project_from_path(ae, str(tmp_path / "missing"))
+
+    assert ae.project is None
+
+    # The failed attempt must not prevent the user from opening a valid project next.
+    try:
+        _run_load_project_from_path(ae, sioux_falls_project_path)
+        assert ae.project is not None
+    finally:
+        ae.run_close_project()
+
+
 def test_base_path_is_root_while_scenario_is_active(sf_project):
     root = Path(sf_project.project.project_base_path)
 

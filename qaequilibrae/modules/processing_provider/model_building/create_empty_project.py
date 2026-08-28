@@ -2,7 +2,7 @@ import importlib.util as iutil
 from os import listdir, rmdir
 from os.path import isdir, join
 
-from qgis.core import QgsProcessingAlgorithm, QgsProcessingException
+from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingException
 from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterString
 
 from qaequilibrae.i18n.translate import trlt
@@ -30,6 +30,10 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterString(self.MODEL_NAME, self.tr("Model name"), defaultValue="new model")
         )
+
+    def flags(self):
+        # Filling the panel means touching widgets, which only the main thread may do
+        return super().flags() | Qgis.ProcessingAlgorithmFlag.NoThreading
 
     def processAlgorithm(self, parameters, context, feedback):
         parent_folder = self.parameterAsFile(parameters, self.PARENT_FOLDER, context)
@@ -81,13 +85,34 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
         modes = list(project.network.modes.all_modes().keys())
         link_types = list(project.network.link_types.all_types().keys())
 
-        project.close()
-
         feedback.pushInfo(self.tr("Project created in ") + project_folder)
         feedback.pushInfo(self.tr("Default modes: ") + ", ".join(sorted(modes)))
         feedback.pushInfo(self.tr("Default link types: ") + ", ".join(sorted(link_types)))
 
+        self.show_in_panel(project, project_folder, feedback)
+
         return {"Output": project_folder}
+
+    def show_in_panel(self, project, project_folder, feedback):
+        """Hands the new model to the panel, the way every other way of creating one does."""
+        from qaequilibrae import get_aequilibrae_menu_instance
+        from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
+
+        qgis_project = get_aequilibrae_menu_instance()
+
+        # Processing also runs with no plugin around it
+        if qgis_project is None:
+            project.close()
+            return
+
+        # The panel holds one project at a time, and the one already open stays
+        if qgis_project.project is not None:
+            feedback.pushWarning(self.tr("Close the open project to see the new one in the panel"))
+            project.close()
+            return
+
+        qgis_project.project = project
+        show_project_in_panel(qgis_project, project_folder)
 
     def name(self):
         return "create_empty_project"
