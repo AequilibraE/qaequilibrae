@@ -102,12 +102,17 @@ def ae(qgis_iface) -> AequilibraEMenu:
 
 
 @pytest.fixture(scope="function")
-def ae_with_project(qgis_iface, folder_path) -> AequilibraEMenu:
+def sioux_falls_project_path(folder_path):
+    copytree("test/data/SiouxFalls_project", folder_path)
+    return folder_path
+
+
+@pytest.fixture(scope="function")
+def ae_with_project(qgis_iface, sioux_falls_project_path) -> AequilibraEMenu:
     ae = AequilibraEMenu(qgis_iface)
     from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
 
-    copytree("test/data/SiouxFalls_project", folder_path)
-    _run_load_project_from_path(ae, folder_path)
+    _run_load_project_from_path(ae, sioux_falls_project_path)
     yield ae
     ae.run_close_project()
     qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}

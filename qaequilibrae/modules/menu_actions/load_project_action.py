@@ -31,10 +31,10 @@ def _run_load_project_from_path(qgis_project, proj_path):
     proj_path = _project_root(proj_path)
 
     qgis_project.contents = []
-    qgis_project.project = Project()
+    project = Project()
 
     try:
-        qgis_project.project.open(proj_path)
+        project.open(proj_path)
     except FileNotFoundError as e:
         if e.args[0] == "Model does not exist. Check your path and try again":
             qgis_project.iface_error_message(
@@ -44,6 +44,7 @@ def _run_load_project_from_path(qgis_project, proj_path):
         else:
             raise e
 
+    qgis_project.project = project
     show_project_in_panel(qgis_project, proj_path)
 
 
