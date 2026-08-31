@@ -84,6 +84,7 @@ def test_find_python_finds_versioned_macos_executable(mocker, tmp_path):
     executable.chmod(0o755)
     mocker.patch("qaequilibrae.download_extra_packages_class.sys.platform", "darwin")
     mocker.patch("qaequilibrae.download_extra_packages_class.sys.executable", str(contents / "MacOS" / "QGIS"))
+    mocker.patch("qaequilibrae.download_extra_packages_class.sys.version_info", (3, 12))
     mocker.patch("qaequilibrae.download_extra_packages_class.sys.prefix", "/qgis")
     mocker.patch("qaequilibrae.download_extra_packages_class.sys.base_prefix", "/qgis")
 

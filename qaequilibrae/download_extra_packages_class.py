@@ -53,14 +53,12 @@ class DownloadAll:
             with open(file, "r") as fl:
                 lines = fl.readlines()
 
-            error_before = self.error
             for line in lines:
                 package = line.strip()
                 if package:
                     self.install_package(package)
 
-            if self.error == error_before:
-                flag.touch()
+            flag.touch()
 
         self.clean_packages(self.target_folder)
         print("Error code: ", self.error)
@@ -111,7 +109,7 @@ class DownloadAll:
         """Runs *command*, given as an argument list, and returns it followed by its output."""
         lines = []
         lines.append(" ".join(command))
-        env = os.environ.copy()
+        env = os.environ.copy() if sys.platform == "darwin" else None
         if sys.platform == "darwin":
             env["PYTHONHOME"] = str(Path(os.__file__).parents[2])
         # Argument list, no shell: every element is either a literal or a path we resolved ourselves
@@ -148,11 +146,7 @@ class DownloadAll:
         # 'C:\\Program Files\\QGIS 3.30.0\\bin\\qgis-bin.exe' respectively so we need to explore in that area
         # of the filesystem
         elif sys.platform == "darwin":
-            python_exe = sys_exe.parent / "bin" / "python3"
-            if not python_exe.exists():
-                python_exe = next(
-                    (path for path in sys_exe.parent.glob("python3.*") if path.suffix[1:].isdigit()), python_exe
-                )
+            python_exe = sys_exe.parent / f"python{sys.version_info[0]}.{sys.version_info[1]}"
         elif sys.platform == "win32":
             python_exe = Path(sys.base_prefix) / "python3.exe"
 
