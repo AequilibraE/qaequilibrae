@@ -3,13 +3,14 @@ from pathlib import Path
 from qaequilibrae.download_extra_packages_class import DownloadAll
 
 
-def _captured_command(mocker, python, uv_available):
+def _captured_command(mocker, python, uv_available, platform="linux"):
     """Runs install_package with the subprocess call stubbed, and returns the argv it built."""
     mocker.patch(
         "qaequilibrae.download_extra_packages_class.find_spec",
         return_value=object() if uv_available else None,
     )
     mocker.patch.object(DownloadAll, "find_python", return_value=python)
+    mocker.patch("qaequilibrae.download_extra_packages_class.sys.platform", platform)
 
     calls = []
     mocker.patch.object(DownloadAll, "execute", side_effect=lambda command: calls.append(command) or [])
@@ -51,6 +52,28 @@ def test_a_python_resolved_by_name_is_left_for_uv_to_find(mocker):
 
     assert command[0] == "python3"
     assert "--python" not in command
+
+
+def test_macos_uses_pip_for_qgis_embedded_python(mocker, tmp_path):
+    """uv cannot inspect QGIS's relocated Python because its probe drops PYTHONHOME."""
+    python = str(tmp_path / "QGIS.app" / "Contents" / "MacOS" / "python3.12")
+
+    command = _captured_command(mocker, python, uv_available=True, platform="darwin")
+
+    assert command[1:4] == ["-m", "pip", "install"]
+    assert "--python" not in command
+
+
+def test_macos_does_not_install_uv(mocker):
+    mocker.patch("qaequilibrae.download_extra_packages_class.sys.platform", "darwin")
+    mocker.patch.object(DownloadAll, "find_python", return_value="python3")
+    mocker.patch.object(DownloadAll, "execute")
+
+    installer = DownloadAll()
+    installer.dependency_files = []
+    installer.install()
+
+    installer.execute.assert_not_called()
 
 
 def test_find_python_finds_versioned_macos_executable(mocker, tmp_path):

@@ -40,9 +40,10 @@ class DownloadAll:
         self.error = 0
 
     def install(self):
-        command = [str(self.find_python()), "-m", "pip", "install", "uv"]
-        _ = self.execute(command)
-        print(" ".join(command))
+        if sys.platform != "darwin":
+            command = [str(self.find_python()), "-m", "pip", "install", "uv"]
+            _ = self.execute(command)
+            print(" ".join(command))
 
         for file in self.dependency_files:
             flag = self.target_folder / file.name
@@ -52,11 +53,14 @@ class DownloadAll:
             with open(file, "r") as fl:
                 lines = fl.readlines()
 
+            error_before = self.error
             for line in lines:
-                self.install_package(line.strip())
+                package = line.strip()
+                if package:
+                    self.install_package(package)
 
-            with open(flag, "w") as fl:
-                fl.write("")
+            if self.error == error_before:
+                flag.touch()
 
         self.clean_packages(self.target_folder)
         print("Error code: ", self.error)
@@ -66,7 +70,11 @@ class DownloadAll:
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
 
         spec = find_spec("uv")
-        installer = ["pip"] if spec is None else ["uv", "pip"]
+        # uv probes Python with an isolated process and drops PYTHONHOME. That breaks the
+        # relocated Python runtime shipped inside the macOS QGIS application, so use the
+        # interpreter's pip there even when uv happens to be installed globally.
+        use_uv = spec is not None and sys.platform != "darwin"
+        installer = ["uv", "pip"] if use_uv else ["pip"]
 
         python = str(self.find_python())
         install_command = ["-m", *installer, "install", *package.split(), "--target", str(self.target_folder)]
@@ -77,7 +85,7 @@ class DownloadAll:
         # around and the wheels it downloads are built for the wrong one: CI landed cp314 wheels
         # beside a QGIS on 3.12, and every compiled module then failed to import. pip needs no
         # such flag, since it always installs for the interpreter that runs it.
-        if spec is not None and os.path.isabs(python):
+        if use_uv and os.path.isabs(python):
             install_command += ["--python", python]
 
         command = [python, *install_command]
