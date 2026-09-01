@@ -1,5 +1,6 @@
 [general]
 name=qaequilibrae
+version=1.7.0
 qgisMinimumVersion=3.40
 qgisMaximumVersion=4.99.0
 supportsQt6=True

@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess  # nosec B404
 import sys
+import tempfile
 from importlib.util import find_spec
 from pathlib import Path
 
@@ -38,6 +39,7 @@ class DownloadAll:
         self.target_folder = pth / "packages"
         self.no_ssl = False
         self.error = 0
+        self.last_exit_code = 0
 
     def install(self):
         if sys.platform != "darwin":
@@ -58,13 +60,17 @@ class DownloadAll:
                 if package:
                     self.install_package(package)
 
-            flag.touch()
+            if self.error == 0:
+                flag.touch()
 
         self.clean_packages(self.target_folder)
         print("Error code: ", self.error)
         return self.error
 
     def install_package(self, package):
+        if sys.platform == "darwin" and package.startswith("aequilibrae=="):
+            return self.build_aequilibrae_macos(package)
+
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
 
         spec = find_spec("uv")
@@ -105,12 +111,164 @@ class DownloadAll:
 
         return reps
 
-    def execute(self, command):
+    def build_aequilibrae_macos(self, package):
+        """Build AequilibraE outside QGIS, then install its wheel into the plugin."""
+        # Try to find uv and brew. They should be on the PATH, but if not we'll check the homebrew locations for both Intel and Apple Silicon macs.
+        # Expect to find in a homebrew location as the MacOS installation docs recommend installing uv via homebrew.
+        # Paths from https://docs.brew.sh/Installation
+
+        uv = shutil.which("uv")
+        if uv is None:
+            for candidate in (Path("/opt/homebrew/bin/uv"), Path("/usr/local/bin/uv")):
+                if candidate.exists():
+                    uv = str(candidate)
+                    break
+
+        brew = shutil.which("brew")
+        if brew is None:
+            for candidate in (
+                Path("/opt/homebrew/bin/brew"),
+                Path("/usr/local/bin/brew"),
+            ):
+                if candidate.exists():
+                    brew = str(candidate)
+                    break
+
+        if uv is None or brew is None:
+            missing = []
+            if uv is None:
+                missing.append("uv")
+            if brew is None:
+                missing.append("Homebrew")
+            self.error = 1
+            QgsMessageLog.logMessage(
+                f"macOS dependency build cannot start; install {', '.join(missing)} first",
+                "Messages",
+                level=Qgis.MessageLevel.Critical,
+            )
+            return []
+
+        build_environment = os.environ.copy()
+        build_environment.pop("PYTHONHOME", None)
+
+        brew_output = self.execute([brew, "--prefix"], environment=build_environment)
+        if self.last_exit_code != 0:
+            QgsMessageLog.logMessage(
+                "Homebrew could not provide its installation prefix",
+                "Messages",
+                level=Qgis.MessageLevel.Critical,
+            )
+            return brew_output
+
+        brew_prefixes = [Path(line.strip()) for line in brew_output[1:] if line.strip()]
+        brew_prefix = next((prefix for prefix in reversed(brew_prefixes) if prefix.exists()), None)
+        if brew_prefix is None:
+            self.error = 1
+            QgsMessageLog.logMessage(
+                "Homebrew returned an invalid installation prefix",
+                "Messages",
+                level=Qgis.MessageLevel.Critical,
+            )
+            return brew_output
+        llvm_prefix = brew_prefix / "opt" / "llvm"
+        spatialite_library = brew_prefix / "lib"
+        compiler = llvm_prefix / "bin" / "clang"
+        compiler_cpp = llvm_prefix / "bin" / "clang++"
+
+        if not compiler.exists() or not compiler_cpp.exists():
+            self.error = 1
+            QgsMessageLog.logMessage(
+                "LLVM was not found. Install it with: brew install llvm",
+                "Messages",
+                level=Qgis.MessageLevel.Critical,
+            )
+            return []
+
+        if not any(spatialite_library.glob("libspatialite.*")):
+            self.error = 1
+            QgsMessageLog.logMessage(
+                "libspatialite was not found. Install it with: brew install libspatialite",
+                "Messages",
+                level=Qgis.MessageLevel.Critical,
+            )
+            return []
+
+        build_environment.update(
+            {
+                "CC": str(compiler),
+                "CXX": str(compiler_cpp),
+                "AEQ_SPATIALITE_DIR": str(spatialite_library),
+                "DYLD_LIBRARY_PATH": f"{spatialite_library}{os.pathsep}"
+                f"{build_environment.get('DYLD_LIBRARY_PATH', '')}",
+                "PATH": f"{llvm_prefix / 'bin'}{os.pathsep}{build_environment.get('PATH', '')}",
+            }
+        )
+
+        build_folder = Path(tempfile.mkdtemp(prefix="qaequilibrae-build-"))
+        virtual_environment = build_folder / "venv"
+        wheel_folder = build_folder / "wheels"
+        wheel_folder.mkdir()
+        python_version = f"{sys.version_info[0]}.{sys.version_info[1]}"
+        commands = [
+            [uv, "python", "install", python_version],
+            [uv, "venv", "--python", python_version, "--seed", str(virtual_environment)],
+            [
+                str(virtual_environment / "bin" / "python"),
+                "-m",
+                "pip",
+                "wheel",
+                package,
+                "--no-deps",
+                "--wheel-dir",
+                str(wheel_folder),
+            ],
+        ]
+
+        try:
+            output = []
+            for command in commands:
+                output.extend(self.execute(command, environment=build_environment))
+                if self.last_exit_code != 0:
+                    return output
+
+            wheels = list(wheel_folder.glob("aequilibrae-*.whl"))
+            if len(wheels) != 1:
+                self.error = 1
+                QgsMessageLog.logMessage(
+                    "The macOS AequilibraE build did not produce exactly one wheel",
+                    "Messages",
+                    level=Qgis.MessageLevel.Critical,
+                )
+                return output
+
+            output.extend(self.install_wheel(wheels[0]))
+            return output
+        finally:
+            shutil.rmtree(build_folder, ignore_errors=True)
+
+    def install_wheel(self, wheel):
+        """Install a wheel and its runtime dependencies into the plugin package directory."""
+        Path(self.target_folder).mkdir(parents=True, exist_ok=True)
+        python = str(self.find_python())
+        command = [
+            python,
+            "-m",
+            "pip",
+            "install",
+            str(wheel),
+            "--target",
+            str(self.target_folder),
+        ]
+        print(" ".join(command))
+        return self.execute(command)
+
+    def execute(self, command, environment=None):
         """Runs *command*, given as an argument list, and returns it followed by its output."""
         lines = []
         lines.append(" ".join(command))
-        env = os.environ.copy() if sys.platform == "darwin" else None
-        if sys.platform == "darwin":
+        env = environment
+        if env is None and sys.platform == "darwin":
+            env = os.environ.copy()
             env["PYTHONHOME"] = str(Path(os.__file__).parents[2])
         # Argument list, no shell: every element is either a literal or a path we resolved ourselves
         process = subprocess.Popen(  # nosec B603
@@ -123,6 +281,7 @@ class DownloadAll:
         )
         lines.extend(process.stdout.readlines())
         exit_code = process.wait()
+        self.last_exit_code = exit_code
         if exit_code != 0:
             self.error = exit_code
         return lines

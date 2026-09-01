@@ -17,9 +17,21 @@ def set_version(sha):
     current_version = current_time.strftime("%y.%j.%H")
 
     metadata_path = project_dir / "qaequilibrae" / "metadata.txt"
-    with open(metadata_path, mode="a") as file:
-        file.write(f"version={current_version}\n")
-        file.write(f"commitSha1={sha}")
+    metadata_lines = metadata_path.read_text().splitlines()
+    replacements = {"version": current_version, "commitSha1": sha}
+    found = set()
+
+    for index, line in enumerate(metadata_lines):
+        key, separator, _ = line.partition("=")
+        if separator and key in replacements:
+            metadata_lines[index] = f"{key}={replacements[key]}"
+            found.add(key)
+
+    for key, value in replacements.items():
+        if key not in found:
+            metadata_lines.append(f"{key}={value}")
+
+    metadata_path.write_text("\n".join(metadata_lines) + "\n")
 
     # Update version in XML
     xml_path = project_dir / "docs" / "source" / "_static" / "plugin.xml"

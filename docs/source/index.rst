@@ -49,5 +49,6 @@ QGIS
    :maxdepth: 1
 
    getting_started
+   macos_installation
    menus_in_detail
    processing_provider
