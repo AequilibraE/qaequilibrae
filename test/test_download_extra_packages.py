@@ -3,14 +3,13 @@ from pathlib import Path
 from qaequilibrae.download_extra_packages_class import DownloadAll
 
 
-def _captured_command(mocker, python, uv_available, platform="linux"):
+def _captured_command(mocker, python, uv_available):
     """Runs install_package with the subprocess call stubbed, and returns the argv it built."""
     mocker.patch(
         "qaequilibrae.download_extra_packages_class.find_spec",
         return_value=object() if uv_available else None,
     )
     mocker.patch.object(DownloadAll, "find_python", return_value=python)
-    mocker.patch("qaequilibrae.download_extra_packages_class.sys.platform", platform)
 
     calls = []
     mocker.patch.object(DownloadAll, "execute", side_effect=lambda command: calls.append(command) or [])
