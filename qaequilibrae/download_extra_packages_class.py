@@ -42,6 +42,8 @@ class DownloadAll:
         self.last_exit_code = 0
 
     def install(self):
+        self.target_folder.mkdir(parents=True, exist_ok=True)
+
         if sys.platform != "darwin":
             command = [str(self.find_python()), "-m", "pip", "install", "uv"]
             _ = self.execute(command)
@@ -69,7 +71,10 @@ class DownloadAll:
 
     def install_package(self, package):
         if sys.platform == "darwin" and package.startswith("aequilibrae=="):
-            return self.build_aequilibrae_macos(package)
+            reps = self.build_aequilibrae_macos(package)
+            for line in reps:
+                QgsMessageLog.logMessage(str(line), "Messages", level=Qgis.MessageLevel.Info)
+            return reps
 
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
 

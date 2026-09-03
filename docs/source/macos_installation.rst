@@ -1,10 +1,10 @@
 macOS installation
 ==================
 
-For Linux and Windows, AequilibraE builds "wheels", pre-compiled packages of
-AequilibraE. On macOS, QAequilibraE build AequlibraE from source. This requires
-the same tools that are used to build AequilibraE usually. We install these
-first, then the QAequilibraE will build and install the packages it requires.   
+For Linux and Windows, AequilibraE provides pre-compiled wheels. On macOS,
+QAequilibraE builds AequilibraE from source. This process requires the same
+tools used to build AequilibraE. Install these tools first. QAequilibraE then
+builds and installs its required packages.
 
 Install the required tools
 --------------------------
@@ -29,7 +29,7 @@ Install the required tools
 
     brew install uv llvm libspatialite
 
-6. Continue with the `regular installation of QAequilibraE <getting_started.rst>`_.
+6. Continue with the :doc:`regular installation of QAequilibraE <getting_started>`.
 
 Troubleshooting
 ---------------
