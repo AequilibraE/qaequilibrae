@@ -53,6 +53,9 @@ showing the image below.
 Otherwise, a message warning about installation problems will be shown, and your
 plugin will be non-functional.
 
+On macOS, install the build tools before you accept the dependency installation prompt.
+Read :doc:`macos_installation` for the required tools and settings.
+
 .. image:: images/getting_started/getting_started_5.png
     :align: center
     :alt: Fifth step
