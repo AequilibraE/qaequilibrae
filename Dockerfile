@@ -1,4 +1,5 @@
-FROM qgis/qgis:ltr
+ARG QGIS_BASE_IMAGE=qgis/qgis:ltr
+FROM ${QGIS_BASE_IMAGE}
 
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt update -y && apt install -y pandoc zip
