@@ -62,8 +62,7 @@ class LiveLogWidget(QWidget):
             return
         self.text.appendPlainText(msg)
         if self.auto_scroll.isChecked():
-            # Drive the scrollbar rather than the cursor. appendPlainText leaves the
-            # text cursor where it was -- usually the very start -- so asking to make
+            # appendPlainText leaves the text cursor where it was so asking to make
             # the cursor visible scrolls back to the top instead of following the tail.
             scrollbar = self.text.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())

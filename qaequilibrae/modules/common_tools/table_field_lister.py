@@ -2,7 +2,7 @@ from sqlite3 import Connection
 
 
 def find_table_fields(conn: Connection, table_name: str):
-    """Returns the column names of *table_name*, spelled as the table spells them.
+    """Returns the column names of *table_name*.
 
     Uses the table-valued form of the pragma so the table name travels as a bound parameter
     rather than being interpolated into the statement."""

@@ -12,7 +12,7 @@ from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import QItemSelectionModel, Qt
 from qgis.PyQt.QtGui import QColor, QPalette
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 
@@ -181,7 +181,12 @@ class TrafficAssignmentDialog(BaseDialog):
                     # From the combo rather than from the config, so that the cores listed below
                     # come from the same matrix `_create_traffic_class` is going to pick up
                     names = self.project.matrices.get_matrix(self.cob_matrices.currentText()).names
-                    self.tbl_core_list.selectRow(names.index(value["matrix_core"]))
+                    cores = value.get("matrix_cores", [value["matrix_core"]])
+                    self.tbl_core_list.clearSelection()
+                    selection = self.tbl_core_list.selectionModel()
+                    flags = QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows
+                    for core in cores:
+                        selection.select(selection.model().index(names.index(core), 0), flags)
                     self.ln_class_name.setText(key)
                     self.pce_setter.setValue(value["pce"])
                     self.chb_check_centroids.setChecked(value["blocked_centroid_flows"])
@@ -262,7 +267,10 @@ class TrafficAssignmentDialog(BaseDialog):
                 pth = Path(info.matrix.file_path).name
                 df = self.project.matrices.list()
                 dc["matrix_name"] = df.loc[df["file_name"] == pth]["name"].values[0]
-                dc["matrix_core"] = self.class_cores[tc][0]
+                cores = self.class_cores[tc]
+                dc["matrix_core"] = cores[0]
+                if len(cores) > 1:
+                    dc["matrix_cores"] = cores
                 dc["network_mode"] = info.mode
                 dc["pce"] = info.pce
                 # Taken from the class rather than from the checkbox, which only reflects the class
@@ -339,7 +347,7 @@ class TrafficAssignmentDialog(BaseDialog):
                             self.skims[tc] if self.skims[tc] else [],
                             info.graph.block_centroid_flows,
                             df.loc[df["file_name"] == pth]["name"].values[0],
-                            self.class_cores[tc][0],
+                            self.class_cores[tc],
                             tc,
                         ]
                     ]

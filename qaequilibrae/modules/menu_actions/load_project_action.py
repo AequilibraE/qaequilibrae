@@ -44,8 +44,23 @@ def _run_load_project_from_path(qgis_project, proj_path):
         else:
             raise e
 
-    qgis_project.project = project
-    show_project_in_panel(qgis_project, proj_path)
+    try:
+        qgis_project.project = project
+        show_project_in_panel(qgis_project, proj_path)
+    except Exception:
+        try:
+            qgis_project.remove_aequilibrae_layers()
+        except Exception:
+            pass
+        qgis_project.cob_scenarios.clear()
+        qgis_project.projectManager.clear()
+        qgis_project.available_scenarios.clear()
+        qgis_project.matrices.clear()
+        qgis_project.layers.clear()
+        if qgis_project.project is project:
+            qgis_project.project = None
+        project.close()
+        raise
 
 
 def show_project_in_panel(qgis_project, proj_path):

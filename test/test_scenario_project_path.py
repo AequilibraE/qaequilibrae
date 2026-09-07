@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from qaequilibrae.modules.menu_actions.load_project_action import _project_root, _run_load_project_from_path
 
 
@@ -14,6 +16,29 @@ def test_failed_load_does_not_claim_project_is_open(ae, tmp_path, sioux_falls_pr
         assert ae.project is not None
     finally:
         ae.run_close_project()
+
+
+def test_failed_panel_setup_does_not_leave_project_open(ae, sioux_falls_project_path, mocker):
+    def fail_after_changing_panel(qgis_project, _):
+        qgis_project.cob_scenarios.addItem("partial")
+        qgis_project.available_scenarios.append("partial")
+        qgis_project.matrices["partial"] = None
+        qgis_project.layers["partial"] = None
+        raise RuntimeError("panel setup failed")
+
+    mocker.patch(
+        "qaequilibrae.modules.menu_actions.load_project_action.show_project_in_panel",
+        side_effect=fail_after_changing_panel,
+    )
+
+    with pytest.raises(RuntimeError, match="panel setup failed"):
+        _run_load_project_from_path(ae, sioux_falls_project_path)
+
+    assert ae.project is None
+    assert ae.cob_scenarios.count() == 0
+    assert ae.available_scenarios == []
+    assert ae.matrices == {}
+    assert ae.layers == {}
 
 
 def test_base_path_is_root_while_scenario_is_active(sf_project):

@@ -1063,6 +1063,7 @@ def test_yaml_carries_the_core_the_matrix_knows(sf_project, qtbot, mocker):
 
     add_class(dialog, qtbot, "demand", [0], "car")
     add_class(dialog, qtbot, "demand_omx", [0], "van", mode_index=4)
+    add_class(dialog, qtbot, "demand_mc", [0, 1], "multi", mode_index=4)
 
     dialog.output_scenario_name.setText("result_same_core")
     dialog.cob_vdf.setCurrentText("bpr")
@@ -1077,14 +1078,16 @@ def test_yaml_carries_the_core_the_matrix_knows(sf_project, qtbot, mocker):
     with open(saved_yaml, "r") as f:
         saved = yaml.safe_load(f)
 
-    cores = {name: cfg["matrix_core"] for entry in saved["traffic_classes"] for name, cfg in entry.items()}
+    configs = {name: cfg for entry in saved["traffic_classes"] for name, cfg in entry.items()}
+    cores = {name: cfg["matrix_core"] for name, cfg in configs.items() if name != "multi"}
     assert cores == {"car": "matrix", "van": "matrix"}
+    assert configs["multi"]["matrix_cores"] == ["car", "motorcycle"]
 
     # Which is the half that matters: the config has to be loadable again
     reopened = TrafficAssignmentDialog(sf_project)
     qtbot.mouseClick(reopened.but_load_yaml, Qt.MouseButton.LeftButton)
 
-    assert reopened.class_cores == {"car": ["matrix"], "van": ["matrix"]}
+    assert reopened.class_cores == {"car": ["matrix"], "van": ["matrix"], "multi": ["car", "motorcycle"]}
     assert reopened.traffic_classes["van"].matrix.view_names == ["van"]
 
     reopened.close()

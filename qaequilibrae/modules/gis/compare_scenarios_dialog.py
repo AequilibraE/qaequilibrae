@@ -22,7 +22,7 @@ def directional_field_pairs(fields):
     # Suffix rather than substring, so a class called "cab" is not paired with itself
     for lower, name in by_lower.items():
         counterpart = by_lower.get(f"{lower[:-2]}ba") if lower.endswith("ab") else None
-        if counterpart is not None:
+        if counterpart:
             pairs.append((f"{name[:-2]}*", (name, counterpart)))
     return pairs
 
@@ -220,7 +220,7 @@ class CompareScenariosDialog(BaseDialog):
             self.tr("Could not measure the fields being compared: {}").format(reason),
             self.tr("Scenario comparison"),
         )
-        # Both are expression text by now, and a second run reads them as numbers again
+        # Reset `band_size` and `space_size` after replacing them with expressions.
         self.sizevaluechange()
         self.spacevaluechange()
         self.but_run.setEnabled(True)
@@ -256,7 +256,6 @@ class CompareScenariosDialog(BaseDialog):
         v2 = self.cob_alt_scenario.currentText()
         v3 = self.cob_base_result.currentText()
         v4 = self.cob_alternative_result.currentText()
-        # The real column names, not the starred labels
         base_fields = list(self.cob_base_data.currentData())
         alter_fields = list(self.cob_alternative_data.currentData())
 
