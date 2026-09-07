@@ -2,6 +2,7 @@ from os.path import dirname, join
 
 import pandas as pd
 from qgis.PyQt.QtWidgets import QAbstractItemView, QMessageBox, QTabWidget
+from qgis.PyQt.QtGui import QKeySequence
 from qgis.core import QgsProject, QgsVectorLayerJoinInfo
 
 from qaequilibrae.modules.common_tools import BaseDialog, PandasModel, layer_from_dataframe
@@ -38,6 +39,9 @@ class LoadProjectDataDialog(BaseDialog):
                 table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
                 table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
+            self.list_matrices_shortcut.setKey(QKeySequence(QKeySequence.StandardKey.Delete))
+            self.list_results_shortcut.setKey(QKeySequence(QKeySequence.StandardKey.Delete))
+
             self.load_matrices()
             self.load_results()
 
@@ -47,6 +51,9 @@ class LoadProjectDataDialog(BaseDialog):
 
             self.list_matrices.doubleClicked.connect(self.delete_matrix_record)
             self.list_results.doubleClicked.connect(self.delete_result_record)
+
+            self.list_matrices_shortcut.activated.connect(self.delete_matrix_record)
+            self.list_results_shortcut.activated.connect(self.delete_result_record)
         else:
             QTabWidget.removeTab(self.tabs, 1)
             QTabWidget.removeTab(self.tabs, 0)
@@ -80,8 +87,11 @@ class LoadProjectDataDialog(BaseDialog):
             conn.execute(qry)
         self.load_matrices()
 
-    def delete_matrix_record(self, index):
+    def delete_matrix_record(self, index=None):
         """Deletes the double-clicked matrix, after the user confirms it."""
+        if index is None:
+            index = self.list_matrices.currentIndex()
+
         row = index.row()
         if row < 0:
             return
@@ -131,8 +141,11 @@ class LoadProjectDataDialog(BaseDialog):
             lien.setPrefix(f"{table_name}_")
             self.link_layer.addJoin(lien)
 
-    def delete_result_record(self, index):
+    def delete_result_record(self, index=None):
         """Deletes the double-clicked result, after the user confirms it."""
+        if index is None:
+            index = self.list_results.currentIndex()
+
         row = index.row()
         if row < 0:
             return

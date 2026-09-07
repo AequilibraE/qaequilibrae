@@ -28,7 +28,7 @@ saved in the project 'results_database.sqlite' file.
     :align: center
     :alt: project data results
 
-In both tabs, a record can be deleted by double-clicking it. QAequilibraE asks you to confirm
+In both tabs, a record can be deleted by double-clicking it or selecting it and pressing delete. QAequilibraE asks you to confirm
 before anything happens, and that confirmation defaults to *No*. Deleting a matrix removes its
 record from the project and its file from the 'matrices' folder, while deleting a result removes
 its record and its table from the results database. Neither can be undone.
