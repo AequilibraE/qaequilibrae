@@ -62,7 +62,10 @@ class LiveLogWidget(QWidget):
             return
         self.text.appendPlainText(msg)
         if self.auto_scroll.isChecked():
-            self.text.ensureCursorVisible()
+            # appendPlainText leaves the text cursor where it was so asking to make
+            # the cursor visible scrolls back to the top instead of following the tail.
+            scrollbar = self.text.verticalScrollBar()
+            scrollbar.setValue(scrollbar.maximum())
 
     def connect_bridge(self, bridge):
         bridge.log_line.connect(self.append)

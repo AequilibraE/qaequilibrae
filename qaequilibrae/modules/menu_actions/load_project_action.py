@@ -31,10 +31,10 @@ def _run_load_project_from_path(qgis_project, proj_path):
     proj_path = _project_root(proj_path)
 
     qgis_project.contents = []
-    qgis_project.project = Project()
+    project = Project()
 
     try:
-        qgis_project.project.open(proj_path)
+        project.open(proj_path)
     except FileNotFoundError as e:
         if e.args[0] == "Model does not exist. Check your path and try again":
             qgis_project.iface_error_message(
@@ -44,7 +44,23 @@ def _run_load_project_from_path(qgis_project, proj_path):
         else:
             raise e
 
-    show_project_in_panel(qgis_project, proj_path)
+    try:
+        qgis_project.project = project
+        show_project_in_panel(qgis_project, proj_path)
+    except Exception:
+        try:
+            qgis_project.remove_aequilibrae_layers()
+        except Exception:
+            pass
+        qgis_project.cob_scenarios.clear()
+        qgis_project.projectManager.clear()
+        qgis_project.available_scenarios.clear()
+        qgis_project.matrices.clear()
+        qgis_project.layers.clear()
+        if qgis_project.project is project:
+            qgis_project.project = None
+        project.close()
+        raise
 
 
 def show_project_in_panel(qgis_project, proj_path):

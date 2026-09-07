@@ -1,5 +1,6 @@
 import logging
 import pprint
+import re
 import subprocess  # nosec B404
 import sys
 from os.path import dirname, isfile, join
@@ -7,7 +8,7 @@ from pathlib import Path
 
 from qgis.core import Qgis, QgsApplication, QgsMessageLog, QgsTask
 from qgis.PyQt import sip
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import QTimer, pyqtSignal
 from qgis.PyQt.QtWidgets import QMessageBox
 
 from qaequilibrae.download_extra_packages_class import DownloadAll
@@ -81,6 +82,72 @@ class RunLogDialog(LiveLogDialog):
         self.setWindowTitle(self.tr("Model Run"))
 
 
+class LogTailer:
+    """Follow a scenario's ``aequilibrae.log`` and relay whatever gets appended"""
+
+    line_pattern = re.compile(r"^\d{4}-\d{2}-\d{2} [\d:,]+;(\w+)\s*;\s?(.*)$")
+
+    def __init__(self, path, emit_line, emit_stage=None, tag=MESSAGE_TAG):
+        self.path = Path(path)
+        self.tag = tag
+        self._emit_line = emit_line
+        self._emit_stage = emit_stage
+        # Start at the end. The log accumulates across runs, and only what this run
+        # appends belongs in its dialog.
+        self.position = self.path.stat().st_size if self.path.is_file() else 0
+        self._carry = b""
+
+    def poll(self):
+        """Relay every complete line written since the last call."""
+        if not self.path.is_file():
+            return
+
+        size = self.path.stat().st_size
+        if size < self.position:
+            # Truncated or replaced underneath us -- reopening a project rewrites it.
+            self.position = 0
+            self._carry = b""
+        if size == self.position and not self._carry:
+            return
+
+        # Byte offsets throughout: a text-mode tell() returns an opaque cookie that
+        # cannot be compared against st_size.
+        with open(self.path, "rb") as handle:
+            handle.seek(self.position)
+            chunk = handle.read()
+            self.position = handle.tell()
+
+        head, separator, self._carry = (self._carry + chunk).rpartition(b"\n")
+        if not separator:
+            return
+        for raw in head.split(b"\n"):
+            line = raw.decode("utf-8", errors="replace").rstrip("\r")
+            if line:
+                self._relay(line)
+
+    def _relay(self, line):
+        match = self.line_pattern.match(line)
+        level = logging.getLevelName(match.group(1)) if match else logging.INFO
+        if not isinstance(level, int):
+            level = logging.INFO
+
+        if level >= logging.ERROR:
+            qgis_level = Qgis.MessageLevel.Critical
+        elif level >= logging.WARNING:
+            qgis_level = Qgis.MessageLevel.Warning
+        else:
+            qgis_level = Qgis.MessageLevel.Info
+
+        QgsMessageLog.logMessage(line, self.tag, qgis_level)
+        self._emit_line(line)
+
+        # Info lines double as the "what is happening now" caption
+        if self._emit_stage is not None and level <= logging.INFO:
+            stage = (match.group(2) if match else line).strip()
+            if stage:
+                self._emit_stage(stage)
+
+
 class RunModuleDialog(BaseDialog):
     run_completed = pyqtSignal()
 
@@ -96,6 +163,8 @@ class RunModuleDialog(BaseDialog):
         self.log_dialog = None
         self.task = None
         self.bridge = None
+        self.tailer = None
+        self.log_timer = None
 
         self.rejected.connect(self.handle_rejection)
 
@@ -213,6 +282,28 @@ class RunModuleDialog(BaseDialog):
         logger.addHandler(handler)
         return handler
 
+    def _start_tailing(self):
+        """Begin following the active scenario's log file on the GUI thread."""
+        self.tailer = LogTailer(
+            self.project.project_base_path / "aequilibrae.log",
+            self.bridge.log_line.emit,
+            self.bridge.stage_line.emit,
+        )
+        self.log_timer = QTimer(self)
+        self.log_timer.setInterval(300)
+        self.log_timer.timeout.connect(self.tailer.poll)
+        self.log_timer.start()
+
+    def _stop_tailing(self):
+        """Stop following the log, relaying whatever arrived since the last tick."""
+        if self.log_timer is not None:
+            self.log_timer.stop()
+            self.log_timer.deleteLater()
+            self.log_timer = None
+        if self.tailer is not None:
+            self.tailer.poll()
+            self.tailer = None
+
     def run(self):
         # Check if selected function is also present at the Parameters file
         func_name = self.items[self.cob_function.currentIndex()]
@@ -234,6 +325,11 @@ class RunModuleDialog(BaseDialog):
         self.log_dialog = RunLogDialog(self)
         self.log_dialog.connect_bridge(self.bridge)
         self.log_dialog.show()
+
+        # Follow the active scenario's log rather than attaching a handler to the
+        # root logger, which AequilibraE's per-project logger never reaches. The
+        # scenario cannot change while a run is blocked, so the path is stable.
+        self._start_tailing()
 
         QgsMessageLog.logMessage(self.tr("Starting model run..."), MESSAGE_TAG, Qgis.MessageLevel.Info)
 
@@ -258,9 +354,8 @@ class RunModuleDialog(BaseDialog):
 
             silence_dynamic_convergence_graph()
 
-            root_logger = logging.getLogger()
-            handler = self.attach_qgis_logging(root_logger, bridge=bridge)
-
+            # Log records reach the dialog by way of the scenario's log file; only
+            # stdout/stderr (progress bars, prints) still need relaying from here.
             relay = StreamRelay(bridge.log_line.emit, sys.__stdout__)
             stdout, stderr = sys.stdout, sys.stderr
             sys.stdout = sys.stderr = relay
@@ -277,7 +372,6 @@ class RunModuleDialog(BaseDialog):
             finally:
                 sys.stdout, sys.stderr = stdout, stderr
                 relay.drain()
-                root_logger.removeHandler(handler)
 
         return worker
 
@@ -292,6 +386,7 @@ class RunModuleDialog(BaseDialog):
             canceled = self.task is not None and self.task.isCanceled()
             result = outcome.get("result")
             self.task = None
+            self._stop_tailing()
             self.bridge = None
             self.qgis_project.allow_change_scenario()
 

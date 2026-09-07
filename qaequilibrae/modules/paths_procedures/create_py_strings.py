@@ -18,7 +18,7 @@ def create_strings(dct: dict):
 \tgraph.set_skimming({})
 \tgraph.set_blocked_centroid_flows({})
 \n\tdemand = matrices.get_matrix('{}')
-\tdemand.computational_view(['{}'])
+\tdemand.computational_view({})
 \n\ttraffic_classes.extend([TrafficClass(name='{}', graph=graph, matrix=demand)])
 """
     for params in dct["classes"]:

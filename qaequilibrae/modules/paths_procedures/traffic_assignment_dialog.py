@@ -1,3 +1,4 @@
+from collections import defaultdict
 from tempfile import gettempdir
 from os.path import dirname, join
 from pathlib import Path
@@ -11,7 +12,7 @@ from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import QItemSelectionModel, Qt
 from qgis.PyQt.QtGui import QColor, QPalette
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 
@@ -52,6 +53,7 @@ class TrafficAssignmentDialog(BaseDialog):
         self.current_modes = []
         self.assignment = TrafficAssignment()
         self.traffic_classes = {}
+        self.class_cores = {}
         self.vdf_parameters = {}
         self.matrices = pd.DataFrame([])
         self.skims = {}
@@ -179,7 +181,12 @@ class TrafficAssignmentDialog(BaseDialog):
                     # From the combo rather than from the config, so that the cores listed below
                     # come from the same matrix `_create_traffic_class` is going to pick up
                     names = self.project.matrices.get_matrix(self.cob_matrices.currentText()).names
-                    self.tbl_core_list.selectRow(names.index(value["matrix_core"]))
+                    cores = value.get("matrix_cores", [value["matrix_core"]])
+                    self.tbl_core_list.clearSelection()
+                    selection = self.tbl_core_list.selectionModel()
+                    flags = QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows
+                    for core in cores:
+                        selection.select(selection.model().index(names.index(core), 0), flags)
                     self.ln_class_name.setText(key)
                     self.pce_setter.setValue(value["pce"])
                     self.chb_check_centroids.setChecked(value["blocked_centroid_flows"])
@@ -260,7 +267,10 @@ class TrafficAssignmentDialog(BaseDialog):
                 pth = Path(info.matrix.file_path).name
                 df = self.project.matrices.list()
                 dc["matrix_name"] = df.loc[df["file_name"] == pth]["name"].values[0]
-                dc["matrix_core"] = info.matrix.view_names[0]
+                cores = self.class_cores[tc]
+                dc["matrix_core"] = cores[0]
+                if len(cores) > 1:
+                    dc["matrix_cores"] = cores
                 dc["network_mode"] = info.mode
                 dc["pce"] = info.pce
                 # Taken from the class rather than from the checkbox, which only reflects the class
@@ -337,7 +347,7 @@ class TrafficAssignmentDialog(BaseDialog):
                             self.skims[tc] if self.skims[tc] else [],
                             info.graph.block_centroid_flows,
                             df.loc[df["file_name"] == pth]["name"].values[0],
-                            info.matrix.view_names[0],
+                            self.class_cores[tc],
                             tc,
                         ]
                     ]
@@ -525,9 +535,15 @@ class TrafficAssignmentDialog(BaseDialog):
         if not mat_name:
             raise AttributeError("Matrix not set")
 
-        class_name = self.ln_class_name.text()
-        if class_name in self.traffic_classes:
+        # Stripped, since the name goes on to name the result columns
+        class_name = self.ln_class_name.text().strip()
+        if not class_name:
+            self.qgis_project.iface_error_message(self.tr("Class name cannot be empty"))
+            return
+        # Folded, because SQLite refuses two columns that differ only by case
+        if class_name.lower() in {name.lower() for name in self.traffic_classes}:
             self.qgis_project.iface_error_message(self.tr("Class name already used"))
+            return
 
         matrix = self.project.matrices.get_matrix(mat_name)
 
@@ -537,6 +553,13 @@ class TrafficAssignmentDialog(BaseDialog):
         rows = [s.row() for s in sel if s.column() == 0]
         user_classes = [matrix.names[i] for i in rows]
         matrix.computational_view(user_classes)
+
+        # Columns are named after the cores: relabel with the class name, keep the real ones for the YAML
+        self.class_cores[class_name] = user_classes
+        if len(user_classes) == 1:
+            matrix.view_names = [class_name]
+        else:
+            matrix.view_names = [f"{class_name}_{core}" for core in user_classes]
 
         nan_mask = np.isnan(matrix.matrix_view)
         nan_count = np.count_nonzero(nan_mask)
@@ -829,6 +852,11 @@ class TrafficAssignmentDialog(BaseDialog):
             self.error = self.tr("No traffic classes to assign")
             return False
 
+        repeated = self.__repeated_result_fields()
+        if repeated:
+            self.error = self.tr("More than one class writes the result fields: {}").format(", ".join(repeated))
+            return False
+
         self.scenario_name = self.output_scenario_name.text()
         if not self.scenario_name:
             self.error = self.tr("Missing scenario name")
@@ -853,6 +881,14 @@ class TrafficAssignmentDialog(BaseDialog):
         self.temp_path = gettempdir()
         tries_setup = self.set_assignment()
         return tries_setup
+
+    def __repeated_result_fields(self):
+        """Result field names claimed by more than one class, folded as SQLite folds column names."""
+        claimed = defaultdict(list)
+        for cls in self.traffic_classes.values():
+            for name in cls.matrix.view_names:
+                claimed[name.lower()].append(name)
+        return sorted({name for claims in claimed.values() if len(claims) > 1 for name in claims})
 
     def signal_handler(self, val):
         if val[0] == "start":
