@@ -1,5 +1,7 @@
 from functools import partial
 
+from qgis.core import Qgis
+
 from qaequilibrae import get_aequilibrae_menu_instance
 from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.processing_provider.base_algorithm import QAequilibraEProcessingAlgorithm
@@ -18,6 +20,9 @@ class AddMode(QAequilibraEProcessingAlgorithm):
             self.tr("Adds a mode to the network of the open project"),
             ["mode", "modes", "network", "add", "new"],
         )
+
+    def flags(self):
+        return super().flags() | Qgis.ProcessingAlgorithmFlag.NoThreading
 
     def createInstance(self):
         return AddMode()

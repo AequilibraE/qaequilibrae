@@ -43,6 +43,7 @@ class AddModeDialog(AddNetworkRecordDialog):
             modes.add(mode)
             mode.save()
         except Exception as e:
+            self.__discard(mode_id, name)
             self.report(self.tr("Could not add the mode: {}").format(e), is_error=True)
             return
 
@@ -50,3 +51,13 @@ class AddModeDialog(AddNetworkRecordDialog):
         self.refresh_link_editing_form()
         self.reset_form()
         self.report(self.tr("Mode '{}' added to the project").format(name))
+
+    def __discard(self, mode_id: str, name: str):
+        """Removes a mode left behind when adding its optional fields fails."""
+        modes = self.project.network.modes
+        try:
+            modes.delete(mode_id)
+        except Exception:
+            # Keep the original save error as the useful feedback if cleanup also fails.
+            with self.project.db_connection as conn:
+                conn.execute("DELETE FROM modes WHERE mode_id = ? AND mode_name = ?", [mode_id, name])
