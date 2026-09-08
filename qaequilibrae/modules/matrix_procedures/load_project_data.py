@@ -1,7 +1,7 @@
 from os.path import dirname, join
 
 import pandas as pd
-from qgis.PyQt.QtWidgets import QAbstractItemView, QMessageBox, QTabWidget
+from qgis.PyQt.QtWidgets import QAbstractItemView, QMessageBox, QShortcut, QTabWidget
 from qgis.PyQt.QtGui import QKeySequence
 from qgis.core import QgsProject, QgsVectorLayerJoinInfo
 
@@ -39,8 +39,8 @@ class LoadProjectDataDialog(BaseDialog):
                 table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
                 table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
-            self.list_matrices_shortcut.setKey(QKeySequence(QKeySequence.StandardKey.Delete))
-            self.list_results_shortcut.setKey(QKeySequence(QKeySequence.StandardKey.Delete))
+            self.list_matrices_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.list_matrices)
+            self.list_results_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.list_results)
 
             self.load_matrices()
             self.load_results()
