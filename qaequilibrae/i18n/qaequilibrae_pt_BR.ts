@@ -114,142 +114,142 @@
 <context>
     <name>AequilibraEMenu</name>
     <message>
-        <location filename="../qaequilibrae.py" line="154"/>
+        <location filename="../qaequilibrae.py" line="155"/>
         <source>Project</source>
         <translation>Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="155"/>
+        <location filename="../qaequilibrae.py" line="156"/>
         <source>Open project</source>
         <translation>Abrir projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="158"/>
+        <location filename="../qaequilibrae.py" line="159"/>
         <source>Close project</source>
         <translation>Fechar Projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="174"/>
+        <location filename="../qaequilibrae.py" line="169"/>
         <source>Shortest path</source>
         <translation>Caminho mínimo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="175"/>
+        <location filename="../qaequilibrae.py" line="170"/>
         <source>Impedance matrix</source>
         <translation>Matriz de Impedância</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="191"/>
+        <location filename="../qaequilibrae.py" line="186"/>
         <source>Import GTFS</source>
         <translation>Importar GTFS</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="205"/>
+        <location filename="../qaequilibrae.py" line="210"/>
         <source>Help</source>
         <translation>Ajuda</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="198"/>
+        <location filename="../qaequilibrae.py" line="193"/>
         <source>Visualize data</source>
         <translation>Visualizar Dados</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="186"/>
+        <location filename="../qaequilibrae.py" line="181"/>
         <source>Route choice</source>
         <translation>Escolha de rota</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="156"/>
+        <location filename="../qaequilibrae.py" line="157"/>
         <source>Run procedures</source>
         <translation>Executar procedimentos</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="176"/>
+        <location filename="../qaequilibrae.py" line="171"/>
         <source>Skim viewer</source>
         <translation>Visualizador de matrizes</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="169"/>
+        <location filename="../qaequilibrae.py" line="164"/>
         <source>Trip distribution</source>
         <translation>Distribuição de viagens</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="173"/>
+        <location filename="../qaequilibrae.py" line="168"/>
         <source>Path computation</source>
         <translation>Computação de caminhos</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="181"/>
+        <location filename="../qaequilibrae.py" line="176"/>
         <source>Traffic assignment</source>
         <translation>Alocação de tráfego</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="190"/>
+        <location filename="../qaequilibrae.py" line="185"/>
         <source>Transit</source>
         <translation>Transporte público</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="197"/>
+        <location filename="../qaequilibrae.py" line="192"/>
         <source>Mapping</source>
         <translation>Mapas</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="192"/>
+        <location filename="../qaequilibrae.py" line="187"/>
         <source>Skimming and assignment</source>
         <translation>Matriz de custos e alocação</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="193"/>
+        <location filename="../qaequilibrae.py" line="188"/>
         <source>Explore transit</source>
         <translation>Explorar Transporte Público</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="199"/>
+        <location filename="../qaequilibrae.py" line="194"/>
         <source>Desire lines</source>
         <translation>Linhas de Desejo</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="200"/>
+        <location filename="../qaequilibrae.py" line="195"/>
         <source>Stacked bandwidth</source>
         <translation>Mapa de volumes</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="201"/>
+        <location filename="../qaequilibrae.py" line="196"/>
         <source>Scenario comparison</source>
         <translation>Comparação de cenários</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="157"/>
+        <location filename="../qaequilibrae.py" line="158"/>
         <source>Scenarios</source>
         <translation>Cenários</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="442"/>
+        <location filename="../qaequilibrae.py" line="447"/>
         <source>You need to load a project</source>
         <translation>Você precisa carregar um projeto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="445"/>
+        <location filename="../qaequilibrae.py" line="450"/>
         <source>You need to close the currently open project</source>
         <translation>Você precisa fechar o projeto aberto</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="448"/>
+        <location filename="../qaequilibrae.py" line="453"/>
         <source>You need to import a GTFS feed</source>
         <translation>Você precisa importar um arquivo GTFS</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="264"/>
+        <location filename="../qaequilibrae.py" line="269"/>
         <source>Changed active scenario: {}</source>
         <translation>Cenário ativo: {}</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="389"/>
+        <location filename="../qaequilibrae.py" line="394"/>
         <source>Closed project on: {}</source>
         <translation>Projeto fechado em: {}</translation>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="599"/>
+        <location filename="../qaequilibrae.py" line="604"/>
         <source>Messages</source>
         <translation>Mensagens</translation>
     </message>
@@ -259,18 +259,23 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="159"/>
+        <location filename="../qaequilibrae.py" line="201"/>
         <source>Break links at nodes while digitizing</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="479"/>
+        <location filename="../qaequilibrae.py" line="484"/>
         <source>Scenario &apos;{}&apos; no longer exists. Using &apos;root&apos;.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../qaequilibrae.py" line="357"/>
+        <location filename="../qaequilibrae.py" line="362"/>
         <source>Could not close the project while unloading: {}</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="200"/>
+        <source>Options</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -343,37 +348,37 @@
         <translation>Pasta de projeto do AequilibraE</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="23"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="25"/>
         <source>Link IDs (comma-separated)</source>
         <translation>IDs dos links (separados por vírgula)</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="33"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="35"/>
         <source>AequilibraE module not found</source>
         <translation>O módulo AequilibraE não foi encontrado.</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="43"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="45"/>
         <source>{project_folder} does not contain an AeqilibraE model: {e}</source>
         <translation>A pasta &apos;{project_folder}&apos; não contém um modelo do AequilibraE: {e}</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="49"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="51"/>
         <source>Error parsing link IDs: {e}</source>
         <translation>Erro ao analisar os links IDs: {e}</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="68"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="70"/>
         <source>Collapse links</source>
         <translation>Simplificar links</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="77"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="79"/>
         <source>This tool collapses links into nodes, adjusting the network in the neighborhood.</source>
         <translation>Esta ferramenta reduz links em nós, ajustando a rede em torno dessa modificação.</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="71"/>
+        <location filename="../modules/processing_provider/model_building/collapse_links.py" line="73"/>
         <source>Model building</source>
         <translation>Construção de Modelos</translation>
     </message>
@@ -381,85 +386,100 @@
 <context>
     <name>CompareScenariosDialog</name>
     <message>
-        <location filename="../modules/gis/compare_scenarios_dialog.py" line="71"/>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="83"/>
         <source>This is the reference case, to which the differences will refer to</source>
         <translation>Este é o modelo de referência a partir do qual a comparação é feita</translation>
     </message>
     <message>
-        <location filename="../modules/gis/compare_scenarios_dialog.py" line="72"/>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="84"/>
         <source>This is the alternative</source>
         <translation>Esse é a alternativa</translation>
     </message>
     <message>
-        <location filename="../modules/gis/compare_scenarios_dialog.py" line="73"/>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="85"/>
         <source>It will be BASE minus ALTERNATIVE</source>
         <translation>Será BASE menos ALTERNATIVA</translation>
+    </message>
+    <message>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="218"/>
+        <source>no value came back</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="219"/>
+        <source>Could not measure the fields being compared: {}</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/gis/compare_scenarios_dialog.py" line="219"/>
+        <source>Scenario comparison</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>CreateEmptyProject</name>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="58"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="62"/>
         <source>AequilibraE module not found</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="66"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="70"/>
         <source>Folder already exists and is not empty: </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="70"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="74"/>
         <source>Could not remove empty folder: </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="73"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="77"/>
         <source>Creating project</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="79"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="83"/>
         <source>Could not create project: </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="86"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="88"/>
         <source>Project created in </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="87"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="89"/>
         <source>Default modes: </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="88"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="90"/>
         <source>Default link types: </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="96"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="121"/>
         <source>Create empty project</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="99"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="124"/>
         <source>Model building</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="106"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="131"/>
         <source>Creates a new empty AequilibraE project, with no links, nodes or zones.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="107"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="132"/>
         <source>The project is created with the default modes and link types, and can be</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="108"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="133"/>
         <source>populated afterwards with the other Model building tools.</source>
         <translation type="unfinished"/>
     </message>
@@ -474,33 +494,38 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="39"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="43"/>
         <source>Parent folder does not exist: </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="42"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="46"/>
         <source>The model name cannot be empty</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="45"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="49"/>
         <source>The model name cannot contain any of these characters: </source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="52"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="56"/>
         <source>The model name cannot be &apos;.&apos; or &apos;..&apos;</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="109"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="134"/>
         <source>The model is created in a folder named after the model, inside the parent</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="110"/>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="135"/>
         <source>folder you choose. That model folder must not exist yet, or must be empty.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/model_building/create_empty_project.py" line="110"/>
+        <source>Close the open project to see the new one in the panel</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -967,7 +992,7 @@
 <context>
     <name>DisplayAequilibraEFormatsDialog</name>
     <message>
-        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="470"/>
+        <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="474"/>
         <source>AequilibraE custom formats</source>
         <translation>Formatos personalizados do AequilibraE</translation>
     </message>
@@ -1776,7 +1801,7 @@
 <context>
     <name>LoadDataset</name>
     <message>
-        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="50"/>
+        <location filename="../modules/matrix_procedures/load_dataset_class.py" line="51"/>
         <source>Field {} does has a type not supported.</source>
         <translation>O campo {} possui um tipo de dado que não é suportado.</translation>
     </message>
@@ -2074,32 +2099,32 @@
         <translation>Pasta de projeto do AequilibraE</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="24"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="26"/>
         <source>AequilibraE module not found</source>
         <translation>O módulo AequilibraE não foi encontrado.</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="34"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="36"/>
         <source>{project_folder} does not contain an AequilibraE model: {e}</source>
         <translation>A pasta &apos;{project_folder}&apos; não contém um modelo do AequilibraE: {e}</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="95"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="97"/>
         <source>Network simplifier</source>
         <translation>Simplificador de rede</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="105"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="107"/>
         <source>This tool simplifies the network, merging short links into longer ones or</source>
         <translation>Esta ferramenta simplifica a rede, unindo links mais curtos em links mais longos ou</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="106"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="108"/>
         <source>turning links into nodes, and saving theses changes into the project.</source>
         <translation>simplificando links em nós, e salvando estas mudanças no projeto.</translation>
     </message>
     <message>
-        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="98"/>
+        <location filename="../modules/processing_provider/model_building/network_simplifier.py" line="100"/>
         <source>Model building</source>
         <translation>Construção de Modelos</translation>
     </message>
@@ -2587,7 +2612,7 @@
 <context>
     <name>RunLogDialog</name>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="81"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="82"/>
         <source>Model Run</source>
         <translation type="unfinished"/>
     </message>
@@ -2613,62 +2638,62 @@
 <context>
     <name>RunModuleDialog</name>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="221"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="312"/>
         <source>Please check the Parameters file</source>
         <translation>Por favor, verifique o arquivo &apos;Parameters&apos;</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="332"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="427"/>
         <source>There are missing requirements to run the procedures.</source>
         <translation>Existem requisitos faltantes para executar os procedimentos do modelo.</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="333"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="428"/>
         <source>Do you want us to install these missing Python packages?</source>
         <translation>Você gostaria de instalar os pacotes faltantes?</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="334"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="429"/>
         <source>Without installing the packages, you cannot use &apos;Run Procedures&apos;.</source>
         <translation>Sem esses pacotes, não é possível executar os procedimentos do modelo.</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="288"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="382"/>
         <source>Check &apos;Messages&apos; tab.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="289"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="383"/>
         <source>{} executed</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="238"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="334"/>
         <source>Starting model run...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="242"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="338"/>
         <source>Running {}</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="252"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="348"/>
         <source>Model running, please wait...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="253"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="349"/>
         <source>Model run finished!</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="286"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="380"/>
         <source>&gt;&gt;&gt; Model run finished</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/project_procedures/run_module_dialog.py" line="287"/>
+        <location filename="../modules/project_procedures/run_module_dialog.py" line="381"/>
         <source>Model run canceled</source>
         <translation type="unfinished"/>
     </message>
@@ -2733,19 +2758,24 @@
 <context>
     <name>ShortestPathDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="53"/>
+        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="96"/>
         <source>Loading data</source>
         <translation>Carregando dados</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="123"/>
+        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="166"/>
         <source>Display</source>
         <translation>Mostrar</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="185"/>
+        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="260"/>
         <source>No path between {} and {}</source>
         <translation>Não há caminhos entre {} e {}</translation>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="123"/>
+        <source>No link with the mode you are interested in</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2973,83 +3003,93 @@
 <context>
     <name>TrafficAssignmentDialog</name>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="510"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="545"/>
         <source>Class name already used</source>
         <translation>O nome da classe já foi utilizado</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="571"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="612"/>
         <source>Remove</source>
         <translation>Remover</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="692"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="812"/>
         <source>Input error</source>
         <translation>Erro de entrada</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="732"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="852"/>
         <source>No traffic classes to assign</source>
         <translation>Não há classes de tráfego para alocar</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="737"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="862"/>
         <source>Missing scenario name</source>
         <translation>Está faltando o nome do cenário</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="743"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="868"/>
         <source>Result table name already exists. Choose a new name</source>
         <translation>O nome para a tabela de resultados já existe. Escolha um novo nome.</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="820"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="953"/>
         <source>VDF parameter is not numeric</source>
         <translation>Parâmetro VDF não é numérico</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="624"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="744"/>
         <source>Wrong value for link ID</source>
         <translation>Valor incorreto para link ID</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="630"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="750"/>
         <source>Link ID doesn&apos;t exist in project</source>
         <translation>link ID não existe no projeto</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="639"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="759"/>
         <source>Missing query name</source>
         <translation>Ausência de nome da consulta</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="643"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="763"/>
         <source>Query name already used</source>
         <translation>Nome de consulta já utilizado</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="647"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="767"/>
         <source>Please set a link selection</source>
         <translation>Por favor, configure uma seleção de links</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="749"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="874"/>
         <source>Missing select link matrix name.</source>
         <translation>Ausência de nome da matriz de links selecionados</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="753"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="878"/>
         <source>Result matrix name already exists. Choose a new name.</source>
         <translation>O nome para a tabela de resultados já existe. Escolha um novo nome.</translation>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="382"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="395"/>
         <source>No VoT found for mode {} in project database. Please configure it.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="717"/>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="837"/>
         <source>Assignment setup error</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="541"/>
+        <source>Class name cannot be empty</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="857"/>
+        <source>More than one class writes the result fields: {}</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -4289,7 +4329,7 @@
         <translation>Campo</translation>
     </message>
     <message>
-        <location filename="../modules/project_procedures/forms/ui_transponet_construction.ui" line="180"/>
+        <location filename="../modules/project_procedures/forms/ui_add_zoning.ui" line="178"/>
         <source>Layer field</source>
         <translation>Campo da camada</translation>
     </message>

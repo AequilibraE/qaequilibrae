@@ -63,7 +63,7 @@ jobs:
   windows_test:
     needs: linting
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     strategy:
       matrix:
       # We test the minimum LTR version required (Qt5) and the latest release (QGIS 4, Qt6).
@@ -73,7 +73,26 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Determine QGIS cache version
+        id: qgis-version
+        shell: pwsh
+        run: |
+          if ("${{ matrix.version }}" -eq "qgis") {
+            $v = (choco info qgis --limit-output | Select-Object -First 1).Split('|')[1]
+          } else {
+            $v = "3.40.8"
+          }
+          "qgis_version=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Cache QGIS installation
+        id: cache-qgis
+        uses: actions/cache@v6
+        with:
+          path: C:\Program Files\QGIS*
+          key: ${{ runner.os }}-qgis-${{ steps.qgis-version.outputs.qgis_version }}
+
       - name: Install QGIS on Chocolatey
+        if: steps.cache-qgis.outputs.cache-hit != 'true'
         uses: crazy-max/ghaction-chocolatey@v4
         with:
           args: install ${{ matrix.version }} -y
