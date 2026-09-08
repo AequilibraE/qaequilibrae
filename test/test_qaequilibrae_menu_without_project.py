@@ -1,16 +1,44 @@
+from contextlib import contextmanager
+
 import pytest
 import sys
+from qgis.PyQt.QtCore import QEvent, QMetaObject, QObject, Qt
+from qgis.PyQt.QtWidgets import QApplication
 
 
 pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
 
 
-def mock_dialog_exec(mocker, dialog_class):
-    def handle_exec(dialog):
-        assert isinstance(dialog, dialog_class), "Dialog does not have the correct class"
-        dialog.close()
+class DialogEventFilter(QObject):
+    def __init__(self, dialog_class):
+        super().__init__()
+        self.dialog_class = dialog_class
+        self.dialog = None
 
-    mocker.patch.object(dialog_class, "exec", autospec=True, side_effect=handle_exec)
+    def eventFilter(self, watched, event):
+        if self.dialog is None and event.type() == QEvent.Type.Show and isinstance(watched, self.dialog_class):
+            self.dialog = watched
+            QMetaObject.invokeMethod(watched, "accept", Qt.ConnectionType.QueuedConnection)
+        return super().eventFilter(watched, event)
+
+
+@contextmanager
+def close_dialog_in_event_loop(dialog_class):
+    dialog_filter = DialogEventFilter(dialog_class)
+    application = QApplication.instance()
+    application.installEventFilter(dialog_filter)
+    try:
+        yield dialog_filter
+    finally:
+        application.removeEventFilter(dialog_filter)
+
+
+def trigger_dialog_action(action, dialog_class):
+    with close_dialog_in_event_loop(dialog_class) as dialog_filter:
+        action.trigger()
+
+    assert isinstance(dialog_filter.dialog, dialog_class), "Dialog does not have the correct class"
+    assert dialog_filter.dialog.isVisible() is False, "Dialog did not close properly"
 
 
 def test_open_project_menu(ae):
@@ -87,22 +115,20 @@ def test_route_choice_menu(ae):
     assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
 
 
-def test_gis_desire_lines_menu(ae, mocker):
+def test_gis_desire_lines_menu(ae):
     from qaequilibrae.modules.gis.desire_lines_dialog import DesireLinesDialog
 
     action = ae.menuActions["Mapping"][1]
     assert action.text() == "Desire lines", "Wrong text content"
-    mock_dialog_exec(mocker, DesireLinesDialog)
-    action.trigger()
+    trigger_dialog_action(action, DesireLinesDialog)
 
 
-def test_gis_stacked_bandwidth_menu(ae, mocker):
+def test_gis_stacked_bandwidth_menu(ae):
     from qaequilibrae.modules.gis import CreateBandwidthsDialog
 
     action = ae.menuActions["Mapping"][2]
     assert action.text() == "Stacked bandwidth", "Wrong text content"
-    mock_dialog_exec(mocker, CreateBandwidthsDialog)
-    action.trigger()
+    trigger_dialog_action(action, CreateBandwidthsDialog)
 
 
 def test_gis_scenario_comparison_menu(ae):

@@ -1,12 +1,43 @@
 import pytest
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QDialog
+from qgis.PyQt.QtCore import QEvent, QMetaObject, QObject, Qt
+from qgis.PyQt.QtWidgets import QApplication, QDialog
 
 from qgis.core import QgsProject
 from qaequilibrae.modules.paths_procedures.show_shortest_path_dialog import ShortestPathDialog
 
 
-def test_click_configure_graph(ae_with_project, qtbot, mocker, timeoutDetector):
+class DialogEventFilter(QObject):
+    def __init__(self, dialog_class, button_name=None):
+        super().__init__()
+        self.dialog_class = dialog_class
+        self.button_name = button_name
+        self.dialog = None
+
+    def eventFilter(self, watched, event):
+        if self.dialog is None and event.type() == QEvent.Type.Show and isinstance(watched, self.dialog_class):
+            self.dialog = watched
+            if self.button_name is None:
+                QMetaObject.invokeMethod(watched, "accept", Qt.ConnectionType.QueuedConnection)
+            else:
+                button = getattr(watched, self.button_name)
+                QMetaObject.invokeMethod(button, "click", Qt.ConnectionType.QueuedConnection)
+        return super().eventFilter(watched, event)
+
+
+def run_with_dialog_event_loop(dialog_class, action, button_name=None):
+    dialog_filter = DialogEventFilter(dialog_class, button_name)
+    application = QApplication.instance()
+    application.installEventFilter(dialog_filter)
+    try:
+        action()
+    finally:
+        application.removeEventFilter(dialog_filter)
+
+    assert isinstance(dialog_filter.dialog, dialog_class), "Dialog does not have the correct class"
+    assert dialog_filter.dialog.isVisible() is False, "Dialog did not close properly"
+
+
+def test_click_configure_graph(ae_with_project, qtbot, timeoutDetector):
     """The Configure button opens the graph settings dialog."""
     from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog
 
@@ -15,18 +46,16 @@ def test_click_configure_graph(ae_with_project, qtbot, mocker, timeoutDetector):
     qtbot.addWidget(dialog)
     qtbot.waitExposed(dialog)
 
-    def handle_exec(dialog):
-        assert isinstance(dialog, LoadGraphLayerSettingDialog), "Dialog does not have the correct class"
-        dialog.close()
-
-    mocker.patch.object(LoadGraphLayerSettingDialog, "exec", autospec=True, side_effect=handle_exec)
-    qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton)
+    run_with_dialog_event_loop(
+        LoadGraphLayerSettingDialog,
+        lambda: qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton),
+    )
     dialog.close()
 
 
 # Graph preparation is intertwined with the LoadGraphLayerSettingDialog, so they cannot be tested independently
 # TODO: for some reason, there is a segfault after this test is finished, couldn't find out why
-def test_prepare_graph_and_network(ae_with_project, qtbot, mocker, timeoutDetector):
+def test_prepare_graph_and_network(ae_with_project, qtbot, timeoutDetector):
     """Loading a graph through the settings dialog is what brings the picking inputs to life."""
     dialog = ShortestPathDialog(ae_with_project)
     dialog.show()
@@ -35,19 +64,16 @@ def test_prepare_graph_and_network(ae_with_project, qtbot, mocker, timeoutDetect
 
     from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog
 
-    def handle_exec(graph_dialog):
-        assert isinstance(graph_dialog, LoadGraphLayerSettingDialog), "Dialog does not have the correct class"
-        graph_dialog.do_load_graph.click()
-        assert graph_dialog.isVisible() is False, "Dialog did not close properly"
-
-    mocker.patch.object(LoadGraphLayerSettingDialog, "exec", autospec=True, side_effect=handle_exec)
-
     # Configuring is the only thing on offer until there is a graph
     assert dialog.do_dist_matrix.isEnabled() is False
     assert dialog.path_from.isEnabled() is False
     assert dialog.path_to.isEnabled() is False
     assert dialog.configure_graph.isEnabled() is True
-    qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton)
+    run_with_dialog_event_loop(
+        LoadGraphLayerSettingDialog,
+        lambda: qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton),
+        button_name="do_load_graph",
+    )
 
     assert dialog.path_from.isEnabled() is True
     assert dialog.path_to.isEnabled() is True
