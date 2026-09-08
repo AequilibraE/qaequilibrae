@@ -76,8 +76,6 @@ class DownloadAll:
                 QgsMessageLog.logMessage(str(line), "Messages", level=Qgis.MessageLevel.Info)
             return reps
 
-        Path(self.target_folder).mkdir(parents=True, exist_ok=True)
-
         spec = find_spec("uv")
         # uv probes Python with an isolated process and drops PYTHONHOME. That breaks the
         # relocated Python runtime shipped inside the macOS QGIS application, so use the
