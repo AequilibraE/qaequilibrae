@@ -1,29 +1,40 @@
 import pytest
-from qgis.PyQt.QtCore import Qt, QTimer
+from qgis.PyQt.QtCore import QEvent, QMetaObject, QObject, Qt
 from qgis.PyQt.QtWidgets import QApplication, QDialog
 
 from qgis.core import QgsProject
 from qaequilibrae.modules.paths_procedures.show_shortest_path_dialog import ShortestPathDialog
 
 
-def wait_for_active_window(qtbot, previousClass):
-    timeout = 3000
-    window = QApplication.activeWindow()
-    while (window is None or isinstance(window, previousClass)) and timeout > 0:
-        window = QApplication.activeWindow()
-        qtbot.wait(100)
-        timeout -= 100
-    assert timeout > 0, "Waiting for window to open timed out after 3 seconds"
-    return window
+class DialogEventFilter(QObject):
+    def __init__(self, dialog_class, button_name=None):
+        super().__init__()
+        self.dialog_class = dialog_class
+        self.button_name = button_name
+        self.dialog = None
+
+    def eventFilter(self, watched, event):
+        if self.dialog is None and event.type() == QEvent.Type.Show and isinstance(watched, self.dialog_class):
+            self.dialog = watched
+            if self.button_name is None:
+                QMetaObject.invokeMethod(watched, "accept", Qt.ConnectionType.QueuedConnection)
+            else:
+                button = getattr(watched, self.button_name)
+                QMetaObject.invokeMethod(button, "click", Qt.ConnectionType.QueuedConnection)
+        return super().eventFilter(watched, event)
 
 
-def check_if_new_active_window_matches_class(qtbot, windowClass, previousClass):
-    dialog = wait_for_active_window(qtbot, previousClass)
+def run_with_dialog_event_loop(dialog_class, action, button_name=None):
+    dialog_filter = DialogEventFilter(dialog_class, button_name)
+    application = QApplication.instance()
+    application.installEventFilter(dialog_filter)
     try:
-        assert isinstance(dialog, windowClass), "Active window does not match the correct window class"
+        action()
     finally:
-        dialog.close()
-        assert QApplication.activeWindow() is None, "Dialog window did not close properly"
+        application.removeEventFilter(dialog_filter)
+
+    assert isinstance(dialog_filter.dialog, dialog_class), "Dialog does not have the correct class"
+    assert dialog_filter.dialog.isVisible() is False, "Dialog did not close properly"
 
 
 def test_click_configure_graph(ae_with_project, qtbot, timeoutDetector):
@@ -35,11 +46,11 @@ def test_click_configure_graph(ae_with_project, qtbot, timeoutDetector):
     qtbot.addWidget(dialog)
     qtbot.waitExposed(dialog)
 
-    def handle_trigger():
-        check_if_new_active_window_matches_class(qtbot, LoadGraphLayerSettingDialog, ShortestPathDialog)
-
-    QTimer.singleShot(10, handle_trigger)
-    qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton)
+    run_with_dialog_event_loop(
+        LoadGraphLayerSettingDialog,
+        lambda: qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton),
+    )
+    dialog.close()
 
 
 # Graph preparation is intertwined with the LoadGraphLayerSettingDialog, so they cannot be tested independently
@@ -51,28 +62,23 @@ def test_prepare_graph_and_network(ae_with_project, qtbot, timeoutDetector):
     qtbot.addWidget(dialog)
     qtbot.waitExposed(dialog)
 
-    def handle_configure_graph_trigger():
-        global graph_dialog
-        graph_dialog = wait_for_active_window(qtbot, ShortestPathDialog)
-
-        def handle_do_load_graph_trigger():
-            global graph_dialog
-            assert graph_dialog.isVisible() is False, "Dialog did not close properly"
-            assert dialog.do_dist_matrix.isEnabled() is True
-            assert dialog.path_from.isEnabled() is True
-            assert dialog.path_to.isEnabled() is True
-            graph_dialog.close()
-
-        QTimer.singleShot(10, handle_do_load_graph_trigger)
-        qtbot.mouseClick(graph_dialog.do_load_graph, Qt.MouseButton.LeftButton)
+    from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog
 
     # Configuring is the only thing on offer until there is a graph
     assert dialog.do_dist_matrix.isEnabled() is False
     assert dialog.path_from.isEnabled() is False
     assert dialog.path_to.isEnabled() is False
     assert dialog.configure_graph.isEnabled() is True
-    QTimer.singleShot(10, handle_configure_graph_trigger)
-    qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton)
+    run_with_dialog_event_loop(
+        LoadGraphLayerSettingDialog,
+        lambda: qtbot.mouseClick(dialog.configure_graph, Qt.MouseButton.LeftButton),
+        button_name="do_load_graph",
+    )
+
+    assert dialog.path_from.isEnabled() is True
+    assert dialog.path_to.isEnabled() is True
+    assert dialog.do_dist_matrix.isEnabled() is True
+    dialog.close()
 
 
 def test_links_layer_is_loaded_when_it_is_not_on_the_canvas(ae_with_project):
