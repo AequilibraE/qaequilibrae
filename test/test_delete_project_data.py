@@ -163,7 +163,7 @@ def test_a_transit_result_is_removed_from_the_transit_database(transit_project):
 
 def test_a_transit_result_name_containing_a_quote_is_still_dropped(transit_project):
     with connection(transit_project._transit_database_path) as conn:
-        conn.execute('INSERT INTO results VALUES (?, ?)', ['odd"name', 'transit assignment'])
+        conn.execute("INSERT INTO results VALUES (?, ?)", ['odd"name', "transit assignment"])
     with connection(transit_project._results_database_path) as conn:
         conn.execute('CREATE TABLE "odd""name" (link_id INTEGER);')
 
