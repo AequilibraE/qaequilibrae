@@ -23,11 +23,15 @@ def delete_result(project, table_name: str) -> None:
         project.results.delete_record(table_name)
         return
 
+    deleted_transit_result = False
     if isfile(project._transit_database_path):
         with project.transit_connection as conn:
             if conn.execute(HAS_RESULTS_TABLE).fetchone() is not None:
-                conn.execute("DELETE FROM results WHERE table_name=?", [table_name])
+                result = conn.execute("SELECT 1 FROM results WHERE table_name=?", [table_name]).fetchone()
+                if result is not None:
+                    conn.execute("DELETE FROM results WHERE table_name=?", [table_name])
+                    deleted_transit_result = True
 
-    if isfile(project._results_database_path):
+    if deleted_transit_result and isfile(project._results_database_path):
         with project.results_connection as conn:
             conn.execute(f"DROP TABLE IF EXISTS {quote_identifier(table_name)}")

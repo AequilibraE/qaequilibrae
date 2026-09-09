@@ -90,6 +90,12 @@ def double_click(table, row):
     table.doubleClicked.emit(table.model().index(row, 0))
 
 
+def activate_shortcut(table, shortcut, row):
+    """Selects a row and fires its Delete-key shortcut."""
+    table.selectRow(row)
+    shortcut.activated.emit()
+
+
 def test_declining_the_prompt_leaves_the_matrix_alone(ae_with_project, mocker):
     dialog = LoadProjectDataDialog(ae_with_project, True)
     question = mocker.patch.object(QMessageBox, "question", return_value=QMessageBox.StandardButton.No)
@@ -97,13 +103,24 @@ def test_declining_the_prompt_leaves_the_matrix_alone(ae_with_project, mocker):
     matrix_name = dialog.matrices["name"].iloc[0]
     matrix_file = dialog.project.project_base_path / "matrices" / dialog.matrices["file_name"].iloc[0]
 
-    double_click(dialog.list_matrices, 0)
+    activate_shortcut(dialog.list_matrices, dialog.list_matrices_shortcut, 0)
 
     # The box has to come up with No selected, so that dismissing it cannot delete anything
     assert question.call_args.args[-1] == QMessageBox.StandardButton.No
     assert matrix_name in dialog.matrices["name"].tolist()
     assert isfile(matrix_file)
 
+    dialog.close()
+
+
+def test_orphan_matrix_prompt_does_not_claim_to_delete_a_file(ae_with_project, mocker):
+    dialog = LoadProjectDataDialog(ae_with_project, True)
+    question = mocker.patch.object(QMessageBox, "question", return_value=QMessageBox.StandardButton.No)
+    dialog.matrices.loc[0, "WARNINGS"] = "File not found on disk"
+
+    double_click(dialog.list_matrices, 0)
+
+    assert "file from disk" not in question.call_args.args[2]
     dialog.close()
 
 
@@ -130,7 +147,7 @@ def test_a_result_is_only_deleted_once_the_prompt_is_confirmed(sf_project, mocke
 
     table_name = dialog.results["table_name"].iloc[0]
 
-    double_click(dialog.list_results, 0)
+    activate_shortcut(dialog.list_results, dialog.list_results_shortcut, 0)
 
     assert question.call_args.args[-1] == QMessageBox.StandardButton.No
     assert table_name in dialog.results["table_name"].tolist()
@@ -143,4 +160,16 @@ def test_a_result_is_only_deleted_once_the_prompt_is_confirmed(sf_project, mocke
         tables = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
     assert table_name not in tables
 
+    dialog.close()
+
+
+def test_orphan_result_prompt_does_not_claim_to_delete_a_table(sf_project, mocker):
+    proj = run_sfalls_assignment(sf_project)
+    dialog = LoadProjectDataDialog(proj, True)
+    question = mocker.patch.object(QMessageBox, "question", return_value=QMessageBox.StandardButton.No)
+    dialog.results.loc[0, "WARNINGS"] = "Table not found in the results database"
+
+    double_click(dialog.list_results, 0)
+
+    assert "table from the results database" not in question.call_args.args[2]
     dialog.close()

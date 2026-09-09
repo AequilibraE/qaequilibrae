@@ -97,7 +97,10 @@ class LoadProjectDataDialog(BaseDialog):
             return
 
         matrix_name = self.matrices["name"].iloc[row]
-        question = self.tr("Delete the matrix '{}' and its file from disk?").format(matrix_name)
+        if self.matrices["WARNINGS"].iloc[row]:
+            question = self.tr("Delete the matrix record '{}'?").format(matrix_name)
+        else:
+            question = self.tr("Delete the matrix '{}' and its file from disk?").format(matrix_name)
         if not self.confirm_deletion(self.tr("Delete matrix"), question):
             return
 
@@ -151,7 +154,10 @@ class LoadProjectDataDialog(BaseDialog):
             return
 
         table_name = self.results["table_name"].iloc[row]
-        question = self.tr("Delete the result '{}' and its table from the results database?").format(table_name)
+        if self.results["WARNINGS"].iloc[row]:
+            question = self.tr("Delete the result record '{}'?").format(table_name)
+        else:
+            question = self.tr("Delete the result '{}' and its table from the results database?").format(table_name)
         if not self.confirm_deletion(self.tr("Delete result"), question):
             return
 

@@ -162,12 +162,23 @@ def test_a_transit_result_is_removed_from_the_transit_database(transit_project):
 
 
 def test_a_transit_result_name_containing_a_quote_is_still_dropped(transit_project):
+    with connection(transit_project._transit_database_path) as conn:
+        conn.execute('INSERT INTO results VALUES (?, ?)', ['odd"name', 'transit assignment'])
     with connection(transit_project._results_database_path) as conn:
         conn.execute('CREATE TABLE "odd""name" (link_id INTEGER);')
 
     delete_result(transit_project, 'odd"name')
 
     assert results_database_tables(transit_project) == ["other", "pt_assig"]
+
+
+def test_a_table_without_a_result_record_is_not_dropped(transit_project):
+    with connection(transit_project._results_database_path) as conn:
+        conn.execute("CREATE TABLE unrelated (link_id INTEGER);")
+
+    delete_result(transit_project, "unrelated")
+
+    assert results_database_tables(transit_project) == ["other", "pt_assig", "unrelated"]
 
 
 def test_deleting_a_result_does_not_create_databases_that_are_not_there(project):
