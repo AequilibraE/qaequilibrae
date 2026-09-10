@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="it_IT">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="it">
 <context>
     <name>AddConnectors</name>
     <message>
@@ -27,7 +27,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="22"/>
         <source>Links</source>
-        <translation type="unfinished"/>
+        <translation>Archi</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="29"/>
@@ -37,12 +37,12 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="38"/>
         <source>Link type</source>
-        <translation type="unfinished"/>
+        <translation>Tipo di arco</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="47"/>
         <source>Modes</source>
-        <translation type="unfinished"/>
+        <translation>Modi</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="60"/>
@@ -52,7 +52,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="65"/>
         <source>Opening project</source>
-        <translation type="unfinished"/>
+        <translation>Progetto in apertura</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="71"/>
@@ -370,7 +370,7 @@
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="70"/>
         <source>Collapse links</source>
-        <translation>Fondi archi</translation>
+        <translation>Comprimi archi</translation>
     </message>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="79"/>
@@ -544,7 +544,7 @@
     <message>
         <location filename="../modules/project_procedures/create_examples_dialog.py" line="25"/>
         <source>Available models:</source>
-        <translation type="unfinished"/>
+        <translation>Modelli disponibili:</translation>
     </message>
 </context>
 <context>
@@ -606,7 +606,7 @@
     <message>
         <location filename="../modules/project_procedures/creates_transponet_dialog.py" line="299"/>
         <source>Link Layer has NO defined CRS</source>
-        <translation>Il sistema di riferimento (CRS) del layer degli archi non è definito</translation>
+        <translation>Il sistema di riferimento del layer degli archi NON è definito</translation>
     </message>
     <message>
         <location filename="../modules/project_procedures/creates_transponet_dialog.py" line="303"/>
@@ -667,7 +667,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="132"/>
         <source>Cancel and Exit</source>
-        <translation type="unfinished"/>
+        <translation>Cancella ed esci</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="144"/>
@@ -702,7 +702,7 @@
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="269"/>
         <source>Desire Lines</source>
-        <translation type="unfinished"/>
+        <translation>Linee di desiderio</translation>
     </message>
     <message>
         <location filename="../modules/gis/forms/ui_DesireLines.ui" line="287"/>
@@ -798,12 +798,12 @@
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="234"/>
         <source>Building graph</source>
-        <translation type="unfinished"/>
+        <translation>Grafo in costruzione</translation>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="266"/>
         <source>Assigning demand</source>
-        <translation type="unfinished"/>
+        <translation>Domanda in assegnazione</translation>
     </message>
     <message>
         <location filename="../modules/gis/desire_lines_procedure.py" line="270"/>
@@ -826,12 +826,12 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="39"/>
         <source>Load datasets</source>
-        <translation>Carica set di dati</translation>
+        <translation>Carica insiemi di dati</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="46"/>
         <source>Dataset name</source>
-        <translation>Nome del set di dati</translation>
+        <translation>Nome dell&apos;insieme di dati</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="51"/>
@@ -851,27 +851,27 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="103"/>
         <source>Load matrices</source>
-        <translation type="unfinished"/>
+        <translation>Carica matrici</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="113"/>
         <source>Vectors</source>
-        <translation type="unfinished"/>
+        <translation>Vettori</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="135"/>
         <source>Attraction</source>
-        <translation type="unfinished"/>
+        <translation>Attrazione</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="178"/>
         <source>Production</source>
-        <translation type="unfinished"/>
+        <translation>Produzione</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="210"/>
         <source>Impedance</source>
-        <translation type="unfinished"/>
+        <translation>Impedenza</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="314"/>
@@ -881,7 +881,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="301"/>
         <source>Matrix</source>
-        <translation type="unfinished"/>
+        <translation>Matrice</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="273"/>
@@ -891,17 +891,17 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="400"/>
         <source>Model</source>
-        <translation type="unfinished"/>
+        <translation>Modello</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="363"/>
         <source>Parameter</source>
-        <translation type="unfinished"/>
+        <translation>Parametro</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="368"/>
         <source>Value</source>
-        <translation type="unfinished"/>
+        <translation>Valore</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="406"/>
@@ -946,7 +946,7 @@
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="444"/>
         <source>Treat empties as zeros</source>
-        <translation type="unfinished"/>
+        <translation>Tratta i valori vuoti come zero</translation>
     </message>
     <message>
         <location filename="../modules/distribution_procedures/forms/ui_distribution.ui" line="477"/>
@@ -1004,7 +1004,7 @@
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="71"/>
         <source>File path: {}</source>
-        <translation>Percorso del file: []</translation>
+        <translation>Percorso del file: {}</translation>
     </message>
     <message>
         <location filename="../modules/matrix_procedures/display_aequilibrae_formats_dialog.py" line="83"/>
@@ -1862,6 +1862,44 @@
     <message>
         <location filename="../modules/matrix_procedures/load_matrix_dialog.py" line="262"/>
         <source>Invalid field chosen</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>LoadProjectDataDialog</name>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="101"/>
+        <source>Delete the matrix record &apos;{}&apos;?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="103"/>
+        <source>Delete the matrix &apos;{}&apos; and its file from disk?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="104"/>
+        <source>Delete matrix</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="158"/>
+        <source>Delete the result record &apos;{}&apos;?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="160"/>
+        <source>Delete the result &apos;{}&apos; and its table from the results database?</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="161"/>
+        <source>Delete result</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="177"/>
+        <source>Could not delete &apos;{}&apos;: {}</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -3447,17 +3485,17 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="92"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="96"/>
         <source>Results</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="105"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="109"/>
         <source>It may take up to one minute to process for the first time a table is loaded from this database</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="108"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="112"/>
         <source>Load Result table as data layer</source>
         <translation type="unfinished"/>
     </message>
@@ -3472,18 +3510,28 @@
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="126"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="130"/>
         <source>Non-project Data</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="138"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="142"/>
         <source>Load Data</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="115"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="119"/>
         <source>Join with layer</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="88"/>
+        <source>Double-click a matrix to delete it</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="102"/>
+        <source>Double-click a result to delete it</source>
         <translation type="unfinished"/>
     </message>
 </context>
