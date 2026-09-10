@@ -20,14 +20,10 @@ _qgis tag tty environment command:
         {{ qgis_image }}:{{ tag }} \
         bash -lc '{{ command }}'
 
-# Build the local QGIS image. The public `ltr` tag is fixed to the CI QGIS 3.44.0 image.
+# Build the local QGIS image from the corresponding public QGIS image.
 _qgis-image tag:
-    qgis_base_image="qgis/qgis:{{ tag }}"; \
-    if [ "{{ tag }}" = "ltr" ]; then \
-        qgis_base_image="qgis/qgis:3.44.0"; \
-    fi; \
     docker build --pull \
-        --build-arg QGIS_BASE_IMAGE="$qgis_base_image" \
+        --build-arg QGIS_BASE_IMAGE="qgis/qgis:{{ tag }}" \
         --tag {{ qgis_image }}:{{ tag }} \
         .
 
@@ -36,9 +32,8 @@ _qgis-image tag:
 setup tag="ltr":
     just _qgis-image {{ tag }}
     just _qgis {{ tag }} '' '{{ qgis_runtime_environment }}' '\
-        export PATH=/opt/venv/bin:$PATH; \
         set -euo pipefail; \
-        qgis_python_version=$(python3 -c "import sys; print(f\"{sys.version_info.major}.{sys.version_info.minor}\")"); \
+        qgis_python_version=$(/usr/bin/python3 -c "import sys; print(f\"{sys.version_info.major}.{sys.version_info.minor}\")"); \
         venv_python_version=$(/opt/venv/bin/python -c "import sys; print(f\"{sys.version_info.major}.{sys.version_info.minor}\")" 2>/dev/null || true); \
         if [ "$venv_python_version" != "$qgis_python_version" ]; then \
             python3 -m venv --clear /opt/venv --system-site-packages; \
