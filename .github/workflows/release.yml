@@ -1,4 +1,4 @@
-name: VersionRelease
+name: Version Release
 
 on:
   push:

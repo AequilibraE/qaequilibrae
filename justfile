@@ -70,7 +70,7 @@ setup tag="ltr":
 # Example: `just test ltr --durations=20`
 test tag="ltr" *pytest_args:
     just setup {{ tag }}
-    just _qgis {{ tag }} '' '{{ qgis_runtime_environment }}' 'export PATH=/opt/venv/bin:$PATH; /opt/venv/bin/python -m pytest --cov-report term-missing --cov=qaequilibrae test {{ pytest_args }}'
+    just _test {{ tag }} {{ pytest_args }}
 
 # Run one test file, test node, or parametrized test.
 # Example: `just test-one test/test_routing.py::test_route ltr --durations=20`
@@ -99,9 +99,23 @@ shell tag="ltr":
 shell-ltr:
     just shell ltr
 
+# Run the project's formatting and lint checks in a prepared QGIS image.
+_lint tag:
+    just _qgis {{ tag }} '' '' '\
+        /opt/venv/bin/ruff check && \
+        /opt/venv/bin/ruff format --check --diff'
+
+# Run the complete test suite in a prepared QGIS image.
+_test tag *pytest_args:
+    just _qgis {{ tag }} '' '{{ qgis_runtime_environment }}' 'export PATH=/opt/venv/bin:$PATH; /opt/venv/bin/python -m pytest --cov-report term-missing --cov=qaequilibrae test {{ pytest_args }}'
+
 # Run the project's formatting and lint checks in the selected QGIS image.
 lint tag="ltr":
     just setup {{ tag }}
-    just _qgis {{ tag }} '' '' '\
-        /opt/venv/bin/ruff check && \
-        /opt/venv/bin/black --check .'
+    just _lint {{ tag }}
+
+# Run the local equivalent of the Linux CI checks without preparing QGIS twice.
+check tag="ltr" *pytest_args:
+    just setup {{ tag }}
+    just _lint {{ tag }}
+    just _test {{ tag }} {{ pytest_args }}
