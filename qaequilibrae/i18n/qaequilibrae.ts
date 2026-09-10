@@ -1868,6 +1868,44 @@
     </message>
 </context>
 <context>
+    <name>LoadProjectDataDialog</name>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="101"/>
+        <source>Delete the matrix record &apos;{}&apos;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="103"/>
+        <source>Delete the matrix &apos;{}&apos; and its file from disk?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="104"/>
+        <source>Delete matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="158"/>
+        <source>Delete the result record &apos;{}&apos;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="160"/>
+        <source>Delete the result &apos;{}&apos; and its table from the results database?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="161"/>
+        <source>Delete result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/load_project_data.py" line="177"/>
+        <source>Could not delete &apos;{}&apos;: {}</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LoadProjectLogFile</name>
     <message>
         <location filename="../modules/processing_provider/project_procedures/load_log.py" line="12"/>
@@ -3449,17 +3487,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="92"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="96"/>
         <source>Results</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="105"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="109"/>
         <source>It may take up to one minute to process for the first time a table is loaded from this database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="108"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="112"/>
         <source>Load Result table as data layer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3474,18 +3512,28 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="126"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="130"/>
         <source>Non-project Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="138"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="142"/>
         <source>Load Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="115"/>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="119"/>
         <source>Join with layer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="88"/>
+        <source>Double-click a matrix to delete it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../modules/matrix_procedures/forms/ui_project_data.ui" line="102"/>
+        <source>Double-click a result to delete it</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
