@@ -26,14 +26,13 @@ function Invoke-QgisPython {
 $repository = Split-Path -Path $PSScriptRoot -Parent
 $qgisBin = Split-Path -Path $QgisPython -Parent
 $qgisPath = Split-Path -Path $qgisBin -Parent
-$qgisPythonDirectory = if ((Split-Path -Path $QgisPython -Leaf) -like "*ltr*") { "qgis-ltr" } else { "qgis" }
 $pluginPath = Join-Path $env:APPDATA "QGIS\$ProfileDirectory\profiles\default\python\plugins"
 $aeqPath = Join-Path $pluginPath "qaequilibrae"
 
 Copy-Item (Join-Path $repository "qaequilibrae") -Destination $aeqPath -Recurse
 Copy-Item (Join-Path $repository "test") -Destination (Join-Path $pluginPath "test") -Recurse
 
-$env:PYTHONPATH = Join-Path $qgisPath "apps\$qgisPythonDirectory\python"
+$env:PYTHONPATH = Join-Path $qgisPath "apps\qgis\python"
 $env:QT_QPA_PLATFORM = "offscreen"
 
 Invoke-QgisPython -Arguments @("-m", "pip", "install", "-r", (Join-Path $pluginPath "test\requirements_test.txt")) `

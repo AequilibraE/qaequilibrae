@@ -70,38 +70,28 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        # We test the current LTR (Qt5) and the latest release (QGIS 4, Qt6).
+        # We test the minimum supported LTR (Qt5) and the latest release (QGIS 4, Qt6).
         # QGIS 4 keeps its profiles under QGIS4\, while the 3.x line uses QGIS3\.
         include:
           - name: QGIS latest (Qt 6)
-            package: qgis-full
+            package: qgis
             python: python-qgis.bat
             profile: QGIS4
           - name: QGIS LTR (Qt 5)
-            package: qgis-ltr-full
+            package: qgis-ltr --version=3.40.8
             python: python-qgis-ltr.bat
             profile: QGIS3
 
     steps:
       - uses: actions/checkout@v7
 
-      # OSGeo4W retains downloaded packages in a separate directory, which can be
-      # restored without caching the installed QGIS tree.
-      - name: Restore OSGeo4W packages
-        uses: actions/cache@v4
+      - name: Install QGIS on Chocolatey
+        uses: crazy-max/ghaction-chocolatey@v4
         with:
-          path: C:\OSGeo4W_pkg
-          key: osgeo4w-${{ runner.os }}-${{ matrix.package }}
-
-      - name: Install QGIS with OSGeo4W
-        uses: echoix/setup-OSGeo4W@v0.3.0
-        with:
-          root: C:\OSGeo4W
-          package-dir: C:\OSGeo4W_pkg
-          packages: >-
-            ${{ matrix.package }}
+          args: install ${{ matrix.package }} -y
 
       - name: Run plugin tests
         shell: pwsh
         run: |
-          & .\ci\test_windows.ps1 -QgisPython "C:\OSGeo4W\bin\${{ matrix.python }}" -ProfileDirectory "${{ matrix.profile }}"
+          $qgisPath = (Get-ChildItem -Path "C:\Program Files" -Filter "QGIS*" -Directory).FullName
+          & .\ci\test_windows.ps1 -QgisPython "$qgisPath\bin\${{ matrix.python }}" -ProfileDirectory "${{ matrix.profile }}"
