@@ -37,9 +37,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: QGIS latest
+          - name: QGIS latest (Qt 6)
             container: qgis/qgis:latest
-          - name: QGIS LTR
+          - name: QGIS LTR (Qt 5)
             container: qgis/qgis:ltr
     container:
       image: ${{ matrix.container }}
