@@ -74,11 +74,11 @@ jobs:
         # QGIS 4 keeps its profiles under QGIS4\, while the 3.x line uses QGIS3\.
         include:
           - name: QGIS latest (Qt 6)
-            package: qgis
+            package: qgis-full
             python: python-qgis.bat
             profile: QGIS4
           - name: QGIS LTR (Qt 5)
-            package: qgis-ltr
+            package: qgis-ltr-full
             python: python-qgis-ltr.bat
             profile: QGIS3
 
@@ -91,7 +91,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: C:\OSGeo4W_pkg
-          key: osgeo4w-${{ runner.os }}-${{ matrix.package }}-v3
+          key: osgeo4w-${{ runner.os }}-${{ matrix.package }}
 
       - name: Install QGIS with OSGeo4W
         uses: echoix/setup-OSGeo4W@v0.3.0
@@ -100,8 +100,6 @@ jobs:
           package-dir: C:\OSGeo4W_pkg
           packages: >-
             ${{ matrix.package }}
-            python3-pip
-            python3-scipy
 
       - name: Run plugin tests
         shell: pwsh
