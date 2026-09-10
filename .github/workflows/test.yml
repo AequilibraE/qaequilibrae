@@ -91,14 +91,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: C:\OSGeo4W_pkg
-          key: osgeo4w-${{ runner.os }}-${{ matrix.package }}-v1
+          key: osgeo4w-${{ runner.os }}-${{ matrix.package }}-v2
 
       - name: Install QGIS with OSGeo4W
         uses: echoix/setup-OSGeo4W@v0.3.0
         with:
           root: C:\OSGeo4W
           package-dir: C:\OSGeo4W_pkg
-          packages: ${{ matrix.package }}
+          packages: >-
+            ${{ matrix.package }}
+            python3-pip
 
       - name: Run plugin tests
         shell: pwsh
