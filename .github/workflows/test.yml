@@ -94,4 +94,13 @@ jobs:
         shell: pwsh
         run: |
           $qgisPath = (Get-ChildItem -Path "C:\Program Files" -Filter "QGIS*" -Directory).FullName
-          & .\ci\test_windows.ps1 -QgisPython "$qgisPath\bin\${{ matrix.python }}" -ProfileDirectory "${{ matrix.profile }}"
+          & .\ci\test_windows.ps1 -QgisPython "$qgisPath\bin\${{ matrix.python }}" -ProfileDirectory "${{ matrix.profile }}" -TestReport "$env:GITHUB_WORKSPACE\test-results\junit.xml"
+
+      # Temporary: retain timing data from Windows runs while we identify bottlenecks.
+      - name: Upload Windows test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-report-${{ matrix.profile }}
+          path: test-results/junit.xml
+          if-no-files-found: warn
