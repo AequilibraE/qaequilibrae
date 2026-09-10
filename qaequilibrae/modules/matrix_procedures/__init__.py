@@ -4,5 +4,7 @@ from .load_matrix_class import LoadMatrix as LoadMatrix
 from .load_matrix_dialog import LoadMatrixDialog as LoadMatrixDialog
 from .load_project_data import LoadProjectDataDialog as LoadProjectDataDialog
 from .load_result_table import load_result_table as load_result_table
+from .matrix_deleter import delete_matrix as delete_matrix
 from .matrix_lister import list_matrices as list_matrices
+from .results_deleter import delete_result as delete_result
 from .results_lister import list_results as list_results
