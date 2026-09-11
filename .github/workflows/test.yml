@@ -1,0 +1,97 @@
+name: Tests
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set Python environment
+        uses: actions/setup-python@v7
+        with:
+          python-version: 3.13
+          architecture: x64
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test/requirements_test.txt
+
+      - name: Lint with ruff
+        run: ruff check
+
+      - name: Check formatting with ruff
+        run: ruff format --check --diff
+
+  test_linux:
+    name: Test (Linux, ${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        include:
+          - name: QGIS latest (Qt 6)
+            container: qgis/qgis:latest
+          - name: QGIS LTR (Qt 5)
+            container: qgis/qgis:ltr
+    container:
+      image: ${{ matrix.container }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install dependencies
+        run: |
+          python3 -m venv /tmp/.venv --system-site-packages
+          . /tmp/.venv/bin/activate
+          qgis --version
+          python3 -m pip install -U pip setuptools uv
+          python3 ./ci/dependency_installation.py
+          python3 -m uv pip install -r test/requirements_test.txt
+          export PYTHONPATH=$(pwd)/qaequilibrae/packages:$PYTHONPATH
+          echo "PYTHONPATH=$PYTHONPATH" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: |
+          . /tmp/.venv/bin/activate
+          export QT_QPA_PLATFORM=offscreen
+          pwd
+          python3 -m pytest --cov-report term-missing --cov=qaequilibrae test
+
+  test_windows:
+    name: Test (Windows, ${{ matrix.name }})
+    runs-on: windows-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        # We test the supported LTR (Qt5) and the latest release (QGIS 4, Qt6).
+        # QGIS 4 keeps its profiles under QGIS4\, while the 3.x line uses QGIS3\.
+        include:
+          - name: QGIS latest (Qt 6)
+            package: qgis
+            python: python-qgis.bat
+            profile: QGIS4
+          - name: QGIS LTR (Qt 5)
+            package: qgis-ltr --version=3.44.8
+            python: python-qgis-ltr.bat
+            profile: QGIS3
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install QGIS on Chocolatey
+        uses: crazy-max/ghaction-chocolatey@v4
+        with:
+          args: install ${{ matrix.package }} -y
+
+      - name: Run plugin tests
+        shell: pwsh
+        run: |
+          $qgisPath = (Get-ChildItem -Path "C:\Program Files" -Filter "QGIS*" -Directory).FullName
+          & .\ci\test_windows.ps1 -QgisPython "$qgisPath\bin\${{ matrix.python }}" -ProfileDirectory "${{ matrix.profile }}"

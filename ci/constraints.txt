@@ -1,0 +1,3 @@
+# Local QGIS test environment constraints.
+# Intentionally empty so the container installs the project dependencies
+# without requiring a repository-specific pin file.
