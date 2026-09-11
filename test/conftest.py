@@ -93,87 +93,87 @@ def dialog_watchdog(qgis_iface):
         )
 
 
-@pytest.fixture(scope="function")
-def ae(qgis_iface) -> AequilibraEMenu:
-    ae = AequilibraEMenu(qgis_iface)
-    yield ae
+def _reset_qgis_state(qgis_iface):
     qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
     QgsProject.instance().removeAllMapLayers()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
+def menu_factory(qgis_iface):
+    """Create menus and close all projects opened by a test when it finishes."""
+    menus = []
+
+    def create(project_path=None):
+        ae = AequilibraEMenu(qgis_iface)
+        menus.append(ae)
+
+        if project_path is not None:
+            from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+
+            _run_load_project_from_path(ae, project_path)
+
+        return ae
+
+    yield create
+
+    for ae in menus:
+        if ae.project is not None:
+            ae.run_close_project()
+    _reset_qgis_state(qgis_iface)
+
+
+@pytest.fixture
+def ae(menu_factory) -> AequilibraEMenu:
+    return menu_factory()
+
+
+@pytest.fixture(scope="session")
+def example_project_templates(tmp_path_factory):
+    """Build the example projects once and use them as read-only templates."""
+    from aequilibrae.utils.create_example import create_example
+
+    template_root = tmp_path_factory.mktemp("example_project_templates")
+    templates = {}
+
+    for name, place in (("sioux_falls", None), ("coquimbo", "coquimbo")):
+        path = template_root / name
+        project = create_example(str(path), place) if place else create_example(str(path))
+        project.close()
+        templates[name] = path
+
+    return templates
+
+
+@pytest.fixture
 def sioux_falls_project_path(folder_path):
     copytree("test/data/SiouxFalls_project", folder_path)
     return folder_path
 
 
-@pytest.fixture(scope="function")
-def ae_with_project(qgis_iface, sioux_falls_project_path) -> AequilibraEMenu:
-    ae = AequilibraEMenu(qgis_iface)
-    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
-
-    _run_load_project_from_path(ae, sioux_falls_project_path)
-    yield ae
-    ae.run_close_project()
-    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
-    QgsProject.instance().removeAllMapLayers()
+@pytest.fixture
+def ae_with_project(menu_factory, sioux_falls_project_path) -> AequilibraEMenu:
+    return menu_factory(sioux_falls_project_path)
 
 
-@pytest.fixture(scope="function")
-def pt_project(qgis_iface, folder_path) -> AequilibraEMenu:
-    ae = AequilibraEMenu(qgis_iface)
-    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
-
+@pytest.fixture
+def pt_project(menu_factory, folder_path) -> AequilibraEMenu:
     copytree("test/data/coquimbo_project", folder_path)
-    _run_load_project_from_path(ae, folder_path)
-    yield ae
-    ae.run_close_project()
-    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
-    QgsProject.instance().removeAllMapLayers()
+    return menu_factory(folder_path)
 
 
-@pytest.fixture(scope="function")
-def pt_no_feed(qgis_iface, folder_path) -> AequilibraEMenu:
-    ae = AequilibraEMenu(qgis_iface)
-    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
-
+@pytest.fixture
+def pt_no_feed(menu_factory, folder_path) -> AequilibraEMenu:
     copytree("test/data/no_pt_feed", folder_path)
-    _run_load_project_from_path(ae, folder_path)
-    yield ae
-    ae.run_close_project()
-    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
-    QgsProject.instance().removeAllMapLayers()
+    return menu_factory(folder_path)
 
 
 @pytest.fixture
-def coquimbo_project(qgis_iface, folder_path) -> AequilibraEMenu:
-    from aequilibrae.utils.create_example import create_example
-
-    project = create_example(folder_path, "coquimbo")
-    project.close()
-
-    ae = AequilibraEMenu(qgis_iface)
-    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
-
-    _run_load_project_from_path(ae, folder_path)
-    yield ae
-    ae.run_close_project()
-    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
-    QgsProject.instance().removeAllMapLayers()
+def coquimbo_project(menu_factory, folder_path, example_project_templates) -> AequilibraEMenu:
+    copytree(example_project_templates["coquimbo"], folder_path)
+    return menu_factory(folder_path)
 
 
 @pytest.fixture
-def sf_project(qgis_iface, folder_path) -> AequilibraEMenu:
-    from aequilibrae.utils.create_example import create_example
-
-    project = create_example(folder_path)
-    project.close()
-
-    ae = AequilibraEMenu(qgis_iface)
-    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
-
-    _run_load_project_from_path(ae, folder_path)
-    yield ae
-    ae.run_close_project()
-    qgis_iface.messageBar().messages = {0: [], 1: [], 2: [], 3: []}
-    QgsProject.instance().removeAllMapLayers()
+def sf_project(menu_factory, folder_path, example_project_templates) -> AequilibraEMenu:
+    copytree(example_project_templates["sioux_falls"], folder_path)
+    return menu_factory(folder_path)
