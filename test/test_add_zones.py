@@ -1,5 +1,3 @@
-from time import sleep
-
 import qgis
 
 from qaequilibrae.modules.project_procedures.add_zones_procedure import AddZonesProcedure
@@ -7,7 +5,7 @@ from qaequilibrae.modules.project_procedures.adds_zones_dialog import AddZonesDi
 from .utilities import create_polygons_layer
 
 
-def test_add_zones_dialog(pt_project):
+def test_add_zones_dialog(pt_project, qtbot):
     _ = create_polygons_layer([97, 98, 99])
 
     dialog = AddZonesDialog(pt_project)
@@ -16,7 +14,7 @@ def test_add_zones_dialog(pt_project):
     dialog.changed_layer()
     dialog.run()
 
-    sleep(2)
+    qtbot.waitUntil(lambda: len(pt_project.project.zoning.all_zones()) == 3, timeout=3000)
 
     assert len(pt_project.project.zoning.all_zones()) == 3
 
@@ -28,7 +26,5 @@ def test_add_zones_procedure(pt_project):
 
     action = AddZonesProcedure(qgis.utils.iface.mainWindow(), pt_project.project, layer, False, False, corresp)
     action.doWork()
-
-    sleep(2)
 
     assert len(pt_project.project.zoning.all_zones()) == 3

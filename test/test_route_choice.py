@@ -70,11 +70,14 @@ def test_execute_single_dialog(coquimbo_project, qtbot):
     dialog.node_from.clear()
     qtbot.mouseClick(dialog.node_from, Qt.MouseButton.LeftButton)
     qtbot.keyClicks(dialog.node_from, "71645")
-    qtbot.wait(200)
     dialog.node_to.clear()
     qtbot.mouseClick(dialog.node_to, Qt.MouseButton.LeftButton)
     qtbot.keyClicks(dialog.node_to, "79385")
-    qtbot.wait(200)
+
+    qtbot.waitUntil(
+        lambda: "route_set-71645-79385" in [layer.name() for layer in QgsProject.instance().mapLayers().values()],
+        timeout=3000,
+    )
 
     dialog.exit_procedure()
 

@@ -211,20 +211,7 @@ def create_delaunay(source: str, name: str, computational_view: str, result_name
     assert results.shape != (0, 0)
 
 
-def wait_for_active_window(qtbot):
-    timeout = 3000
-    window = QApplication.activeWindow()
-    while window is None and timeout > 0:
-        window = QApplication.activeWindow()
-        qtbot.wait(100)
-        timeout -= 100
-    assert timeout > 0, "Waiting for window to open timed out after 3 seconds"
-    return window
-
-
 def test_install_external_libraries(coquimbo_project, qtbot):
-    # This test is a bit time-consuming due to the second QTimer.singleShot waiting
-    # 5 seconds for running the installation of the external library.
     folder = coquimbo_project.project.project_base_path
 
     with open(folder / "run" / "requirements.txt", "w") as file:
@@ -250,13 +237,25 @@ def test_install_external_libraries(coquimbo_project, qtbot):
     p.parameters["run"]["seaborn_plot"] = None
     p.write_back()
 
-    def handle_dialog():
-        dialog = wait_for_active_window(qtbot)
-        ok_button = dialog.button(QMessageBox.StandardButton.Ok)
-        qtbot.mouseClick(ok_button, Qt.MouseButton.LeftButton, delay=1)
+    dialogs_handled = 0
 
-    QTimer.singleShot(100, handle_dialog)
-    QTimer.singleShot(5_000, handle_dialog)
+    def handle_dialog():
+        nonlocal dialogs_handled
+        dialog = QApplication.activeModalWidget() or QApplication.activeWindow()
+        if not isinstance(dialog, QMessageBox):
+            QTimer.singleShot(10, handle_dialog)
+            return
+
+        ok_button = dialog.button(QMessageBox.StandardButton.Ok)
+        qtbot.mouseClick(ok_button, Qt.MouseButton.LeftButton)
+        dialogs_handled += 1
+
+        # The installer runs synchronously between these two message boxes. Queue the second
+        # click now so it runs as soon as the information box starts its nested event loop.
+        if dialogs_handled == 1:
+            QTimer.singleShot(0, handle_dialog)
+
+    QTimer.singleShot(0, handle_dialog)
 
     _ = RunModuleDialog(coquimbo_project)
 
