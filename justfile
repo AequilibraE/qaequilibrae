@@ -101,3 +101,24 @@ check tag="ltr" *pytest_args:
     just setup {{ tag }}
     just _lint {{ tag }}
     just _test {{ tag }} {{ pytest_args }}
+
+[arg('tag', pattern='3|4')]
+[unix]
+link target username tag="3" profile="default":
+    # need to keep everything on one line and separate regular linux and wsl
+    if grep -qi microsoft /proc/version; then \
+        exit; ln -sfn "{{target}}" "/mnt/c/Users/{{username}}/AppData/Roaming/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/"; \
+    else \
+        ln -sfn "{{target}}" "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae"; \
+    fi
+
+[arg('tag', pattern='3|4')]
+[macos]
+link tag="3":
+    echo "Tom's part"
+
+[arg('tag', pattern='3|4')]
+[windows]
+link target tag="3" profile="default":
+    # assume using git bash
+    cmd /c mklink /j  "C:\Users\{{env_var("USERNAME")}}\AppData\Roaming\QGIS\QGIS{{tag}}\{{profile}}\default\python\plugins\qaequilibrae" target
