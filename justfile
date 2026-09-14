@@ -102,14 +102,26 @@ check tag="ltr" *pytest_args:
     just _lint {{ tag }}
     just _test {{ tag }} {{ pytest_args }}
 
+adkf:
+    echo "hi"; \
+    echo "world"
+
 [arg('tag', pattern='3|4')]
 [unix]
 link target username tag="3" profile="default":
-    # need to keep everything on one line and separate regular linux and wsl
-    if grep -qi microsoft /proc/version; then \
-        exit; ln -sfn "{{target}}" "/mnt/c/Users/{{username}}/AppData/Roaming/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/"; \
+    if uname -r | grep -qi microsoft; then \
+        cp -ru {{target}} /mnt/c/Users/{{username}}/AppData/Roaming/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/; \
+        echo "version=1.0" >> ~/../../mnt/c/Users/{{username}}/AppData/Roaming/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/metadata.txt; \
     else \
-        ln -sfn "{{target}}" "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae"; \
+        cp {{target}}/qaequilibrae.py {{target}}/requirements.txt {{target}}/large_icon.png {{target}}/icon.png {{target}}/set_version.py \
+        {{target}}/missing_dependencies.py {{target}}/pandas_compat.py {{target}}/__init__.py {{target}}/message.py {{target}}/get_version.py \
+        {{target}}/LICENSE {{target}}/aequilivrae_version.txt {{target}}/download_extra_packages_class.py {{target}}/metadata.txt\
+        "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/"; \
+        ln -sfn "{{target}}/modules" "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/modules"; \
+        ln -sfn "{{target}}/__pycache__" "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/__pycache__"; \
+        ln -sfn "{{target}}/packages" "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/packages"; \
+        ln -sfn "{{target}}/i18n" "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/i18n"; \
+        echo "version=1.0" >> "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/metadata.txt"; \
     fi
 
 [arg('tag', pattern='3|4')]
