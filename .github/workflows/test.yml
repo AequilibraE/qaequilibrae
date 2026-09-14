@@ -85,7 +85,26 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Determine QGIS cache version
+        id: qgis-version
+        shell: pwsh
+        run: |
+          if ("${{ matrix.package }}" -eq "qgis") {
+            $version = (choco info qgis --limit-output | Select-Object -First 1).Split('|')[1]
+          } else {
+            $version = "3.44.8"
+          }
+          "qgis_version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Restore QGIS installation
+        id: cache-qgis
+        uses: actions/cache@v6
+        with:
+          path: C:\Program Files\QGIS*
+          key: ${{ runner.os }}-qgis-${{ steps.qgis-version.outputs.qgis_version }}
+
       - name: Install QGIS on Chocolatey
+        if: steps.cache-qgis.outputs.cache-hit != 'true'
         uses: crazy-max/ghaction-chocolatey@v4
         with:
           args: install ${{ matrix.package }} -y
@@ -94,4 +113,12 @@ jobs:
         shell: pwsh
         run: |
           $qgisPath = (Get-ChildItem -Path "C:\Program Files" -Filter "QGIS*" -Directory).FullName
-          & .\ci\test_windows.ps1 -QgisPython "$qgisPath\bin\${{ matrix.python }}" -ProfileDirectory "${{ matrix.profile }}"
+          & .\ci\test_windows.ps1 -QgisPython "$qgisPath\bin\${{ matrix.python }}" -ProfileDirectory "${{ matrix.profile }}" -TestReport "$env:GITHUB_WORKSPACE\test-results\junit.xml"
+
+      - name: Upload Windows test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-test-report-${{ matrix.profile }}
+          path: test-results/junit.xml
+          if-no-files-found: warn

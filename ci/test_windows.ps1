@@ -3,7 +3,9 @@ param(
     [string]$QgisPython,
 
     [Parameter(Mandatory = $true)]
-    [string]$ProfileDirectory
+    [string]$ProfileDirectory,
+
+    [string]$TestReport
 )
 
 $ErrorActionPreference = "Stop"
@@ -60,9 +62,18 @@ if ($aon.Name -notlike "*$expected*") {
 Write-Host "AequilibraE compiled extension present: $($aon.Name) (matches $pyDir)"
 
 $env:PYTHONPATH = "$env:PYTHONPATH;$pluginPath;$aeqPath\packages"
+if ($TestReport) {
+    New-Item -ItemType Directory -Force -Path (Split-Path -Path $TestReport -Parent) | Out-Null
+}
+
+$pytestArguments = @("-m", "pytest", "test", "--durations=50", "--durations-min=1")
+if ($TestReport) {
+    $pytestArguments += "--junitxml=$TestReport"
+}
+
 Push-Location $pluginPath
 try {
-    Invoke-QgisPython -Arguments @("-m", "pytest", "test") -FailureMessage "Pytest failed"
+    Invoke-QgisPython -Arguments $pytestArguments -FailureMessage "Pytest failed"
 }
 finally {
     Pop-Location
