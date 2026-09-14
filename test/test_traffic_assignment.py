@@ -689,6 +689,7 @@ def test_single_class_from_yaml(sf_project, qtbot, mocker):
     assert round(np.sum(np.nan_to_num(mtx["free_flow_time_blended"][:])), 4) > 0
     assert round(np.sum(np.nan_to_num(mtx["distance_final"][:])), 4) > 0
     assert round(np.sum(np.nan_to_num(mtx["distance_blended"][:])), 4) > 0
+    mtx.close()
 
 
 def test_multi_class_from_yaml(sf_project, qtbot, mocker):
