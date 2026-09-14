@@ -4,7 +4,6 @@ from qgis.core import QgsProject
 
 from qaequilibrae.modules.matrix_procedures.load_project_data import LoadProjectDataDialog
 from qaequilibrae.modules.paths_procedures.skim_viewer_dialog import SkimViewerDialog
-from .utilities import run_sfalls_assignment
 
 
 # TODO: ideally, we would test if all the views are correct.
@@ -100,12 +99,12 @@ def test_parameter_changed(ae_with_project, qtbot, timeoutDetector, qgis_iface):
     assert start_cost != current_cost
 
 
-def test_plot_with_joined_results(sf_project, qtbot, timeoutDetector, mocker, qgis_iface):
-    lyr = sf_project.layers["nodes"][0]
+def test_plot_with_joined_results(sf_project_with_assignment, qtbot, timeoutDetector, mocker, qgis_iface):
+    lyr = sf_project_with_assignment.layers["nodes"][0]
     QgsProject.instance().addMapLayer(lyr)
     qgis_iface.setActiveLayer(lyr)
 
-    proj = run_sfalls_assignment(sf_project)
+    proj = sf_project_with_assignment
 
     function = "qaequilibrae.modules.matrix_procedures.load_project_data.DisplayAequilibraEFormatsDialog"
     mocker.patch(function)
@@ -123,7 +122,7 @@ def test_plot_with_joined_results(sf_project, qtbot, timeoutDetector, mocker, qg
     # Check if layer 'links' is set active
     assert "links" in existing_layers
 
-    dialog = SkimViewerDialog(sf_project)
+    dialog = SkimViewerDialog(sf_project_with_assignment)
 
     # Check if link fields are in the skimmeable fields
     new_fields = [

@@ -1,6 +1,7 @@
 import sys
 from os.path import dirname, join
 from shutil import copytree
+from types import SimpleNamespace
 from uuid import uuid4
 
 import pytest
@@ -176,4 +177,29 @@ def coquimbo_project(menu_factory, folder_path, example_project_templates) -> Ae
 @pytest.fixture
 def sf_project(menu_factory, folder_path, example_project_templates) -> AequilibraEMenu:
     copytree(example_project_templates["sioux_falls"], folder_path)
+    return menu_factory(folder_path)
+
+
+@pytest.fixture(scope="session")
+def sf_assignment_template(tmp_path_factory, example_project_templates):
+    """Build the Sioux Falls assignment once for tests that need its results."""
+    from aequilibrae import Project
+
+    from .utilities import run_sfalls_assignment
+
+    template_path = tmp_path_factory.mktemp("sf_assignment_template") / "model"
+    copytree(example_project_templates["sioux_falls"], template_path)
+
+    project = Project()
+    project.open(template_path)
+    run_sfalls_assignment(SimpleNamespace(project=project))
+    project.close()
+
+    return template_path
+
+
+@pytest.fixture
+def sf_project_with_assignment(menu_factory, folder_path, sf_assignment_template) -> AequilibraEMenu:
+    """Open an isolated copy of the prepared Sioux Falls assignment model."""
+    copytree(sf_assignment_template, folder_path)
     return menu_factory(folder_path)

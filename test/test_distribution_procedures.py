@@ -11,7 +11,6 @@ from qgis.core import QgsProject
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
 from qaequilibrae.modules.distribution_procedures.distribution_models_dialog import DistributionModelsDialog
 from qaequilibrae.modules.matrix_procedures.load_dataset_dialog import LoadDatasetDialog
-from .utilities import run_sfalls_assignment
 
 DISTRIBUTION_PATH = "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog"
 
@@ -83,8 +82,8 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
 
 
 @pytest.mark.parametrize("method", ["negative_exponential", "inverse_power", "both"])
-def test_calibrate_gravity(sf_project, method, folder_path, mocker, qtbot):
-    proj = run_sfalls_assignment(sf_project)
+def test_calibrate_gravity(sf_project_with_assignment, method, folder_path, mocker, qtbot):
+    proj = sf_project_with_assignment
 
     mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
     mocker.patch(f"{DISTRIBUTION_PATH}.exit_procedure")

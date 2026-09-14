@@ -31,13 +31,29 @@ point_assertions = {
 
 places = ["Valparaiso", "Santiago", "Antofagasta"]
 
+polygon_cases = [
+    ("polygon", "ENCLOSED"),
+    ("polygon", "TOUCHING"),
+    ("polygon", "CLOSEST"),
+    ("linestring", "ENCLOSED"),
+    ("linestring", "TOUCHING"),
+    ("linestring", "CLOSEST"),
+    ("point", "ENCLOSED"),
+    ("point", "CLOSEST"),
+]
+linestring_cases = [
+    ("polygon", "ENCLOSED"),
+    ("polygon", "TOUCHING"),
+    ("polygon", "CLOSEST"),
+    ("linestring", "TOUCHING"),
+    ("linestring", "CLOSEST"),
+    ("point", "CLOSEST"),
+]
+point_cases = [("polygon", "ENCLOSED"), ("polygon", "CLOSEST"), ("linestring", "CLOSEST"), ("point", "CLOSEST")]
 
-@pytest.mark.parametrize("ops", ["ENCLOSED", "TOUCHING", "CLOSEST"])
-@pytest.mark.parametrize("to_layer", ["polygon", "linestring", "point"])
+
+@pytest.mark.parametrize(("to_layer", "ops"), polygon_cases)
 def test_simple_tag_polygon(coquimbo_project, to_layer, ops):
-    if to_layer == "point" and ops == "TOUCHING":
-        pytest.skip(f"'{ops}' does not apply to polygon-{to_layer}")
-
     coquimbo_project.load_layer_by_name("zones")
 
     zones = [97, 98, 99]
@@ -90,14 +106,8 @@ def test_simple_tag_polygon(coquimbo_project, to_layer, ops):
         assert "Antofagasta" in feats
 
 
-@pytest.mark.parametrize("ops", ["ENCLOSED", "TOUCHING", "CLOSEST"])
-@pytest.mark.parametrize("to_layer", ["polygon", "linestring", "point"])
+@pytest.mark.parametrize(("to_layer", "ops"), linestring_cases)
 def test_simple_tag_linestring(coquimbo_project, to_layer, ops):
-    if to_layer != "polygon" and ops == "ENCLOSED":
-        pytest.skip(f"'{ops}' does not apply to linestring-{to_layer}")
-    if to_layer == "point" and ops == "TOUCHING":
-        pytest.skip(f"'{ops}' does not apply to linestring-{to_layer}")
-
     coquimbo_project.load_layer_by_name("links")
 
     nodes = [21, 121, 1021]
@@ -141,12 +151,8 @@ def test_simple_tag_linestring(coquimbo_project, to_layer, ops):
     assert len(feats) == len(linestring_assertions[to_layer][ops])
 
 
-@pytest.mark.parametrize("ops", ["ENCLOSED", "CLOSEST"])
-@pytest.mark.parametrize("to_layer", ["polygon", "linestring", "point"])
+@pytest.mark.parametrize(("to_layer", "ops"), point_cases)
 def test_simple_tag_point(coquimbo_project, to_layer, ops):
-    if to_layer != "polygon" and ops == "ENCLOSED":
-        pytest.skip(f"'{ops}' does not apply to point-{to_layer}")
-
     nodes = [21, 121, 12321]
 
     coquimbo_project.load_layer_by_name("nodes")

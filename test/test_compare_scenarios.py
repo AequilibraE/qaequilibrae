@@ -1,24 +1,36 @@
+from shutil import copytree
+
 import numpy as np
 import pandas as pd
 import pytest
+from aequilibrae import Project
 from aequilibrae.distribution import Ipf
 from aequilibrae.paths import TrafficAssignment, TrafficClass
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.gis.compare_scenarios_dialog import CompareScenariosDialog, directional_field_pairs
 from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
-from .utilities import run_sfalls_assignment
+
+
+@pytest.fixture(scope="module")
+def prepared_model_template(tmp_path_factory, sf_assignment_template):
+    """Build the comparison data once, then keep it pristine for each test."""
+    template_path = tmp_path_factory.mktemp("compare_scenarios") / "model"
+    copytree(sf_assignment_template, template_path)
+
+    project = Project()
+    project.open(template_path)
+    future_assignment(project)
+    project.close()
+
+    return template_path
 
 
 @pytest.fixture
-def model_path(sf_project):
-    path = str(sf_project.project.project_base_path)
-    proj = run_sfalls_assignment(sf_project)
-    proj = future_assignment(proj)
-
-    proj.project.close()
-
-    yield path
+def model_path(prepared_model_template, folder_path):
+    """Give every test a writable copy of the prepared comparison model."""
+    copytree(prepared_model_template, folder_path)
+    return str(folder_path)
 
 
 @pytest.mark.parametrize("composite", [True, False])
@@ -83,9 +95,7 @@ def test_compare_scenarios_on_every_offered_field(ae, model_path, field):
     assert link_layer.renderer().symbol().symbolLayerCount() > 1
 
 
-def future_assignment(aeq_from_qgis):
-
-    project = aeq_from_qgis.project
+def future_assignment(project):
     project.network.build_graphs()
 
     graph = project.network.graphs["c"]
@@ -154,5 +164,3 @@ def future_assignment(aeq_from_qgis):
 
     assig.save_results("future_assignment")
     assig.save_skims("future_assignment", which_ones="all", format="omx")
-
-    return aeq_from_qgis
