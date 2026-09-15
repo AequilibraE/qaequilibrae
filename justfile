@@ -102,35 +102,54 @@ check tag="ltr" *pytest_args:
     just _lint {{ tag }}
     just _test {{ tag }} {{ pytest_args }}
 
-adkf:
-    echo "hi"; \
-    echo "world"
-
 [arg('tag', pattern='3|4')]
 [unix]
-link target username tag="3" profile="default":
+link-unix target username tag="3" profile="default":
     if uname -r | grep -qi microsoft; then \
-        cp -ru {{target}} /mnt/c/Users/{{username}}/AppData/Roaming/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/; \
-        echo "version=1.0" >> ~/../../mnt/c/Users/{{username}}/AppData/Roaming/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/metadata.txt; \
+        cp -ru {{ target }} /mnt/c/Users/{{ username }}/AppData/Roaming/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/; \
+        echo "version=1.0" >> ~/../../mnt/c/Users/{{ username }}/AppData/Roaming/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/metadata.txt; \
     else \
-        cp {{target}}/qaequilibrae.py {{target}}/requirements.txt {{target}}/large_icon.png {{target}}/icon.png {{target}}/set_version.py \
-        {{target}}/missing_dependencies.py {{target}}/pandas_compat.py {{target}}/__init__.py {{target}}/message.py {{target}}/get_version.py \
-        {{target}}/LICENSE {{target}}/aequilivrae_version.txt {{target}}/download_extra_packages_class.py {{target}}/metadata.txt\
-        "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/"; \
-        ln -sfn "{{target}}/modules" "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/modules"; \
-        ln -sfn "{{target}}/__pycache__" "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/__pycache__"; \
-        ln -sfn "{{target}}/packages" "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/packages"; \
-        ln -sfn "{{target}}/i18n" "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/i18n"; \
-        echo "version=1.0" >> "$HOME/.local/share/QGIS/QGIS{{tag}}/profiles/{{profile}}/python/plugins/qaequilibrae/metadata.txt"; \
+        cp {{ target }}/qaequilibrae.py {{ target }}/requirements.txt {{ target }}/large_icon.png {{ target }}/icon.png {{ target }}/set_version.py \
+        {{ target }}/missing_dependencies.py {{ target }}/pandas_compat.py {{ target }}/__init__.py {{ target }}/message.py {{ target }}/get_version.py \
+        {{ target }}/LICENSE {{ target }}/aequilivrae_version.txt {{ target }}/download_extra_packages_class.py {{ target }}/metadata.txt\
+        "$HOME/.local/share/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/"; \
+        ln -sfn "{{ target }}/modules" "$HOME/.local/share/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/modules"; \
+        ln -sfn "{{ target }}/__pycache__" "$HOME/.local/share/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/__pycache__"; \
+        ln -sfn "{{ target }}/packages" "$HOME/.local/share/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/packages"; \
+        ln -sfn "{{ target }}/i18n" "$HOME/.local/share/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/i18n"; \
+        echo "version=1.0" >> "$HOME/.local/share/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/metadata.txt"; \
     fi
 
+# Link the working-tree code into the selected QGIS profile.
+# `packages` stays profile-local so QGIS can install dependencies on first load.
 [arg('tag', pattern='3|4')]
 [macos]
-link tag="3":
-    echo "Tom's part"
+link tag="3" profile="default":
+    set -euo pipefail; \
+    plugin_dir="$HOME/Library/Application Support/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins"; \
+    plugin_path="$plugin_dir/qaequilibrae"; \
+    source_dir="{{ workspace }}/qaequilibrae"; \
+    mkdir -p "$plugin_dir"; \
+    cd "{{ workspace }}"; \
+    version_sha=$(git rev-parse --short HEAD); \
+    python3 -c 'from qaequilibrae.set_version import set_version; import sys; set_version(sys.argv[1])' "$version_sha"; \
+    if [ -L "$plugin_path" ]; then \
+        rm "$plugin_path"; \
+    elif [ -e "$plugin_path" ]; then \
+        backup_path="$plugin_path.before-link-$(date +%Y%m%d%H%M%S)"; \
+        mv "$plugin_path" "$backup_path"; \
+        echo "Moved the existing plugin to $backup_path"; \
+    fi; \
+    mkdir -p "$plugin_path/packages"; \
+    for source_path in "$source_dir"/*; do \
+        name="${source_path##*/}"; \
+        [ "$name" = "packages" ] && continue; \
+        ln -sfn "$source_path" "$plugin_path/$name"; \
+    done; \
+    echo "Linked qaequilibrae source to $plugin_path"
 
 [arg('tag', pattern='3|4')]
 [windows]
-link target tag="3" profile="default":
+link-windows target tag="3" profile="default":
     # assume using git bash
-    cmd /c mklink /j  "C:\Users\{{env_var("USERNAME")}}\AppData\Roaming\QGIS\QGIS{{tag}}\{{profile}}\default\python\plugins\qaequilibrae" target
+    cmd /c mklink /j  "C:\Users\{{ env_var("USERNAME") }}\AppData\Roaming\QGIS\QGIS{{ tag }}\{{ profile }}\default\python\plugins\qaequilibrae" target
