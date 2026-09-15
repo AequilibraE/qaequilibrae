@@ -111,7 +111,7 @@ link-unix target username tag="3" profile="default":
     else \
         cp {{ target }}/qaequilibrae.py {{ target }}/requirements.txt {{ target }}/large_icon.png {{ target }}/icon.png {{ target }}/set_version.py \
         {{ target }}/missing_dependencies.py {{ target }}/pandas_compat.py {{ target }}/__init__.py {{ target }}/message.py {{ target }}/get_version.py \
-        {{ target }}/LICENSE {{ target }}/aequilivrae_version.txt {{ target }}/download_extra_packages_class.py {{ target }}/metadata.txt\
+        {{ target }}/LICENSE {{ target }}/aequilibrae_version.txt {{ target }}/download_extra_packages_class.py {{ target }}/metadata.txt\
         "$HOME/.local/share/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/"; \
         ln -sfn "{{ target }}/modules" "$HOME/.local/share/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/modules"; \
         ln -sfn "{{ target }}/__pycache__" "$HOME/.local/share/QGIS/QGIS{{ tag }}/profiles/{{ profile }}/python/plugins/qaequilibrae/__pycache__"; \
@@ -152,4 +152,4 @@ link tag="3" profile="default":
 [windows]
 link-windows target tag="3" profile="default":
     # assume using git bash
-    cmd /c mklink /j  "C:\Users\{{ env_var("USERNAME") }}\AppData\Roaming\QGIS\QGIS{{ tag }}\{{ profile }}\default\python\plugins\qaequilibrae" target
+    cmd /c mklink /j  "C:\Users\{{ env_var("USERNAME") }}\AppData\Roaming\QGIS\QGIS{{ tag }}\profiles\{{ profile }}\python\plugins\qaequilibrae" "{{ target }}"
