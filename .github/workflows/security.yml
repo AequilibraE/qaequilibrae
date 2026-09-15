@@ -1,4 +1,4 @@
-name: SecurityScan
+name: Security Scan
 
 # Mirrors the scan that plugins.qgis.org runs on every uploaded version, so a plugin release is
 # never rejected by a finding that could have been caught here.

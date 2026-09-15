@@ -43,29 +43,64 @@ We also assume you are using one of `PyCharm <https://www.jetbrains.com/pycharm>
 `VSCode <https://code.visualstudio.com/>`_, which are good IDEs for Python. If you are using
 a different IDE, we would welcome if you could contribute with instructions to set that up.
 
-(For us,) The easiest way of developing a QGIS plugin is using a Docker container to build
-an image containing a QGIS installation. When cloning QAequilibraE repository into your local
-machine you will find a ``Dockerfile`` with this recipe. ::
+The easiest way to develop this QGIS plugin uses Docker and
+`just <https://just.systems/>`_. Docker provides a consistent and portable test environment, and just saves us from needing to remember the docker commands.
 
-  git clone https://github.com/AequilibraE/qaequilibrae.git
+Install Docker and Just. Then clone the repository. ::
 
-Then all you have to do is activate the virtual environment and adding the environmental variables.
-Without adding these variables, your installation of AequilibraE in QGIS is goint to be useless.
+    git clone https://github.com/AequilibraE/qaequilibrae.git
+    cd qaequilibrae
 
-We understood that the creation of a virtual development environment within a container would be
-redundant, however after facing some developing issues related to 
-`PEP 668 <https://peps.python.org/pep-0668/>`_, we believe that using a virtual environment would
-be a good practice.
+Run the following commands from the repository root. The default QGIS image is the long-term
+release (LTR).
 
-.. code-block::
+.. code-block:: console
 
-    . .venv/bin/activate
-    export PYTHONPATH=$(pwd)/qaequilibrae/packages:$PYTHONPATH
-    export QT_QPA_PLATFORM=offscreen
+    # List the available commands.
+    just
 
-If you have to test changes in QAequilibraE after its installed in QGIS, we strongly recommend
-using the `Plugin Reloader <https://plugins.qgis.org/plugins/plugin_reloader/>`_, a plugin to
-reload another plugins.
+    # Run the complete test suite.
+    just test
+
+    # Run one test.
+    just test-one test/test_routing.py::test_route
+
+    # Run the lint and formatting checks.
+    just lint
+
+    # Run the lint, formatting, and test checks.
+    just check
+
+    # Open an interactive shell in the QGIS test environment.
+    just shell
+
+    # Install the plugin into your local copy of QGIS
+    just link
+
+To use the latest QGIS image, add ``latest`` after the command name. For example,
+run ``just test latest``. ``just`` always defaults to ``LTR``.
+
+All of the commands will build the local QGIS as required, then setup the test
+environment. This will be slow the first time, then faster on subsequent runs as
+the image is cached. You do not need to manually handle any test environments.
+
+Testing in desktop QGIS
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To test the working tree in a local QGIS installation, run ``just link``. The command
+links the plugin source into the default QGIS 3 profile.
+
+To select QGIS 4 or another profile, give the QGIS major version and profile name. ::
+
+    just link 4
+
+Restart QGIS after you run the command. You can also use the
+`Plugin Reloader <https://plugins.qgis.org/plugins/plugin_reloader/>`_ plugin to reload QAequilibraE.
+
+You will not need to re-run `just link` if you are making changes to the plugin
+source code in the ``modules`` directory. If you are changing anything
+higher-level (say, ``download_extra_packages_class.py``) you will need to re-run
+``just link`` each time, as this higher level is copied rather than sym-linked.
 
 Developing QAequilibraE and AequilibraE simultaneously
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
