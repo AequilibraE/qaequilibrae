@@ -75,6 +75,10 @@ QAequilibraE panel, so a new link only asks for what the model cannot work out o
   every link of a run. QGIS remembers those for as long as the layer stays loaded, so the
   first link after reopening the project starts from the defaults above.
 
+A mode or a link type the model does not have yet can be added with
+:ref:`Add mode <add_mode>` and :ref:`Add link type <add_link_type>`, and each one shows up
+in these drop-downs right away.
+
 Nodes created while digitizing are numbered from 10,000 up, leaving the lower numbers free
 for you to assign to centroids. Nodes that already exist are never renumbered, and a model
 already numbering past 10,000 simply carries on from where it was.

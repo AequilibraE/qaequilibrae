@@ -1,4 +1,6 @@
 from .action_add_connectors import run_add_connectors as run_add_connectors
+from .action_add_link_type import run_add_link_type as run_add_link_type
+from .action_add_mode import run_add_mode as run_add_mode
 from .action_add_zoning import run_add_zones as run_add_zones
 from .action_create_example import create_example as create_example
 from .action_distribution import run_distribution_models as run_distribution_models

@@ -19,5 +19,7 @@ Licence:     See LICENSE.TXT
 -----------------------------------------------------------------------------------------------------------
 """
 
+from .add_link_type_dialog import AddLinkTypeDialog as AddLinkTypeDialog
+from .add_mode_dialog import AddModeDialog as AddModeDialog
 from .adds_connectors_dialog import AddConnectorsDialog as AddConnectorsDialog
 from .network_preparation_dialog import NetworkPreparationDialog as NetworkPreparationDialog
