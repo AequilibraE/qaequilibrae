@@ -105,7 +105,7 @@ def test_digitizing_through_a_node_leaves_one_link_per_stretch(ae_with_project, 
 
     layer.startEditing()
     _digitize(layer, _points(first, middle, last))
-    qtbot.wait(50)  # the split waits for QGIS to close its own digitizing command
+    qtbot.waitUntil(lambda: len(layer.editBuffer().addedFeatures()) == 2, timeout=1000)
 
     added = list(layer.editBuffer().addedFeatures().values())
     assert len(added) == 2
@@ -133,9 +133,8 @@ def test_a_link_digitized_after_a_split_does_not_reuse_an_id(ae_with_project, qt
 
     layer.startEditing()
     _digitize(layer, _points(first, middle, last))
-    qtbot.wait(50)
+    qtbot.waitUntil(lambda: len(layer.editBuffer().addedFeatures()) == 2, timeout=1000)
     _digitize(layer, _points((-96.5, 43.5), (-96.4, 43.4)))
-    qtbot.wait(50)
 
     added = layer.editBuffer().addedFeatures().values()
     assert sorted(int(feature["link_id"]) for feature in added) == [77, 78, 79]
@@ -144,21 +143,19 @@ def test_a_link_digitized_after_a_split_does_not_reuse_an_id(ae_with_project, qt
     assert layer.commitChanges(), layer.commitErrors()
 
 
-def test_digitizing_clear_of_the_nodes_leaves_a_single_link(ae_with_project, qtbot):
+def test_digitizing_clear_of_the_nodes_leaves_a_single_link(ae_with_project):
     layer = _links_layer(ae_with_project)
     first, last = _node_coordinates(ae_with_project.project, [1, 6])
     midpoint = ((first[0] + last[0]) / 2, (first[1] + last[1]) / 2 + 0.01)
 
     layer.startEditing()
     _digitize(layer, _points(first, midpoint, last))
-    qtbot.wait(50)
-
     assert len(layer.editBuffer().addedFeatures()) == 1
 
     layer.rollBack()
 
 
-def test_the_toggle_stops_the_link_from_being_broken(ae_with_project, qtbot):
+def test_the_toggle_stops_the_link_from_being_broken(ae_with_project):
     layer = _links_layer(ae_with_project)
     vertices = _points(*_node_coordinates(ae_with_project.project, [1, 2, 6]))
 
@@ -166,8 +163,6 @@ def test_the_toggle_stops_the_link_from_being_broken(ae_with_project, qtbot):
     try:
         layer.startEditing()
         _digitize(layer, vertices)
-        qtbot.wait(50)
-
         assert len(layer.editBuffer().addedFeatures()) == 1
     finally:
         LinkSplitter.set_enabled(True)

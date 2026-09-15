@@ -1,13 +1,12 @@
 from os.path import isfile
 
 from qaequilibrae.modules.common_tools.report_dialog import ReportDialog
-from .utilities import run_sfalls_assignment
 
 
-def test_report_dialog(sf_project, mocker, qtbot):
-    proj = run_sfalls_assignment(sf_project)
+def test_report_dialog(sf_project_with_assignment, mocker, qtbot):
+    proj = sf_project_with_assignment
 
-    file_path = sf_project.project.project_base_path / "report_output.txt"
+    file_path = proj.project.project_base_path / "report_output.txt"
     report = ["This is an example"]
 
     mocker.patch(

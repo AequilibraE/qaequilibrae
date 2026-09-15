@@ -65,7 +65,7 @@ test-one test_path tag="ltr" *pytest_args:
 # Example: `just profile test/test_routing.py ltr`
 profile test_path="test" tag="ltr" *pytest_args:
     just setup {{ tag }}
-    just _qgis {{ tag }} '' 'profile_file=/tmp/qaequilibrae-pytest.prof; python -m cProfile -o "$profile_file" -m pytest {{ test_path }} {{ pytest_args }}; pytest_exit=$?; python -c "import pstats; pstats.Stats(\"$profile_file\").strip_dirs().sort_stats(\"tottime\").print_stats(40)"; exit "$pytest_exit"'
+    just _qgis {{ tag }} '' 'profile_file=/tmp/qaequilibrae-pytest.prof; python -m cProfile -o "$profile_file" -m pytest {{ test_path }} {{ pytest_args }}; pytest_exit=$?; python -c "import pstats; pstats.Stats(\"$profile_file\").strip_dirs().sort_stats(\"cumulative\").print_stats(40)"; exit "$pytest_exit"'
 
 # Run the suite with the LTR QGIS image explicitly.
 test-ltr:

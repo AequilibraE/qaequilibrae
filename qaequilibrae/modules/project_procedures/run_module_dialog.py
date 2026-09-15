@@ -1,8 +1,10 @@
 import logging
+import os
 import pprint
 import re
 import subprocess  # nosec B404
 import sys
+from importlib.util import find_spec
 from os.path import dirname, isfile, join
 from pathlib import Path
 
@@ -202,8 +204,12 @@ class RunModuleDialog(BaseDialog):
                         init_file.touch()
 
                     # Prepare installation
-                    install_command = [str(DownloadAll().find_python())]
-                    install_command += ["-m", "pip", "install", "-r", str(run_path), "--target", str(target_dir)]
+                    python = str(DownloadAll().find_python())
+                    use_uv = find_spec("uv") is not None and sys.platform != "darwin"
+                    installer = ["-m", "uv", "pip"] if use_uv else ["-m", "pip"]
+                    install_command = [python, *installer, "install", "-r", str(run_path), "--target", str(target_dir)]
+                    if use_uv and os.path.isabs(python):
+                        install_command += ["--python", python]
                     self.qgis_project.message_log(" ".join(install_command))
 
                     # Argument list, no shell: every element is either a literal or a path we resolved ourselves

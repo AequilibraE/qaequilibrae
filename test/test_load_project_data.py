@@ -7,7 +7,6 @@ from qgis.PyQt.QtWidgets import QMessageBox, QTabWidget
 from qgis.core import QgsProject
 
 from qaequilibrae.modules.matrix_procedures.load_project_data import LoadProjectDataDialog
-from .utilities import run_sfalls_assignment
 
 
 pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
@@ -27,8 +26,8 @@ def test_no_project(ae, mocker, qtbot):
 
 # TODO: Re-write the tests - they're really time consuming
 @pytest.mark.parametrize("button_clicked", [True, False])
-def test_project(sf_project, mocker, qtbot, button_clicked):
-    proj = run_sfalls_assignment(sf_project)
+def test_project(sf_project_with_assignment, mocker, qtbot, button_clicked):
+    proj = sf_project_with_assignment
 
     function = "qaequilibrae.modules.matrix_procedures.load_project_data.DisplayAequilibraEFormatsDialog"
     mocker.patch(function)
@@ -139,8 +138,8 @@ def test_confirming_deletes_the_matrix_and_its_file(ae_with_project, mocker):
     dialog.close()
 
 
-def test_a_result_is_only_deleted_once_the_prompt_is_confirmed(sf_project, mocker):
-    proj = run_sfalls_assignment(sf_project)
+def test_a_result_is_only_deleted_once_the_prompt_is_confirmed(sf_project_with_assignment, mocker):
+    proj = sf_project_with_assignment
 
     dialog = LoadProjectDataDialog(proj, True)
     question = mocker.patch.object(QMessageBox, "question", return_value=QMessageBox.StandardButton.No)
@@ -163,8 +162,8 @@ def test_a_result_is_only_deleted_once_the_prompt_is_confirmed(sf_project, mocke
     dialog.close()
 
 
-def test_orphan_result_prompt_does_not_claim_to_delete_a_table(sf_project, mocker):
-    proj = run_sfalls_assignment(sf_project)
+def test_orphan_result_prompt_does_not_claim_to_delete_a_table(sf_project_with_assignment, mocker):
+    proj = sf_project_with_assignment
     dialog = LoadProjectDataDialog(proj, True)
     question = mocker.patch.object(QMessageBox, "question", return_value=QMessageBox.StandardButton.No)
     dialog.results.loc[0, "WARNINGS"] = "Table not found in the results database"
