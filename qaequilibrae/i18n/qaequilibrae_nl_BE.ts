@@ -18,6 +18,42 @@
     </message>
 </context>
 <context>
+    <name>AddLinkType</name>
+    <message>
+        <location filename="../modules/processing_provider/data_procedures/add_link_type.py" line="14"/>
+        <source>Add link type</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/data_procedures/add_link_type.py" line="14"/>
+        <source>Data</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/data_procedures/add_link_type.py" line="14"/>
+        <source>Adds a link type to the network of the open project</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>AddLinkTypeDialog</name>
+    <message>
+        <location filename="../modules/network/add_link_type_dialog.py" line="47"/>
+        <source>Could not add the link type: {}</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/add_link_type_dialog.py" line="50"/>
+        <source>Link type &apos;{}&apos; ({}) added to the project</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/add_link_type_dialog.py" line="53"/>
+        <source>Link type &apos;{}&apos; added to the project</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>AddLinksFromLayer</name>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="15"/>
@@ -82,6 +118,75 @@
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="143"/>
         <source>Model building</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>AddMode</name>
+    <message>
+        <location filename="../modules/processing_provider/data_procedures/add_mode.py" line="14"/>
+        <source>Add mode</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/data_procedures/add_mode.py" line="14"/>
+        <source>Data</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/processing_provider/data_procedures/add_mode.py" line="14"/>
+        <source>Adds a mode to the network of the open project</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>AddModeDialog</name>
+    <message>
+        <location filename="../modules/network/add_mode_dialog.py" line="47"/>
+        <source>Could not add the mode: {}</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/add_mode_dialog.py" line="50"/>
+        <source>Mode &apos;{}&apos; ({}) added to the project</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/add_mode_dialog.py" line="53"/>
+        <source>Mode &apos;{}&apos; added to the project</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>AddNetworkRecordDialog</name>
+    <message>
+        <location filename="../modules/network/add_network_record_dialog.py" line="69"/>
+        <source>Every single-letter identifier is already taken</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/add_network_record_dialog.py" line="79"/>
+        <source>The identifier must be a single letter</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/add_network_record_dialog.py" line="81"/>
+        <source>The identifier is already in use</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/add_network_record_dialog.py" line="83"/>
+        <source>The name cannot be empty</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/add_network_record_dialog.py" line="85"/>
+        <source>The name can only contain letters and &quot;_&quot;</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/add_network_record_dialog.py" line="87"/>
+        <source>The name is already in use</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -4286,6 +4391,127 @@
     <message>
         <location filename="../modules/paths_procedures/forms/ui_traffic_assignment.ui" line="1043"/>
         <source>Export to YAML</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>ui_add_link_type</name>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="19"/>
+        <source>AequilibraE - Add link type</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="25"/>
+        <source>Link types in the project</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="56"/>
+        <source>New link type</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="62"/>
+        <source>Link type ID</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="88"/>
+        <source>Link type name</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="101"/>
+        <source>Description</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="114"/>
+        <source>Lanes</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="176"/>
+        <source>Not set</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="137"/>
+        <source>Lane capacity</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="163"/>
+        <source>Speed (m/s)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="217"/>
+        <source>Add link type</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_link_type.ui" line="224"/>
+        <source>Close</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>ui_add_mode</name>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="19"/>
+        <source>AequilibraE - Add mode</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="25"/>
+        <source>Modes in the project</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="56"/>
+        <source>New mode</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="62"/>
+        <source>Mode ID</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="88"/>
+        <source>Mode name</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="101"/>
+        <source>Description</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="114"/>
+        <source>PCE</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="143"/>
+        <source>Value of time</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="163"/>
+        <source>Persons per vehicle</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="217"/>
+        <source>Add mode</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../modules/network/forms/ui_add_mode.ui" line="224"/>
+        <source>Close</source>
         <translation type="unfinished"/>
     </message>
 </context>
