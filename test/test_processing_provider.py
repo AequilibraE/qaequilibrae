@@ -7,7 +7,13 @@ import pytest
 from aequilibrae import Project
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.utils.create_example import create_example
-from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingException, QgsProcessingFeedback, QgsProject
+from qgis.core import (
+    QgsApplication,
+    QgsProcessingContext,
+    QgsProcessingException,
+    QgsProcessingFeedback,
+    QgsProject,
+)
 
 from qaequilibrae.modules.processing_provider.matrix_procedures.export_matrix import ExportMatrix
 from qaequilibrae.modules.processing_provider.matrix_procedures.matrix_calculator import MatrixCalculator
@@ -16,6 +22,7 @@ from qaequilibrae.modules.processing_provider.model_building.add_links_from_laye
 from qaequilibrae.modules.processing_provider.model_building.collapse_links import CollapseLinks
 from qaequilibrae.modules.processing_provider.model_building.create_empty_project import CreateEmptyProject
 from qaequilibrae.modules.processing_provider.model_building.network_simplifier import NetworkSimplifier
+from qaequilibrae.modules.processing_provider.paths_procedures.shortest_path import ShortestPath
 from qaequilibrae.modules.processing_provider.provider import Provider
 from .utilities import load_test_layer
 
@@ -82,6 +89,62 @@ def test_add_links_from_layer(ae_with_project):
 
     assert project.network.count_links() == 81
     assert project.network.count_nodes() == 28
+
+
+def test_shortest_path(ae_with_project):
+    ae_with_project.load_layer_by_name("links")
+    links = QgsProject.instance().mapLayersByName("links")[0]
+
+    parameters = {
+        ShortestPath.LINKS: links,
+        ShortestPath.MODE: "c",
+        ShortestPath.COST_FIELD: "distance",
+        ShortestPath.FROM_NODE: 1,
+        ShortestPath.TO_NODE: 6,
+        ShortestPath.BLOCK_CENTROID_FLOWS: False,
+        ShortestPath.EXCLUDED_LINKS: "4,14",
+        ShortestPath.OUTPUT: "TEMPORARY_OUTPUT",
+    }
+
+    action = ShortestPath()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    context.setProject(QgsProject.instance())
+    feedback = QgsProcessingFeedback()
+    result, ok = action.run(parameters, context, feedback)
+
+    assert ok, feedback.textLog()
+    assert result[ShortestPath.PATH_LINKS]
+    output = context.takeResultLayer(result[ShortestPath.OUTPUT])
+    assert output is not None
+    assert output.featureCount() == 4
+
+
+def test_shortest_path_blocks_centroids(ae_with_project):
+    ae_with_project.load_layer_by_name("links")
+    ae_with_project.load_layer_by_name("nodes")
+    links = QgsProject.instance().mapLayersByName("links")[0]
+    nodes = QgsProject.instance().mapLayersByName("nodes")[0]
+
+    parameters = {
+        ShortestPath.LINKS: links,
+        ShortestPath.NODES: nodes,
+        ShortestPath.MODE: "c",
+        ShortestPath.COST_FIELD: "distance",
+        ShortestPath.FROM_NODE: 1,
+        ShortestPath.TO_NODE: 2,
+        ShortestPath.BLOCK_CENTROID_FLOWS: True,
+        ShortestPath.OUTPUT: "TEMPORARY_OUTPUT",
+    }
+
+    action = ShortestPath()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    context.setProject(QgsProject.instance())
+    feedback = QgsProcessingFeedback()
+    _, ok = action.run(parameters, context, feedback)
+
+    assert ok, feedback.textLog()
 
 
 def test_matrix_calc(folder_path):
