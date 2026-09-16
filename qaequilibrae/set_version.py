@@ -12,14 +12,11 @@ if str(project_dir) not in sys.path:
 
 
 def set_version(sha):
-    # Add missing info to the metadata
     current_time = datetime.now()
     current_version = current_time.strftime("%y.%j.%H")
 
     metadata_path = project_dir / "qaequilibrae" / "metadata.txt"
-    with open(metadata_path, mode="a") as file:
-        file.write(f"version={current_version}\n")
-        file.write(f"commitSha1={sha}")
+    _update_metadata(metadata_path, current_version, sha)
 
     # Update version in XML
     xml_path = project_dir / "docs" / "source" / "_static" / "plugin.xml"
@@ -30,3 +27,25 @@ def set_version(sha):
         child.attrib["version"] = current_version
 
     tree.write(xml_path)
+
+
+def _update_metadata(metadata_path, version, sha):
+    """Replace release metadata without duplicating keys on repeated builds."""
+    values = {"version": version, "commitSha1": sha}
+    updated = []
+    replaced = set()
+
+    for line in metadata_path.read_text(encoding="utf-8").splitlines():
+        key, separator, _ = line.partition("=")
+        if separator and key in values:
+            if key not in replaced:
+                updated.append(f"{key}={values[key]}")
+                replaced.add(key)
+        else:
+            updated.append(line)
+
+    for key, value in values.items():
+        if key not in replaced:
+            updated.append(f"{key}={value}")
+
+    metadata_path.write_text("\n".join(updated) + "\n", encoding="utf-8")
