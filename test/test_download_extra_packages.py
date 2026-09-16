@@ -49,3 +49,27 @@ def test_a_python_resolved_by_name_is_left_for_uv_to_find(mocker):
 
     assert command[0] == "python3"
     assert "--python" not in command
+
+
+def test_execute_closes_the_subprocess_streams(mocker):
+    process = mocker.MagicMock()
+    process.__enter__.return_value = process
+    process.communicate.return_value = ("Installed\n", None)
+    process.returncode = 0
+    mocker.patch("qaequilibrae.download_extra_packages_class.subprocess.Popen", return_value=process)
+
+    output = DownloadAll().execute(["python3", "-m", "pip", "install", "example"])
+
+    assert output == ["python3 -m pip install example", "Installed\n"]
+    process.communicate.assert_called_once_with()
+    process.__exit__.assert_called_once_with(None, None, None)
+
+
+def test_macos_tool_lookup_checks_uvs_default_user_install_location(mocker, tmp_path):
+    uv = tmp_path / ".local" / "bin" / "uv"
+    uv.parent.mkdir(parents=True)
+    uv.touch()
+    mocker.patch("qaequilibrae.download_extra_packages_class.shutil.which", return_value=None)
+    mocker.patch("qaequilibrae.download_extra_packages_class.Path.home", return_value=tmp_path)
+
+    assert DownloadAll._find_macos_tool("uv") == str(uv)
