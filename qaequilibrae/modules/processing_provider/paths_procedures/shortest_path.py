@@ -30,14 +30,13 @@ def _runtime_dependencies():
         import numpy as np
         from aequilibrae.paths import Graph
         from aequilibrae.paths.results import PathResults
-        from qaequilibrae.modules.common_tools import geodataframe_from_layer
-        from qaequilibrae.modules.common_tools.writable_dataframe import make_writable_network_dataframe
+        from .network_dataframe import make_writable_network_dataframe, network_dataframe_from_source
     except ImportError as exception:
         raise QgsProcessingException(
             trlt("ShortestPath", f"Could not load shortest-path dependencies: {exception}")
         ) from exception
 
-    return Graph, PathResults, geodataframe_from_layer, make_writable_network_dataframe, np
+    return Graph, PathResults, network_dataframe_from_source, make_writable_network_dataframe, np
 
 
 class ShortestPath(QgsProcessingAlgorithm):
@@ -118,13 +117,13 @@ class ShortestPath(QgsProcessingAlgorithm):
         self.addOutput(QgsProcessingOutputString(self.PATH_LINKS, self.tr("Path link IDs")))
 
     def processAlgorithm(self, parameters, context, feedback):
-        Graph, PathResults, geodataframe_from_layer, make_writable_network_dataframe, np = _runtime_dependencies()
+        Graph, PathResults, network_dataframe_from_source, make_writable_network_dataframe, np = _runtime_dependencies()
 
         links = self.parameterAsSource(parameters, self.LINKS, context)
         if links is None:
             raise QgsProcessingException(self.tr("The links layer could not be loaded"))
 
-        network = geodataframe_from_layer(links)
+        network = network_dataframe_from_source(links)
         mode = self.parameterAsString(parameters, self.MODE, context).strip()
         cost_field = self.parameterAsString(parameters, self.COST_FIELD, context).lower()
 
@@ -202,8 +201,9 @@ class ShortestPath(QgsProcessingAlgorithm):
 
     def _graph_centroids(self, network, nodes, np, block_centroid_flows):
         if not block_centroid_flows:
-            # AequilibraE requires at least one graph centroid even when it will not block flows.
-            return np.asarray([network["a_node"].iloc[0]], dtype=np.int64)
+            # Point-to-point paths do not need the compressed graph. Passing a fabricated
+            # centroid forces AequilibraE through its Cython compression code unnecessarily.
+            return None
 
         if nodes is None:
             raise QgsProcessingException(self.tr("A nodes layer is required to block flows through centroids"))
