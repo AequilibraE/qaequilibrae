@@ -1,6 +1,6 @@
 from qgis.core import Qgis, QgsMessageLog
 
-from qaequilibrae.logging import LOG_CATEGORY, get_logger
+from qaequilibrae.qgis_logging import LOG_CATEGORY, get_logger
 
 
 def test_python_log_records_are_written_to_the_qgis_aequilibrae_category(monkeypatch):

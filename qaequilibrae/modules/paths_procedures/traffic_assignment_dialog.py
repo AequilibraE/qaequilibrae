@@ -17,7 +17,7 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
-from qaequilibrae.logging import get_logger
+from qaequilibrae.qgis_logging import get_logger
 
 logger = get_logger()
 

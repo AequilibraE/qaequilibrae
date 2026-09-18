@@ -9,7 +9,7 @@ from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFileDest
 from qgis.utils import plugins
 
 from qaequilibrae.i18n.translate import trlt
-from qaequilibrae.logging import get_logger
+from qaequilibrae.qgis_logging import get_logger
 
 
 class TripLengthDistribution(QgsProcessingAlgorithm):

@@ -23,7 +23,7 @@ from qaequilibrae.missing_dependencies import DisabledLinkSplitter, DisabledSnap
 from qaequilibrae.missing_dependencies import disabled_action, temporary_folder
 from qaequilibrae.modules.style_loader.editor_styles import load_editor_styles
 from qaequilibrae.pandas_compat import ensure_regex_capable_strings
-from qaequilibrae.logging import get_logger
+from qaequilibrae.qgis_logging import get_logger
 
 sys.path.insert(0, join(dirname(__file__), "packages"))
 

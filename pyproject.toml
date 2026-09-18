@@ -45,9 +45,6 @@ exclude = [
     "qaequilibrae/modules/transit_procedures",
 ]
 
-[tool.ty.environment]
-extra-paths = ["qaequilibrae/packages"]
-
 [tool.ty.rules]
 # QGIS does not publish type stubs and is not installed in the lightweight lint job.
 unresolved-import = "ignore"

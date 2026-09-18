@@ -10,7 +10,7 @@ from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog
 from qaequilibrae.modules.common_tools import standard_path, get_vector_layer_by_name
 from qaequilibrae.modules.common_tools.global_parameters import poly_types, numeric_types, point_types
 from qaequilibrae.modules.matrix_procedures import list_matrices
-from qaequilibrae.logging import get_logger
+from qaequilibrae.qgis_logging import get_logger
 from .desire_lines_procedure import DesireLinesProcedure
 
 

@@ -14,7 +14,7 @@ from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path,
 from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
 from qaequilibrae.modules.common_tools.global_parameters import float_types, integer_types
 from qaequilibrae.modules.common_tools.report_dialog import ReportDialog
-from qaequilibrae.logging import get_logger
+from qaequilibrae.qgis_logging import get_logger
 from qaequilibrae.modules.matrix_procedures.load_matrix_class import LoadMatrix
 from qaequilibrae.modules.matrix_procedures.mat_reblock import MatrixReblocking
 

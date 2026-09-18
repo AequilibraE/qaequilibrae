@@ -15,7 +15,7 @@ from qgis.core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFeat
 from scipy.spatial import Delaunay
 
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
-from qaequilibrae.logging import get_logger
+from qaequilibrae.qgis_logging import get_logger
 
 
 class DesireLinesProcedure(WorkerThread):

@@ -13,7 +13,7 @@ from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog, BaseD
 from qaequilibrae.modules.common_tools import standard_path, geodataframe_from_layer
 from qaequilibrae.modules.common_tools.writable_dataframe import make_writable_network_dataframe
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
-from qaequilibrae.logging import get_logger
+from qaequilibrae.qgis_logging import get_logger
 
 logger = get_logger()
 

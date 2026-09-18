@@ -9,7 +9,7 @@ from pathlib import Path
 
 from qgis.core import Qgis
 
-from qaequilibrae.logging import get_logger
+from qaequilibrae.qgis_logging import get_logger
 
 
 LOGGER = get_logger(__name__)
