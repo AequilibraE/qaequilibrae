@@ -18,11 +18,11 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
     # These resolve to the parent folder itself (or above it) instead of a new folder inside it
     RESERVED_NAMES = (".", "..")
 
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self, configuration=None):
         # 1. Existing folder the new model folder will be created in
         self.addParameter(
             QgsProcessingParameterFile(
-                self.PARENT_FOLDER, self.tr("Parent folder"), behavior=QgsProcessingParameterFile.Behavior.Folder
+                self.PARENT_FOLDER, self.tr("Parent folder"), behavior=Qgis.ProcessingFileParameterBehavior.Folder
             )
         )
 

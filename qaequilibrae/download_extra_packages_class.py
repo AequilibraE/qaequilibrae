@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import subprocess  # nosec B404
@@ -6,7 +7,26 @@ import tempfile
 from importlib.util import find_spec
 from pathlib import Path
 
-from qgis.core import Qgis, QgsMessageLog
+from qgis.core import Qgis
+
+if __package__:
+    from qaequilibrae.qgis_logging import get_logger
+else:
+    # Windows CI executes this module directly from the plugin directory, where importing
+    # ``qaequilibrae`` would resolve to qaequilibrae.py instead of the package.
+    from qgis_logging import get_logger
+
+
+LOGGER = get_logger(__name__)
+
+
+def log_message(message, level: Qgis.MessageLevel = Qgis.MessageLevel.Info, notify_user: bool = True):
+    """Write dependency-installation messages through the plugin logger."""
+    python_level = {
+        Qgis.MessageLevel.Critical: logging.ERROR,
+        Qgis.MessageLevel.Warning: logging.WARNING,
+    }.get(level, logging.INFO)
+    LOGGER.log(python_level, message, extra={"qgis_level": level, "notify_user": notify_user})
 
 
 class DownloadAll:
@@ -73,7 +93,7 @@ class DownloadAll:
         if sys.platform == "darwin" and package.startswith("aequilibrae=="):
             reps = self.build_aequilibrae_macos(package)
             for line in reps:
-                QgsMessageLog.logMessage(str(line), "Messages", level=Qgis.MessageLevel.Info)
+                log_message(str(line))
             return reps
 
         spec = find_spec("uv")
@@ -110,7 +130,7 @@ class DownloadAll:
             self.no_ssl = True
 
         for line in reps:
-            QgsMessageLog.logMessage(str(line), "Messages", level=Qgis.MessageLevel.Info)
+            log_message(str(line))
 
         return reps
 
@@ -126,10 +146,9 @@ class DownloadAll:
             if brew is None:
                 missing.append("Homebrew")
             self.error = 1
-            QgsMessageLog.logMessage(
+            log_message(
                 f"macOS dependency build cannot start; install {', '.join(missing)} first",
-                "Messages",
-                level=Qgis.MessageLevel.Critical,
+                Qgis.MessageLevel.Critical,
             )
             return []
 
@@ -138,10 +157,9 @@ class DownloadAll:
 
         brew_output = self.execute([brew, "--prefix"], environment=build_environment)
         if self.last_exit_code != 0:
-            QgsMessageLog.logMessage(
+            log_message(
                 "Homebrew could not provide its installation prefix",
-                "Messages",
-                level=Qgis.MessageLevel.Critical,
+                Qgis.MessageLevel.Critical,
             )
             return brew_output
 
@@ -149,10 +167,9 @@ class DownloadAll:
         brew_prefix = next((prefix for prefix in reversed(brew_prefixes) if prefix.exists()), None)
         if brew_prefix is None:
             self.error = 1
-            QgsMessageLog.logMessage(
+            log_message(
                 "Homebrew returned an invalid installation prefix",
-                "Messages",
-                level=Qgis.MessageLevel.Critical,
+                Qgis.MessageLevel.Critical,
             )
             return brew_output
         llvm_prefix = brew_prefix / "opt" / "llvm"
@@ -162,19 +179,17 @@ class DownloadAll:
 
         if not compiler.exists() or not compiler_cpp.exists():
             self.error = 1
-            QgsMessageLog.logMessage(
+            log_message(
                 "LLVM was not found. Install it with: brew install llvm",
-                "Messages",
-                level=Qgis.MessageLevel.Critical,
+                Qgis.MessageLevel.Critical,
             )
             return []
 
         if not any(spatialite_library.glob("libspatialite.*")):
             self.error = 1
-            QgsMessageLog.logMessage(
+            log_message(
                 "libspatialite was not found. Install it with: brew install libspatialite",
-                "Messages",
-                level=Qgis.MessageLevel.Critical,
+                Qgis.MessageLevel.Critical,
             )
             return []
 
@@ -219,10 +234,9 @@ class DownloadAll:
             wheels = list(wheel_folder.glob("aequilibrae-*.whl"))
             if len(wheels) != 1:
                 self.error = 1
-                QgsMessageLog.logMessage(
+                log_message(
                     "The macOS AequilibraE build did not produce exactly one wheel",
-                    "Messages",
-                    level=Qgis.MessageLevel.Critical,
+                    Qgis.MessageLevel.Critical,
                 )
                 return output
 
@@ -341,10 +355,8 @@ class DownloadAll:
                 if pkg.lower() in fldr.lower():
                     if os.path.isdir(os.path.join(target_folder, fldr)):
                         shutil.rmtree(os.path.join(target_folder, fldr))
-                        QgsMessageLog.logMessage(
+                        log_message(
                             f"Duplicated packages removed from installation: {fldr}",
-                            "Messages",
-                            level=Qgis.MessageLevel.Info,
                         )
 
     def retry_pkg_install(self):

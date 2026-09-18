@@ -1,7 +1,6 @@
 from os.path import dirname, join
 
 import pandas as pd
-from aequilibrae.context import get_logger
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import PathResults
 from qgis.PyQt.QtCore import QEvent, QMetaType
@@ -14,8 +13,9 @@ from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog, BaseD
 from qaequilibrae.modules.common_tools import standard_path, geodataframe_from_layer
 from qaequilibrae.modules.common_tools.writable_dataframe import make_writable_network_dataframe
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
+from qaequilibrae.qgis_logging import get_logger
 
-logger = get_logger()
+logger = get_logger(__name__)
 
 # Shape and colour telling the two ends of the path apart on the map
 MARKER_STYLES = {
@@ -240,8 +240,8 @@ class ShortestPathDialog(BaseDialog):
             node_id = self.node_keys[feature_id][self.node_fields.index("node_id")]
             geometry = self.node_layer.getFeature(feature_id).geometry()
             return node_id, geometry.asPoint()
-        except Exception as e:
-            logger.error(e.args)
+        except Exception:
+            logger.exception("Could not identify the selected node")
             return None, None
 
     def produces_path(self):

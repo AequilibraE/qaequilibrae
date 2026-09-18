@@ -1,15 +1,11 @@
-import pytest
-import sys
 from os.path import isfile
 
+import pytest
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QMessageBox, QTabWidget
-from qgis.core import QgsProject
 
 from qaequilibrae.modules.matrix_procedures.load_project_data import LoadProjectDataDialog
-
-
-pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
 
 
 def test_no_project(ae, mocker, qtbot):

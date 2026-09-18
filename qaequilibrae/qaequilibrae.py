@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QVBoxLayout, QToolBar, QToolButton
 from qgis.PyQt.QtWidgets import QWidget, QDockWidget, QAction, QMenu, QTabWidget
 from qgis.PyQt.QtWidgets import QComboBox, QLabel, QTableWidgetItem, QTableWidget
 from qgis.core import QgsDataSourceUri, QgsVectorLayer, QgsVectorFileWriter
-from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, QgsMessageLog, Qgis
+from qgis.core import QgsProject, QgsExpressionContextUtils, QgsApplication, Qgis
 
 from qaequilibrae import get_aequilibrae_menu_instance, set_aequilibrae_menu_instance
 from qaequilibrae.message import messages, FAQ_URL
@@ -23,16 +23,13 @@ from qaequilibrae.missing_dependencies import DisabledLinkSplitter, DisabledSnap
 from qaequilibrae.missing_dependencies import disabled_action, temporary_folder
 from qaequilibrae.modules.style_loader.editor_styles import load_editor_styles
 from qaequilibrae.pandas_compat import ensure_regex_capable_strings
+from qaequilibrae.qgis_logging import get_logger
 
 sys.path.insert(0, join(dirname(__file__), "packages"))
 
 # Has to run before the first dataframe is built, so before any dialog imports pandas
 if ensure_regex_capable_strings():
-    QgsMessageLog.logMessage(
-        "PyArrow was built without regex support, so pandas will use Python string storage",
-        "AequilibraE",
-        Qgis.MessageLevel.Info,
-    )
+    get_logger(__name__).info("PyArrow was built without regex support, so pandas will use Python string storage")
 
 if Path(join(dirname(__file__), "packages", "requirements.txt")).exists():
     pass
@@ -250,12 +247,7 @@ class AequilibraEMenu:
                 self.saving_actions.append(temp_saving)
 
     def get_logger(self):
-        if DEPENDENCY_ERROR is not None:
-            return logging.getLogger("AequilibraEGUI")
-
-        from aequilibrae.context import get_logger
-
-        return get_logger()
+        return get_logger("gui")
 
     def configure_scenario(self):
         from qaequilibrae.modules.network.node_numbering import reserve_node_ids_for_centroids
@@ -279,28 +271,24 @@ class AequilibraEMenu:
 
     def add_menu_action(self, main_menu: str, text: str, function, submenu=None, checked: bool = None):
         """Adds one menu entry. Passing ``checked`` makes it a toggle, handed its new state."""
-        if main_menu == "AequilibraE":
-            action = QToolButton()
-            action.setText(text)
-            action.clicked.connect(function)
-        else:
-            action = QAction(text, self.manager)
-            if checked is not None:
-                action.setCheckable(True)
-                action.setChecked(checked)
-            action.triggered.connect(function)
+        action = QAction(text, self.manager)
+        if checked is not None:
+            action.setCheckable(True)
+            action.setChecked(checked)
+        action.triggered.connect(function)
         if submenu is None:
             self.menuActions[main_menu].append(action)
         else:
             self.menuActions[main_menu][submenu].append(action)
 
     def build_menu(self):
+        self.main_menu = self.iface.mainWindow().menuBar().addMenu("AequilibraE")
+        self.main_menu.setObjectName("AequilibraEMenu")
+        self.dock_menu_buttons = []
         for menu, actions in self.menuActions.items():
             if menu == "AequilibraE":
-                for action in actions:
-                    self.toolbar.addWidget(action)
                 continue
-            itemMenu = QMenu()
+            itemMenu = QMenu(menu, self.main_menu)
             self.set_font(itemMenu)
             if isinstance(actions, dict):
                 for submenu, mini_actions in actions.items():
@@ -311,12 +299,23 @@ class AequilibraEMenu:
             else:
                 for action in actions:
                     itemMenu.addAction(action)
-            itemButton = QToolButton()
+            self.main_menu.addMenu(itemMenu)
+
+            itemButton = QToolButton(self.toolbar)
             itemButton.setText(menu)
             itemButton.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
             itemButton.setMenu(itemMenu)
-
             self.toolbar.addWidget(itemButton)
+            self.dock_menu_buttons.append(itemButton)
+
+        self.main_menu.addSeparator()
+        for action in self.menuActions["AequilibraE"]:
+            self.main_menu.addAction(action)
+            itemButton = QToolButton(self.toolbar)
+            itemButton.setDefaultAction(action)
+            itemButton.setText(action.text())
+            self.toolbar.addWidget(itemButton)
+            self.dock_menu_buttons.append(itemButton)
 
     def run_help(self):
         QDesktopServices.openUrl(QUrl(FAQ_URL))
@@ -365,6 +364,9 @@ class AequilibraEMenu:
         self.dock.setParent(None)
         self.dock.deleteLater()
 
+        self.iface.mainWindow().menuBar().removeAction(self.main_menu.menuAction())
+        self.main_menu.deleteLater()
+
         if get_aequilibrae_menu_instance() is self:
             set_aequilibrae_menu_instance(None)
 
@@ -374,9 +376,8 @@ class AequilibraEMenu:
         for f in glob.glob(p):
             try:
                 unlink(f)
-            except Exception as e:
-                self.logger.error(e.args)
-                pass
+            except Exception:
+                self.logger.exception("Could not remove temporary file %s", f)
 
     def run_close_project(self):
         if not self.project:
@@ -601,7 +602,15 @@ class AequilibraEMenu:
 
         Uses 'Info' level and does not notify user, by default, although these are editable.
         """
-        QgsMessageLog.logMessage(message, self.tr("Messages"), level, notify_user)
+        python_level = {
+            Qgis.MessageLevel.Critical: logging.ERROR,
+            Qgis.MessageLevel.Warning: logging.WARNING,
+        }.get(level, logging.INFO)
+        self.logger.log(
+            python_level,
+            message,
+            extra={"qgis_level": level, "notify_user": notify_user},
+        )
 
     def iface_error_message(self, text: str = None, title: str = "Error"):
         """Standardizes QAequilibraE error messages display"""

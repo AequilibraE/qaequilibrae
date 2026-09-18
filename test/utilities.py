@@ -4,10 +4,10 @@
 import os
 import sys
 from os.path import abspath, dirname, exists, join
+from pathlib import Path
 from shutil import copyfile
 
 import numpy as np
-from qgis.PyQt.QtCore import QMetaType
 from aequilibrae.context import get_logger
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.core import (
@@ -19,12 +19,19 @@ from qgis.core import (
     QgsProject,
     QgsVectorLayer,
 )
+from qgis.PyQt.QtCore import QMetaType, QUrl
 
 LOGGER = get_logger()
 QGIS_APP = None  # Static variable used to hold hand to running QGIS app
 CANVAS = None
 PARENT = None
 IFACE = None
+
+
+def get_test_data_path(*path_parts: str) -> str:
+    """Get the path to test data files, working correctly on all platforms."""
+    test_dir = Path(__file__).parent
+    return str(test_dir.joinpath("data", *path_parts))
 
 
 def get_qgis_app():
@@ -39,9 +46,10 @@ def get_qgis_app():
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
     sys.path.insert(0, abspath(join(dirname(dirname(__file__)), "qaequilibrae")))
     try:
-        from qgis.PyQt import QtGui, QtCore
         from qgis.core import QgsApplication
         from qgis.gui import QgsMapCanvas
+        from qgis.PyQt import QtCore, QtGui
+
         from .qgis_interface import QgisInterface
     except ImportError:
         return None, None, None, None
@@ -241,7 +249,7 @@ def load_sfalls_from_layer(path):
 
     if not exists(path):
         os.makedirs(path)
-    copyfile("test/data/SiouxFalls_project/SiouxFalls.gpkg", path_to_gpkg)
+    copyfile(get_test_data_path("SiouxFalls_project", "SiouxFalls.gpkg"), path_to_gpkg)
 
     # append the layername part
     gpkg_links_layer = path_to_gpkg + "|layername=links"
@@ -306,14 +314,18 @@ def load_test_layer(folder, file_name):
 
     if not exists(folder):
         os.makedirs(folder)
-    copyfile(f"test/data/NetworkPreparation/{file_name}.csv", f"{folder}/{file_name}.csv")
+    csv_path = join(folder, f"{file_name}.csv")
+    copyfile(get_test_data_path("NetworkPreparation", f"{file_name}.csv"), csv_path)
 
-    csv_path = f"{folder}/{file_name}.csv"
-
+    # A delimited-text layer needs a well-formed file URL. Prefixing the path with
+    # "file://" only works on POSIX ("file://" + "/tmp/..." is "file:///tmp/...");
+    # on Windows it yields "file://C:\...", which the provider rejects, so the layer
+    # never loads. QUrl builds the correct URL once the path uses forward slashes.
+    uri = QUrl.fromLocalFile(csv_path.replace("\\", "/")).toString()
     if file_name == "link":
-        uri = "file://{}?delimiter=,&crs=epsg:4326&wktField={}".format(csv_path, "geometry")
+        uri += "?delimiter=,&crs=epsg:4326&wktField=geometry"
     else:
-        uri = "file://{}?delimiter=,&crs=epsg:4326&xField={}&yField={}".format(csv_path, "x", "y")
+        uri += "?delimiter=,&crs=epsg:4326&xField=x&yField=y"
 
     layer = QgsVectorLayer(uri, file_name, "delimitedtext")
 

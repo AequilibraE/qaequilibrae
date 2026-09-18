@@ -4,15 +4,16 @@ from math import ceil, floor, log10
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from qgis.core import QgsProcessingAlgorithm, QgsMessageLog, QgsProcessingParameterString
-from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFileDestination, Qgis
+from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterString
+from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFileDestination
 from qgis.utils import plugins
 
 from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.qgis_logging import get_logger
 
 
 class TripLengthDistribution(QgsProcessingAlgorithm):
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self, configuration=None):
         """
         Define parameters and outputs of the algorithm and attempt to load information
         from an open AequilibraE project (if available).
@@ -87,9 +88,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
 
         except Exception as e:
             # Handle cases where the plugin or project information is not accessible
-            QgsMessageLog.logMessage(
-                self.tr("Error checking AequilibraE project: {}").format(str(e)), "Messages", Qgis.MessageLevel.Critical
-            )
+            get_logger(__name__).error(self.tr("Error checking AequilibraE project: {}").format(str(e)))
 
     def processAlgorithm(self, parameters, context, feedback):
         # Checks if we have AequilibraE installed
@@ -131,7 +130,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         mult = floor(skim_matrix.index.shape[0] / 10)
         b = max(1, floor(log10(skim_matrix.matrix_view.shape[0]) * mult))
         n, bins, _ = plt.hist(
-            np.nan_to_num(skim_matrix.matrix_view.flatten(), 0),
+            np.nan_to_num(skim_matrix.matrix_view.flatten(), nan=0),
             bins=b,
             weights=np.nan_to_num(demand_matrix.matrix_view.flatten()),
             density=False,

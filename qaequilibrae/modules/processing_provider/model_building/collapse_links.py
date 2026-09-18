@@ -1,7 +1,7 @@
 import importlib.util as iutil
 import sys
 
-from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterString
+from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingParameterString
 from qgis.core import QgsProcessingParameterFile, QgsProcessingException
 
 from qaequilibrae.i18n.translate import trlt
@@ -11,13 +11,13 @@ class CollapseLinks(QgsProcessingAlgorithm):
     PROJECT_FOLDER = "PROJECT_FOLDER"
     LINK_IDS = "LINK_IDS"
 
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self, configuration=None):
         # 1. Folder containing an AequilibraE project
         self.addParameter(
             QgsProcessingParameterFile(
                 self.PROJECT_FOLDER,
                 self.tr("AequilibraE Project Folder"),
-                behavior=QgsProcessingParameterFile.Behavior.Folder,
+                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
             )
         )
 

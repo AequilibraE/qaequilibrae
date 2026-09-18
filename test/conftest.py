@@ -5,9 +5,9 @@ from types import SimpleNamespace
 from uuid import uuid4
 
 import pytest
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QApplication
-from qgis.core import QgsProject
 
 # AequilibraE and the other dependencies are vendored in qaequilibrae/packages, and only qaequilibrae.py
 # puts that folder on sys.path - which these tests never reach, because they import plugin modules
@@ -17,6 +17,8 @@ sys.path.append(join(dirname(dirname(__file__)), "qaequilibrae", "packages"))
 
 from qaequilibrae.modules.common_tools import ReportDialog  # noqa: E402
 from qaequilibrae.qaequilibrae import AequilibraEMenu  # noqa: E402
+
+from .utilities import get_test_data_path  # noqa: E402
 
 
 @pytest.fixture
@@ -147,7 +149,7 @@ def example_project_templates(tmp_path_factory):
 
 @pytest.fixture
 def sioux_falls_project_path(folder_path):
-    copytree("test/data/SiouxFalls_project", folder_path)
+    copytree(get_test_data_path("SiouxFalls_project"), folder_path)
     return folder_path
 
 
@@ -158,13 +160,13 @@ def ae_with_project(menu_factory, sioux_falls_project_path) -> AequilibraEMenu:
 
 @pytest.fixture
 def pt_project(menu_factory, folder_path) -> AequilibraEMenu:
-    copytree("test/data/coquimbo_project", folder_path)
+    copytree(get_test_data_path("coquimbo_project"), folder_path)
     return menu_factory(folder_path)
 
 
 @pytest.fixture
 def pt_no_feed(menu_factory, folder_path) -> AequilibraEMenu:
-    copytree("test/data/no_pt_feed", folder_path)
+    copytree(get_test_data_path("no_pt_feed"), folder_path)
     return menu_factory(folder_path)
 
 

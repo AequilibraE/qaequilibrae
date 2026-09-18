@@ -6,7 +6,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import yaml
-from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
 from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
@@ -18,8 +17,9 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
+from qaequilibrae.qgis_logging import get_logger
 
-logger = get_logger()
+logger = get_logger(__name__)
 
 # What each volume-delay function actually takes, mirroring the parameter bounds AequilibraE
 # checks in TrafficAssignment.set_vdf_parameters. Offering the wrong set here either leaves the
@@ -833,7 +833,7 @@ class TrafficAssignmentDialog(BaseDialog):
             for q in [self.progressbar, self.progress_label]:
                 q.setVisible(False)
             self.error = str(e.args[0]) if e.args else str(e)
-            logger.error(f"Could not set up the traffic assignment. {e.args}")
+            logger.exception("Could not set up the traffic assignment")
             self.qgis_project.iface_error_message(self.error, self.tr("Assignment setup error"))
             return
 
@@ -949,9 +949,9 @@ class TrafficAssignmentDialog(BaseDialog):
             else:
                 try:
                     val = float(val)
-                except Exception as e:
+                except ValueError:
                     self.error = self.tr("VDF parameter is not numeric")
-                    logger.error(f"Tried to set a VDF parameter not numeric. {e.args}")
+                    logger.warning("VDF parameter %s is not numeric: %r", k, val)
                     return False
             self.vdf_parameters[k] = val
         return True
