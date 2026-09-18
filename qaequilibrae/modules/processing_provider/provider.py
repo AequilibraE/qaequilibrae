@@ -156,3 +156,17 @@ class Provider(QgsProcessingProvider):
     def icon(self):
         """Icon used for the provider inside the Processing toolbox."""
         return QIcon(join(provider_path, "icon.png"))
+
+
+class HeadlessProvider(Provider):
+    """Processing provider for applications without the QGIS Desktop interface.
+
+    ``qgis_process`` only needs algorithms used by the model.  Loading the full provider imports
+    GUI-backed algorithms and AequilibraE extensions before Processing has selected an algorithm.
+    Keep startup independent of those optional imports and load the routing algorithm on demand.
+    """
+
+    def loadAlgorithms(self):
+        from .paths_procedures.shortest_path import ShortestPath
+
+        self.addAlgorithm(ShortestPath())

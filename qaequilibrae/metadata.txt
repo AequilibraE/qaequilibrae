@@ -17,3 +17,5 @@ homepage=https://www.aequilibrae.com/latest/qgis/index.html
 # tags are comma-separated with spaces allowed
 tags=transport, transportation, modeling, traffic, GTFS
 deprecated=False
+version=26.260.11
+commitSha1=1ac4f9b
