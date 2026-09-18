@@ -4,7 +4,7 @@ import pandas as pd
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
 from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
 
-from .conftest import get_test_data_path
+from .utilities import get_test_data_path
 
 
 # TODO: test removing the matrices

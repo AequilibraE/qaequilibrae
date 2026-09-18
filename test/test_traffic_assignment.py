@@ -10,7 +10,7 @@ from qgis.PyQt.QtCore import QItemSelectionModel, Qt
 
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
 
-from .conftest import get_test_data_path
+from .utilities import get_test_data_path
 
 
 def test_nan_demand_is_replaced_with_zero(sf_project, qtbot, mocker):

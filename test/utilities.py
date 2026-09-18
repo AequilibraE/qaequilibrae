@@ -19,7 +19,7 @@ from qgis.core import (
     QgsProject,
     QgsVectorLayer,
 )
-from qgis.PyQt.QtCore import QMetaType
+from qgis.PyQt.QtCore import QMetaType, QUrl
 
 LOGGER = get_logger()
 QGIS_APP = None  # Static variable used to hold hand to running QGIS app
@@ -314,14 +314,18 @@ def load_test_layer(folder, file_name):
 
     if not exists(folder):
         os.makedirs(folder)
-    copyfile(get_test_data_path("NetworkPreparation", f"{file_name}.csv"), f"{folder}/{file_name}.csv")
+    csv_path = join(folder, f"{file_name}.csv")
+    copyfile(get_test_data_path("NetworkPreparation", f"{file_name}.csv"), csv_path)
 
-    csv_path = f"{folder}/{file_name}.csv"
-
+    # A delimited-text layer needs a well-formed file URL. Prefixing the path with
+    # "file://" only works on POSIX ("file://" + "/tmp/..." is "file:///tmp/...");
+    # on Windows it yields "file://C:\...", which the provider rejects, so the layer
+    # never loads. QUrl builds the correct URL once the path uses forward slashes.
+    uri = QUrl.fromLocalFile(csv_path.replace("\\", "/")).toString()
     if file_name == "link":
-        uri = "file://{}?delimiter=,&crs=epsg:4326&wktField={}".format(csv_path, "geometry")
+        uri += "?delimiter=,&crs=epsg:4326&wktField=geometry"
     else:
-        uri = "file://{}?delimiter=,&crs=epsg:4326&xField={}&yField={}".format(csv_path, "x", "y")
+        uri += "?delimiter=,&crs=epsg:4326&xField=x&yField=y"
 
     layer = QgsVectorLayer(uri, file_name, "delimitedtext")
 

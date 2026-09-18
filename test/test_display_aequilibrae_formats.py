@@ -6,7 +6,7 @@ from qgis.core import QgsProject
 
 from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
 
-from .conftest import get_test_data_path
+from .utilities import get_test_data_path
 
 
 def test_display_data_no_path(ae, mocker):

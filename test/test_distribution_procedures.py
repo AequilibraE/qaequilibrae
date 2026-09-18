@@ -12,7 +12,7 @@ from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_fr
 from qaequilibrae.modules.distribution_procedures.distribution_models_dialog import DistributionModelsDialog
 from qaequilibrae.modules.matrix_procedures.load_dataset_dialog import LoadDatasetDialog
 
-from .conftest import get_test_data_path
+from .utilities import get_test_data_path
 
 DISTRIBUTION_PATH = "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog"
 

@@ -1,6 +1,5 @@
 import sys
 from os.path import dirname, join
-from pathlib import Path
 from shutil import copytree
 from types import SimpleNamespace
 from uuid import uuid4
@@ -16,17 +15,10 @@ from qgis.PyQt.QtWidgets import QApplication
 # AequilibraE at all. Appended rather than inserted, so an installed AequilibraE still takes precedence.
 sys.path.append(join(dirname(dirname(__file__)), "qaequilibrae", "packages"))
 
-# Set up the base directory for test data - this ensures relative paths work correctly on Windows
-TEST_DIR = Path(__file__).parent
-TEST_DATA_DIR = TEST_DIR / "data"
-
 from qaequilibrae.modules.common_tools import ReportDialog  # noqa: E402
 from qaequilibrae.qaequilibrae import AequilibraEMenu  # noqa: E402
 
-
-def get_test_data_path(*path_parts) -> str:
-    """Get the path to test data files, working correctly on all platforms."""
-    return str(TEST_DATA_DIR.joinpath(*path_parts))
+from .utilities import get_test_data_path  # noqa: E402
 
 
 @pytest.fixture
@@ -157,7 +149,7 @@ def example_project_templates(tmp_path_factory):
 
 @pytest.fixture
 def sioux_falls_project_path(folder_path):
-    copytree(str(TEST_DATA_DIR / "SiouxFalls_project"), folder_path)
+    copytree(get_test_data_path("SiouxFalls_project"), folder_path)
     return folder_path
 
 
@@ -168,13 +160,13 @@ def ae_with_project(menu_factory, sioux_falls_project_path) -> AequilibraEMenu:
 
 @pytest.fixture
 def pt_project(menu_factory, folder_path) -> AequilibraEMenu:
-    copytree(str(TEST_DATA_DIR / "coquimbo_project"), folder_path)
+    copytree(get_test_data_path("coquimbo_project"), folder_path)
     return menu_factory(folder_path)
 
 
 @pytest.fixture
 def pt_no_feed(menu_factory, folder_path) -> AequilibraEMenu:
-    copytree(str(TEST_DATA_DIR / "no_pt_feed"), folder_path)
+    copytree(get_test_data_path("no_pt_feed"), folder_path)
     return menu_factory(folder_path)
 
 

@@ -6,7 +6,7 @@ from aequilibrae.transit import Transit
 from qaequilibrae.modules.transit_procedures.gtfs_feed import GTFSFeed
 from qaequilibrae.modules.transit_procedures.gtfs_importer import GTFSImporter
 
-from .conftest import get_test_data_path
+from .utilities import get_test_data_path
 
 
 def test_add_new_feed(pt_no_feed, mocker):

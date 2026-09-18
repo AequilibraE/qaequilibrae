@@ -7,7 +7,7 @@ from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_fr
 from qaequilibrae.modules.matrix_procedures.load_dataset_class import LoadDataset
 from qaequilibrae.modules.matrix_procedures.load_dataset_dialog import LoadDatasetDialog
 
-from .conftest import get_test_data_path
+from .utilities import get_test_data_path
 
 
 @pytest.mark.parametrize("method", ["csv", "parquet", "open layer"])

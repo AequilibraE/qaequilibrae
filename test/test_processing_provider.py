@@ -17,8 +17,7 @@ from qaequilibrae.modules.processing_provider.model_building.create_empty_projec
 from qaequilibrae.modules.processing_provider.model_building.network_simplifier import NetworkSimplifier
 from qaequilibrae.modules.processing_provider.provider import Provider
 
-from .conftest import get_test_data_path
-from .utilities import load_test_layer
+from .utilities import get_test_data_path, load_test_layer
 
 
 def qgis_app():
