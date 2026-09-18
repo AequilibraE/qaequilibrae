@@ -34,7 +34,7 @@ initializable_link_fields = ["link_id"]
 class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, qgis_project):
         QtWidgets.QDialog.__init__(self)
-        self.logger = get_logger()
+        self.logger = get_logger(__name__)
         self.iface = qgis_project.iface
         self.qgis_project = qgis_project
         self.setupUi(self)
@@ -225,8 +225,8 @@ class CreatesTranspoNetDialog(QtWidgets.QDialog, FORM_CLASS):
                         cbb.addItem(field.name())
                     final_table.setCellWidget(counter, 2, self.centers_item(cbb))
                 counter += 1
-        except Exception as e:
-            self.logger.error(e.args)
+        except Exception:
+            self.logger.exception("Could not update the TranspoNet field selection")
 
     def centers_item(self, item):
         cell_widget = QtWidgets.QWidget()

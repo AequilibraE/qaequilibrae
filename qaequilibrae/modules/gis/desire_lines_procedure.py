@@ -32,7 +32,7 @@ class DesireLinesProcedure(WorkerThread):
         self.error = None
         self.matrix_hash = matrix_hash
         self.report = []
-        self.logger = get_logger()
+        self.logger = get_logger(__name__)
         self.nodes_to_indices = {matrix.index[x]: x for x in range(matrix.zones)}
         self.python_version = 8 * struct.calcsize("P")
 

@@ -1,4 +1,9 @@
-"""Logging helpers that route QAequilibraE messages into the QGIS log."""
+"""Logging helpers that route standard QAequilibraE messages into the QGIS log.
+
+Model-run output retains its dedicated ``Model Run`` category so it can also feed the live run
+dialog. All other plugin messages should use :func:`get_logger`. QGIS logs are user-visible and
+can be persisted or shared, so messages must not contain credentials or other secrets.
+"""
 
 import logging
 from typing import cast
@@ -8,6 +13,7 @@ from qgis.core import Qgis, QgsMessageLog
 
 LOG_CATEGORY = "AequilibraE"
 LOGGER_NAME = "qaequilibrae"
+HANDLER_MARKER = "_qaequilibrae_qgis_log_handler"
 
 
 def _qgis_level(record: logging.LogRecord) -> Qgis.MessageLevel:
@@ -27,6 +33,9 @@ class QgsMessageLogHandler(logging.Handler):
     def __init__(self, category: str = LOG_CATEGORY):
         super().__init__()
         self.category = category
+        # A logger survives QGIS plugin reloads, unlike this module's handler class.
+        # A stable marker therefore prevents every reload from adding another handler.
+        setattr(self, HANDLER_MARKER, True)
 
     def emit(self, record: logging.LogRecord) -> None:
         try:
@@ -41,13 +50,17 @@ class QgsMessageLogHandler(logging.Handler):
 
 
 def get_logger(name: str | None = None) -> logging.Logger:
-    """Return a QAequilibraE logger configured to write to the QGIS message log."""
+    """Return a named QAequilibraE logger configured to write to the QGIS message log."""
     logger = logging.getLogger(LOGGER_NAME)
-    if not any(isinstance(handler, QgsMessageLogHandler) for handler in logger.handlers):
+    if not any(getattr(handler, HANDLER_MARKER, False) for handler in logger.handlers):
         handler = QgsMessageLogHandler()
-        handler.setFormatter(logging.Formatter("%(message)s"))
+        handler.setFormatter(logging.Formatter("[%(name)s] %(message)s"))
         logger.addHandler(handler)
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
-    return logger if name is None else logger.getChild(name)
+    if name is None:
+        return logger
+    if name == LOGGER_NAME or name.startswith(f"{LOGGER_NAME}."):
+        return logging.getLogger(name)
+    return logger.getChild(name)

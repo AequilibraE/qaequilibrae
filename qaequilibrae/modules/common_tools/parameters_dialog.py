@@ -33,7 +33,7 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
         lexer.setDefaultFont(font)
         self.text_box.setLexer(lexer)
         self.text_box.setFolding(QsciScintilla.FoldStyle.PlainFoldStyle)
-        self.logger = get_logger()
+        self.logger = get_logger(__name__)
 
         # Load the data
         self.load_original_data()
@@ -87,8 +87,8 @@ class ParameterDialog(QtWidgets.QDialog, FORM_CLASS):
                 if key not in dict1:
                     self.error = True
                     break
-        except Exception as e:
-            self.logger.error(e.args)
+        except Exception:
+            self.logger.exception("Could not compare parameter dictionaries")
             self.error = True
 
     def save_new_parameters(self):

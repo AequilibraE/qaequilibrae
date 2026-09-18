@@ -21,7 +21,7 @@ from qaequilibrae.qgis_logging import get_logger
 
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
 
-logger = get_logger()
+logger = get_logger(__name__)
 
 
 class DistributionModelsDialog(BaseDialog):
@@ -367,8 +367,8 @@ class DistributionModelsDialog(BaseDialog):
                 self.outfile = out_name
                 self.worker_thread = self.job_queue[self.outfile]
                 self.run_thread()
-        except Exception as e:
-            logger.error(e.args)
+        except Exception:
+            logger.exception("Could not start the distribution procedure")
 
     def check_data(self):
         self.error = None

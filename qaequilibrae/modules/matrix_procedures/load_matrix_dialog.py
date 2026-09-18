@@ -23,7 +23,7 @@ has_omx = spec is not None
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_matrix_loader.ui"))
 
-logger = get_logger()
+logger = get_logger(__name__)
 
 
 # TODO: Add possibility to add a centroid list to guarantee the match between matrix index and graph

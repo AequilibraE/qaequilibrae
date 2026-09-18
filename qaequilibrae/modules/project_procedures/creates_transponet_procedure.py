@@ -9,7 +9,7 @@ from qaequilibrae.modules.common_tools.geodataframe_from_data_layer import geoda
 from qaequilibrae.modules.common_tools.sql_identifiers import quote_identifier
 from qaequilibrae.qgis_logging import get_logger
 
-logger = get_logger()
+logger = get_logger(__name__)
 
 
 class CreatesTranspoNetProcedure(WorkerThread):

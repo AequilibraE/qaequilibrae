@@ -6,4 +6,5 @@ pytest-mock
 ruff==0.16.2
 ty==0.0.82
 pytest-reportlog
+numpy
 pyarrow

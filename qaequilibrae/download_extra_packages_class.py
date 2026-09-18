@@ -1,9 +1,9 @@
+import logging
 import os
 import shutil
 import subprocess  # nosec B404
 import sys
 import tempfile
-import logging
 from importlib.util import find_spec
 from pathlib import Path
 
@@ -20,13 +20,13 @@ else:
 LOGGER = get_logger(__name__)
 
 
-def log_message(message, level: Qgis.MessageLevel = Qgis.MessageLevel.Info):
+def log_message(message, level: Qgis.MessageLevel = Qgis.MessageLevel.Info, notify_user: bool = True):
     """Write dependency-installation messages through the plugin logger."""
     python_level = {
         Qgis.MessageLevel.Critical: logging.ERROR,
         Qgis.MessageLevel.Warning: logging.WARNING,
     }.get(level, logging.INFO)
-    LOGGER.log(python_level, message, extra={"qgis_level": level})
+    LOGGER.log(python_level, message, extra={"qgis_level": level, "notify_user": notify_user})
 
 
 class DownloadAll:

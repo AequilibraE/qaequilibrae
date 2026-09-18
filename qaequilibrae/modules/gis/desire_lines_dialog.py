@@ -32,7 +32,7 @@ class DesireLinesDialog(BaseDialog):
             self.proj_matrices = pd.DataFrame([])
         else:
             self.proj_matrices = list_matrices(self.qgis_project.project)
-        self.logger = get_logger()
+        self.logger = get_logger(__name__)
 
         self.resize(389, 385)
 
@@ -139,9 +139,9 @@ class DesireLinesDialog(BaseDialog):
     def job_finished_from_thread(self):
         try:
             QgsProject.instance().addMapLayer(self.worker_thread.result_layer)
-        except Exception as e:
+        except Exception:
             self.worker_thread.report.append("Could not load desire lines to map")
-            self.logger.error(f"Could not load desire lines to map. {e.args}")
+            self.logger.exception("Could not load desire lines to map")
         if self.worker_thread.report:
             dlg2 = ReportDialog(self.iface, self.worker_thread.report)
             dlg2.show()

@@ -376,9 +376,8 @@ class AequilibraEMenu:
         for f in glob.glob(p):
             try:
                 unlink(f)
-            except Exception as e:
-                self.logger.error(e.args)
-                pass
+            except Exception:
+                self.logger.exception("Could not remove temporary file %s", f)
 
     def run_close_project(self):
         if not self.project:
