@@ -4,12 +4,14 @@ import pandas as pd
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
 from qaequilibrae.modules.matrix_procedures.load_matrix_dialog import LoadMatrixDialog
 
+from .conftest import get_test_data_path
+
 
 # TODO: test removing the matrices
 def test_save_matrix(ae_with_project, folder_path, timeoutDetector):
     file_name = f"{folder_path}/test_matrix.omx"
 
-    df = pd.read_csv("test/data/SiouxFalls_project/SiouxFalls_od.csv")
+    df = pd.read_csv(get_test_data_path("SiouxFalls_project", "SiouxFalls_od.csv"))
     _ = layer_from_dataframe(df, "open_layer")
 
     dialog = LoadMatrixDialog(ae_with_project)

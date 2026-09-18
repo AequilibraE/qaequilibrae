@@ -6,9 +6,11 @@ import openmatrix as omx
 import pandas as pd
 import pytest
 import yaml
-from qgis.PyQt.QtCore import Qt, QItemSelectionModel
+from qgis.PyQt.QtCore import QItemSelectionModel, Qt
 
 from qaequilibrae.modules.paths_procedures.traffic_assignment_dialog import TrafficAssignmentDialog
+
+from .conftest import get_test_data_path
 
 
 def test_nan_demand_is_replaced_with_zero(sf_project, qtbot, mocker):
@@ -665,7 +667,7 @@ def test_single_class_from_yaml(sf_project, qtbot, mocker):
     """A single-class assignment configured entirely from a YAML file produces the same outputs."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
-        return_value="test/data/SiouxFalls_project/assignment_config.yml",
+        return_value=get_test_data_path("SiouxFalls_project", "assignment_config.yml"),
     )
 
     dialog = TrafficAssignmentDialog(sf_project)
@@ -696,7 +698,7 @@ def test_multi_class_from_yaml(sf_project, qtbot, mocker):
     """A multi-class YAML config restores every class, including a VDF named in the wrong case."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
-        return_value="test/data/SiouxFalls_project/mc_config.yml",
+        return_value=get_test_data_path("SiouxFalls_project", "mc_config.yml"),
     )
 
     dialog = TrafficAssignmentDialog(sf_project)
@@ -725,7 +727,7 @@ def test_fixed_cost_from_yaml(sf_project, qtbot, mocker):
     """A fixed cost belongs to the class that declares it, and is not inherited by the next one."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
-        return_value="test/data/SiouxFalls_project/fixed_cost_config.yml",
+        return_value=get_test_data_path("SiouxFalls_project", "fixed_cost_config.yml"),
     )
 
     dialog = TrafficAssignmentDialog(sf_project)
@@ -770,7 +772,7 @@ def test_mixed_case_from_yaml(sf_project, qtbot, mocker):
     """Every option a config names in a different case still resolves to the project's own spelling."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
-        return_value="test/data/SiouxFalls_project/mixed_case_config.yml",
+        return_value=get_test_data_path("SiouxFalls_project", "mixed_case_config.yml"),
     )
 
     dialog = TrafficAssignmentDialog(sf_project)
@@ -807,7 +809,7 @@ def test_mixed_case_from_yaml(sf_project, qtbot, mocker):
 )
 def test_config_with_unavailable_option(sf_project, mocker, section, key):
     """A config asking for an option the project does not have is refused, naming the option."""
-    with open("test/data/SiouxFalls_project/mixed_case_config.yml", "r") as f:
+    with open(get_test_data_path("SiouxFalls_project", "mixed_case_config.yml"), "r") as f:
         config = yaml.safe_load(f)
 
     target = config["traffic_classes"][0]["car"] if section == "traffic_class" else config["assignment"]
@@ -836,7 +838,7 @@ def test_select_links_from_yaml(sf_project, qtbot, mocker):
     """A select link analysis configured from YAML writes its matrix and results table."""
     mocker.patch(
         "qaequilibrae.modules.paths_procedures.traffic_assignment_dialog.TrafficAssignmentDialog._browse_yaml_path",
-        return_value="test/data/SiouxFalls_project/sl_config.yml",
+        return_value=get_test_data_path("SiouxFalls_project", "sl_config.yml"),
     )
 
     dialog = TrafficAssignmentDialog(sf_project)

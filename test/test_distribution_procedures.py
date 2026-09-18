@@ -5,12 +5,14 @@ import openmatrix as omx
 import pandas as pd
 import pytest
 from aequilibrae.matrix import AequilibraeMatrix
-from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsProject
+from qgis.PyQt.QtCore import Qt
 
 from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
 from qaequilibrae.modules.distribution_procedures.distribution_models_dialog import DistributionModelsDialog
 from qaequilibrae.modules.matrix_procedures.load_dataset_dialog import LoadDatasetDialog
+
+from .conftest import get_test_data_path
 
 DISTRIBUTION_PATH = "qaequilibrae.modules.distribution_procedures.distribution_models_dialog.DistributionModelsDialog"
 
@@ -18,7 +20,7 @@ DISTRIBUTION_PATH = "qaequilibrae.modules.distribution_procedures.distribution_m
 @pytest.mark.parametrize("method", ["csv", "parquet", "open layer"])
 def test_ipf(ae_with_project, folder_path, mocker, method):
 
-    df = pd.read_csv("test/data/SiouxFalls_project/synthetic_future_vector.csv")
+    df = pd.read_csv(get_test_data_path("SiouxFalls_project", "synthetic_future_vector.csv"))
     _ = layer_from_dataframe(df, "synthetic_future_vector")
 
     file_path = f"{folder_path}/demand_ipf_D.omx"
@@ -28,10 +30,10 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
     dialog = DistributionModelsDialog(ae_with_project, mode="ipf")
 
     if method == "csv":
-        dataset_path = "test/data/SiouxFalls_project/synthetic_future_vector.csv"
+        dataset_path = get_test_data_path("SiouxFalls_project", "synthetic_future_vector.csv")
         dataset = pd.read_csv(dataset_path)
     elif method == "parquet":
-        dataset_path = "test/data/SiouxFalls_project/synthetic_future_vector.parquet"
+        dataset_path = get_test_data_path("SiouxFalls_project", "synthetic_future_vector.parquet")
         dataset = pd.read_parquet(dataset_path)
     elif method == "open layer":
         layer = QgsProject.instance().mapLayersByName("synthetic_future_vector")[0]
@@ -142,7 +144,7 @@ def test_apply_gravity(ae_with_project, method, folder_path, mocker):
     mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
     mocked_outfile.return_value = file_path
 
-    dataset_path = "test/data/SiouxFalls_project/synthetic_future_vector.csv"
+    dataset_path = get_test_data_path("SiouxFalls_project", "synthetic_future_vector.csv")
     dataset = pd.read_csv(dataset_path)
 
     data_name = splitext(basename(dataset_path))[0]
@@ -164,7 +166,7 @@ def test_apply_gravity(ae_with_project, method, folder_path, mocker):
     dialog.cob_atra_field.setCurrentText("destinations")
 
     if method == "negative":
-        model_file = "test/data/SiouxFalls_project/mod_negative_exponential_X.mod"
+        model_file = get_test_data_path("SiouxFalls_project", "mod_negative_exponential_X.mod")
         dialog.model.load(model_file)
         dialog.update_model_parameters()
     elif method == "power":

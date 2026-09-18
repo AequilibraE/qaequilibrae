@@ -9,7 +9,12 @@ from pathlib import Path
 
 from qgis.core import Qgis
 
-from qaequilibrae.qgis_logging import get_logger
+if __package__:
+    from qaequilibrae.qgis_logging import get_logger
+else:
+    # Windows CI executes this module directly from the plugin directory, where importing
+    # ``qaequilibrae`` would resolve to qaequilibrae.py instead of the package.
+    from qgis_logging import get_logger
 
 
 LOGGER = get_logger(__name__)

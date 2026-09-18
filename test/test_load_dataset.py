@@ -7,10 +7,12 @@ from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_fr
 from qaequilibrae.modules.matrix_procedures.load_dataset_class import LoadDataset
 from qaequilibrae.modules.matrix_procedures.load_dataset_dialog import LoadDatasetDialog
 
+from .conftest import get_test_data_path
+
 
 @pytest.mark.parametrize("method", ["csv", "parquet", "open layer"])
 def test_load_dialog(ae_with_project, method, folder_path, timeoutDetector):
-    df = pd.read_csv("test/data/SiouxFalls_project/synthetic_future_vector.csv")
+    df = pd.read_csv(get_test_data_path("SiouxFalls_project", "synthetic_future_vector.csv"))
     _ = layer_from_dataframe(df, "synthetic_future_vector")
 
     dialog = LoadDatasetDialog(ae_with_project)
