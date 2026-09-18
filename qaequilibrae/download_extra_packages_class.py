@@ -116,26 +116,8 @@ class DownloadAll:
 
     def build_aequilibrae_macos(self, package):
         """Build AequilibraE outside QGIS, then install its wheel into the plugin."""
-        # Try to find uv and brew. They should be on the PATH, but if not we'll check the homebrew locations for both Intel and Apple Silicon macs.
-        # Expect to find in a homebrew location as the MacOS installation docs recommend installing uv via homebrew.
-        # Paths from https://docs.brew.sh/Installation
-
-        uv = shutil.which("uv")
-        if uv is None:
-            for candidate in (Path("/opt/homebrew/bin/uv"), Path("/usr/local/bin/uv")):
-                if candidate.exists():
-                    uv = str(candidate)
-                    break
-
-        brew = shutil.which("brew")
-        if brew is None:
-            for candidate in (
-                Path("/opt/homebrew/bin/brew"),
-                Path("/usr/local/bin/brew"),
-            ):
-                if candidate.exists():
-                    brew = str(candidate)
-                    break
+        uv = self._find_macos_tool("uv")
+        brew = self._find_macos_tool("brew")
 
         if uv is None or brew is None:
             missing = []
@@ -249,6 +231,23 @@ class DownloadAll:
         finally:
             shutil.rmtree(build_folder, ignore_errors=True)
 
+    @staticmethod
+    def _find_macos_tool(name):
+        """Find a macOS build tool outside the environment QGIS inherits."""
+        executable = shutil.which(name)
+        if executable is not None:
+            return executable
+
+        for candidate in (
+            Path.home() / ".local" / "bin" / name,
+            Path("/opt/homebrew/bin") / name,
+            Path("/usr/local/bin") / name,
+        ):
+            if candidate.exists():
+                return str(candidate)
+
+        return None
+
     def install_wheel(self, wheel):
         """Install a wheel and its runtime dependencies into the plugin package directory."""
         Path(self.target_folder).mkdir(parents=True, exist_ok=True)
@@ -274,16 +273,17 @@ class DownloadAll:
             env = os.environ.copy()
             env["PYTHONHOME"] = str(Path(os.__file__).parents[2])
         # Argument list, no shell: every element is either a literal or a path we resolved ourselves
-        process = subprocess.Popen(  # nosec B603
+        with subprocess.Popen(  # nosec B603
             command,
             stdout=subprocess.PIPE,
             stdin=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
             env=env,
-        )
-        lines.extend(process.stdout.readlines())
-        exit_code = process.wait()
+        ) as process:
+            output, _ = process.communicate()
+            lines.extend(output.splitlines(keepends=True))
+            exit_code = process.returncode
         self.last_exit_code = exit_code
         if exit_code != 0:
             self.error = exit_code
