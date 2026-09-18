@@ -1,7 +1,6 @@
 from os.path import dirname, join
 
 import pandas as pd
-from aequilibrae.context import get_logger
 from aequilibrae.paths import Graph
 from aequilibrae.paths.results import PathResults
 from qgis.PyQt.QtCore import QEvent, QMetaType
@@ -14,6 +13,7 @@ from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog, BaseD
 from qaequilibrae.modules.common_tools import standard_path, geodataframe_from_layer
 from qaequilibrae.modules.common_tools.writable_dataframe import make_writable_network_dataframe
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
+from qaequilibrae.logging import get_logger
 
 logger = get_logger()
 

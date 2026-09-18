@@ -1,11 +1,12 @@
 from os.path import dirname, join
 
 import yaml
-from aequilibrae.context import get_logger
 from aequilibrae.parameters import Parameters
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.Qsci import QsciLexerYAML, QsciScintilla
 from qgis.PyQt.QtGui import QFont
+
+from qaequilibrae.logging import get_logger
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_parameters.ui"))
 

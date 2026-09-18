@@ -4,7 +4,6 @@ from os.path import dirname, isdir, join
 
 import qgis
 from qgis.PyQt.QtCore import Qt
-from aequilibrae.context import get_logger
 from aequilibrae.project.network.network import Network
 from qgis.PyQt import QtWidgets, uic
 
@@ -13,6 +12,7 @@ from qaequilibrae.modules.common_tools import all_layers_from_toc
 from qaequilibrae.modules.common_tools import GetOutputFolderName, get_vector_layer_by_name, standard_path
 from qaequilibrae.modules.common_tools.global_parameters import point_types, line_types
 from qaequilibrae.modules.project_procedures.creates_transponet_procedure import CreatesTranspoNetProcedure
+from qaequilibrae.logging import get_logger
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_transponet_construction.ui"))

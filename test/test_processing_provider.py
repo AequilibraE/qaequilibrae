@@ -36,6 +36,15 @@ def test_provider_exists(qgis_app):
     registry = QgsApplication.processingRegistry()
     provider_names = [p.name().lower() for p in registry.providers()]
     assert "aequilibrae" in provider_names
+    assert {type(algorithm).__name__ for algorithm in provider.algorithms()} == {
+        "AddLinksFromLayer",
+        "CollapseLinks",
+        "CreateEmptyProject",
+        "ExportMatrix",
+        "MatrixCalculator",
+        "NetworkSimplifier",
+        "TripLengthDistribution",
+    }
 
 
 @pytest.mark.parametrize("format", [0, 1])

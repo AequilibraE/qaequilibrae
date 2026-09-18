@@ -16,3 +16,38 @@ line-length = 120
 # Ruff 0.16 grew its default rule set from 59 to 413 rules. Pinned to the pre-0.16 default
 select = ["E4", "E7", "E9", "F"]
 ignore = ["E203", "E266", "E501"]
+
+[tool.ty.src]
+# Check plugin code by default. Remove entries from this temporary legacy list as
+# directories become type-check clean; new Processing algorithms are checked automatically.
+include = ["qaequilibrae"]
+exclude = [
+    "qaequilibrae/__init__.py",
+    "qaequilibrae/download_extra_packages_class.py",
+    "qaequilibrae/get_version.py",
+    "qaequilibrae/missing_dependencies.py",
+    "qaequilibrae/pandas_compat.py",
+    "qaequilibrae/qaequilibrae.py",
+    "qaequilibrae/set_version.py",
+    "qaequilibrae/i18n",
+    "qaequilibrae/packages",
+    "qaequilibrae/modules/__init__.py",
+    "qaequilibrae/modules/common_tools",
+    "qaequilibrae/modules/distribution_procedures",
+    "qaequilibrae/modules/gis",
+    "qaequilibrae/modules/matrix_procedures",
+    "qaequilibrae/modules/menu_actions",
+    "qaequilibrae/modules/network",
+    "qaequilibrae/modules/paths_procedures",
+    "qaequilibrae/modules/project_procedures",
+    "qaequilibrae/modules/routing_procedures",
+    "qaequilibrae/modules/style_loader",
+    "qaequilibrae/modules/transit_procedures",
+]
+
+[tool.ty.environment]
+extra-paths = ["qaequilibrae/packages"]
+
+[tool.ty.rules]
+# QGIS does not publish type stubs and is not installed in the lightweight lint job.
+unresolved-import = "ignore"

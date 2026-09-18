@@ -141,8 +141,36 @@ def test_gis_scenario_comparison_menu(ae):
 
 def test_help_menu(ae):
     """TODO: find a way to capture the opening of webpage"""
-    button = ae.menuActions["AequilibraE"][0]
-    assert button.text() == "Help", "Wrong text content"
+    action = ae.menuActions["AequilibraE"][0]
+    assert action.text() == "Help", "Wrong text content"
+
+
+def test_menu_is_added_to_the_qgis_menu_bar(ae):
+    assert ae.main_menu.title() == "AequilibraE"
+    assert [action.text() for action in ae.main_menu.actions() if action.menu()] == [
+        "Project",
+        "Trip distribution",
+        "Path computation",
+        "Traffic assignment",
+        "Route choice",
+        "Transit",
+        "Mapping",
+        "Options",
+    ]
+
+
+def test_menu_controls_remain_in_the_docked_panel(ae):
+    assert [button.text() for button in ae.dock_menu_buttons] == [
+        "Project",
+        "Trip distribution",
+        "Path computation",
+        "Traffic assignment",
+        "Route choice",
+        "Transit",
+        "Mapping",
+        "Options",
+        "Help",
+    ]
 
 
 def test_gtfs_importer(ae):

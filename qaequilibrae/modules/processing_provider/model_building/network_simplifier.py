@@ -1,6 +1,6 @@
 import importlib.util as iutil
 
-from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingException
+from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingException
 
 from qaequilibrae.i18n.translate import trlt
 
@@ -8,13 +8,13 @@ from qaequilibrae.i18n.translate import trlt
 class NetworkSimplifier(QgsProcessingAlgorithm):
     PROJECT_FOLDER = "PROJECT_FOLDER"
 
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self, configuration=None):
         # 1. Folder containing an AequilibraE project
         self.addParameter(
             QgsProcessingParameterFile(
                 self.PROJECT_FOLDER,
                 self.tr("AequilibraE Project Folder"),
-                behavior=QgsProcessingParameterFile.Behavior.Folder,
+                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
             )
         )
 

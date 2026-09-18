@@ -1,7 +1,6 @@
 import pytest
 
 from qaequilibrae.modules.network import AddLinkTypeDialog, AddModeDialog
-from qaequilibrae.modules.processing_provider.provider import Provider
 
 
 def _column(table, header):
@@ -14,16 +13,6 @@ def _column(table, header):
 def _value_map(layer, field_name):
     setup = layer.editorWidgetSetup(layer.fields().indexOf(field_name))
     return [value for item in setup.config()["map"] for value in item.values()]
-
-
-def test_the_tools_are_in_the_data_group_of_the_toolbox(qgis_app):
-    provider = Provider()
-    provider.refreshAlgorithms()
-
-    groups = {algorithm.name(): algorithm.groupId() for algorithm in provider.algorithms()}
-
-    assert groups["add_link_type"] == "data"
-    assert groups["add_mode"] == "data"
 
 
 def test_add_mode_lists_the_modes_already_in_the_project(ae_with_project):

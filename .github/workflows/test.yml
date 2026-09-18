@@ -30,6 +30,9 @@ jobs:
       - name: Check formatting with ruff
         run: ruff format --check --diff
 
+      - name: Type check with ty
+        run: ty check
+
   test_linux:
     name: Test (Linux, ${{ matrix.name }})
     runs-on: ubuntu-latest

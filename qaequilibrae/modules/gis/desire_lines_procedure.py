@@ -4,7 +4,6 @@ from collections import OrderedDict
 
 import numpy as np
 import pandas as pd
-from aequilibrae.context import get_logger
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.paths import Graph
 from aequilibrae.paths import allOrNothing
@@ -16,6 +15,7 @@ from qgis.core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFeat
 from scipy.spatial import Delaunay
 
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
+from qaequilibrae.logging import get_logger
 
 
 class DesireLinesProcedure(WorkerThread):
