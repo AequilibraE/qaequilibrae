@@ -5,7 +5,6 @@ from os.path import basename, dirname, join, splitext
 import numpy as np
 import pandas as pd
 import qgis
-from aequilibrae.context import get_logger
 from aequilibrae.distribution import SyntheticGravityModel
 from aequilibrae.distribution.synthetic_gravity_model import valid_functions
 from aequilibrae.matrix import AequilibraeMatrix
@@ -18,10 +17,11 @@ from qaequilibrae.modules.distribution_procedures.calibrate_gravity_procedure im
 from qaequilibrae.modules.distribution_procedures.ipf_procedure import IpfProcedure
 from qaequilibrae.modules.matrix_procedures import LoadDatasetDialog
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
+from qaequilibrae.qgis_logging import get_logger
 
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
 
-logger = get_logger()
+logger = get_logger(__name__)
 
 
 class DistributionModelsDialog(BaseDialog):
@@ -367,8 +367,8 @@ class DistributionModelsDialog(BaseDialog):
                 self.outfile = out_name
                 self.worker_thread = self.job_queue[self.outfile]
                 self.run_thread()
-        except Exception as e:
-            logger.error(e.args)
+        except Exception:
+            logger.exception("Could not start the distribution procedure")
 
     def check_data(self):
         self.error = None

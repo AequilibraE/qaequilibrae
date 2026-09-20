@@ -6,7 +6,6 @@ from typing import Optional
 import numpy as np
 import openmatrix as omx
 import pandas as pd
-from aequilibrae.context import get_logger
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.PyQt.QtGui import QColor
@@ -18,6 +17,7 @@ from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsLine
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
 from qaequilibrae.modules.common_tools import layer_from_dataframe
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
+from qaequilibrae.qgis_logging import get_logger
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_data_viewer.ui"))
 
@@ -34,7 +34,7 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.setupUi(self)
             self.data_to_show = None
             self.error = None
-            self.logger = get_logger()
+            self.logger = get_logger(__name__)
             self.qgis_project = qgis_project
             self.from_proj = True if qgis_project.project else False
             self.indices = np.array(1)
@@ -79,9 +79,9 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
             with omx.open_file(self.data_path) as omx_file:
                 self.list_cores = omx_file.list_matrices()
                 self.list_indices = omx_file.list_mappings()
-        except Exception as e:
+        except Exception:
             self.error = self.tr("Could not load dataset")
-            self.logger.error(e.args)
+            self.logger.exception("Could not load dataset: %s", self.data_path)
             self.exit_with_error()
             return
 

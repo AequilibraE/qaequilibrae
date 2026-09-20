@@ -1,4 +1,3 @@
-import sys
 from os import makedirs
 from os.path import isdir, isfile, join
 
@@ -17,9 +16,8 @@ from qaequilibrae.modules.processing_provider.model_building.collapse_links impo
 from qaequilibrae.modules.processing_provider.model_building.create_empty_project import CreateEmptyProject
 from qaequilibrae.modules.processing_provider.model_building.network_simplifier import NetworkSimplifier
 from qaequilibrae.modules.processing_provider.provider import Provider
-from .utilities import load_test_layer
 
-pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
+from .utilities import get_test_data_path, load_test_layer
 
 
 def qgis_app():
@@ -36,6 +34,15 @@ def test_provider_exists(qgis_app):
     registry = QgsApplication.processingRegistry()
     provider_names = [p.name().lower() for p in registry.providers()]
     assert "aequilibrae" in provider_names
+    assert {type(algorithm).__name__ for algorithm in provider.algorithms()} == {
+        "AddLinksFromLayer",
+        "CollapseLinks",
+        "CreateEmptyProject",
+        "ExportMatrix",
+        "MatrixCalculator",
+        "NetworkSimplifier",
+        "TripLengthDistribution",
+    }
 
 
 @pytest.mark.parametrize("format", [0, 1])
@@ -43,7 +50,7 @@ def test_export_matrix(folder_path, format):
     makedirs(folder_path)
 
     parameters = {
-        "matrix_path": "test/data/SiouxFalls_project/matrices/sfalls_skims.omx",
+        "matrix_path": get_test_data_path("SiouxFalls_project", "matrices", "sfalls_skims.omx"),
         "file_path": folder_path,
         "output_format": format,
     }
@@ -88,7 +95,7 @@ def test_matrix_calc(folder_path):
     makedirs(folder_path)
 
     parameters = {
-        "conf_file": "test/data/SiouxFalls_project/matrix_config.yml",
+        "conf_file": get_test_data_path("SiouxFalls_project", "matrix_config.yml"),
         "procedure": "(cars - (heavy_vehicles * 0.25)).T",
         "file_path": f"{folder_path}/hello.omx",
         "matrix_core": "new_core",
@@ -115,7 +122,7 @@ def test_matrix_calc_rejects_a_result_that_is_not_a_matrix(folder_path):
 
     # min() collapses to a single number, which cannot be written out as a matrix
     parameters = {
-        "conf_file": "test/data/SiouxFalls_project/matrix_config.yml",
+        "conf_file": get_test_data_path("SiouxFalls_project", "matrix_config.yml"),
         "procedure": "min(cars)",
         "file_path": f"{folder_path}/scalar.omx",
         "matrix_core": "new_core",

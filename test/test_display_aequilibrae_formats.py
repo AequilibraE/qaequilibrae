@@ -1,5 +1,4 @@
 import os
-import sys
 
 import numpy as np
 import pytest
@@ -7,7 +6,7 @@ from qgis.core import QgsProject
 
 from qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog import DisplayAequilibraEFormatsDialog
 
-pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
+from .utilities import get_test_data_path
 
 
 def test_display_data_no_path(ae, mocker):
@@ -24,7 +23,7 @@ def test_display_data_no_path(ae, mocker):
 
 @pytest.mark.parametrize("path", ["demand.omx", "SiouxFalls.omx"])
 def test_display_data_with_project(tmpdir, ae_with_project, mocker, path):
-    file_path = f"test/data/SiouxFalls_project/matrices/{path}"
+    file_path = get_test_data_path("SiouxFalls_project", "matrices", path)
     name, extension = path.split(".")
     file_func = "qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog.DisplayAequilibraEFormatsDialog.get_file_name"
     mocker.patch(file_func, return_value=(file_path, extension.upper()))
@@ -48,7 +47,7 @@ def test_display_data_with_project(tmpdir, ae_with_project, mocker, path):
 
 @pytest.mark.parametrize("path", ["demand.omx", "SiouxFalls.omx"])
 def test_display_data_without_project(tmpdir, ae, mocker, path):
-    file_path = f"test/data/SiouxFalls_project/matrices/{path}"
+    file_path = get_test_data_path("SiouxFalls_project", "matrices", path)
     name, extension = path.split(".")
     file_func = "qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog.DisplayAequilibraEFormatsDialog.get_file_name"
     mocker.patch(file_func, return_value=(file_path, extension.upper()))
@@ -73,7 +72,7 @@ def test_display_data_without_project(tmpdir, ae, mocker, path):
 # TODO: Ideally, we would test if the visualization is working
 @pytest.mark.parametrize("element", ["row", "columns"])
 def test_select_elements(ae_with_project, mocker, element):
-    file_path = "test/data/SiouxFalls_project/matrices/sfalls_skims.omx"
+    file_path = get_test_data_path("SiouxFalls_project", "matrices", "sfalls_skims.omx")
     _, extension = file_path.split(".")
     file_func = "qaequilibrae.modules.matrix_procedures.display_aequilibrae_formats_dialog.DisplayAequilibraEFormatsDialog.get_file_name"
     mocker.patch(file_func, return_value=(file_path, extension.upper()))

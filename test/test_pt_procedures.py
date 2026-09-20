@@ -6,6 +6,8 @@ from aequilibrae.transit import Transit
 from qaequilibrae.modules.transit_procedures.gtfs_feed import GTFSFeed
 from qaequilibrae.modules.transit_procedures.gtfs_importer import GTFSImporter
 
+from .utilities import get_test_data_path
+
 
 def test_add_new_feed(pt_no_feed, mocker):
     mocker.patch(
@@ -24,7 +26,7 @@ def test_add_new_feed(pt_no_feed, mocker):
     assert feed.label_3.text() == "Description*"
     assert feed.label_4.text() == "Agency*"
 
-    gtfs_file = "test/data/coquimbo_project/gtfs_coquimbo.zip"
+    gtfs_file = get_test_data_path("coquimbo_project", "gtfs_coquimbo.zip")
     feed.set_data(gtfs_file)
     feed.led_agency.setText("New agency")
     feed.led_description.setText("Adds new agency description")
@@ -82,7 +84,7 @@ def test_add_other_feed(pt_project, set_agency, set_date, is_checked, mocker):
     assert feed.label_3.text() == "Description*"
     assert feed.label_4.text() == "Agency*"
 
-    gtfs_file = "test/data/coquimbo_project/gtfs_coquimbo.zip"
+    gtfs_file = get_test_data_path("coquimbo_project", "gtfs_coquimbo.zip")
     feed.set_data(gtfs_file)
     feed.led_agency.setText(set_agency)
     feed.led_description.setText("Adds new agency description")

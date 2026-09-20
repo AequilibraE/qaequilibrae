@@ -1,12 +1,7 @@
 from contextlib import contextmanager
 
-import pytest
-import sys
 from qgis.PyQt.QtCore import QEvent, QMetaObject, QObject, Qt
 from qgis.PyQt.QtWidgets import QApplication
-
-
-pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
 
 
 class DialogEventFilter(QObject):

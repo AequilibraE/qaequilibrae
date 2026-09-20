@@ -2,35 +2,35 @@ import importlib.util as iutil
 import sys
 from string import ascii_letters
 
-from qgis.core import QgsProcessing, QgsProcessingMultiStepFeedback, QgsProcessingParameterVectorLayer
+from qgis.core import Qgis, QgsProcessingMultiStepFeedback, QgsProcessingParameterVectorLayer
 from qgis.core import QgsProcessingAlgorithm
-from qgis.core import QgsProcessingParameterField, QgsProcessingParameterFile
+from qgis.core import QgsProcessingException, QgsProcessingParameterField, QgsProcessingParameterFile
 
 from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.common_tools import geodataframe_from_layer
 
 
 class AddLinksFromLayer(QgsProcessingAlgorithm):
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self, configuration=None):
         self.addParameter(
             QgsProcessingParameterFile(
                 "project_path",
                 self.tr("Project path"),
-                behavior=QgsProcessingParameterFile.Behavior.Folder,
+                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
             )
         )
         self.addParameter(
             QgsProcessingParameterVectorLayer(
                 "links",
                 self.tr("Links"),
-                types=[QgsProcessing.SourceType.TypeVectorLine],
+                types=[Qgis.ProcessingSourceType.VectorLine],
             )
         )
         self.addParameter(
             QgsProcessingParameterField(
                 "direction",
                 self.tr("Direction"),
-                type=QgsProcessingParameterField.DataType.Numeric,
+                type=Qgis.ProcessingFieldParameterDataType.Numeric,
                 parentLayerParameterName="links",
                 allowMultiple=False,
             )
@@ -39,7 +39,7 @@ class AddLinksFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "link_type",
                 self.tr("Link type"),
-                type=QgsProcessingParameterField.DataType.String,
+                type=Qgis.ProcessingFieldParameterDataType.String,
                 parentLayerParameterName="links",
                 allowMultiple=False,
             )
@@ -48,20 +48,20 @@ class AddLinksFromLayer(QgsProcessingAlgorithm):
             QgsProcessingParameterField(
                 "modes",
                 self.tr("Modes"),
-                type=QgsProcessingParameterField.DataType.String,
+                type=Qgis.ProcessingFieldParameterDataType.String,
                 parentLayerParameterName="links",
                 allowMultiple=False,
             )
         )
 
-    def processAlgorithm(self, parameters, context, model_feedback):
+    def processAlgorithm(self, parameters, context, feedback):
         # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
 
         from aequilibrae import Project
 
-        feedback = QgsProcessingMultiStepFeedback(5, model_feedback)
+        feedback = QgsProcessingMultiStepFeedback(5, feedback)
         feedback.pushInfo(self.tr("Opening project"))
 
         project_path = parameters["project_path"]
@@ -72,6 +72,8 @@ class AddLinksFromLayer(QgsProcessingAlgorithm):
 
         # Load layer as GeoDataFrame
         layer = self.parameterAsVectorLayer(parameters, "links", context)
+        if layer is None:
+            raise QgsProcessingException(self.tr("Links layer could not be loaded"))
         gdf = geodataframe_from_layer(layer).infer_objects()
 
         columns = [parameters["link_type"], parameters["direction"], parameters["modes"], "geometry"]

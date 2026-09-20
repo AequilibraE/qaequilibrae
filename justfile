@@ -81,17 +81,23 @@ shell tag="ltr":
 shell-ltr:
     just shell ltr
 
-# Run the project's formatting and lint checks in a prepared QGIS image.
+# Run the project's formatting, lint, and type checks in a prepared QGIS image.
 _lint tag:
     just _qgis {{ tag }} '' '\
         ruff check && \
-        ruff format --check --diff'
+        ruff format --check --diff && \
+        ty check'
+
+# Type-check plugin code, or the paths supplied on the command line.
+# Example: `just typecheck qaequilibrae/modules/processing_provider/provider.py`
+typecheck *paths:
+    uvx ty check {{ paths }}
 
 # Run the complete test suite in a prepared QGIS image.
 _test tag *pytest_args:
     just _qgis {{ tag }} '' 'python -m pytest --cov-report term-missing --cov=qaequilibrae test {{ pytest_args }}'
 
-# Run the project's formatting and lint checks in the selected QGIS image.
+# Run the project's formatting, lint, and type checks in the selected QGIS image.
 lint tag="ltr":
     just setup {{ tag }}
     just _lint {{ tag }}

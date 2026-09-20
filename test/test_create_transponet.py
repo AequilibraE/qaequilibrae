@@ -1,16 +1,13 @@
 from os.path import join
-import pytest
-import sys
 
 from aequilibrae import Project
-from qgis.PyQt import QtWidgets
 from qgis.core import QgsProject
+from qgis.PyQt import QtWidgets
 
 from qaequilibrae.modules.project_procedures.creates_transponet_dialog import CreatesTranspoNetDialog
 from qaequilibrae.modules.project_procedures.creates_transponet_procedure import CreatesTranspoNetProcedure
-from .utilities import load_test_layer
 
-pytestmark = pytest.mark.skipif(sys.platform.startswith("win"), reason="Running on Windows")
+from .utilities import load_test_layer
 
 # The standard AequilibraE link layer, minus a_node/b_node/distance, which the project computes on its own
 link_standard_fields = ["link_id", "direction", "modes", "link_type", "name", "speed_ab", "speed_ba",

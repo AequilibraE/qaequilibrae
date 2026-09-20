@@ -4,7 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from qgis.core import QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
+from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
 from qgis.core import QgsProcessingParameterFileDestination, QgsProcessingParameterString, QgsProcessingException
 
 from qaequilibrae.i18n.translate import trlt
@@ -12,12 +12,12 @@ from .matrix_expression import MatrixExpressionError, evaluate
 
 
 class MatrixCalculator(QgsProcessingAlgorithm):
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self, configuration=None):
         self.addParameter(
             QgsProcessingParameterFile(
                 "conf_file",
                 self.tr("Configuration file (*.yaml)"),
-                behavior=QgsProcessingParameterFile.Behavior.File,
+                behavior=Qgis.ProcessingFileParameterBehavior.File,
             )
         )
         self.addParameter(QgsProcessingParameterString("procedure", self.tr("Expression"), multiLine=True))
@@ -30,7 +30,7 @@ class MatrixCalculator(QgsProcessingAlgorithm):
             QgsProcessingParameterFileDestination("file_path", self.tr("File path"), "OpenMatrix (*.omx)")
         )
 
-    def processAlgorithm(self, parameters, context, model_feedback):
+    def processAlgorithm(self, parameters, context, feedback):
         # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
@@ -40,7 +40,7 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         if parameters["file_path"] is None:
             raise QgsProcessingException(self.tr("Plase use a valid file name."))
 
-        feedback = QgsProcessingMultiStepFeedback(4, model_feedback)
+        feedback = QgsProcessingMultiStepFeedback(4, feedback)
         feedback.pushInfo(self.tr("Getting matrices from configuration file"))
 
         with open(parameters["conf_file"], "r") as f:
@@ -48,7 +48,7 @@ class MatrixCalculator(QgsProcessingAlgorithm):
 
         # Load matrices
         matrices = {}
-        index = []
+        index = None
         for matrix in params:
             for name, values in matrix.items():
                 matrix_path = Path(values["matrix_path"])
@@ -59,8 +59,13 @@ class MatrixCalculator(QgsProcessingAlgorithm):
                 mat = AequilibraeMatrix()
                 mat.load(matrix_path)
                 matrices[name] = mat.get_matrix(values["matrix_core"])
-                index[:] = mat.index[:]
+                if mat.index is None:
+                    raise QgsProcessingException(self.tr("Could not load matrix indices"))
+                index = mat.index.copy()
                 mat.close()
+
+        if index is None:
+            raise QgsProcessingException(self.tr("The configuration contains no matrices"))
 
         try:
             out = evaluate(parameters["procedure"], matrices)
@@ -77,9 +82,11 @@ class MatrixCalculator(QgsProcessingAlgorithm):
 
         mat = AequilibraeMatrix()
         mat.create_empty(zones=len(index), matrix_names=[parameters["matrix_core"]])
+        if mat.matrix is None or mat.index is None:
+            raise QgsProcessingException(self.tr("Could not create the output matrix"))
         mat.matrix[parameters["matrix_core"]][:, :] = out[:, :]
         mat.index[:] = index[:]
-        mat.export(parameters["file_path"])
+        mat.export(Path(parameters["file_path"]))
         mat.close()
 
         return {"Output": "Finished"}

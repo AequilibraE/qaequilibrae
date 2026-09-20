@@ -3,7 +3,6 @@ from os.path import dirname, join
 
 import numpy as np
 import qgis
-from aequilibrae.context import get_logger
 from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, QSize
@@ -15,6 +14,7 @@ from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path,
 from qaequilibrae.modules.common_tools.get_output_file_name import GetOutputFileName
 from qaequilibrae.modules.common_tools.global_parameters import float_types, integer_types
 from qaequilibrae.modules.common_tools.report_dialog import ReportDialog
+from qaequilibrae.qgis_logging import get_logger
 from qaequilibrae.modules.matrix_procedures.load_matrix_class import LoadMatrix
 from qaequilibrae.modules.matrix_procedures.mat_reblock import MatrixReblocking
 
@@ -23,7 +23,7 @@ has_omx = spec is not None
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_matrix_loader.ui"))
 
-logger = get_logger()
+logger = get_logger(__name__)
 
 
 # TODO: Add possibility to add a centroid list to guarantee the match between matrix index and graph
