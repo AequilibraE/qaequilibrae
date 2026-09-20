@@ -2,12 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
-    <name>AddConnectors</name>
-</context>
-<context>
-    <name>AddLinkType</name>
-</context>
-<context>
     <name>AddLinkTypeDialog</name>
     <message>
         <location filename="../modules/network/add_link_type_dialog.py" line="47"/>
@@ -99,9 +93,6 @@
     </message>
 </context>
 <context>
-    <name>AddMode</name>
-</context>
-<context>
     <name>AddModeDialog</name>
     <message>
         <location filename="../modules/network/add_mode_dialog.py" line="47"/>
@@ -151,9 +142,6 @@
         <source>The name is already in use</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>AddZones</name>
 </context>
 <context>
     <name>AddZonesProcedure</name>
@@ -370,9 +358,6 @@
     </message>
 </context>
 <context>
-    <name>CloseProject</name>
-</context>
-<context>
     <name>CollapseLinks</name>
     <message>
         <location filename="../modules/processing_provider/model_building/collapse_links.py" line="16"/>
@@ -578,12 +563,6 @@
         <source>Available models:</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>CreateExamples</name>
-</context>
-<context>
-    <name>CreateScenarios</name>
 </context>
 <context>
     <name>CreateScenariosDialog</name>
@@ -1123,9 +1102,6 @@
     </message>
 </context>
 <context>
-    <name>ExploreTransit</name>
-</context>
-<context>
     <name>ExportMatrix</name>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/export_matrix.py" line="14"/>
@@ -1608,9 +1584,6 @@
     </message>
 </context>
 <context>
-    <name>ImpedanceMatrix</name>
-</context>
-<context>
     <name>ImpedanceMatrixDialog</name>
     <message>
         <location filename="../modules/paths_procedures/impedance_matrix_dialog.py" line="182"/>
@@ -1727,12 +1700,6 @@
     </message>
 </context>
 <context>
-    <name>ImportGTFS</name>
-</context>
-<context>
-    <name>ImportMatrix</name>
-</context>
-<context>
     <name>LiveLogWidget</name>
     <message>
         <location filename="../modules/common_tools/live_log.py" line="49"/>
@@ -1844,12 +1811,6 @@
         <source>Could not delete &apos;{}&apos;: {}</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>LoadProjectLogFile</name>
-</context>
-<context>
-    <name>LoadProjectParameters</name>
 </context>
 <context>
     <name>LogDialog</name>
@@ -2095,9 +2056,6 @@
     </message>
 </context>
 <context>
-    <name>OpenProject</name>
-</context>
-<context>
     <name>ParameterDialog</name>
     <message>
         <location filename="../modules/common_tools/parameters_dialog.py" line="66"/>
@@ -2109,15 +2067,6 @@
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>PrepareNetwork</name>
-</context>
-<context>
-    <name>ProjectFromLayer</name>
-</context>
-<context>
-    <name>ProjectFromOSM</name>
 </context>
 <context>
     <name>ProjectFromOSMDialog</name>
@@ -2599,18 +2548,6 @@
     </message>
 </context>
 <context>
-    <name>RunProcedures</name>
-</context>
-<context>
-    <name>RunTSP</name>
-</context>
-<context>
-    <name>ScenarioComparison</name>
-</context>
-<context>
-    <name>ShortestPath</name>
-</context>
-<context>
     <name>ShortestPathDialog</name>
     <message>
         <location filename="../modules/paths_procedures/show_shortest_path_dialog.py" line="96"/>
@@ -2662,9 +2599,6 @@
     </message>
 </context>
 <context>
-    <name>SimpleTag</name>
-</context>
-<context>
     <name>SimpleTagDialog</name>
     <message>
         <location filename="../modules/gis/simple_tag_dialog.py" line="45"/>
@@ -2703,9 +2637,6 @@
     </message>
 </context>
 <context>
-    <name>SkimViewer</name>
-</context>
-<context>
     <name>SkimViewerDialog</name>
     <message>
         <location filename="../modules/paths_procedures/skim_viewer_dialog.py" line="373"/>
@@ -2717,9 +2648,6 @@
         <source>Critical layer for Skim Viewer removed from the layers&apos; panel</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>StackedBandwidth</name>
 </context>
 <context>
     <name>TQ_NetPrep</name>
@@ -2818,9 +2746,6 @@
     </message>
 </context>
 <context>
-    <name>TrafficAssignment</name>
-</context>
-<context>
     <name>TrafficAssignmentDialog</name>
     <message>
         <location filename="../modules/paths_procedures/traffic_assignment_dialog.py" line="545"/>
@@ -2914,12 +2839,6 @@
     </message>
 </context>
 <context>
-    <name>TransitAssignment</name>
-</context>
-<context>
-    <name>TripDistribution</name>
-</context>
-<context>
     <name>TripLengthDistribution</name>
     <message>
         <location filename="../modules/processing_provider/matrix_procedures/trip_length_distribution.py" line="83"/>
@@ -2981,9 +2900,6 @@
         <source>Error checking AequilibraE project: {}</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>VisualizeData</name>
 </context>
 <context>
     <name>bandwidths</name>
