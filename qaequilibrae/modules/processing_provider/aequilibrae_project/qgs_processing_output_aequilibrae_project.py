@@ -9,7 +9,7 @@ class QgsProcessingOutputAequilibraeProject(QgsProcessingOutputDefinition):
         super().__init__(name=name, description=description)
 
     def type():
-        return Project
+        return "Project"
 
     def getProject():
         # FIXME: is this the best way? Is the return mutable?

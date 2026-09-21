@@ -9,7 +9,7 @@ class QgsProcessingParameterAequilibraeProject(QgsProcessingParameterDefinition)
         super().__init__(name=name, description=description)
 
     def type():
-        return Project
+        return "Project"
 
     def clone():
         return QgsProcessingParameterAequilibraeProject()
