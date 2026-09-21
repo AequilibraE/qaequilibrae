@@ -8,7 +8,7 @@ from qgis.core import (
     )
 
 from qaequilibrae.i18n.translate import trlt
-from qaequilibrae.qaequilibrae.modules.processing_provider.qgs_processing_output_aequilibrae_project import QgsProcessingOutputAequilibraeProject
+from qaequilibrae.modules.processing_provider.qgs_processing_output_aequilibrae_project import QgsProcessingOutputAequilibraeProject
 
 class OpenAequilibraeProjectAlgorithm(QgsProcessingAlgorithm):
     """ Open a new Aequilibrae project"""
@@ -46,7 +46,7 @@ class OpenAequilibraeProjectAlgorithm(QgsProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
-        return{"OUTPUT": project}
+        return {"OUTPUT": project}
 
     def name(self) -> str:
         return "openAequilibraeProject"

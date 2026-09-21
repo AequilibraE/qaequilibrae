@@ -4,9 +4,9 @@ from aequilibrae.project import Project
 
 class QgsProcessingOutputAequilibraeProject(QgsProcessingOutputDefinition):
 
-    def __init__(name: str | None = None, description: str | None = '', project: None | Project = None):
+    def __init__(self, name: str | None = None, description: str | None = '', project: None | Project = None):
         self.project = project
-        super.__init__(name, description)
+        super().__init__(name=name, description=description)
 
     def type():
         return Project
@@ -19,3 +19,5 @@ class QgsProcessingOutputAequilibraeProject(QgsProcessingOutputDefinition):
         if self.project is None:
             return
         self.project.close()
+
+    # TODO: extract links algorithm
