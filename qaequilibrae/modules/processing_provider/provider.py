@@ -34,8 +34,10 @@ class Provider(QgsProcessingProvider):
 
     def __load_aequilibrae_project(self):
         from .aequilibrae_project.open_aequilibrae_project import OpenAequilibraeProjectAlgorithm
-        
+        from .aequilibrae_project.close_aequilibrae_project import CloseAequilibraeProjectAlgorithm
+
         self.addAlgorithm(OpenAequilibraeProjectAlgorithm())
+        self.addAlgorithm(CloseAequilibraeProjectAlgorithm())
 
 
     def __load_matrix_procedures(self):

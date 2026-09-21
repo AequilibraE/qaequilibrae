@@ -1,8 +1,8 @@
-from qgis.core import QgsProcessingOutputDefinition
+from qgis.core import QgsProcessingParameterDefinition
 
 from aequilibrae.project import Project
 
-class QgsProcessingOutputAequilibraeProject(QgsProcessingOutputDefinition):
+class QgsProcessingParameterAequilibraeProject(QgsProcessingParameterDefinition):
 
     def __init__(self, name: str | None = None, description: str | None = '', project: None | Project = None):
         self.project = project
@@ -10,6 +10,9 @@ class QgsProcessingOutputAequilibraeProject(QgsProcessingOutputDefinition):
 
     def type():
         return Project
+
+    def clone():
+        return QgsProcessingParameterAequilibraeProject()
 
     def getProject():
         # FIXME: is this the best way? Is the return mutable?
