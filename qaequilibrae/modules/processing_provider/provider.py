@@ -17,6 +17,7 @@ class Provider(QgsProcessingProvider):
         self.__load_model_building()
         self.__load_matrix_procedures()
         self.__load_paths_procedures()
+        self.__load_aequilibrae_project()
 
     def __load_model_building(self):
 
@@ -24,14 +25,18 @@ class Provider(QgsProcessingProvider):
         from .model_building.collapse_links import CollapseLinks
         from .model_building.create_empty_project import CreateEmptyProject
         from .model_building.network_simplifier import NetworkSimplifier
-        from .model_building.open_aequilibrae_project import OpenAequilibraeProjectAlgorithm
 
         self.addAlgorithm(AddLinksFromLayer())
         self.addAlgorithm(CollapseLinks())
         self.addAlgorithm(CreateEmptyProject())
         self.addAlgorithm(NetworkSimplifier())
 
+
+    def __load_aequilibrae_project(self):
+        from .aequilibrae_project.open_aequilibrae_project import OpenAequilibraeProjectAlgorithm
+        
         self.addAlgorithm(OpenAequilibraeProjectAlgorithm())
+
 
     def __load_matrix_procedures(self):
 

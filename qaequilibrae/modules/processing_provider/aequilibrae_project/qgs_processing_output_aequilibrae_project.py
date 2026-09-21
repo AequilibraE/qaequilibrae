@@ -19,5 +19,3 @@ class QgsProcessingOutputAequilibraeProject(QgsProcessingOutputDefinition):
         if self.project is None:
             return
         self.project.close()
-
-    # TODO: extract links algorithm

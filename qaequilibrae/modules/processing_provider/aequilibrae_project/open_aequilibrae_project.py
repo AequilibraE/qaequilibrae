@@ -8,7 +8,7 @@ from qgis.core import (
     )
 
 from qaequilibrae.i18n.translate import trlt
-from qaequilibrae.modules.processing_provider.qgs_processing_output_aequilibrae_project import QgsProcessingOutputAequilibraeProject
+from qaequilibrae.modules.processing_provider.aequilibrae_project.qgs_processing_output_aequilibrae_project import QgsProcessingOutputAequilibraeProject
 
 class OpenAequilibraeProjectAlgorithm(QgsProcessingAlgorithm):
     """ Open a new Aequilibrae project"""
@@ -56,10 +56,10 @@ class OpenAequilibraeProjectAlgorithm(QgsProcessingAlgorithm):
 
     def group(self) -> str:
         # FIXME: is this the right group?
-        return self.tr("Model building")
+        return self.tr("Aequilibrae Project")
 
     def groupId(self) -> str:
-        return "model_building"
+        return "aequilibrae_project"
 
     def createInstance(self) -> "OpenAequilibraeProjectAlgorithm":
         return OpenAequilibraeProjectAlgorithm()
