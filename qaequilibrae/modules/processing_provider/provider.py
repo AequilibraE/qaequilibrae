@@ -16,6 +16,7 @@ class Provider(QgsProcessingProvider):
     def loadAlgorithms(self):
         self.__load_model_building()
         self.__load_matrix_procedures()
+        self.__load_paths_procedures()
 
     def __load_model_building(self):
 
@@ -38,6 +39,11 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(ExportMatrix())
         self.addAlgorithm(MatrixCalculator())
         self.addAlgorithm(TripLengthDistribution())
+
+    def __load_paths_procedures(self):
+        from .paths_procedures.shortest_path import ShortestPath
+
+        self.addAlgorithm(ShortestPath())
 
     def id(self):
         """The ID used for identifying the provider."""

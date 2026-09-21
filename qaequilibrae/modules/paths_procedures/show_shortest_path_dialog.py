@@ -1,17 +1,13 @@
 from os.path import dirname, join
 
 import pandas as pd
-from aequilibrae.paths import Graph
-from aequilibrae.paths.results import PathResults
-from qgis.PyQt.QtCore import QEvent, QMetaType
+from qgis.PyQt.QtCore import QEvent
 from qgis.PyQt.QtGui import QColor
-from qgis.core import QgsProject, QgsVectorLayer, QgsSpatialIndex, QgsField, QgsFeature
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProcessingUtils, QgsProject, QgsSpatialIndex
 from qgis.gui import QgsVertexMarker
 from qgis.utils import iface
 
 from qaequilibrae.modules.common_tools import LoadGraphLayerSettingDialog, BaseDialog
-from qaequilibrae.modules.common_tools import standard_path, geodataframe_from_layer
-from qaequilibrae.modules.common_tools.writable_dataframe import make_writable_network_dataframe
 from qaequilibrae.modules.paths_procedures.point_tool import PointTool
 from qaequilibrae.qgis_logging import get_logger
 
@@ -43,11 +39,7 @@ class ShortestPathDialog(BaseDialog):
         self.node_fields = None
         self.index = None
         self.matrix = None
-        self.path = standard_path()
         self.node_id = None
-
-        self.res = PathResults()
-        self.link_features = None
 
         # Which box the next click on the map lands in, and the markers showing where the two
         # ends currently sit
@@ -99,11 +91,11 @@ class ShortestPathDialog(BaseDialog):
         with self.project.db_connection as conn:
             all_modes = pd.read_sql("select mode_name, mode_id from modes", conn)
 
-        network = geodataframe_from_layer(self.line_layer)
-        if "modes" not in network.columns:
-            raise ValueError("Your network does not have mode information")
+        if self.line_layer.fields().lookupField("modes") < 0:
+            self.qgis_project.iface_error_message(self.tr("Your network does not have mode information"))
+            return self.abandon_configuration(was_ready, previous_text)
 
-        numeric_fields = network.select_dtypes(include=["number"]).columns.tolist()
+        numeric_fields = [field.name() for field in self.line_layer.fields() if field.isNumeric()]
 
         dlg2 = LoadGraphLayerSettingDialog(self.qgis_project, all_modes, numeric_fields)
         dlg2.show()
@@ -114,42 +106,8 @@ class ShortestPathDialog(BaseDialog):
 
         self.mode = dlg2.mode
         self.mfield = dlg2.minimize_field.lower()
-
-        mode_mask = network["modes"].str.contains(str(self.mode), na=False, regex=False)
-        network = network.loc[mode_mask].copy(deep=True).infer_objects()
-
-        if network.shape[0] == 0:
-            # self.project is the AequilibraE project, which has no message bar of its own
-            self.qgis_project.iface_error_message(self.tr("No link with the mode you are interested in"))
-            return self.abandon_configuration(was_ready, previous_text)
-
-        needed = {
-            "link_id",
-            "a_node",
-            "b_node",
-            "direction",
-            self.mfield,
-            f"{self.mfield}_ab",
-            f"{self.mfield}_ba",
-        }
-
-        network = network[[c for c in network.columns if c in needed]]
-        network = make_writable_network_dataframe(network)
-
-        self.graph = Graph()
-        self.graph.network = network
-        self.graph.prepare_graph(self._centroids_from_model())
-
-        if dlg2.remove_chosen_links:
-            idx = self.line_layer.dataProvider().fieldNameIndex("link_id")
-            remove = [feat.attributes()[idx] for feat in self.line_layer.selectedFeatures()]
-            self.graph.exclude_links(remove)
-
-        self.graph.set_graph(self.mfield)
-        self.graph.set_skimming([self.mfield])
-        self.graph.set_blocked_centroid_flows(dlg2.block_connector)
-
-        self.res.prepare(self.graph)
+        self.block_connector = dlg2.block_connector
+        self.remove_chosen_links = dlg2.remove_chosen_links
 
         self.node_fields = [field.name() for field in self.node_layer.dataProvider().fields().toList()]
         self.index = QgsSpatialIndex()
@@ -157,17 +115,8 @@ class ShortestPathDialog(BaseDialog):
             self.index.addFeature(feature)
             self.node_keys[feature.id()] = feature.attributes()
 
-        idx = self.line_layer.dataProvider().fieldNameIndex("link_id")
-        self.link_features = {}
-        for feat in self.line_layer.getFeatures():
-            link_id = feat.attributes()[idx]
-            self.link_features[link_id] = feat
-
         self.do_dist_matrix.setText(self.tr("Display"))
         self.set_picking_enabled(True)
-
-    def clear_memory_layer(self):
-        self.link_features = None
 
     def activate_map_tool(self):
         """Hands the canvas over to the point tool, so the map is ready to be clicked."""
@@ -246,91 +195,59 @@ class ShortestPathDialog(BaseDialog):
 
     def produces_path(self):
         if self.path_from.text().isdigit() and self.path_to.text().isdigit():
-            self.res.reset()
-            self.res.compute_path(int(self.path_from.text()), int(self.path_to.text()))
+            from qaequilibrae.modules.processing_provider.paths_procedures.shortest_path import ShortestPath
 
-            if self.res.path is not None:
-                # If you want to do selections instead of new layers
-                if self.rdo_selection.isChecked():
-                    self.create_path_with_selection()
-                # If you want to create new layers
-                else:
-                    self.create_path_with_scratch_layer()
+            selected_links = []
+            if self.remove_chosen_links:
+                link_id_index = self.line_layer.fields().lookupField("link_id")
+                selected_links = [feature.attribute(link_id_index) for feature in self.line_layer.selectedFeatures()]
+
+            # The dialog only translates its state into Processing parameters. Routing,
+            # validation, and output construction belong to the reusable algorithm.
+            parameters = {
+                ShortestPath.LINKS: self.line_layer,
+                ShortestPath.MODE: str(self.mode),
+                ShortestPath.COST_FIELD: self.mfield,
+                ShortestPath.FROM_NODE: int(self.path_from.text()),
+                ShortestPath.TO_NODE: int(self.path_to.text()),
+                ShortestPath.BLOCK_CENTROID_FLOWS: self.block_connector,
+                ShortestPath.EXCLUDED_LINKS: ",".join(str(link_id) for link_id in selected_links),
+                ShortestPath.OUTPUT: "TEMPORARY_OUTPUT",
+            }
+            if self.block_connector:
+                parameters[ShortestPath.NODES] = self.node_layer
+
+            algorithm = ShortestPath()
+            algorithm.initAlgorithm()
+            context = QgsProcessingContext()
+            context.setProject(QgsProject.instance())
+            feedback = QgsProcessingFeedback()
+            result, succeeded = algorithm.run(parameters, context, feedback)
+            if not succeeded:
+                self.qgis_project.iface_error_message(feedback.textLog() or self.tr("Could not compute the path"))
+                return
+
+            path = [int(link_id) for link_id in result[ShortestPath.PATH_LINK_IDS].split(",") if link_id]
+            if self.rdo_selection.isChecked():
+                self.create_path_with_selection(path)
             else:
-                msg = self.tr("No path between {} and {}").format(self.path_from.text(), self.path_to.text())
-                self.qgis_project.iface_error_message(msg)
+                self.create_path_with_scratch_layer(result[ShortestPath.OUTPUT], context)
 
-    def create_path_with_selection(self):
-        f = "link_id"
-        t = " or ".join([f"{f}={int(k)}" for k in self.res.path])
-        self.line_layer.selectByExpression(t)
+    def create_path_with_selection(self, path):
+        expression = " OR ".join(f'"link_id"={link_id}' for link_id in path)
+        self.line_layer.selectByExpression(expression)
 
-    def create_path_with_scratch_layer(self):
-        crs = self.line_layer.dataProvider().crs().authid()
-        vl = QgsVectorLayer(
-            "LineString?crs={}".format(crs), f"{self.path_from.text()} to {self.path_to.text()}", "memory"
-        )
-        pr = vl.dataProvider()
+    def create_path_with_scratch_layer(self, destination, context):
+        layer = context.takeResultLayer(destination)
+        if layer is None:
+            layer = QgsProcessingUtils.mapLayerFromString(destination, context)
+        if layer is None:
+            self.qgis_project.iface_error_message(self.tr("The shortest path output could not be loaded"))
+            return
 
-        graph_fields = [
-            QgsField("link_id", QMetaType.Type.LongLong),
-            QgsField("a_node", QMetaType.Type.LongLong),
-            QgsField("b_node", QMetaType.Type.LongLong),
-            QgsField("direction", QMetaType.Type.Int),
-        ]
-
-        data = self.graph.graph.assign(__data_key__=self.graph.graph.link_id * self.graph.graph.direction)
-
-        # Alongside the fields added above, the graph carries aequilibrae's own bookkeeping
-        # columns, which mean nothing outside of it
-        exclude = [
-            "link_id",
-            "a_node",
-            "b_node",
-            "direction",
-            "__data_key__",
-            "id",
-            "__supernet_id__",
-            "__compressed_id__",
-        ]
-
-        added_fields = [fld for fld in data if fld not in exclude]
-        graph_fields.extend([QgsField(fld, QMetaType.Type.Double) for fld in added_fields])
-
-        # add fields
-        pr.addAttributes(graph_fields)
-        vl.updateFields()  # tell the vector layer to fetch changes from the provider
-
-        # add features
-        all_links = []
-        data = data[data["__data_key__"].isin(self.res.path * self.res.path_link_directions)]
-        # The graph numbers its nodes by position, so they have to be translated back into the
-        # node IDs the user knows
-        all_nodes = self.graph.all_nodes
-        for _, rec in data.iterrows():
-            fet = self.link_features[int(rec.link_id)]
-            # iterrows() types each row to hold every column at once, so an integer column comes
-            # back as a NumPy float, and QGIS cannot write those into the fields declared above
-            attrs = [
-                int(rec.link_id),
-                int(all_nodes[int(rec.a_node)]),
-                int(all_nodes[int(rec.b_node)]),
-                int(rec.direction),
-            ]
-            attrs.extend([float(rec[fld]) for fld in added_fields])
-
-            feat = QgsFeature(vl.fields())
-            feat.setGeometry(fet.geometry())
-            feat.setAttributes(attrs)
-            all_links.append(feat)
-
-        # add all links to the temp layer
-        pr.addFeatures(all_links)
-
-        # add layer to the map
-        QgsProject.instance().addMapLayer(vl)
-
-        symbol = vl.renderer().symbol()
+        layer.setName(f"{self.path_from.text()} to {self.path_to.text()}")
+        QgsProject.instance().addMapLayer(layer)
+        symbol = layer.renderer().symbol()
         symbol.setWidth(1)
         self.iface.mapCanvas().refresh()
 
@@ -363,8 +280,3 @@ class ShortestPathDialog(BaseDialog):
         if layer.id() in QgsProject.instance().mapLayers():
             return layer
         return None
-
-    def _centroids_from_model(self):
-        with self.project.db_connection as conn:
-            centroids = pd.read_sql("select node_id from nodes where is_centroid=1", con=conn).node_id.to_numpy()
-            return centroids if centroids.size != 0 else None
