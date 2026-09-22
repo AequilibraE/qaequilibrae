@@ -1,6 +1,9 @@
 """Adapters that turn QGIS feature sources into tabular routing input."""
 
-from qgis.core import QgsFeatureSource
+from collections.abc import Iterable
+from typing import cast
+
+from qgis.core import QgsFeature, QgsFeatureSource
 
 
 def network_dataframe_from_source(source: QgsFeatureSource):
@@ -13,4 +16,5 @@ def network_dataframe_from_source(source: QgsFeatureSource):
     import pandas as pd
 
     fields = [field.name().lower() for field in source.fields()]
-    return pd.DataFrame((feature.attributes() for feature in source.getFeatures()), columns=fields)
+    features = cast(Iterable[QgsFeature], source.getFeatures())
+    return pd.DataFrame((feature.attributes() for feature in features), columns=fields)

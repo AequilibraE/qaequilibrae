@@ -18,7 +18,7 @@ from qaequilibrae.modules.processing_provider.model_building.network_simplifier 
 from qaequilibrae.modules.processing_provider.paths_procedures.shortest_path import ShortestPath
 from qaequilibrae.modules.processing_provider.provider import Provider
 
-from .utilities import get_test_data_path, load_test_layer
+from ..utilities import get_test_data_path, load_test_layer
 
 
 def qgis_app():
@@ -37,10 +37,21 @@ def test_provider_exists(qgis_app):
     assert "aequilibrae" in provider_names
     assert {type(algorithm).__name__ for algorithm in provider.algorithms()} == {
         "AddLinksFromLayer",
+        "AddLinks",
+        "AddNodes",
+        "AddZones",
+        "AddLinkType",
+        "AddMode",
         "CollapseLinks",
         "CreateEmptyProject",
+        "ExtractLinks",
+        "ExtractNodes",
+        "ExtractZones",
         "ExportMatrix",
         "MatrixCalculator",
+        "ModifyLinks",
+        "ModifyNodes",
+        "ModifyZones",
         "NetworkSimplifier",
         "ShortestPath",
         "TripLengthDistribution",
@@ -81,10 +92,12 @@ def test_add_links_from_layer(ae_with_project):
     }
 
     action = AddLinksFromLayer()
+    action.initAlgorithm()
     context = QgsProcessingContext()
     feedback = QgsProcessingFeedback()
 
-    _ = action.run(parameters, context, feedback)
+    _, succeeded = action.run(parameters, context, feedback)
+    assert succeeded, feedback.textLog()
 
     project = Project()
     project.open(folder_path)

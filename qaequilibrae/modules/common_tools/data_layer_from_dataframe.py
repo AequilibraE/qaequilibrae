@@ -1,6 +1,7 @@
 import pandas as pd
-from qgis.PyQt.QtCore import QMetaType
-from qgis.core import QgsVectorLayer, QgsField, QgsFeature, QgsProject
+from qgis.core import QgsProject, QgsVectorLayer
+
+from .vector_layer_helpers import add_dataframe_features, fields_from_dataframe
 
 
 def layer_from_dataframe(df: pd.DataFrame, layer_name: str) -> QgsVectorLayer:
@@ -8,29 +9,11 @@ def layer_from_dataframe(df: pd.DataFrame, layer_name: str) -> QgsVectorLayer:
     vl = QgsVectorLayer("none", layer_name, "memory")
     pr = vl.dataProvider()
 
-    # add fields
-    def qgs_type(ftype):
-        return (
-            QMetaType.Type.Double
-            if "float" in ftype.name
-            else QMetaType.Type.LongLong
-            if "int" in ftype.name
-            else QMetaType.Type.QString
-        )
-
-    field_names = list(df.dtypes.index)
-    types = [qgs_type(df.dtypes[fname]) for fname in field_names]
-    attributes = [QgsField(fname, dtype) for fname, dtype in zip(field_names, types, strict=True)]
-    pr.addAttributes(attributes)
+    fields = fields_from_dataframe(df)
+    pr.addAttributes(list(fields))
     vl.updateFields()  # tell the vector layer to fetch changes from the provider
 
-    # Add records
-    features = []
-    for _, record in df.iterrows():
-        fet = QgsFeature()
-        fet.setAttributes(record.to_list())
-        features.append(fet)
-    pr.addFeatures(features)
+    add_dataframe_features(df, pr, fields)
 
     QgsProject.instance().addMapLayer(vl)
 

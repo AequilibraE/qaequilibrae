@@ -17,6 +17,8 @@ class Provider(QgsProcessingProvider):
         self.__load_model_building()
         self.__load_matrix_procedures()
         self.__load_paths_procedures()
+        self.__load_geometry_io()
+        self.__load_data_procedures()
 
     def __load_model_building(self):
 
@@ -44,6 +46,31 @@ class Provider(QgsProcessingProvider):
         from .paths_procedures.shortest_path import ShortestPath
 
         self.addAlgorithm(ShortestPath())
+
+    def __load_geometry_io(self):
+        from .geometry_io.add import AddLinks, AddNodes, AddZones
+        from .geometry_io.extract import ExtractLinks, ExtractNodes, ExtractZones
+        from .geometry_io.modify import ModifyLinks, ModifyNodes, ModifyZones
+
+        for algorithm in (
+            ExtractLinks(),
+            ExtractNodes(),
+            ExtractZones(),
+            AddLinks(),
+            AddNodes(),
+            AddZones(),
+            ModifyLinks(),
+            ModifyNodes(),
+            ModifyZones(),
+        ):
+            self.addAlgorithm(algorithm)
+
+    def __load_data_procedures(self):
+        from .data_procedures.add_link_type import AddLinkType
+        from .data_procedures.add_mode import AddMode
+
+        self.addAlgorithm(AddLinkType())
+        self.addAlgorithm(AddMode())
 
     def id(self):
         """The ID used for identifying the provider."""
