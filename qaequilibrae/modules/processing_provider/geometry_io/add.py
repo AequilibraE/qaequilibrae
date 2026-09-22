@@ -9,7 +9,7 @@ from qgis.core import (
 
 from ..project_algorithm import ProjectAlgorithm
 from .common import editable_attribute_values, ignored_input_fields, project_table, source_rows
-from .project import open_project
+from ..project import open_project
 
 
 class AddProjectLayer(ProjectAlgorithm):
@@ -94,6 +94,7 @@ class AddProjectLayer(ProjectAlgorithm):
 
     def createInstance(self):
         return type(self)()
+
 
 class AddLinks(AddProjectLayer):
     table_name = "links"

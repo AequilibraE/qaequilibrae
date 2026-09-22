@@ -2,7 +2,7 @@
 
 from qgis.core import Qgis, QgsProcessingException, QgsProcessingParameterNumber, QgsProcessingParameterString
 
-from ..geometry_io.project import open_project
+from ..project import open_project
 from ..project_algorithm import ProjectAlgorithm
 
 
@@ -21,9 +21,24 @@ class AddMode(ProjectAlgorithm):
         self.addParameter(QgsProcessingParameterString(self.MODE_ID, self.tr("Mode ID")))
         self.addParameter(QgsProcessingParameterString(self.MODE_NAME, self.tr("Mode name")))
         self.addParameter(QgsProcessingParameterString(self.DESCRIPTION, self.tr("Description"), optional=True))
-        self.addParameter(QgsProcessingParameterNumber(self.PCE, self.tr("Passenger car equivalent"), type=Qgis.ProcessingNumberParameterType.Double, optional=True))
-        self.addParameter(QgsProcessingParameterNumber(self.VOT, self.tr("Value of time"), type=Qgis.ProcessingNumberParameterType.Double, optional=True))
-        self.addParameter(QgsProcessingParameterNumber(self.PPV, self.tr("Persons per vehicle"), type=Qgis.ProcessingNumberParameterType.Double, optional=True))
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.PCE,
+                self.tr("Passenger car equivalent"),
+                type=Qgis.ProcessingNumberParameterType.Double,
+                optional=True,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.VOT, self.tr("Value of time"), type=Qgis.ProcessingNumberParameterType.Double, optional=True
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.PPV, self.tr("Persons per vehicle"), type=Qgis.ProcessingNumberParameterType.Double, optional=True
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         project_folder = self.project_folder(parameters, context)

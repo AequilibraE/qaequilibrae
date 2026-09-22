@@ -2,7 +2,7 @@ import importlib.util as iutil
 
 from qgis.core import QgsProcessingException
 
-from ..geometry_io.project import open_project
+from ..project import open_project
 from ..project_algorithm import ProjectAlgorithm
 
 

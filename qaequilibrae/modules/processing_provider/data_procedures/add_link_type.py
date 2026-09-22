@@ -7,7 +7,7 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
-from ..geometry_io.project import open_project
+from ..project import open_project
 from ..project_algorithm import ProjectAlgorithm
 
 
@@ -26,9 +26,24 @@ class AddLinkType(ProjectAlgorithm):
         self.addParameter(QgsProcessingParameterString(self.LINK_TYPE_ID, self.tr("Link type ID")))
         self.addParameter(QgsProcessingParameterString(self.LINK_TYPE, self.tr("Link type name")))
         self.addParameter(QgsProcessingParameterString(self.DESCRIPTION, self.tr("Description"), optional=True))
-        self.addParameter(QgsProcessingParameterNumber(self.LANES, self.tr("Lanes"), type=Qgis.ProcessingNumberParameterType.Double, optional=True))
-        self.addParameter(QgsProcessingParameterNumber(self.LANE_CAPACITY, self.tr("Lane capacity"), type=Qgis.ProcessingNumberParameterType.Double, optional=True))
-        self.addParameter(QgsProcessingParameterNumber(self.SPEED, self.tr("Speed"), type=Qgis.ProcessingNumberParameterType.Double, optional=True))
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.LANES, self.tr("Lanes"), type=Qgis.ProcessingNumberParameterType.Double, optional=True
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.LANE_CAPACITY,
+                self.tr("Lane capacity"),
+                type=Qgis.ProcessingNumberParameterType.Double,
+                optional=True,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.SPEED, self.tr("Speed"), type=Qgis.ProcessingNumberParameterType.Double, optional=True
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         project_folder = self.project_folder(parameters, context)
@@ -42,7 +57,11 @@ class AddLinkType(ProjectAlgorithm):
             link_type = project.network.link_types.new(type_id)
             link_type.link_type = name
             link_type.description = self.parameterAsString(parameters, self.DESCRIPTION, context).strip() or None
-            for parameter, field in ((self.LANES, "lanes"), (self.LANE_CAPACITY, "lane_capacity"), (self.SPEED, "speed")):
+            for parameter, field in (
+                (self.LANES, "lanes"),
+                (self.LANE_CAPACITY, "lane_capacity"),
+                (self.SPEED, "speed"),
+            ):
                 if parameters.get(parameter) not in (None, "") and field in link_type.__dict__:
                     setattr(link_type, field, self.parameterAsDouble(parameters, parameter, context))
             link_type.save()

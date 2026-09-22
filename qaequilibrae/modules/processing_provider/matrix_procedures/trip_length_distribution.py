@@ -14,7 +14,7 @@ from qgis.core import (
 
 from qaequilibrae.i18n.translate import trlt
 
-from ..geometry_io.project import open_project
+from ..project import open_project
 
 
 class TripLengthDistribution(QgsProcessingAlgorithm):
@@ -43,7 +43,9 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
 
     def processAlgorithm(self, parameters, context, feedback):
         project_folder = (
-            self.parameterAsFile(parameters, self.PROJECT_FOLDER, context) if self.PROJECT_FOLDER in parameters else None
+            self.parameterAsFile(parameters, self.PROJECT_FOLDER, context)
+            if self.PROJECT_FOLDER in parameters
+            else None
         )
         if project_folder:
             with open_project(project_folder) as project:

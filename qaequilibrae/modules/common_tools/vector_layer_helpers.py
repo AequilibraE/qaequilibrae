@@ -98,7 +98,9 @@ def rows_from_feature_source(source, target_crs=None) -> list[dict[str, Any]]:
         rows.append(
             {
                 **dict(zip(names, feature.attributes(), strict=True)),
-                "geometry": None if geometry is None or geometry.isEmpty() else shapely.wkb.loads(bytes(geometry.asWkb())),
+                "geometry": None
+                if geometry is None or geometry.isEmpty()
+                else shapely.wkb.loads(bytes(geometry.asWkb())),
             }
         )
     return rows

@@ -5,7 +5,7 @@ from qgis.core import QgsProcessingParameterVectorLayer
 
 from qaequilibrae.modules.common_tools import geodataframe_from_layer
 
-from ..geometry_io.project import open_project
+from ..project import open_project
 from ..project_algorithm import ProjectAlgorithm
 
 

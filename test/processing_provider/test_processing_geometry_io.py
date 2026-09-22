@@ -86,7 +86,9 @@ def source_layer_factory():
         (ExtractZones, "zones", "zone_id"),
     ],
 )
-def test_extract_algorithms_output_project_features(sioux_falls_project_path, algorithm_type, table_name, identifier_field):
+def test_extract_algorithms_output_project_features(
+    sioux_falls_project_path, algorithm_type, table_name, identifier_field
+):
     expected = _project_data(sioux_falls_project_path, table_name)
 
     results, context = _run_algorithm(
@@ -202,7 +204,12 @@ def test_modify_links(sioux_falls_project_path, source_layer_factory):
     layer = source_layer_factory(
         "modified_links",
         "LineString",
-        [("link_id", QMetaType.Type.LongLong), ("direction", QMetaType.Type.LongLong), ("modes", QMetaType.Type.QString), ("link_type", QMetaType.Type.QString)],
+        [
+            ("link_id", QMetaType.Type.LongLong),
+            ("direction", QMetaType.Type.LongLong),
+            ("modes", QMetaType.Type.QString),
+            ("link_type", QMetaType.Type.QString),
+        ],
         [(row.geometry, [int(row.link_id), direction, str(row.modes), str(row.link_type)])],
     )
 
@@ -214,7 +221,9 @@ def test_modify_links(sioux_falls_project_path, source_layer_factory):
         },
     )
 
-    assert _record_attributes(sioux_falls_project_path, "links", int(row.link_id), ["direction"])["direction"] == direction
+    assert (
+        _record_attributes(sioux_falls_project_path, "links", int(row.link_id), ["direction"])["direction"] == direction
+    )
 
 
 def test_modify_nodes(sioux_falls_project_path, source_layer_factory):
