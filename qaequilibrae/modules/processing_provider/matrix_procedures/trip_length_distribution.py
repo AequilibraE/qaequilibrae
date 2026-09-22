@@ -1,106 +1,70 @@
-import importlib.util as iutil
 from math import ceil, floor, log10
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from qgis.core import QgsProcessingAlgorithm, QgsProcessingParameterString
-from qgis.core import QgsProcessingParameterEnum, QgsProcessingParameterFileDestination
-from qgis.utils import plugins
+from qgis.core import (
+    Qgis,
+    QgsProcessingAlgorithm,
+    QgsProcessingException,
+    QgsProcessingParameterFile,
+    QgsProcessingParameterFileDestination,
+    QgsProcessingParameterString,
+)
 
 from qaequilibrae.i18n.translate import trlt
-from qaequilibrae.qgis_logging import get_logger
+
+from ..geometry_io.project import open_project
 
 
 class TripLengthDistribution(QgsProcessingAlgorithm):
+    PROJECT_FOLDER = "PROJECT_FOLDER"
+
     def initAlgorithm(self, configuration=None):
-        """
-        Define parameters and outputs of the algorithm and attempt to load information
-        from an open AequilibraE project (if available).
-        """
-        # Initialize parameters for the algorithm
-        try:
-            # Attempt to retrieve the AequilibraE plugin instance
-            aeq_plugin = plugins.get("qaequilibrae")
-
-            if not aeq_plugin:
-                self.addParameter(
-                    QgsProcessingParameterString(
-                        "PROJECT_INFO", self.tr("No AequilibraE project loaded."), optional=True
-                    )
-                )
-                return
-            else:
-                self.project = aeq_plugin.project
-
-            # Check if there's an open project and fetch its information
-
-            if self.project:
-                self.matrices = self.project.matrices
-                self.mat_names = self.matrices.list()["name"].tolist()
-
-                self.addParameter(
-                    QgsProcessingParameterEnum(
-                        "demand_mat_name",
-                        self.tr("Demand matrix"),
-                        self.matrices.list()["name"].tolist(),
-                        defaultValue=0,  # Default to the first option
-                    )
-                )
-                self.addParameter(
-                    QgsProcessingParameterString(
-                        "demand_mat_core",
-                        self.tr("Demand matrix core"),
-                        multiLine=False,
-                    )
-                )
-                self.addParameter(
-                    QgsProcessingParameterEnum(
-                        "skim_mat_name",
-                        self.tr("Skim matrix"),
-                        self.matrices.list()["name"].tolist(),
-                        defaultValue=0,  # Default to the first option
-                    )
-                )
-                self.addParameter(
-                    QgsProcessingParameterString(
-                        "skim_mat_core",
-                        self.tr("Skim matrix core"),
-                        multiLine=False,
-                    )
-                )
-                self.addParameter(
-                    QgsProcessingParameterString("plot_name", self.tr("Plot name"), multiLine=False, optional=True)
-                )
-                self.addParameter(
-                    QgsProcessingParameterFileDestination(
-                        "file_path",
-                        self.tr("File path"),
-                        fileFilter="PNG (*.png)",
-                    )
-                )
-            else:
-                self.addParameter(
-                    QgsProcessingParameterString(
-                        "PROJECT_INFO", self.tr("No AequilibraE project loaded."), optional=True
-                    )
-                )
-
-        except Exception as e:
-            # Handle cases where the plugin or project information is not accessible
-            get_logger(__name__).error(self.tr("Error checking AequilibraE project: {}").format(str(e)))
+        self.addParameter(
+            QgsProcessingParameterFile(
+                self.PROJECT_FOLDER,
+                self.tr("AequilibraE project folder"),
+                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
+            )
+        )
+        self.addParameter(QgsProcessingParameterString("demand_mat_name", self.tr("Demand matrix")))
+        self.addParameter(QgsProcessingParameterString("demand_mat_core", self.tr("Demand matrix core")))
+        self.addParameter(QgsProcessingParameterString("skim_mat_name", self.tr("Skim matrix")))
+        self.addParameter(QgsProcessingParameterString("skim_mat_core", self.tr("Skim matrix core")))
+        self.addParameter(QgsProcessingParameterString("plot_name", self.tr("Plot name"), optional=True))
+        self.addParameter(
+            QgsProcessingParameterFileDestination(
+                "file_path",
+                self.tr("File path"),
+                fileFilter="PNG (*.png)",
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
-        # Checks if we have AequilibraE installed
-        if iutil.find_spec("aequilibrae") is None:
-            feedback.reportError(self.tr("AequilibraE module not found"))
-            return {"Output": "Error: AequilibraE module not found"}
+        project_folder = (
+            self.parameterAsFile(parameters, self.PROJECT_FOLDER, context) if self.PROJECT_FOLDER in parameters else None
+        )
+        if project_folder:
+            with open_project(project_folder) as project:
+                self.matrices = project.matrices
+                self.mat_names = self.matrices.list()["name"].tolist()
+                return self._process_algorithm(parameters, context, feedback)
+
+        # Keep direct callers that inject matrices working while the Processing
+        # interface uses an explicit project folder.
+        if not hasattr(self, "matrices") or not hasattr(self, "mat_names"):
+            raise QgsProcessingException(self.tr("An AequilibraE project folder is required"))
+        return self._process_algorithm(parameters, context, feedback)
+
+    def _process_algorithm(self, parameters, context, feedback):
+        """Create the plot while the project-owned matrix handles are alive."""
 
         # Check if the demand matrix has the indicated demand matrix core
         demand_mat_idx = parameters["demand_mat_name"]
         demand_mat_core = parameters["demand_mat_core"]
 
-        demand_matrix = self.matrices.get_matrix(self.mat_names[demand_mat_idx])
+        demand_matrix = self.matrices.get_matrix(self._matrix_name(demand_mat_idx))
         demand_cores = demand_matrix.names
 
         if demand_mat_core in demand_cores:
@@ -114,7 +78,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         skim_mat_idx = parameters["skim_mat_name"]
         skim_mat_core = parameters["skim_mat_core"]
 
-        skim_matrix = self.matrices.get_matrix(self.mat_names[skim_mat_idx])
+        skim_matrix = self.matrices.get_matrix(self._matrix_name(skim_mat_idx))
         skim_cores = skim_matrix.names
 
         if skim_mat_core in skim_cores:
@@ -158,6 +122,12 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         plt.close()
 
         return {"Output": f"Success: TLD plot saved in {parameters['file_path']}"}
+
+    def _matrix_name(self, value):
+        """Accept matrix names and the old enum indexes for direct callers."""
+        if isinstance(value, int):
+            return self.mat_names[value]
+        return str(value)
 
     def name(self):
         return self.tr("Trip length distribution")

@@ -9,6 +9,8 @@ from qgis.core import QgsProcessingException, QgsProcessingParameterField, QgsPr
 from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.common_tools import geodataframe_from_layer
 
+from ..geometry_io.project import open_project
+
 
 class AddLinksFromLayer(QgsProcessingAlgorithm):
     def initAlgorithm(self, configuration=None):
@@ -59,81 +61,63 @@ class AddLinksFromLayer(QgsProcessingAlgorithm):
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
 
-        from aequilibrae import Project
-
         feedback = QgsProcessingMultiStepFeedback(5, feedback)
         feedback.pushInfo(self.tr("Opening project"))
 
-        project_path = parameters["project_path"]
-        project = Project()
-        project.open(project_path)
+        project_path = parameters.get("project_path")
+        if project_path is None:
+            project_path = self.parameterAsFile(parameters, "project_path", context)
+        with open_project(project_path) as project:
+            feedback.pushInfo(self.tr("Importing links layer"))
 
-        feedback.pushInfo(self.tr("Importing links layer"))
+            layer = self.parameterAsVectorLayer(parameters, "links", context)
+            if layer is None:
+                raise QgsProcessingException(self.tr("Links layer could not be loaded"))
+            gdf = geodataframe_from_layer(layer).infer_objects()
 
-        # Load layer as GeoDataFrame
-        layer = self.parameterAsVectorLayer(parameters, "links", context)
-        if layer is None:
-            raise QgsProcessingException(self.tr("Links layer could not be loaded"))
-        gdf = geodataframe_from_layer(layer).infer_objects()
+            columns = [parameters["link_type"], parameters["direction"], parameters["modes"], "geometry"]
+            gdf = gdf[columns]
+            gdf.columns = ["link_type", "direction", "modes", "geometry"]
 
-        columns = [parameters["link_type"], parameters["direction"], parameters["modes"], "geometry"]
+            all_modes = set("".join(gdf["modes"].unique()))
+            modes = project.network.modes
+            current_modes = list(modes.all_modes().keys())
+            for mode_id in [mode for mode in all_modes if mode not in current_modes]:
+                new_mode = modes.new(mode_id)
+                new_mode.mode_name = mode_id
+                new_mode.description = "Mode automatically added during project creation from layers"
+                modes.add(new_mode)
+                new_mode.save()
 
-        gdf = gdf[columns]
-        gdf.columns = ["link_type", "direction", "modes", "geometry"]
+            all_link_types = gdf["link_type"].unique()
+            link_types = project.network.link_types
+            current_link_types = [link_type.link_type for link_type in link_types.all_types().values()]
+            letters = [letter for letter in ascii_letters if letter not in link_types.all_types()]
+            for link_type_name in [name for name in all_link_types if name not in current_link_types]:
+                if not letters:
+                    raise QgsProcessingException(self.tr("No unused link type identifiers are available"))
+                new_link_type = link_types.new(letters.pop(0))
+                new_link_type.link_type = link_type_name
+                new_link_type.description = "Link type automatically added during project creation from layers"
+                new_link_type.save()
 
-        # We check if all modes exist in the project
-        all_modes = set("".join(gdf["modes"].unique()))
-        modes = project.network.modes
-        current_modes = list(modes.all_modes().keys())
-        all_modes = [x for x in all_modes if x not in current_modes]
-        for md in all_modes:
-            new_mode = modes.new(md)
-            new_mode.mode_name = md
-            new_mode.description = "Mode automatically added during project creation from layers"
-            modes.add(new_mode)
-            new_mode.save()
+            feedback.pushInfo(self.tr("Adding links"))
+            links = project.network.links
+            for _, record in gdf.iterrows():
+                if feedback.isCanceled():
+                    break
+                new_link = links.new()
+                new_link.direction = record.direction
+                new_link.modes = record.modes
+                new_link.link_type = record.link_type
+                new_link.geometry = record.geometry
+                new_link.save()
 
-        # We check if all link types exist in the project
-        all_link_types = gdf["link_type"].unique()
-        link_types = project.network.link_types
-        current_lt = [lt.link_type for lt in link_types.all_types().values()]
-        letters = [x for x in list(ascii_letters) if x not in link_types.all_types().keys()]
-        all_link_types = [lt for lt in all_link_types if lt not in current_lt]
-        for lt in all_link_types:
-            new_link_type = link_types.new(letters[0])
-            letters = letters[1:]
-            new_link_type.link_type = lt
-            new_link_type.description = "Link type automatically added during project creation from layers"
-            new_link_type.save()
+            links.refresh()
+            link_count = project.network.count_links()
 
-        feedback.pushInfo(" ")
-        feedback.setCurrentStep(2)
-
-        links = project.network.links
-
-        # Now let's add all the fields we had
-        for _, record in gdf.iterrows():
-            new_link = links.new()
-
-            new_link.direction = record.direction
-            new_link.modes = record.modes
-            new_link.link_type = record.link_type
-            new_link.geometry = record.geometry
-            new_link.save()
-
-        links.refresh()
-
-        feedback.pushInfo(" ")
-        feedback.setCurrentStep(2)
-
-        feedback.pushInfo(self.tr("Adding links"))
-
-        feedback.pushInfo(" ")
-        feedback.setCurrentStep(3)
-        project.close()
         feedback.pushInfo(self.tr("Closing project"))
-
-        return {"Output": project.network.count_links()}
+        return {"Output": link_count}
 
     def name(self):
         return "addlinksfromlayer"
