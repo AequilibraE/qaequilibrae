@@ -1,6 +1,3 @@
-import importlib.util as iutil
-import sys
-
 from qgis.core import QgsProcessingException, QgsProcessingParameterString
 
 from ..geometry_io.project import open_project
@@ -25,12 +22,6 @@ class CollapseLinks(ProjectAlgorithm):
         project_folder = self.project_folder(parameters, context)
         link_ids_raw = self.parameterAsString(parameters, self.LINK_IDS, context)
 
-        # Checks if we have access to AequilibraE library
-        if iutil.find_spec("aequilibrae") is None:
-            sys.exit(self.tr("AequilibraE module not found"))
-
-        from aequilibrae.project.tools.network_simplifier import NetworkSimplifier
-
         # Parse LINK_IDS
         try:
             link_ids = [int(n.strip()) for n in link_ids_raw.split(",") if n.strip()]
@@ -39,6 +30,8 @@ class CollapseLinks(ProjectAlgorithm):
 
         try:
             with open_project(project_folder):
+                from aequilibrae.project.tools.network_simplifier import NetworkSimplifier
+
                 net = NetworkSimplifier()
                 feedback.pushInfo("Collapsing links into nodes")
                 net.collapse_links_into_nodes(link_ids)

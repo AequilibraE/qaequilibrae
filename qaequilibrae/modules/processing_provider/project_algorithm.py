@@ -12,17 +12,19 @@ class ProjectAlgorithm(QgsProcessingAlgorithm):
     group_name = "AequilibraE project"
     group_id = "aequilibrae_project"
 
-    def add_project_folder_parameter(self):
+    def add_project_folder_parameter(self, name: str | None = None):
+        """Add a project-folder parameter, optionally retaining a legacy key."""
         self.addParameter(
             QgsProcessingParameterFile(
-                self.PROJECT_FOLDER,
+                name or self.PROJECT_FOLDER,
                 self.tr("AequilibraE project folder"),
                 behavior=Qgis.ProcessingFileParameterBehavior.Folder,
             )
         )
 
-    def project_folder(self, parameters, context):
-        return self.parameterAsFile(parameters, self.PROJECT_FOLDER, context)
+    def project_folder(self, parameters, context, name: str | None = None):
+        """Resolve the configured project-folder parameter."""
+        return self.parameterAsFile(parameters, name or self.PROJECT_FOLDER, context)
 
     def group(self):
         return self.tr(self.group_name)
@@ -32,4 +34,3 @@ class ProjectAlgorithm(QgsProcessingAlgorithm):
 
     def tr(self, message):
         return trlt(type(self).__name__, message)
-

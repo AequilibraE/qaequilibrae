@@ -8,7 +8,7 @@ from qgis.core import (
 )
 
 from ..project_algorithm import ProjectAlgorithm
-from .common import record_data_fields, source_rows
+from .common import editable_attribute_values, ignored_input_fields, project_table, source_rows
 from .project import open_project
 
 
@@ -52,16 +52,8 @@ class AddProjectLayer(ProjectAlgorithm):
                     # creates it lazily when the first zoning record is added.
                     project.zoning.create_zoning_layer()
             added = 0
-            table = project.zoning if self.table_name == "zones" else getattr(project.network, self.table_name)
-            ignored_fields = {"geometry", "ogc_fid"}
-            if self.id_field:
-                ignored_fields.add(self.id_field)
-            if self.table_name == "links":
-                ignored_fields.update({"a_node", "b_node", "distance"})
-            elif self.table_name == "nodes":
-                ignored_fields.update({"modes", "link_types"})
-            elif self.table_name == "zones":
-                ignored_fields.add("area")
+            table = project_table(project, self.table_name)
+            ignored_fields = ignored_input_fields(self.table_name, self.id_field, adding=True)
             for row in rows:
                 if feedback.isCanceled():
                     break
@@ -71,11 +63,7 @@ class AddProjectLayer(ProjectAlgorithm):
                 record = self._new_record(project, int(identifier) if identifier is not None else None)
                 if self.table_name == "nodes" and row.get("is_centroid") is None:
                     record.is_centroid = 0
-                for field, value in row.items():
-                    if field in ignored_fields or value is None:
-                        continue
-                    if field in record_data_fields(record, table):
-                        setattr(record, field, value)
+                editable_attribute_values(record, table, row, ignored_fields, skip_nulls=True)
                 if row["geometry"] is None:
                     raise QgsProcessingException(self.tr(f"Feature {identifier} has no geometry"))
                 record.geometry = row["geometry"]
@@ -85,7 +73,7 @@ class AddProjectLayer(ProjectAlgorithm):
         return {"ADDED": added}
 
     def _new_record(self, project, identifier):
-        table = project.zoning if self.table_name == "zones" else getattr(project.network, self.table_name)
+        table = project_table(project, self.table_name)
         if self.table_name == "nodes":
             return table.new_centroid(identifier)
         if self.table_name == "zones":

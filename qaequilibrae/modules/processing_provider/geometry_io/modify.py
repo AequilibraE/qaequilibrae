@@ -8,7 +8,7 @@ from qgis.core import (
 )
 
 from ..project_algorithm import ProjectAlgorithm
-from .common import record_data_fields, source_rows
+from .common import editable_attribute_values, ignored_input_fields, project_table, source_rows
 from .project import open_project
 
 
@@ -42,15 +42,9 @@ class ModifyProjectLayer(ProjectAlgorithm):
         rows = source_rows(source)
         project_folder = self.project_folder(parameters, context)
         with open_project(project_folder) as project:
-            table = project.zoning if self.table_name == "zones" else getattr(project.network, self.table_name)
+            table = project_table(project, self.table_name)
             updated = 0
-            ignored_fields = {self.id_field, "geometry", "ogc_fid"}
-            if self.table_name == "nodes":
-                ignored_fields.update({"modes", "link_types"})
-            elif self.table_name == "links":
-                ignored_fields.add("distance")
-            elif self.table_name == "zones":
-                ignored_fields.add("area")
+            ignored_fields = ignored_input_fields(self.table_name, self.id_field)
             for row in rows:
                 if feedback.isCanceled():
                     break
@@ -61,11 +55,7 @@ class ModifyProjectLayer(ProjectAlgorithm):
                     record = table.get(int(identifier))
                 except (TypeError, ValueError) as error:
                     raise QgsProcessingException(self.tr(f"Could not find {self.id_field} {identifier}")) from error
-                for field, value in row.items():
-                    if field in ignored_fields:
-                        continue
-                    if field in record_data_fields(record, table):
-                        setattr(record, field, value)
+                editable_attribute_values(record, table, row, ignored_fields, skip_nulls=False)
                 if row["geometry"] is not None:
                     record.geometry = row["geometry"]
                 record.save()

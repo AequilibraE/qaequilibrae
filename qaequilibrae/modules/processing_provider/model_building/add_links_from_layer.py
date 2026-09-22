@@ -1,26 +1,21 @@
-import importlib.util as iutil
-import sys
 from string import ascii_letters
 
-from qgis.core import Qgis, QgsProcessingMultiStepFeedback, QgsProcessingParameterVectorLayer
-from qgis.core import QgsProcessingAlgorithm
-from qgis.core import QgsProcessingException, QgsProcessingParameterField, QgsProcessingParameterFile
+from qgis.core import Qgis, QgsProcessingException, QgsProcessingMultiStepFeedback, QgsProcessingParameterField
+from qgis.core import QgsProcessingParameterVectorLayer
 
-from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.common_tools import geodataframe_from_layer
 
 from ..geometry_io.project import open_project
+from ..project_algorithm import ProjectAlgorithm
 
 
-class AddLinksFromLayer(QgsProcessingAlgorithm):
+class AddLinksFromLayer(ProjectAlgorithm):
+    PROJECT_PATH = "project_path"
+    group_name = "Model building"
+    group_id = "model_building"
+
     def initAlgorithm(self, configuration=None):
-        self.addParameter(
-            QgsProcessingParameterFile(
-                "project_path",
-                self.tr("Project path"),
-                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
-            )
-        )
+        self.add_project_folder_parameter(self.PROJECT_PATH)
         self.addParameter(
             QgsProcessingParameterVectorLayer(
                 "links",
@@ -57,16 +52,10 @@ class AddLinksFromLayer(QgsProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        # Checks if we have access to aequilibrae library
-        if iutil.find_spec("aequilibrae") is None:
-            sys.exit(self.tr("AequilibraE module not found"))
-
         feedback = QgsProcessingMultiStepFeedback(5, feedback)
         feedback.pushInfo(self.tr("Opening project"))
 
-        project_path = parameters.get("project_path")
-        if project_path is None:
-            project_path = self.parameterAsFile(parameters, "project_path", context)
+        project_path = parameters.get(self.PROJECT_PATH) or self.project_folder(parameters, context, self.PROJECT_PATH)
         with open_project(project_path) as project:
             feedback.pushInfo(self.tr("Importing links layer"))
 
@@ -125,17 +114,8 @@ class AddLinksFromLayer(QgsProcessingAlgorithm):
     def displayName(self):
         return self.tr("Add links from layer to project")
 
-    def group(self):
-        return self.tr("Model building")
-
-    def groupId(self):
-        return "model_building"
-
     def shortHelpString(self):
         return self.tr("Adds links from a layer to an existing AequilibraE project")
 
     def createInstance(self):
         return AddLinksFromLayer()
-
-    def tr(self, message):
-        return trlt("AddLinksFromLayer", message)

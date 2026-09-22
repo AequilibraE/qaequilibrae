@@ -1,8 +1,17 @@
 """Shared helpers for creating QGIS memory layers from tabular data."""
 
+from typing import Any
+
 import pandas as pd
 from qgis.PyQt.QtCore import QMetaType
-from qgis.core import QgsFeature, QgsField, QgsFields, QgsGeometry
+from qgis.core import (
+    QgsCoordinateTransform,
+    QgsFeature,
+    QgsField,
+    QgsFields,
+    QgsGeometry,
+    QgsProject,
+)
 
 
 def fields_from_dataframe(dataframe: pd.DataFrame) -> QgsFields:
@@ -63,6 +72,36 @@ def crs_string(geodataframe) -> str:
     if geodataframe.crs is None:
         return "EPSG:4326"
     return geodataframe.crs.to_string()
+
+
+def rows_from_feature_source(source, target_crs=None) -> list[dict[str, Any]]:
+    """Return lower-case attributes and Shapely geometries from a QGIS source.
+
+    When ``target_crs`` is supplied, geometries are transformed before conversion.
+    Leaving it unset preserves the source coordinates and is appropriate for
+    callers that also preserve the source CRS on their output layer.
+    """
+    import shapely.wkb
+
+    names = [field.name().lower() for field in source.fields()]
+    source_crs = source.sourceCrs() if hasattr(source, "sourceCrs") else source.crs()
+    coordinate_transform = None
+    if target_crs is not None and source_crs.isValid() and source_crs != target_crs:
+        coordinate_transform = QgsCoordinateTransform(source_crs, target_crs, QgsProject.instance())
+
+    rows = []
+    for feature in source.getFeatures():
+        geometry = feature.geometry()
+        if geometry is not None and not geometry.isEmpty() and coordinate_transform is not None:
+            geometry = QgsGeometry(geometry)
+            geometry.transform(coordinate_transform)
+        rows.append(
+            {
+                **dict(zip(names, feature.attributes(), strict=True)),
+                "geometry": None if geometry is None or geometry.isEmpty() else shapely.wkb.loads(bytes(geometry.asWkb())),
+            }
+        )
+    return rows
 
 
 def _qgis_value(value):

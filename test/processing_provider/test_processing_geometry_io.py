@@ -129,7 +129,7 @@ def test_add_links(sioux_falls_project_path, source_layer_factory):
     assert len(_project_data(sioux_falls_project_path, "links")) == before + 1
 
 
-def test_add_nodes_defaults_to_a_non_centroid(sioux_falls_project_path, source_layer_factory):
+def test_add_nodes_without_links_are_cleaned_up(sioux_falls_project_path, source_layer_factory):
     row = _project_data(sioux_falls_project_path, "nodes").iloc[0]
     geometry = Point(row.geometry.x + 0.001, row.geometry.y + 0.001)
     layer = source_layer_factory(
@@ -147,7 +147,8 @@ def test_add_nodes_defaults_to_a_non_centroid(sioux_falls_project_path, source_l
         },
     )
 
-    assert _record_attributes(sioux_falls_project_path, "nodes", 9998, ["is_centroid"])["is_centroid"] == 0
+    with pytest.raises(ValueError, match="does not exist"):
+        _record_attributes(sioux_falls_project_path, "nodes", 9998, ["is_centroid"])
 
 
 def test_add_nodes(sioux_falls_project_path, source_layer_factory):

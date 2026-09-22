@@ -5,25 +5,61 @@ from typing import Any
 import pandas as pd
 from qgis.core import (
     QgsCoordinateReferenceSystem,
-    QgsCoordinateTransform,
     QgsFields,
-    QgsGeometry,
     QgsProcessingException,
-    QgsProject,
 )
 
 from qaequilibrae.modules.common_tools.vector_layer_helpers import (
     add_dataframe_features,
     fields_from_dataframe,
+    rows_from_feature_source,
 )
 
-__all__ = ["add_dataframe_to_sink", "fields_from_dataframe", "source_rows"]
+__all__ = [
+    "add_dataframe_to_sink",
+    "editable_attribute_values",
+    "fields_from_dataframe",
+    "ignored_input_fields",
+    "project_table",
+    "source_rows",
+]
 
 
 def record_data_fields(record, table) -> list[str]:
     """Return the editable fields exposed by a project record."""
     data_fields = getattr(record, "data_fields", None)
     return data_fields() if data_fields is not None else table.fields.all_fields()
+
+
+def project_table(project, table_name):
+    """Return the project table named by a geometry algorithm."""
+    return project.zoning if table_name == "zones" else getattr(project.network, table_name)
+
+
+def ignored_input_fields(table_name: str, identifier_field: str | None = None, *, adding: bool = False) -> set[str]:
+    """Return fields managed by AequilibraE rather than a geometry input."""
+    ignored = {"geometry", "ogc_fid"}
+    if identifier_field:
+        ignored.add(identifier_field)
+    if table_name == "links":
+        ignored.add("distance")
+        if adding:
+            ignored.update({"a_node", "b_node"})
+    elif table_name == "nodes":
+        ignored.update({"modes", "link_types"})
+    elif table_name == "zones":
+        ignored.add("area")
+    return ignored
+
+
+def editable_attribute_values(record, table, row, ignored_fields, *, skip_nulls: bool) -> None:
+    """Copy supported input attributes to a project record."""
+    data_fields = set(record_data_fields(record, table))
+    for field, value in row.items():
+        if field in ignored_fields or (skip_nulls and value is None):
+            continue
+        if field in data_fields:
+            setattr(record, field, value)
 
 
 def add_dataframe_to_sink(dataframe: pd.DataFrame, sink, fields: QgsFields, feedback) -> int:
@@ -36,24 +72,5 @@ def add_dataframe_to_sink(dataframe: pd.DataFrame, sink, fields: QgsFields, feed
 
 def source_rows(source) -> list[dict[str, Any]]:
     """Return lower-case attribute dictionaries and Shapely geometries."""
-    import shapely.wkb
-
-    names = [field.name().lower() for field in source.fields()]
     target_crs = QgsCoordinateReferenceSystem("EPSG:4326")
-    source_crs = source.sourceCrs()
-    coordinate_transform = None
-    if source_crs.isValid() and source_crs != target_crs:
-        coordinate_transform = QgsCoordinateTransform(source_crs, target_crs, QgsProject.instance())
-    rows = []
-    for feature in source.getFeatures():
-        geometry = feature.geometry()
-        if geometry is not None and not geometry.isEmpty() and coordinate_transform is not None:
-            geometry = QgsGeometry(geometry)
-            geometry.transform(coordinate_transform)
-        rows.append(
-            {
-                **dict(zip(names, feature.attributes(), strict=True)),
-                "geometry": None if geometry is None or geometry.isEmpty() else shapely.wkb.loads(bytes(geometry.asWkb())),
-            }
-        )
-    return rows
+    return rows_from_feature_source(source, target_crs=target_crs)
