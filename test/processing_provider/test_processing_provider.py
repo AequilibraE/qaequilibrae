@@ -54,6 +54,7 @@ def test_provider_exists(qgis_app):
         "ModifyZones",
         "NetworkSimplifier",
         "ShortestPath",
+        "RunTrafficAssignment",
         "TripLengthDistribution",
     }
 

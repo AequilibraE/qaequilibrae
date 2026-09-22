@@ -17,6 +17,9 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
+from qaequilibrae.modules.processing_provider.paths_procedures.traffic_assignment import (
+    configure_traffic_assignment,
+)
 from qaequilibrae.qgis_logging import get_logger
 
 logger = get_logger(__name__)
@@ -349,6 +352,7 @@ class TrafficAssignmentDialog(BaseDialog):
                             df.loc[df["file_name"] == pth]["name"].values[0],
                             self.class_cores[tc],
                             tc,
+                            info.pce,
                         ]
                     ]
                 )
@@ -820,14 +824,19 @@ class TrafficAssignmentDialog(BaseDialog):
         # AequilibraE is the sole authority on whether the network data can be assigned, so we do not
         # pre-check any of it. We just surface whatever the library refuses to accept
         try:
-            self.assignment.set_classes(list(self.traffic_classes.values()))
-            self.assignment.set_vdf(self.cob_vdf.currentText())
-            self.assignment.set_vdf_parameters(self.vdf_parameters)
-            self.assignment.set_capacity_field(self.cob_capacity.currentText())
-            self.assignment.set_time_field(self.cob_ffttime.currentText())
-            self.assignment.max_iter = self.miter
-            self.assignment.rgap_target = float(self.rel_gap.text())
-            self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
+            configure_traffic_assignment(
+                self.assignment,
+                list(self.traffic_classes.values()),
+                {
+                    "vdf": self.cob_vdf.currentText(),
+                    **self.vdf_parameters,
+                    "capacity_field": self.cob_capacity.currentText(),
+                    "time_field": self.cob_ffttime.currentText(),
+                    "algorithm": self.cb_choose_algorithm.currentText(),
+                    "max_iter": self.miter,
+                    "rgap": float(self.rel_gap.text()),
+                },
+            )
             self.assignment.log_specification()
         except Exception as e:
             for q in [self.progressbar, self.progress_label]:
