@@ -57,6 +57,7 @@ def test_provider_exists(qgis_app):
         "RunTrafficAssignment",
         "TripLengthDistribution",
     }
+    registry.removeProvider(provider)
 
 
 @pytest.mark.parametrize("format", [0, 1])

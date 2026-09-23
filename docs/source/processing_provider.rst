@@ -472,6 +472,60 @@ Path computation
 ----------------
 Please refer to the :ref:`Path computation module <paths_procedures>` documentation.
 
+Traffic assignment
+~~~~~~~~~~~~~~~~~~
+
+``qaequilibrae:traffic_assignment`` runs assignment from Processing inputs.
+The Traffic Assignment dialog and exported Python runners use this algorithm too.
+The algorithm saves results in the AequilibraE project folder.
+
+The traffic-class table contains one row per class, with these columns:
+
+* Class name, matrix record name, and matrix cores (comma-separated).
+* Network mode, PCE, and the switch to block flows through centroids.
+* Optional fixed-cost field, value of time, and skim fields (comma-separated).
+
+A skim field produces final and blended cores by default.
+``free_flow_time:final,distance:blended`` produces only the specified cores.
+Each class has a separate OMX file named ``<result_name>_<class_name>.omx``.
+VDF parameters accept either numbers or network field names.
+The optional excluded-links table contains a class name and link IDs (comma-separated).
+
+The select-link table contains a query name, link IDs (comma-separated), and a direction: ``AB``, ``BA``, or ``Both``.
+Rows with the same query name form one query, including rows with different directions.
+The algorithm uses the AequilibraE select-link query semantics.
+The switches for select-link matrices and flows default to true.
+The default output name is ``<result_name>_sl``.
+
+Model Designer outputs have fixed names:
+
+.. list-table:: Assignment outputs
+   :header-rows: 1
+
+   * - Output
+     - Value
+   * - ``OUTPUT_DATABASE``
+     - Results database path
+   * - ``OUTPUT_RESULT_NAME``
+     - Assignment results table name
+   * - ``OUTPUT_MATRIX_FOLDER``
+     - Project matrix folder
+   * - ``OUTPUT_SKIMS``
+     - JSON array of skim OMX paths, or ``[]`` without skims
+   * - ``OUTPUT_SELECT_LINK_MATRIX``
+     - Select-link OMX path, or an empty string without this output
+   * - ``OUTPUT_SELECT_LINK_FLOWS``
+     - Select-link flows table name, or an empty string without this output
+
+The output database path and table name identify each flow table.
+The skim-path array supports multiple classes without a variable number of model outputs.
+In a Model Designer expression, ``array_get(from_json(...), 0)`` selects the first skim path.
+The expression argument is the ``OUTPUT_SKIMS`` value from the assignment step.
+
+The algorithm checks existing output names before computation and does not overwrite results.
+Cancellation takes effect before computation or after computation, before any output saves.
+A failure during output saves can leave some results in the project.
+
 Project
 -------
 In the project menu, the user can perform actions such as open/close project, create
