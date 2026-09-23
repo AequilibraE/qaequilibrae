@@ -18,7 +18,7 @@ from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBo
 
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
-from qaequilibrae.modules.processing_provider.paths_procedures.traffic_assignment import (
+from qaequilibrae.modules.processing_provider.traffic_assignment_procedures.traffic_assignment import (
     RunTrafficAssignment,
     run_traffic_assignment,
 )
@@ -46,25 +46,41 @@ VDF_PARAMETERS = {
 class AssignmentFeedback(QgsProcessingFeedback):
     message = pyqtSignal(str)
 
+    def __init__(self, cancellation_requested):
+        super().__init__()
+        self.cancellation_requested = cancellation_requested
+
     def pushInfo(self, message):
         super().pushInfo(message)
         self.message.emit(message)
+
+    def isCanceled(self):
+        return self.cancellation_requested() or super().isCanceled()
 
 
 class AssignmentWorker(QThread):
     """Keep the Processing worker off the UI thread."""
 
-    def __init__(self, parameters, project, feedback, parent):
+    message = pyqtSignal(str)
+    progress = pyqtSignal(float)
+
+    def __init__(self, parameters, project, parent):
         super().__init__(parent)
         self.parameters = parameters
         self.project = project
-        self.feedback = feedback
         self.error = None
         self.result = None
+        self.cancel_requested = False
+
+    def cancel(self):
+        self.cancel_requested = True
 
     def run(self):
         try:
-            self.result = run_traffic_assignment(self.parameters, self.project, self.feedback)
+            feedback = AssignmentFeedback(lambda: self.cancel_requested)
+            feedback.message.connect(self.message.emit)
+            feedback.progressChanged.connect(self.progress.emit)
+            self.result = run_traffic_assignment(self.parameters, self.project, feedback)
         except Exception as error:
             self.error = str(error)
 
@@ -826,12 +842,11 @@ class TrafficAssignmentDialog(BaseDialog):
             self.qgis_project.iface_error_message(self.error, self.tr("Assignment setup error"))
             return
 
-        self.feedback = AssignmentFeedback()
-        self.feedback.message.connect(self.progress_label.setText)
-        self.feedback.progressChanged.connect(self._set_progress)
         self.do_assignment.setEnabled(False)
         self.tabWidget.setEnabled(False)
-        self.worker_thread = AssignmentWorker(parameters, self.project, self.feedback, self)
+        self.worker_thread = AssignmentWorker(parameters, self.project, self)
+        self.worker_thread.message.connect(self.progress_label.setText)
+        self.worker_thread.progress.connect(self._set_progress)
         self.run_thread()
 
     def _set_progress(self, value):
@@ -961,7 +976,7 @@ class TrafficAssignmentDialog(BaseDialog):
 
     def closeEvent(self, event):
         if self.worker_thread is not None and self.worker_thread.isRunning():
-            self.feedback.cancel()
+            self.worker_thread.cancel()
             self.progress_label.setText(self.tr("Canceling after the current computation finishes"))
             event.ignore()
             return
@@ -969,7 +984,7 @@ class TrafficAssignmentDialog(BaseDialog):
 
     def reject(self):
         if self.worker_thread is not None and self.worker_thread.isRunning():
-            self.feedback.cancel()
+            self.worker_thread.cancel()
             self.progress_label.setText(self.tr("Canceling after the current computation finishes"))
             return
         super().reject()

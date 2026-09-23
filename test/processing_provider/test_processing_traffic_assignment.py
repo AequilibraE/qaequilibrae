@@ -16,9 +16,11 @@ from qgis.core import (
     QgsProcessingModelOutput,
 )
 
-from qaequilibrae.modules.processing_provider.paths_procedures.traffic_assignment import RunTrafficAssignment
+from qaequilibrae.modules.processing_provider.traffic_assignment_procedures.traffic_assignment import (
+    RunTrafficAssignment,
+)
 from qaequilibrae.modules.processing_provider.project_algorithm import ProjectAlgorithm
-from qaequilibrae.modules.processing_provider.paths_procedures import traffic_assignment as operation
+from qaequilibrae.modules.processing_provider.traffic_assignment_procedures import traffic_assignment as operation
 
 
 def test_traffic_assignment_runs_from_processing_parameters(sf_project):
@@ -78,6 +80,41 @@ def _run(parameters):
     outputs, ok = algorithm.run(parameters, QgsProcessingContext(), feedback)
     assert ok, feedback.textLog()
     return outputs
+
+
+def test_traffic_classes_from_project(sf_project):
+    classes = operation.traffic_classes_from_project(sf_project.project)
+    by_name = {name: options for item in classes for name, options in item.items()}
+    assert by_name
+    for options in by_name.values():
+        assert options["matrix_name"]
+        assert options["matrix_cores"]
+        assert options["network_mode"]
+        assert options["pce"] > 0
+    # Core names that match the mode name, including a singular core for a plural mode
+    assert by_name["car"]["network_mode"] == "c"
+    assert by_name["motorcycle"]["network_mode"] == "M"
+    assert by_name["trucks"]["network_mode"] == "T"
+
+
+def test_assignment_writes_flows_layer(sf_project):
+    parameters = _parameters(sf_project.project)
+    parameters[RunTrafficAssignment.OUTPUT_FLOWS] = "TEMPORARY_OUTPUT"
+    algorithm = RunTrafficAssignment()
+    algorithm.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    outputs, ok = algorithm.run(parameters, context, feedback)
+    assert ok, feedback.textLog()
+
+    layer = context.takeResultLayer(outputs[RunTrafficAssignment.OUTPUT_FLOWS])
+    assert layer is not None
+    assert layer.featureCount() > 0
+    names = {field.name() for field in layer.fields()}
+    assert "link_id" in names
+    assert "car_tot" in names
+    assert "PCE_tot" in names
+    assert all(not feature.geometry().isEmpty() for feature in layer.getFeatures())
 
 
 def test_assignment_reports_progress(sf_project):

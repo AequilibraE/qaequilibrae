@@ -945,7 +945,7 @@ def test_single_class_from_python(sf_project, qtbot, mocker):
     dialog.close()
 
     project = sf_project.project
-    from qaequilibrae.modules.processing_provider.paths_procedures import traffic_assignment as operation
+    from qaequilibrae.modules.processing_provider.traffic_assignment_procedures import traffic_assignment as operation
 
     configure = mocker.spy(operation, "configure_traffic_assignment")
     project.run.run_assignment()

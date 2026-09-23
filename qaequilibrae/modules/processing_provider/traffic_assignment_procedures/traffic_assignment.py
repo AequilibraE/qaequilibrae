@@ -1,6 +1,12 @@
-"""Traffic-assignment Processing worker, shared by the dialog and project runners."""
+"""Traffic-assignment Processing worker, shared by the dialog and project runners.
+
+RunTrafficAssignment runs a static traffic assignment for one or more traffic classes,
+saves the link-flow results to the AequilibraE project, and exposes the optional
+select-link and skim outputs.
+"""
 
 from collections.abc import Mapping
+from copy import deepcopy
 from contextlib import ExitStack, contextmanager
 from pathlib import Path
 from typing import Any
@@ -8,6 +14,7 @@ import json
 
 from qgis.core import (
     Qgis,
+    QgsCoordinateReferenceSystem,
     QgsProcessingException,
     QgsProcessingContext,
     QgsProcessingFeedback,
@@ -15,6 +22,7 @@ from qgis.core import (
     QgsProcessingOutputFolder,
     QgsProcessingOutputString,
     QgsProcessingParameterBoolean,
+    QgsProcessingParameterFeatureSink,
     QgsProcessingParameterMatrix,
     QgsProcessingParameterNumber,
     QgsProcessingParameterString,
@@ -90,6 +98,7 @@ def _build_assignment(project, class_options, assignment_options, resources, fee
     traffic_classes = []
     used_result_fields = set()
     class_names = set()
+    base_graphs = {}
     for class_option in class_options:
         class_name, options = _traffic_class(class_option)
         if class_name.lower() in class_names:
@@ -118,8 +127,11 @@ def _build_assignment(project, class_options, assignment_options, resources, fee
             _info(feedback, f"Replaced NaN demand with zero for traffic class '{class_name}'")
 
         mode = _string(options, "network_mode")
-        project.network.build_graphs(modes=[mode])
-        graph = project.network.graphs[mode]
+        if mode not in base_graphs:
+            project.network.build_graphs(modes=[mode])
+            base_graphs[mode] = deepcopy(project.network.graphs[mode])
+        graph = deepcopy(base_graphs[mode])
+        _fill_missing_mode_fields(graph, mode)
         if options.get("excluded_links"):
             graph.exclude_links(options["excluded_links"])
         graph.set_blocked_centroid_flows(bool(options.get("blocked_centroid_flows", False)))
@@ -141,6 +153,26 @@ def _build_assignment(project, class_options, assignment_options, resources, fee
     assignment = AequilibraeTrafficAssignment(project)
     configure_traffic_assignment(assignment, traffic_classes, assignment_options)
     return assignment, traffic_classes
+
+
+def _fill_missing_mode_fields(graph, mode: str) -> None:
+    """Give links that do not carry ``mode`` usable values for their empty fields.
+
+    ``build_graphs`` keeps links that do not support a mode, turning them into self-loops
+    so the compressed graph culls them. They never carry flow, but they stay in the
+    uncompressed graph, and the assignment rejects empty capacity, free-flow time and VDF
+    parameters there. Filling those values keeps every mode's graph on the same set of
+    links, which the assignment needs to sum flows across traffic classes.
+    """
+    network = graph.network
+    if "modes" not in network.columns:
+        return
+    culled = ~network["modes"].astype("string").str.contains(mode, na=False, regex=False)
+    if not culled.any():
+        return
+    numeric = network.select_dtypes(include="number").columns
+    network.loc[culled, numeric] = network.loc[culled, numeric].fillna(1.0)
+    graph.prepare_graph(graph.centroids)
 
 
 def _matrix(project, matrix_name):
@@ -368,7 +400,16 @@ def _info(feedback, message):
 
 
 class RunTrafficAssignment(ProjectAlgorithm):
-    """Run an AequilibraE traffic assignment from QGIS Processing parameters."""
+    """Run an AequilibraE traffic assignment from QGIS Processing parameters.
+
+    Inputs: an AequilibraE project, one demand matrix per traffic class, network
+    mode and assignment settings (algorithm, VDF, capacity and time fields, gap
+    target), plus optional select-link queries and excluded links.
+
+    Outputs: link-flow results saved to the project results database, optional
+    skim OMX files per class, optional select-link OD and flow outputs, and an
+    optional assigned-flows vector layer.
+    """
 
     TRAFFIC_CLASSES = "TRAFFIC_CLASSES"
     SELECT_LINKS = "SELECT_LINKS"
@@ -388,14 +429,15 @@ class RunTrafficAssignment(ProjectAlgorithm):
     TIME_FIELD = "TIME_FIELD"
     RESULT_NAME = "RESULT_NAME"
     OUTPUT_RESULT_NAME = "OUTPUT_RESULT_NAME"
+    OUTPUT_FLOWS = "OUTPUT_FLOWS"
     OUTPUT_DATABASE = "OUTPUT_DATABASE"
     OUTPUT_MATRIX_FOLDER = "OUTPUT_MATRIX_FOLDER"
     OUTPUT_SKIMS = "OUTPUT_SKIMS"
     OUTPUT_SELECT_LINK_MATRIX = "OUTPUT_SELECT_LINK_MATRIX"
     OUTPUT_SELECT_LINK_FLOWS = "OUTPUT_SELECT_LINK_FLOWS"
     project = None
-    group_name = "Path computation"
-    group_id = "path_computation"
+    group_name = "Traffic assignment"
+    group_id = "traffic_assignment"
 
     def initAlgorithm(self, configuration=None):
         self.add_project_folder_parameter()
@@ -477,13 +519,21 @@ class RunTrafficAssignment(ProjectAlgorithm):
         self.addParameter(QgsProcessingParameterString(self.BETA, self.tr("VDF beta field or value"), "4.0"))
         self.addParameter(QgsProcessingParameterString(self.TAU, self.tr("Akcelik tau field or value"), "0.0"))
         self.addParameter(
-            QgsProcessingParameterString(self.LENGTH, self.tr("Akcelik length field or value"), optional=True)
+            QgsProcessingParameterString(self.LENGTH, self.tr("Akcelik length field or value"))
         )
         self.addParameter(QgsProcessingParameterString(self.CAPACITY_FIELD, self.tr("Capacity field"), "capacity"))
         self.addParameter(
             QgsProcessingParameterString(self.TIME_FIELD, self.tr("Free-flow time field"), "free_flow_time")
         )
         self.addParameter(QgsProcessingParameterString(self.RESULT_NAME, self.tr("Results table name"), "assignment"))
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT_FLOWS,
+                self.tr("Assigned flows layer"),
+                type=Qgis.ProcessingSourceType.VectorLine,
+                optional=True,
+            )
+        )
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_RESULT_NAME, self.tr("Results table name")))
         self.addOutput(QgsProcessingOutputFile(self.OUTPUT_DATABASE, self.tr("Results database")))
         self.addOutput(QgsProcessingOutputFolder(self.OUTPUT_MATRIX_FOLDER, self.tr("Matrix folder")))
@@ -494,11 +544,41 @@ class RunTrafficAssignment(ProjectAlgorithm):
     def processAlgorithm(self, parameters, context, feedback):
         try:
             configuration = self._configuration(parameters, context)
-            return _run_assignment(self.project or self.project_folder(parameters, context), configuration, feedback)
+            project_folder = self.project or self.project_folder(parameters, context)
+            outputs = _run_assignment(project_folder, configuration, feedback)
+            result_name = configuration["assignment"]["result_name"]
+            outputs.update(self._flows_layer(project_folder, result_name, parameters, context, feedback))
+            return outputs
         except TrafficAssignmentError as error:
             raise QgsProcessingException(self.tr(str(error))) from error
         except Exception as error:
             raise QgsProcessingException(self.tr(f"Traffic assignment failed: {error}")) from error
+
+    def _flows_layer(self, project_folder, result_name, parameters, context, feedback):
+        """Write the saved results, joined to the link geometry, to the feature sink."""
+        if not parameters.get(self.OUTPUT_FLOWS):
+            return {}
+        from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
+
+        from ..geometry_io.common import add_dataframe_to_sink, fields_from_dataframe
+
+        with _assignment_project(project_folder) as project:
+            links = project.network.links.data
+            results = load_result_table(project, result_name)
+            merged = links.merge(results, on="link_id", how="left")
+            fields = fields_from_dataframe(merged)
+            sink, destination = self.parameterAsSink(
+                parameters,
+                self.OUTPUT_FLOWS,
+                context,
+                fields,
+                Qgis.WkbType.LineString,
+                QgsCoordinateReferenceSystem("EPSG:4326"),
+            )
+            if sink is None:
+                raise QgsProcessingException(self.tr("Could not create the assigned-flows layer"))
+            add_dataframe_to_sink(merged, sink, fields, feedback)
+        return {self.OUTPUT_FLOWS: destination}
 
     def name(self):
         return "traffic_assignment"
@@ -507,13 +587,58 @@ class RunTrafficAssignment(ProjectAlgorithm):
         return self.tr("Traffic assignment")
 
     def shortHelpString(self):
-        return self.tr(
-            "Runs and saves a traffic assignment. Add one row per traffic class. "
-            "Skim fields default to final and blended outputs; use field:final or field:blended to select one. "
-            "Repeat a select-link query name to combine rows with different directions. "
-            "Outputs include the results database, table names, matrix folder, and skim paths as a JSON array. "
-            "Cancel stops before saving after the current computation finishes. Existing outputs are not overwritten."
-        )
+        help_messages = [
+            self.tr(
+                "Runs a static traffic assignment for one or more traffic classes on an AequilibraE project "
+                "and saves the link-flow results."
+            ),
+            self.tr("Inputs:"),
+            self.tr("- AequilibraE project folder: the project whose network, modes and matrices are assigned."),
+            self.tr(
+                "- Traffic classes: one row per class, with columns Name, Matrix record, "
+                "Cores (comma-separated), Mode, PCE, Block centroid flows (true/false), "
+                "Fixed-cost field (optional), Value of time (optional) and Skims (optional)."
+            ),
+            self.tr(
+                "- Assignment settings: algorithm, maximum iterations, relative gap, capacity field, "
+                "free-flow time field, and the volume-delay function with its parameters "
+                "(alpha, beta, tau and length, given as numbers or network field names)."
+            ),
+            self.tr("- Results table name: name of the flow table written to the results database."),
+            self.tr(
+                "- Select-link queries (optional): one row per query part, with columns Name, "
+                "Link IDs (comma-separated) and Direction (AB, BA or Both). "
+                "Rows sharing a name form one query; repeat the name to combine directions."
+            ),
+            self.tr(
+                "- Excluded links (optional): one row per class, with columns Class and Link IDs (comma-separated)."
+            ),
+            self.tr("Outputs:"),
+            self.tr(
+                "- Results database and results table name: all link flows live in "
+                "<project>/results_database.sqlite under the chosen table name."
+            ),
+            self.tr(
+                "- Skims: one OMX file per class, named <result_name>_<class_name>.omx. "
+                "A skim field produces final and blended cores by default; use "
+                "field:final or field:blended to select one."
+            ),
+            self.tr(
+                "- Select-link OD matrix and select-link flows table, when the corresponding "
+                "switches are on. The matrix defaults to <result_name>_sl.omx and the table "
+                "to <result_name>_sl."
+            ),
+            self.tr(
+                "- Assigned-flows layer (optional): the project links joined with the results, "
+                "ready to feed downstream algorithms."
+            ),
+            self.tr(
+                "Output values also expose the matrix folder, and the skim paths as a JSON array. "
+                "Cancellation stops before saving once the current computation finishes. "
+                "Existing outputs are not overwritten."
+            ),
+        ]
+        return "\n".join(help_messages)
 
     def createInstance(self):
         return type(self)()
@@ -530,16 +655,20 @@ class RunTrafficAssignment(ProjectAlgorithm):
             "result_name": self.parameterAsString(parameters, self.RESULT_NAME, context),
         }
         assignment.update(self._vdf_parameters(vdf, parameters, context))
+        traffic_class_values = self.parameterAsMatrix(parameters, self.TRAFFIC_CLASSES, context)
+        if not _matrix_has_rows(traffic_class_values):
+            raise TrafficAssignmentError("At least one traffic class is required")
         configuration = {
-            "traffic_classes": _traffic_classes(self.parameterAsMatrix(parameters, self.TRAFFIC_CLASSES, context)),
+            "traffic_classes": _traffic_classes(traffic_class_values),
             "assignment": assignment,
         }
         classes = {name: options for item in configuration["traffic_classes"] for name, options in item.items()}
-        excluded = (
+        excluded_values = (
             self.parameterAsMatrix(parameters, self.EXCLUDED_LINKS, context)
             if parameters.get(self.EXCLUDED_LINKS)
             else []
         )
+        excluded = excluded_values if _matrix_has_rows(excluded_values) else []
         for name, links in _matrix_rows(excluded, 2, "excluded links"):
             if name not in classes:
                 raise TrafficAssignmentError(f"Unknown traffic class '{name}' in excluded links")
@@ -604,6 +733,62 @@ def _traffic_classes(values):
     return traffic_classes
 
 
+def traffic_classes_from_project(project) -> list[dict]:
+    """Suggest one traffic class per matrix core for a project.
+
+    The project does not record which mode a matrix belongs to, so each core name is matched
+    against the mode IDs and names. The match ignores case and lets a core name sit inside a
+    mode name or the other way around (``motorcycle`` matches ``motorcycles``). When nothing
+    matches, the project's first mode is used.
+    """
+    modes = project.network.modes.all_modes()
+    modes_by_name = {mode.mode_name.lower(): mode_id for mode_id, mode in modes.items()}
+    default_mode = next(iter(modes), "")
+    used_names = set()
+    traffic_classes = []
+    for _, record in project.matrices.list().iterrows():
+        if record.get("status"):
+            continue
+        matrix = project.matrices.get_matrix(record["name"])
+        try:
+            cores = list(matrix.names)
+        finally:
+            matrix.close()
+        for core in cores:
+            name = core
+            if name in used_names:
+                name = f"{Path(record['name']).stem}_{core}"
+            used_names.add(name)
+            mode_id = _match_mode(core, modes, modes_by_name, default_mode)
+            mode = modes.get(mode_id) if mode_id else None
+            traffic_classes.append(
+                {
+                    name: {
+                        "matrix_name": record["name"],
+                        "matrix_cores": [core],
+                        "network_mode": mode_id,
+                        "pce": getattr(mode, "pce", None) or 1.0,
+                        "blocked_centroid_flows": False,
+                        "skims": {},
+                    }
+                }
+            )
+    return traffic_classes
+
+
+def _match_mode(core, modes, modes_by_name, default_mode):
+    """Pick the mode whose ID or name best matches a matrix core name."""
+    key = core.lower()
+    if key in modes:
+        return key
+    if key in modes_by_name:
+        return modes_by_name[key]
+    for name, mode_id in modes_by_name.items():
+        if key in name or name in key:
+            return mode_id
+    return default_mode
+
+
 def _skim_choices(value, class_name):
     choices = {}
     for item in _comma_separated(value, class_name, "skims", required=False):
@@ -635,6 +820,17 @@ def _select_links(values):
         except ValueError as error:
             raise TrafficAssignmentError(f"Select-link query '{name}' has invalid link IDs") from error
     return selections
+
+
+def _matrix_has_rows(values):
+    """Whether a Processing matrix parameter holds anything but its empty placeholder.
+
+    QGIS gives an empty matrix back as an empty list, or as a single placeholder cell that
+    can be ``None``, ``NULL`` or an empty string depending on the Qt version.
+    """
+    if values is None:
+        return False
+    return any(value is not None and str(value).strip() not in ("", "NULL", "None") for value in values)
 
 
 def _matrix_rows(values, columns, description):

@@ -6,7 +6,7 @@ def create_strings(dct: dict):
     """Export the same Processing parameters used by the assignment dialog."""
     source = f"""from aequilibrae.context import get_active_project
 
-from qaequilibrae.modules.processing_provider.paths_procedures.traffic_assignment import run_traffic_assignment
+from qaequilibrae.modules.processing_provider.traffic_assignment_procedures.traffic_assignment import run_traffic_assignment
 
 
 def run_assignment():
