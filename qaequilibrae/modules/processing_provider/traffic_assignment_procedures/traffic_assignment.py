@@ -5,18 +5,18 @@ saves the link-flow results to the AequilibraE project, and exposes the optional
 select-link and skim outputs.
 """
 
+import json
 from collections.abc import Mapping
-from copy import deepcopy
 from contextlib import ExitStack, contextmanager
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
-import json
 
 from qgis.core import (
     Qgis,
     QgsCoordinateReferenceSystem,
-    QgsProcessingException,
     QgsProcessingContext,
+    QgsProcessingException,
     QgsProcessingFeedback,
     QgsProcessingOutputFile,
     QgsProcessingOutputFolder,
@@ -518,9 +518,7 @@ class RunTrafficAssignment(ProjectAlgorithm):
         self.addParameter(QgsProcessingParameterString(self.ALPHA, self.tr("VDF alpha field or value"), "0.15"))
         self.addParameter(QgsProcessingParameterString(self.BETA, self.tr("VDF beta field or value"), "4.0"))
         self.addParameter(QgsProcessingParameterString(self.TAU, self.tr("Akcelik tau field or value"), "0.0"))
-        self.addParameter(
-            QgsProcessingParameterString(self.LENGTH, self.tr("Akcelik length field or value"))
-        )
+        self.addParameter(QgsProcessingParameterString(self.LENGTH, self.tr("Akcelik length field or value")))
         self.addParameter(QgsProcessingParameterString(self.CAPACITY_FIELD, self.tr("Capacity field"), "capacity"))
         self.addParameter(
             QgsProcessingParameterString(self.TIME_FIELD, self.tr("Free-flow time field"), "free_flow_time")
