@@ -76,9 +76,7 @@ def compute_desire_lines(
         if int(zone) not in centroids:
             position = zone_position[int(zone)]
             flow = (
-                np.nansum(total[position, :])
-                + np.nansum(total[:, position])
-                - 2 * np.nansum(total[position, position])
+                np.nansum(total[position, :]) + np.nansum(total[:, position]) - 2 * np.nansum(total[position, position])
             )
             unassigned += flow
             report.append(f"Zone {zone} does not have a corresponding centroid/zone. Total flow {flow}")

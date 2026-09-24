@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from pathlib import Path
 from typing import Any, cast
 
 import numpy as np
@@ -30,9 +31,7 @@ from qaequilibrae.i18n.translate import trlt
 from ..geometry_io.common import add_dataframe_to_sink, fields_from_dataframe
 
 
-def compute_delaunay_network(
-    nodes: dict[int, tuple[float, float]], matrix: Any | None = None
-) -> pd.DataFrame:
+def compute_delaunay_network(nodes: dict[int, tuple[float, float]], matrix: Any | None = None) -> pd.DataFrame:
     """Create Delaunay edges and optionally assign matrix demand to them."""
     if len(nodes) < 3:
         raise ValueError("At least three nodes are required to create a Delaunay network")
@@ -83,11 +82,7 @@ def compute_delaunay_network(
     assignment.set_algorithm("all-or-nothing")
     assignment.execute()
 
-    flow_columns = [
-        field
-        for core in matrix.view_names
-        for field in (f"{core}_ab", f"{core}_ba", f"{core}_tot")
-    ]
+    flow_columns = [field for core in matrix.view_names for field in (f"{core}_ab", f"{core}_ba", f"{core}_tot")]
     flows = assignment.results()[flow_columns]
     dataframe = dataframe.join(flows, on="link_id")
     return dataframe
@@ -111,7 +106,9 @@ class DelaunayNetwork(QgsProcessingAlgorithm):
             )
         )
         self.addParameter(
-            QgsProcessingParameterField(self.NODE_ID_FIELD, self.tr("Node ID field"), parentLayerParameterName=self.NODES)
+            QgsProcessingParameterField(
+                self.NODE_ID_FIELD, self.tr("Node ID field"), parentLayerParameterName=self.NODES
+            )
         )
         self.addParameter(
             QgsProcessingParameterFile(
@@ -159,8 +156,10 @@ class DelaunayNetwork(QgsProcessingAlgorithm):
                 from aequilibrae.matrix import AequilibraeMatrix
 
                 matrix = AequilibraeMatrix()
-                matrix.load(matrix_path)
-                selected_cores = [core.strip() for core in cores.split(",") if core.strip()] if cores else list(matrix.names)
+                matrix.load(Path(matrix_path))
+                selected_cores = (
+                    [core.strip() for core in cores.split(",") if core.strip()] if cores else list(matrix.names)
+                )
                 if not selected_cores:
                     raise ValueError("The matrix contains no cores")
                 matrix.computational_view(selected_cores)
@@ -182,7 +181,9 @@ class DelaunayNetwork(QgsProcessingAlgorithm):
         return {self.OUTPUT: destination}
 
     @staticmethod
-    def _nodes(source: QgsFeatureSource, node_id_index: int, feedback: QgsProcessingFeedback) -> dict[int, tuple[float, float]]:
+    def _nodes(
+        source: QgsFeatureSource, node_id_index: int, feedback: QgsProcessingFeedback
+    ) -> dict[int, tuple[float, float]]:
         nodes = {}
         for feature in cast(Iterable[QgsFeature], source.getFeatures()):
             if feedback.isCanceled():

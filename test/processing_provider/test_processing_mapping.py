@@ -19,7 +19,6 @@ from qaequilibrae.modules.processing_provider.mapping_procedures.desire_lines im
 from qaequilibrae.modules.processing_provider.mapping_procedures.simple_tag import SimpleTag, match_features
 
 
-
 def _run_algorithm(algorithm, parameters):
     algorithm.initAlgorithm()
     context = QgsProcessingContext()
