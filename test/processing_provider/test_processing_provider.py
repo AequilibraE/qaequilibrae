@@ -44,6 +44,8 @@ def test_provider_exists(qgis_app):
         "AddMode",
         "CollapseLinks",
         "CreateEmptyProject",
+        "DelaunayNetwork",
+        "DesireLines",
         "ExtractLinks",
         "ExtractNodes",
         "ExtractZones",
@@ -55,6 +57,7 @@ def test_provider_exists(qgis_app):
         "NetworkSimplifier",
         "ShortestPath",
         "RunTrafficAssignment",
+        "SimpleTag",
         "TripLengthDistribution",
     }
     registry.removeProvider(provider)
