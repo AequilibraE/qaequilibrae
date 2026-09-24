@@ -191,6 +191,41 @@ available.
 Be aware that the existence of triggers in the project database might affect the
 performance of Simple tag.
 
+The Processing algorithm writes a new output layer. It copies the target layer's
+fields and geometry, then writes the matched value to the named target field. It
+creates that field when it does not exist. Features without a match receive a
+null value. For *Closest*, the algorithm checks the five nearest indexed source
+features. For *Touching*, it selects the feature with the greatest shared
+length, or area when both layers are polygons. Optional match fields must be
+selected on both layers or left empty on both.
+
+Desire lines
+~~~~~~~~~~~~
+**Mapping > Desire lines** builds one line for every origin-destination pair that
+carries flow. It uses a zone or centroid layer and an OpenMatrix (\*.omx) file.
+The integer zone ID field must match the matrix index. Select matrix cores as a
+comma-separated list, or leave the field empty to use all cores. Intrazonal
+flows are omitted. Each matrix core becomes AB and BA flow fields on the output
+line layer. Lines use the input layer's CRS.
+
+.. image:: images/mapping_tools/desire_lines_gui.png
+    :align: center
+    :alt: Desire lines
+
+Delaunay network
+~~~~~~~~~~~~~~~~
+**Mapping > Delaunay network** builds a Delaunay triangulation of the centroids
+of an AequilibraE project. It can also assign a matrix to the triangulation. The
+network is stored in the project's *delaunay_network* table and returned as a
+line layer.
+
+Select *Zones* or *Network* as the centroid source. Leave the matrix name empty
+to build the network only, or give a matrix name and, optionally, the cores to
+assign. The algorithm creates or replaces the project's *delaunay_network*
+table. If you assign a matrix, it also saves a result table in the project and
+includes its AB, BA and total fields in the output layer. Use the overwrite
+option when the project already contains a Delaunay network.
+
 Model Building
 --------------
 With the Model Building tools, it is possible to effectively build an AequilibraE model,

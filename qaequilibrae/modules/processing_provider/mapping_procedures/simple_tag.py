@@ -6,16 +6,20 @@ Processing inputs and outputs around it, and the desktop dialog uses the same
 operation so both entry points stay in step.
 """
 
-from typing import Any
+from collections.abc import Iterable, Sequence
+from typing import Any, cast
 
 from qgis.core import (
     Qgis,
     QgsCoordinateTransform,
     QgsFeature,
+    QgsFeatureSource,
     QgsField,
     QgsFields,
     QgsGeometry,
     QgsProcessingAlgorithm,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
     QgsProcessingException,
     QgsProcessingParameterEnum,
     QgsProcessingParameterFeatureSink,
@@ -39,8 +43,8 @@ class SimpleTagError(ValueError):
 
 
 def match_features(
-    source_features,
-    target_features,
+    source_features: Sequence[QgsFeature],
+    target_features: Sequence[QgsFeature],
     *,
     source_value_index: int,
     operation: str,
@@ -60,22 +64,25 @@ def match_features(
 
     matching = source_match_index is not None and target_match_index is not None
     index = QgsSpatialIndex()
-    source_geometry = {}
-    source_value = {}
-    source_match = {}
+    source_geometry: dict[int, QgsGeometry] = {}
+    source_value: dict[int, Any] = {}
+    source_match: dict[int, Any] = {}
     for feature in source_features:
+        geometry = feature.geometry()
+        if geometry is None or geometry.isEmpty():
+            continue
         index.addFeature(feature)
-        source_geometry[feature.id()] = feature.geometry()
+        source_geometry[feature.id()] = geometry
         source_value[feature.id()] = feature.attributes()[source_value_index]
         if matching:
             source_match[feature.id()] = feature.attributes()[source_match_index]
 
-    target_match = {}
+    target_match: dict[int, Any] = {}
     if matching:
         for feature in target_features:
             target_match[feature.id()] = feature.attributes()[target_match_index]
 
-    matches = {}
+    matches: dict[int, Any] = {}
     for feature in target_features:
         geometry = feature.geometry()
         if geometry is None or geometry.isEmpty():
@@ -89,7 +96,6 @@ def match_features(
             source_geometry,
             source_value,
             source_match,
-            feature.id(),
             geometry,
             operation,
             source_is_polygon,
@@ -101,16 +107,15 @@ def match_features(
 
 
 def _match_feature(
-    index,
-    source_geometry,
-    source_value,
-    source_match,
-    target_id,
-    geometry,
-    operation,
-    source_is_polygon,
-    target_match_value,
-):
+    index: QgsSpatialIndex,
+    source_geometry: dict[int, QgsGeometry],
+    source_value: dict[int, Any],
+    source_match: dict[int, Any],
+    geometry: QgsGeometry,
+    operation: str,
+    source_is_polygon: bool,
+    target_match_value: Any,
+) -> Any | None:
     """Choose the source value for one target geometry."""
     if operation in (ENCLOSED, TOUCHING):
         return _enclosed_or_touching(
@@ -127,8 +132,15 @@ def _match_feature(
 
 
 def _enclosed_or_touching(
-    index, source_geometry, source_value, source_match, geometry, operation, source_is_polygon, target_match_value
-):
+    index: QgsSpatialIndex,
+    source_geometry: dict[int, QgsGeometry],
+    source_value: dict[int, Any],
+    source_match: dict[int, Any],
+    geometry: QgsGeometry,
+    operation: str,
+    source_is_polygon: bool,
+    target_match_value: Any,
+) -> Any | None:
     candidates = index.intersects(geometry.boundingBox())
     if source_match:
         candidates = [candidate for candidate in candidates if source_match[candidate] == target_match_value]
@@ -144,7 +156,7 @@ def _enclosed_or_touching(
 
     # TOUCHING keeps the match with the largest shared length, or area for two polygons.
     use_area = source_is_polygon and QgsWkbTypes.geometryType(geometry.wkbType()) == Qgis.GeometryType.Polygon
-    best_value = None
+    best_value: Any | None = None
     best_measure = -1.0
     for candidate in candidates:
         intersection = source_geometry[candidate].intersection(geometry)
@@ -157,7 +169,14 @@ def _enclosed_or_touching(
     return best_value
 
 
-def _closest(index, source_geometry, source_value, source_match, geometry, target_match_value):
+def _closest(
+    index: QgsSpatialIndex,
+    source_geometry: dict[int, QgsGeometry],
+    source_value: dict[int, Any],
+    source_match: dict[int, Any],
+    geometry: QgsGeometry,
+    target_match_value: Any,
+) -> Any | None:
     # A spatial index alone cannot rank the true nearest feature, so a handful of
     # neighbours are compared by real distance before one is chosen.
     candidates = index.nearestNeighbor(geometry.centroid().asPoint(), 5)
@@ -182,7 +201,7 @@ class SimpleTag(QgsProcessingAlgorithm):
 
     OPERATION_LABELS = ("Closest", "Enclosed", "Touching")
 
-    def initAlgorithm(self, configuration=None):
+    def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.SOURCE,
@@ -243,7 +262,11 @@ class SimpleTag(QgsProcessingAlgorithm):
             )
         )
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self, parameters: dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback | None
+    ) -> dict[str, Any]:
+        if feedback is None:
+            feedback = QgsProcessingFeedback()
         source = self.parameterAsSource(parameters, self.SOURCE, context)
         target = self.parameterAsSource(parameters, self.TARGET, context)
         if source is None or target is None:
@@ -258,12 +281,18 @@ class SimpleTag(QgsProcessingAlgorithm):
         source_value_index = source.fields().lookupField(source_field)
         if source_value_index < 0:
             raise QgsProcessingException(self.tr(f"The source field '{source_field}' does not exist"))
+        if bool(source_match_field) != bool(target_match_field):
+            raise QgsProcessingException(self.tr("Select both match fields, or leave both empty"))
         source_match_index = source.fields().lookupField(source_match_field) if source_match_field else None
         target_match_index = target.fields().lookupField(target_match_field) if target_match_field else None
+        if source_match_field and (source_match_index is None or source_match_index < 0):
+            raise QgsProcessingException(self.tr(f"The source match field '{source_match_field}' does not exist"))
+        if target_match_field and (target_match_index is None or target_match_index < 0):
+            raise QgsProcessingException(self.tr(f"The target match field '{target_match_field}' does not exist"))
 
         feedback.pushInfo(self.tr("Reading source and target features"))
-        source_features = list(source.getFeatures())
-        target_features = list(target.getFeatures())
+        source_features = list(cast(Iterable[QgsFeature], source.getFeatures()))
+        target_features = list(cast(Iterable[QgsFeature], target.getFeatures()))
         if feedback.isCanceled():
             return {}
 
@@ -308,14 +337,17 @@ class SimpleTag(QgsProcessingAlgorithm):
             else:
                 values.append(value)
             output.setAttributes(values)
-            sink.addFeature(output)
+            if not sink.addFeature(output):
+                raise QgsProcessingException(self.tr("Could not write a tagged feature to the output"))
             feedback.setProgress(index * 100 / max(len(target_features), 1))
 
         feedback.pushInfo(self.tr(f"Tagged {len(matches)} of {len(target_features)} features"))
         return {self.OUTPUT: destination}
 
     @staticmethod
-    def _transform(source, target, context):
+    def _transform(
+        source: QgsFeatureSource, target: QgsFeatureSource, context: QgsProcessingContext
+    ) -> QgsCoordinateTransform | None:
         source_crs = source.sourceCrs()
         target_crs = target.sourceCrs()
         if not source_crs.isValid() or not target_crs.isValid() or source_crs == target_crs:
@@ -323,7 +355,9 @@ class SimpleTag(QgsProcessingAlgorithm):
         return QgsCoordinateTransform(target_crs, source_crs, context.transformContext())
 
     @staticmethod
-    def _output_fields(source, target, source_field, target_field):
+    def _output_fields(
+        source: QgsFeatureSource, target: QgsFeatureSource, source_field: str, target_field: str
+    ) -> QgsFields:
         fields = QgsFields()
         for field in target.fields():
             fields.append(field)
@@ -332,29 +366,33 @@ class SimpleTag(QgsProcessingAlgorithm):
             fields.append(QgsField(target_field, source_type))
         return fields
 
-    def name(self):
+    def name(self) -> str:
         return "simple_tag"
 
-    def displayName(self):
+    def displayName(self) -> str:
         return self.tr("Simple tag")
 
-    def group(self):
+    def group(self) -> str:
         return self.tr("Mapping")
 
-    def groupId(self):
+    def groupId(self) -> str:
         return "mapping"
 
-    def shortHelpString(self):
+    def shortHelpString(self) -> str:
         return self.tr(
-            "Copies values from a source field into a target layer using a spatial relationship. "
-            "Use Enclosed, Touching or Closest to decide which source feature wins."
+            "Copies a source field value to a new output copy of the target layer. Closest selects "
+            "the nearest of five indexed source candidates. Enclosed selects the first containing "
+            "feature. Touching selects the feature with the greatest shared length, or area when "
+            "both layers are polygons. Optional match fields must be supplied as a pair. Target "
+            "geometries are transformed to the source CRS for matching. Targets without a match "
+            "have a null output value."
         )
 
-    def createInstance(self):
+    def createInstance(self) -> QgsProcessingAlgorithm:
         return SimpleTag()
 
-    def tags(self):
+    def tags(self) -> list[str]:
         return ["spatial", "join", "tag", "mapping"]
 
-    def tr(self, message):
+    def tr(self, message: str) -> str:
         return trlt("SimpleTag", message)

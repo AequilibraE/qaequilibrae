@@ -9,12 +9,12 @@ from aequilibrae.paths import Graph
 from aequilibrae.paths import allOrNothing
 from aequilibrae.paths.results import AssignmentResults
 from aequilibrae.utils.interface.worker_thread import WorkerThread
-from numpy.lib import recfunctions as rfn
 from qgis.PyQt.QtCore import pyqtSignal, QMetaType
 from qgis.core import QgsVectorLayer, QgsField, QgsPointXY, QgsGeometry, QgsFeature
 from scipy.spatial import Delaunay
 
 from qaequilibrae.modules.common_tools import get_vector_layer_by_name
+from qaequilibrae.modules.processing_provider.mapping_procedures.desire_lines import compute_desire_lines
 from qaequilibrae.qgis_logging import get_logger
 
 
@@ -77,96 +77,53 @@ class DesireLinesProcedure(WorkerThread):
 
     def do_desire_lines(self):
         all_centroids, base_dl_fields, desireline_layer, dlpr = self.get_basic_data()
-        unnasigned = 0
-        max_zone = self.matrix.index[:].max().astype(np.int64) + 1
-        items = [(i, j[0], j[1]) for i, j in all_centroids.items() if i < max_zone]
-        coords = np.array(items)
-        coord_index = np.zeros((max_zone, 2))
-        coord_index[coords[:, 0].astype(np.int64), 0] = coords[:, 1]
-        coord_index[coords[:, 0].astype(np.int64), 1] = coords[:, 2]
-        self.signal.emit(["set_text", self.tr("Manipulating matrix indices")])
-        zones = self.matrix.index[:].shape[0]
-        a = np.array(self.matrix.index[:], np.int64)
-        ij, ji = np.meshgrid(a, a, sparse=False, indexing="ij")
-        ij = ij.flatten()
-        ji = ji.flatten()
-        arrays = [ij, ji]
-        self.signal.emit(["start", len(self.matrix.view_names), "Collecting all matrices"])
-        total_mat = np.zeros((zones, zones), np.float64)
-        for i, mat in enumerate(self.matrix.view_names):
-            m = self.matrix.get_matrix(mat)
-            total_mat += m
-            arrays.append(m.flatten())
-            self.signal.emit(["update", i, f"Matrices collected: {i}"])
 
-        # Eliminates the cells for which we don't have geography
-        self.signal.emit(["set_text", self.tr("Filtering zones with no geography available")])
-        zones_with_no_geography = [x for x in self.matrix.index[:] if x not in all_centroids]
-        if zones_with_no_geography:
-            self.signal.emit(["start", len(zones_with_no_geography), "Zones with no geometry"])
-        for k, z in enumerate(zones_with_no_geography):
-            i = self.matrix.matrix_hash[z]
-            t = np.nansum(total_mat[i, :]) + np.nansum(total_mat[:, i])
-            unnasigned += t
-            self.report.append(f"Zone {z} does not have a corresponding centroid/zone. Total flow {t}")
-            total_mat[i, :] = 0
-            total_mat[:, i] = 0
-            self.signal.emit(["update", k, f"Zones with no geometry: {k}"])
-        self.signal.emit(["set_text", self.tr("Filtering down to OD pairs with flows")])
-        field_names = [x for x in self.matrix.view_names]
-        nonzero = np.nonzero(total_mat.flatten())
-        arrays = np.vstack(arrays).transpose()
-        arrays = arrays[nonzero, :]
-        arrays = arrays.reshape(arrays.shape[1], arrays.shape[2])
-        base_types = [(x, np.float64) for x in ["from", "to"]]
-        base_types = base_types + [(f"{x}_AB", np.float64) for x in field_names]
-        dtypes_ab = [(x, np.int64) for x in ["from", "to"]] + [(f"{x}_AB", float) for x in field_names]
-        dtypes_ba = [(x, np.int64) for x in ["to", "from"]] + [(f"{x}_BA", float) for x in field_names]
-        ab_mat = np.array(arrays[arrays[:, 0] > arrays[:, 1], :])
-        ba_mat = np.array(arrays[arrays[:, 0] < arrays[:, 1], :])
-        flows_ab = ab_mat.view(base_types)
-        flows_ab = flows_ab.reshape(flows_ab.shape[:-1])
-        flows_ab = flows_ab.astype(dtypes_ab)
-        flows_ba = ba_mat.view(base_types)
-        flows_ba = flows_ba.reshape(flows_ba.shape[:-1])
-        flows_ba = flows_ba.astype(dtypes_ba)
-        defaults1 = {x + "_AB": 0.0 for x in field_names}
-        defaults = {x + "_BA": 0.0 for x in field_names}
-        defaults = {**defaults, **defaults1}
-        self.signal.emit(["set_text", self.tr("Concatenating AB & BA flows")])
-        flows = rfn.join_by(
-            ["from", "to"], flows_ab, flows_ba, jointype="outer", defaults=defaults, usemask=True, asrecarray=True
-        )
-        flows = flows.filled()
-        for f in flows.dtype.names[2:]:
-            base_dl_fields.extend([QgsField(f, QMetaType.Type.Double)])
+        self.signal.emit(["set_text", self.tr("Manipulating matrix indices")])
+        try:
+            dataframe, report, unassigned = compute_desire_lines(all_centroids, self.matrix)
+        except Exception as error:
+            self.error = str(error)
+            self.logger.exception("Could not create desire lines")
+            return
+        self.report.extend(report)
+
+        for core in self.matrix.view_names:
+            base_dl_fields.append(QgsField(f"{core}_AB", QMetaType.Type.Double))
+        for core in self.matrix.view_names:
+            base_dl_fields.append(QgsField(f"{core}_BA", QMetaType.Type.Double))
         dlpr.addAttributes(base_dl_fields)
         desireline_layer.updateFields()
 
-        self.signal.emit(["start", flows.shape[0], self.tr("Creating Desire Lines")])
+        if dataframe.empty:
+            self.report.append("Nothing to show")
+            return
+
+        self.signal.emit(["start", len(dataframe), self.tr("Creating Desire Lines")])
+        fields = desireline_layer.fields()
         all_features = []
-        for i, rec in enumerate(flows):
-            a_node = rec[0]
-            b_node = rec[1]
-
-            a_point = QgsPointXY(*all_centroids[a_node])
-            b_point = QgsPointXY(*all_centroids[b_node])
-            dist = QgsGeometry().fromPointXY(a_point).distance(QgsGeometry().fromPointXY(b_point))
-            feature = QgsFeature()
-            feature.setGeometry(QgsGeometry.fromPolylineXY([a_point, b_point]))
-
-            attrs = [i + 1, int(a_node), int(b_node), 0, dist]
-            attrs.extend([float(x) for x in list(rec)[2:]])
-            feature.setAttributes(attrs)
+        for i, (_, row) in enumerate(dataframe.iterrows()):
+            feature = QgsFeature(fields)
+            feature.setGeometry(QgsGeometry.fromWkt(row["geometry"].wkt))
+            attributes = [
+                int(row["link_id"]),
+                int(row["a_node"]),
+                int(row["b_node"]),
+                int(row["direction"]),
+                float(row["distance"]),
+            ]
+            attributes.extend(float(row[f"{core}_AB"]) for core in self.matrix.view_names)
+            attributes.extend(float(row[f"{core}_BA"]) for core in self.matrix.view_names)
+            feature.setAttributes(attributes)
             all_features.append(feature)
-            self.signal.emit(["update", i, f"Creating lines: {i} / {len(flows)}"])
-        if unnasigned > 0:
-            self.report.append(f"Total non assigned flows (not counting intrazonals): {str(unnasigned)}")
-        if flows.shape[0] > 1:
-            a = dlpr.addFeatures(all_features)
+            self.signal.emit(["update", i, f"Creating lines: {i} / {len(dataframe)}"])
+
+        if len(dataframe) > 1:
+            _ = dlpr.addFeatures(all_features)
             self.result_layer = desireline_layer
         else:
             self.report.append("Nothing to show")
+        if unassigned > 0:
+            self.report.append(f"Total non assigned flows (not counting intrazonals): {str(unassigned)}")
 
     def do_delaunay_lines(self):
         all_centroids, base_dl_fields, desireline_layer, dlpr = self.get_basic_data()

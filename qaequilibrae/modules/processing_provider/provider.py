@@ -80,9 +80,13 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(AddMode())
 
     def __load_mapping_procedures(self):
+        from .mapping_procedures.delaunay_network import DelaunayNetwork
+        from .mapping_procedures.desire_lines import DesireLines
         from .mapping_procedures.simple_tag import SimpleTag
 
         self.addAlgorithm(SimpleTag())
+        self.addAlgorithm(DesireLines())
+        self.addAlgorithm(DelaunayNetwork())
 
     def id(self):
         """The ID used for identifying the provider."""
