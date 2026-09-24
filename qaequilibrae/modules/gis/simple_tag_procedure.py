@@ -53,6 +53,19 @@ class SimpleTAG(WorkerThread):
         fid = self.to_layer.dataProvider().fieldNameIndex(self.tfield)
         source_match_index = self.from_layer.dataProvider().fieldNameIndex(self.fmatch) if self.fmatch else None
         target_match_index = self.to_layer.dataProvider().fieldNameIndex(self.tmatch) if self.tmatch else None
+        invalid_fields = []
+        if idx < 0:
+            invalid_fields.append(f"source value field '{self.ffield}'")
+        if fid < 0:
+            invalid_fields.append(f"target field '{self.tfield}'")
+        if source_match_index is not None and source_match_index < 0:
+            invalid_fields.append(f"source match field '{self.fmatch}'")
+        if target_match_index is not None and target_match_index < 0:
+            invalid_fields.append(f"target match field '{self.tmatch}'")
+        if invalid_fields:
+            self.error = "The following fields do not exist: " + ", ".join(invalid_fields)
+            self.signal.emit(["finished"])
+            return
 
         self.signal.emit(["start", from_layer_counts, self.tr("Reading source layer")])
         source_features = list(self.from_layer.getFeatures())

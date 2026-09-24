@@ -1,181 +1,198 @@
-"""Delaunay-network Processing algorithm built on AequilibraE's DelaunayAnalysis."""
+"""Standalone Delaunay-network Processing algorithm."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from collections.abc import Iterable
+from typing import Any, cast
+
+import numpy as np
+import pandas as pd
+from scipy.spatial import Delaunay
+from shapely.geometry import LineString
 
 from qgis.core import (
     Qgis,
-    QgsCoordinateReferenceSystem,
+    QgsFeature,
+    QgsFeatureSource,
     QgsProcessingAlgorithm,
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
-    QgsProcessingOutputString,
-    QgsProcessingParameterBoolean,
-    QgsProcessingParameterEnum,
     QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterField,
+    QgsProcessingParameterFile,
     QgsProcessingParameterString,
 )
 
 from qaequilibrae.i18n.translate import trlt
-from qaequilibrae.modules.common_tools.sql_identifiers import quote_identifier
 
 from ..geometry_io.common import add_dataframe_to_sink, fields_from_dataframe
-from ..project import open_project
-from ..project_algorithm import ProjectAlgorithm
-
-if TYPE_CHECKING:
-    import pandas as pd
 
 
-class DelaunayNetwork(ProjectAlgorithm):
-    """Build a Delaunay triangulation of a project's centroids and assign a matrix."""
+def compute_delaunay_network(
+    nodes: dict[int, tuple[float, float]], matrix: Any | None = None
+) -> pd.DataFrame:
+    """Create Delaunay edges and optionally assign matrix demand to them."""
+    if len(nodes) < 3:
+        raise ValueError("At least three nodes are required to create a Delaunay network")
 
-    SOURCE = "SOURCE"
-    OVERWRITE = "OVERWRITE"
-    MATRIX_NAME = "MATRIX_NAME"
+    node_ids = np.asarray(list(nodes), dtype=np.int64)
+    coordinates = np.asarray([nodes[int(node)] for node in node_ids], dtype=np.float64)
+    triangulation = Delaunay(coordinates)
+    edges = {
+        tuple(sorted((int(node_ids[left]), int(node_ids[right]))))
+        for simplex in triangulation.simplices
+        for left, right in ((simplex[0], simplex[1]), (simplex[1], simplex[2]), (simplex[2], simplex[0]))
+    }
+
+    records = []
+    for link_id, (a_node, b_node) in enumerate(sorted(edges), start=1):
+        line = LineString([nodes[a_node], nodes[b_node]])
+        row: dict[str, Any] = {
+            "link_id": link_id,
+            "direction": 0,
+            "a_node": a_node,
+            "b_node": b_node,
+            "distance": float(line.length),
+        }
+        row["geometry"] = line
+        records.append(row)
+
+    columns = ["link_id", "direction", "a_node", "b_node", "distance", "geometry"]
+    dataframe = pd.DataFrame(records, columns=columns)
+    if matrix is None:
+        return dataframe
+
+    from aequilibrae.paths import Graph, TrafficAssignment, TrafficClass
+
+    graph = Graph()
+    graph.mode = "delaunay"
+    graph.network = dataframe[["link_id", "direction", "a_node", "b_node", "distance"]].copy()
+    graph.network["capacity"] = 1.0
+    graph.prepare_graph(np.asarray(sorted(nodes), dtype=np.int64))
+    graph.set_blocked_centroid_flows(True)
+
+    traffic_class = TrafficClass("delaunay", graph, matrix)
+    assignment = TrafficAssignment()
+    assignment.set_classes([traffic_class])
+    assignment.set_time_field("distance")
+    assignment.set_capacity_field("capacity")
+    assignment.set_vdf("BPR")
+    assignment.set_vdf_parameters({"alpha": 0, "beta": 1.0})
+    assignment.set_algorithm("all-or-nothing")
+    assignment.execute()
+
+    flow_columns = [
+        field
+        for core in matrix.view_names
+        for field in (f"{core}_ab", f"{core}_ba", f"{core}_tot")
+    ]
+    flows = assignment.results()[flow_columns]
+    dataframe = dataframe.join(flows, on="link_id")
+    return dataframe
+
+
+class DelaunayNetwork(QgsProcessingAlgorithm):
+    """Build Delaunay edges from supplied nodes and optionally attach matrix flows."""
+
+    NODES = "NODES"
+    NODE_ID_FIELD = "NODE_ID_FIELD"
+    MATRIX_PATH = "MATRIX_PATH"
     MATRIX_CORES = "MATRIX_CORES"
-    RESULT_NAME = "RESULT_NAME"
     OUTPUT = "OUTPUT"
-    RESULT = "RESULT"
-
-    group_name = "Mapping"
-    group_id = "mapping"
 
     def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
-        self.add_project_folder_parameter()
         self.addParameter(
-            QgsProcessingParameterEnum(
-                self.SOURCE,
-                self.tr("Centroid source"),
-                options=[self.tr("Zones"), self.tr("Network")],
-                defaultValue=0,
+            QgsProcessingParameterFeatureSource(
+                self.NODES,
+                self.tr("Node or centroid layer"),
+                types=[Qgis.ProcessingSourceType.VectorAnyGeometry],
             )
         )
         self.addParameter(
-            QgsProcessingParameterBoolean(
-                self.OVERWRITE,
-                self.tr("Overwrite an existing Delaunay network"),
-                defaultValue=True,
-            )
+            QgsProcessingParameterField(self.NODE_ID_FIELD, self.tr("Node ID field"), parentLayerParameterName=self.NODES)
         )
         self.addParameter(
-            QgsProcessingParameterString(
-                self.MATRIX_NAME,
-                self.tr("Matrix name to assign (optional)"),
+            QgsProcessingParameterFile(
+                self.MATRIX_PATH,
+                self.tr("Optional matrix file (*.omx)"),
+                behavior=Qgis.ProcessingFileParameterBehavior.File,
+                fileFilter="OpenMatrix (*.omx)",
                 optional=True,
             )
         )
         self.addParameter(
             QgsProcessingParameterString(
                 self.MATRIX_CORES,
-                self.tr("Matrix cores to assign (comma-separated, all by default)"),
+                self.tr("Matrix cores (comma-separated, all by default)"),
                 optional=True,
             )
         )
         self.addParameter(
-            QgsProcessingParameterString(
-                self.RESULT_NAME,
-                self.tr("Result name"),
-                defaultValue="delaunay",
-            )
-        )
-        self.addParameter(
             QgsProcessingParameterFeatureSink(
-                self.OUTPUT,
-                self.tr("Delaunay network"),
-                type=Qgis.ProcessingSourceType.VectorLine,
+                self.OUTPUT, self.tr("Delaunay network"), type=Qgis.ProcessingSourceType.VectorLine
             )
         )
-        self.addOutput(QgsProcessingOutputString(self.RESULT, self.tr("Saved result name")))
 
     def processAlgorithm(
         self, parameters: dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback | None
     ) -> dict[str, Any]:
-        if feedback is None:
-            feedback = QgsProcessingFeedback()
-        project_folder = self.project_folder(parameters, context)
-        source = ("zones", "network")[self.parameterAsEnum(parameters, self.SOURCE, context)]
-        overwrite = self.parameterAsBool(parameters, self.OVERWRITE, context)
-        matrix_name = self.parameterAsString(parameters, self.MATRIX_NAME, context) or None
+        feedback = feedback or QgsProcessingFeedback()
+        source = self.parameterAsSource(parameters, self.NODES, context)
+        if source is None:
+            raise QgsProcessingException(self.tr("The node or centroid layer could not be loaded"))
+        node_id_field = self.parameterAsString(parameters, self.NODE_ID_FIELD, context)
+        node_id_index = source.fields().lookupField(node_id_field)
+        if node_id_index < 0:
+            raise QgsProcessingException(self.tr(f"The node ID field '{node_id_field}' does not exist"))
+
+        nodes = self._nodes(source, node_id_index, feedback)
+        if len(nodes) < 3:
+            raise QgsProcessingException(self.tr("At least three usable nodes are required"))
+
+        matrix_path = self.parameterAsFile(parameters, self.MATRIX_PATH, context)
         cores = self.parameterAsString(parameters, self.MATRIX_CORES, context)
-        result_name = self.parameterAsString(parameters, self.RESULT_NAME, context) or "delaunay"
-
+        matrix = None
         try:
-            with open_project(project_folder) as project:
-                from aequilibrae.utils.create_delaunay_network import DelaunayAnalysis
+            if matrix_path:
+                from aequilibrae.matrix import AequilibraeMatrix
 
-                feedback.pushInfo(self.tr("Creating the Delaunay network"))
-                analysis = DelaunayAnalysis(project)
-                analysis.create_network(source=source, overwrite=overwrite)
-
-                assigned = False
-                if matrix_name:
-                    assigned = self._assign_matrix(project, analysis, matrix_name, cores, result_name, feedback)
-                dataframe = self._read_network(project, result_name if assigned else None)
-        except QgsProcessingException:
-            raise
+                matrix = AequilibraeMatrix()
+                matrix.load(matrix_path)
+                selected_cores = [core.strip() for core in cores.split(",") if core.strip()] if cores else list(matrix.names)
+                if not selected_cores:
+                    raise ValueError("The matrix contains no cores")
+                matrix.computational_view(selected_cores)
+            dataframe = compute_delaunay_network(nodes, matrix)
         except Exception as error:
             raise QgsProcessingException(self.tr(f"Could not create Delaunay network: {error}")) from error
+        finally:
+            if matrix is not None:
+                matrix.close()
 
         fields = fields_from_dataframe(dataframe)
         sink, destination = self.parameterAsSink(
-            parameters,
-            self.OUTPUT,
-            context,
-            fields,
-            Qgis.WkbType.LineString,
-            QgsCoordinateReferenceSystem("EPSG:4326"),
+            parameters, self.OUTPUT, context, fields, Qgis.WkbType.LineString, source.sourceCrs()
         )
         if sink is None:
             raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
         count = add_dataframe_to_sink(dataframe, sink, fields, feedback)
-
         feedback.pushInfo(self.tr(f"Wrote {count} Delaunay links"))
-        outputs = {self.OUTPUT: destination, self.RESULT: result_name if assigned else ""}
-        return outputs
-
-    def _assign_matrix(
-        self,
-        project: Any,
-        analysis: Any,
-        matrix_name: str,
-        cores: str,
-        result_name: str,
-        feedback: QgsProcessingFeedback,
-    ) -> bool:
-        matrix = project.matrices.get_matrix(matrix_name)
-        try:
-            selected_cores = (
-                [core.strip() for core in cores.split(",") if core.strip()] if cores else list(matrix.names)
-            )
-            if not selected_cores:
-                raise ValueError("At least one matrix core is required")
-            matrix.computational_view(selected_cores)
-            feedback.pushInfo(self.tr("Assigning the matrix to the Delaunay network"))
-            analysis.assign_matrix(matrix, result_name)
-        finally:
-            matrix.close()
-        return True
+        return {self.OUTPUT: destination}
 
     @staticmethod
-    def _read_network(project: Any, result_name: str | None) -> pd.DataFrame:
-        import pandas as pd
-        import shapely.wkb
-
-        with project.db_connection as conn:
-            links = pd.read_sql(
-                "SELECT link_id, direction, a_node, b_node, distance, "
-                "st_asBinary(geometry) AS geometry FROM delaunay_network",
-                conn,
-            )
-        links["geometry"] = links["geometry"].apply(shapely.wkb.loads)
-        if result_name:
-            with project.results_connection as conn:
-                results = pd.read_sql(f"SELECT * FROM {quote_identifier(result_name)}", conn).set_index("link_id")
-            links = links.join(results, on="link_id")
-        return links
+    def _nodes(source: QgsFeatureSource, node_id_index: int, feedback: QgsProcessingFeedback) -> dict[int, tuple[float, float]]:
+        nodes = {}
+        for feature in cast(Iterable[QgsFeature], source.getFeatures()):
+            if feedback.isCanceled():
+                break
+            geometry = feature.geometry()
+            if geometry is None or geometry.isEmpty():
+                continue
+            point = geometry.centroid().asPoint()
+            nodes[int(feature.attributes()[node_id_index])] = (point.x(), point.y())
+        return nodes
 
     def name(self) -> str:
         return "delaunay_network"
@@ -183,21 +200,26 @@ class DelaunayNetwork(ProjectAlgorithm):
     def displayName(self) -> str:
         return self.tr("Delaunay network")
 
+    def group(self) -> str:
+        return self.tr("Mapping")
+
+    def groupId(self) -> str:
+        return "mapping"
+
     def shortHelpString(self) -> str:
         return self.tr(
-            "Builds a Delaunay triangulation from the project's zone centroids or network "
-            "centroid nodes, using AequilibraE's DelaunayAnalysis. The algorithm creates or "
-            "replaces the project's delaunay_network table. If a project matrix is selected, "
-            "the chosen cores are assigned and the result is saved in the project results "
-            "database. Zone IDs or centroid node IDs must match the matrix index. The output "
-            "line layer includes link attributes and, when assigned, AB/BA/total flow fields."
+            "Builds Delaunay edges from the centroids of the supplied node features. The node ID field "
+            "must contain integer IDs. An optional OpenMatrix (*.omx) file assigns matrix demand to "
+            "the network with an all-or-nothing assignment, adding AB, BA, and total flow fields. Matrix "
+            "IDs must match node IDs. Geometry and distance use "
+            "the input layer CRS."
         )
 
     def createInstance(self) -> QgsProcessingAlgorithm:
         return DelaunayNetwork()
 
     def tags(self) -> list[str]:
-        return ["delaunay", "desire", "lines", "mapping", "triangulation"]
+        return ["delaunay", "lines", "mapping", "triangulation"]
 
     def tr(self, message: str) -> str:
         return trlt("DelaunayNetwork", message)

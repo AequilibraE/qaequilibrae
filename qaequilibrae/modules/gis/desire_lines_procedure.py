@@ -117,11 +117,9 @@ class DesireLinesProcedure(WorkerThread):
             all_features.append(feature)
             self.signal.emit(["update", i, f"Creating lines: {i} / {len(dataframe)}"])
 
-        if len(dataframe) > 1:
+        if all_features:
             _ = dlpr.addFeatures(all_features)
             self.result_layer = desireline_layer
-        else:
-            self.report.append("Nothing to show")
         if unassigned > 0:
             self.report.append(f"Total non assigned flows (not counting intrazonals): {str(unassigned)}")
 

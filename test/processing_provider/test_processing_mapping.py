@@ -17,7 +17,7 @@ from qgis.core import (
 from qaequilibrae.modules.processing_provider.mapping_procedures.delaunay_network import DelaunayNetwork
 from qaequilibrae.modules.processing_provider.mapping_procedures.desire_lines import DesireLines, compute_desire_lines
 from qaequilibrae.modules.processing_provider.mapping_procedures.simple_tag import SimpleTag, match_features
-from qaequilibrae.modules.processing_provider.project_algorithm import ProjectAlgorithm
+
 
 
 def _run_algorithm(algorithm, parameters):
@@ -300,6 +300,21 @@ def test_empty_desire_lines_keep_output_schema():
     assert unassigned == 0
 
 
+def test_desire_lines_unassigned_flow_excludes_intrazonals():
+    class Matrix:
+        view_names = ["car"]
+        index = np.array([1, 2])
+
+        @staticmethod
+        def get_matrix(core):
+            return np.array([[100.0, 3.0], [4.0, 200.0]])
+
+    _, report, unassigned = compute_desire_lines({1: (0.0, 0.0)}, Matrix())
+
+    assert unassigned == 7.0
+    assert report == ["Zone 2 does not have a corresponding centroid/zone. Total flow 7.0"]
+
+
 def test_desire_lines_orient_flow_by_zone_id_not_matrix_position():
     class Matrix:
         view_names = ["car"]
@@ -317,16 +332,18 @@ def test_desire_lines_orient_flow_by_zone_id_not_matrix_position():
     assert (row.car_AB, row.car_BA) == (2.0, 3.0)
 
 
-def test_delaunay_network_builds_and_assigns_matrix(fresh_sioux_falls_project_path):
+def test_delaunay_network_builds_without_matrix():
+    nodes = _make_layer(
+        "nodes",
+        "Point",
+        [("POINT (0 0)", [1]), ("POINT (2 0)", [2]), ("POINT (1 2)", [3]), ("POINT (3 2)", [4])],
+        [("node_id", QMetaType.Type.Int)],
+    )
     results, context = _run_algorithm(
         DelaunayNetwork(),
         {
-            ProjectAlgorithm.PROJECT_FOLDER: fresh_sioux_falls_project_path,
-            DelaunayNetwork.SOURCE: 1,
-            DelaunayNetwork.OVERWRITE: True,
-            DelaunayNetwork.MATRIX_NAME: "demand_omx",
-            DelaunayNetwork.MATRIX_CORES: "",
-            DelaunayNetwork.RESULT_NAME: "delaunay_test",
+            DelaunayNetwork.NODES: nodes,
+            DelaunayNetwork.NODE_ID_FIELD: "node_id",
             DelaunayNetwork.OUTPUT: "TEMPORARY_OUTPUT",
         },
     )
@@ -334,5 +351,30 @@ def test_delaunay_network_builds_and_assigns_matrix(fresh_sioux_falls_project_pa
     output = context.takeResultLayer(results[DelaunayNetwork.OUTPUT])
     assert output is not None
     assert output.featureCount() > 0
-    assert results[DelaunayNetwork.RESULT] == "delaunay_test"
+    field_names = [field.name() for field in output.fields()]
+    assert {"link_id", "direction", "a_node", "b_node", "distance"}.issubset(field_names)
+    assert not any(field.endswith(("_ab", "_ba", "_tot")) for field in field_names)
+
+
+def test_delaunay_network_builds_and_assigns_matrix(fresh_sioux_falls_project_path):
+    nodes = _make_layer(
+        "nodes",
+        "Point",
+        [(f"POINT ({zone} {zone % 5})", [zone]) for zone in range(1, 25)],
+        [("node_id", QMetaType.Type.Int)],
+    )
+    results, context = _run_algorithm(
+        DelaunayNetwork(),
+        {
+            DelaunayNetwork.NODES: nodes,
+            DelaunayNetwork.NODE_ID_FIELD: "node_id",
+            DelaunayNetwork.MATRIX_PATH: join(fresh_sioux_falls_project_path, "matrices", "demand.omx"),
+            DelaunayNetwork.MATRIX_CORES: "matrix",
+            DelaunayNetwork.OUTPUT: "TEMPORARY_OUTPUT",
+        },
+    )
+
+    output = context.takeResultLayer(results[DelaunayNetwork.OUTPUT])
+    assert output is not None
+    assert output.featureCount() > 0
     assert any(field.name().endswith("_tot") for field in output.fields())
