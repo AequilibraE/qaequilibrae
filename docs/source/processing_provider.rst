@@ -505,7 +505,43 @@ The input for the tool consists in a folder containing an AequilibraE project.
 
 Path computation
 ----------------
-Please refer to the :ref:`Path computation module <paths_procedures>` documentation.
+The menu dialogs are documented in the :ref:`Path computation module <paths_procedures>`
+section. The algorithms run the same computations from Processing inputs and save their
+results in the AequilibraE project folder.
+
+Network skimming
+~~~~~~~~~~~~~~~~
+``qaequilibrae:network_skimming`` computes a skim matrix for one mode and saves it in the
+project. The impedance-matrix dialog uses this algorithm too.
+
+Inputs:
+
+* AequilibraE project folder: the project whose network is skimmed.
+* Network mode and cost field: the mode to skim and the field the paths are minimised on.
+* Skim fields: the network fields written to the matrix, comma-separated.
+* Trace between all nodes: skim every node instead of only the network's centroids. This
+  cannot be combined with blocking flows through centroids.
+* Block flows through centroids: keep centroid-to-centroid paths from passing through
+  another centroid.
+* Excluded link IDs (optional): links left out of the graph, comma-separated.
+* Output matrix name: the name of the OMX matrix and its project record.
+
+Outputs have fixed names:
+
+.. list-table:: Network skimming outputs
+   :header-rows: 1
+
+   * - Output
+     - Value
+   * - ``OUTPUT_MATRIX_NAME``
+     - Matrix record name
+   * - ``OUTPUT_MATRIX_PATH``
+     - Matrix OMX file path
+   * - ``OUTPUT_MATRIX_FOLDER``
+     - Project matrix folder
+
+The algorithm checks the matrix name before computation and does not overwrite an
+existing matrix.
 
 Project
 -------
@@ -561,7 +597,42 @@ submitting them as the new parameter file for all AequilibraE procedures.
 
 Route choice
 ------------
-Please refer to the :ref:`Route choice <route_choice>` documentation.
+The menu dialog is documented in the :ref:`Route choice <route_choice>` section.
+``qaequilibrae:route_choice`` exposes assignment and choice-set building to the
+Processing Toolbox. The dialog uses the same worker for those operations; its
+single-OD visualization remains an interactive map workflow.
+
+Inputs include the AequilibraE project folder, network mode, and utility terms.
+Each utility term has a numeric coefficient and network field. Select a demand
+matrix and its cores, then choose ``assign`` or ``build``. Configure the choice-set
+algorithm, maximum routes or depth, penalty, probability cutoff, and PSL beta.
+Optional inputs support blocked centroid flows, excluded links, select-link queries,
+and sub-area polygons. Select-link query rows use a name and a comma-separated set
+of ``link_id:direction`` items, for example ``12:AB,14:Both``. Repeated names
+represent alternative link sets.
+
+Assignment saves link-load results to the project results database. Choice sets are
+saved under the project ``route_choice`` folder when building or when the save
+switch is enabled. Select-link analysis writes a result table and an OMX matrix.
+Sub-area analysis also writes its external-demand table as a Parquet file.
+
+.. list-table:: Route-choice outputs
+   :header-rows: 1
+
+   * - Output
+     - Value
+   * - ``OUTPUT_RESULT_NAME``
+     - Link-load result table name, or empty for choice-set building
+   * - ``OUTPUT_ROUTES_FOLDER``
+     - Folder containing saved choice sets, or empty when not saved
+   * - ``OUTPUT_SUB_AREA_MATRIX``
+     - Sub-area demand Parquet path, or empty when not used
+   * - ``OUTPUT_SELECT_LINK_FLOWS``
+     - Select-link result table name, or empty when not requested
+   * - ``OUTPUT_SELECT_LINK_MATRIX``
+     - Select-link OMX path, or empty when not requested
+
+The algorithm rejects existing result and matrix names instead of replacing them.
 
 Routing
 -------

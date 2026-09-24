@@ -45,9 +45,13 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(TripLengthDistribution())
 
     def __load_paths_procedures(self):
+        from .paths_procedures.network_skimming import NetworkSkimming
+        from .paths_procedures.route_choice import RouteChoice
         from .paths_procedures.shortest_path import ShortestPath
 
+        self.addAlgorithm(NetworkSkimming())
         self.addAlgorithm(ShortestPath())
+        self.addAlgorithm(RouteChoice())
 
     def __load_traffic_assignment(self):
         from .traffic_assignment_procedures.traffic_assignment import RunTrafficAssignment
