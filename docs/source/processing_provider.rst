@@ -116,6 +116,22 @@ be used as input, and the output format can be either one of \*.omx or \*.csv.
     :align: center
     :alt: Processing provider export matrices
 
+OMX and QGIS OD tables
+~~~~~~~~~~~~~~~~~~~~~~
+**Data > OMX to QGIS OD table** reads all cores from an OMX file.
+The result is a non-spatial QGIS table with ``origin``, ``destination``, ``core``, and ``value`` fields.
+Each row contains one matrix cell. Select a zone mapping when the OMX file has more than one mapping.
+
+**Data > QGIS OD table to OMX** writes this table format to a new OMX file.
+The table must contain one row for each origin-destination pair in each core.
+Zone IDs must be nonnegative integers. The output mapping is named ``zone_id`` and uses sorted zone IDs.
+This table format lets you inspect or edit matrix cells in QGIS before you write an OMX file.
+For a map of one origin or destination, use *Data > OMX origin or destination to zone table*.
+This tool reads only one row or column and writes one table row per zone.
+Join the result's ``zone_id`` field to the zone layer's ``zone_id`` field.
+You can also select a row or column in the *Visualize data* dialog.
+Do not convert a large OMX file to a full OD table for mapping: the table has one row per matrix cell.
+
 Matrix calculator
 ~~~~~~~~~~~~~~~~~
 Under the hood, this tool performs several matrix calculations using NumPy. Its output is

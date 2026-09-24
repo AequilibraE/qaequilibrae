@@ -38,10 +38,14 @@ class Provider(QgsProcessingProvider):
 
         from .matrix_procedures.export_matrix import ExportMatrix
         from .matrix_procedures.matrix_calculator import MatrixCalculator
+        from .matrix_procedures.omx_interop import OmxToTable, OmxZoneSlice, TableToOmx
         from .matrix_procedures.trip_length_distribution import TripLengthDistribution
 
         self.addAlgorithm(ExportMatrix())
         self.addAlgorithm(MatrixCalculator())
+        self.addAlgorithm(OmxToTable())
+        self.addAlgorithm(OmxZoneSlice())
+        self.addAlgorithm(TableToOmx())
         self.addAlgorithm(TripLengthDistribution())
 
     def __load_paths_procedures(self):
