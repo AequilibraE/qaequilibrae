@@ -20,6 +20,7 @@ class Provider(QgsProcessingProvider):
         self.__load_traffic_assignment()
         self.__load_geometry_io()
         self.__load_data_procedures()
+        self.__load_mapping_procedures()
 
     def __load_model_building(self):
 
@@ -77,6 +78,11 @@ class Provider(QgsProcessingProvider):
 
         self.addAlgorithm(AddLinkType())
         self.addAlgorithm(AddMode())
+
+    def __load_mapping_procedures(self):
+        from .mapping_procedures.simple_tag import SimpleTag
+
+        self.addAlgorithm(SimpleTag())
 
     def id(self):
         """The ID used for identifying the provider."""
