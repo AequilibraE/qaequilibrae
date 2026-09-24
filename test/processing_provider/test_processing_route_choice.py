@@ -90,13 +90,31 @@ def test_route_choice_saves_select_link_outputs(coquimbo_project):
         MATRIX_NAME="demand_omx",
         MATRIX_CORES="demand",
         SELECT_LINKS=["bridge", "7369:AB,20983:AB"],
-        SELECT_LINK_NAME="processing_route_sl",
+        SELECT_LINK_NAME="processing_route_sl.v1",
     )
 
     outputs = run_route_choice(parameters, project=project)
 
-    assert outputs[RouteChoice.OUTPUT_SELECT_LINK_FLOWS] == "processing_route_sl_uncompressed"
-    assert (project.project_base_path / "matrices" / "processing_route_sl.omx").is_file()
+    assert outputs[RouteChoice.OUTPUT_SELECT_LINK_FLOWS] == "processing_route_sl.v1_uncompressed"
+    matrix_path = project.project_base_path / "matrices" / "processing_route_sl.v1.omx"
+    assert outputs[RouteChoice.OUTPUT_SELECT_LINK_MATRIX] == str(matrix_path)
+    assert matrix_path.is_file()
+
+
+def test_route_choice_does_not_overwrite_legacy_select_link_matrix(sf_project):
+    project = sf_project.project
+    existing_matrix = project.project_base_path / "matrices" / "processing_route_sl.omx"
+    existing_matrix.write_bytes(b"existing matrix")
+    parameters = _parameters(
+        project.project_base_path,
+        SELECT_LINKS=["bridge", "1:AB"],
+        SELECT_LINK_NAME="processing_route_sl.v1",
+    )
+
+    with pytest.raises(QgsProcessingException, match="already exists"):
+        run_route_choice(parameters, project=project)
+
+    assert existing_matrix.read_bytes() == b"existing matrix"
 
 
 def test_route_choice_rejects_an_existing_result(sf_project):

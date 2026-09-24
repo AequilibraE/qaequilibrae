@@ -53,7 +53,7 @@ class RouteChoiceConfiguration(TypedDict):
     output_name: str
     save_choice_sets: bool
     excluded_links: list[int]
-    select_links: dict[str, list[tuple[int, int] | list[tuple[int, int]]]]
+    select_links: dict[str, list[list[tuple[int, int]]]]
     select_link_name: str
     sub_area: bool
 
@@ -133,6 +133,7 @@ def _run_route_choice(
             route_choice.add_demand(matrix)
             route_choice.prepare()
             if configuration["select_links"]:
+                # The upstream method also accepts single-link alternatives in its broader type.
                 selections = cast(
                     dict[Hashable, list[tuple[int, int] | list[tuple[int, int]]]],
                     configuration["select_links"],
@@ -164,11 +165,15 @@ def _run_route_choice(
                 route_choice.save_link_flows(output_name, project=project)
                 outputs[RouteChoice.OUTPUT_RESULT_NAME] = f"{output_name}_uncompressed"
             if configuration["select_links"]:
-                route_choice.save_select_link_flows(configuration["select_link_name"], project=project)
-                outputs[RouteChoice.OUTPUT_SELECT_LINK_FLOWS] = f"{configuration['select_link_name']}_uncompressed"
-                outputs[RouteChoice.OUTPUT_SELECT_LINK_MATRIX] = str(
-                    (Path(project.matrices.fldr) / configuration["select_link_name"]).with_suffix(".omx")
-                )
+                select_link_name = configuration["select_link_name"]
+                route_choice.save_select_link_flows(select_link_name, project=project)
+                matrix_path = Path(project.matrices.fldr) / f"{select_link_name}.omx"
+                # AequilibraE replaces dotted name suffixes when saving the OMX file.
+                legacy_path = (Path(project.matrices.fldr) / select_link_name).with_suffix(".omx")
+                if legacy_path != matrix_path and not matrix_path.exists() and legacy_path.exists():
+                    legacy_path.rename(matrix_path)
+                outputs[RouteChoice.OUTPUT_SELECT_LINK_FLOWS] = f"{select_link_name}_uncompressed"
+                outputs[RouteChoice.OUTPUT_SELECT_LINK_MATRIX] = str(matrix_path)
         finally:
             demand_matrix.close()
 
@@ -253,7 +258,9 @@ def _check_output_names(
             raise RouteChoiceError(f"Results table '{name}' already exists")
     if configuration["select_links"]:
         matrix_name = configuration["select_link_name"]
-        if project.matrices.check_exists(matrix_name) or (Path(project.matrices.fldr) / f"{matrix_name}.omx").exists():
+        matrix_path = Path(project.matrices.fldr) / f"{matrix_name}.omx"
+        legacy_path = (Path(project.matrices.fldr) / matrix_name).with_suffix(".omx")
+        if project.matrices.check_exists(matrix_name) or matrix_path.exists() or legacy_path.exists():
             raise RouteChoiceError(f"Matrix '{matrix_name}' already exists")
     if configuration["sub_area"]:
         path = routes_folder / f"{configuration['output_name']}.parquet"
@@ -547,7 +554,7 @@ class RouteChoice(ProjectAlgorithm):
 
 def _select_links(
     values: Sequence[Any] | None,
-) -> dict[str, list[tuple[int, int] | list[tuple[int, int]]]]:
+) -> dict[str, list[list[tuple[int, int]]]]:
     """Parse query rows into named alternative sets of directed link IDs.
 
     Each row contains a query name and comma-separated ``ID:direction`` items.
