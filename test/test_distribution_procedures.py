@@ -70,10 +70,7 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
     dialog.cob_atra_field.setCurrentText("destinations")
 
     dialog.add_job_to_queue()
-    dialog.worker_thread = dialog.job_queue[dialog.outfile]
-    dialog.worker_thread.doWork()
-
-    dialog.worker_thread.output.export(dialog.outfile)
+    dialog.run_job(dialog.job_queue[dialog.outfile])
 
     assert isfile(file_path)
 
@@ -180,9 +177,7 @@ def test_apply_gravity(ae_with_project, method, folder_path, mocker):
     dialog.outfile = file_path
 
     dialog.add_job_to_queue()
-    dialog.worker_thread = dialog.job_queue[dialog.outfile]
-    dialog.worker_thread.doWork()
-    dialog.worker_thread.output.export(dialog.outfile)
+    dialog.run_job(dialog.job_queue[dialog.outfile])
 
     assert isfile(file_path)
 

@@ -16,6 +16,7 @@ class Provider(QgsProcessingProvider):
     def loadAlgorithms(self):
         self.__load_model_building()
         self.__load_matrix_procedures()
+        self.__load_distribution_procedures()
         self.__load_paths_procedures()
         self.__load_traffic_assignment()
         self.__load_geometry_io()
@@ -42,6 +43,15 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(ExportMatrix())
         self.addAlgorithm(MatrixCalculator())
         self.addAlgorithm(TripLengthDistribution())
+
+    def __load_distribution_procedures(self):
+        from .distribution_procedures.apply_gravity import ApplyGravity
+        from .distribution_procedures.calibrate_gravity import CalibrateGravity
+        from .distribution_procedures.iterative_proportional_fitting import IterativeProportionalFitting
+
+        self.addAlgorithm(ApplyGravity())
+        self.addAlgorithm(CalibrateGravity())
+        self.addAlgorithm(IterativeProportionalFitting())
 
     def __load_paths_procedures(self):
         from .paths_procedures.shortest_path import ShortestPath

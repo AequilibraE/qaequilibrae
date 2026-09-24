@@ -164,6 +164,47 @@ matrices and their selected cores.
     :align: center
     :alt: Processing provider TLD
 
+Distribution
+------------
+The Distribution tools expose the three trip-distribution procedures from the
+:ref:`Trip Distribution menu <trip_distribution>` directly to Processing. They take their
+inputs from the project and from vector layers, so they can be used on their own and in
+the model designer.
+
+Apply gravity model
+~~~~~~~~~~~~~~~~~~~
+**Distribution > Apply gravity model** produces a trip matrix by applying a synthetic
+gravity model to an impedance matrix.
+
+* *Impedance matrix name* and *Impedance matrix core* identify the skim matrix and core.
+* *Trip-end vector layer*, *Index field*, *Production field* and *Attraction field*
+  provide the row and column totals. The index field holds the zone IDs.
+* *Deterrence function* is one of ``GAMMA``, ``EXPO`` or ``POWER``. ``GAMMA`` takes both
+  *alpha* and *beta*; ``EXPO`` takes only *beta* and ``POWER`` only *alpha*.
+* The result is written to an OpenMatrix (\*.omx) file.
+
+Calibrate gravity model
+~~~~~~~~~~~~~~~~~~~~~~~
+**Distribution > Calibrate gravity model** fits a synthetic gravity model to an observed
+trip matrix and an impedance matrix, and saves the calibrated model as a \*.mod file.
+
+* *Observed matrix name* and *Observed matrix core* identify the observed demand matrix.
+* *Impedance matrix name* and *Impedance matrix core* identify the skim matrix.
+* *Deterrence function* is either ``EXPO`` or ``POWER``.
+
+Iterative proportional fitting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Distribution > Iterative proportional fitting** balances a seed trip matrix so that its
+row and column totals match the production and attraction vectors. It is also known as
+Fratar or Furness.
+
+* *Seed matrix name* and *Seed matrix core* identify the matrix to balance.
+* *Trip-end vector layer*, *Index field*, *Production field* and *Attraction field*
+  provide the row and column totals.
+* The balanced matrix is written to an OpenMatrix (\*.omx) file.
+
+The *Treat NaN values as zero* option is available on all three tools.
+
 Mapping
 -------
 With Mapping tools, the user can easily visualize project data. For the tools not presented
