@@ -7,7 +7,7 @@ select-link and skim outputs.
 
 import json
 from collections.abc import Mapping
-from contextlib import ExitStack, contextmanager
+from contextlib import ExitStack
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -28,7 +28,7 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
-from ..project import open_project
+from ..project import borrow_project
 from ..project_algorithm import ProjectAlgorithm
 
 
@@ -52,7 +52,7 @@ def _run_assignment(project_folder, configuration, feedback):
         raise TrafficAssignmentError("The assignment configuration requires at least one traffic class")
 
     _info(feedback, "Opening AequilibraE project")
-    with _assignment_project(project_folder) as project, ExitStack() as resources:
+    with borrow_project(project_folder) as project, ExitStack() as resources:
         _check_canceled(feedback)
         _check_output_names(project, configuration)
         assignment, traffic_classes = _build_assignment(
@@ -69,25 +69,6 @@ def _run_assignment(project_folder, configuration, feedback):
 
     _info(feedback, f"Saved traffic-assignment results as {result_name}")
     return outputs
-
-
-@contextmanager
-def _assignment_project(folder):
-    """Borrow an open project or restore the active project after a standalone run."""
-    from aequilibrae.context import activate_project, get_active_project
-
-    if hasattr(folder, "network"):
-        yield folder
-        return
-    active = get_active_project(must_exist=False)
-    if active is not None and Path(active.project_base_path).resolve() == Path(folder).resolve():
-        yield active
-        return
-    try:
-        with open_project(folder) as project:
-            yield project
-    finally:
-        activate_project(active)
 
 
 def _build_assignment(project, class_options, assignment_options, resources, feedback):
@@ -560,7 +541,7 @@ class RunTrafficAssignment(ProjectAlgorithm):
 
         from ..geometry_io.common import add_dataframe_to_sink, fields_from_dataframe
 
-        with _assignment_project(project_folder) as project:
+        with borrow_project(project_folder) as project:
             links = project.network.links.data
             results = load_result_table(project, result_name)
             merged = links.merge(results, on="link_id", how="left")

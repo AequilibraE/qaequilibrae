@@ -1,22 +1,65 @@
 from os.path import dirname, join
 
-from aequilibrae.paths import SkimResults, NetworkSkimming
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QThread, pyqtSignal
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
+from qgis.core import QgsProcessingFeedback
 
-from qaequilibrae.modules.common_tools import ReportDialog, BaseDialog
+from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.common_tools import standard_path
-from qaequilibrae.modules.common_tools.global_parameters import integer_types, float_types
+from qaequilibrae.modules.processing_provider.paths_procedures.network_skimming import (
+    NetworkSkimming,
+    run_network_skimming,
+)
+
+
+class SkimmingFeedback(QgsProcessingFeedback):
+    """Forward Processing progress to the dialog while it runs on a worker thread."""
+
+    message = pyqtSignal(str)
+
+    def __init__(self, cancellation_requested):
+        super().__init__()
+        self.cancellation_requested = cancellation_requested
+
+    def pushInfo(self, message):
+        super().pushInfo(message)
+        self.message.emit(message)
+
+    def isCanceled(self):
+        return self.cancellation_requested() or super().isCanceled()
+
+
+class SkimmingWorker(QThread):
+    message = pyqtSignal(str)
+    progress = pyqtSignal(float)
+
+    def __init__(self, parameters, project, parent):
+        super().__init__(parent)
+        self.parameters = parameters
+        self.project = project
+        self.error = None
+        self.result = None
+        self.cancel_requested = False
+
+    def cancel(self):
+        self.cancel_requested = True
+
+    def run(self):
+        try:
+            feedback = SkimmingFeedback(lambda: self.cancel_requested)
+            feedback.message.connect(self.message.emit)
+            feedback.progressChanged.connect(self.progress.emit)
+            self.result = run_network_skimming(self.parameters, self.project, feedback)
+        except Exception as error:
+            self.error = str(error)
 
 
 class ImpedanceMatrixDialog(BaseDialog):
     def __init__(self, qgis_project):
         super().__init__(ui_file=join(dirname(__file__), "forms/ui_impedance_matrix.ui"), qgis_project=qgis_project)
 
-    def _base_ui_setup(self):
+    def _base_ui_setup(self, **kwargs):
         self.link_layer = self.qgis_project.layers["links"][0]
-        self.result = SkimResults()
-        self.validtypes = integer_types + float_types
         self.tot_skims = 0
         self.name_skims = 0
         self.graph = None
@@ -24,6 +67,8 @@ class ImpedanceMatrixDialog(BaseDialog):
         self.skim_fields = []
         self.all_modes = {}
         self.error = None
+        self.worker_thread = None
+        self.processing_results = None
 
         # FIRST, we connect slot signals
         # For adding skims
@@ -45,7 +90,6 @@ class ImpedanceMatrixDialog(BaseDialog):
         self.cb_minimizing.clear()
         self.available_skims_table.clearContents()
         self.block_paths.setChecked(True)
-        self.graph = None  # type: Graph
 
         with self.project.db_connection as conn:
             res = conn.execute("""select mode_name, mode_id from modes""")
@@ -113,62 +157,59 @@ class ImpedanceMatrixDialog(BaseDialog):
             return True
 
     def run_thread(self):
-        self.do_dist_matrix.setVisible(False)
-        self.worker_thread.signal.connect(self.signal_handler)
+        self.worker_thread.finished.connect(self.job_finished_from_thread)
         self.worker_thread.start()
         self.exec()
 
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.progressbar.setMaximum(val[1])
-        elif val[0] == "update":
-            self.progress_label.setText(val[2])
-            self.progressbar.setValue(val[1])
-        elif val[0] == "set_text":
-            self.progress_label.setText(val[1])
-        elif val[0] == "finished":
-            self.progressbar.reset()
-            self.progress_label.clear()
-            self.finished_threaded_procedure()
-
-    def finished_threaded_procedure(self):
-        self.report = self.worker_thread.report
-        self.worker_thread.save_to_project(self.only_str(self.mat_name))
+    def job_finished_from_thread(self):
+        self.worker_thread.wait()
+        self.error = self.worker_thread.error
+        self.processing_results = self.worker_thread.result
+        if self.error:
+            self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
         self.exit_procedure()
 
     def run_skimming(self):  # Saving results
         if not self.check_name_exists():
             return
         self.mat_name = self.line_matrix.text()
-        mode = self.all_modes[self.cb_modes.currentText()]
-        self.project.network.build_graphs()
-        self.graph = self.project.network.graphs[mode]
-
-        # We prepare the graph to set all nodes as centroids
-        if self.rdo_all_nodes.isChecked():
-            self.graph.prepare_graph(self.graph.all_nodes)
-
-        self.graph.set_graph(cost_field=self.cb_minimizing.currentText())
-        self.graph.set_blocked_centroid_flows(self.block_paths.isChecked())
-
-        if self.chb_chosen_links.isChecked():
-            idx = self.link_layer.dataProvider().fieldNameIndex("link_id")
-            remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
-            self.graph.exclude_links(remove)
-
-        self.graph.set_skimming(self.skim_fields)
-
-        self.result.prepare(self.graph)
-
+        self.processing_results = None
         self.funding1.setVisible(False)
         self.funding2.setVisible(False)
         self.progressbar.setVisible(True)
         self.progress_label.setVisible(True)
-        self.worker_thread = NetworkSkimming(self.graph, self.result)
-        try:
-            self.run_thread()
-        except ValueError as error:
-            self.qgis_project.iface_error_message(error.message, self.tr("Input error"))
+        self.progressbar.setRange(0, 100)
+        self.progressbar.setValue(0)
+        self.do_dist_matrix.setVisible(False)
+
+        # The dialog only translates its state into Processing parameters. Graph
+        # preparation, validation and saving belong to the reusable algorithm.
+        self.worker_thread = SkimmingWorker(self.processing_parameters(), self.project, self)
+        self.worker_thread.message.connect(self.progress_label.setText)
+        self.worker_thread.progress.connect(self._set_progress)
+        self.run_thread()
+
+    def _set_progress(self, value):
+        self.progressbar.setValue(int(value))
+
+    def processing_parameters(self):
+        """Translate widget values into the public Processing inputs."""
+        algorithm = NetworkSkimming
+        excluded_links = []
+        if self.chb_chosen_links.isChecked():
+            link_id_index = self.link_layer.fields().lookupField("link_id")
+            excluded_links = [feature.attribute(link_id_index) for feature in self.link_layer.selectedFeatures()]
+
+        return {
+            algorithm.PROJECT_FOLDER: str(self.project.project_base_path),
+            algorithm.MODE: self.all_modes[self.cb_modes.currentText()],
+            algorithm.COST_FIELD: self.cb_minimizing.currentText(),
+            algorithm.SKIM_FIELDS: ",".join(self.skim_fields),
+            algorithm.TRACE_ALL_NODES: self.rdo_all_nodes.isChecked(),
+            algorithm.BLOCK_CENTROID_FLOWS: self.block_paths.isChecked(),
+            algorithm.EXCLUDED_LINKS: ",".join(str(link_id) for link_id in excluded_links),
+            algorithm.MATRIX_NAME: self.mat_name,
+        }
 
     @staticmethod
     def only_str(str_input):
@@ -176,22 +217,5 @@ class ImpedanceMatrixDialog(BaseDialog):
             return str_input.decode("utf-8")
         return str_input
 
-    def check_inputs(self):
-        self.error = None
-        if self.rdo_all_nodes.isChecked() and self.block_paths.isChecked():
-            self.error = self.tr(
-                "It is not possible to trace paths between all nodes while blocking flows through centroids"
-            )
-
-        if self.graph is None:
-            self.error = self.tr("No graph loaded")
-
-        if len(self.skim_fields) < 1:
-            self.error = self.tr("No skim fields provided")
-
     def exit_procedure(self):
         self.close()
-        if self.report:
-            dlg2 = ReportDialog(self.iface, self.report)
-            dlg2.show()
-            dlg2.exec()

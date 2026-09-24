@@ -55,6 +55,8 @@ def test_provider_exists(qgis_app):
         "ModifyNodes",
         "ModifyZones",
         "NetworkSimplifier",
+        "NetworkSkimming",
+        "RouteChoice",
         "ShortestPath",
         "RunTrafficAssignment",
         "SimpleTag",

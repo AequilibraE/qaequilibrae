@@ -5,9 +5,9 @@ from os.path import dirname, isdir, join
 import geopandas as gpd
 import numpy as np
 import qgis
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QThread
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
-from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest
+from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest, QgsProcessingFeedback
 
 from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.common_tools import geodataframe_from_layer, get_vector_layer_by_name, model_area_polygon
@@ -15,15 +15,40 @@ from qaequilibrae.modules.matrix_procedures import list_matrices
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
 from qaequilibrae.modules.paths_procedures.plot_route_choice import plot_results
 from qaequilibrae.modules.paths_procedures.route_choice_procedure import RouteChoiceProcedure
+from qaequilibrae.modules.processing_provider.paths_procedures.route_choice import (
+    RouteChoice as RouteChoiceAlgorithm,
+    run_route_choice,
+)
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
+
+
+class RouteChoiceWorker(QThread):
+    def __init__(self, parameters, project, zones, parent):
+        super().__init__(parent)
+        self.parameters = parameters
+        self.project = project
+        self.zones = zones
+        self.error = None
+        self.result = None
+
+    def run(self):
+        try:
+            self.result = run_route_choice(
+                self.parameters,
+                self.project,
+                QgsProcessingFeedback(),
+                self.zones,
+            )
+        except Exception as error:
+            self.error = str(error)
 
 
 class RouteChoiceDialog(BaseDialog):
     def __init__(self, qgis_project):
         super().__init__(ui_file=join(dirname(__file__), "forms/ui_route_choice.ui"), qgis_project=qgis_project)
 
-    def _base_ui_setup(self):
+    def _base_ui_setup(self, **kwargs):
         self.matrices = self.project.matrices
         self.error = None
         self.matrix = None
@@ -34,6 +59,7 @@ class RouteChoiceDialog(BaseDialog):
         self._pairs = []
         self.link_layer = self.qgis_project.layers["links"][0]
         self.parameters = {}
+        self.processing_results = None
 
         self.select_links = {}
         self.__rebuilt_modes = set()
@@ -431,15 +457,90 @@ class RouteChoiceDialog(BaseDialog):
 
     def run(self):
         self._validate_inputs()
-        self._get_graph_config()
-
         if self.error:
             return
 
-        self.worker_thread = RouteChoiceProcedure(
-            qgis.utils.iface.mainWindow(), self.project, self.job, self.parameters
+        if self.job == "execute_single":
+            self._get_graph_config()
+            self.worker_thread = RouteChoiceProcedure(
+                qgis.utils.iface.mainWindow(), self.project, self.job, self.parameters
+            )
+            self.worker_thread.signal.connect(self.signal_handler)
+            self.worker_thread.start()
+            self.exec()
+            return
+
+        parameters = self.processing_parameters()
+        self.worker_thread = RouteChoiceWorker(
+            parameters,
+            self.project,
+            self.parameters.get("zones"),
+            self,
         )
-        self.run_thread()
+        self.worker_thread.finished.connect(self.job_finished_from_thread)
+        self.worker_thread.start()
+        self.exec()
+
+    def processing_parameters(self):
+        """Translate dialog state into the public route-choice Processing inputs."""
+        algorithm = RouteChoiceAlgorithm
+        cores = []
+        for index, core in enumerate(self.matrix.names):
+            selected = self.chb_use_all_matrices.isChecked()
+            if not selected:
+                selected = self.tbl_array_cores.cellWidget(index, 1).findChildren(QCheckBox)[0].isChecked()
+            if selected:
+                cores.append(core)
+
+        utility_fields = []
+        for coefficient, field in self.utility:
+            utility_fields.extend([coefficient, field])
+
+        excluded_links = []
+        if self.chb_chosen_links.isChecked():
+            index = self.link_layer.fields().lookupField("link_id")
+            excluded_links = [feature.attribute(index) for feature in self.link_layer.selectedFeatures()]
+
+        select_links = []
+        if self.chb_set_select_link.isChecked():
+            for name, alternatives in self.select_links.items():
+                for link_set in alternatives:
+                    encoded = ",".join(
+                        f"{link_id}:{ {1: 'AB', -1: 'BA', 0: 'Both'}[direction] }" for link_id, direction in link_set
+                    )
+                    select_links.extend([name, encoded])
+
+        return {
+            algorithm.PROJECT_FOLDER: str(self.project.project_base_path),
+            algorithm.MODE: self.all_modes[self.cob_mode.currentText()],
+            algorithm.UTILITY_FIELDS: utility_fields,
+            algorithm.ALGORITHM: self.parameters["algorithm"],
+            algorithm.MAX_ROUTES: self.parameters["kwargs"]["max_routes"],
+            algorithm.MAX_DEPTH: self.parameters["kwargs"]["max_depth"],
+            algorithm.PENALTY: self.parameters["kwargs"]["penalty"],
+            algorithm.CUTOFF: self.parameters["kwargs"]["cutoff_prob"],
+            algorithm.BETA: self.parameters["kwargs"]["beta"],
+            algorithm.BLOCK_CENTROID_FLOWS: self.chb_check_centroids.isChecked(),
+            algorithm.MATRIX_NAME: self.cob_matrices.currentText(),
+            algorithm.MATRIX_CORES: ",".join(cores),
+            algorithm.JOB: self.job,
+            algorithm.RESULT_NAME: self.ln_rc_output.text().strip() or "route_choice",
+            algorithm.SAVE_CHOICE_SETS: self.parameters["save_choice_sets"],
+            algorithm.EXCLUDED_LINKS: ",".join(str(link_id) for link_id in excluded_links),
+            algorithm.SELECT_LINKS: select_links,
+            algorithm.SELECT_LINK_NAME: self.ln_mat_name.text().strip(),
+            algorithm.SUB_AREA: self.parameters["set_sub_area"],
+        }
+
+    def job_finished_from_thread(self):
+        self.worker_thread.wait()
+        self.error = self.worker_thread.error
+        self.processing_results = self.worker_thread.result
+        if self.error:
+            self.qgis_project.iface_error_message(self.error, self.tr("Route choice error"))
+        elif self.job == "build" or self.parameters["save_choice_sets"]:
+            self.qgis_project.iface_success_message(f"Route choice sets saved to {self.project.project_base_path}")
+        self.exit_procedure()
 
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
@@ -448,39 +549,17 @@ class RouteChoiceDialog(BaseDialog):
 
     def signal_handler(self, val):
         if val[0] == "finished":
-            message = None
-
-            if self.job == "assign":
-                self.worker_thread.rc.save_link_flows(self.ln_rc_output.text())
-
-            if self.parameters["set_select_links"]:
-                message = f"Route choice sets saved to {self.project.project_base_path}"
-                self.worker_thread.rc.save_select_link_flows(self.ln_mat_name.text())
-
-            if self.parameters["set_sub_area"]:
-                self.worker_thread.matrix.to_parquet(
-                    self.parameters["rc_folder"] / f"{self.ln_rc_output.text()}.parquet"
-                )
-
-            if self.job == "build" or self.parameters["save_choice_sets"]:
-                message = f"Route choice sets saved to {self.project.project_base_path}"
-                self.qgis_project.iface_success_message(message)
-
-            if self.job == "execute_single":
-                res = self.worker_thread.rc.get_results()
-
-                plot_results(res, self.parameters["node_from"], self.parameters["node_to"], self.link_layer)
-
-                dlg2 = ExecuteSingleDialog(
-                    self.qgis_project,
-                    self.worker_thread.graph,
-                    self.link_layer,
-                    self.parameters,
-                )
-                dlg2.show()
-                dlg2.open()
-                # see note in https://doc.qt.io/qt-6/qdialog.html#exec
-
+            res = self.worker_thread.rc.get_results()
+            plot_results(res, self.parameters["node_from"], self.parameters["node_to"], self.link_layer)
+            dlg2 = ExecuteSingleDialog(
+                self.qgis_project,
+                self.worker_thread.graph,
+                self.link_layer,
+                self.parameters,
+            )
+            dlg2.show()
+            dlg2.open()
+            # see note in https://doc.qt.io/qt-6/qdialog.html#exec
             self.exit_procedure()
 
     def exit_procedure(self):
