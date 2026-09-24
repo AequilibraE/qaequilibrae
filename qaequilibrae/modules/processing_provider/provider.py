@@ -17,6 +17,7 @@ class Provider(QgsProcessingProvider):
         self.__load_model_building()
         self.__load_matrix_procedures()
         self.__load_paths_procedures()
+        self.__load_traffic_assignment()
         self.__load_geometry_io()
         self.__load_data_procedures()
 
@@ -46,6 +47,11 @@ class Provider(QgsProcessingProvider):
         from .paths_procedures.shortest_path import ShortestPath
 
         self.addAlgorithm(ShortestPath())
+
+    def __load_traffic_assignment(self):
+        from .traffic_assignment_procedures.traffic_assignment import RunTrafficAssignment
+
+        self.addAlgorithm(RunTrafficAssignment())
 
     def __load_geometry_io(self):
         from .geometry_io.add import AddLinks, AddNodes, AddZones
