@@ -7,6 +7,7 @@ from qaequilibrae.modules.processing_provider.paths_procedures.route_choice impo
     RouteChoice,
     _select_links,
     run_route_choice,
+    run_single_route_choice,
 )
 from qaequilibrae.modules.processing_provider.project_algorithm import ProjectAlgorithm
 from test.utilities import create_matrix
@@ -65,6 +66,27 @@ def test_route_choice_assignment_runs_as_processing_operation(sf_project):
     assert get_active_project() is project
 
 
+def test_single_route_choice_uses_shared_graph_without_changing_project(sf_project):
+    project = sf_project.project
+    project.network.build_graphs(modes=["c"])
+    original_graph = project.network.graphs["c"]
+    configuration = {
+        "mode": "c",
+        "utility_fields": [(0.01, "distance")],
+        "excluded_links": [],
+        "block_centroid_flows": False,
+        "algorithm": "bfsle",
+        "kwargs": {"max_routes": 3, "max_depth": 0, "penalty": 1.0, "cutoff_prob": 0.0, "beta": 1.1},
+    }
+
+    choice, graph = run_single_route_choice(project, configuration, 1, 15, 1.0)
+
+    assert not choice.get_results().empty
+    assert graph is not original_graph
+    assert "__utility__" not in original_graph.network.columns
+    assert get_active_project() is project
+
+
 def test_route_choice_build_saves_choice_sets(sf_project):
     project = sf_project.project
     parameters = _parameters(
@@ -115,6 +137,62 @@ def test_route_choice_does_not_overwrite_legacy_select_link_matrix(sf_project):
         run_route_choice(parameters, project=project)
 
     assert existing_matrix.read_bytes() == b"existing matrix"
+
+
+@pytest.mark.parametrize(
+    ("overrides", "message"),
+    [
+        ({"MATRIX_CORES": "missing_core"}, "does not contain"),
+        ({"UTILITY_FIELDS": [1.0, "missing_field"]}, "not available"),
+        ({"EXCLUDED_LINKS": "invalid"}, "must be integers"),
+    ],
+)
+def test_route_choice_invalid_inputs_leave_no_results(sf_project, overrides, message):
+    project = sf_project.project
+    parameters = _parameters(project.project_base_path, **overrides)
+    with pytest.raises(QgsProcessingException, match=message):
+        run_route_choice(parameters, project=project)
+
+    with project.results_connection as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM sqlite_master WHERE name = 'processing_route_choice_uncompressed'"
+        ).fetchone()[0] == 0
+
+
+def test_route_choice_cancellation_does_not_write_outputs(sf_project):
+    project = sf_project.project
+    feedback = QgsProcessingFeedback()
+    feedback.cancel()
+    with pytest.raises(QgsProcessingException, match="canceled"):
+        run_route_choice(_parameters(project.project_base_path), project=project, feedback=feedback)
+
+    with project.results_connection as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM sqlite_master WHERE name = 'processing_route_choice_uncompressed'"
+        ).fetchone()[0] == 0
+    assert not (project.project_base_path / "route_choice").exists()
+
+
+def test_route_choice_cancellation_after_compute_does_not_save(sf_project, monkeypatch):
+    from aequilibrae.paths import RouteChoice as AequilibraeRouteChoice
+
+    project = sf_project.project
+    feedback = QgsProcessingFeedback()
+    execute = AequilibraeRouteChoice.execute
+
+    def cancel_after_compute(self, *args, **kwargs):
+        result = execute(self, *args, **kwargs)
+        feedback.cancel()
+        return result
+
+    monkeypatch.setattr(AequilibraeRouteChoice, "execute", cancel_after_compute)
+    with pytest.raises(QgsProcessingException, match="canceled"):
+        run_route_choice(_parameters(project.project_base_path), project=project, feedback=feedback)
+
+    with project.results_connection as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM sqlite_master WHERE name = 'processing_route_choice_uncompressed'"
+        ).fetchone()[0] == 0
 
 
 def test_route_choice_rejects_an_existing_result(sf_project):

@@ -1,9 +1,7 @@
 import sys
-from os import mkdir
-from os.path import dirname, isdir, join
+from os.path import dirname, join
 
 import geopandas as gpd
-import numpy as np
 import qgis
 from qgis.PyQt.QtCore import Qt, QThread
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
@@ -62,7 +60,6 @@ class RouteChoiceDialog(BaseDialog):
         self.processing_results = None
 
         self.select_links = {}
-        self.__rebuilt_modes = set()
         self.__current_links = []
 
         self.__populate_project_info()
@@ -184,49 +181,23 @@ class RouteChoiceDialog(BaseDialog):
 
     def clear_cost_function(self):
         self.txt_cost_func.clear()
-
         self.cost_function = ""
+        self.utility.clear()
 
-    def __graph_for_mode(self, mode_id: str):
-        """Returns the graph for a mode, rebuilding it once per dialog session."""
-        if mode_id not in self.__rebuilt_modes or mode_id not in self.project.network.graphs:
-            self.project.network.build_graphs(modes=[mode_id])
-            self.__rebuilt_modes.add(mode_id)
-
-        return self.project.network.graphs[mode_id]
-
-    def _get_graph_config(self):
-        mode = self.cob_mode.currentText()
-        mode_id = self.all_modes[mode]
-
-        idx = self.link_layer.dataProvider().fieldNameIndex("link_id")
-        remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
-
-        graph = self.__graph_for_mode(mode_id)
-
+    def _single_route_configuration(self):
+        """Translate the interactive route inputs into the shared operation settings."""
+        excluded_links = []
         if self.chb_chosen_links.isChecked():
-            graph = self.project.network.graphs.pop(mode_id)
-            graph.exclude_links(remove)
-
-        if self.job == "execute_single":
-            nodes_of_interest = np.array([self.parameters["node_from"], self.parameters["node_to"]], dtype=np.int64)
-        else:
-            nodes_of_interest = graph.centroids
-
-        graph.network = graph.network.assign(__utility__=0.0)
-        graph.prepare_graph(nodes_of_interest)
-
-        field = np.zeros((1, graph.graph.shape[0]))
-        for idx, (par, col) in enumerate(self.utility):
-            field += par * graph.graph[col].array
-
-        graph.graph["__utility__"] = field.reshape(graph.graph.shape[0], 1)
-
-        graph.set_blocked_centroid_flows(self.chb_check_centroids.isChecked())
-
-        graph.set_graph("__utility__")
-
-        self.parameters["graph"] = graph
+            index = self.link_layer.fields().lookupField("link_id")
+            excluded_links = [feature.attribute(index) for feature in self.link_layer.selectedFeatures()]
+        return {
+            "mode": self.all_modes[self.cob_mode.currentText()],
+            "utility_fields": self.utility,
+            "excluded_links": excluded_links,
+            "block_centroid_flows": self.chb_check_centroids.isChecked(),
+            "algorithm": self.parameters.get("algorithm", "bfsle"),
+            "kwargs": self.parameters.get("kwargs", {}),
+        }
 
     ###### For sub-area analysis
     def set_sub_area_use(self):
@@ -371,14 +342,12 @@ class RouteChoiceDialog(BaseDialog):
         if self.job == "execute_single":
             nds = {"node_from": self.node_from.text(), "node_to": self.node_to.text()}
             for node in nds.values():
-                # Check node ID is numeric
                 if not node.isdigit():
                     self.error = "Wrong input value for node ID"
-
-                # Check if node_id exists
-                node_id = int(node)
-                if node_id not in self.__project_nodes:
-                    self.error = f"Node ID {node_id} doesn't exist in project"
+                    break
+                if int(node) not in self.__project_nodes:
+                    self.error = f"Node ID {node} doesn't exist in project"
+                    break
 
             # Check for execute_single demand
             demand = self.ln_demand.text()
@@ -386,20 +355,13 @@ class RouteChoiceDialog(BaseDialog):
                 self.error = "Wrong input value for demand"
 
         if self.job in ["assign", "build"]:
-            # Let's check up matrix data here
             self.set_matrix()
-
-            if self.chb_use_all_matrices.isChecked():
-                matrix_cores_to_use = self.matrix.names
-            else:
-                matrix_cores_to_use = []
-                for i, mat in enumerate(self.matrix.names):
-                    if self.tbl_array_cores.cellWidget(i, 1).findChildren(QCheckBox)[0].isChecked():
-                        matrix_cores_to_use.append(mat)
-
-            if len(matrix_cores_to_use) > 0:
-                self.matrix.computational_view(matrix_cores_to_use)
-            else:
+            if self.matrix is None:
+                self.error = "Check matrices inputs"
+            elif not self.chb_use_all_matrices.isChecked() and not any(
+                self.tbl_array_cores.cellWidget(i, 1).findChildren(QCheckBox)[0].isChecked()
+                for i in range(len(self.matrix.names))
+            ):
                 self.error = "Check matrices inputs"
 
         if self.error:
@@ -428,12 +390,6 @@ class RouteChoiceDialog(BaseDialog):
         else:
             self.parameters["set_sub_area"] = False
 
-        if self.job == "build" or self.parameters["save_choice_sets"] or self.parameters["set_sub_area"]:
-            rc_folder = self.project.project_base_path / "route_choice"
-            if not isdir(rc_folder):
-                mkdir(rc_folder)
-            self.parameters["rc_folder"] = rc_folder
-
         self.parameters["matrix"] = float(demand) if self.job == "execute_single" else self.matrix
 
         if self.job == "execute_single":
@@ -461,10 +417,8 @@ class RouteChoiceDialog(BaseDialog):
             return
 
         if self.job == "execute_single":
-            self._get_graph_config()
-            self.worker_thread = RouteChoiceProcedure(
-                qgis.utils.iface.mainWindow(), self.project, self.job, self.parameters
-            )
+            self.parameters["configuration"] = self._single_route_configuration()
+            self.worker_thread = RouteChoiceProcedure(qgis.utils.iface.mainWindow(), self.project, self.parameters)
             self.worker_thread.signal.connect(self.signal_handler)
             self.worker_thread.start()
             self.exec()
