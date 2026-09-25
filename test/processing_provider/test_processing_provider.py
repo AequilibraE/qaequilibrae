@@ -15,9 +15,10 @@ from qaequilibrae.modules.processing_provider.model_building.add_links_from_laye
 from qaequilibrae.modules.processing_provider.model_building.collapse_links import CollapseLinks
 from qaequilibrae.modules.processing_provider.model_building.create_empty_project import CreateEmptyProject
 from qaequilibrae.modules.processing_provider.model_building.network_simplifier import NetworkSimplifier
+from qaequilibrae.modules.processing_provider.paths_procedures.shortest_path import ShortestPath
 from qaequilibrae.modules.processing_provider.provider import Provider
 
-from .utilities import get_test_data_path, load_test_layer
+from ..utilities import get_test_data_path, load_test_layer
 
 
 def qgis_app():
@@ -36,13 +37,35 @@ def test_provider_exists(qgis_app):
     assert "aequilibrae" in provider_names
     assert {type(algorithm).__name__ for algorithm in provider.algorithms()} == {
         "AddLinksFromLayer",
+        "AddLinks",
+        "AddNodes",
+        "AddZones",
+        "AddLinkType",
+        "AddMode",
         "CollapseLinks",
         "CreateEmptyProject",
+        "DelaunayNetwork",
+        "DesireLines",
+        "ExtractLinks",
+        "ExtractNodes",
+        "ExtractZones",
         "ExportMatrix",
         "MatrixCalculator",
+        "OmxToTable",
+        "OmxZoneSlice",
+        "TableToOmx",
+        "ModifyLinks",
+        "ModifyNodes",
+        "ModifyZones",
         "NetworkSimplifier",
+        "NetworkSkimming",
+        "RouteChoice",
+        "ShortestPath",
+        "RunTrafficAssignment",
+        "SimpleTag",
         "TripLengthDistribution",
     }
+    registry.removeProvider(provider)
 
 
 @pytest.mark.parametrize("format", [0, 1])
@@ -79,16 +102,80 @@ def test_add_links_from_layer(ae_with_project):
     }
 
     action = AddLinksFromLayer()
+    action.initAlgorithm()
     context = QgsProcessingContext()
     feedback = QgsProcessingFeedback()
 
-    _ = action.run(parameters, context, feedback)
+    _, succeeded = action.run(parameters, context, feedback)
+    assert succeeded, feedback.textLog()
 
     project = Project()
     project.open(folder_path)
 
     assert project.network.count_links() == 81
     assert project.network.count_nodes() == 28
+
+
+def test_shortest_path(ae_with_project):
+    """The QGIS adapter writes the operation result using a stable output schema."""
+    ae_with_project.load_layer_by_name("links")
+    links = QgsProject.instance().mapLayersByName("links")[0]
+
+    parameters = {
+        ShortestPath.LINKS: links,
+        ShortestPath.MODE: "c",
+        ShortestPath.COST_FIELD: "distance",
+        ShortestPath.FROM_NODE: 1,
+        ShortestPath.TO_NODE: 6,
+        ShortestPath.BLOCK_CENTROID_FLOWS: False,
+        ShortestPath.EXCLUDED_LINKS: "4,14",
+        ShortestPath.OUTPUT: "TEMPORARY_OUTPUT",
+    }
+
+    action = ShortestPath()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    context.setProject(QgsProject.instance())
+    feedback = QgsProcessingFeedback()
+    result, ok = action.run(parameters, context, feedback)
+
+    assert ok, feedback.textLog()
+    assert result[ShortestPath.PATH_LINK_IDS]
+    assert result[ShortestPath.TOTAL_COST] > 0
+    output = context.takeResultLayer(result[ShortestPath.OUTPUT])
+    assert output is not None
+    assert output.featureCount() == 4
+    assert [field.name() for field in output.fields()] == [
+        "sequence",
+        "link_id",
+        "a_node",
+        "b_node",
+        "direction",
+        "cost",
+    ]
+
+
+def test_shortest_path_blocks_centroid_flows(ae_with_project):
+    ae_with_project.load_layer_by_name("links")
+    ae_with_project.load_layer_by_name("nodes")
+
+    parameters = {
+        ShortestPath.LINKS: QgsProject.instance().mapLayersByName("links")[0],
+        ShortestPath.NODES: QgsProject.instance().mapLayersByName("nodes")[0],
+        ShortestPath.MODE: "c",
+        ShortestPath.COST_FIELD: "distance",
+        ShortestPath.FROM_NODE: 1,
+        ShortestPath.TO_NODE: 2,
+        ShortestPath.BLOCK_CENTROID_FLOWS: True,
+        ShortestPath.OUTPUT: "TEMPORARY_OUTPUT",
+    }
+
+    action = ShortestPath()
+    action.initAlgorithm()
+    feedback = QgsProcessingFeedback()
+    _, ok = action.run(parameters, QgsProcessingContext(), feedback)
+
+    assert ok, feedback.textLog()
 
 
 def test_matrix_calc(folder_path):

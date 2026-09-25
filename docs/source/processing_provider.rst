@@ -116,6 +116,22 @@ be used as input, and the output format can be either one of \*.omx or \*.csv.
     :align: center
     :alt: Processing provider export matrices
 
+OMX and QGIS OD tables
+~~~~~~~~~~~~~~~~~~~~~~
+**Data > OMX to QGIS OD table** reads all cores from an OMX file.
+The result is a non-spatial QGIS table with ``origin``, ``destination``, ``core``, and ``value`` fields.
+Each row contains one matrix cell. Select a zone mapping when the OMX file has more than one mapping.
+
+**Data > QGIS OD table to OMX** writes this table format to a new OMX file.
+The table must contain one row for each origin-destination pair in each core.
+Zone IDs must be nonnegative integers. The output mapping is named ``zone_id`` and uses sorted zone IDs.
+This table format lets you inspect or edit matrix cells in QGIS before you write an OMX file.
+For a map of one origin or destination, use *Data > OMX origin or destination to zone table*.
+This tool reads only one row or column and writes one table row per zone.
+Join the result's ``zone_id`` field to the zone layer's ``zone_id`` field.
+You can also select a row or column in the *Visualize data* dialog.
+Do not convert a large OMX file to a full OD table for mapping: the table has one row per matrix cell.
+
 Matrix calculator
 ~~~~~~~~~~~~~~~~~
 Under the hood, this tool performs several matrix calculations using NumPy. Its output is
@@ -190,6 +206,41 @@ available.
 
 Be aware that the existence of triggers in the project database might affect the
 performance of Simple tag.
+
+The Processing algorithm writes a new output layer. It copies the target layer's
+fields and geometry, then writes the matched value to the named target field. It
+creates that field when it does not exist. Features without a match receive a
+null value. For *Closest*, the algorithm checks the five nearest indexed source
+features. For *Touching*, it selects the feature with the greatest shared
+length, or area when both layers are polygons. Optional match fields must be
+selected on both layers or left empty on both.
+
+Desire lines
+~~~~~~~~~~~~
+**Mapping > Desire lines** builds one line for every origin-destination pair that
+carries flow. It uses a zone or centroid layer and an OpenMatrix (\*.omx) file.
+The integer zone ID field must match the matrix index. Select matrix cores as a
+comma-separated list, or leave the field empty to use all cores. Intrazonal
+flows are omitted. Each matrix core becomes AB and BA flow fields on the output
+line layer. Lines use the input layer's CRS.
+
+.. image:: images/mapping_tools/desire_lines_gui.png
+    :align: center
+    :alt: Desire lines
+
+Delaunay network
+~~~~~~~~~~~~~~~~
+**Mapping > Delaunay network** builds a Delaunay triangulation of the centroids
+of an AequilibraE project. It can also assign a matrix to the triangulation. The
+network is stored in the project's *delaunay_network* table and returned as a
+line layer.
+
+Select *Zones* or *Network* as the centroid source. Leave the matrix name empty
+to build the network only, or give a matrix name and, optionally, the cores to
+assign. The algorithm creates or replaces the project's *delaunay_network*
+table. If you assign a matrix, it also saves a result table in the project and
+includes its AB, BA and total fields in the output layer. Use the overwrite
+option when the project already contains a Delaunay network.
 
 Model Building
 --------------
@@ -470,7 +521,43 @@ The input for the tool consists in a folder containing an AequilibraE project.
 
 Path computation
 ----------------
-Please refer to the :ref:`Path computation module <paths_procedures>` documentation.
+The menu dialogs are documented in the :ref:`Path computation module <paths_procedures>`
+section. The algorithms run the same computations from Processing inputs and save their
+results in the AequilibraE project folder.
+
+Network skimming
+~~~~~~~~~~~~~~~~
+``qaequilibrae:network_skimming`` computes a skim matrix for one mode and saves it in the
+project. The impedance-matrix dialog uses this algorithm too.
+
+Inputs:
+
+* AequilibraE project folder: the project whose network is skimmed.
+* Network mode and cost field: the mode to skim and the field the paths are minimised on.
+* Skim fields: the network fields written to the matrix, comma-separated.
+* Trace between all nodes: skim every node instead of only the network's centroids. This
+  cannot be combined with blocking flows through centroids.
+* Block flows through centroids: keep centroid-to-centroid paths from passing through
+  another centroid.
+* Excluded link IDs (optional): links left out of the graph, comma-separated.
+* Output matrix name: the name of the OMX matrix and its project record.
+
+Outputs have fixed names:
+
+.. list-table:: Network skimming outputs
+   :header-rows: 1
+
+   * - Output
+     - Value
+   * - ``OUTPUT_MATRIX_NAME``
+     - Matrix record name
+   * - ``OUTPUT_MATRIX_PATH``
+     - Matrix OMX file path
+   * - ``OUTPUT_MATRIX_FOLDER``
+     - Project matrix folder
+
+The algorithm checks the matrix name before computation and does not overwrite an
+existing matrix.
 
 Project
 -------
@@ -526,7 +613,42 @@ submitting them as the new parameter file for all AequilibraE procedures.
 
 Route choice
 ------------
-Please refer to the :ref:`Route choice <route_choice>` documentation.
+The menu dialog is documented in the :ref:`Route choice <route_choice>` section.
+``qaequilibrae:route_choice`` exposes assignment and choice-set building to the
+Processing Toolbox. The dialog uses the same worker for those operations; its
+single-OD visualization remains an interactive map workflow.
+
+Inputs include the AequilibraE project folder, network mode, and utility terms.
+Each utility term has a numeric coefficient and network field. Select a demand
+matrix and its cores, then choose ``assign`` or ``build``. Configure the choice-set
+algorithm, maximum routes or depth, penalty, probability cutoff, and PSL beta.
+Optional inputs support blocked centroid flows, excluded links, select-link queries,
+and sub-area polygons. Select-link query rows use a name and a comma-separated set
+of ``link_id:direction`` items, for example ``12:AB,14:Both``. Repeated names
+represent alternative link sets.
+
+Assignment saves link-load results to the project results database. Choice sets are
+saved under the project ``route_choice`` folder when building or when the save
+switch is enabled. Select-link analysis writes a result table and an OMX matrix.
+Sub-area analysis also writes its external-demand table as a Parquet file.
+
+.. list-table:: Route-choice outputs
+   :header-rows: 1
+
+   * - Output
+     - Value
+   * - ``OUTPUT_RESULT_NAME``
+     - Link-load result table name, or empty for choice-set building
+   * - ``OUTPUT_ROUTES_FOLDER``
+     - Folder containing saved choice sets, or empty when not saved
+   * - ``OUTPUT_SUB_AREA_MATRIX``
+     - Sub-area demand Parquet path, or empty when not used
+   * - ``OUTPUT_SELECT_LINK_FLOWS``
+     - Select-link result table name, or empty when not requested
+   * - ``OUTPUT_SELECT_LINK_MATRIX``
+     - Select-link OMX path, or empty when not requested
+
+The algorithm rejects existing result and matrix names instead of replacing them.
 
 Routing
 -------
@@ -571,7 +693,57 @@ Please note that the TSP stops are labeled according their sequence.
 
 Traffic Assignment
 ------------------
-Please refer to the :ref:`Traffic Assignment module <traffic_assignment_procedures>` documentation.
+The menu dialog is documented in the :ref:`Traffic Assignment module <traffic_assignment_procedures>`
+section. ``qaequilibrae:traffic_assignment`` runs the same assignment from Processing inputs, and the
+dialog and exported Python runners use this algorithm too. The algorithm saves results in the
+AequilibraE project folder.
+
+The traffic-class table contains one row per class, with these columns:
+
+* Class name, matrix record name, and matrix cores (comma-separated).
+* Network mode, PCE, and the switch to block flows through centroids.
+* Optional fixed-cost field, value of time, and skim fields (comma-separated).
+
+A skim field produces final and blended cores by default.
+``free_flow_time:final,distance:blended`` produces only the specified cores.
+Each class has a separate OMX file named ``<result_name>_<class_name>.omx``.
+VDF parameters accept either numbers or network field names.
+The optional excluded-links table contains a class name and link IDs (comma-separated).
+
+The select-link table contains a query name, link IDs (comma-separated), and a direction: ``AB``, ``BA``, or ``Both``.
+Rows with the same query name form one query, including rows with different directions.
+The algorithm uses the AequilibraE select-link query semantics.
+The switches for select-link matrices and flows default to true.
+The default output name is ``<result_name>_sl``.
+
+Model Designer outputs have fixed names:
+
+.. list-table:: Assignment outputs
+   :header-rows: 1
+
+   * - Output
+     - Value
+   * - ``OUTPUT_DATABASE``
+     - Results database path
+   * - ``OUTPUT_RESULT_NAME``
+     - Assignment results table name
+   * - ``OUTPUT_MATRIX_FOLDER``
+     - Project matrix folder
+   * - ``OUTPUT_SKIMS``
+     - JSON array of skim OMX paths, or ``[]`` without skims
+   * - ``OUTPUT_SELECT_LINK_MATRIX``
+     - Select-link OMX path, or an empty string without this output
+   * - ``OUTPUT_SELECT_LINK_FLOWS``
+     - Select-link flows table name, or an empty string without this output
+
+The output database path and table name identify each flow table.
+The skim-path array supports multiple classes without a variable number of model outputs.
+In a Model Designer expression, ``array_get(from_json(...), 0)`` selects the first skim path.
+The expression argument is the ``OUTPUT_SKIMS`` value from the assignment step.
+
+The algorithm checks existing output names before computation and does not overwrite results.
+Cancellation takes effect before computation or after computation, before any output saves.
+A failure during output saves can leave some results in the project.
 
 Transit
 -------

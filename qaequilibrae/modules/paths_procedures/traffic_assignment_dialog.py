@@ -11,12 +11,17 @@ from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtCore import QItemSelectionModel, Qt
+from qgis.PyQt.QtCore import QItemSelectionModel, Qt, QThread, pyqtSignal
+from qgis.core import QgsProcessingFeedback
 from qgis.PyQt.QtGui import QColor, QPalette
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
+from qaequilibrae.modules.processing_provider.traffic_assignment_procedures.traffic_assignment import (
+    RunTrafficAssignment,
+    run_traffic_assignment,
+)
 from qaequilibrae.qgis_logging import get_logger
 
 logger = get_logger(__name__)
@@ -38,6 +43,48 @@ VDF_PARAMETERS = {
 }
 
 
+class AssignmentFeedback(QgsProcessingFeedback):
+    message = pyqtSignal(str)
+
+    def __init__(self, cancellation_requested):
+        super().__init__()
+        self.cancellation_requested = cancellation_requested
+
+    def pushInfo(self, message):
+        super().pushInfo(message)
+        self.message.emit(message)
+
+    def isCanceled(self):
+        return self.cancellation_requested() or super().isCanceled()
+
+
+class AssignmentWorker(QThread):
+    """Keep the Processing worker off the UI thread."""
+
+    message = pyqtSignal(str)
+    progress = pyqtSignal(float)
+
+    def __init__(self, parameters, project, parent):
+        super().__init__(parent)
+        self.parameters = parameters
+        self.project = project
+        self.error = None
+        self.result = None
+        self.cancel_requested = False
+
+    def cancel(self):
+        self.cancel_requested = True
+
+    def run(self):
+        try:
+            feedback = AssignmentFeedback(lambda: self.cancel_requested)
+            feedback.message.connect(self.message.emit)
+            feedback.progressChanged.connect(self.progress.emit)
+            self.result = run_traffic_assignment(self.parameters, self.project, feedback)
+        except Exception as error:
+            self.error = str(error)
+
+
 class TrafficAssignmentDialog(BaseDialog):
     def __init__(self, qgis_project):
         super().__init__(ui_file=join(dirname(__file__), "forms/ui_traffic_assignment.ui"), qgis_project=qgis_project)
@@ -51,20 +98,18 @@ class TrafficAssignmentDialog(BaseDialog):
         self.error = None
         self.report = None
         self.current_modes = []
-        self.assignment = TrafficAssignment()
         self.traffic_classes = {}
         self.class_cores = {}
+        self.class_excluded_links = {}
         self.vdf_parameters = {}
         self.matrices = pd.DataFrame([])
         self.skims = {}
         self.matrix = None
         self.block_centroid_flows = None
         self.worker_thread = None
+        self.processing_results = None
         self.all_modes = {}
         self.__populate_project_info()
-        self.rgap = "Undefined"
-        self.iter = 0
-        self.miter = 1000
         self.select_links = {}
         self.__rebuilt_modes = set()
         self.__current_links = []
@@ -95,9 +140,9 @@ class TrafficAssignmentDialog(BaseDialog):
         for q in [self.progressbar, self.progress_label]:
             q.setVisible(False)
 
-        for algo in self.assignment.all_algorithms:
+        for algo in TrafficAssignment.all_algorithms:
             self.cb_choose_algorithm.addItem(algo)
-        self.cb_choose_algorithm.setCurrentIndex(len(self.assignment.all_algorithms) - 1)
+        self.cb_choose_algorithm.setCurrentIndex(len(TrafficAssignment.all_algorithms) - 1)
 
         for vdf in all_vdf_functions:
             self.cob_vdf.addItem(vdf)
@@ -181,7 +226,7 @@ class TrafficAssignmentDialog(BaseDialog):
                     # From the combo rather than from the config, so that the cores listed below
                     # come from the same matrix `_create_traffic_class` is going to pick up
                     names = self.project.matrices.get_matrix(self.cob_matrices.currentText()).names
-                    cores = value.get("matrix_cores", [value["matrix_core"]])
+                    cores = value.get("matrix_cores", [value.get("matrix_core")])
                     self.tbl_core_list.clearSelection()
                     selection = self.tbl_core_list.selectionModel()
                     flags = QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows
@@ -197,6 +242,7 @@ class TrafficAssignmentDialog(BaseDialog):
                         self.__select_option(self.cob_fixed_cost, value["fixed_cost"], "fixed cost field")
                         self.vot_setter.setValue(value["vot"])
                     self._create_traffic_class(value["network_mode"])
+                    self.class_excluded_links[key] = value.get("excluded_links", [])
 
                     # Populate Skimming tab, through the same redraw the buttons go through
                     if "skims" in value:
@@ -272,6 +318,8 @@ class TrafficAssignmentDialog(BaseDialog):
                 if len(cores) > 1:
                     dc["matrix_cores"] = cores
                 dc["network_mode"] = info.mode
+                if excluded := self.class_excluded_links.get(tc):
+                    dc["excluded_links"] = excluded
                 dc["pce"] = info.pce
                 # Taken from the class rather than from the checkbox, which only reflects the class
                 # currently being edited: keying off it would write the fixed cost for classes that
@@ -325,55 +373,17 @@ class TrafficAssignmentDialog(BaseDialog):
         out_name = self._browse_python_path()
 
         if out_name:
-            self.check_data()
+            if not self.check_data():
+                self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
+                return
 
-            info_dict = {
-                "classes": [],
-                "assignment": [],
-                "scenario_name": self.scenario_name,
-                "skimming": self.skimming,
-                "out_name": out_name,
-                "project_path": self.project.project_base_path,
-            }
-
-            df = self.project.matrices.list()
-            for tc, info in self.traffic_classes.items():
-                pth = Path(info.matrix.file_path).name
-                info_dict["classes"].extend(
-                    [
-                        [
-                            info.graph.mode,
-                            self.cob_ffttime.currentText(),
-                            self.skims[tc] if self.skims[tc] else [],
-                            info.graph.block_centroid_flows,
-                            df.loc[df["file_name"] == pth]["name"].values[0],
-                            self.class_cores[tc],
-                            tc,
-                        ]
-                    ]
-                )
-
-            info_dict["assignment"].extend(
-                [
-                    self.cob_vdf.currentText(),
-                    self.vdf_parameters,
-                    self.cob_capacity.currentText(),
-                    self.cob_ffttime.currentText(),
-                    self.cb_choose_algorithm.currentText(),
-                    self.miter,
-                    float(self.rel_gap.text()),
-                ]
-            )
-
-            if self.do_select_link.isChecked():
-                info_dict["select_links"] = {
-                    "select_links": [self.select_links],
-                    "output_name": self.sl_mat_name.text(),
-                    "save_matrix": self.chb_save_matrix.isChecked(),
-                    "save_result": self.chb_save_result.isChecked(),
+            create_strings(
+                {
+                    "parameters": self.processing_parameters(),
+                    "out_name": out_name,
+                    "project_path": self.project.project_base_path,
                 }
-
-            _ = create_strings(info_dict)
+            )
 
             p = Parameters()
             p.parameters["run"]["run_assignment"] = None
@@ -575,11 +585,13 @@ class TrafficAssignmentDialog(BaseDialog):
         mode_id = md if self._from_yaml else self.all_modes[mode]
 
         graph = self.__graph_for_mode(mode_id)
+        self.class_excluded_links[class_name] = []
 
         if self.chb_chosen_links.isChecked():
             graph = self.project.network.graphs.pop(mode_id)
             idx = self.link_layer.dataProvider().fieldNameIndex("link_id")
             remove = [feat.attributes()[idx] for feat in self.link_layer.selectedFeatures()]
+            self.class_excluded_links[class_name] = remove
             graph.exclude_links(remove)
 
         graph.set_blocked_centroid_flows(self.chb_check_centroids.isChecked())
@@ -684,8 +696,7 @@ class TrafficAssignmentDialog(BaseDialog):
                 checkbox.setStyleSheet(f"QCheckBox {{ background-color: {band.name()}; }}")
                 table.setCellWidget(i, column, checkbox)
 
-        # Every skim owns exactly one row, so an empty table means nothing is being skimmed and
-        # `produce_all_outputs` must not go looking for skims to save
+        # Every skim owns exactly one row, so an empty table means no skim output.
         self.skimming = table.rowCount() > 0
 
     def _add_skimming(self):
@@ -798,37 +809,31 @@ class TrafficAssignmentDialog(BaseDialog):
         self.__edit_skimming_modes()
 
     def run_thread(self):
-        self.worker_thread.signal.connect(self.signal_handler)
+        self.worker_thread.finished.connect(self.job_finished_from_thread)
         self.worker_thread.start()
         self.exec()
 
     def job_finished_from_thread(self):
-        self.produce_all_outputs()
-
+        self.worker_thread.wait()
+        self.error = self.worker_thread.error
+        self.processing_results = self.worker_thread.result
+        if self.error:
+            self.qgis_project.iface_error_message(self.error, self.tr("Assignment error"))
         self.exit_procedure()
 
     def run(self):
+        if self.worker_thread is not None and self.worker_thread.isRunning():
+            return
         if not self.check_data():
             self.qgis_project.iface_error_message(self.error, self.tr("Input error"))
             return
 
-        self.miter = int(self.max_iter.text())
         for q in [self.progressbar, self.progress_label]:
             q.setVisible(True)
-        self.progressbar.setRange(0, self.project.network.count_centroids())
-
-        # AequilibraE is the sole authority on whether the network data can be assigned, so we do not
-        # pre-check any of it. We just surface whatever the library refuses to accept
+        self.progressbar.setRange(0, 100)
+        self.progressbar.setValue(0)
         try:
-            self.assignment.set_classes(list(self.traffic_classes.values()))
-            self.assignment.set_vdf(self.cob_vdf.currentText())
-            self.assignment.set_vdf_parameters(self.vdf_parameters)
-            self.assignment.set_capacity_field(self.cob_capacity.currentText())
-            self.assignment.set_time_field(self.cob_ffttime.currentText())
-            self.assignment.max_iter = self.miter
-            self.assignment.rgap_target = float(self.rel_gap.text())
-            self.assignment.set_algorithm(self.cb_choose_algorithm.currentText())
-            self.assignment.log_specification()
+            parameters = self.processing_parameters()
         except Exception as e:
             for q in [self.progressbar, self.progress_label]:
                 q.setVisible(False)
@@ -837,12 +842,67 @@ class TrafficAssignmentDialog(BaseDialog):
             self.qgis_project.iface_error_message(self.error, self.tr("Assignment setup error"))
             return
 
-        if self.do_select_link.isChecked():
-            for traffic_class in self.traffic_classes.values():
-                traffic_class.set_select_links(self.select_links)
-
-        self.worker_thread = self.assignment.assignment
+        self.do_assignment.setEnabled(False)
+        self.tabWidget.setEnabled(False)
+        self.worker_thread = AssignmentWorker(parameters, self.project, self)
+        self.worker_thread.message.connect(self.progress_label.setText)
+        self.worker_thread.progress.connect(self._set_progress)
         self.run_thread()
+
+    def _set_progress(self, value):
+        self.progressbar.setValue(int(value))
+
+    def processing_parameters(self):
+        """Translate widget values into the public Processing inputs."""
+        algorithm = RunTrafficAssignment
+        matrices = self.project.matrices.list()
+        classes = []
+        exclusions = []
+        skim_choices = self.skim_choices()
+        for name, cls in self.traffic_classes.items():
+            matrix_name = matrices.loc[matrices.file_name == Path(cls.matrix.file_path).name, "name"].iloc[0]
+            classes.extend(
+                [
+                    name,
+                    matrix_name,
+                    ",".join(self.class_cores[name]),
+                    cls.mode,
+                    cls.pce,
+                    cls.graph.block_centroid_flows,
+                    cls.fixed_cost_field or "",
+                    cls.vot,
+                    ",".join(
+                        f"{field}:{kind}"
+                        for field in self.skims[name]
+                        for kind, selected in zip(("final", "blended"), skim_choices[(name, field)])
+                        if selected
+                    ),
+                ]
+            )
+            if links := self.class_excluded_links.get(name):
+                exclusions.extend([name, ",".join(str(link) for link in links)])
+        selections = []
+        if self.do_select_link.isChecked():
+            for name, links in self.select_links.items():
+                for link, direction in links:
+                    selections.extend([name, str(link), {1: "AB", -1: "BA", 0: "Both"}[direction]])
+        return {
+            algorithm.PROJECT_FOLDER: str(self.project.project_base_path),
+            algorithm.TRAFFIC_CLASSES: classes,
+            algorithm.EXCLUDED_LINKS: exclusions,
+            algorithm.SELECT_LINKS: selections,
+            algorithm.SELECT_LINK_NAME: self.sl_mat_name.text(),
+            algorithm.SAVE_SELECT_LINK_MATRICES: self.chb_save_matrix.isChecked(),
+            algorithm.SAVE_SELECT_LINK_FLOWS: self.chb_save_result.isChecked(),
+            algorithm.ALGORITHM: self.cb_choose_algorithm.currentText(),
+            algorithm.MAX_ITERATIONS: int(self.max_iter.text()),
+            algorithm.RELATIVE_GAP: float(self.rel_gap.text()),
+            algorithm.VDF: self.cob_vdf.currentText(),
+            **{key.upper(): value for key, value in self.vdf_parameters.items()},
+            algorithm.CAPACITY_FIELD: self.cob_capacity.currentText(),
+            algorithm.TIME_FIELD: self.cob_ffttime.currentText(),
+            algorithm.RESULT_NAME: self.output_scenario_name.text(),
+        }
 
     def check_data(self):
         self.error = None
@@ -879,8 +939,7 @@ class TrafficAssignmentDialog(BaseDialog):
                 return False
 
         self.temp_path = gettempdir()
-        tries_setup = self.set_assignment()
-        return tries_setup
+        return self._read_vdf_parameters()
 
     def __repeated_result_fields(self):
         """Result field names claimed by more than one class, folded as SQLite folds column names."""
@@ -890,56 +949,8 @@ class TrafficAssignmentDialog(BaseDialog):
                 claimed[name.lower()].append(name)
         return sorted({name for claims in claimed.values() if len(claims) > 1 for name in claims})
 
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.progressbar.setValue(0)
-            self.progressbar.setMaximum(val[1])
-            self.progress_label.setText(val[2])
-        elif val[0] == "update":
-            self.progressbar.setValue(val[1])
-            self.progress_label.setText(val[2])
-        elif val[0] == "finished":
-            self.job_finished_from_thread()
-
-    # Save link flows to disk
-    def produce_all_outputs(self):
-        if self.do_select_link.isChecked():
-            if self.chb_save_matrix.isChecked():
-                self.assignment.save_select_link_matrices(self.output_name)
-
-            # These two lines are raising an sqlite3 error in pytest
-            if self.chb_save_result.isChecked():
-                self.assignment.save_select_link_flows(self.output_name)
-
-        self.assignment.save_results(self.scenario_name)
-        if self.skimming:
-            self.assignment.save_skims(self.scenario_name, which_ones="all", format="omx")
-
-    # def click_button_inside_the_list(self, purpose):
-    #     if purpose == "select link":
-    #         table = self.select_link_list
-    #     else:
-    #         table = self.list_link_extraction
-    #
-    #     button = self.sender()
-    #     index = self.select_link_list.indexAt(button.pos())
-    #     row = index.row()
-    #     table.removeRow(row)
-    #
-    #     if purpose == "select link":
-    #         self.tot_crit_link_queries -= 1
-    #     elif purpose == "Link flow extraction":
-    #         self.tot_link_flow_extract -= 1
-
-    def set_assignment(self):
-        for k, cls in self.traffic_classes.items():
-            if self.skims[k]:
-                dt = cls.graph.block_centroid_flows
-                logger.debug(f"Set skims {self.skims[k]} for {k}")
-                cls.graph.set_graph(self.cob_ffttime.currentText())
-                cls.graph.set_skimming(self.skims[k])
-                cls.graph.set_blocked_centroid_flows(dt)
-
+    def _read_vdf_parameters(self):
+        self.vdf_parameters = {}
         table = self.tbl_vdf_parameters
         for i in range(table.rowCount()):
             k = table.item(i, 0).text()
@@ -962,3 +973,18 @@ class TrafficAssignmentDialog(BaseDialog):
             dlg2 = ReportDialog(self.iface, self.report)
             dlg2.show()
             dlg2.exec()
+
+    def closeEvent(self, event):
+        if self.worker_thread is not None and self.worker_thread.isRunning():
+            self.worker_thread.cancel()
+            self.progress_label.setText(self.tr("Canceling after the current computation finishes"))
+            event.ignore()
+            return
+        super().closeEvent(event)
+
+    def reject(self):
+        if self.worker_thread is not None and self.worker_thread.isRunning():
+            self.worker_thread.cancel()
+            self.progress_label.setText(self.tr("Canceling after the current computation finishes"))
+            return
+        super().reject()

@@ -1,7 +1,6 @@
 import math
 from os.path import isfile
 from time import localtime, strftime
-from typing import Union
 
 from aequilibrae import Parameters
 from pyproj import CRS, Transformer
@@ -105,7 +104,7 @@ def polygon_from_radius(point: Point, radius):
     return transform(projection_back, buffered_point)
 
 
-def model_area_polygon(poly) -> Union[Polygon, int]:
+def model_area_polygon(poly) -> tuple[Polygon, int]:
     tol = 1e-3
     zones = poly.to_crs(4326)
     return zones.union_all().buffer(tol).buffer(-tol), 4326
