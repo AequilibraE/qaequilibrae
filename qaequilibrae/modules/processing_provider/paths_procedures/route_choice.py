@@ -6,7 +6,7 @@ outputs, or sub-area demand. :func:`run_route_choice` also lets the desktop dial
 reuse the same operation without reopening its project.
 """
 
-from collections.abc import Hashable, Sequence
+from collections.abc import Hashable, Mapping, Sequence
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, TypedDict, cast
@@ -197,7 +197,30 @@ def _load_demand(project: Any, matrix_name: str, cores: list[str]) -> Any:
         raise
 
 
-def _build_utility_graph(project: Any, configuration: RouteChoiceConfiguration) -> Any:
+def run_single_route_choice(
+    project: Any,
+    configuration: Mapping[str, Any],
+    origin: int,
+    destination: int,
+    demand: float,
+) -> tuple[Any, Any]:
+    """Compute one OD route choice without saving results to the project.
+
+    This is an interactive-only operation, not the registered Processing
+    algorithm: the dialog plots its in-memory route set as a QGIS layer.
+    Return the route-choice object (for plotting) and its prepared graph (for
+    the interactive route viewer). Both are owned by the caller.
+    """
+    from aequilibrae.paths import RouteChoice as AequilibraERouteChoice
+
+    graph = _build_utility_graph(project, configuration, nodes=np.array([origin, destination], dtype=np.int64))
+    route_choice = AequilibraERouteChoice(graph)
+    route_choice.set_choice_set_generation(configuration["algorithm"], **configuration["kwargs"])
+    route_choice.execute_single(origin, destination, demand)
+    return route_choice, graph
+
+
+def _build_utility_graph(project: Any, configuration: Mapping[str, Any], nodes: Any | None = None) -> Any:
     """Build an isolated mode graph and calculate its weighted utility field."""
     mode = configuration["mode"]
     project.network.build_graphs(modes=[mode])
@@ -205,7 +228,7 @@ def _build_utility_graph(project: Any, configuration: RouteChoiceConfiguration) 
     graph.network = graph.network.assign(__utility__=0.0)
     if configuration["excluded_links"]:
         graph.exclude_links(configuration["excluded_links"])
-    graph.prepare_graph(graph.centroids)
+    graph.prepare_graph(graph.centroids if nodes is None else nodes)
 
     utility = np.zeros((1, graph.graph.shape[0]))
     for coefficient, field in configuration["utility_fields"]:

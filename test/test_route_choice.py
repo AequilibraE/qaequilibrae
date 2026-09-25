@@ -4,10 +4,11 @@ import numpy as np
 import pandas as pd
 import pytest
 from qgis.PyQt.QtCore import Qt
-from qgis.core import QgsProject
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback, QgsProject
 
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
 from qaequilibrae.modules.paths_procedures.route_choice_dialog import RouteChoiceDialog
+from qaequilibrae.modules.processing_provider.paths_procedures.route_choice import RouteChoice, _build_utility_graph
 from .utilities import create_matrix
 
 
@@ -42,6 +43,31 @@ def test_execute_single(sf_project, qtbot, cob_field):
 
     # Check if dialog was closed
     assert not dialog.isVisible()
+
+
+def test_clear_cost_removes_terms(sf_project, qtbot):
+    dialog = RouteChoiceDialog(sf_project)
+    dialog.ln_parameter.setText("0.01")
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
+    assert dialog.utility
+
+    qtbot.mouseClick(dialog.but_clear_cost, Qt.MouseButton.LeftButton)
+    assert dialog.utility == []
+    assert dialog.txt_cost_func.toPlainText() == ""
+    dialog.close()
+
+
+def test_invalid_single_route_node_does_not_crash(sf_project):
+    dialog = RouteChoiceDialog(sf_project)
+    dialog.job = "execute_single"
+    dialog.node_from.setText("invalid")
+    dialog.node_to.setText("15")
+    dialog.ln_demand.setText("1.0")
+
+    dialog._validate_inputs()
+
+    assert dialog.error == "Wrong input value for node ID"
+    dialog.close()
 
 
 def test_execute_single_dialog(coquimbo_project, qtbot):
@@ -123,6 +149,35 @@ def test_assign_and_save(sf_project, qtbot, save):
 
         messagebar = sf_project.iface.messageBar()
         assert "Success:Route choice sets saved to" in messagebar.messages[3][0]
+
+
+def test_dialog_assignment_matches_processing(sf_project, qtbot):
+    dialog = RouteChoiceDialog(sf_project)
+    dialog.cob_net_field.setCurrentText("distance")
+    dialog.ln_parameter.setText("0.01")
+    qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
+    dialog.cob_matrices.setCurrentText("demand_omx")
+    dialog.ln_rc_output.setText("dialog_route_choice")
+    dialog.job = "assign"
+    dialog._validate_inputs()
+    assert not dialog.error
+    parameters = dialog.processing_parameters()
+    qtbot.mouseClick(dialog.but_perform_assig, Qt.MouseButton.LeftButton)
+    assert dialog.processing_results[RouteChoice.OUTPUT_RESULT_NAME] == "dialog_route_choice_uncompressed"
+
+    parameters[RouteChoice.RESULT_NAME] = "processing_route_choice"
+    algorithm = RouteChoice()
+    algorithm.initAlgorithm()
+    feedback = QgsProcessingFeedback()
+    outputs, ok = algorithm.run(parameters, QgsProcessingContext(), feedback)
+    assert ok, feedback.textLog()
+    assert outputs[RouteChoice.OUTPUT_RESULT_NAME] == "processing_route_choice_uncompressed"
+    with sf_project.project.results_connection as connection:
+        dialog_flows = pd.read_sql('SELECT * FROM "dialog_route_choice_uncompressed" ORDER BY link_id', connection)
+        processing_flows = pd.read_sql(
+            'SELECT * FROM "processing_route_choice_uncompressed" ORDER BY link_id', connection
+        )
+    pd.testing.assert_frame_equal(dialog_flows, processing_flows)
 
 
 def test_build_and_save(ae_with_project, qtbot):
@@ -274,10 +329,9 @@ def _dialog_with_graph(project, qtbot):
     qtbot.mouseClick(dialog.but_add_to_cost, Qt.MouseButton.LeftButton)
 
     dialog.chb_check_centroids.setChecked(False)
-    dialog.job = "assign"
-    dialog._get_graph_config()
+    graph = _build_utility_graph(dialog.project, dialog._single_route_configuration())
 
-    return dialog
+    return dialog, graph
 
 
 def test_network_fix_is_picked_up_when_dialog_reopens(sf_project, qtbot):
@@ -291,9 +345,9 @@ def test_network_fix_is_picked_up_when_dialog_reopens(sf_project, qtbot):
     with project.db_connection as conn:
         conn.execute("UPDATE links SET free_flow_time = NULL WHERE link_id = 1")
 
-    dialog = _dialog_with_graph(sf_project, qtbot)
+    dialog, graph = _dialog_with_graph(sf_project, qtbot)
 
-    assert pd.isna(dialog.parameters["graph"].graph["free_flow_time"]).any()
+    assert pd.isna(graph.graph["free_flow_time"]).any()
 
     dialog.close()
 
@@ -301,9 +355,9 @@ def test_network_fix_is_picked_up_when_dialog_reopens(sf_project, qtbot):
     with project.db_connection as conn:
         conn.execute("UPDATE links SET free_flow_time = 6 WHERE link_id = 1")
 
-    dialog = _dialog_with_graph(sf_project, qtbot)
+    dialog, graph = _dialog_with_graph(sf_project, qtbot)
 
-    assert not pd.isna(dialog.parameters["graph"].graph["free_flow_time"]).any()
+    assert not pd.isna(graph.graph["free_flow_time"]).any()
 
     dialog.close()
 
