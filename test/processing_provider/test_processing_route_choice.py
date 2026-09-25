@@ -154,9 +154,12 @@ def test_route_choice_invalid_inputs_leave_no_results(sf_project, overrides, mes
         run_route_choice(parameters, project=project)
 
     with project.results_connection as connection:
-        assert connection.execute(
-            "SELECT COUNT(*) FROM sqlite_master WHERE name = 'processing_route_choice_uncompressed'"
-        ).fetchone()[0] == 0
+        assert (
+            connection.execute(
+                "SELECT COUNT(*) FROM sqlite_master WHERE name = 'processing_route_choice_uncompressed'"
+            ).fetchone()[0]
+            == 0
+        )
 
 
 def test_route_choice_cancellation_does_not_write_outputs(sf_project):
@@ -167,9 +170,12 @@ def test_route_choice_cancellation_does_not_write_outputs(sf_project):
         run_route_choice(_parameters(project.project_base_path), project=project, feedback=feedback)
 
     with project.results_connection as connection:
-        assert connection.execute(
-            "SELECT COUNT(*) FROM sqlite_master WHERE name = 'processing_route_choice_uncompressed'"
-        ).fetchone()[0] == 0
+        assert (
+            connection.execute(
+                "SELECT COUNT(*) FROM sqlite_master WHERE name = 'processing_route_choice_uncompressed'"
+            ).fetchone()[0]
+            == 0
+        )
     assert not (project.project_base_path / "route_choice").exists()
 
 
@@ -190,9 +196,12 @@ def test_route_choice_cancellation_after_compute_does_not_save(sf_project, monke
         run_route_choice(_parameters(project.project_base_path), project=project, feedback=feedback)
 
     with project.results_connection as connection:
-        assert connection.execute(
-            "SELECT COUNT(*) FROM sqlite_master WHERE name = 'processing_route_choice_uncompressed'"
-        ).fetchone()[0] == 0
+        assert (
+            connection.execute(
+                "SELECT COUNT(*) FROM sqlite_master WHERE name = 'processing_route_choice_uncompressed'"
+            ).fetchone()[0]
+            == 0
+        )
 
 
 def test_route_choice_rejects_an_existing_result(sf_project):
