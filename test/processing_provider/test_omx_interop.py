@@ -59,6 +59,28 @@ def test_omx_table_round_trip(tmp_path):
     assert read_omx_core(original, "cars", "ids")[0].tolist() == [20, 10]
 
 
+def test_omx_to_table_flushes_multiple_batches(tmp_path):
+    path = tmp_path / "matrix.omx"
+    zones = 65  # More than 4096 OD cells: one full batch and a partial batch.
+    with omx.open_file(str(path), "w") as file:
+        file.create_mapping("ids", list(range(zones)))
+        file["cars"] = np.arange(zones * zones, dtype=float).reshape(zones, zones)
+
+    action = OmxToTable()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    result, ok = action.run({action.PATH: str(path), action.OUTPUT: "memory:"}, context, feedback)
+    assert ok, feedback.textLog()
+    table = context.takeResultLayer(result[action.OUTPUT])
+    assert table.featureCount() == zones * zones
+    assert {(f["origin"], f["destination"]): f["value"] for f in table.getFeatures()} == {
+        (origin, destination): float(origin * zones + destination)
+        for origin in range(zones)
+        for destination in range(zones)
+    }
+
+
 @pytest.mark.parametrize("direction,expected", [(0, {20: 1.0, 10: 2.0}), (1, {20: 1.0, 10: 3.0})])
 def test_omx_zone_slice(tmp_path, direction, expected):
     path = tmp_path / "matrix.omx"
@@ -88,6 +110,59 @@ def test_omx_zone_slice(tmp_path, direction, expected):
     table = context.takeResultLayer(result[action.OUTPUT])
     assert table.featureCount() == 2
     assert {f["zone_id"]: f["data"] for f in table.getFeatures()} == expected
+
+
+def test_table_to_omx_rejects_zone_ids_outside_omx_range(tmp_path):
+    large_id = 2**53 + 1
+    table = QgsVectorLayer("None", "od", "memory")
+    table.dataProvider().addAttributes(
+        [
+            QgsField("origin", QVariant.LongLong),
+            QgsField("destination", QVariant.LongLong),
+            QgsField("core", QVariant.String),
+            QgsField("value", QVariant.Double),
+        ]
+    )
+    table.updateFields()
+    for origin in (1, large_id):
+        for destination in (1, large_id):
+            feature = QgsFeature(table.fields())
+            feature.setAttributes([origin, destination, "cars", 2.0])
+            table.dataProvider().addFeatures([feature])
+
+    writer = TableToOmx()
+    writer.initAlgorithm()
+    output = tmp_path / "large_ids.omx"
+    with pytest.raises(QgsProcessingException, match="Zone IDs must fit in an OMX mapping"):
+        writer.processAlgorithm(
+            {writer.INPUT: table, writer.OUTPUT: str(output)}, QgsProcessingContext(), QgsProcessingFeedback()
+        )
+    assert not output.exists()
+
+
+def test_table_to_omx_rejects_fractional_zone_ids(tmp_path):
+    table = QgsVectorLayer("None", "od", "memory")
+    table.dataProvider().addAttributes(
+        [
+            QgsField("origin", QVariant.Double),
+            QgsField("destination", QVariant.Double),
+            QgsField("core", QVariant.String),
+            QgsField("value", QVariant.Double),
+        ]
+    )
+    table.updateFields()
+    feature = QgsFeature(table.fields())
+    feature.setAttributes([1.5, 1.0, "cars", 2.0])
+    table.dataProvider().addFeatures([feature])
+
+    writer = TableToOmx()
+    writer.initAlgorithm()
+    with pytest.raises(QgsProcessingException, match="Invalid OD table row"):
+        writer.processAlgorithm(
+            {writer.INPUT: table, writer.OUTPUT: str(tmp_path / "fractional.omx")},
+            QgsProcessingContext(),
+            QgsProcessingFeedback(),
+        )
 
 
 def test_table_to_omx_cancel_removes_partial_file(tmp_path):

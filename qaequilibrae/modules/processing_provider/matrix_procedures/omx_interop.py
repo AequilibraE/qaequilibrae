@@ -102,6 +102,8 @@ class OmxToTable(QgsProcessingAlgorithm):
                 if sink is None:
                     raise QgsProcessingException(self.tr("Could not create OD table"))
                 progress_step = max(1, total // 100)
+                batch_size = 4096
+                batch = []
                 for core_number, core in enumerate(cores):
                     logger.info(self.tr("Writing core: {}").format(core))
                     values = file[core]
@@ -111,14 +113,20 @@ class OmxToTable(QgsProcessingAlgorithm):
                         if feedback.isCanceled():
                             del sink
                             return {}
+                        row_values = values[row, :]
                         for column, destination_id in enumerate(ids):
                             feature = QgsFeature()
-                            feature.setAttributes([int(origin), int(destination_id), core, float(values[row, column])])
-                            if not sink.addFeature(feature):
-                                raise QgsProcessingException(self.tr("Could not write OD table row"))
+                            feature.setAttributes([int(origin), int(destination_id), core, float(row_values[column])])
+                            batch.append(feature)
+                            if len(batch) >= batch_size:
+                                if not sink.addFeatures(batch):
+                                    raise QgsProcessingException(self.tr("Could not write OD table rows"))
+                                batch = []
                         completed = core_number * len(ids) + row + 1
                         if completed % progress_step == 0 or completed == total:
                             feedback.setProgress(99 * completed / total)
+                if batch and not sink.addFeatures(batch):
+                    raise QgsProcessingException(self.tr("Could not write OD table rows"))
                 del sink
                 feedback.setProgress(100)
                 logger.info(self.tr("OD table complete"))
@@ -291,15 +299,19 @@ class TableToOmx(QgsProcessingAlgorithm):
                 return {}
             try:
                 raw_origin, raw_destination = feature["origin"], feature["destination"]
+                for raw_id in (raw_origin, raw_destination):
+                    if isinstance(raw_id, (float, np.floating)) and not raw_id.is_integer():
+                        raise ValueError("Zone IDs must be integers")
                 origin, destination = int(raw_origin), int(raw_destination)
                 core = str(feature["core"])
                 value = float(feature["value"])
-                if origin != float(raw_origin) or destination != float(raw_destination):
-                    raise ValueError("Zone IDs must be integers")
             except (TypeError, ValueError, OverflowError) as error:
                 raise QgsProcessingException(self.tr("Invalid OD table row")) from error
             if not core or origin < 0 or destination < 0:
                 raise QgsProcessingException(self.tr("Core must be nonempty and zone IDs must be nonnegative integers"))
+            # openmatrix.create_mapping stores zone IDs as unsigned 32-bit integers.
+            if origin > np.iinfo(np.uint32).max or destination > np.iinfo(np.uint32).max:
+                raise QgsProcessingException(self.tr("Zone IDs must fit in an OMX mapping (0 to 4294967295)"))
             core_cells = cells.setdefault(core, {})
             key = (origin, destination)
             if key in core_cells:
