@@ -220,9 +220,7 @@ def run_single_route_choice(
     return route_choice, graph
 
 
-def _build_utility_graph(
-    project: Any, configuration: Mapping[str, Any], nodes: Any | None = None
-) -> Any:
+def _build_utility_graph(project: Any, configuration: Mapping[str, Any], nodes: Any | None = None) -> Any:
     """Build an isolated mode graph and calculate its weighted utility field."""
     mode = configuration["mode"]
     project.network.build_graphs(modes=[mode])
