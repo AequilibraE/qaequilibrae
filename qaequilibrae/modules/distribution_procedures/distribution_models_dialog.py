@@ -10,15 +10,19 @@ from aequilibrae.distribution import SyntheticGravityModel
 from aequilibrae.distribution.synthetic_gravity_model import valid_functions
 from aequilibrae.matrix import AequilibraeMatrix
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QComboBox, QDoubleSpinBox, QAbstractItemView
+from qgis.core import (
+    QgsApplication,
+    QgsProcessingAlgRunnerTask,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
+    QgsProject,
+)
 
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, GetOutputFileName, BaseDialog
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
 from qaequilibrae.modules.matrix_procedures import LoadDatasetDialog
 from qaequilibrae.modules.matrix_procedures.matrix_lister import list_matrices
-from qaequilibrae.modules.processing_provider.distribution_procedures.apply_gravity import apply_gravity_model
-from qaequilibrae.modules.processing_provider.distribution_procedures.calibrate_gravity import calibrate_gravity_model
-from qaequilibrae.modules.processing_provider.distribution_procedures.common import DistributionError
-from qaequilibrae.modules.processing_provider.distribution_procedures.iterative_proportional_fitting import fit_ipf
+from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
 from qaequilibrae.qgis_logging import get_logger
 
 # TODO: Implement consideration of the "empty as zeros" for ALL distrbution models Should force inputs for trip distribution to be of FLOAT type
@@ -41,6 +45,11 @@ class DistributionModelsDialog(BaseDialog):
         self.model = SyntheticGravityModel()
         self.model.function = "GAMMA"
         self.outfile = ""
+        self._task = None
+        self._task_context = None
+        self._task_feedback = None
+        self._task_layer = None
+        self._pending_jobs = []
 
         self.matrices = OrderedDict()
         self.datasets = OrderedDict()
@@ -277,24 +286,20 @@ class DistributionModelsDialog(BaseDialog):
         job = {"kind": self.job, "nan_as_zero": self.chb_empty_as_zero.isChecked()}
 
         if self.job != "ipf":
-            imped_name = self.matrices.at[self.cob_imped_mat.currentIndex(), "file_name"]
-            imped_matrix = AequilibraeMatrix()
-            imped_matrix.load(self.project.project_base_path / "matrices" / imped_name)
-            imped_matrix.computational_view([self.cob_imped_field.currentText()])
-            job["impedance"] = imped_matrix
+            job["impedance_name"] = self.matrices.at[self.cob_imped_mat.currentIndex(), "name"]
+            job["impedance_core"] = self.cob_imped_field.currentText()
 
         if self.job != "apply":
-            seed_name = self.matrices.at[self.cob_seed_mat.currentIndex(), "file_name"]
-            seed_matrix = AequilibraeMatrix()
-            seed_matrix.load(self.project.project_base_path / "matrices" / seed_name)
-            seed_matrix.computational_view([self.cob_seed_field.currentText()])
-            job["matrix"] = seed_matrix
+            job["matrix_name"] = self.matrices.at[self.cob_seed_mat.currentIndex(), "name"]
+            job["matrix_core"] = self.cob_seed_field.currentText()
 
         if self.job != "calibrate":
-            vec = self.datasets[self.cob_data.currentText()]
+            vectors = self.datasets[self.cob_data.currentText()].copy()
             if not self._has_idx:
-                vec.set_index(self.cob_index.currentText(), inplace=True)
-            job["vectors"] = vec
+                vectors = vectors.set_index(self.cob_index.currentText())
+            vectors.index.name = self.cob_index.currentText() if not self._has_idx else vectors.index.name
+            job["vectors"] = vectors.reset_index()
+            job["index_field"] = vectors.index.name
             job["row_field"] = self.cob_prod_field.currentText()
             job["column_field"] = self.cob_atra_field.currentText()
 
@@ -310,7 +315,9 @@ class DistributionModelsDialog(BaseDialog):
                         self.model.alpha = float(self.table_model.cellWidget(i, 1).value())
                     if str(self.table_model.item(i, 0).text()) == "Beta":
                         self.model.beta = float(self.table_model.cellWidget(i, 1).value())
-                job["model"] = self.model
+                job["function"] = self.model.function
+                job["alpha"] = self.model.alpha
+                job["beta"] = self.model.beta
 
         if self.out_name is None:
             return
@@ -341,53 +348,128 @@ class DistributionModelsDialog(BaseDialog):
             self.table_jobs.setItem(i, 2, QTableWidgetItem(self.tr("Queued")))
 
     def run(self):
+        """Run queued Processing algorithms without blocking the QGIS interface."""
         self.chb_empty_as_zero.setVisible(False)
+        self.but_run.setEnabled(False)
+        self.but_queue.setEnabled(False)
+        self._pending_jobs = list(self.job_queue.items())
         self.report = []
+        self._run_next_job()
+
+    def _run_next_job(self):
+        if not self._pending_jobs:
+            self.but_run.setEnabled(True)
+            self.but_queue.setEnabled(True)
+            self.exit_procedure()
+            return
+
+        out_name, job = self._pending_jobs.pop(0)
+        self.outfile = out_name
         try:
-            for out_name, job in self.job_queue.items():
-                self.outfile = out_name
-                self.report.extend(self.run_job(job))
-        except DistributionError as error:
-            self.qgis_project.iface_error_message(error.args[0], self.tr("Procedure error:"))
-            return
-        except Exception:
-            logger.exception("Could not run the distribution procedure")
-            return
+            algorithm_id, parameters = self._algorithm_parameters(job)
+            registry = QgsApplication.processingRegistry()
+            algorithm = registry.algorithmById(algorithm_id)
+            if algorithm is None:
+                from qaequilibrae.modules.processing_provider.distribution_procedures.apply_gravity import ApplyGravity
+                from qaequilibrae.modules.processing_provider.distribution_procedures.calibrate_gravity import (
+                    CalibrateGravity,
+                )
+                from qaequilibrae.modules.processing_provider.distribution_procedures.iterative_proportional_fitting import (
+                    IterativeProportionalFitting,
+                )
 
-        self.exit_procedure()
+                algorithms = {
+                    "qaequilibrae:apply_gravity_model": ApplyGravity,
+                    "qaequilibrae:calibrate_gravity_model": CalibrateGravity,
+                    "qaequilibrae:iterative_proportional_fitting": IterativeProportionalFitting,
+                }
+                algorithm_class = algorithms.get(algorithm_id)
+                if algorithm_class is None:
+                    raise RuntimeError(f"Processing algorithm '{algorithm_id}' is not available")
+                algorithm = algorithm_class()
+                algorithm.initAlgorithm()
 
-    def run_job(self, job: dict[str, Any]) -> list[str]:
-        """Run one queued distribution procedure and write its output."""
+            self._task_context = QgsProcessingContext()
+            self._task_context.setProject(QgsProject.instance())
+            self._task_feedback = QgsProcessingFeedback()
+            self._task = QgsProcessingAlgRunnerTask(algorithm, parameters, self._task_context, self._task_feedback)
+            self._task.executed.connect(self._algorithm_finished)
+            QgsApplication.taskManager().addTask(self._task)
+        except Exception as error:
+            self._task_failed(str(error))
+
+    def _algorithm_parameters(self, job: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+        """Translate a queued desktop job to the public Processing algorithm API."""
+        base = {"PROJECT_FOLDER": str(self.project.project_base_path), "NAN_AS_ZERO": job["nan_as_zero"]}
+        if job["kind"] != "calibrate":
+            self._task_layer = layer_from_dataframe(job["vectors"], "distribution_vectors")
+            base.update(
+                {
+                    "VECTOR_SOURCE": self._task_layer,
+                    "INDEX_FIELD": job["index_field"],
+                    "ROW_FIELD": job["row_field"],
+                    "COLUMN_FIELD": job["column_field"],
+                }
+            )
         if job["kind"] == "ipf":
-            output, report = fit_ipf(
-                job["matrix"],
-                job["vectors"],
-                job["row_field"],
-                job["column_field"],
-                nan_as_zero=job["nan_as_zero"],
+            base.update(
+                {
+                    "SEED_MATRIX_NAME": job["matrix_name"],
+                    "SEED_MATRIX_CORE": job["matrix_core"],
+                    "OUTPUT_MATRIX": job["output"],
+                }
             )
-            output.export(job["output"])
-        elif job["kind"] == "apply":
-            output, report = apply_gravity_model(
-                self.project,
-                job["model"],
-                job["impedance"],
-                job["vectors"],
-                job["row_field"],
-                job["column_field"],
-                nan_as_zero=job["nan_as_zero"],
+            return "qaequilibrae:iterative_proportional_fitting", base
+        if job["kind"] == "apply":
+            base.update(
+                {
+                    "IMPEDANCE_MATRIX_NAME": job["impedance_name"],
+                    "IMPEDANCE_MATRIX_CORE": job["impedance_core"],
+                    "FUNCTION": ["EXPO", "GAMMA", "POWER"].index(job["function"]),
+                    "ALPHA": job["alpha"],
+                    "BETA": job["beta"],
+                    "OUTPUT_MATRIX": job["output"],
+                }
             )
-            output.export(job["output"])
-        else:
-            model, report = calibrate_gravity_model(
-                self.project,
-                job["matrix"],
-                job["impedance"],
-                job["function"],
-                nan_as_zero=job["nan_as_zero"],
-            )
-            model.save(job["output"])
-        return report
+            return "qaequilibrae:apply_gravity_model", base
+        base.update(
+            {
+                "OBSERVED_MATRIX_NAME": job["matrix_name"],
+                "OBSERVED_MATRIX_CORE": job["matrix_core"],
+                "IMPEDANCE_MATRIX_NAME": job["impedance_name"],
+                "IMPEDANCE_MATRIX_CORE": job["impedance_core"],
+                "FUNCTION": ["EXPO", "POWER"].index(job["function"]),
+                "OUTPUT_MODEL": job["output"],
+            }
+        )
+        return "qaequilibrae:calibrate_gravity_model", base
+
+    def _algorithm_finished(self, successful, results):
+        layer = self._task_layer
+        if layer is not None:
+            QgsProject.instance().removeMapLayer(layer.id())
+            self._task_layer = None
+        if not successful:
+            message = self._task_feedback.textLog() if self._task_feedback is not None else ""
+            self._task = None
+            self._task_failed(message or "Distribution algorithm failed")
+            return
+        log = self._task_feedback.textLog() if self._task_feedback is not None else ""
+        if log:
+            self.report.extend(line for line in log.splitlines() if line.strip())
+        self._task = self._task_context = self._task_feedback = None
+        self._run_next_job()
+
+    def _task_failed(self, message: str):
+        logger.error("Distribution Processing task failed: %s", message)
+        if self._task_layer is not None:
+            QgsProject.instance().removeMapLayer(self._task_layer.id())
+            self._task_layer = None
+        self._pending_jobs.clear()
+        self.but_run.setEnabled(True)
+        self.but_queue.setEnabled(True)
+        self._task = self._task_context = self._task_feedback = None
+        self.qgis_project.iface_error_message(message, self.tr("Procedure error:"))
 
     def check_data(self):
         self.error = None
