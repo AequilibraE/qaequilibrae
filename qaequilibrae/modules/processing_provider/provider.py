@@ -22,6 +22,12 @@ class Provider(QgsProcessingProvider):
         self.__load_geometry_io()
         self.__load_data_procedures()
         self.__load_mapping_procedures()
+        self.__load_transit()
+
+    def __load_transit(self):
+        from .transit_procedures.add_gtfs_algorithm import AddGTFSFeedAlgorithm
+
+        self.addAlgorithm(AddGTFSFeedAlgorithm())
 
     def __load_model_building(self):
 

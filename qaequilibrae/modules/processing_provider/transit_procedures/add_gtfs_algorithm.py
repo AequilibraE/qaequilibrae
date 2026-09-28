@@ -28,6 +28,33 @@ from qaequilibrae.i18n.translate import trlt
 class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
     """ """
 
+    def initAlgorithm(self, config: dict | None = None) -> None:
+        self.addParameter(
+            QgsProcessingParameterFile(
+                name="QGIS_PROJECT",
+                behavior=QgsProcessingParameterFile.Folder
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterFile(
+                name="QTFS_FEED",
+                behavior=QgsProcessingParameterFile.Folder
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterString(
+                name="AGENCY"
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterString(
+                name="DESCRIPTION"
+            )
+        )
+
     def name(self) -> str:
         return "addGTFSFeed"
 
@@ -42,3 +69,4 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
 
     def createInstance(self) -> "AddGTFSFeedAlgorithm":
         return AddGTFSFeedAlgorithm()
+
