@@ -100,6 +100,13 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
             else:
                 raise e
 
+        is_pt_database = project_has_transit(self.qgis_project.project)
+
+        if (is_pt_database and option not in ["Overwrite Routes", "Add to Existing Routes"]):
+            raise QgsProcessingException("Project already has transit systems. Please choose 'Overwrite Routes' or 'Add to Existing Routes'.")
+        elif (not is_pt_database and option not in ["Add transit table", "Create new route system"]):
+            raise QgsProcessingException("Project does not have transit system. Please choose 'Add transit table' or 'Create new route system'.")
+
         # add the feed
         self._p = Transit(self.qgis_project)
         self.set_data(qtfs_feed, date)
@@ -131,9 +138,6 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
 
         self.feed.signal.connect(self.signal_handler)
         self.feed.execute_import()
-
-        # self.qgis_project.projectManager.removeTab(0)
-        # self.qgis_project.update_project_layers()
 
         self.qgis_project.close()
 
