@@ -16,6 +16,7 @@ from qgis.core import (
     QgsProcessingException,
     QgsProcessingFeedback,
     QgsFeatureSource,
+    QgsProcessingParameterDateTime,
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField,
@@ -32,6 +33,7 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFile(
                 name="QGIS_PROJECT",
+                description=self.tr("Qgis Project"),
                 behavior=QgsProcessingParameterFile.Folder
             )
         )
@@ -39,19 +41,30 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFile(
                 name="QTFS_FEED",
+                description=self.tr("QTFS Feed"),
                 behavior=QgsProcessingParameterFile.Folder
             )
         )
 
         self.addParameter(
-            QgsProcessingParameterString(
-                name="AGENCY"
+            QgsProcessingParameterDateTime(
+                name="DATE",
+                description=self.tr("Date"),
+                type=Qgis.ProcessingDateTimeParameterDataType.Date
             )
         )
 
         self.addParameter(
             QgsProcessingParameterString(
-                name="DESCRIPTION"
+                name="AGENCY",
+                description=self.tr("Agency")
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterString(
+                name="DESCRIPTION",
+                description=self.tr("Description")
             )
         )
 
@@ -69,4 +82,7 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
 
     def createInstance(self) -> "AddGTFSFeedAlgorithm":
         return AddGTFSFeedAlgorithm()
+    
+    def tr(self, message: str) -> str:
+        return trlt("DesireLines", message)
 
