@@ -2,12 +2,18 @@ from os import makedirs
 from os.path import isdir, isfile, join
 
 import numpy as np
+import pandas as pd
 import pytest
 from aequilibrae import Project
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.utils.create_example import create_example
 from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingException, QgsProcessingFeedback, QgsProject
 
+from qaequilibrae.modules.processing_provider.distribution_procedures.apply_gravity import ApplyGravity
+from qaequilibrae.modules.processing_provider.distribution_procedures.calibrate_gravity import CalibrateGravity
+from qaequilibrae.modules.processing_provider.distribution_procedures.iterative_proportional_fitting import (
+    IterativeProportionalFitting,
+)
 from qaequilibrae.modules.processing_provider.matrix_procedures.export_matrix import ExportMatrix
 from qaequilibrae.modules.processing_provider.matrix_procedures.matrix_calculator import MatrixCalculator
 from qaequilibrae.modules.processing_provider.matrix_procedures.trip_length_distribution import TripLengthDistribution
@@ -42,6 +48,8 @@ def test_provider_exists(qgis_app):
         "AddZones",
         "AddLinkType",
         "AddMode",
+        "ApplyGravity",
+        "CalibrateGravity",
         "CollapseLinks",
         "CreateEmptyProject",
         "DelaunayNetwork",
@@ -50,6 +58,7 @@ def test_provider_exists(qgis_app):
         "ExtractNodes",
         "ExtractZones",
         "ExportMatrix",
+        "IterativeProportionalFitting",
         "MatrixCalculator",
         "OmxToTable",
         "OmxZoneSlice",
@@ -416,3 +425,97 @@ def test_network_simplifier(folder_path):
 
     assert project.network.count_links() < links_before
     assert project.network.count_nodes() < nodes_before
+
+
+def _synthetic_future_vector_layer():
+    from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
+
+    dataframe = pd.read_csv(get_test_data_path("SiouxFalls_project", "synthetic_future_vector.csv"))
+    return layer_from_dataframe(dataframe, "synthetic_future_vector")
+
+
+def test_iterative_proportional_fitting(ae_with_project, folder_path):
+    makedirs(folder_path, exist_ok=True)
+    layer = _synthetic_future_vector_layer()
+    output_path = join(folder_path, "ipf.omx")
+
+    parameters = {
+        IterativeProportionalFitting.PROJECT_FOLDER: str(ae_with_project.project.project_base_path),
+        IterativeProportionalFitting.SEED_MATRIX_NAME: "demand",
+        IterativeProportionalFitting.SEED_MATRIX_CORE: "matrix",
+        IterativeProportionalFitting.VECTOR_SOURCE: layer,
+        IterativeProportionalFitting.INDEX_FIELD: "index",
+        IterativeProportionalFitting.ROW_FIELD: "origins",
+        IterativeProportionalFitting.COLUMN_FIELD: "destinations",
+        IterativeProportionalFitting.NAN_AS_ZERO: False,
+        IterativeProportionalFitting.OUTPUT_MATRIX: output_path,
+    }
+
+    action = IterativeProportionalFitting()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    result, ok = action.run(parameters, context, feedback)
+
+    assert ok, feedback.textLog()
+    assert isfile(output_path)
+    assert result[IterativeProportionalFitting.OUTPUT_MATRIX] == output_path
+
+
+def test_apply_gravity(ae_with_project, folder_path):
+    makedirs(folder_path, exist_ok=True)
+    layer = _synthetic_future_vector_layer()
+    output_path = join(folder_path, "gravity.omx")
+
+    parameters = {
+        ApplyGravity.PROJECT_FOLDER: str(ae_with_project.project.project_base_path),
+        ApplyGravity.IMPEDANCE_MATRIX_NAME: "trafficassignment_dp_x_car_omx",
+        ApplyGravity.IMPEDANCE_MATRIX_CORE: "free_flow_time_final",
+        ApplyGravity.VECTOR_SOURCE: layer,
+        ApplyGravity.INDEX_FIELD: "index",
+        ApplyGravity.ROW_FIELD: "origins",
+        ApplyGravity.COLUMN_FIELD: "destinations",
+        ApplyGravity.FUNCTION: 1,
+        ApplyGravity.ALPHA: 0.02718039228535631,
+        ApplyGravity.BETA: 0.020709580776383137,
+        ApplyGravity.NAN_AS_ZERO: False,
+        ApplyGravity.OUTPUT_MATRIX: output_path,
+    }
+
+    action = ApplyGravity()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    result, ok = action.run(parameters, context, feedback)
+
+    assert ok, feedback.textLog()
+    assert isfile(output_path)
+    assert result[ApplyGravity.OUTPUT_MATRIX] == output_path
+
+
+def test_calibrate_gravity(sf_project_with_assignment, folder_path):
+    makedirs(folder_path, exist_ok=True)
+    output_path = join(folder_path, "calibrated.mod")
+
+    parameters = {
+        CalibrateGravity.PROJECT_FOLDER: str(sf_project_with_assignment.project.project_base_path),
+        CalibrateGravity.OBSERVED_MATRIX_NAME: "demand_omx",
+        CalibrateGravity.OBSERVED_MATRIX_CORE: "matrix",
+        CalibrateGravity.IMPEDANCE_MATRIX_NAME: "assignment_car",
+        CalibrateGravity.IMPEDANCE_MATRIX_CORE: "free_flow_time_final",
+        CalibrateGravity.FUNCTION: 0,
+        CalibrateGravity.NAN_AS_ZERO: False,
+        CalibrateGravity.OUTPUT_MODEL: output_path,
+    }
+
+    action = CalibrateGravity()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    result, ok = action.run(parameters, context, feedback)
+
+    assert ok, feedback.textLog()
+    assert isfile(output_path)
+    with open(output_path, encoding="utf-8") as model_file:
+        assert "function: EXPO" in model_file.read()
+    assert result[CalibrateGravity.OUTPUT_MODEL] == output_path
