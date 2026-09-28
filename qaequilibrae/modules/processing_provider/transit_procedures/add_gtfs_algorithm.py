@@ -19,6 +19,7 @@ from qaequilibrae.i18n.translate import trlt
 from aequilibrae.project import Project
 from aequilibrae.transit import Transit
 from qaequilibrae.modules.common_tools import (
+    LiveLogBridge,
     project_has_transit,
     quote_identifier,
 )
@@ -88,7 +89,6 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
         option: list[str] = self.parameterAsString(parameters, "OPTIONS", context)
 
         # TODO: do various checks
-        # include checks for option based on whether gtfs already exists
 
         self.qgis_project = Project()
         
@@ -100,7 +100,7 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
             else:
                 raise e
 
-        is_pt_database = project_has_transit(self.qgis_project.project)
+        is_pt_database = project_has_transit(self.qgis_project)
 
         if (is_pt_database and option not in ["Overwrite Routes", "Add to Existing Routes"]):
             raise QgsProcessingException("Project already has transit systems. Please choose 'Overwrite Routes' or 'Add to Existing Routes'.")
@@ -111,8 +111,7 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
         self._p = Transit(self.qgis_project)
         self.set_data(qtfs_feed, date)
 
-        # raise ValueError(f"Date: {date}, should work: {date in self.feed.gtfs_data.feed_dates}, type of date: {type(date)}, type of dates: {type(self.feed.gtfs_data.feed_dates[0])}")
-        # self.feed.set_date(date.toString("yyyy-MM-dd"))
+        self.feed.set_date(date.toString("yyyy-MM-dd"))
 
         self.feed.gtfs_data.agency.description = description
         self.feed.gtfs_data.agency.agency = agency
@@ -136,6 +135,7 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
                 for table in __transit_tables:
                     conn.execute(f"DELETE FROM {quote_identifier(table)};")
 
+        self.progress_bridge = LiveLogBridge()
         self.feed.signal.connect(self.signal_handler)
         self.feed.execute_import()
 
