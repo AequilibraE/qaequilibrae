@@ -223,8 +223,19 @@ def run_single_route_choice(
 def _build_utility_graph(project: Any, configuration: Mapping[str, Any], nodes: Any | None = None) -> Any:
     """Build an isolated mode graph and calculate its weighted utility field."""
     mode = configuration["mode"]
-    project.network.build_graphs(modes=[mode])
-    graph = deepcopy(project.network.graphs[mode])
+    # build_graphs replaces the project's cached graph. Keep the fresh graph for
+    # this operation without discarding any graph configured by another tool.
+    previous_graph = project.network.graphs.get(mode)
+    try:
+        project.network.build_graphs(modes=[mode])
+        graph = project.network.graphs[mode]
+        if previous_graph is not None:
+            graph = deepcopy(graph)
+    finally:
+        if previous_graph is None:
+            project.network.graphs.pop(mode, None)
+        else:
+            project.network.graphs[mode] = previous_graph
     graph.network = graph.network.assign(__utility__=0.0)
     if configuration["excluded_links"]:
         graph.exclude_links(configuration["excluded_links"])

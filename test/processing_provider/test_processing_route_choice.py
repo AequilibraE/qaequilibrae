@@ -83,8 +83,27 @@ def test_single_route_choice_uses_shared_graph_without_changing_project(sf_proje
 
     assert not choice.get_results().empty
     assert graph is not original_graph
+    assert project.network.graphs["c"] is original_graph
     assert "__utility__" not in original_graph.network.columns
     assert get_active_project() is project
+
+
+def test_single_route_choice_does_not_leave_a_new_cached_graph(sf_project):
+    project = sf_project.project
+    project.network.graphs.pop("c", None)
+    configuration = {
+        "mode": "c",
+        "utility_fields": [(0.01, "distance")],
+        "excluded_links": [],
+        "block_centroid_flows": False,
+        "algorithm": "bfsle",
+        "kwargs": {"max_routes": 3, "max_depth": 0, "penalty": 1.0, "cutoff_prob": 0.0, "beta": 1.1},
+    }
+
+    choice, _ = run_single_route_choice(project, configuration, 1, 15, 1.0)
+
+    assert not choice.get_results().empty
+    assert "c" not in project.network.graphs
 
 
 def test_route_choice_build_saves_choice_sets(sf_project):
