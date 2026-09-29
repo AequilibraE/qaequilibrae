@@ -1,6 +1,8 @@
 """Convert OMX cores to and from non-spatial QGIS OD tables."""
 
+from collections.abc import Iterable
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import openmatrix as omx
@@ -20,7 +22,6 @@ from qgis.core import (
     QgsProcessingParameterFile,
     QgsProcessingParameterFileDestination,
     QgsProcessingParameterString,
-    QgsWkbTypes,
 )
 
 from qaequilibrae.i18n.translate import trlt
@@ -97,7 +98,7 @@ class OmxToTable(QgsProcessingAlgorithm):
                     )
                 )
                 sink, destination = self.parameterAsSink(
-                    parameters, self.OUTPUT, context, FIELDS, QgsWkbTypes.NoGeometry, QgsCoordinateReferenceSystem()
+                    parameters, self.OUTPUT, context, FIELDS, Qgis.WkbType.NoGeometry, QgsCoordinateReferenceSystem()
                 )
                 if sink is None:
                     raise QgsProcessingException(self.tr("Could not create OD table"))
@@ -225,7 +226,7 @@ class OmxZoneSlice(QgsProcessingAlgorithm):
                 fields.append(QgsField("zone_id", QVariant.LongLong))
                 fields.append(QgsField("data", QVariant.Double))
                 sink, destination = self.parameterAsSink(
-                    parameters, self.OUTPUT, context, fields, QgsWkbTypes.NoGeometry, QgsCoordinateReferenceSystem()
+                    parameters, self.OUTPUT, context, fields, Qgis.WkbType.NoGeometry, QgsCoordinateReferenceSystem()
                 )
                 if sink is None:
                     raise QgsProcessingException(self.tr("Could not create zone values table"))
@@ -294,7 +295,8 @@ class TableToOmx(QgsProcessingAlgorithm):
         feedback.setProgress(0)
         logger.info(self.tr("Reading and validating {} OD rows").format(count if count >= 0 else "unknown"))
         progress_step = max(1, count // 100) if count > 0 else 1000
-        for row, feature in enumerate(source.getFeatures(), start=1):
+        # QGIS iterators are iterable at runtime, despite their stub's optional __iter__ return.
+        for row, feature in enumerate(cast(Iterable[QgsFeature], source.getFeatures()), start=1):
             if feedback.isCanceled():
                 return {}
             try:
