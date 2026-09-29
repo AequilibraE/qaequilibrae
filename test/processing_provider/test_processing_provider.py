@@ -9,7 +9,7 @@ from aequilibrae.matrix import AequilibraeMatrix
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
 from aequilibrae.utils.create_example import create_example
 from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingException, QgsProcessingFeedback, QgsProject
-from qgis.PyQt.QtCore import QDate, QDateTime
+from qgis.PyQt.QtCore import QDate, QDateTime, QTime
 
 from qaequilibrae.modules.processing_provider.distribution_procedures.apply_gravity import ApplyGravity
 from qaequilibrae.modules.processing_provider.distribution_procedures.calibrate_gravity import CalibrateGravity
@@ -164,7 +164,7 @@ def test_processing_gtfs_import(pt_project):
     parameters = {
         algorithm.PROJECT: str(pt_project.project.project_base_path),
         algorithm.GTFS_FEED: get_test_data_path("coquimbo_project", "gtfs_coquimbo.zip"),
-        algorithm.DATE: QDateTime(QDate(2016, 6, 17)),
+        algorithm.DATE: QDateTime(QDate(2016, 6, 17), QTime(0, 0)),
         algorithm.AGENCY: "Processing test agency",
         algorithm.DESCRIPTION: "Processing test feed",
         algorithm.OPTIONS: 0,
