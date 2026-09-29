@@ -26,8 +26,12 @@ class Provider(QgsProcessingProvider):
 
     def __load_transit(self):
         from .transit_procedures.add_gtfs_algorithm import AddGTFSFeedAlgorithm
+        from .transit_procedures.transit_assignment import TransitAssignmentAlgorithm
+        from .transit_procedures.supply_metrics import TransitSupplyMetricsAlgorithm
 
         self.addAlgorithm(AddGTFSFeedAlgorithm())
+        self.addAlgorithm(TransitAssignmentAlgorithm())
+        self.addAlgorithm(TransitSupplyMetricsAlgorithm())
 
     def __load_model_building(self):
 

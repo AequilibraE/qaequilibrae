@@ -9,9 +9,9 @@ from qaequilibrae.modules.common_tools import (
     LiveLogBridge,
     connect_progress_widgets,
     project_has_transit,
-    quote_identifier,
 )
 from qaequilibrae.modules.transit_procedures import GTFSFeed
+from qaequilibrae.modules.transit_procedures.gtfs_import_runner import import_gtfs_feeds
 
 
 class GTFSImporter(BaseDialog):
@@ -45,20 +45,6 @@ class GTFSImporter(BaseDialog):
         self.setFixedHeight(380)
         self.items = [self.config_box, self.progress_box]
 
-        self.__transit_tables = [
-            "agencies",
-            "fare_attributes",
-            "fare_rules",
-            "fare_zones",
-            "pattern_mapping",
-            "route_links",
-            "routes",
-            "stop_connectors",
-            "stops",
-            "trips",
-            "trips_schedule",
-        ]
-
     def add_gtfs_feed(self):
         self._p = Transit(self.qgis_project.project)
         self.dlg2 = GTFSFeed(self.qgis_project, self._p)
@@ -86,16 +72,15 @@ class GTFSImporter(BaseDialog):
             item.setEnabled(not item.isEnabled())
         self.setFixedHeight(176)
 
-        if self.rdo_clear.isChecked() and self.is_pt_database:
-            with self.qgis_project.project.transit_connection as conn:
-                for table in self.__transit_tables:
-                    conn.execute(f"DELETE FROM {quote_identifier(table)};")
-
-        for _, feed in enumerate(self.feeds):
-            feed.signal.connect(self.signal_handler)
+        for feed in self.feeds:
             if self.check_allow_map_match.isChecked():
                 feed.set_allow_map_match()
-            feed.execute_import()
+        import_gtfs_feeds(
+            self.qgis_project.project,
+            self.feeds,
+            overwrite=self.rdo_clear.isChecked() and self.is_pt_database,
+            signal_handler=self.signal_handler,
+        )
 
         self.qgis_project.projectManager.removeTab(0)
         self.qgis_project.update_project_layers()

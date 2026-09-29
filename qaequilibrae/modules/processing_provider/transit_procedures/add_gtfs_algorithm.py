@@ -1,13 +1,14 @@
-""" Add a GTFS feed to the QAequilibrae model. """
+"""Add a GTFS feed to an AequilibraE project."""
 
-from copy import deepcopy
-
+import json
+import math
 from qgis.core import (
     Qgis,
     QgsProcessingAlgorithm,
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
+    QgsProcessingParameterBoolean,
     QgsProcessingParameterDateTime,
     QgsProcessingParameterEnum,
     QgsProcessingParameterFile,
@@ -15,174 +16,199 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QDate
 
-from qaequilibrae.i18n.translate import trlt
 from aequilibrae.project import Project
 from aequilibrae.transit import Transit
-from qaequilibrae.modules.common_tools import (
-    LiveLogBridge,
-    project_has_transit,
-    quote_identifier,
-)
+from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.common_tools import project_has_transit
+from qaequilibrae.modules.transit_procedures.gtfs_import_runner import import_gtfs_feeds
+
 
 class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
-    """ """
+    """Import one GTFS feed into an existing AequilibraE project."""
 
-    def initAlgorithm(self, config: dict | None = None) -> None:
+    PROJECT = "PROJECT"
+    GTFS_FEED = "GTFS_FEED"
+    DATE = "DATE"
+    AGENCY = "AGENCY"
+    DESCRIPTION = "DESCRIPTION"
+    CAPACITIES = "CAPACITIES"
+    OPTIONS = "OPTIONS"
+    ALLOW_MAP_MATCH = "ALLOW_MAP_MATCH"
+    OPTIONS_VALUES = (
+        "Overwrite Routes",
+        "Add to Existing Routes",
+        "Add transit table",
+        "Create new route system",
+    )
+
+    def initAlgorithm(self, configuration: dict | None = None) -> None:
         self.addParameter(
             QgsProcessingParameterFile(
-                name="PROJECT",
-                description=self.tr("Qgis Project"),
-                behavior=QgsProcessingParameterFile.Folder
+                self.PROJECT,
+                self.tr("AequilibraE project folder"),
+                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
             )
         )
-
         self.addParameter(
             QgsProcessingParameterFile(
-                name="QTFS_FEED",
-                description=self.tr("QTFS Feed"),
-                behavior=QgsProcessingParameterFile.File
+                self.GTFS_FEED,
+                self.tr("GTFS feed ZIP file"),
+                behavior=Qgis.ProcessingFileParameterBehavior.File,
             )
         )
-
         self.addParameter(
             QgsProcessingParameterDateTime(
-                name="DATE",
-                description=self.tr("Date"),
-                type=Qgis.ProcessingDateTimeParameterDataType.Date
+                self.DATE,
+                self.tr("Service date"),
+                type=Qgis.ProcessingDateTimeParameterDataType.Date,
             )
         )
-
+        self.addParameter(QgsProcessingParameterString(self.AGENCY, self.tr("Agency")))
+        self.addParameter(QgsProcessingParameterString(self.DESCRIPTION, self.tr("Description")))
         self.addParameter(
             QgsProcessingParameterString(
-                name="AGENCY",
-                description=self.tr("Agency")
+                self.CAPACITIES,
+                self.tr("Vehicle capacities as a JSON object (optional)"),
+                optional=True,
             )
         )
-
         self.addParameter(
-            QgsProcessingParameterString(
-                name="DESCRIPTION",
-                description=self.tr("Description")
+            QgsProcessingParameterBoolean(
+                self.ALLOW_MAP_MATCH,
+                self.tr("Allow map matching"),
+                defaultValue=False,
             )
         )
-
         self.addParameter(
             QgsProcessingParameterEnum(
-                name="OPTIONS",
-                description=self.tr("Resetting Transit Tables"),
-                options=["Overwrite Routes", "Add to Existing Routes", "Add transit table", "Create new route system"],
-                usesStaticStrings=True
+                self.OPTIONS,
+                self.tr("Transit import option"),
+                options=list(self.OPTIONS_VALUES),
+                usesStaticStrings=True,
             )
         )
 
-    def processAlgorithm(self, parameters: dict, context: QgsProcessingContext, feedbkac: QgsProcessingFeedback):
-        project_path = self.parameterAsFile(parameters, "PROJECT", context)
+    def processAlgorithm(
+        self,
+        parameters: dict,
+        context: QgsProcessingContext,
+        feedback: QgsProcessingFeedback | None,
+    ) -> dict:
+        project_path = self.parameterAsFile(parameters, self.PROJECT, context)
+        feed_path = self.parameterAsFile(parameters, self.GTFS_FEED, context)
+        selected_date = self.parameterAsDateTime(parameters, self.DATE, context)
+        agency = self.parameterAsString(parameters, self.AGENCY, context).strip()
+        description = self.parameterAsString(parameters, self.DESCRIPTION, context).strip()
+        capacities_text = self.parameterAsString(parameters, self.CAPACITIES, context).strip()
+        option_index = self.parameterAsEnum(parameters, self.OPTIONS, context)
 
-        qtfs_feed = self.parameterAsFile(parameters, "QTFS_FEED", context)
+        if not project_path or not feed_path or not selected_date.isValid():
+            raise QgsProcessingException(self.tr("A project, GTFS feed, and valid service date are required."))
+        if not agency or not description:
+            raise QgsProcessingException(self.tr("Agency and description must not be empty."))
+        if option_index < 0 or option_index >= len(self.OPTIONS_VALUES):
+            raise QgsProcessingException(self.tr("Select a valid transit import option."))
+        option = self.OPTIONS_VALUES[option_index]
 
-        date = self.parameterAsDateTime(parameters, "DATE", context).date()
-
-        agency: str = self.parameterAsString(parameters, "AGENCY", context)
-
-        description: str = self.parameterAsString(parameters, "DESCRIPTION", context)
-
-        option: list[str] = self.parameterAsString(parameters, "OPTIONS", context)
-
-        # TODO: do various checks
-
-        self.qgis_project = Project()
-        
+        project = Project()
         try:
-            self.qgis_project.open(project_path)
-        except FileNotFoundError as e:
-            if e.args[0] == "Model does not exist. Check your path and try again":
-                raise QgsProcessingException("Folder does not contain an Aequilibrae model. Check your path and try again.")
-            else:
-                raise e
+            project.open(project_path)
+        except FileNotFoundError as error:
+            raise QgsProcessingException(
+                self.tr("Folder does not contain an AequilibraE model. Check your path and try again.")
+            ) from error
 
-        is_pt_database = project_has_transit(self.qgis_project)
+        try:
+            has_transit = project_has_transit(project)
+            if has_transit and option not in self.OPTIONS_VALUES[:2]:
+                raise QgsProcessingException(
+                    self.tr("Project already has transit tables. Choose overwrite or add to existing routes.")
+                )
+            if not has_transit and option not in self.OPTIONS_VALUES[2:]:
+                raise QgsProcessingException(
+                    self.tr("Project has no transit tables. Choose add transit table or create a route system.")
+                )
 
-        if (is_pt_database and option not in ["Overwrite Routes", "Add to Existing Routes"]):
-            raise QgsProcessingException("Project already has transit systems. Please choose 'Overwrite Routes' or 'Add to Existing Routes'.")
-        elif (not is_pt_database and option not in ["Add transit table", "Create new route system"]):
-            raise QgsProcessingException("Project does not have transit system. Please choose 'Add transit table' or 'Create new route system'.")
+            transit = Transit(project)
+            feed = transit.new_gtfs_builder(agency="", file_path=feed_path)
+            date = selected_date.date()
+            available_dates = [QDate.fromString(value, "yyyy-MM-dd") for value in feed.dates_available()]
+            available_dates = [value for value in available_dates if value.isValid()]
+            if available_dates and date not in available_dates:
+                raise QgsProcessingException(
+                    self.tr(
+                        f"Date {date.toString('yyyy-MM-dd')} is not available in this GTFS feed. "
+                        f"Available dates: {', '.join(value.toString('yyyy-MM-dd') for value in available_dates)}"
+                    )
+                )
 
-        # add the feed
-        self._p = Transit(self.qgis_project)
-        self.set_data(qtfs_feed, date)
+            feed.set_date(date.toString("yyyy-MM-dd"))
+            if capacities_text:
+                try:
+                    capacities = json.loads(capacities_text)
+                except json.JSONDecodeError as error:
+                    raise QgsProcessingException(self.tr("Capacities must be a valid JSON object.")) from error
 
-        self.feed.set_date(date.toString("yyyy-MM-dd"))
+                def is_valid_capacity(value: object) -> bool:
+                    if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
+                        return False
+                    try:
+                        return math.isfinite(value)
+                    except OverflowError:
+                        return False
 
-        self.feed.gtfs_data.agency.description = description
-        self.feed.gtfs_data.agency.agency = agency
+                if not isinstance(capacities, dict) or any(
+                    not isinstance(value, list) or len(value) != 2 or any(not is_valid_capacity(item) for item in value)
+                    for value in capacities.values()
+                ):
+                    raise QgsProcessingException(
+                        self.tr("Each capacity entry must contain a non-negative [seated, total] pair.")
+                    )
+                feed.__capacities__ = capacities
+                transit.default_capacities = capacities
+            feed.gtfs_data.agency.description = description
+            feed.gtfs_data.agency.agency = agency
+            if self.parameterAsBool(parameters, self.ALLOW_MAP_MATCH, context):
+                feed.set_allow_map_match()
 
+            def report_import_progress(value: tuple) -> None:
+                if feedback is None:
+                    return
+                if value[0] == "start":
+                    feedback.setProgress(0)
+                    feedback.pushInfo(str(value[2]))
+                elif value[0] == "update":
+                    feedback.setProgress(float(value[1]))
+                    feedback.pushInfo(str(value[2]))
+                elif value[0] == "set_text":
+                    feedback.pushInfo(str(value[1]))
 
-        if option == "Overwrite Routes":
-            __transit_tables = [
-                        "agencies",
-                        "fare_attributes",
-                        "fare_rules",
-                        "fare_zones",
-                        "pattern_mapping",
-                        "route_links",
-                        "routes",
-                        "stop_connectors",
-                        "stops",
-                        "trips",
-                        "trips_schedule",
-                    ]
-            with self.qgis_project.transit_connection as conn:
-                for table in __transit_tables:
-                    conn.execute(f"DELETE FROM {quote_identifier(table)};")
-
-        self.progress_bridge = LiveLogBridge()
-        self.feed.signal.connect(self.signal_handler)
-        self.feed.execute_import()
-
-        self.qgis_project.close()
-
-        return {}
-    
-    def set_data(self, source_path_file, date):
-        self.feed = self._p.new_gtfs_builder(agency="", file_path=source_path_file)
-        if dates := self.feed.dates_available():
-            # check the provided date is within the right range
-            dates = [QDate.fromString(dt, "yyyy-MM-dd") for dt in dates]
-            min_date = min(dates)
-            max_date = max(dates)
-            if (date > max_date or date < min_date):
-                raise QgsProcessingException(f"Date needs to be between {min_date} and {max_date} for this data. Date was: {date}")
-            if (date not in dates):
-                raise QgsProcessingException(f"Date {date} is not available in this GTFS feed. Potential dates are: {dates}")
-        self.default_capacities = deepcopy(self._p.default_capacities)
-
-    def signal_handler(self, val):
-        if val[0] == "start":
-            self.progress_bridge.progress_started.emit(val[1], val[2])
-        elif val[0] == "update":
-            self.progress_bridge.stage_line.emit(val[2])
-            self.progress_bridge.progress_updated.emit(val[1])
-        elif val[0] == "set_text":
-            self.progress_bridge.progress_reset.emit()
-            self.progress_bridge.stage_line.emit(val[1])
-        elif val[0] == "finished":
-            self.progress_bridge.finished.emit()
+            import_gtfs_feeds(
+                project,
+                [feed],
+                overwrite=option == "Overwrite Routes",
+                signal_handler=report_import_progress,
+            )
+            if feedback is not None:
+                feedback.pushInfo(self.tr("GTFS feed import completed."))
+            return {}
+        finally:
+            project.close()
 
     def name(self) -> str:
         return "addGTFSFeed"
 
     def displayName(self) -> str:
-        return "Add GTFS feed"
-    
+        return self.tr("Add GTFS feed")
+
     def group(self) -> str:
-        return "Transit"
+        return self.tr("Transit")
 
     def groupId(self) -> str:
         return "transit"
 
     def createInstance(self) -> "AddGTFSFeedAlgorithm":
         return AddGTFSFeedAlgorithm()
-    
-    def tr(self, message: str) -> str:
-        return trlt("DesireLines", message)
 
+    def tr(self, message: str) -> str:
+        return trlt("ProcessingProvider", message)
