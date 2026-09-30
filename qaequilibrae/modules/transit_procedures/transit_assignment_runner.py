@@ -39,6 +39,16 @@ def run_transit_assignment(
         raise ValueError(f"Unknown transit operation: {action}")
 
     transit_data = transit_data or Transit(project)
+    if action == "create":
+        matrix_name = configs["matrix_name"]
+        if not isinstance(matrix_name, str) or not matrix_name.strip():
+            raise ValueError("A skim matrix name is required")
+        if Path(matrix_name).name != matrix_name or "\\" in matrix_name:
+            raise ValueError("Matrix names must not contain directory separators")
+        matrix_path = Path(project.project_base_path) / "matrices" / f"{matrix_name}.omx"
+        if project.matrices.check_exists(matrix_name) or matrix_path.exists():
+            raise ValueError(f"Matrix '{matrix_name}' already exists")
+
     report(1, "Creating transit graph")
     if configs["has_graph"]:
         graph_builder = TransitGraphBuilder.from_db(project, configs["period_id"])
@@ -93,8 +103,21 @@ def run_transit_assignment(
                 raise ValueError("Demand matrix and transit graph have different zone sets")
             if not np.array_equal(matrix_zones, graph_zones):
                 order = np.fromiter((matrix_positions[int(zone)] for zone in graph_zones), dtype=np.intp)
-                matrix.matrix[:, :] = matrix.matrix[np.ix_(order, order)].copy()
-                matrix.index[:] = graph_zones
+                reordered_matrix = AequilibraeMatrix()
+                try:
+                    cores = list(configs["mat_core"])
+                    reordered_matrix.create_empty(zones=len(graph_zones), matrix_names=cores, memory_only=True)
+                    if reordered_matrix.index is None:
+                        raise RuntimeError("Could not allocate the reordered demand matrix index")
+                    reordered_matrix.index[:] = graph_zones
+                    for core in cores:
+                        reordered_matrix.matrix[core][:, :] = matrix.get_matrix(core)[np.ix_(order, order)]
+                    reordered_matrix.computational_view(cores)
+                except Exception:
+                    reordered_matrix.close()
+                    raise
+                matrix.close()
+                matrix = reordered_matrix
 
         report(7, "Creating transit class")
         transit_class = TransitClass(name=configs["class_name"], graph=graph, matrix=matrix)
@@ -119,10 +142,12 @@ def run_transit_assignment(
             skim_results = assignment.get_skim_results()
             skim_result = skim_results[configs["class_name"]] if isinstance(skim_results, dict) else skim_results[0]
             skim_result.export(str(output_path))
+            project.matrices.update_database()
+            project.matrices.reload()
             return {"matrix": str(output_path)}
 
         assignment.save_results(table_name=configs["result_name"])
         return {"result_name": configs["result_name"]}
     finally:
-        if action == "assign" and matrix is not None:
+        if matrix is not None:
             matrix.close()

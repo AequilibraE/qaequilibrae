@@ -16,10 +16,10 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QDate
 
-from aequilibrae.project import Project
 from aequilibrae.transit import Transit
 from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.common_tools import project_has_transit
+from qaequilibrae.modules.processing_provider.project import borrow_project
 from qaequilibrae.modules.transit_procedures.gtfs_import_runner import import_gtfs_feeds
 
 
@@ -110,90 +110,87 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
             raise QgsProcessingException(self.tr("Select a valid transit import option."))
         option = self.OPTIONS_VALUES[option_index]
 
-        project = Project()
         try:
-            project.open(project_path)
-        except FileNotFoundError as error:
-            raise QgsProcessingException(
-                self.tr("Folder does not contain an AequilibraE model. Check your path and try again.")
-            ) from error
-
-        try:
-            has_transit = project_has_transit(project)
-            if has_transit and option not in self.OPTIONS_VALUES[:2]:
-                raise QgsProcessingException(
-                    self.tr("Project already has transit tables. Choose overwrite or add to existing routes.")
-                )
-            if not has_transit and option not in self.OPTIONS_VALUES[2:]:
-                raise QgsProcessingException(
-                    self.tr("Project has no transit tables. Choose add transit table or create a route system.")
-                )
-
-            transit = Transit(project)
-            feed = transit.new_gtfs_builder(agency="", file_path=feed_path)
-            date = selected_date.date()
-            available_dates = [QDate.fromString(value, "yyyy-MM-dd") for value in feed.dates_available()]
-            available_dates = [value for value in available_dates if value.isValid()]
-            if available_dates and date not in available_dates:
-                raise QgsProcessingException(
-                    self.tr(
-                        f"Date {date.toString('yyyy-MM-dd')} is not available in this GTFS feed. "
-                        f"Available dates: {', '.join(value.toString('yyyy-MM-dd') for value in available_dates)}"
-                    )
-                )
-
-            feed.set_date(date.toString("yyyy-MM-dd"))
-            if capacities_text:
-                try:
-                    capacities = json.loads(capacities_text)
-                except json.JSONDecodeError as error:
-                    raise QgsProcessingException(self.tr("Capacities must be a valid JSON object.")) from error
-
-                def is_valid_capacity(value: object) -> bool:
-                    if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
-                        return False
-                    try:
-                        return math.isfinite(value)
-                    except OverflowError:
-                        return False
-
-                if not isinstance(capacities, dict) or any(
-                    not isinstance(value, list) or len(value) != 2 or any(not is_valid_capacity(item) for item in value)
-                    for value in capacities.values()
-                ):
+            with borrow_project(project_path) as project:
+                has_transit = project_has_transit(project)
+                if has_transit and option not in self.OPTIONS_VALUES[:2]:
                     raise QgsProcessingException(
-                        self.tr("Each capacity entry must contain a non-negative [seated, total] pair.")
+                        self.tr("Project already has transit tables. Choose overwrite or add to existing routes.")
                     )
-                feed.__capacities__ = capacities
-                transit.default_capacities = capacities
-            feed.gtfs_data.agency.description = description
-            feed.gtfs_data.agency.agency = agency
-            if self.parameterAsBool(parameters, self.ALLOW_MAP_MATCH, context):
-                feed.set_allow_map_match()
+                if not has_transit and option not in self.OPTIONS_VALUES[2:]:
+                    raise QgsProcessingException(
+                        self.tr("Project has no transit tables. Choose add transit table or create a route system.")
+                    )
 
-            def report_import_progress(value: tuple) -> None:
-                if feedback is None:
-                    return
-                if value[0] == "start":
-                    feedback.setProgress(0)
-                    feedback.pushInfo(str(value[2]))
-                elif value[0] == "update":
-                    feedback.setProgress(float(value[1]))
-                    feedback.pushInfo(str(value[2]))
-                elif value[0] == "set_text":
-                    feedback.pushInfo(str(value[1]))
+                transit = Transit(project)
+                feed = transit.new_gtfs_builder(agency="", file_path=feed_path)
+                date = selected_date.date()
+                available_dates = [QDate.fromString(value, "yyyy-MM-dd") for value in feed.dates_available()]
+                available_dates = [value for value in available_dates if value.isValid()]
+                if available_dates and date not in available_dates:
+                    raise QgsProcessingException(
+                        self.tr(
+                            f"Date {date.toString('yyyy-MM-dd')} is not available in this GTFS feed. "
+                            f"Available dates: {', '.join(value.toString('yyyy-MM-dd') for value in available_dates)}"
+                        )
+                    )
 
-            import_gtfs_feeds(
-                project,
-                [feed],
-                overwrite=option == "Overwrite Routes",
-                signal_handler=report_import_progress,
-            )
-            if feedback is not None:
-                feedback.pushInfo(self.tr("GTFS feed import completed."))
-            return {}
-        finally:
-            project.close()
+                feed.set_date(date.toString("yyyy-MM-dd"))
+                if capacities_text:
+                    try:
+                        capacities = json.loads(capacities_text)
+                    except json.JSONDecodeError as error:
+                        raise QgsProcessingException(self.tr("Capacities must be a valid JSON object.")) from error
+
+                    def is_valid_capacity(value: object) -> bool:
+                        if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
+                            return False
+                        try:
+                            return math.isfinite(value)
+                        except OverflowError:
+                            return False
+
+                    if not isinstance(capacities, dict) or any(
+                        not isinstance(value, list)
+                        or len(value) != 2
+                        or any(not is_valid_capacity(item) for item in value)
+                        for value in capacities.values()
+                    ):
+                        raise QgsProcessingException(
+                            self.tr("Each capacity entry must contain a non-negative [seated, total] pair.")
+                        )
+                    feed.__capacities__ = capacities
+                    transit.default_capacities = capacities
+                feed.gtfs_data.agency.description = description
+                feed.gtfs_data.agency.agency = agency
+                if self.parameterAsBool(parameters, self.ALLOW_MAP_MATCH, context):
+                    feed.set_allow_map_match()
+
+                def report_import_progress(value: tuple) -> None:
+                    if feedback is None:
+                        return
+                    if value[0] == "start":
+                        feedback.setProgress(0)
+                        feedback.pushInfo(str(value[2]))
+                    elif value[0] == "update":
+                        feedback.setProgress(float(value[1]))
+                        feedback.pushInfo(str(value[2]))
+                    elif value[0] == "set_text":
+                        feedback.pushInfo(str(value[1]))
+
+                import_gtfs_feeds(
+                    project,
+                    [feed],
+                    overwrite=option == "Overwrite Routes",
+                    signal_handler=report_import_progress,
+                )
+                if feedback is not None:
+                    feedback.pushInfo(self.tr("GTFS feed import completed."))
+                return {}
+        except QgsProcessingException:
+            raise
+        except Exception as error:
+            raise QgsProcessingException(self.tr(f"GTFS import failed: {error}")) from error
 
     def name(self) -> str:
         return "addGTFSFeed"

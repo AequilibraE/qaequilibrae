@@ -150,7 +150,6 @@ def test_processing_transit_skimming(coquimbo_project):
 
     assert succeeded, feedback.textLog()
     assert result["matrix"].endswith("processing_pt_skims.omx")
-    coquimbo_project.project.matrices.update_database()
     matrix = coquimbo_project.project.matrices.get_matrix("processing_pt_skims_omx")
     assert matrix.cores == 2
     assert matrix.names == ["boardings", "transfer_time"]
