@@ -6,8 +6,10 @@ import pandas as pd
 import pytest
 from aequilibrae import Project
 from aequilibrae.matrix import AequilibraeMatrix
+from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
 from aequilibrae.utils.create_example import create_example
 from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingException, QgsProcessingFeedback, QgsProject
+from qgis.PyQt.QtCore import QDate, QDateTime, QTime
 
 from qaequilibrae.modules.processing_provider.distribution_procedures.apply_gravity import ApplyGravity
 from qaequilibrae.modules.processing_provider.distribution_procedures.calibrate_gravity import CalibrateGravity
@@ -23,8 +25,11 @@ from qaequilibrae.modules.processing_provider.model_building.create_empty_projec
 from qaequilibrae.modules.processing_provider.model_building.network_simplifier import NetworkSimplifier
 from qaequilibrae.modules.processing_provider.paths_procedures.shortest_path import ShortestPath
 from qaequilibrae.modules.processing_provider.provider import Provider
+from qaequilibrae.modules.processing_provider.transit_procedures.add_gtfs_algorithm import AddGTFSFeedAlgorithm
+from qaequilibrae.modules.processing_provider.transit_procedures.supply_metrics import TransitSupplyMetricsAlgorithm
+from qaequilibrae.modules.processing_provider.transit_procedures.transit_assignment import TransitAssignmentAlgorithm
 
-from ..utilities import get_test_data_path, load_test_layer
+from ..utilities import create_matrix, get_test_data_path, load_test_layer
 
 
 def qgis_app():
@@ -73,8 +78,124 @@ def test_provider_exists(qgis_app):
         "RunTrafficAssignment",
         "SimpleTag",
         "TripLengthDistribution",
+        "AddGTFSFeedAlgorithm",
+        "TransitAssignmentAlgorithm",
+        "TransitSupplyMetricsAlgorithm",
     }
     registry.removeProvider(provider)
+
+
+def test_processing_transit_assignment(coquimbo_project):
+    matrix_path = coquimbo_project.project.project_base_path / "matrices" / "demand.omx"
+    create_matrix(np.arange(1, 134), str(matrix_path))
+    coquimbo_project.project.matrices.update_database()
+    coquimbo_project.project.matrices.reload()
+
+    algorithm = TransitAssignmentAlgorithm()
+    algorithm.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    parameters = {
+        algorithm.PROJECT_FOLDER: str(coquimbo_project.project.project_base_path),
+        algorithm.ACTION: 1,
+        algorithm.PERIOD_ID: 1,
+        algorithm.USE_SAVED_GRAPH: False,
+        algorithm.MATRIX_NAME: "demand_omx",
+        algorithm.MATRIX_CORE: "demand",
+        algorithm.CLASS_NAME: "processing_pt",
+        algorithm.RESULT_NAME: "processing_pt_assignment",
+        "OUTER_TRANSFERS": False,
+        "INNER_TRANSFERS": True,
+        "WALKING_EDGES": False,
+        "BLOCK_CENTROID_FLOWS": False,
+        "SAVE_GRAPH": True,
+        "CONNECTOR_METHOD": 1,
+        "LINE_METHOD": 1,
+        "NETWORK_MODE": "c",
+    }
+
+    result, succeeded = algorithm.run(parameters, context, feedback)
+
+    assert succeeded, feedback.textLog()
+    assert result["result_name"] == "processing_pt_assignment"
+    result_table = load_result_table(coquimbo_project.project, "processing_pt_assignment")
+    assert result_table.shape == (468, 2)
+    assert result_table.columns.tolist() == ["index", "processing_pt_volume"]
+
+
+def test_processing_transit_skimming(coquimbo_project):
+    algorithm = TransitAssignmentAlgorithm()
+    algorithm.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    parameters = {
+        algorithm.PROJECT_FOLDER: str(coquimbo_project.project.project_base_path),
+        algorithm.ACTION: 0,
+        algorithm.PERIOD_ID: 1,
+        algorithm.USE_SAVED_GRAPH: False,
+        algorithm.MATRIX_NAME: "processing_pt_skims",
+        algorithm.CLASS_NAME: "processing_pt",
+        algorithm.SKIM_FIELDS: "boardings,transfer_time",
+        "OUTER_TRANSFERS": False,
+        "INNER_TRANSFERS": True,
+        "WALKING_EDGES": False,
+        "BLOCK_CENTROID_FLOWS": False,
+        "SAVE_GRAPH": False,
+        "CONNECTOR_METHOD": 1,
+        "LINE_METHOD": 1,
+        "NETWORK_MODE": "c",
+    }
+
+    result, succeeded = algorithm.run(parameters, context, feedback)
+
+    assert succeeded, feedback.textLog()
+    assert result["matrix"].endswith("processing_pt_skims.omx")
+    matrix = coquimbo_project.project.matrices.get_matrix("processing_pt_skims_omx")
+    assert matrix.cores == 2
+    assert matrix.names == ["boardings", "transfer_time"]
+
+
+def test_processing_gtfs_import(pt_project):
+    algorithm = AddGTFSFeedAlgorithm()
+    algorithm.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    parameters = {
+        algorithm.PROJECT: str(pt_project.project.project_base_path),
+        algorithm.GTFS_FEED: get_test_data_path("coquimbo_project", "gtfs_coquimbo.zip"),
+        algorithm.DATE: QDateTime(QDate(2016, 6, 17), QTime(0, 0)),
+        algorithm.AGENCY: "Processing test agency",
+        algorithm.DESCRIPTION: "Processing test feed",
+        algorithm.OPTIONS: 0,
+    }
+
+    result, succeeded = algorithm.run(parameters, context, feedback)
+
+    assert succeeded, feedback.textLog()
+    assert result == {}
+    with pt_project.project.transit_connection as connection:
+        agencies = connection.execute("SELECT agency FROM agencies").fetchall()
+    assert [agency[0] for agency in agencies] == ["Processing test agency"]
+
+
+def test_transit_supply_metrics(pt_project):
+    algorithm = TransitSupplyMetricsAlgorithm()
+    algorithm.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    parameters = {
+        algorithm.PROJECT_FOLDER: str(pt_project.project.project_base_path),
+        algorithm.ENTITY: 0,
+        algorithm.OUTPUT: "TEMPORARY_OUTPUT",
+    }
+
+    result, succeeded = algorithm.run(parameters, context, feedback)
+
+    assert succeeded, feedback.textLog()
+    output = context.takeResultLayer(result[algorithm.OUTPUT])
+    assert output is not None
+    assert output.featureCount() > 0
+    assert "route_id" in output.fields().names()
 
 
 @pytest.mark.parametrize("format", [0, 1])

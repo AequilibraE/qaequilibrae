@@ -788,7 +788,23 @@ A failure during output saves can leave some results in the project.
 
 Transit
 -------
-Please refer to the :ref:`Transit module <transit_procedures>` documentation.
+
+The transit algorithms use the same import and assignment runners as the transit dialogs.
+The dialogs remain available from the AequilibraE menu.
+
+**Add GTFS feed** imports one GTFS ZIP file into an AequilibraE project. Select a service date,
+agency, description, and transit import option. Optional settings enable map matching and
+provide vehicle capacities as a JSON object. Each capacity value is a ``[seated, total]`` pair.
+
+**Transit assignment and skimming** builds or reuses a transit graph. Select *Assign demand*
+to load a project matrix and save transit assignment results. Select *Create skim matrix* to
+create and save a skim matrix. The algorithm accepts a period ID, graph-building options, and
+comma-separated skim fields for skimming.
+
+**Transit supply metrics** writes route, pattern, stop, or zone metrics to a non-spatial table.
+Optional filters can limit the time range and route, pattern, or stop IDs.
+
+Please refer to the :ref:`Transit module <transit_procedures>` documentation for the transit UI.
 
 Trip distribution
 -----------------
