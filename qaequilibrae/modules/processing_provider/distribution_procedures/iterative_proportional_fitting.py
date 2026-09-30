@@ -1,19 +1,10 @@
-"""Iterative proportional fitting as a Processing algorithm and shared operation.
+"""Balance a seed matrix to trip-end vectors with iterative proportional fitting."""
 
-The :func:`fit_ipf` operation receives an AequilibraE matrix and trip-end vectors.
-The :class:`IterativeProportionalFitting` adapter translates QGIS inputs and
-outputs around it, so the operation stays independent from the desktop dialog.
-"""
+from pathlib import Path
 
-from typing import Any
-
-import pandas as pd
 from qgis.core import (
-    Qgis,
     QgsProcessingException,
     QgsProcessingParameterBoolean,
-    QgsProcessingParameterFeatureSource,
-    QgsProcessingParameterField,
     QgsProcessingParameterFileDestination,
     QgsProcessingParameterString,
 )
@@ -21,39 +12,7 @@ from qgis.core import (
 from qaequilibrae.modules.processing_provider.project import open_project
 from qaequilibrae.modules.processing_provider.project_algorithm import ProjectAlgorithm
 
-from .common import DistributionError, load_matrix_core, push_report, vectors_from_source
-
-
-def fit_ipf(
-    matrix: Any,
-    vectors: pd.DataFrame,
-    row_field: str,
-    column_field: str,
-    *,
-    nan_as_zero: bool = False,
-) -> tuple[Any, list[str]]:
-    """Balance *matrix* so its row and column totals match *vectors*.
-
-    Returns the fitted matrix and the procedure report. Callers decide how to
-    export the matrix and present :class:`DistributionError`.
-    """
-    from aequilibrae.distribution import Ipf
-
-    try:
-        ipf = Ipf(
-            matrix=matrix,
-            vectors=vectors,
-            row_field=row_field,
-            column_field=column_field,
-            nan_as_zero=nan_as_zero,
-        )
-        ipf.fit()
-    except Exception as error:
-        raise DistributionError(f"IPF failed: {error}") from error
-
-    if ipf.error is not None:
-        raise DistributionError(str(ipf.error))
-    return ipf.output, ipf.report
+from .common import add_trip_end_parameters, load_matrix_core, push_report, vectors_from_source
 
 
 class IterativeProportionalFitting(ProjectAlgorithm):
@@ -78,35 +37,7 @@ class IterativeProportionalFitting(ProjectAlgorithm):
         self.add_project_folder_parameter(self.PROJECT_FOLDER)
         self.addParameter(QgsProcessingParameterString(self.SEED_MATRIX_NAME, self.tr("Seed matrix name")))
         self.addParameter(QgsProcessingParameterString(self.SEED_MATRIX_CORE, self.tr("Seed matrix core")))
-        self.addParameter(
-            QgsProcessingParameterFeatureSource(
-                self.VECTOR_SOURCE,
-                self.tr("Trip-end vector layer"),
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterField(
-                self.INDEX_FIELD,
-                self.tr("Index field (zone ID)"),
-                parentLayerParameterName=self.VECTOR_SOURCE,
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterField(
-                self.ROW_FIELD,
-                self.tr("Production field"),
-                parentLayerParameterName=self.VECTOR_SOURCE,
-                type=Qgis.ProcessingFieldParameterDataType.Numeric,
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterField(
-                self.COLUMN_FIELD,
-                self.tr("Attraction field"),
-                parentLayerParameterName=self.VECTOR_SOURCE,
-                type=Qgis.ProcessingFieldParameterDataType.Numeric,
-            )
-        )
+        add_trip_end_parameters(self)
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.NAN_AS_ZERO,
@@ -123,6 +54,8 @@ class IterativeProportionalFitting(ProjectAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
+        from aequilibrae.distribution import Ipf
+
         project_folder = self.project_folder(parameters, context, self.PROJECT_FOLDER)
         matrix_name = self.parameterAsString(parameters, self.SEED_MATRIX_NAME, context)
         core_name = self.parameterAsString(parameters, self.SEED_MATRIX_CORE, context)
@@ -143,16 +76,26 @@ class IterativeProportionalFitting(ProjectAlgorithm):
 
         feedback.pushInfo(self.tr("Loading the seed matrix"))
         try:
-            with open_project(project_folder) as project:
-                seed_matrix = load_matrix_core(project, matrix_name, core_name)
-
+            with (
+                open_project(project_folder) as project,
+                load_matrix_core(project, matrix_name, core_name) as seed_matrix,
+            ):
                 feedback.pushInfo(self.tr("Fitting the seed matrix"))
-                output, report = fit_ipf(seed_matrix, vectors, row_field, column_field, nan_as_zero=nan_as_zero)
-                output.export(output_path)
-        except DistributionError as error:
+                ipf = Ipf(
+                    matrix=seed_matrix,
+                    vectors=vectors,
+                    row_field=row_field,
+                    column_field=column_field,
+                    nan_as_zero=nan_as_zero,
+                )
+                ipf.fit()
+                if ipf.error is not None:
+                    raise ValueError(str(ipf.error))
+                ipf.output.export(Path(output_path))
+        except Exception as error:
             raise QgsProcessingException(self.tr(str(error))) from error
 
-        push_report(feedback, report)
+        push_report(feedback, ipf.report)
         return {self.OUTPUT_MATRIX: output_path}
 
     def shortHelpString(self):

@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from os import makedirs
 from os.path import isdir, isfile, join
 
@@ -8,11 +9,19 @@ from aequilibrae import Project
 from aequilibrae.matrix import AequilibraeMatrix
 from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
 from aequilibrae.utils.create_example import create_example
-from qgis.core import QgsApplication, QgsProcessingContext, QgsProcessingException, QgsProcessingFeedback, QgsProject
+from qgis.core import (
+    Qgis,
+    QgsApplication,
+    QgsProcessingContext,
+    QgsProcessingException,
+    QgsProcessingFeedback,
+    QgsProject,
+)
 from qgis.PyQt.QtCore import QDate, QDateTime, QTime
 
 from qaequilibrae.modules.processing_provider.distribution_procedures.apply_gravity import ApplyGravity
 from qaequilibrae.modules.processing_provider.distribution_procedures.calibrate_gravity import CalibrateGravity
+from qaequilibrae.modules.processing_provider.distribution_procedures.common import load_matrix_core
 from qaequilibrae.modules.processing_provider.distribution_procedures.iterative_proportional_fitting import (
     IterativeProportionalFitting,
 )
@@ -83,6 +92,40 @@ def test_provider_exists(qgis_app):
         "TransitSupplyMetricsAlgorithm",
     }
     registry.removeProvider(provider)
+
+
+@pytest.mark.parametrize("algorithm_type", [ApplyGravity, IterativeProportionalFitting])
+def test_trip_end_parameters(algorithm_type):
+    algorithm = algorithm_type()
+    algorithm.initAlgorithm()
+    assert [parameter.name() for parameter in algorithm.parameterDefinitions()][3:7] == [
+        "VECTOR_SOURCE",
+        "INDEX_FIELD",
+        "ROW_FIELD",
+        "COLUMN_FIELD",
+    ]
+    for name in ("INDEX_FIELD", "ROW_FIELD", "COLUMN_FIELD"):
+        parameter = algorithm.parameterDefinition(name)
+        assert parameter.parentLayerParameterName() == "VECTOR_SOURCE"
+        assert parameter.dataType() == (
+            Qgis.ProcessingFieldParameterDataType.Any
+            if name == "INDEX_FIELD"
+            else Qgis.ProcessingFieldParameterDataType.Numeric
+        )
+
+
+@pytest.mark.parametrize("failure", [None, "setup", "body"])
+def test_distribution_matrix_is_closed(mocker, failure):
+    project, matrix = mocker.Mock(), mocker.Mock()
+    project.matrices.get_matrix.return_value = matrix
+    if failure == "setup":
+        matrix.computational_view.side_effect = ValueError("missing core")
+    with pytest.raises(ValueError) if failure else nullcontext():
+        with load_matrix_core(project, "demand", "core") as loaded:
+            assert loaded is matrix
+            if failure == "body":
+                raise ValueError("computation failed")
+    matrix.close.assert_called_once()
 
 
 def test_processing_transit_assignment(coquimbo_project):

@@ -1,15 +1,12 @@
-"""Apply a synthetic gravity model as a Processing algorithm and shared operation."""
+"""Apply a synthetic gravity model as a Processing algorithm."""
 
-from typing import Any
+from pathlib import Path
 
-import pandas as pd
 from qgis.core import (
     Qgis,
     QgsProcessingException,
     QgsProcessingParameterBoolean,
     QgsProcessingParameterEnum,
-    QgsProcessingParameterFeatureSource,
-    QgsProcessingParameterField,
     QgsProcessingParameterFileDestination,
     QgsProcessingParameterNumber,
     QgsProcessingParameterString,
@@ -18,41 +15,13 @@ from qgis.core import (
 from qaequilibrae.modules.processing_provider.project import open_project
 from qaequilibrae.modules.processing_provider.project_algorithm import ProjectAlgorithm
 
-from .common import GRAVITY_FUNCTIONS, DistributionError, load_matrix_core, push_report, vectors_from_source
-
-
-def apply_gravity_model(
-    project: Any,
-    model: Any,
-    impedance: Any,
-    vectors: pd.DataFrame,
-    row_field: str,
-    column_field: str,
-    *,
-    nan_as_zero: bool = False,
-) -> tuple[Any, list[str]]:
-    """Apply *model* to *impedance* and balance the result to *vectors*.
-
-    Returns the produced matrix and the procedure report. Callers decide how to
-    export the matrix and present :class:`DistributionError`.
-    """
-    from aequilibrae.distribution import GravityApplication
-
-    try:
-        gravity = GravityApplication(
-            project=project,
-            model=model,
-            impedance=impedance,
-            vectors=vectors,
-            row_field=row_field,
-            column_field=column_field,
-            nan_as_zero=nan_as_zero,
-        )
-        gravity.apply()
-    except Exception as error:
-        raise DistributionError(f"Gravity application failed: {error}") from error
-
-    return gravity.output, gravity.report
+from .common import (
+    GRAVITY_FUNCTIONS,
+    add_trip_end_parameters,
+    load_matrix_core,
+    push_report,
+    vectors_from_source,
+)
 
 
 class ApplyGravity(ProjectAlgorithm):
@@ -80,35 +49,7 @@ class ApplyGravity(ProjectAlgorithm):
         self.add_project_folder_parameter(self.PROJECT_FOLDER)
         self.addParameter(QgsProcessingParameterString(self.IMPEDANCE_MATRIX_NAME, self.tr("Impedance matrix name")))
         self.addParameter(QgsProcessingParameterString(self.IMPEDANCE_MATRIX_CORE, self.tr("Impedance matrix core")))
-        self.addParameter(
-            QgsProcessingParameterFeatureSource(
-                self.VECTOR_SOURCE,
-                self.tr("Trip-end vector layer"),
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterField(
-                self.INDEX_FIELD,
-                self.tr("Index field (zone ID)"),
-                parentLayerParameterName=self.VECTOR_SOURCE,
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterField(
-                self.ROW_FIELD,
-                self.tr("Production field"),
-                parentLayerParameterName=self.VECTOR_SOURCE,
-                type=Qgis.ProcessingFieldParameterDataType.Numeric,
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterField(
-                self.COLUMN_FIELD,
-                self.tr("Attraction field"),
-                parentLayerParameterName=self.VECTOR_SOURCE,
-                type=Qgis.ProcessingFieldParameterDataType.Numeric,
-            )
-        )
+        add_trip_end_parameters(self)
         self.addParameter(
             QgsProcessingParameterEnum(
                 self.FUNCTION,
@@ -149,6 +90,8 @@ class ApplyGravity(ProjectAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
+        from aequilibrae.distribution import GravityApplication
+
         project_folder = self.project_folder(parameters, context, self.PROJECT_FOLDER)
         matrix_name = self.parameterAsString(parameters, self.IMPEDANCE_MATRIX_NAME, context)
         core_name = self.parameterAsString(parameters, self.IMPEDANCE_MATRIX_CORE, context)
@@ -170,18 +113,27 @@ class ApplyGravity(ProjectAlgorithm):
 
         feedback.pushInfo(self.tr("Loading the impedance matrix"))
         try:
-            with open_project(project_folder) as project:
-                impedance = load_matrix_core(project, matrix_name, core_name)
-
+            with (
+                open_project(project_folder) as project,
+                load_matrix_core(project, matrix_name, core_name) as impedance,
+            ):
                 feedback.pushInfo(self.tr("Applying the gravity model"))
-                output, report = apply_gravity_model(
-                    project, model, impedance, vectors, row_field, column_field, nan_as_zero=nan_as_zero
+                gravity = GravityApplication(
+                    project=project,
+                    model=model,
+                    impedance=impedance,
+                    vectors=vectors,
+                    row_field=row_field,
+                    column_field=column_field,
+                    nan_as_zero=nan_as_zero,
                 )
-                output.export(output_path)
-        except DistributionError as error:
+                gravity.apply()
+                assert gravity.output is not None
+                gravity.output.export(Path(output_path))
+        except Exception as error:
             raise QgsProcessingException(self.tr(str(error))) from error
 
-        push_report(feedback, report)
+        push_report(feedback, gravity.report)
         return {self.OUTPUT_MATRIX: output_path}
 
     def _build_model(self, parameters, context):
