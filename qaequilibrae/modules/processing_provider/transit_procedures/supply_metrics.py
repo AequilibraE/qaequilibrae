@@ -27,6 +27,11 @@ from qaequilibrae.modules.transit_procedures.transit_supply_metrics import Suppl
 class TransitSupplyMetricsAlgorithm(ProjectAlgorithm):
     """Compute route, pattern, stop, or zone transit supply metrics."""
 
+    algorithm_name = "transitSupplyMetrics"
+    display_name = "Transit supply metrics"
+    group_name = "Transit"
+    group_id = "transit"
+
     ENTITY = "ENTITY"
     FROM_MINUTE = "FROM_MINUTE"
     TO_MINUTE = "TO_MINUTE"
@@ -173,18 +178,3 @@ class TransitSupplyMetricsAlgorithm(ProjectAlgorithm):
         if pd.isna(value):
             return None
         return value.item() if hasattr(value, "item") else value
-
-    def name(self) -> str:
-        return "transitSupplyMetrics"
-
-    def displayName(self) -> str:
-        return self.tr("Transit supply metrics")
-
-    def group(self) -> str:
-        return self.tr("Transit")
-
-    def groupId(self) -> str:
-        return "transit"
-
-    def createInstance(self) -> "TransitSupplyMetricsAlgorithm":
-        return TransitSupplyMetricsAlgorithm()

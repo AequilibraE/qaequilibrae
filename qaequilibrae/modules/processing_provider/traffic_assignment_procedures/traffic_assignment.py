@@ -392,6 +392,11 @@ class RunTrafficAssignment(ProjectAlgorithm):
     optional assigned-flows vector layer.
     """
 
+    algorithm_name = "traffic_assignment"
+    display_name = "Traffic assignment"
+    group_name = "Traffic assignment"
+    group_id = "traffic_assignment"
+
     TRAFFIC_CLASSES = "TRAFFIC_CLASSES"
     SELECT_LINKS = "SELECT_LINKS"
     SELECT_LINK_NAME = "SELECT_LINK_NAME"
@@ -417,8 +422,6 @@ class RunTrafficAssignment(ProjectAlgorithm):
     OUTPUT_SELECT_LINK_MATRIX = "OUTPUT_SELECT_LINK_MATRIX"
     OUTPUT_SELECT_LINK_FLOWS = "OUTPUT_SELECT_LINK_FLOWS"
     project = None
-    group_name = "Traffic assignment"
-    group_id = "traffic_assignment"
 
     def initAlgorithm(self, configuration=None):
         self.add_project_folder_parameter()
@@ -559,12 +562,6 @@ class RunTrafficAssignment(ProjectAlgorithm):
             add_dataframe_to_sink(merged, sink, fields, feedback)
         return {self.OUTPUT_FLOWS: destination}
 
-    def name(self):
-        return "traffic_assignment"
-
-    def displayName(self):
-        return self.tr("Traffic assignment")
-
     def shortHelpString(self):
         help_messages = [
             self.tr(
@@ -618,9 +615,6 @@ class RunTrafficAssignment(ProjectAlgorithm):
             ),
         ]
         return "\n".join(help_messages)
-
-    def createInstance(self):
-        return type(self)()
 
     def _configuration(self, parameters, context):
         vdf = self.parameterAsString(parameters, self.VDF, context).lower()

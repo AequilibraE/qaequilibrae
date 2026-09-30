@@ -17,7 +17,6 @@ from shapely.geometry import LineString
 from qgis.core import (
     Qgis,
     QgsFeature,
-    QgsProcessingAlgorithm,
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
@@ -29,7 +28,7 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
 from ..geometry_io.common import add_dataframe_to_sink, fields_from_dataframe
 
@@ -119,8 +118,13 @@ def compute_desire_lines(
     return dataframe, report, unassigned
 
 
-class DesireLines(QgsProcessingAlgorithm):
+class DesireLines(ProcessingAlgorithm):
     """Create desire lines for the flows in a matrix."""
+
+    algorithm_name = "desire_lines"
+    display_name = "Desire lines"
+    group_name = "Mapping"
+    group_id = "mapping"
 
     ZONES = "ZONES"
     ZONE_ID_FIELD = "ZONE_ID_FIELD"
@@ -243,18 +247,6 @@ class DesireLines(QgsProcessingAlgorithm):
             centroids[int(feature.attributes()[zone_id_index])] = (point.x(), point.y())
         return centroids
 
-    def name(self) -> str:
-        return "desire_lines"
-
-    def displayName(self) -> str:
-        return self.tr("Desire lines")
-
-    def group(self) -> str:
-        return self.tr("Mapping")
-
-    def groupId(self) -> str:
-        return "mapping"
-
     def shortHelpString(self) -> str:
         return self.tr(
             "Creates one line for each non-intrazonal zone pair with flow. The zone ID field "
@@ -265,11 +257,5 @@ class DesireLines(QgsProcessingAlgorithm):
             "use the input layer CRS."
         )
 
-    def createInstance(self) -> QgsProcessingAlgorithm:
-        return DesireLines()
-
     def tags(self) -> list[str]:
         return ["desire", "lines", "mapping", "matrix", "flow"]
-
-    def tr(self, message: str) -> str:
-        return trlt("DesireLines", message)

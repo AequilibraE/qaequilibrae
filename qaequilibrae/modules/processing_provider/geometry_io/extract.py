@@ -14,14 +14,15 @@ from ..project import open_project
 class ExtractProjectLayer(ProjectAlgorithm):
     """Base class for exporting one project table as a vector layer."""
 
-    OUTPUT = "OUTPUT"
+    algorithm_name = ""
+    display_name = ""
     group_name = "Geometry IO"
     group_id = "geometry_io"
+
+    OUTPUT = "OUTPUT"
     table_name = ""
     geometry_type = Qgis.ProcessingSourceType.VectorLine
     sink_geometry_type = Qgis.WkbType.LineString
-    display_name = ""
-    algorithm_name = ""
 
     def initAlgorithm(self, configuration=None):
         self.add_project_folder_parameter()
@@ -50,17 +51,8 @@ class ExtractProjectLayer(ProjectAlgorithm):
         feedback.pushInfo(self.tr(f"Extracted {count} {self.table_name}"))
         return {self.OUTPUT: destination}
 
-    def name(self):
-        return self.algorithm_name
-
-    def displayName(self):
-        return self.tr(self.display_name)
-
     def shortHelpString(self):
         return self.tr(f"Extracts {self.table_name} from an AequilibraE project.")
-
-    def createInstance(self):
-        return type(self)()
 
 
 def project_crs():
@@ -70,23 +62,23 @@ def project_crs():
 
 
 class ExtractLinks(ExtractProjectLayer):
+    algorithm_name = "extract_links"
+    display_name = "Extract links"
     table_name = "links"
     geometry_type = Qgis.ProcessingSourceType.VectorLine
-    display_name = "Extract links"
-    algorithm_name = "extract_links"
 
 
 class ExtractNodes(ExtractProjectLayer):
+    algorithm_name = "extract_nodes"
+    display_name = "Extract nodes"
     table_name = "nodes"
     geometry_type = Qgis.ProcessingSourceType.VectorPoint
     sink_geometry_type = Qgis.WkbType.Point
-    display_name = "Extract nodes"
-    algorithm_name = "extract_nodes"
 
 
 class ExtractZones(ExtractProjectLayer):
+    algorithm_name = "extract_zones"
+    display_name = "Extract zones"
     table_name = "zones"
     geometry_type = Qgis.ProcessingSourceType.VectorPolygon
     sink_geometry_type = Qgis.WkbType.MultiPolygon
-    display_name = "Extract zones"
-    algorithm_name = "extract_zones"

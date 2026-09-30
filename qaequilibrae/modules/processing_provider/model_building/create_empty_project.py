@@ -2,13 +2,18 @@ import importlib.util as iutil
 from os import listdir, rmdir
 from os.path import isdir, join
 
-from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingException
+from qgis.core import Qgis, QgsProcessingException
 from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterString
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
 
-class CreateEmptyProject(QgsProcessingAlgorithm):
+class CreateEmptyProject(ProcessingAlgorithm):
+    algorithm_name = "create_empty_project"
+    display_name = "Create empty project"
+    group_name = "Model building"
+    group_id = "model_building"
+
     PARENT_FOLDER = "PARENT_FOLDER"
     MODEL_NAME = "MODEL_NAME"
 
@@ -114,18 +119,6 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
         qgis_project.project = project
         show_project_in_panel(qgis_project, project_folder)
 
-    def name(self):
-        return "create_empty_project"
-
-    def displayName(self) -> str:
-        return self.tr("Create empty project")
-
-    def group(self) -> str:
-        return self.tr("Model building")
-
-    def groupId(self) -> str:
-        return "model_building"
-
     def shortHelpString(self):
         help_messages = [
             self.tr("Creates a new empty AequilibraE project, with no links, nodes or zones."),
@@ -136,11 +129,5 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
         ]
         return "\n".join(help_messages)
 
-    def createInstance(self):
-        return CreateEmptyProject()
-
     def tags(self):
         return ["create", "new", "empty", "project", "model"]
-
-    def tr(self, message):
-        return trlt("CreateEmptyProject", message)

@@ -205,6 +205,11 @@ class NetworkSkimming(ProjectAlgorithm):
         OUTPUT_MATRIX_FOLDER: Project matrix folder path.
     """
 
+    algorithm_name = "network_skimming"
+    display_name = "Network skimming"
+    group_name = "Path computation"
+    group_id = "path_computation"
+
     MODE = "MODE"
     COST_FIELD = "COST_FIELD"
     SKIM_FIELDS = "SKIM_FIELDS"
@@ -216,8 +221,6 @@ class NetworkSkimming(ProjectAlgorithm):
     OUTPUT_MATRIX_PATH = "OUTPUT_MATRIX_PATH"
     OUTPUT_MATRIX_FOLDER = "OUTPUT_MATRIX_FOLDER"
     project: Any | None = None
-    group_name = "Path computation"
-    group_id = "path_computation"
 
     def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
         self.add_project_folder_parameter()
@@ -314,12 +317,6 @@ class NetworkSkimming(ProjectAlgorithm):
         except ValueError as error:
             raise SkimmingError("Excluded link IDs must be integers separated by commas") from error
 
-    def name(self) -> str:
-        return "network_skimming"
-
-    def displayName(self) -> str:
-        return self.tr("Network skimming")
-
     def shortHelpString(self) -> str:
         help_messages = [
             self.tr("Skims a mode's network and saves the result as a matrix in the AequilibraE project."),
@@ -341,6 +338,3 @@ class NetworkSkimming(ProjectAlgorithm):
             self.tr("Existing matrix names are not overwritten."),
         ]
         return "\n".join(help_messages)
-
-    def createInstance(self) -> "NetworkSkimming":
-        return type(self)()

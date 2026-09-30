@@ -15,14 +15,15 @@ from ..project import open_project
 class ModifyProjectLayer(ProjectAlgorithm):
     """Update existing records, matched by the table's immutable identifier."""
 
-    INPUT = "INPUT"
+    algorithm_name = ""
+    display_name = ""
     group_name = "Geometry IO"
     group_id = "geometry_io"
+
+    INPUT = "INPUT"
     table_name = ""
     id_field = ""
     geometry_source_type = Qgis.ProcessingSourceType.VectorLine
-    display_name = ""
-    algorithm_name = ""
 
     def initAlgorithm(self, configuration=None):
         self.add_project_folder_parameter()
@@ -63,38 +64,29 @@ class ModifyProjectLayer(ProjectAlgorithm):
         feedback.pushInfo(self.tr(f"Updated {updated} {self.table_name}"))
         return {"UPDATED": updated}
 
-    def name(self):
-        return self.algorithm_name
-
-    def displayName(self):
-        return self.tr(self.display_name)
-
     def shortHelpString(self):
         return self.tr(f"Updates existing {self.table_name} using {self.id_field} as the key.")
 
-    def createInstance(self):
-        return type(self)()
-
 
 class ModifyLinks(ModifyProjectLayer):
+    algorithm_name = "modify_links"
+    display_name = "Modify links"
     table_name = "links"
     id_field = "link_id"
     geometry_source_type = Qgis.ProcessingSourceType.VectorLine
-    display_name = "Modify links"
-    algorithm_name = "modify_links"
 
 
 class ModifyNodes(ModifyProjectLayer):
+    algorithm_name = "modify_nodes"
+    display_name = "Modify nodes"
     table_name = "nodes"
     id_field = "node_id"
     geometry_source_type = Qgis.ProcessingSourceType.VectorPoint
-    display_name = "Modify nodes"
-    algorithm_name = "modify_nodes"
 
 
 class ModifyZones(ModifyProjectLayer):
+    algorithm_name = "modify_zones"
+    display_name = "Modify zones"
     table_name = "zones"
     id_field = "zone_id"
     geometry_source_type = Qgis.ProcessingSourceType.VectorPolygon
-    display_name = "Modify zones"
-    algorithm_name = "modify_zones"

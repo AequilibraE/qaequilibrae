@@ -13,7 +13,6 @@ from qgis.core import (
     QgsFeature,
     QgsField,
     QgsFields,
-    QgsProcessingAlgorithm,
     QgsProcessingException,
     QgsProcessingOutputNumber,
     QgsProcessingOutputString,
@@ -26,7 +25,7 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QMetaType
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
 from .network_dataframe import network_dataframe_from_source
 
@@ -206,8 +205,13 @@ def _path_segments(results, graph, cost_field) -> tuple[PathSegment, ...]:
     return tuple(segments)
 
 
-class ShortestPath(QgsProcessingAlgorithm):
+class ShortestPath(ProcessingAlgorithm):
     """Compute a shortest path from a link layer and write its geometry to a sink."""
+
+    algorithm_name = "shortest_path"
+    display_name = "Shortest path"
+    group_name = "Path computation"
+    group_id = "path_computation"
 
     LINKS = "LINKS"
     NODES = "NODES"
@@ -390,28 +394,10 @@ class ShortestPath(QgsProcessingAlgorithm):
         fields.append(QgsField("cost", QMetaType.Type.Double))
         return fields
 
-    def name(self):
-        return "shortest_path"
-
-    def displayName(self):
-        return self.tr("Shortest path")
-
-    def group(self):
-        return self.tr("Path computation")
-
-    def groupId(self):
-        return "path_computation"
-
     def shortHelpString(self):
         return self.tr(
             "Computes the lowest-cost path between two network nodes. The output has one feature per directed link."
         )
 
-    def createInstance(self):
-        return ShortestPath()
-
     def tags(self):
         return ["shortest", "path", "routing"]
-
-    def tr(self, message):
-        return trlt("ShortestPath", message)

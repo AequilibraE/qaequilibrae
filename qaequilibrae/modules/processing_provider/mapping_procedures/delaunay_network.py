@@ -15,7 +15,6 @@ from qgis.core import (
     Qgis,
     QgsFeature,
     QgsFeatureSource,
-    QgsProcessingAlgorithm,
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
@@ -26,7 +25,7 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
 from ..geometry_io.common import add_dataframe_to_sink, fields_from_dataframe
 
@@ -88,8 +87,13 @@ def compute_delaunay_network(nodes: dict[int, tuple[float, float]], matrix: Any 
     return dataframe
 
 
-class DelaunayNetwork(QgsProcessingAlgorithm):
+class DelaunayNetwork(ProcessingAlgorithm):
     """Build Delaunay edges from supplied nodes and optionally attach matrix flows."""
+
+    algorithm_name = "delaunay_network"
+    display_name = "Delaunay network"
+    group_name = "Mapping"
+    group_id = "mapping"
 
     NODES = "NODES"
     NODE_ID_FIELD = "NODE_ID_FIELD"
@@ -195,18 +199,6 @@ class DelaunayNetwork(QgsProcessingAlgorithm):
             nodes[int(feature.attributes()[node_id_index])] = (point.x(), point.y())
         return nodes
 
-    def name(self) -> str:
-        return "delaunay_network"
-
-    def displayName(self) -> str:
-        return self.tr("Delaunay network")
-
-    def group(self) -> str:
-        return self.tr("Mapping")
-
-    def groupId(self) -> str:
-        return "mapping"
-
     def shortHelpString(self) -> str:
         return self.tr(
             "Builds Delaunay edges from the centroids of the supplied node features. The node ID field "
@@ -216,11 +208,5 @@ class DelaunayNetwork(QgsProcessingAlgorithm):
             "the input layer CRS."
         )
 
-    def createInstance(self) -> QgsProcessingAlgorithm:
-        return DelaunayNetwork()
-
     def tags(self) -> list[str]:
         return ["delaunay", "lines", "mapping", "triangulation"]
-
-    def tr(self, message: str) -> str:
-        return trlt("DelaunayNetwork", message)

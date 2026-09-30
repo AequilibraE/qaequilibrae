@@ -17,7 +17,6 @@ from qgis.core import (
     QgsField,
     QgsFields,
     QgsGeometry,
-    QgsProcessingAlgorithm,
     QgsProcessingContext,
     QgsProcessingFeedback,
     QgsProcessingException,
@@ -30,7 +29,7 @@ from qgis.core import (
     QgsWkbTypes,
 )
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
 CLOSEST = "CLOSEST"
 ENCLOSED = "ENCLOSED"
@@ -187,8 +186,13 @@ def _closest(
     return None
 
 
-class SimpleTag(QgsProcessingAlgorithm):
+class SimpleTag(ProcessingAlgorithm):
     """Copy a source field into a target layer using a spatial relationship."""
+
+    algorithm_name = "simple_tag"
+    display_name = "Simple tag"
+    group_name = "Mapping"
+    group_id = "mapping"
 
     SOURCE = "SOURCE"
     SOURCE_FIELD = "SOURCE_FIELD"
@@ -366,18 +370,6 @@ class SimpleTag(QgsProcessingAlgorithm):
             fields.append(QgsField(target_field, source_type))
         return fields
 
-    def name(self) -> str:
-        return "simple_tag"
-
-    def displayName(self) -> str:
-        return self.tr("Simple tag")
-
-    def group(self) -> str:
-        return self.tr("Mapping")
-
-    def groupId(self) -> str:
-        return "mapping"
-
     def shortHelpString(self) -> str:
         return self.tr(
             "Copies a source field value to a new output copy of the target layer. Closest selects "
@@ -388,11 +380,5 @@ class SimpleTag(QgsProcessingAlgorithm):
             "have a null output value."
         )
 
-    def createInstance(self) -> QgsProcessingAlgorithm:
-        return SimpleTag()
-
     def tags(self) -> list[str]:
         return ["spatial", "join", "tag", "mapping"]
-
-    def tr(self, message: str) -> str:
-        return trlt("SimpleTag", message)

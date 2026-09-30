@@ -4,30 +4,26 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from qgis.core import (
-    Qgis,
-    QgsProcessingAlgorithm,
     QgsProcessingException,
-    QgsProcessingParameterFile,
     QgsProcessingParameterFileDestination,
     QgsProcessingParameterString,
 )
 
-from qaequilibrae.i18n.translate import trlt
-
 from ..project import open_project
+from ..project_algorithm import ProjectAlgorithm
 
 
-class TripLengthDistribution(QgsProcessingAlgorithm):
+class TripLengthDistribution(ProjectAlgorithm):
+    algorithm_name = "Trip length distribution"
+    display_name = "Trip length distribution"
+    translate_algorithm_name = True
+    group_name = "Data"
+    group_id = "data"
+
     PROJECT_FOLDER = "PROJECT_FOLDER"
 
     def initAlgorithm(self, configuration=None):
-        self.addParameter(
-            QgsProcessingParameterFile(
-                self.PROJECT_FOLDER,
-                self.tr("AequilibraE project folder"),
-                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
-            )
-        )
+        self.add_project_folder_parameter()
         self.addParameter(QgsProcessingParameterString("demand_mat_name", self.tr("Demand matrix")))
         self.addParameter(QgsProcessingParameterString("demand_mat_core", self.tr("Demand matrix core")))
         self.addParameter(QgsProcessingParameterString("skim_mat_name", self.tr("Skim matrix")))
@@ -42,11 +38,7 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        project_folder = (
-            self.parameterAsFile(parameters, self.PROJECT_FOLDER, context)
-            if self.PROJECT_FOLDER in parameters
-            else None
-        )
+        project_folder = self.project_folder(parameters, context) if self.PROJECT_FOLDER in parameters else None
         if project_folder:
             with open_project(project_folder) as project:
                 self.matrices = project.matrices
@@ -131,23 +123,5 @@ class TripLengthDistribution(QgsProcessingAlgorithm):
             return self.mat_names[value]
         return str(value)
 
-    def name(self):
-        return self.tr("Trip length distribution")
-
-    def displayName(self) -> str:
-        return self.tr("Trip length distribution")
-
-    def group(self) -> str:
-        return self.tr("Data")
-
-    def groupId(self) -> str:
-        return "data"
-
     def shortHelpString(self):
         return self.tr("Creates a trip-length distribution histogram and save in an output folder.")
-
-    def createInstance(self):
-        return TripLengthDistribution()
-
-    def tr(self, message):
-        return trlt("TripLengthDistribution", message)

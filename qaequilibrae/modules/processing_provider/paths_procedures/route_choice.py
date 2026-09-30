@@ -28,7 +28,6 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
-from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.common_tools import geodataframe_from_layer, model_area_polygon
 
 from ..project import borrow_project
@@ -351,6 +350,11 @@ class RouteChoice(ProjectAlgorithm):
     The algorithm rejects existing result and matrix names. It does not replace them.
     """
 
+    algorithm_name = "route_choice"
+    display_name = "Route choice"
+    group_name = "Route choice"
+    group_id = "route_choice"
+
     MODE = "MODE"
     UTILITY_FIELDS = "UTILITY_FIELDS"
     ALGORITHM = "ALGORITHM"
@@ -377,8 +381,6 @@ class RouteChoice(ProjectAlgorithm):
     OUTPUT_SELECT_LINK_MATRIX = "OUTPUT_SELECT_LINK_MATRIX"
     project: Any | None = None
     zones: Any | None = None
-    group_name = "Route choice"
-    group_id = "route_choice"
 
     def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
         self.add_project_folder_parameter()
@@ -551,12 +553,6 @@ class RouteChoice(ProjectAlgorithm):
             "sub_area": sub_area,
         }
 
-    def name(self) -> str:
-        return "route_choice"
-
-    def displayName(self) -> str:
-        return self.tr("Route choice")
-
     def shortHelpString(self) -> str:
         help_messages = [
             self.tr(
@@ -578,12 +574,6 @@ class RouteChoice(ProjectAlgorithm):
             self.tr("Existing result and matrix names are not replaced."),
         ]
         return "\n".join(help_messages)
-
-    def createInstance(self) -> "RouteChoice":
-        return type(self)()
-
-    def tr(self, message: str) -> str:
-        return trlt(type(self).__name__, message)
 
 
 def _select_links(

@@ -10,18 +10,16 @@ from typing import Any
 import pandas as pd
 from qgis.core import (
     Qgis,
-    QgsProcessingAlgorithm,
     QgsProcessingException,
     QgsProcessingParameterBoolean,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField,
-    QgsProcessingParameterFile,
     QgsProcessingParameterFileDestination,
     QgsProcessingParameterString,
 )
 
-from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.processing_provider.project import open_project
+from qaequilibrae.modules.processing_provider.project_algorithm import ProjectAlgorithm
 
 from .common import DistributionError, load_matrix_core, push_report, vectors_from_source
 
@@ -58,8 +56,13 @@ def fit_ipf(
     return ipf.output, ipf.report
 
 
-class IterativeProportionalFitting(QgsProcessingAlgorithm):
+class IterativeProportionalFitting(ProjectAlgorithm):
     """Balance a seed matrix to a set of production and attraction totals."""
+
+    algorithm_name = "iterative_proportional_fitting"
+    display_name = "Iterative proportional fitting"
+    group_name = "Distribution"
+    group_id = "distribution"
 
     PROJECT_FOLDER = "PROJECT_FOLDER"
     SEED_MATRIX_NAME = "SEED_MATRIX_NAME"
@@ -72,13 +75,7 @@ class IterativeProportionalFitting(QgsProcessingAlgorithm):
     OUTPUT_MATRIX = "OUTPUT_MATRIX"
 
     def initAlgorithm(self, configuration=None):
-        self.addParameter(
-            QgsProcessingParameterFile(
-                self.PROJECT_FOLDER,
-                self.tr("AequilibraE project folder"),
-                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
-            )
-        )
+        self.add_project_folder_parameter(self.PROJECT_FOLDER)
         self.addParameter(QgsProcessingParameterString(self.SEED_MATRIX_NAME, self.tr("Seed matrix name")))
         self.addParameter(QgsProcessingParameterString(self.SEED_MATRIX_CORE, self.tr("Seed matrix core")))
         self.addParameter(
@@ -126,7 +123,7 @@ class IterativeProportionalFitting(QgsProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        project_folder = self.parameterAsFile(parameters, self.PROJECT_FOLDER, context)
+        project_folder = self.project_folder(parameters, context, self.PROJECT_FOLDER)
         matrix_name = self.parameterAsString(parameters, self.SEED_MATRIX_NAME, context)
         core_name = self.parameterAsString(parameters, self.SEED_MATRIX_CORE, context)
         source = self.parameterAsSource(parameters, self.VECTOR_SOURCE, context)
@@ -158,18 +155,6 @@ class IterativeProportionalFitting(QgsProcessingAlgorithm):
         push_report(feedback, report)
         return {self.OUTPUT_MATRIX: output_path}
 
-    def name(self):
-        return "iterative_proportional_fitting"
-
-    def displayName(self):
-        return self.tr("Iterative proportional fitting")
-
-    def group(self):
-        return self.tr("Distribution")
-
-    def groupId(self):
-        return "distribution"
-
     def shortHelpString(self):
         return self.tr(
             "Balances a seed matrix to production and attraction totals. The vector index must "
@@ -180,9 +165,3 @@ class IterativeProportionalFitting(QgsProcessingAlgorithm):
 
     def tags(self):
         return ["ipf", "fratar", "furness", "distribution", "matrix"]
-
-    def createInstance(self):
-        return IterativeProportionalFitting()
-
-    def tr(self, message):
-        return trlt("IterativeProportionalFitting", message)

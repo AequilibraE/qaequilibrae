@@ -5,8 +5,12 @@ from ..project_algorithm import ProjectAlgorithm
 
 
 class CollapseLinks(ProjectAlgorithm):
+    algorithm_name = "Collapse links"
+    display_name = "Collapse links"
+    translate_algorithm_name = True
     group_name = "Model building"
     group_id = "model_building"
+
     LINK_IDS = "LINK_IDS"
 
     def initAlgorithm(self, configuration=None):
@@ -45,14 +49,5 @@ class CollapseLinks(ProjectAlgorithm):
 
         return {"SELECTED_NODE_COUNT": len(link_ids), "SELECTED_LINK_IDS": link_ids}
 
-    def name(self):
-        return self.tr("Collapse links")
-
-    def displayName(self) -> str:
-        return self.tr("Collapse links")
-
     def shortHelpString(self):
         return self.tr("This tool collapses links into nodes, adjusting the network in the neighborhood.")
-
-    def createInstance(self):
-        return CollapseLinks()

@@ -7,8 +7,11 @@ from ..project_algorithm import ProjectAlgorithm
 
 
 class AddMode(ProjectAlgorithm):
+    algorithm_name = "add_mode"
+    display_name = "Add mode"
     group_name = "Data"
     group_id = "data"
+
     MODE_ID = "MODE_ID"
     MODE_NAME = "MODE_NAME"
     DESCRIPTION = "DESCRIPTION"
@@ -59,14 +62,5 @@ class AddMode(ProjectAlgorithm):
             mode.save()
         return {"MODE_ID": mode_id}
 
-    def name(self):
-        return "add_mode"
-
-    def displayName(self):
-        return self.tr("Add mode")
-
     def shortHelpString(self):
         return self.tr("Adds a mode to an AequilibraE project.")
-
-    def createInstance(self):
-        return AddMode()

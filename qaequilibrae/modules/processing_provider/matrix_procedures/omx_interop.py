@@ -13,7 +13,6 @@ from qgis.core import (
     QgsFeature,
     QgsField,
     QgsFields,
-    QgsProcessingAlgorithm,
     QgsProcessingException,
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterFeatureSource,
@@ -24,7 +23,7 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 from qaequilibrae.qgis_logging import get_logger, with_processing_feedback
 
 logger = get_logger(__name__)
@@ -61,7 +60,12 @@ def read_omx_core(path, core, mapping=None):
         return ids, values
 
 
-class OmxToTable(QgsProcessingAlgorithm):
+class OmxToTable(ProcessingAlgorithm):
+    algorithm_name = "omxtotable"
+    display_name = "OMX to QGIS OD table"
+    group_name = "Data"
+    group_id = "data"
+
     PATH = "omx_path"
     MAPPING = "mapping"
     OUTPUT = "output"
@@ -135,32 +139,19 @@ class OmxToTable(QgsProcessingAlgorithm):
         except (OSError, ValueError, KeyError) as error:
             raise QgsProcessingException(str(error)) from error
 
-    def name(self):
-        return "omxtotable"
-
-    def displayName(self):
-        return self.tr("OMX to QGIS OD table")
-
-    def group(self):
-        return self.tr("Data")
-
-    def groupId(self):
-        return "data"
-
     def shortHelpString(self):
         return self.tr(
             "Reads every OMX core into a non-spatial table with origin, destination, core and value fields. Select a mapping if the file has more than one."
         )
 
-    def createInstance(self):
-        return OmxToTable()
 
-    def tr(self, message):
-        return trlt("OmxToTable", message)
-
-
-class OmxZoneSlice(QgsProcessingAlgorithm):
+class OmxZoneSlice(ProcessingAlgorithm):
     """Expose one origin or destination as a small table for a zone-layer join."""
+
+    algorithm_name = "omxzoneslice"
+    display_name = "OMX origin or destination to zone table"
+    group_name = "Data"
+    group_id = "data"
 
     PATH = "omx_path"
     CORE = "core"
@@ -249,31 +240,18 @@ class OmxZoneSlice(QgsProcessingAlgorithm):
         except (OSError, ValueError, KeyError) as error:
             raise QgsProcessingException(str(error)) from error
 
-    def name(self):
-        return "omxzoneslice"
-
-    def displayName(self):
-        return self.tr("OMX origin or destination to zone table")
-
-    def group(self):
-        return self.tr("Data")
-
-    def groupId(self):
-        return "data"
-
     def shortHelpString(self):
         return self.tr(
             "Reads one origin row or destination column from an OMX core into a zone_id/data table. Join zone_id to a zone layer for mapping."
         )
 
-    def createInstance(self):
-        return OmxZoneSlice()
 
-    def tr(self, message):
-        return trlt("OmxZoneSlice", message)
+class TableToOmx(ProcessingAlgorithm):
+    algorithm_name = "tabletoomx"
+    display_name = "QGIS OD table to OMX"
+    group_name = "Data"
+    group_id = "data"
 
-
-class TableToOmx(QgsProcessingAlgorithm):
     INPUT = "input"
     OUTPUT = "output"
 
@@ -290,6 +268,7 @@ class TableToOmx(QgsProcessingAlgorithm):
         if not required.issubset(source.fields().names()):
             raise QgsProcessingException(self.tr("OD table requires origin, destination, core and value fields"))
         cells = {}
+
         ids = set()
         count = source.featureCount()
         feedback.setProgress(0)
@@ -370,25 +349,7 @@ class TableToOmx(QgsProcessingAlgorithm):
         logger.info(self.tr("OMX file complete"))
         return {self.OUTPUT: output}
 
-    def name(self):
-        return "tabletoomx"
-
-    def displayName(self):
-        return self.tr("QGIS OD table to OMX")
-
-    def group(self):
-        return self.tr("Data")
-
-    def groupId(self):
-        return "data"
-
     def shortHelpString(self):
         return self.tr(
             "Writes a complete OD table (origin, destination, core, value) to a new OMX file. Each core must include every zone pair."
         )
-
-    def createInstance(self):
-        return TableToOmx()
-
-    def tr(self, message):
-        return trlt("TableToOmx", message)

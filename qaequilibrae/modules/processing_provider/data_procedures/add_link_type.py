@@ -12,8 +12,11 @@ from ..project_algorithm import ProjectAlgorithm
 
 
 class AddLinkType(ProjectAlgorithm):
+    algorithm_name = "add_link_type"
+    display_name = "Add link type"
     group_name = "Data"
     group_id = "data"
+
     LINK_TYPE_ID = "LINK_TYPE_ID"
     LINK_TYPE = "LINK_TYPE"
     DESCRIPTION = "DESCRIPTION"
@@ -67,14 +70,5 @@ class AddLinkType(ProjectAlgorithm):
             link_type.save()
         return {"LINK_TYPE_ID": type_id}
 
-    def name(self):
-        return "add_link_type"
-
-    def displayName(self):
-        return self.tr("Add link type")
-
     def shortHelpString(self):
         return self.tr("Adds a link type to an AequilibraE project.")
-
-    def createInstance(self):
-        return AddLinkType()
