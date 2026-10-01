@@ -27,7 +27,7 @@ class SimpleTAG(WorkerThread):
         feedback = QgsProcessingFeedback()
         self.signal.emit(["start", 100, self.tr("Performing spatial matching")])
         feedback.progressChanged.connect(
-            lambda value: self.signal.emit(["update", value, "Performing spatial matching"])
+            lambda value: self.signal.emit(["update", int(value), "Performing spatial matching"])
         )
         try:
             field_index = self.to_layer.fields().lookupField(self.tfield)

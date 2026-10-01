@@ -195,7 +195,7 @@ def test_simple_tag_point(coquimbo_project, to_layer, ops):
     assert feats == point_assertions[to_layer][ops]
 
 
-def test_processing_backed_tag_keeps_original_ids_and_unmatched_values(mocker):
+def test_processing_backed_tag_keeps_original_ids_and_unmatched_values(mocker, ae, qtbot):
     source = QgsVectorLayer("Polygon?crs=EPSG:4326", "tag_source", "memory")
     target = QgsVectorLayer("Point?crs=EPSG:4326", "tag_target", "memory")
     for layer in (source, target):
@@ -215,8 +215,15 @@ def test_processing_backed_tag_keeps_original_ids_and_unmatched_values(mocker):
     assert target.dataProvider().deleteFeatures([ids[0]])
     processing = mocker.spy(SimpleTag, "processAlgorithm")
     worker = SimpleTAG(None, source.name(), target.name(), "tag", "tag", None, None, "ENCLOSED")
+    dialog = SimpleTagDialog(ae)
+    qtbot.addWidget(dialog)
+    dialog.worker_thread = worker
+    worker.signal.connect(dialog.signal_handler)
+    progress = []
+    dialog.progressbar.valueChanged.connect(progress.append)
     worker.doWork()
     processing.assert_called_once()
     assert worker.error is None
+    assert [value for value in progress if value > 0] == [50, 100]
     assert worker.all_attr == {ids[1]: "matched"}
     assert {feature.id(): feature["tag"] for feature in target.getFeatures()} == {ids[1]: "matched", ids[2]: "keep"}
