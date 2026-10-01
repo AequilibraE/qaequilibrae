@@ -7,7 +7,7 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
-from ..project import open_project
+from ..project import borrow_project
 from ..project_algorithm import ProjectAlgorithm
 
 
@@ -23,6 +23,7 @@ class AddLinkType(ProjectAlgorithm):
     LANES = "LANES"
     LANE_CAPACITY = "LANE_CAPACITY"
     SPEED = "SPEED"
+    project = None
 
     def initAlgorithm(self, configuration=None):
         self.add_project_folder_parameter()
@@ -49,25 +50,33 @@ class AddLinkType(ProjectAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        project_folder = self.project_folder(parameters, context)
+        project_folder = self.project or self.project_folder(parameters, context)
         type_id = self.parameterAsString(parameters, self.LINK_TYPE_ID, context).strip()
         name = self.parameterAsString(parameters, self.LINK_TYPE, context).strip()
         if len(type_id) != 1 or not type_id.isascii() or not type_id.isalpha():
             raise QgsProcessingException(self.tr("The link type ID must be a single ASCII letter"))
         if not name:
             raise QgsProcessingException(self.tr("The link type name cannot be empty"))
-        with open_project(project_folder) as project:
-            link_type = project.network.link_types.new(type_id)
-            link_type.link_type = name
-            link_type.description = self.parameterAsString(parameters, self.DESCRIPTION, context).strip() or None
-            for parameter, field in (
-                (self.LANES, "lanes"),
-                (self.LANE_CAPACITY, "lane_capacity"),
-                (self.SPEED, "speed"),
-            ):
-                if parameters.get(parameter) not in (None, "") and field in link_type.__dict__:
-                    setattr(link_type, field, self.parameterAsDouble(parameters, parameter, context))
-            link_type.save()
+        with borrow_project(project_folder) as project:
+            link_types = project.network.link_types
+            link_type = link_types.new(type_id)
+            try:
+                link_type.link_type = name
+                link_type.description = self.parameterAsString(parameters, self.DESCRIPTION, context).strip() or None
+                for parameter, field in (
+                    (self.LANES, "lanes"),
+                    (self.LANE_CAPACITY, "lane_capacity"),
+                    (self.SPEED, "speed"),
+                ):
+                    if parameters.get(parameter) not in (None, "") and field in link_type.__dict__:
+                        setattr(link_type, field, self.parameterAsDouble(parameters, parameter, context))
+                link_type.save()
+            except Exception:
+                try:
+                    link_types.delete(type_id)
+                except Exception:
+                    link_types.all_types().pop(type_id, None)
+                raise
         return {"LINK_TYPE_ID": type_id}
 
     def shortHelpString(self):

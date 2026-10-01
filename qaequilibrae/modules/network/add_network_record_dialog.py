@@ -1,6 +1,7 @@
 from string import ascii_letters
 
-from qgis.PyQt.QtWidgets import QTableWidgetItem
+from qgis.PyQt.QtWidgets import QLineEdit, QTableWidgetItem
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.style_loader.editor_styles import load_editor_styles
@@ -14,12 +15,16 @@ class AddNetworkRecordDialog(BaseDialog):
     Both tables are keyed by a single letter and carry a name that AequilibraE restricts to letters
     and underscores, so listing what the project already has, offering an identifier that is still
     free and checking what was typed is the same work for the two of them. Subclasses name the
-    table and the two columns that identify a record in it, and write the record itself.
+    table, record columns, Processing algorithm, and optional inputs.
     """
 
     table = ""
     id_field = ""
     name_field = ""
+    error_message = ""
+    log_message = ""
+    success_message = ""
+    algorithm_type: type
 
     def _base_ui_setup(self):
         self.but_add.clicked.connect(self.add_record)
@@ -28,8 +33,32 @@ class AddNetworkRecordDialog(BaseDialog):
         self.list_existing()
 
     def add_record(self):
-        """Reads the form and writes the new record to the project."""
-        raise NotImplementedError
+        """Validate the form, run its Processing algorithm, and refresh the GUI."""
+        identifier = self.txt_id.text().strip()
+        name = self.txt_name.text().strip()
+        error = self.invalid_input(identifier, name, self.existing_records())
+        if error is not None:
+            self.report(error, is_error=True)
+            return
+
+        algorithm = self.algorithm_type()
+        algorithm.initAlgorithm()
+        algorithm.project = self.project
+        parameters = {self.id_field.upper(): identifier, self.name_field.upper(): name}
+        for field, (_, widget) in self.optional_inputs().items():
+            value = (widget.text().strip() or None) if isinstance(widget, QLineEdit) else widget.value()
+            # Link-type spin boxes use zero to display "Not set"; mode values keep zero.
+            parameters[field.upper()] = (value or None) if self.table == "link_types" else value
+        try:
+            algorithm.processAlgorithm(parameters, QgsProcessingContext(), QgsProcessingFeedback())
+        except Exception as error:
+            self.report(self.tr(self.error_message).format(error), is_error=True)
+            return
+
+        self.qgis_project.message_log(self.tr(self.log_message).format(name, identifier))
+        self.refresh_link_editing_form()
+        self.reset_form()
+        self.report(self.tr(self.success_message).format(name))
 
     def optional_inputs(self) -> dict:
         """Maps each column the form offers besides the identifier and the name to its widgets."""

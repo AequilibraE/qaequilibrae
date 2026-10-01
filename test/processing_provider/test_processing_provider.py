@@ -25,6 +25,7 @@ from qaequilibrae.modules.processing_provider.distribution_procedures.common imp
 from qaequilibrae.modules.processing_provider.distribution_procedures.iterative_proportional_fitting import (
     IterativeProportionalFitting,
 )
+from qaequilibrae.modules.processing_provider.matrix import open_matrix
 from qaequilibrae.modules.processing_provider.matrix_procedures.export_matrix import ExportMatrix
 from qaequilibrae.modules.processing_provider.matrix_procedures.matrix_calculator import MatrixCalculator
 from qaequilibrae.modules.processing_provider.matrix_procedures.trip_length_distribution import TripLengthDistribution
@@ -115,13 +116,18 @@ def test_trip_end_parameters(algorithm_type):
 
 
 @pytest.mark.parametrize("failure", [None, "setup", "body"])
-def test_distribution_matrix_is_closed(mocker, failure):
+@pytest.mark.parametrize("source", ["project", "file"])
+def test_processing_matrix_is_closed(mocker, failure, source):
     project, matrix = mocker.Mock(), mocker.Mock()
     project.matrices.get_matrix.return_value = matrix
+    mocker.patch("aequilibrae.matrix.AequilibraeMatrix", return_value=matrix)
+    matrix_context = (
+        load_matrix_core(project, "demand", "core") if source == "project" else open_matrix("matrix.omx", "core")
+    )
     if failure == "setup":
         matrix.computational_view.side_effect = ValueError("missing core")
     with pytest.raises(ValueError) if failure else nullcontext():
-        with load_matrix_core(project, "demand", "core") as loaded:
+        with matrix_context as loaded:
             assert loaded is matrix
             if failure == "body":
                 raise ValueError("computation failed")
@@ -221,14 +227,15 @@ def test_processing_gtfs_import(pt_project):
     assert [agency[0] for agency in agencies] == ["Processing test agency"]
 
 
-def test_transit_supply_metrics(pt_project):
+@pytest.mark.parametrize("entity, id_field", [(0, "route_id"), (1, "pattern_id"), (2, "stop_id"), (3, "zone_id")])
+def test_transit_supply_metrics(pt_project, entity, id_field):
     algorithm = TransitSupplyMetricsAlgorithm()
     algorithm.initAlgorithm()
     context = QgsProcessingContext()
     feedback = QgsProcessingFeedback()
     parameters = {
         algorithm.PROJECT_FOLDER: str(pt_project.project.project_base_path),
-        algorithm.ENTITY: 0,
+        algorithm.ENTITY: entity,
         algorithm.OUTPUT: "TEMPORARY_OUTPUT",
     }
 
@@ -238,7 +245,7 @@ def test_transit_supply_metrics(pt_project):
     output = context.takeResultLayer(result[algorithm.OUTPUT])
     assert output is not None
     assert output.featureCount() > 0
-    assert "route_id" in output.fields().names()
+    assert id_field in output.fields().names()
 
 
 @pytest.mark.parametrize("format", [0, 1])

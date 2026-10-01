@@ -116,33 +116,17 @@ def _match_feature(
     target_match_value: Any,
 ) -> Any | None:
     """Choose the source value for one target geometry."""
-    if operation in (ENCLOSED, TOUCHING):
-        return _enclosed_or_touching(
-            index,
-            source_geometry,
-            source_value,
-            source_match,
-            geometry,
-            operation,
-            source_is_polygon,
-            target_match_value,
-        )
-    return _closest(index, source_geometry, source_value, source_match, geometry, target_match_value)
-
-
-def _enclosed_or_touching(
-    index: QgsSpatialIndex,
-    source_geometry: dict[int, QgsGeometry],
-    source_value: dict[int, Any],
-    source_match: dict[int, Any],
-    geometry: QgsGeometry,
-    operation: str,
-    source_is_polygon: bool,
-    target_match_value: Any,
-) -> Any | None:
-    candidates = index.intersects(geometry.boundingBox())
+    if operation == CLOSEST:
+        # Rank five indexed neighbours by real distance, not bounding-box distance.
+        candidates = index.nearestNeighbor(geometry.centroid().asPoint(), 5)
+        candidates.sort(key=lambda candidate: source_geometry[candidate].distance(geometry))
+    else:
+        candidates = index.intersects(geometry.boundingBox())
     if source_match:
         candidates = [candidate for candidate in candidates if source_match[candidate] == target_match_value]
+
+    if operation == CLOSEST:
+        return source_value[candidates[0]] if candidates else None
 
     if operation == ENCLOSED:
         # Either the source sits inside the target or the target sits inside the source.
@@ -166,24 +150,6 @@ def _enclosed_or_touching(
             best_measure = measure
             best_value = source_value[candidate]
     return best_value
-
-
-def _closest(
-    index: QgsSpatialIndex,
-    source_geometry: dict[int, QgsGeometry],
-    source_value: dict[int, Any],
-    source_match: dict[int, Any],
-    geometry: QgsGeometry,
-    target_match_value: Any,
-) -> Any | None:
-    # A spatial index alone cannot rank the true nearest feature, so a handful of
-    # neighbours are compared by real distance before one is chosen.
-    candidates = index.nearestNeighbor(geometry.centroid().asPoint(), 5)
-    ordered = sorted(candidates, key=lambda candidate: source_geometry[candidate].distance(geometry))
-    for candidate in ordered:
-        if not source_match or source_match[candidate] == target_match_value:
-            return source_value[candidate]
-    return None
 
 
 class SimpleTag(ProcessingAlgorithm):
@@ -269,6 +235,8 @@ class SimpleTag(ProcessingAlgorithm):
     def processAlgorithm(
         self, parameters: dict[str, Any], context: QgsProcessingContext, feedback: QgsProcessingFeedback | None
     ) -> dict[str, Any]:
+        # GUI adapters use original feature IDs to apply only matched values in place.
+        self.matches: dict[int, Any] = {}
         if feedback is None:
             feedback = QgsProcessingFeedback()
         source = self.parameterAsSource(parameters, self.SOURCE, context)
@@ -315,6 +283,7 @@ class SimpleTag(ProcessingAlgorithm):
         except SimpleTagError as error:
             raise QgsProcessingException(self.tr(str(error))) from error
 
+        self.matches = matches
         fields = self._output_fields(source, target, source_field, target_field)
         sink, destination = self.parameterAsSink(
             parameters,

@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-from pathlib import Path
-from typing import Any, cast
+from contextlib import nullcontext
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -13,11 +12,10 @@ from shapely.geometry import LineString
 
 from qgis.core import (
     Qgis,
-    QgsFeature,
-    QgsFeatureSource,
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
+    QgsProcessingParameterBoolean,
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField,
@@ -25,12 +23,16 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
+from qaequilibrae.modules.common_tools.vector_layer_helpers import centroid_coordinates
 from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
 from ..geometry_io.common import add_dataframe_to_sink, fields_from_dataframe
+from ..matrix import open_matrix
 
 
-def compute_delaunay_network(nodes: dict[int, tuple[float, float]], matrix: Any | None = None) -> pd.DataFrame:
+def compute_delaunay_network(
+    nodes: dict[int, tuple[float, float]], matrix: Any | None = None, *, block_centroid_flows: bool = True
+) -> pd.DataFrame:
     """Create Delaunay edges and optionally assign matrix demand to them."""
     if len(nodes) < 3:
         raise ValueError("At least three nodes are required to create a Delaunay network")
@@ -69,7 +71,7 @@ def compute_delaunay_network(nodes: dict[int, tuple[float, float]], matrix: Any 
     graph.network = dataframe[["link_id", "direction", "a_node", "b_node", "distance"]].copy()
     graph.network["capacity"] = 1.0
     graph.prepare_graph(np.asarray(sorted(nodes), dtype=np.int64))
-    graph.set_blocked_centroid_flows(True)
+    graph.set_blocked_centroid_flows(block_centroid_flows)
 
     traffic_class = TrafficClass("delaunay", graph, matrix)
     assignment = TrafficAssignment()
@@ -100,6 +102,8 @@ class DelaunayNetwork(ProcessingAlgorithm):
     MATRIX_PATH = "MATRIX_PATH"
     MATRIX_CORES = "MATRIX_CORES"
     OUTPUT = "OUTPUT"
+    BLOCK_CENTROID_FLOWS = "BLOCK_CENTROID_FLOWS"
+    matrix: Any | None = None
 
     def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
         self.addParameter(
@@ -131,6 +135,9 @@ class DelaunayNetwork(ProcessingAlgorithm):
             )
         )
         self.addParameter(
+            QgsProcessingParameterBoolean(self.BLOCK_CENTROID_FLOWS, self.tr("Block flows through centroids"), True)
+        )
+        self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT, self.tr("Delaunay network"), type=Qgis.ProcessingSourceType.VectorLine
             )
@@ -148,31 +155,26 @@ class DelaunayNetwork(ProcessingAlgorithm):
         if node_id_index < 0:
             raise QgsProcessingException(self.tr(f"The node ID field '{node_id_field}' does not exist"))
 
-        nodes = self._nodes(source, node_id_index, feedback)
+        nodes = centroid_coordinates(source, node_id_index, feedback)
         if len(nodes) < 3:
             raise QgsProcessingException(self.tr("At least three usable nodes are required"))
 
         matrix_path = self.parameterAsFile(parameters, self.MATRIX_PATH, context)
         cores = self.parameterAsString(parameters, self.MATRIX_CORES, context)
-        matrix = None
         try:
-            if matrix_path:
-                from aequilibrae.matrix import AequilibraeMatrix
-
-                matrix = AequilibraeMatrix()
-                matrix.load(Path(matrix_path))
-                selected_cores = (
-                    [core.strip() for core in cores.split(",") if core.strip()] if cores else list(matrix.names)
+            matrix_context = (
+                open_matrix(matrix_path, cores, self.matrix)
+                if matrix_path or self.matrix is not None
+                else nullcontext()
+            )
+            with matrix_context as matrix:
+                dataframe = compute_delaunay_network(
+                    nodes,
+                    matrix,
+                    block_centroid_flows=self.parameterAsBool(parameters, self.BLOCK_CENTROID_FLOWS, context),
                 )
-                if not selected_cores:
-                    raise ValueError("The matrix contains no cores")
-                matrix.computational_view(selected_cores)
-            dataframe = compute_delaunay_network(nodes, matrix)
         except Exception as error:
             raise QgsProcessingException(self.tr(f"Could not create Delaunay network: {error}")) from error
-        finally:
-            if matrix is not None:
-                matrix.close()
 
         fields = fields_from_dataframe(dataframe)
         sink, destination = self.parameterAsSink(
@@ -183,21 +185,6 @@ class DelaunayNetwork(ProcessingAlgorithm):
         count = add_dataframe_to_sink(dataframe, sink, fields, feedback)
         feedback.pushInfo(self.tr(f"Wrote {count} Delaunay links"))
         return {self.OUTPUT: destination}
-
-    @staticmethod
-    def _nodes(
-        source: QgsFeatureSource, node_id_index: int, feedback: QgsProcessingFeedback
-    ) -> dict[int, tuple[float, float]]:
-        nodes = {}
-        for feature in cast(Iterable[QgsFeature], source.getFeatures()):
-            if feedback.isCanceled():
-                break
-            geometry = feature.geometry()
-            if geometry is None or geometry.isEmpty():
-                continue
-            point = geometry.centroid().asPoint()
-            nodes[int(feature.attributes()[node_id_index])] = (point.x(), point.y())
-        return nodes
 
     def shortHelpString(self) -> str:
         return self.tr(

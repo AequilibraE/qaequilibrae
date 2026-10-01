@@ -3,13 +3,10 @@
 from typing import Any
 
 import pandas as pd
-from qgis.PyQt.QtCore import QVariant
 from qgis.core import (
     Qgis,
     QgsCoordinateReferenceSystem,
     QgsFeature,
-    QgsField,
-    QgsFields,
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
@@ -19,6 +16,7 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
+from qaequilibrae.modules.common_tools.vector_layer_helpers import fields_from_dataframe
 from qaequilibrae.modules.processing_provider.project import borrow_project
 from qaequilibrae.modules.processing_provider.project_algorithm import ProjectAlgorithm
 from qaequilibrae.modules.transit_procedures.transit_supply_metrics import SupplyMetrics
@@ -133,15 +131,8 @@ class TransitSupplyMetricsAlgorithm(ProjectAlgorithm):
                 if feedback and feedback.isCanceled():
                     return {}
                 supply_metrics = SupplyMetrics(project)
-                methods = {
-                    "route_metrics": supply_metrics.route_metrics,
-                    "pattern_metrics": supply_metrics.pattern_metrics,
-                    "stop_metrics": supply_metrics.stop_metrics,
-                    "zone_metrics": supply_metrics.zone_metrics,
-                }
-                metrics = methods[metric_names[entity_index]](**filters)
-                metrics = metrics.reset_index(drop=True)
-                fields = self._fields(metrics)
+                metrics = getattr(supply_metrics, metric_names[entity_index])(**filters)
+                fields = fields_from_dataframe(metrics)
                 sink, destination = self.parameterAsSink(
                     parameters, self.OUTPUT, context, fields, Qgis.WkbType.NoGeometry, QgsCoordinateReferenceSystem()
                 )
@@ -157,21 +148,6 @@ class TransitSupplyMetricsAlgorithm(ProjectAlgorithm):
                 return {self.OUTPUT: destination}
         except (KeyError, ValueError, OSError) as error:
             raise QgsProcessingException(str(error)) from error
-
-    @staticmethod
-    def _fields(dataframe: pd.DataFrame) -> QgsFields:
-        fields = QgsFields()
-        for name, dtype in dataframe.dtypes.items():
-            if pd.api.types.is_bool_dtype(dtype):
-                variant_type = QVariant.Bool
-            elif pd.api.types.is_integer_dtype(dtype):
-                variant_type = QVariant.LongLong
-            elif pd.api.types.is_numeric_dtype(dtype):
-                variant_type = QVariant.Double
-            else:
-                variant_type = QVariant.String
-            fields.append(QgsField(str(name), variant_type))
-        return fields
 
     @staticmethod
     def _value(value: Any) -> Any:

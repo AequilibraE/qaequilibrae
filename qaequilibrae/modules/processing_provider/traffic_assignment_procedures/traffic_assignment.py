@@ -37,6 +37,15 @@ class TrafficAssignmentError(ValueError):
     """An invalid traffic-assignment configuration."""
 
 
+VDF_PARAMETERS = {
+    "bpr": ("alpha", "beta"),
+    "bpr2": ("alpha", "beta"),
+    "conical": ("alpha", "beta"),
+    "inrets": ("alpha",),
+    "akcelik": ("alpha", "tau", "length"),
+}
+
+
 def run_traffic_assignment(parameters, project=None, feedback=None):
     """Run the Processing worker from a dialog or an exported project runner."""
     algorithm = RunTrafficAssignment()
@@ -174,25 +183,12 @@ def configure_traffic_assignment(assignment, traffic_classes, assignment_options
     """Apply shared assignment settings to prepared AequilibraE traffic classes."""
     assignment.set_classes(traffic_classes)
     assignment.set_vdf(assignment_options["vdf"])
-    assignment.set_vdf_parameters(
-        {key: value for key, value in assignment_options.items() if key not in _ASSIGNMENT_KEYS}
-    )
+    assignment.set_vdf_parameters(assignment_options["vdf_parameters"])
     assignment.set_capacity_field(assignment_options["capacity_field"])
     assignment.set_time_field(assignment_options["time_field"])
     assignment.set_algorithm(assignment_options["algorithm"])
     assignment.max_iter = assignment_options["max_iter"]
     assignment.rgap_target = assignment_options["rgap"]
-
-
-_ASSIGNMENT_KEYS = {
-    "algorithm",
-    "max_iter",
-    "rgap",
-    "capacity_field",
-    "time_field",
-    "result_name",
-    "vdf",
-}
 
 
 def _save_outputs(assignment, configuration):
@@ -551,11 +547,11 @@ class RunTrafficAssignment(ProjectAlgorithm):
             "max_iter": self.parameterAsInt(parameters, self.MAX_ITERATIONS, context),
             "rgap": self.parameterAsDouble(parameters, self.RELATIVE_GAP, context),
             "vdf": vdf,
+            "vdf_parameters": self._vdf_parameters(vdf, parameters, context),
             "capacity_field": self.parameterAsString(parameters, self.CAPACITY_FIELD, context),
             "time_field": self.parameterAsString(parameters, self.TIME_FIELD, context),
             "result_name": self.parameterAsString(parameters, self.RESULT_NAME, context),
         }
-        assignment.update(self._vdf_parameters(vdf, parameters, context))
         traffic_class_values = self.parameterAsMatrix(parameters, self.TRAFFIC_CLASSES, context)
         configuration = {
             "traffic_classes": _traffic_classes(traffic_class_values),
@@ -587,27 +583,20 @@ class RunTrafficAssignment(ProjectAlgorithm):
         return configuration
 
     def _vdf_parameters(self, vdf, parameters, context):
-        parameters_by_vdf = {
-            "bpr": (self.ALPHA, self.BETA),
-            "bpr2": (self.ALPHA, self.BETA),
-            "conical": (self.ALPHA, self.BETA),
-            "inrets": (self.ALPHA,),
-            "akcelik": (self.ALPHA, self.TAU, self.LENGTH),
-        }
         try:
-            names = parameters_by_vdf[vdf]
+            names = VDF_PARAMETERS[vdf]
         except KeyError as error:
             raise TrafficAssignmentError(f"Unknown volume-delay function '{vdf}'") from error
         values = {}
         for name in names:
-            value = self.parameterAsString(parameters, name, context).strip()
+            value = self.parameterAsString(parameters, name.upper(), context).strip()
             if not value:
-                raise TrafficAssignmentError(f"{vdf} requires {name.lower()} field or value")
+                raise TrafficAssignmentError(f"{vdf} requires {name} field or value")
             try:
                 value = float(value)
             except ValueError:
                 pass
-            values[name.lower()] = value
+            values[name] = value
         return values
 
 

@@ -1,8 +1,10 @@
 import pytest
-from qgis.core import QgsProject
+from qgis.PyQt.QtCore import QMetaType
+from qgis.core import QgsProject, QgsVectorLayer, QgsFeature, QgsField, QgsGeometry
 
 from qaequilibrae.modules.gis.simple_tag_dialog import SimpleTagDialog
 from qaequilibrae.modules.gis.simple_tag_procedure import SimpleTAG
+from qaequilibrae.modules.processing_provider.mapping_procedures.simple_tag import SimpleTag
 from .utilities import create_links_layer, create_nodes_layer, create_polygons_layer
 
 linestring_assertions = {
@@ -94,7 +96,6 @@ def test_simple_tag_polygon(coquimbo_project, to_layer, ops):
         fmatch=None,
         tmatch=None,
         operation=ops,
-        geo_types=dialog.geography_types,
     )
     dialog.worker_thread.doWork()
 
@@ -143,7 +144,6 @@ def test_simple_tag_linestring(coquimbo_project, to_layer, ops):
         fmatch=None,
         tmatch=None,
         operation=ops,
-        geo_types=dialog.geography_types,
     )
     dialog.worker_thread.doWork()
 
@@ -188,9 +188,35 @@ def test_simple_tag_point(coquimbo_project, to_layer, ops):
         fmatch=None,
         tmatch=None,
         operation=ops,
-        geo_types=dialog.geography_types,
     )
     dialog.worker_thread.doWork()
 
     feats = [f["name"] for f in layer.getFeatures()]
     assert feats == point_assertions[to_layer][ops]
+
+
+def test_processing_backed_tag_keeps_original_ids_and_unmatched_values(mocker):
+    source = QgsVectorLayer("Polygon?crs=EPSG:4326", "tag_source", "memory")
+    target = QgsVectorLayer("Point?crs=EPSG:4326", "tag_target", "memory")
+    for layer in (source, target):
+        layer.dataProvider().addAttributes([QgsField("tag", QMetaType.Type.QString)])
+        layer.updateFields()
+        QgsProject.instance().addMapLayer(layer)
+    for layer, rows in (
+        (source, [("POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))", "matched")]),
+        (target, [("POINT (0.25 0.25)", "keep"), ("POINT (0.5 0.5)", "keep"), ("POINT (9 9)", "keep")]),
+    ):
+        for wkt, value in rows:
+            feature = QgsFeature(layer.fields())
+            feature.setGeometry(QgsGeometry.fromWkt(wkt))
+            feature.setAttributes([value])
+            assert layer.dataProvider().addFeatures([feature])[0]
+    ids = [feature.id() for feature in target.getFeatures()]
+    assert target.dataProvider().deleteFeatures([ids[0]])
+    processing = mocker.spy(SimpleTag, "processAlgorithm")
+    worker = SimpleTAG(None, source.name(), target.name(), "tag", "tag", None, None, "ENCLOSED")
+    worker.doWork()
+    processing.assert_called_once()
+    assert worker.error is None
+    assert worker.all_attr == {ids[1]: "matched"}
+    assert {feature.id(): feature["tag"] for feature in target.getFeatures()} == {ids[1]: "matched", ids[2]: "keep"}

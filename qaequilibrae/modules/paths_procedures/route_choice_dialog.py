@@ -3,11 +3,12 @@ from os.path import dirname, join
 
 import geopandas as gpd
 import qgis
-from qgis.PyQt.QtCore import Qt, QThread
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
-from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest, QgsProcessingFeedback
+from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest
 
 from qaequilibrae.modules.common_tools import BaseDialog
+from qaequilibrae.modules.common_tools.processing_worker import ProcessingWorker
 from qaequilibrae.modules.common_tools import geodataframe_from_layer, get_vector_layer_by_name, model_area_polygon
 from qaequilibrae.modules.matrix_procedures import list_matrices
 from qaequilibrae.modules.paths_procedures.execute_single_dialog import ExecuteSingleDialog
@@ -19,27 +20,6 @@ from qaequilibrae.modules.processing_provider.paths_procedures.route_choice impo
 )
 
 sys.modules["qgsmaplayercombobox"] = qgis.gui
-
-
-class RouteChoiceWorker(QThread):
-    def __init__(self, parameters, project, zones, parent):
-        super().__init__(parent)
-        self.parameters = parameters
-        self.project = project
-        self.zones = zones
-        self.error = None
-        self.result = None
-
-    def run(self):
-        try:
-            self.result = run_route_choice(
-                self.parameters,
-                self.project,
-                QgsProcessingFeedback(),
-                self.zones,
-            )
-        except Exception as error:
-            self.error = str(error)
 
 
 class RouteChoiceDialog(BaseDialog):
@@ -425,11 +405,8 @@ class RouteChoiceDialog(BaseDialog):
             return
 
         parameters = self.processing_parameters()
-        self.worker_thread = RouteChoiceWorker(
-            parameters,
-            self.project,
-            self.parameters.get("zones"),
-            self,
+        self.worker_thread = ProcessingWorker(
+            run_route_choice, parameters, self.project, self, zones=self.parameters.get("zones")
         )
         self.worker_thread.finished.connect(self.job_finished_from_thread)
         self.worker_thread.start()
