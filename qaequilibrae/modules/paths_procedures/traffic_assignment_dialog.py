@@ -11,14 +11,15 @@ from aequilibrae.paths.traffic_assignment import TrafficAssignment
 from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtCore import QItemSelectionModel, Qt, QThread, pyqtSignal
-from qgis.core import QgsProcessingFeedback
+from qgis.PyQt.QtCore import QItemSelectionModel, Qt
 from qgis.PyQt.QtGui import QColor, QPalette
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
 
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
+from qaequilibrae.modules.common_tools.processing_worker import ProcessingWorker
 from qaequilibrae.modules.processing_provider.traffic_assignment_procedures.traffic_assignment import (
+    VDF_PARAMETERS,
     RunTrafficAssignment,
     run_traffic_assignment,
 )
@@ -26,63 +27,10 @@ from qaequilibrae.qgis_logging import get_logger
 
 logger = get_logger(__name__)
 
-# What each volume-delay function actually takes, mirroring the parameter bounds AequilibraE
-# checks in TrafficAssignment.set_vdf_parameters. Offering the wrong set here either leaves the
-# user with nothing to fill in (Akcelik) or with a field the function never reads (INRETS).
 # How far the second band sits from the first, in absolute HSL lightness. Two figures because
 # a step that reads clearly against white is nearly invisible against a dark background
 BAND_STEP_FROM_LIGHT = 15
 BAND_STEP_FROM_DARK = 18
-
-VDF_PARAMETERS = {
-    "bpr": ["alpha", "beta"],
-    "bpr2": ["alpha", "beta"],
-    "conical": ["alpha", "beta"],
-    "inrets": ["alpha"],
-    "akcelik": ["alpha", "tau", "length"],
-}
-
-
-class AssignmentFeedback(QgsProcessingFeedback):
-    message = pyqtSignal(str)
-
-    def __init__(self, cancellation_requested):
-        super().__init__()
-        self.cancellation_requested = cancellation_requested
-
-    def pushInfo(self, message):
-        super().pushInfo(message)
-        self.message.emit(message)
-
-    def isCanceled(self):
-        return self.cancellation_requested() or super().isCanceled()
-
-
-class AssignmentWorker(QThread):
-    """Keep the Processing worker off the UI thread."""
-
-    message = pyqtSignal(str)
-    progress = pyqtSignal(float)
-
-    def __init__(self, parameters, project, parent):
-        super().__init__(parent)
-        self.parameters = parameters
-        self.project = project
-        self.error = None
-        self.result = None
-        self.cancel_requested = False
-
-    def cancel(self):
-        self.cancel_requested = True
-
-    def run(self):
-        try:
-            feedback = AssignmentFeedback(lambda: self.cancel_requested)
-            feedback.message.connect(self.message.emit)
-            feedback.progressChanged.connect(self.progress.emit)
-            self.result = run_traffic_assignment(self.parameters, self.project, feedback)
-        except Exception as error:
-            self.error = str(error)
 
 
 class TrafficAssignmentDialog(BaseDialog):
@@ -844,7 +792,7 @@ class TrafficAssignmentDialog(BaseDialog):
 
         self.do_assignment.setEnabled(False)
         self.tabWidget.setEnabled(False)
-        self.worker_thread = AssignmentWorker(parameters, self.project, self)
+        self.worker_thread = ProcessingWorker(run_traffic_assignment, parameters, self.project, self)
         self.worker_thread.message.connect(self.progress_label.setText)
         self.worker_thread.progress.connect(self._set_progress)
         self.run_thread()

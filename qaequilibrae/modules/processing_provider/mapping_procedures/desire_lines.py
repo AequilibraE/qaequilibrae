@@ -6,9 +6,8 @@ The :class:`DesireLines` adapter reads the matrix and centroids from QGIS inputs
 and writes the result to a feature sink; the desktop dialog reuses the operation.
 """
 
-from collections.abc import Iterable, Mapping, Sequence
-from pathlib import Path
-from typing import Any, Protocol, cast
+from collections.abc import Mapping, Sequence
+from typing import Any, Protocol
 
 import numpy as np
 import pandas as pd
@@ -16,12 +15,9 @@ from shapely.geometry import LineString
 
 from qgis.core import (
     Qgis,
-    QgsFeature,
-    QgsProcessingAlgorithm,
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
-    QgsFeatureSource,
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterField,
@@ -29,9 +25,11 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.common_tools.vector_layer_helpers import centroid_coordinates
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
 from ..geometry_io.common import add_dataframe_to_sink, fields_from_dataframe
+from ..matrix import open_matrix
 
 
 class MatrixLike(Protocol):
@@ -119,14 +117,20 @@ def compute_desire_lines(
     return dataframe, report, unassigned
 
 
-class DesireLines(QgsProcessingAlgorithm):
+class DesireLines(ProcessingAlgorithm):
     """Create desire lines for the flows in a matrix."""
+
+    algorithm_name = "desire_lines"
+    display_name = "Desire lines"
+    group_name = "Mapping"
+    group_id = "mapping"
 
     ZONES = "ZONES"
     ZONE_ID_FIELD = "ZONE_ID_FIELD"
     MATRIX_PATH = "MATRIX_PATH"
     MATRIX_CORES = "MATRIX_CORES"
     OUTPUT = "OUTPUT"
+    matrix: Any | None = None
 
     def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
         self.addParameter(
@@ -181,35 +185,22 @@ class DesireLines(QgsProcessingAlgorithm):
         matrix_path = self.parameterAsFile(parameters, self.MATRIX_PATH, context)
         cores = self.parameterAsString(parameters, self.MATRIX_CORES, context)
 
-        centroids = self._centroids(source, zone_id_index, feedback)
+        centroids = centroid_coordinates(source, zone_id_index, feedback)
         if feedback.isCanceled():
             return {}
         if not centroids:
             raise QgsProcessingException(self.tr("The zone layer contains no usable centroids"))
 
-        from aequilibrae.matrix import AequilibraeMatrix
-
-        matrix = AequilibraeMatrix()
         try:
-            matrix.load(Path(matrix_path))
-            selected_cores = (
-                [core.strip() for core in cores.split(",") if core.strip()] if cores else list(matrix.names)
-            )
-            if not selected_cores:
-                raise QgsProcessingException(self.tr("The matrix contains no cores"))
-            matrix.computational_view(selected_cores)
-            dataframe, report, unassigned = compute_desire_lines(centroids, matrix)
-        except QgsProcessingException:
-            raise
+            with open_matrix(matrix_path, cores, self.matrix) as matrix:
+                dataframe, report, unassigned = compute_desire_lines(centroids, matrix)
         except Exception as error:
             raise QgsProcessingException(self.tr(f"Could not create desire lines: {error}")) from error
-        finally:
-            matrix.close()
 
         for message in report:
-            feedback.pushInfo(message)
+            feedback.pushWarning(message)
         if unassigned > 0:
-            feedback.pushInfo(self.tr(f"Total non assigned flows (not counting intrazonals): {unassigned}"))
+            feedback.pushWarning(self.tr(f"Total non assigned flows (not counting intrazonals): {unassigned}"))
         if dataframe.empty:
             feedback.pushWarning(self.tr("There is nothing to show"))
 
@@ -228,33 +219,6 @@ class DesireLines(QgsProcessingAlgorithm):
         feedback.pushInfo(self.tr(f"Created {count} desire lines"))
         return {self.OUTPUT: destination}
 
-    @staticmethod
-    def _centroids(
-        source: QgsFeatureSource, zone_id_index: int, feedback: QgsProcessingFeedback
-    ) -> dict[int, tuple[float, float]]:
-        centroids = {}
-        for feature in cast(Iterable[QgsFeature], source.getFeatures()):
-            if feedback.isCanceled():
-                break
-            geometry = feature.geometry()
-            if geometry is None or geometry.isEmpty():
-                continue
-            point = geometry.centroid().asPoint()
-            centroids[int(feature.attributes()[zone_id_index])] = (point.x(), point.y())
-        return centroids
-
-    def name(self) -> str:
-        return "desire_lines"
-
-    def displayName(self) -> str:
-        return self.tr("Desire lines")
-
-    def group(self) -> str:
-        return self.tr("Mapping")
-
-    def groupId(self) -> str:
-        return "mapping"
-
     def shortHelpString(self) -> str:
         return self.tr(
             "Creates one line for each non-intrazonal zone pair with flow. The zone ID field "
@@ -265,11 +229,5 @@ class DesireLines(QgsProcessingAlgorithm):
             "use the input layer CRS."
         )
 
-    def createInstance(self) -> QgsProcessingAlgorithm:
-        return DesireLines()
-
     def tags(self) -> list[str]:
         return ["desire", "lines", "mapping", "matrix", "flow"]
-
-    def tr(self, message: str) -> str:
-        return trlt("DesireLines", message)

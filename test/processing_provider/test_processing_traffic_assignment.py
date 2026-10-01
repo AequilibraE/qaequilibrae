@@ -213,6 +213,13 @@ def test_failure_closes_input_matrices_and_preserves_borrowed_project(sf_project
         assert connection.execute("SELECT COUNT(*) FROM links").fetchone()[0] > 0
 
 
+def test_registered_matrix_failure_does_not_fall_back_to_file(sf_project, mocker):
+    project = sf_project.project
+    mocker.patch.object(project.matrices, "get_matrix", side_effect=OSError("cannot read registered matrix"))
+    with pytest.raises(OSError, match="cannot read registered matrix"):
+        operation._matrix(project, "demand_omx")
+
+
 def test_existing_output_is_rejected_before_execution(sf_project, mocker):
     parameters = _parameters(sf_project.project)
     outputs = _run(parameters)

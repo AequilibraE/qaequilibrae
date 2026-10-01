@@ -19,6 +19,7 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
+from ..feedback import connect_progress, push_info
 from ..project import borrow_project
 from ..project_algorithm import ProjectAlgorithm
 
@@ -70,92 +71,41 @@ def _run_skimming(
     feedback: QgsProcessingFeedback | None,
 ) -> dict[str, str]:
     """Run skimming inside a borrowed project and save its matrix."""
-    _info(feedback, "Opening AequilibraE project")
+    from aequilibrae.paths import NetworkSkimming as SkimmingProcedure
+
+    push_info(feedback, "Opening AequilibraE project")
     with borrow_project(project_folder) as project:
         _check_canceled(feedback)
         _check_output_names(project, configuration)
-        skimming = compute_network_skims(project, configuration, feedback)
-        _check_canceled(feedback)
-        _info(feedback, "Saving network skim matrix")
-        matrix_name, matrix_path = _save_skims(project, skimming, configuration)
+        mode = configuration["mode"]
+        project.network.build_graphs(modes=[mode])
+        graph = project.network.graphs[mode]
+        if configuration["trace_all_nodes"]:
+            graph.prepare_graph(graph.all_nodes)
+        graph.set_graph(configuration["cost_field"])
+        graph.set_blocked_centroid_flows(configuration["block_centroid_flows"])
+        if configuration["excluded_links"]:
+            graph.exclude_links(configuration["excluded_links"])
+        graph.set_skimming(configuration["skim_fields"])
 
-    _info(feedback, f"Saved network skim matrix as {matrix_name}")
+        skimming = SkimmingProcedure(graph)
+        connect_progress(skimming, feedback)
+        push_info(feedback, "Running network skimming")
+        skimming.execute()
+        if skimming.report:
+            push_info(feedback, "\n".join(skimming.report))
+        _check_canceled(feedback)
+        push_info(feedback, "Saving network skim matrix")
+        matrix_name = configuration["matrix_name"]
+        skimming.save_to_project(matrix_name, project=project)
+        matrix_path = Path(project.matrices.fldr) / f"{matrix_name}.omx"
+
+    push_info(feedback, f"Saved network skim matrix as {matrix_name}")
     return {
         NetworkSkimming.OUTPUT_MATRIX_NAME: matrix_name,
         NetworkSkimming.OUTPUT_MATRIX_PATH: str(matrix_path),
         NetworkSkimming.OUTPUT_MATRIX_FOLDER: str(matrix_path.parent),
     }
-
-
-def compute_network_skims(
-    project: Any,
-    configuration: SkimmingConfiguration,
-    feedback: QgsProcessingFeedback | None = None,
-) -> Any:
-    """Prepare a mode graph and run AequilibraE network skimming.
-
-    The caller owns the project and decides where to save the resulting matrix.
-    The function applies node selection, centroid blocking, link exclusions, and skim fields.
-
-    Args:
-        project: An open AequilibraE project.
-        configuration: Validated network mode and skimming settings.
-        feedback: Optional Processing feedback for progress and status messages.
-
-    Returns:
-        The AequilibraE ``NetworkSkimming`` worker, with computed results and report.
-    """
-    from aequilibrae.paths import NetworkSkimming as SkimmingProcedure
-
-    mode = configuration["mode"]
-    project.network.build_graphs(modes=[mode])
-    graph = project.network.graphs[mode]
-
-    if configuration["trace_all_nodes"]:
-        graph.prepare_graph(graph.all_nodes)
-    graph.set_graph(configuration["cost_field"])
-    graph.set_blocked_centroid_flows(configuration["block_centroid_flows"])
-    if configuration["excluded_links"]:
-        graph.exclude_links(configuration["excluded_links"])
-    graph.set_skimming(configuration["skim_fields"])
-
-    skimming = SkimmingProcedure(graph)
-    _report_progress(skimming, feedback)
-    _info(feedback, "Running network skimming")
-    skimming.execute()
-    if skimming.report:
-        _info(feedback, "\n".join(skimming.report))
-    return skimming
-
-
-def _save_skims(project: Any, skimming: Any, configuration: SkimmingConfiguration) -> tuple[str, Path]:
-    """Save computed skim cores as a named OMX matrix in the project."""
-    name = configuration["matrix_name"]
-    skimming.save_to_project(name, project=project)
-    return name, Path(project.matrices.fldr) / f"{name}.omx"
-
-
-def _report_progress(skimming: Any, feedback: QgsProcessingFeedback | None) -> None:
-    """Forward AequilibraE per-origin progress to Processing feedback."""
-    if feedback is None:
-        return
-    signal = getattr(skimming, "signal", None)
-    if signal is None or not hasattr(signal, "connect"):
-        return
-
-    total = [1]
-
-    def report(message: list[Any]) -> None:
-        kind = message[0] if message else None
-        if kind == "start":
-            total[0] = max(int(message[1]), 1)
-            feedback.setProgress(0)
-        elif kind == "update":
-            feedback.setProgress(int(100 * int(message[1]) / total[0]))
-        elif kind == "finished":
-            feedback.setProgress(100)
-
-    signal.connect(report)
 
 
 def _check_canceled(feedback: QgsProcessingFeedback | None) -> None:
@@ -171,11 +121,6 @@ def _check_output_names(project: Any, configuration: SkimmingConfiguration) -> N
         raise SkimmingError("Matrix names must not contain directory separators")
     if project.matrices.check_exists(name) or (Path(project.matrices.fldr) / f"{name}.omx").exists():
         raise SkimmingError(f"Matrix '{name}' already exists")
-
-
-def _info(feedback: QgsProcessingFeedback | None, message: str) -> None:
-    if feedback is not None:
-        feedback.pushInfo(message)
 
 
 class NetworkSkimming(ProjectAlgorithm):
@@ -205,6 +150,11 @@ class NetworkSkimming(ProjectAlgorithm):
         OUTPUT_MATRIX_FOLDER: Project matrix folder path.
     """
 
+    algorithm_name = "network_skimming"
+    display_name = "Network skimming"
+    group_name = "Path computation"
+    group_id = "path_computation"
+
     MODE = "MODE"
     COST_FIELD = "COST_FIELD"
     SKIM_FIELDS = "SKIM_FIELDS"
@@ -216,8 +166,6 @@ class NetworkSkimming(ProjectAlgorithm):
     OUTPUT_MATRIX_PATH = "OUTPUT_MATRIX_PATH"
     OUTPUT_MATRIX_FOLDER = "OUTPUT_MATRIX_FOLDER"
     project: Any | None = None
-    group_name = "Path computation"
-    group_id = "path_computation"
 
     def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
         self.add_project_folder_parameter()
@@ -266,10 +214,8 @@ class NetworkSkimming(ProjectAlgorithm):
             configuration = self._configuration(parameters, context)
             project_folder = self.project or self.project_folder(parameters, context)
             return _run_skimming(project_folder, configuration, feedback)
-        except SkimmingError as error:
-            raise QgsProcessingException(self.tr(str(error))) from error
         except Exception as error:
-            raise QgsProcessingException(self.tr(f"Network skimming failed: {error}")) from error
+            raise QgsProcessingException(self.tr(str(error))) from error
 
     def _configuration(self, parameters: dict[str, Any], context: QgsProcessingContext) -> SkimmingConfiguration:
         mode = self.parameterAsString(parameters, self.MODE, context).strip()
@@ -307,18 +253,10 @@ class NetworkSkimming(ProjectAlgorithm):
 
     def _excluded_links(self, parameters: dict[str, Any], context: QgsProcessingContext) -> list[int]:
         raw = self.parameterAsString(parameters, self.EXCLUDED_LINKS, context)
-        if not raw or not raw.strip():
-            return []
         try:
             return [int(link_id.strip()) for link_id in raw.split(",") if link_id.strip()]
         except ValueError as error:
             raise SkimmingError("Excluded link IDs must be integers separated by commas") from error
-
-    def name(self) -> str:
-        return "network_skimming"
-
-    def displayName(self) -> str:
-        return self.tr("Network skimming")
 
     def shortHelpString(self) -> str:
         help_messages = [
@@ -341,6 +279,3 @@ class NetworkSkimming(ProjectAlgorithm):
             self.tr("Existing matrix names are not overwritten."),
         ]
         return "\n".join(help_messages)
-
-    def createInstance(self) -> "NetworkSkimming":
-        return type(self)()

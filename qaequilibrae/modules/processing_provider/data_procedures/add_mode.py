@@ -2,19 +2,23 @@
 
 from qgis.core import Qgis, QgsProcessingException, QgsProcessingParameterNumber, QgsProcessingParameterString
 
-from ..project import open_project
+from ..project import borrow_project
 from ..project_algorithm import ProjectAlgorithm
 
 
 class AddMode(ProjectAlgorithm):
+    algorithm_name = "add_mode"
+    display_name = "Add mode"
     group_name = "Data"
     group_id = "data"
+
     MODE_ID = "MODE_ID"
     MODE_NAME = "MODE_NAME"
     DESCRIPTION = "DESCRIPTION"
     PCE = "PCE"
     VOT = "VOT"
     PPV = "PPV"
+    project = None
 
     def initAlgorithm(self, configuration=None):
         self.add_project_folder_parameter()
@@ -41,32 +45,32 @@ class AddMode(ProjectAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        project_folder = self.project_folder(parameters, context)
+        project_folder = self.project or self.project_folder(parameters, context)
         mode_id = self.parameterAsString(parameters, self.MODE_ID, context).strip()
         mode_name = self.parameterAsString(parameters, self.MODE_NAME, context).strip()
         if len(mode_id) != 1 or not mode_id.isascii() or not mode_id.isalpha():
             raise QgsProcessingException(self.tr("The mode ID must be a single ASCII letter"))
         if not mode_name:
             raise QgsProcessingException(self.tr("The mode name cannot be empty"))
-        with open_project(project_folder) as project:
+        with borrow_project(project_folder) as project:
             mode = project.network.modes.new(mode_id)
             mode.mode_name = mode_name
             mode.description = self.parameterAsString(parameters, self.DESCRIPTION, context).strip() or None
             for parameter, field in ((self.PCE, "pce"), (self.VOT, "vot"), (self.PPV, "ppv")):
                 if parameters.get(parameter) not in (None, ""):
                     setattr(mode, field, self.parameterAsDouble(parameters, parameter, context))
-            project.network.modes.add(mode)
-            mode.save()
+            try:
+                project.network.modes.add(mode)  # add() also saves the optional fields.
+            except Exception:
+                try:
+                    project.network.modes.delete(mode_id)
+                except Exception:
+                    with project.db_connection as connection:
+                        connection.execute(
+                            "DELETE FROM modes WHERE mode_id = ? AND mode_name = ?", [mode_id, mode_name]
+                        )
+                raise
         return {"MODE_ID": mode_id}
-
-    def name(self):
-        return "add_mode"
-
-    def displayName(self):
-        return self.tr("Add mode")
 
     def shortHelpString(self):
         return self.tr("Adds a mode to an AequilibraE project.")
-
-    def createInstance(self):
-        return AddMode()

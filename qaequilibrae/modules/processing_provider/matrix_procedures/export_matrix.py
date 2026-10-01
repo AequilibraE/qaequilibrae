@@ -3,13 +3,18 @@ import sys
 from os.path import join
 from pathlib import Path
 
-from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingParameterEnum
+from qgis.core import Qgis, QgsProcessingParameterFile, QgsProcessingParameterEnum
 from qgis.core import QgsProcessingException
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
 
-class ExportMatrix(QgsProcessingAlgorithm):
+class ExportMatrix(ProcessingAlgorithm):
+    algorithm_name = "exportmatrices"
+    display_name = "Export matrices"
+    group_name = "Data"
+    group_id = "data"
+
     def initAlgorithm(self, configuration=None):
         self.addParameter(
             QgsProcessingParameterFile(
@@ -62,23 +67,5 @@ class ExportMatrix(QgsProcessingAlgorithm):
 
         return {"Output": dst_path}
 
-    def name(self):
-        return "exportmatrices"
-
-    def displayName(self):
-        return self.tr("Export matrices")
-
-    def group(self):
-        return self.tr("Data")
-
-    def groupId(self):
-        return "data"
-
     def shortHelpString(self):
         return self.tr("Exports an existing *.omx matrix file into *.csv or *.omx")
-
-    def createInstance(self):
-        return ExportMatrix()
-
-    def tr(self, message):
-        return trlt("ExportMatrix", message)

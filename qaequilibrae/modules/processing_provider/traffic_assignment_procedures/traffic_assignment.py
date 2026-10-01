@@ -28,12 +28,22 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
+from ..feedback import connect_progress, push_info
 from ..project import borrow_project
 from ..project_algorithm import ProjectAlgorithm
 
 
 class TrafficAssignmentError(ValueError):
     """An invalid traffic-assignment configuration."""
+
+
+VDF_PARAMETERS = {
+    "bpr": ("alpha", "beta"),
+    "bpr2": ("alpha", "beta"),
+    "conical": ("alpha", "beta"),
+    "inrets": ("alpha",),
+    "akcelik": ("alpha", "tau", "length"),
+}
 
 
 def run_traffic_assignment(parameters, project=None, feedback=None):
@@ -45,29 +55,28 @@ def run_traffic_assignment(parameters, project=None, feedback=None):
 
 
 def _run_assignment(project_folder, configuration, feedback):
-    assignment_options = _mapping(configuration, "assignment")
-    result_name = _string(assignment_options, "result_name")
-    traffic_class_options = configuration.get("traffic_classes")
-    if not isinstance(traffic_class_options, list) or not traffic_class_options:
-        raise TrafficAssignmentError("The assignment configuration requires at least one traffic class")
+    assignment_options = configuration["assignment"]
+    result_name = assignment_options["result_name"]
 
-    _info(feedback, "Opening AequilibraE project")
+    push_info(feedback, "Opening AequilibraE project")
     with borrow_project(project_folder) as project, ExitStack() as resources:
         _check_canceled(feedback)
         _check_output_names(project, configuration)
         assignment, traffic_classes = _build_assignment(
-            project, traffic_class_options, assignment_options, resources, feedback
+            project, configuration["traffic_classes"], assignment_options, resources, feedback
         )
-        _configure_select_links(traffic_classes, configuration.get("select_links"))
+        if selection := configuration.get("select_links"):
+            for traffic_class in traffic_classes:
+                traffic_class.set_select_links(selection["selection"])
         _check_canceled(feedback)
-        _report_assignment_progress(assignment, feedback)
-        _info(feedback, "Running traffic assignment")
+        connect_progress(getattr(assignment, "assignment", None), feedback)
+        push_info(feedback, "Running traffic assignment")
         assignment.execute()
         _check_canceled(feedback)
-        _info(feedback, "Saving traffic-assignment results")
+        push_info(feedback, "Saving traffic-assignment results")
         outputs = _save_outputs(assignment, configuration)
 
-    _info(feedback, f"Saved traffic-assignment results as {result_name}")
+    push_info(feedback, f"Saved traffic-assignment results as {result_name}")
     return outputs
 
 
@@ -81,20 +90,14 @@ def _build_assignment(project, class_options, assignment_options, resources, fee
     class_names = set()
     base_graphs = {}
     for class_option in class_options:
-        class_name, options = _traffic_class(class_option)
+        class_name, options = next(iter(class_option.items()))
         if class_name.lower() in class_names:
             raise TrafficAssignmentError(f"Traffic class name is repeated: {class_name}")
         class_names.add(class_name.lower())
 
-        matrix = _matrix(project, _string(options, "matrix_name"))
+        matrix = _matrix(project, options["matrix_name"])
         resources.callback(matrix.close)
-        matrix_cores = options.get("matrix_cores", [options.get("matrix_core")])
-        if (
-            not isinstance(matrix_cores, list)
-            or not matrix_cores
-            or not all(isinstance(core, str) for core in matrix_cores)
-        ):
-            raise TrafficAssignmentError(f"Traffic class '{class_name}' requires matrix_core or matrix_cores")
+        matrix_cores = options["matrix_cores"]
         matrix.computational_view(matrix_cores)
         matrix.view_names = [class_name if len(matrix_cores) == 1 else f"{class_name}_{core}" for core in matrix_cores]
         # SQLite result columns are case insensitive, including generated multicore names.
@@ -105,9 +108,9 @@ def _build_assignment(project, class_options, assignment_options, resources, fee
         nan_mask = np.isnan(matrix.matrix_view)
         if nan_mask.any():
             matrix.matrix_view[nan_mask] = 0.0
-            _info(feedback, f"Replaced NaN demand with zero for traffic class '{class_name}'")
+            push_info(feedback, f"Replaced NaN demand with zero for traffic class '{class_name}'")
 
-        mode = _string(options, "network_mode")
+        mode = options["network_mode"]
         if mode not in base_graphs:
             project.network.build_graphs(modes=[mode])
             base_graphs[mode] = deepcopy(project.network.graphs[mode])
@@ -115,20 +118,16 @@ def _build_assignment(project, class_options, assignment_options, resources, fee
         _fill_missing_mode_fields(graph, mode)
         if options.get("excluded_links"):
             graph.exclude_links(options["excluded_links"])
-        graph.set_blocked_centroid_flows(bool(options.get("blocked_centroid_flows", False)))
-        skims = options.get("skims", {})
-        if not isinstance(skims, dict):
-            raise TrafficAssignmentError(f"Traffic class '{class_name}' has invalid skims")
-        if skims:
-            graph.set_graph(_string(assignment_options, "time_field"))
-            graph.set_skimming(list(skims))
-            graph.set_blocked_centroid_flows(bool(options.get("blocked_centroid_flows", False)))
+        graph.set_blocked_centroid_flows(options["blocked_centroid_flows"])
+        if options["skims"]:
+            graph.set_graph(assignment_options["time_field"])
+            graph.set_skimming(list(options["skims"]))
 
         traffic_class = TrafficClass(class_name, graph, matrix)
-        traffic_class.set_pce(float(options.get("pce", 1.0)))
+        traffic_class.set_pce(options["pce"])
         if "fixed_cost" in options:
-            traffic_class.set_vot(float(options.get("vot", 0)))
-            traffic_class.set_fixed_cost(_string(options, "fixed_cost"))
+            traffic_class.set_vot(options["vot"])
+            traffic_class.set_fixed_cost(options["fixed_cost"])
         traffic_classes.append(traffic_class)
 
     assignment = AequilibraeTrafficAssignment(project)
@@ -157,62 +156,39 @@ def _fill_missing_mode_fields(graph, mode: str) -> None:
 
 
 def _matrix(project, matrix_name):
-    try:
+    if project.matrices.check_exists(matrix_name):
         return project.matrices.get_matrix(matrix_name)
-    except Exception as error:
-        matrix_folder = Path(project.project_base_path) / "matrices"
-        candidates = [matrix_folder / f"{matrix_name}.omx"]
-        if matrix_name.endswith("_omx"):
-            candidates.append(matrix_folder / f"{matrix_name.removesuffix('_omx')}.omx")
-        matrix_path = next((candidate for candidate in candidates if candidate.is_file()), None)
-        if matrix_path is None:
-            raise TrafficAssignmentError(f"Could not find matrix '{matrix_name}'") from error
 
-        from aequilibrae.matrix import AequilibraeMatrix
+    # Older projects can contain OMX files that are not registered in the database.
+    matrix_folder = Path(project.project_base_path) / "matrices"
+    candidates = [matrix_folder / f"{matrix_name}.omx"]
+    if matrix_name.endswith("_omx"):
+        candidates.append(matrix_folder / f"{matrix_name.removesuffix('_omx')}.omx")
+    matrix_path = next((candidate for candidate in candidates if candidate.is_file()), None)
+    if matrix_path is None:
+        raise TrafficAssignmentError(f"Could not find matrix '{matrix_name}'")
 
-        matrix = AequilibraeMatrix()
-        try:
-            matrix.load(matrix_path)
-        except Exception:
-            matrix.close()
-            raise
-        return matrix
+    from aequilibrae.matrix import AequilibraeMatrix
+
+    matrix = AequilibraeMatrix()
+    try:
+        matrix.load(matrix_path)
+    except Exception:
+        matrix.close()
+        raise
+    return matrix
 
 
 def configure_traffic_assignment(assignment, traffic_classes, assignment_options: Mapping[str, Any]):
     """Apply shared assignment settings to prepared AequilibraE traffic classes."""
-    try:
-        assignment.set_classes(traffic_classes)
-        assignment.set_vdf(_string(assignment_options, "vdf"))
-        assignment.set_vdf_parameters(
-            {key: value for key, value in assignment_options.items() if key not in _ASSIGNMENT_KEYS}
-        )
-        assignment.set_capacity_field(_string(assignment_options, "capacity_field"))
-        assignment.set_time_field(_string(assignment_options, "time_field"))
-        assignment.set_algorithm(_string(assignment_options, "algorithm"))
-        assignment.max_iter = int(assignment_options["max_iter"])
-        assignment.rgap_target = float(assignment_options["rgap"])
-    except (KeyError, TypeError, ValueError) as error:
-        raise TrafficAssignmentError(f"Could not configure traffic assignment: {error}") from error
-
-
-_ASSIGNMENT_KEYS = {
-    "algorithm",
-    "max_iter",
-    "rgap",
-    "capacity_field",
-    "time_field",
-    "result_name",
-    "vdf",
-}
-
-
-def _configure_select_links(traffic_classes, options):
-    if options is None:
-        return
-    selection = _mapping(options, "selection")
-    for traffic_class in traffic_classes:
-        traffic_class.set_select_links(selection)
+    assignment.set_classes(traffic_classes)
+    assignment.set_vdf(assignment_options["vdf"])
+    assignment.set_vdf_parameters(assignment_options["vdf_parameters"])
+    assignment.set_capacity_field(assignment_options["capacity_field"])
+    assignment.set_time_field(assignment_options["time_field"])
+    assignment.set_algorithm(assignment_options["algorithm"])
+    assignment.max_iter = assignment_options["max_iter"]
+    assignment.rgap_target = assignment_options["rgap"]
 
 
 def _save_outputs(assignment, configuration):
@@ -231,10 +207,10 @@ def _save_outputs(assignment, configuration):
     outputs[RunTrafficAssignment.OUTPUT_SKIMS] = json.dumps(_save_skims(assignment, configuration))
     if select_link_options is None:
         return outputs
-    output_name = _string(select_link_options, "output_name")
-    if select_link_options.get("save_matrix", True):
+    output_name = select_link_options["output_name"]
+    if select_link_options["save_matrix"]:
         outputs[RunTrafficAssignment.OUTPUT_SELECT_LINK_MATRIX] = _save_select_link_matrices(assignment, output_name)
-    if select_link_options.get("save_result", True):
+    if select_link_options["save_result"]:
         assignment.save_select_link_flows(output_name)
         outputs[RunTrafficAssignment.OUTPUT_SELECT_LINK_FLOWS] = output_name
     return outputs
@@ -242,10 +218,10 @@ def _save_outputs(assignment, configuration):
 
 def _save_skims(assignment, configuration):
     """Export only the final/blended cores requested for each traffic class."""
-    class_options = dict(_traffic_class(item) for item in configuration["traffic_classes"])
+    class_options = {name: options for item in configuration["traffic_classes"] for name, options in item.items()}
     paths = []
     for cls in assignment.classes:
-        choices = class_options[cls._id].get("skims", {})
+        choices = class_options[cls._id]["skims"]
         cores = [(field, kind) for field, kinds in choices.items() for kind in kinds]
         if not cores:
             continue
@@ -294,29 +270,6 @@ def _save_matrix(assignment, name, data, centroids, description):
     return str(Path(assignment.project.matrices.fldr) / f"{name}.omx")
 
 
-def _report_assignment_progress(assignment, feedback):
-    """Forward AequilibraE's per-iteration progress to the Processing feedback."""
-    if feedback is None:
-        return
-    signal = getattr(getattr(assignment, "assignment", None), "signal", None)
-    if signal is None or not hasattr(signal, "connect"):
-        return
-
-    total = [1]
-
-    def report(message):
-        kind = message[0] if message else None
-        if kind == "start":
-            total[0] = max(int(message[1]), 1)
-            feedback.setProgress(0)
-        elif kind == "update":
-            feedback.setProgress(int(100 * int(message[1]) / total[0]))
-        elif kind == "finished":
-            feedback.setProgress(100)
-
-    signal.connect(report)
-
-
 def _check_canceled(feedback):
     if feedback is not None and feedback.isCanceled():
         raise TrafficAssignmentError("Traffic assignment canceled; results were not saved")
@@ -326,15 +279,16 @@ def _check_output_names(project, configuration):
     name = configuration["assignment"]["result_name"]
     tables = [name]
     matrices = [
-        f"{name}_{_traffic_class(item)[0]}"
+        f"{name}_{class_name}"
         for item in configuration["traffic_classes"]
-        if _traffic_class(item)[1].get("skims")
+        for class_name, options in item.items()
+        if options["skims"]
     ]
     if selection := configuration.get("select_links"):
-        output = _string(selection, "output_name")
-        if selection.get("save_result", True):
+        output = selection["output_name"]
+        if selection["save_result"]:
             tables.append(output)
-        if selection.get("save_matrix", True):
+        if selection["save_matrix"]:
             matrices.append(output)
     if len(set(item.lower() for item in tables)) != len(tables):
         raise TrafficAssignmentError("Assignment and select-link flows require different result names")
@@ -352,34 +306,6 @@ def _check_output_names(project, configuration):
             raise TrafficAssignmentError(f"Matrix '{matrix}' already exists")
 
 
-def _traffic_class(value):
-    if not isinstance(value, dict) or len(value) != 1:
-        raise TrafficAssignmentError("Each traffic class must be a mapping with one class name")
-    name, options = next(iter(value.items()))
-    if not isinstance(name, str) or not name.strip() or not isinstance(options, dict):
-        raise TrafficAssignmentError("Each traffic class needs a name and options")
-    return name, options
-
-
-def _mapping(mapping, key):
-    value = mapping.get(key)
-    if not isinstance(value, dict):
-        raise TrafficAssignmentError(f"The assignment configuration requires '{key}'")
-    return value
-
-
-def _string(mapping, key):
-    value = mapping.get(key)
-    if not isinstance(value, str) or not value:
-        raise TrafficAssignmentError(f"The assignment configuration requires '{key}'")
-    return value
-
-
-def _info(feedback, message):
-    if feedback is not None:
-        feedback.pushInfo(message)
-
-
 class RunTrafficAssignment(ProjectAlgorithm):
     """Run an AequilibraE traffic assignment from QGIS Processing parameters.
 
@@ -391,6 +317,11 @@ class RunTrafficAssignment(ProjectAlgorithm):
     skim OMX files per class, optional select-link OD and flow outputs, and an
     optional assigned-flows vector layer.
     """
+
+    algorithm_name = "traffic_assignment"
+    display_name = "Traffic assignment"
+    group_name = "Traffic assignment"
+    group_id = "traffic_assignment"
 
     TRAFFIC_CLASSES = "TRAFFIC_CLASSES"
     SELECT_LINKS = "SELECT_LINKS"
@@ -417,8 +348,6 @@ class RunTrafficAssignment(ProjectAlgorithm):
     OUTPUT_SELECT_LINK_MATRIX = "OUTPUT_SELECT_LINK_MATRIX"
     OUTPUT_SELECT_LINK_FLOWS = "OUTPUT_SELECT_LINK_FLOWS"
     project = None
-    group_name = "Traffic assignment"
-    group_id = "traffic_assignment"
 
     def initAlgorithm(self, configuration=None):
         self.add_project_folder_parameter()
@@ -528,10 +457,8 @@ class RunTrafficAssignment(ProjectAlgorithm):
             result_name = configuration["assignment"]["result_name"]
             outputs.update(self._flows_layer(project_folder, result_name, parameters, context, feedback))
             return outputs
-        except TrafficAssignmentError as error:
-            raise QgsProcessingException(self.tr(str(error))) from error
         except Exception as error:
-            raise QgsProcessingException(self.tr(f"Traffic assignment failed: {error}")) from error
+            raise QgsProcessingException(self.tr(str(error))) from error
 
     def _flows_layer(self, project_folder, result_name, parameters, context, feedback):
         """Write the saved results, joined to the link geometry, to the feature sink."""
@@ -558,12 +485,6 @@ class RunTrafficAssignment(ProjectAlgorithm):
                 raise QgsProcessingException(self.tr("Could not create the assigned-flows layer"))
             add_dataframe_to_sink(merged, sink, fields, feedback)
         return {self.OUTPUT_FLOWS: destination}
-
-    def name(self):
-        return "traffic_assignment"
-
-    def displayName(self):
-        return self.tr("Traffic assignment")
 
     def shortHelpString(self):
         help_messages = [
@@ -619,9 +540,6 @@ class RunTrafficAssignment(ProjectAlgorithm):
         ]
         return "\n".join(help_messages)
 
-    def createInstance(self):
-        return type(self)()
-
     def _configuration(self, parameters, context):
         vdf = self.parameterAsString(parameters, self.VDF, context).lower()
         assignment = {
@@ -629,14 +547,12 @@ class RunTrafficAssignment(ProjectAlgorithm):
             "max_iter": self.parameterAsInt(parameters, self.MAX_ITERATIONS, context),
             "rgap": self.parameterAsDouble(parameters, self.RELATIVE_GAP, context),
             "vdf": vdf,
+            "vdf_parameters": self._vdf_parameters(vdf, parameters, context),
             "capacity_field": self.parameterAsString(parameters, self.CAPACITY_FIELD, context),
             "time_field": self.parameterAsString(parameters, self.TIME_FIELD, context),
             "result_name": self.parameterAsString(parameters, self.RESULT_NAME, context),
         }
-        assignment.update(self._vdf_parameters(vdf, parameters, context))
         traffic_class_values = self.parameterAsMatrix(parameters, self.TRAFFIC_CLASSES, context)
-        if not _matrix_has_rows(traffic_class_values):
-            raise TrafficAssignmentError("At least one traffic class is required")
         configuration = {
             "traffic_classes": _traffic_classes(traffic_class_values),
             "assignment": assignment,
@@ -667,32 +583,25 @@ class RunTrafficAssignment(ProjectAlgorithm):
         return configuration
 
     def _vdf_parameters(self, vdf, parameters, context):
-        parameters_by_vdf = {
-            "bpr": (self.ALPHA, self.BETA),
-            "bpr2": (self.ALPHA, self.BETA),
-            "conical": (self.ALPHA, self.BETA),
-            "inrets": (self.ALPHA,),
-            "akcelik": (self.ALPHA, self.TAU, self.LENGTH),
-        }
         try:
-            names = parameters_by_vdf[vdf]
+            names = VDF_PARAMETERS[vdf]
         except KeyError as error:
             raise TrafficAssignmentError(f"Unknown volume-delay function '{vdf}'") from error
         values = {}
         for name in names:
-            value = self.parameterAsString(parameters, name, context).strip()
+            value = self.parameterAsString(parameters, name.upper(), context).strip()
             if not value:
-                raise TrafficAssignmentError(f"{vdf} requires {name.lower()} field or value")
+                raise TrafficAssignmentError(f"{vdf} requires {name} field or value")
             try:
                 value = float(value)
             except ValueError:
                 pass
-            values[name.lower()] = value
+            values[name] = value
         return values
 
 
 def _traffic_classes(values):
-    rows = _matrix_rows(values, 9, "traffic classes")
+    rows = _matrix_rows(values if _matrix_has_rows(values) else [], 9, "traffic classes")
     traffic_classes = []
     for name, matrix_name, cores, mode, pce, blocked, fixed_cost, vot, skims in rows:
         options = {

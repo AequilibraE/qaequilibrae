@@ -7,6 +7,9 @@ from ..project_algorithm import ProjectAlgorithm
 
 
 class NetworkSimplifier(ProjectAlgorithm):
+    algorithm_name = "Network simplifier"
+    display_name = "Network simplifier"
+    translate_algorithm_name = True
     group_name = "Model building"
     group_id = "model_building"
 
@@ -85,18 +88,9 @@ class NetworkSimplifier(ProjectAlgorithm):
 
         return {"Output": "Ok."}
 
-    def name(self):
-        return self.tr("Network simplifier")
-
-    def displayName(self) -> str:
-        return self.tr("Network simplifier")
-
     def shortHelpString(self):
         help_messages = [
             self.tr("This tool simplifies the network, merging short links into longer ones or"),
             self.tr("turning links into nodes, and saving theses changes into the project."),
         ]
         return "\n".join(help_messages)
-
-    def createInstance(self):
-        return NetworkSimplifier()

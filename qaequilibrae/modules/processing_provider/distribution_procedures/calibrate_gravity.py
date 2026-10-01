@@ -1,58 +1,26 @@
-"""Calibrate a synthetic gravity model as a Processing algorithm and shared operation."""
-
-from typing import Any
+"""Calibrate a synthetic gravity model as a Processing algorithm."""
 
 from qgis.core import (
-    Qgis,
-    QgsProcessingAlgorithm,
     QgsProcessingException,
     QgsProcessingParameterBoolean,
     QgsProcessingParameterEnum,
-    QgsProcessingParameterFile,
     QgsProcessingParameterFileDestination,
     QgsProcessingParameterString,
 )
 
-from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.processing_provider.project import open_project
+from qaequilibrae.modules.processing_provider.project_algorithm import ProjectAlgorithm
 
-from .common import CALIBRATION_FUNCTIONS, DistributionError, load_matrix_core, push_report
-
-
-def calibrate_gravity_model(
-    project: Any,
-    matrix: Any,
-    impedance: Any,
-    function: str,
-    *,
-    nan_as_zero: bool = False,
-) -> tuple[Any, list[str]]:
-    """Calibrate a gravity model against an observed matrix and an impedance matrix.
-
-    Returns the calibrated model and the procedure report. Callers decide how to
-    save the model and present :class:`DistributionError`.
-    """
-    from aequilibrae.distribution import GravityCalibration
-
-    try:
-        calibration = GravityCalibration(
-            project=project,
-            matrix=matrix,
-            impedance=impedance,
-            function=function,
-            nan_as_zero=nan_as_zero,
-        )
-        calibration.calibrate()
-    except Exception as error:
-        raise DistributionError(f"Gravity calibration failed: {error}") from error
-
-    if calibration.error is not None:
-        raise DistributionError(str(calibration.error))
-    return calibration.model, calibration.report
+from .common import CALIBRATION_FUNCTIONS, load_matrix_core, push_report
 
 
-class CalibrateGravity(QgsProcessingAlgorithm):
+class CalibrateGravity(ProjectAlgorithm):
     """Fit a synthetic gravity model to an observed trip matrix."""
+
+    algorithm_name = "calibrate_gravity_model"
+    display_name = "Calibrate gravity model"
+    group_name = "Distribution"
+    group_id = "distribution"
 
     PROJECT_FOLDER = "PROJECT_FOLDER"
     OBSERVED_MATRIX_NAME = "OBSERVED_MATRIX_NAME"
@@ -64,13 +32,7 @@ class CalibrateGravity(QgsProcessingAlgorithm):
     OUTPUT_MODEL = "OUTPUT_MODEL"
 
     def initAlgorithm(self, configuration=None):
-        self.addParameter(
-            QgsProcessingParameterFile(
-                self.PROJECT_FOLDER,
-                self.tr("AequilibraE project folder"),
-                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
-            )
-        )
+        self.add_project_folder_parameter(self.PROJECT_FOLDER)
         self.addParameter(QgsProcessingParameterString(self.OBSERVED_MATRIX_NAME, self.tr("Observed matrix name")))
         self.addParameter(QgsProcessingParameterString(self.OBSERVED_MATRIX_CORE, self.tr("Observed matrix core")))
         self.addParameter(QgsProcessingParameterString(self.IMPEDANCE_MATRIX_NAME, self.tr("Impedance matrix name")))
@@ -99,7 +61,9 @@ class CalibrateGravity(QgsProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        project_folder = self.parameterAsFile(parameters, self.PROJECT_FOLDER, context)
+        from aequilibrae.distribution import GravityCalibration
+
+        project_folder = self.project_folder(parameters, context, self.PROJECT_FOLDER)
         observed_name = self.parameterAsString(parameters, self.OBSERVED_MATRIX_NAME, context)
         observed_core = self.parameterAsString(parameters, self.OBSERVED_MATRIX_CORE, context)
         impedance_name = self.parameterAsString(parameters, self.IMPEDANCE_MATRIX_NAME, context)
@@ -110,30 +74,28 @@ class CalibrateGravity(QgsProcessingAlgorithm):
 
         feedback.pushInfo(self.tr("Loading the observed and impedance matrices"))
         try:
-            with open_project(project_folder) as project:
-                observed = load_matrix_core(project, observed_name, observed_core)
-                impedance = load_matrix_core(project, impedance_name, impedance_core)
-
+            with (
+                open_project(project_folder) as project,
+                load_matrix_core(project, observed_name, observed_core) as observed,
+                load_matrix_core(project, impedance_name, impedance_core) as impedance,
+            ):
                 feedback.pushInfo(self.tr("Calibrating the gravity model"))
-                model, report = calibrate_gravity_model(project, observed, impedance, function, nan_as_zero=nan_as_zero)
-                model.save(output_path)
-        except DistributionError as error:
+                calibration = GravityCalibration(
+                    project=project,
+                    matrix=observed,
+                    impedance=impedance,
+                    function=function,
+                    nan_as_zero=nan_as_zero,
+                )
+                calibration.calibrate()
+                if calibration.error is not None:
+                    raise ValueError(str(calibration.error))
+                calibration.model.save(output_path)
+        except Exception as error:
             raise QgsProcessingException(self.tr(str(error))) from error
 
-        push_report(feedback, report)
+        push_report(feedback, calibration.report)
         return {self.OUTPUT_MODEL: output_path}
-
-    def name(self):
-        return "calibrate_gravity_model"
-
-    def displayName(self):
-        return self.tr("Calibrate gravity model")
-
-    def group(self):
-        return self.tr("Distribution")
-
-    def groupId(self):
-        return "distribution"
 
     def shortHelpString(self):
         return self.tr(
@@ -144,9 +106,3 @@ class CalibrateGravity(QgsProcessingAlgorithm):
 
     def tags(self):
         return ["gravity", "calibration", "distribution", "model"]
-
-    def createInstance(self):
-        return CalibrateGravity()
-
-    def tr(self, message):
-        return trlt("CalibrateGravity", message)

@@ -4,7 +4,6 @@ import json
 import math
 from qgis.core import (
     Qgis,
-    QgsProcessingAlgorithm,
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
@@ -17,14 +16,21 @@ from qgis.core import (
 from qgis.PyQt.QtCore import QDate
 
 from aequilibrae.transit import Transit
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 from qaequilibrae.modules.common_tools import project_has_transit
 from qaequilibrae.modules.processing_provider.project import borrow_project
 from qaequilibrae.modules.transit_procedures.gtfs_import_runner import import_gtfs_feeds
 
 
-class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
+class AddGTFSFeedAlgorithm(ProcessingAlgorithm):
     """Import one GTFS feed into an existing AequilibraE project."""
+
+    algorithm_name = "addGTFSFeed"
+    display_name = "Add GTFS feed"
+    group_name = "Transit"
+    group_id = "transit"
+
+    translation_context = "ProcessingProvider"
 
     PROJECT = "PROJECT"
     GTFS_FEED = "GTFS_FEED"
@@ -191,21 +197,3 @@ class AddGTFSFeedAlgorithm(QgsProcessingAlgorithm):
             raise
         except Exception as error:
             raise QgsProcessingException(self.tr(f"GTFS import failed: {error}")) from error
-
-    def name(self) -> str:
-        return "addGTFSFeed"
-
-    def displayName(self) -> str:
-        return self.tr("Add GTFS feed")
-
-    def group(self) -> str:
-        return self.tr("Transit")
-
-    def groupId(self) -> str:
-        return "transit"
-
-    def createInstance(self) -> "AddGTFSFeedAlgorithm":
-        return AddGTFSFeedAlgorithm()
-
-    def tr(self, message: str) -> str:
-        return trlt("ProcessingProvider", message)

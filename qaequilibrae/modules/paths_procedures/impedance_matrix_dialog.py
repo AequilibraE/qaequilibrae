@@ -1,57 +1,15 @@
 from os.path import dirname, join
 
-from qgis.PyQt.QtCore import Qt, QThread, pyqtSignal
+from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
-from qgis.core import QgsProcessingFeedback
 
 from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.common_tools import standard_path
+from qaequilibrae.modules.common_tools.processing_worker import ProcessingWorker
 from qaequilibrae.modules.processing_provider.paths_procedures.network_skimming import (
     NetworkSkimming,
     run_network_skimming,
 )
-
-
-class SkimmingFeedback(QgsProcessingFeedback):
-    """Forward Processing progress to the dialog while it runs on a worker thread."""
-
-    message = pyqtSignal(str)
-
-    def __init__(self, cancellation_requested):
-        super().__init__()
-        self.cancellation_requested = cancellation_requested
-
-    def pushInfo(self, message):
-        super().pushInfo(message)
-        self.message.emit(message)
-
-    def isCanceled(self):
-        return self.cancellation_requested() or super().isCanceled()
-
-
-class SkimmingWorker(QThread):
-    message = pyqtSignal(str)
-    progress = pyqtSignal(float)
-
-    def __init__(self, parameters, project, parent):
-        super().__init__(parent)
-        self.parameters = parameters
-        self.project = project
-        self.error = None
-        self.result = None
-        self.cancel_requested = False
-
-    def cancel(self):
-        self.cancel_requested = True
-
-    def run(self):
-        try:
-            feedback = SkimmingFeedback(lambda: self.cancel_requested)
-            feedback.message.connect(self.message.emit)
-            feedback.progressChanged.connect(self.progress.emit)
-            self.result = run_network_skimming(self.parameters, self.project, feedback)
-        except Exception as error:
-            self.error = str(error)
 
 
 class ImpedanceMatrixDialog(BaseDialog):
@@ -184,7 +142,7 @@ class ImpedanceMatrixDialog(BaseDialog):
 
         # The dialog only translates its state into Processing parameters. Graph
         # preparation, validation and saving belong to the reusable algorithm.
-        self.worker_thread = SkimmingWorker(self.processing_parameters(), self.project, self)
+        self.worker_thread = ProcessingWorker(run_network_skimming, self.processing_parameters(), self.project, self)
         self.worker_thread.message.connect(self.progress_label.setText)
         self.worker_thread.progress.connect(self._set_progress)
         self.run_thread()

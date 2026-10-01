@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
-from typing import Any
+from contextlib import contextmanager
+from typing import Any, Iterator
 
 import pandas as pd
-from qgis.core import NULL, QgsProcessingException
+from qgis.core import (
+    NULL,
+    Qgis,
+    QgsProcessingException,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterField,
+)
+
+from ..project_algorithm import ProjectAlgorithm
 
 # The synthetic gravity model only understands these functional forms.
 GRAVITY_FUNCTIONS = ["EXPO", "GAMMA", "POWER"]
@@ -13,8 +22,24 @@ GRAVITY_FUNCTIONS = ["EXPO", "GAMMA", "POWER"]
 CALIBRATION_FUNCTIONS = ["EXPO", "POWER"]
 
 
-class DistributionError(ValueError):
-    """An input or computation error that callers can present in their own way."""
+def add_trip_end_parameters(algorithm: ProjectAlgorithm) -> None:
+    """Add the vector source and zone, production, and attraction fields."""
+    algorithm.addParameter(QgsProcessingParameterFeatureSource("VECTOR_SOURCE", algorithm.tr("Trip-end vector layer")))
+    for name, label in (
+        ("INDEX_FIELD", "Index field (zone ID)"),
+        ("ROW_FIELD", "Production field"),
+        ("COLUMN_FIELD", "Attraction field"),
+    ):
+        algorithm.addParameter(
+            QgsProcessingParameterField(
+                name,
+                algorithm.tr(label),
+                parentLayerParameterName="VECTOR_SOURCE",
+                type=Qgis.ProcessingFieldParameterDataType.Any
+                if name == "INDEX_FIELD"
+                else Qgis.ProcessingFieldParameterDataType.Numeric,
+            )
+        )
 
 
 def dataframe_from_source(source: Any, index_field: str) -> pd.DataFrame:
@@ -48,25 +73,17 @@ def vectors_from_source(source: Any, index_field: str, row_field: str, column_fi
     return dataframe
 
 
-def load_matrix_core(project: Any, matrix_name: str, core_name: str) -> Any:
-    """Load a project matrix and set its computational view to a single core."""
-    matrix_name = matrix_name.strip()
-    core_name = core_name.strip()
-    if not matrix_name:
-        raise QgsProcessingException("A matrix name is required")
-    if not core_name:
+@contextmanager
+def load_matrix_core(project: Any, matrix_name: str, core_name: str) -> Iterator[Any]:
+    """Load one matrix core and close the matrix on every exit path."""
+    if not core_name.strip():
         raise QgsProcessingException("A matrix core is required")
-
-    available = project.matrices.list()
-    if matrix_name not in available["name"].tolist():
-        raise QgsProcessingException(f"The project has no matrix named '{matrix_name}'")
-
-    matrix = project.matrices.get_matrix(matrix_name)
-    if core_name not in matrix.names:
-        cores = ", ".join(matrix.names)
-        raise QgsProcessingException(f"Matrix '{matrix_name}' has no core named '{core_name}'. Available: {cores}")
-    matrix.computational_view([core_name])
-    return matrix
+    matrix = project.matrices.get_matrix(matrix_name.strip())
+    try:
+        matrix.computational_view([core_name.strip()])
+        yield matrix
+    finally:
+        matrix.close()
 
 
 def push_report(feedback: Any, report: list[str] | dict[str, Any] | None) -> None:

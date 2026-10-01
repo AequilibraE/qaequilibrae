@@ -74,6 +74,20 @@ def crs_string(geodataframe) -> str:
     return geodataframe.crs.to_string()
 
 
+def centroid_coordinates(source, id_field_index: int, feedback) -> dict[int, tuple[float, float]]:
+    """Read node or zone IDs and geometry centroids from a feature source."""
+    coordinates = {}
+    for feature in source.getFeatures():
+        if feedback.isCanceled():
+            break
+        geometry = feature.geometry()
+        if geometry is None or geometry.isEmpty():
+            continue
+        point = geometry.centroid().asPoint()
+        coordinates[int(feature.attributes()[id_field_index])] = (point.x(), point.y())
+    return coordinates
+
+
 def rows_from_feature_source(source, target_crs=None) -> list[dict[str, Any]]:
     """Return lower-case attributes and Shapely geometries from a QGIS source.
 

@@ -180,7 +180,8 @@ def test_matching_fields_must_be_selected_as_a_pair():
     assert results == {}
 
 
-def test_matching_fields_restrict_the_source():
+@pytest.mark.parametrize("operation", [0, 1, 2])
+def test_matching_fields_restrict_the_source(operation):
     source = _make_layer(
         "source_polygons",
         "Polygon",
@@ -191,9 +192,9 @@ def test_matching_fields_restrict_the_source():
         [("tag", QMetaType.Type.QString), ("match", QMetaType.Type.QString)],
     )
     target = _make_layer(
-        "target_points",
-        "Point",
-        [("POINT (1 1)", [None, "b"])],
+        "target_line",
+        "LineString",
+        [("LINESTRING (1 1, 2 1)", [None, "b"])],
         [("name", QMetaType.Type.QString), ("match", QMetaType.Type.QString)],
     )
 
@@ -202,7 +203,7 @@ def test_matching_fields_restrict_the_source():
         SimpleTag.SOURCE_FIELD: "tag",
         SimpleTag.TARGET: target,
         SimpleTag.TARGET_FIELD: "name",
-        SimpleTag.OPERATION: 1,
+        SimpleTag.OPERATION: operation,
         SimpleTag.MATCH_SOURCE_FIELD: "match",
         SimpleTag.MATCH_TARGET_FIELD: "match",
         SimpleTag.OUTPUT: "TEMPORARY_OUTPUT",

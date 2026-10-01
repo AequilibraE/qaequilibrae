@@ -7,9 +7,9 @@ reuse the same operation without reopening its project.
 """
 
 from collections.abc import Hashable, Mapping, Sequence
-from copy import deepcopy
+from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, TypedDict, cast
+from typing import Any, Iterator, TypedDict, cast
 
 import geopandas as gpd
 import numpy as np
@@ -28,9 +28,9 @@ from qgis.core import (
     QgsProcessingParameterString,
 )
 
-from qaequilibrae.i18n.translate import trlt
 from qaequilibrae.modules.common_tools import geodataframe_from_layer, model_area_polygon
 
+from ..feedback import connect_progress, push_info
 from ..project import borrow_project
 from ..project_algorithm import ProjectAlgorithm
 
@@ -93,7 +93,7 @@ def _run_route_choice(
     feedback: QgsProcessingFeedback | None,
 ) -> dict[str, str]:
     """Run route choice, save configured outputs, and return their paths or names."""
-    _info(feedback, "Opening AequilibraE project")
+    push_info(feedback, "Opening AequilibraE project")
     with borrow_project(project_or_folder) as project:
         _check_canceled(feedback)
         matrix_name = configuration["matrix_name"]
@@ -101,9 +101,7 @@ def _run_route_choice(
         routes_folder = Path(project.project_base_path) / "route_choice"
         _check_output_names(project, configuration, routes_folder)
 
-        demand_matrix = _load_demand(project, matrix_name, configuration["matrix_cores"])
-        matrix = demand_matrix
-        try:
+        with _load_demand(project, matrix_name, configuration["matrix_cores"]) as matrix:
             graph = _build_utility_graph(project, configuration)
             if configuration["sub_area"]:
                 if zones_layer is None:
@@ -116,7 +114,7 @@ def _run_route_choice(
 
                 sub_area = SubAreaAnalysis(graph, zones, matrix)
                 sub_area.rc.set_choice_set_generation(configuration["algorithm"], **configuration["kwargs"])
-                _info(feedback, "Running sub-area route-choice analysis")
+                push_info(feedback, "Running sub-area route-choice analysis")
                 sub_area.rc.execute(True)
                 sub_area_matrix = sub_area.post_process().reset_index().infer_objects()
                 sub_area_matrix = sub_area_matrix.groupby(["origin id", "destination id"]).sum()
@@ -142,9 +140,9 @@ def _run_route_choice(
             if configuration["job"] == "build" or configuration["save_choice_sets"]:
                 routes_folder.mkdir(parents=True, exist_ok=True)
                 route_choice.set_save_routes(str(routes_folder))
-            _report_progress(route_choice, feedback)
+            connect_progress(route_choice, feedback)
             _check_canceled(feedback)
-            _info(
+            push_info(
                 feedback, "Building route choice sets" if configuration["job"] == "build" else "Assigning route choice"
             )
             route_choice.execute(configuration["job"] == "assign")
@@ -174,27 +172,22 @@ def _run_route_choice(
                     legacy_path.rename(matrix_path)
                 outputs[RouteChoice.OUTPUT_SELECT_LINK_FLOWS] = f"{select_link_name}_uncompressed"
                 outputs[RouteChoice.OUTPUT_SELECT_LINK_MATRIX] = str(matrix_path)
-        finally:
-            demand_matrix.close()
 
-    _info(feedback, "Route-choice operation completed")
+    push_info(feedback, "Route-choice operation completed")
     return outputs
 
 
-def _load_demand(project: Any, matrix_name: str, cores: list[str]) -> Any:
-    """Load a project demand matrix and set its computational cores."""
-    try:
-        matrix = project.matrices.get_matrix(matrix_name)
-    except Exception as error:
-        raise RouteChoiceError(f"Could not load demand matrix '{matrix_name}': {error}") from error
+@contextmanager
+def _load_demand(project: Any, matrix_name: str, cores: list[str]) -> Iterator[Any]:
+    """Load demand and close it after computation, including failed setup."""
+    matrix = project.matrices.get_matrix(matrix_name)
     try:
         if not cores or any(core not in matrix.names for core in cores):
             raise RouteChoiceError(f"Demand matrix '{matrix_name}' does not contain the requested core(s)")
         matrix.computational_view(cores)
-        return matrix
-    except Exception:
+        yield matrix
+    finally:
         matrix.close()
-        raise
 
 
 def run_single_route_choice(
@@ -229,8 +222,6 @@ def _build_utility_graph(project: Any, configuration: Mapping[str, Any], nodes: 
     try:
         project.network.build_graphs(modes=[mode])
         graph = project.network.graphs[mode]
-        if previous_graph is not None:
-            graph = deepcopy(graph)
     finally:
         if previous_graph is None:
             project.network.graphs.pop(mode, None)
@@ -250,26 +241,6 @@ def _build_utility_graph(project: Any, configuration: Mapping[str, Any], nodes: 
     graph.set_blocked_centroid_flows(configuration["block_centroid_flows"])
     graph.set_graph("__utility__")
     return graph
-
-
-def _report_progress(route_choice: Any, feedback: QgsProcessingFeedback | None) -> None:
-    """Forward route-choice progress signals to Processing feedback."""
-    signal = getattr(route_choice, "signal", None)
-    if feedback is None or signal is None or not hasattr(signal, "connect"):
-        return
-    total = [1]
-
-    def report(message: list[Any]) -> None:
-        kind = message[0] if message else None
-        if kind == "start":
-            total[0] = max(int(message[1]), 1)
-            feedback.setProgress(0)
-        elif kind == "update":
-            feedback.setProgress(int(100 * int(message[1]) / total[0]))
-        elif kind == "finished":
-            feedback.setProgress(100)
-
-    signal.connect(report)
 
 
 def _check_output_names(
@@ -305,11 +276,6 @@ def _check_output_names(
 def _check_canceled(feedback: QgsProcessingFeedback | None) -> None:
     if feedback is not None and feedback.isCanceled():
         raise RouteChoiceError("Route-choice operation canceled")
-
-
-def _info(feedback: QgsProcessingFeedback | None, message: str) -> None:
-    if feedback is not None:
-        feedback.pushInfo(message)
 
 
 class RouteChoice(ProjectAlgorithm):
@@ -351,6 +317,11 @@ class RouteChoice(ProjectAlgorithm):
     The algorithm rejects existing result and matrix names. It does not replace them.
     """
 
+    algorithm_name = "route_choice"
+    display_name = "Route choice"
+    group_name = "Route choice"
+    group_id = "route_choice"
+
     MODE = "MODE"
     UTILITY_FIELDS = "UTILITY_FIELDS"
     ALGORITHM = "ALGORITHM"
@@ -377,8 +348,6 @@ class RouteChoice(ProjectAlgorithm):
     OUTPUT_SELECT_LINK_MATRIX = "OUTPUT_SELECT_LINK_MATRIX"
     project: Any | None = None
     zones: Any | None = None
-    group_name = "Route choice"
-    group_id = "route_choice"
 
     def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
         self.add_project_folder_parameter()
@@ -466,14 +435,12 @@ class RouteChoice(ProjectAlgorithm):
         try:
             configuration = self._configuration(parameters, context)
             project = self.project or self.project_folder(parameters, context)
-            zones = getattr(self, "zones", None)
+            zones = self.zones
             if zones is None and configuration["sub_area"]:
                 zones = self.parameterAsVectorLayer(parameters, self.ZONES, context)
             return _run_route_choice(project, configuration, zones, feedback)
-        except RouteChoiceError as error:
-            raise QgsProcessingException(self.tr(str(error))) from error
         except Exception as error:
-            raise QgsProcessingException(self.tr(f"Route-choice operation failed: {error}")) from error
+            raise QgsProcessingException(self.tr(str(error))) from error
 
     def _configuration(
         self,
@@ -551,12 +518,6 @@ class RouteChoice(ProjectAlgorithm):
             "sub_area": sub_area,
         }
 
-    def name(self) -> str:
-        return "route_choice"
-
-    def displayName(self) -> str:
-        return self.tr("Route choice")
-
     def shortHelpString(self) -> str:
         help_messages = [
             self.tr(
@@ -578,12 +539,6 @@ class RouteChoice(ProjectAlgorithm):
             self.tr("Existing result and matrix names are not replaced."),
         ]
         return "\n".join(help_messages)
-
-    def createInstance(self) -> "RouteChoice":
-        return type(self)()
-
-    def tr(self, message: str) -> str:
-        return trlt(type(self).__name__, message)
 
 
 def _select_links(
@@ -608,21 +563,18 @@ def _select_links(
         if not name:
             raise RouteChoiceError("Select-link queries require a name")
         link_set = []
-        try:
-            for item in str(links or "").split(","):
-                if not item.strip():
-                    continue
-                link_id, separator, direction = item.partition(":")
-                direction = direction.strip().lower() if separator else "both"
-                if direction not in directions:
-                    raise RouteChoiceError(f"Select-link query '{name}' has invalid direction '{direction}'")
-                try:
-                    link_id = int(link_id.strip())
-                except ValueError as error:
-                    raise RouteChoiceError(f"Select-link query '{name}' has invalid link IDs") from error
-                link_set.append((link_id, directions[direction]))
-        except RouteChoiceError:
-            raise
+        for item in str(links or "").split(","):
+            if not item.strip():
+                continue
+            link_id, separator, direction = item.partition(":")
+            direction = direction.strip().lower() if separator else "both"
+            if direction not in directions:
+                raise RouteChoiceError(f"Select-link query '{name}' has invalid direction '{direction}'")
+            try:
+                link_id = int(link_id.strip())
+            except ValueError as error:
+                raise RouteChoiceError(f"Select-link query '{name}' has invalid link IDs") from error
+            link_set.append((link_id, directions[direction]))
         if not link_set:
             raise RouteChoiceError(f"Select-link query '{name}' requires at least one link ID")
         selections.setdefault(name, []).append(link_set)

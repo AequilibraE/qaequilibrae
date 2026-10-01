@@ -19,6 +19,11 @@ from qaequilibrae.modules.transit_procedures.transit_assignment_runner import ru
 class TransitAssignmentAlgorithm(ProjectAlgorithm):
     """Build transit networks, run assignment, and create transit skims."""
 
+    algorithm_name = "transitAssignment"
+    display_name = "Transit assignment and skimming"
+    group_name = "Transit"
+    group_id = "transit"
+
     ACTION = "ACTION"
     PERIOD_ID = "PERIOD_ID"
     USE_SAVED_GRAPH = "USE_SAVED_GRAPH"
@@ -186,18 +191,3 @@ class TransitAssignmentAlgorithm(ProjectAlgorithm):
             return {}
         except (KeyError, ValueError, RuntimeError) as error:
             raise QgsProcessingException(str(error)) from error
-
-    def name(self) -> str:
-        return "transitAssignment"
-
-    def displayName(self) -> str:
-        return self.tr("Transit assignment and skimming")
-
-    def group(self) -> str:
-        return self.tr("Transit")
-
-    def groupId(self) -> str:
-        return "transit"
-
-    def createInstance(self) -> "TransitAssignmentAlgorithm":
-        return TransitAssignmentAlgorithm()

@@ -10,9 +10,12 @@ from ..project_algorithm import ProjectAlgorithm
 
 
 class AddLinksFromLayer(ProjectAlgorithm):
-    PROJECT_PATH = "project_path"
+    algorithm_name = "addlinksfromlayer"
+    display_name = "Add links from layer to project"
     group_name = "Model building"
     group_id = "model_building"
+
+    PROJECT_PATH = "project_path"
 
     def initAlgorithm(self, configuration=None):
         self.add_project_folder_parameter(self.PROJECT_PATH)
@@ -108,14 +111,5 @@ class AddLinksFromLayer(ProjectAlgorithm):
         feedback.pushInfo(self.tr("Closing project"))
         return {"Output": link_count}
 
-    def name(self):
-        return "addlinksfromlayer"
-
-    def displayName(self):
-        return self.tr("Add links from layer to project")
-
     def shortHelpString(self):
         return self.tr("Adds links from a layer to an existing AequilibraE project")
-
-    def createInstance(self):
-        return AddLinksFromLayer()

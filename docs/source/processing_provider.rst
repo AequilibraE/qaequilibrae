@@ -1,9 +1,9 @@
 Processing Tools
 ================
 
-AequilibraE's plugin functionalities are also available in a processing plugin.
-The processing plugin is automatically installed with QAequilibraE and allows you to perform
-several tasks, such as creating project from links, exporting matrices, and much more.
+AequilibraE provides algorithms in the QGIS Processing Toolbox and tools in the
+plugin menus. This page describes toolbox algorithms and their inputs and outputs.
+It also retains instructions for menu workflows that do not appear in the toolbox.
 
 To find AequilibraE's processing plugin, click on the **Processing** panel and select **Toolbox**.
 You can also use the available QGIS shortcut to open the Toolbox window.
@@ -12,10 +12,9 @@ You can also use the available QGIS shortcut to open the Toolbox window.
     :align: center
     :alt: Processing provider menu
 
-At the bottom of the window, you'll find the AequilibraE logo and the available functions.
-The functions are divided into groups, following the same logic as the AequilibraE widget
-menu. Notice that all AequilibraE functionalities are available for processing, but not
-all processing tools exist at the main AequilibraE menu.
+The AequilibraE provider appears at the bottom of the toolbox. Its algorithms are divided
+into groups. Some algorithms also have a plugin menu dialog. Other algorithms are only
+available in the Processing Toolbox.
 
 .. subfigure:: AB
     :align: center
@@ -26,15 +25,13 @@ all processing tools exist at the main AequilibraE menu.
     .. image:: images/processing_provider/processing_provider_toolbox-2.png
         :alt: Toolbox Detailed
 
-In the following subsections, we'll go over all menus and its functionalities. As the
-provider menus are ordered alphabetically, we'll display them in the same order. 
+The relevant sections use the group and algorithm names shown in the toolbox. Other
+sections describe plugin menu workflows.
 
 Data
 ----
-With Data tools, it is possible to import/export matrices to/from the project, as
-well as perform matrix calculations and generate a trip length distribution output
-using project data. It is also where the modes and the link types the network is
-built from are added to the model.
+The Data group adds modes and link types, exports matrices, converts OMX files to
+QGIS tables, calculates matrices, and creates trip-length distribution plots.
 
 .. warning::
 
@@ -45,9 +42,10 @@ built from are added to the model.
 
 Add link type
 ~~~~~~~~~~~~~
-Every link in an AequilibraE network carries a link type, and a link can only be saved
-with one the model already knows about. **Data > Add link type** adds a new one to the
-open project.
+Every link in an AequilibraE network has a link type. The project must contain that type
+before it can save a link. **Data > Add link type** adds a type to the selected project.
+In the toolbox, enter the project folder, a one-letter ID, and a name. Description,
+lanes, lane capacity, and speed are optional.
 
 The table at the top lists the link types the project already has, exactly as they are
 stored in the *link_types* table, so you can see which identifiers and names are taken
@@ -76,8 +74,10 @@ and each new link type is immediately available in the attribute form used to
 
 Add mode
 ~~~~~~~~
-Modes work the same way as link types: each link lists the modes allowed on it, and only
-modes the model knows about can be used. **Data > Add mode** adds one to the open project.
+Each link lists the modes that can use it. The project must contain a mode before a link
+can use it. **Data > Add mode** adds a mode to the selected project. In the toolbox, enter
+the project folder, a one-letter ID, and a name. Description, PCE, value of time, and
+persons per vehicle are optional.
 
 .. image:: images/processing_provider/data-add_mode.png
     :align: center
@@ -93,12 +93,11 @@ table. Persons per vehicle can be zero, which is how non-travel uses are represe
 
 .. _importing_matrices:
 
-Importing matrices
-~~~~~~~~~~~~~~~~~~
-It is also possible for the user to import matrices from an open layer to a project. This can be done by clicking 
-**Data > Import Matrices** and properly indicating the fields in the new window. First click *Load*
-and then *Save*. A new window will open and you can point to the project matrices folder. To take a look in the
-matrix you just imported, you can upload the matrix table and display it as shown in the last topic.
+Import matrices from the menu
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The plugin menu can import matrices from an open layer. Click **Data > Import Matrices**.
+Select the input fields, then click *Load* and *Save*. Select the output file in the
+project matrices folder. You can then load the matrix table to view the imported values.
 
 .. image:: images/processing_provider/data-matrix_importer.png
     :align: center
@@ -106,11 +105,9 @@ matrix you just imported, you can upload the matrix table and display it as show
 
 Export matrices
 ~~~~~~~~~~~~~~~
-The *Export matrices* tool is analogous to the *Export* button in the matrix viewer 
-(see: :ref:`this figure <fig_data_visualize_matrices>` for more details). 
-Its usage is straightforward: select the matrix you want to export, specify the path
-on your machine to store the file, and select its output format. Only \*.omx files can
-be used as input, and the output format can be either one of \*.omx or \*.csv.
+The Processing **Export matrices** algorithm is similar to the *Export* button in the
+matrix viewer (see :ref:`this figure <fig_data_visualize_matrices>`). Enter an OMX input
+file, an output folder, and the output format. The output format can be OMX or CSV.
 
 .. image:: images/processing_provider/processing_provider_export_matrices.png
     :align: center
@@ -220,6 +217,24 @@ Fratar or Furness.
 * The balanced matrix is written to an OpenMatrix (\*.omx) file.
 
 The *Treat NaN values as zero* option is available on all three tools.
+
+Geometry IO
+-----------
+The **Geometry IO** group transfers links, nodes, and zones between project tables
+and QGIS vector layers. These tools operate on an existing AequilibraE project.
+
+* **Extract links**, **Extract nodes**, and **Extract zones** write the selected
+  project table to an output layer.
+* **Add links**, **Add nodes**, and **Add zones** append features from an input
+  layer. Node and zone inputs must include their respective ``node_id`` or
+  ``zone_id`` field. Link IDs are assigned by the project.
+* **Modify links**, **Modify nodes**, and **Modify zones** update existing
+  records matched by ``link_id``, ``node_id``, or ``zone_id``. Fields that
+  identify records cannot be changed by these tools.
+
+The add and modify tools use the input layer's matching project fields and
+geometry. Review the input attributes before running them, especially when
+updating existing records.
 
 Mapping
 -------
@@ -563,8 +578,20 @@ The input for the tool consists in a folder containing an AequilibraE project.
 Path computation
 ----------------
 The menu dialogs are documented in the :ref:`Path computation module <paths_procedures>`
-section. The algorithms run the same computations from Processing inputs and save their
-results in the AequilibraE project folder.
+section. The toolbox provides shortest-path and network-skimming algorithms. Network
+skimming saves results in the AequilibraE project folder.
+
+Shortest path
+~~~~~~~~~~~~~
+``qaequilibrae:shortest_path`` finds the lowest-cost path between two nodes in a link
+layer. The link layer must contain ``link_id``, ``a_node``, ``b_node``, ``direction``,
+``modes``, and the selected numeric cost field. Enter a mode and the start and end node IDs.
+
+The optional node layer supports *Block flows through centroids*. The algorithm also
+accepts a comma-separated list of excluded link IDs. It writes one output feature for
+each directed link in the path.
+
+The algorithm returns the output layer, the ordered path link IDs, and the total cost.
 
 Network skimming
 ~~~~~~~~~~~~~~~~

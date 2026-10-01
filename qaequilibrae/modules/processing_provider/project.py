@@ -22,17 +22,14 @@ def open_project(project_folder: str | Path) -> Iterator[Any]:
         raise QgsProcessingException("The AequilibraE Python package is not available") from error
 
     project = Project()
-    opened = False
     try:
-        try:
-            project.open(str(project_folder))
-        except Exception as error:
-            raise QgsProcessingException(f"Could not open AequilibraE project {project_folder}: {error}") from error
-        opened = True
+        project.open(str(project_folder))
+    except Exception as error:
+        raise QgsProcessingException(f"Could not open AequilibraE project {project_folder}: {error}") from error
+    try:
         yield project
     finally:
-        if opened:
-            project.close()
+        project.close()
 
 
 @contextmanager

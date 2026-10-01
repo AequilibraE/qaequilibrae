@@ -15,14 +15,15 @@ from ..project import open_project
 class AddProjectLayer(ProjectAlgorithm):
     """Base class for adding vector features to a project table."""
 
-    INPUT = "INPUT"
+    algorithm_name = ""
+    display_name = ""
     group_name = "Geometry IO"
     group_id = "geometry_io"
+
+    INPUT = "INPUT"
     table_name = ""
     id_field = ""
     geometry_source_type = Qgis.ProcessingSourceType.VectorLine
-    display_name = ""
-    algorithm_name = ""
 
     def initAlgorithm(self, configuration=None):
         self.add_project_folder_parameter()
@@ -80,41 +81,32 @@ class AddProjectLayer(ProjectAlgorithm):
             return table.new(identifier)
         return table.new()
 
-    def name(self):
-        return self.algorithm_name
-
-    def displayName(self):
-        return self.tr(self.display_name)
-
     def shortHelpString(self):
         message = f"Adds {self.table_name} to an AequilibraE project."
         if self.table_name == "links":
             message += " Link IDs are assigned by the project."
         return self.tr(message)
 
-    def createInstance(self):
-        return type(self)()
-
 
 class AddLinks(AddProjectLayer):
+    algorithm_name = "add_links"
+    display_name = "Add links"
     table_name = "links"
     id_field = None
     geometry_source_type = Qgis.ProcessingSourceType.VectorLine
-    display_name = "Add links"
-    algorithm_name = "add_links"
 
 
 class AddNodes(AddProjectLayer):
+    algorithm_name = "add_nodes"
+    display_name = "Add nodes"
     table_name = "nodes"
     id_field = "node_id"
     geometry_source_type = Qgis.ProcessingSourceType.VectorPoint
-    display_name = "Add nodes"
-    algorithm_name = "add_nodes"
 
 
 class AddZones(AddProjectLayer):
+    algorithm_name = "add_zones"
+    display_name = "Add zones"
     table_name = "zones"
     id_field = "zone_id"
     geometry_source_type = Qgis.ProcessingSourceType.VectorPolygon
-    display_name = "Add zones"
-    algorithm_name = "add_zones"
