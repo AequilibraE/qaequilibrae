@@ -4,14 +4,19 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
+from qgis.core import Qgis, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
 from qgis.core import QgsProcessingParameterFileDestination, QgsProcessingParameterString, QgsProcessingException
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 from .matrix_expression import MatrixExpressionError, evaluate
 
 
-class MatrixCalculator(QgsProcessingAlgorithm):
+class MatrixCalculator(ProcessingAlgorithm):
+    algorithm_name = "matrixcalc"
+    display_name = "Matrix calculator"
+    group_name = "Data"
+    group_id = "data"
+
     def initAlgorithm(self, configuration=None):
         self.addParameter(
             QgsProcessingParameterFile(
@@ -31,7 +36,6 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
 
@@ -46,7 +50,6 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         with open(parameters["conf_file"], "r") as f:
             params = yaml.safe_load(f)
 
-        # Load matrices
         matrices = {}
         index = None
         for matrix in params:
@@ -91,18 +94,6 @@ class MatrixCalculator(QgsProcessingAlgorithm):
 
         return {"Output": "Finished"}
 
-    def name(self):
-        return "matrixcalc"
-
-    def displayName(self):
-        return self.tr("Matrix calculator")
-
-    def group(self):
-        return self.tr("Data")
-
-    def groupId(self):
-        return "data"
-
     def shortHelpString(self):
         help_messages = [
             self.tr("Runs a matrix calculation based on a matrix configuration file (*.yaml) and an expression."),
@@ -115,9 +106,3 @@ class MatrixCalculator(QgsProcessingAlgorithm):
             self.tr("Examples of valid expressions and configuration are provided in the plugin documentation."),
         ]
         return "".join(help_messages)
-
-    def createInstance(self):
-        return MatrixCalculator()
-
-    def tr(self, message):
-        return trlt("MatrixCalculator", message)

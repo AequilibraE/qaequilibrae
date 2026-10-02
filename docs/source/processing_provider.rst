@@ -1,9 +1,9 @@
 Processing Tools
 ================
 
-AequilibraE's plugin functionalities are also available in a processing plugin.
-The processing plugin is automatically installed with QAequilibraE and allows you to perform
-several tasks, such as creating project from links, exporting matrices, and much more.
+AequilibraE provides algorithms in the QGIS Processing Toolbox and tools in the
+plugin menus. This page describes toolbox algorithms and their inputs and outputs.
+It also retains instructions for menu workflows that do not appear in the toolbox.
 
 To find AequilibraE's processing plugin, click on the **Processing** panel and select **Toolbox**.
 You can also use the available QGIS shortcut to open the Toolbox window.
@@ -12,10 +12,9 @@ You can also use the available QGIS shortcut to open the Toolbox window.
     :align: center
     :alt: Processing provider menu
 
-At the bottom of the window, you'll find the AequilibraE logo and the available functions.
-The functions are divided into groups, following the same logic as the AequilibraE widget
-menu. Notice that all AequilibraE functionalities are available for processing, but not
-all processing tools exist at the main AequilibraE menu.
+The AequilibraE provider appears at the bottom of the toolbox. Its algorithms are divided
+into groups. Some algorithms also have a plugin menu dialog. Other algorithms are only
+available in the Processing Toolbox.
 
 .. subfigure:: AB
     :align: center
@@ -26,15 +25,13 @@ all processing tools exist at the main AequilibraE menu.
     .. image:: images/processing_provider/processing_provider_toolbox-2.png
         :alt: Toolbox Detailed
 
-In the following subsections, we'll go over all menus and its functionalities. As the
-provider menus are ordered alphabetically, we'll display them in the same order. 
+The relevant sections use the group and algorithm names shown in the toolbox. Other
+sections describe plugin menu workflows.
 
 Data
 ----
-With Data tools, it is possible to import/export matrices to/from the project, as
-well as perform matrix calculations and generate a trip length distribution output
-using project data. It is also where the modes and the link types the network is
-built from are added to the model.
+The Data group adds modes and link types, exports matrices, converts OMX files to
+QGIS tables, calculates matrices, and creates trip-length distribution plots.
 
 .. warning::
 
@@ -45,9 +42,10 @@ built from are added to the model.
 
 Add link type
 ~~~~~~~~~~~~~
-Every link in an AequilibraE network carries a link type, and a link can only be saved
-with one the model already knows about. **Data > Add link type** adds a new one to the
-open project.
+Every link in an AequilibraE network has a link type. The project must contain that type
+before it can save a link. **Data > Add link type** adds a type to the selected project.
+In the toolbox, enter the project folder, a one-letter ID, and a name. Description,
+lanes, lane capacity, and speed are optional.
 
 The table at the top lists the link types the project already has, exactly as they are
 stored in the *link_types* table, so you can see which identifiers and names are taken
@@ -76,8 +74,10 @@ and each new link type is immediately available in the attribute form used to
 
 Add mode
 ~~~~~~~~
-Modes work the same way as link types: each link lists the modes allowed on it, and only
-modes the model knows about can be used. **Data > Add mode** adds one to the open project.
+Each link lists the modes that can use it. The project must contain a mode before a link
+can use it. **Data > Add mode** adds a mode to the selected project. In the toolbox, enter
+the project folder, a one-letter ID, and a name. Description, PCE, value of time, and
+persons per vehicle are optional.
 
 .. image:: images/processing_provider/data-add_mode.png
     :align: center
@@ -93,12 +93,11 @@ table. Persons per vehicle can be zero, which is how non-travel uses are represe
 
 .. _importing_matrices:
 
-Importing matrices
-~~~~~~~~~~~~~~~~~~
-It is also possible for the user to import matrices from an open layer to a project. This can be done by clicking 
-**Data > Import Matrices** and properly indicating the fields in the new window. First click *Load*
-and then *Save*. A new window will open and you can point to the project matrices folder. To take a look in the
-matrix you just imported, you can upload the matrix table and display it as shown in the last topic.
+Import matrices from the menu
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The plugin menu can import matrices from an open layer. Click **Data > Import Matrices**.
+Select the input fields, then click *Load* and *Save*. Select the output file in the
+project matrices folder. You can then load the matrix table to view the imported values.
 
 .. image:: images/processing_provider/data-matrix_importer.png
     :align: center
@@ -106,15 +105,29 @@ matrix you just imported, you can upload the matrix table and display it as show
 
 Export matrices
 ~~~~~~~~~~~~~~~
-The *Export matrices* tool is analogous to the *Export* button in the matrix viewer 
-(see: :ref:`this figure <fig_data_visualize_matrices>` for more details). 
-Its usage is straightforward: select the matrix you want to export, specify the path
-on your machine to store the file, and select its output format. Only \*.omx files can
-be used as input, and the output format can be either one of \*.omx or \*.csv.
+The Processing **Export matrices** algorithm is similar to the *Export* button in the
+matrix viewer (see :ref:`this figure <fig_data_visualize_matrices>`). Enter an OMX input
+file, an output folder, and the output format. The output format can be OMX or CSV.
 
 .. image:: images/processing_provider/processing_provider_export_matrices.png
     :align: center
     :alt: Processing provider export matrices
+
+OMX and QGIS OD tables
+~~~~~~~~~~~~~~~~~~~~~~
+**Data > OMX to QGIS OD table** reads all cores from an OMX file.
+The result is a non-spatial QGIS table with ``origin``, ``destination``, ``core``, and ``value`` fields.
+Each row contains one matrix cell. Select a zone mapping when the OMX file has more than one mapping.
+
+**Data > QGIS OD table to OMX** writes this table format to a new OMX file.
+The table must contain one row for each origin-destination pair in each core.
+Zone IDs must be nonnegative integers. The output mapping is named ``zone_id`` and uses sorted zone IDs.
+This table format lets you inspect or edit matrix cells in QGIS before you write an OMX file.
+For a map of one origin or destination, use *Data > OMX origin or destination to zone table*.
+This tool reads only one row or column and writes one table row per zone.
+Join the result's ``zone_id`` field to the zone layer's ``zone_id`` field.
+You can also select a row or column in the *Visualize data* dialog.
+Do not convert a large OMX file to a full OD table for mapping: the table has one row per matrix cell.
 
 Matrix calculator
 ~~~~~~~~~~~~~~~~~
@@ -164,6 +177,65 @@ matrices and their selected cores.
     :align: center
     :alt: Processing provider TLD
 
+Distribution
+------------
+The Distribution tools expose the three trip-distribution procedures from the
+:ref:`Trip Distribution menu <trip_distribution>` directly to Processing. They take their
+inputs from the project and from vector layers, so they can be used on their own and in
+the model designer.
+
+Apply gravity model
+~~~~~~~~~~~~~~~~~~~
+**Distribution > Apply gravity model** produces a trip matrix by applying a synthetic
+gravity model to an impedance matrix.
+
+* *Impedance matrix name* and *Impedance matrix core* identify the skim matrix and core.
+* *Trip-end vector layer*, *Index field*, *Production field* and *Attraction field*
+  provide the row and column totals. The index field holds the zone IDs.
+* *Deterrence function* is one of ``GAMMA``, ``EXPO`` or ``POWER``. ``GAMMA`` takes both
+  *alpha* and *beta*; ``EXPO`` takes only *beta* and ``POWER`` only *alpha*.
+* The result is written to an OpenMatrix (\*.omx) file.
+
+Calibrate gravity model
+~~~~~~~~~~~~~~~~~~~~~~~
+**Distribution > Calibrate gravity model** fits a synthetic gravity model to an observed
+trip matrix and an impedance matrix, and saves the calibrated model as a \*.mod file.
+
+* *Observed matrix name* and *Observed matrix core* identify the observed demand matrix.
+* *Impedance matrix name* and *Impedance matrix core* identify the skim matrix.
+* *Deterrence function* is either ``EXPO`` or ``POWER``.
+
+Iterative proportional fitting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Distribution > Iterative proportional fitting** balances a seed trip matrix so that its
+row and column totals match the production and attraction vectors. It is also known as
+Fratar or Furness.
+
+* *Seed matrix name* and *Seed matrix core* identify the matrix to balance.
+* *Trip-end vector layer*, *Index field*, *Production field* and *Attraction field*
+  provide the row and column totals.
+* The balanced matrix is written to an OpenMatrix (\*.omx) file.
+
+The *Treat NaN values as zero* option is available on all three tools.
+
+Geometry IO
+-----------
+The **Geometry IO** group transfers links, nodes, and zones between project tables
+and QGIS vector layers. These tools operate on an existing AequilibraE project.
+
+* **Extract links**, **Extract nodes**, and **Extract zones** write the selected
+  project table to an output layer.
+* **Add links**, **Add nodes**, and **Add zones** append features from an input
+  layer. Node and zone inputs must include their respective ``node_id`` or
+  ``zone_id`` field. Link IDs are assigned by the project.
+* **Modify links**, **Modify nodes**, and **Modify zones** update existing
+  records matched by ``link_id``, ``node_id``, or ``zone_id``. Fields that
+  identify records cannot be changed by these tools.
+
+The add and modify tools use the input layer's matching project fields and
+geometry. Review the input attributes before running them, especially when
+updating existing records.
+
 Mapping
 -------
 With Mapping tools, the user can easily visualize project data. For the tools not presented
@@ -190,6 +262,41 @@ available.
 
 Be aware that the existence of triggers in the project database might affect the
 performance of Simple tag.
+
+The Processing algorithm writes a new output layer. It copies the target layer's
+fields and geometry, then writes the matched value to the named target field. It
+creates that field when it does not exist. Features without a match receive a
+null value. For *Closest*, the algorithm checks the five nearest indexed source
+features. For *Touching*, it selects the feature with the greatest shared
+length, or area when both layers are polygons. Optional match fields must be
+selected on both layers or left empty on both.
+
+Desire lines
+~~~~~~~~~~~~
+**Mapping > Desire lines** builds one line for every origin-destination pair that
+carries flow. It uses a zone or centroid layer and an OpenMatrix (\*.omx) file.
+The integer zone ID field must match the matrix index. Select matrix cores as a
+comma-separated list, or leave the field empty to use all cores. Intrazonal
+flows are omitted. Each matrix core becomes AB and BA flow fields on the output
+line layer. Lines use the input layer's CRS.
+
+.. image:: images/mapping_tools/desire_lines_gui.png
+    :align: center
+    :alt: Desire lines
+
+Delaunay network
+~~~~~~~~~~~~~~~~
+**Mapping > Delaunay network** builds a Delaunay triangulation of the centroids
+of an AequilibraE project. It can also assign a matrix to the triangulation. The
+network is stored in the project's *delaunay_network* table and returned as a
+line layer.
+
+Select *Zones* or *Network* as the centroid source. Leave the matrix name empty
+to build the network only, or give a matrix name and, optionally, the cores to
+assign. The algorithm creates or replaces the project's *delaunay_network*
+table. If you assign a matrix, it also saves a result table in the project and
+includes its AB, BA and total fields in the output layer. Use the overwrite
+option when the project already contains a Delaunay network.
 
 Model Building
 --------------
@@ -470,7 +577,55 @@ The input for the tool consists in a folder containing an AequilibraE project.
 
 Path computation
 ----------------
-Please refer to the :ref:`Path computation module <paths_procedures>` documentation.
+The menu dialogs are documented in the :ref:`Path computation module <paths_procedures>`
+section. The toolbox provides shortest-path and network-skimming algorithms. Network
+skimming saves results in the AequilibraE project folder.
+
+Shortest path
+~~~~~~~~~~~~~
+``qaequilibrae:shortest_path`` finds the lowest-cost path between two nodes in a link
+layer. The link layer must contain ``link_id``, ``a_node``, ``b_node``, ``direction``,
+``modes``, and the selected numeric cost field. Enter a mode and the start and end node IDs.
+
+The optional node layer supports *Block flows through centroids*. The algorithm also
+accepts a comma-separated list of excluded link IDs. It writes one output feature for
+each directed link in the path.
+
+The algorithm returns the output layer, the ordered path link IDs, and the total cost.
+
+Network skimming
+~~~~~~~~~~~~~~~~
+``qaequilibrae:network_skimming`` computes a skim matrix for one mode and saves it in the
+project. The impedance-matrix dialog uses this algorithm too.
+
+Inputs:
+
+* AequilibraE project folder: the project whose network is skimmed.
+* Network mode and cost field: the mode to skim and the field the paths are minimised on.
+* Skim fields: the network fields written to the matrix, comma-separated.
+* Trace between all nodes: skim every node instead of only the network's centroids. This
+  cannot be combined with blocking flows through centroids.
+* Block flows through centroids: keep centroid-to-centroid paths from passing through
+  another centroid.
+* Excluded link IDs (optional): links left out of the graph, comma-separated.
+* Output matrix name: the name of the OMX matrix and its project record.
+
+Outputs have fixed names:
+
+.. list-table:: Network skimming outputs
+   :header-rows: 1
+
+   * - Output
+     - Value
+   * - ``OUTPUT_MATRIX_NAME``
+     - Matrix record name
+   * - ``OUTPUT_MATRIX_PATH``
+     - Matrix OMX file path
+   * - ``OUTPUT_MATRIX_FOLDER``
+     - Project matrix folder
+
+The algorithm checks the matrix name before computation and does not overwrite an
+existing matrix.
 
 Project
 -------
@@ -526,7 +681,42 @@ submitting them as the new parameter file for all AequilibraE procedures.
 
 Route choice
 ------------
-Please refer to the :ref:`Route choice <route_choice>` documentation.
+The menu dialog is documented in the :ref:`Route choice <route_choice>` section.
+``qaequilibrae:route_choice`` exposes assignment and choice-set building to the
+Processing Toolbox. The dialog uses the same worker for those operations; its
+single-OD visualization remains an interactive map workflow.
+
+Inputs include the AequilibraE project folder, network mode, and utility terms.
+Each utility term has a numeric coefficient and network field. Select a demand
+matrix and its cores, then choose ``assign`` or ``build``. Configure the choice-set
+algorithm, maximum routes or depth, penalty, probability cutoff, and PSL beta.
+Optional inputs support blocked centroid flows, excluded links, select-link queries,
+and sub-area polygons. Select-link query rows use a name and a comma-separated set
+of ``link_id:direction`` items, for example ``12:AB,14:Both``. Repeated names
+represent alternative link sets.
+
+Assignment saves link-load results to the project results database. Choice sets are
+saved under the project ``route_choice`` folder when building or when the save
+switch is enabled. Select-link analysis writes a result table and an OMX matrix.
+Sub-area analysis also writes its external-demand table as a Parquet file.
+
+.. list-table:: Route-choice outputs
+   :header-rows: 1
+
+   * - Output
+     - Value
+   * - ``OUTPUT_RESULT_NAME``
+     - Link-load result table name, or empty for choice-set building
+   * - ``OUTPUT_ROUTES_FOLDER``
+     - Folder containing saved choice sets, or empty when not saved
+   * - ``OUTPUT_SUB_AREA_MATRIX``
+     - Sub-area demand Parquet path, or empty when not used
+   * - ``OUTPUT_SELECT_LINK_FLOWS``
+     - Select-link result table name, or empty when not requested
+   * - ``OUTPUT_SELECT_LINK_MATRIX``
+     - Select-link OMX path, or empty when not requested
+
+The algorithm rejects existing result and matrix names instead of replacing them.
 
 Routing
 -------
@@ -571,11 +761,77 @@ Please note that the TSP stops are labeled according their sequence.
 
 Traffic Assignment
 ------------------
-Please refer to the :ref:`Traffic Assignment module <traffic_assignment_procedures>` documentation.
+The menu dialog is documented in the :ref:`Traffic Assignment module <traffic_assignment_procedures>`
+section. ``qaequilibrae:traffic_assignment`` runs the same assignment from Processing inputs, and the
+dialog and exported Python runners use this algorithm too. The algorithm saves results in the
+AequilibraE project folder.
+
+The traffic-class table contains one row per class, with these columns:
+
+* Class name, matrix record name, and matrix cores (comma-separated).
+* Network mode, PCE, and the switch to block flows through centroids.
+* Optional fixed-cost field, value of time, and skim fields (comma-separated).
+
+A skim field produces final and blended cores by default.
+``free_flow_time:final,distance:blended`` produces only the specified cores.
+Each class has a separate OMX file named ``<result_name>_<class_name>.omx``.
+VDF parameters accept either numbers or network field names.
+The optional excluded-links table contains a class name and link IDs (comma-separated).
+
+The select-link table contains a query name, link IDs (comma-separated), and a direction: ``AB``, ``BA``, or ``Both``.
+Rows with the same query name form one query, including rows with different directions.
+The algorithm uses the AequilibraE select-link query semantics.
+The switches for select-link matrices and flows default to true.
+The default output name is ``<result_name>_sl``.
+
+Model Designer outputs have fixed names:
+
+.. list-table:: Assignment outputs
+   :header-rows: 1
+
+   * - Output
+     - Value
+   * - ``OUTPUT_DATABASE``
+     - Results database path
+   * - ``OUTPUT_RESULT_NAME``
+     - Assignment results table name
+   * - ``OUTPUT_MATRIX_FOLDER``
+     - Project matrix folder
+   * - ``OUTPUT_SKIMS``
+     - JSON array of skim OMX paths, or ``[]`` without skims
+   * - ``OUTPUT_SELECT_LINK_MATRIX``
+     - Select-link OMX path, or an empty string without this output
+   * - ``OUTPUT_SELECT_LINK_FLOWS``
+     - Select-link flows table name, or an empty string without this output
+
+The output database path and table name identify each flow table.
+The skim-path array supports multiple classes without a variable number of model outputs.
+In a Model Designer expression, ``array_get(from_json(...), 0)`` selects the first skim path.
+The expression argument is the ``OUTPUT_SKIMS`` value from the assignment step.
+
+The algorithm checks existing output names before computation and does not overwrite results.
+Cancellation takes effect before computation or after computation, before any output saves.
+A failure during output saves can leave some results in the project.
 
 Transit
 -------
-Please refer to the :ref:`Transit module <transit_procedures>` documentation.
+
+The transit algorithms use the same import and assignment runners as the transit dialogs.
+The dialogs remain available from the AequilibraE menu.
+
+**Add GTFS feed** imports one GTFS ZIP file into an AequilibraE project. Select a service date,
+agency, description, and transit import option. Optional settings enable map matching and
+provide vehicle capacities as a JSON object. Each capacity value is a ``[seated, total]`` pair.
+
+**Transit assignment and skimming** builds or reuses a transit graph. Select *Assign demand*
+to load a project matrix and save transit assignment results. Select *Create skim matrix* to
+create and save a skim matrix. The algorithm accepts a period ID, graph-building options, and
+comma-separated skim fields for skimming.
+
+**Transit supply metrics** writes route, pattern, stop, or zone metrics to a non-spatial table.
+Optional filters can limit the time range and route, pattern, or stop IDs.
+
+Please refer to the :ref:`Transit module <transit_procedures>` documentation for the transit UI.
 
 Trip distribution
 -----------------

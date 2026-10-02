@@ -3,13 +3,18 @@ import sys
 from os.path import join
 from pathlib import Path
 
-from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingParameterEnum
+from qgis.core import Qgis, QgsProcessingParameterFile, QgsProcessingParameterEnum
 from qgis.core import QgsProcessingException
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
 
-class ExportMatrix(QgsProcessingAlgorithm):
+class ExportMatrix(ProcessingAlgorithm):
+    algorithm_name = "exportmatrices"
+    display_name = "Export matrices"
+    group_name = "Data"
+    group_id = "data"
+
     def initAlgorithm(self, configuration=None):
         self.addParameter(
             QgsProcessingParameterFile(
@@ -35,26 +40,25 @@ class ExportMatrix(QgsProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
 
         from aequilibrae.matrix import AequilibraeMatrix
 
         file_format = ["csv", "omx"]
-        format = file_format[parameters["output_format"]]
+        output_format = file_format[parameters["output_format"]]
         matrix_path = Path(parameters["matrix_path"])
 
         if matrix_path.suffix.lower() != ".omx":
             raise QgsProcessingException(self.tr("Only OpenMatrix (*.omx) files can be exported"))
 
-        dst_path = join(parameters["file_path"], f"{matrix_path.stem}.{format}")
+        dst_path = join(parameters["file_path"], f"{matrix_path.stem}.{output_format}")
 
         mat = AequilibraeMatrix()
 
-        if format == "omx":
+        if output_format == "omx":
             mat.create_from_omx(omx_path=parameters["matrix_path"], file_path=dst_path, memory_only=False)
-        elif format in ["csv"]:
+        elif output_format == "csv":
             mat.create_from_omx(parameters["matrix_path"])
             mat.export(Path(dst_path))
 
@@ -62,23 +66,5 @@ class ExportMatrix(QgsProcessingAlgorithm):
 
         return {"Output": dst_path}
 
-    def name(self):
-        return "exportmatrices"
-
-    def displayName(self):
-        return self.tr("Export matrices")
-
-    def group(self):
-        return self.tr("Data")
-
-    def groupId(self):
-        return "data"
-
     def shortHelpString(self):
         return self.tr("Exports an existing *.omx matrix file into *.csv or *.omx")
-
-    def createInstance(self):
-        return ExportMatrix()
-
-    def tr(self, message):
-        return trlt("ExportMatrix", message)

@@ -1,41 +1,36 @@
 import importlib.util as iutil
 
-from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingParameterFile, QgsProcessingException
+from qgis.core import QgsProcessingException
 
-from qaequilibrae.i18n.translate import trlt
+from ..project import open_project
+from ..project_algorithm import ProjectAlgorithm
 
 
-class NetworkSimplifier(QgsProcessingAlgorithm):
-    PROJECT_FOLDER = "PROJECT_FOLDER"
+class NetworkSimplifier(ProjectAlgorithm):
+    algorithm_name = "Network simplifier"
+    display_name = "Network simplifier"
+    translate_algorithm_name = True
+    group_name = "Model building"
+    group_id = "model_building"
 
     def initAlgorithm(self, configuration=None):
-        # 1. Folder containing an AequilibraE project
-        self.addParameter(
-            QgsProcessingParameterFile(
-                self.PROJECT_FOLDER,
-                self.tr("AequilibraE Project Folder"),
-                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
-            )
-        )
+        self.add_project_folder_parameter()
 
     def processAlgorithm(self, parameters, context, feedback):
-        project_folder = self.parameterAsFile(parameters, self.PROJECT_FOLDER, context)
+        project_folder = self.project_folder(parameters, context)
 
-        # Checks if we have access to AequilibraE library
         if iutil.find_spec("aequilibrae") is None:
             raise QgsProcessingException(self.tr("AequilibraE module not found"))
 
-        from aequilibrae.project import Project
         from aequilibrae.project.tools.network_simplifier import NetworkSimplifier
 
-        # Check if folder contains AequilibraE project
         try:
-            project = Project()
-            project.open(project_folder)
+            with open_project(project_folder) as project:
+                return self._simplify(project, project_folder, feedback, NetworkSimplifier)
         except Exception as e:
             raise QgsProcessingException(self.tr(f"{project_folder} does not contain an AequilibraE model: {e}")) from e
 
-        # Check if centroids exists, otherwise create a centroid
+    def _simplify(self, project, project_folder, feedback, network_simplifier):
         feedback.pushInfo("Checking centroids")
         nodes = project.network.nodes
         centroid_count = nodes.data.query("is_centroid == 1").shape[0]
@@ -51,7 +46,6 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
         # TODO: I don't know if its a good idea setting up a mode here.
         mode = "c"
 
-        # Let's set the graph for computation
         feedback.pushInfo("Setting graph for computation")
         network = project.network
         network.build_graphs(modes=[mode])
@@ -63,7 +57,7 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
 
         feedback.pushInfo(str(graph.network))
 
-        # Let's revert to setting up that node as centroid in case we had to do it
+        # Restore the temporary centroid change.
         if centroid_count == 0:
             feedback.pushInfo("Revert nodes as centroids")
             nd.is_centroid = 0
@@ -72,7 +66,7 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
         links_before = project.network.links.data.shape[0]
         nodes_before = project.network.nodes.data.shape[0]
 
-        net = NetworkSimplifier()
+        net = network_simplifier()
         feedback.pushInfo("Simplify network")
         net.simplify(graph)
         feedback.pushInfo("Saving network")
@@ -81,26 +75,13 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
         links_after = project.network.links.data.shape[0]
         nodes_after = project.network.nodes.data.shape[0]
 
-        project.close()
         feedback.pushInfo(f"Project closed in {project_folder}")
 
-        exp = "This project initially had {} links and {} nodes".format(links_before, nodes_before)
-        exp = exp + "\nNow it has {} links and {} nodes.".format(links_after, nodes_after)
+        exp = f"This project initially had {links_before} links and {nodes_before} nodes"
+        exp += f"\nNow it has {links_after} links and {nodes_after} nodes."
         feedback.pushInfo(exp)
 
         return {"Output": "Ok."}
-
-    def name(self):
-        return self.tr("Network simplifier")
-
-    def displayName(self) -> str:
-        return self.tr("Network simplifier")
-
-    def group(self) -> str:
-        return self.tr("Model building")
-
-    def groupId(self) -> str:
-        return "model_building"
 
     def shortHelpString(self):
         help_messages = [
@@ -108,9 +89,3 @@ class NetworkSimplifier(QgsProcessingAlgorithm):
             self.tr("turning links into nodes, and saving theses changes into the project."),
         ]
         return "\n".join(help_messages)
-
-    def createInstance(self):
-        return NetworkSimplifier()
-
-    def tr(self, message):
-        return trlt("NetworkSimplifier", message)

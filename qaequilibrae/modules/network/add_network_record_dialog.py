@@ -1,6 +1,7 @@
 from string import ascii_letters
 
-from qgis.PyQt.QtWidgets import QTableWidgetItem
+from qgis.PyQt.QtWidgets import QLineEdit, QTableWidgetItem
+from qgis.core import QgsProcessingContext, QgsProcessingFeedback
 
 from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.style_loader.editor_styles import load_editor_styles
@@ -9,17 +10,15 @@ ALLOWED_NAME_CHARACTERS = ascii_letters + "_"
 
 
 class AddNetworkRecordDialog(BaseDialog):
-    """Shared behaviour of the dialogs that add one record to the modes or the link types table.
-
-    Both tables are keyed by a single letter and carry a name that AequilibraE restricts to letters
-    and underscores, so listing what the project already has, offering an identifier that is still
-    free and checking what was typed is the same work for the two of them. Subclasses name the
-    table and the two columns that identify a record in it, and write the record itself.
-    """
+    """Shared dialog behavior for adding a project mode or link type."""
 
     table = ""
     id_field = ""
     name_field = ""
+    error_message = ""
+    log_message = ""
+    success_message = ""
+    algorithm_type: type
 
     def _base_ui_setup(self):
         self.but_add.clicked.connect(self.add_record)
@@ -28,15 +27,39 @@ class AddNetworkRecordDialog(BaseDialog):
         self.list_existing()
 
     def add_record(self):
-        """Reads the form and writes the new record to the project."""
-        raise NotImplementedError
+        """Validate the form, run its Processing algorithm, and refresh the GUI."""
+        identifier = self.txt_id.text().strip()
+        name = self.txt_name.text().strip()
+        error = self.invalid_input(identifier, name, self.existing_records())
+        if error is not None:
+            self.report(error, is_error=True)
+            return
+
+        algorithm = self.algorithm_type()
+        algorithm.initAlgorithm()
+        algorithm.project = self.project
+        parameters = {self.id_field.upper(): identifier, self.name_field.upper(): name}
+        for field, (_, widget) in self.optional_inputs().items():
+            value = (widget.text().strip() or None) if isinstance(widget, QLineEdit) else widget.value()
+            # Link-type spin boxes use zero to display "Not set"; mode values keep zero.
+            parameters[field.upper()] = (value or None) if self.table == "link_types" else value
+        try:
+            algorithm.processAlgorithm(parameters, QgsProcessingContext(), QgsProcessingFeedback())
+        except Exception as error:
+            self.report(self.tr(self.error_message).format(error), is_error=True)
+            return
+
+        self.qgis_project.message_log(self.tr(self.log_message).format(name, identifier))
+        self.refresh_link_editing_form()
+        self.reset_form()
+        self.report(self.tr(self.success_message).format(name))
 
     def optional_inputs(self) -> dict:
-        """Maps each column the form offers besides the identifier and the name to its widgets."""
+        """Return additional record fields and their widgets."""
         return {}
 
     def existing_records(self) -> dict:
-        """Maps every identifier in the project's table to the name that goes with it."""
+        """Read the identifiers and names from the project table."""
         with self.project.db_connection as conn:
             return dict(conn.execute(f"select {self.id_field}, {self.name_field} from {self.table}").fetchall())
 
@@ -83,7 +106,7 @@ class AddNetworkRecordDialog(BaseDialog):
             return self.tr("The name cannot be empty")
         if any(character not in ALLOWED_NAME_CHARACTERS for character in name):
             return self.tr('The name can only contain letters and "_"')
-        if name.lower() in [str(taken).lower() for taken in records.values()]:
+        if any(name.lower() == str(taken).lower() for taken in records.values()):
             return self.tr("The name is already in use")
         return None
 
@@ -98,7 +121,6 @@ class AddNetworkRecordDialog(BaseDialog):
         self.lbl_feedback.setStyleSheet("color: red;" if is_error else "")
 
     def refresh_link_editing_form(self):
-        """The links layer offers the modes and link types read when it was added to the canvas."""
         links = self.qgis_project.layers.get("links")
         if links is not None:
             load_editor_styles(links[0], "links", self.project)

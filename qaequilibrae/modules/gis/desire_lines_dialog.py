@@ -27,7 +27,6 @@ class DesireLinesDialog(BaseDialog):
         self.path = standard_path()
         self.zones = None
         self.columns = None
-        self.matrix_hash = {}
         if self.qgis_project.project is None:
             self.proj_matrices = pd.DataFrame([])
         else:
@@ -132,7 +131,7 @@ class DesireLinesDialog(BaseDialog):
             self.progressbar.setValue(0)
             self.progressbar.setMaximum(val[1])
         elif val[0] == "update":
-            self.progressbar.setValue(self.progressbar.value() + 1)
+            self.progressbar.setValue(val[1])
         elif val[0] == "finished":
             self.job_finished_from_thread()
 
@@ -196,7 +195,6 @@ class DesireLinesDialog(BaseDialog):
                 self.zoning_layer.currentText(),
                 self.zone_id_field.currentText(),
                 self.matrix,
-                self.matrix_hash,
                 dl_type,
             )
             self.run_thread()

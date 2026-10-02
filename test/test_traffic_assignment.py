@@ -305,8 +305,7 @@ def test_akcelik_assignment_and_yaml_round_trip(sf_project, qtbot, mocker):
     dialog.run()
     assert dialog.error is None, f"the assignment refused the configuration: {dialog.error}"
 
-    with pytest.raises(ValueError):
-        dialog.produce_all_outputs()
+    assert dialog.processing_results["OUTPUT_RESULT_NAME"] == test_name
     dialog.close()
 
     with sf_project.project.results_connection as conn:
@@ -372,8 +371,8 @@ def test_single_class(sf_project, qtbot, mocker):
 
     dialog.run()
 
-    with pytest.raises(ValueError):
-        dialog.produce_all_outputs()
+    assert dialog.processing_results["OUTPUT_RESULT_NAME"] == test_name
+    assert dialog.progressbar.value() == 100
 
     dialog.close()
 
@@ -473,8 +472,7 @@ def test_multiclass(sf_project, qtbot, mocker):
 
     dialog.run()
 
-    with pytest.raises(ValueError):
-        dialog.produce_all_outputs()
+    assert dialog.processing_results["OUTPUT_RESULT_NAME"] == test_name
 
     dialog.close()
 
@@ -527,8 +525,7 @@ def test_all_or_nothing(sf_project, qtbot):
 
     dialog.run()
 
-    with pytest.raises(ValueError):
-        dialog.produce_all_outputs()
+    assert dialog.processing_results["OUTPUT_RESULT_NAME"] == test_name
 
     dialog.close()
 
@@ -643,8 +640,7 @@ def test_link_removal(sf_project, qtbot):
 
     dialog.run()
 
-    with pytest.raises(ValueError):
-        dialog.produce_all_outputs()
+    assert dialog.processing_results["OUTPUT_RESULT_NAME"] == test_name
 
     dialog.close()
 
@@ -686,12 +682,10 @@ def test_single_class_from_yaml(sf_project, qtbot, mocker):
     skims = pth / "matrices" / "result_test_from_yaml_car.omx"
     assert isfile(skims)
 
-    mtx = omx.open_file(skims)
-    assert round(np.sum(np.nan_to_num(mtx["free_flow_time_final"][:])), 4) > 0
-    assert round(np.sum(np.nan_to_num(mtx["free_flow_time_blended"][:])), 4) > 0
-    assert round(np.sum(np.nan_to_num(mtx["distance_final"][:])), 4) > 0
-    assert round(np.sum(np.nan_to_num(mtx["distance_blended"][:])), 4) > 0
-    mtx.close()
+    with omx.open_file(skims) as mtx:
+        assert set(mtx.list_matrices()) == {"free_flow_time_final", "distance_blended"}
+        assert round(np.sum(np.nan_to_num(mtx["free_flow_time_final"][:])), 4) > 0
+        assert round(np.sum(np.nan_to_num(mtx["distance_blended"][:])), 4) > 0
 
 
 def test_multi_class_from_yaml(sf_project, qtbot, mocker):
@@ -890,7 +884,8 @@ def test_network_fix_is_picked_up_when_dialog_reopens(sf_project, qtbot):
 
     dialog.run()
     assert "NaN" in dialog.error
-    assert dialog.worker_thread is None
+    assert not dialog.worker_thread.isRunning()
+    assert dialog.processing_results is None
 
     dialog.close()
 
@@ -942,12 +937,24 @@ def test_single_class_from_python(sf_project, qtbot, mocker):
     dialog.max_iter.setText("25")
     dialog.rel_gap.setText("0.001")
 
+    dialog.traffic_classes["car"].set_fixed_cost("toll")
+    dialog.traffic_classes["car"].set_vot(2.5)
+    dialog.class_excluded_links["car"] = [1]
     qtbot.mouseClick(dialog.but_save_python, Qt.MouseButton.LeftButton)  # Save configs in Python file
 
     dialog.close()
 
     project = sf_project.project
+    from qaequilibrae.modules.processing_provider.traffic_assignment_procedures import traffic_assignment as operation
+
+    configure = mocker.spy(operation, "configure_traffic_assignment")
     project.run.run_assignment()
+    assignment = configure.call_args.args[0]
+    assert assignment.max_iter == 25
+    assert assignment.classes[0].fixed_cost_field == "toll"
+    assert assignment.classes[0].vot == 2.5
+    with project.results_connection as connection:
+        assert connection.execute(f'SELECT car_tot FROM "{test_name}" WHERE link_id=1').fetchone()[0] == 0
 
     assert isfile(sf_project.project._results_database_path)
 

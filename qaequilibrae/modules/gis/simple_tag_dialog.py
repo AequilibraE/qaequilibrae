@@ -20,11 +20,6 @@ class SimpleTagDialog(BaseDialog):
 
     def _base_ui_setup(self):
         self.valid_layer_types = point_types + line_types + poly_types + multi_poly + multi_line + multi_point
-        self.geography_types = [None, None]
-
-        self.fromtype = None
-        self.frommatchingtype = None
-
         self.fromlayer.currentIndexChanged.connect(self.set_from_fields)
         self.tolayer.currentIndexChanged.connect(self.set_to_fields)
         self.fromfield.currentIndexChanged.connect(self.reload_fields)
@@ -51,11 +46,9 @@ class SimpleTagDialog(BaseDialog):
         self.works_field_matching()
 
     def reload_fields(self):
-        self.matches_types()
         self.set_to_fields()
 
     def reload_fields_matching(self):
-        self.matches_types()
         if self.tolayer.currentIndex() >= 0:
             self.matchingto.clear()
             layer = get_vector_layer_by_name(self.tolayer.currentText())  # If we have the right layer in hands
@@ -77,7 +70,6 @@ class SimpleTagDialog(BaseDialog):
 
         if self.needsmatching.isChecked():
             self.works_field_matching()
-        self.matches_types()
 
     def set_to_fields(self):
         self.tofield.clear()
@@ -116,20 +108,6 @@ class SimpleTagDialog(BaseDialog):
         else:
             self.touching.setEnabled(True)
 
-        if flayer.wkbType() in poly_types + multi_poly:
-            self.geography_types[0] = "polygon"
-        elif flayer.wkbType() in line_types + multi_line:
-            self.geography_types[0] = "linestring"
-        else:
-            self.geography_types[0] = "point"
-
-        if tlayer.wkbType() in poly_types + multi_poly:
-            self.geography_types[1] = "polygon"
-        elif tlayer.wkbType() in line_types + multi_line:
-            self.geography_types[1] = "linestring"
-        else:
-            self.geography_types[1] = "point"
-
     def works_field_matching(self):
         self.matchingfrom.clear()
         self.matchingto.clear()
@@ -154,23 +132,6 @@ class SimpleTagDialog(BaseDialog):
             self.matchingto.setVisible(False)
             self.lblmatchfrom.setVisible(False)
             self.lblmatchto.setVisible(False)
-
-    def matches_types(self):
-        self.fromtype = None
-        self.frommatchingtype = None
-
-        if self.fromlayer.currentIndex() >= 0:
-            layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
-            for field in layer.fields().toList():
-                if self.fromfield.currentText() == field.name():
-                    self.fromtype = field.type()
-
-        if self.needsmatching.isChecked():
-            if self.fromlayer.currentIndex() >= 0:
-                layer = get_vector_layer_by_name(self.fromlayer.currentText())  # If we have the right layer in hands
-                for field in layer.fields().toList():
-                    if self.matchingfrom.currentText() == field.name():
-                        self.frommatchingtype = field.type()
 
     def run_thread(self):
         self.worker_thread.signal.connect(self.signal_handler)
@@ -218,7 +179,6 @@ class SimpleTagDialog(BaseDialog):
                 fmatch,
                 tmatch,
                 operation,
-                self.geography_types,
             )
             self.run_thread()
         else:

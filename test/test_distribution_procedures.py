@@ -18,7 +18,7 @@ DISTRIBUTION_PATH = "qaequilibrae.modules.distribution_procedures.distribution_m
 
 
 @pytest.mark.parametrize("method", ["csv", "parquet", "open layer"])
-def test_ipf(ae_with_project, folder_path, mocker, method):
+def test_ipf(ae_with_project, folder_path, mocker, method, qtbot):
 
     df = pd.read_csv(get_test_data_path("SiouxFalls_project", "synthetic_future_vector.csv"))
     _ = layer_from_dataframe(df, "synthetic_future_vector")
@@ -26,6 +26,7 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
     file_path = f"{folder_path}/demand_ipf_D.omx"
     mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
     mocked_outfile.return_value = file_path
+    mocker.patch(f"{DISTRIBUTION_PATH}.exit_procedure")
 
     dialog = DistributionModelsDialog(ae_with_project, mode="ipf")
 
@@ -70,11 +71,8 @@ def test_ipf(ae_with_project, folder_path, mocker, method):
     dialog.cob_atra_field.setCurrentText("destinations")
 
     dialog.add_job_to_queue()
-    dialog.worker_thread = dialog.job_queue[dialog.outfile]
-    dialog.worker_thread.doWork()
-
-    dialog.worker_thread.output.export(dialog.outfile)
-
+    dialog.run()
+    qtbot.waitUntil(lambda: dialog._task is None and dialog.but_run.isEnabled(), timeout=60000)
     assert isfile(file_path)
 
     mat = AequilibraeMatrix()
@@ -111,6 +109,12 @@ def test_calibrate_gravity(sf_project_with_assignment, method, folder_path, mock
         qtbot.mouseClick(dialog.but_queue, Qt.MouseButton.LeftButton)
 
     qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
+    expected_outputs = [
+        f"{folder_path}/neg_{method}.mod" if method in ["negative_exponential", "both"] else None,
+        f"{folder_path}/inv_{method}.mod" if method in ["inverse_power", "both"] else None,
+    ]
+    qtbot.waitUntil(lambda: dialog._task is None and dialog.but_run.isEnabled(), timeout=60000)
+    assert all(path is None or isfile(path) for path in expected_outputs)
 
     if method in ["negative_exponential", "both"]:
         file_path = f"{folder_path}/neg_{method}.mod"
@@ -138,11 +142,12 @@ def test_calibrate_gravity(sf_project_with_assignment, method, folder_path, mock
 
 
 @pytest.mark.parametrize("method", ["negative", "power", "gamma"])
-def test_apply_gravity(ae_with_project, method, folder_path, mocker):
+def test_apply_gravity(ae_with_project, method, folder_path, mocker, qtbot):
 
     file_path = f"{folder_path}/matrices/ADJ-TrafficAssignment_DP.omx"
     mocked_outfile = mocker.patch(f"{DISTRIBUTION_PATH}.browse_outfile")
     mocked_outfile.return_value = file_path
+    mocker.patch(f"{DISTRIBUTION_PATH}.exit_procedure")
 
     dataset_path = get_test_data_path("SiouxFalls_project", "synthetic_future_vector.csv")
     dataset = pd.read_csv(dataset_path)
@@ -180,10 +185,8 @@ def test_apply_gravity(ae_with_project, method, folder_path, mocker):
     dialog.outfile = file_path
 
     dialog.add_job_to_queue()
-    dialog.worker_thread = dialog.job_queue[dialog.outfile]
-    dialog.worker_thread.doWork()
-    dialog.worker_thread.output.export(dialog.outfile)
-
+    dialog.run()
+    qtbot.waitUntil(lambda: dialog._task is None and dialog.but_run.isEnabled(), timeout=60000)
     assert isfile(file_path)
 
     with omx.open_file(file_path, "a") as omx_file:

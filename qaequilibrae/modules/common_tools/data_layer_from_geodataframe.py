@@ -1,45 +1,26 @@
 import geopandas as gpd
-from qgis.PyQt.QtCore import QMetaType
-from qgis.core import QgsField, QgsFeature, QgsGeometry, QgsProject, QgsVectorLayer
+from qgis.core import QgsProject, QgsVectorLayer
+
+from .vector_layer_helpers import (
+    add_dataframe_features,
+    crs_string,
+    fields_from_dataframe,
+    geometry_type_from_geodataframe,
+)
 
 
 def layer_from_geodataframe(gdf: gpd.GeoDataFrame, layer_name: str):
-    """Transform GeoDataFrame to QGIS LineString vector layer in memory"""
+    """Transform a GeoDataFrame to a QGIS vector layer in memory."""
 
-    # create layer
-    crs = gdf.crs.__dict__["srs"]
-    vl = QgsVectorLayer(f"LineString?crs={crs}", layer_name, "memory")
+    geometry_type = geometry_type_from_geodataframe(gdf)
+    vl = QgsVectorLayer(f"{geometry_type}?crs={crs_string(gdf)}", layer_name, "memory")
     pr = vl.dataProvider()
 
-    # add fields
-    def qgs_type(ftype):
-        return (
-            QMetaType.Type.Double
-            if "float" in ftype.name
-            else QMetaType.Type.LongLong
-            if "int" in ftype.name
-            else QMetaType.Type.QString
-        )
-
-    field_names = list(gdf.dtypes.index)
-    field_names.remove("geometry")
-    types = [qgs_type(gdf.dtypes[fname]) for fname in field_names]
-    attributes = [QgsField(fname, dtype) for fname, dtype in zip(field_names, types, strict=True)]
-    pr.addAttributes(attributes)
+    fields = fields_from_dataframe(gdf)
+    pr.addAttributes(list(fields))
     vl.updateFields()
 
-    # Add records
-    features = []
-    for _, record in gdf.iterrows():
-        fet = QgsFeature()
-
-        if record.geometry is not None:
-            geom = QgsGeometry.fromWkt(record.geometry.wkt)
-            fet.setGeometry(geom)
-
-        fet.setAttributes(record.tolist()[:-1])
-        features.append(fet)
-    pr.addFeatures(features)
+    add_dataframe_features(gdf, pr, fields)
 
     QgsProject.instance().addMapLayer(vl)
 

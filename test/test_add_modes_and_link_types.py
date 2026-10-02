@@ -1,6 +1,11 @@
 import pytest
 
+from aequilibrae.project.network.link_type import LinkType
+from aequilibrae.project.network.mode import Mode
+
 from qaequilibrae.modules.network import AddLinkTypeDialog, AddModeDialog
+from qaequilibrae.modules.processing_provider.data_procedures.add_link_type import AddLinkType
+from qaequilibrae.modules.processing_provider.data_procedures.add_mode import AddMode
 
 
 def _column(table, header):
@@ -27,7 +32,9 @@ def test_add_mode_lists_the_modes_already_in_the_project(ae_with_project):
     assert dialog.txt_id.text() not in modes
 
 
-def test_add_mode(ae_with_project):
+def test_add_mode(ae_with_project, mocker):
+    processing = mocker.spy(AddMode, "processAlgorithm")
+    save = mocker.spy(Mode, "save")
     dialog = AddModeDialog(ae_with_project)
     dialog.txt_name.setText("flying_car")
     dialog.txt_description.setText("Cars that fly")
@@ -38,6 +45,8 @@ def test_add_mode(ae_with_project):
     mode_id = dialog.txt_id.text()
     dialog.add_record()
 
+    processing.assert_called_once()
+    save.assert_called_once()
     modes = ae_with_project.project.network.modes.all_modes()
     assert mode_id in modes
 
@@ -101,7 +110,8 @@ def test_add_link_type_lists_the_link_types_already_in_the_project(ae_with_proje
     assert dialog.txt_id.text() not in link_types
 
 
-def test_add_link_type(ae_with_project):
+def test_add_link_type(ae_with_project, mocker):
+    processing = mocker.spy(AddLinkType, "processAlgorithm")
     dialog = AddLinkTypeDialog(ae_with_project)
     dialog.txt_name.setText("arterial")
     dialog.txt_description.setText("Streets like AequilibraE Avenue")
@@ -111,6 +121,7 @@ def test_add_link_type(ae_with_project):
     link_type_id = dialog.txt_id.text()
     dialog.add_record()
 
+    processing.assert_called_once()
     link_types = ae_with_project.project.network.link_types.all_types()
     assert link_type_id in link_types
 
@@ -183,23 +194,31 @@ def test_add_link_type_refuses_what_the_project_cannot_take(ae_with_project, lin
     assert set(ae_with_project.project.network.link_types.all_types()) == before
 
 
-def test_a_link_type_that_cannot_be_saved_does_not_hold_on_to_its_identifier(ae_with_project, monkeypatch):
-    """A link type only reaches the project when it saves, but new() lists it before that."""
-    from aequilibrae.project.network.link_type import LinkType
-
+@pytest.mark.parametrize("dialog_type, record_type", [(AddModeDialog, Mode), (AddLinkTypeDialog, LinkType)])
+@pytest.mark.parametrize("cleanup_fails", [False, True])
+def test_a_record_that_cannot_be_saved_does_not_hold_on_to_its_identifier(
+    ae_with_project, monkeypatch, mocker, dialog_type, record_type, cleanup_fails
+):
     def refuse_to_save(self):
         raise ValueError("the database said no")
 
-    monkeypatch.setattr(LinkType, "save", refuse_to_save)
-
-    dialog = AddLinkTypeDialog(ae_with_project)
-    dialog.txt_name.setText("arterial")
-
-    link_type_id = dialog.txt_id.text()
+    monkeypatch.setattr(record_type, "save", refuse_to_save)
+    dialog = dialog_type(ae_with_project)
+    if cleanup_fails:
+        records = getattr(ae_with_project.project.network, dialog.table)
+        mocker.patch.object(records, "delete", side_effect=ValueError("cleanup failed"))
+    dialog.txt_name.setText("additional")
+    identifier = dialog.txt_id.text()
     dialog.add_record()
 
-    assert dialog.lbl_feedback.text() != ""
-    assert link_type_id not in ae_with_project.project.network.link_types.all_types()
+    assert "the database said no" in dialog.lbl_feedback.text()
+    assert identifier not in dialog.existing_records()
+    records = (
+        ae_with_project.project.network.modes.all_modes()
+        if record_type is Mode
+        else ae_with_project.project.network.link_types.all_types()
+    )
+    assert identifier not in records
 
 
 def test_the_new_mode_reaches_the_form_used_to_digitize_links(ae_with_project):
