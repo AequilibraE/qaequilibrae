@@ -1,10 +1,4 @@
-"""Desire-line operation and its QGIS Processing adapter.
-
-The operation turns a matrix and a set of centroid coordinates into one line per
-unordered origin-destination pair, with an AB and a BA flow for every matrix core.
-The :class:`DesireLines` adapter reads the matrix and centroids from QGIS inputs
-and writes the result to a feature sink; the desktop dialog reuses the operation.
-"""
+"""Desire-line computation and its QGIS Processing adapter."""
 
 from collections.abc import Mapping, Sequence
 from typing import Any, Protocol

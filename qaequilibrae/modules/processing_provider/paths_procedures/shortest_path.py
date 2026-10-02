@@ -1,9 +1,4 @@
-"""Shortest-path operation and its QGIS Processing adapter.
-
-The routing operation receives a tabular AequilibraE network and returns plain
-Python data. The :class:`ShortestPath` adapter translates QGIS inputs and outputs
-around it, keeping the routing logic independent from the desktop dialog.
-"""
+"""Shortest-path computation shared by the Processing algorithm and plugin dialog."""
 
 from dataclasses import dataclass
 from typing import Iterable
@@ -54,17 +49,14 @@ class ShortestPathResult:
 
     @property
     def link_ids(self) -> tuple[int, ...]:
-        """Return link IDs in traversal order."""
         return tuple(segment.link_id for segment in self.segments)
 
     @property
     def total_cost(self) -> float:
-        """Return the sum of the directed-link costs."""
         return sum(segment.cost for segment in self.segments)
 
 
 def parse_excluded_link_ids(value: str) -> tuple[int, ...]:
-    """Parse the compact link-ID form used by Processing and the dialog."""
     if not value.strip():
         return ()
 
@@ -84,11 +76,7 @@ def compute_shortest_path(
     centroid_node_ids: Iterable[int] | None = None,
     excluded_link_ids: Iterable[int] = (),
 ) -> ShortestPathResult:
-    """Compute a path from a tabular AequilibraE network.
-
-    ``network`` must use AequilibraE's standard link columns. Callers read their
-    source and decide how to report :class:`ShortestPathError`.
-    """
+    """Compute the lowest-cost path from a tabular AequilibraE network."""
     import numpy as np
     from aequilibrae.paths import Graph
     from aequilibrae.paths.results import PathResults
@@ -98,11 +86,16 @@ def compute_shortest_path(
     if not mode:
         raise ShortestPathError("A mode is required")
 
-    data = _network_for_mode(network, mode, cost_field)
-    centroids = _centroid_array(centroid_node_ids, data, np)
+    mode_network = _network_for_mode(network, mode, cost_field)
+    if centroid_node_ids is None:
+        centroids = np.asarray([mode_network["a_node"].iloc[0]], dtype=np.int64)
+    else:
+        centroids = np.asarray(tuple(centroid_node_ids), dtype=np.int64)
+        if not centroids.size:
+            raise ShortestPathError("At least one centroid node is required when centroid flows are blocked")
 
     graph = Graph()
-    graph.network = data
+    graph.network = mode_network
     graph.prepare_graph(centroids)
 
     excluded_link_ids = list(excluded_link_ids)
@@ -124,7 +117,6 @@ def compute_shortest_path(
 
 
 def _network_for_mode(network, mode, cost_field):
-    """Validate and filter input into AequilibraE's required layout."""
     network = network.rename(columns=lambda column: str(column).lower())
     required_columns = {"link_id", "a_node", "b_node", "direction", "modes", cost_field}
     missing_columns = required_columns.difference(network.columns)
@@ -144,23 +136,18 @@ def _network_for_mode(network, mode, cost_field):
     return make_writable_network_dataframe(network[columns])
 
 
-def _centroid_array(centroid_node_ids, network, np):
-    """Return graph centroids while keeping centroid-flow policy caller controlled."""
-    if centroid_node_ids is None:
-        return np.asarray([network["a_node"].iloc[0]], dtype=np.int64)
-
-    centroids = np.asarray(tuple(centroid_node_ids), dtype=np.int64)
-    if not centroids.size:
-        raise ShortestPathError("At least one centroid node is required when centroid flows are blocked")
-    return centroids
-
-
 def _path_segments(results, graph, cost_field) -> tuple[PathSegment, ...]:
     """Translate AequilibraE's internal node positions back to model IDs."""
-    data = graph.graph.assign(_path_key=graph.graph.link_id * graph.graph.direction)
-    records = {int(record["_path_key"]): record for _, record in data.iterrows()}
+    path = tuple(zip(results.path, results.path_link_directions, strict=True))
+    path_keys = {int(link_id) * int(direction) for link_id, direction in path}
+    records = {}
+    for _, record in graph.graph.iterrows():
+        key = int(record["link_id"]) * int(record["direction"])
+        if key in path_keys:
+            records[key] = record
+
     segments = []
-    for link_id, direction in zip(results.path, results.path_link_directions, strict=True):
+    for link_id, direction in path:
         record = records.get(int(link_id) * int(direction))
         if record is None:
             raise ShortestPathError(f"Could not find directed link {link_id} in the routing graph")
@@ -261,8 +248,6 @@ class ShortestPath(ProcessingAlgorithm):
         self.addOutput(QgsProcessingOutputNumber(self.TOTAL_COST, self.tr("Total cost")))
 
     def processAlgorithm(self, parameters, context, feedback):
-        # The algorithm owns QGIS-specific work: resolve sources, report progress, and
-        # turn the operation's simple result into a QGIS feature sink.
         links = self.parameterAsSource(parameters, self.LINKS, context)
         if links is None:
             raise QgsProcessingException(self.tr("The links layer could not be loaded"))
@@ -303,7 +288,7 @@ class ShortestPath(ProcessingAlgorithm):
         if sink is None:
             raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
 
-        source_features = self._source_features_by_link_id(links)
+        source_features = self._source_features_by_link_id(links, result.link_ids)
         for sequence, segment in enumerate(result.segments, start=1):
             if feedback.isCanceled():
                 return {}
@@ -343,15 +328,18 @@ class ShortestPath(ProcessingAlgorithm):
                 centroids.append(feature.attribute(node_id_index))
         return tuple(centroids)
 
-    def _source_features_by_link_id(self, links):
+    def _source_features_by_link_id(self, links, link_ids):
         link_id_index = links.fields().lookupField("link_id")
         if link_id_index < 0:
             raise QgsProcessingException(self.tr("The links layer requires a link_id field"))
+        path_link_ids = set(link_ids)
         features_by_link_id = {}
         features = links.getFeatures()
         feature = QgsFeature()
         while features.nextFeature(feature):
-            features_by_link_id[int(feature.attribute(link_id_index))] = QgsFeature(feature)
+            link_id = int(feature.attribute(link_id_index))
+            if link_id in path_link_ids:
+                features_by_link_id[link_id] = QgsFeature(feature)
         return features_by_link_id
 
     @staticmethod

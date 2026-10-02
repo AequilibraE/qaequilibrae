@@ -19,13 +19,11 @@ class NetworkSimplifier(ProjectAlgorithm):
     def processAlgorithm(self, parameters, context, feedback):
         project_folder = self.project_folder(parameters, context)
 
-        # Checks if we have access to AequilibraE library
         if iutil.find_spec("aequilibrae") is None:
             raise QgsProcessingException(self.tr("AequilibraE module not found"))
 
         from aequilibrae.project.tools.network_simplifier import NetworkSimplifier
 
-        # Check if folder contains AequilibraE project
         try:
             with open_project(project_folder) as project:
                 return self._simplify(project, project_folder, feedback, NetworkSimplifier)
@@ -33,8 +31,6 @@ class NetworkSimplifier(ProjectAlgorithm):
             raise QgsProcessingException(self.tr(f"{project_folder} does not contain an AequilibraE model: {e}")) from e
 
     def _simplify(self, project, project_folder, feedback, network_simplifier):
-
-        # Check if centroids exists, otherwise create a centroid
         feedback.pushInfo("Checking centroids")
         nodes = project.network.nodes
         centroid_count = nodes.data.query("is_centroid == 1").shape[0]
@@ -50,7 +46,6 @@ class NetworkSimplifier(ProjectAlgorithm):
         # TODO: I don't know if its a good idea setting up a mode here.
         mode = "c"
 
-        # Let's set the graph for computation
         feedback.pushInfo("Setting graph for computation")
         network = project.network
         network.build_graphs(modes=[mode])
@@ -62,7 +57,7 @@ class NetworkSimplifier(ProjectAlgorithm):
 
         feedback.pushInfo(str(graph.network))
 
-        # Let's revert to setting up that node as centroid in case we had to do it
+        # Restore the temporary centroid change.
         if centroid_count == 0:
             feedback.pushInfo("Revert nodes as centroids")
             nd.is_centroid = 0
@@ -82,8 +77,8 @@ class NetworkSimplifier(ProjectAlgorithm):
 
         feedback.pushInfo(f"Project closed in {project_folder}")
 
-        exp = "This project initially had {} links and {} nodes".format(links_before, nodes_before)
-        exp = exp + "\nNow it has {} links and {} nodes.".format(links_after, nodes_after)
+        exp = f"This project initially had {links_before} links and {nodes_before} nodes"
+        exp += f"\nNow it has {links_after} links and {nodes_after} nodes."
         feedback.pushInfo(exp)
 
         return {"Output": "Ok."}

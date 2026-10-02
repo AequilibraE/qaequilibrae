@@ -1,10 +1,4 @@
-"""Spatial-tag operation and its QGIS Processing adapter.
-
-The matching operation receives plain QGIS features and returns the value every
-target feature should receive. The :class:`SimpleTag` adapter translates QGIS
-Processing inputs and outputs around it, and the desktop dialog uses the same
-operation so both entry points stay in step.
-"""
+"""Spatial-tag computation and its QGIS Processing adapter."""
 
 from collections.abc import Iterable, Sequence
 from typing import Any, cast

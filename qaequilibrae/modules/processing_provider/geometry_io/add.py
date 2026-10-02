@@ -61,7 +61,13 @@ class AddProjectLayer(ProjectAlgorithm):
                 identifier = row.get(self.id_field) if self.id_field else None
                 if self.id_field and identifier is None:
                     raise QgsProcessingException(self.tr(f"The input is missing {self.id_field}"))
-                record = self._new_record(project, int(identifier) if identifier is not None else None)
+                record_id = int(identifier) if identifier is not None else None
+                if self.table_name == "nodes":
+                    record = table.new_centroid(record_id)
+                elif self.table_name == "zones":
+                    record = table.new(record_id)
+                else:
+                    record = table.new()
                 if self.table_name == "nodes" and row.get("is_centroid") is None:
                     record.is_centroid = 0
                 editable_attribute_values(record, table, row, ignored_fields, skip_nulls=True)
@@ -72,14 +78,6 @@ class AddProjectLayer(ProjectAlgorithm):
                 added += 1
         feedback.pushInfo(self.tr(f"Added {added} {self.table_name}"))
         return {"ADDED": added}
-
-    def _new_record(self, project, identifier):
-        table = project_table(project, self.table_name)
-        if self.table_name == "nodes":
-            return table.new_centroid(identifier)
-        if self.table_name == "zones":
-            return table.new(identifier)
-        return table.new()
 
     def shortHelpString(self):
         message = f"Adds {self.table_name} to an AequilibraE project."

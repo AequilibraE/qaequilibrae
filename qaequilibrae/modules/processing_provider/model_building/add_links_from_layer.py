@@ -73,8 +73,10 @@ class AddLinksFromLayer(ProjectAlgorithm):
 
             all_modes = set("".join(gdf["modes"].unique()))
             modes = project.network.modes
-            current_modes = list(modes.all_modes().keys())
-            for mode_id in [mode for mode in all_modes if mode not in current_modes]:
+            current_modes = set(modes.all_modes())
+            for mode_id in all_modes:
+                if mode_id in current_modes:
+                    continue
                 new_mode = modes.new(mode_id)
                 new_mode.mode_name = mode_id
                 new_mode.description = "Mode automatically added during project creation from layers"
@@ -83,9 +85,11 @@ class AddLinksFromLayer(ProjectAlgorithm):
 
             all_link_types = gdf["link_type"].unique()
             link_types = project.network.link_types
-            current_link_types = [link_type.link_type for link_type in link_types.all_types().values()]
+            current_link_types = {link_type.link_type for link_type in link_types.all_types().values()}
             letters = [letter for letter in ascii_letters if letter not in link_types.all_types()]
-            for link_type_name in [name for name in all_link_types if name not in current_link_types]:
+            for link_type_name in all_link_types:
+                if link_type_name in current_link_types:
+                    continue
                 if not letters:
                     raise QgsProcessingException(self.tr("No unused link type identifiers are available"))
                 new_link_type = link_types.new(letters.pop(0))

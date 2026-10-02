@@ -1,9 +1,4 @@
-"""Traffic-assignment Processing worker, shared by the dialog and project runners.
-
-RunTrafficAssignment runs a static traffic assignment for one or more traffic classes,
-saves the link-flow results to the AequilibraE project, and exposes the optional
-select-link and skim outputs.
-"""
+"""Traffic-assignment computation and its QGIS Processing adapter."""
 
 import json
 from collections.abc import Mapping
@@ -307,16 +302,7 @@ def _check_output_names(project, configuration):
 
 
 class RunTrafficAssignment(ProjectAlgorithm):
-    """Run an AequilibraE traffic assignment from QGIS Processing parameters.
-
-    Inputs: an AequilibraE project, one demand matrix per traffic class, network
-    mode and assignment settings (algorithm, VDF, capacity and time fields, gap
-    target), plus optional select-link queries and excluded links.
-
-    Outputs: link-flow results saved to the project results database, optional
-    skim OMX files per class, optional select-link OD and flow outputs, and an
-    optional assigned-flows vector layer.
-    """
+    """Run traffic assignment and save the configured project outputs."""
 
     algorithm_name = "traffic_assignment"
     display_name = "Traffic assignment"
@@ -461,7 +447,6 @@ class RunTrafficAssignment(ProjectAlgorithm):
             raise QgsProcessingException(self.tr(str(error))) from error
 
     def _flows_layer(self, project_folder, result_name, parameters, context, feedback):
-        """Write the saved results, joined to the link geometry, to the feature sink."""
         if not parameters.get(self.OUTPUT_FLOWS):
             return {}
         from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
@@ -665,7 +650,6 @@ def traffic_classes_from_project(project) -> list[dict]:
 
 
 def _match_mode(core, modes, modes_by_name, default_mode):
-    """Pick the mode whose ID or name best matches a matrix core name."""
     key = core.lower()
     if key in modes:
         return key

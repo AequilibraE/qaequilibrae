@@ -103,7 +103,7 @@ def test_simple_tag_polygon(coquimbo_project, to_layer, ops):
     assert "Santiago" in feats
     if ops in ["TOUCHING", "CLOSEST"] or to_layer == "point":
         assert "Valparaiso" in feats
-    elif ops in ["CLOSEST"] or to_layer == "point":
+    elif ops == "CLOSEST" or to_layer == "point":
         assert "Antofagasta" in feats
 
 

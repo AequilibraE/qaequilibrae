@@ -316,7 +316,7 @@ class RouteChoiceDialog(BaseDialog):
             self.error = "Probability cutoff assumes values between 0.0 and 1.0"
 
         penalty = float(self.penalty.text())
-        if cob_algo in ["bfsle with link penalization"] and penalty <= 1.0:
+        if cob_algo == "bfsle with link penalization" and penalty <= 1.0:
             self.error = "Penalty needs to be greater than 1.0 for BFSLE with Link Penalization"
 
         if self.job == "execute_single":

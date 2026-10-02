@@ -24,14 +24,12 @@ class CreateEmptyProject(ProcessingAlgorithm):
     RESERVED_NAMES = (".", "..")
 
     def initAlgorithm(self, configuration=None):
-        # 1. Existing folder the new model folder will be created in
         self.addParameter(
             QgsProcessingParameterFile(
                 self.PARENT_FOLDER, self.tr("Parent folder"), behavior=Qgis.ProcessingFileParameterBehavior.Folder
             )
         )
 
-        # 2. Name of the model's own folder, created inside the parent folder
         self.addParameter(
             QgsProcessingParameterString(self.MODEL_NAME, self.tr("Model name"), defaultValue="new model")
         )
@@ -62,7 +60,6 @@ class CreateEmptyProject(ProcessingAlgorithm):
 
         project_folder = join(parent_folder, model_name)
 
-        # Checks if we have access to AequilibraE library
         if iutil.find_spec("aequilibrae") is None:
             raise QgsProcessingException(self.tr("AequilibraE module not found"))
 
@@ -99,7 +96,7 @@ class CreateEmptyProject(ProcessingAlgorithm):
         return {"Output": project_folder}
 
     def show_in_panel(self, project, project_folder, feedback):
-        """Hands the new model to the panel, the way every other way of creating one does."""
+        """Show the new project in the plugin panel when available."""
         from qaequilibrae import get_aequilibrae_menu_instance
         from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
 

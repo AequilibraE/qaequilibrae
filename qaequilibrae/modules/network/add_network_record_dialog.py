@@ -10,13 +10,7 @@ ALLOWED_NAME_CHARACTERS = ascii_letters + "_"
 
 
 class AddNetworkRecordDialog(BaseDialog):
-    """Shared behaviour of the dialogs that add one record to the modes or the link types table.
-
-    Both tables are keyed by a single letter and carry a name that AequilibraE restricts to letters
-    and underscores, so listing what the project already has, offering an identifier that is still
-    free and checking what was typed is the same work for the two of them. Subclasses name the
-    table, record columns, Processing algorithm, and optional inputs.
-    """
+    """Shared dialog behavior for adding a project mode or link type."""
 
     table = ""
     id_field = ""
@@ -61,11 +55,11 @@ class AddNetworkRecordDialog(BaseDialog):
         self.report(self.tr(self.success_message).format(name))
 
     def optional_inputs(self) -> dict:
-        """Maps each column the form offers besides the identifier and the name to its widgets."""
+        """Return additional record fields and their widgets."""
         return {}
 
     def existing_records(self) -> dict:
-        """Maps every identifier in the project's table to the name that goes with it."""
+        """Read the identifiers and names from the project table."""
         with self.project.db_connection as conn:
             return dict(conn.execute(f"select {self.id_field}, {self.name_field} from {self.table}").fetchall())
 
@@ -112,7 +106,7 @@ class AddNetworkRecordDialog(BaseDialog):
             return self.tr("The name cannot be empty")
         if any(character not in ALLOWED_NAME_CHARACTERS for character in name):
             return self.tr('The name can only contain letters and "_"')
-        if name.lower() in [str(taken).lower() for taken in records.values()]:
+        if any(name.lower() == str(taken).lower() for taken in records.values()):
             return self.tr("The name is already in use")
         return None
 
@@ -127,7 +121,6 @@ class AddNetworkRecordDialog(BaseDialog):
         self.lbl_feedback.setStyleSheet("color: red;" if is_error else "")
 
     def refresh_link_editing_form(self):
-        """The links layer offers the modes and link types read when it was added to the canvas."""
         links = self.qgis_project.layers.get("links")
         if links is not None:
             load_editor_styles(links[0], "links", self.project)

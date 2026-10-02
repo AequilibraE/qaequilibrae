@@ -1,10 +1,4 @@
-"""Route-choice Processing operation shared by the dialog and project runners.
-
-The module builds a mode graph from weighted network fields, applies demand from
-project matrices, and optionally saves route sets, assignment results, select-link
-outputs, or sub-area demand. :func:`run_route_choice` also lets the desktop dialog
-reuse the same operation without reopening its project.
-"""
+"""Route-choice computation and its QGIS Processing adapter."""
 
 from collections.abc import Hashable, Mapping, Sequence
 from contextlib import contextmanager
@@ -64,21 +58,7 @@ def run_route_choice(
     feedback: QgsProcessingFeedback | None = None,
     zones: Any | None = None,
 ) -> dict[str, str]:
-    """Run the Processing worker from the dialog or a project runner.
-
-    Args:
-        parameters: Processing inputs for the project, graph, demand, algorithm, and outputs.
-        project: An already-open AequilibraE project. If omitted, the worker opens the
-            folder from ``parameters`` and restores the previously active project.
-        feedback: Optional Processing feedback for messages, progress, and cancellation.
-        zones: Optional polygon GeoDataFrame used by the dialog's sub-area workflow.
-
-    Returns:
-        Fixed-name outputs for result tables, saved choice sets, and optional matrices.
-
-    Raises:
-        QgsProcessingException: If configuration, computation, or output saving fails.
-    """
+    """Run route choice from Processing parameters, reusing an open project when supplied."""
     algorithm = RouteChoice()
     algorithm.initAlgorithm()
     algorithm.project = project
@@ -92,7 +72,6 @@ def _run_route_choice(
     zones_layer: Any | None,
     feedback: QgsProcessingFeedback | None,
 ) -> dict[str, str]:
-    """Run route choice, save configured outputs, and return their paths or names."""
     push_info(feedback, "Opening AequilibraE project")
     with borrow_project(project_or_folder) as project:
         _check_canceled(feedback)
@@ -197,13 +176,7 @@ def run_single_route_choice(
     destination: int,
     demand: float,
 ) -> tuple[Any, Any]:
-    """Compute one OD route choice without saving results to the project.
-
-    This is an interactive-only operation, not the registered Processing
-    algorithm: the dialog plots its in-memory route set as a QGIS layer.
-    Return the route-choice object (for plotting) and its prepared graph (for
-    the interactive route viewer). Both are owned by the caller.
-    """
+    """Compute one OD route choice for interactive plotting; the caller owns both results."""
     from aequilibrae.paths import RouteChoice as AequilibraERouteChoice
 
     graph = _build_utility_graph(project, configuration, nodes=np.array([origin, destination], dtype=np.int64))
@@ -214,7 +187,6 @@ def run_single_route_choice(
 
 
 def _build_utility_graph(project: Any, configuration: Mapping[str, Any], nodes: Any | None = None) -> Any:
-    """Build an isolated mode graph and calculate its weighted utility field."""
     mode = configuration["mode"]
     # build_graphs replaces the project's cached graph. Keep the fresh graph for
     # this operation without discarding any graph configured by another tool.
@@ -248,7 +220,6 @@ def _check_output_names(
     configuration: RouteChoiceConfiguration,
     routes_folder: Path,
 ) -> None:
-    """Reject result names that already exist in the project."""
     names = []
     if configuration["job"] == "assign":
         names.append(configuration["output_name"] + "_uncompressed")
@@ -279,43 +250,7 @@ def _check_canceled(feedback: QgsProcessingFeedback | None) -> None:
 
 
 class RouteChoice(ProjectAlgorithm):
-    """Build route-choice sets or assign demand for an AequilibraE project.
-
-    The algorithm forms link utility as the sum of each coefficient multiplied by its
-    network field. It uses that utility to generate paths for the selected mode.
-    The selected demand cores determine which origin-destination demand the algorithm uses.
-
-    Choose ``assign`` to save link-load results. Choose ``build`` to save route sets without
-    assignment. Both operations can save route sets, omit links, and run select-link analysis.
-    Sub-area analysis needs a polygon layer. It also writes external demand to a Parquet file.
-
-    Processing inputs:
-        PROJECT_FOLDER: AequilibraE project folder.
-        MODE: Network mode ID.
-        UTILITY_FIELDS: Rows of numeric coefficient and network field.
-        ALGORITHM: ``bfsle`` or ``lp``.
-        MAX_ROUTES and MAX_DEPTH: Stop limits. At least one must be greater than zero.
-        PENALTY, CUTOFF, and BETA: Route penalty, probability cutoff, and PSL beta.
-        BLOCK_CENTROID_FLOWS: Prevent paths from passing through other centroids.
-        MATRIX_NAME and MATRIX_CORES: Project demand matrix record and selected cores.
-        JOB: ``assign`` or ``build``.
-        RESULT_NAME: Name for assignment results and sub-area output.
-        SAVE_CHOICE_SETS: Save route sets during assignment.
-        EXCLUDED_LINKS: Optional comma-separated link IDs to omit.
-        SELECT_LINKS: Rows with a query name and link set. Link sets use ``ID:AB``,
-            ``ID:BA``, or ``ID:Both`` items. Repeated query names define alternatives.
-        SELECT_LINK_NAME: Optional select-link table and matrix name.
-        SUB_AREA and ZONES: Enable sub-area processing and define its polygons.
-
-    Processing outputs:
-        OUTPUT_RESULT_NAME: Link-load table name, or an empty string for ``build``.
-        OUTPUT_ROUTES_FOLDER: Choice-set folder, or an empty string when not saved.
-        OUTPUT_SUB_AREA_MATRIX: Parquet path, or an empty string when not used.
-        OUTPUT_SELECT_LINK_FLOWS: Select-link table name, or an empty string when not used.
-        OUTPUT_SELECT_LINK_MATRIX: Select-link OMX path, or an empty string when not used.
-
-    The algorithm rejects existing result and matrix names. It does not replace them.
-    """
+    """Build route-choice sets or assign demand for an AequilibraE project."""
 
     algorithm_name = "route_choice"
     display_name = "Route choice"
@@ -488,6 +423,11 @@ class RouteChoice(ProjectAlgorithm):
         )
         if Path(select_link_name).name != select_link_name or "\\" in select_link_name:
             raise RouteChoiceError("Select-link output names must not contain directory separators")
+        raw_excluded_links = self.parameterAsString(parameters, self.EXCLUDED_LINKS, context) or ""
+        try:
+            excluded_links = [int(item.strip()) for item in raw_excluded_links.split(",") if item.strip()]
+        except ValueError as error:
+            raise RouteChoiceError("Excluded link IDs must be integers separated by commas") from error
         return {
             "mode": mode,
             "utility_fields": utility_fields,
@@ -512,7 +452,7 @@ class RouteChoice(ProjectAlgorithm):
             "job": job,
             "output_name": output_name,
             "save_choice_sets": self.parameterAsBool(parameters, self.SAVE_CHOICE_SETS, context),
-            "excluded_links": _parse_ids(self.parameterAsString(parameters, self.EXCLUDED_LINKS, context)),
+            "excluded_links": excluded_links,
             "select_links": select_links,
             "select_link_name": select_link_name,
             "sub_area": sub_area,
@@ -579,11 +519,3 @@ def _select_links(
             raise RouteChoiceError(f"Select-link query '{name}' requires at least one link ID")
         selections.setdefault(name, []).append(link_set)
     return selections
-
-
-def _parse_ids(value: str | None) -> list[int]:
-    """Parse comma-separated excluded-link IDs."""
-    try:
-        return [int(item.strip()) for item in str(value or "").split(",") if item.strip()]
-    except ValueError as error:
-        raise RouteChoiceError("Excluded link IDs must be integers separated by commas") from error

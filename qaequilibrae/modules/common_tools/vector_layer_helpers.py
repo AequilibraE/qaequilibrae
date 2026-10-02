@@ -121,6 +121,7 @@ def rows_from_feature_source(source, target_crs=None) -> list[dict[str, Any]]:
 
 
 def _qgis_value(value):
+    """Convert scalar pandas missing values to ``None`` for QGIS attributes."""
     if value is None:
         return None
     try:

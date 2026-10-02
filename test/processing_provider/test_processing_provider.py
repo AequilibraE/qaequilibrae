@@ -422,7 +422,6 @@ def test_trip_length_distribution(ae_with_project, folder_path):
     action.matrices = matrices
     action.mat_names = mat_names
 
-    # Mock context and feedback
     class DummyContext:
         pass
 

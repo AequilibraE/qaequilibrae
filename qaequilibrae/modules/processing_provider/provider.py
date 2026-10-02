@@ -34,7 +34,6 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(TransitSupplyMetricsAlgorithm())
 
     def __load_model_building(self):
-
         from .model_building.add_links_from_layer import AddLinksFromLayer
         from .model_building.collapse_links import CollapseLinks
         from .model_building.create_empty_project import CreateEmptyProject
@@ -46,7 +45,6 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(NetworkSimplifier())
 
     def __load_matrix_procedures(self):
-
         from .matrix_procedures.export_matrix import ExportMatrix
         from .matrix_procedures.matrix_calculator import MatrixCalculator
         from .matrix_procedures.omx_interop import OmxToTable, OmxZoneSlice, TableToOmx
@@ -117,13 +115,10 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(DelaunayNetwork())
 
     def id(self):
-        """The ID used for identifying the provider."""
         return "qaequilibrae"
 
     def name(self):
-        """The human friendly name of the plugin in Processing."""
         return "AequilibraE"
 
     def icon(self):
-        """Icon used for the provider inside the Processing toolbox."""
         return QIcon(join(provider_path, "icon.png"))

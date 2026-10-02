@@ -1,9 +1,4 @@
-"""Network-skimming Processing worker, shared by the dialog and project runners.
-
-:class:`NetworkSkimming` runs a network skimming for one mode, saves the skim matrix
-into the AequilibraE project, and exposes the matrix name, file and folder as outputs.
-The impedance-matrix dialog and exported runners call :func:`run_network_skimming`.
-"""
+"""Network-skimming computation and its QGIS Processing adapter."""
 
 from pathlib import Path
 from typing import Any, TypedDict
@@ -45,20 +40,7 @@ def run_network_skimming(
     project: Any | None = None,
     feedback: QgsProcessingFeedback | None = None,
 ) -> dict[str, str]:
-    """Run the Processing worker from a dialog or an exported project runner.
-
-    Args:
-        parameters: Processing inputs, including the project folder and skim settings.
-        project: An already-open AequilibraE project. If omitted, the worker opens the
-            folder from ``parameters`` and restores the previously active project.
-        feedback: Optional Processing feedback for messages, progress, and cancellation.
-
-    Returns:
-        The matrix name, OMX file path, and project matrix folder.
-
-    Raises:
-        QgsProcessingException: If validation, graph preparation, skimming, or saving fails.
-    """
+    """Run network skimming from Processing parameters and an optional open project."""
     algorithm = NetworkSkimming()
     algorithm.initAlgorithm()
     algorithm.project = project
@@ -70,7 +52,6 @@ def _run_skimming(
     configuration: SkimmingConfiguration,
     feedback: QgsProcessingFeedback | None,
 ) -> dict[str, str]:
-    """Run skimming inside a borrowed project and save its matrix."""
     from aequilibrae.paths import NetworkSkimming as SkimmingProcedure
 
     push_info(feedback, "Opening AequilibraE project")
@@ -109,13 +90,11 @@ def _run_skimming(
 
 
 def _check_canceled(feedback: QgsProcessingFeedback | None) -> None:
-    """Stop before saving when Processing feedback reports cancellation."""
     if feedback is not None and feedback.isCanceled():
         raise SkimmingError("Network skimming canceled; results were not saved")
 
 
 def _check_output_names(project: Any, configuration: SkimmingConfiguration) -> None:
-    """Reject matrix names that are unsafe or already in use."""
     name = configuration["matrix_name"]
     if Path(name).name != name or "\\" in name:
         raise SkimmingError("Matrix names must not contain directory separators")
@@ -124,31 +103,7 @@ def _check_output_names(project: Any, configuration: SkimmingConfiguration) -> N
 
 
 class NetworkSkimming(ProjectAlgorithm):
-    """Compute a network skim matrix for one mode.
-
-    The algorithm builds the selected mode graph, sets a minimizing cost field, and
-    computes one or more skim fields. By default, it traces paths between centroids.
-    It can instead trace paths between every node. That option cannot block centroid flows.
-    The algorithm can also omit selected links.
-
-    The algorithm saves one OMX file and adds its record to the project database.
-    It rejects an existing matrix name instead of replacing that matrix.
-
-    Processing inputs:
-        PROJECT_FOLDER: AequilibraE project folder.
-        MODE: Network mode ID, such as ``c``.
-        COST_FIELD: Numeric network field used to choose paths.
-        SKIM_FIELDS: Comma-separated numeric fields to write to the output matrix.
-        TRACE_ALL_NODES: Trace all network nodes instead of centroids only.
-        BLOCK_CENTROID_FLOWS: Prevent paths from passing through other centroids.
-        EXCLUDED_LINKS: Optional comma-separated link IDs to omit.
-        MATRIX_NAME: Name of the output matrix record and OMX file.
-
-    Processing outputs:
-        OUTPUT_MATRIX_NAME: Matrix record name.
-        OUTPUT_MATRIX_PATH: Full path to the OMX file.
-        OUTPUT_MATRIX_FOLDER: Project matrix folder path.
-    """
+    """Compute a network skim matrix for one mode."""
 
     algorithm_name = "network_skimming"
     display_name = "Network skimming"
@@ -241,22 +196,21 @@ class NetworkSkimming(ProjectAlgorithm):
         if not matrix_name:
             raise SkimmingError("An output matrix name is required")
 
+        raw_links = self.parameterAsString(parameters, self.EXCLUDED_LINKS, context)
+        try:
+            excluded_links = [int(link_id.strip()) for link_id in raw_links.split(",") if link_id.strip()]
+        except ValueError as error:
+            raise SkimmingError("Excluded link IDs must be integers separated by commas") from error
+
         return {
             "mode": mode,
             "cost_field": cost_field,
             "skim_fields": skim_fields,
             "block_centroid_flows": block_centroid_flows,
             "trace_all_nodes": trace_all_nodes,
-            "excluded_links": self._excluded_links(parameters, context),
+            "excluded_links": excluded_links,
             "matrix_name": matrix_name,
         }
-
-    def _excluded_links(self, parameters: dict[str, Any], context: QgsProcessingContext) -> list[int]:
-        raw = self.parameterAsString(parameters, self.EXCLUDED_LINKS, context)
-        try:
-            return [int(link_id.strip()) for link_id in raw.split(",") if link_id.strip()]
-        except ValueError as error:
-            raise SkimmingError("Excluded link IDs must be integers separated by commas") from error
 
     def shortHelpString(self) -> str:
         help_messages = [

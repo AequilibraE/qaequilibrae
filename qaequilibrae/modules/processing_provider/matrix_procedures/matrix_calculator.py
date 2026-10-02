@@ -36,7 +36,6 @@ class MatrixCalculator(ProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
 
@@ -51,7 +50,6 @@ class MatrixCalculator(ProcessingAlgorithm):
         with open(parameters["conf_file"], "r") as f:
             params = yaml.safe_load(f)
 
-        # Load matrices
         matrices = {}
         index = None
         for matrix in params:

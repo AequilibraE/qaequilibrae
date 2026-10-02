@@ -14,10 +14,7 @@ class CollapseLinks(ProjectAlgorithm):
     LINK_IDS = "LINK_IDS"
 
     def initAlgorithm(self, configuration=None):
-        # 1. Folder containing an AequilibraE project
         self.add_project_folder_parameter()
-
-        # 2. Way of selecting one or more LINK_IDS
         self.addParameter(
             QgsProcessingParameterString(self.LINK_IDS, self.tr("Link IDs (comma-separated)"), defaultValue="")
         )
@@ -26,7 +23,6 @@ class CollapseLinks(ProjectAlgorithm):
         project_folder = self.project_folder(parameters, context)
         link_ids_raw = self.parameterAsString(parameters, self.LINK_IDS, context)
 
-        # Parse LINK_IDS
         try:
             link_ids = [int(n.strip()) for n in link_ids_raw.split(",") if n.strip()]
         except Exception as e:

@@ -40,26 +40,25 @@ class ExportMatrix(ProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
 
         from aequilibrae.matrix import AequilibraeMatrix
 
         file_format = ["csv", "omx"]
-        format = file_format[parameters["output_format"]]
+        output_format = file_format[parameters["output_format"]]
         matrix_path = Path(parameters["matrix_path"])
 
         if matrix_path.suffix.lower() != ".omx":
             raise QgsProcessingException(self.tr("Only OpenMatrix (*.omx) files can be exported"))
 
-        dst_path = join(parameters["file_path"], f"{matrix_path.stem}.{format}")
+        dst_path = join(parameters["file_path"], f"{matrix_path.stem}.{output_format}")
 
         mat = AequilibraeMatrix()
 
-        if format == "omx":
+        if output_format == "omx":
             mat.create_from_omx(omx_path=parameters["matrix_path"], file_path=dst_path, memory_only=False)
-        elif format in ["csv"]:
+        elif output_format == "csv":
             mat.create_from_omx(parameters["matrix_path"])
             mat.export(Path(dst_path))
 

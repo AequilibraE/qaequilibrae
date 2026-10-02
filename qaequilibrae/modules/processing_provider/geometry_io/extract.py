@@ -2,6 +2,7 @@
 
 from qgis.core import (
     Qgis,
+    QgsCoordinateReferenceSystem,
     QgsProcessingException,
     QgsProcessingParameterFeatureSink,
 )
@@ -43,7 +44,7 @@ class ExtractProjectLayer(ProjectAlgorithm):
                 context,
                 fields,
                 self.sink_geometry_type,
-                project_crs(),
+                QgsCoordinateReferenceSystem("EPSG:4326"),
             )
             if sink is None:
                 raise QgsProcessingException(self.tr("Could not create the output layer"))
@@ -53,12 +54,6 @@ class ExtractProjectLayer(ProjectAlgorithm):
 
     def shortHelpString(self):
         return self.tr(f"Extracts {self.table_name} from an AequilibraE project.")
-
-
-def project_crs():
-    from qgis.core import QgsCoordinateReferenceSystem
-
-    return QgsCoordinateReferenceSystem("EPSG:4326")
 
 
 class ExtractLinks(ExtractProjectLayer):
