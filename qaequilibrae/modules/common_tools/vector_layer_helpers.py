@@ -55,25 +55,6 @@ def add_dataframe_features(dataframe: pd.DataFrame, sink, fields: QgsFields, fee
     return written
 
 
-def geometry_type_from_geodataframe(geodataframe) -> str:
-    """Return the QGIS memory-layer geometry type for a GeoDataFrame."""
-    geometry_types = set(geodataframe.geometry.geom_type.dropna())
-    if geometry_types & {"Point", "MultiPoint"}:
-        return "Point"
-    if geometry_types & {"LineString", "MultiLineString"}:
-        return "LineString"
-    if geometry_types & {"Polygon", "MultiPolygon"}:
-        return "Polygon"
-    return "LineString"
-
-
-def crs_string(geodataframe) -> str:
-    """Return a CRS string accepted by a QGIS memory-layer URI."""
-    if geodataframe.crs is None:
-        return "EPSG:4326"
-    return geodataframe.crs.to_string()
-
-
 def centroid_coordinates(source, id_field_index: int, feedback) -> dict[int, tuple[float, float]]:
     """Read node or zone IDs and geometry centroids from a feature source."""
     coordinates = {}
@@ -91,9 +72,7 @@ def centroid_coordinates(source, id_field_index: int, feedback) -> dict[int, tup
 def rows_from_feature_source(source, target_crs=None) -> list[dict[str, Any]]:
     """Return lower-case attributes and Shapely geometries from a QGIS source.
 
-    When ``target_crs`` is supplied, geometries are transformed before conversion.
-    Leaving it unset preserves the source coordinates and is appropriate for
-    callers that also preserve the source CRS on their output layer.
+    Transform geometries to ``target_crs`` if supplied; otherwise preserve source coordinates.
     """
     import shapely.wkb
 

@@ -3,8 +3,7 @@ import sys
 from os.path import join
 from pathlib import Path
 
-from qgis.core import Qgis, QgsProcessingParameterFile, QgsProcessingParameterEnum
-from qgis.core import QgsProcessingException
+from qgis.core import Qgis, QgsProcessingException, QgsProcessingParameterEnum, QgsProcessingParameterFile
 
 from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
@@ -45,8 +44,7 @@ class ExportMatrix(ProcessingAlgorithm):
 
         from aequilibrae.matrix import AequilibraeMatrix
 
-        file_format = ["csv", "omx"]
-        output_format = file_format[parameters["output_format"]]
+        output_format = ("csv", "omx")[parameters["output_format"]]
         matrix_path = Path(parameters["matrix_path"])
 
         if matrix_path.suffix.lower() != ".omx":

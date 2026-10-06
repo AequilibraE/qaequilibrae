@@ -1,4 +1,4 @@
-"""Add a GTFS feed to an AequilibraE project."""
+"""Import GTFS feeds into a project."""
 
 import json
 import math
@@ -16,14 +16,14 @@ from qgis.core import (
 from qgis.PyQt.QtCore import QDate
 
 from aequilibrae.transit import Transit
-from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
+from qaequilibrae.modules.processing_provider.project_algorithm import ProjectAlgorithm
 from qaequilibrae.modules.common_tools import project_has_transit
 from qaequilibrae.modules.processing_provider.project import borrow_project
 from qaequilibrae.modules.transit_procedures.gtfs_import_runner import import_gtfs_feeds
 
 
-class AddGTFSFeedAlgorithm(ProcessingAlgorithm):
-    """Import one GTFS feed into an existing AequilibraE project."""
+class AddGTFSFeedAlgorithm(ProjectAlgorithm):
+    """Import a GTFS feed into an AequilibraE project."""
 
     algorithm_name = "addGTFSFeed"
     display_name = "Add GTFS feed"
@@ -48,42 +48,26 @@ class AddGTFSFeedAlgorithm(ProcessingAlgorithm):
     )
 
     def initAlgorithm(self, configuration: dict | None = None) -> None:
+        self.add_project_folder_parameter(self.PROJECT)
         self.addParameter(
             QgsProcessingParameterFile(
-                self.PROJECT,
-                self.tr("AequilibraE project folder"),
-                behavior=Qgis.ProcessingFileParameterBehavior.Folder,
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterFile(
-                self.GTFS_FEED,
-                self.tr("GTFS feed ZIP file"),
-                behavior=Qgis.ProcessingFileParameterBehavior.File,
+                self.GTFS_FEED, self.tr("GTFS feed ZIP file"), behavior=Qgis.ProcessingFileParameterBehavior.File
             )
         )
         self.addParameter(
             QgsProcessingParameterDateTime(
-                self.DATE,
-                self.tr("Service date"),
-                type=Qgis.ProcessingDateTimeParameterDataType.Date,
+                self.DATE, self.tr("Service date"), type=Qgis.ProcessingDateTimeParameterDataType.Date
             )
         )
         self.addParameter(QgsProcessingParameterString(self.AGENCY, self.tr("Agency")))
         self.addParameter(QgsProcessingParameterString(self.DESCRIPTION, self.tr("Description")))
         self.addParameter(
             QgsProcessingParameterString(
-                self.CAPACITIES,
-                self.tr("Vehicle capacities as a JSON object (optional)"),
-                optional=True,
+                self.CAPACITIES, self.tr("Vehicle capacities as a JSON object (optional)"), optional=True
             )
         )
         self.addParameter(
-            QgsProcessingParameterBoolean(
-                self.ALLOW_MAP_MATCH,
-                self.tr("Allow map matching"),
-                defaultValue=False,
-            )
+            QgsProcessingParameterBoolean(self.ALLOW_MAP_MATCH, self.tr("Allow map matching"), defaultValue=False)
         )
         self.addParameter(
             QgsProcessingParameterEnum(
@@ -100,7 +84,7 @@ class AddGTFSFeedAlgorithm(ProcessingAlgorithm):
         context: QgsProcessingContext,
         feedback: QgsProcessingFeedback | None,
     ) -> dict:
-        project_path = self.parameterAsFile(parameters, self.PROJECT, context)
+        project_path = self.project_folder(parameters, context, self.PROJECT)
         feed_path = self.parameterAsFile(parameters, self.GTFS_FEED, context)
         selected_date = self.parameterAsDateTime(parameters, self.DATE, context)
         agency = self.parameterAsString(parameters, self.AGENCY, context).strip()

@@ -9,7 +9,6 @@ from qaequilibrae.modules.processing_provider.paths_procedures.shortest_path imp
 
 
 def test_parse_excluded_link_ids():
-    """Excluded link IDs use the compact form accepted by the Processing adapter."""
     assert parse_excluded_link_ids(" 4, 14,  20 ") == (4, 14, 20)
     assert parse_excluded_link_ids(" ") == ()
 

@@ -5,7 +5,7 @@ from qaequilibrae.modules.transit_procedures.transit_assignment_runner import ru
 
 
 class TransitAssignProcedure(WorkerThread):
-    """Run shared transit-assignment logic from the legacy dialog thread."""
+    """Run transit assignment in the dialog's worker thread."""
 
     signal = pyqtSignal(object)
 

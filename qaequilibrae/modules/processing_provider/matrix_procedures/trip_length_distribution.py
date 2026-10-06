@@ -21,8 +21,6 @@ class TripLengthDistribution(ProjectAlgorithm):
     group_name = "Data"
     group_id = "data"
 
-    PROJECT_FOLDER = "PROJECT_FOLDER"
-
     def initAlgorithm(self, configuration=None):
         self.add_project_folder_parameter()
         self.addParameter(QgsProcessingParameterString("demand_mat_name", self.tr("Demand matrix")))
@@ -66,36 +64,36 @@ class TripLengthDistribution(ProjectAlgorithm):
                 selected[kind] = matrix
             demand_matrix, skim_matrix = selected["demand"], selected["skim"]
 
-            figure, ax = plt.subplots()
+            figure, axis = plt.subplots()
             resources.callback(plt.close, figure)
-            mult = floor(skim_matrix.index.shape[0] / 10)
-            b = max(1, floor(log10(skim_matrix.matrix_view.shape[0]) * mult))
-            n, bins, _ = ax.hist(
+            zone_scale = floor(skim_matrix.index.shape[0] / 10)
+            bin_count = max(1, floor(log10(skim_matrix.matrix_view.shape[0]) * zone_scale))
+            counts, bin_edges, _ = axis.hist(
                 np.nan_to_num(skim_matrix.matrix_view.flatten(), nan=0),
-                bins=b,
+                bins=bin_count,
                 weights=np.nan_to_num(demand_matrix.matrix_view.flatten()),
                 density=False,
                 facecolor="#146DB3",
                 alpha=0.75,
             )
 
-            df = pd.DataFrame([n[1:], bins[1:]]).transpose().fillna(0)
-            df.columns = ["trips", "position"]
-            df["cumsum"] = df["trips"].cumsum()
-            df["rate"] = df["cumsum"] / df["trips"].sum()
-            if df["rate"].min() == df["rate"].max():
-                limit_right = ceil(df["position"].values[-1])
+            histogram = pd.DataFrame([counts[1:], bin_edges[1:]]).transpose().fillna(0)
+            histogram.columns = ["trips", "position"]
+            histogram["cumsum"] = histogram["trips"].cumsum()
+            histogram["rate"] = histogram["cumsum"] / histogram["trips"].sum()
+            if histogram["rate"].min() == histogram["rate"].max():
+                limit_right = ceil(histogram["position"].values[-1])
             else:
-                limit_right = ceil(df[df["rate"] <= 0.99]["position"].values[-1])
+                limit_right = ceil(histogram[histogram["rate"] <= 0.99]["position"].values[-1])
 
-            ax.set_xlim(left=0, right=limit_right)
-            ax.set_ylim(bottom=0, top=ceil(max(n[1:]) * 1.1))
-            ax.set_xlabel("Trip length")
-            ax.set_ylabel("Trips")
-            ax.set_title(parameters.get("plot_name", "Trip length distribution"))
+            axis.set_xlim(left=0, right=limit_right)
+            axis.set_ylim(bottom=0, top=ceil(max(counts[1:]) * 1.1))
+            axis.set_xlabel("Trip length")
+            axis.set_ylabel("Trips")
+            axis.set_title(parameters.get("plot_name", "Trip length distribution"))
             figure.savefig(parameters["file_path"])
 
         return {"Output": f"Success: TLD plot saved in {parameters['file_path']}"}
 
     def shortHelpString(self):
-        return self.tr("Creates a trip-length distribution histogram and save in an output folder.")
+        return self.tr("Creates a trip-length distribution histogram in the output folder.")

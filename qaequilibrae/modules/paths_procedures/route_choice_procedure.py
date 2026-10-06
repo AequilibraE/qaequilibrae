@@ -1,9 +1,4 @@
-"""Worker for the dialog's interactive, single-OD route inspection.
-
-Assignment and choice-set building use the registered RouteChoice Processing
-algorithm instead. This worker only dispatches the interactive operation and
-notifies the dialog so it can plot the returned routes.
-"""
+"""Run single-OD route choice for interactive plotting."""
 
 from qgis.PyQt.QtCore import pyqtSignal
 from aequilibrae.utils.interface.worker_thread import WorkerThread

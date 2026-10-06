@@ -1,4 +1,4 @@
-"""QGIS adapters shared by the project geometry algorithms."""
+"""Read and write project geometry through QGIS."""
 
 from typing import Any
 
@@ -17,18 +17,12 @@ from qaequilibrae.modules.common_tools.vector_layer_helpers import (
 
 __all__ = [
     "add_dataframe_to_sink",
-    "editable_attribute_values",
+    "copy_record_attributes",
     "fields_from_dataframe",
     "ignored_input_fields",
     "project_table",
     "source_rows",
 ]
-
-
-def record_data_fields(record, table) -> list[str]:
-    """Return the editable fields exposed by a project record."""
-    data_fields = getattr(record, "data_fields", None)
-    return data_fields() if data_fields is not None else table.fields.all_fields()
 
 
 def project_table(project, table_name):
@@ -52,9 +46,10 @@ def ignored_input_fields(table_name: str, identifier_field: str | None = None, *
     return ignored
 
 
-def editable_attribute_values(record, table, row, ignored_fields, *, skip_nulls: bool) -> None:
+def copy_record_attributes(record, table, row, ignored_fields, *, skip_nulls: bool) -> None:
     """Copy supported input attributes to a project record."""
-    data_fields = set(record_data_fields(record, table))
+    record_fields = getattr(record, "data_fields", None)
+    data_fields = set(record_fields() if record_fields is not None else table.fields.all_fields())
     for field, value in row.items():
         if field in ignored_fields or (skip_nulls and value is None):
             continue
@@ -72,5 +67,4 @@ def add_dataframe_to_sink(dataframe: pd.DataFrame, sink, fields: QgsFields, feed
 
 def source_rows(source) -> list[dict[str, Any]]:
     """Return lower-case attribute dictionaries and Shapely geometries."""
-    target_crs = QgsCoordinateReferenceSystem("EPSG:4326")
-    return rows_from_feature_source(source, target_crs=target_crs)
+    return rows_from_feature_source(source, target_crs=QgsCoordinateReferenceSystem("EPSG:4326"))

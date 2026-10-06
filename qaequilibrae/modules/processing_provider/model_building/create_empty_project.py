@@ -2,8 +2,7 @@ import importlib.util as iutil
 from os import listdir, rmdir
 from os.path import isdir, join
 
-from qgis.core import Qgis, QgsProcessingException
-from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterString
+from qgis.core import Qgis, QgsProcessingException, QgsProcessingParameterFile, QgsProcessingParameterString
 
 from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
@@ -17,10 +16,10 @@ class CreateEmptyProject(ProcessingAlgorithm):
     PARENT_FOLDER = "PARENT_FOLDER"
     MODEL_NAME = "MODEL_NAME"
 
-    # The model name becomes a folder name, so anything a file system could choke on is out
+    # The model name is also the folder name.
     INVALID_NAME_CHARACTERS = '\\/:*?"<>|'
 
-    # These resolve to the parent folder itself (or above it) instead of a new folder inside it
+    # These names would point to the parent folder or its parent.
     RESERVED_NAMES = (".", "..")
 
     def initAlgorithm(self, configuration=None):
@@ -35,7 +34,7 @@ class CreateEmptyProject(ProcessingAlgorithm):
         )
 
     def flags(self):
-        # Filling the panel means touching widgets, which only the main thread may do
+        # The plugin panel's widgets require the main thread.
         return super().flags() | Qgis.ProcessingAlgorithmFlag.NoThreading
 
     def processAlgorithm(self, parameters, context, feedback):
@@ -53,8 +52,7 @@ class CreateEmptyProject(ProcessingAlgorithm):
                 self.tr("The model name cannot contain any of these characters: ") + self.INVALID_NAME_CHARACTERS
             )
 
-        # Caught before joining, since these would point the project folder at the parent folder
-        # itself and leave the empty-folder handling below ready to remove it
+        # Check before the empty-folder cleanup below.
         if model_name in self.RESERVED_NAMES:
             raise QgsProcessingException(self.tr("The model name cannot be '.' or '..'"))
 
@@ -65,8 +63,7 @@ class CreateEmptyProject(ProcessingAlgorithm):
 
         from aequilibrae.project import Project
 
-        # AequilibraE refuses to create a project on a folder that already exists, so we
-        # only clear the way when the folder we were pointed to is empty
+        # AequilibraE needs a folder that does not exist yet.
         if isdir(project_folder):
             if listdir(project_folder):
                 raise QgsProcessingException(self.tr("Folder already exists and is not empty: ") + project_folder)
@@ -102,12 +99,10 @@ class CreateEmptyProject(ProcessingAlgorithm):
 
         qgis_project = get_aequilibrae_menu_instance()
 
-        # Processing also runs with no plugin around it
         if qgis_project is None:
             project.close()
             return
 
-        # The panel holds one project at a time, and the one already open stays
         if qgis_project.project is not None:
             feedback.pushWarning(self.tr("Close the open project to see the new one in the panel"))
             project.close()
@@ -117,14 +112,10 @@ class CreateEmptyProject(ProcessingAlgorithm):
         show_project_in_panel(qgis_project, project_folder)
 
     def shortHelpString(self):
-        help_messages = [
-            self.tr("Creates a new empty AequilibraE project, with no links, nodes or zones."),
-            self.tr("The project is created with the default modes and link types, and can be"),
-            self.tr("populated afterwards with the other Model building tools."),
-            self.tr("The model is created in a folder named after the model, inside the parent"),
-            self.tr("folder you choose. That model folder must not exist yet, or must be empty."),
-        ]
-        return "\n".join(help_messages)
+        return self.tr(
+            "Creates an empty AequilibraE project with default modes and link types. "
+            "The project folder uses the model name and must be new or empty."
+        )
 
     def tags(self):
         return ["create", "new", "empty", "project", "model"]

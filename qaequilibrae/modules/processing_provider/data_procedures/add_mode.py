@@ -25,24 +25,16 @@ class AddMode(ProjectAlgorithm):
         self.addParameter(QgsProcessingParameterString(self.MODE_ID, self.tr("Mode ID")))
         self.addParameter(QgsProcessingParameterString(self.MODE_NAME, self.tr("Mode name")))
         self.addParameter(QgsProcessingParameterString(self.DESCRIPTION, self.tr("Description"), optional=True))
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.PCE,
-                self.tr("Passenger car equivalent"),
-                type=Qgis.ProcessingNumberParameterType.Double,
-                optional=True,
+        for key, label in (
+            (self.PCE, "Passenger car equivalent"),
+            (self.VOT, "Value of time"),
+            (self.PPV, "Persons per vehicle"),
+        ):
+            self.addParameter(
+                QgsProcessingParameterNumber(
+                    key, self.tr(label), type=Qgis.ProcessingNumberParameterType.Double, optional=True
+                )
             )
-        )
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.VOT, self.tr("Value of time"), type=Qgis.ProcessingNumberParameterType.Double, optional=True
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.PPV, self.tr("Persons per vehicle"), type=Qgis.ProcessingNumberParameterType.Double, optional=True
-            )
-        )
 
     def processAlgorithm(self, parameters, context, feedback):
         project_folder = self.project or self.project_folder(parameters, context)

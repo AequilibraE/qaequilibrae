@@ -1,4 +1,4 @@
-"""Shared helpers for the trip-distribution Processing algorithms."""
+"""Inputs and output helpers for trip distribution."""
 
 from __future__ import annotations
 
@@ -16,9 +16,7 @@ from qgis.core import (
 
 from ..project_algorithm import ProjectAlgorithm
 
-# The synthetic gravity model only understands these functional forms.
 GRAVITY_FUNCTIONS = ["EXPO", "GAMMA", "POWER"]
-# Calibration only has a closed-form update for these two forms.
 CALIBRATION_FUNCTIONS = ["EXPO", "POWER"]
 
 
@@ -42,27 +40,14 @@ def add_trip_end_parameters(algorithm: ProjectAlgorithm) -> None:
         )
 
 
-def dataframe_from_source(source: Any, index_field: str) -> pd.DataFrame:
-    """Read a feature source into a DataFrame indexed by *index_field*.
-
-    Distribution vectors are matched to matrix zones by their index, so the
-    chosen index field moves out of the columns and into the index.
-    """
+def vectors_from_source(source: Any, index_field: str, row_field: str, column_field: str) -> pd.DataFrame:
+    """Read trip ends as floats, as required by AequilibraE."""
     field_names = [field.name() for field in source.fields()]
     if index_field not in field_names:
         raise QgsProcessingException(f"The vector layer has no field named '{index_field}'")
 
     rows = [[_clean_value(value) for value in feature.attributes()] for feature in source.getFeatures()]
-    return pd.DataFrame(rows, columns=field_names).set_index(index_field)
-
-
-def vectors_from_source(source: Any, index_field: str, row_field: str, column_field: str) -> pd.DataFrame:
-    """Build the trip-end vectors a distribution procedure expects.
-
-    The row and column totals are cast to float because AequilibraE rejects
-    integer totals, while QGIS layers are free to store them as integers.
-    """
-    dataframe = dataframe_from_source(source, index_field)
+    dataframe = pd.DataFrame(rows, columns=field_names).set_index(index_field)
     for field_name in (row_field, column_field):
         if field_name not in dataframe.columns:
             raise QgsProcessingException(f"The vector layer has no field named '{field_name}'")

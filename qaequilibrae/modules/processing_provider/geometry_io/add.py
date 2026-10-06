@@ -1,4 +1,4 @@
-"""Algorithms that append geometry records to an AequilibraE project."""
+"""Add layer features to project tables."""
 
 from qgis.core import (
     Qgis,
@@ -7,16 +7,14 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
 )
 
-from ..project_algorithm import ProjectAlgorithm
-from .common import editable_attribute_values, ignored_input_fields, project_table, source_rows
 from ..project import open_project
+from ..project_algorithm import ProjectAlgorithm
+from .common import copy_record_attributes, ignored_input_fields, project_table, source_rows
 
 
 class AddProjectLayer(ProjectAlgorithm):
     """Base class for adding vector features to a project table."""
 
-    algorithm_name = ""
-    display_name = ""
     group_name = "Geometry IO"
     group_id = "geometry_io"
 
@@ -30,9 +28,7 @@ class AddProjectLayer(ProjectAlgorithm):
         self.addOutput(QgsProcessingOutputNumber("ADDED", self.tr("Features added")))
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.INPUT,
-                self.tr(self.display_name + " input"),
-                types=[self.geometry_source_type],
+                self.INPUT, self.tr(self.display_name + " input"), types=[self.geometry_source_type]
             )
         )
 
@@ -70,7 +66,7 @@ class AddProjectLayer(ProjectAlgorithm):
                     record = table.new()
                 if self.table_name == "nodes" and row.get("is_centroid") is None:
                     record.is_centroid = 0
-                editable_attribute_values(record, table, row, ignored_fields, skip_nulls=True)
+                copy_record_attributes(record, table, row, ignored_fields, skip_nulls=True)
                 if row["geometry"] is None:
                     raise QgsProcessingException(self.tr(f"Feature {identifier} has no geometry"))
                 record.geometry = row["geometry"]
@@ -91,7 +87,6 @@ class AddLinks(AddProjectLayer):
     display_name = "Add links"
     table_name = "links"
     id_field = None
-    geometry_source_type = Qgis.ProcessingSourceType.VectorLine
 
 
 class AddNodes(AddProjectLayer):

@@ -1,7 +1,7 @@
-"""Shortest-path computation shared by the Processing algorithm and plugin dialog."""
+"""Compute paths from network links."""
 
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Iterable, cast
 
 from qgis.core import (
     Qgis,
@@ -23,11 +23,9 @@ from qgis.PyQt.QtCore import QMetaType
 from qaequilibrae.modules.common_tools.writable_dataframe import make_writable_network_dataframe
 from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
-from .network_dataframe import network_dataframe_from_source
-
 
 class ShortestPathError(ValueError):
-    """An input or routing error that callers can present in their own way."""
+    """Invalid shortest-path input or an unavailable path."""
 
 
 @dataclass(frozen=True)
@@ -57,9 +55,6 @@ class ShortestPathResult:
 
 
 def parse_excluded_link_ids(value: str) -> tuple[int, ...]:
-    if not value.strip():
-        return ()
-
     try:
         return tuple(int(link_id.strip()) for link_id in value.split(",") if link_id.strip())
     except ValueError as error:
@@ -129,8 +124,7 @@ def _network_for_mode(network, mode, cost_field):
     if network.empty:
         raise ShortestPathError(f"No link supports mode '{mode}'")
 
-    # Direction-specific costs are optional in AequilibraE. Preserve them when
-    # supplied, while still accepting a direction-independent cost field.
+    # AequilibraE uses directional costs when the optional AB/BA fields are present.
     directional_costs = [field for field in (f"{cost_field}_ab", f"{cost_field}_ba") if field in network.columns]
     columns = ["link_id", "a_node", "b_node", "direction", cost_field, *directional_costs]
     return make_writable_network_dataframe(network[columns])
@@ -186,9 +180,7 @@ class ShortestPath(ProcessingAlgorithm):
     def initAlgorithm(self, configuration=None):
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.LINKS,
-                self.tr("Links"),
-                types=[Qgis.ProcessingSourceType.VectorLine],
+                self.LINKS, self.tr("Links"), types=[Qgis.ProcessingSourceType.VectorLine]
             )
         )
         self.addParameter(
@@ -210,50 +202,43 @@ class ShortestPath(ProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterNumber(
-                self.FROM_NODE,
-                self.tr("From node"),
-                type=Qgis.ProcessingNumberParameterType.Integer,
+                self.FROM_NODE, self.tr("From node"), type=Qgis.ProcessingNumberParameterType.Integer
             )
         )
         self.addParameter(
             QgsProcessingParameterNumber(
-                self.TO_NODE,
-                self.tr("To node"),
-                type=Qgis.ProcessingNumberParameterType.Integer,
+                self.TO_NODE, self.tr("To node"), type=Qgis.ProcessingNumberParameterType.Integer
             )
         )
         self.addParameter(
             QgsProcessingParameterBoolean(
-                self.BLOCK_CENTROID_FLOWS,
-                self.tr("Block flows through centroids"),
-                defaultValue=False,
+                self.BLOCK_CENTROID_FLOWS, self.tr("Block flows through centroids"), defaultValue=False
             )
         )
         self.addParameter(
             QgsProcessingParameterString(
-                self.EXCLUDED_LINKS,
-                self.tr("Excluded link IDs (comma-separated)"),
-                defaultValue="",
-                optional=True,
+                self.EXCLUDED_LINKS, self.tr("Excluded link IDs (comma-separated)"), defaultValue="", optional=True
             )
         )
         self.addParameter(
             QgsProcessingParameterFeatureSink(
-                self.OUTPUT,
-                self.tr("Shortest path"),
-                type=Qgis.ProcessingSourceType.VectorLine,
+                self.OUTPUT, self.tr("Shortest path"), type=Qgis.ProcessingSourceType.VectorLine
             )
         )
         self.addOutput(QgsProcessingOutputString(self.PATH_LINK_IDS, self.tr("Path link IDs")))
         self.addOutput(QgsProcessingOutputNumber(self.TOTAL_COST, self.tr("Total cost")))
 
     def processAlgorithm(self, parameters, context, feedback):
+        import pandas as pd
+
         links = self.parameterAsSource(parameters, self.LINKS, context)
         if links is None:
             raise QgsProcessingException(self.tr("The links layer could not be loaded"))
 
         feedback.pushInfo(self.tr("Reading links"))
-        network = network_dataframe_from_source(links)
+        field_names = [field.name().lower() for field in links.fields()]
+        features = cast(Iterable[QgsFeature], links.getFeatures())
+        network = pd.DataFrame((feature.attributes() for feature in features), columns=field_names)
         if feedback.isCanceled():
             return {}
 
@@ -276,7 +261,13 @@ class ShortestPath(ProcessingAlgorithm):
         if feedback.isCanceled():
             return {}
 
-        fields = self._output_fields()
+        fields = QgsFields()
+        fields.append(QgsField("sequence", QMetaType.Type.Int))
+        fields.append(QgsField("link_id", QMetaType.Type.LongLong))
+        fields.append(QgsField("a_node", QMetaType.Type.LongLong))
+        fields.append(QgsField("b_node", QMetaType.Type.LongLong))
+        fields.append(QgsField("direction", QMetaType.Type.Int))
+        fields.append(QgsField("cost", QMetaType.Type.Double))
         sink, destination = self.parameterAsSink(
             parameters,
             self.OUTPUT,
@@ -321,9 +312,7 @@ class ShortestPath(ProcessingAlgorithm):
             raise ShortestPathError("The nodes layer requires node_id and is_centroid fields")
 
         centroids = []
-        features = nodes.getFeatures()
-        feature = QgsFeature()
-        while features.nextFeature(feature):
+        for feature in nodes.getFeatures():
             if feature.attribute(centroid_index) in (True, 1, "1"):
                 centroids.append(feature.attribute(node_id_index))
         return tuple(centroids)
@@ -334,24 +323,11 @@ class ShortestPath(ProcessingAlgorithm):
             raise QgsProcessingException(self.tr("The links layer requires a link_id field"))
         path_link_ids = set(link_ids)
         features_by_link_id = {}
-        features = links.getFeatures()
-        feature = QgsFeature()
-        while features.nextFeature(feature):
+        for feature in links.getFeatures():
             link_id = int(feature.attribute(link_id_index))
             if link_id in path_link_ids:
                 features_by_link_id[link_id] = QgsFeature(feature)
         return features_by_link_id
-
-    @staticmethod
-    def _output_fields():
-        fields = QgsFields()
-        fields.append(QgsField("sequence", QMetaType.Type.Int))
-        fields.append(QgsField("link_id", QMetaType.Type.LongLong))
-        fields.append(QgsField("a_node", QMetaType.Type.LongLong))
-        fields.append(QgsField("b_node", QMetaType.Type.LongLong))
-        fields.append(QgsField("direction", QMetaType.Type.Int))
-        fields.append(QgsField("cost", QMetaType.Type.Double))
-        return fields
 
     def shortHelpString(self):
         return self.tr(

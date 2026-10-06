@@ -27,8 +27,10 @@ class NetworkSimplifier(ProjectAlgorithm):
         try:
             with open_project(project_folder) as project:
                 return self._simplify(project, project_folder, feedback, NetworkSimplifier)
-        except Exception as e:
-            raise QgsProcessingException(self.tr(f"{project_folder} does not contain an AequilibraE model: {e}")) from e
+        except Exception as error:
+            raise QgsProcessingException(
+                self.tr(f"{project_folder} does not contain an AequilibraE model: {error}")
+            ) from error
 
     def _simplify(self, project, project_folder, feedback, network_simplifier):
         feedback.pushInfo("Checking centroids")
@@ -39,11 +41,11 @@ class NetworkSimplifier(ProjectAlgorithm):
         if centroid_count == 0:
             feedback.pushInfo("Creating arbitrary centroid")
             arbitrary_node = nodes.data["node_id"][0]
-            nd = nodes.get(arbitrary_node)
-            nd.is_centroid = 1
-            nd.save()
+            temporary_centroid = nodes.get(arbitrary_node)
+            temporary_centroid.is_centroid = 1
+            temporary_centroid.save()
 
-        # TODO: I don't know if its a good idea setting up a mode here.
+        # TODO: Check whether mode "c" is appropriate for every project.
         mode = "c"
 
         feedback.pushInfo("Setting graph for computation")
@@ -57,35 +59,30 @@ class NetworkSimplifier(ProjectAlgorithm):
 
         feedback.pushInfo(str(graph.network))
 
-        # Restore the temporary centroid change.
         if centroid_count == 0:
             feedback.pushInfo("Revert nodes as centroids")
-            nd.is_centroid = 0
-            nd.save()
+            temporary_centroid.is_centroid = 0
+            temporary_centroid.save()
 
         links_before = project.network.links.data.shape[0]
         nodes_before = project.network.nodes.data.shape[0]
 
-        net = network_simplifier()
+        simplifier = network_simplifier()
         feedback.pushInfo("Simplify network")
-        net.simplify(graph)
+        simplifier.simplify(graph)
         feedback.pushInfo("Saving network")
-        net.rebuild_network()
+        simplifier.rebuild_network()
 
         links_after = project.network.links.data.shape[0]
         nodes_after = project.network.nodes.data.shape[0]
 
         feedback.pushInfo(f"Project closed in {project_folder}")
 
-        exp = f"This project initially had {links_before} links and {nodes_before} nodes"
-        exp += f"\nNow it has {links_after} links and {nodes_after} nodes."
-        feedback.pushInfo(exp)
+        summary = f"This project initially had {links_before} links and {nodes_before} nodes"
+        summary += f"\nNow it has {links_after} links and {nodes_after} nodes."
+        feedback.pushInfo(summary)
 
         return {"Output": "Ok."}
 
     def shortHelpString(self):
-        help_messages = [
-            self.tr("This tool simplifies the network, merging short links into longer ones or"),
-            self.tr("turning links into nodes, and saving theses changes into the project."),
-        ]
-        return "\n".join(help_messages)
+        return self.tr("Simplifies the network by merging links and removing intermediate nodes.")

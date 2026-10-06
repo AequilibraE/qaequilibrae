@@ -1,4 +1,4 @@
-"""Adapt the desire-line GUI to the registered mapping Processing algorithms."""
+"""Create desire lines or Delaunay networks from the mapping dialog."""
 
 from aequilibrae.matrix import AequilibraeMatrix
 from aequilibrae.utils.interface.worker_thread import WorkerThread

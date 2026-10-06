@@ -116,4 +116,4 @@ class AddLinksFromLayer(ProjectAlgorithm):
         return {"Output": link_count}
 
     def shortHelpString(self):
-        return self.tr("Adds links from a layer to an existing AequilibraE project")
+        return self.tr("Adds links from a layer to an existing AequilibraE project.")

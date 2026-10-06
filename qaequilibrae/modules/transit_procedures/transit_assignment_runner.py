@@ -1,4 +1,4 @@
-"""Shared execution for the transit assignment dialog and Processing algorithm."""
+"""Build transit graphs and run assignment or skimming."""
 
 from collections.abc import Callable
 from pathlib import Path
@@ -24,7 +24,7 @@ def run_transit_assignment(
     progress: Progress | None = None,
     is_canceled: Cancelled | None = None,
 ) -> dict[str, Any]:
-    """Run transit skimming or assignment with shared dialog/toolbox behavior."""
+    """Run transit skimming or assignment."""
 
     def report(step: int, message: str) -> None:
         if progress:
@@ -131,20 +131,18 @@ def run_transit_assignment(
         transit_class.set_demand_matrix_core(configs["demand_matrix_core"])
 
         report(8, "Preparing transit assignment")
-        check_canceled()
         report(9, "Running transit assignment")
         assignment.execute()
         check_canceled()
 
         report(10, "Saving transit results")
         if action == "create":
-            output_path = Path(project.project_base_path) / "matrices" / f"{configs['matrix_name']}.omx"
             skim_results = assignment.get_skim_results()
             skim_result = skim_results[configs["class_name"]] if isinstance(skim_results, dict) else skim_results[0]
-            skim_result.export(str(output_path))
+            skim_result.export(str(matrix_path))
             project.matrices.update_database()
             project.matrices.reload()
-            return {"matrix": str(output_path)}
+            return {"matrix": str(matrix_path)}
 
         assignment.save_results(table_name=configs["result_name"])
         return {"result_name": configs["result_name"]}

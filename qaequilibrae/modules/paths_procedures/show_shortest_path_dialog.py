@@ -31,15 +31,11 @@ class ShortestPathDialog(BaseDialog):
         )
 
     def _base_ui_setup(self):
-        self.field_types = {}
-        self.centroids = None
         self.node_layer = self.qgis_project.layers["nodes"][0]
         self.line_layer = self._links_layer_on_canvas()
         self.node_keys = {}
         self.node_fields = None
         self.index = None
-        self.matrix = None
-        self.node_id = None
 
         # Which box the next click on the map lands in, and the markers showing where the two
         # ends currently sit
@@ -202,8 +198,6 @@ class ShortestPathDialog(BaseDialog):
                 link_id_index = self.line_layer.fields().lookupField("link_id")
                 selected_links = [feature.attribute(link_id_index) for feature in self.line_layer.selectedFeatures()]
 
-            # The dialog only translates its state into Processing parameters. Routing,
-            # validation, and output construction belong to the reusable algorithm.
             parameters = {
                 ShortestPath.LINKS: self.line_layer,
                 ShortestPath.MODE: str(self.mode),

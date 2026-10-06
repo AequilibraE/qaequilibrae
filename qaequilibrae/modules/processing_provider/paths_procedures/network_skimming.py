@@ -1,4 +1,4 @@
-"""Network-skimming computation and its QGIS Processing adapter."""
+"""Calculate network skim matrices."""
 
 from pathlib import Path
 from typing import Any, TypedDict
@@ -24,7 +24,7 @@ class SkimmingError(ValueError):
 
 
 class SkimmingConfiguration(TypedDict):
-    """Validated settings for one network-skimming run."""
+    """Settings for one network skim."""
 
     mode: str
     cost_field: str
@@ -128,30 +128,20 @@ class NetworkSkimming(ProjectAlgorithm):
         self.addParameter(QgsProcessingParameterString(self.COST_FIELD, self.tr("Cost field"), "distance"))
         self.addParameter(
             QgsProcessingParameterString(
-                self.SKIM_FIELDS,
-                self.tr("Skim fields (comma-separated)"),
-                defaultValue="distance",
+                self.SKIM_FIELDS, self.tr("Skim fields (comma-separated)"), defaultValue="distance"
             )
         )
         self.addParameter(
-            QgsProcessingParameterBoolean(
-                self.TRACE_ALL_NODES,
-                self.tr("Trace between all nodes"),
-                defaultValue=False,
-            )
+            QgsProcessingParameterBoolean(self.TRACE_ALL_NODES, self.tr("Trace between all nodes"), defaultValue=False)
         )
         self.addParameter(
             QgsProcessingParameterBoolean(
-                self.BLOCK_CENTROID_FLOWS,
-                self.tr("Block flows through centroids"),
-                defaultValue=True,
+                self.BLOCK_CENTROID_FLOWS, self.tr("Block flows through centroids"), defaultValue=True
             )
         )
         self.addParameter(
             QgsProcessingParameterString(
-                self.EXCLUDED_LINKS,
-                self.tr("Excluded link IDs (comma-separated)"),
-                optional=True,
+                self.EXCLUDED_LINKS, self.tr("Excluded link IDs (comma-separated)"), optional=True
             )
         )
         self.addParameter(QgsProcessingParameterString(self.MATRIX_NAME, self.tr("Output matrix name"), "skims"))
@@ -213,23 +203,10 @@ class NetworkSkimming(ProjectAlgorithm):
         }
 
     def shortHelpString(self) -> str:
-        help_messages = [
-            self.tr("Skims a mode's network and saves the result as a matrix in the AequilibraE project."),
-            self.tr("Inputs:"),
-            self.tr("- AequilibraE project folder: the project whose network is skimmed."),
-            self.tr("- Network mode and the cost field the paths are minimised on."),
-            self.tr("- Skim fields: the network fields written to the matrix, comma-separated."),
-            self.tr(
-                "- Trace between all nodes: skim every node instead of only the network's centroids. "
-                "This cannot be combined with blocking flows through centroids."
-            ),
-            self.tr(
-                "- Block flows through centroids: keep centroid-to-centroid paths from passing through another centroid."
-            ),
-            self.tr("- Excluded link IDs (optional): links left out of the graph, comma-separated."),
-            self.tr("- Output matrix name: name of the OMX matrix and its project record."),
-            self.tr("Outputs:"),
-            self.tr("- Matrix name, matrix file and matrix folder for use by later steps."),
-            self.tr("Existing matrix names are not overwritten."),
-        ]
-        return "\n".join(help_messages)
+        return self.tr(
+            "Calculates network skims for a mode and saves them as an OMX matrix in the project. "
+            "Choose the path cost and comma-separated skim fields. You can exclude links, block "
+            "paths through intermediate centroids, or skim all nodes instead of centroids. "
+            "Skimming all nodes requires centroid blocking to be off. "
+            "The outputs give the matrix name, file, and folder. Existing matrices are not overwritten."
+        )

@@ -30,24 +30,16 @@ class AddLinkType(ProjectAlgorithm):
         self.addParameter(QgsProcessingParameterString(self.LINK_TYPE_ID, self.tr("Link type ID")))
         self.addParameter(QgsProcessingParameterString(self.LINK_TYPE, self.tr("Link type name")))
         self.addParameter(QgsProcessingParameterString(self.DESCRIPTION, self.tr("Description"), optional=True))
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.LANES, self.tr("Lanes"), type=Qgis.ProcessingNumberParameterType.Double, optional=True
+        for key, label in (
+            (self.LANES, "Lanes"),
+            (self.LANE_CAPACITY, "Lane capacity"),
+            (self.SPEED, "Speed"),
+        ):
+            self.addParameter(
+                QgsProcessingParameterNumber(
+                    key, self.tr(label), type=Qgis.ProcessingNumberParameterType.Double, optional=True
+                )
             )
-        )
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.LANE_CAPACITY,
-                self.tr("Lane capacity"),
-                type=Qgis.ProcessingNumberParameterType.Double,
-                optional=True,
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.SPEED, self.tr("Speed"), type=Qgis.ProcessingNumberParameterType.Double, optional=True
-            )
-        )
 
     def processAlgorithm(self, parameters, context, feedback):
         project_folder = self.project or self.project_folder(parameters, context)

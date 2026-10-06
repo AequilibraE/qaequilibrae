@@ -1,4 +1,4 @@
-"""Matrix ownership for Processing algorithms and their GUI adapters."""
+"""Open or reuse matrices for Processing algorithms."""
 
 from contextlib import contextmanager
 from pathlib import Path
@@ -7,7 +7,7 @@ from typing import Any, Iterator
 
 @contextmanager
 def open_matrix(path: str, cores: str, matrix: Any | None = None) -> Iterator[Any]:
-    """Borrow a GUI matrix, or load selected file cores and close them afterwards."""
+    """Reuse a matrix or load selected cores from a file."""
     if matrix is not None:
         yield matrix
         return

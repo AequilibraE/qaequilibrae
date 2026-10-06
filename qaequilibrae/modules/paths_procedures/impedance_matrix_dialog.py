@@ -4,7 +4,6 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QTableWidgetItem, QAbstractItemView
 
 from qaequilibrae.modules.common_tools import BaseDialog
-from qaequilibrae.modules.common_tools import standard_path
 from qaequilibrae.modules.common_tools.processing_worker import ProcessingWorker
 from qaequilibrae.modules.processing_provider.paths_procedures.network_skimming import (
     NetworkSkimming,
@@ -18,9 +17,6 @@ class ImpedanceMatrixDialog(BaseDialog):
 
     def _base_ui_setup(self, **kwargs):
         self.link_layer = self.qgis_project.layers["links"][0]
-        self.tot_skims = 0
-        self.name_skims = 0
-        self.graph = None
         self.skimmeable_fields = []
         self.skim_fields = []
         self.all_modes = {}
@@ -41,9 +37,6 @@ class ImpedanceMatrixDialog(BaseDialog):
         self.skim_list.setColumnWidth(0, 245)
         self.available_skims_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.skim_list.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-
-        # loads default path from parameters
-        self.path = standard_path()
 
         self.cb_minimizing.clear()
         self.available_skims_table.clearContents()
@@ -140,8 +133,6 @@ class ImpedanceMatrixDialog(BaseDialog):
         self.progressbar.setValue(0)
         self.do_dist_matrix.setVisible(False)
 
-        # The dialog only translates its state into Processing parameters. Graph
-        # preparation, validation and saving belong to the reusable algorithm.
         self.worker_thread = ProcessingWorker(run_network_skimming, self.processing_parameters(), self.project, self)
         self.worker_thread.message.connect(self.progress_label.setText)
         self.worker_thread.progress.connect(self._set_progress)
@@ -151,7 +142,7 @@ class ImpedanceMatrixDialog(BaseDialog):
         self.progressbar.setValue(int(value))
 
     def processing_parameters(self):
-        """Translate widget values into the public Processing inputs."""
+        """Return Processing parameters from the dialog inputs."""
         algorithm = NetworkSkimming
         excluded_links = []
         if self.chb_chosen_links.isChecked():

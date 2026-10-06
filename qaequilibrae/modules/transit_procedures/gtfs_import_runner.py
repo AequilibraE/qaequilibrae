@@ -1,4 +1,4 @@
-"""Shared GTFS import execution for the legacy dialog and Processing algorithm."""
+"""Import GTFS feeds into a project."""
 
 from collections.abc import Callable, Iterable
 from typing import Any

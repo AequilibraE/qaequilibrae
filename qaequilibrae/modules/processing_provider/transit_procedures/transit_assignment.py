@@ -1,4 +1,4 @@
-"""Run transit assignment or create transit skim matrices."""
+"""Assign transit demand and create skim matrices."""
 
 from qgis.core import (
     Qgis,
@@ -53,16 +53,12 @@ class TransitAssignmentAlgorithm(ProjectAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterBoolean(
-                self.USE_SAVED_GRAPH,
-                self.tr("Use the saved transit graph"),
-                defaultValue=False,
+                self.USE_SAVED_GRAPH, self.tr("Use the saved transit graph"), defaultValue=False
             )
         )
         self.addParameter(
             QgsProcessingParameterString(
-                self.MATRIX_NAME,
-                self.tr("Demand matrix (assignment) or skim output matrix (skimming)"),
-                optional=True,
+                self.MATRIX_NAME, self.tr("Demand matrix (assignment) or skim output matrix (skimming)"), optional=True
             )
         )
         self.addParameter(QgsProcessingParameterString(self.MATRIX_CORE, self.tr("Demand matrix core"), optional=True))

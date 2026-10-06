@@ -1,4 +1,4 @@
-"""Apply a synthetic gravity model as a Processing algorithm."""
+"""Apply a gravity model to an impedance matrix."""
 
 from pathlib import Path
 
@@ -25,14 +25,13 @@ from .common import (
 
 
 class ApplyGravity(ProjectAlgorithm):
-    """Produce a trip matrix by applying a synthetic gravity model to an impedance matrix."""
+    """Create a trip matrix with a synthetic gravity model."""
 
     algorithm_name = "apply_gravity_model"
     display_name = "Apply gravity model"
     group_name = "Distribution"
     group_id = "distribution"
 
-    PROJECT_FOLDER = "PROJECT_FOLDER"
     IMPEDANCE_MATRIX_NAME = "IMPEDANCE_MATRIX_NAME"
     IMPEDANCE_MATRIX_CORE = "IMPEDANCE_MATRIX_CORE"
     VECTOR_SOURCE = "VECTOR_SOURCE"
@@ -46,53 +45,34 @@ class ApplyGravity(ProjectAlgorithm):
     OUTPUT_MATRIX = "OUTPUT_MATRIX"
 
     def initAlgorithm(self, configuration=None):
-        self.add_project_folder_parameter(self.PROJECT_FOLDER)
+        self.add_project_folder_parameter()
         self.addParameter(QgsProcessingParameterString(self.IMPEDANCE_MATRIX_NAME, self.tr("Impedance matrix name")))
         self.addParameter(QgsProcessingParameterString(self.IMPEDANCE_MATRIX_CORE, self.tr("Impedance matrix core")))
         add_trip_end_parameters(self)
         self.addParameter(
             QgsProcessingParameterEnum(
-                self.FUNCTION,
-                self.tr("Deterrence function"),
-                options=GRAVITY_FUNCTIONS,
-                defaultValue=1,
+                self.FUNCTION, self.tr("Deterrence function"), options=GRAVITY_FUNCTIONS, defaultValue=1
             )
         )
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.ALPHA,
-                self.tr("Alpha (GAMMA and POWER)"),
-                type=Qgis.ProcessingNumberParameterType.Double,
-                optional=True,
+        for key, label in ((self.ALPHA, "Alpha (GAMMA and POWER)"), (self.BETA, "Beta (GAMMA and EXPO)")):
+            self.addParameter(
+                QgsProcessingParameterNumber(
+                    key, self.tr(label), type=Qgis.ProcessingNumberParameterType.Double, optional=True
+                )
             )
-        )
         self.addParameter(
-            QgsProcessingParameterNumber(
-                self.BETA,
-                self.tr("Beta (GAMMA and EXPO)"),
-                type=Qgis.ProcessingNumberParameterType.Double,
-                optional=True,
-            )
-        )
-        self.addParameter(
-            QgsProcessingParameterBoolean(
-                self.NAN_AS_ZERO,
-                self.tr("Treat NaN values as zero"),
-                defaultValue=False,
-            )
+            QgsProcessingParameterBoolean(self.NAN_AS_ZERO, self.tr("Treat NaN values as zero"), defaultValue=False)
         )
         self.addParameter(
             QgsProcessingParameterFileDestination(
-                self.OUTPUT_MATRIX,
-                self.tr("Output matrix"),
-                fileFilter="OpenMatrix (*.omx)",
+                self.OUTPUT_MATRIX, self.tr("Output matrix"), fileFilter="OpenMatrix (*.omx)"
             )
         )
 
     def processAlgorithm(self, parameters, context, feedback):
         from aequilibrae.distribution import GravityApplication
 
-        project_folder = self.project_folder(parameters, context, self.PROJECT_FOLDER)
+        project_folder = self.project_folder(parameters, context)
         matrix_name = self.parameterAsString(parameters, self.IMPEDANCE_MATRIX_NAME, context)
         core_name = self.parameterAsString(parameters, self.IMPEDANCE_MATRIX_CORE, context)
         source = self.parameterAsSource(parameters, self.VECTOR_SOURCE, context)

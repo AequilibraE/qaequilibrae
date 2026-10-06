@@ -1,4 +1,4 @@
-"""Algorithms that update existing project geometry from vector layers."""
+"""Update project geometry from vector layers."""
 
 from qgis.core import (
     Qgis,
@@ -7,16 +7,14 @@ from qgis.core import (
     QgsProcessingParameterFeatureSource,
 )
 
-from ..project_algorithm import ProjectAlgorithm
-from .common import editable_attribute_values, ignored_input_fields, project_table, source_rows
 from ..project import open_project
+from ..project_algorithm import ProjectAlgorithm
+from .common import copy_record_attributes, ignored_input_fields, project_table, source_rows
 
 
 class ModifyProjectLayer(ProjectAlgorithm):
     """Update existing records, matched by the table's immutable identifier."""
 
-    algorithm_name = ""
-    display_name = ""
     group_name = "Geometry IO"
     group_id = "geometry_io"
 
@@ -30,9 +28,7 @@ class ModifyProjectLayer(ProjectAlgorithm):
         self.addOutput(QgsProcessingOutputNumber("UPDATED", self.tr("Features updated")))
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.INPUT,
-                self.tr(self.display_name + " input"),
-                types=[self.geometry_source_type],
+                self.INPUT, self.tr(self.display_name + " input"), types=[self.geometry_source_type]
             )
         )
 
@@ -56,7 +52,7 @@ class ModifyProjectLayer(ProjectAlgorithm):
                     record = table.get(int(identifier))
                 except (TypeError, ValueError) as error:
                     raise QgsProcessingException(self.tr(f"Could not find {self.id_field} {identifier}")) from error
-                editable_attribute_values(record, table, row, ignored_fields, skip_nulls=False)
+                copy_record_attributes(record, table, row, ignored_fields, skip_nulls=False)
                 if row["geometry"] is not None:
                     record.geometry = row["geometry"]
                 record.save()
@@ -73,7 +69,6 @@ class ModifyLinks(ModifyProjectLayer):
     display_name = "Modify links"
     table_name = "links"
     id_field = "link_id"
-    geometry_source_type = Qgis.ProcessingSourceType.VectorLine
 
 
 class ModifyNodes(ModifyProjectLayer):

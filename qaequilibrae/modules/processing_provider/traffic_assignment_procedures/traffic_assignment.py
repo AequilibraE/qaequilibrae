@@ -1,4 +1,4 @@
-"""Traffic-assignment computation and its QGIS Processing adapter."""
+"""Assign traffic demand to a project network."""
 
 import json
 from collections.abc import Mapping
@@ -42,7 +42,7 @@ VDF_PARAMETERS = {
 
 
 def run_traffic_assignment(parameters, project=None, feedback=None):
-    """Run the Processing worker from a dialog or an exported project runner."""
+    """Run traffic assignment from the dialog or a project runner."""
     algorithm = RunTrafficAssignment()
     algorithm.initAlgorithm()
     algorithm.project = project
@@ -131,13 +131,10 @@ def _build_assignment(project, class_options, assignment_options, resources, fee
 
 
 def _fill_missing_mode_fields(graph, mode: str) -> None:
-    """Give links that do not carry ``mode`` usable values for their empty fields.
+    """Fill empty numeric fields on links excluded from this mode.
 
-    ``build_graphs`` keeps links that do not support a mode, turning them into self-loops
-    so the compressed graph culls them. They never carry flow, but they stay in the
-    uncompressed graph, and the assignment rejects empty capacity, free-flow time and VDF
-    parameters there. Filling those values keeps every mode's graph on the same set of
-    links, which the assignment needs to sum flows across traffic classes.
+    Assignment needs every class graph to contain the same links. Excluded links
+    remain as self-loops and carry no flow, but their numeric fields must be valid.
     """
     network = graph.network
     if "modes" not in network.columns:
@@ -194,12 +191,11 @@ def _save_outputs(assignment, configuration):
     outputs = {
         RunTrafficAssignment.OUTPUT_RESULT_NAME: result_name,
         RunTrafficAssignment.OUTPUT_DATABASE: str(project.project_base_path / "results_database.sqlite"),
-        RunTrafficAssignment.OUTPUT_SKIMS: "[]",
+        RunTrafficAssignment.OUTPUT_SKIMS: json.dumps(_save_skims(assignment, configuration)),
         RunTrafficAssignment.OUTPUT_MATRIX_FOLDER: str(project.matrices.fldr),
         RunTrafficAssignment.OUTPUT_SELECT_LINK_MATRIX: "",
         RunTrafficAssignment.OUTPUT_SELECT_LINK_FLOWS: "",
     }
-    outputs[RunTrafficAssignment.OUTPUT_SKIMS] = json.dumps(_save_skims(assignment, configuration))
     if select_link_options is None:
         return outputs
     output_name = select_link_options["output_name"]
@@ -285,9 +281,9 @@ def _check_output_names(project, configuration):
             tables.append(output)
         if selection["save_matrix"]:
             matrices.append(output)
-    if len(set(item.lower() for item in tables)) != len(tables):
+    if len({item.lower() for item in tables}) != len(tables):
         raise TrafficAssignmentError("Assignment and select-link flows require different result names")
-    if len(set(item.lower() for item in matrices)) != len(matrices):
+    if len({item.lower() for item in matrices}) != len(matrices):
         raise TrafficAssignmentError("Skims and select-link matrices require different names")
     with project.results_connection as connection:
         existing = {row[0].lower() for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
@@ -373,23 +369,17 @@ class RunTrafficAssignment(ProjectAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterString(
-                self.SELECT_LINK_NAME,
-                self.tr("Select-link output name (default: result name + _sl)"),
-                optional=True,
+                self.SELECT_LINK_NAME, self.tr("Select-link output name (default: result name + _sl)"), optional=True
             )
         )
         self.addParameter(
             QgsProcessingParameterBoolean(
-                self.SAVE_SELECT_LINK_MATRICES,
-                self.tr("Save select-link OD matrices"),
-                defaultValue=True,
+                self.SAVE_SELECT_LINK_MATRICES, self.tr("Save select-link OD matrices"), defaultValue=True
             )
         )
         self.addParameter(
             QgsProcessingParameterBoolean(
-                self.SAVE_SELECT_LINK_FLOWS,
-                self.tr("Save select-link flows"),
-                defaultValue=True,
+                self.SAVE_SELECT_LINK_FLOWS, self.tr("Save select-link flows"), defaultValue=True
             )
         )
         self.addParameter(
@@ -472,58 +462,16 @@ class RunTrafficAssignment(ProjectAlgorithm):
         return {self.OUTPUT_FLOWS: destination}
 
     def shortHelpString(self):
-        help_messages = [
-            self.tr(
-                "Runs a static traffic assignment for one or more traffic classes on an AequilibraE project "
-                "and saves the link-flow results."
-            ),
-            self.tr("Inputs:"),
-            self.tr("- AequilibraE project folder: the project whose network, modes and matrices are assigned."),
-            self.tr(
-                "- Traffic classes: one row per class, with columns Name, Matrix record, "
-                "Cores (comma-separated), Mode, PCE, Block centroid flows (true/false), "
-                "Fixed-cost field (optional), Value of time (optional) and Skims (optional)."
-            ),
-            self.tr(
-                "- Assignment settings: algorithm, maximum iterations, relative gap, capacity field, "
-                "free-flow time field, and the volume-delay function with its parameters "
-                "(alpha, beta, tau and length, given as numbers or network field names)."
-            ),
-            self.tr("- Results table name: name of the flow table written to the results database."),
-            self.tr(
-                "- Select-link queries (optional): one row per query part, with columns Name, "
-                "Link IDs (comma-separated) and Direction (AB, BA or Both). "
-                "Rows sharing a name form one query; repeat the name to combine directions."
-            ),
-            self.tr(
-                "- Excluded links (optional): one row per class, with columns Class and Link IDs (comma-separated)."
-            ),
-            self.tr("Outputs:"),
-            self.tr(
-                "- Results database and results table name: all link flows live in "
-                "<project>/results_database.sqlite under the chosen table name."
-            ),
-            self.tr(
-                "- Skims: one OMX file per class, named <result_name>_<class_name>.omx. "
-                "A skim field produces final and blended cores by default; use "
-                "field:final or field:blended to select one."
-            ),
-            self.tr(
-                "- Select-link OD matrix and select-link flows table, when the corresponding "
-                "switches are on. The matrix defaults to <result_name>_sl.omx and the table "
-                "to <result_name>_sl."
-            ),
-            self.tr(
-                "- Assigned-flows layer (optional): the project links joined with the results, "
-                "ready to feed downstream algorithms."
-            ),
-            self.tr(
-                "Output values also expose the matrix folder, and the skim paths as a JSON array. "
-                "Cancellation stops before saving once the current computation finishes. "
-                "Existing outputs are not overwritten."
-            ),
-        ]
-        return "\n".join(help_messages)
+        return self.tr(
+            "Assigns demand for one or more traffic classes and saves link flows in the project's "
+            "results_database.sqlite file. Each class specifies a demand matrix, cores and network mode.\n\n"
+            "Select-link queries specify a name, link IDs, and AB, BA, or both directions. Reuse a "
+            "name to combine directions. Skims are saved as <result_name>_<class_name>.omx with "
+            "final and blended cores unless you choose one with field:final or field:blended. "
+            "Optional outputs include a select-link OD matrix and flows table (both named "
+            "<result_name>_sl by default) and a layer of links joined to flows. Cancellation stops before "
+            "saving once computation finishes. Existing outputs are not overwritten."
+        )
 
     def _configuration(self, parameters, context):
         vdf = self.parameterAsString(parameters, self.VDF, context).lower()
@@ -609,10 +557,8 @@ def _traffic_classes(values):
 def traffic_classes_from_project(project) -> list[dict]:
     """Suggest one traffic class per matrix core for a project.
 
-    The project does not record which mode a matrix belongs to, so each core name is matched
-    against the mode IDs and names. The match ignores case and lets a core name sit inside a
-    mode name or the other way around (``motorcycle`` matches ``motorcycles``). When nothing
-    matches, the project's first mode is used.
+    Matrices do not record their mode. Match core names to mode IDs or names,
+    using the first mode if no match is found.
     """
     modes = project.network.modes.all_modes()
     modes_by_name = {mode.mode_name.lower(): mode_id for mode_id, mode in modes.items()}
@@ -695,11 +641,7 @@ def _select_links(values):
 
 
 def _matrix_has_rows(values):
-    """Whether a Processing matrix parameter holds anything but its empty placeholder.
-
-    QGIS gives an empty matrix back as an empty list, or as a single placeholder cell that
-    can be ``None``, ``NULL`` or an empty string depending on the Qt version.
-    """
+    """Ignore empty QGIS matrix cells: None, NULL or empty strings, depending on Qt."""
     if values is None:
         return False
     return any(value is not None and str(value).strip() not in ("", "NULL", "None") for value in values)

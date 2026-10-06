@@ -1,4 +1,4 @@
-"""Export filtered transit supply metrics as a Processing table."""
+"""Calculate transit supply metrics."""
 
 from typing import Any
 
@@ -48,24 +48,19 @@ class TransitSupplyMetricsAlgorithm(ProjectAlgorithm):
                 usesStaticStrings=True,
             )
         )
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.FROM_MINUTE,
-                self.tr("Start time (minutes after midnight)"),
-                type=Qgis.ProcessingNumberParameterType.Integer,
-                minValue=0,
-                optional=True,
+        for key, label in (
+            (self.FROM_MINUTE, "Start time (minutes after midnight)"),
+            (self.TO_MINUTE, "End time (minutes after midnight)"),
+        ):
+            self.addParameter(
+                QgsProcessingParameterNumber(
+                    key,
+                    self.tr(label),
+                    type=Qgis.ProcessingNumberParameterType.Integer,
+                    minValue=0,
+                    optional=True,
+                )
             )
-        )
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.TO_MINUTE,
-                self.tr("End time (minutes after midnight)"),
-                type=Qgis.ProcessingNumberParameterType.Integer,
-                minValue=0,
-                optional=True,
-            )
-        )
         for key, label in (
             (self.ROUTES, "Route IDs (comma-separated, optional)"),
             (self.PATTERNS, "Pattern IDs (comma-separated, optional)"),
@@ -74,9 +69,7 @@ class TransitSupplyMetricsAlgorithm(ProjectAlgorithm):
             self.addParameter(QgsProcessingParameterString(key, self.tr(label), optional=True))
         self.addParameter(
             QgsProcessingParameterFeatureSink(
-                self.OUTPUT,
-                self.tr("Transit supply metrics table"),
-                type=Qgis.ProcessingSourceType.Vector,
+                self.OUTPUT, self.tr("Transit supply metrics table"), type=Qgis.ProcessingSourceType.Vector
             )
         )
 

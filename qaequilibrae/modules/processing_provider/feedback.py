@@ -1,4 +1,4 @@
-"""Adapt AequilibraE worker messages to QGIS Processing feedback."""
+"""Report worker progress through QGIS Processing."""
 
 from typing import Any
 
@@ -30,6 +30,6 @@ def connect_progress(worker: Any, feedback: QgsProcessingFeedback | None) -> Non
 
 
 def push_info(feedback: QgsProcessingFeedback | None, message: str) -> None:
-    """Log a message when the caller supplies Processing feedback."""
+    """Log a message if feedback is available."""
     if feedback is not None:
         feedback.pushInfo(message)

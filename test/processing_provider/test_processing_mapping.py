@@ -49,7 +49,7 @@ def _values(layer, field_name):
     return [feature[field_name] for feature in layer.getFeatures()]
 
 
-def test_match_features_closest_uses_real_distance():
+def test_closest_copies_nearest_source_values():
     source = _make_layer(
         "source_points",
         "Point",

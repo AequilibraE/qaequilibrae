@@ -3,7 +3,7 @@ from pprint import pformat
 
 
 def create_strings(dct: dict):
-    """Export the same Processing parameters used by the assignment dialog."""
+    """Write an assignment script using the dialog's Processing parameters."""
     source = f"""from aequilibrae.context import get_active_project
 
 from qaequilibrae.modules.processing_provider.traffic_assignment_procedures.traffic_assignment import run_traffic_assignment

@@ -1,4 +1,4 @@
-"""Balance a seed matrix to trip-end vectors with iterative proportional fitting."""
+"""Balance a seed matrix to production and attraction totals."""
 
 from pathlib import Path
 
@@ -16,14 +16,13 @@ from .common import add_trip_end_parameters, load_matrix_core, push_report, vect
 
 
 class IterativeProportionalFitting(ProjectAlgorithm):
-    """Balance a seed matrix to a set of production and attraction totals."""
+    """Run iterative proportional fitting on a seed matrix."""
 
     algorithm_name = "iterative_proportional_fitting"
     display_name = "Iterative proportional fitting"
     group_name = "Distribution"
     group_id = "distribution"
 
-    PROJECT_FOLDER = "PROJECT_FOLDER"
     SEED_MATRIX_NAME = "SEED_MATRIX_NAME"
     SEED_MATRIX_CORE = "SEED_MATRIX_CORE"
     VECTOR_SOURCE = "VECTOR_SOURCE"
@@ -34,29 +33,23 @@ class IterativeProportionalFitting(ProjectAlgorithm):
     OUTPUT_MATRIX = "OUTPUT_MATRIX"
 
     def initAlgorithm(self, configuration=None):
-        self.add_project_folder_parameter(self.PROJECT_FOLDER)
+        self.add_project_folder_parameter()
         self.addParameter(QgsProcessingParameterString(self.SEED_MATRIX_NAME, self.tr("Seed matrix name")))
         self.addParameter(QgsProcessingParameterString(self.SEED_MATRIX_CORE, self.tr("Seed matrix core")))
         add_trip_end_parameters(self)
         self.addParameter(
-            QgsProcessingParameterBoolean(
-                self.NAN_AS_ZERO,
-                self.tr("Treat NaN values as zero"),
-                defaultValue=False,
-            )
+            QgsProcessingParameterBoolean(self.NAN_AS_ZERO, self.tr("Treat NaN values as zero"), defaultValue=False)
         )
         self.addParameter(
             QgsProcessingParameterFileDestination(
-                self.OUTPUT_MATRIX,
-                self.tr("Output matrix"),
-                fileFilter="OpenMatrix (*.omx)",
+                self.OUTPUT_MATRIX, self.tr("Output matrix"), fileFilter="OpenMatrix (*.omx)"
             )
         )
 
     def processAlgorithm(self, parameters, context, feedback):
         from aequilibrae.distribution import Ipf
 
-        project_folder = self.project_folder(parameters, context, self.PROJECT_FOLDER)
+        project_folder = self.project_folder(parameters, context)
         matrix_name = self.parameterAsString(parameters, self.SEED_MATRIX_NAME, context)
         core_name = self.parameterAsString(parameters, self.SEED_MATRIX_CORE, context)
         source = self.parameterAsSource(parameters, self.VECTOR_SOURCE, context)

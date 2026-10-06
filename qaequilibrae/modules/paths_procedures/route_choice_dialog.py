@@ -34,7 +34,6 @@ class RouteChoiceDialog(BaseDialog):
         self.utility = []
 
         self.all_modes = {}
-        self._pairs = []
         self.link_layer = self.qgis_project.layers["links"][0]
         self.parameters = {}
         self.processing_results = None
@@ -165,7 +164,7 @@ class RouteChoiceDialog(BaseDialog):
         self.utility.clear()
 
     def _single_route_configuration(self):
-        """Translate the interactive route inputs into the shared operation settings."""
+        """Return settings for interactive route choice."""
         excluded_links = []
         if self.chb_chosen_links.isChecked():
             index = self.link_layer.fields().lookupField("link_id")
@@ -413,7 +412,7 @@ class RouteChoiceDialog(BaseDialog):
         self.exec()
 
     def processing_parameters(self):
-        """Translate dialog state into the public route-choice Processing inputs."""
+        """Return Processing parameters from the dialog inputs."""
         algorithm = RouteChoiceAlgorithm
         cores = []
         for index, core in enumerate(self.matrix.names):
@@ -472,11 +471,6 @@ class RouteChoiceDialog(BaseDialog):
         elif self.job == "build" or self.parameters["save_choice_sets"]:
             self.qgis_project.iface_success_message(f"Route choice sets saved to {self.project.project_base_path}")
         self.exit_procedure()
-
-    def run_thread(self):
-        self.worker_thread.signal.connect(self.signal_handler)
-        self.worker_thread.start()
-        self.exec()
 
     def signal_handler(self, val):
         if val[0] == "finished":

@@ -1,4 +1,4 @@
-"""Calibrate a synthetic gravity model as a Processing algorithm."""
+"""Calibrate a gravity model from observed trips."""
 
 from qgis.core import (
     QgsProcessingException,
@@ -22,7 +22,6 @@ class CalibrateGravity(ProjectAlgorithm):
     group_name = "Distribution"
     group_id = "distribution"
 
-    PROJECT_FOLDER = "PROJECT_FOLDER"
     OBSERVED_MATRIX_NAME = "OBSERVED_MATRIX_NAME"
     OBSERVED_MATRIX_CORE = "OBSERVED_MATRIX_CORE"
     IMPEDANCE_MATRIX_NAME = "IMPEDANCE_MATRIX_NAME"
@@ -32,38 +31,29 @@ class CalibrateGravity(ProjectAlgorithm):
     OUTPUT_MODEL = "OUTPUT_MODEL"
 
     def initAlgorithm(self, configuration=None):
-        self.add_project_folder_parameter(self.PROJECT_FOLDER)
+        self.add_project_folder_parameter()
         self.addParameter(QgsProcessingParameterString(self.OBSERVED_MATRIX_NAME, self.tr("Observed matrix name")))
         self.addParameter(QgsProcessingParameterString(self.OBSERVED_MATRIX_CORE, self.tr("Observed matrix core")))
         self.addParameter(QgsProcessingParameterString(self.IMPEDANCE_MATRIX_NAME, self.tr("Impedance matrix name")))
         self.addParameter(QgsProcessingParameterString(self.IMPEDANCE_MATRIX_CORE, self.tr("Impedance matrix core")))
         self.addParameter(
             QgsProcessingParameterEnum(
-                self.FUNCTION,
-                self.tr("Deterrence function"),
-                options=CALIBRATION_FUNCTIONS,
-                defaultValue=0,
+                self.FUNCTION, self.tr("Deterrence function"), options=CALIBRATION_FUNCTIONS, defaultValue=0
             )
         )
         self.addParameter(
-            QgsProcessingParameterBoolean(
-                self.NAN_AS_ZERO,
-                self.tr("Treat NaN values as zero"),
-                defaultValue=False,
-            )
+            QgsProcessingParameterBoolean(self.NAN_AS_ZERO, self.tr("Treat NaN values as zero"), defaultValue=False)
         )
         self.addParameter(
             QgsProcessingParameterFileDestination(
-                self.OUTPUT_MODEL,
-                self.tr("Output model"),
-                fileFilter="Model file (*.mod)",
+                self.OUTPUT_MODEL, self.tr("Output model"), fileFilter="Model file (*.mod)"
             )
         )
 
     def processAlgorithm(self, parameters, context, feedback):
         from aequilibrae.distribution import GravityCalibration
 
-        project_folder = self.project_folder(parameters, context, self.PROJECT_FOLDER)
+        project_folder = self.project_folder(parameters, context)
         observed_name = self.parameterAsString(parameters, self.OBSERVED_MATRIX_NAME, context)
         observed_core = self.parameterAsString(parameters, self.OBSERVED_MATRIX_CORE, context)
         impedance_name = self.parameterAsString(parameters, self.IMPEDANCE_MATRIX_NAME, context)

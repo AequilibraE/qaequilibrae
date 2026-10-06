@@ -399,7 +399,7 @@ class DistributionModelsDialog(BaseDialog):
             self._task_failed(str(error))
 
     def _algorithm_parameters(self, job: dict[str, Any]) -> tuple[str, dict[str, Any]]:
-        """Translate a queued desktop job to the public Processing algorithm API."""
+        """Build Processing parameters for a queued job."""
         base = {"PROJECT_FOLDER": str(self.project.project_base_path), "NAN_AS_ZERO": job["nan_as_zero"]}
         if job["kind"] != "calibrate":
             self._task_layer = layer_from_dataframe(job["vectors"], "distribution_vectors")

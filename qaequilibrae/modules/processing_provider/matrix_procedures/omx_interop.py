@@ -6,7 +6,6 @@ from typing import cast
 
 import numpy as np
 import openmatrix as omx
-from qgis.PyQt.QtCore import QVariant
 from qgis.core import (
     Qgis,
     QgsCoordinateReferenceSystem,
@@ -14,23 +13,21 @@ from qgis.core import (
     QgsField,
     QgsFields,
     QgsProcessingException,
+    QgsProcessingParameterEnum,
     QgsProcessingParameterFeatureSink,
     QgsProcessingParameterFeatureSource,
-    QgsProcessingParameterEnum,
-    QgsProcessingParameterNumber,
     QgsProcessingParameterFile,
     QgsProcessingParameterFileDestination,
+    QgsProcessingParameterNumber,
     QgsProcessingParameterString,
 )
+from qgis.PyQt.QtCore import QVariant
 
 from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 from qaequilibrae.qgis_logging import get_logger, with_processing_feedback
 
 logger = get_logger(__name__)
 
-
-# A long-form table avoids QGIS field-count limits for large matrices. Each row
-# represents one cell; a core column keeps multi-core OMX files reversible.
 FIELDS = QgsFields()
 for field in (
     QgsField("origin", QVariant.LongLong),
@@ -42,7 +39,7 @@ for field in (
 
 
 def read_omx_core(path, core, mapping=None):
-    """Return zone IDs and values for one core, without modifying the OMX file."""
+    """Return zone IDs and values for one core."""
     with omx.open_file(str(path), "r") as file:
         if core not in file.list_matrices():
             raise ValueError(f"OMX core not found: {core}")
@@ -140,9 +137,7 @@ class OmxToTable(ProcessingAlgorithm):
             raise QgsProcessingException(str(error)) from error
 
     def shortHelpString(self):
-        return self.tr(
-            "Reads every OMX core into a non-spatial table with origin, destination, core and value fields. Select a mapping if the file has more than one."
-        )
+        return self.tr("Reads every OMX core into a non-spatial table with origin, destination, core and value fields.")
 
 
 class OmxZoneSlice(ProcessingAlgorithm):
@@ -163,9 +158,7 @@ class OmxZoneSlice(ProcessingAlgorithm):
     def initAlgorithm(self, configuration=None):
         self.addParameter(QgsProcessingParameterFile(self.PATH, self.tr("OMX file"), fileFilter="OpenMatrix (*.omx)"))
         self.addParameter(QgsProcessingParameterString(self.CORE, self.tr("Matrix core")))
-        self.addParameter(
-            QgsProcessingParameterString(self.MAPPING, self.tr("Zone mapping (blank: first mapping)"), optional=True)
-        )
+        self.addParameter(QgsProcessingParameterString(self.MAPPING, self.tr("Zone mapping"), optional=True))
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.ZONE, self.tr("Origin or destination zone ID"), type=Qgis.ProcessingNumberParameterType.Integer
@@ -290,7 +283,6 @@ class TableToOmx(ProcessingAlgorithm):
                 raise QgsProcessingException(self.tr("Invalid OD table row")) from error
             if not core or origin < 0 or destination < 0:
                 raise QgsProcessingException(self.tr("Core must be nonempty and zone IDs must be nonnegative integers"))
-            # openmatrix.create_mapping stores zone IDs as unsigned 32-bit integers.
             if origin > np.iinfo(np.uint32).max or destination > np.iinfo(np.uint32).max:
                 raise QgsProcessingException(self.tr("Zone IDs must fit in an OMX mapping (0 to 4294967295)"))
             core_cells = cells.setdefault(core, {})
@@ -350,6 +342,4 @@ class TableToOmx(ProcessingAlgorithm):
         return {self.OUTPUT: output}
 
     def shortHelpString(self):
-        return self.tr(
-            "Writes a complete OD table (origin, destination, core, value) to a new OMX file. Each core must include every zone pair."
-        )
+        return self.tr("Writes a complete OD table (origin, destination, core, value) to a new OMX file.")

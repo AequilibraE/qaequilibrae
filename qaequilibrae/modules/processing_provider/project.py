@@ -1,4 +1,4 @@
-"""Shared project lifecycle helpers for Processing algorithms."""
+"""Open or reuse AequilibraE projects."""
 
 from contextlib import contextmanager
 from pathlib import Path
@@ -28,7 +28,7 @@ def open_project(project_folder: str | Path) -> Iterator[Any]:
 
 @contextmanager
 def borrow_project(project_or_folder: Any) -> Iterator[Any]:
-    """Reuse an open project or open a folder and restore the previous active project."""
+    """Reuse a project or open one, then restore the active project."""
     from aequilibrae.context import activate_project, get_active_project
 
     if hasattr(project_or_folder, "network"):

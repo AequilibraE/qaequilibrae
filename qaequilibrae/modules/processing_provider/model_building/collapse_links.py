@@ -46,4 +46,4 @@ class CollapseLinks(ProjectAlgorithm):
         return {"SELECTED_NODE_COUNT": len(link_ids), "SELECTED_LINK_IDS": link_ids}
 
     def shortHelpString(self):
-        return self.tr("This tool collapses links into nodes, adjusting the network in the neighborhood.")
+        return self.tr("Collapses links into nodes and updates the surrounding network.")

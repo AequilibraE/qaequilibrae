@@ -1,4 +1,4 @@
-"""Standalone Delaunay-network Processing algorithm."""
+"""Build a Delaunay network from node coordinates."""
 
 from __future__ import annotations
 
@@ -55,8 +55,8 @@ def compute_delaunay_network(
             "a_node": a_node,
             "b_node": b_node,
             "distance": float(line.length),
+            "geometry": line,
         }
-        row["geometry"] = line
         records.append(row)
 
     columns = ["link_id", "direction", "a_node", "b_node", "distance", "geometry"]
@@ -85,12 +85,11 @@ def compute_delaunay_network(
 
     flow_columns = [field for core in matrix.view_names for field in (f"{core}_ab", f"{core}_ba", f"{core}_tot")]
     flows = assignment.results()[flow_columns]
-    dataframe = dataframe.join(flows, on="link_id")
-    return dataframe
+    return dataframe.join(flows, on="link_id")
 
 
 class DelaunayNetwork(ProcessingAlgorithm):
-    """Build Delaunay edges from supplied nodes and optionally attach matrix flows."""
+    """Build Delaunay edges and assign matrix flows when supplied."""
 
     algorithm_name = "delaunay_network"
     display_name = "Delaunay network"
@@ -108,9 +107,7 @@ class DelaunayNetwork(ProcessingAlgorithm):
     def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.NODES,
-                self.tr("Node or centroid layer"),
-                types=[Qgis.ProcessingSourceType.VectorAnyGeometry],
+                self.NODES, self.tr("Node or centroid layer"), types=[Qgis.ProcessingSourceType.VectorAnyGeometry]
             )
         )
         self.addParameter(
@@ -129,9 +126,7 @@ class DelaunayNetwork(ProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterString(
-                self.MATRIX_CORES,
-                self.tr("Matrix cores (comma-separated, all by default)"),
-                optional=True,
+                self.MATRIX_CORES, self.tr("Matrix cores (comma-separated, all by default)"), optional=True
             )
         )
         self.addParameter(

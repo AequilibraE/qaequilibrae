@@ -1,4 +1,4 @@
-"""Spatial-tag computation and its QGIS Processing adapter."""
+"""Copy field values between layers using spatial matches."""
 
 from collections.abc import Iterable, Sequence
 from typing import Any, cast
@@ -46,11 +46,9 @@ def match_features(
     source_is_polygon: bool = False,
     transform: QgsCoordinateTransform | None = None,
 ) -> dict[int, Any]:
-    """Return the value each target feature should receive.
+    """Return source values for target features with a match.
 
-    ``source_features`` and ``target_features`` are QGIS features. A target
-    feature is only present in the result when the operation found a source it
-    can match, which is how the dialog decides to leave an existing value alone.
+    Unmatched features are omitted so the dialog can keep their current values.
     """
     if operation not in OPERATIONS:
         raise SimpleTagError(f"Unknown spatial-tag operation: {operation}")
@@ -70,11 +68,6 @@ def match_features(
         if matching:
             source_match[feature.id()] = feature.attributes()[source_match_index]
 
-    target_match: dict[int, Any] = {}
-    if matching:
-        for feature in target_features:
-            target_match[feature.id()] = feature.attributes()[target_match_index]
-
     matches: dict[int, Any] = {}
     for feature in target_features:
         geometry = feature.geometry()
@@ -92,7 +85,7 @@ def match_features(
             geometry,
             operation,
             source_is_polygon,
-            target_match.get(feature.id()),
+            feature.attributes()[target_match_index] if matching else None,
         )
         if value is not None:
             matches[feature.id()] = value
@@ -168,31 +161,21 @@ class SimpleTag(ProcessingAlgorithm):
     def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.SOURCE,
-                self.tr("Source layer"),
-                types=[Qgis.ProcessingSourceType.VectorAnyGeometry],
+                self.SOURCE, self.tr("Source layer"), types=[Qgis.ProcessingSourceType.VectorAnyGeometry]
             )
         )
         self.addParameter(
             QgsProcessingParameterField(
-                self.SOURCE_FIELD,
-                self.tr("Source field (values to copy)"),
-                parentLayerParameterName=self.SOURCE,
+                self.SOURCE_FIELD, self.tr("Source field (values to copy)"), parentLayerParameterName=self.SOURCE
             )
         )
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.TARGET,
-                self.tr("Target layer"),
-                types=[Qgis.ProcessingSourceType.VectorAnyGeometry],
+                self.TARGET, self.tr("Target layer"), types=[Qgis.ProcessingSourceType.VectorAnyGeometry]
             )
         )
         self.addParameter(
-            QgsProcessingParameterString(
-                self.TARGET_FIELD,
-                self.tr("Target field name"),
-                defaultValue="tagged",
-            )
+            QgsProcessingParameterString(self.TARGET_FIELD, self.tr("Target field name"), defaultValue="tagged")
         )
         self.addParameter(
             QgsProcessingParameterEnum(
@@ -220,9 +203,7 @@ class SimpleTag(ProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterFeatureSink(
-                self.OUTPUT,
-                self.tr("Tagged layer"),
-                type=Qgis.ProcessingSourceType.VectorAnyGeometry,
+                self.OUTPUT, self.tr("Tagged layer"), type=Qgis.ProcessingSourceType.VectorAnyGeometry
             )
         )
 
@@ -278,7 +259,12 @@ class SimpleTag(ProcessingAlgorithm):
             raise QgsProcessingException(self.tr(str(error))) from error
 
         self.matches = matches
-        fields = self._output_fields(source, target, source_field, target_field)
+        fields = QgsFields()
+        for field in target.fields():
+            fields.append(field)
+        if fields.lookupField(target_field) < 0:
+            source_type = source.fields().field(source_field).type()
+            fields.append(QgsField(target_field, source_type))
         sink, destination = self.parameterAsSink(
             parameters,
             self.OUTPUT,
@@ -320,18 +306,6 @@ class SimpleTag(ProcessingAlgorithm):
         if not source_crs.isValid() or not target_crs.isValid() or source_crs == target_crs:
             return None
         return QgsCoordinateTransform(target_crs, source_crs, context.transformContext())
-
-    @staticmethod
-    def _output_fields(
-        source: QgsFeatureSource, target: QgsFeatureSource, source_field: str, target_field: str
-    ) -> QgsFields:
-        fields = QgsFields()
-        for field in target.fields():
-            fields.append(field)
-        if fields.lookupField(target_field) < 0:
-            source_type = source.fields().field(source_field).type()
-            fields.append(QgsField(target_field, source_type))
-        return fields
 
     def shortHelpString(self) -> str:
         return self.tr(

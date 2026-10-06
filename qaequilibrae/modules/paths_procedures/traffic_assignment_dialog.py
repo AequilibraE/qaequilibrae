@@ -1,5 +1,4 @@
 from collections import defaultdict
-from tempfile import gettempdir
 from os.path import dirname, join
 from pathlib import Path
 
@@ -41,19 +40,14 @@ class TrafficAssignmentDialog(BaseDialog):
         self.project = self.qgis_project.project
         self.skimming = False
         self.path = standard_path()
-        self.output_path = None
-        self.temp_path = None
         self.error = None
         self.report = None
-        self.current_modes = []
         self.traffic_classes = {}
         self.class_cores = {}
         self.class_excluded_links = {}
         self.vdf_parameters = {}
         self.matrices = pd.DataFrame([])
         self.skims = {}
-        self.matrix = None
-        self.block_centroid_flows = None
         self.worker_thread = None
         self.processing_results = None
         self.all_modes = {}
@@ -574,7 +568,6 @@ class TrafficAssignmentDialog(BaseDialog):
         but.setEnabled(False)
         table.setCellWidget(idx, 5, but)
 
-        self.current_modes.append(mode)
         # Seeded before the combos are rebuilt, because refreshing them reads it back
         self.skims[class_name] = []
         self.__edit_skimming_modes()
@@ -801,7 +794,7 @@ class TrafficAssignmentDialog(BaseDialog):
         self.progressbar.setValue(int(value))
 
     def processing_parameters(self):
-        """Translate widget values into the public Processing inputs."""
+        """Return Processing parameters from the dialog inputs."""
         algorithm = RunTrafficAssignment
         matrices = self.project.matrices.list()
         classes = []
@@ -886,7 +879,6 @@ class TrafficAssignmentDialog(BaseDialog):
                 self.error = self.tr("Result matrix name already exists. Choose a new name.")
                 return False
 
-        self.temp_path = gettempdir()
         return self._read_vdf_parameters()
 
     def __repeated_result_fields(self):

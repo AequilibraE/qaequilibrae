@@ -1,12 +1,10 @@
-"""Desire-line computation and its QGIS Processing adapter."""
+"""Create desire lines from matrix flows."""
 
 from collections.abc import Mapping, Sequence
 from typing import Any, Protocol
 
 import numpy as np
 import pandas as pd
-from shapely.geometry import LineString
-
 from qgis.core import (
     Qgis,
     QgsProcessingContext,
@@ -18,6 +16,7 @@ from qgis.core import (
     QgsProcessingParameterFile,
     QgsProcessingParameterString,
 )
+from shapely.geometry import LineString
 
 from qaequilibrae.modules.common_tools.vector_layer_helpers import centroid_coordinates
 from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
@@ -27,28 +26,21 @@ from ..matrix import open_matrix
 
 
 class MatrixLike(Protocol):
-    """Matrix interface required by :func:`compute_desire_lines`."""
+    """Matrix data needed to create desire lines."""
 
     view_names: Sequence[str] | None
     index: Any
 
-    def get_matrix(self, core: str) -> np.ndarray:
-        """Return the selected matrix core as a two-dimensional array."""
-        ...
+    def get_matrix(self, core: str) -> np.ndarray: ...
 
 
 def compute_desire_lines(
     centroids: Mapping[int, tuple[float, float]], matrix: MatrixLike
 ) -> tuple[pd.DataFrame, list[str], float]:
-    """Return desire lines as ``(dataframe, report, unassigned_flow)``.
+    """Create one line per zone pair with flow, omitting intrazonal demand.
 
-    ``centroids`` maps a zone ID to its ``(x, y)`` point. ``matrix`` must already
-    have its computational view set to the cores that should be used. The
-    dataframe holds one row per unordered pair that carries any flow, with
-    ``{core}_AB`` and ``{core}_BA`` columns and a Shapely geometry. IDs missing
-    from ``centroids`` are excluded and their associated flow is included in the
-    report total. Intrazonal demand is omitted. Each pair is oriented from the
-    higher zone ID to the lower: AB is that direction and BA is the reverse.
+    AB runs from the higher zone ID to the lower; BA runs in reverse. Flows for
+    zones without centroids are excluded and reported separately.
     """
     cores = list(matrix.view_names or ())
     if not cores:
@@ -65,17 +57,15 @@ def compute_desire_lines(
     report = []
     unassigned = 0.0
     for zone in index:
-        if int(zone) not in centroids:
-            position = zone_position[int(zone)]
-            flow = (
-                np.nansum(total[position, :]) + np.nansum(total[:, position]) - 2 * np.nansum(total[position, position])
-            )
-            unassigned += flow
-            report.append(f"Zone {zone} does not have a corresponding centroid/zone. Total flow {flow}")
-            total[position, :] = 0
-            total[:, position] = 0
+        if int(zone) in centroids:
+            continue
+        position = zone_position[int(zone)]
+        flow = np.nansum(total[position, :]) + np.nansum(total[:, position]) - 2 * np.nansum(total[position, position])
+        unassigned += flow
+        report.append(f"Zone {zone} does not have a corresponding centroid/zone. Total flow {flow}")
+        total[position, :] = 0
+        total[:, position] = 0
 
-    records = []
     pairs = []
     for origin_position, origin in enumerate(index):
         for destination_position, destination in enumerate(index):
@@ -85,6 +75,7 @@ def compute_desire_lines(
                 pairs.append((int(origin), int(destination), origin_position, destination_position))
     pairs.sort(key=lambda pair: (pair[0], pair[1]))
 
+    records = []
     for sequence, (a_node, b_node, a_position, b_position) in enumerate(pairs, start=1):
         line = LineString([centroids[a_node], centroids[b_node]])
         row = {
@@ -93,10 +84,11 @@ def compute_desire_lines(
             "b_node": b_node,
             "direction": 0,
             "distance": float(line.length),
+            "geometry": line,
         }
-        row.update({f"{core}_AB": float(core_matrices[core][a_position, b_position]) for core in cores})
-        row.update({f"{core}_BA": float(core_matrices[core][b_position, a_position]) for core in cores})
-        row["geometry"] = line
+        for core in cores:
+            row[f"{core}_AB"] = float(core_matrices[core][a_position, b_position])
+            row[f"{core}_BA"] = float(core_matrices[core][b_position, a_position])
         records.append(row)
 
     columns = ["link_id", "a_node", "b_node", "direction", "distance"]
@@ -129,16 +121,12 @@ class DesireLines(ProcessingAlgorithm):
     def initAlgorithm(self, configuration: dict[str, Any] | None = None) -> None:
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.ZONES,
-                self.tr("Zone or centroid layer"),
-                types=[Qgis.ProcessingSourceType.VectorAnyGeometry],
+                self.ZONES, self.tr("Zone or centroid layer"), types=[Qgis.ProcessingSourceType.VectorAnyGeometry]
             )
         )
         self.addParameter(
             QgsProcessingParameterField(
-                self.ZONE_ID_FIELD,
-                self.tr("Zone ID field"),
-                parentLayerParameterName=self.ZONES,
+                self.ZONE_ID_FIELD, self.tr("Zone ID field"), parentLayerParameterName=self.ZONES
             )
         )
         self.addParameter(
@@ -151,16 +139,12 @@ class DesireLines(ProcessingAlgorithm):
         )
         self.addParameter(
             QgsProcessingParameterString(
-                self.MATRIX_CORES,
-                self.tr("Matrix cores (comma-separated, all by default)"),
-                optional=True,
+                self.MATRIX_CORES, self.tr("Matrix cores (comma-separated, all by default)"), optional=True
             )
         )
         self.addParameter(
             QgsProcessingParameterFeatureSink(
-                self.OUTPUT,
-                self.tr("Desire lines"),
-                type=Qgis.ProcessingSourceType.VectorLine,
+                self.OUTPUT, self.tr("Desire lines"), type=Qgis.ProcessingSourceType.VectorLine
             )
         )
 

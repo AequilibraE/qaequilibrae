@@ -1,4 +1,4 @@
-"""Shared base classes for AequilibraE Processing algorithms."""
+"""Base classes for AequilibraE Processing algorithms."""
 
 from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingParameterFile
 
@@ -6,7 +6,7 @@ from qaequilibrae.i18n.translate import trlt
 
 
 class ProcessingAlgorithm(QgsProcessingAlgorithm):
-    """Shared metadata, translation, and instance creation for provider algorithms."""
+    """Provide common metadata and translation methods."""
 
     algorithm_name = ""
     display_name = ""
@@ -16,9 +16,7 @@ class ProcessingAlgorithm(QgsProcessingAlgorithm):
     translation_context: str | None = None
 
     def name(self) -> str:
-        if self.translate_algorithm_name:
-            return self.tr(self.algorithm_name)
-        return self.algorithm_name
+        return self.tr(self.algorithm_name) if self.translate_algorithm_name else self.algorithm_name
 
     def displayName(self) -> str:
         return self.tr(self.display_name)
@@ -38,7 +36,7 @@ class ProcessingAlgorithm(QgsProcessingAlgorithm):
 
 
 class ProjectAlgorithm(ProcessingAlgorithm):
-    """Add project-folder parameters to algorithms that use a project."""
+    """Add a project folder parameter to a Processing algorithm."""
 
     PROJECT_FOLDER = "PROJECT_FOLDER"
     group_name = "AequilibraE project"

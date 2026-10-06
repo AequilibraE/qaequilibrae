@@ -109,12 +109,7 @@ def test_calibrate_gravity(sf_project_with_assignment, method, folder_path, mock
         qtbot.mouseClick(dialog.but_queue, Qt.MouseButton.LeftButton)
 
     qtbot.mouseClick(dialog.but_run, Qt.MouseButton.LeftButton)
-    expected_outputs = [
-        f"{folder_path}/neg_{method}.mod" if method in ["negative_exponential", "both"] else None,
-        f"{folder_path}/inv_{method}.mod" if method in ["inverse_power", "both"] else None,
-    ]
     qtbot.waitUntil(lambda: dialog._task is None and dialog.but_run.isEnabled(), timeout=60000)
-    assert all(path is None or isfile(path) for path in expected_outputs)
 
     if method in ["negative_exponential", "both"]:
         file_path = f"{folder_path}/neg_{method}.mod"

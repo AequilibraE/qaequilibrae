@@ -1,4 +1,4 @@
-"""Route-choice computation and its QGIS Processing adapter."""
+"""Build route choice sets and assign demand."""
 
 from collections.abc import Hashable, Mapping, Sequence
 from contextlib import contextmanager
@@ -34,7 +34,7 @@ class RouteChoiceError(ValueError):
 
 
 class RouteChoiceConfiguration(TypedDict):
-    """Validated settings for a route-choice assignment or build."""
+    """Settings for route choice or assignment."""
 
     mode: str
     utility_fields: list[tuple[float, str]]
@@ -110,7 +110,6 @@ def _run_route_choice(
             route_choice.add_demand(matrix)
             route_choice.prepare()
             if configuration["select_links"]:
-                # The upstream method also accepts single-link alternatives in its broader type.
                 selections = cast(
                     dict[Hashable, list[tuple[int, int] | list[tuple[int, int]]]],
                     configuration["select_links"],
@@ -158,7 +157,6 @@ def _run_route_choice(
 
 @contextmanager
 def _load_demand(project: Any, matrix_name: str, cores: list[str]) -> Iterator[Any]:
-    """Load demand and close it after computation, including failed setup."""
     matrix = project.matrices.get_matrix(matrix_name)
     try:
         if not cores or any(core not in matrix.names for core in cores):
@@ -295,24 +293,19 @@ class RouteChoice(ProjectAlgorithm):
             )
         )
         self.addParameter(QgsProcessingParameterString(self.ALGORITHM, self.tr("Choice-set algorithm"), "bfsle"))
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.MAX_ROUTES,
-                self.tr("Maximum routes"),
-                type=Qgis.ProcessingNumberParameterType.Integer,
-                minValue=0,
-                defaultValue=3,
+        for key, label, default in (
+            (self.MAX_ROUTES, "Maximum routes", 3),
+            (self.MAX_DEPTH, "Maximum depth", 0),
+        ):
+            self.addParameter(
+                QgsProcessingParameterNumber(
+                    key,
+                    self.tr(label),
+                    type=Qgis.ProcessingNumberParameterType.Integer,
+                    minValue=0,
+                    defaultValue=default,
+                )
             )
-        )
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.MAX_DEPTH,
-                self.tr("Maximum depth"),
-                type=Qgis.ProcessingNumberParameterType.Integer,
-                minValue=0,
-                defaultValue=0,
-            )
-        )
         self.addParameter(QgsProcessingParameterNumber(self.PENALTY, self.tr("Link penalty"), defaultValue=1.0))
         self.addParameter(
             QgsProcessingParameterNumber(
@@ -349,10 +342,7 @@ class RouteChoice(ProjectAlgorithm):
         self.addParameter(QgsProcessingParameterBoolean(self.SUB_AREA, self.tr("Use sub-area analysis"), False))
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.ZONES,
-                self.tr("Sub-area polygons"),
-                types=[Qgis.ProcessingSourceType.VectorPolygon],
-                optional=True,
+                self.ZONES, self.tr("Sub-area polygons"), types=[Qgis.ProcessingSourceType.VectorPolygon], optional=True
             )
         )
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_RESULT_NAME, self.tr("Results table")))
@@ -382,7 +372,6 @@ class RouteChoice(ProjectAlgorithm):
         parameters: dict[str, Any],
         context: QgsProcessingContext,
     ) -> RouteChoiceConfiguration:
-        """Convert Processing values into validated route-choice settings."""
         mode = self.parameterAsString(parameters, self.MODE, context).strip()
         matrix_name = self.parameterAsString(parameters, self.MATRIX_NAME, context).strip()
         output_name = self.parameterAsString(parameters, self.RESULT_NAME, context).strip()
@@ -418,6 +407,7 @@ class RouteChoice(ProjectAlgorithm):
         penalty = self.parameterAsDouble(parameters, self.PENALTY, context)
         select_links = _select_links(self.parameterAsMatrix(parameters, self.SELECT_LINKS, context))
         sub_area = self.parameterAsBool(parameters, self.SUB_AREA, context)
+        save_choice_sets = self.parameterAsBool(parameters, self.SAVE_CHOICE_SETS, context)
         select_link_name = (
             self.parameterAsString(parameters, self.SELECT_LINK_NAME, context).strip() or f"{output_name}_sl"
         )
@@ -438,9 +428,7 @@ class RouteChoice(ProjectAlgorithm):
                 "penalty": penalty,
                 "cutoff_prob": self.parameterAsDouble(parameters, self.CUTOFF, context),
                 "beta": self.parameterAsDouble(parameters, self.BETA, context),
-                "store_results": not (
-                    job == "assign" and not self.parameterAsBool(parameters, self.SAVE_CHOICE_SETS, context)
-                ),
+                "store_results": job != "assign" or save_choice_sets,
             },
             "block_centroid_flows": self.parameterAsBool(parameters, self.BLOCK_CENTROID_FLOWS, context),
             "matrix_name": matrix_name,
@@ -451,7 +439,7 @@ class RouteChoice(ProjectAlgorithm):
             ],
             "job": job,
             "output_name": output_name,
-            "save_choice_sets": self.parameterAsBool(parameters, self.SAVE_CHOICE_SETS, context),
+            "save_choice_sets": save_choice_sets,
             "excluded_links": excluded_links,
             "select_links": select_links,
             "select_link_name": select_link_name,
@@ -459,26 +447,15 @@ class RouteChoice(ProjectAlgorithm):
         }
 
     def shortHelpString(self) -> str:
-        help_messages = [
-            self.tr(
-                "Builds route-choice sets or assigns demand for an AequilibraE project. "
-                "Utility terms are coefficient and network-field pairs."
-            ),
-            self.tr("Choose 'assign' to save link-load results, or 'build' to save paths without assignment."),
-            self.tr("Select at least one demand matrix core and one utility term."),
-            self.tr("Set either a maximum route count or a maximum search depth above zero."),
-            self.tr(
-                "Optional inputs support blocked centroid flows, excluded links, select-link analysis, "
-                "saved route sets, and sub-area analysis."
-            ),
-            self.tr("Sub-area analysis needs polygon features and writes an external-demand Parquet file."),
-            self.tr(
-                "Outputs identify the result table, choice-set folder, sub-area file, and optional "
-                "select-link table and OMX matrix."
-            ),
-            self.tr("Existing result and matrix names are not replaced."),
-        ]
-        return "\n".join(help_messages)
+        return self.tr(
+            "Use 'build' to save route sets or 'assign' to save link loads. Choose at least one "
+            "matrix core and utility term (a coefficient and network field). Set a maximum route "
+            "count or search depth above zero. Options include centroid blocking, excluded links, "
+            "saved route sets, select-link analysis, and sub-area analysis. Sub-area analysis needs "
+            "polygons and writes an external-demand Parquet file. Outputs identify the result table, "
+            "route-set folder, sub-area file, and optional select-link table and OMX matrix. "
+            "Existing results and matrices are not overwritten."
+        )
 
 
 def _select_links(

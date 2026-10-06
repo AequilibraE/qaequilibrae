@@ -1,4 +1,4 @@
-"""Algorithms that export project geometry to Processing sinks."""
+"""Export project tables as vector layers."""
 
 from qgis.core import (
     Qgis,
@@ -7,16 +7,14 @@ from qgis.core import (
     QgsProcessingParameterFeatureSink,
 )
 
-from ..project_algorithm import ProjectAlgorithm
-from .common import add_dataframe_to_sink, fields_from_dataframe
 from ..project import open_project
+from ..project_algorithm import ProjectAlgorithm
+from .common import add_dataframe_to_sink, fields_from_dataframe, project_table
 
 
 class ExtractProjectLayer(ProjectAlgorithm):
     """Base class for exporting one project table as a vector layer."""
 
-    algorithm_name = ""
-    display_name = ""
     group_name = "Geometry IO"
     group_id = "geometry_io"
 
@@ -34,9 +32,7 @@ class ExtractProjectLayer(ProjectAlgorithm):
     def processAlgorithm(self, parameters, context, feedback):
         project_folder = self.project_folder(parameters, context)
         with open_project(project_folder) as project:
-            dataframe = (
-                getattr(project.network, self.table_name).data if self.table_name != "zones" else project.zoning.data
-            )
+            dataframe = project_table(project, self.table_name).data
             fields = fields_from_dataframe(dataframe)
             sink, destination = self.parameterAsSink(
                 parameters,
@@ -60,7 +56,6 @@ class ExtractLinks(ExtractProjectLayer):
     algorithm_name = "extract_links"
     display_name = "Extract links"
     table_name = "links"
-    geometry_type = Qgis.ProcessingSourceType.VectorLine
 
 
 class ExtractNodes(ExtractProjectLayer):

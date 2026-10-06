@@ -106,7 +106,7 @@ class AddNetworkRecordDialog(BaseDialog):
             return self.tr("The name cannot be empty")
         if any(character not in ALLOWED_NAME_CHARACTERS for character in name):
             return self.tr('The name can only contain letters and "_"')
-        if any(name.lower() == str(taken).lower() for taken in records.values()):
+        if name.lower() in [str(taken).lower() for taken in records.values()]:
             return self.tr("The name is already in use")
         return None
 
