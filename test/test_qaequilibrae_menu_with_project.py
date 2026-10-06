@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
 from qgis.PyQt.QtCore import QEvent, QMetaObject, QObject, Qt
-from qgis.PyQt.QtWidgets import QApplication
+from qgis.PyQt.QtWidgets import QApplication, QToolButton
 
 
 class DialogEventFilter(QObject):
@@ -40,6 +40,21 @@ def test_load_project(ae_with_project):
     messagebar = ae_with_project.iface.messageBar()
     assert len(messagebar.messages[2]) == 0, "Messagebar should be empty" + str(messagebar.messages)
     assert ae_with_project.project is not None, "project should be loaded"
+
+
+def test_open_project_resizes_floating_panel(menu_factory, sioux_falls_project_path, qtbot):
+    from qaequilibrae.modules.menu_actions.load_project_action import _run_load_project_from_path
+
+    ae = menu_factory()
+    ae.dock.setFloating(True)
+    ae.dock.resize(150, 200)
+    ae.dock.show()
+    _run_load_project_from_path(ae, sioux_falls_project_path)
+
+    qtbot.waitUntil(ae.geo_layers_table.isVisible)
+    extension = ae.toolbar.findChild(QToolButton, "qt_toolbar_ext_button")
+    qtbot.waitUntil(lambda: not extension.isVisible())
+    qtbot.waitUntil(lambda: ae.geo_layers_table.viewport().height() > 0)
 
 
 def test_run_module_menu(coquimbo_project):

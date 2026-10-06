@@ -612,7 +612,17 @@ class AequilibraEMenu:
                 layers += ["transit_links", "transit_routes", "transit_stops", "transit_pattern_mapping"]
 
             descrlayout = QVBoxLayout()
+            hint = self.tr("Double-click a layer to add it to QGIS.")
+            note = QLabel(hint)
+            note.setWordWrap(True)
+            font = self.toolbar.font()
+            font.setPointSize(max(8, font.pointSize() - 2))
+            note.setFont(font)
+            note.setStyleSheet("color: #999999;")
+            descrlayout.addWidget(note)
+
             self.geo_layers_table = QTableWidget()
+            self.geo_layers_table.setToolTip(hint)
             self.geo_layers_table.doubleClicked.connect(self.load_geo_layer)
 
             self.geo_layers_table.setRowCount(len(layers))
@@ -620,6 +630,7 @@ class AequilibraEMenu:
             self.geo_layers_table.horizontalHeader().hide()
             for i, f in enumerate(layers):
                 item1 = QTableWidgetItem(f)
+                item1.setToolTip(self.tr("Double-click to add '{}' to QGIS.").format(f))
                 item1.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
                 self.geo_layers_table.setItem(i, 0, item1)
 
@@ -631,12 +642,30 @@ class AequilibraEMenu:
             for i in range(self.projectManager.count()):
                 self.projectManager.removeTab(i)
             self.projectManager.addTab(descr, "Geo layers")
+            self.resize_project_panel()
             conn.execute("PRAGMA temp_store = 0;")
 
             # Creates all layers and puts them in memory
             self.layers.clear()
             for lyr in layers:
                 self.create_layer_by_name(lyr)
+
+    def resize_project_panel(self):
+        """Request room for the project controls within the available window or screen."""
+        self.projectManager.currentWidget().layout().activate()
+        self.projectManager.updateGeometry()
+        self.toolbar.layout().invalidate()
+        self.toolbar.layout().activate()
+        self.manager.layout().activate()
+        self.dock.layout().activate()
+        size = self.dock.sizeHint()
+        if self.dock.isFloating():
+            available = self.dock.screen().availableGeometry().size()
+            self.dock.resize(size.boundedTo(available))
+        else:
+            window = self.iface.mainWindow()
+            window.resizeDocks([self.dock], [min(size.width(), window.width() // 2)], Qt.Orientation.Horizontal)
+            window.resizeDocks([self.dock], [min(size.height(), window.height())], Qt.Orientation.Vertical)
 
     def message_log(self, message, level: Qgis.MessageLevel = Qgis.MessageLevel.Info, notify_user: bool = False):
         """
