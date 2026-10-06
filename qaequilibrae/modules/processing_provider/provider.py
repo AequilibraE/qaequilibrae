@@ -34,11 +34,19 @@ class Provider(QgsProcessingProvider):
         self.addAlgorithm(TransitSupplyMetricsAlgorithm())
 
     def __load_model_building(self):
+        from .model_building.centroids import AddCentroidConnectors, AddCentroidsFromZones
+        from .model_building.create_project import CreateProjectFromLinkLayer, CreateProjectFromOSM
+        from .model_building.renumber_nodes import RenumberNodesFromLayer
         from .model_building.add_links_from_layer import AddLinksFromLayer
         from .model_building.collapse_links import CollapseLinks
         from .model_building.create_empty_project import CreateEmptyProject
         from .model_building.network_simplifier import NetworkSimplifier
 
+        self.addAlgorithm(AddCentroidConnectors())
+        self.addAlgorithm(AddCentroidsFromZones())
+        self.addAlgorithm(RenumberNodesFromLayer())
+        self.addAlgorithm(CreateProjectFromLinkLayer())
+        self.addAlgorithm(CreateProjectFromOSM())
         self.addAlgorithm(AddLinksFromLayer())
         self.addAlgorithm(CollapseLinks())
         self.addAlgorithm(CreateEmptyProject())

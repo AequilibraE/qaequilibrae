@@ -144,6 +144,9 @@ def test_menu_is_added_to_the_qgis_menu_bar(ae):
     assert ae.main_menu.title() == "AequilibraE"
     assert [action.text() for action in ae.main_menu.actions() if action.menu()] == [
         "Project",
+        "Model building",
+        "Data",
+        "Routing",
         "Trip distribution",
         "Path computation",
         "Traffic assignment",
@@ -157,6 +160,9 @@ def test_menu_is_added_to_the_qgis_menu_bar(ae):
 def test_menu_controls_remain_in_the_docked_panel(ae):
     assert [button.text() for button in ae.dock_menu_buttons] == [
         "Project",
+        "Model building",
+        "Data",
+        "Routing",
         "Trip distribution",
         "Path computation",
         "Traffic assignment",
@@ -190,3 +196,45 @@ def test_gtfs_explorer(ae):
     action.trigger()
     messagebar = ae.iface.messageBar()
     assert messagebar.messages[2][0] == "Error:You need to load a project", "Level 2 error message is missing"
+
+
+def test_restored_project_creation_menus_open_dialogs(ae):
+    from qaequilibrae.modules.project_procedures import CreatesTranspoNetDialog, CreateExampleDialog
+
+    for group, name, dialog in (
+        ("Project", "Create example", CreateExampleDialog),
+        ("Model building", "Create project from layers", CreatesTranspoNetDialog),
+    ):
+        trigger_dialog_action(next(action for action in ae.menuActions[group] if action.text() == name), dialog)
+
+
+def test_restored_editing_menus_require_a_project(ae):
+    for group, name in (
+        ("Model building", "Add zoning data"),
+        ("Model building", "Add centroid connectors"),
+        ("Data", "Add mode"),
+        ("Data", "Add link type"),
+    ):
+        next(action for action in ae.menuActions[group] if action.text() == name).trigger()
+    assert len(ae.iface.messageBar().messages[2]) == 4
+
+
+def test_create_empty_project_menu_opens_processing_result(ae, monkeypatch, tmp_path):
+    import processing
+    from aequilibrae import Project
+
+    folder = str(tmp_path / "empty")
+    project = Project()
+    project.new(folder)
+    project.close()
+    calls = []
+
+    def run_dialog(identifier):
+        calls.append(identifier)
+        return {"Output": folder}
+
+    monkeypatch.setattr(processing, "execAlgorithmDialog", run_dialog)
+    next(action for action in ae.menuActions["Model building"] if action.text() == "Create empty project").trigger()
+    assert calls == ["qaequilibrae:create_empty_project"]
+    assert ae.project is not None
+    assert str(ae.project.project_base_path) == folder

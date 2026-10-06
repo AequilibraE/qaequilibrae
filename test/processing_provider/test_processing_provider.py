@@ -58,6 +58,11 @@ def test_provider_exists(qgis_app):
     assert "aequilibrae" in provider_names
     assert {type(algorithm).__name__ for algorithm in provider.algorithms()} == {
         "AddLinksFromLayer",
+        "AddCentroidConnectors",
+        "AddCentroidsFromZones",
+        "RenumberNodesFromLayer",
+        "CreateProjectFromLinkLayer",
+        "CreateProjectFromOSM",
         "AddLinks",
         "AddNodes",
         "AddZones",
@@ -512,22 +517,17 @@ def test_create_empty_project(no_menu_instance, tmp_path, pre_create_folder):
     project.close()
 
 
-def test_create_empty_project_shows_in_the_panel(ae, tmp_path):
-    """A model created from scratch reaches the panel."""
-    parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "new model"}
-
-    action = CreateEmptyProject()
-    action.initAlgorithm()
-
-    results, ok = action.run(parameters, QgsProcessingContext(), QgsProcessingFeedback())
-    assert ok
-
-    assert str(ae.project.project_base_path) == results["Output"]
-    assert ae.available_scenarios == ["root"]
-    assert {"links", "nodes", "zones"} <= set(ae.layers)
-    assert ae.projectManager.count() == 1
-
-    ae.run_close_project()
+def test_create_empty_project_does_not_open_the_panel(ae, tmp_path):
+    algorithm = CreateEmptyProject()
+    algorithm.initAlgorithm()
+    result = algorithm.processAlgorithm(
+        {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "processing"},
+        QgsProcessingContext(),
+        QgsProcessingFeedback(),
+    )
+    assert result["Output"] == str(tmp_path / "processing")
+    assert ae.project is None
+    assert ae.available_scenarios == []
 
 
 def test_create_empty_project_leaves_the_open_project_alone(ae_with_project, tmp_path):

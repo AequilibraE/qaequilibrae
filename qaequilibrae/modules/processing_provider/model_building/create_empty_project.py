@@ -2,7 +2,13 @@ import importlib.util as iutil
 from os import listdir, rmdir
 from os.path import isdir, join
 
-from qgis.core import Qgis, QgsProcessingException, QgsProcessingParameterFile, QgsProcessingParameterString
+from qgis.core import (
+    Qgis,
+    QgsProcessingException,
+    QgsProcessingOutputFolder,
+    QgsProcessingParameterFile,
+    QgsProcessingParameterString,
+)
 
 from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
@@ -32,10 +38,7 @@ class CreateEmptyProject(ProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterString(self.MODEL_NAME, self.tr("Model name"), defaultValue="new model")
         )
-
-    def flags(self):
-        # The plugin panel's widgets require the main thread.
-        return super().flags() | Qgis.ProcessingAlgorithmFlag.NoThreading
+        self.addOutput(QgsProcessingOutputFolder("Output", self.tr("Project folder")))
 
     def processAlgorithm(self, parameters, context, feedback):
         parent_folder = self.parameterAsFile(parameters, self.PARENT_FOLDER, context)
@@ -61,7 +64,7 @@ class CreateEmptyProject(ProcessingAlgorithm):
         if iutil.find_spec("aequilibrae") is None:
             raise QgsProcessingException(self.tr("AequilibraE module not found"))
 
-        from aequilibrae.project import Project
+        from .create_project import new_project
 
         # AequilibraE needs a folder that does not exist yet.
         if isdir(project_folder):
@@ -75,41 +78,18 @@ class CreateEmptyProject(ProcessingAlgorithm):
                 ) from e
         feedback.pushInfo(self.tr("Creating project"))
 
-        project = Project()
         try:
-            project.new(project_folder)
+            with new_project(project_folder) as project:
+                modes = list(project.network.modes.all_modes())
+                link_types = list(project.network.link_types.all_types())
         except Exception as e:
             raise QgsProcessingException(self.tr("Could not create project: ") + str(e)) from e
-
-        modes = list(project.network.modes.all_modes().keys())
-        link_types = list(project.network.link_types.all_types().keys())
 
         feedback.pushInfo(self.tr("Project created in ") + project_folder)
         feedback.pushInfo(self.tr("Default modes: ") + ", ".join(sorted(modes)))
         feedback.pushInfo(self.tr("Default link types: ") + ", ".join(sorted(link_types)))
 
-        self.show_in_panel(project, project_folder, feedback)
-
         return {"Output": project_folder}
-
-    def show_in_panel(self, project, project_folder, feedback):
-        """Show the new project in the plugin panel when available."""
-        from qaequilibrae import get_aequilibrae_menu_instance
-        from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
-
-        qgis_project = get_aequilibrae_menu_instance()
-
-        if qgis_project is None:
-            project.close()
-            return
-
-        if qgis_project.project is not None:
-            feedback.pushWarning(self.tr("Close the open project to see the new one in the panel"))
-            project.close()
-            return
-
-        qgis_project.project = project
-        show_project_in_panel(qgis_project, project_folder)
 
     def shortHelpString(self):
         return self.tr(

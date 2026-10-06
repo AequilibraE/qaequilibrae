@@ -2,7 +2,8 @@ Processing Tools
 ================
 
 AequilibraE provides algorithms in the QGIS Processing Toolbox and tools in the
-plugin menus.
+plugin menus. The provider contains parameterized algorithms only.
+It does not contain shortcuts that open plugin dialogs.
 
 To find AequilibraE's processing plugin, click on the **Processing** panel and select **Toolbox**.
 You can also use the available QGIS shortcut to open the Toolbox window.
@@ -301,12 +302,112 @@ An empty core list selects all cores. Matrix IDs must match node IDs. The
 algorithm assigns demand with an all-or-nothing assignment and adds AB, BA, and
 total flow fields to the output.
 
-Model Building
+Model building
 --------------
-With the Model Building tools, it is possible to effectively build an AequilibraE model,
-and to do so, there are some options, such as creating project from Open Street Maps or
-using your existing layers. Model Building also provides options for editing the model's
-network.
+The Processing **Model building** group creates projects and changes their networks.
+The **AequilibraE > Model building** menu opens the interactive dialogs.
+The dock panel provides the same menu actions as the menubar.
+
+Processing tools return results without opening the plugin panel.
+Menu tools can open the new project in that panel.
+
+.. list-table:: Project creation and centroid algorithms
+   :header-rows: 1
+
+   * - Algorithm ID
+     - Operation
+     - Output
+   * - ``qaequilibrae:create_empty_project``
+     - Create an empty project
+     - ``Output``: project folder
+   * - ``qaequilibrae:projectfromlayer``
+     - Create a project from a link layer
+     - ``OUTPUT``: project folder
+   * - ``qaequilibrae:projectfromosm``
+     - Create a project from OSM
+     - ``OUTPUT``: project folder
+   * - ``qaequilibrae:add_centroids_from_zones``
+     - Create missing zone centroids
+     - ``ADDED``: centroid count
+   * - ``qaequilibrae:renumbernodes``
+     - Add or renumber centroids from a point layer
+     - ``ADDED``, ``RENUMBERED``, ``MATCHED``: node counts
+   * - ``qaequilibrae:addcentroidconnector``
+     - Generate centroid connectors
+     - ``ADDED``: link count
+
+Create a project from a link layer with Processing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Select the links layer and its direction, modes, and link-type fields.
+Direction values must be ``-1``, ``0``, or ``1``.
+Modes use one-letter IDs. Link-type names use letters and underscores.
+The algorithm creates missing modes and link types.
+
+Select an optional source ID field to preserve its values in ``source_id``.
+The project assigns its own ``link_id`` values.
+*Import additional link fields* copies other attributes and creates missing fields.
+New field names use lowercase input names.
+Generated fields, such as endpoint IDs and distance, come from the project.
+The algorithm transforms input geometry to EPSG:4326.
+
+Select a project folder that does not exist.
+The algorithm generates regular nodes from link endpoints, with IDs starting at 10000.
+Use *Add or renumber centroids from layer* to assign centroid IDs afterward.
+The interactive *Create project from layers* dialog also accepts a node layer and field mappings.
+
+Create a project from OSM with Processing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Supply either a place name or a download extent.
+Select the OSM mode names, such as ``car`` or ``walk``.
+These names differ from the one-letter network mode IDs.
+Select a project folder that does not exist.
+The algorithm transforms the extent to EPSG:4326 before the download.
+
+OSM import requires internet access.
+Cancellation cannot interrupt the library download and network build.
+A failed import can leave a partial project folder.
+
+Create centroids with Processing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*Add centroids from zones* creates a centroid for each project zone without one.
+It retains existing centroids and rejects zone IDs occupied by regular nodes.
+
+*Add or renumber centroids from layer* accepts a point layer and an ID field.
+IDs must be positive integers. IDs and point locations must be unique.
+The algorithm transforms points to EPSG:4326 and rounds coordinates to eight decimal places for matching.
+Matched nodes become centroids with the requested IDs.
+Unmatched points create new centroids.
+Node renumbering also updates the connected link endpoints.
+
+The algorithm checks all ID conflicts before it changes nodes.
+It supports ID swaps between matched nodes.
+It rejects multiple matching nodes and IDs occupied by unrelated nodes.
+Cancellation takes effect before changes begin.
+Once changes begin, the algorithm completes the ID changes.
+
+Generate connectors with Processing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*Add centroid connectors* connects project centroids to eligible network nodes.
+Select the mode IDs, link-type IDs, and number of connectors per centroid and mode.
+Empty mode and link-type inputs select all available IDs.
+The initial search radius uses meters.
+If that area contains no eligible node, the library expands it.
+
+Select *Create missing centroids from project zones* to create zone centroids first.
+For centroid positions from another layer, run *Add or renumber centroids from layer* first.
+The output counts new links, rather than new mode permissions on existing links.
+
+Network changes save during the operation.
+Cancellation or an error can leave partial additions.
+The same applies to project creation from a link layer.
+
+Interactive model-building tools
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Use **AequilibraE > Model building** in the menubar or the dock panel.
+This menu contains project creation, network preparation, zoning import, and centroid connector dialogs.
+*Network preparation* creates node and link layers for inspection before project import.
+*Add zoning data* includes an option to create centroids.
+These dialogs are menu tools; they are not Processing algorithms.
 
 .. _adding_centroids:
 
@@ -410,6 +511,10 @@ The tool takes two inputs: the *parent folder*, which you browse to, and the *mo
 which defaults to ``new model``. The model is created in a folder named after the model
 inside the parent folder, and that folder must either not exist yet, or be empty.
 
+Processing returns the project folder without opening the plugin panel.
+**AequilibraE > Model building > Create empty project** opens the same algorithm dialog.
+After a successful menu operation, the plugin opens the project in its panel.
+
 An empty project is the natural starting point when you intend to build your model
 incrementally with the other Model building tools, such as
 Add links from layer to project and :ref:`Add zoning data <add-zoning-data>`.
@@ -487,7 +592,7 @@ layers for this task on the page
 
 Basic workflow
 ^^^^^^^^^^^^^^
-Accessing **Model building > Create Project from Layers**, the user is
+Accessing **Model building > Create project from layers**, the user is
 presented with the following screen.
 
 .. image:: images/processing_provider/project_from_layers_links.png
@@ -555,7 +660,7 @@ When preparing your project network, you might face there are two distinct situa
      *IDs* chosen among the fields from the nodes layer
 
 The *GUI* for these two processes can be accessed in the AequilibraE menu **Model
-Building > Network Preparation**, and it looks like this:
+building > Network preparation**, and it looks like this:
 
 .. image:: images/processing_provider/network_edit_network_preparation.png
     :width: 774

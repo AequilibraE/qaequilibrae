@@ -5,6 +5,11 @@
 Preparing a network
 ===================
 
+Open **AequilibraE > Model building > Network preparation** from the menubar or dock panel.
+This interactive tool prepares node and link layers.
+It does not require an open AequilibraE project.
+For project creation, use the menu dialogs or the :doc:`Processing algorithms <../processing_provider>`.
+
 .. toctree::
    :maxdepth: 2
 

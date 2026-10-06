@@ -8,8 +8,15 @@ are interested in better understanding its structure, please visit its
 `documentation <https://www.aequilibrae.com/latest/python/modeling_with_aequilibrae/project.html>`_
 webpage.
 
-Under the project menu, there are some options to choose from and the following sections
-explore some of these actions.
+The **AequilibraE > Project** menu opens projects, runs procedures, and manages scenarios.
+It also provides **Create example**, **Log file**, and **Parameters**.
+The dock panel provides the same actions as the menubar.
+Project creation from layers or OSM is under **Model building**.
+
+The **Data** menu provides matrix import, mode creation, and link-type creation.
+The **Routing** menu provides the traveling salesman dialog.
+The **Mapping** menu includes the interactive Simple tag dialog.
+These menu dialogs are separate from the parameterized Processing algorithms.
 
 .. image:: ../images/project_procedures/menu_project.png
     :align: center
