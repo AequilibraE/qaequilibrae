@@ -177,9 +177,6 @@
     </message>
 </context>
 <context>
-    <name>AddLinkTypeDialog</name>
-</context>
-<context>
     <name>AddLinksFromLayer</name>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="22"/>
@@ -269,9 +266,6 @@
         <source>Adds a mode to an AequilibraE project.</source>
         <translation type="unfinished"/>
     </message>
-</context>
-<context>
-    <name>AddModeDialog</name>
 </context>
 <context>
     <name>AddNetworkRecordDialog</name>
@@ -587,6 +581,16 @@
     <message>
         <location filename="../qaequilibrae.py" line="235"/>
         <source>Simple tag</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="615"/>
+        <source>Double-click a layer to add it to QGIS.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="633"/>
+        <source>Double-click to add &apos;{}&apos; to QGIS.</source>
         <translation type="unfinished"/>
     </message>
 </context>
