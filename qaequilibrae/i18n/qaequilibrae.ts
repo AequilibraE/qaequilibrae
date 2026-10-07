@@ -179,9 +179,6 @@
     </message>
 </context>
 <context>
-    <name>AddLinkTypeDialog</name>
-</context>
-<context>
     <name>AddLinksFromLayer</name>
     <message>
         <location filename="../modules/processing_provider/model_building/add_links_from_layer.py" line="22"/>
@@ -271,9 +268,6 @@
         <source>Adds a mode to an AequilibraE project.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>AddModeDialog</name>
 </context>
 <context>
     <name>AddNetworkRecordDialog</name>
