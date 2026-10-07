@@ -583,6 +583,16 @@
         <source>Simple tag</source>
         <translation>Tag simple</translation>
     </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="615"/>
+        <source>Double-click a layer to add it to QGIS.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../qaequilibrae.py" line="633"/>
+        <source>Double-click to add &apos;{}&apos; to QGIS.</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>ApplyGravity</name>
