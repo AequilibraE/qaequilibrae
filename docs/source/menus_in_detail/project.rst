@@ -39,6 +39,22 @@ error. That applies to the tools that build a model as well
 :ref:`from an example <create_example>`), since each of them leaves the model it
 created open, with its layers listed in the Project tab.
 
+.. _add_project_geometry_layers:
+
+Add project geometry layers to QGIS
+----------------------------------
+
+When you open a project, the *Geo layers* tab lists the geometry layers for the current
+scenario. You can find this tab in the AequilibraE panel, below *Model scenario*. The list
+includes *links*, *nodes*, and *zones*. Projects with transit data also list transit layers.
+
+To add a layer to QGIS, double-click its name in the list. Opening an AequilibraE project 
+makes these layers available, but does not add them to the QGIS *Layers* panel automatically. 
+If the *Geo layers* tab is hidden, enlarge the panel.
+
+When you select another scenario under *Model scenario*, the *Geo layers* tab lists the
+layers for that scenario. Double-click the layer names to add them to QGIS.
+
 .. _run_procedures:
 
 Run procedures
