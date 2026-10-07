@@ -1,20 +1,21 @@
 Processing Tools
 ================
 
-AequilibraE provides algorithms in the QGIS Processing Toolbox and tools in the
-plugin menus. The provider contains parameterized algorithms only.
-It does not contain shortcuts that open plugin dialogs.
+Processing Algorithms
+---------------------
 
-To find AequilibraE's processing plugin, click on the **Processing** panel and select **Toolbox**.
-You can also use the available QGIS shortcut to open the Toolbox window.
+QGIS Processing Algorithms, available from the Processing Toolbox, expose much
+of the functionality of QGIS and its plugins with a consistent interface.
+QAequilibraE similarly adds its own set of algorithms to the Processing Toolbox,
+allowing users to integrate the underlying functionality with other tools and
+workflows within QGIS. Generally, the design is such that most modellers will
+prefer instead to use the tools under the "AequilibraE" menu itself, where we
+provide convenient interfaces and project-aware workflows, but the algorithms
+that underpin these workflows are made available.
 
 .. image:: images/processing_provider/processing_provider_init.png
     :align: center
-    :alt: Processing provider menu
-
-The AequilibraE provider appears at the bottom of the toolbox. Its algorithms are divided
-into groups. Some algorithms also have a plugin menu dialog. Other algorithms are only
-available in the Processing Toolbox.
+    :alt: Open the QGIS Processing Toolbox
 
 .. subfigure:: AB
     :align: center
@@ -25,291 +26,20 @@ available in the Processing Toolbox.
     .. image:: images/processing_provider/processing_provider_toolbox-2.png
         :alt: Toolbox Detailed
 
-Data
-----
-The Data group adds modes and link types, exports matrices, converts OMX files to
-QGIS tables, calculates matrices, and creates trip-length distribution plots.
+Common uses for using the processing algorithms directly include batch
+processing, automating repetitive tasks, and building out "Models" in the QGIS
+Model Designer.
 
-.. warning::
-
-    Support for AequilibraE Matrix (AEM) files has been removed. Matrices must be
-    stored in OpenMatrix (\*.omx) format.
-
-.. _add_link_type:
-
-Add link type
-~~~~~~~~~~~~~
-Every link in an AequilibraE network has a link type. The project must contain that type
-before it can save a link. **Data > Add link type** adds a type to the selected project.
-In the toolbox, enter the project folder, a one-letter ID, and a name. Description,
-lanes, lane capacity, and speed are optional.
-
-The table at the top lists the link types the project already has, exactly as they are
-stored in the *link_types* table, so you can see which identifiers and names are taken
-before filling in the form below it.
-
-.. image:: images/processing_provider/data-add_link_type.png
-    :align: center
-    :alt: Add link type
-
-A link type needs two things: a **link type ID**, which is the single letter used to
-refer to it wherever a set of link types is chosen (when
-:ref:`adding centroid connectors <adding_centroids>`, for example), and a **link type
-name**, which is what the links themselves carry. The dialog offers the first identifier
-that is still free, and the name may only contain letters and underscores.
-
-*Description*, *lanes*, *lane capacity* and *speed* are optional, and the three numbers
-are left empty in the model while they read *Not set*. A model built with an older
-version of AequilibraE may not have all of these columns, and the ones it does not have
-are not offered.
-
-The dialog stays open after each addition, so several link types can be added in a row,
-and each new link type is immediately available in the attribute form used to
-:ref:`digitize links <editing_networks>`.
-
-.. _add_mode:
-
-Add mode
-~~~~~~~~
-Each link lists the modes that can use it. The project must contain a mode before a link
-can use it. **Data > Add mode** adds a mode to the selected project. In the toolbox, enter
-the project folder, a one-letter ID, and a name. Description, PCE, value of time, and
-persons per vehicle are optional.
-
-.. image:: images/processing_provider/data-add_mode.png
-    :align: center
-    :alt: Add mode
-
-A **mode ID** is the single letter that identifies the mode in the *modes* field of the
-links layer, and the **mode name** is its descriptive name. As with link types, the first
-free identifier is offered, and names may only contain letters and underscores.
-
-*PCE* (passenger-car equivalent), *value of time* and *persons per vehicle* are the
-defaults this mode brings to traffic assignment, and can be edited later in the modes
-table. Persons per vehicle can be zero, which is how non-travel uses are represented.
-
-.. _importing_matrices:
-
-Import matrices from the menu
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The plugin menu can import matrices from an open layer. Click **Data > Import Matrices**.
-Select the input fields, then click *Load* and *Save*. Select the output file in the
-project matrices folder. You can then load the matrix table to view the imported values.
-
-.. image:: images/processing_provider/data-matrix_importer.png
-    :align: center
-    :alt: project data results
-
-Export matrices
-~~~~~~~~~~~~~~~
-The Processing **Export matrices** algorithm is similar to the *Export* button in the
-matrix viewer (see :ref:`this figure <fig_data_visualize_matrices>`). Enter an OMX input
-file, an output folder, and the output format. The output format can be OMX or CSV.
-
-.. image:: images/processing_provider/processing_provider_export_matrices.png
-    :align: center
-    :alt: Processing provider export matrices
-
-OMX and QGIS OD tables
-~~~~~~~~~~~~~~~~~~~~~~
-**Data > OMX to QGIS OD table** reads all cores from an OMX file.
-The result is a non-spatial QGIS table with ``origin``, ``destination``, ``core``, and ``value`` fields.
-Each row contains one matrix cell. Select a zone mapping when the OMX file has more than one mapping.
-
-**Data > QGIS OD table to OMX** writes this table format to a new OMX file.
-The table must contain one row for each origin-destination pair in each core.
-Zone IDs must be nonnegative integers. The output mapping is named ``zone_id`` and uses sorted zone IDs.
-This table format lets you inspect or edit matrix cells in QGIS before you write an OMX file.
-
-For a map of one origin or destination, use *Data > OMX origin or destination to zone table*.
-This tool reads only one row or column and writes one table row per zone.
-Join the result's ``zone_id`` field to the zone layer's ``zone_id`` field.
-You can also select a row or column in the *Visualize data* dialog.
-The full OD table has one row per matrix cell and can be too large for mapping.
-
-Matrix calculator
-~~~~~~~~~~~~~~~~~
-Under the hood, this tool performs several matrix calculations using NumPy. Its output is
-an OpenMatrix (\*.omx) file stored in the file path you provide. Notice that not all matrices
-operations available in NumPy are also available here. We currently handle the following
-operations.
-
-* ``+``, ``-``, ``*``, ``/``
-* ``min``, ``max``, ``abs``
-* ``ln``, ``exp``, ``power``
-* ``null_diag``, ``T``
-
-To be more effective in your calculation, please use the brackets to separate the operations
-in the desired order of execution.
-
-.. image:: images/processing_provider/processing_provider_matrix_calc.png
-    :align: center
-    :alt: Processing provider matrix calculator
-
-The following code blocks present, respectively, examples of a matrix input configuration for 
-the YAML file and an expression that can be used for calculation. 
-
-.. code-block:: yaml
-    :caption: Matrix configuration
-
-    # For each matrix used for calculation
-    - matrix_name1:
-        matrix_path: path to *.omx file
-        matrix_core: specifiy the core name
-
-.. code-block:: yaml
-    :caption: Expression
-
-    (matrix_name1 - matrix_name2).T
-
-Trip length distribution
-~~~~~~~~~~~~~~~~~~~~~~~~
-This tool generates a Trip Length Distribution (TLD) plot for a pair of demand and skim
-matrices and their selected cores.
-
-.. important::
-
-    The tool reads demand and skim matrices from the selected project folder.
-
-.. image:: images/processing_provider/processing_provider_tld.png
-    :align: center
-    :alt: Processing provider TLD
-
-Distribution
-------------
-The Distribution group applies gravity models, calibrates them, and balances trip
-matrices. These tools use project matrices and vector layers.
-The :ref:`Trip Distribution menu <trip_distribution>` provides the same procedures.
-
-Apply gravity model
-~~~~~~~~~~~~~~~~~~~
-**Distribution > Apply gravity model** produces a trip matrix by applying a synthetic
-gravity model to an impedance matrix.
-
-* *Impedance matrix name* and *Impedance matrix core* identify the skim matrix and core.
-* *Trip-end vector layer*, *Index field*, *Production field* and *Attraction field*
-  provide the row and column totals. The index field holds the zone IDs.
-* *Deterrence function* is one of ``GAMMA``, ``EXPO`` or ``POWER``. ``GAMMA`` takes both
-  *alpha* and *beta*. ``EXPO`` takes only *beta* and ``POWER`` only *alpha*.
-* The result is written to an OpenMatrix (\*.omx) file.
-
-Vector zone IDs must match the matrix index in the same order.
-Production and attraction totals must balance.
-
-Calibrate gravity model
-~~~~~~~~~~~~~~~~~~~~~~~
-**Distribution > Calibrate gravity model** fits a synthetic gravity model to an observed
-trip matrix and an impedance matrix, and saves the calibrated model as a \*.mod file.
-
-* *Observed matrix name* and *Observed matrix core* identify the observed demand matrix.
-* *Impedance matrix name* and *Impedance matrix core* identify the skim matrix.
-* *Deterrence function* is either ``EXPO`` or ``POWER``.
-
-Both matrices must use the same zone IDs in the same order.
-
-Iterative proportional fitting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-**Distribution > Iterative proportional fitting** balances a seed trip matrix so that its
-row and column totals match the production and attraction vectors. It is also known as
-Fratar or Furness.
-
-* *Seed matrix name* and *Seed matrix core* identify the matrix to balance.
-* *Trip-end vector layer*, *Index field*, *Production field* and *Attraction field*
-  provide the row and column totals.
-* The balanced matrix is written to an OpenMatrix (\*.omx) file.
-
-Vector zone IDs must match the matrix index in the same order.
-Production and attraction totals must balance.
-
-The *Treat NaN values as zero* option is available on all three tools.
-
-Geometry IO
------------
-The **Geometry IO** group transfers links, nodes, and zones between project tables
-and QGIS vector layers. These tools operate on an existing AequilibraE project.
-
-* **Extract links**, **Extract nodes**, and **Extract zones** write the selected
-  project table to an output layer.
-* **Add links**, **Add nodes**, and **Add zones** append features from an input
-  layer. Node and zone inputs must include their respective ``node_id`` or
-  ``zone_id`` field. Link IDs are assigned by the project.
-* **Modify links**, **Modify nodes**, and **Modify zones** update existing
-  records matched by ``link_id``, ``node_id``, or ``zone_id``. Fields that
-  identify records cannot be changed by these tools.
-
-The add and modify tools copy matching project fields and geometry from the input
-layer. Modify tools replace the values of existing records.
-
-Mapping
--------
-With Mapping tools, the user can easily visualize project data. For the tools not presented
-here, please refer to the :ref:`Mapping tools module <mapping_tools>` documentation.
-
-Simple tag
-~~~~~~~~~~
-**Mapping > Simple tag** works as a spatial join tool in AequilibraE that allows you
-to join useful information between layers.
-
-Suppose you have a nodes layer with a 'name' column only with ``NULL`` values,
-and a zoning layer with an analogous column 'name' but filled with actual names.
-We can join the information from the zoning layer into the nodes layer using 
-Simple tag.
-
-We start selecting the layer and the field from which we want to import the
-data, and then selecting the layer and the field we want to 'paste' the data.
-Notice that depending on the operation one want to perform, not all methods are
-available.
-
-.. image:: images/processing_provider/simple_tag.png
-    :align: center
-    :alt: simple tag UI
-
-Be aware that the existence of triggers in the project database might affect the
-performance of Simple tag.
-
-The Processing algorithm writes a new output layer. It copies the target layer's
-fields and geometry, then writes the matched value to the named target field. It
-creates that field when it does not exist. Features without a match receive a
-null value. For *Closest*, the algorithm checks the five nearest indexed source
-features. For *Touching*, it selects the feature with the greatest shared
-length, or area when both layers are polygons. Optional match fields must be
-selected on both layers or left empty on both.
-
-Desire lines
-~~~~~~~~~~~~
-**Mapping > Desire lines** builds one line for each pair of zones that
-carries flow. It uses a zone or centroid layer and an OpenMatrix (\*.omx) file.
-The integer zone ID field must match the matrix index. Select matrix cores as a
-comma-separated list, or leave the field empty to use all cores. Intrazonal
-flows are omitted. Each matrix core becomes AB and BA flow fields on the output
-line layer. AB runs from the higher zone ID to the lower ID. BA runs in reverse.
-Lines use the input layer's CRS.
-
-.. image:: images/mapping_tools/desire_lines_gui.png
-    :align: center
-    :alt: Desire lines
-
-Delaunay network
-~~~~~~~~~~~~~~~~
-**Mapping > Delaunay network** builds a line layer from the centroids of an input
-node or zone layer. The input must contain at least three nodes with integer IDs.
-Geometry and distance use the input layer CRS.
-
-Select the input layer and its ID field. If you supply an OMX matrix, select its
-cores as a comma-separated list.
-
-An empty core list selects all cores. Matrix IDs must match node IDs. The
-algorithm assigns demand with an all-or-nothing assignment and adds AB, BA, and
-total flow fields to the output.
+For interactive plugin dialogs, see :doc:`Menus in Detail <menus_in_detail>`.
 
 Model building
 --------------
 The Processing **Model building** group creates projects and changes their networks.
-The **AequilibraE > Model building** menu opens the interactive dialogs.
-The dock panel provides the same menu actions as the menubar.
+For the interactive project creation, network preparation, and zoning dialogs, see the :ref:`Model building menu <model_building>`.
 
-Processing tools return results without opening the plugin panel.
-Menu tools can open the new project in that panel.
+A link layer is enough to create a project with Processing.
+You can then add zones, create centroids, and connect them to the network in separate steps.
+This approach is useful when the same preparation steps must work for several input networks.
 
 .. list-table:: Project creation and centroid algorithms
    :header-rows: 1
@@ -401,287 +131,206 @@ Network changes save during the operation.
 Cancellation or an error can leave partial additions.
 The same applies to project creation from a link layer.
 
-Interactive model-building tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Use **AequilibraE > Model building** in the menubar or the dock panel.
-This menu contains project creation, network preparation, zoning import, and centroid connector dialogs.
-*Network preparation* creates node and link layers for inspection before project import.
-*Add zoning data* includes an option to create centroids.
-These dialogs are menu tools; they are not Processing algorithms.
+Editing an existing network
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. _adding_centroids:
+*Add links from layer to project* appends links and maps their direction, modes, and link-type fields.
+The project generates endpoint nodes as needed.
+The input does not need ``a_node`` or ``b_node`` fields.
 
-Add centroid connectors
-~~~~~~~~~~~~~~~~~~~~~~~
-Starting in version 0.6 of AequilibraE, centroid connectors can now only be
-added to
-`AequilibraE projects <https://www.aequilibrae.com/latest/python/modeling_with_aequilibrae/project.html>`_,
-and no longer generates new layers during the process.
+*Collapse links* takes a comma-separated list of link IDs and collapses them into nodes, updating the surrounding network.
+*Network simplifier* merges links and removes intermediate nodes.
+These tools change the selected project, so inspect the network after each operation.
 
-Before we describe what this tool can do for you, however, let's just remember
-that there is a virtually unlimited number of things that can go awfully wrong
-when we edit networks with automated procedures, and we highly recommend that
-you **BACKUP YOUR DATA** prior to running this procedure and that you inspect
-the results of this tool **CAREFULLY**.
+Data
+----
 
-The *GUI* for this procedure is fairly straightforward, as shown below.
+The Data group provides tools for matrix files and project mode or link-type records.
+Use *Add mode* and *Add link type* with a project folder to create records without opening the plugin dialogs.
+For the interactive forms and matrix import, see the :ref:`Data menu <data_menu>`.
 
-.. image:: images/processing_provider/add_connectors_to_project.png
-    :width: 600
-    :align: center
-    :alt: Adding connectors
+Matrices use OpenMatrix (``.omx``).
+AequilibraE Matrix (AEM) files are no longer supported.
+An OMX file can contain several matrices, called *cores*, with a common zone index.
+The core identifies the values to use; the index identifies which zone each row and column represents.
 
-When creating centroids from zone centers, one can choose to limit the connector
-to the zone or not. Plase notice if one choose to limit the connector creation to a 
-zone that has fewer nodes connected to links of the required types than the number of connectors will result 
-in fewer connectors being created than desired.
-
-One would notice that nowhere in the *GUI* one can indicate which modes they
-want to see the network connected for or how to control how many connectors per
-mode will be created. Although it could be implemented, such a solution would
-be convoluted and there is probably no good reason to do so.
-
-Instead, we have chosen to develop the procedure with the following criteria:
-
-* All modes will be connected to links where those modes are allowed.
-* When considering number of connectors per centroid, there is no guarantee that
-  each and every mode will have that number of connectors. If a particular mode
-  is only available rather far from the centroid, it is likely that a single
-  connector to that mode will be created for that centroid
-* When considering the maximum length of connectors, the *GUI* returns to the
-  user the list of centroids/modes that could not be connected.
-
-Notice that in order to add centroids and their connectors to the network,
-we need to create the set of centroids we want to add to the network in a
-separate layer and to have a field that contains unique centroid IDs. These IDs
-also cannot exist in the set of node IDs that are already part of the map.
-
-Add links from layer to project
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This tool allows you to add links from a vector layer to your existing project network.
-The fields usage is straightforward: in *Project path*, you add the project's path in your
-machine, then select a vector layer that corresponds to the new links you want to add to
-your project, and indicate the layer fields that correspond to the link type, direction, and
-modes. Notice that this tool doesn't require a node layer, nor does it require fields such
-as ``a_node`` or ``b_node``, as it will use the existing numbering in the project.
-
-.. image:: images/processing_provider/processing_provider_new_links_to_project.png
-    :align: center
-    :alt: Processing provider add new links from layer to project
-
-.. _add-zoning-data:
-
-Add zoning data
+Export matrices
 ~~~~~~~~~~~~~~~
-It is possible to import to AequilibraE project your own zoning system in case
-you already have one. Currently, AequilibraE only supports one projection system,
-which is the EPSG:4326 (WGS84), so make sure your zone layer is in this projection.
+The Processing **Export matrices** algorithm is similar to the *Export* button in the
+matrix viewer (see :ref:`this figure <fig_data_visualize_matrices>`). Enter an OMX input
+file, an output folder, and the output format. The output format can be OMX or CSV.
 
-To add your zones to the active project, go to **Model building > Add zoning data**, 
-select the zoning layer you want to add to the project, select weather you
-want to migrate the data and the respective layer field in the zoning layer, and
-finally click on process.
+OMX and QGIS OD tables
+~~~~~~~~~~~~~~~~~~~~~~
+**OMX to QGIS OD table** reads all cores from an OMX file.
+The result is a non-spatial QGIS table with ``origin``, ``destination``, ``core``, and ``value`` fields.
+Each row contains one matrix cell. Select a zone mapping when the OMX file has more than one mapping.
 
-.. image:: images/processing_provider/add-zone-layer.png
-    :width: 450
+**QGIS OD table to OMX** writes this table format to a new OMX file.
+The table must contain one row for each origin-destination pair in each core.
+Zone IDs must be nonnegative integers. The output mapping is named ``zone_id`` and uses sorted zone IDs.
+This table format lets you inspect or edit matrix cells in QGIS before you write an OMX file.
+
+For a map of one origin or destination, use *OMX origin or destination to zone table*.
+This tool reads only one row or column and writes one table row per zone.
+Join the result's ``zone_id`` field to the zone layer's ``zone_id`` field.
+You can also select a row or column in the *Visualize data* dialog.
+The full OD table has one row per matrix cell and can be too large for mapping.
+
+Matrix calculator
+~~~~~~~~~~~~~~~~~
+
+The matrix calculator combines named matrices using a restricted set of NumPy operations.
+For example, multiplying demand by a distance skim gives the distance-weighted demand for each origin-destination pair.
+Use matrices with the same zone index and ordering so the cells refer to the same trips.
+
+Provide a YAML file with names, paths, and cores for the input matrices:
+
+.. code-block:: yaml
+
+    - demand:
+        matrix_path: /path/to/demand.omx
+        matrix_core: trips
+    - skim:
+        matrix_path: /path/to/skim.omx
+        matrix_core: distance
+
+Use those names in an expression, such as ``demand * skim`` or ``(demand + demand).T``.
+Use parentheses to control the order of operations.
+Available operations include:
+
+* Arithmetic: ``+``, ``-``, ``*``, ``/``, and ``**``.
+* Functions: ``min``, ``max``, ``abs``, ``ln``, ``exp``, and ``power``.
+* Matrix operations: ``null_diag`` to clear the diagonal, and ``.T`` to transpose.
+
+``min`` and ``max`` return reductions, so an expression using them must still produce a matrix.
+The result must be a matrix with the input dimensions and is saved as an OMX file.
+
+.. image:: images/processing_provider/processing_provider_matrix_calc.png
     :align: center
-    :alt: adding zone layer
+    :alt: Matrix calculator configuration, expression, and output fields
 
-Collapse links
-~~~~~~~~~~~~~~
-This tool allows you to collapse one or more links into nodes, adjusting the network in
-the neighborhood if necessary.
+Trip length distribution
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-The input for the tool consists in a folder containing an AequilibraE project and a
-the link IDs of the links you want to collapse separated by a comma.
+A trip length distribution shows how demand spreads across travel distances or times.
+Select the demand and skim matrices and their cores from the project, then choose an output folder and plot name.
+For a distance distribution, use a distance skim; for a travel-time distribution, use a time skim.
+The plot helps you inspect an observed matrix or compare the shape of a modeled distribution.
 
-.. image:: images/processing_provider/processing_provider_collapse_links.png
-    :align: center
-    :alt: Processing provider collapse links
+Distribution
+------------
+The Distribution group applies gravity models, calibrates them, and balances trip
+matrices. These tools use project matrices and vector layers.
+Use *Apply gravity model* to create demand, *Calibrate gravity model* to fit deterrence parameters, or *Iterative proportional fitting* to balance demand.
+For illustrated examples, see the :ref:`Trip distribution menu <trip_distribution>`.
 
-.. _create_empty_project:
+Apply gravity model
+~~~~~~~~~~~~~~~~~~~
+**Apply gravity model** produces a trip matrix by applying a synthetic
+gravity model to an impedance matrix.
 
-Create empty project
-~~~~~~~~~~~~~~~~~~~~
-This tool creates a new AequilibraE project containing no links, nodes, or zones. The
-project is created with the default modes and link types, which are read from the
-:ref:`parameters file <parameters_file>`.
+* *Impedance matrix name* and *Impedance matrix core* identify the skim matrix and core.
+* *Trip-end vector layer*, *Index field*, *Production field* and *Attraction field*
+  provide the row and column totals. The index field holds the zone IDs.
+* *Deterrence function* is one of ``GAMMA``, ``EXPO`` or ``POWER``. ``GAMMA`` takes both
+  *alpha* and *beta*. ``EXPO`` takes only *beta* and ``POWER`` only *alpha*.
+* The result is written to an OpenMatrix (\*.omx) file.
 
-The tool takes two inputs: the *parent folder*, which you browse to, and the *model name*,
-which defaults to ``new model``. The model is created in a folder named after the model
-inside the parent folder, and that folder must either not exist yet, or be empty.
+Vector zone IDs must match the matrix index in the same order.
+Production and attraction totals must balance.
 
-Processing returns the project folder without opening the plugin panel.
-**AequilibraE > Model building > Create empty project** opens the same algorithm dialog.
-After a successful menu operation, the plugin opens the project in its panel.
-
-An empty project is the natural starting point when you intend to build your model
-incrementally with the other Model building tools, such as
-Add links from layer to project and :ref:`Add zoning data <add-zoning-data>`.
-
-.. _create_project_from_osm:
-
-Create project from OSM
+Calibrate gravity model
 ~~~~~~~~~~~~~~~~~~~~~~~
-The first feature is the capability of importing networks directly from
-`Open Street Maps <https://www.openstreetmap.org/>`_ into AequilibraE's efficient
-TranspoNet format. This is also time to give a HUGE shout out to
-`Geoff Boeing <http://www.geoffboeing.com/>`_, creator of the widely used Python
-package `OSMNx <https://osmnx.readthedocs.io/en/stable/>`_. For several weeks I
-worked with Geoff in refactoring the entire OSMNx code base so I could include
-it as a submodule or dependency for AequilibraE, but its deep integration with
-`GeoPandas <https://geopandas.org/en/stable/index.html>`_ and all the packages it depends on (Pandas,
-Shapely, Fiona, RTree, etc.), means that we would have to rebuild OSMNx from the
-ground up in order to use it with AequilibraE within QGIS, since its Windows
-distribution does not include all those dependencies.
+**Calibrate gravity model** fits a synthetic gravity model to an observed
+trip matrix and an impedance matrix, and saves the calibrated model as a \*.mod file.
 
-For this reason, I have ported some of Geoff's code into AequilibraE
-(modifications were quite heavy, however), and was ultimately able to bring this
-feature to life.
+* *Observed matrix name* and *Observed matrix core* identify the observed demand matrix.
+* *Impedance matrix name* and *Impedance matrix core* identify the skim matrix.
+* *Deterrence function* is either ``EXPO`` or ``POWER``.
 
-.. note::
-   Importing networks from OSM is a rather slow process, so we recommend that
-   you carefully choose the area you are downloading it for. We have also
-   inserted small pauses between successive downloads to not put too much
-   pressure on the OSM servers. So be patient!!
+Both matrices must use the same zone IDs in the same order.
 
-Importing networks from OSM can be done by choosing an area for download,
-defined as the current map canvas on QGIS...
+Iterative proportional fitting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Iterative proportional fitting** balances a seed trip matrix so that its
+row and column totals match the production and attraction vectors. It is also known as
+Fratar or Furness.
 
-.. image:: images/processing_provider/model_from_canvas_area.png
-    :width: 999
-    :align: center
-    :alt: Download OSM networks for visible area
+* *Seed matrix name* and *Seed matrix core* identify the matrix to balance.
+* *Trip-end vector layer*, *Index field*, *Production field* and *Attraction field*
+  provide the row and column totals.
+* The balanced matrix is written to an OpenMatrix (\*.omx) file.
 
+Vector zone IDs must match the matrix index in the same order.
+Production and attraction totals must balance.
 
-... or for a named place.
+The *Treat NaN values as zero* option is available on all three tools.
 
-.. image:: images/processing_provider/model_from_place.png
-    :width: 1057
-    :align: center
-    :alt: Download OSM networks for named place
+Geometry IO
+-----------
 
-Once the import is over, the new model is opened and its layers are listed in the
-Project tab, ready to be added to the map.
+The Geometry IO tools move network and zoning data between an AequilibraE project and QGIS layers.
+For example, extract links to inspect their attributes, edit a copy, then apply those changes with *Modify links*.
 
-.. _project_from_layers:
+**Extract links**, **Extract nodes**, and **Extract zones** write project tables to QGIS layers.
+The corresponding **Add** algorithms append features, and **Modify** algorithms update records matched by their IDs.
+Add and modify tools copy matching project fields and geometry from the input layer.
+**Add nodes** requires a ``node_id`` field, and **Add zones** requires a ``zone_id`` field.
+**Add links** assigns link IDs and computes endpoint IDs from geometry.
+Modify inputs require ``link_id``, ``node_id``, or ``zone_id`` to identify existing records.
+Modify tools cannot change record IDs.
+Input geometry is transformed to EPSG:4326.
+Modify tools copy null attribute values too, so a null input can clear an existing value.
 
-Project from layers
-~~~~~~~~~~~~~~~~~~~
-The AequilibraE project can also be bootstrapped from existing line and node
-layers obtained from any other source, as long as they contain the following
-required field for the conversion:
+Adding or modifying features changes the project database; extracting features produces a separate layer.
 
-* link direction
-* allowed modes
-* link type
+Mapping
+-------
 
-The *link_id* field can also be brought from the layer, but QAequilibraE
-numbers the links for you if you would rather not provide it.
+Mapping algorithms turn model data into layers that you can style and inspect in QGIS.
+For interactive visualization and spatial tagging, see the :ref:`Mapping menu <mapping_tools>`.
 
-The *a_node*, *b_node* and *distance* fields cannot be brought from the layer, as
-AequilibraE computes them from the link geometry and the nodes layer.
+Simple tag
+~~~~~~~~~~
 
-These requirements often create quite a bit of manual work, as most networks
-available do not have complete (or reliable) information. Manually editing the
-networks might be necessary, which is common practice in transport modelling.
+Suppose your nodes have no zone names, but your zone polygons contain a ``name`` field.
+*Simple tag* can copy those names into a new nodes layer using spatial matches.
+Select the zone layer and its source field, the nodes as the target, and the target field name.
+The algorithm creates the target field if it does not exist.
 
-Before creating a project from the layer, you can understand how to prepare the
-layers for this task on the page
-:ref:`Preparing a network <network_preparation_page>`.
+The Processing algorithm writes a new output layer. It copies the target layer's
+fields and geometry, then writes the matched value to the named target field. It
+creates that field when it does not exist. Features without a match receive a
+null value. For *Closest*, the algorithm checks the five nearest indexed source
+features. For *Touching*, it selects the feature with the greatest shared
+length, or area when both layers are polygons. Optional match fields must be
+selected on both layers or left empty on both.
 
-Basic workflow
-^^^^^^^^^^^^^^
-Accessing **Model building > Create project from layers**, the user is
-presented with the following screen.
+The :ref:`menu dialog <mapping_simple_tag>` edits the existing target layer and retains unmatched values.
 
-.. image:: images/processing_provider/project_from_layers_links.png
-    :width: 614
-    :align: center
-    :alt: project_from_layers_links
+Desire lines
+~~~~~~~~~~~~
+**Desire lines** builds one line for each pair of zones that
+carries flow. It uses a zone or centroid layer and an OpenMatrix (\*.omx) file.
+The integer zone ID field must match the matrix index. Select matrix cores as a
+comma-separated list, or leave the field empty to use all cores. Intrazonal
+flows are omitted. Each matrix core becomes AB and BA flow fields on the output
+line layer. AB runs from the higher zone ID to the lower ID. BA runs in reverse.
+Lines use the input layer's CRS.
 
-The list on the right side of the screen holds the fields of the standard
-AequilibraE link layer: *link_id*, *direction*, *modes*, *link_type*, *name*,
-*speed_ab/ba*, *travel_time_ab/ba* and *capacity_ab/ba*.
+Delaunay network
+~~~~~~~~~~~~~~~~
+**Delaunay network** builds a line layer from the centroids of an input
+node or zone layer. The input must contain at least three nodes with integer IDs.
+Geometry and distance use the input layer CRS.
 
-The fields AequilibraE requires are taken from the layer, and one needs to
-associate the corresponding layer field to each of them. The remaining ones start
-out with *Initialize?* checked, which leaves them empty in the new project —
-uncheck the box to bring one of them from the layer instead. *link_id* is the only
-required field whose box you can check, in which case QAequilibraE numbers the
-links sequentially for you.
+Select the input layer and its ID field. If you supply an OMX matrix, select its
+cores as a comma-separated list.
 
-Any other field is up to the user to bring from the layer being imported. All the
-layer fields are listed on the left side of the screen, and the ones added to the
-list on the right are created in the project with the same name.
-
-In the case of the nodes layer, both fields are mandatory.
-
-.. image:: images/processing_provider/project_from_layers_nodes.png
-    :width: 614
-    :align: center
-    :alt: project_from_layers_nodes
-
-After filling all fields, it is just a matter of saving it! The model is opened as soon
-as it is built, and its layers are listed in the Project tab.
-
-After running this tool a sqlite file (spatialite enabled) will be created and
-you can edit the network (create, move or delete links and nodes) and both
-layers (including node *ID* and *A_Node*/*B_Node* fields) will remain
-consistent with each other.
-
-.. _network_preparation:
-
-Network preparation
-~~~~~~~~~~~~~~~~~~~
-When preparing your project network, you might face there are two distinct situations:
-
-1. **User has only the network links**: This is the case when one exports only links 
-   from a transportation package or downloads a link layer from Open Street Maps or a 
-   government open data portal and want to use such network for path computation. 
-   This tool then does the following:
-
-   * Duplicates the pre-existing network in order to edit it without risk of data corruption
-   * Creates nodes at the extremities of all links in the network (no duplicate nodes at the 
-     same latitude/longitude)
-   * Adds the fields *a_node* and *b_node* to the new link layer, and populate them with the 
-     *IDs* generated for the nodes layer
-
-2. **User has the network links and nodes but no database field linking them**: In case one 
-   has both the complete sets of nodes and links and nodes for a
-   certain network (commercial packages would allow you to export them separately),
-   you can use this tool to associate those links and nodes (if that information
-   was not exported from the package). In that case, the steps would be the following:
-
-   * Duplicates the pre-existing network in order to edit it without risk of data corruption
-   * Checks if the nodes provided cover both extremities of all links from the layer provided.
-     Node IDs are also checked for uniqueness
-   * Adds the fields *a_node* and *b_node* to the new link layer, and populate them with the 
-     *IDs* chosen among the fields from the nodes layer
-
-The *GUI* for these two processes can be accessed in the AequilibraE menu **Model
-building > Network preparation**, and it looks like this:
-
-.. image:: images/processing_provider/network_edit_network_preparation.png
-    :width: 774
-    :align: center
-    :alt: Network preparation
-
-In this case we chose to add nodes with IDs starting in 1,001, as we will
-reserve all nodes from 1 to 1,000 for centroids, external stations and other
-special uses (we are not planning to use all that range and that is not
-necessary, but the numbering gets quite neat that way).
-
-Network simplifier
-~~~~~~~~~~~~~~~~~~
-This tool allows you to simplify the network, merging short links into larger ones or
-turning links into nodes, and save these changes into the project.
-
-The input for the tool consists in a folder containing an AequilibraE project.
-
-.. image:: images/processing_provider/processing_provider_network_simplifier.png
-    :align: center
-    :alt: Processing provider Network simplifier
+An empty core list selects all cores. Matrix IDs must match node IDs. The
+algorithm assigns demand with an all-or-nothing assignment and adds AB, BA, and
+total flow fields to the output.
 
 Path computation
 ----------------
@@ -700,11 +349,15 @@ The algorithm also accepts a comma-separated list of excluded link IDs.
 It writes one output feature for each directed link in the path.
 
 Outputs are the path layer, ordered link IDs, and total cost.
+Use the total cost to compare alternatives, or display the path layer to inspect the selected route.
 
 Network skimming
 ~~~~~~~~~~~~~~~~
 ``qaequilibrae:network_skimming`` computes a skim matrix for one mode and saves it in the
 project.
+
+For example, minimize ``travel_time`` while skimming both ``travel_time`` and ``distance``.
+The resulting cores describe the time and distance of the fastest paths, rather than the shortest-distance paths.
 
 Inputs:
 
@@ -733,61 +386,11 @@ Inputs:
 The algorithm checks the matrix name before computation and does not overwrite an
 existing matrix.
 
-Project
--------
-In the project menu, the user can perform actions such as open/close project, create
-examples, run procedures, or check parameter and log files. For the tools not presented
-here, please refer to the :ref:`Project <aequilibrae_project>` documentation.
-
-.. _create_example:
-
-Create example
-~~~~~~~~~~~~~~
-AequilibraE has three different example sets one can use as learning tool, and they were all
-made available within the QGIS ecosystem.
-
-Within **Project > Create example**, select one of the available models, the desired
-location of the output folder, and just press *Create*. The window closes automatically
-and the new model is opened, with its layers listed in the Project tab.
-
-.. image:: images/processing_provider/project_create_example.png
-    :align: center
-    :alt: utils create example
-
-Log file
-~~~~~~~~
-The log file contains information about which actions took place and when they happened.
-For example, after you :ref:`create a project from OSM <create_project_from_osm>`,
-if you access the log file, you are going to see something like the figure below,
-containing the sequence of steps followed to import the OSM network. If you wish to
-access this file later on, it is also possible to save this log file locally in your machine,
-using the **save to disk** button in the lower left corner of the log file box.
-
-.. image:: images/processing_provider/project-logfile.png
-    :width: 704
-    :align: center
-    :alt: proj logfile
-
-.. _parameters_file:
-
-Parameters
-~~~~~~~~~~
-The parameters file is part of the AequilibraE package for Python, so all the
-reference documentation for this section can be found in its
-`Python companion page <https://aequilibrae.com/latest/python/modeling_with_aequilibrae/parameter_file.html>`_.
-
-The QGIS plugin, however, has a nice interface to view and edit the parameters
-file, which can be accessed through **Project > Parameters**. This
-interface, depicted below, allows one to edit and validate parameters before
-submitting them as the new parameter file for all AequilibraE procedures.
-
-.. image:: images/processing_provider/parameters_menu.png
-    :align: center
-    :alt: parameters menu
-
 Route choice
 ------------
 ``qaequilibrae:route_choice`` assigns demand or builds choice sets.
+A choice set contains candidate routes for an origin-destination pair.
+Use ``build`` to save route sets for later inspection, or ``assign`` to load demand across them.
 For single-OD visualization, use the :ref:`Route choice menu <route_choice>`.
 
 Inputs include the AequilibraE project folder, network mode, and utility terms.
@@ -824,51 +427,13 @@ Sub-area analysis also writes its external-demand table as a Parquet file.
 
 The algorithm does not overwrite existing results or matrices.
 
-Routing
--------
-AequilibraE's routing allows the user to run a Travelling Salesman Problem (TSP),
-using a selected set of nodes or the centroids of a network. 
-
-Its usage is straightforward. For Sioux Falls, for example, we would select the
-centroids of the network, and minimize the distance travelled by car. It is also
-possible to choose the start node of our TSP (we'll let node_id 1 to be the starting
-node, but it could be any available node), and indicate we want to see the result in
-a new layer.
-
-Our prompt box would look like this:
-
-.. image:: images/processing_provider/tsp-prompt-box.png
-    :align: center
-    :alt: TSP prompt box
-
-When AequilibraE is done solving the TSP, it provides a procedure report, like the
-one in the figure below. You can export the procedure report in a .txt file if you 
-wish, by clicking on the lower right button in the window. Otherwise, you can just
-close this window (the TSP sequence can be found in the TSP stops layer).
-
-.. image:: images/processing_provider/tsp-procedure-report.png
-    :align: center
-    :alt: TSP procedure report
-
-And as we chose to display the result in a new layer, it would look like the figure below. 
-Please note that the TSP stops are labeled according their sequence.
-
-.. image:: images/processing_provider/tsp-solution.png
-    :align: center
-    :alt: TSP solution
-
-.. note::
-
-    TSP is a well-known optimization problem and it has already been implemented in several
-    different software and programming languages. However, the main problem related to
-    TSP is related to its size (hence its complexity). This means that as we increase the 
-    number of stops we want to travel to, the software will take much longer to provide you
-    with an answer, and in some cases, it might also crash.
-
-Traffic Assignment
+Traffic assignment
 ------------------
 ``qaequilibrae:traffic_assignment`` assigns demand and saves results in the project folder.
-The :ref:`Traffic Assignment menu <traffic_assignment_procedures>` provides the same operation.
+The :ref:`Traffic assignment menu <traffic_assignment_procedures>` provides the same operation.
+
+A traffic class combines a demand matrix with a network mode and its assignment settings.
+For example, cars and trucks can use separate classes with different PCE values and permitted links.
 
 The traffic-class table contains one row per class, with these columns:
 
@@ -918,6 +483,10 @@ A failure during output saves can leave some results in the project.
 Transit
 -------
 
+Start with *Add GTFS feed* to bring scheduled services into the project.
+You can then calculate supply metrics or build a transit graph for assignment and skimming.
+
+
 **Add GTFS feed** imports one GTFS ZIP file into an AequilibraE project. Select a service date,
 agency, description, and transit import option. Optional settings enable map matching and
 provide vehicle capacities as a JSON object. Each capacity value is a ``[seated, total]`` pair.
@@ -932,6 +501,54 @@ Optional filters can limit the time range and route, pattern, or stop IDs.
 
 For the menu dialogs, see :ref:`Transit <transit_procedures>`.
 
-Trip distribution
------------------
-Please refer to the :ref:`Trip distribution module <trip_distribution>` documentation.
+Project operations
+------------------
+
+Project opening, closing, examples, scenarios, logs, and parameters are available from the :ref:`Project menu <aequilibrae_project>`.
+The traveling salesman dialog is documented under :ref:`Routing <routing_menu>`.
+
+.. _processing_model_designer:
+
+QGIS Model Designer
+--------------
+
+The `QGIS Model Designer
+<https://docs.qgis.org/3.44/en/docs/user_manual/processing/modeler.html>`_ is a
+graphical interface for building new processing algorithms as compositions of
+existing ones. One defines the input parameters, connects them to each
+intermediate algorithms, and specifies the outputs. This is particularly useful
+for creating reusable workflows to automate complex tasks, particularly when
+combining AequilibraE algorithms with other QGIS algorithms (say,
+geoprocessing).
+
+Shallowest Path Example
+~~~~~~~~~~~~~~~~~~~~~~~
+
+As a toy example, let us consider using AequilibraE's shortest path algorithm to
+compute the "shallowest" path between two points in a network, minimising the
+sum of the slopes along each link. To do so manually would involve loading the
+AequilibraE project and a digital elevation model, sampling the elevation at the
+nodes, joining the nodes data to the links network, computing slope, then
+configuring and running shortest path. Doing this once is feasible, but doing it
+many times becomes tedious.
+
+We may instead build our own algorithm to do this. Open the QGIS Model Designer with **Processing > Model Designer**. See the `QGIS Model Designer documentation <https://docs.qgis.org/3.44/en/docs/user_manual/processing/modeler.html>`_ for complete instructions on use. For our example, we will add inputs for 
+
+* Nodes
+* Links
+* Digital Elevation Model (DEM)
+* Origin Node
+* Destination Node
+* Vehicle Mode
+
+We then use **Raster Analysis > Sample Raster Values**, with the nodes and DEM as inputs, to obtain the elevations. Next, **Vector General > Join Attributes by Field Value** to join the A- and B-node elevations to the links. Then **Modeller Tools > Calculate expression** to compute the slope, and finally **AequilibraE > Path computation > Shortest Path** to find the shallowest path, configuring the cost field to be the previously computed slope.
+
+.. image:: images/processing_provider/model-designer-demo.png
+    :align: center
+    :alt: Example "Shallowest Path" Model Definition
+
+One can then adjust the defaults for parameters, add documentation to the model, save as a `.model3` file, and add to the project. The algorithm will then be available as any other processing algorithm within QGIS, in the **Project models** section.
+
+.. image:: images/processing_provider/shallowest-path.png
+    :align: center
+    :alt: Example "Shallowest Path" Model Execution

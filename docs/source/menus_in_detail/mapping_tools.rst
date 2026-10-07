@@ -246,3 +246,23 @@ And this is what it looks like!
     
     .. image:: ../images/mapping_tools/scenario_comparison_4.png
         :alt: Composite lines
+
+.. _mapping_simple_tag:
+
+Simple tag
+----------
+
+Open **Mapping > Simple tag** from the menubar or dock panel.
+This dialog updates the existing target layer with spatially matched attributes from the source layer.
+Unmatched target features retain their existing values.
+The target field must already exist.
+The Processing *Simple tag* algorithm creates a new output layer and assigns null values to unmatched features.
+For example, it can copy zone names into an empty ``name`` field on a nodes layer.
+
+Select the source layer and field, then the target layer and field.
+Choose a spatial matching method supported by the input geometries.
+Database triggers can affect performance when updating project layers.
+
+.. image:: ../images/processing_provider/simple_tag.png
+    :align: center
+    :alt: Interactive spatial tagging
