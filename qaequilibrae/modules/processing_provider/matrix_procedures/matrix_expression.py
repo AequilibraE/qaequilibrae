@@ -1,9 +1,4 @@
-"""Safe evaluation of the expressions typed into the matrix calculator.
-
-The expression is user input, so it is parsed into an abstract syntax tree and walked node
-by node rather than handed to ``eval``. Only the arithmetic, functions and attributes
-documented for the tool are accepted; anything else raises MatrixExpressionError.
-"""
+"""Evaluate matrix expressions using a restricted syntax tree, without ``eval``."""
 
 import ast
 import operator
@@ -12,11 +7,11 @@ import numpy as np
 
 
 class MatrixExpressionError(Exception):
-    """Raised when an expression uses something the matrix calculator does not support."""
+    """Unsupported matrix expression."""
 
 
 def null_diag(matrix):
-    """Returns a copy of *matrix* with its main diagonal zeroed out."""
+    """Return a copy of *matrix* with a zero diagonal."""
     result = np.array(matrix, copy=True)
     np.fill_diagonal(result, 0)
     return result
@@ -46,7 +41,7 @@ UNARY_OPS = {ast.UAdd: operator.pos, ast.USub: operator.neg}
 
 
 def evaluate(expression, matrices):
-    """Evaluates *expression* over *matrices*, a mapping of matrix name to NumPy array."""
+    """Evaluate an expression using the named matrices."""
     try:
         tree = ast.parse(expression.strip(), mode="eval")
     except (SyntaxError, ValueError) as error:

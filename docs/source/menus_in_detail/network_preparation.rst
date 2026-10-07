@@ -1,117 +1,87 @@
-:orphan:
-
 .. _network_preparation_page:
 
 Preparing a network
 ===================
 
-.. toctree::
-   :maxdepth: 2
+Open **AequilibraE > Model building > Network preparation** from the menubar or dock panel.
+This interactive tool prepares node and link layers without requiring an open project.
+See :ref:`Model building <model_building>` for the workflow and project creation dialogs.
 
-.. TODO: NEED TO WRITE ABOUT MORE COMPREHENSIVE NETWORK PREPARATION
-.. including the addition of addition of unique link_id
+Project import requirements
+---------------------------
 
-Preparing a link network to be imported into an AequilibraE project consists of
-ensuring that all fields necessary for network import exist and are properly
-filled. These fields are:
+Project creation requires link direction, allowed modes, and link type values.
+Both importers compute ``a_node``, ``b_node``, and ``distance`` from geometry.
+These fields do not need to exist in the source link layer.
 
-* **link_id**
-* **a_node**
-* **b_node**
-* **direction**
-* **distance**
-* **modes**
-* **link_type**
+The :ref:`interactive layer importer <project_from_layers>` accepts link and node layers with field mappings.
+Map ``node_id`` and ``is_centroid`` from the node layer.
+You can supply unique link IDs or select *Initialize?* to generate them.
 
-Below we give some directions on how to prepare each field.
+The Processing *Create project from link layer* algorithm generates nodes from link endpoints and assigns its own link IDs.
+Its optional source ID mapping preserves input identifiers in ``source_id``.
+Use *Add or renumber centroids from layer* afterward to assign centroid IDs from a point layer.
 
-Link ID
--------
+Link IDs
+--------
 
-The link ID field is necessarily a field with unique values, but it would
-ideally also be filled with small integers (e.g. a network with 100,000 links
-does not need to have IDs in the order of 1,000,000,000,000,000), as this save
-memory and computational time during some of the computations.
+For imported link IDs, use unique integers.
+Small IDs reduce memory requirements in network computations.
+Source field names can differ from project field names when the importer provides field mappings.
 
-To create such field, one can use QGIS' field calculator as shown below. Please
-note that the field **does NOT need to be named link_id**, as you will have the
-opportunity to indicate your field of choice to contain link ids when it is time
-to create the project.
+The QGIS field calculator can create a sequence of IDs:
 
 .. image:: ../images/network/create_link_id.png
     :width: 859
     :align: center
-    :alt: Creating Link IDs
-
-.. warning::
-  **LET'S STRESS THIS !!!!!!**
-
-  **AequilibraE can deal with an arbitrary set of IDs for links and nodes**, but
-  we vectorize a lot of operations for faster performance, which means that you
-  will be using a LOT more memory you would if you use large IDs for nodes and
-  links without actually needing it. You may also explode memory or the NumPy
-  Numerical types. A good practice is to keep IDs as low as possible, but in
-  general, if you get too close to 922,337,203,685,4775,807, you will certainly
-  break things, regardless of your system's capabilities.
+    :alt: Creating link IDs with the QGIS field calculator
 
 Network articulation
 --------------------
 
-The association of *a_nodes* and *b_nodes* to a link layer is what can be named
-articulation of a network, and is one of the foundational tools in AequilibraE.
-Please **make sure that all your links are LineString geometries**, otherwise the articulation
-is not going to work. If all your links are MultiLineString geometries, you can save
-your data as a GeoPackage and enforce it to be LineString only.
+Use LineString geometries for network links.
+Convert MultiLineString features to LineString features before using network preparation.
+The first endpoint corresponds to ``a_node`` and the last endpoint corresponds to ``b_node``.
+The network preparation dialog creates or matches nodes and adds these endpoint IDs to copied link layers.
 
-It is important to note that AequilibraE understands *a_node* as being the
-topologically first point of the line, and *b_node* the last. Topology in GIS
-involves a LOT of stuff, but you can look at an
-`intro <https://www.gaia-gis.it/fossil/libspatialite/wiki?name=topo-intro>`_.
-
-.. If you prefer a video tutorial, you can access:
-
-.. .. raw:: html
-
-..     <iframe width="560" height="315" src="https://www.youtube.com/embed/oFi02QWYwn8" frameborder="0" allow="accelerometer;
-..     autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+Standalone algorithms, such as Processing *Shortest path*, operate directly on network layers.
+Their link inputs need ``link_id``, ``a_node``, ``b_node``, ``direction``, ``modes``, and the selected numeric cost field.
+This requirement differs from project import, which computes endpoint IDs in the project database.
 
 .. _link_direction:
 
 Direction
 ---------
 
-Links need to have directionality associated to them because **links can be**
-**bi-directional** in AequilibraE, which is not the case for several of the
-commercial platforms in the market. For this reason, one needs to have a field
-for link direction with values in the set [-1, 0, 1], where:
+Link direction uses three integer values:
 
-* If **direction = -1**, then the link allows **BA flow only**
-* If **direction = 0**, then the link allows flows in **both directions**
-* If **direction = 1**, then the link allows **AB flow only**
+* ``-1`` permits flow from B to A only.
+* ``0`` permits flow in both directions.
+* ``1`` permits flow from A to B only.
 
 Distance
 --------
 
-The field for distance needs to be numeric, but its value is currently
-unimportant, as distance values will be overwritten with distance in meters by
-SpatiaLite. Other units will be possible in the future.
+Project imports compute link distance in meters from geometry and ignore source distance values.
+For a standalone path calculation, supply a numeric cost field such as distance or travel time in the input layer.
 
 Modes
 -----
 
-In AequilibraE, each mode is represented by a lower-case letter. So imagine we
-will have several modes in our network, such as cars (c), trucks (t), bicycles
-(b) and walking (w). In that case, a link that allows all modes will have a
-modes field equal to **ctbw** (the order of modes is irrelevant), while a link
-that allows bikes and pedestrians would have a modes string equal to **bw**.
+Each network mode has a one-letter ID, which can be uppercase or lowercase.
+A link's ``modes`` value combines the IDs of all modes permitted on that link.
+For example, ``ctbw`` permits car, truck, bicycle, and walking modes when the project defines those IDs.
+The order of IDs does not matter.
 
-The list of modes that will exist in the model, however, comes from the
-parameter list built into AequilibraE under the section *Network* --> *modes*.
+New projects include default modes from the :ref:`parameters file <parameters_file>`.
+Layer importers also create missing modes from the input values.
+Use :ref:`Data > Add mode <add_mode>` to add a mode to an existing project.
+OSM import uses mode names such as ``car`` and ``walk`` instead of one-letter IDs.
 
-To find out how to access the parameters file see documentation on the
-:ref:`global parameters file <parameters_file>`.
+Link types
+----------
 
-Link Type
----------
-
-Link types can be any **string** value you would like, but cannot be empty.
+Every link needs a nonempty link type name.
+Use names containing letters and underscores, as required by the Processing layer importer and the link-type creation dialog.
+Layer importers create missing link types.
+For an existing project, use :ref:`Data > Add link type <add_link_type>`.

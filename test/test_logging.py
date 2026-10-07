@@ -1,6 +1,6 @@
 import importlib
 
-from qgis.core import Qgis, QgsMessageLog
+from qgis.core import Qgis, QgsMessageLog, QgsProcessingFeedback
 
 import qaequilibrae.qgis_logging as qgis_logging
 from qaequilibrae.download_extra_packages_class import log_message
@@ -31,6 +31,26 @@ def test_plugin_reload_does_not_duplicate_qgis_log_messages(monkeypatch):
     reloaded_logging.get_logger("reload").info("Only once")
 
     assert received == [("[qaequilibrae.reload] Only once", LOG_CATEGORY, Qgis.MessageLevel.Info, False)]
+
+
+def test_processing_feedback_is_scoped_to_the_active_run():
+    logger = qgis_logging.get_logger("processing")
+    first = QgsProcessingFeedback()
+    second = QgsProcessingFeedback()
+
+    with qgis_logging.processing_feedback(first):
+        logger.info("Started first run")
+        with qgis_logging.processing_feedback(second):
+            logger.warning("Second run warning")
+        logger.info("Finished first run")
+    logger.info("Outside processing")
+
+    assert "Started first run" in first.textLog()
+    assert "Finished first run" in first.textLog()
+    assert "Second run warning" not in first.textLog()
+    assert "Outside processing" not in first.textLog()
+    assert "Second run warning" in second.textLog()
+    assert "Started first run" not in second.textLog()
 
 
 def test_exceptions_include_a_traceback(monkeypatch):

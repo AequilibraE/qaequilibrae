@@ -19,7 +19,4 @@ Licence:     See LICENSE.TXT
 -----------------------------------------------------------------------------------------------------------
 """
 
-from .apply_gravity_procedure import ApplyGravityProcedure as ApplyGravityProcedure
-from .calibrate_gravity_procedure import CalibrateGravityProcedure as CalibrateGravityProcedure
 from .distribution_models_dialog import DistributionModelsDialog as DistributionModelsDialog
-from .ipf_procedure import IpfProcedure as IpfProcedure

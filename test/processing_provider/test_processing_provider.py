@@ -1,0 +1,691 @@
+from contextlib import nullcontext
+from os import makedirs
+from os.path import isdir, isfile, join
+
+import numpy as np
+import pandas as pd
+import pytest
+from aequilibrae import Project
+from aequilibrae.matrix import AequilibraeMatrix
+from qaequilibrae.modules.matrix_procedures.load_result_table import load_result_table
+from aequilibrae.utils.create_example import create_example
+from qgis.core import (
+    Qgis,
+    QgsApplication,
+    QgsProcessingContext,
+    QgsProcessingException,
+    QgsProcessingFeedback,
+    QgsProject,
+)
+from qgis.PyQt.QtCore import QDate, QDateTime, QTime
+
+from qaequilibrae.modules.processing_provider.distribution_procedures.apply_gravity import ApplyGravity
+from qaequilibrae.modules.processing_provider.distribution_procedures.calibrate_gravity import CalibrateGravity
+from qaequilibrae.modules.processing_provider.distribution_procedures.common import load_matrix_core
+from qaequilibrae.modules.processing_provider.distribution_procedures.iterative_proportional_fitting import (
+    IterativeProportionalFitting,
+)
+from qaequilibrae.modules.processing_provider.matrix import open_matrix
+from qaequilibrae.modules.processing_provider.matrix_procedures.export_matrix import ExportMatrix
+from qaequilibrae.modules.processing_provider.matrix_procedures.matrix_calculator import MatrixCalculator
+from qaequilibrae.modules.processing_provider.matrix_procedures.trip_length_distribution import TripLengthDistribution
+from qaequilibrae.modules.processing_provider.model_building.add_links_from_layer import AddLinksFromLayer
+from qaequilibrae.modules.processing_provider.model_building.collapse_links import CollapseLinks
+from qaequilibrae.modules.processing_provider.model_building.create_empty_project import CreateEmptyProject
+from qaequilibrae.modules.processing_provider.model_building.network_simplifier import NetworkSimplifier
+from qaequilibrae.modules.processing_provider.paths_procedures.shortest_path import ShortestPath
+from qaequilibrae.modules.processing_provider.provider import Provider
+from qaequilibrae.modules.processing_provider.transit_procedures.add_gtfs_algorithm import AddGTFSFeedAlgorithm
+from qaequilibrae.modules.processing_provider.transit_procedures.supply_metrics import TransitSupplyMetricsAlgorithm
+from qaequilibrae.modules.processing_provider.transit_procedures.transit_assignment import TransitAssignmentAlgorithm
+
+from ..utilities import create_matrix, get_test_data_path, load_test_layer
+
+
+def qgis_app():
+    qgs = QgsApplication([], False)
+    qgs.initQgis()
+    yield qgs
+    qgs.exitQgis()
+
+
+def test_provider_exists(qgis_app):
+    provider = Provider()
+    QgsApplication.processingRegistry().addProvider(provider)
+
+    registry = QgsApplication.processingRegistry()
+    provider_names = [p.name().lower() for p in registry.providers()]
+    assert "aequilibrae" in provider_names
+    assert {type(algorithm).__name__ for algorithm in provider.algorithms()} == {
+        "AddLinksFromLayer",
+        "AddCentroidConnectors",
+        "AddCentroidsFromZones",
+        "RenumberNodesFromLayer",
+        "CreateProjectFromLinkLayer",
+        "CreateProjectFromOSM",
+        "AddLinks",
+        "AddNodes",
+        "AddZones",
+        "AddLinkType",
+        "AddMode",
+        "ApplyGravity",
+        "CalibrateGravity",
+        "CollapseLinks",
+        "CreateEmptyProject",
+        "DelaunayNetwork",
+        "DesireLines",
+        "ExtractLinks",
+        "ExtractNodes",
+        "ExtractZones",
+        "ExportMatrix",
+        "IterativeProportionalFitting",
+        "MatrixCalculator",
+        "OmxToTable",
+        "OmxZoneSlice",
+        "TableToOmx",
+        "ModifyLinks",
+        "ModifyNodes",
+        "ModifyZones",
+        "NetworkSimplifier",
+        "NetworkSkimming",
+        "RouteChoice",
+        "ShortestPath",
+        "RunTrafficAssignment",
+        "SimpleTag",
+        "TripLengthDistribution",
+        "AddGTFSFeedAlgorithm",
+        "TransitAssignmentAlgorithm",
+        "TransitSupplyMetricsAlgorithm",
+    }
+    registry.removeProvider(provider)
+
+
+@pytest.mark.parametrize("algorithm_type", [ApplyGravity, IterativeProportionalFitting])
+def test_trip_end_parameters(algorithm_type):
+    algorithm = algorithm_type()
+    algorithm.initAlgorithm()
+    assert [parameter.name() for parameter in algorithm.parameterDefinitions()][3:7] == [
+        "VECTOR_SOURCE",
+        "INDEX_FIELD",
+        "ROW_FIELD",
+        "COLUMN_FIELD",
+    ]
+    for name in ("INDEX_FIELD", "ROW_FIELD", "COLUMN_FIELD"):
+        parameter = algorithm.parameterDefinition(name)
+        assert parameter.parentLayerParameterName() == "VECTOR_SOURCE"
+        assert parameter.dataType() == (
+            Qgis.ProcessingFieldParameterDataType.Any
+            if name == "INDEX_FIELD"
+            else Qgis.ProcessingFieldParameterDataType.Numeric
+        )
+
+
+@pytest.mark.parametrize("failure", [None, "setup", "body"])
+@pytest.mark.parametrize("source", ["project", "file"])
+def test_processing_matrix_is_closed(mocker, failure, source):
+    project, matrix = mocker.Mock(), mocker.Mock()
+    project.matrices.get_matrix.return_value = matrix
+    mocker.patch("aequilibrae.matrix.AequilibraeMatrix", return_value=matrix)
+    matrix_context = (
+        load_matrix_core(project, "demand", "core") if source == "project" else open_matrix("matrix.omx", "core")
+    )
+    if failure == "setup":
+        matrix.computational_view.side_effect = ValueError("missing core")
+    with pytest.raises(ValueError) if failure else nullcontext():
+        with matrix_context as loaded:
+            assert loaded is matrix
+            if failure == "body":
+                raise ValueError("computation failed")
+    matrix.close.assert_called_once()
+
+
+def test_processing_transit_assignment(coquimbo_project):
+    matrix_path = coquimbo_project.project.project_base_path / "matrices" / "demand.omx"
+    create_matrix(np.arange(1, 134), str(matrix_path))
+    coquimbo_project.project.matrices.update_database()
+    coquimbo_project.project.matrices.reload()
+
+    algorithm = TransitAssignmentAlgorithm()
+    algorithm.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    parameters = {
+        algorithm.PROJECT_FOLDER: str(coquimbo_project.project.project_base_path),
+        algorithm.ACTION: 1,
+        algorithm.PERIOD_ID: 1,
+        algorithm.USE_SAVED_GRAPH: False,
+        algorithm.MATRIX_NAME: "demand_omx",
+        algorithm.MATRIX_CORE: "demand",
+        algorithm.CLASS_NAME: "processing_pt",
+        algorithm.RESULT_NAME: "processing_pt_assignment",
+        "OUTER_TRANSFERS": False,
+        "INNER_TRANSFERS": True,
+        "WALKING_EDGES": False,
+        "BLOCK_CENTROID_FLOWS": False,
+        "SAVE_GRAPH": True,
+        "CONNECTOR_METHOD": 1,
+        "LINE_METHOD": 1,
+        "NETWORK_MODE": "c",
+    }
+
+    result, succeeded = algorithm.run(parameters, context, feedback)
+
+    assert succeeded, feedback.textLog()
+    assert result["result_name"] == "processing_pt_assignment"
+    result_table = load_result_table(coquimbo_project.project, "processing_pt_assignment")
+    assert result_table.shape == (468, 2)
+    assert result_table.columns.tolist() == ["index", "processing_pt_volume"]
+
+
+def test_processing_transit_skimming(coquimbo_project):
+    algorithm = TransitAssignmentAlgorithm()
+    algorithm.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    parameters = {
+        algorithm.PROJECT_FOLDER: str(coquimbo_project.project.project_base_path),
+        algorithm.ACTION: 0,
+        algorithm.PERIOD_ID: 1,
+        algorithm.USE_SAVED_GRAPH: False,
+        algorithm.MATRIX_NAME: "processing_pt_skims",
+        algorithm.CLASS_NAME: "processing_pt",
+        algorithm.SKIM_FIELDS: "boardings,transfer_time",
+        "OUTER_TRANSFERS": False,
+        "INNER_TRANSFERS": True,
+        "WALKING_EDGES": False,
+        "BLOCK_CENTROID_FLOWS": False,
+        "SAVE_GRAPH": False,
+        "CONNECTOR_METHOD": 1,
+        "LINE_METHOD": 1,
+        "NETWORK_MODE": "c",
+    }
+
+    result, succeeded = algorithm.run(parameters, context, feedback)
+
+    assert succeeded, feedback.textLog()
+    assert result["matrix"].endswith("processing_pt_skims.omx")
+    matrix = coquimbo_project.project.matrices.get_matrix("processing_pt_skims_omx")
+    assert matrix.cores == 2
+    assert matrix.names == ["boardings", "transfer_time"]
+
+
+def test_processing_gtfs_import(pt_project):
+    algorithm = AddGTFSFeedAlgorithm()
+    algorithm.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    parameters = {
+        algorithm.PROJECT: str(pt_project.project.project_base_path),
+        algorithm.GTFS_FEED: get_test_data_path("coquimbo_project", "gtfs_coquimbo.zip"),
+        algorithm.DATE: QDateTime(QDate(2016, 6, 17), QTime(0, 0)),
+        algorithm.AGENCY: "Processing test agency",
+        algorithm.DESCRIPTION: "Processing test feed",
+        algorithm.OPTIONS: 0,
+    }
+
+    result, succeeded = algorithm.run(parameters, context, feedback)
+
+    assert succeeded, feedback.textLog()
+    assert result == {}
+    with pt_project.project.transit_connection as connection:
+        agencies = connection.execute("SELECT agency FROM agencies").fetchall()
+    assert [agency[0] for agency in agencies] == ["Processing test agency"]
+
+
+@pytest.mark.parametrize("entity, id_field", [(0, "route_id"), (1, "pattern_id"), (2, "stop_id"), (3, "zone_id")])
+def test_transit_supply_metrics(pt_project, entity, id_field):
+    algorithm = TransitSupplyMetricsAlgorithm()
+    algorithm.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    parameters = {
+        algorithm.PROJECT_FOLDER: str(pt_project.project.project_base_path),
+        algorithm.ENTITY: entity,
+        algorithm.OUTPUT: "TEMPORARY_OUTPUT",
+    }
+
+    result, succeeded = algorithm.run(parameters, context, feedback)
+
+    assert succeeded, feedback.textLog()
+    output = context.takeResultLayer(result[algorithm.OUTPUT])
+    assert output is not None
+    assert output.featureCount() > 0
+    assert id_field in output.fields().names()
+
+
+@pytest.mark.parametrize("format", [0, 1])
+def test_export_matrix(folder_path, format):
+    makedirs(folder_path)
+
+    parameters = {
+        "matrix_path": get_test_data_path("SiouxFalls_project", "matrices", "sfalls_skims.omx"),
+        "file_path": folder_path,
+        "output_format": format,
+    }
+
+    action = ExportMatrix()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    result = action.processAlgorithm(parameters, context, feedback)
+
+    assert isfile(result["Output"])
+
+
+def test_add_links_from_layer(ae_with_project):
+    folder_path = ae_with_project.project.project_base_path
+
+    load_test_layer(ae_with_project.project.project_base_path, "link")
+    layer = QgsProject.instance().mapLayersByName("link")[0]
+
+    parameters = {
+        "links": layer,
+        "link_type": "link_type",
+        "direction": "direction",
+        "modes": "modes",
+        "project_path": ae_with_project.project.project_base_path,
+    }
+
+    action = AddLinksFromLayer()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    _, succeeded = action.run(parameters, context, feedback)
+    assert succeeded, feedback.textLog()
+
+    project = Project()
+    project.open(folder_path)
+
+    assert project.network.count_links() == 81
+    assert project.network.count_nodes() == 28
+
+
+def test_shortest_path(ae_with_project):
+    """The QGIS adapter writes the operation result using a stable output schema."""
+    ae_with_project.load_layer_by_name("links")
+    links = QgsProject.instance().mapLayersByName("links")[0]
+
+    parameters = {
+        ShortestPath.LINKS: links,
+        ShortestPath.MODE: "c",
+        ShortestPath.COST_FIELD: "distance",
+        ShortestPath.FROM_NODE: 1,
+        ShortestPath.TO_NODE: 6,
+        ShortestPath.BLOCK_CENTROID_FLOWS: False,
+        ShortestPath.EXCLUDED_LINKS: "4,14",
+        ShortestPath.OUTPUT: "TEMPORARY_OUTPUT",
+    }
+
+    action = ShortestPath()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    context.setProject(QgsProject.instance())
+    feedback = QgsProcessingFeedback()
+    result, ok = action.run(parameters, context, feedback)
+
+    assert ok, feedback.textLog()
+    assert result[ShortestPath.PATH_LINK_IDS]
+    assert result[ShortestPath.TOTAL_COST] > 0
+    output = context.takeResultLayer(result[ShortestPath.OUTPUT])
+    assert output is not None
+    assert output.featureCount() == 4
+    assert [field.name() for field in output.fields()] == [
+        "sequence",
+        "link_id",
+        "a_node",
+        "b_node",
+        "direction",
+        "cost",
+    ]
+
+
+def test_shortest_path_blocks_centroid_flows(ae_with_project):
+    ae_with_project.load_layer_by_name("links")
+    ae_with_project.load_layer_by_name("nodes")
+
+    parameters = {
+        ShortestPath.LINKS: QgsProject.instance().mapLayersByName("links")[0],
+        ShortestPath.NODES: QgsProject.instance().mapLayersByName("nodes")[0],
+        ShortestPath.MODE: "c",
+        ShortestPath.COST_FIELD: "distance",
+        ShortestPath.FROM_NODE: 1,
+        ShortestPath.TO_NODE: 2,
+        ShortestPath.BLOCK_CENTROID_FLOWS: True,
+        ShortestPath.OUTPUT: "TEMPORARY_OUTPUT",
+    }
+
+    action = ShortestPath()
+    action.initAlgorithm()
+    feedback = QgsProcessingFeedback()
+    _, ok = action.run(parameters, QgsProcessingContext(), feedback)
+
+    assert ok, feedback.textLog()
+
+
+def test_matrix_calc(folder_path):
+    makedirs(folder_path)
+
+    parameters = {
+        "conf_file": get_test_data_path("SiouxFalls_project", "matrix_config.yml"),
+        "procedure": "(cars - (heavy_vehicles * 0.25)).T",
+        "file_path": f"{folder_path}/hello.omx",
+        "matrix_core": "new_core",
+    }
+
+    action = MatrixCalculator()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    _ = action.run(parameters, context, feedback)
+
+    assert isfile(parameters["file_path"])
+    mat = AequilibraeMatrix()
+    mat.load(parameters["file_path"])
+
+    info = mat.__dict__
+    assert info["names"] == [parameters["matrix_core"]]
+    assert info["zones"] == 24
+    assert np.sum(mat.get_matrix(parameters["matrix_core"])) > 0
+
+
+def test_matrix_calc_rejects_a_result_that_is_not_a_matrix(folder_path):
+    makedirs(folder_path)
+
+    # min() collapses to a single number, which cannot be written out as a matrix
+    parameters = {
+        "conf_file": get_test_data_path("SiouxFalls_project", "matrix_config.yml"),
+        "procedure": "min(cars)",
+        "file_path": f"{folder_path}/scalar.omx",
+        "matrix_core": "new_core",
+    }
+
+    action = MatrixCalculator()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    with pytest.raises(QgsProcessingException, match="must be a"):
+        action.processAlgorithm(parameters, context, feedback)
+
+    assert not isfile(parameters["file_path"])
+
+
+def test_trip_length_distribution(ae_with_project, folder_path):
+    matrices = ae_with_project.project.matrices
+    mat_names = matrices.list()["name"].tolist()
+
+    parameters = {
+        "demand_mat_name": 3,
+        "demand_mat_core": "matrix",
+        "skim_mat_name": 5,
+        "skim_mat_core": "distance_blended",
+        "file_path": join(folder_path, "my_file.png"),
+    }
+
+    action = TripLengthDistribution()
+    action.matrices = matrices
+    action.mat_names = mat_names
+
+    class DummyContext:
+        pass
+
+    class DummyFeedback:
+        def pushInfo(self, msg):
+            pass
+
+        def reportError(self, msg):
+            pass
+
+    context = DummyContext()
+    feedback = DummyFeedback()
+
+    _ = action.processAlgorithm(parameters, context, feedback)
+
+    assert isfile(parameters["file_path"])
+
+
+def test_collapse_links(folder_path):
+    project = create_example(folder_path, "nauru")
+    links_before = project.network.count_links()
+    nodes_before = project.network.count_nodes()
+    project.close()
+
+    parameters = {"PROJECT_FOLDER": folder_path, "LINK_IDS": "903,1075"}
+
+    action = CollapseLinks()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    _ = action.run(parameters, context, feedback)
+
+    project = Project()
+    project.open(folder_path)
+
+    assert project.network.count_links() < links_before
+    assert project.network.count_nodes() < nodes_before
+
+
+def test_create_empty_project_defaults_the_model_name():
+    action = CreateEmptyProject()
+    action.initAlgorithm()
+
+    assert action.parameterDefinition("MODEL_NAME").defaultValue() == "new model"
+
+
+@pytest.fixture
+def no_menu_instance():
+    """Runs an algorithm with no plugin instance, whatever ran before."""
+    from qaequilibrae import get_aequilibrae_menu_instance, set_aequilibrae_menu_instance
+
+    previous = get_aequilibrae_menu_instance()
+    set_aequilibrae_menu_instance(None)
+    yield
+    set_aequilibrae_menu_instance(previous)
+
+
+@pytest.mark.parametrize("pre_create_folder", [True, False])
+def test_create_empty_project(no_menu_instance, tmp_path, pre_create_folder):
+    parent_folder = str(tmp_path)
+    project_folder = join(parent_folder, "new model")
+
+    # The model folder is allowed to exist as long as it is empty, so both cases must work
+    if pre_create_folder:
+        makedirs(project_folder)
+
+    parameters = {"PARENT_FOLDER": parent_folder, "MODEL_NAME": "new model"}
+
+    action = CreateEmptyProject()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    results, ok = action.run(parameters, context, feedback)
+    assert ok
+    assert results["Output"] == project_folder
+    assert isdir(project_folder)
+    assert isfile(join(project_folder, "project_database.sqlite"))
+
+    project = Project()
+    project.open(project_folder)
+
+    assert project.network.count_links() == 0
+    assert project.network.count_nodes() == 0
+    assert len(project.network.modes.all_modes()) > 0
+    assert len(project.network.link_types.all_types()) > 0
+
+    project.close()
+
+
+def test_create_empty_project_does_not_open_the_panel(ae, tmp_path):
+    algorithm = CreateEmptyProject()
+    algorithm.initAlgorithm()
+    result = algorithm.processAlgorithm(
+        {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "processing"},
+        QgsProcessingContext(),
+        QgsProcessingFeedback(),
+    )
+    assert result["Output"] == str(tmp_path / "processing")
+    assert ae.project is None
+    assert ae.available_scenarios == []
+
+
+def test_create_empty_project_leaves_the_open_project_alone(ae_with_project, tmp_path):
+    """The panel holds one project at a time, so the new model is only created on disk."""
+    in_the_panel = ae_with_project.project
+
+    parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "new model"}
+
+    action = CreateEmptyProject()
+    action.initAlgorithm()
+
+    results, ok = action.run(parameters, QgsProcessingContext(), QgsProcessingFeedback())
+    assert ok
+    assert isfile(join(results["Output"], "project_database.sqlite"))
+
+    assert ae_with_project.project is in_the_panel
+
+
+def test_create_empty_project_on_populated_folder(tmp_path):
+    create_example(join(str(tmp_path), "nauru"), "nauru").close()
+
+    parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": "nauru"}
+
+    action = CreateEmptyProject()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    with pytest.raises(QgsProcessingException):
+        action.processAlgorithm(parameters, context, feedback)
+
+
+@pytest.mark.parametrize("model_name", ["", "   ", "sub/folder", "sub\\folder", "model:name", ".", ".."])
+def test_create_empty_project_with_unusable_model_name(tmp_path, model_name):
+    parameters = {"PARENT_FOLDER": str(tmp_path), "MODEL_NAME": model_name}
+
+    action = CreateEmptyProject()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    with pytest.raises(QgsProcessingException):
+        action.processAlgorithm(parameters, context, feedback)
+
+    # "." resolves to the parent folder, which must survive the rejection untouched
+    assert isdir(str(tmp_path))
+
+
+def test_network_simplifier(folder_path):
+    project = create_example(folder_path, "nauru")
+    links_before = project.network.count_links()
+    nodes_before = project.network.count_nodes()
+    project.close()
+
+    parameters = {"PROJECT_FOLDER": folder_path}
+
+    action = NetworkSimplifier()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+
+    _ = action.run(parameters, context, feedback)
+
+    project = Project()
+    project.open(folder_path)
+
+    assert project.network.count_links() < links_before
+    assert project.network.count_nodes() < nodes_before
+
+
+def _synthetic_future_vector_layer():
+    from qaequilibrae.modules.common_tools.data_layer_from_dataframe import layer_from_dataframe
+
+    dataframe = pd.read_csv(get_test_data_path("SiouxFalls_project", "synthetic_future_vector.csv"))
+    return layer_from_dataframe(dataframe, "synthetic_future_vector")
+
+
+def test_iterative_proportional_fitting(ae_with_project, folder_path):
+    makedirs(folder_path, exist_ok=True)
+    layer = _synthetic_future_vector_layer()
+    output_path = join(folder_path, "ipf.omx")
+
+    parameters = {
+        IterativeProportionalFitting.PROJECT_FOLDER: str(ae_with_project.project.project_base_path),
+        IterativeProportionalFitting.SEED_MATRIX_NAME: "demand",
+        IterativeProportionalFitting.SEED_MATRIX_CORE: "matrix",
+        IterativeProportionalFitting.VECTOR_SOURCE: layer,
+        IterativeProportionalFitting.INDEX_FIELD: "index",
+        IterativeProportionalFitting.ROW_FIELD: "origins",
+        IterativeProportionalFitting.COLUMN_FIELD: "destinations",
+        IterativeProportionalFitting.NAN_AS_ZERO: False,
+        IterativeProportionalFitting.OUTPUT_MATRIX: output_path,
+    }
+
+    action = IterativeProportionalFitting()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    result, ok = action.run(parameters, context, feedback)
+
+    assert ok, feedback.textLog()
+    assert isfile(output_path)
+    assert result[IterativeProportionalFitting.OUTPUT_MATRIX] == output_path
+
+
+def test_apply_gravity(ae_with_project, folder_path):
+    makedirs(folder_path, exist_ok=True)
+    layer = _synthetic_future_vector_layer()
+    output_path = join(folder_path, "gravity.omx")
+
+    parameters = {
+        ApplyGravity.PROJECT_FOLDER: str(ae_with_project.project.project_base_path),
+        ApplyGravity.IMPEDANCE_MATRIX_NAME: "trafficassignment_dp_x_car_omx",
+        ApplyGravity.IMPEDANCE_MATRIX_CORE: "free_flow_time_final",
+        ApplyGravity.VECTOR_SOURCE: layer,
+        ApplyGravity.INDEX_FIELD: "index",
+        ApplyGravity.ROW_FIELD: "origins",
+        ApplyGravity.COLUMN_FIELD: "destinations",
+        ApplyGravity.FUNCTION: 1,
+        ApplyGravity.ALPHA: 0.02718039228535631,
+        ApplyGravity.BETA: 0.020709580776383137,
+        ApplyGravity.NAN_AS_ZERO: False,
+        ApplyGravity.OUTPUT_MATRIX: output_path,
+    }
+
+    action = ApplyGravity()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    result, ok = action.run(parameters, context, feedback)
+
+    assert ok, feedback.textLog()
+    assert isfile(output_path)
+    assert result[ApplyGravity.OUTPUT_MATRIX] == output_path
+
+
+def test_calibrate_gravity(sf_project_with_assignment, folder_path):
+    makedirs(folder_path, exist_ok=True)
+    output_path = join(folder_path, "calibrated.mod")
+
+    parameters = {
+        CalibrateGravity.PROJECT_FOLDER: str(sf_project_with_assignment.project.project_base_path),
+        CalibrateGravity.OBSERVED_MATRIX_NAME: "demand_omx",
+        CalibrateGravity.OBSERVED_MATRIX_CORE: "matrix",
+        CalibrateGravity.IMPEDANCE_MATRIX_NAME: "assignment_car",
+        CalibrateGravity.IMPEDANCE_MATRIX_CORE: "free_flow_time_final",
+        CalibrateGravity.FUNCTION: 0,
+        CalibrateGravity.NAN_AS_ZERO: False,
+        CalibrateGravity.OUTPUT_MODEL: output_path,
+    }
+
+    action = CalibrateGravity()
+    action.initAlgorithm()
+    context = QgsProcessingContext()
+    feedback = QgsProcessingFeedback()
+    result, ok = action.run(parameters, context, feedback)
+
+    assert ok, feedback.textLog()
+    assert isfile(output_path)
+    with open(output_path, encoding="utf-8") as model_file:
+        assert "function: EXPO" in model_file.read()
+    assert result[CalibrateGravity.OUTPUT_MODEL] == output_path

@@ -1,0 +1,105 @@
+"""Add layer features to project tables."""
+
+from qgis.core import (
+    Qgis,
+    QgsProcessingException,
+    QgsProcessingOutputNumber,
+    QgsProcessingParameterFeatureSource,
+)
+
+from ..project import open_project
+from ..project_algorithm import ProjectAlgorithm
+from .common import copy_record_attributes, ignored_input_fields, project_table, source_rows
+
+
+class AddProjectLayer(ProjectAlgorithm):
+    """Base class for adding vector features to a project table."""
+
+    group_name = "Geometry IO"
+    group_id = "geometry_io"
+
+    INPUT = "INPUT"
+    table_name = ""
+    id_field = ""
+    geometry_source_type = Qgis.ProcessingSourceType.VectorLine
+
+    def initAlgorithm(self, configuration=None):
+        self.add_project_folder_parameter()
+        self.addOutput(QgsProcessingOutputNumber("ADDED", self.tr("Features added")))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT, self.tr(self.display_name + " input"), types=[self.geometry_source_type]
+            )
+        )
+
+    def processAlgorithm(self, parameters, context, feedback):
+        source = self.parameterAsSource(parameters, self.INPUT, context)
+        if source is None:
+            raise QgsProcessingException(self.tr("The input layer could not be loaded"))
+        rows = source_rows(source)
+        project_folder = self.project_folder(parameters, context)
+        with open_project(project_folder) as project:
+            if self.table_name == "zones":
+                with project.db_connection as connection:
+                    has_zoning = connection.execute(
+                        "select exists(select 1 from sqlite_master where type='table' and name='zones')"
+                    ).fetchone()[0]
+                if not has_zoning:
+                    # Older projects can be created without a zoning table. The API
+                    # creates it lazily when the first zoning record is added.
+                    project.zoning.create_zoning_layer()
+            added = 0
+            table = project_table(project, self.table_name)
+            ignored_fields = ignored_input_fields(self.table_name, self.id_field, adding=True)
+            for row in rows:
+                if feedback.isCanceled():
+                    break
+                identifier = row.get(self.id_field) if self.id_field else None
+                if self.id_field and identifier is None:
+                    raise QgsProcessingException(self.tr(f"The input is missing {self.id_field}"))
+                record_id = int(identifier) if identifier is not None else None
+                if self.table_name == "nodes":
+                    record = table.new_centroid(record_id)
+                elif self.table_name == "zones":
+                    record = table.new(record_id)
+                else:
+                    record = table.new()
+                if self.table_name == "nodes" and row.get("is_centroid") is None:
+                    record.is_centroid = 0
+                copy_record_attributes(record, table, row, ignored_fields, skip_nulls=True)
+                if row["geometry"] is None:
+                    raise QgsProcessingException(self.tr(f"Feature {identifier} has no geometry"))
+                record.geometry = row["geometry"]
+                record.save()
+                added += 1
+        feedback.pushInfo(self.tr(f"Added {added} {self.table_name}"))
+        return {"ADDED": added}
+
+    def shortHelpString(self):
+        message = f"Adds {self.table_name} to an AequilibraE project."
+        if self.table_name == "links":
+            message += " Link IDs are assigned by the project."
+        return self.tr(message)
+
+
+class AddLinks(AddProjectLayer):
+    algorithm_name = "add_links"
+    display_name = "Add links"
+    table_name = "links"
+    id_field = None
+
+
+class AddNodes(AddProjectLayer):
+    algorithm_name = "add_nodes"
+    display_name = "Add nodes"
+    table_name = "nodes"
+    id_field = "node_id"
+    geometry_source_type = Qgis.ProcessingSourceType.VectorPoint
+
+
+class AddZones(AddProjectLayer):
+    algorithm_name = "add_zones"
+    display_name = "Add zones"
+    table_name = "zones"
+    id_field = "zone_id"
+    geometry_source_type = Qgis.ProcessingSourceType.VectorPolygon

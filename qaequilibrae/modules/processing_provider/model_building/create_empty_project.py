@@ -2,38 +2,43 @@ import importlib.util as iutil
 from os import listdir, rmdir
 from os.path import isdir, join
 
-from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingException
-from qgis.core import QgsProcessingParameterFile, QgsProcessingParameterString
+from qgis.core import (
+    Qgis,
+    QgsProcessingException,
+    QgsProcessingOutputFolder,
+    QgsProcessingParameterFile,
+    QgsProcessingParameterString,
+)
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 
 
-class CreateEmptyProject(QgsProcessingAlgorithm):
+class CreateEmptyProject(ProcessingAlgorithm):
+    algorithm_name = "create_empty_project"
+    display_name = "Create empty project"
+    group_name = "Model building"
+    group_id = "model_building"
+
     PARENT_FOLDER = "PARENT_FOLDER"
     MODEL_NAME = "MODEL_NAME"
 
-    # The model name becomes a folder name, so anything a file system could choke on is out
+    # The model name is also the folder name.
     INVALID_NAME_CHARACTERS = '\\/:*?"<>|'
 
-    # These resolve to the parent folder itself (or above it) instead of a new folder inside it
+    # These names would point to the parent folder or its parent.
     RESERVED_NAMES = (".", "..")
 
     def initAlgorithm(self, configuration=None):
-        # 1. Existing folder the new model folder will be created in
         self.addParameter(
             QgsProcessingParameterFile(
                 self.PARENT_FOLDER, self.tr("Parent folder"), behavior=Qgis.ProcessingFileParameterBehavior.Folder
             )
         )
 
-        # 2. Name of the model's own folder, created inside the parent folder
         self.addParameter(
             QgsProcessingParameterString(self.MODEL_NAME, self.tr("Model name"), defaultValue="new model")
         )
-
-    def flags(self):
-        # Filling the panel means touching widgets, which only the main thread may do
-        return super().flags() | Qgis.ProcessingAlgorithmFlag.NoThreading
+        self.addOutput(QgsProcessingOutputFolder("Output", self.tr("Project folder")))
 
     def processAlgorithm(self, parameters, context, feedback):
         parent_folder = self.parameterAsFile(parameters, self.PARENT_FOLDER, context)
@@ -50,21 +55,18 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
                 self.tr("The model name cannot contain any of these characters: ") + self.INVALID_NAME_CHARACTERS
             )
 
-        # Caught before joining, since these would point the project folder at the parent folder
-        # itself and leave the empty-folder handling below ready to remove it
+        # Check before the empty-folder cleanup below.
         if model_name in self.RESERVED_NAMES:
             raise QgsProcessingException(self.tr("The model name cannot be '.' or '..'"))
 
         project_folder = join(parent_folder, model_name)
 
-        # Checks if we have access to AequilibraE library
         if iutil.find_spec("aequilibrae") is None:
             raise QgsProcessingException(self.tr("AequilibraE module not found"))
 
-        from aequilibrae.project import Project
+        from .create_project import new_project
 
-        # AequilibraE refuses to create a project on a folder that already exists, so we
-        # only clear the way when the folder we were pointed to is empty
+        # AequilibraE needs a folder that does not exist yet.
         if isdir(project_folder):
             if listdir(project_folder):
                 raise QgsProcessingException(self.tr("Folder already exists and is not empty: ") + project_folder)
@@ -76,71 +78,24 @@ class CreateEmptyProject(QgsProcessingAlgorithm):
                 ) from e
         feedback.pushInfo(self.tr("Creating project"))
 
-        project = Project()
         try:
-            project.new(project_folder)
+            with new_project(project_folder) as project:
+                modes = list(project.network.modes.all_modes())
+                link_types = list(project.network.link_types.all_types())
         except Exception as e:
             raise QgsProcessingException(self.tr("Could not create project: ") + str(e)) from e
-
-        modes = list(project.network.modes.all_modes().keys())
-        link_types = list(project.network.link_types.all_types().keys())
 
         feedback.pushInfo(self.tr("Project created in ") + project_folder)
         feedback.pushInfo(self.tr("Default modes: ") + ", ".join(sorted(modes)))
         feedback.pushInfo(self.tr("Default link types: ") + ", ".join(sorted(link_types)))
 
-        self.show_in_panel(project, project_folder, feedback)
-
         return {"Output": project_folder}
 
-    def show_in_panel(self, project, project_folder, feedback):
-        """Hands the new model to the panel, the way every other way of creating one does."""
-        from qaequilibrae import get_aequilibrae_menu_instance
-        from qaequilibrae.modules.menu_actions.load_project_action import show_project_in_panel
-
-        qgis_project = get_aequilibrae_menu_instance()
-
-        # Processing also runs with no plugin around it
-        if qgis_project is None:
-            project.close()
-            return
-
-        # The panel holds one project at a time, and the one already open stays
-        if qgis_project.project is not None:
-            feedback.pushWarning(self.tr("Close the open project to see the new one in the panel"))
-            project.close()
-            return
-
-        qgis_project.project = project
-        show_project_in_panel(qgis_project, project_folder)
-
-    def name(self):
-        return "create_empty_project"
-
-    def displayName(self) -> str:
-        return self.tr("Create empty project")
-
-    def group(self) -> str:
-        return self.tr("Model building")
-
-    def groupId(self) -> str:
-        return "model_building"
-
     def shortHelpString(self):
-        help_messages = [
-            self.tr("Creates a new empty AequilibraE project, with no links, nodes or zones."),
-            self.tr("The project is created with the default modes and link types, and can be"),
-            self.tr("populated afterwards with the other Model building tools."),
-            self.tr("The model is created in a folder named after the model, inside the parent"),
-            self.tr("folder you choose. That model folder must not exist yet, or must be empty."),
-        ]
-        return "\n".join(help_messages)
-
-    def createInstance(self):
-        return CreateEmptyProject()
+        return self.tr(
+            "Creates an empty AequilibraE project with default modes and link types. "
+            "The project folder uses the model name and must be new or empty."
+        )
 
     def tags(self):
         return ["create", "new", "empty", "project", "model"]
-
-    def tr(self, message):
-        return trlt("CreateEmptyProject", message)

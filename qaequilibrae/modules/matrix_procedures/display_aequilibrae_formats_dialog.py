@@ -17,6 +17,7 @@ from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo, QgsSymbol, QgsLine
 from qaequilibrae.modules.common_tools import NumpyModel, GetOutputFileName
 from qaequilibrae.modules.common_tools import layer_from_dataframe
 from qaequilibrae.modules.common_tools.auxiliary_functions import standard_path
+from qaequilibrae.modules.processing_provider.matrix_procedures.omx_interop import read_omx_core
 from qaequilibrae.qgis_logging import get_logger
 
 FORM_CLASS, _ = uic.loadUiType(join(dirname(__file__), "forms/ui_data_viewer.ui"))
@@ -451,21 +452,16 @@ class DisplayAequilibraEFormatsDialog(QtWidgets.QDialog, FORM_CLASS):
         self.close()
 
     def add_matrix_parameters(self, idx, field):
-        with omx.open_file(self.data_path, "a") as omx_file:
-            matrix_name = self.data_to_show.random_name()
-            matrix_index = np.array(list(omx_file.mapping(idx).keys()))
-
-            args = {
-                "zones": matrix_index.shape[0],
-                "matrix_names": [field],
-                "file_name": matrix_name,
-                "memory_only": True,
-            }
-
-            self.data_to_show.create_empty(**args)
-            self.data_to_show.matrix_view = np.array(omx_file[field])
-            self.data_to_show.index = np.array(list(omx_file.mapping(idx).keys()))
-            self.data_to_show.matrix[field] = self.data_to_show.matrix_view[:, :]
+        matrix_index, values = read_omx_core(self.data_path, field, idx)
+        self.data_to_show.create_empty(
+            zones=len(matrix_index),
+            matrix_names=[field],
+            file_name=self.data_to_show.random_name(),
+            memory_only=True,
+        )
+        self.data_to_show.matrix_view = values
+        self.data_to_show.index = matrix_index
+        self.data_to_show.matrix[field] = values
 
     def get_file_name(self):
         formats = ["OpenMatrix (*.omx)"]

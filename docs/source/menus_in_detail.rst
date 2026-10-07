@@ -28,6 +28,9 @@ Got a bigger instance we could use as an example? Send it over!
    :maxdepth: 1
 
    menus_in_detail/project
+   menus_in_detail/model_building
+   menus_in_detail/data
+   menus_in_detail/routing
    menus_in_detail/trip_distribution
    menus_in_detail/path_computation
    menus_in_detail/traffic_assignment

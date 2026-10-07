@@ -67,6 +67,22 @@ try:
     from qaequilibrae.modules.menu_actions import run_route_choice, run_pt_skim, last_folder  # noqa: E402
     from qaequilibrae.modules.menu_actions import run_pt_explore, create_scenarios, run_import_gtfs  # noqa: E402
     from qaequilibrae.modules.menu_actions import run_traffic_assig, load_skim_viewer  # noqa: E402
+    from qaequilibrae.modules.menu_actions import (  # noqa: E402
+        create_example,
+        prepare_network,
+        project_from_osm,
+        run_create_transponet,
+        run_add_connectors,
+        run_add_zones,
+        run_add_mode,
+        run_add_link_type,
+        load_matrices,
+        run_change_parameters,
+        show_log,
+        run_tsp,
+        run_tag,
+    )
+    from qaequilibrae.modules.menu_actions.action_create_empty_project import create_empty_project  # noqa: E402
     from qaequilibrae.modules.processing_provider.provider import Provider  # noqa: E402
 
     DEPENDENCY_ERROR = None
@@ -89,6 +105,9 @@ except ImportError as import_error:
     run_route_choice = run_pt_skim = disabled_action
     run_pt_explore = create_scenarios = run_import_gtfs = disabled_action
     run_traffic_assig = load_skim_viewer = disabled_action
+    create_example = prepare_network = project_from_osm = run_create_transponet = disabled_action
+    run_add_connectors = run_add_zones = run_add_mode = run_add_link_type = disabled_action
+    load_matrices = run_change_parameters = show_log = run_tsp = run_tag = create_empty_project = disabled_action
 
 
 class AequilibraEMenu:
@@ -137,6 +156,9 @@ class AequilibraEMenu:
 
         self.menuActions = {
             self.tr("Project"): [],
+            self.tr("Model building"): [],
+            self.tr("Data"): [],
+            self.tr("Routing"): [],
             self.tr("Trip distribution"): [],
             self.tr("Path computation"): [],
             self.tr("Traffic assignment"): [],
@@ -154,6 +176,25 @@ class AequilibraEMenu:
         self.add_menu_action(mmenu, self.tr("Run procedures"), partial(run_module, self))
         self.add_menu_action(mmenu, self.tr("Scenarios"), partial(create_scenarios, self))
         self.add_menu_action(mmenu, self.tr("Close project"), self.run_close_project)
+        self.add_menu_action(mmenu, self.tr("Create example"), partial(create_example, self))
+        self.add_menu_action(mmenu, self.tr("Log file"), partial(show_log, self))
+        self.add_menu_action(mmenu, self.tr("Parameters"), partial(run_change_parameters, self))
+
+        mmenu = self.tr("Model building")
+        self.add_menu_action(mmenu, self.tr("Create empty project"), partial(create_empty_project, self))
+        self.add_menu_action(mmenu, self.tr("Create project from layers"), partial(run_create_transponet, self))
+        self.add_menu_action(mmenu, self.tr("Create project from OSM"), partial(project_from_osm, self))
+        self.add_menu_action(mmenu, self.tr("Network preparation"), partial(prepare_network, self))
+        self.add_menu_action(mmenu, self.tr("Add zoning data"), partial(run_add_zones, self))
+        self.add_menu_action(mmenu, self.tr("Add centroid connectors"), partial(run_add_connectors, self))
+
+        mmenu = self.tr("Data")
+        self.add_menu_action(mmenu, self.tr("Import matrices"), partial(load_matrices, self))
+        self.add_menu_action(mmenu, self.tr("Add mode"), partial(run_add_mode, self))
+        self.add_menu_action(mmenu, self.tr("Add link type"), partial(run_add_link_type, self))
+
+        mmenu = self.tr("Routing")
+        self.add_menu_action(mmenu, self.tr("Traveling salesman problem"), partial(run_tsp, self))
 
         # # # ########################################################################
         # # # ##################  TRIP DISTRIBUTION SUB-MENU  ########################
@@ -191,6 +232,7 @@ class AequilibraEMenu:
         self.add_menu_action(mmenu, self.tr("Desire lines"), partial(run_desire_lines, self))
         self.add_menu_action(mmenu, self.tr("Stacked bandwidth"), partial(run_stacked_bandwidths, self))
         self.add_menu_action(mmenu, self.tr("Scenario comparison"), partial(run_scenario_comparison, self))
+        self.add_menu_action(mmenu, self.tr("Simple tag"), partial(run_tag, self))
 
         # # # ########################################################################
         # # # ###################  OPTIONS SUB-MENU  #################################

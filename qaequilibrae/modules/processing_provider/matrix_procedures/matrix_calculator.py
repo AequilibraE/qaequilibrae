@@ -4,14 +4,19 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from qgis.core import Qgis, QgsProcessingAlgorithm, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
+from qgis.core import Qgis, QgsProcessingMultiStepFeedback, QgsProcessingParameterFile
 from qgis.core import QgsProcessingParameterFileDestination, QgsProcessingParameterString, QgsProcessingException
 
-from qaequilibrae.i18n.translate import trlt
+from qaequilibrae.modules.processing_provider.project_algorithm import ProcessingAlgorithm
 from .matrix_expression import MatrixExpressionError, evaluate
 
 
-class MatrixCalculator(QgsProcessingAlgorithm):
+class MatrixCalculator(ProcessingAlgorithm):
+    algorithm_name = "matrixcalc"
+    display_name = "Matrix calculator"
+    group_name = "Data"
+    group_id = "data"
+
     def initAlgorithm(self, configuration=None):
         self.addParameter(
             QgsProcessingParameterFile(
@@ -31,7 +36,6 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        # Checks if we have access to aequilibrae library
         if iutil.find_spec("aequilibrae") is None:
             sys.exit(self.tr("AequilibraE module not found"))
 
@@ -43,81 +47,57 @@ class MatrixCalculator(QgsProcessingAlgorithm):
         feedback = QgsProcessingMultiStepFeedback(4, feedback)
         feedback.pushInfo(self.tr("Getting matrices from configuration file"))
 
-        with open(parameters["conf_file"], "r") as f:
-            params = yaml.safe_load(f)
+        with open(parameters["conf_file"], "r") as config_file:
+            configuration = yaml.safe_load(config_file)
 
-        # Load matrices
         matrices = {}
         index = None
-        for matrix in params:
+        for matrix in configuration:
             for name, values in matrix.items():
                 matrix_path = Path(values["matrix_path"])
                 if matrix_path.suffix.upper() != ".OMX":
                     raise QgsProcessingException(
                         self.tr("Only OpenMatrix (*.omx) files are supported: {}").format(matrix_path)
                     )
-                mat = AequilibraeMatrix()
-                mat.load(matrix_path)
-                matrices[name] = mat.get_matrix(values["matrix_core"])
-                if mat.index is None:
+                input_matrix = AequilibraeMatrix()
+                input_matrix.load(matrix_path)
+                matrices[name] = input_matrix.get_matrix(values["matrix_core"])
+                if input_matrix.index is None:
                     raise QgsProcessingException(self.tr("Could not load matrix indices"))
-                index = mat.index.copy()
-                mat.close()
+                index = input_matrix.index.copy()
+                input_matrix.close()
 
         if index is None:
             raise QgsProcessingException(self.tr("The configuration contains no matrices"))
 
         try:
-            out = evaluate(parameters["procedure"], matrices)
+            result = evaluate(parameters["procedure"], matrices)
         except MatrixExpressionError as error:
             raise QgsProcessingException(self.tr("Invalid expression: {}").format(error)) from error
 
         # Expressions such as min(matrix) collapse to a single number, which cannot be written out
         expected = (len(index), len(index))
-        if np.shape(out) != expected:
-            got = self.tr("a single number") if np.shape(out) == () else f"{np.shape(out)}"
+        result_shape = np.shape(result)
+        if result_shape != expected:
+            got = self.tr("a single number") if result_shape == () else f"{result_shape}"
             raise QgsProcessingException(
                 self.tr("The expression returned {}, but the result must be a {}x{} matrix").format(got, *expected)
             )
 
-        mat = AequilibraeMatrix()
-        mat.create_empty(zones=len(index), matrix_names=[parameters["matrix_core"]])
-        if mat.matrix is None or mat.index is None:
+        output_matrix = AequilibraeMatrix()
+        output_matrix.create_empty(zones=len(index), matrix_names=[parameters["matrix_core"]])
+        if output_matrix.matrix is None or output_matrix.index is None:
             raise QgsProcessingException(self.tr("Could not create the output matrix"))
-        mat.matrix[parameters["matrix_core"]][:, :] = out[:, :]
-        mat.index[:] = index[:]
-        mat.export(Path(parameters["file_path"]))
-        mat.close()
+        output_matrix.matrix[parameters["matrix_core"]][:, :] = result[:, :]
+        output_matrix.index[:] = index[:]
+        output_matrix.export(Path(parameters["file_path"]))
+        output_matrix.close()
 
         return {"Output": "Finished"}
 
-    def name(self):
-        return "matrixcalc"
-
-    def displayName(self):
-        return self.tr("Matrix calculator")
-
-    def group(self):
-        return self.tr("Data")
-
-    def groupId(self):
-        return "data"
-
     def shortHelpString(self):
-        help_messages = [
-            self.tr("Runs a matrix calculation based on a matrix configuration file (*.yaml) and an expression."),
-            self.tr("Results are stored in an OpenMatrix (*.omx) file."),
-            self.tr("Please notice that:"),
-            self.tr(
-                "- each key in the configuration file corresponds to the name of the matrix in the input expression;"
-            ),
-            self.tr("- expression must be written according to NumPy syntax."),
-            self.tr("Examples of valid expressions and configuration are provided in the plugin documentation."),
-        ]
-        return "".join(help_messages)
-
-    def createInstance(self):
-        return MatrixCalculator()
-
-    def tr(self, message):
-        return trlt("MatrixCalculator", message)
+        return self.tr(
+            "Calculates an expression using matrices listed in a YAML configuration file. "
+            "Use each YAML key as a matrix name in the expression. The result is saved as an "
+            "OpenMatrix (*.omx) file. See the plugin documentation for examples."
+        )

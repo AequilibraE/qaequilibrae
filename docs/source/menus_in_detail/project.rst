@@ -8,8 +8,15 @@ are interested in better understanding its structure, please visit its
 `documentation <https://www.aequilibrae.com/latest/python/modeling_with_aequilibrae/project.html>`_
 webpage.
 
-Under the project menu, there are some options to choose from and the following sections
-explore some of these actions.
+The **AequilibraE > Project** menu opens projects, runs procedures, and manages scenarios.
+It also provides **Create example**, **Log file**, and **Parameters**.
+The dock panel provides the same actions as the menubar.
+For project creation and network editing, see :ref:`Model building <model_building>`.
+
+The :ref:`Data menu <data_menu>` provides matrix import, mode creation, and link-type creation.
+The :ref:`Routing menu <routing_menu>` provides the traveling salesman dialog.
+The **Mapping** menu includes the interactive Simple tag dialog.
+These menu dialogs are separate from the parameterized Processing algorithms.
 
 .. image:: ../images/project_procedures/menu_project.png
     :align: center
@@ -98,3 +105,42 @@ layers available at the "Geo layers" tab also change.
 .. image:: ../images/project_procedures/scenarios_list.png
     :align: center
     :alt: list project scenarios
+
+.. _create_example:
+
+Create example
+--------------
+
+Open **Project > Create example** to create a project from one of the supplied example models.
+Select the model and output location, then click *Create*.
+The plugin opens the new project and lists its layers in the Project tab.
+
+.. image:: ../images/processing_provider/project_create_example.png
+    :align: center
+    :alt: Interactive example-project creation
+
+Log file
+--------
+
+Open **Project > Log file** to view the project log.
+It records project operations and their times, including the steps of an OSM import.
+Click *Save to disk* to save a copy of the displayed log.
+
+.. image:: ../images/processing_provider/project-logfile.png
+    :width: 704
+    :align: center
+    :alt: Project log viewer
+
+.. _parameters_file:
+
+Parameters
+----------
+
+Open **Project > Parameters** to view and edit the AequilibraE parameters file.
+Check the values before saving them for subsequent procedures.
+The Python documentation provides the parameter reference:
+`Parameters file <https://aequilibrae.com/latest/python/modeling_with_aequilibrae/parameter_file.html>`_.
+
+.. image:: ../images/processing_provider/parameters_menu.png
+    :align: center
+    :alt: Interactive project parameter editor
