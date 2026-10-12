@@ -29,7 +29,7 @@ can be found in the AequilibraE documentation.
 
 .. important::
 
-    For setting a fixed cost, one **must** have a value fot the *vot* column in the project
+    For setting a fixed cost, one **must** have a value for the *vot* column in the project
     *modes* table.
 
 .. image:: ../images/traffic_assignment/traffic_assignment_traffic_classes.png
