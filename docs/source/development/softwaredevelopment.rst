@@ -79,6 +79,9 @@ release (LTR).
 To use the latest QGIS image, add ``latest`` after the command name. For example,
 run ``just test latest``. ``just`` always defaults to ``LTR``.
 
+If you get a failed to connect to the docker API error, ensure the docker is properly set up. Notably, if on WSL,
+ensure WSL integration in enabled in both general settings and resources settings.
+
 All of the commands will build the local QGIS as required, then setup the test
 environment. This will be slow the first time, then faster on subsequent runs as
 the image is cached. You do not need to manually handle any test environments.
