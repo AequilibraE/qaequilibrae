@@ -50,19 +50,19 @@ This approach is useful when the same preparation steps must work for several in
    * - ``qaequilibrae:create_empty_project``
      - Create an empty project
      - ``Output``: project folder
-   * - ``qaequilibrae:projectfromlayer``
+   * - ``qaequilibrae:project_from_layer``
      - Create a project from a link layer
      - ``OUTPUT``: project folder
-   * - ``qaequilibrae:projectfromosm``
+   * - ``qaequilibrae:project_from_osm``
      - Create a project from OSM
      - ``OUTPUT``: project folder
    * - ``qaequilibrae:add_centroids_from_zones``
      - Create missing zone centroids
      - ``ADDED``: centroid count
-   * - ``qaequilibrae:renumbernodes``
+   * - ``qaequilibrae:renumber_nodes``
      - Add or renumber centroids from a point layer
      - ``ADDED``, ``RENUMBERED``, ``MATCHED``: node counts
-   * - ``qaequilibrae:addcentroidconnector``
+   * - ``qaequilibrae:add_centroid_connector``
      - Generate centroid connectors
      - ``ADDED``: link count
 
