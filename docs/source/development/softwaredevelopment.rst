@@ -35,7 +35,7 @@ Developing QAequilibraE
 -----------------------
 
 We recommend using a dedicated virtual environment to develop QAequilibraE, using the
-version of Python that ships with the QGIS release you target. When this section was
+version of Python that ships with the QGIS release as your target. When this section was
 updated (August/2026), both LTR 3.40 and QGIS 4.0.2 were coming with a default 3.12
 Python environment.
 
@@ -51,7 +51,7 @@ Install Docker and Just. Then clone the repository. ::
     git clone https://github.com/AequilibraE/qaequilibrae.git
     cd qaequilibrae
 
-Run the following commands from the repository root. The default QGIS image is the long-term
+While Docker Desktop is running, run the following commands from the repository root. The default QGIS image is the long-term
 release (LTR).
 
 .. code-block:: console
@@ -63,8 +63,7 @@ release (LTR).
     just test
 
     # Run one test.
-    just test-one test/test_routing.py::test_route
-
+    just test-one test/test_routing.py::test_centroid_error
     # Run the lint and formatting checks.
     just lint
 
@@ -80,6 +79,9 @@ release (LTR).
 To use the latest QGIS image, add ``latest`` after the command name. For example,
 run ``just test latest``. ``just`` always defaults to ``LTR``.
 
+If you get a failed to connect to the docker API error, ensure the docker is properly set up. Notably, if on WSL,
+ensure WSL integration in enabled in both general settings and resources settings.
+
 All of the commands will build the local QGIS as required, then setup the test
 environment. This will be slow the first time, then faster on subsequent runs as
 the image is cached. You do not need to manually handle any test environments.
@@ -90,7 +92,7 @@ Testing in desktop QGIS
 To test the working tree in a local QGIS installation, run ``just link``. The command
 links the plugin source into the default QGIS 3 profile.
 
-To select QGIS 4 or another profile, give the QGIS major version and profile name. ::
+To select QGIS 4 or a non-default profile, give the QGIS major version and the profile name. ::
 
     just link 4
 
@@ -278,7 +280,7 @@ Contributing to AequilibraE for QGIS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GitHub has a nice visual explanation on how collaboration is done `GitHub Flow
-<https://guides.github.com/introduction/flow>`_. (For us,) The most important points there are:
+<https://guides.github.com/introduction/flow>`_. For us, the most important points there are:
 
 * The main branch contains the latest working/release version of QAequilibraE
 * Work is done in an issue/feature branch (or a fork) and then pushed to a new branch

@@ -110,7 +110,7 @@ of external libraries.
     :alt: Plugins upgradeable
 
 If you have any problems with this step, please check the 
-`official QGIS documentation <https://docs.qgis.org/3.40/en/docs/training_manual/qgis_plugins/fetching_plugins.html#follow-along-configuring-additional-plugin-repositories>`_.
+`official QGIS documentation <https://docs.qgis.org/3.44/en/docs/training_manual/qgis_plugins/fetching_plugins.html>`_.
 
 Saving as QGIS Project
 ----------------------

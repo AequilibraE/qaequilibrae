@@ -5,7 +5,7 @@ AequilibraE Project
 
 This page is dedicated to a practical implementation of the AequilibraE project. In case you
 are interested in better understanding its structure, please visit its 
-`documentation <https://www.aequilibrae.com/latest/python/modeling_with_aequilibrae/project.html>`_
+`documentation <aequilibrae_project>`_
 webpage.
 
 The **AequilibraE > Project** menu opens projects, runs procedures, and manages scenarios.
@@ -72,7 +72,7 @@ panel, under the *Model Run* tab. When the run ends, a message is pushed to the 
 value the procedure returned is written to the *Messages* tab.
 
 To better understand the application of the run module, we encourage you to read about it at
-`the AequilibraE documentation <https://www.aequilibrae.com/develop/python/run_module.html>`_.
+`the AequilibraE documentation <https://www.aequilibrae.com/latest/python/run_module.html>`_.
 
 .. image:: ../images/project_procedures/run_module_dialog.png
     :align: center
