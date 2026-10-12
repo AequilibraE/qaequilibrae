@@ -165,7 +165,7 @@ Transit assignment
 ~~~~~~~~~~~~~~~~~~
 
 In this example, we'll perform the assignment for all day-long also for Coquimbo. This is a reproduction
-of an AequilibraE's `example <https://www.aequilibrae.com/develop/python/_auto_examples/public_transport/plot_public_transit_assignment.html#>`_.
+of an AequilibraE's `example <https://www.aequilibrae.com/latest/python/_auto_examples/public_transport/plot_public_transit_assignment.html#>`_.
 
 Let's start the example selecting the default period at the periods table.
 
