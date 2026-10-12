@@ -6,7 +6,8 @@ import qgis
 from aequilibrae.matrix.aequilibrae_matrix import AequilibraeMatrix, CORE_NAME_MAX_LENGTH
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import Qt, QSize
-from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
+from qgis.PyQt.QtGui import QKeySequence
+from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem, QShortcut
 from qgis.core import Qgis
 
 from qaequilibrae.modules.common_tools.all_layers_from_toc import all_layers_from_toc
@@ -62,6 +63,9 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
 
         self.but_permanent_save.clicked.connect(self.get_name_and_save_to_disk)
 
+        self.slots_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.slots_shortcut)
+        self.slots_shortcut.activated.connect(self.slot_double_clicked)
+
         # THIRD, we load layers in the canvas to the combo-boxes
         for layer in all_layers_from_toc():  # We iterate through all layers
             if "wkbType" in dir(layer):
@@ -86,7 +90,9 @@ class LoadMatrixDialog(QDialog, FORM_CLASS):
         self.but_save_for_single_use.setEnabled(False)
         self.but_permanent_save.setEnabled(False)
 
-    def slot_double_clicked(self, mi):
+    def slot_double_clicked(self, mi=None):
+        if mi is None:
+            mi = self.list_matrices.currentIndex()
         row = mi.row()
         if row > -1:
             self.matrix_count -= 1

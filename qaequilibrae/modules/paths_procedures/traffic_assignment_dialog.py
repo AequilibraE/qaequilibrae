@@ -11,8 +11,8 @@ from aequilibrae.paths.traffic_class import TrafficClass
 from aequilibrae.paths.vdf import all_vdf_functions
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QItemSelectionModel, Qt
-from qgis.PyQt.QtGui import QColor, QPalette
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView
+from qgis.PyQt.QtGui import QColor, QPalette, QKeySequence
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView, QShortcut
 
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
@@ -71,6 +71,8 @@ class TrafficAssignmentDialog(BaseDialog):
         self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
         self.chb_fixed_cost.toggled.connect(self.set_fixed_cost_use)
         self.do_select_link.toggled.connect(self.set_select_link_use)
+        self.skim_list = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.skim_list)
+        self.skim_list.activated.connect(self._remove_skimming)
 
         self.but_save_yaml.clicked.connect(self.export_yaml)
         self.but_save_python.clicked.connect(self.export_python)
@@ -562,6 +564,9 @@ class TrafficAssignmentDialog(BaseDialog):
             item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             table.setItem(idx, i, item)
 
+        self.class_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.class_shortcut)
+        self.class_shortcut.activated.connect(self.__remove_class)
+
         but = QPushButton()
         but.setText(self.tr("Remove"))
         but.clicked.connect(self.__remove_class)
@@ -654,13 +659,16 @@ class TrafficAssignmentDialog(BaseDialog):
         self.redraw_skim_table(choices)
         self.refresh_available_skims()
 
-    def _remove_skimming(self, line):
+    def _remove_skimming(self, line=None):
         """Drops the skim on `line`, which is how a skim added by mistake is taken back.
 
         Double-clicking columns 2 and 3 never gets here, since the checkboxes sitting in those
         cells take the mouse events themselves. That is the behavior we want: toggling a skim
         between final and blended should not be one stray double-click away from deleting it.
         """
+        if line is None:
+            line = self.skim_list.currentIndex()
+
         table = self.skim_list_table
         class_name = table.item(line, 0).text()
         field = table.item(line, 1).text()

@@ -4,8 +4,9 @@ from os.path import dirname, join
 import geopandas as gpd
 import qgis
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox
+from qgis.PyQt.QtWidgets import QTableWidgetItem, QWidget, QHBoxLayout, QCheckBox, QShortcut
 from qgis.core import QgsMapLayerProxyModel, QgsFeatureRequest
+from qgis.PyQt.QtGui import QKeySequence
 
 from qaequilibrae.modules.common_tools import BaseDialog
 from qaequilibrae.modules.common_tools.processing_worker import ProcessingWorker
@@ -63,6 +64,9 @@ class RouteChoiceDialog(BaseDialog):
         self.but_save_qry.clicked.connect(self.save_query)
         self.tbl_selected_links.cellDoubleClicked.connect(self.__remove_select_link_item)
         self.but_clear_qry.clicked.connect(self.__clean_link_selection)
+
+        self.cell_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.cell_shortcut)
+        self.cell_shortcut.activated.connect(self.__remove_select_link_item)
 
         self.list_matrices()
         self.set_show_matrices()
