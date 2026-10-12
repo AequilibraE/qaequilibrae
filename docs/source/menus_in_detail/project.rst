@@ -5,7 +5,7 @@ AequilibraE Project
 
 This page is dedicated to a practical implementation of the AequilibraE project. In case you
 are interested in better understanding its structure, please visit its 
-`documentation <https://www.aequilibrae.com/latest/python/modeling_with_aequilibrae/project.html>`_
+`documentation <https://www.aequilibrae.com/latest/python/aequilibrae_project.html>`_
 webpage.
 
 The **AequilibraE > Project** menu opens projects, runs procedures, and manages scenarios.

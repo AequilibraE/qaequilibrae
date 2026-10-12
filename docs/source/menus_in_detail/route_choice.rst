@@ -26,7 +26,7 @@ In the tab "Critical analysis", we can select to run either a set of select link
 analysis. These analyses cannot be run at the same time in QAequilibraE. If you choose to run a sub-area 
 analysis, all OD pairs with demand are considered for computation. To select only a few pairs
 of interest, we encourage you to take a look at 
-`Route choice with sub-area analysis <https://www.aequilibrae.com/develop/python/route_choice/_auto_examples/plot_subarea_analysis.html>`_ 
+`Route choice with sub-area analysis <https://www.aequilibrae.com/latest/python/_auto_examples/route_choice/plot_subarea_analysis.html>`_ 
 at AequilibraE's Python documentation and run this task outside QGIS.
 
 .. image:: ../images/route_choice/route_choice_2.png
@@ -221,5 +221,5 @@ containing the sub-area demand matrix.
 .. tip::
 
     Try to reproduce AequilibraE's Route Choice 
-    `examples <https://www.aequilibrae.com/latest/python/route_choice/_auto_examples/index.html>`_ 
+    `examples <https://www.aequilibrae.com/latest/python/_auto_examples/route_choice/index.html>`_ 
     in QGIS!
