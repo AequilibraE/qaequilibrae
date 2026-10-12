@@ -26,7 +26,7 @@ that underpin these workflows are made available.
     .. image:: images/processing_provider/processing_provider_toolbox-2.png
         :alt: Toolbox Detailed
 
-Common uses for using the processing algorithms directly include batch
+Common uses for using the Processing Algorithms directly include batch
 processing, automating repetitive tasks, and building out "Models" in the QGIS
 Model Designer.
 
@@ -149,14 +149,14 @@ The Data group provides tools for matrix files and project mode or link-type rec
 Use *Add mode* and *Add link type* with a project folder to create records without opening the plugin dialogs.
 For the interactive forms and matrix import, see the :ref:`Data menu <data_menu>`.
 
-Matrices use OpenMatrix (``.omx``).
+Matrices use the OpenMatrix (``.omx``) format.
 AequilibraE Matrix (AEM) files are no longer supported.
 An OMX file can contain several matrices, called *cores*, with a common zone index.
 The core identifies the values to use; the index identifies which zone each row and column represents.
 
 Export matrices
 ~~~~~~~~~~~~~~~
-The Processing **Export matrices** algorithm is similar to the *Export* button in the
+The Processing **Export Matrices** Algorithm is similar to the *Export* button in the
 matrix viewer (see :ref:`this figure <fig_data_visualize_matrices>`). Enter an OMX input
 file, an output folder, and the output format. The output format can be OMX or CSV.
 
@@ -299,7 +299,7 @@ Suppose your nodes have no zone names, but your zone polygons contain a ``name``
 Select the zone layer and its source field, the nodes as the target, and the target field name.
 The algorithm creates the target field if it does not exist.
 
-The Processing algorithm writes a new output layer. It copies the target layer's
+The Processing Algorithm writes a new output layer. It copies the target layer's
 fields and geometry, then writes the matched value to the named target field. It
 creates that field when it does not exist. Features without a match receive a
 null value. For *Closest*, the algorithm checks the five nearest indexed source
