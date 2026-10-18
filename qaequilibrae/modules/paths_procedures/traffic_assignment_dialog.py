@@ -71,8 +71,11 @@ class TrafficAssignmentDialog(BaseDialog):
         self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
         self.chb_fixed_cost.toggled.connect(self.set_fixed_cost_use)
         self.do_select_link.toggled.connect(self.set_select_link_use)
-        self.skim_list = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.skim_list)
-        self.skim_list.activated.connect(self._remove_skimming)
+        self.skim_list_shortcut = QShortcut(
+            QKeySequence(QKeySequence.StandardKey.Delete), self.skim_list_table
+        )
+        self.skim_list_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        self.skim_list_shortcut.activated.connect(self._remove_skimming)
 
         self.but_save_yaml.clicked.connect(self.export_yaml)
         self.but_save_python.clicked.connect(self.export_python)
@@ -564,8 +567,8 @@ class TrafficAssignmentDialog(BaseDialog):
             item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
             table.setItem(idx, i, item)
 
-        self.class_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.class_shortcut)
-        self.class_shortcut.activated.connect(self.__remove_class)
+        # self.class_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.class_shortcut)
+        # self.class_shortcut.activated.connect(self.__remove_class)
 
         but = QPushButton()
         but.setText(self.tr("Remove"))
@@ -660,24 +663,32 @@ class TrafficAssignmentDialog(BaseDialog):
         self.refresh_available_skims()
 
     def _remove_skimming(self, line=None):
-        """Drops the skim on `line`, which is how a skim added by mistake is taken back.
+        """Drops a skim on `line` or the currently selected row(s).
 
         Double-clicking columns 2 and 3 never gets here, since the checkboxes sitting in those
         cells take the mouse events themselves. That is the behavior we want: toggling a skim
         between final and blended should not be one stray double-click away from deleting it.
         """
-        if line is None:
-            line = self.skim_list.currentIndex()
-
         table = self.skim_list_table
-        class_name = table.item(line, 0).text()
-        field = table.item(line, 1).text()
+        if line is None:
+            rows = [index.row() for index in table.selectionModel().selectedRows()]
+            if not rows and table.currentRow() >= 0:
+                rows = [table.currentRow()]
+        else:
+            rows = [line]
+
+        rows = sorted({row for row in rows if 0 <= row < table.rowCount()}, reverse=True)
+        if not rows:
+            return
 
         choices = self.skim_choices()
+        for row in rows:
+            class_name = table.item(row, 0).text()
+            field = table.item(row, 1).text()
 
-        # Keyed by the class name, which is what `TrafficClass._id` holds
-        if field in self.skims.get(class_name, []):
-            self.skims[class_name].remove(field)
+            # Keyed by the class name, which is what `TrafficClass._id` holds
+            if field in self.skims.get(class_name, []):
+                self.skims[class_name].remove(field)
 
         self.redraw_skim_table(choices)
 
