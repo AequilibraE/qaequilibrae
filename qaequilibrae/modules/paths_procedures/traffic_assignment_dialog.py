@@ -12,7 +12,15 @@ from aequilibrae.paths.vdf import all_vdf_functions
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QItemSelectionModel, Qt
 from qgis.PyQt.QtGui import QColor, QPalette, QKeySequence
-from qgis.PyQt.QtWidgets import QTableWidgetItem, QLineEdit, QComboBox, QCheckBox, QPushButton, QAbstractItemView, QShortcut
+from qgis.PyQt.QtWidgets import (
+    QTableWidgetItem,
+    QLineEdit,
+    QComboBox,
+    QCheckBox,
+    QPushButton,
+    QAbstractItemView,
+    QShortcut
+)
 
 from .create_py_strings import create_strings
 from qaequilibrae.modules.common_tools import PandasModel, ReportDialog, standard_path, GetOutputFileName, BaseDialog
@@ -71,9 +79,7 @@ class TrafficAssignmentDialog(BaseDialog):
         self.cob_mode_for_class.currentIndexChanged.connect(self.change_class_name)
         self.chb_fixed_cost.toggled.connect(self.set_fixed_cost_use)
         self.do_select_link.toggled.connect(self.set_select_link_use)
-        self.skim_list_shortcut = QShortcut(
-            QKeySequence(QKeySequence.StandardKey.Delete), self.skim_list_table
-        )
+        self.skim_list_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.skim_list_table)
         self.skim_list_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self.skim_list_shortcut.activated.connect(self._remove_skimming)
 
