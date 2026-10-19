@@ -669,22 +669,21 @@ class TrafficAssignmentDialog(BaseDialog):
         cells take the mouse events themselves. That is the behavior we want: toggling a skim
         between final and blended should not be one stray double-click away from deleting it.
         """
-        table = self.skim_list_table
         if line is None:
-            rows = [index.row() for index in table.selectionModel().selectedRows()]
-            if not rows and table.currentRow() >= 0:
-                rows = [table.currentRow()]
+            rows = [index.row() for index in self.skim_list_table.selectionModel().selectedRows()]
+            if not rows and self.skim_list_table.currentRow() >= 0:
+                rows = [self.skim_list_table.currentRow()]
         else:
             rows = [line]
 
-        rows = sorted({row for row in rows if 0 <= row < table.rowCount()}, reverse=True)
+        rows = sorted({row for row in rows if 0 <= row < self.skim_list_table.rowCount()}, reverse=True)
         if not rows:
             return
 
         choices = self.skim_choices()
         for row in rows:
-            class_name = table.item(row, 0).text()
-            field = table.item(row, 1).text()
+            class_name = self.skim_list_table.item(row, 0).text()
+            field = self.skim_list_table.item(row, 1).text()
 
             # Keyed by the class name, which is what `TrafficClass._id` holds
             if field in self.skims.get(class_name, []):
